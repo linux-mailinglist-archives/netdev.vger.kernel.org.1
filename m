@@ -1,203 +1,485 @@
-Return-Path: <netdev+bounces-35758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EF767AAF9C
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:37:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2217AAFB4
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 12:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 35C62282477
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:37:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id A63221F228C7
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 10:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A607168C2;
-	Fri, 22 Sep 2023 10:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5037617752;
+	Fri, 22 Sep 2023 10:40:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298D69CA64;
-	Fri, 22 Sep 2023 10:37:27 +0000 (UTC)
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9F999;
-	Fri, 22 Sep 2023 03:37:24 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 85F6740004;
-	Fri, 22 Sep 2023 10:37:08 +0000 (UTC)
-Message-ID: <6d686c54-078d-8d71-d4e2-c754cf92c557@ghiti.fr>
-Date: Fri, 22 Sep 2023 12:37:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B0D171D8
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:40:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E403DC433C7;
+	Fri, 22 Sep 2023 10:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695379230;
+	bh=XeZt3oEFCH9Tx43GWS87u/pzQd5jbZDTqmRBramW/zQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VGleOAJxgMWBIcykf2pkqWjWCk9iYBwewPWEl3lHKw46X4qJ3oEhf/allzcxaePjN
+	 dLRUiZzqI8YuoBi5MTutFCl6vKGKU8erXQDXnjhQ6p22BUR20T2+MB4INg6fUS3FGT
+	 DWEoxyOt1wItugkwJdtLRAl67kj3Y+3imKBziO5D3fMz4In+YSU64kMld30CUllEqm
+	 heM9c7hjgGl/9aBD6XFnZ8GtBLq31KX/X1gHc7upZNzMOoBRqgcTxZTjdibQOlUA6M
+	 c99bCks/GTlQ1No1ClI4yUa4wPxuFA02bPmJ+v7mMkKZINZPJd2N+tTaupqrdTAfdL
+	 B1taGjCeBGN6g==
+Message-ID: <1cacae47-013c-456a-9b9e-22dc1907ea91@kernel.org>
+Date: Fri, 22 Sep 2023 13:40:21 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 08/13] riscv: extend execmem_params for generated code
- allocations
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: add TAPRIO offload
+ support
+To: MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Richard Cochran <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, vladimir.oltean@nxp.com,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
+ r-gunasekaran@ti.com, Roger Quadros <rogerq@ti.com>
+References: <20230921070031.795788-1-danishanwar@ti.com>
+ <b3248b40-38a1-47b0-a61d-e81a451fa0a7@kernel.org>
+ <ab89486b-1a3d-918b-b083-071372559fbf@ti.com>
 Content-Language: en-US
-To: Mike Rapoport <rppt@kernel.org>, linux-kernel@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
- =?UTF-8?Q?l?= <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- "David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>,
- Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
- Huacai Chen <chenhuacai@kernel.org>,
- Kent Overstreet <kent.overstreet@linux.dev>,
- Luis Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mips@vger.kernel.org, linux-mm@kvack.org,
- linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, netdev@vger.kernel.org,
- sparclinux@vger.kernel.org, x86@kernel.org
-References: <20230918072955.2507221-1-rppt@kernel.org>
- <20230918072955.2507221-9-rppt@kernel.org>
-From: Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <20230918072955.2507221-9-rppt@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: alex@ghiti.fr
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-
-Hi Mike,
-
-On 18/09/2023 09:29, Mike Rapoport wrote:
-> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
->
-> The memory allocations for kprobes and BPF on RISC-V are not placed in
-> the modules area and these custom allocations are implemented with
-> overrides of alloc_insn_page() and  bpf_jit_alloc_exec().
->
-> Slightly reorder execmem_params initialization to support both 32 and 64
-> bit variants, define EXECMEM_KPROBES and EXECMEM_BPF ranges in
-> riscv::execmem_params and drop overrides of alloc_insn_page() and
-> bpf_jit_alloc_exec().
->
-> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> ---
->   arch/riscv/kernel/module.c         | 21 ++++++++++++++++++++-
->   arch/riscv/kernel/probes/kprobes.c | 10 ----------
->   arch/riscv/net/bpf_jit_core.c      | 13 -------------
->   3 files changed, 20 insertions(+), 24 deletions(-)
->
-> diff --git a/arch/riscv/kernel/module.c b/arch/riscv/kernel/module.c
-> index 343a0edfb6dd..31505ecb5c72 100644
-> --- a/arch/riscv/kernel/module.c
-> +++ b/arch/riscv/kernel/module.c
-> @@ -436,20 +436,39 @@ int apply_relocate_add(Elf_Shdr *sechdrs, const char *strtab,
->   	return 0;
->   }
->   
-> -#if defined(CONFIG_MMU) && defined(CONFIG_64BIT)
-> +#ifdef CONFIG_MMU
->   static struct execmem_params execmem_params __ro_after_init = {
->   	.ranges = {
->   		[EXECMEM_DEFAULT] = {
->   			.pgprot = PAGE_KERNEL,
->   			.alignment = 1,
->   		},
-> +		[EXECMEM_KPROBES] = {
-> +			.pgprot = PAGE_KERNEL_READ_EXEC,
-> +			.alignment = 1,
-> +		},
-> +		[EXECMEM_BPF] = {
-> +			.pgprot = PAGE_KERNEL,
-> +			.alignment = 1,
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <ab89486b-1a3d-918b-b083-071372559fbf@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
-Not entirely sure it is the same alignment (sorry did not go through the 
-entire series), but if it is, the alignment above ^ is not the same that 
-is requested by our current bpf_jit_alloc_exec() implementation which is 
-PAGE_SIZE.
 
+On 22/09/2023 07:58, MD Danish Anwar wrote:
+> On 21/09/23 16:12, Roger Quadros wrote:
+>> Hi Danish,
+>>
+>> On 21/09/2023 10:00, MD Danish Anwar wrote:
+>>
+>> Can you please retain patch authorhsip?
+>>
+> 
+> Sure Roger. This patch was not applying clearly on latest linux-next so
+> I had to manually apply it. I must have lost authorship while doing
+> this. I will reset the authorship.
+> 
+>>> ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
+>>> in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
+>>> configuration. EST allows express queue traffic to be scheduled
+>>> (placed) on the wire at specific repeatable time intervals. In
+>>> Linux kernel, EST configuration is done through tc command and
+>>> the taprio scheduler in the net core implements a software only
+>>> scheduler (SCH_TAPRIO). If the NIC is capable of EST configuration,
+>>> user indicate "flag 2" in the command which is then parsed by
+>>> taprio scheduler in net core and indicate that the command is to
+>>> be offloaded to h/w. taprio then offloads the command to the
+>>> driver by calling ndo_setup_tc() ndo ops. This patch implements
+>>> ndo_setup_tc() to offload EST configuration to ICSSG.
+>>>
+>>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>>> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
+>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>> ---
+>>> Cc: Roger Quadros <rogerq@ti.com>
+>>> Cc: Andrew Lunn <andrew@lunn.ch>
+>>>
+>>> Changes from v1 to v2:
+>>> *) Rebased on the latest next-20230821 linux-next.
+>>> *) Dropped the RFC tag as merge window is open now.
+>>> *) Splitted this patch from the switch mode series [v1].
+>>> *) Removed TODO comment as asked by Andrew and Roger.
+>>> *) Changed Copyright to 2023 as asked by Roger.
+>>>
+>>> v1: https://lore.kernel.org/all/20230830110847.1219515-1-danishanwar@ti.com/
+>>>
+>>>  drivers/net/ethernet/ti/Makefile             |   3 +-
+>>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c |   5 +-
+>>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |   7 +
+>>>  drivers/net/ethernet/ti/icssg/icssg_qos.c    | 286 +++++++++++++++++++
+>>>  drivers/net/ethernet/ti/icssg/icssg_qos.h    | 119 ++++++++
+>>>  5 files changed, 418 insertions(+), 2 deletions(-)
+>>>  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.c
+>>>  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_qos.h
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+>>> index 34fd7a716ba6..0df60ded1b2d 100644
+>>> --- a/drivers/net/ethernet/ti/Makefile
+>>> +++ b/drivers/net/ethernet/ti/Makefile
+>>> @@ -37,5 +37,6 @@ icssg-prueth-y := k3-cppi-desc-pool.o \
+>>>  		  icssg/icssg_config.o \
+>>>  		  icssg/icssg_mii_cfg.o \
+>>>  		  icssg/icssg_stats.o \
+>>> -		  icssg/icssg_ethtool.o
+>>> +		  icssg/icssg_ethtool.o \
+>>> +		  icssg/icssg_qos.o
+>>>  obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+>>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>>> index 6635b28bc672..89c301716926 100644
+>>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>>> @@ -1166,7 +1166,7 @@ static int emac_phy_connect(struct prueth_emac *emac)
+>>>  	return 0;
+>>>  }
+>>>  
+>>> -static u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
+>>> +u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts)
+>>>  {
+>>>  	u32 hi_rollover_count, hi_rollover_count_r;
+>>>  	struct prueth_emac *emac = clockops_data;
+>>> @@ -1403,6 +1403,8 @@ static int emac_ndo_open(struct net_device *ndev)
+>>>  		napi_enable(&emac->tx_chns[i].napi_tx);
+>>>  	napi_enable(&emac->napi_rx);
+>>>  
+>>> +	icssg_qos_tas_init(ndev);
+>>> +
+>>>  	/* start PHY */
+>>>  	phy_start(ndev->phydev);
+>>>  
+>>> @@ -1669,6 +1671,7 @@ static const struct net_device_ops emac_netdev_ops = {
+>>>  	.ndo_set_rx_mode = emac_ndo_set_rx_mode,
+>>>  	.ndo_eth_ioctl = emac_ndo_ioctl,
+>>>  	.ndo_get_stats64 = emac_ndo_get_stats64,
+>>> +	.ndo_setup_tc = icssg_qos_ndo_setup_tc,
+>>>  };
+>>>  
+>>>  /* get emac_port corresponding to eth_node name */
+>>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>>> index 8b6d6b497010..5712a65bced4 100644
+>>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>>> @@ -37,6 +37,7 @@
+>>>  #include "icssg_config.h"
+>>>  #include "icss_iep.h"
+>>>  #include "icssg_switch_map.h"
+>>> +#include "icssg_qos.h"
+>>>  
+>>>  #define PRUETH_MAX_MTU          (2000 - ETH_HLEN - ETH_FCS_LEN)
+>>>  #define PRUETH_MIN_PKT_SIZE     (VLAN_ETH_ZLEN)
+>>> @@ -174,6 +175,9 @@ struct prueth_emac {
+>>>  
+>>>  	struct pruss_mem_region dram;
+>>>  
+>>> +	struct prueth_qos qos;
+>>> +	struct work_struct ts_work;
+>>> +
+>>>  	struct delayed_work stats_work;
+>>>  	u64 stats[ICSSG_NUM_STATS];
+>>>  };
+>>> @@ -285,4 +289,7 @@ u32 icssg_queue_level(struct prueth *prueth, int queue);
+>>>  void emac_stats_work_handler(struct work_struct *work);
+>>>  void emac_update_hardware_stats(struct prueth_emac *emac);
+>>>  int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name);
+>>> +
+>>> +u64 prueth_iep_gettime(void *clockops_data, struct ptp_system_timestamp *sts);
+>>> +
+>>>  #endif /* __NET_TI_ICSSG_PRUETH_H */
+>>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_qos.c b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+>>> new file mode 100644
+>>> index 000000000000..63a19142ee69
+>>> --- /dev/null
+>>> +++ b/drivers/net/ethernet/ti/icssg/icssg_qos.c
+>>> @@ -0,0 +1,286 @@
+>>> +// SPDX-License-Identifier: GPL-2.0
+>>> +/* Texas Instruments ICSSG PRUETH QoS submodule
+>>> + * Copyright (C) 2023 Texas Instruments Incorporated - http://www.ti.com/
+>>> + */
+>>> +
+>>> +#include <linux/printk.h>
+>>> +#include "icssg_prueth.h"
+>>> +#include "icssg_switch_map.h"
+>>> +
+>>> +static void tas_update_fw_list_pointers(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +
+>>> +	if ((readb(tas->active_list)) == TAS_LIST0) {
+>>> +		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST0;
+>>> +		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST1;
+>>> +	} else {
+>>> +		tas->fw_active_list = emac->dram.va + TAS_GATE_MASK_LIST1;
+>>> +		tas->fw_shadow_list = emac->dram.va + TAS_GATE_MASK_LIST0;
+>>> +	}
+>>> +}
+>>> +
+>>> +static void tas_update_maxsdu_table(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +	u16 __iomem *max_sdu_tbl_ptr;
+>>> +	u8 gate_idx;
+>>> +
+>>> +	/* update the maxsdu table */
+>>> +	max_sdu_tbl_ptr = emac->dram.va + TAS_QUEUE_MAX_SDU_LIST;
+>>> +
+>>> +	for (gate_idx = 0; gate_idx < TAS_MAX_NUM_QUEUES; gate_idx++)
+>>> +		writew(tas->max_sdu_table.max_sdu[gate_idx], &max_sdu_tbl_ptr[gate_idx]);
+>>> +}
+>>> +
+>>> +static void tas_reset(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +	int i;
+>>> +
+>>> +	for (i = 0; i < TAS_MAX_NUM_QUEUES; i++)
+>>> +		tas->max_sdu_table.max_sdu[i] = 2048;
+>>> +
+>>> +	tas_update_maxsdu_table(emac);
+>>> +
+>>> +	writeb(TAS_LIST0, tas->active_list);
+>>> +
+>>> +	memset_io(tas->fw_active_list, 0, sizeof(*tas->fw_active_list));
+>>> +	memset_io(tas->fw_shadow_list, 0, sizeof(*tas->fw_shadow_list));
+>>> +}
+>>> +
+>>> +static int tas_set_state(struct prueth_emac *emac, enum tas_state state)
+>>> +{
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +	int ret;
+>>> +
+>>> +	if (tas->state == state)
+>>> +		return 0;
+>>> +
+>>> +	switch (state) {
+>>> +	case TAS_STATE_RESET:
+>>> +		tas_reset(emac);
+>>> +		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_RESET);
+>>> +		tas->state = TAS_STATE_RESET;
+>>> +		break;
+>>> +	case TAS_STATE_ENABLE:
+>>> +		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_ENABLE);
+>>> +		tas->state = TAS_STATE_ENABLE;
+>>> +		break;
+>>> +	case TAS_STATE_DISABLE:
+>>> +		ret = emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_DISABLE);
+>>> +		tas->state = TAS_STATE_DISABLE;
+>>> +		break;
+>>> +	default:
+>>> +		netdev_err(emac->ndev, "%s: unsupported state\n", __func__);
+>>> +		ret = -EINVAL;
+>>> +		break;
+>>> +	}
+>>> +
+>>> +	if (ret)
+>>> +		netdev_err(emac->ndev, "TAS set state failed %d\n", ret);
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static int tas_set_trigger_list_change(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +	struct ptp_system_timestamp sts;
+>>> +	u32 change_cycle_count;
+>>> +	u32 cycle_time;
+>>> +	u64 base_time;
+>>> +	u64 cur_time;
+>>> +
+>>> +	cycle_time = admin_list->cycle_time - 4; /* -4ns to compensate for IEP wraparound time */
+>>> +	base_time = admin_list->base_time;
+>>> +	cur_time = prueth_iep_gettime(emac, &sts);
+>>> +
+>>> +	if (base_time > cur_time)
+>>> +		change_cycle_count = DIV_ROUND_UP_ULL(base_time - cur_time, cycle_time);
+>>> +	else
+>>> +		change_cycle_count = 1;
+>>> +
+>>> +	writel(cycle_time, emac->dram.va + TAS_ADMIN_CYCLE_TIME);
+>>> +	writel(change_cycle_count, emac->dram.va + TAS_CONFIG_CHANGE_CYCLE_COUNT);
+>>> +	writeb(admin_list->num_entries, emac->dram.va + TAS_ADMIN_LIST_LENGTH);
+>>> +
+>>> +	/* config_change cleared by f/w to ack reception of new shadow list */
+>>> +	writeb(1, &tas->config_list->config_change);
+>>> +	/* config_pending cleared by f/w when new shadow list is copied to active list */
+>>> +	writeb(1, &tas->config_list->config_pending);
+>>> +
+>>> +	return emac_set_port_state(emac, ICSSG_EMAC_PORT_TAS_TRIGGER);
+>>> +}
+>>> +
+>>> +static int tas_update_oper_list(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tc_taprio_qopt_offload *admin_list = emac->qos.tas.taprio_admin;
+>>> +	struct tas_config *tas = &emac->qos.tas.config;
+>>> +	u32 tas_acc_gate_close_time = 0;
+>>> +	u8 idx, gate_idx, val;
+>>> +	int ret;
+>>> +
+>>> +	tas_update_fw_list_pointers(emac);
+>>> +
+>>> +	for (idx = 0; idx < admin_list->num_entries; idx++) {
+>>> +		writeb(admin_list->entries[idx].gate_mask,
+>>> +		       &tas->fw_shadow_list->gate_mask_list[idx]);
+>>> +		tas_acc_gate_close_time += admin_list->entries[idx].interval;
+>>> +
+>>> +		/* extend last entry till end of cycle time */
+>>> +		if (idx == admin_list->num_entries - 1)
+>>> +			writel(admin_list->cycle_time,
+>>> +			       &tas->fw_shadow_list->win_end_time_list[idx]);
+>>> +		else
+>>> +			writel(tas_acc_gate_close_time,
+>>> +			       &tas->fw_shadow_list->win_end_time_list[idx]);
+>>> +	}
+>>> +
+>>> +	/* clear remaining entries */
+>>> +	for (idx = admin_list->num_entries; idx < TAS_MAX_CMD_LISTS; idx++) {
+>>> +		writeb(0, &tas->fw_shadow_list->gate_mask_list[idx]);
+>>> +		writel(0, &tas->fw_shadow_list->win_end_time_list[idx]);
+>>> +	}
+>>> +
+>>> +	/* update the Array of gate close time for each queue in each window */
+>>> +	for (idx = 0 ; idx < admin_list->num_entries; idx++) {
+>>> +		/* On Linux, only PRUETH_MAX_TX_QUEUES are supported per port */
+>>> +		for (gate_idx = 0; gate_idx < PRUETH_MAX_TX_QUEUES; gate_idx++) {
+>>> +			u8 gate_mask_list_idx = readb(&tas->fw_shadow_list->gate_mask_list[idx]);
+>>> +			u32 gate_close_time = 0;
+>>> +
+>>> +			if (gate_mask_list_idx & BIT(gate_idx))
+>>> +				gate_close_time = readl(&tas->fw_shadow_list->win_end_time_list[idx]);
+>>> +
+>>> +			writel(gate_close_time,
+>>> +			       &tas->fw_shadow_list->gate_close_time_list[idx][gate_idx]);
+>>> +		}
+>>> +	}
+>>> +
+>>> +	/* tell f/w to swap active & shadow list */
+>>> +	ret = tas_set_trigger_list_change(emac);
+>>> +	if (ret) {
+>>> +		netdev_err(emac->ndev, "failed to swap f/w config list: %d\n", ret);
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	/* Wait for completion */
+>>> +	ret = readb_poll_timeout(&tas->config_list->config_change, val, !val,
+>>> +				 USEC_PER_MSEC, 10 * USEC_PER_MSEC);
+>>> +	if (ret) {
+>>> +		netdev_err(emac->ndev, "TAS list change completion time out\n");
+>>> +		return ret;
+>>> +	}
+>>> +
+>>> +	tas_update_fw_list_pointers(emac);
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int emac_set_taprio(struct prueth_emac *emac)
+>>> +{
+>>> +	struct tc_taprio_qopt_offload *taprio = emac->qos.tas.taprio_admin;
+>>> +	int ret;
+>>> +
+>>> +	if (taprio->cmd == TAPRIO_CMD_DESTROY)
+>>> +		return tas_set_state(emac, TAS_STATE_DISABLE);
+>>> +
+>>> +	if (taprio->cmd != TAPRIO_CMD_REPLACE)
+>>> +		return -EOPNOTSUPP;
+>>> +
+>>> +	ret = tas_update_oper_list(emac);
+>>> +	if (ret)
+>>> +		return ret;
+>>> +
+>>> +	return tas_set_state(emac, TAS_STATE_ENABLE);
+>>> +}
+>>> +
+>>> +static void emac_cp_taprio(struct tc_taprio_qopt_offload *from,
+>>> +			   struct tc_taprio_qopt_offload *to)
+>>> +{
+>>> +	int i;
+>>> +
+>>> +	*to = *from;
+>>> +	for (i = 0; i < from->num_entries; i++)
+>>> +		to->entries[i] = from->entries[i];
+>>> +}
+>>> +
+>>> +static int emac_setup_taprio(struct net_device *ndev, struct tc_taprio_qopt_offload *taprio)
+>>
+>> Please change this to
+>> 	static int emac_setup_taprio(struct net_device *ndev, void *type_data)
+>>
+>> and later add
+>> 	struct tc_taprio_qopt_offload *taprio = type_data;
+> 
+> Sure.
+> 
+>>> +{
+>>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>>> +	struct tc_taprio_qopt_offload *est_new;
+>>> +	int ret, idx;
+>>> +
+>>> +	if (!netif_running(ndev)) {
+>>> +		netdev_err(ndev, "interface is down, link speed unknown\n");
+>>> +		return -ENETDOWN;
+>>> +	}
+>>
+>> Do we really need this?
+>>
+>> How about handling the taprio->cmd with a switch statement
+>> and adding helper functions for each case?
+>>
+> 
+> emac_set_taprio() is already doing something like this.
+> It only implements TAPRIO_CMD_REPLACE and TAPRIO_CMD_DESTROY. Others are
+> not supported.
+> 
+> static int emac_set_taprio(struct prueth_emac *emac)
+> {
+> 	struct tc_taprio_qopt_offload *taprio = emac->qos.tas.taprio_admin;
+> 	int ret;
+> 
+> 	if (taprio->cmd == TAPRIO_CMD_DESTROY)
+> 		return tas_set_state(emac, TAS_STATE_DISABLE);
+> 
+> 	if (taprio->cmd != TAPRIO_CMD_REPLACE)
+> 		return -EOPNOTSUPP;
+> 
+> 	ret = tas_update_oper_list(emac);
+> 	if (ret)
+> 		return ret;
+> 
+> 	return tas_set_state(emac, TAS_STATE_ENABLE);
+> }
+> 
+> emac_setup_taprio() is first doing all the neccessary check and then
+> calling emac_set_taprio(), which actually perform actions based on the
+> taprio->cmd. I think I'll keep this as it is.
 
-> +		},
->   	},
->   };
->   
->   struct execmem_params __init *execmem_arch_params(void)
->   {
-> +#ifdef CONFIG_64BIT
->   	execmem_params.ranges[EXECMEM_DEFAULT].start = MODULES_VADDR;
->   	execmem_params.ranges[EXECMEM_DEFAULT].end = MODULES_END;
-> +#else
-> +	execmem_params.ranges[EXECMEM_DEFAULT].start = VMALLOC_START;
-> +	execmem_params.ranges[EXECMEM_DEFAULT].end = VMALLOC_END;
-> +#endif
-> +
-> +	execmem_params.ranges[EXECMEM_KPROBES].start = VMALLOC_START;
-> +	execmem_params.ranges[EXECMEM_KPROBES].end = VMALLOC_END;
-> +
-> +	execmem_params.ranges[EXECMEM_BPF].start = BPF_JIT_REGION_START;
-> +	execmem_params.ranges[EXECMEM_BPF].end = BPF_JIT_REGION_END;
->   
->   	return &execmem_params;
->   }
-> diff --git a/arch/riscv/kernel/probes/kprobes.c b/arch/riscv/kernel/probes/kprobes.c
-> index 2f08c14a933d..e64f2f3064eb 100644
-> --- a/arch/riscv/kernel/probes/kprobes.c
-> +++ b/arch/riscv/kernel/probes/kprobes.c
-> @@ -104,16 +104,6 @@ int __kprobes arch_prepare_kprobe(struct kprobe *p)
->   	return 0;
->   }
->   
-> -#ifdef CONFIG_MMU
-> -void *alloc_insn_page(void)
-> -{
-> -	return  __vmalloc_node_range(PAGE_SIZE, 1, VMALLOC_START, VMALLOC_END,
-> -				     GFP_KERNEL, PAGE_KERNEL_READ_EXEC,
-> -				     VM_FLUSH_RESET_PERMS, NUMA_NO_NODE,
-> -				     __builtin_return_address(0));
-> -}
-> -#endif
-> -
->   /* install breakpoint in text */
->   void __kprobes arch_arm_kprobe(struct kprobe *p)
->   {
-> diff --git a/arch/riscv/net/bpf_jit_core.c b/arch/riscv/net/bpf_jit_core.c
-> index 7b70ccb7fec3..c8a758f0882b 100644
-> --- a/arch/riscv/net/bpf_jit_core.c
-> +++ b/arch/riscv/net/bpf_jit_core.c
-> @@ -218,19 +218,6 @@ u64 bpf_jit_alloc_exec_limit(void)
->   	return BPF_JIT_REGION_SIZE;
->   }
->   
-> -void *bpf_jit_alloc_exec(unsigned long size)
-> -{
-> -	return __vmalloc_node_range(size, PAGE_SIZE, BPF_JIT_REGION_START,
-> -				    BPF_JIT_REGION_END, GFP_KERNEL,
-> -				    PAGE_KERNEL, 0, NUMA_NO_NODE,
-> -				    __builtin_return_address(0));
-> -}
-> -
-> -void bpf_jit_free_exec(void *addr)
-> -{
-> -	return vfree(addr);
-> -}
-> -
->   void *bpf_arch_text_copy(void *dst, void *src, size_t len)
->   {
->   	int ret;
+OK but pleae at least use switch statement in emac_set_taprio()
+and error out in default: case.
 
+> 
+>> So emac_setup_taprio() reduces to
+>>
+>> static int emac_setup_taprio(struct net_device *ndev, void *type_data)
+>> {
+>> 	struct tc_taprio_qopt_offload *taprio = type_data;
+>> 	int err = 0;
+>>
+>>         switch (taprio->cmd) {
+>>         case TAPRIO_CMD_REPLACE:
+>>                 err = emac_taprio_replace(ndev, taprio);
+>>                 break;
+>>         case TAPRIO_CMD_DESTROY:
+>>                 emac_taprio_destroy(ndev);
+>>                 break;
+>>         case TAPRIO_CMD_STATS:
+>>                 emac_taprio_stats(ndev, &taprio->stats);
+>>                 break;
+>>         case TAPRIO_CMD_QUEUE_STATS:
+>>                 emac_taprio_queue_stats(ndev, &taprio->queue_stats);
+>>                 break;
+>>         default:
+>>                 err = -EOPNOTSUPP;
+>>         }
+>>
+>> 	return err;
+>> }
+>>
 
-Otherwise, you can add:
-
-Reviewed-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-
-Thanks,
-
-Alex
-
+-- 
+cheers,
+-roger
 
