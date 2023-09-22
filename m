@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-35653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788627AA762
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:42:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 082D27AA763
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id AFFAC282813
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:42:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 22058282CB3
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19481A34;
-	Fri, 22 Sep 2023 03:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDD217FD;
+	Fri, 22 Sep 2023 03:42:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458582116
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:42:36 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A948CC
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:35 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bee08c13aso23326737b3.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4384E211F
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:42:38 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F2AF7
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:36 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59bee08c13aso23326937b3.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695354154; x=1695958954; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1695354156; x=1695958956; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9Z/nKzvWlwT9KaXr/yM1vYWg3R0vUbwg2NkHpWMLpM=;
-        b=SCCEUdc4oJwdZYO8TxFOFV4Er0Bg0pnB0rN5ZKAFHAAgc5OLmZh81YgRblxcHSU5WJ
-         i39A+Abxg85NWo8gNYh4qJy3DXNU2wLkkWyARLnZ73naXzWM3NEQfvRmkRozRaTvSfNe
-         CO6UdYZTI/kmm13b2b8fByRw5wrcpXa87FDgeLs2TfbQRac/nHeIzxJJKB0yR93rOnj6
-         63/O6v0vH58JMwCCu7HuxPd73MRaKfyjNPq7cA9fnVofwDkU79eMUV9M6z2CeB+5zzLg
-         DlFQaFj2lHLqeqeCvxXVtc/zuCqjIBmUi59BkBXRCOqIBC3qooahBmHGpt6kvw6NGhsT
-         cBSw==
+        bh=j6Juutre+yi4BpZqiVckzcbN1GkYN+N+Vn3GYokg3Is=;
+        b=SxNjbLsiAdURtwfF4L8bxnwBBNLBHI35nlorzD5JC2xejq66tZE+7sfNltiDUKzNDP
+         GYVQab6qcQ6P+m2EPtwQ1aqCsJAawLa2zdpPxp6hFHGebmcO+3ocjnxfehSa05lAhbzN
+         rGm8vK9Dv3m0ItBv/If9ZH6d9C1qje/uKC4eadh92q4pkeJpCBOtCF4rCsAeIdzZdkNC
+         GlI3jbmi1nqMYP+z2XqTuuu/Nz40NEffem45vlEuBindKDF9odJmc+OhMIVjEAMv4bK2
+         79jthPwCpAEl+W69/ob/4kwWEU2s48XPOlhDm+G262Qy10wgkB0kVSHu0QzCCfu5iOuq
+         etsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695354154; x=1695958954;
+        d=1e100.net; s=20230601; t=1695354156; x=1695958956;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G9Z/nKzvWlwT9KaXr/yM1vYWg3R0vUbwg2NkHpWMLpM=;
-        b=dhxlpc/lAd11L4nlOWtnxlXK8jIVIdzuBUw0+eqf5NPLTOEzZonoHTPn3oURKeZfD0
-         cqOmpdoEMnOhwOVtU3/eKZp2Zg/AO52FImmx4UKcYfGuSAt9leQacjWDt26Mon2X+e28
-         egOXSeLJ0RLZ32rikQAMm+hUUWHiMO1s2ueR3cagV9F+fQ9VimjmSDkaYbzrpa0LxRl1
-         O7I8I1ZAkq/137u21adHWFq4mPho704LgVjDuHdWUkaiPNVpEodAC32F+L5EL0UL4o+y
-         ZzRW6XDYRMxsjV7E3Xj2ieHWpNc4Ueknv7mLB9cvApgUpMxvFAczbNbLLEVEM/RwzR5k
-         4PuA==
-X-Gm-Message-State: AOJu0YxJ5klZPpIJ4zwU+Efb2eD5w69xW3UdGUIxi5wnqOFvw6dpAPkM
-	iZrAzm3PvCu8B0+Mps7aahufLTbSu47+7Q==
-X-Google-Smtp-Source: AGHT+IETLJIuo2BswbKuX1kUmTtVYgJTzVdtTC2UQhwnUmAmHXW1Chb40WYRIBTPgY/gPoNwLDmt3PzkBdPHEw==
+        bh=j6Juutre+yi4BpZqiVckzcbN1GkYN+N+Vn3GYokg3Is=;
+        b=GEy7s8r1nA43q0SwdLubtNmFfoG+ErX0c1A78VvKsvuglZE7PvnH4sTY+gghTMP8E5
+         skzneBmgnKVhTy4xetvH65KOOIL0WAd0N/MIeNyNMqZtBmfArE/jZlxKJHv1cWrODS6F
+         XjpFOG+D5saOxQ0Tx81mfVSlEdTOXdTyWzZtqT7dQejz+pvCtmL6VT5RT+w34mOefQIr
+         QJVvDq1nHX9XI4NHLqbGjYdKVETGmuNFQJ64TKR5ClItFPNO0VsdPav+wNXcCsv6bgXs
+         IPOLU1LJLAT4GfeBNudOP4GXYTbQEQlqJwkAXttakRQgsoZjBPE3PQDkeZXaU+x7/OmQ
+         SeCg==
+X-Gm-Message-State: AOJu0Yz8XT79SrVXy0sc77dNmMopcFq8njH0rioK5QfAioNb8rUmoM44
+	931ldgXQQ9nK8qQOaLCZwwnS+1NavVCV/w==
+X-Google-Smtp-Source: AGHT+IGc+EhskLxVOVfKWZaLXPWdZJNNMXGw5GsAA9TqoL2/QZnsVNyi6ierZBPfi8DgmS3o93UkaiDaHe2MFw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:496:0:b0:d7f:2cb6:7d88 with SMTP id
- 144-20020a250496000000b00d7f2cb67d88mr104600ybe.13.1695354154542; Thu, 21 Sep
- 2023 20:42:34 -0700 (PDT)
-Date: Fri, 22 Sep 2023 03:42:20 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:4323:0:b0:59b:d857:8317 with SMTP id
+ q35-20020a814323000000b0059bd8578317mr102911ywa.2.1695354155866; Thu, 21 Sep
+ 2023 20:42:35 -0700 (PDT)
+Date: Fri, 22 Sep 2023 03:42:21 +0000
 In-Reply-To: <20230922034221.2471544-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230922034221.2471544-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922034221.2471544-8-edumazet@google.com>
-Subject: [PATCH v2 net-next 7/8] inet: lockless IP_PKTOPTIONS implementation
+Message-ID: <20230922034221.2471544-9-edumazet@google.com>
+Subject: [PATCH v2 net-next 8/8] inet: implement lockless getsockopt(IP_MULTICAST_IF)
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -75,114 +75,148 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Current implementation is already lockless, because the socket
-lock is released before reading socket fields.
+Add missing annotations to inet->mc_index and inet->mc_addr
+to fix data-races.
 
-Add missing READ_ONCE() annotations.
+getsockopt(IP_MULTICAST_IF) can be lockless.
 
-Note that corresponding WRITE_ONCE() are needed, the order
-of the patches do not really matter.
+setsockopt() side is left for later.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- net/ipv4/ip_sockglue.c | 76 ++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 39 deletions(-)
+ net/ipv4/datagram.c    |  4 ++--
+ net/ipv4/ip_sockglue.c | 25 ++++++++++++-------------
+ net/ipv4/ping.c        |  4 ++--
+ net/ipv4/raw.c         |  4 ++--
+ net/ipv4/udp.c         |  4 ++--
+ 5 files changed, 20 insertions(+), 21 deletions(-)
 
+diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
+index 1480e9ebdfef445960e1f70f34f33a0e0c52b65b..2cc50cbfc2a31ec91fbdc4a541cb89df689cd9ae 100644
+--- a/net/ipv4/datagram.c
++++ b/net/ipv4/datagram.c
+@@ -39,9 +39,9 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
+ 	saddr = inet->inet_saddr;
+ 	if (ipv4_is_multicast(usin->sin_addr.s_addr)) {
+ 		if (!oif || netif_index_is_l3_master(sock_net(sk), oif))
+-			oif = inet->mc_index;
++			oif = READ_ONCE(inet->mc_index);
+ 		if (!saddr)
+-			saddr = inet->mc_addr;
++			saddr = READ_ONCE(inet->mc_addr);
+ 	} else if (!oif) {
+ 		oif = READ_ONCE(inet->uc_index);
+ 	}
 diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 58995526c6e965d613b8cdea61b84916d608a6fb..1ee01ff64171c94b6b244589518a53ce807a212d 100644
+index 1ee01ff64171c94b6b244589518a53ce807a212d..0b74ac49d6a6f82f5e8ffe5279dba3baf30f874e 100644
 --- a/net/ipv4/ip_sockglue.c
 +++ b/net/ipv4/ip_sockglue.c
-@@ -1633,6 +1633,43 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 			return -ENOTCONN;
- 		goto copyval;
+@@ -1168,8 +1168,8 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 
+ 		if (!mreq.imr_ifindex) {
+ 			if (mreq.imr_address.s_addr == htonl(INADDR_ANY)) {
+-				inet->mc_index = 0;
+-				inet->mc_addr  = 0;
++				WRITE_ONCE(inet->mc_index, 0);
++				WRITE_ONCE(inet->mc_addr, 0);
+ 				err = 0;
+ 				break;
+ 			}
+@@ -1194,8 +1194,8 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		    midx != sk->sk_bound_dev_if)
+ 			break;
+ 
+-		inet->mc_index = mreq.imr_ifindex;
+-		inet->mc_addr  = mreq.imr_address.s_addr;
++		WRITE_ONCE(inet->mc_index, mreq.imr_ifindex);
++		WRITE_ONCE(inet->mc_addr, mreq.imr_address.s_addr);
+ 		err = 0;
+ 		break;
  	}
-+	case IP_PKTOPTIONS:
-+	{
-+		struct msghdr msg;
-+
-+		if (sk->sk_type != SOCK_STREAM)
-+			return -ENOPROTOOPT;
-+
-+		if (optval.is_kernel) {
-+			msg.msg_control_is_user = false;
-+			msg.msg_control = optval.kernel;
-+		} else {
-+			msg.msg_control_is_user = true;
-+			msg.msg_control_user = optval.user;
-+		}
-+		msg.msg_controllen = len;
-+		msg.msg_flags = in_compat_syscall() ? MSG_CMSG_COMPAT : 0;
-+
-+		if (inet_test_bit(PKTINFO, sk)) {
-+			struct in_pktinfo info;
-+
-+			info.ipi_addr.s_addr = READ_ONCE(inet->inet_rcv_saddr);
-+			info.ipi_spec_dst.s_addr = READ_ONCE(inet->inet_rcv_saddr);
-+			info.ipi_ifindex = READ_ONCE(inet->mc_index);
-+			put_cmsg(&msg, SOL_IP, IP_PKTINFO, sizeof(info), &info);
-+		}
-+		if (inet_test_bit(TTL, sk)) {
-+			int hlim = READ_ONCE(inet->mc_ttl);
-+
-+			put_cmsg(&msg, SOL_IP, IP_TTL, sizeof(hlim), &hlim);
-+		}
-+		if (inet_test_bit(TOS, sk)) {
-+			int tos = READ_ONCE(inet->rcv_tos);
-+			put_cmsg(&msg, SOL_IP, IP_TOS, sizeof(tos), &tos);
-+		}
-+		len -= msg.msg_controllen;
-+		return copy_to_sockptr(optlen, &len, sizeof(int));
-+	}
+@@ -1673,19 +1673,11 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
  	case IP_UNICAST_IF:
  		val = (__force int)htonl((__u32) READ_ONCE(inet->uc_index));
  		goto copyval;
-@@ -1678,45 +1715,6 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 		else
- 			err = ip_get_mcast_msfilter(sk, optval, optlen, len);
- 		goto out;
--	case IP_PKTOPTIONS:
--	{
--		struct msghdr msg;
--
--		sockopt_release_sock(sk);
--
--		if (sk->sk_type != SOCK_STREAM)
--			return -ENOPROTOOPT;
--
--		if (optval.is_kernel) {
--			msg.msg_control_is_user = false;
--			msg.msg_control = optval.kernel;
--		} else {
--			msg.msg_control_is_user = true;
--			msg.msg_control_user = optval.user;
--		}
--		msg.msg_controllen = len;
--		msg.msg_flags = in_compat_syscall() ? MSG_CMSG_COMPAT : 0;
--
--		if (inet_test_bit(PKTINFO, sk)) {
--			struct in_pktinfo info;
--
--			info.ipi_addr.s_addr = inet->inet_rcv_saddr;
--			info.ipi_spec_dst.s_addr = inet->inet_rcv_saddr;
--			info.ipi_ifindex = inet->mc_index;
--			put_cmsg(&msg, SOL_IP, IP_PKTINFO, sizeof(info), &info);
--		}
--		if (inet_test_bit(TTL, sk)) {
--			int hlim = READ_ONCE(inet->mc_ttl);
--
--			put_cmsg(&msg, SOL_IP, IP_TTL, sizeof(hlim), &hlim);
--		}
--		if (inet_test_bit(TOS, sk)) {
--			int tos = inet->rcv_tos;
--			put_cmsg(&msg, SOL_IP, IP_TOS, sizeof(tos), &tos);
--		}
--		len -= msg.msg_controllen;
--		return copy_to_sockptr(optlen, &len, sizeof(int));
 -	}
- 	case IP_LOCAL_PORT_RANGE:
- 		val = inet->local_port_range.hi << 16 | inet->local_port_range.lo;
- 		break;
+-
+-	if (needs_rtnl)
+-		rtnl_lock();
+-	sockopt_lock_sock(sk);
+-
+-	switch (optname) {
+ 	case IP_MULTICAST_IF:
+ 	{
+ 		struct in_addr addr;
+ 		len = min_t(unsigned int, len, sizeof(struct in_addr));
+-		addr.s_addr = inet->mc_addr;
+-		sockopt_release_sock(sk);
++		addr.s_addr = READ_ONCE(inet->mc_addr);
+ 
+ 		if (copy_to_sockptr(optlen, &len, sizeof(int)))
+ 			return -EFAULT;
+@@ -1693,6 +1685,13 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
+ 			return -EFAULT;
+ 		return 0;
+ 	}
++	}
++
++	if (needs_rtnl)
++		rtnl_lock();
++	sockopt_lock_sock(sk);
++
++	switch (optname) {
+ 	case IP_MSFILTER:
+ 	{
+ 		struct ip_msfilter msf;
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index 66ad1f95af49f222afe0ee75b9163dd0af0a2c49..2c61f444e1c7d322e75e020c41af02977d8814f0 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -773,9 +773,9 @@ static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ 	if (ipv4_is_multicast(daddr)) {
+ 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
+-			ipc.oif = inet->mc_index;
++			ipc.oif = READ_ONCE(inet->mc_index);
+ 		if (!saddr)
+-			saddr = inet->mc_addr;
++			saddr = READ_ONCE(inet->mc_addr);
+ 	} else if (!ipc.oif)
+ 		ipc.oif = READ_ONCE(inet->uc_index);
+ 
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index e2357d23202e5a39832bb1550c365de9a836c363..27da9d7294c0b4fb9027bb7feb704063dc6302db 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -579,9 +579,9 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	uc_index = READ_ONCE(inet->uc_index);
+ 	if (ipv4_is_multicast(daddr)) {
+ 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
+-			ipc.oif = inet->mc_index;
++			ipc.oif = READ_ONCE(inet->mc_index);
+ 		if (!saddr)
+-			saddr = inet->mc_addr;
++			saddr = READ_ONCE(inet->mc_addr);
+ 	} else if (!ipc.oif) {
+ 		ipc.oif = uc_index;
+ 	} else if (ipv4_is_lbcast(daddr) && uc_index) {
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 1e0c3aba1e5a88c7ba50a28511412a1710f1bab5..7f7724beca33781f8ff12750d1c9c9ccc420f481 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1177,9 +1177,9 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	uc_index = READ_ONCE(inet->uc_index);
+ 	if (ipv4_is_multicast(daddr)) {
+ 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
+-			ipc.oif = inet->mc_index;
++			ipc.oif = READ_ONCE(inet->mc_index);
+ 		if (!saddr)
+-			saddr = inet->mc_addr;
++			saddr = READ_ONCE(inet->mc_addr);
+ 		connected = 0;
+ 	} else if (!ipc.oif) {
+ 		ipc.oif = uc_index;
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
