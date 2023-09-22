@@ -1,98 +1,107 @@
-Return-Path: <netdev+bounces-35664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9AA7AA80D
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:02:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9034E7AA814
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:12:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 065A8282032
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:02:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B657028208C
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447F8210D;
-	Fri, 22 Sep 2023 05:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230D153BE;
+	Fri, 22 Sep 2023 05:12:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7E92104
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 05:02:51 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E520C192
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 22:02:49 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R791e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0Vsc3Sx8_1695358964;
-Received: from 30.221.145.61(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vsc3Sx8_1695358964)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Sep 2023 13:02:45 +0800
-Message-ID: <c95274cd-d119-402b-baf1-0c500472c9fb@linux.alibaba.com>
-Date: Fri, 22 Sep 2023 13:02:42 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A4533D4;
+	Fri, 22 Sep 2023 05:12:10 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B7B18F;
+	Thu, 21 Sep 2023 22:12:06 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38M5B8Jr83708355, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38M5B8Jr83708355
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 22 Sep 2023 13:11:08 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Fri, 22 Sep 2023 13:11:07 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Fri, 22 Sep 2023 13:11:06 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c]) by
+ RTEXMBS04.realtek.com.tw ([fe80::7445:d92b:d0b3:f79c%5]) with mapi id
+ 15.01.2375.007; Fri, 22 Sep 2023 13:11:06 +0800
+From: Hayes Wang <hayeswang@realtek.com>
+To: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        nic_swsd <nic_swsd@realtek.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "bjorn@mork.no" <bjorn@mork.no>
+Subject: RE: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in driver
+Thread-Topic: [PATCH net-next v2 1/2] r8152: remove queuing rx packets in
+ driver
+Thread-Index: AQHZ6qdYyQovugIsME21Grz+cVcRerAhiHwAgACHqzCAArZ0gIABgcUA
+Date: Fri, 22 Sep 2023 05:11:05 +0000
+Message-ID: <9e03e260818940bcb37828eea83e0137@realtek.com>
+References: <20230919031351.7334-429-nic_swsd@realtek.com>
+	 <20230919031351.7334-430-nic_swsd@realtek.com>
+	 <369f3139-4e63-4327-8745-2d72d7dfea8f@lunn.ch>
+	 <1a57cf3f867d4dfd991ef1d4024c931b@realtek.com>
+ <50a8ec7dece0100c931fd187e19e14dd1ca1a0e9.camel@redhat.com>
+In-Reply-To: <50a8ec7dece0100c931fd187e19e14dd1ca1a0e9.camel@redhat.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.22.228.6]
+x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 5/6] virtio-net: fix the vq coalescing setting for vq
- resize
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
- "Michael S . Tsirkin" <mst@redhat.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Gavin Li <gavinl@nvidia.com>
-References: <20230919074915.103110-1-hengqi@linux.alibaba.com>
- <20230919074915.103110-6-hengqi@linux.alibaba.com>
- <CACGkMEuJjxAmr6WC9ETYAw2K9dp0AUoD6LSZCduQyUQ9y7oM3Q@mail.gmail.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <CACGkMEuJjxAmr6WC9ETYAw2K9dp0AUoD6LSZCduQyUQ9y7oM3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-在 2023/9/22 下午12:29, Jason Wang 写道:
-> On Tue, Sep 19, 2023 at 3:49 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->> According to the definition of virtqueue coalescing spec[1]:
->>
->>    Upon disabling and re-enabling a transmit virtqueue, the device MUST set
->>    the coalescing parameters of the virtqueue to those configured through the
->>    VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver did not set
->>    any TX coalescing parameters, to 0.
->>
->>    Upon disabling and re-enabling a receive virtqueue, the device MUST set
->>    the coalescing parameters of the virtqueue to those configured through the
->>    VIRTIO_NET_CTRL_NOTF_COAL_RX_SET command, or, if the driver did not set
->>    any RX coalescing parameters, to 0.
->>
->> We need to add this setting for vq resize (ethtool -G) where vq_reset happens.
->>
->> [1] https://lists.oasis-open.org/archives/virtio-dev/202303/msg00415.html
->>
->> Fixes: 394bd87764b6 ("virtio_net: support per queue interrupt coalesce command")
-> I'm not sure this is a real fix as spec allows it to go zero?
-
-The spec says that if the user has configured interrupt coalescing 
-parameters,
-parameters need to be restored after vq_reset, otherwise set to 0.
-vi->intr_coal_tx and vi->intr_coal_rx always save the newest global 
-parameters,
-regardless of whether the command is sent or not. So I think we need 
-this patch
-it complies with the specification requirements.
-
-Thanks!
-
->
-> Thanks
-
+UGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUaHVyc2RheSwgU2VwdGVt
+YmVyIDIxLCAyMDIzIDk6MzkgUE0NClsuLi5dDQo+IE9uZSBvZiB0aGUga2V5IHBvaW50cyBpbiBK
+YWt1YidzIHJlcGx5IGlzIHRoYXQgdGhlIGJ1cnN0IG11c3QgZXhjZWVkDQo+IHRoZSBidWRnZXQg
+YnkgYSBsaW1pdGVkIG51bWJlciBvZiBwYWNrZXRzOg0KPiANCj4gIk5vdGhpbmcgd2lsbCBleHBs
+b2RlIGlmIHdlIHByb2Nlc3MgYSBmZXcgbW9yZSBwYWNrZXRzIHRoYW4gYnVkZ2V0DQo+IChhc3N1
+bWluZyBidWRnZXQgPiAwKSINCj4gDQo+IEhvdyBtYW55IHBhY2tldHMgY2FuIGNvbnRhaW4gYXQg
+bW9zdCBhIHNpbmdsZSBVUkI/DQoNCkkgdGhpbmsgaXQgZGVwZW5kcyBvbg0KMS4gaWYgdGhlIHBh
+Y2tldHMgY29taW5nIGNvbnRpbnVhbGx5DQoyLiB0aGUgc2l6ZSBvZiB0aGUgcGFja2V0DQoNClRo
+ZSBVUkIgd291bGQgYmUgY29tcGxldGVkIHdoZW4NCjEuIHRoZSBkZXZpY2UgZG9lc24ndCByZWNl
+aXZlIGFueSBwYWNrZXQgZHVyaW5nIHNldmVyYWwgdXMuDQoyLiB0aGUgZGVzaXJlZCBzaXplIGlz
+IHJlYWNoZWQuDQoNCkZvciAyLjVHIE5JQyB3aXRoIHRoZSBwYWNrZXRzIG9mIDE1MTQgYnl0ZXMs
+IGEgdXJiIGF0IG1vc3QgY29udGFpbnMgYWJvdXQgMjEgcGFja2V0cy4NCklmIGFsbCBwYWNrZXQg
+YXJlIDYwIGJ5dGVzLCB0aGUgbnVtYmVyIHdvdWxkIGJlIGFib3V0IDM5MC4NCklmIHRoZSBhdmVy
+YWdlIHNpemUgb2YgdGhlIHBhY2tldHMgaXMgNDg4IGJ5dGVzLCB0aGUgbnVtYmVyIGlzIGFib3V0
+IDY0Lg0KDQo+IElmIHRoYXQgbnVtYmVyIGNhbiBiZSBzaWduaWZpY2FudCBncmVhdGVyIHRoZW4g
+dGhlIG5hcGkgYnVkZ2V0LCBJIHRoaW5rDQo+IHdlIGFyZSBiZXR0ZXIgb2ZmIGtlZXBpbmcgdGhl
+IHBhY2tldCBpbiB0aGUgcXVldWUgLSBvdGhlcndpc2UgdGhlIHdob2xlDQo+IHN5c3RlbSBsYXRl
+bmN5L3N0YWJpbGl0eSB3b3VsZCBiZSBhZmZlY3RlZC4NCg0KU2hvdWxkIEkgZ28gYmFjayB0aGUg
+cGF0Y2ggd2l0aCBxdWV1aW5nIHRoZSByeCBwYWNrZXQgaW4gZHJpdmVyPw0KDQpCZXN0IFJlZ2Fy
+ZHMsDQpIYXllcw0KDQo=
 
