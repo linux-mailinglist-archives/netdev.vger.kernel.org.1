@@ -1,162 +1,419 @@
-Return-Path: <netdev+bounces-35854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E102E7AB5C5
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:21:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4324E7AB5BA
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 92CDD282050
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:21:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 5F05C1C209DB
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0D14177A;
-	Fri, 22 Sep 2023 16:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8816341773;
+	Fri, 22 Sep 2023 16:20:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FCA41773
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:21:38 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E71718F
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695399692; x=1726935692;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=MVHsb1hX19s0UbaJH6I80TECq8Yl3GkfDPzwBHRL6Tw=;
-  b=hA8jMW5HTNslIShaxjjYENZ/9MDCn22XxwMpObC1COS9bF0hA3VklgAt
-   Lr3eg4lPv7KRRWPBQqHMUTHouZ5gvRQfEzGXOUNHHbB3mT24nQ5UnectS
-   K7ne6XB+jC1B/7fB+ew6f9AnhhcY26Pg0+VAs92b/WLVs8xvdspmgl1Ed
-   F1WGNvSq3Sh7BtyOYSvayaUqMq9rlYuf+0r77zYpJh5MdB9Sfo4QvrqpA
-   a+ENBr4z2xB37fxiEifUFuVaYrDeLrJZeUhITdFdurT+F4p1zr9+fNOuY
-   Dyh7h5eaHavGhxLcSX+mNe+YXol3T+cb4ouAuHJlsTSfru29J0h7lmKzT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="384707090"
-X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="384707090"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 09:16:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10841"; a="813116698"
-X-IronPort-AV: E=Sophos;i="6.03,167,1694761200"; 
-   d="scan'208";a="813116698"
-Received: from kkazimiedevpc.igk.intel.com (HELO localhost.igk.intel.com) ([10.102.102.224])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2023 09:16:53 -0700
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: aleksander.lobakin@intel.com,
-	larysa.zaremba@intel.com,
-	alan.brady@intel.com,
-	joshua.a.hay@intel.com,
-	emil.s.tantilov@intel.com,
-	netdev@vger.kernel.org,
-	Michal Kubiak <michal.kubiak@intel.com>
-Subject: [PATCH iwl-next] idpf: set scheduling mode for completion queue
-Date: Fri, 22 Sep 2023 18:16:03 +0200
-Message-Id: <20230922161603.3461104-1-michal.kubiak@intel.com>
-X-Mailer: git-send-email 2.33.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591334174B
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:20:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E34122
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:20:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695399644;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N9dWQMyY29t0wR7wAqt+YAF4UGVxKmfZQHVC/zI3Xbo=;
+	b=YPc7nuqZ8kzJTOq5eB6MgBblYttm/gPQGIVD3gnF9Vq+MCRVtc2sOSofZHz2GychKS00BZ
+	diYXOW5ZSWaabKTbuVIrde03sB0RG2jjZ8DXXcYEtdmzIirPjoHqGdlIpyEpscWlT+tuYt
+	R8wIR1LBc7iDapLiUgSu0drkXRcUmx4=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-76-kSyNDA8_Me-sv327tAAjvw-1; Fri, 22 Sep 2023 12:20:40 -0400
+X-MC-Unique: kSyNDA8_Me-sv327tAAjvw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31f79595669so1911317f8f.0
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:20:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695399639; x=1696004439;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N9dWQMyY29t0wR7wAqt+YAF4UGVxKmfZQHVC/zI3Xbo=;
+        b=vJUHKEI213v1WZ5wTNlJ0GwKMiRTlbyG6IpzME1y3Q9Z8KRQiUEQgecofUvIvNTNCE
+         7rNcG7fr/+TWZk00cqrlaPnSmJYxIaLA/5H5NheRJ4aZp58QiBRHcA5iYieykC929M3A
+         4qW0tgTWDzu36eg8YUnR5C5398dN2uBHpP4ip9rymBY3kLvXsBvl7oG8AvoDO0foiTsD
+         X0/sw8vghpbboIvT5Y5Ysq6vv/WrIFOD2aP7D4KssrTi7NpONqqoowp3icQtsh7h8q5Q
+         o+pvetazchicOqISuJoT8hRXTgtEMbdYFJV77hB7r8UnBhQSmM9lQzjmVDFMShlh/ZzO
+         4gXw==
+X-Gm-Message-State: AOJu0Yxjd58i8zR62g6o4o7EKj5+ZK5D3UXWvNUWWFdzeSfkY1Fdr2fK
+	83YmDfUW3o54S7qGaZ3OK1Lz3kYukxJ3L9T1yV7TRpdT/ISU6pRe3m27SayYEp3mT6GC1xpV4oD
+	wbrpA+sL6rOxpq1VV
+X-Received: by 2002:a5d:408c:0:b0:321:8181:6012 with SMTP id o12-20020a5d408c000000b0032181816012mr73821wrp.21.1695399638902;
+        Fri, 22 Sep 2023 09:20:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGtBRRgDYgPBt8y6kCoghzVzS/QSEpow4ZyIw6NVNK54Rc2GHD2ASQKNNoKh4/QVDuPUmQyvg==
+X-Received: by 2002:a5d:408c:0:b0:321:8181:6012 with SMTP id o12-20020a5d408c000000b0032181816012mr73804wrp.21.1695399638426;
+        Fri, 22 Sep 2023 09:20:38 -0700 (PDT)
+Received: from localhost (net-2-34-76-254.cust.vodafonedsl.it. [2.34.76.254])
+        by smtp.gmail.com with ESMTPSA id i9-20020a5d6309000000b003143b14848dsm4750559wru.102.2023.09.22.09.20.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 09:20:37 -0700 (PDT)
+Date: Fri, 22 Sep 2023 18:20:36 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org,
+	neilb@suse.de, chuck.lever@oracle.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
+ netlink commands
+Message-ID: <ZQ2+1NhagxR5bZF+@lore-desk>
+References: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
+ <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="O+06KXfkn58hdwdo"
+Content-Disposition: inline
+In-Reply-To: <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The HW must be programmed differently for queue-based scheduling mode.
-To program the completion queue context correctly, the control plane
-must know the scheduling mode not only for the Tx queue, but also for
-the completion queue.
-Unfortunately, currently the driver sets the scheduling mode only for
-the Tx queues.
 
-Propagate the scheduling mode data for the completion queue as
-well when sending the queue configuration messages.
+--O+06KXfkn58hdwdo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: 1c325aac10a8 ("idpf: configure resources for TX queues")
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Michal Kubiak <michal.kubiak@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c     | 10 ++++++++--
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c |  8 +++++++-
- 2 files changed, 15 insertions(+), 3 deletions(-)
+> On Fri, 2023-09-22 at 14:44 +0200, Lorenzo Bianconi wrote:
+> > Introduce write_threads and write_v4_end_grace netlink commands similar
+> > to the ones available through the procfs.
+> > Introduce nfsd_nl_server_status_get_dumpit netlink command in order to
+> > report global server metadata.
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> > This patch can be tested with user-space tool reported below:
+> > https://github.com/LorenzoBianconi/nfsd-netlink.git
+> > ---
+> >  Documentation/netlink/specs/nfsd.yaml | 33 +++++++++
+> >  fs/nfsd/netlink.c                     | 30 ++++++++
+> >  fs/nfsd/netlink.h                     |  5 ++
+> >  fs/nfsd/nfsctl.c                      | 98 +++++++++++++++++++++++++++
+> >  include/uapi/linux/nfsd_netlink.h     | 11 +++
+> >  5 files changed, 177 insertions(+)
+> >=20
+> > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netl=
+ink/specs/nfsd.yaml
+> > index 403d3e3a04f3..fa1204892703 100644
+> > --- a/Documentation/netlink/specs/nfsd.yaml
+> > +++ b/Documentation/netlink/specs/nfsd.yaml
+> > @@ -62,6 +62,15 @@ attribute-sets:
+> >          name: compound-ops
+> >          type: u32
+> >          multi-attr: true
+> > +  -
+> > +    name: server-attr
+> > +    attributes:
+> > +      -
+> > +        name: threads
+> > +        type: u16
+>=20
+> 65k threads ought to be enough for anybody!
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 6fa79898c42c..58c5412d3173 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -1160,6 +1160,7 @@ static void idpf_rxq_set_descids(struct idpf_vport *vport, struct idpf_queue *q)
-  */
- static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
+maybe u8 is fine here :)
+
+>=20
+> > +      -
+> > +        name: v4-grace
+> > +        type: u8
+> > =20
+> >  operations:
+> >    list:
+> > @@ -72,3 +81,27 @@ operations:
+> >        dump:
+> >          pre: nfsd-nl-rpc-status-get-start
+> >          post: nfsd-nl-rpc-status-get-done
+> > +    -
+> > +      name: threads-set
+> > +      doc: set the number of running threads
+> > +      attribute-set: server-attr
+> > +      flags: [ admin-perm ]
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - threads
+> > +    -
+> > +      name: v4-grace-release
+> > +      doc: release the grace period for nfsd's v4 lock manager
+> > +      attribute-set: server-attr
+> > +      flags: [ admin-perm ]
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - v4-grace
+> > +    -
+> > +      name: server-status-get
+> > +      doc: dump server status info
+> > +      attribute-set: server-attr
+> > +      dump:
+> > +        pre: nfsd-nl-server-status-get-start
+> > diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
+> > index 0e1d635ec5f9..783a34e69354 100644
+> > --- a/fs/nfsd/netlink.c
+> > +++ b/fs/nfsd/netlink.c
+> > @@ -10,6 +10,16 @@
+> > =20
+> >  #include <uapi/linux/nfsd_netlink.h>
+> > =20
+> > +/* NFSD_CMD_THREADS_SET - do */
+> > +static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVE=
+R_ATTR_THREADS + 1] =3D {
+> > +	[NFSD_A_SERVER_ATTR_THREADS] =3D { .type =3D NLA_U16, },
+> > +};
+> > +
+> > +/* NFSD_CMD_V4_GRACE_RELEASE - do */
+> > +static const struct nla_policy nfsd_v4_grace_release_nl_policy[NFSD_A_=
+SERVER_ATTR_V4_GRACE + 1] =3D {
+> > +	[NFSD_A_SERVER_ATTR_V4_GRACE] =3D { .type =3D NLA_U8, },
+> > +};
+> > +
+> >  /* Ops table for nfsd */
+> >  static const struct genl_split_ops nfsd_nl_ops[] =3D {
+> >  	{
+> > @@ -19,6 +29,26 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D=
  {
-+	bool flow_sch_en;
- 	int err, i;
- 
- 	vport->txq_grps = kcalloc(vport->num_txq_grp,
-@@ -1167,6 +1168,9 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 	if (!vport->txq_grps)
- 		return -ENOMEM;
- 
-+	flow_sch_en = !idpf_is_cap_ena(vport->adapter, IDPF_OTHER_CAPS,
-+				       VIRTCHNL2_CAP_SPLITQ_QSCHED);
-+
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
- 		struct idpf_adapter *adapter = vport->adapter;
-@@ -1195,8 +1199,7 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 			q->txq_grp = tx_qgrp;
- 			hash_init(q->sched_buf_hash);
- 
--			if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS,
--					     VIRTCHNL2_CAP_SPLITQ_QSCHED))
-+			if (flow_sch_en)
- 				set_bit(__IDPF_Q_FLOW_SCH_EN, q->flags);
- 		}
- 
-@@ -1215,6 +1218,9 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- 		tx_qgrp->complq->desc_count = vport->complq_desc_count;
- 		tx_qgrp->complq->vport = vport;
- 		tx_qgrp->complq->txq_grp = tx_qgrp;
-+
-+		if (flow_sch_en)
-+			__set_bit(__IDPF_Q_FLOW_SCH_EN, tx_qgrp->complq->flags);
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 9bc85b2f1709..e276b5360c2e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1473,7 +1473,7 @@ static int idpf_send_config_tx_queues_msg(struct idpf_vport *vport)
- 	/* Populate the queue info buffer with all queue context info */
- 	for (i = 0; i < vport->num_txq_grp; i++) {
- 		struct idpf_txq_group *tx_qgrp = &vport->txq_grps[i];
--		int j;
-+		int j, sched_mode;
- 
- 		for (j = 0; j < tx_qgrp->num_txq; j++, k++) {
- 			qi[k].queue_id =
-@@ -1514,6 +1514,12 @@ static int idpf_send_config_tx_queues_msg(struct idpf_vport *vport)
- 		qi[k].ring_len = cpu_to_le16(tx_qgrp->complq->desc_count);
- 		qi[k].dma_ring_addr = cpu_to_le64(tx_qgrp->complq->dma);
- 
-+		if (test_bit(__IDPF_Q_FLOW_SCH_EN, tx_qgrp->complq->flags))
-+			sched_mode = VIRTCHNL2_TXQ_SCHED_MODE_FLOW;
-+		else
-+			sched_mode = VIRTCHNL2_TXQ_SCHED_MODE_QUEUE;
-+		qi[k].sched_mode = cpu_to_le16(sched_mode);
-+
- 		k++;
- 	}
- 
--- 
-2.33.1
+> >  		.done	=3D nfsd_nl_rpc_status_get_done,
+> >  		.flags	=3D GENL_CMD_CAP_DUMP,
+> >  	},
+> > +	{
+> > +		.cmd		=3D NFSD_CMD_THREADS_SET,
+> > +		.doit		=3D nfsd_nl_threads_set_doit,
+> > +		.policy		=3D nfsd_threads_set_nl_policy,
+> > +		.maxattr	=3D NFSD_A_SERVER_ATTR_THREADS,
+> > +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> > +	},
+> > +	{
+> > +		.cmd		=3D NFSD_CMD_V4_GRACE_RELEASE,
+> > +		.doit		=3D nfsd_nl_v4_grace_release_doit,
+> > +		.policy		=3D nfsd_v4_grace_release_nl_policy,
+> > +		.maxattr	=3D NFSD_A_SERVER_ATTR_V4_GRACE,
+> > +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> > +	},
+> > +	{
+> > +		.cmd	=3D NFSD_CMD_SERVER_STATUS_GET,
+> > +		.start	=3D nfsd_nl_server_status_get_start,
+> > +		.dumpit	=3D nfsd_nl_server_status_get_dumpit,
+> > +		.flags	=3D GENL_CMD_CAP_DUMP,
+> > +	},
+> >  };
+> > =20
+> >  struct genl_family nfsd_nl_family __ro_after_init =3D {
+> > diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
+> > index d83dd6bdee92..2e98061fbb0a 100644
+> > --- a/fs/nfsd/netlink.h
+> > +++ b/fs/nfsd/netlink.h
+> > @@ -12,10 +12,15 @@
+> >  #include <uapi/linux/nfsd_netlink.h>
+> > =20
+> >  int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
+> > +int nfsd_nl_server_status_get_start(struct netlink_callback *cb);
+> >  int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
+> > =20
+> >  int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
+> >  				  struct netlink_callback *cb);
+> > +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *in=
+fo);
+> > +int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_inf=
+o *info);
+> > +int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
+> > +				     struct netlink_callback *cb);
+> > =20
+> >  extern struct genl_family nfsd_nl_family;
+> > =20
+> > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> > index b71744e355a8..c631b59b7a4f 100644
+> > --- a/fs/nfsd/nfsctl.c
+> > +++ b/fs/nfsd/nfsctl.c
+> > @@ -1694,6 +1694,104 @@ int nfsd_nl_rpc_status_get_done(struct netlink_=
+callback *cb)
+> >  	return 0;
+> >  }
+> > =20
+> > +/**
+> > + * nfsd_nl_threads_set_doit - set the number of running threads
+> > + * @skb: reply buffer
+> > + * @info: netlink metadata and command arguments
+> > + *
+> > + * Return 0 on success or a negative errno.
+> > + */
+> > +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *in=
+fo)
+> > +{
+> > +	u16 nthreads;
+> > +	int ret;
+> > +
+> > +	if (!info->attrs[NFSD_A_SERVER_ATTR_THREADS])
+> > +		return -EINVAL;
+> > +
+> > +	nthreads =3D nla_get_u16(info->attrs[NFSD_A_SERVER_ATTR_THREADS]);
+> > +
+> > +	ret =3D nfsd_svc(nthreads, genl_info_net(info), get_current_cred());
+> > +	return ret =3D=3D nthreads ? 0 : ret;
+> > +}
+> > +
+> > +/**
+> > + * nfsd_nl_v4_grace_release_doit - release the nfs4 grace period
+> > + * @skb: reply buffer
+> > + * @info: netlink metadata and command arguments
+> > + *
+> > + * Return 0 on success or a negative errno.
+> > + */
+> > +int nfsd_nl_v4_grace_release_doit(struct sk_buff *skb, struct genl_inf=
+o *info)
+> > +{
+> > +#ifdef CONFIG_NFSD_V4
+> > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_id);
+> > +
+> > +	if (!info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE])
+> > +		return -EINVAL;
+> > +
+> > +	if (nla_get_u8(info->attrs[NFSD_A_SERVER_ATTR_V4_GRACE]))
+> > +		nfsd4_end_grace(nn);
+> > +
+>=20
+> To be clear here. Issuing this with anything but 0 will end the grace
+> period. A value of 0 is ignored. It might be best to make the value not
+
+I tried to be aligned with write_v4_end_grace() here but supporting just 1 =
+(or
+any other non-zero value) and skipping 'Y/y'. If we send 0 it should skip t=
+he
+release action.
+
+> matter at all. Do we have to send down a value at all?
+
+I am not sure if ynl supports a doit operation with a request with no param=
+eters.
+@Chuck, Jakub: any input here?
+
+Regards,
+Lorenzo
+
+>=20
+> > +	return 0;
+> > +#else
+> > +	return -EOPNOTSUPP;
+> > +#endif /* CONFIG_NFSD_V4 */
+> > +}
+> > +
+> > +/**
+> > + * nfsd_nl_server_status_get_start - Prepare server_status_get dumpit
+> > + * @cb: netlink metadata and command arguments
+> > + *
+> > + * Return values:
+> > + *   %0: The server_status_get command may proceed
+> > + *   %-ENODEV: There is no NFSD running in this namespace
+> > + */
+> > +int nfsd_nl_server_status_get_start(struct netlink_callback *cb)
+> > +{
+> > +	struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net_i=
+d);
+> > +
+> > +	return nn->nfsd_serv ? 0 : -ENODEV;
+> > +}
+> > +
+> > +/**
+> > + * nfsd_nl_server_status_get_dumpit - dump server status info
+> > + * @skb: reply buffer
+> > + * @cb: netlink metadata and command arguments
+> > + *
+> > + * Returns the size of the reply or a negative errno.
+> > + */
+> > +int nfsd_nl_server_status_get_dumpit(struct sk_buff *skb,
+> > +				     struct netlink_callback *cb)
+> > +{
+> > +	struct net *net =3D sock_net(skb->sk);
+> > +#ifdef CONFIG_NFSD_V4
+> > +	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
+> > +#endif /* CONFIG_NFSD_V4 */
+> > +	void *hdr;
+> > +
+> > +	if (cb->args[0]) /* already consumed */
+> > +		return 0;
+> > +
+> > +	hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_s=
+eq,
+> > +			  &nfsd_nl_family, NLM_F_MULTI,
+> > +			  NFSD_CMD_SERVER_STATUS_GET);
+> > +	if (!hdr)
+> > +		return -ENOBUFS;
+> > +
+> > +	if (nla_put_u16(skb, NFSD_A_SERVER_ATTR_THREADS, nfsd_nrthreads(net)))
+> > +		return -ENOBUFS;
+> > +#ifdef CONFIG_NFSD_V4
+> > +	if (nla_put_u8(skb, NFSD_A_SERVER_ATTR_V4_GRACE, !nn->grace_ended))
+> > +		return -ENOBUFS;
+> > +#endif /* CONFIG_NFSD_V4 */
+> > +
+> > +	genlmsg_end(skb, hdr);
+> > +	cb->args[0] =3D 1;
+> > +
+> > +	return skb->len;
+> > +}
+> > +
+> >  /**
+> >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
+> >   * @net: a freshly-created network namespace
+> > diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfs=
+d_netlink.h
+> > index c8ae72466ee6..b82fbc53d336 100644
+> > --- a/include/uapi/linux/nfsd_netlink.h
+> > +++ b/include/uapi/linux/nfsd_netlink.h
+> > @@ -29,8 +29,19 @@ enum {
+> >  	NFSD_A_RPC_STATUS_MAX =3D (__NFSD_A_RPC_STATUS_MAX - 1)
+> >  };
+> > =20
+> > +enum {
+> > +	NFSD_A_SERVER_ATTR_THREADS =3D 1,
+> > +	NFSD_A_SERVER_ATTR_V4_GRACE,
+> > +
+> > +	__NFSD_A_SERVER_ATTR_MAX,
+> > +	NFSD_A_SERVER_ATTR_MAX =3D (__NFSD_A_SERVER_ATTR_MAX - 1)
+> > +};
+> > +
+> >  enum {
+> >  	NFSD_CMD_RPC_STATUS_GET =3D 1,
+> > +	NFSD_CMD_THREADS_SET,
+> > +	NFSD_CMD_V4_GRACE_RELEASE,
+> > +	NFSD_CMD_SERVER_STATUS_GET,
+> > =20
+> >  	__NFSD_CMD_MAX,
+> >  	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
+>=20
+> --=20
+> Jeff Layton <jlayton@kernel.org>
+>=20
+
+--O+06KXfkn58hdwdo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZQ2+1AAKCRA6cBh0uS2t
+rJfoAP9GqpFRIn9dKxFIurZSBZJj3+XzTi6NYK8NrU60zsE7CAD7B2oT4tpFAicQ
+ZuxUQiBfai8wablokwY3vPAvLMwceAg=
+=HZ20
+-----END PGP SIGNATURE-----
+
+--O+06KXfkn58hdwdo--
 
 
