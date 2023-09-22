@@ -1,107 +1,140 @@
-Return-Path: <netdev+bounces-35789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB3E7AB11D
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:44:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CED07AB127
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:47:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0FB78282CB6
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:43:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8EB71282C8E
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E210E200A0;
-	Fri, 22 Sep 2023 11:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CCD200A6;
+	Fri, 22 Sep 2023 11:47:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBF71F930
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:43:56 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B40102;
-	Fri, 22 Sep 2023 04:43:53 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9a648f9d8e3so270672566b.1;
-        Fri, 22 Sep 2023 04:43:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695383031; x=1695987831; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1I3gNmUlZMGbKyjyOXpthLU4hKIFkiFyB/Tjb6zLBfA=;
-        b=OL3deMoZ6Wl2Q5FwHCv3eZXPpK0Ri4tJq5EVxYMrIHfyt4fXJQMFYGTimVuMuM4PJm
-         o6tVMiPKcbZESdZymIOBToj9xtXCjY7uldAm7T/zEfqjYX/c6Glg5KWOvpVPqiO+AhVg
-         0hFLGW4g83ETBrxoToora7NHg+Zle5TdNcn3hUt6qkKakzhd05sazER8Yw/DaEYt0du9
-         r52Uc+b2a1tnPO5QUtBQMrxfrGaLdYtTPdX0wWlZdfgKZQg1g9ai/DKipz2C9DlYVnUD
-         pLWlYUBoZNJUDLUsp3poEVnJTbePuDOXNNORQ0/anIIZ03aHcx+PRCsCEtwXDQ+RG/DE
-         Nckg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695383031; x=1695987831;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1I3gNmUlZMGbKyjyOXpthLU4hKIFkiFyB/Tjb6zLBfA=;
-        b=aH5SAM0vR7lyRh603/kPJ9/AiZB7RzH4kfZ6Y+Vttxb7a6vraKEaad5+bqqe4c3iF7
-         t4SFZ5F2mSCttek9/z4Z/B1wYSXUqvBHKo+GYZibvukizMp/fe2SBsvOVGIzr592SVCR
-         Pt6z60DIxO+t/j53ixMPazgEvZ2FUzcEhkaFGNrRNz98SYGgmmR0mkb9xAqb/4kYr/q6
-         KeF1WvG4+wsLB8FLPiiX2ipiXsfTuXr8RwSat8pYYVLx1oZBjocvIOfG7hAP0A6pKV/w
-         lPF+sYCVUfveQC6TWkB18kySpoDLZDUQ5GKpYvRSmXfbz/H7tutEZL+2S8uCFhrn3QYE
-         yJvQ==
-X-Gm-Message-State: AOJu0YyMSQPiUjHhOumInYM4NRqUnuzzCOpW9Ld1jTytzd+DB1oZzHDr
-	J0xY8pwd1vlfTp8FZ8WKhY8=
-X-Google-Smtp-Source: AGHT+IHbAXqA0Cb2XWyQ2fjc+0jrFxYIM22/f7Ic2xZbRFXNDej9vFnrqWPJSAAS359M2c/RD7DCkA==
-X-Received: by 2002:a17:906:109:b0:9aa:e07:d421 with SMTP id 9-20020a170906010900b009aa0e07d421mr7270525eje.43.1695383031474;
-        Fri, 22 Sep 2023 04:43:51 -0700 (PDT)
-Received: from skbuf ([188.25.255.147])
-        by smtp.gmail.com with ESMTPSA id f12-20020a1709062c4c00b0099ca4f61a8bsm2618242ejh.92.2023.09.22.04.43.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Sep 2023 04:43:51 -0700 (PDT)
-Date: Fri, 22 Sep 2023 14:43:48 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH v5 net-next 5/5] net: dsa: microchip: Enable HSR
- offloading for KSZ9477
-Message-ID: <20230922114348.ivbfcgi7lkmcsymp@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58B21F937
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:47:50 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74E3FB;
+	Fri, 22 Sep 2023 04:47:48 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 1E0F78646A;
+	Fri, 22 Sep 2023 13:47:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1695383267;
+	bh=wZ4qEmkgvGBQxuMpDb2RuZll8Or+xcawRQGRdom8Msw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=t/Fb1wZRps1aXga8sCjPShIsti8Y3lhvjvRtrxAZVJrQQnNHpgFRdk8NgOx3pCUUU
+	 ObEC2RstTMui28bHijrOF9KvMeHtPlkKH0GjVbvD/Sp6KRyVHG6/rQrz1ZWNy8Ery9
+	 6ern9XL6O2Vjgua1p2HzNamZp6RCiKNXjEvTFV/WGqHLVns0FLXXlwSZcDCKlpRw5N
+	 O44nTJDT8yoyC8SNk1EUKTJcnxnphTYPrZmoZRfMY7QTfyMhD/BzJ0DbnX9xieGyec
+	 ajwCsY97UTjtauUkgWYFSJ3eqPjmHi0OlaWw2KdnGudrrC1zvdUvs2Cxtq3nLp/+py
+	 wDYnwCuzELtiw==
+Date: Fri, 22 Sep 2023 13:47:39 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>, Andrew
+ Lunn <andrew@lunn.ch>, davem@davemloft.net, Woojung Huh
+ <woojung.huh@microchip.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
+ for KSZ9477
+Message-ID: <20230922134739.6f55f46d@wsk>
+In-Reply-To: <20230922113136.jgfo2waalz2pya6b@skbuf>
 References: <20230920114343.1979843-1-lukma@denx.de>
- <20230920114343.1979843-1-lukma@denx.de>
- <20230920114343.1979843-6-lukma@denx.de>
- <20230920114343.1979843-6-lukma@denx.de>
- <20230921193224.l3ojpdcsb4bpfl7d@skbuf>
- <20230922132904.750688b6@wsk>
+	<20230921192308.kntudhbwc4j4skza@skbuf>
+	<20230922131838.4bab19e7@wsk>
+	<20230922113136.jgfo2waalz2pya6b@skbuf>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922132904.750688b6@wsk>
+Content-Type: multipart/signed; boundary="Sig_/8Zz4y42B9pmx0W0fITOB7ek";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 01:29:04PM +0200, Lukasz Majewski wrote:
-> Unfortunately, yes...
-> 
-> The code as it is now -> would set for port lan1 0x21 and lan2 0x22.
-> 
-> However the setup shall be 0x23 for both ports.
-> 
-> More info here:
-> https://github.com/Microchip-Ethernet/EVB-KSZ9477/issues/98#issuecomment-1701557449
-> 
-> I will setup this register from dev->hsr_ports when both HSR ports are
-> known.
+--Sig_/8Zz4y42B9pmx0W0fITOB7ek
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Testing after making changes is key.
+Hi Vladimir,
+
+> On Fri, Sep 22, 2023 at 01:18:38PM +0200, Lukasz Majewski wrote:
+> > By mistake my net-next repo was pointing to:
+> > git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+> >=20
+> > Please correct me if I'm wrong but it looks like the net repo for
+> > current mainline fixes... =20
+>=20
+> Yes, net.git is for fixes to the current mainline branch, and net-next
+> is for new features to be included in mainline during the next merge
+> window. They are the same at the beginning of the development cycle
+> and then they start to diverge.
+>=20
+> > However, after fetching net-next - I can apply v5 without issues on
+> > top of it.
+> >=20
+> > SHA1: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
+> > "Merge branch 'mlxsw-multicast'"
+> >=20
+> > https://source.denx.de/linux/linux-ksz9477/-/commits/net-next-ksz-HSR-d=
+evel-v5?ref_type=3Dheads
+> > Linux version from `uname -a`: 6.6.0-rc2+
+> >=20
+> > However, it looks like I would need to prepare v6 anyway... =20
+>=20
+> I don't know. "git rebase" is a bit smarter than "git am" and can
+> automatically resolve some conflicts, on which "git am" will simply
+> bail out if even the context is not identical. Either way, both
+> patchwork and me failed to apply your v5 series on net-next, and the
+> patches won't be accepted without build testing.
+
+Ok. I will test them with git am -3
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/8Zz4y42B9pmx0W0fITOB7ek
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUNftsACgkQAR8vZIA0
+zr3YUggA3jZ3lHpn8ZkcF4MmRins1g2DVkXSl71NXa1XaRcAcQeMJrEdCpj6HFkB
+ex/zy+QtQkEnkVA+V5ME6lH8C4zd4ezp0sqaDeXstaV2CTt3j1G66STYkV4ELQ5N
+aeV2CLxk1y9+QFTCHazhjD4pVeP+0WaLCJxAtelb4PO25WT0SQ7l711Qblas0F4k
+HCiAilgpD80GoOMeTwo/Pbe04zQ9fTVyhuAkEliRi47+s1VcbKdErhny+Ccwr8V5
+EUlUFk4ifYNni1TMSHd/C+GsLVTiq/z12sTZD1OM0sUeKhDRKiL7FLnSVtMQRd0M
+q6RzfYy0MWyvfdnfvBK34I8YiqnAfw==
+=CMjG
+-----END PGP SIGNATURE-----
+
+--Sig_/8Zz4y42B9pmx0W0fITOB7ek--
 
