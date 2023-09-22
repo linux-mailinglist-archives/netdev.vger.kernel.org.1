@@ -1,224 +1,117 @@
-Return-Path: <netdev+bounces-35783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780B47AB0C2
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:31:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F2C7AB0CA
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2C28C282E51
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:31:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B6894282FD0
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46CB1F93C;
-	Fri, 22 Sep 2023 11:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062941F93F;
+	Fri, 22 Sep 2023 11:31:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24AB1F92F
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:31:21 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3C63CC7
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 04:31:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695382280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YZNprSzbt9e8k58JcxEUqpXJf2zPy5yDQe5/rD+YGMw=;
-	b=TFxSkctqToVg/Nfm+QeiLMYjPf08sP9mOd5a5Zyhhfa/OtemUTjaJKubrzTqJnGSya8UP9
-	qlww4ygd5K4hQCAL3Cgqg7ADjqVHjhj9dS37r7RMZeUwCS+MrpKlDieNQwenlXZKbsjuWT
-	qmwqgwu+rAnFYN8I7yTJvXUhZEDzA2Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-44-75ozITHwPxqfRUZSOFIvLw-1; Fri, 22 Sep 2023 07:31:16 -0400
-X-MC-Unique: 75ozITHwPxqfRUZSOFIvLw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6EA2B101A529;
-	Fri, 22 Sep 2023 11:31:15 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0CD1420268D6;
-	Fri, 22 Sep 2023 11:31:12 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: David Howells <dhowells@redhat.com>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Christian Brauner <christian@brauner.io>,
-	David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v3 10/10] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
-Date: Fri, 22 Sep 2023 12:30:38 +0100
-Message-ID: <20230922113038.1135236-11-dhowells@redhat.com>
-In-Reply-To: <20230922113038.1135236-1-dhowells@redhat.com>
-References: <20230922113038.1135236-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801BF1F93D
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:31:46 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABF3AC;
+	Fri, 22 Sep 2023 04:31:41 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-502e7d66c1eso3344572e87.1;
+        Fri, 22 Sep 2023 04:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695382300; x=1695987100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FDWp5uiOwDwoGc4/Ybg3Oz+ADX7nwDhG7f/HnAB3i7M=;
+        b=OwaeSkJnWHuDQ/Ayxlc8hTQ+cUH2a0b9mxuKqskUTMuY3lXoYiOa6eqzU7JDrBlZtV
+         OI+mMUSQAmkqByZfzQMRnwZxIvl5hsRw5v2hlmc7GIEEOj4yhD1gFx3okv70+JQTbJte
+         uI9UBtbO6WfvTIoFbe+12A0i8ABsdCsl5FK+dq+YaUjeQBFN7kCHrRev1ETTjryINGpN
+         1+r5FqvWLQZMSGRmXRbUm0MFGRrasa0tYxk6DXXQgZUeWV2EQChvmu+d21UhcCTr6Md7
+         6LmBBBkc/VUYcd0+smZid+Ex0iayyRNs3ctXBSmhVVL8CcRBw9i5hU7SrSkH1jVa7qd1
+         HMLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695382300; x=1695987100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FDWp5uiOwDwoGc4/Ybg3Oz+ADX7nwDhG7f/HnAB3i7M=;
+        b=UGjd2cah2F44GARSnlNoKGio58AWWYxEdiCzQEvUYqkmqsqQFNSXOMYYA04KodNCEl
+         duvnvYRUlDJhTe3XLLfuoOTxZKVpkh9SLW3blPDoKCxthAhMoiceBgNABcvRgAQddD5L
+         QYtxTNYunBoRt239yb8WhpXJmze5z3FiNJwT3aGVO3nWIoIgNlmoX/lOs9Km5t1p2/fd
+         IJsbgvmLFW7r+itr91TzJyQ/ILVbKLbvOFyEhswqDlytPCKo4hOtAC7hUc2MQSirF+H2
+         oJcz0O0V9ggHRYzppCl8wzspJVGb6WNC4BWyJQdRp3cz7JGR6o71SVN0bVMeV5uzj0Aj
+         Eu+A==
+X-Gm-Message-State: AOJu0YwBexk3NGI/I3h+UfZwzb8QMOTA2AtkKlyQSFAmmtunxU+0Vs+M
+	vo6Hj2sA+f+uyR6imTh3z90=
+X-Google-Smtp-Source: AGHT+IH+Po4obqpRXpBKtY/vOBw8JlAG0X1n45dmY7bPGn0wadoIcozZVmPT1J/z6KSYak5aQQ08IA==
+X-Received: by 2002:a05:6512:2013:b0:502:ffdf:b098 with SMTP id a19-20020a056512201300b00502ffdfb098mr6495626lfb.6.1695382299590;
+        Fri, 22 Sep 2023 04:31:39 -0700 (PDT)
+Received: from skbuf ([188.25.255.147])
+        by smtp.gmail.com with ESMTPSA id d13-20020a50fb0d000000b0052567e6586bsm2188130edq.38.2023.09.22.04.31.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 04:31:39 -0700 (PDT)
+Date: Fri, 22 Sep 2023 14:31:36 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
+ for KSZ9477
+Message-ID: <20230922113136.jgfo2waalz2pya6b@skbuf>
+References: <20230920114343.1979843-1-lukma@denx.de>
+ <20230921192308.kntudhbwc4j4skza@skbuf>
+ <20230922131838.4bab19e7@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922131838.4bab19e7@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
-iterator.  This attaches a userspace VM with a mapped file in it
-temporarily to the test thread.
+On Fri, Sep 22, 2023 at 01:18:38PM +0200, Lukasz Majewski wrote:
+> By mistake my net-next repo was pointing to:
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+> 
+> Please correct me if I'm wrong but it looks like the net repo for
+> current mainline fixes...
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: Brendan Higgins <brendanhiggins@google.com>
-cc: David Gow <davidgow@google.com>
-cc: linux-kselftest@vger.kernel.org
-cc: kunit-dev@googlegroups.com
-cc: linux-mm@kvack.org
-cc: linux-fsdevel@vger.kernel.org
----
- lib/kunit_iov_iter.c | 95 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+Yes, net.git is for fixes to the current mainline branch, and net-next
+is for new features to be included in mainline during the next merge window.
+They are the same at the beginning of the development cycle and then
+they start to diverge.
 
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index 2fbe6f2afb26..d5b7517f4f47 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -1325,6 +1325,99 @@ static void *__init iov_kunit_create_source(struct kunit *test, size_t npages)
- 	return scratch;
- }
- 
-+/*
-+ * Time copying 256MiB through an ITER_UBUF.
-+ */
-+static void __init iov_kunit_benchmark_ubuf(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over UBUF:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		size_t remain = size;
-+
-+		a = ktime_get_real();
-+		do {
-+			size_t part = min(remain, PAGE_SIZE);
-+
-+			iov_iter_ubuf(&iter, ITER_SOURCE, buffer, part);
-+			copied = copy_from_iter(scratch, part, &iter);
-+			KUNIT_EXPECT_EQ(test, copied, part);
-+			remain -= part;
-+		} while (remain > 0);
-+		b = ktime_get_real();
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_IOVEC.
-+ */
-+static void __init iov_kunit_benchmark_iovec(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	struct iovec *iov;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE, part;
-+	size_t ioc = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	iov = kunit_kmalloc_array(test, ioc, sizeof(*iov), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, iov);
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Split the target over a number of iovecs */
-+	copied = 0;
-+	for (i = 0; i < ioc; i++) {
-+		part = size / ioc;
-+		iov[i].iov_base = buffer + copied;
-+		iov[i].iov_len = part;
-+		copied += part;
-+	}
-+	iov[i - 1].iov_len += size - part;
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over IOVEC:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_init(&iter, ITER_SOURCE, iov, npages, size);
-+
-+		a = ktime_get_real();
-+		copied = copy_from_iter(scratch, size, &iter);
-+		b = ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- /*
-  * Time copying 256MiB through an ITER_KVEC.
-  */
-@@ -1611,6 +1704,8 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
- 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_ubuf),
-+	KUNIT_CASE(iov_kunit_benchmark_iovec),
- 	KUNIT_CASE(iov_kunit_benchmark_kvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
+> However, after fetching net-next - I can apply v5 without issues on top
+> of it.
+> 
+> SHA1: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
+> "Merge branch 'mlxsw-multicast'"
+> 
+> https://source.denx.de/linux/linux-ksz9477/-/commits/net-next-ksz-HSR-devel-v5?ref_type=heads
+> Linux version from `uname -a`: 6.6.0-rc2+
+> 
+> However, it looks like I would need to prepare v6 anyway...
 
+I don't know. "git rebase" is a bit smarter than "git am" and can
+automatically resolve some conflicts, on which "git am" will simply bail
+out if even the context is not identical. Either way, both patchwork and
+me failed to apply your v5 series on net-next, and the patches won't be
+accepted without build testing.
 
