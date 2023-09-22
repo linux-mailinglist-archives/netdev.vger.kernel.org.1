@@ -1,97 +1,119 @@
-Return-Path: <netdev+bounces-35856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A607AB616
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:35:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6807AB626
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 61842B209CA
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:35:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0AAF81C209C8
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB6C25107;
-	Fri, 22 Sep 2023 16:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0A441769;
+	Fri, 22 Sep 2023 16:38:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC4B323E
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:35:11 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248A0114
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:35:10 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99c93638322so610129666b.1
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:35:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1695400508; x=1696005308; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gOhjx56+C1/SUOCT4pJr+RaAn7PBsJsy8c2/c8L0wsg=;
-        b=VXldlrG11szZBfan3YaFaOg1qRTFUXItPvz+d594Ed/RZo0X8fDhhFTcT+Tfee5VSP
-         yLE9fyNVXNnPLkw0gSESTe8Z8WM+wGotLZjHCgzE0IfCnJJtL1u/7KVdSA3g4FbBQDNs
-         0yJxayfVAnOtmdEA4zWcMbTKTM0gvJiAOw2es=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A421E3D986
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:38:08 +0000 (UTC)
+Received: from mail-vs1-xe64.google.com (mail-vs1-xe64.google.com [IPv6:2607:f8b0:4864:20::e64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B67A194
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:38:06 -0700 (PDT)
+Received: by mail-vs1-xe64.google.com with SMTP id ada2fe7eead31-4529d1238a9so1151114137.3
+        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:38:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695400508; x=1696005308;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gOhjx56+C1/SUOCT4pJr+RaAn7PBsJsy8c2/c8L0wsg=;
-        b=w+ZWxSaAhvX5664ojbF3AYqzg+de4YgGYCt7IfNL9wgexAMJnh85XrHuJqfojNVLIq
-         gsH3udCltMF4Kl0A4x4W0pqYVvDKkXVnvwVyKmEOw5YK2a8O2JWlKW4QHKuDEXJTRuID
-         RqklWzcC1O4GM+D/gwjgJA+NXuNraCNctPhFuaHCOXGVpm8a4GW96QOtSEcskZzBqqYy
-         RqI25uxmmi3XVTLsK4e5TX+TMVaFnmye0QubnpM04Ch80N59csWu/6t33byD3cU/L6/j
-         Cng1tfWQYmO4GHbDQwnKy2qkFfPi8K6MMcUhZg8v0uGy+ajMNNxlLQ9soZSc5ms6YKtI
-         XpZA==
-X-Gm-Message-State: AOJu0YxODzV7EsBl4q9Tq6x9mHAtc5Wnx2XBf1JtNqLpRXSr36eHKYgn
-	t7dD52VoDZSdVDc8uwZPt31oPGt4VpeJzX2CDcqrv9+N
-X-Google-Smtp-Source: AGHT+IFb6mDrHkfLrnDEwRahWUjmuXa5ZyTOcoAK4WYCx7a3HA7TzfsVXhr8EN0V3mali2KAbi9aaw==
-X-Received: by 2002:a17:906:4fce:b0:9aa:206d:b052 with SMTP id i14-20020a1709064fce00b009aa206db052mr4853837ejw.27.1695400508519;
-        Fri, 22 Sep 2023 09:35:08 -0700 (PDT)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id p20-20020a1709060e9400b009ae587ce135sm2923883ejf.223.2023.09.22.09.35.07
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Sep 2023 09:35:07 -0700 (PDT)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-532addba879so6128672a12.0
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:35:07 -0700 (PDT)
-X-Received: by 2002:a05:6402:27ca:b0:52c:f73:3567 with SMTP id
- c10-20020a05640227ca00b0052c0f733567mr4854122ede.13.1695400507255; Fri, 22
- Sep 2023 09:35:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695400685; x=1696005485;
+        h=from:message-id:content-transfer-encoding:user-agent:cc:subject:to
+         :date:dkim-signature:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pD16L7bzKZHGImef/xBf1dFAV1vQpWiuIcQ1e7o+p+U=;
+        b=RmP47Y3UyObfdPPnFk5iztlc2PZN350Q41qTaEV5sudgwfhgU30gG31sOF0K6CkMP0
+         VVbc04kjJKpP1f73LOzHmmmxcbOh7a/VaMxXX9QU0oLCIHm7z2GuaBn+q9FPc9wICJLE
+         m7/lhDExCQm/vjlGyluqKRMDr/TVDZ6iYRs547tObMn6Gc+Y1oDfE1Y+/vs9ggz5etcG
+         od/G4TsmcI9xweDwVNEs22jAzCgWgSOpZUmG1+DXQAgU6Ky1LYK5ETcI8gNbFI5lrhOU
+         j9jkqbsLyv7vzAqDutwE/c1cUfwmEtiOPVmlNCkEAYRL2X+wkhiZDaskwLC4fBVSif7e
+         lvdA==
+X-Gm-Message-State: AOJu0YznOZwOcX9ZnKifbPM/2ndSLD0HuN6zzZaiE376xFdJF6p80k2M
+	iHCXYuodvnNo+r/POwZ5gcYq39oMuifTyELJzlxWqCuvrlIS
+X-Google-Smtp-Source: AGHT+IHFZ12Ok0odf7n7xvLFvliRtfNcU0J6F/mX6xY8/rd40WkKYnJp3VobEZFPd3IRcjUakvZUYy7rTgEo
+X-Received: by 2002:a67:fb18:0:b0:44e:8ef9:3371 with SMTP id d24-20020a67fb18000000b0044e8ef93371mr129528vsr.8.1695400685509;
+        Fri, 22 Sep 2023 09:38:05 -0700 (PDT)
+Received: from smtp.aristanetworks.com (mx.aristanetworks.com. [162.210.129.12])
+        by smtp-relay.gmail.com with ESMTPS id w20-20020ab055d4000000b0079de0a4af6fsm222139uaa.11.2023.09.22.09.38.05
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Sep 2023 09:38:05 -0700 (PDT)
+X-Relaying-Domain: arista.com
+Received: from us122.sjc.aristanetworks.com (us122.sjc.aristanetworks.com [10.242.248.9])
+	by smtp.aristanetworks.com (Postfix) with ESMTP id 8E29B40188E;
+	Fri, 22 Sep 2023 09:38:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arista.com;
+	s=Arista-A; t=1695400684;
+	bh=pD16L7bzKZHGImef/xBf1dFAV1vQpWiuIcQ1e7o+p+U=;
+	h=Date:To:Subject:Cc:From:From;
+	b=w0JOCtsUqRr9L2yiSMUUh4U0gHzYGhfZiLxPm16WujaERSVmv7pPKtqDh2jHjHqaI
+	 yMe+FMU9FsWBedV75VKZ/hneECmmr1MCAQHeUndMXB4oI1tykIoock00DIaHvHP7u7
+	 0mTDwP3Vjnt8Ii2CYYB/paPpC6s/E34c4yh/bfQ3ZdeYeAvGUhxL4ksutaqAuAtznL
+	 00R1px9OPe0u0S4cxwh7bzpNd/p5VuNzsTE9/xjIViOGBON7jeD+JIkIjN4FekwvOA
+	 Lizga9KIhIZ1AQmzxlbSngTiLUUuccaYoN0eGWFGemOAEElyku8vldYpqcS6xjyBRb
+	 3ureBhcvVd4LA==
+Received: by us122.sjc.aristanetworks.com (Postfix, from userid 10181)
+	id 7DDBA2440449; Fri, 22 Sep 2023 09:38:04 -0700 (PDT)
+Date: Fri, 22 Sep 2023 09:38:04 -0700
+To: intel-wired-lan@lists.osuosl.org
+Subject: [PATCH] [iwl-net] Revert "igc: set TP bit in 'supported' and
+ 'advertising' fields of ethtool_link_ksettings"
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ dumazet@google.com, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+ sasha.neftin@intel.com, prasad@arista.com
+User-Agent: Heirloom mailx 12.5 7/5/10
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230922163804.7DDBA2440449@us122.sjc.aristanetworks.com>
+From: prasad@arista.com (Prasad Koya)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230922120227.1173720-1-dhowells@redhat.com> <20230922120227.1173720-9-dhowells@redhat.com>
-In-Reply-To: <20230922120227.1173720-9-dhowells@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 22 Sep 2023 09:34:49 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgW5z-OBA8kbOOoM7dAriOsb1j7n6GaUNjGeg9fPY=JRw@mail.gmail.com>
-Message-ID: <CAHk-=wgW5z-OBA8kbOOoM7dAriOsb1j7n6GaUNjGeg9fPY=JRw@mail.gmail.com>
-Subject: Re: [PATCH v6 08/13] iov_iter: Don't deal with iter->copy_mc in memcpy_from_iter_mc()
-To: David Howells <dhowells@redhat.com>
-Cc: Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>, 
-	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, 
-	Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Fri, 22 Sept 2023 at 05:02, David Howells <dhowells@redhat.com> wrote:
->
-> iter->copy_mc is only used with a bvec iterator and only by
-> dump_emit_page() in fs/coredump.c so rather than handle this in
-> memcpy_from_iter_mc() where it is checked repeatedly by _copy_from_iter()
-> and copy_page_from_iter_atomic(),
+This reverts commit 9ac3fc2f42e5ffa1e927dcbffb71b15fa81459e2.
 
-This looks fine now, but is missing your sign-off...
+After the command "ethtool -s enps0 speed 100 duplex full autoneg on",
+i.e., advertise only 100Mbps speed to the peer, "ethtool enps0" shows
+advertised speeds as 100Mbps and 2500Mbps. Same behavior is seen
+when changing the speed to 10Mbps or 1000Mbps.
 
-             Linus
+This applies to I225/226 parts, which only supports copper mode.
+Reverting to original till the ambiguity is resolved.
+
+Fixes: 9ac3fc2f42e5 ("igc: set TP bit in 'supported' and 
+'advertising' fields of ethtool_link_ksettings")
+Signed-off-by: Prasad Koya <prasad@arista.com>
+---
+ drivers/net/ethernet/intel/igc/igc_ethtool.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+index 93bce729be76..0e2cb00622d1 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
++++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
+@@ -1708,8 +1708,6 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
+ 	/* twisted pair */
+ 	cmd->base.port = PORT_TP;
+ 	cmd->base.phy_address = hw->phy.addr;
+-	ethtool_link_ksettings_add_link_mode(cmd, supported, TP);
+-	ethtool_link_ksettings_add_link_mode(cmd, advertising, TP);
+ 
+ 	/* advertising link modes */
+ 	if (hw->phy.autoneg_advertised & ADVERTISE_10_HALF)
+-- 
+2.41.0
+
 
