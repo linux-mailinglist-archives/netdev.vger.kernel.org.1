@@ -1,223 +1,154 @@
-Return-Path: <netdev+bounces-35654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082D27AA763
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 05:42:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2AEE7AA7BC
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 06:27:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 22058282CB3
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:42:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 20FF11F21D75
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 04:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDD217FD;
-	Fri, 22 Sep 2023 03:42:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98E080D;
+	Fri, 22 Sep 2023 04:27:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4384E211F
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 03:42:38 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F2AF7
-	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:36 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59bee08c13aso23326937b3.0
-        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 20:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695354156; x=1695958956; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6Juutre+yi4BpZqiVckzcbN1GkYN+N+Vn3GYokg3Is=;
-        b=SxNjbLsiAdURtwfF4L8bxnwBBNLBHI35nlorzD5JC2xejq66tZE+7sfNltiDUKzNDP
-         GYVQab6qcQ6P+m2EPtwQ1aqCsJAawLa2zdpPxp6hFHGebmcO+3ocjnxfehSa05lAhbzN
-         rGm8vK9Dv3m0ItBv/If9ZH6d9C1qje/uKC4eadh92q4pkeJpCBOtCF4rCsAeIdzZdkNC
-         GlI3jbmi1nqMYP+z2XqTuuu/Nz40NEffem45vlEuBindKDF9odJmc+OhMIVjEAMv4bK2
-         79jthPwCpAEl+W69/ob/4kwWEU2s48XPOlhDm+G262Qy10wgkB0kVSHu0QzCCfu5iOuq
-         etsw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2678517E2
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 04:27:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF85A18F
+	for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 21:27:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695356819;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5EaqgmQfjWf4RSP054NnjKIxOwf3P8mlQqF+5e289Wk=;
+	b=C/uVg1YNlo8rYzyTvMQIfwNoUiiPVUWG10O3YN2is5QtCIOunFuYqswXkmi9HPaclg61YH
+	8e5sGMXbq+YdDls1u/+uyNHiWX4FA0DzvFT9567MiKItYm2bV5+snOlnoePbIDimVj0005
+	WmvLVsggzbq/AqKLFj00Sf526dhIGS0=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-288-ABUpvCNSOLKz9ToF9Wg5Qg-1; Fri, 22 Sep 2023 00:26:57 -0400
+X-MC-Unique: ABUpvCNSOLKz9ToF9Wg5Qg-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2c0082e04eeso20976761fa.0
+        for <netdev@vger.kernel.org>; Thu, 21 Sep 2023 21:26:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695354156; x=1695958956;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6Juutre+yi4BpZqiVckzcbN1GkYN+N+Vn3GYokg3Is=;
-        b=GEy7s8r1nA43q0SwdLubtNmFfoG+ErX0c1A78VvKsvuglZE7PvnH4sTY+gghTMP8E5
-         skzneBmgnKVhTy4xetvH65KOOIL0WAd0N/MIeNyNMqZtBmfArE/jZlxKJHv1cWrODS6F
-         XjpFOG+D5saOxQ0Tx81mfVSlEdTOXdTyWzZtqT7dQejz+pvCtmL6VT5RT+w34mOefQIr
-         QJVvDq1nHX9XI4NHLqbGjYdKVETGmuNFQJ64TKR5ClItFPNO0VsdPav+wNXcCsv6bgXs
-         IPOLU1LJLAT4GfeBNudOP4GXYTbQEQlqJwkAXttakRQgsoZjBPE3PQDkeZXaU+x7/OmQ
-         SeCg==
-X-Gm-Message-State: AOJu0Yz8XT79SrVXy0sc77dNmMopcFq8njH0rioK5QfAioNb8rUmoM44
-	931ldgXQQ9nK8qQOaLCZwwnS+1NavVCV/w==
-X-Google-Smtp-Source: AGHT+IGc+EhskLxVOVfKWZaLXPWdZJNNMXGw5GsAA9TqoL2/QZnsVNyi6ierZBPfi8DgmS3o93UkaiDaHe2MFw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:4323:0:b0:59b:d857:8317 with SMTP id
- q35-20020a814323000000b0059bd8578317mr102911ywa.2.1695354155866; Thu, 21 Sep
- 2023 20:42:35 -0700 (PDT)
-Date: Fri, 22 Sep 2023 03:42:21 +0000
-In-Reply-To: <20230922034221.2471544-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1695356816; x=1695961616;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5EaqgmQfjWf4RSP054NnjKIxOwf3P8mlQqF+5e289Wk=;
+        b=QKlr+iuQ6czH/Rpn+becJgq5J31ogTY0UvmfQJXxnD3HvtVbOY1/T1Qat2/WYTsDbt
+         JNmXN7ZWUmYOKygxtSnUoBHxWdiNBWWSUg9gZVfLCiOo+yVTKf13oi/u/ru5QQZysSki
+         I83Z+HdeYHXcztndC959EThCxHgViKFhqftD+fXKeIf1jhN3hOsLkYQuKC9x+V4fMf96
+         GhGCAXKxXbax4Ki2gOvqiWWh3kppyrULdTPGkzSUq4jMu7jWGir0mZEpmECIgZBc33Hl
+         bYSv/y2ra652gLkoYpfzHKjuwtH103EP1IzKURD485CyyrSCGkt3YT8pQyqXI1BFx/UG
+         gdxQ==
+X-Gm-Message-State: AOJu0Ywy3Cc0tRXKgLJd2dRO8D32tuWwHT2phz9vXj873OzpzpjFpT6D
+	3KycVfC/nkKgQZiuFa0GM2/PxTYjZJEeJu6kELAakZJzb3InN3Q+hT0yQMyUDqmdhDT8YrGYadu
+	5x9I3sjdgOpZl5lPjQE9CkoNlmxEm9Uqn
+X-Received: by 2002:a2e:90d5:0:b0:2bf:ff17:811b with SMTP id o21-20020a2e90d5000000b002bfff17811bmr6233302ljg.3.1695356816406;
+        Thu, 21 Sep 2023 21:26:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6kt7xDg+aB1I6QHkKIhyfLUbsI0g/0L7rhAHVvAsPsk/167eY/3mb1NulDto656tDuHLO1oTrs2ZNOV+f0Oc=
+X-Received: by 2002:a2e:90d5:0:b0:2bf:ff17:811b with SMTP id
+ o21-20020a2e90d5000000b002bfff17811bmr6233295ljg.3.1695356816098; Thu, 21 Sep
+ 2023 21:26:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230922034221.2471544-1-edumazet@google.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230922034221.2471544-9-edumazet@google.com>
-Subject: [PATCH v2 net-next 8/8] inet: implement lockless getsockopt(IP_MULTICAST_IF)
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20230919074915.103110-1-hengqi@linux.alibaba.com> <20230919074915.103110-4-hengqi@linux.alibaba.com>
+In-Reply-To: <20230919074915.103110-4-hengqi@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 22 Sep 2023 12:26:45 +0800
+Message-ID: <CACGkMEumtfsqmB5F+c9t+6mSkEN_UB8iS9ztTg+NfYm56mQuvg@mail.gmail.com>
+Subject: Re: [PATCH net 3/6] virtio-net: consistently save parameters for per-queue
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	"Michael S . Tsirkin" <mst@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Gavin Li <gavinl@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add missing annotations to inet->mc_index and inet->mc_addr
-to fix data-races.
+On Tue, Sep 19, 2023 at 3:49=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
+wrote:
+>
+> When using .set_coalesce interface to set all queue coalescing
+> parameters, we need to update both per-queue and global save values.
+>
+> Fixes: 394bd87764b6 ("virtio_net: support per queue interrupt coalesce co=
+mmand")
+> Cc: Gavin Li <gavinl@nvidia.com>
+> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 
-getsockopt(IP_MULTICAST_IF) can be lockless.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-setsockopt() side is left for later.
+Thanks
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
----
- net/ipv4/datagram.c    |  4 ++--
- net/ipv4/ip_sockglue.c | 25 ++++++++++++-------------
- net/ipv4/ping.c        |  4 ++--
- net/ipv4/raw.c         |  4 ++--
- net/ipv4/udp.c         |  4 ++--
- 5 files changed, 20 insertions(+), 21 deletions(-)
-
-diff --git a/net/ipv4/datagram.c b/net/ipv4/datagram.c
-index 1480e9ebdfef445960e1f70f34f33a0e0c52b65b..2cc50cbfc2a31ec91fbdc4a541cb89df689cd9ae 100644
---- a/net/ipv4/datagram.c
-+++ b/net/ipv4/datagram.c
-@@ -39,9 +39,9 @@ int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len
- 	saddr = inet->inet_saddr;
- 	if (ipv4_is_multicast(usin->sin_addr.s_addr)) {
- 		if (!oif || netif_index_is_l3_master(sock_net(sk), oif))
--			oif = inet->mc_index;
-+			oif = READ_ONCE(inet->mc_index);
- 		if (!saddr)
--			saddr = inet->mc_addr;
-+			saddr = READ_ONCE(inet->mc_addr);
- 	} else if (!oif) {
- 		oif = READ_ONCE(inet->uc_index);
- 	}
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index 1ee01ff64171c94b6b244589518a53ce807a212d..0b74ac49d6a6f82f5e8ffe5279dba3baf30f874e 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1168,8 +1168,8 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 
- 		if (!mreq.imr_ifindex) {
- 			if (mreq.imr_address.s_addr == htonl(INADDR_ANY)) {
--				inet->mc_index = 0;
--				inet->mc_addr  = 0;
-+				WRITE_ONCE(inet->mc_index, 0);
-+				WRITE_ONCE(inet->mc_addr, 0);
- 				err = 0;
- 				break;
- 			}
-@@ -1194,8 +1194,8 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		    midx != sk->sk_bound_dev_if)
- 			break;
- 
--		inet->mc_index = mreq.imr_ifindex;
--		inet->mc_addr  = mreq.imr_address.s_addr;
-+		WRITE_ONCE(inet->mc_index, mreq.imr_ifindex);
-+		WRITE_ONCE(inet->mc_addr, mreq.imr_address.s_addr);
- 		err = 0;
- 		break;
- 	}
-@@ -1673,19 +1673,11 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 	case IP_UNICAST_IF:
- 		val = (__force int)htonl((__u32) READ_ONCE(inet->uc_index));
- 		goto copyval;
--	}
--
--	if (needs_rtnl)
--		rtnl_lock();
--	sockopt_lock_sock(sk);
--
--	switch (optname) {
- 	case IP_MULTICAST_IF:
- 	{
- 		struct in_addr addr;
- 		len = min_t(unsigned int, len, sizeof(struct in_addr));
--		addr.s_addr = inet->mc_addr;
--		sockopt_release_sock(sk);
-+		addr.s_addr = READ_ONCE(inet->mc_addr);
- 
- 		if (copy_to_sockptr(optlen, &len, sizeof(int)))
- 			return -EFAULT;
-@@ -1693,6 +1685,13 @@ int do_ip_getsockopt(struct sock *sk, int level, int optname,
- 			return -EFAULT;
- 		return 0;
- 	}
-+	}
-+
-+	if (needs_rtnl)
-+		rtnl_lock();
-+	sockopt_lock_sock(sk);
-+
-+	switch (optname) {
- 	case IP_MSFILTER:
- 	{
- 		struct ip_msfilter msf;
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 66ad1f95af49f222afe0ee75b9163dd0af0a2c49..2c61f444e1c7d322e75e020c41af02977d8814f0 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -773,9 +773,9 @@ static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 	if (ipv4_is_multicast(daddr)) {
- 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
--			ipc.oif = inet->mc_index;
-+			ipc.oif = READ_ONCE(inet->mc_index);
- 		if (!saddr)
--			saddr = inet->mc_addr;
-+			saddr = READ_ONCE(inet->mc_addr);
- 	} else if (!ipc.oif)
- 		ipc.oif = READ_ONCE(inet->uc_index);
- 
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index e2357d23202e5a39832bb1550c365de9a836c363..27da9d7294c0b4fb9027bb7feb704063dc6302db 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -579,9 +579,9 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	uc_index = READ_ONCE(inet->uc_index);
- 	if (ipv4_is_multicast(daddr)) {
- 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
--			ipc.oif = inet->mc_index;
-+			ipc.oif = READ_ONCE(inet->mc_index);
- 		if (!saddr)
--			saddr = inet->mc_addr;
-+			saddr = READ_ONCE(inet->mc_addr);
- 	} else if (!ipc.oif) {
- 		ipc.oif = uc_index;
- 	} else if (ipv4_is_lbcast(daddr) && uc_index) {
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 1e0c3aba1e5a88c7ba50a28511412a1710f1bab5..7f7724beca33781f8ff12750d1c9c9ccc420f481 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1177,9 +1177,9 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	uc_index = READ_ONCE(inet->uc_index);
- 	if (ipv4_is_multicast(daddr)) {
- 		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
--			ipc.oif = inet->mc_index;
-+			ipc.oif = READ_ONCE(inet->mc_index);
- 		if (!saddr)
--			saddr = inet->mc_addr;
-+			saddr = READ_ONCE(inet->mc_addr);
- 		connected = 0;
- 	} else if (!ipc.oif) {
- 		ipc.oif = uc_index;
--- 
-2.42.0.515.g380fc7ccd1-goog
+> ---
+>  drivers/net/virtio_net.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 80d35a864790..ce60162d380a 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3233,6 +3233,7 @@ static int virtnet_send_notf_coal_cmds(struct virtn=
+et_info *vi,
+>                                        struct ethtool_coalesce *ec)
+>  {
+>         struct scatterlist sgs_tx, sgs_rx;
+> +       int i;
+>
+>         vi->ctrl->coal_tx.tx_usecs =3D cpu_to_le32(ec->tx_coalesce_usecs)=
+;
+>         vi->ctrl->coal_tx.tx_max_packets =3D cpu_to_le32(ec->tx_max_coale=
+sced_frames);
+> @@ -3246,6 +3247,10 @@ static int virtnet_send_notf_coal_cmds(struct virt=
+net_info *vi,
+>         /* Save parameters */
+>         vi->intr_coal_tx.max_usecs =3D ec->tx_coalesce_usecs;
+>         vi->intr_coal_tx.max_packets =3D ec->tx_max_coalesced_frames;
+> +       for (i =3D 0; i < vi->max_queue_pairs; i++) {
+> +               vi->sq[i].intr_coal.max_usecs =3D ec->tx_coalesce_usecs;
+> +               vi->sq[i].intr_coal.max_packets =3D ec->tx_max_coalesced_=
+frames;
+> +       }
+>
+>         vi->ctrl->coal_rx.rx_usecs =3D cpu_to_le32(ec->rx_coalesce_usecs)=
+;
+>         vi->ctrl->coal_rx.rx_max_packets =3D cpu_to_le32(ec->rx_max_coale=
+sced_frames);
+> @@ -3259,6 +3264,10 @@ static int virtnet_send_notf_coal_cmds(struct virt=
+net_info *vi,
+>         /* Save parameters */
+>         vi->intr_coal_rx.max_usecs =3D ec->rx_coalesce_usecs;
+>         vi->intr_coal_rx.max_packets =3D ec->rx_max_coalesced_frames;
+> +       for (i =3D 0; i < vi->max_queue_pairs; i++) {
+> +               vi->rq[i].intr_coal.max_usecs =3D ec->rx_coalesce_usecs;
+> +               vi->rq[i].intr_coal.max_packets =3D ec->rx_max_coalesced_=
+frames;
+> +       }
+>
+>         return 0;
+>  }
+> --
+> 2.19.1.6.gb485710b
+>
 
 
