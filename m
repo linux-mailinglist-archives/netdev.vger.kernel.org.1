@@ -1,199 +1,92 @@
-Return-Path: <netdev+bounces-35639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFCE27AA6B6
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38D067AA6AB
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 03:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 73885282354
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:51:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E16E92821F0
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 01:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972AA659;
-	Fri, 22 Sep 2023 01:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881D7391;
+	Fri, 22 Sep 2023 01:51:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9633980D;
-	Fri, 22 Sep 2023 01:51:11 +0000 (UTC)
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D50F1;
-	Thu, 21 Sep 2023 18:51:06 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0Vsa-hC4_1695347462;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vsa-hC4_1695347462)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Sep 2023 09:51:04 +0800
-Message-ID: <1695347358.2770545-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue reset
-Date: Fri, 22 Sep 2023 09:49:18 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- Mark Gross <markgross@kernel.org>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <bjorn.andersson@linaro.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Vincent Whitchurch <vincent.whitchurch@axis.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org,
- kangjie.xu@linux.alibaba.com
-References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
- <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
- <20230921100112-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230921100112-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B26377
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 01:51:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5126FC433C8;
+	Fri, 22 Sep 2023 01:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695347462;
+	bh=tO499MJh0Rmss4aq5EkxYyocXf/RBJNFYcxNU66BgZ0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DedHTISbGl1Riy18bkpDUE2V1L8tCAl347+qvXyDNjcqd6UoXQPkXJ/T6hLBMCPdh
+	 GQHrEdXGfqqInls/ng/5jvcyukR/1kpUN2L6M7JaDGd1Om913kWjs9EyHORdrViNQc
+	 9lf5etLiFOUw9tWjUS0d85P7/uHrycgcG98cFeO1b+z0hjtO1rJc8+t8icXqcCt0lK
+	 NFs6pPuMQOQOvHKbwp2sRbqi9N0ee0AYJ4vVSM5UyXRJjk1zBZ8tmev8LlD2n6ka/6
+	 eZEuzD2I8YXE0rBxgEaf5VK74NicMJHFo0qOfKofFhk2d8Ps+wyAx+Acnb7cpYsCXR
+	 7wP1qJrTSBb8A==
+Message-ID: <e49bcbc4-b7ae-66b1-4964-957983688426@kernel.org>
+Date: Thu, 21 Sep 2023 19:51:01 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCHv3 net 1/2] fib: convert fib_nh_is_v6 and nh_updated to use
+ a single bit
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ido Schimmel <idosch@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>,
+ Thomas Haller <thaller@redhat.com>,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Eric Dumazet <edumazet@google.com>,
+ Nicolas Dichtel <nicolas.dichtel@6wind.com>, Ido Schimmel <idosch@idosch.org>
+References: <20230921031409.514488-1-liuhangbin@gmail.com>
+ <20230921031409.514488-2-liuhangbin@gmail.com>
+ <21c58c78-1b76-745a-0a12-7532a569374b@kernel.org>
+ <ZQzuB00CJpr51C+N@Laptop-X1>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ZQzuB00CJpr51C+N@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 21 Sep 2023 10:02:53 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
-> > Introduce new helpers to implement queue reset and get queue reset
-> > status.
-> >
-> >  https://github.com/oasis-tcs/virtio-spec/issues/124
-> >  https://github.com/oasis-tcs/virtio-spec/issues/139
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> >  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
-> >  include/linux/virtio_pci_modern.h      |  2 ++
-> >  2 files changed, 41 insertions(+)
-> >
-> > diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-> > index fa2a9445bb18..869cb46bef96 100644
-> > --- a/drivers/virtio/virtio_pci_modern_dev.c
-> > +++ b/drivers/virtio/virtio_pci_modern_dev.c
-> > @@ -3,6 +3,7 @@
-> >  #include <linux/virtio_pci_modern.h>
-> >  #include <linux/module.h>
-> >  #include <linux/pci.h>
-> > +#include <linux/delay.h>
-> >
-> >  /*
-> >   * vp_modern_map_capability - map a part of virtio pci capability
-> > @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
-> >  }
-> >  EXPORT_SYMBOL_GPL(vp_modern_set_status);
-> >
-> > +/*
-> > + * vp_modern_get_queue_reset - get the queue reset status
-> > + * @mdev: the modern virtio-pci device
-> > + * @index: queue index
-> > + */
-> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > +{
-> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > +
-> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > +
-> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > +	return vp_ioread16(&cfg->queue_reset);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
-> > +
->
-> Actually, this does not validate that the config structure is big
-> enough. So it can access some unrelated memory. Don't know whether
-> that's exploitable e.g. for CoCo but not nice, anyway.
-> Need to validate the size and disable reset if it's too small.
+On 9/21/23 7:29 PM, Hangbin Liu wrote:
+> On Thu, Sep 21, 2023 at 07:03:20AM -0600, David Ahern wrote:
+>> On 9/20/23 9:14 PM, Hangbin Liu wrote:
+>>> The FIB info structure currently looks like this:
+>>> struct fib_info {
+>>>         struct hlist_node          fib_hash;             /*     0    16 */
+>>>         [...]
+>>>         u32                        fib_priority;         /*    80     4 */
+>>>
+>>>         /* XXX 4 bytes hole, try to pack */
+>>>
+>>>         struct dst_metrics *       fib_metrics;          /*    88     8 */
+>>>         int                        fib_nhs;              /*    96     4 */
+>>>         bool                       fib_nh_is_v6;         /*   100     1 */
+>>>         bool                       nh_updated;           /*   101     1 */
+>>>
+>>>         /* XXX 2 bytes hole, try to pack */
+>>
+>> 2B hole here and you want to add a single flag so another bool. I would
+>> prefer the delay to a bitfield until all holes are consumed.
+>>
+> 
+> OK, just in case I didn't misunderstand. I should add a `bool pfsrc_removed`
+> here and drop the first patch, right?
 
 
-static int vp_modern_disable_vq_and_reset(struct virtqueue *vq)
-{
-	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-	struct virtio_pci_vq_info *info;
-	unsigned long flags;
+yes.
 
-->	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-		return -ENOENT;
+The bitfield has higher overhead. Let's reserve that overhead to when
+there are no more holes and a new field pushes the struct over 128B.
 
-	vp_modern_set_queue_reset(mdev, vq->index);
-
-
-I checked VIRTIO_F_RING_RESET before call this.
-
-Do you mean, we should put the check to this function.
-
-
-Thanks.
-
-
-
->
->
-> > +/*
-> > + * vp_modern_set_queue_reset - reset the queue
-> > + * @mdev: the modern virtio-pci device
-> > + * @index: queue index
-> > + */
-> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > +{
-> > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > +
-> > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > +
-> > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > +	vp_iowrite16(1, &cfg->queue_reset);
-> > +
-> > +	while (vp_ioread16(&cfg->queue_reset))
-> > +		msleep(1);
-> > +
-> > +	while (vp_ioread16(&cfg->cfg.queue_enable))
-> > +		msleep(1);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > +
-> >  /*
-> >   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
-> >   * @mdev: the modern virtio-pci device
-> > diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> > index 05123b9a606f..c4eeb79b0139 100644
-> > --- a/include/linux/virtio_pci_modern.h
-> > +++ b/include/linux/virtio_pci_modern.h
-> > @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
-> >  				       u16 index, resource_size_t *pa);
-> >  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
-> >  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
-> > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> >  #endif
-> > --
-> > 2.31.0
->
 
