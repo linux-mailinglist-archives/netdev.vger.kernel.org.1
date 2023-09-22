@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-35690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52B47AAA34
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:26:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F4D7AAA42
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 09:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5E344282F74
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:26:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 63AF11F2222D
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 07:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD00B18040;
-	Fri, 22 Sep 2023 07:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275E718AF9;
+	Fri, 22 Sep 2023 07:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BF8179B6
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 07:26:21 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A17DE6A;
-	Fri, 22 Sep 2023 00:26:19 -0700 (PDT)
-Date: Fri, 22 Sep 2023 09:26:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1695367577;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6gtB/j1aJ/v54tV0PTQ7LW78TWmuTnW88E+MNr8Zzbc=;
-	b=zAUpq1Z6lwsBmAdroV/pNRDfHu6BTjZHV09Fy6xTJusAK3k7MO2EJvsNjmSiv3KmzrqYW0
-	U7pxSAkcHEXMuNJJcmUsezuKhRg79S/9/g9tVXUSGTQNaNLyDfyj599Tk0EoJmQ+PaO0Ej
-	xJKVkXU+UlFHTLcHkwWgatqf3GURoLkZ9+3lwyExyXwh/C0dYvyJKJskNaCUXB5iXjOeyc
-	zcL9n+IK6RpvdCZfNljxykIJxZ6Vu4v8nH0z6FO0ZaEKsREOCq//KbohzBzZd/nNFx77de
-	FNJd8noV/kI9Vbv3LYyZ6EMm7hibZKlCVIp3dmteJ88uOYPqWwhMmEtGCsIDgA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1695367577;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6gtB/j1aJ/v54tV0PTQ7LW78TWmuTnW88E+MNr8Zzbc=;
-	b=7Bc/A7kODDY2eUV5JhgyXJ+mE5qj9cz/GAe83+rGVd7TroDCdTEyh1lyIJeJCu04Wxkny6
-	Sein6bbaGP37xBCw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Ferenc Fejes <primalgamer@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>
-Subject: Re: [RFC PATCH net-next 1/2] net: Use SMP threads for backlog NAPI.
-Message-ID: <20230922072614.aT8vDgAy@linutronix.de>
-References: <20230814093528.117342-1-bigeasy@linutronix.de>
- <20230814093528.117342-2-bigeasy@linutronix.de>
- <0a842574fd0acc113ef925c48d2ad9e67aa0e101.camel@redhat.com>
- <20230920155754.KzYGXMWh@linutronix.de>
- <2eb9af65d098bb54ed54178d7269e7197d6de5a0.camel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B4615AC7
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 07:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DC6BC433C9;
+	Fri, 22 Sep 2023 07:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695367825;
+	bh=aa4BxjPwXSMGcRd3j+W0FsFIluA0XqusP+L+BgKB/Bc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Vezckz3Zw31YpZIVkDUbeI5QiS2RnP1LOWHckJVPVp/BZVJLMFytgu252T6NW5MBA
+	 /vnIPxbv/ZsaTeaywfSr6pB42eb/M22KZedQIRSDQEw+5tqbAk9d0wB7SkUzj2Y3Ah
+	 jlrJZIJUtsXai8xfJArciP96Dc48NTWQiwfmHdV0YjnaI9om8InAO/gDOxG/7MZUJF
+	 q09ls9lvK4wGSpCVHzyw7fcGDIaxIuGC4BfrylffNd0OKMpLRf52tvJPk99HMGGeZK
+	 Il9JPOfTpYsxupSK3IB278MXAnHKdwyaifG/D+8Q4jQaSJhslzvO7og2Lex4C+c5Ah
+	 UVZ3oXE8y1RZw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 64FFDE11F5C;
+	Fri, 22 Sep 2023 07:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2eb9af65d098bb54ed54178d7269e7197d6de5a0.camel@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/3] mlxsw: Improve blocks selection for IPv6
+ multicast forwarding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169536782540.11432.12690951867009056734.git-patchwork-notify@kernel.org>
+Date: Fri, 22 Sep 2023 07:30:25 +0000
+References: <cover.1695137616.git.petrm@nvidia.com>
+In-Reply-To: <cover.1695137616.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, idosch@nvidia.com,
+ amcohen@nvidia.com, mlxsw@nvidia.com
 
-On 2023-09-21 12:41:33 [+0200], Ferenc Fejes wrote:
-> Hi!
-Hi,
+Hello:
 
-> > If we could somehow define a DoS condition once we are overwhelmed
-> > with
-> > packets, then we could act on it and throttle it. This in turn would
-> > allow a SCHED_FIFO priority without the fear of a lockup if the
-> > system
-> > is flooded with packets.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 19 Sep 2023 17:42:53 +0200 you wrote:
+> Amit Cohen writes:
 > 
-> Can this be avoided if we reuse gro_flush_timeout as the maximum time
-> the NAPI thread can be scheduled?
-
-First your run time needs to be accounted somehow. I observed that some
-cards/ systems tend pull often a few packets on each interrupt and
-others pull more packets at a time.
-So probably packets in a time frame would make sense. Maybe even plus
-packet size assuming larger packets require more processing time.
-
-If you run at SCHED_OTHER you don't care, you can keep it running. With
-SCHED_FIFO you would need to decide:
-- how much is too much
-- what to do once you reach too much
-
-Once you reach too much you could:
-- change the scheduling policy to SCHED_OTHER and keep going until it is
-  no longer "too much in a given period" so you can flip it back.
-
-- stop processing for a period of time and risk packet loss which is
-  defined as better than to continue.
-
-- pulling packets and dropping them instead of injecting into the stack.
-  Using xdp/ebpf might be easy since there is an API for that. One could
-  even peek at packets to decide if some can be kept.
-  This would rely on the fact that the system can do this quick enough
-  under a DoS condition.
-
+> The driver configures two ACL regions during initialization, these regions
+> are used for IPv4 and IPv6 multicast forwarding. Entries residing in these
+> two regions match on the {SIP, DIP, VRID} key elements.
 > 
-> Ferenc
+> Currently for IPv6 region, 9 key blocks are used. This can be improved by
+> reducing the amount key blocks needed for the IPv6 region to 8. It is
+> possible to use key blocks that mix subsets of the VRID element with
+> subsets of the DIP element.
+> 
+> [...]
 
-Sebastian
+Here is the summary with links:
+  - [net-next,v2,1/3] mlxsw: Add 'ipv4_5' flex key
+    https://git.kernel.org/netdev/net-next/c/c2f3e10ac4eb
+  - [net-next,v2,2/3] mlxsw: spectrum_acl_flex_keys: Add 'ipv4_5b' flex key
+    https://git.kernel.org/netdev/net-next/c/c6caabdf3e0c
+  - [net-next,v2,3/3] mlxsw: Edit IPv6 key blocks to use one less block for multicast forwarding
+    https://git.kernel.org/netdev/net-next/c/92953e7aab01
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
