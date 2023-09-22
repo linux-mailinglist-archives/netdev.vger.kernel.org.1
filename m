@@ -1,335 +1,107 @@
-Return-Path: <netdev+bounces-35788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C5977AB119
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:43:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB3E7AB11D
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 13:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2FAB4282C92
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:43:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0FB78282CB6
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 11:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 635671F95E;
-	Fri, 22 Sep 2023 11:43:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E210E200A0;
+	Fri, 22 Sep 2023 11:43:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489C91F954;
-	Fri, 22 Sep 2023 11:43:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D9C7C433C8;
-	Fri, 22 Sep 2023 11:43:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695382992;
-	bh=UL8TH12yxhaIMYvyUi/thvzlbWtFsgDinsXcxmzB5uA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z5j69VsppTky9oLNhaaNt7S9yZ8FTOTxkyDyKDzfbrKb1yeXrzLzHjw8r4jZWPAmq
-	 dYVRdIMzUWVC1o3rmhaRK0EA/BAPl1F3QFP+S9wB0MB3kzjXvgGF4o8bo1OwA6G2Z/
-	 XSXjsseo7vWGeZtHEsaP2Tz7+/sFlQtAPUcQUeUP750ScNPcjB0qFk+PjPuTYU9/ze
-	 37p7LaL35yaXqVglDgrwxxRw/pL+S3UuJCCeH5lvZJtnp8oEn/mJRtyVQpOmB1n0zK
-	 y4BNOl6kjKD7UiIKjF5VFgV4zmZT3/JHPENsh+kdi5SAHJvcGtl+E/QfJ0xHGClrnT
-	 CL5dEyCIS9DSQ==
-Date: Fri, 22 Sep 2023 12:43:06 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBF71F930
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 11:43:56 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B40102;
+	Fri, 22 Sep 2023 04:43:53 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9a648f9d8e3so270672566b.1;
+        Fri, 22 Sep 2023 04:43:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695383031; x=1695987831; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1I3gNmUlZMGbKyjyOXpthLU4hKIFkiFyB/Tjb6zLBfA=;
+        b=OL3deMoZ6Wl2Q5FwHCv3eZXPpK0Ri4tJq5EVxYMrIHfyt4fXJQMFYGTimVuMuM4PJm
+         o6tVMiPKcbZESdZymIOBToj9xtXCjY7uldAm7T/zEfqjYX/c6Glg5KWOvpVPqiO+AhVg
+         0hFLGW4g83ETBrxoToora7NHg+Zle5TdNcn3hUt6qkKakzhd05sazER8Yw/DaEYt0du9
+         r52Uc+b2a1tnPO5QUtBQMrxfrGaLdYtTPdX0wWlZdfgKZQg1g9ai/DKipz2C9DlYVnUD
+         pLWlYUBoZNJUDLUsp3poEVnJTbePuDOXNNORQ0/anIIZ03aHcx+PRCsCEtwXDQ+RG/DE
+         Nckg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695383031; x=1695987831;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1I3gNmUlZMGbKyjyOXpthLU4hKIFkiFyB/Tjb6zLBfA=;
+        b=aH5SAM0vR7lyRh603/kPJ9/AiZB7RzH4kfZ6Y+Vttxb7a6vraKEaad5+bqqe4c3iF7
+         t4SFZ5F2mSCttek9/z4Z/B1wYSXUqvBHKo+GYZibvukizMp/fe2SBsvOVGIzr592SVCR
+         Pt6z60DIxO+t/j53ixMPazgEvZ2FUzcEhkaFGNrRNz98SYGgmmR0mkb9xAqb/4kYr/q6
+         KeF1WvG4+wsLB8FLPiiX2ipiXsfTuXr8RwSat8pYYVLx1oZBjocvIOfG7hAP0A6pKV/w
+         lPF+sYCVUfveQC6TWkB18kySpoDLZDUQ5GKpYvRSmXfbz/H7tutEZL+2S8uCFhrn3QYE
+         yJvQ==
+X-Gm-Message-State: AOJu0YyMSQPiUjHhOumInYM4NRqUnuzzCOpW9Ld1jTytzd+DB1oZzHDr
+	J0xY8pwd1vlfTp8FZ8WKhY8=
+X-Google-Smtp-Source: AGHT+IHbAXqA0Cb2XWyQ2fjc+0jrFxYIM22/f7Ic2xZbRFXNDej9vFnrqWPJSAAS359M2c/RD7DCkA==
+X-Received: by 2002:a17:906:109:b0:9aa:e07:d421 with SMTP id 9-20020a170906010900b009aa0e07d421mr7270525eje.43.1695383031474;
+        Fri, 22 Sep 2023 04:43:51 -0700 (PDT)
+Received: from skbuf ([188.25.255.147])
+        by smtp.gmail.com with ESMTPSA id f12-20020a1709062c4c00b0099ca4f61a8bsm2618242ejh.92.2023.09.22.04.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Sep 2023 04:43:51 -0700 (PDT)
+Date: Fri, 22 Sep 2023 14:43:48 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/7] dt-bindings: net: add STM32MP13 compatible in
- documentation for stm32
-Message-ID: <20230922-surface-graduate-a269a700e5c5@spud>
-References: <20230921150622.599232-1-christophe.roullier@foss.st.com>
- <20230921150622.599232-2-christophe.roullier@foss.st.com>
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH v5 net-next 5/5] net: dsa: microchip: Enable HSR
+ offloading for KSZ9477
+Message-ID: <20230922114348.ivbfcgi7lkmcsymp@skbuf>
+References: <20230920114343.1979843-1-lukma@denx.de>
+ <20230920114343.1979843-1-lukma@denx.de>
+ <20230920114343.1979843-6-lukma@denx.de>
+ <20230920114343.1979843-6-lukma@denx.de>
+ <20230921193224.l3ojpdcsb4bpfl7d@skbuf>
+ <20230922132904.750688b6@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="y7/hylnc6AQ95TsF"
-Content-Disposition: inline
-In-Reply-To: <20230921150622.599232-2-christophe.roullier@foss.st.com>
-
-
---y7/hylnc6AQ95TsF
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230922132904.750688b6@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Yo,
+On Fri, Sep 22, 2023 at 01:29:04PM +0200, Lukasz Majewski wrote:
+> Unfortunately, yes...
+> 
+> The code as it is now -> would set for port lan1 0x21 and lan2 0x22.
+> 
+> However the setup shall be 0x23 for both ports.
+> 
+> More info here:
+> https://github.com/Microchip-Ethernet/EVB-KSZ9477/issues/98#issuecomment-1701557449
+> 
+> I will setup this register from dev->hsr_ports when both HSR ports are
+> known.
 
-On Thu, Sep 21, 2023 at 05:06:16PM +0200, Christophe Roullier wrote:
-> New STM32 SOC have 2 GMACs instances.
-> GMAC IP version is SNPS 4.20.
->=20
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
-> ---
->  .../devicetree/bindings/net/stm32-dwmac.yaml  | 140 +++++++++++++++---
->  1 file changed, 118 insertions(+), 22 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Doc=
-umentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index fc8c96b08d7d..75836916c38c 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -22,15 +22,17 @@ select:
->          enum:
->            - st,stm32-dwmac
->            - st,stm32mp1-dwmac
-> +          - st,stm32mp13-dwmac
->    required:
->      - compatible
-> =20
-> -allOf:
-> -  - $ref: snps,dwmac.yaml#
-> -
->  properties:
->    compatible:
->      oneOf:
-> +      - items:
-> +          - enum:
-> +              - st,stm32mp13-dwmac
-> +          - const: snps,dwmac-4.20a
-
-The enum just below this is also for the 4.20a, no? Why not just put
-this mp13 compatible into that enum?
-
->        - items:
->            - enum:
->                - st,stm32mp1-dwmac
-> @@ -72,27 +74,69 @@ properties:
->          - eth-ck
->          - ptp_ref
-> =20
-> -  st,syscon:
-
-Please try to avoid defining properties inside if/then/else sections and
-only move the variable bits if possible.
-
-> -    $ref: /schemas/types.yaml#/definitions/phandle-array
-> -    items:
-> -      - items:
-> -          - description: phandle to the syscon node which encompases the=
- glue register
-> -          - description: offset of the control register
-> +  phy-supply:
-> +    description: PHY regulator
-> +
-> +  st,ext-phyclk:
->      description:
-> -      Should be phandle/offset pair. The phandle to the syscon node which
-> -      encompases the glue register, and the offset of the control regist=
-er
-> +      set this property in RMII mode when you have PHY without crystal 5=
-0MHz and want to
-> +      select RCC clock instead of ETH_REF_CLK. or in RGMII mode when you=
- want to select
-> +      RCC clock instead of ETH_CLK125.
-> +    type: boolean
-> =20
->    st,eth-clk-sel:
-> +    deprecated: true
-
-Why have these been marked as deprecated? That doesn't appear to be
-mention in the commit message & sounds like it should be a different
-commit.
-
->      description:
->        set this property in RGMII PHY when you want to select RCC clock i=
-nstead of ETH_CLK125.
->      type: boolean
-> =20
->    st,eth-ref-clk-sel:
-> +    deprecated: true
-
-Ditto.
-
->      description:
->        set this property in RMII mode when you have PHY without crystal 5=
-0MHz and want to
->        select RCC clock instead of ETH_REF_CLK.
->      type: boolean
-> =20
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - st,stm32mp1-dwmac
-> +              - st,stm32-dwmac
-> +    then:
-> +      properties:
-> +        st,syscon:
-> +          $ref: /schemas/types.yaml#/definitions/phandle-array
-> +          items:
-> +            - items:
-> +                - description: phandle to the syscon node which encompas=
-es the glue register
-> +                - description: offset of the control register
-> +          description:
-> +            Should be phandle/offset pair. The phandle to the syscon nod=
-e which
-> +            encompases the glue register, and the offset of the control =
-register
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - st,stm32mp13-dwmac
-
-You've got 2 if/then sections containing tests for 3 compatibles. There
-are only 2 compatibles total right now & 3 with the patch, so it looks
-like you'd get away with if/then/else instead.
-
-> +    then:
-> +      properties:
-> +        st,syscon:
-> +          $ref: /schemas/types.yaml#/definitions/phandle-array
-> +          items:
-> +            - items:
-> +                - description: phandle to the syscon node which encompas=
-es the glue register
-> +                - description: offset of the control register
-> +                - description: field to set mask in register
-> +          description:
-> +            Should be phandle/offset pair. The phandle to the syscon nod=
-e which
-> +            encompases the glue register, the offset of the control regi=
-ster and
-> +            the mask to set bitfield in control register
-> +
->  required:
->    - compatible
->    - clocks
-> @@ -112,24 +156,36 @@ examples:
->             compatible =3D "st,stm32mp1-dwmac", "snps,dwmac-4.20a";
-
-I don't understand why this existing example is changing.
-
-Thanks,
-Conor.
-
->             reg =3D <0x5800a000 0x2000>;
->             reg-names =3D "stmmaceth";
-> -           interrupts =3D <GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH>;
-> -           interrupt-names =3D "macirq";
-> +           interrupts-extended =3D <&intc GIC_SPI 61 IRQ_TYPE_LEVEL_HIGH=
->,
-> +                                 <&exti 70 IRQ_TYPE_LEVEL_HIGH>;
-> +           interrupt-names =3D "macirq",
-> +                             "eth_wake_irq";
->             clock-names =3D "stmmaceth",
-> -                     "mac-clk-tx",
-> -                     "mac-clk-rx",
-> -                     "ethstp",
-> -                     "eth-ck";
-> +                         "mac-clk-tx",
-> +                         "mac-clk-rx",
-> +                         "eth-ck",
-> +                         "ptp_ref",
-> +                         "ethstp";
->             clocks =3D <&rcc ETHMAC>,
-> -                <&rcc ETHTX>,
-> -                <&rcc ETHRX>,
-> -                <&rcc ETHSTP>,
-> -                <&rcc ETHCK_K>;
-> +                    <&rcc ETHTX>,
-> +                    <&rcc ETHRX>,
-> +                    <&rcc ETHCK_K>,
-> +                    <&rcc ETHPTP_K>,
-> +                    <&rcc ETHSTP>;
->             st,syscon =3D <&syscfg 0x4>;
-> +           snps,mixed-burst;
->             snps,pbl =3D <2>;
-> +           snps,en-tx-lpi-clockgating;
->             snps,axi-config =3D <&stmmac_axi_config_0>;
->             snps,tso;
->             phy-mode =3D "rgmii";
-> -       };
-> +
-> +           stmmac_axi_config_0: stmmac-axi-config {
-> +                                snps,wr_osr_lmt =3D <0x7>;
-> +                                snps,rd_osr_lmt =3D <0x7>;
-> +                                snps,blen =3D <0 0 0 0 16 8 4>;
-> +           };
-> +     };
-> =20
->    - |
->      //Example 2 (MCU example)
-> @@ -161,3 +217,43 @@ examples:
->             snps,pbl =3D <8>;
->             phy-mode =3D "mii";
->         };
-> +
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/clock/stm32mp1-clks.h>
-> +    #include <dt-bindings/reset/stm32mp1-resets.h>
-> +    #include <dt-bindings/mfd/stm32h7-rcc.h>
-> +    //Example 4
-> +     ethernet3: ethernet@5800a000 {
-> +           compatible =3D "st,stm32mp13-dwmac", "snps,dwmac-4.20a";
-> +           reg =3D <0x5800a000 0x2000>;
-> +           reg-names =3D "stmmaceth";
-> +           interrupts-extended =3D <&intc GIC_SPI 62 IRQ_TYPE_LEVEL_HIGH=
->,
-> +                                 <&exti 68 IRQ_TYPE_LEVEL_HIGH>;
-> +           interrupt-names =3D "macirq",
-> +                             "eth_wake_irq";
-> +           clock-names =3D "stmmaceth",
-> +                         "mac-clk-tx",
-> +                         "mac-clk-rx",
-> +                         "eth-ck",
-> +                         "ptp_ref",
-> +                         "ethstp";
-> +           clocks =3D <&rcc ETHMAC>,
-> +                    <&rcc ETHTX>,
-> +                    <&rcc ETHRX>,
-> +                    <&rcc ETHCK_K>,
-> +                    <&rcc ETHPTP_K>,
-> +                    <&rcc ETHSTP>;
-> +           st,syscon =3D <&syscfg 0x4 0xff0000>;
-> +           snps,mixed-burst;
-> +           snps,pbl =3D <2>;
-> +           snps,axi-config =3D <&stmmac_axi_config_1>;
-> +           snps,tso;
-> +           phy-mode =3D "rmii";
-> +
-> +           stmmac_axi_config_1: stmmac-axi-config {
-> +                                snps,wr_osr_lmt =3D <0x7>;
-> +                                snps,rd_osr_lmt =3D <0x7>;
-> +                                snps,blen =3D <0 0 0 0 16 8 4>;
-> +           };
-> +     };
-> --=20
-> 2.25.1
->=20
-
---y7/hylnc6AQ95TsF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZQ19ygAKCRB4tDGHoIJi
-0uJ2AQDYMHSxhPUAaxKOHWJ6DyhZftPWpUilt+MV/PUTA3814gEAqkENVdWxZsMn
-IiIRijrOe3RpmdB14TsJ6QPhUyr+mgg=
-=e7lu
------END PGP SIGNATURE-----
-
---y7/hylnc6AQ95TsF--
+Testing after making changes is key.
 
