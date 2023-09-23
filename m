@@ -1,158 +1,198 @@
-Return-Path: <netdev+bounces-35935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1DC47ABE29
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 09:00:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 423B77ABEA9
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 09:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 781FE281EB2
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 07:00:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 942F82848D5
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 07:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8DB20EC;
-	Sat, 23 Sep 2023 07:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0552263B9;
+	Sat, 23 Sep 2023 07:52:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21455375
-	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 07:00:06 +0000 (UTC)
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90FDD199;
-	Sat, 23 Sep 2023 00:00:03 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-774105e8c81so176108885a.3;
-        Sat, 23 Sep 2023 00:00:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695452402; x=1696057202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FcnYbvS5MK6GuTtXypuDsEXHQd3nYjUtnq+MVVoDLKA=;
-        b=GJNAHCnb6x2Um5FVft6CRxSZusS0gEHiA1ktiho+VkWGLMVXPNA3PhDDLoUAH9nSnz
-         DUR5xj9vLRPIGVji/grhQycf8HjdpShDrag28c5BaZkGQX8Cd3tUG8V7p2BgYPdE50ty
-         zMNa/nRdoNr1uq5dxQ60jxWMBxkAWbCwhzo0PW1weYqGz5G1QXvqx5oKW7rV8lbPivds
-         Ka6+VY1gCX6tsXZfOECpOy/vKTAWhJi2YCNYUXfPXvE06JTgQcgFKdm/oquBZt3qPzYq
-         VnWKQpe31lDoltTwfUe2zvYWMjNf8fUGU63PO8e1ArPzSTJMjoMyYF7Jv5lAsbWDm40o
-         55Dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695452402; x=1696057202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FcnYbvS5MK6GuTtXypuDsEXHQd3nYjUtnq+MVVoDLKA=;
-        b=nN2oAeVTULLabF1e8628FJU/1pH6s7qSAE1nkvCAwmykwj05Z5bCWRECuGHQZMVd7n
-         ri0vzpJ5eLdnWjG3+DD4z3dDxc5UJp4Vf+HudLa9mob+GpX/gSRth9qV9v6IKlY2vv4R
-         Kiz/67mgRhbljQdWrV3tqSOvHTwlCH95xyKNC2PFxNgW1uvilYsGBTlnIIq2SZT0ee5J
-         BYS/FZXhi12BY7HQPhVzyQZn25vgTffSbWGZKl9Zj+fmYf/yGkXgqmSFj0oLzFtiOvak
-         50yV9w0jPuJGCPGPdbauxLvWd83wpF3RmAY9ulGyMFAOfVKj1wsO1UM/MIhmLt/LA0tE
-         k0Jg==
-X-Gm-Message-State: AOJu0Yw82/3LTVXinVlOrfJ0bFW+/3th6SgVwJsnQ1Ok4x0aAxTb+aym
-	fGtg9LfaBhM3uTBqQ/UJ8hhNPsYp3DtZ7n32rLw=
-X-Google-Smtp-Source: AGHT+IFMxTVXVKT+nznCbj1bmQxWY2DbB+LZ7TuCR7qcNktIseQwd/89E9HbXm65hYtHy2dHcCCUdURKinwtHDaGpS8=
-X-Received: by 2002:a05:620a:4487:b0:774:165a:6990 with SMTP id
- x7-20020a05620a448700b00774165a6990mr1758934qkp.20.1695452402627; Sat, 23 Sep
- 2023 00:00:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3BB2117;
+	Sat, 23 Sep 2023 07:52:08 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABDED11D;
+	Sat, 23 Sep 2023 00:52:03 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8AAA7E0006;
+	Sat, 23 Sep 2023 07:51:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1695455521;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qzR1Tm71WW1g2sGVPubeL8o1clYwaCbl99rSURcNlMg=;
+	b=dYHJFSuZO9hNBOYgJEl3TTcTTG+FObNVnjlqb+2tW/JG0oz12VSmtx9+bnnM1FzrME7MTn
+	4FTiNevh8bhild2bQnXJaleFnQJ46R7S8YmC25MvgjlZ56ODzuSPwMCnHXaRFYP1arRpIT
+	jcGKbf6RWm1xnxzNYPfPKNGUFIWu7wD+JoOpr9YeYd9ITG1W6xCYkiGCaER1AA3p25xW+3
+	1tCTFzOgV8doTsumiW8Geh23guBnl97RC5+ZVzo3BS/hm9A2D7q/DntjBvV4J6F3i0ifFR
+	GpaX8gEY4QAbepe0nE2iAq5YEWNiuTSMWjAFfeBTGeT0VrZ5y+oh6lUogOTqzg==
+Message-ID: <63649fb5-6dc7-4e63-906d-c3e04aafcc4e@arinc9.com>
+Date: Sat, 23 Sep 2023 10:51:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230920222231.686275-1-dhowells@redhat.com> <591a70bf016b4317add2d936696abc0f@AcuMS.aculab.com>
- <1173637.1695384067@warthog.procyon.org.uk>
-In-Reply-To: <1173637.1695384067@warthog.procyon.org.uk>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sat, 23 Sep 2023 08:59:25 +0200
-Message-ID: <CAF=yD-L3aXM17=hsJBoauWJ6Dqq16ykcnv8sg-Fn_Td_FsOafA@mail.gmail.com>
-Subject: Re: [PATCH v5 00/11] iov_iter: Convert the iterator macros into
- inline funcs
-To: David Howells <dhowells@redhat.com>
-Cc: David Laight <David.Laight@aculab.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Christoph Hellwig <hch@lst.de>, 
-	Christian Brauner <christian@brauner.io>, Matthew Wilcox <willy@infradead.org>, 
-	Jeff Layton <jlayton@kernel.org>, linux-fsdevel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ George McCollister <george.mccollister@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Oleksij Rempel <linux@rempel-privat.de>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
+ Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+ <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+ <ZQ4VPEuXB3+e48Qs@shell.armlinux.org.uk>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZQ4VPEuXB3+e48Qs@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 2:01=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> David Laight <David.Laight@ACULAB.COM> wrote:
->
-> > >  (8) Move the copy-and-csum code to net/ where it can be in proximity=
- with
-> > >      the code that uses it.  This eliminates the code if CONFIG_NET=
-=3Dn and
-> > >      allows for the slim possibility of it being inlined.
-> > >
-> > >  (9) Fold memcpy_and_csum() in to its two users.
-> > >
-> > > (10) Move csum_and_copy_from_iter_full() out of line and merge in
-> > >      csum_and_copy_from_iter() since the former is the only caller of=
- the
-> > >      latter.
-> >
-> > I thought that the real idea behind these was to do the checksum
-> > at the same time as the copy to avoid loading the data into the L1
-> > data-cache twice - especially for long buffers.
-> > I wonder how often there are multiple iov[] that actually make
-> > it better than just check summing the linear buffer?
->
-> It also reduces the overhead for finding the data to checksum in the case=
- the
-> packet gets split since we're doing the checksumming as we copy - but wit=
-h a
-> linear buffer, that's negligible.
->
-> > I had a feeling that check summing of udp data was done during
-> > copy_to/from_user, but the code can't be the copy-and-csum here
-> > for that because it is missing support form odd-length buffers.
->
-> Is there a bug there?
->
-> > Intel x86 desktop chips can easily checksum at 8 bytes/clock
-> > (But probably not with the current code!).
-> > (I've got ~12 bytes/clock using adox and adcx but that loop
-> > is entirely horrid and it would need run-time patching.
-> > Especially since I think some AMD cpu execute them very slowly.)
-> >
-> > OTOH 'rep movs[bq]' copy will copy 16 bytes/clock (32 if the
-> > destination is 32 byte aligned - it pretty much won't be).
-> >
-> > So you'd need a csum-and-copy loop that did 16 bytes every
-> > three clocks to get the same throughput for long buffers.
-> > In principle splitting the 'adc memory' into two instructions
-> > is the same number of u-ops - but I'm sure I've tried to do
-> > that and failed and the extra memory write can happen in
-> > parallel with everything else.
-> > So I don't think you'll get 16 bytes in two clocks - but you
-> > might get it is three.
-> >
-> > OTOH for a cpu where memcpy is code loop summing the data in
-> > the copy loop is likely to be a gain.
-> >
-> > But I suspect doing the checksum and copy at the same time
-> > got 'all to complicated' to actually implement fully.
-> > With most modern ethernet chips checksumming receive pacakets
-> > does it really get used enough for the additional complexity?
->
-> You may be right.  That's more a question for the networking folks than f=
-or
-> me.  It's entirely possible that the checksumming code is just not used o=
-n
-> modern systems these days.
->
-> Maybe Willem can comment since he's the UDP maintainer?
+On 23.09.2023 01:29, Russell King (Oracle) wrote:
+> On Sat, Sep 23, 2023 at 12:57:52AM +0300, Arınç ÜNAL wrote:
+>> I agree. My patch description here failed to explain the actual issue,
+>> which is missing hardware descriptions. Here's what I understand. An
+>> ethernet-controller is a MAC. For the MAC to work properly with its link
+>> partner, at least one of these must be described:
+>> - pointer to a PHY to retrieve link information from the PHY
+>> - pointer to a PCS to retrieve link information from the PCS
+>> - pointer to an SFP to retrieve link information from the SFP
+>> - static link information
+> 
+> What about something like macb? The macb driver:
+> - attempts to connect a phy using phylink_of_phy_connect()
+> - if that fails, and there is no phy-handle property, then the driver
+>    will attempt to find the first PHY to exist on its MII bus, and will
+>    connect that using phylink_connect_phy().
+> 
+> So, in this case, if we define a phylink binding to require one of a
+> phy-handle node, pcs node, sfp node or static link information, then
+> although macb uses phylink, it then doesn't conform to this phylink
+> binding. (This is the only driver that uses phy_find_first() which
+> also uses phylink according to my greps, but I haven't checked for
+> any other games drivers be using.)
+> 
+> The same thing more or less happens with non-phylink drivers. Take a
+> look at drivers/net/ethernet/microchip/lan743x_main.c, and notice
+> that it first attempts to get a PHY from DT. If that fails, it
+> uses phy_find_first(). If that fails, and we have a LAN7431, then
+> a gigabit full-duplex fixed-link PHY is used instead. So, what macb
+> is doing with phylink is no different from what other drivers are
+> doing with phylib - and it's the driver's choice.
+> 
+> The same way that there are multiple drivers that don't do this,
+> which want a PHY device to be specified in DT if the driver was
+> bound to a device that was described in DT - there are phylink
+> and non-phylink drivers that do this.
+> 
+> This is exactly my point - there is *no* *such* *thing* as a phylink
+> binding. There is the ethernet-controller binding, which phylink
+> provides the ability for network drivers to optionally use, but
+> phylink doesn't require anything from any firmware description, except
+> to attach a SFP interface, or to describe a fixed-link. Everything else
+> is really up to the ethernet-controller aka MAC driver to decide how it
+> wants to deal with things.
+> 
+> We currently work around this by the ethernet-controller YAML having
+> all these properties as optional. Maybe some drivers extend that YAML
+> and require certain properties - that is their perogative, but that is
+> the driver's choice, and is a completely separate issue to whether
+> the driver is using phylink or not.
+> 
+> The real question is how do we want to describe an ethernet controller
+> and what properties should we be requiring for it (if any). Maybe if we
+> want to require one of a PHY, PCS, SFP, or fixed-link, maybe we should
+> have that as a strictly-checked ethernet controller which drivers can
+> opt into using if that's what they require.
 
-Perhaps these days it is more relevant to embedded systems than high
-end servers.
+I'd like to make this clear. We're only talking about deviating from proper
+devicetree bindings so that it won't cause too much work or not at all to
+fix the incorrect Linux driver policies.
+
+As long as we don't collectively agree on fixing the drivers to work with
+proper devicetree bindings, I'd keep the missing ethernet controller
+bindings (requiring at least one of PHY, PCS, SFP, fixed-link) as they
+currently are on ethernet-controller.yaml, optional. Or rather, I wouldn't
+touch anything regarding this as it's nonsensical to change devicetree
+bindings because of driver policies.
+
+As you have pointed out with certain examples, once the driver starts
+operating out of what the devicetree says, in other words, once the driver
+starts guessing the hardware, there's no guarantee it will always guess it
+correctly. As seen with the macb driver, the driver assumes that if there's
+no phy-handle property, the PHY on its MDIO bus must be used regardless.
+But the MAC may be connected to another MAC, PCS or SFP, meaning it doesn't
+use the PHY on that bus.
+
+There is also a case for DSA. If there's an implication that the DSA
+controlled switch has an MDIO bus (phy_read() and phy_write()), the DSA
+driver will connect the switch MACs to the PHYs on the MDIO bus of the
+switch, even if there's no description of that MDIO bus on the devicetree.
+As unlikely as it is on a real life scenario, there may be a device that
+has its switch MACs wired to the PHYs on another MDIO bus.
+
+This is why I've proposed to make the drivers strictly follow what the
+devicetree says.
+
+> 
+> However, to dress this up as "phylink requires xyz, so lets create
+> a phylink binding description" is just wrong.
+
+Agreed.
+
+Arınç
 
