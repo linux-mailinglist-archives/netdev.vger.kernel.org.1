@@ -1,63 +1,97 @@
-Return-Path: <netdev+bounces-35967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD66E7AC2CB
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 16:38:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF08E7AC2E0
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 16:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id F40C21C208EF
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 14:38:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 882EC2828E0
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 14:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77591D532;
-	Sat, 23 Sep 2023 14:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988F11D55A;
+	Sat, 23 Sep 2023 14:55:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218D71CFA5;
-	Sat, 23 Sep 2023 14:38:09 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3D111D;
-	Sat, 23 Sep 2023 07:38:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695479888; x=1727015888;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9FgEs+W2rw9WobfIupSC05nSHa9tZRyrzcLmSdnEKaM=;
-  b=G1v9xIqkAhfEihGV2laXpUr7g1M1QuvhUxijRdkXb6gpwin46yeIbEQH
-   Cxt65qdUpu7orqgM+nQ9SmwsqNruMegqoE3MdQnA+GVuOtkkr6l8bfVTd
-   XRN57hCv+6n0WEuoRoUBAqJkc0XWwVjK17wKJTIjHKtCfJZSoxHdSVO5t
-   yT2K5z4ims10ej7lQFsNRRg0OObteEXScs7OKad5KIuNgXYbRcGIaGxqb
-   4orMr23glM8KIUhk+oXn2SOnXVm1fD654XGKBK/bU/GrM0GWB7mPE+8Zp
-   4IKbJh62KjaZ7B4ch5g/ocT9WgQXGCuhm4ySRtx3F9BNPJ/1/KS4ERGsM
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="360408650"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="360408650"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2023 07:38:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10842"; a="697519648"
-X-IronPort-AV: E=Sophos;i="6.03,171,1694761200"; 
-   d="scan'208";a="697519648"
-Received: from lkp-server02.sh.intel.com (HELO 493f6c7fed5d) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 23 Sep 2023 07:38:02 -0700
-Received: from kbuild by 493f6c7fed5d with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qk3lB-0002Tt-30;
-	Sat, 23 Sep 2023 14:37:34 +0000
-Date: Sat, 23 Sep 2023 22:37:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Fastabend <john.fastabend@gmail.com>, daniel@iogearbox.net,
-	ast@kernel.org, andrii@kernel.org, jakub@cloudflare.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	john.fastabend@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf 1/3] bpf: tcp_read_skb needs to pop skb regardless of
- seq
-Message-ID: <202309232236.36lvZlKR-lkp@intel.com>
-References: <20230920232706.498747-2-john.fastabend@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1F6DF42;
+	Sat, 23 Sep 2023 14:55:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DE47D3;
+	Sat, 23 Sep 2023 07:55:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6SKox0c6G4xgW3Mj8AqJyJbgfI5M1BKoQYQM71CgVN0=; b=kZQaY593rSQ1gVZfpbR1Y6X+c3
+	+eVPVxehkCSlk6ly/tDUGPRLxwgp+yGBLbfYr/c0VbFaYzft4ioDkixUZe2byFbSw8LbV7vO1QI/0
+	jEGecobWOqC8tN0CNKfkt7G+c4s8HrZktrNQg/II2rg5XNOz2Hm4BTvoQFMGE+a11nOU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qk41P-007IOa-FC; Sat, 23 Sep 2023 16:54:15 +0200
+Date: Sat, 23 Sep 2023 16:54:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	George McCollister <george.mccollister@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Marek Vasut <marex@denx.de>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	John Crispin <john@phrozen.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+Message-ID: <f7a24532-1211-461f-945b-bdf7a847ed65@lunn.ch>
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+ <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+ <ZQ4VPEuXB3+e48Qs@shell.armlinux.org.uk>
+ <63649fb5-6dc7-4e63-906d-c3e04aafcc4e@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,161 +100,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230920232706.498747-2-john.fastabend@gmail.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <63649fb5-6dc7-4e63-906d-c3e04aafcc4e@arinc9.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi John,
+> As you have pointed out with certain examples, once the driver starts
+> operating out of what the devicetree says, in other words, once the driver
+> starts guessing the hardware, there's no guarantee it will always guess it
+> correctly.
 
-kernel test robot noticed the following build warnings:
+This is partially a result of history. Some of these drivers are older
+than DT. This guessing was sufficient to make them work in the systems
+of that time. Some drivers are used when DT is not available, e.g. USB
+or PCI devices, or even ACPI.
 
-[auto build test WARNING on bpf/master]
+> There is also a case for DSA. If there's an implication that the DSA
+> controlled switch has an MDIO bus (phy_read() and phy_write()), the DSA
+> driver will connect the switch MACs to the PHYs on the MDIO bus of the
+> switch, even if there's no description of that MDIO bus on the devicetree.
+> As unlikely as it is on a real life scenario, there may be a device that
+> has its switch MACs wired to the PHYs on another MDIO bus.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Fastabend/bpf-tcp_read_skb-needs-to-pop-skb-regardless-of-seq/20230921-073209
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git master
-patch link:    https://lore.kernel.org/r/20230920232706.498747-2-john.fastabend%40gmail.com
-patch subject: [PATCH bpf 1/3] bpf: tcp_read_skb needs to pop skb regardless of seq
-config: um-allnoconfig (https://download.01.org/0day-ci/archive/20230923/202309232236.36lvZlKR-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230923/202309232236.36lvZlKR-lkp@intel.com/reproduce)
+> This is why I've proposed to make the drivers strictly follow what the
+> devicetree says.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309232236.36lvZlKR-lkp@intel.com/
+There are mv88e6xxx systems which don't have a DT description, just
+platform data. So if you need to make code changes, keep that in mind.
 
-All warnings (new ones prefixed by >>):
-
-   In file included from net/ipv4/tcp.c:252:
-   In file included from include/linux/inet_diag.h:5:
-   In file included from include/net/netlink.h:6:
-   In file included from include/linux/netlink.h:7:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from net/ipv4/tcp.c:252:
-   In file included from include/linux/inet_diag.h:5:
-   In file included from include/net/netlink.h:6:
-   In file included from include/linux/netlink.h:7:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from net/ipv4/tcp.c:252:
-   In file included from include/linux/inet_diag.h:5:
-   In file included from include/net/netlink.h:6:
-   In file included from include/linux/netlink.h:7:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from arch/um/include/asm/hardirq.h:5:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/um/include/asm/io.h:24:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:692:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     692 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:700:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     700 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:708:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     708 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:717:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     717 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:726:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     726 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:735:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     735 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> net/ipv4/tcp.c:1625:6: warning: variable 'seq' set but not used [-Wunused-but-set-variable]
-    1625 |         u32 seq = tp->copied_seq;
-         |             ^
-   13 warnings generated.
-
-
-vim +/seq +1625 net/ipv4/tcp.c
-
-^1da177e4c3f41 Linus Torvalds 2005-04-16  1621  
-965b57b469a589 Cong Wang      2022-06-15  1622  int tcp_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
-04919bed948dc2 Cong Wang      2022-06-15  1623  {
-04919bed948dc2 Cong Wang      2022-06-15  1624  	struct tcp_sock *tp = tcp_sk(sk);
-04919bed948dc2 Cong Wang      2022-06-15 @1625  	u32 seq = tp->copied_seq;
-04919bed948dc2 Cong Wang      2022-06-15  1626  	struct sk_buff *skb;
-04919bed948dc2 Cong Wang      2022-06-15  1627  	int copied = 0;
-04919bed948dc2 Cong Wang      2022-06-15  1628  
-04919bed948dc2 Cong Wang      2022-06-15  1629  	if (sk->sk_state == TCP_LISTEN)
-04919bed948dc2 Cong Wang      2022-06-15  1630  		return -ENOTCONN;
-04919bed948dc2 Cong Wang      2022-06-15  1631  
-98edede7d6d1b6 John Fastabend 2023-09-20  1632  	while ((skb = skb_peek(&sk->sk_receive_queue)) != NULL) {
-db4192a754ebd5 Cong Wang      2022-09-12  1633  		u8 tcp_flags;
-db4192a754ebd5 Cong Wang      2022-09-12  1634  		int used;
-04919bed948dc2 Cong Wang      2022-06-15  1635  
-04919bed948dc2 Cong Wang      2022-06-15  1636  		__skb_unlink(skb, &sk->sk_receive_queue);
-96628951869c0d Peilin Ye      2022-09-08  1637  		WARN_ON_ONCE(!skb_set_owner_sk_safe(skb, sk));
-db4192a754ebd5 Cong Wang      2022-09-12  1638  		tcp_flags = TCP_SKB_CB(skb)->tcp_flags;
-db4192a754ebd5 Cong Wang      2022-09-12  1639  		used = recv_actor(sk, skb);
-db4192a754ebd5 Cong Wang      2022-09-12  1640  		if (used < 0) {
-db4192a754ebd5 Cong Wang      2022-09-12  1641  			if (!copied)
-db4192a754ebd5 Cong Wang      2022-09-12  1642  				copied = used;
-db4192a754ebd5 Cong Wang      2022-09-12  1643  			break;
-db4192a754ebd5 Cong Wang      2022-09-12  1644  		}
-db4192a754ebd5 Cong Wang      2022-09-12  1645  		seq += used;
-db4192a754ebd5 Cong Wang      2022-09-12  1646  		copied += used;
-db4192a754ebd5 Cong Wang      2022-09-12  1647  
-db4192a754ebd5 Cong Wang      2022-09-12  1648  		if (tcp_flags & TCPHDR_FIN) {
-04919bed948dc2 Cong Wang      2022-06-15  1649  			++seq;
-db4192a754ebd5 Cong Wang      2022-09-12  1650  			break;
-db4192a754ebd5 Cong Wang      2022-09-12  1651  		}
-04919bed948dc2 Cong Wang      2022-06-15  1652  	}
-04919bed948dc2 Cong Wang      2022-06-15  1653  	return copied;
-04919bed948dc2 Cong Wang      2022-06-15  1654  }
-04919bed948dc2 Cong Wang      2022-06-15  1655  EXPORT_SYMBOL(tcp_read_skb);
-04919bed948dc2 Cong Wang      2022-06-15  1656  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+	 Andrew
 
