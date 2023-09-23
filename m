@@ -1,134 +1,178 @@
-Return-Path: <netdev+bounces-35896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B527AB808
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 19:48:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3F77AB69A
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 18:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 30C2428239C
-	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 17:48:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2FE57282202
+	for <lists+netdev@lfdr.de>; Fri, 22 Sep 2023 16:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B3743A81;
-	Fri, 22 Sep 2023 17:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008FD41E44;
+	Fri, 22 Sep 2023 16:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5DC41E33
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 17:48:06 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 713798F
-	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:48:05 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1c5db4925f9so17668975ad.1
-        for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 10:48:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695404885; x=1696009685; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZDQiy/7rzxHndWIo2eHT7YJAhtALvq5paJxFdkDPMFY=;
-        b=NT9SRryZZaGJV6im2f10mv5ZhU/e0CCpBJSlKjQu97xn1L2ZXD4Efo6t0PiorakRgR
-         SlC4+trVubHWJLEkH2f+M/S1toSD8Eh8xSVsMgNd8MFIO5FmdjxYZdhyo56RK1F5+x6e
-         wMvgnazvFjpkfG8c4ktc7wXMTikKEDr4W5SrOK+kVM5TFQUrwdqIqcCSwgr6Ug+nyvvp
-         386PEd1A+Xyhave11oj7GurCV7Lzidmbva3MKDljDxWPFLUcLE1KtheGjZzyu/GuDdHv
-         qnX5xY4ST2gebunPNEtAsfzb7zxyFOBwgI9O5oeCnrumc0yKzVTuEZmeE/Jn/QkKCWId
-         6QXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695404885; x=1696009685;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZDQiy/7rzxHndWIo2eHT7YJAhtALvq5paJxFdkDPMFY=;
-        b=YJO61fJTkQgK9MXC6CKLrGKR1ZotLOHGZBA++YrqDchUrH9EHtD+BzHU6+qB9izmty
-         MCYH3vw+LFRRvi9+xNAkLWfZ86nB7DFWaM8AHEKSH6YDvTlaWr3r+b8hszfYS9tLE1dr
-         9e6rfMJPOJ8BkzXM8aANiTmCidkiKKT3w+4PAM5Gv9F1KApEbQ60CNJbhh/7Aj1XnkAW
-         599tRoA4ivYSFHSfJqKShzdmvUrqLLGN1qVQ8ilv1AFUGV4KPr7+gyhZuCcowt7sQd8u
-         LjCPFnSKw3Cx5FTpXmPB1g7vlNxWTXFUA9GvkehIeftH/8X/baJMNzc68TMD6Eai+xN6
-         lZqg==
-X-Gm-Message-State: AOJu0YxUqC5KiBzdqZyeMYgfGvpzKFU45UwJEiNS62yUdGP10gu/MO5m
-	RNX46PBOJeFW8otSe8n47GTLmPdW7Qc=
-X-Google-Smtp-Source: AGHT+IHKC0VItTLKS11bP4cvBmjdizql+YdnuxIhOCp6Uh+BCsInpszoBHE8IM1/teEcRZ6pxn1jzw==
-X-Received: by 2002:a17:903:32cf:b0:1c0:e87e:52ba with SMTP id i15-20020a17090332cf00b001c0e87e52bamr602919plr.2.1695404884891;
-        Fri, 22 Sep 2023 10:48:04 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id e3-20020a170902b78300b001befac3b3cbsm3739610pls.290.2023.09.22.10.48.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Sep 2023 10:48:04 -0700 (PDT)
-Message-ID: <3279f31e-a81a-454c-b3b2-b0dc1559fa85@gmail.com>
-Date: Fri, 22 Sep 2023 10:48:01 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10AD41E3C
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 16:58:26 +0000 (UTC)
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A22E122
+	for <netdev@vger.kernel.org>; Fri, 22 Sep 2023 09:58:23 -0700 (PDT)
+Received: from eig-obgw-6007a.ext.cloudfilter.net ([10.0.30.247])
+	by cmsmtp with ESMTP
+	id jjHbq7WWnyYOwjjTyqvMHY; Fri, 22 Sep 2023 16:58:22 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id jjTxqaz4843lpjjTxq2mvK; Fri, 22 Sep 2023 16:58:21 +0000
+X-Authority-Analysis: v=2.4 cv=d+nmdDvE c=1 sm=1 tr=0 ts=650dc7ad
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=P7XfKmiOJ4/qXqHZrN7ymg==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=82YB-BmEshB4s5qE:21 a=IkcTkHD0fZMA:10 a=zNV7Rl7Rt7sA:10 a=wYkD_t78qR0A:10
+ a=M5GUcnROAAAA:8 a=jZVsG21pAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8
+ a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=QyXUC8HyAAAA:8 a=cm27Pg_UAAAA:8
+ a=JPoDtM7TZ6yJWmQF7qYA:9 a=QEXdDO2ut3YA:10 a=OBjm3rFKGHvpk9ecZwUJ:22
+ a=3Sh2lD0sZASs_lUdrUhf:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22
+ a=xmb-EsYY8bH0VWELuYED:22 a=QbVwxleSvN6QbbUpbDEe:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OFRJLSn67ylmUTDesqnwR89r8xipKnIGHe/ry8CSlXk=; b=HbLP1eegN06YX5GDIsBoF0TU0H
+	cl2eMr0D7OYH+lFQXEZQMW7UVNXdh6ShvGci2bt6xeHph6Wuo05Kv1L3HcBkbZ1VeLc/4nBVy/WIS
+	uAgWkfv4PYAMMsGnJuGjmTZAFgBU3R16zl9uD/WsSaATzgrtXX6wCqUkdJTHUiky9/NP9dGWrf/GA
+	5OdEfFsceqPWo2jxX5P0zVxExXiYVBbJtBRxjEaoREJ1LbLasVmvBgTmVXqlVivoDt2YKKWb8f/QH
+	LaHq95/KscNTOVelKeG/st5RCugAQ6rOknbXzdGwqEpNkbZDbFpQKf7rM6AM/6OuzxEBcE5hUP0N9
+	69IAWJWw==;
+Received: from [94.239.20.48] (port=48068 helo=[192.168.1.98])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1qjjTw-003SsD-0v;
+	Fri, 22 Sep 2023 11:58:20 -0500
+Message-ID: <1c639919-342a-cccc-1cad-772455b72656@embeddedor.com>
+Date: Fri, 22 Sep 2023 18:59:23 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] mlxbf_gige: Enable the GigE port in
- mlxbf_gige_open
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2] sky2: Make sure there is at least one frag_addr
+ available
 Content-Language: en-US
-To: Asmaa Mnebhi <asmaa@nvidia.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com
-Cc: netdev@vger.kernel.org, davthompson@nvidia.com
-References: <20230922173626.23790-1-asmaa@nvidia.com>
- <20230922173626.23790-4-asmaa@nvidia.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20230922173626.23790-4-asmaa@nvidia.com>
+To: Kees Cook <keescook@chromium.org>, Mirko Lindner <mlindner@marvell.com>
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, kernel test robot <lkp@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20230922165036.gonna.464-kees@kernel.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20230922165036.gonna.464-kees@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 94.239.20.48
+X-Source-L: No
+X-Exim-ID: 1qjjTw-003SsD-0v
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.98]) [94.239.20.48]:48068
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 5
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfGN5idXThH88DfL/1PJIUmngi8d/6cH9GdjY6mzMoWxhhGHo+3oMKvmmTJdRLAbSateRwitOH22s2ReTxsnXHPEjjC+McNU+61UoV+1D8rocqAoMY9fn
+ 2geOGKz5Kwa205C1uh6+QJqyLZJfeJFW4/AZbZAsyIpPvHGIhpm60z4Go2nnKaI/63dNkgaG2Bwe10dHhlDIH/c+TtiI0bC4KuE=
+X-Spam-Status: No, score=-2.3 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 9/22/2023 10:36 AM, Asmaa Mnebhi wrote:
-> At the moment, the GigE port is enabled in the mlxbf_gige_probe
-> function. If the mlxbf_gige_open is not executed, this could cause
-> pause frames to increase in the case where there is high backgroud
-> traffic. This results in clogging the port.
-> So move enabling the OOB port to mlxbf_gige_open.
+On 9/22/23 10:50, Kees Cook wrote:
+> In the pathological case of building sky2 with 16k PAGE_SIZE, the
+> frag_addr[] array would never be used, so the original code was correct
+> that size should be 0. But the compiler now gets upset with 0 size arrays
+> in places where it hasn't eliminated the code that might access such an
+> array (it can't figure out that in this case an rx skb with fragments
+> would never be created). To keep the compiler happy, make sure there is
+> at least 1 frag_addr in struct rx_ring_info:
 > 
-> Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
-> Signed-off-by: Asmaa Mnebhi <asmaa@nvidia.com>
-> Reviewed-by: David Thompson <davthompson@nvidia.com>
+>     In file included from include/linux/skbuff.h:28,
+>                      from include/net/net_namespace.h:43,
+>                      from include/linux/netdevice.h:38,
+>                      from drivers/net/ethernet/marvell/sky2.c:18:
+>     drivers/net/ethernet/marvell/sky2.c: In function 'sky2_rx_unmap_skb':
+>     include/linux/dma-mapping.h:416:36: warning: array subscript i is outside array bounds of 'dma_addr_t[0]' {aka 'long long unsigned int[]'} [-Warray-bounds=]
+>       416 | #define dma_unmap_page(d, a, s, r) dma_unmap_page_attrs(d, a, s, r, 0)
+>           |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>     drivers/net/ethernet/marvell/sky2.c:1257:17: note: in expansion of macro 'dma_unmap_page'
+>      1257 |                 dma_unmap_page(&pdev->dev, re->frag_addr[i],
+>           |                 ^~~~~~~~~~~~~~
+>     In file included from drivers/net/ethernet/marvell/sky2.c:41:
+>     drivers/net/ethernet/marvell/sky2.h:2198:25: note: while referencing 'frag_addr'
+>      2198 |         dma_addr_t      frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
+>           |                         ^~~~~~~~~
+> 
+> With CONFIG_PAGE_SIZE_16KB=y, PAGE_SHIFT == 14, so:
+> 
+>    #define ETH_JUMBO_MTU   9000
+> 
+> causes "ETH_JUMBO_MTU >> PAGE_SHIFT" to be 0. Use "?: 1" to solve this build warning.
+> 
+> Cc: Mirko Lindner <mlindner@marvell.com>
+> Cc: Stephen Hemminger <stephen@networkplumber.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202309191958.UBw1cjXk-lkp@intel.com/
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks
+--
+Gustavo
+
+> ---
+> v2 - improve commit message, add Ack
+> v1 - https://lore.kernel.org/netdev/20230920202509.never.299-kees@kernel.org/
+> ---
+>   drivers/net/ethernet/marvell/sky2.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/sky2.h b/drivers/net/ethernet/marvell/sky2.h
+> index ddec1627f1a7..8d0bacf4e49c 100644
+> --- a/drivers/net/ethernet/marvell/sky2.h
+> +++ b/drivers/net/ethernet/marvell/sky2.h
+> @@ -2195,7 +2195,7 @@ struct rx_ring_info {
+>   	struct sk_buff	*skb;
+>   	dma_addr_t	data_addr;
+>   	DEFINE_DMA_UNMAP_LEN(data_size);
+> -	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT];
+> +	dma_addr_t	frag_addr[ETH_JUMBO_MTU >> PAGE_SHIFT ?: 1];
+>   };
+>   
+>   enum flow_control {
 
