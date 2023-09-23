@@ -1,131 +1,168 @@
-Return-Path: <netdev+bounces-35996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA507AC5B8
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 00:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD247AC637
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 03:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BB26E281B45
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 22:36:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 31E9F281D32
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 01:41:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82E51D523;
-	Sat, 23 Sep 2023 22:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0E5634;
+	Sun, 24 Sep 2023 01:41:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1ECC8CC;
-	Sat, 23 Sep 2023 22:36:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0672C433A9;
-	Sat, 23 Sep 2023 22:36:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695508575;
-	bh=p6KwkG6gIDCpi+5ECOWCYMC6fT/RtPXwryMv7tZb+xk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Sdoueq4M4QTiFNPfWfSloC8UKyAofVMUXLdmfW+XAUHMMD2LvJyRaeus5UjoSPFlr
-	 88Wh6CmBckFHEhnxKycvXUfGgEmVhnkNg21KC23xUdnnlxkbYasPjPKkQlrcNAebr5
-	 9pHynRgrmwdFQyLAu3/g4ssd40NJcoo3KIo3EFZJ61BFYwbJKaub/jIgdHGDYqoLbp
-	 CkKxHqxZ+lcZkLuiQ0SW3Jhlx3Q2UF/lc1lkzKluKqJLT3FIFmzOl5wuIzY8rKKn7h
-	 rcNc8n7xzQhAsBwvPQXPLNwkEJiEajEWMRQOGpAKemjtGyymfK7KXS5SUzAoMHpafQ
-	 UD9dEvhoDjHEA==
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2b9338e4695so68340991fa.2;
-        Sat, 23 Sep 2023 15:36:15 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yx6003vTGJetNVXAgkTYYVPsm5O353i0/nhni2wWF7WYIoBOkST
-	G0c0ytrTg/9PMRl6Vn8n4baU5RCn+09TRgWJah8=
-X-Google-Smtp-Source: AGHT+IHGEMyzPMP0PdtKXqSKknw0oXHfeYEIvmKQhWxGVhq9jrC3LZkcXvNIlQvBWHbanSZQKP0MnXe/fed+WldiSzw=
-X-Received: by 2002:a05:6512:250d:b0:4fb:90c6:c31a with SMTP id
- be13-20020a056512250d00b004fb90c6c31amr2958776lfb.14.1695508573892; Sat, 23
- Sep 2023 15:36:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2D362F;
+	Sun, 24 Sep 2023 01:41:51 +0000 (UTC)
+Received: from omta36.uswest2.a.cloudfilter.net (omta36.uswest2.a.cloudfilter.net [35.89.44.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA292180;
+	Sat, 23 Sep 2023 18:41:49 -0700 (PDT)
+Received: from eig-obgw-5007a.ext.cloudfilter.net ([10.0.29.141])
+	by cmsmtp with ESMTP
+	id k7Q2qwjv9EoVskE84qKPpz; Sun, 24 Sep 2023 01:41:49 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id kE83qrrpTPNASkE83qgI1T; Sun, 24 Sep 2023 01:41:48 +0000
+X-Authority-Analysis: v=2.4 cv=X8FBlUfe c=1 sm=1 tr=0 ts=650f93dc
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=P7XfKmiOJ4/qXqHZrN7ymg==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=zNV7Rl7Rt7sA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
+ a=i0EeH86SAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8
+ a=20KFwNOVAAAA:8 a=cm27Pg_UAAAA:8 a=YSKGN3ub9cUXa_79IdMA:9 a=QEXdDO2ut3YA:10
+ a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22 a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QlO38JItyn9oJ4bwMUFFP3FqsNzwUMOqMup3Pv/RlbM=; b=Gkx26kuo9o/AJL/iYhzFoN09LU
+	WMsmG9IcUJxXG+VvqHMCURZfGBb+vkFjRPVV0Pwn7QDXGghrOgZo79R3x/hScOMDhaGal8jrU2DD4
+	sCxs/0oGyUdDvFfx7KlDZcXymiMW539jiVOum6/5rFS3mbqjhwQUbM6MAVyuatF34tgKAdEovYTVz
+	rTytP47tAxm3PfG/B0A+ZheMpSXUu+CRwsPjV7baGkJ7mJKZm8zzVNHpBv5pjlrHsLXpn2OFAtH38
+	Bxq/ldFDJSheMZPRsy6HvD2R8uLLn2tobWxoCyXerJiQIVeLDzmE7iAMTTS3LFH5m3IFAN3tg8ysK
+	F6suFvzw==;
+Received: from [94.239.20.48] (port=55626 helo=[192.168.1.98])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1qjkIo-000075-35;
+	Fri, 22 Sep 2023 12:50:55 -0500
+Message-ID: <dd13a477-96b5-4348-eeeb-14f21319ed39@embeddedor.com>
+Date: Fri, 22 Sep 2023 19:51:50 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230918072955.2507221-1-rppt@kernel.org> <20230918072955.2507221-3-rppt@kernel.org>
- <CAPhsuW5-=H1V=VXUYxyGnUdJuNUpRt44QmpwjkDUD=9i0itjuw@mail.gmail.com> <20230923153808.GI3303@kernel.org>
-In-Reply-To: <20230923153808.GI3303@kernel.org>
-From: Song Liu <song@kernel.org>
-Date: Sat, 23 Sep 2023 15:36:01 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
-Message-ID: <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
-Subject: Re: [PATCH v3 02/13] mm: introduce execmem_text_alloc() and execmem_free()
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	"David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, 
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nadav Amit <nadav.amit@gmail.com>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, bpf@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, 
-	linux-mm@kvack.org, linux-modules@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 04/14] net: hns: Annotate struct ppe_common_cb with
+ __counted_by
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Jamal Hadi Salim <jhs@mojatatu.com>, David Ahern <dsahern@kernel.org>,
+ Martin KaFai Lau <martin.lau@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Claudiu Manoil
+ <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Ajay Sharma <sharmaajay@microsoft.com>, Alex Elder <elder@kernel.org>,
+ Pravin B Shelar <pshelar@ovn.org>, Shaokun Zhang
+ <zhangshaokun@hisilicon.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+ dev@openvswitch.org, linux-parisc@vger.kernel.org, llvm@lists.linux.dev,
+ linux-hardening@vger.kernel.org
+References: <20230922172449.work.906-kees@kernel.org>
+ <20230922172858.3822653-4-keescook@chromium.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20230922172858.3822653-4-keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 94.239.20.48
+X-Source-L: No
+X-Exim-ID: 1qjkIo-000075-35
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.98]) [94.239.20.48]:55626
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 0
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfNJpHygesTnC9s4/oKhsiSlt39atOTOWtv0wJ1wVifhALYIJgEbY4fx/e1uMwTYJ3/8CRN5d3KuTZbbtkim+x5p+/obVSjygLkB93NEpyPKF1THf9WIC
+ FCMpFVXXS5HFy1i09t6eTnCSsdXJcltIMiF/7oEdZagp/qFb/RmYoP7hW609X2twlv+xv1qjaaP7zPTJ5Bq+zZ+dTZQKwZBOkHnJQjQ6YDFcie3GoIDxPV9K
+ xBBc0wDxcVz04PQXWuiJImSLZCoZTD1O7NkZGRKYWKrSQ1vqBwaO0casmMyjDhykoiJnYGI4OQofBH3kycEiZtXPpMZoNqPgmHpxclNpHeqPvOidWW3koSfT
+ roA3/Ne0t4hupZ8ACDMliQXE3dsBHni6H09yww2yse6efyr751H/f9vfHTJ7RKUYinqy1wbD
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DATE_IN_FUTURE_06_12,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Sep 23, 2023 at 8:39=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
-te:
->
-> On Thu, Sep 21, 2023 at 03:34:18PM -0700, Song Liu wrote:
-> > On Mon, Sep 18, 2023 at 12:30=E2=80=AFAM Mike Rapoport <rppt@kernel.org=
-> wrote:
-> > >
-> >
-> > [...]
-> >
-> > > diff --git a/arch/s390/kernel/module.c b/arch/s390/kernel/module.c
-> > > index 42215f9404af..db5561d0c233 100644
-> > > --- a/arch/s390/kernel/module.c
-> > > +++ b/arch/s390/kernel/module.c
-> > > @@ -21,6 +21,7 @@
-> > >  #include <linux/moduleloader.h>
-> > >  #include <linux/bug.h>
-> > >  #include <linux/memory.h>
-> > > +#include <linux/execmem.h>
-> > >  #include <asm/alternative.h>
-> > >  #include <asm/nospec-branch.h>
-> > >  #include <asm/facility.h>
-> > > @@ -76,7 +77,7 @@ void *module_alloc(unsigned long size)
-> > >  #ifdef CONFIG_FUNCTION_TRACER
-> > >  void module_arch_cleanup(struct module *mod)
-> > >  {
-> > > -       module_memfree(mod->arch.trampolines_start);
-> > > +       execmem_free(mod->arch.trampolines_start);
-> > >  }
-> > >  #endif
-> > >
-> > > @@ -510,7 +511,7 @@ static int module_alloc_ftrace_hotpatch_trampolin=
-es(struct module *me,
-> > >
-> > >         size =3D FTRACE_HOTPATCH_TRAMPOLINES_SIZE(s->sh_size);
-> > >         numpages =3D DIV_ROUND_UP(size, PAGE_SIZE);
-> > > -       start =3D module_alloc(numpages * PAGE_SIZE);
-> > > +       start =3D execmem_text_alloc(EXECMEM_FTRACE, numpages * PAGE_=
-SIZE);
-> >
-> > This should be EXECMEM_MODULE_TEXT?
->
-> This is an ftrace trampoline, so I think it should be FTRACE type of
-> allocation.
 
-Yeah, I was aware of the ftrace trampoline. My point was, ftrace trampoline
-doesn't seem to have any special requirements. Therefore, it is probably no=
-t
-necessary to have a separate type just for it.
 
-AFAICT, kprobe, ftrace, and BPF (JIT and trampoline) can share the same
-execmem_type. We may need some work for some archs, but nothing is
-fundamentally different among these.
+On 9/22/23 11:28, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct ppe_common_cb.
+> 
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Yisen Zhuang <yisen.zhuang@huawei.com>
+> Cc: Salil Mehta <salil.mehta@huawei.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Thanks,
-Song
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks
+-- 
+Gustavo
+
+> ---
+>   drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.h b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.h
+> index 0f0e16f9afc0..7e00231c1acf 100644
+> --- a/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.h
+> +++ b/drivers/net/ethernet/hisilicon/hns/hns_dsaf_ppe.h
+> @@ -92,7 +92,7 @@ struct ppe_common_cb {
+>   	u8 comm_index;   /*ppe_common index*/
+>   
+>   	u32 ppe_num;
+> -	struct hns_ppe_cb ppe_cb[];
+> +	struct hns_ppe_cb ppe_cb[] __counted_by(ppe_num);
+>   
+>   };
+>   
 
