@@ -1,104 +1,127 @@
-Return-Path: <netdev+bounces-35939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA02B7ABF60
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 11:36:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2D87AC08A
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 12:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 3E6E51F236F9
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 09:36:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4D931281B61
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 10:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E270DDDAB;
-	Sat, 23 Sep 2023 09:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4188D101CA;
+	Sat, 23 Sep 2023 10:31:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEB3D2F5
-	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 09:36:29 +0000 (UTC)
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEEAE180
-	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 02:36:26 -0700 (PDT)
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4053c6f0d55so25221645e9.0
-        for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 02:36:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695461785; x=1696066585;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wvRajMYgZD3FvWccqWRugbM5mUQdQPIjYnoPd05TMMQ=;
-        b=XtUrg0YGiY9GnZq1SQKLOJSK1acpzZ76yH01a3y9A0iyhCztfkpt39m4HWa21fuKSe
-         WHTc+UYdDYJTmsEc21UuGij/2snqm+Kj9+chDNuJ6B5r/v8sMAeoMTmx2kYShGRWTG/d
-         IxaLz0C/R3gp78+ecUGBy205P1WF8SUzHCL5rWsr2LQCI5nJ+ETatrlM5rrTqSQ43PjT
-         5M+FBok7YYO0FavFKf5exydnBDmZOT+RQV1Sz/Q5sdTxEb9NuPNVWrVpayEwuyb9Gi4V
-         ngADZBugA/WFHZH8rLiLp9NmApJ95Cj3zB2HkHFWLdDDX31RRPdftafNfmboYOL9wzXC
-         PZsw==
-X-Gm-Message-State: AOJu0Yxe4/36Z85AhoZKo0+7/MkX8qvqZDcb8wo5EahfwxnG4h+4Blq5
-	Lnkc8OvGUzimRTgHI/bjxB0UtoWTnTFMuv/9
-X-Google-Smtp-Source: AGHT+IHhi8VABVLKKFMxgqoK9U/f7FYRH5MFm42XUdHs90XtwZWAKZgGeQBXJTnCOTW1Amp7AVjFNg==
-X-Received: by 2002:a7b:c8d0:0:b0:402:fec4:fddc with SMTP id f16-20020a7bc8d0000000b00402fec4fddcmr1471510wml.17.1695461784928;
-        Sat, 23 Sep 2023 02:36:24 -0700 (PDT)
-Received: from [10.148.84.122] (business-89-135-192-225.business.broadband.hu. [89.135.192.225])
-        by smtp.gmail.com with ESMTPSA id v20-20020a05600c215400b00401b242e2e6sm4122635wml.47.2023.09.23.02.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Sep 2023 02:36:22 -0700 (PDT)
-Message-ID: <3fd39981aba0e0aa8ced76398c2ea8ad85208f7d.camel@inf.elte.hu>
-Subject: Re: question about BPF sk_skb_stream_verdict redirect and
- poll/epoll events
-From: Ferenc Fejes <fejes@inf.elte.hu>
-To: Farbod Shahinfar <farbod.shahinfar@polimi.it>, john.fastabend@gmail.com,
-  netdev@vger.kernel.org
-Date: Sat, 23 Sep 2023 11:36:21 +0200
-In-Reply-To: <be02a7af-5a00-fef7-2132-0199fad6ba7a@polimi.it>
-References: <be02a7af-5a00-fef7-2132-0199fad6ba7a@polimi.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.0-1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3421D2567
+	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 10:31:54 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9BF19F
+	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 03:31:52 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-275-mAZ3OHZQNnS1PlaWjhD8UA-1; Sat, 23 Sep 2023 11:31:40 +0100
+X-MC-Unique: mAZ3OHZQNnS1PlaWjhD8UA-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sat, 23 Sep
+ 2023 11:31:39 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Sat, 23 Sep 2023 11:31:39 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>, David Howells
+	<dhowells@redhat.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>, Al Viro
+	<viro@zeniv.linux.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>,
+	Christoph Hellwig <hch@lst.de>, Christian Brauner <christian@brauner.io>,
+	Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH v5 00/11] iov_iter: Convert the iterator macros into
+ inline funcs
+Thread-Topic: [PATCH v5 00/11] iov_iter: Convert the iterator macros into
+ inline funcs
+Thread-Index: AQHZ7BD/kh4zTlIOdEezFNQQd09cYrAlRT1QgAK52CSAADgPAA==
+Date: Sat, 23 Sep 2023 10:31:38 +0000
+Message-ID: <7e7f2599b5544d838696ebc2cba16e47@AcuMS.aculab.com>
+References: <20230920222231.686275-1-dhowells@redhat.com>
+ <591a70bf016b4317add2d936696abc0f@AcuMS.aculab.com>
+ <1173637.1695384067@warthog.procyon.org.uk>
+ <CAF=yD-L3aXM17=hsJBoauWJ6Dqq16ykcnv8sg-Fn_Td_FsOafA@mail.gmail.com>
+In-Reply-To: <CAF=yD-L3aXM17=hsJBoauWJ6Dqq16ykcnv8sg-Fn_Td_FsOafA@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi!
-
-On Fri, 2023-09-22 at 19:32 +0200, Farbod Shahinfar wrote:
-> Hello,
->=20
-> I am doing a simple experiment in which I send a message to a TCP
-> server=20
-> and the server echoes the message. I am attaching a BPF sk_skb=20
-> stream_verdict program to the server socket to redirect the message
-> back=20
-> to the client (redirects the SKB on the same socket but to the TX=20
-> queue). In my test, I noticed that the user-space server, which is
-> using=20
-> the poll system call, is woken up, and when it reads the socket,=20
-> receives zero as the number of bytes read.
-
-Do you poll for POLLIN events?
-
->=20
-> I first want to ask if this is the intended behavior.
-> In case this is the intended behavior, my second question is, what=20
-> should I do to prevent the user program from waking up? I hope by not
-> waking up the user program I could better use the available
-> resources.
-
-AFAIK sockets in sockmap are propagates every events to poll (fixme),
-but with pollfd::events you can specify the ones makes sense to you
-e.g.: POLLERR, POLLHUP, POLLRDHUP, etc.
->=20
-> Sincerely,
-> Farbod
-
-Ferenc
+RnJvbTogV2lsbGVtIGRlIEJydWlqbg0KPiBTZW50OiAyMyBTZXB0ZW1iZXIgMjAyMyAwNzo1OQ0K
+PiANCj4gT24gRnJpLCBTZXAgMjIsIDIwMjMgYXQgMjowMeKAr1BNIERhdmlkIEhvd2VsbHMgPGRo
+b3dlbGxzQHJlZGhhdC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gRGF2aWQgTGFpZ2h0IDxEYXZpZC5M
+YWlnaHRAQUNVTEFCLkNPTT4gd3JvdGU6DQo+ID4NCj4gPiA+ID4gICg4KSBNb3ZlIHRoZSBjb3B5
+LWFuZC1jc3VtIGNvZGUgdG8gbmV0LyB3aGVyZSBpdCBjYW4gYmUgaW4gcHJveGltaXR5IHdpdGgN
+Cj4gPiA+ID4gICAgICB0aGUgY29kZSB0aGF0IHVzZXMgaXQuICBUaGlzIGVsaW1pbmF0ZXMgdGhl
+IGNvZGUgaWYgQ09ORklHX05FVD1uIGFuZA0KPiA+ID4gPiAgICAgIGFsbG93cyBmb3IgdGhlIHNs
+aW0gcG9zc2liaWxpdHkgb2YgaXQgYmVpbmcgaW5saW5lZC4NCj4gPiA+ID4NCj4gPiA+ID4gICg5
+KSBGb2xkIG1lbWNweV9hbmRfY3N1bSgpIGluIHRvIGl0cyB0d28gdXNlcnMuDQo+ID4gPiA+DQo+
+ID4gPiA+ICgxMCkgTW92ZSBjc3VtX2FuZF9jb3B5X2Zyb21faXRlcl9mdWxsKCkgb3V0IG9mIGxp
+bmUgYW5kIG1lcmdlIGluDQo+ID4gPiA+ICAgICAgY3N1bV9hbmRfY29weV9mcm9tX2l0ZXIoKSBz
+aW5jZSB0aGUgZm9ybWVyIGlzIHRoZSBvbmx5IGNhbGxlciBvZiB0aGUNCj4gPiA+ID4gICAgICBs
+YXR0ZXIuDQo+ID4gPg0KPiA+ID4gSSB0aG91Z2h0IHRoYXQgdGhlIHJlYWwgaWRlYSBiZWhpbmQg
+dGhlc2Ugd2FzIHRvIGRvIHRoZSBjaGVja3N1bQ0KPiA+ID4gYXQgdGhlIHNhbWUgdGltZSBhcyB0
+aGUgY29weSB0byBhdm9pZCBsb2FkaW5nIHRoZSBkYXRhIGludG8gdGhlIEwxDQo+ID4gPiBkYXRh
+LWNhY2hlIHR3aWNlIC0gZXNwZWNpYWxseSBmb3IgbG9uZyBidWZmZXJzLg0KPiA+ID4gSSB3b25k
+ZXIgaG93IG9mdGVuIHRoZXJlIGFyZSBtdWx0aXBsZSBpb3ZbXSB0aGF0IGFjdHVhbGx5IG1ha2UN
+Cj4gPiA+IGl0IGJldHRlciB0aGFuIGp1c3QgY2hlY2sgc3VtbWluZyB0aGUgbGluZWFyIGJ1ZmZl
+cj8NCj4gPg0KPiA+IEl0IGFsc28gcmVkdWNlcyB0aGUgb3ZlcmhlYWQgZm9yIGZpbmRpbmcgdGhl
+IGRhdGEgdG8gY2hlY2tzdW0gaW4gdGhlIGNhc2UgdGhlDQo+ID4gcGFja2V0IGdldHMgc3BsaXQg
+c2luY2Ugd2UncmUgZG9pbmcgdGhlIGNoZWNrc3VtbWluZyBhcyB3ZSBjb3B5IC0gYnV0IHdpdGgg
+YQ0KPiA+IGxpbmVhciBidWZmZXIsIHRoYXQncyBuZWdsaWdpYmxlLg0KPiA+DQo+ID4gPiBJIGhh
+ZCBhIGZlZWxpbmcgdGhhdCBjaGVjayBzdW1taW5nIG9mIHVkcCBkYXRhIHdhcyBkb25lIGR1cmlu
+Zw0KPiA+ID4gY29weV90by9mcm9tX3VzZXIsIGJ1dCB0aGUgY29kZSBjYW4ndCBiZSB0aGUgY29w
+eS1hbmQtY3N1bSBoZXJlDQo+ID4gPiBmb3IgdGhhdCBiZWNhdXNlIGl0IGlzIG1pc3Npbmcgc3Vw
+cG9ydCBmb3JtIG9kZC1sZW5ndGggYnVmZmVycy4NCj4gPg0KPiA+IElzIHRoZXJlIGEgYnVnIHRo
+ZXJlPw0KDQpObywgSSBtaXNyZWFkIHRoZSBjb2RlIC0gaSBzaG91bGRuJ3Qgc2NhbiBwYXRjaGVz
+IHdoZW4gSSdkDQpnb3QgYSB2aXJhbCBoZWFkIGNvZGUuLi4NCg0KLi4uDQo+ID4gWW91IG1heSBi
+ZSByaWdodC4gIFRoYXQncyBtb3JlIGEgcXVlc3Rpb24gZm9yIHRoZSBuZXR3b3JraW5nIGZvbGtz
+IHRoYW4gZm9yDQo+ID4gbWUuICBJdCdzIGVudGlyZWx5IHBvc3NpYmxlIHRoYXQgdGhlIGNoZWNr
+c3VtbWluZyBjb2RlIGlzIGp1c3Qgbm90IHVzZWQgb24NCj4gPiBtb2Rlcm4gc3lzdGVtcyB0aGVz
+ZSBkYXlzLg0KPiA+DQo+ID4gTWF5YmUgV2lsbGVtIGNhbiBjb21tZW50IHNpbmNlIGhlJ3MgdGhl
+IFVEUCBtYWludGFpbmVyPw0KPiANCj4gUGVyaGFwcyB0aGVzZSBkYXlzIGl0IGlzIG1vcmUgcmVs
+ZXZhbnQgdG8gZW1iZWRkZWQgc3lzdGVtcyB0aGFuIGhpZ2gNCj4gZW5kIHNlcnZlcnMuDQoNClRo
+ZSBjaGVja3N1bSBhbmQgY29weSBhcmUgZG9uZSB0b2dldGhlci4NCkkgcHJvYmFibHkgbWlzc2Vk
+IGl0IGJlY2F1c2UgdGhlIGZ1bmN0aW9uIGlzbid0IHBhc3NlZCB0aGUNCm9sZCBjaGVja3N1bSAo
+d2hpY2ggaXQgY2FuIHByZXR0eSBtdWNoIHByb2Nlc3MgZm9yIGZyZWUpLg0KSW5zdGVhZCB0aGUg
+Y2FsbGVyIGlzIGFkZGluZyBpdCBhZnRlcndhcmRzIC0gd2hpY2ggaW52b2x2ZXMNCmFuZCBleHRy
+YSBleHBsaWNpdCBjc3VtX2FkZCgpLg0KDQpUaGUgeDg2LXg4NCBpcCBjaGVja3N1bSBsb29wcyBh
+cmUgYWxsIGhvcnJpZCB0aG91Z2guDQpUaGUgdW5yb2xsaW5nIGluIHRoZW0gaXMgc28gMTk5MCdz
+Lg0KV2l0aCB0aGUgb3V0LW9mLW9yZGVyIHBpcGVsaW5lIHRoZSBtZW1vcnkgYWNjZXNzZXMgdGVu
+ZA0KdG8gdGFrZSBjYXJlIG9mIHRoZW1zZWx2ZXMuDQpOb3QgdG8gbWVudGlvbiB0aGF0IGEgd2hv
+bGUgcmFmdCBvZiAobm93IG9sZGlzaCkgY3B1IHRha2UgdHdvDQpjbG9ja3MgdG8gZXhlY3V0ZSAn
+YWRjJy4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxl
+eSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0
+aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
 
