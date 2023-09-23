@@ -1,198 +1,84 @@
-Return-Path: <netdev+bounces-35937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 423B77ABEA9
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 09:52:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2DA7ABF3E
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 11:25:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 942F82848D5
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 07:52:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id A8A341F210C2
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 09:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0552263B9;
-	Sat, 23 Sep 2023 07:52:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD1FD512;
+	Sat, 23 Sep 2023 09:25:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F3BB2117;
-	Sat, 23 Sep 2023 07:52:08 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABDED11D;
-	Sat, 23 Sep 2023 00:52:03 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8AAA7E0006;
-	Sat, 23 Sep 2023 07:51:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1695455521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qzR1Tm71WW1g2sGVPubeL8o1clYwaCbl99rSURcNlMg=;
-	b=dYHJFSuZO9hNBOYgJEl3TTcTTG+FObNVnjlqb+2tW/JG0oz12VSmtx9+bnnM1FzrME7MTn
-	4FTiNevh8bhild2bQnXJaleFnQJ46R7S8YmC25MvgjlZ56ODzuSPwMCnHXaRFYP1arRpIT
-	jcGKbf6RWm1xnxzNYPfPKNGUFIWu7wD+JoOpr9YeYd9ITG1W6xCYkiGCaER1AA3p25xW+3
-	1tCTFzOgV8doTsumiW8Geh23guBnl97RC5+ZVzo3BS/hm9A2D7q/DntjBvV4J6F3i0ifFR
-	GpaX8gEY4QAbepe0nE2iAq5YEWNiuTSMWjAFfeBTGeT0VrZ5y+oh6lUogOTqzg==
-Message-ID: <63649fb5-6dc7-4e63-906d-c3e04aafcc4e@arinc9.com>
-Date: Sat, 23 Sep 2023 10:51:35 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737632CA7
+	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 09:25:05 +0000 (UTC)
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A7E196;
+	Sat, 23 Sep 2023 02:25:02 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R291e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsfkbAw_1695461098;
+Received: from 10.196.86.117(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsfkbAw_1695461098)
+          by smtp.aliyun-inc.com;
+          Sat, 23 Sep 2023 17:24:59 +0800
+Message-ID: <a1b2e09e-070f-7f72-e631-835acf82d715@linux.alibaba.com>
+Date: Sat, 23 Sep 2023 17:24:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Conor Dooley <conor+dt@kernel.org>,
- George McCollister <george.mccollister@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Oleksij Rempel <linux@rempel-privat.de>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
- <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
- <ZQ4VPEuXB3+e48Qs@shell.armlinux.org.uk>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <ZQ4VPEuXB3+e48Qs@shell.armlinux.org.uk>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net-next 01/18] net/smc: decouple ism_dev from SMC-D
+ device dump
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <1695134522-126655-1-git-send-email-guwen@linux.alibaba.com>
+ <1695134522-126655-2-git-send-email-guwen@linux.alibaba.com>
+ <20230921204153.GQ224399@kernel.org>
+ <2c9d570c-f780-0484-a26c-78b115e1a6a3@linux.alibaba.com>
+ <b7dad8b72ec94d27378eca87fea4cb0c86b8c361.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <b7dad8b72ec94d27378eca87fea4cb0c86b8c361.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 23.09.2023 01:29, Russell King (Oracle) wrote:
-> On Sat, Sep 23, 2023 at 12:57:52AM +0300, Arınç ÜNAL wrote:
->> I agree. My patch description here failed to explain the actual issue,
->> which is missing hardware descriptions. Here's what I understand. An
->> ethernet-controller is a MAC. For the MAC to work properly with its link
->> partner, at least one of these must be described:
->> - pointer to a PHY to retrieve link information from the PHY
->> - pointer to a PCS to retrieve link information from the PCS
->> - pointer to an SFP to retrieve link information from the SFP
->> - static link information
-> 
-> What about something like macb? The macb driver:
-> - attempts to connect a phy using phylink_of_phy_connect()
-> - if that fails, and there is no phy-handle property, then the driver
->    will attempt to find the first PHY to exist on its MII bus, and will
->    connect that using phylink_connect_phy().
-> 
-> So, in this case, if we define a phylink binding to require one of a
-> phy-handle node, pcs node, sfp node or static link information, then
-> although macb uses phylink, it then doesn't conform to this phylink
-> binding. (This is the only driver that uses phy_find_first() which
-> also uses phylink according to my greps, but I haven't checked for
-> any other games drivers be using.)
-> 
-> The same thing more or less happens with non-phylink drivers. Take a
-> look at drivers/net/ethernet/microchip/lan743x_main.c, and notice
-> that it first attempts to get a PHY from DT. If that fails, it
-> uses phy_find_first(). If that fails, and we have a LAN7431, then
-> a gigabit full-duplex fixed-link PHY is used instead. So, what macb
-> is doing with phylink is no different from what other drivers are
-> doing with phylib - and it's the driver's choice.
-> 
-> The same way that there are multiple drivers that don't do this,
-> which want a PHY device to be specified in DT if the driver was
-> bound to a device that was described in DT - there are phylink
-> and non-phylink drivers that do this.
-> 
-> This is exactly my point - there is *no* *such* *thing* as a phylink
-> binding. There is the ethernet-controller binding, which phylink
-> provides the ability for network drivers to optionally use, but
-> phylink doesn't require anything from any firmware description, except
-> to attach a SFP interface, or to describe a fixed-link. Everything else
-> is really up to the ethernet-controller aka MAC driver to decide how it
-> wants to deal with things.
-> 
-> We currently work around this by the ethernet-controller YAML having
-> all these properties as optional. Maybe some drivers extend that YAML
-> and require certain properties - that is their perogative, but that is
-> the driver's choice, and is a completely separate issue to whether
-> the driver is using phylink or not.
-> 
-> The real question is how do we want to describe an ethernet controller
-> and what properties should we be requiring for it (if any). Maybe if we
-> want to require one of a PHY, PCS, SFP, or fixed-link, maybe we should
-> have that as a strictly-checked ethernet controller which drivers can
-> opt into using if that's what they require.
 
-I'd like to make this clear. We're only talking about deviating from proper
-devicetree bindings so that it won't cause too much work or not at all to
-fix the incorrect Linux driver policies.
 
-As long as we don't collectively agree on fixing the drivers to work with
-proper devicetree bindings, I'd keep the missing ethernet controller
-bindings (requiring at least one of PHY, PCS, SFP, fixed-link) as they
-currently are on ethernet-controller.yaml, optional. Or rather, I wouldn't
-touch anything regarding this as it's nonsensical to change devicetree
-bindings because of driver policies.
+On 2023/9/23 02:13, Gerd Bayer wrote:
 
-As you have pointed out with certain examples, once the driver starts
-operating out of what the devicetree says, in other words, once the driver
-starts guessing the hardware, there's no guarantee it will always guess it
-correctly. As seen with the macb driver, the driver assumes that if there's
-no phy-handle property, the PHY on its MDIO bus must be used regardless.
-But the MAC may be connected to another MAC, PCS or SFP, meaning it doesn't
-use the PHY on that bus.
-
-There is also a case for DSA. If there's an implication that the DSA
-controlled switch has an MDIO bus (phy_read() and phy_write()), the DSA
-driver will connect the switch MACs to the PHYs on the MDIO bus of the
-switch, even if there's no description of that MDIO bus on the devicetree.
-As unlikely as it is on a real life scenario, there may be a device that
-has its switch MACs wired to the PHYs on another MDIO bus.
-
-This is why I've proposed to make the drivers strictly follow what the
-devicetree says.
-
+> Hi Wen Gu,
 > 
-> However, to dress this up as "phylink requires xyz, so lets create
-> a phylink binding description" is just wrong.
+> seems like there is some email filter at work. Neither v2 nor v3 made
+> it to the netdev mailing list - nor to patchwork.kernel.org.
+> There's traces of Wenjia's replies and your replies to her - but not
+> the original mail.
+> 
+> Could you please check? Thanks!
+> Gerd
 
-Agreed.
+Yes, it is ture. v2 and v3 was refused by ver.kernel.org.
 
-Arınç
+I will send the v4 based on Wenjia's comments as soon as possible,
+and add CC of you, Sandy, Niklas and Halil in v4 in case the filter
+happens again.
+
+Thank you very much for your reminder!
+
+Regards,
+Wen Gu
 
