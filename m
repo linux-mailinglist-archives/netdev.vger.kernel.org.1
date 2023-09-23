@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-35943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-35944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 875767AC100
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 13:10:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E6D7AC101
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 13:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 2A10A1F22799
-	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 11:10:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id A13B11C20863
+	for <lists+netdev@lfdr.de>; Sat, 23 Sep 2023 11:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA17C15E86;
-	Sat, 23 Sep 2023 11:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178E115E8F;
+	Sat, 23 Sep 2023 11:10:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8682567
-	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 11:10:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97646C433C7;
-	Sat, 23 Sep 2023 11:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06DE410A18
+	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 11:10:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786CCC433C9;
+	Sat, 23 Sep 2023 11:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695467420;
-	bh=G6v81uejH6j4JToJZhqDGFZIfPfAL+yoQGjuursMf0Y=;
+	s=k20201202; t=1695467434;
+	bh=VlkcOypmZrR7VawQYftIHguoiDQHrQSxjDWYlRjEukk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GIuVdFZ74fZyPEpIv/BCSFe8zoDgQ1QuRcEYkDYW+LBW4tTpU9o7zmqFGsu3qbw1R
-	 6bcOMDI2yaPxGGq/faWSNqXDEbRwERxDs/4dhTN9B5QyKSyr5b5JhEaTEohTdhvhSO
-	 h4KXgV37NSU7WC8lZwtMYLivCMlhaZc5OMbbXgElg1NOMpZp+iUlp+5WE9kM/Cx1/r
-	 rPus1VfRDqYQ0fhsSRZK7vINy1N0pc7wGomWCSailXdPSZNpIz5CtJj79t4c9QhTXK
-	 nFDklo4bGb+5xLOh1fHsEwVAgj+/rcUsHehp87Uz5jwyWsKcR0hu2KqUSQPoCLDkOq
-	 0IJ2TTwFWN4Ng==
-Message-ID: <14d4fc18-4cb5-abc5-8957-0d72cebda025@kernel.org>
-Date: Sat, 23 Sep 2023 13:09:36 +0200
+	b=o7SFacdvd8KWsD5jzP7QBxdmkQqBBGyvoJA+PAyhLLiePoprUmjdIj7Huj3pELzdf
+	 QGxJKYt/6kKhrADlzl9TNZSfV4FWZ2ZOSUHuGGLSIiUziTKpYQDDwj94R9Bl46FB7d
+	 EvaC3mtgI0pHUde8DpPEylS9ExB5MHSr++ejCBumaAub6MxyGNPwjnfL0DzRuKT2Hd
+	 JeDWT7c7gYkrZEsCTiDnmj+/Taaj57SwlgxcwVWAukfGgXFWVAXLfprF2NepbNl0Fl
+	 9Nq71TUW/YHQEHaAGOAkHvhGWLPnWuoIPKN7uXimnOn1I5QhygFd3MnFad6J3s8K6I
+	 tXybNE2aMgwEQ==
+Message-ID: <a493b48a-9b20-2471-8004-ee355059f8f7@kernel.org>
+Date: Sat, 23 Sep 2023 13:09:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -38,7 +38,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next 1/4] tcp_metrics: add missing barriers on delete
+Subject: Re: [PATCH net-next 3/4] tcp_metrics: do not create an entry from
+ tcp_init_metrics()
 Content-Language: en-US
 To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
  <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
@@ -46,24 +47,24 @@ To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
 Cc: Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>,
  netdev@vger.kernel.org, eric.dumazet@gmail.com
 References: <20230922220356.3739090-1-edumazet@google.com>
- <20230922220356.3739090-2-edumazet@google.com>
+ <20230922220356.3739090-4-edumazet@google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230922220356.3739090-2-edumazet@google.com>
+In-Reply-To: <20230922220356.3739090-4-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 9/22/23 4:03 PM, Eric Dumazet wrote:
-> When removing an item from RCU protected list, we must prevent
-> store-tearing, using rcu_assign_pointer() or WRITE_ONCE().
+> tcp_init_metrics() only wants to get metrics if they were
+> previously stored in the cache. Creating an entry is adding
+> useless costs, especially when tcp_no_metrics_save is set.
 > 
-> Fixes: 04f721c671656 ("tcp_metrics: Rewrite tcp_metrics_flush_all")
+> Fixes: 51c5d0c4b169 ("tcp: Maintain dynamic metrics in local cache.")
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  net/ipv4/tcp_metrics.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  net/ipv4/tcp_metrics.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
-
 
 
