@@ -1,100 +1,143 @@
-Return-Path: <netdev+bounces-36023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 770897ACA1F
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 16:51:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94367ACA27
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 16:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 25663B20957
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 14:51:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0A7BB2814A2
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 14:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D72D274;
-	Sun, 24 Sep 2023 14:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E77D27A;
+	Sun, 24 Sep 2023 14:56:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD672D26D
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 14:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB401FA4;
+	Sun, 24 Sep 2023 14:56:13 +0000 (UTC)
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180E9FC
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 07:51:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D58FC;
+	Sun, 24 Sep 2023 07:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wF8VAQkHm9aN8DanZcHbvC5q8/HPij/Ar/JZNa+ORCY=; b=RTqDnomTBtd2RJjAH6CSlzlyJR
-	mM3J05j5rKGOIUKzu+LzLyMrzbEoweDsd9CMM8umrdgK/E0oz3efGS8TI/y/b8xj5aFiCwqfUODXZ
-	q/+FY6X2lJVedqkfhRe5gruEv8YWPwFeXTzc2wDFizkPBRho56On09v97AbAC3UqrtzI=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=a0RI2EF5VAOb9mrpmA1xh0jjtBBMo7NRn7kCBceeFDo=; b=Ka
+	9jVVC1YfiOMJeEi2JVxXYgoz/MBKnf47MIA4j9oz6BgcZc1ubOozNQQa7JsVGsuyNP+qGwOQjsqoG
+	hp2txzye8csh7V0bmUfppxLl5sekmzl1L4zuxExa8q4AP3XYTB6MXI3lB75y4fLbd1C/tjlrqVn1T
+	GZq266029NbgEew=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1qkQRs-007M2R-St; Sun, 24 Sep 2023 16:51:04 +0200
-Date: Sun, 24 Sep 2023 16:51:04 +0200
+	id 1qkQVl-007M3k-16; Sun, 24 Sep 2023 16:55:05 +0200
+Date: Sun, 24 Sep 2023 16:55:05 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Neftin, Sasha" <sasha.neftin@intel.com>
-Cc: Prasad Koya <prasad@arista.com>, intel-wired-lan@lists.osuosl.org,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	dumazet@google.com, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
-	"lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Subject: Re: [PATCH] [iwl-net] Revert "igc: set TP bit in 'supported' and
- 'advertising' fields of ethtool_link_ksettings"
-Message-ID: <04bc5392-24da-49dc-a240-27e8c69c7e06@lunn.ch>
-References: <20230922163804.7DDBA2440449@us122.sjc.aristanetworks.com>
- <40c11058-5065-41f0-bf09-2784b291c41b@intel.com>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	George McCollister <george.mccollister@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Marek Vasut <marex@denx.de>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	John Crispin <john@phrozen.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+Message-ID: <29cd6190-a565-4f95-9de0-41ed7c7772e6@lunn.ch>
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+ <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+ <4856b212-5bc5-4783-a184-b34a4a915878@lunn.ch>
+ <5650a2a3-a36f-441e-b4c2-aa7c751b5af5@arinc9.com>
+ <410dfe3c-6f99-4054-88f8-0acbd134cfce@lunn.ch>
+ <228f24db-0a26-4d38-8f73-a9691262cc5f@arinc9.com>
+ <2be01f7e-8bd0-42c5-bc82-b1da29b83e24@lunn.ch>
+ <78e70cc9-a6ca-439b-bfca-3119299249de@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <40c11058-5065-41f0-bf09-2784b291c41b@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <78e70cc9-a6ca-439b-bfca-3119299249de@arinc9.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Sep 24, 2023 at 10:09:17AM +0300, Neftin, Sasha wrote:
-> On 22/09/2023 19:38, Prasad Koya wrote:
-> > This reverts commit 9ac3fc2f42e5ffa1e927dcbffb71b15fa81459e2.
+On Sun, Sep 24, 2023 at 10:49:49AM +0300, Arınç ÜNAL wrote:
+> On 24/09/2023 06:15, Andrew Lunn wrote:
+> > > > There is a MAC driver currently under review which does not have a PHY
+> > > > at all. The MAC is directly connected to a switch, all within one
+> > > > IC. The link is always running at 5Gbps, the link is always up. It is
+> > > > physically impossible to connect a PHY, so get_link_settings just
+> > > > returns hard coded values.
+> > > 
+> > > The fixed-link property would be used to describe the link of the MAC here.
 > > 
-> > After the command "ethtool -s enps0 speed 100 duplex full autoneg on",
-> > i.e., advertise only 100Mbps speed to the peer, "ethtool enps0" shows
-> > advertised speeds as 100Mbps and 2500Mbps. Same behavior is seen
-> > when changing the speed to 10Mbps or 1000Mbps.
+> > Fixed-link make sense for a general purpose MAC which could be
+> > connected to a PHY, or could also be used without a PHY. fixed-link
+> > simplifies the code in that the MAC driver does not see a difference,
+> > it all looks like a PHY.
 > > 
-> > This applies to I225/226 parts, which only supports copper mode.
-> > Reverting to original till the ambiguity is resolved.
-> > 
-> > Fixes: 9ac3fc2f42e5 ("igc: set TP bit in 'supported' and
-> > 'advertising' fields of ethtool_link_ksettings")
-> > Signed-off-by: Prasad Koya <prasad@arista.com>
+> > However for a MAC which cannot be connected to a PHY, there is no need
+> > to emulate a PHY. The MAC driver will be simpler. So i would not
+> > recommend a fixed-link in this situation.
 > 
-> Acked-by: Sasha Neftin <sasha.neftin@intel.com>
-> 
-> > ---
-> >   drivers/net/ethernet/intel/igc/igc_ethtool.c | 2 --
-> >   1 file changed, 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> > index 93bce729be76..0e2cb00622d1 100644
-> > --- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> > +++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-> > @@ -1708,8 +1708,6 @@ static int igc_ethtool_get_link_ksettings(struct net_device *netdev,
-> >   	/* twisted pair */
-> >   	cmd->base.port = PORT_TP;
-> >   	cmd->base.phy_address = hw->phy.addr;
-> > -	ethtool_link_ksettings_add_link_mode(cmd, supported, TP);
-> > -	ethtool_link_ksettings_add_link_mode(cmd, advertising, TP);
+> There's a link, it must be described.
 
-This looks very odd. Please can you confirm this revert really does
-make ethtool report the correct advertisement when it has been limited
-to 100Mbps. Because looking at this patch, i have no idea how this is
-going wrong.
+Why must it be described?
 
-	Andrew
+Lets take this to the extreme to make a point. The chip has a ground
+pin. Must i describe that?
+
+     Andrew
 
