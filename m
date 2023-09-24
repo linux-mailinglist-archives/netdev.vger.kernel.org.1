@@ -1,91 +1,99 @@
-Return-Path: <netdev+bounces-36004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 899727AC649
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 04:03:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C3507AC673
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 05:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 866E6281CAD
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 02:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9BA3D28169A
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 03:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A2262F;
-	Sun, 24 Sep 2023 02:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0534658;
+	Sun, 24 Sep 2023 03:16:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA1B63C
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 02:03:31 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61B62192
-	for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 19:03:29 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-27702912521so2804769a91.1
-        for <netdev@vger.kernel.org>; Sat, 23 Sep 2023 19:03:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695521007; x=1696125807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYVo5GdkTbBgfnivmVoW8KukwKTsj2A6u4CjQwQFBnw=;
-        b=SGLLhABuwI73NA3/AHiKeurFZFCrtZ9/z8Ak3RS++VRDkQVMnDFnEOA9U/FpoOUOJH
-         N4ab3hpVJ9odTyIIOSnLhEtH8al8lU+sASIYFOYEWniMI7Z33DLBGwR+YvI8GJKJc/DP
-         zCPTX3B3mKKdk+gXhtXGAvbgtxQ2ocPZE86qQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695521007; x=1696125807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vYVo5GdkTbBgfnivmVoW8KukwKTsj2A6u4CjQwQFBnw=;
-        b=evkBGTu8mzSGvXaug/xhJeCdA6lcApeaOyFdepfSfw9WDC1cmDLbZf0aOFfrzx3CRL
-         jMeq/u3NA8z3kaBF7/+/sRTnn/sXbBbm3pNf1jUeM7NVlVz0pS4tjtFmH666vsguO1gp
-         agxQjeOPWM7ih+ylJl1ezl6wr3EF8yauq9c7Qrg4C68fGaL36QDRLz+e82Psk8zQ07ti
-         kvZr76zzB8TKPz5JHI+1KR8B9TMKpyv5CBJRrupyinsOp5pyBppSe4UYF3LWOu+uQpgg
-         myZAF11CzbQ+b7VOWWmaouw9WY5rHb6czrGwypJuFc+eui2rEYRCgqKsU1xUtLIHPJG4
-         xgWA==
-X-Gm-Message-State: AOJu0YzLwdmJghA0js9GL/OK2Oj9rkDh/DeFYoC04Lgu1RaHJTlwQzhs
-	QHF5Qss0FWsKt/WLUVW7SRkDog==
-X-Google-Smtp-Source: AGHT+IGasKw5qGGD+KI5YxzCFxg3lZRJ7Ns/75yx0TF2sBm+b8qXZJKFwUDGZ86xbS0T4ovXuXNpDA==
-X-Received: by 2002:a17:90b:11d5:b0:274:ac60:1d57 with SMTP id gv21-20020a17090b11d500b00274ac601d57mr9710054pjb.16.1695521007664;
-        Sat, 23 Sep 2023 19:03:27 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id n6-20020a17090ade8600b002680dfd368dsm5521151pjv.51.2023.09.23.19.03.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Sep 2023 19:03:26 -0700 (PDT)
-Date: Sat, 23 Sep 2023 19:03:26 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Alex Elder <elder@ieee.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7155519B;
+	Sun, 24 Sep 2023 03:16:09 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E5A197;
+	Sat, 23 Sep 2023 20:16:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hIhc6S9lojzS96JV1IiMmWOoZlmX89PQJ27DBWFUgb8=; b=tcs+ci/+NHqzYCxUBXKQ+iWWbo
+	HfbC2lCB0ZZoR7iP5dsuSuFXkuh1tgcCGESEariPR4RvyDkM72A02vQzkxKS8hh5eOZU/cD/Td5Tc
+	MKXK+8Wll1YtcvYbtg0SFi31WqGbXpEzFT1HVXukIcJDW6B7SWY0wnwAbN8joc058JbY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qkFaK-007KCk-Ou; Sun, 24 Sep 2023 05:15:04 +0200
+Date: Sun, 24 Sep 2023 05:15:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
-	David Ahern <dsahern@kernel.org>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	George McCollister <george.mccollister@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Marek Vasut <marex@denx.de>,
 	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Pravin B Shelar <pshelar@ovn.org>,
-	Shaokun Zhang <zhangshaokun@hisilicon.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, dev@openvswitch.org,
-	linux-parisc@vger.kernel.org, llvm@lists.linux.dev,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 08/14] net: ipa: Annotate struct ipa_power with
- __counted_by
-Message-ID: <202309231859.D8467DB23@keescook>
-References: <20230922172449.work.906-kees@kernel.org>
- <20230922172858.3822653-8-keescook@chromium.org>
- <6f52f36c-be16-2427-c19f-0e8b3dd2ff5f@ieee.org>
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	John Crispin <john@phrozen.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Sekhar Nori <nsekhar@ti.com>,
+	Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+Message-ID: <2be01f7e-8bd0-42c5-bc82-b1da29b83e24@lunn.ch>
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+ <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+ <4856b212-5bc5-4783-a184-b34a4a915878@lunn.ch>
+ <5650a2a3-a36f-441e-b4c2-aa7c751b5af5@arinc9.com>
+ <410dfe3c-6f99-4054-88f8-0acbd134cfce@lunn.ch>
+ <228f24db-0a26-4d38-8f73-a9691262cc5f@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,53 +102,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6f52f36c-be16-2427-c19f-0e8b3dd2ff5f@ieee.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+In-Reply-To: <228f24db-0a26-4d38-8f73-a9691262cc5f@arinc9.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 23, 2023 at 07:09:19AM -0500, Alex Elder wrote:
-> On 9/22/23 12:28 PM, Kees Cook wrote:
-> > Prepare for the coming implementation by GCC and Clang of the __counted_by
-> > attribute. Flexible array members annotated with __counted_by can have
-> > their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> > (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> > functions).
-> > 
-> > As found with Coccinelle[1], add __counted_by for struct ipa_power.
+> > There is a MAC driver currently under review which does not have a PHY
+> > at all. The MAC is directly connected to a switch, all within one
+> > IC. The link is always running at 5Gbps, the link is always up. It is
+> > physically impossible to connect a PHY, so get_link_settings just
+> > returns hard coded values.
 > 
-> Looks good, thanks.
-> 
-> Reviewed-by: Alex Elder <elder@linaro.org>
-> 
-> Note that there is some interaction between struct ipa_power_data
-> and struct ipa_power (the former is used to initialize the latter).
-> Both of these contain flexible arrays counted by another field in
-> the structure.  It seems possible that the way these are initialized
-> might need slight modification to allow the compiler to do its
-> enforcement; if that's the case, please reach out to me.
+> The fixed-link property would be used to describe the link of the MAC here.
 
-I think it's all okay:
+Fixed-link make sense for a general purpose MAC which could be
+connected to a PHY, or could also be used without a PHY. fixed-link
+simplifies the code in that the MAC driver does not see a difference,
+it all looks like a PHY.
 
-struct ipa_power_data {
-        u32 core_clock_rate;
-        u32 interconnect_count;         /* # entries in interconnect_data[] */
-        const struct ipa_interconnect_data *interconnect_data;
-};
+However for a MAC which cannot be connected to a PHY, there is no need
+to emulate a PHY. The MAC driver will be simpler. So i would not
+recommend a fixed-link in this situation.
 
-"interconnect_data" here is a pointer, not a flexible array. (Yes,
-__counted_by is expected to be expanded in the future for pointers,
-but not yet.) Looking at initializers, I didn't see any problems with
-how struct ipa_power is allocated.
-
-Thanks for the heads-up; I'm sure I'll look at this again when we can
-further expand __counted_by to pointers. :)
-
--Kees
-
--- 
-Kees Cook
+	  Andrew
 
