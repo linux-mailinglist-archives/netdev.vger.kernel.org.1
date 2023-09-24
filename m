@@ -1,174 +1,154 @@
-Return-Path: <netdev+bounces-36015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56A757AC723
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 10:19:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0CB47AC72E
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 10:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3479B1C20821
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 08:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BEC6D280FBA
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 08:54:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1589CA54;
-	Sun, 24 Sep 2023 08:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571C1A3C;
+	Sun, 24 Sep 2023 08:54:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D4365B
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 08:19:15 +0000 (UTC)
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE69AEE
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 01:19:13 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-502a4f33440so7438111e87.1
-        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 01:19:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695543552; x=1696148352; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1hHLqx//+KHKke7RxCV9Yuyp7jdtEnxin017FD+uo04=;
-        b=j5sXX0y9otl1g2XHDtxW2ZZalq5xYNivaSQ8SC0z0+ojPDPmwsajQO6vg4MOyrLBXE
-         J68QpllXYRSs7lE6dLGUJAZe501gxmQm3h6/kJHHGffTIxZMKlukEP5MzEV7A9Pllbm4
-         YIpOvuVVgrIn7m95jBUQKLnQF0MUpG6o7Q8biARUrYs1858qE21xaGRmbi4MYi1bYGVW
-         O4CLuHb0P1Q55hEbRhk+J/SMOfqXBlFUVW+Mr5k079o/5Ji92q947QwdhWftGQzUhbQQ
-         AbJTizFNYQuFUaSLSVL0L3N+Je0H7wvTEq4h201tHcpBZaRY9krvunS/Y/M9Zo8I00+4
-         f91w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695543552; x=1696148352;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1hHLqx//+KHKke7RxCV9Yuyp7jdtEnxin017FD+uo04=;
-        b=Sv6vc2Jp74bX8wLT/haLrz63UAXZ4ZbIkE5lDc8FstMGPsIQMsn+4ygqlXLUvbHyMs
-         voIIfubxhFvpb1uNSLfb7F91jjW1f8B7GXF/8cugA0VQMWFcsqDmqf/7mVHECXdtZK40
-         ne62R9VPJGfouAH1isORvQQteC+sCTXijPYcAdmq/Lc/qwfGnVpt5dt7og0YHBa3JrLk
-         Azp7MJMOQCgVPhbxK55BNe+zBWet0ackDjME72LKT4EQ1amdzT2m8Fo1pZ2OcZoZIdq+
-         RBuETDQfeSNs/yv6Tw2KVfiZ1uJOkp6+dd/gjRJ6QpzArgyGPR2gwqw1lxlNw39f3Hqg
-         pv5A==
-X-Gm-Message-State: AOJu0YxVCasrxNsrgRgWhrR0ENFxK/R0iX/Sg/250eAcpWssZX+4pRQR
-	5740wNjTNK1eA+czuqYiiI8SUQ==
-X-Google-Smtp-Source: AGHT+IHGm7AQbFXuimot0EDmqmJRuWEsigBLLH9wurZI26YcE210hwvBjgQtg2QBwug/Mmho6/dcrw==
-X-Received: by 2002:a05:6512:546:b0:503:2dce:4544 with SMTP id h6-20020a056512054600b005032dce4544mr2945667lfl.59.1695543551864;
-        Sun, 24 Sep 2023 01:19:11 -0700 (PDT)
-Received: from [192.168.1.2] (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
-        by smtp.gmail.com with ESMTPSA id c19-20020a197613000000b005033948f108sm1335674lff.272.2023.09.24.01.19.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Sep 2023 01:19:11 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 24 Sep 2023 10:19:02 +0200
-Subject: [PATCH net-next] net: phy: amd: Support the Altima AMI101L
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDC87F
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 08:54:14 +0000 (UTC)
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D41100;
+	Sun, 24 Sep 2023 01:54:11 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R961e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsiANs2_1695545648;
+Received: from 30.13.48.111(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsiANs2_1695545648)
+          by smtp.aliyun-inc.com;
+          Sun, 24 Sep 2023 16:54:09 +0800
+Message-ID: <41d1f41f-737a-7705-c09d-f3678387f8d4@linux.alibaba.com>
+Date: Sun, 24 Sep 2023 16:54:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: [PATCH net-next 12/18] net/smc: implement DMB-related operations
+ of loopback
+To: kernel test robot <lkp@intel.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695134522-126655-13-git-send-email-guwen@linux.alibaba.com>
+ <202309232327.nzXalNsH-lkp@intel.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <202309232327.nzXalNsH-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230924-ac101l-phy-v1-1-5e6349e28aa4@linaro.org>
-X-B4-Tracking: v=1; b=H4sIAPXwD2UC/x3MwQpAQBRG4VfRXbt1Z5B4FVlM/LiloRmJ5N1Nl
- t/inIcigiJSmz0UcGrUzSeYPKNhcX4G65hMVmwhjS3ZDUbMyvtycy0lGiemsqgoBXvApNc/68j
- jYI/roP59P/FOBkZmAAAA
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The Altima AC101L is obviously compatible with the AMD PHY,
-as seen by reading the datasheet.
 
-Datasheet: https://docs.broadcom.com/doc/AC101L-DS05-405-RDS.pdf
 
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/phy/Kconfig |  4 ++--
- drivers/net/phy/amd.c   | 33 +++++++++++++++++++++++----------
- 2 files changed, 25 insertions(+), 12 deletions(-)
+On 2023/9/23 23:24, kernel test robot wrote:
+> Hi Wen,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on net-next/main]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Wen-Gu/net-smc-decouple-ism_dev-from-SMC-D-device-dump/20230920-010019
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/1695134522-126655-13-git-send-email-guwen%40linux.alibaba.com
+> patch subject: [PATCH net-next 12/18] net/smc: implement DMB-related operations of loopback
+> config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20230923/202309232327.nzXalNsH-lkp@intel.com/config)
+> compiler: arceb-elf-gcc (GCC) 13.2.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230923/202309232327.nzXalNsH-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202309232327.nzXalNsH-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>     net/smc/smc_loopback.c: In function 'smc_lo_register_dmb':
+>>> net/smc/smc_loopback.c:107:30: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+>       107 |         dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
+>           |                              ^
+> 
+> 
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 107880d13d21..421d2b62918f 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -69,9 +69,9 @@ config SFP
- comment "MII PHY device drivers"
- 
- config AMD_PHY
--	tristate "AMD PHYs"
-+	tristate "AMD and Altima PHYs"
- 	help
--	  Currently supports the am79c874
-+	  Currently supports the AMD am79c874 and Altima AC101L.
- 
- config MESON_GXL_PHY
- 	tristate "Amlogic Meson GXL Internal PHY"
-diff --git a/drivers/net/phy/amd.c b/drivers/net/phy/amd.c
-index 001bb6d8bfce..930b15fa6ce9 100644
---- a/drivers/net/phy/amd.c
-+++ b/drivers/net/phy/amd.c
-@@ -13,6 +13,7 @@
- #include <linux/mii.h>
- #include <linux/phy.h>
- 
-+#define PHY_ID_AC101L		0x00225520
- #define PHY_ID_AM79C874		0x0022561b
- 
- #define MII_AM79C_IR		17	/* Interrupt Status/Control Register */
-@@ -87,19 +88,31 @@ static irqreturn_t am79c_handle_interrupt(struct phy_device *phydev)
- 	return IRQ_HANDLED;
- }
- 
--static struct phy_driver am79c_driver[] = { {
--	.phy_id		= PHY_ID_AM79C874,
--	.name		= "AM79C874",
--	.phy_id_mask	= 0xfffffff0,
--	/* PHY_BASIC_FEATURES */
--	.config_init	= am79c_config_init,
--	.config_intr	= am79c_config_intr,
--	.handle_interrupt = am79c_handle_interrupt,
--} };
-+static struct phy_driver am79c_drivers[] = {
-+	{
-+		.phy_id		= PHY_ID_AM79C874,
-+		.name		= "AM79C874",
-+		.phy_id_mask	= 0xfffffff0,
-+		/* PHY_BASIC_FEATURES */
-+		.config_init	= am79c_config_init,
-+		.config_intr	= am79c_config_intr,
-+		.handle_interrupt = am79c_handle_interrupt,
-+	},
-+	{
-+		.phy_id		= PHY_ID_AC101L,
-+		.name		= "AC101L",
-+		.phy_id_mask	= 0xfffffff0,
-+		/* PHY_BASIC_FEATURES */
-+		.config_init	= am79c_config_init,
-+		.config_intr	= am79c_config_intr,
-+		.handle_interrupt = am79c_handle_interrupt,
-+	},
-+};
- 
--module_phy_driver(am79c_driver);
-+module_phy_driver(am79c_drivers);
- 
- static struct mdio_device_id __maybe_unused amd_tbl[] = {
-+	{ PHY_ID_AC101L, 0xfffffff0 },
- 	{ PHY_ID_AM79C874, 0xfffffff0 },
- 	{ }
- };
+Will fix it on v4. Thanks!
 
----
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-change-id: 20230924-ac101l-phy-704e9a0152e5
-
-Best regards,
--- 
-Linus Walleij <linus.walleij@linaro.org>
-
+> vim +107 net/smc/smc_loopback.c
+> 
+>      76	
+>      77	static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+>      78				       void *client_priv)
+>      79	{
+>      80		struct smc_lo_dmb_node *dmb_node, *tmp_node;
+>      81		struct smc_lo_dev *ldev = smcd->priv;
+>      82		int sba_idx, rc;
+>      83	
+>      84		/* check space for new dmb */
+>      85		for_each_clear_bit(sba_idx, ldev->sba_idx_mask, SMC_LODEV_MAX_DMBS) {
+>      86			if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
+>      87				break;
+>      88		}
+>      89		if (sba_idx == SMC_LODEV_MAX_DMBS)
+>      90			return -ENOSPC;
+>      91	
+>      92		dmb_node = kzalloc(sizeof(*dmb_node), GFP_KERNEL);
+>      93		if (!dmb_node) {
+>      94			rc = -ENOMEM;
+>      95			goto err_bit;
+>      96		}
+>      97	
+>      98		dmb_node->sba_idx = sba_idx;
+>      99		dmb_node->cpu_addr = kzalloc(dmb->dmb_len, GFP_KERNEL |
+>     100					     __GFP_NOWARN | __GFP_NORETRY |
+>     101					     __GFP_NOMEMALLOC);
+>     102		if (!dmb_node->cpu_addr) {
+>     103			rc = -ENOMEM;
+>     104			goto err_node;
+>     105		}
+>     106		dmb_node->len = dmb->dmb_len;
+>   > 107		dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
+>     108	
+>     109	again:
+>     110		/* add new dmb into hash table */
+>     111		get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
+>     112		write_lock(&ldev->dmb_ht_lock);
+>     113		hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_node->token) {
+>     114			if (tmp_node->token == dmb_node->token) {
+>     115				write_unlock(&ldev->dmb_ht_lock);
+>     116				goto again;
+>     117			}
+>     118		}
+>     119		hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
+>     120		write_unlock(&ldev->dmb_ht_lock);
+>     121	
+>     122		dmb->sba_idx = dmb_node->sba_idx;
+>     123		dmb->dmb_tok = dmb_node->token;
+>     124		dmb->cpu_addr = dmb_node->cpu_addr;
+>     125		dmb->dma_addr = dmb_node->dma_addr;
+>     126		dmb->dmb_len = dmb_node->len;
+>     127	
+>     128		return 0;
+>     129	
+>     130	err_node:
+>     131		kfree(dmb_node);
+>     132	err_bit:
+>     133		clear_bit(sba_idx, ldev->sba_idx_mask);
+>     134		return rc;
+>     135	}
+>     136	
+> 
 
