@@ -1,292 +1,126 @@
-Return-Path: <netdev+bounces-36044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC547ACA65
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 17:18:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA5057ACA7B
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 17:31:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D15EB2818FF
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 15:18:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id CBAC91C20456
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 15:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B918DD2FB;
-	Sun, 24 Sep 2023 15:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E05D302;
+	Sun, 24 Sep 2023 15:31:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E315FD292
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 15:18:01 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339F3CD8;
-	Sun, 24 Sep 2023 08:17:43 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0Vsio80D_1695568659;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vsio80D_1695568659)
-          by smtp.aliyun-inc.com;
-          Sun, 24 Sep 2023 23:17:41 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: wintera@linux.ibm.com,
-	schnelle@linux.ibm.com,
-	gbayer@linux.ibm.com,
-	pasic@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	dust.li@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AFF0D280
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 15:31:15 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6FCCB8;
+	Sun, 24 Sep 2023 08:31:14 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-991c786369cso597134966b.1;
+        Sun, 24 Sep 2023 08:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695569473; x=1696174273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pM+cS4xkipoFkqRFvppgVlJ829+I7pdub5JIx78AhSQ=;
+        b=KMosOautp7h/bCvdezUTiL3tpoesDjEoJR43G5PRZuVdRzImnWW8U1P4z29xTBO7ym
+         K5tosniFTMgFJhCeS/YgWMVHaRgYHo50pkK8rKm65U93Yd5Bh6ot/nLOfcZ2YkbFKMbx
+         dJAaA88RpqtCajYIyVkWjjwHCVR69j3Qb4JfvGIpFpx+Tdun/0f7g5MGrY1ohhW6h5S9
+         zxd6MvWeFPeFwHg3nfB9odYw+ki7cCsWa/28RZ0j6/Zzj9EBWxa8EIsF0y+QWoY+rwid
+         sDcGIR75jeceM40sFjW/+yqPZOxpqeHhPHpClrsT9lcSsCT8vgyGATN3o96I91vXh/mg
+         X8Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695569473; x=1696174273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pM+cS4xkipoFkqRFvppgVlJ829+I7pdub5JIx78AhSQ=;
+        b=skErX66XFNynupxSC28WUL5gjbvx+UdudMPnwfWQPjz3DyIfJCSzLfdfXNTZy+o+53
+         LLVdH1bJFlS8OOsZZoL/FWQjbv4xyKevx4fF/ds/bxLulFTGoAXXWYeJtXipcqC22yJL
+         SP8FMUntZYZfyepkrCFMpl09W6BaNF+FRKqYacJJPufbJlYz55z5YxduGitz04haLX6x
+         vgoeIhc6MrvaZbJNp3JLEJ5XTmULEzm5mbW24pW9Pg5K7Ev387XJB7Sa/RtrT/eQDX0X
+         TSK1+goJiA38fFa6ug78x/803V65fjBBFb6TnKQyGET8KhnEwMCwu8Ggpe4UxaDvDHQ1
+         et5A==
+X-Gm-Message-State: AOJu0YznYAyKpeZdKeZ6kS1birtuKUfYM+f18gTCQvIBQ5Wo532sFpj+
+	7vqa89F3j6j1MIBVwdrZIEQjffWW9yI=
+X-Google-Smtp-Source: AGHT+IEDZ/fZ1NORxT8XbnjwSBri8HXsEXNvH8uuHccF5HMdWnpyPRDGjAn6JDRBNDTL9ZceQcOR9A==
+X-Received: by 2002:a17:907:2d20:b0:9a1:ad87:1354 with SMTP id gs32-20020a1709072d2000b009a1ad871354mr5124279ejc.34.1695569473140;
+        Sun, 24 Sep 2023 08:31:13 -0700 (PDT)
+Received: from tp.. ([212.38.43.101])
+        by smtp.gmail.com with ESMTPSA id mh2-20020a170906eb8200b00992b2c55c67sm5125099ejb.156.2023.09.24.08.31.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Sep 2023 08:31:12 -0700 (PDT)
+From: Beniamino Galvani <b.galvani@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Guillaume Nault <gnault@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 18/18] net/smc: add interface implementation of loopback device
-Date: Sun, 24 Sep 2023 23:16:53 +0800
-Message-Id: <1695568613-125057-19-git-send-email-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
-References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: [PATCH net-next] ipv6: mark address parameters of udp_tunnel6_xmit_skb() as const
+Date: Sun, 24 Sep 2023 17:30:14 +0200
+Message-Id: <20230924153014.786962-1-b.galvani@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-This patch completes the specific implementation of loopback device
-for the newly added SMC-D DMB-related interface.
+The function doesn't modify the addresses passed as input, mark them
+as 'const' to make that clear.
 
-The loopback device always provides mappable DMB because the device
-users are in the same OS instance.
-
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Beniamino Galvani <b.galvani@gmail.com>
 ---
- net/smc/smc_loopback.c | 104 ++++++++++++++++++++++++++++++++++++++++++++-----
- net/smc/smc_loopback.h |   5 +++
- 2 files changed, 99 insertions(+), 10 deletions(-)
+ include/net/udp_tunnel.h  | 5 +++--
+ net/ipv6/ip6_udp_tunnel.c | 5 +++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index 8375575..e9d2d62 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -106,6 +106,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	dmb_node->len = dmb->dmb_len;
- 	dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
-+	refcount_set(&dmb_node->refcnt, 1);
+diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
+index 29251c3519cf..21ba0a25f936 100644
+--- a/include/net/udp_tunnel.h
++++ b/include/net/udp_tunnel.h
+@@ -154,8 +154,9 @@ void udp_tunnel_xmit_skb(struct rtable *rt, struct sock *sk, struct sk_buff *skb
  
- again:
- 	/* add new dmb into hash table */
-@@ -119,6 +120,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
- 	write_unlock(&ldev->dmb_ht_lock);
-+	atomic_inc(&ldev->dmb_cnt);
+ int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
+ 			 struct sk_buff *skb,
+-			 struct net_device *dev, struct in6_addr *saddr,
+-			 struct in6_addr *daddr,
++			 struct net_device *dev,
++			 const struct in6_addr *saddr,
++			 const struct in6_addr *daddr,
+ 			 __u8 prio, __u8 ttl, __be32 label,
+ 			 __be16 src_port, __be16 dst_port, bool nocheck);
  
- 	dmb->sba_idx = dmb_node->sba_idx;
- 	dmb->dmb_tok = dmb_node->token;
-@@ -140,18 +142,27 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
+diff --git a/net/ipv6/ip6_udp_tunnel.c b/net/ipv6/ip6_udp_tunnel.c
+index cdc4d4ee2420..70d38705c92f 100644
+--- a/net/ipv6/ip6_udp_tunnel.c
++++ b/net/ipv6/ip6_udp_tunnel.c
+@@ -75,8 +75,9 @@ EXPORT_SYMBOL_GPL(udp_sock_create6);
  
--	/* remove dmb from hash table */
--	write_lock(&ldev->dmb_ht_lock);
-+	/* find dmb from hash table */
-+	read_lock(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
- 		if (tmp_node->token == dmb->dmb_tok) {
- 			dmb_node = tmp_node;
-+			dmb_node->freeing = 1;
- 			break;
- 		}
- 	}
- 	if (!dmb_node) {
--		write_unlock(&ldev->dmb_ht_lock);
-+		read_unlock(&ldev->dmb_ht_lock);
- 		return -EINVAL;
- 	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	/* wait for dmb refcnt to be 0 */
-+	if (!refcount_dec_and_test(&dmb_node->refcnt))
-+		wait_event(ldev->dmbs_release, !refcount_read(&dmb_node->refcnt));
-+
-+	/* remove dmb from hash table */
-+	write_lock(&ldev->dmb_ht_lock);
- 	hash_del(&dmb_node->list);
- 	write_unlock(&ldev->dmb_ht_lock);
- 
-@@ -159,9 +170,69 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 	vfree(dmb_node->cpu_addr);
- 	kfree(dmb_node);
- 
-+	if (atomic_dec_and_test(&ldev->dmb_cnt))
-+		wake_up(&ldev->ldev_release);
- 	return 0;
- }
- 
-+static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
-+		if (tmp_node->token == dmb->dmb_tok && !tmp_node->freeing) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	refcount_inc(&dmb_node->refcnt);
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	/* provide dmb information */
-+	dmb->sba_idx = dmb_node->sba_idx;
-+	dmb->dmb_tok = dmb_node->token;
-+	dmb->cpu_addr = dmb_node->cpu_addr;
-+	dmb->dma_addr = dmb_node->dma_addr;
-+	dmb->dmb_len = dmb_node->len;
-+	return 0;
-+}
-+
-+static int smc_lo_detach_dmb(struct smcd_dev *smcd, u64 token)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, token) {
-+		if (tmp_node->token == token) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock(&ldev->dmb_ht_lock);
-+
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		wake_up_all(&ldev->dmbs_release);
-+	return 0;
-+}
-+
-+static int smc_lo_get_dev_attr(struct smcd_dev *smcd)
-+{
-+	return BIT(ISM_ATTR_DMB_MAP);
-+}
-+
- static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
+ int udp_tunnel6_xmit_skb(struct dst_entry *dst, struct sock *sk,
+ 			 struct sk_buff *skb,
+-			 struct net_device *dev, struct in6_addr *saddr,
+-			 struct in6_addr *daddr,
++			 struct net_device *dev,
++			 const struct in6_addr *saddr,
++			 const struct in6_addr *daddr,
+ 			 __u8 prio, __u8 ttl, __be32 label,
+ 			 __be16 src_port, __be16 dst_port, bool nocheck)
  {
- 	return -EOPNOTSUPP;
-@@ -194,7 +265,15 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx
- {
- 	struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
--
-+	struct smc_connection *conn;
-+
-+	if (!sf) {
-+		/* local sndbuf shares the same physical memory with
-+		 * peer RMB, so no need to copy data from local sndbuf
-+		 * to peer RMB.
-+		 */
-+		return 0;
-+	}
- 	read_lock(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
- 		if (tmp_node->token == dmb_tok) {
-@@ -210,13 +289,10 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx
- 
- 	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
- 
--	if (sf) {
--		struct smc_connection *conn =
--			smcd->conn[rmb_node->sba_idx];
-+	conn = smcd->conn[rmb_node->sba_idx];
-+	if (conn && !conn->killed)
-+		smcd_cdc_rx_handler(conn);
- 
--		if (conn && !conn->killed)
--			smcd_cdc_rx_handler(conn);
--	}
- 	return 0;
- }
- 
-@@ -253,6 +329,8 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
- 	.query_remote_gid = smc_lo_query_rgid,
- 	.register_dmb = smc_lo_register_dmb,
- 	.unregister_dmb = smc_lo_unregister_dmb,
-+	.attach_dmb = smc_lo_attach_dmb,
-+	.detach_dmb = smc_lo_detach_dmb,
- 	.add_vlan_id = smc_lo_add_vlan_id,
- 	.del_vlan_id = smc_lo_del_vlan_id,
- 	.set_vlan_required = smc_lo_set_vlan_required,
-@@ -264,6 +342,7 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
- 	.get_local_gid = smc_lo_get_local_gid,
- 	.get_chid = smc_lo_get_chid,
- 	.get_dev = smc_lo_get_dev,
-+	.get_dev_attr = smc_lo_get_dev_attr,
- };
- 
- static struct smcd_dev *smcd_lo_alloc_dev(const struct smcd_ops *ops,
-@@ -343,6 +422,9 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
- 	smc_lo_generate_id(ldev);
- 	rwlock_init(&ldev->dmb_ht_lock);
- 	hash_init(ldev->dmb_ht);
-+	atomic_set(&ldev->dmb_cnt, 0);
-+	init_waitqueue_head(&ldev->dmbs_release);
-+	init_waitqueue_head(&ldev->ldev_release);
- 
- 	return smcd_lo_register_dev(ldev);
- }
-@@ -376,6 +458,8 @@ static int smc_lo_dev_probe(void)
- static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
- {
- 	smcd_lo_unregister_dev(ldev);
-+	if (atomic_read(&ldev->dmb_cnt))
-+		wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
- }
- 
- static void smc_lo_dev_remove(void)
-diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
-index a5b501b..e42c807 100644
---- a/net/smc/smc_loopback.h
-+++ b/net/smc/smc_loopback.h
-@@ -30,6 +30,8 @@ struct smc_lo_dmb_node {
- 	u32 sba_idx;
- 	void *cpu_addr;
- 	dma_addr_t dma_addr;
-+	refcount_t refcnt;
-+	u8 freeing : 1;
- };
- 
- struct smc_lo_dev {
-@@ -40,6 +42,9 @@ struct smc_lo_dev {
- 	DECLARE_BITMAP(sba_idx_mask, SMC_LODEV_MAX_DMBS);
- 	rwlock_t dmb_ht_lock;
- 	DECLARE_HASHTABLE(dmb_ht, SMC_LODEV_DMBS_HASH_BITS);
-+	atomic_t dmb_cnt;
-+	wait_queue_head_t dmbs_release;
-+	wait_queue_head_t ldev_release;
- };
- #endif
- 
 -- 
-1.8.3.1
+2.40.1
 
 
