@@ -1,117 +1,139 @@
-Return-Path: <netdev+bounces-36012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 997F77AC6F7
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 09:28:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5459F7AC709
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 09:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 2D42FB208CB
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 07:28:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id D2B691C20866
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 07:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CF065B;
-	Sun, 24 Sep 2023 07:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7931065B;
+	Sun, 24 Sep 2023 07:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319A3A38
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 07:28:21 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6582103
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 00:28:19 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f4f2a9ef0so45924807b3.2
-        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 00:28:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695540499; x=1696145299; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlhytN8p6rzsoNNyF2qTaia7H0UbvnXVgo1f8ue1miw=;
-        b=bzemv4DxQIseJIZGlcspLaUqsTJ+pNLlu4GBS30lHDRoXayjlS3aKQVLaaq7mZHHAS
-         LF4KFpnYj/oqv+iLOBVj4QTA9s1ROI6Q7qbopwqBNV9M5u7wWCVP8sBZYanb5sH5If6L
-         Tpdmw6tnWY/S6+mCF8bIZOZ7l0wUic5/swoKZ5aLOPdDIY7G65ONrJEbrOSt3lfnvd8h
-         eHkCE4ys3myKIam9xyfe9tZISOAW7KX4mMYGcq69E5hKCk4cyeOdTPn+DXjnHnYPaw71
-         OTKRBQnVvfNRqio22MSKg6jrC3fjHpEkMTGOAbleiXmVLyzRX73USUTEyLbIwlW990dV
-         CTag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695540499; x=1696145299;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlhytN8p6rzsoNNyF2qTaia7H0UbvnXVgo1f8ue1miw=;
-        b=gpnyA35DbaMANvf0HEe/B1IkyNMncI64MjsStXZVDzsWKBk6p2SggGnXScgBxTTtAG
-         bxkLMduoWqVcTcY14tpWz4Woe3htl81wtTjhyW8PGRPDCKkK8YqyUKfVgakHbVPWmM2M
-         /RD3wKFlzTA9W8cO5/8dl7nFGSqvTn3Qhq8L/d0sCONcs/rkSzHd3Nr8eNZZgdyg6hNg
-         TB06RGD6EX9XQ7ss9EVP7EepYldNnLaedhurni0ZqibFAn3txchdz5SbAQuUf5t1aSur
-         cIF9hpI7Vxa7/+G+mu3jjXQKktMV1NyiyLhQA1kJlZnRk701o9YO/VsXA2LlQPqHZgz4
-         nvDw==
-X-Gm-Message-State: AOJu0YwtnPeUR/axDXjOZnHasVaM6vjtPO4v+NEUrXNWRzg0YXDQ9jcN
-	7MElDUiLCGcQekpWw4kWoK7weZzOK50C4Q==
-X-Google-Smtp-Source: AGHT+IEhWDis5bOzbmBGOi4zqdXmHXsB5eM3APbeJBFJO8QLORC4+n5ComSE/iuNU8T1xE+g9g77xuCbvAPMMA==
-X-Received: from shakeelb.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:262e])
- (user=shakeelb job=sendgmr) by 2002:a81:e304:0:b0:59c:b9b:8940 with SMTP id
- q4-20020a81e304000000b0059c0b9b8940mr42160ywl.8.1695540498994; Sun, 24 Sep
- 2023 00:28:18 -0700 (PDT)
-Date: Sun, 24 Sep 2023 07:28:16 +0000
-In-Reply-To: <71ac08d3-9f36-e0de-870e-3e252abcb66a@bytedance.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8120AA4A;
+	Sun, 24 Sep 2023 07:50:26 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E87D106;
+	Sun, 24 Sep 2023 00:50:23 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 66D9CFF804;
+	Sun, 24 Sep 2023 07:49:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1695541821;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W5IpBspYKC9GLqm5jxyIjisuYRFWL1ICp1Y7jz+OR7M=;
+	b=QLIpJcqUJNNSv8OEUEOc9TZAu+SgbjfTrGUaSNT5+TJdC14MhI1H+RflsE4yp+HOiqh3nG
+	tbR1kfLeKdtyeP9hF7C6m1GBZuZ9uaOU0Iqx1Wd2RvBsfbFNGvGV9UwKyevSsrf+C7jxMe
+	qk2iScqmkai8sFmXzUZyxme5XZK+62t/hnWvvxoCwcdnAQbwlmpOWaNmvalUMEpAvDSDWW
+	gAU4T3UJW5uSqiu9q1sGOJxP1fsAUdf9fPfvM02YRWyz6QJSBlw92J/7/19/1I5PBDk32R
+	URM4P5hXC8NnQ55uWZwheD44ynYrGhZUmtWfi3H/Xn0LHGNFwf0YNlO5srJmqg==
+Message-ID: <78e70cc9-a6ca-439b-bfca-3119299249de@arinc9.com>
+Date: Sun, 24 Sep 2023 10:49:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230920132545.56834-1-wuyun.abel@bytedance.com>
- <20230920132545.56834-2-wuyun.abel@bytedance.com> <20230921190156.s4oygohw4hud42tx@google.com>
- <82c0a442-c7d7-d0f1-54de-7a5e7e6a31d5@bytedance.com> <71ac08d3-9f36-e0de-870e-3e252abcb66a@bytedance.com>
-Message-ID: <20230924072816.6ywgoe7ab2max672@google.com>
-Subject: Re: [PATCH net-next 2/2] sock: Fix improper heuristic on raising memory
-From: Shakeel Butt <shakeelb@google.com>
-To: Abel Wu <wuyun.abel@bytedance.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Breno Leitao <leitao@debian.org>, 
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>, David Howells <dhowells@redhat.com>, 
-	Jason Xing <kernelxing@tencent.com>, Xin Long <lucien.xin@gmail.com>, 
-	KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>, 
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ George McCollister <george.mccollister@gmail.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Daniel Golle <daniel@makrotopia.org>, Landen Chao
+ <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Oleksij Rempel <linux@rempel-privat.de>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
+ Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org
+References: <20230916110902.234273-1-arinc.unal@arinc9.com>
+ <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
+ <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
+ <4856b212-5bc5-4783-a184-b34a4a915878@lunn.ch>
+ <5650a2a3-a36f-441e-b4c2-aa7c751b5af5@arinc9.com>
+ <410dfe3c-6f99-4054-88f8-0acbd134cfce@lunn.ch>
+ <228f24db-0a26-4d38-8f73-a9691262cc5f@arinc9.com>
+ <2be01f7e-8bd0-42c5-bc82-b1da29b83e24@lunn.ch>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <2be01f7e-8bd0-42c5-bc82-b1da29b83e24@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 06:10:06PM +0800, Abel Wu wrote:
-[...]
+On 24/09/2023 06:15, Andrew Lunn wrote:
+>>> There is a MAC driver currently under review which does not have a PHY
+>>> at all. The MAC is directly connected to a switch, all within one
+>>> IC. The link is always running at 5Gbps, the link is always up. It is
+>>> physically impossible to connect a PHY, so get_link_settings just
+>>> returns hard coded values.
+>>
+>> The fixed-link property would be used to describe the link of the MAC here.
 > 
-> After a second thought, it is still vague to me about the position
-> the memcg pressure should be in socket memory allocation. It lacks
-> convincing design. I think the above hunk helps, but not much.
+> Fixed-link make sense for a general purpose MAC which could be
+> connected to a PHY, or could also be used without a PHY. fixed-link
+> simplifies the code in that the MAC driver does not see a difference,
+> it all looks like a PHY.
 > 
-> I wonder if we should take option (3) first. Thoughts?
-> 
+> However for a MAC which cannot be connected to a PHY, there is no need
+> to emulate a PHY. The MAC driver will be simpler. So i would not
+> recommend a fixed-link in this situation.
 
-Let's take a step further. Let's decouple the memcg accounting and
-global skmem accounting. __sk_mem_raise_allocated is already very hard
-to reason. There are couple of heuristics in it which may or may not
-apply to both accounting infrastructures.
+There's a link, it must be described. The MAC driver can configure the link
+without reading the fixed-link property as there's no room for guessing.
 
-Let's explicitly document what heurisitics allows to forcefully succeed
-the allocations i.e. irrespective of pressure or over limit for both
-accounting infras. I think decoupling them would make the flow of the
-code very clear.
+The phy-handle, pcs-handle, and sfp properties point out there's a PHY. The
+fixed-link property can be used standalone to describe MAC to MAC links.
 
-There are three heuristics:
+For this specific ethernet controller, the phy-handle, pcs-handle, and sfp
+properties can be disallowed on its schema to point out the ethernet
+controller cannot be connected to a PHY.
 
-1. minimum buffer size even under pressure.
-
-2. allow allocation for a socket whose usage is below average of the
-system.
-
-3. socket is over its sndbuf.
-
-Let's discuss which heuristic applies to which accounting infra and
-under which state (under pressure or over limit).
-
-thanks,
-Shakeel
+Arınç
 
