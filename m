@@ -1,154 +1,93 @@
-Return-Path: <netdev+bounces-36016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CB47AC72E
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 10:54:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D87067AC7A2
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 12:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BEC6D280FBA
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 08:54:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 41E461F23A4F
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 10:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571C1A3C;
-	Sun, 24 Sep 2023 08:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7183D63F;
+	Sun, 24 Sep 2023 10:59:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDC87F
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 08:54:14 +0000 (UTC)
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D41100;
-	Sun, 24 Sep 2023 01:54:11 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R961e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsiANs2_1695545648;
-Received: from 30.13.48.111(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VsiANs2_1695545648)
-          by smtp.aliyun-inc.com;
-          Sun, 24 Sep 2023 16:54:09 +0800
-Message-ID: <41d1f41f-737a-7705-c09d-f3678387f8d4@linux.alibaba.com>
-Date: Sun, 24 Sep 2023 16:54:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DC710F4
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 10:59:20 +0000 (UTC)
+Received: from mail-oa1-f69.google.com (mail-oa1-f69.google.com [209.85.160.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51CC0107
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 03:59:18 -0700 (PDT)
+Received: by mail-oa1-f69.google.com with SMTP id 586e51a60fabf-1bf2e81ce63so9892874fac.1
+        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 03:59:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695553157; x=1696157957;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jlk+O3J+o0kkp1OKytTuo5mn2nF+ogupL5uOl8zcGuA=;
+        b=Ju06olCrIgfVm2Wuom7ZQBTHItms/5pvUdqcO51NJKbuM2KtkzuoXoD6TE05se0TVV
+         wadu6gYGBQ5SGDWCjRhv/xct/yQQM/eFsErZRh0xSW808aspLJWXrcENJIx+wdKYRVcQ
+         MW31+lnStHisHUcWmzP+vkgAcNGqjBdUQmaAnvcavJkPbKh7FE0ZjDLeoniKWUpPL7qK
+         zX/JnW8bN/DiveEEL79cGLfuOr1hEaBPiACTjghV/tffUbePX7qsbQYhLHjD51WQwCpN
+         2uO5GEXe7zhWq+REQVUwJKgLgx+nRvJu+4mDaILQOnlHxRc8Pfyh26/uj17nz7EltgiG
+         lpKw==
+X-Gm-Message-State: AOJu0YzQFGwr2Bm4K3RJZUVjDY8aWvbm6wNdJGqEsA16dJOWSsNTS/9K
+	678iHjcS/WuSVtq1GNCPxjCtm5WglpDkAgaHyF5vOtWz+9um
+X-Google-Smtp-Source: AGHT+IGp8vx1D9jMEB/i7wblpIR1qbSKkkYzRnZBs6mxLXQ6LjSZuwUrXWRzpxMUsQ4CTqUu0G4qMtnatkOXoDUjowcVzPeX9afh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.0
-Subject: Re: [PATCH net-next 12/18] net/smc: implement DMB-related operations
- of loopback
-To: kernel test robot <lkp@intel.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1695134522-126655-13-git-send-email-guwen@linux.alibaba.com>
- <202309232327.nzXalNsH-lkp@intel.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <202309232327.nzXalNsH-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+X-Received: by 2002:a05:6870:9a93:b0:1d6:a9da:847 with SMTP id
+ hp19-20020a0568709a9300b001d6a9da0847mr2947177oab.0.1695553157625; Sun, 24
+ Sep 2023 03:59:17 -0700 (PDT)
+Date: Sun, 24 Sep 2023 03:59:17 -0700
+In-Reply-To: <0000000000000c439a05daa527cb@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a87e66060618bb7e@google.com>
+Subject: Re: [syzbot] [netfilter?] INFO: rcu detected stall in gc_worker (3)
+From: syzbot <syzbot+eec403943a2a2455adaa@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, coreteam@netfilter.org, davem@davemloft.net, 
+	dvyukov@google.com, edumazet@google.com, fw@strlen.de, gautamramk@gmail.com, 
+	hdanton@sina.com, jhs@mojatatu.com, jiri@resnulli.us, kadlec@netfilter.org, 
+	kuba@kernel.org, lesliemonis@gmail.com, linux-kernel@vger.kernel.org, 
+	mohitbhasi1998@gmail.com, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	paulmck@kernel.org, sdp.sachin@gmail.com, syzkaller-bugs@googlegroups.com, 
+	tahiliani@nitk.edu.in, tglx@linutronix.de, vsaicharan1998@gmail.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+syzbot has bisected this issue to:
 
+commit ec97ecf1ebe485a17cd8395a5f35e6b80b57665a
+Author: Mohit P. Tahiliani <tahiliani@nitk.edu.in>
+Date:   Wed Jan 22 18:22:33 2020 +0000
 
-On 2023/9/23 23:24, kernel test robot wrote:
-> Hi Wen,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Wen-Gu/net-smc-decouple-ism_dev-from-SMC-D-device-dump/20230920-010019
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/1695134522-126655-13-git-send-email-guwen%40linux.alibaba.com
-> patch subject: [PATCH net-next 12/18] net/smc: implement DMB-related operations of loopback
-> config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20230923/202309232327.nzXalNsH-lkp@intel.com/config)
-> compiler: arceb-elf-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230923/202309232327.nzXalNsH-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202309232327.nzXalNsH-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->     net/smc/smc_loopback.c: In function 'smc_lo_register_dmb':
->>> net/smc/smc_loopback.c:107:30: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
->       107 |         dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
->           |                              ^
-> 
-> 
+    net: sched: add Flow Queue PIE packet scheduler
 
-Will fix it on v4. Thanks!
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15c5748e680000
+start commit:   d4a7ce642100 igc: Fix Kernel Panic during ndo_tx_timeout c..
+git tree:       net
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17c5748e680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13c5748e680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=77b9a3cf8f44c6da
+dashboard link: https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1504b511a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137bf931a80000
 
-> vim +107 net/smc/smc_loopback.c
-> 
->      76	
->      77	static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
->      78				       void *client_priv)
->      79	{
->      80		struct smc_lo_dmb_node *dmb_node, *tmp_node;
->      81		struct smc_lo_dev *ldev = smcd->priv;
->      82		int sba_idx, rc;
->      83	
->      84		/* check space for new dmb */
->      85		for_each_clear_bit(sba_idx, ldev->sba_idx_mask, SMC_LODEV_MAX_DMBS) {
->      86			if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
->      87				break;
->      88		}
->      89		if (sba_idx == SMC_LODEV_MAX_DMBS)
->      90			return -ENOSPC;
->      91	
->      92		dmb_node = kzalloc(sizeof(*dmb_node), GFP_KERNEL);
->      93		if (!dmb_node) {
->      94			rc = -ENOMEM;
->      95			goto err_bit;
->      96		}
->      97	
->      98		dmb_node->sba_idx = sba_idx;
->      99		dmb_node->cpu_addr = kzalloc(dmb->dmb_len, GFP_KERNEL |
->     100					     __GFP_NOWARN | __GFP_NORETRY |
->     101					     __GFP_NOMEMALLOC);
->     102		if (!dmb_node->cpu_addr) {
->     103			rc = -ENOMEM;
->     104			goto err_node;
->     105		}
->     106		dmb_node->len = dmb->dmb_len;
->   > 107		dmb_node->dma_addr = (dma_addr_t)dmb_node->cpu_addr;
->     108	
->     109	again:
->     110		/* add new dmb into hash table */
->     111		get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
->     112		write_lock(&ldev->dmb_ht_lock);
->     113		hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_node->token) {
->     114			if (tmp_node->token == dmb_node->token) {
->     115				write_unlock(&ldev->dmb_ht_lock);
->     116				goto again;
->     117			}
->     118		}
->     119		hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
->     120		write_unlock(&ldev->dmb_ht_lock);
->     121	
->     122		dmb->sba_idx = dmb_node->sba_idx;
->     123		dmb->dmb_tok = dmb_node->token;
->     124		dmb->cpu_addr = dmb_node->cpu_addr;
->     125		dmb->dma_addr = dmb_node->dma_addr;
->     126		dmb->dmb_len = dmb_node->len;
->     127	
->     128		return 0;
->     129	
->     130	err_node:
->     131		kfree(dmb_node);
->     132	err_bit:
->     133		clear_bit(sba_idx, ldev->sba_idx_mask);
->     134		return rc;
->     135	}
->     136	
-> 
+Reported-by: syzbot+eec403943a2a2455adaa@syzkaller.appspotmail.com
+Fixes: ec97ecf1ebe4 ("net: sched: add Flow Queue PIE packet scheduler")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
