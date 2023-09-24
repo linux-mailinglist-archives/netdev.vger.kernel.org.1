@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-36020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7CF77AC852
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 15:16:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F1637AC89A
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 15:18:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id E117A1F23D5D
-	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 13:16:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id CC5921C20506
+	for <lists+netdev@lfdr.de>; Sun, 24 Sep 2023 13:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E5E9523A;
-	Sun, 24 Sep 2023 13:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9737C613D;
+	Sun, 24 Sep 2023 13:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD9C28FD
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 13:16:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA7A0C433C8;
-	Sun, 24 Sep 2023 13:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88F7E1FA4
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 13:18:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B034C43391;
+	Sun, 24 Sep 2023 13:18:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695561372;
-	bh=pPmCSRq7LsPwt9WgVd4iUn6iV3z68X5Q8RyzgZcg6pU=;
+	s=k20201202; t=1695561502;
+	bh=zbFmQ45HpDOudC7crOmoknEiEDeFeWVX6XUc7yFMAUg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TQ1/R55tew0kfIWmT/4kjT17k+5E7mxZH2Myo6IiHaQFyU9eWJPW2mPnULSV5Kkks
-	 PE/dD6yM+fi9quaiuBPaijjF9S6fosQbTSS6KnzWKByg8lta98Ki7oAaCdl+TGKOS6
-	 4EsHlkrGARLFW59tKk4yGMTcPLbSCkSmTXtgAHFk6OrkMI6HYyaBegj4PzA91IpTqw
-	 5ZErywm7b5CiUxZpkpQaMPMKmqmwiQnp1RJWMTnBRVf2FHr1R2oiYd29kmM8e62ubc
-	 sHJwxVX6k7KTn82vJoW4js6dcU0Qd+p311+x95mU3o0Ekpj06PPRgPGjIOjA5jc6Gn
-	 x7ynvtd+Vg0ng==
+	b=CFY+rDLr7YpEQZqk6gnSmDjAFHmDqK53bLNp1t0MkPQ/Q/aoXhmLeLaKzmdCxAQzN
+	 zHKVIuiVJtuvuCtGdWx81pVQ+yPeSv3Rnnud39z757d3jhCHYJ0WKinQ3gtNE1EvhF
+	 XUQ1MeMtoVR7GoVOMQ2N3KJA3epkN6VOPZ17KLCG+T/+RMdhYCV3F8WDlb+l2p1JWa
+	 7pGn5SXUMDoBBEYVLQajLpWhXtNmVKeLalL/9jmWGjlAdkzUS9dnxcDyW2SjsYcfZ/
+	 5QF9AuZ5YjtZvPbK+xphGYHJ4xvokPGpLFE5QclYoqytYNezKYn6wAcBiDaN2rGUyz
+	 N3YB23l5WuKqA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -42,12 +42,12 @@ Cc: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
 	pabeni@redhat.com,
 	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 18/41] net/smc: bugfix for smcr v2 server connect success statistic
-Date: Sun, 24 Sep 2023 09:15:06 -0400
-Message-Id: <20230924131529.1275335-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 15/28] net/smc: bugfix for smcr v2 server connect success statistic
+Date: Sun, 24 Sep 2023 09:17:32 -0400
+Message-Id: <20230924131745.1275960-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230924131529.1275335-1-sashal@kernel.org>
-References: <20230924131529.1275335-1-sashal@kernel.org>
+In-Reply-To: <20230924131745.1275960-1-sashal@kernel.org>
+References: <20230924131745.1275960-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +56,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.5.5
+X-stable-base: Linux 6.1.55
 Content-Transfer-Encoding: 8bit
 
 From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/smc/smc_stats.h b/net/smc/smc_stats.h
-index b60fe1eb37ab6..aa8928975cc63 100644
+index 84b7ecd8c05ca..4dbc237b7c19e 100644
 --- a/net/smc/smc_stats.h
 +++ b/net/smc/smc_stats.h
-@@ -243,8 +243,9 @@ while (0)
+@@ -244,8 +244,9 @@ while (0)
  #define SMC_STAT_SERV_SUCC_INC(net, _ini) \
  do { \
  	typeof(_ini) i = (_ini); \
