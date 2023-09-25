@@ -1,186 +1,129 @@
-Return-Path: <netdev+bounces-36166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845397ADEA9
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 20:27:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF4C7ADF84
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 21:24:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id DF9D81F24F06
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 18:27:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AD8902812E7
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 19:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37416224EA;
-	Mon, 25 Sep 2023 18:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA603224EF;
+	Mon, 25 Sep 2023 19:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A99224CA;
-	Mon, 25 Sep 2023 18:27:36 +0000 (UTC)
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFAD295;
-	Mon, 25 Sep 2023 11:27:34 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6bf58009a8dso4353746a34.1;
-        Mon, 25 Sep 2023 11:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695666454; x=1696271254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hORITzYCrCj4rLhQhCGh606G9+/re5bZyItzl2r+Jjw=;
-        b=B7qjSkIKyyjJgclQzFXrmqEp6H0IPyBDdviQo6W1qNfYtSXEtvogQWA6gUrNODQVyu
-         0sYiaE26+sRJV8Z5/f/sTn85M29bx9BKZtHC1yqHhaPufhqRRbooadOIJHLw/UhBQBKL
-         6BgnNm0Eui595fS+a7/pUgjuOCtDXYdGDepA5w/B2u98TOzpEnSi6ODx66uSpZZLZS72
-         SrVXalvvbZoF1jZy/M8wZ1C96S7fDeYCCqYCEFU1jDoFJqw/Mn0StnoKMbEsWN59vmy2
-         1DzdEuVCBRZG+5dLC9JLR2+xv9jXGoaD9uRmodA0CTs/FNcjmOOilQq2SWHpD4vYiwNl
-         g7eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695666454; x=1696271254;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=hORITzYCrCj4rLhQhCGh606G9+/re5bZyItzl2r+Jjw=;
-        b=TKq373NEbJdaQtwxAs25rEzi6n2qIL4YL5oAb9C+XHOTY8+0rgQg5adZIBurDy2f7x
-         gHTm+hnyPKh3HMNo3zWGKBYwsGV44GG3pzSRsbI/2dUKtDZ2Im3cIGAruSGezIJ8nITm
-         iL9qyrmIHhlyvx2dzQ071InKFLgGYkHtoerqUy/ZXZ0UCzYjAHOiPa7XjNxAkrzhEFvj
-         /MqYNnmRasUePCM/PdV/uMxciNDndDD9jSeT0HuF/n+AIk0BQB4JAB1H4bRTy9NshEZt
-         1eoOXzoLFBozC2wQO1ZFBJXcnBHVtH5bhIxa/jlP2MnwsAHWKsKQLAVKAkqBq0UQ7/E1
-         5YAA==
-X-Gm-Message-State: AOJu0YyMw6n9KWAbc31S3EcplhCDrECRwJ0NllQm4ArCMxmTKLby0x3p
-	7AS6jO74XkoRMXuuiBbX/mRkKNOc8Ls=
-X-Google-Smtp-Source: AGHT+IETQ+D4lE/eOVkhNhtvqvSBiHvKSq2Yx+ZFEpXDng3OTbYWEMx9xVDZhp3XYlfyl+BYhjdihA==
-X-Received: by 2002:a05:6830:2004:b0:6bd:63b:4b21 with SMTP id e4-20020a056830200400b006bd063b4b21mr7799078otp.15.1695666454009;
-        Mon, 25 Sep 2023 11:27:34 -0700 (PDT)
-Received: from localhost ([2605:59c8:148:ba00:51e:699c:e63:c15a])
-        by smtp.gmail.com with ESMTPSA id g1-20020a62e301000000b0068bbd43a6e2sm8632708pfh.10.2023.09.25.11.27.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 11:27:33 -0700 (PDT)
-Date: Mon, 25 Sep 2023 11:27:32 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
- bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org, 
- kernel-team@cloudflare.com, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Cong Wang <cong.wang@bytedance.com>
-Message-ID: <6511d1143dc59_110e52088a@john.notmuch>
-In-Reply-To: <20230920102055.42662-1-jakub@cloudflare.com>
-References: <20230920102055.42662-1-jakub@cloudflare.com>
-Subject: RE: [PATCH bpf] bpf, sockmap: Reject sk_msg egress redirects to
- non-TCP sockets
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C873134CA
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:24:40 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8999BE;
+	Mon, 25 Sep 2023 12:24:39 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.nyi.internal (Postfix) with ESMTP id AED1D5C27BA;
+	Mon, 25 Sep 2023 15:24:36 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute3.internal (MEProxy); Mon, 25 Sep 2023 15:24:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm2; t=1695669876; x=1695756276; bh=5YkBrqvzG1
+	Jlekk42DoeCAtVDkGf3aQHqWIlJPo84PU=; b=rTEv/5QNmW1lbqE89+kczg1HvU
+	PNborzPx7y2hTwMUgI6jTqbOgjhh6Z8OoPg7sgEJZ+R5H8oA3zeNtvlgjE4DPpvO
+	WhpqknfknLmkDndQ5JSCQY6IAkDcFdOH1COKOzRRwKGUROUjoAK92ZUltgMaO7pN
+	nbm6pLSoX8rtEQ12h/C52Hy7E36j+jyhPeJCt0jW5QDeBPYgCJKqJdvjIVOPgKDi
+	83oZ9Voe4ofLn0zX52fZtHn85BSgLa8zYLQdQ72sFdAnXvoGKkCWP77DqAovz8FB
+	jY2Q52SKWREr8/kc6bx7e69RbPMCq1QSFd7OWK89HINq5rFhlp3eVzcDz+Wg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1695669876; x=1695756276; bh=5YkBrqvzG1Jle
+	kk42DoeCAtVDkGf3aQHqWIlJPo84PU=; b=a8xN2o4LLDEoxAjLlu75CRIZh+ExM
+	qsHmiFc7jjjoNQapYXt7/BOX3wBRzLXKetMTmMnVTf+2QJ8iBDCG4CTthCu38SVz
+	xfGoxbzmQxukhQYdbpxy6bQtCb1PmWXoQbW7DyFkIEHFkyMxfADTvPvMWRTvIYzw
+	/ZES2SdfcTBX9qXywqA627qjYV/zI1SWZC4iidI6lMGF7yRvj5c5junvtfk1z1kp
+	ktsRtZ0pbLZoQsgDtwTpDLTA7fbl6XV/vmkX/xqjzcsvHW/uvkMf4CkSuvma1O4o
+	ruJI29GUZHJwnjmBdkzAaMZxbylGXg8sqWTfYSyu2kX5EveIgx4e3pLqw==
+X-ME-Sender: <xms:dN4RZf-VY4Tdr6CaCVkW1XzH35ox1cirpY8ip6vlQk9ywfciy7VWew>
+    <xme:dN4RZbsTNIjMS2-U8ynYebeDZ2PSG8rnjzHr9ATZdxVGyNbQis_j2mN8KBTuVI-5h
+    aSmQAu6Juu3GH9db5c>
+X-ME-Received: <xmr:dN4RZdDAqhkDW5CGVVB4M0xaylW8PKtWErbvjlv4lUMaNk_dWHFjguPvkV7HdbaGMJyARmEFC0lzbhW7IcIkFKYgwvHokqnwwSLE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudelgedgudefhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeflvghrvghm
+    hicuvehlihhnvgcuoehjvghrvghmhiesjhgtlhhinhgvrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeevleevfeehuefhhfeiudevgfdufeeivdefudetjeelffelgffgkedvuefhgfet
+    veenucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsphhothdrtghomhenucevlh
+    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvghrvghmhies
+    jhgtlhhinhgvrdhorhhg
+X-ME-Proxy: <xmx:dN4RZbdkkrsH-03oU-ruhJfuzskx6Qm33PkCB1Xw086OdVHrSt974w>
+    <xmx:dN4RZUMQySrDol70N-GqvJcIRP5aUrL_oxk5Q4rX2r6olHVQeCcAIw>
+    <xmx:dN4RZdm64nQGMH5agL90VLoGYjtMW9TYjE40nPQptoVzRr4BvFl7KQ>
+    <xmx:dN4RZToh9iQN6wvxHod5Dpxd5FzKBowpDI5opgN7EgFFAiCWwl4aag>
+Feedback-ID: i7a7146c5:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 25 Sep 2023 15:24:35 -0400 (EDT)
+From: Jeremy Cline <jeremy@jcline.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lin Ma <linma@zju.edu.cn>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeremy Cline <jeremy@jcline.org>,
+	syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+Subject: [PATCH v2 net] net: nfc: llcp: Add lock when modifying device list
+Date: Mon, 25 Sep 2023 15:23:51 -0400
+Message-ID: <20230925192351.40744-1-jeremy@jcline.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jakub Sitnicki wrote:
-> With a SOCKMAP/SOCKHASH map and an sk_msg program user can steer messages
-> sent from one TCP socket (s1) to actually egress from another TCP
-> socket (s2):
-> 
-> tcp_bpf_sendmsg(s1)		// = sk_prot->sendmsg
->   tcp_bpf_send_verdict(s1)	// __SK_REDIRECT case
->     tcp_bpf_sendmsg_redir(s2)
->       tcp_bpf_push_locked(s2)
-> 	tcp_bpf_push(s2)
-> 	  tcp_rate_check_app_limited(s2) // expects tcp_sock
-> 	  tcp_sendmsg_locked(s2)	 // ditto
-> 
-> There is a hard-coded assumption in the call-chain, that the egress
-> socket (s2) is a TCP socket.
-> 
-> However in commit 122e6c79efe1 ("sock_map: Update sock type checks for
-> UDP") we have enabled redirects to non-TCP sockets. This was done for the
-> sake of BPF sk_skb programs. There was no indention to support sk_msg
-> send-to-egress use case.
-> 
-> As a result, attempts to send-to-egress through a non-TCP socket lead to a
-> crash due to invalid downcast from sock to tcp_sock:
-> 
->  BUG: kernel NULL pointer dereference, address: 000000000000002f
->  ...
->  Call Trace:
->   <TASK>
->   ? show_regs+0x60/0x70
->   ? __die+0x1f/0x70
->   ? page_fault_oops+0x80/0x160
->   ? do_user_addr_fault+0x2d7/0x800
->   ? rcu_is_watching+0x11/0x50
->   ? exc_page_fault+0x70/0x1c0
->   ? asm_exc_page_fault+0x27/0x30
->   ? tcp_tso_segs+0x14/0xa0
->   tcp_write_xmit+0x67/0xce0
->   __tcp_push_pending_frames+0x32/0xf0
->   tcp_push+0x107/0x140
->   tcp_sendmsg_locked+0x99f/0xbb0
->   tcp_bpf_push+0x19d/0x3a0
->   tcp_bpf_sendmsg_redir+0x55/0xd0
->   tcp_bpf_send_verdict+0x407/0x550
->   tcp_bpf_sendmsg+0x1a1/0x390
->   inet_sendmsg+0x6a/0x70
->   sock_sendmsg+0x9d/0xc0
->   ? sockfd_lookup_light+0x12/0x80
->   __sys_sendto+0x10e/0x160
->   ? syscall_enter_from_user_mode+0x20/0x60
->   ? __this_cpu_preempt_check+0x13/0x20
->   ? lockdep_hardirqs_on+0x82/0x110
->   __x64_sys_sendto+0x1f/0x30
->   do_syscall_64+0x38/0x90
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Reject selecting a non-TCP sockets as redirect target from a BPF sk_msg
-> program to prevent the crash. When attempted, user will receive an EACCES
-> error from send/sendto/sendmsg() syscall.
-> 
-> Fixes: 122e6c79efe1 ("sock_map: Update sock type checks for UDP")
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
-> FYI, I'm working on revamping the sockmap_listen selftest, which exercises
-> some of redirect combinations, to cover the whole combination matrix so
-> that we can catch these kinds of problems early on.
+The device list needs its associated lock held when modifying it, or the
+list could become corrupted, as syzbot discovered.
 
-Yes this would be appreciated.
+Reported-and-tested-by: syzbot+c1d0a03d305972dbbe14@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=c1d0a03d305972dbbe14
+Fixes: 6709d4b7bc2e ("net: nfc: Fix use-after-free caused by nfc_llcp_find_local")
+Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+---
+Changes from v1: added the correct Fixes tag
 
-> 
->  net/core/sock_map.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> index cb11750b1df5..4292c2ed1828 100644
-> --- a/net/core/sock_map.c
-> +++ b/net/core/sock_map.c
-> @@ -668,6 +668,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
->  	sk = __sock_map_lookup_elem(map, key);
->  	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->  		return SK_DROP;
-> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-> +		return SK_DROP;
->  
->  	msg->flags = flags;
->  	msg->sk_redir = sk;
-> @@ -1267,6 +1269,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
->  	sk = __sock_hash_lookup_elem(map, key);
->  	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
->  		return SK_DROP;
-> +	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
-> +		return SK_DROP;
+ net/nfc/llcp_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-As a stop gap I think this is fine. If anyone wants to add support though
-I do think as a use case it would make sense to redirect TCP into an
-AF_UNIX socket and vice versa.
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index f60e424e0607..6705bb895e23 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1636,7 +1636,9 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
+ 	timer_setup(&local->sdreq_timer, nfc_llcp_sdreq_timer, 0);
+ 	INIT_WORK(&local->sdreq_timeout_work, nfc_llcp_sdreq_timeout_work);
+ 
++	spin_lock(&llcp_devices_lock);
+ 	list_add(&local->list, &llcp_devices);
++	spin_unlock(&llcp_devices_lock);
+ 
+ 	return 0;
+ }
+-- 
+2.41.0
 
-Acked-by: John Fastabend <john.fastabend@gmail.com>
 
