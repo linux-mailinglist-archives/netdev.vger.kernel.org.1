@@ -1,85 +1,242 @@
-Return-Path: <netdev+bounces-36089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 833347AD262
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:53:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 619C97AD26B
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D86FE2823B1
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:53:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 6383CB209C3
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADC1111B7;
-	Mon, 25 Sep 2023 07:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB0B11190;
+	Mon, 25 Sep 2023 07:55:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58D51119F
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 07:53:14 +0000 (UTC)
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629CBDA
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 00:53:13 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VsoCOPl_1695628390;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VsoCOPl_1695628390)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Sep 2023 15:53:11 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: Jason Wang <jasowang@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH net v2 6/6] virtio-net: a tiny comment update
-Date: Mon, 25 Sep 2023 15:53:02 +0800
-Message-Id: <48956a0ef470396d46723e105db47c90b893e4e5.1695627660.git.hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <cover.1695627660.git.hengqi@linux.alibaba.com>
-References: <cover.1695627660.git.hengqi@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613086FCF
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 07:55:37 +0000 (UTC)
+Received: from out-205.mta1.migadu.com (out-205.mta1.migadu.com [95.215.58.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34966B3
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 00:55:34 -0700 (PDT)
+Message-ID: <72bfc00f-7c60-f027-61cb-03084021c218@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695628532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l4uaK2NAz0kQWXVGJqJdnSvIF01RSrsxRcBRw98P7Xo=;
+	b=v5hhDL2M9ia8zckH0z93X+e58vN0PpXpaidx8X8FRZpIZ1QpmwFZqng2W2ZU2b2AMJ0F7a
+	oEE76dGg7Gl8gLZdlLYKF+Jsooxcul0wSkHM/o5k7DWjZ/ax2CmlBZKPqCjS8s4uzYZEi0
+	IpY7rKKhWdmTx807Fcueu9Sbx2pIxqI=
+Date: Mon, 25 Sep 2023 15:55:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+Subject: Re: [PATCH] i40e: fix the wrong PTP frequency calculation
+Content-Language: en-US
+To: Jacob Keller <jacob.e.keller@intel.com>, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20230627022658.1876747-1-yajun.deng@linux.dev>
+ <10269e86-ed8a-0b09-a39a-a5239a1ba744@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yajun Deng <yajun.deng@linux.dev>
+In-Reply-To: <10269e86-ed8a-0b09-a39a-a5239a1ba744@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Update a comment because virtio-net now supports both
-VIRTIO_NET_F_NOTF_COAL and VIRTIO_NET_F_VQ_NOTF_COAL.
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
----
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index cb19b224419b..4d746bb3d0be 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3347,7 +3347,7 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
- {
- 	/* usecs coalescing is supported only if VIRTIO_NET_F_NOTF_COAL
--	 * feature is negotiated.
-+	 * or VIRTIO_NET_F_VQ_NOTF_COAL feature is negotiated.
- 	 */
- 	if (ec->rx_coalesce_usecs || ec->tx_coalesce_usecs)
- 		return -EOPNOTSUPP;
--- 
-2.19.1.6.gb485710b
-
+On 2023/6/28 04:20, Jacob Keller wrote:
+>
+> On 6/26/2023 7:26 PM, Yajun Deng wrote:
+>> The new adjustment should be based on the base frequency, not the
+>> I40E_PTP_40GB_INCVAL in i40e_ptp_adjfine().
+>>
+>> This issue was introduced in commit 3626a690b717 ("i40e: use
+>> mul_u64_u64_div_u64 for PTP frequency calculation"), and was fixed in
+>> commit 1060707e3809 ("ptp: introduce helpers to adjust by scaled
+>> parts per million"). However the latter is a new feature and hasn't been
+>> backported to the stable releases.
+>>
+>> This issue affects both v6.0 and v6.1 versions, and the v6.1 version is
+>> an LTS version.
+>>
+>> Fixes: 3626a690b717 ("i40e: use mul_u64_u64_div_u64 for PTP frequency calculation")
+>> Cc: <stable@vger.kernel.org> # 6.1
+>> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+>> ---
+>>   drivers/net/ethernet/intel/i40e/i40e_ptp.c | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+>> index ffea0c9c82f1..97a9efe7b713 100644
+>> --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+>> +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+>> @@ -361,9 +361,9 @@ static int i40e_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+>>   				   1000000ULL << 16);
+>>   
+>>   	if (neg_adj)
+>> -		adj = I40E_PTP_40GB_INCVAL - diff;
+>> +		adj = freq - diff;
+>>   	else
+>> -		adj = I40E_PTP_40GB_INCVAL + diff;
+>> +		adj = freq + diff;
+>>   
+>>   	wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
+>>   	wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
+> This straight forward fix makes sense. However, it wasn't obvious to me
+> without context why the 3626a690b717 ("i40e: use mul_u64_u64_div_u64 for
+> PTP frequency calculation") was where the fault got introduced. Thus,
+> here is that context for anyone else who failed to spot it just looking
+> at shrunk patch diffs.
+>
+> --> code before that commit <---
+>> /**
+>>   * i40e_ptp_adjfreq - Adjust the PHC frequency
+>>   * @ptp: The PTP clock structure
+>>   * @ppb: Parts per billion adjustment from the base
+>>   *
+>>   * Adjust the frequency of the PHC by the indicated parts per billion from the
+>>   * base frequency.
+>>   **/
+>> static int i40e_ptp_adjfreq(struct ptp_clock_info *ptp, s32 ppb)
+>> {
+>>          struct i40e_pf *pf = container_of(ptp, struct i40e_pf, ptp_caps);
+>>          struct i40e_hw *hw = &pf->hw;
+>>          u64 adj, freq, diff;
+>>          int neg_adj = 0;
+>>
+>>          if (ppb < 0) {
+>>                  neg_adj = 1;
+>>                  ppb = -ppb;
+>>          }
+>>
+>>          freq = I40E_PTP_40GB_INCVAL;
+> frequency is left just as base I40E_PTP_40GB_INCVAL.
+>
+>>          freq *= ppb;
+>>          diff = div_u64(freq, 1000000000ULL);
+>>
+>>          if (neg_adj)
+>>                  adj = I40E_PTP_40GB_INCVAL - diff;
+>>          else
+>>                  adj = I40E_PTP_40GB_INCVAL + diff;
+>>
+> So the base here can't be freq since we modify freq above using *=, but
+> using I40E_PTP_40GB_INCVAL is consistent.
+>
+>>          /* At some link speeds, the base incval is so large that directly
+>>           * multiplying by ppb would result in arithmetic overflow even when
+>>           * using a u64. Avoid this by instead calculating the new incval
+>>           * always in terms of the 40GbE clock rate and then multiplying by the
+>>           * link speed factor afterwards. This does result in slightly lower
+>>           * precision at lower link speeds, but it is fairly minor.
+>>           */
+>>          smp_mb(); /* Force any pending update before accessing. */
+>>          adj *= READ_ONCE(pf->ptp_adj_mult);
+>>
+> Finally, the multiply is applied last. This affects the combined base +
+> difference, and is done in order to avoid overflowing the *= used in the
+> original implementation.
+>
+>>          wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
+>>          wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
+>>
+>>          return 0;
+>> }
+>
+> ---> code after that commit <---
+>> /**
+>>   * i40e_ptp_adjfreq - Adjust the PHC frequency
+>>   * @ptp: The PTP clock structure
+>>   * @ppb: Parts per billion adjustment from the base
+>>   *
+>>   * Adjust the frequency of the PHC by the indicated parts per billion from the
+>>   * base frequency.
+>>   **/
+>> static int i40e_ptp_adjfreq(struct ptp_clock_info *ptp, s32 ppb)
+>> {
+>>          struct i40e_pf *pf = container_of(ptp, struct i40e_pf, ptp_caps);
+>>          struct i40e_hw *hw = &pf->hw;
+>>          u64 adj, freq, diff;
+>>          int neg_adj = 0;
+>>
+>>          if (ppb < 0) {
+>>                  neg_adj = 1;
+>>                  ppb = -ppb;
+>>          }
+>>
+>>          smp_mb(); /* Force any pending update before accessing. */
+>>          freq = I40E_PTP_40GB_INCVAL * READ_ONCE(pf->ptp_adj_mult);
+>>          diff = mul_u64_u64_div_u64(freq, (u64)ppb,
+>>                                     1000000000ULL);
+>>
+> Here, we assign freq to be the I40E_PTP_40GB_INCVAL times the
+> ptp_adj_mult value, and then we don't modify it, instead using
+> mul_u64_u64_div_u64.
+>
+>>          if (neg_adj)
+>>                  adj = I40E_PTP_40GB_INCVAL - diff;
+>>          else
+>>                  adj = I40E_PTP_40GB_INCVAL + diff;
+>>
+> But then the diff is applied on the wrong value, and no multiplication
+> is done afterwards.
+>
+>>          wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
+>>          wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
+>>
+>>          return 0;
+>> }
+> ---> current version with adjust_by_scaled_ppm <---
+>> /**
+>>   * i40e_ptp_adjfine - Adjust the PHC frequency
+>>   * @ptp: The PTP clock structure
+>>   * @scaled_ppm: Scaled parts per million adjustment from base
+>>   *
+>>   * Adjust the frequency of the PHC by the indicated delta from the base
+>>   * frequency.
+>>   *
+>>   * Scaled parts per million is ppm with a 16 bit binary fractional field.
+>>   **/
+>> static int i40e_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+>> {
+>>          struct i40e_pf *pf = container_of(ptp, struct i40e_pf, ptp_caps);
+>>          struct i40e_hw *hw = &pf->hw;
+>>          u64 adj, base_adj;
+>>
+>>          smp_mb(); /* Force any pending update before accessing. */
+>>          base_adj = I40E_PTP_40GB_INCVAL * READ_ONCE(pf->ptp_adj_mult);
+>>
+>>          adj = adjust_by_scaled_ppm(base_adj, scaled_ppm);
+>>
+> Using adjust_by_scaled_ppm correctly performs the calculation and uses
+> the base adjustment, so there's no error here.
+>
+>>          wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
+>>          wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
+>>
+>>          return 0;
+>> }
+>
+> Thanks for finding and fixing this mistake. I think its the simplest fix
+> to get into the stable kernel that are broken, since taking the
+> adjust_by_scaled_ppm version would require additional patches.
+>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+>
+Kindly ping...
 
