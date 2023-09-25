@@ -1,119 +1,133 @@
-Return-Path: <netdev+bounces-36097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416F37AD352
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:29:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D347AD35A
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 5FC471C20445
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 08:29:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2229B281610
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 08:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E4F11CA5;
-	Mon, 25 Sep 2023 08:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1665F11CAF;
+	Mon, 25 Sep 2023 08:30:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65EC611C8E
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 08:29:25 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E94A9D;
-	Mon, 25 Sep 2023 01:29:23 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 59D431C0011;
-	Mon, 25 Sep 2023 08:29:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695630562;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BETUE3RcO2izRKuzFet0qGTNc4Tx8tBroVhfQaFja4M=;
-	b=CoAUieulogXjKaWvt/53Nr27hPmJCYgbgpgtpvTWdxfeuSQObY+TxPZ6e8XNeMb3xMdFQ/
-	kWasErliE/rkTA9bsfAzWShxLCoSf2vd0eOUygOBU/J+BFucsiVZ0Ys85Wl6ll/3bXKoEM
-	nP/v7ZV88VPVeMLoluryuPMwXR7B/N5uDuq8ZkpiLIp0D2ym8Tx1jEmNj9Roy4m+xz+Ba5
-	zgDa6xTFUIHRWiFmMHuVp5Nx5vNKCrnyHNjPuO+7OrdqyNpXkOjzH0f2ItUF4P0vyB+xQg
-	EL+0860POWWsexkowpKD3TIJ4gd4afx6ZAjmB/0jgEN4wZa2xLRpDweDSVkh9A==
-Date: Mon, 25 Sep 2023 10:29:19 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Marcel Holtmann <marcel@holtmann.org>, Harry
- Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-Message-ID: <20230925102919.356b45ab@xps-13>
-In-Reply-To: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
-References: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3A411C91
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 08:30:02 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB58C4;
+	Mon, 25 Sep 2023 01:29:59 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VsoSBCa_1695630596;
+Received: from 30.221.144.144(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VsoSBCa_1695630596)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Sep 2023 16:29:57 +0800
+Message-ID: <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
+Date: Mon, 25 Sep 2023 16:29:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
+ closing listen socket
+Content-Language: en-US
+To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
+ jaka@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
+ <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Dinghao,
 
-dinghao.liu@zju.edu.cn wrote on Mon, 25 Sep 2023 15:24:22 +0800:
 
-> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
-> it calls clk_unregister() to release priv->clk and returns an
-> error. However, the caller ca8210_probe() then calls ca8210_remove(),
-> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
-> this case, a use-after-free may happen in the second time we call
-> clk_unregister().
->=20
-> Fix this by nulling priv->clk after the first clk_unregister(). Also
-> refine the pointer checking in ca8210_unregister_ext_clock().
->=20
-> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
->  drivers/net/ieee802154/ca8210.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
-210.c
-> index aebb19f1b3a4..1d545879c000 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -2760,6 +2760,7 @@ static int ca8210_register_ext_clock(struct spi_dev=
-ice *spi)
->  	ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
->  	if (ret) {
->  		clk_unregister(priv->clk);
-> +		priv->clk =3D NULL;
+On 9/22/23 7:59 AM, Wenjia Zhang wrote:
+>
+>
+> On 20.09.23 14:08, D. Wythe wrote:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> Consider the following scenarios:
+>>
+>> smc_release
+>>     smc_close_active
+>> write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
+>>         smc->clcsock->sk->sk_user_data = NULL;
+>> write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
+>>
+>> smc_tcp_syn_recv_sock
+>>     smc = smc_clcsock_user_data(sk);
+>>     /* now */
+>>     /* smc == NULL */
+>>
+>> Hence, we may read the a NULL value in smc_tcp_syn_recv_sock(). And
+>> since we only unset sk_user_data during smc_release, it's safe to
+>> drop the incoming tcp reqsock.
+>>
+>> Fixes:  ("net/smc: net/smc: Limit backlog connections"
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>> ---
+>>   net/smc/af_smc.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>> index bacdd97..b4acf47 100644
+>> --- a/net/smc/af_smc.c
+>> +++ b/net/smc/af_smc.c
+>> @@ -125,6 +125,8 @@ static struct sock *smc_tcp_syn_recv_sock(const 
+>> struct sock *sk,
+>>       struct sock *child;
+>>         smc = smc_clcsock_user_data(sk);
+>> +    if (unlikely(!smc))
+>> +        goto drop;
+>>         if (READ_ONCE(sk->sk_ack_backlog) + 
+>> atomic_read(&smc->queued_smc_hs) >
+>>                   sk->sk_max_ack_backlog)
 
-This function is a bit convoluted. You could just return the result of
-of_clk_add_provider() (keep the printk's if you want, they don't seem
-very useful) and let ca8210_unregister_ext_clock() do the cleanup.
+Hi Wenjia,
 
->  		dev_crit(
->  			&spi->dev,
->  			"Failed to register external clock as clock provider\n"
-> @@ -2780,7 +2781,7 @@ static void ca8210_unregister_ext_clock(struct spi_=
-device *spi)
->  {
->  	struct ca8210_priv *priv =3D spi_get_drvdata(spi);
-> =20
-> -	if (!priv->clk)
-> +	if (IS_ERR_OR_NULL(priv->clk))
+>
+> this is unfortunately not sufficient for this fix. You have to make 
+> sure that is not a life-time problem. Even so, READ_ONCE() is also 
+> needed in this case.
+>
 
-Does not look useful as you are enforcing priv->clock to be valid or
-NULL, it cannot be an error code.
+Life-time problem? If you means the smc will still be NULL in the 
+future,  I don't really think so, smc is a local variable assigned by 
+smc_clcsock_user_data.
+it's either NULL or a valid and unchanged value.
 
-Thanks,
-Miqu=C3=A8l
+And READ_ONCE() is needed indeed, considering not make too much change, 
+maybe we can protected following
+
+smc = smc_clcsock_user_data(sk);
+
+with sk_callback_lock， which solves the same problem. What do you think?
+
+Best Wishes
+D. Wythe
+
+
+
+
+
+
+
+
+
+
 
