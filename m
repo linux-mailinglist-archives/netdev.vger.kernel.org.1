@@ -1,107 +1,187 @@
-Return-Path: <netdev+bounces-36121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00C9B7AD6FF
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:31:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD817AD70F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A73F42810D5
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:31:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E1C4E280EE7
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C99D18E1A;
-	Mon, 25 Sep 2023 11:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C4E18E22;
+	Mon, 25 Sep 2023 11:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7AF18E0B
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 11:31:44 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29ECC6;
-	Mon, 25 Sep 2023 04:31:42 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RvLFz4vpqzNnnZ;
-	Mon, 25 Sep 2023 19:27:51 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 25 Sep
- 2023 19:31:40 +0800
-Subject: Re: [PATCH net-next v8 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-CC: Jesper Dangaard Brouer <jbrouer@redhat.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <brouer@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen
-	<liangchen.linux@gmail.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Guillaume Tucker
-	<guillaume.tucker@collabora.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Linux-MM <linux-mm@kvack.org>, Matthew
- Wilcox <willy@infradead.org>, Mel Gorman <mgorman@techsingularity.net>
-References: <20230912083126.65484-1-linyunsheng@huawei.com>
- <20230912083126.65484-2-linyunsheng@huawei.com>
- <84282e55-519c-0e17-30c5-b6de54d1001c@redhat.com>
- <15f95505-dba9-4afd-6980-5bdf0a64d507@huawei.com>
- <CAC_iWjL_u=R+UK-6rhnv=32qX2P9SY72LFu928Y64u11EVoOPQ@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <b0388db7-d4b2-443b-12f0-fbe6ae4002cd@huawei.com>
-Date: Mon, 25 Sep 2023 19:31:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3288118E1E
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 11:35:54 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42F5DA;
+	Mon, 25 Sep 2023 04:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695641753; x=1727177753;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=A0N/3KD/SqIlzzRTtVUghnzqarLjTjUyuOAf9873lpc=;
+  b=BwopjTaaOy+x8lSwycGUkgxA8HK4nUMsV3pJJgdhSU1ail/00xDnOnl8
+   uP/4uLsmOU9g8nq5Y6eW5TD2W5ntLYAD+3bZNPn2oY/Dy2jemO0JMGDvl
+   aLDPvCXlKsy/hbTr1KQ79JF8pMf9rkQFOycs47RFglYcaP6/wM87u+fcF
+   7HbZ+tnvcA+DDqKKJ9b8p/4zA9HNzaEDah/yK7DvbifnjLrnyS8S3BZBR
+   b0YmpWzWw/+xBNn/In2hWNZ/azJ8q7mpArf/GIIfm+ccHZo0HyQvVnCZp
+   WIhy+x/ZfFlN+GrAuzTOHLkDF+n7JHdJlohX3VwRa14vynoIvopiXkluF
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="385058264"
+X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
+   d="scan'208";a="385058264"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 04:35:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="891652378"
+X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
+   d="scan'208";a="891652378"
+Received: from lkp-server02.sh.intel.com (HELO 32c80313467c) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 25 Sep 2023 04:34:47 -0700
+Received: from kbuild by 32c80313467c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qkjsR-0001Sr-10;
+	Mon, 25 Sep 2023 11:35:47 +0000
+Date: Mon, 25 Sep 2023 19:35:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	linux-wpan@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>,
+	Romuald Despres <romuald.despres@qorvo.com>,
+	Frederic Blain <frederic.blain@qorvo.com>,
+	Nicolas Schodet <nico@ni.fr.eu.org>,
+	Guilhem Imberton <guilhem.imberton@qorvo.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: Re: [PATCH wpan-next v4 04/11] mac802154: Handle associating
+Message-ID: <202309251904.eSN2jHxq-lkp@intel.com>
+References: <20230922155029.592018-5-miquel.raynal@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAC_iWjL_u=R+UK-6rhnv=32qX2P9SY72LFu928Y64u11EVoOPQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922155029.592018-5-miquel.raynal@bootlin.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/9/25 18:37, Ilias Apalodimas wrote:
-> Hi
-> 
-> On Wed, 20 Sept 2023 at 11:59, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2023/9/15 16:28, Jesper Dangaard Brouer wrote:
->>> Hi Lin,
->>>
->>> This looks reasonable, but given you are changing struct-page
->>> (include/linux/mm_types.h) we need to MM-list <linux-mm@kvack.org>.
->>> Also Cc Wilcox.
->>>
->>> I think it was Ilias and Duyck that validated the assumptions, last time
->>> this patch was discussed. Thus I want to see their review before this is
->>> applied.
->>
->> FWIW, PAGE_SIZE aligned buffer being PAGE_SIZE aligned in DMA is
->> validated by Duyck:
->> https://lore.kernel.org/all/CAKgT0UfeUAUQpEffxnkc+gzXsjOrHkuMgxU_Aw0VXSJYKzaovQ@mail.gmail.com/
->>
->> And I had done researching to find out there seems to be no combination of
->> the above arch with an address space >16TB:
->> https://lore.kernel.org/all/2b570282-24f8-f23b-1ff7-ad836794baa9@huawei.com/
-> 
-> Apologies for the late reply.  I just saw you sent a v9, I'll review
-> that instead, but I am traveling right now, will take a while
+Hi Miquel,
 
-Actually there is a newer v10, see:
-https://lore.kernel.org/all/20230922091138.18014-2-linyunsheng@huawei.com/
+kernel test robot noticed the following build warnings:
 
-Thanks for the time reviewing.
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v6.6-rc3 next-20230925]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-> 
-> Thanks
-> /Ilias
+url:    https://github.com/intel-lab-lkp/linux/commits/Miquel-Raynal/ieee802154-Let-PAN-IDs-be-reset/20230923-000250
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230922155029.592018-5-miquel.raynal%40bootlin.com
+patch subject: [PATCH wpan-next v4 04/11] mac802154: Handle associating
+config: i386-randconfig-061-20230925 (https://download.01.org/0day-ci/archive/20230925/202309251904.eSN2jHxq-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230925/202309251904.eSN2jHxq-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202309251904.eSN2jHxq-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> net/mac802154/cfg.c:379:39: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __le16 [usertype] pan_id @@     got int @@
+   net/mac802154/cfg.c:379:39: sparse:     expected restricted __le16 [usertype] pan_id
+   net/mac802154/cfg.c:379:39: sparse:     got int
+
+vim +379 net/mac802154/cfg.c
+
+   317	
+   318	static int mac802154_associate(struct wpan_phy *wpan_phy,
+   319				       struct wpan_dev *wpan_dev,
+   320				       struct ieee802154_addr *coord)
+   321	{
+   322		struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
+   323		u64 ceaddr = swab64((__force u64)coord->extended_addr);
+   324		struct ieee802154_sub_if_data *sdata;
+   325		struct ieee802154_pan_device *parent;
+   326		__le16 short_addr;
+   327		int ret;
+   328	
+   329		ASSERT_RTNL();
+   330	
+   331		sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
+   332	
+   333		if (wpan_dev->parent) {
+   334			dev_err(&sdata->dev->dev,
+   335				"Device %8phC is already associated\n", &ceaddr);
+   336			return -EPERM;
+   337		}
+   338	
+   339		if (coord->mode == IEEE802154_SHORT_ADDRESSING)
+   340			return -EINVAL;
+   341	
+   342		parent = kzalloc(sizeof(*parent), GFP_KERNEL);
+   343		if (!parent)
+   344			return -ENOMEM;
+   345	
+   346		parent->pan_id = coord->pan_id;
+   347		parent->mode = coord->mode;
+   348		parent->extended_addr = coord->extended_addr;
+   349		parent->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
+   350	
+   351		/* Set the PAN ID hardware address filter beforehand to avoid dropping
+   352		 * the association response with a destination PAN ID field set to the
+   353		 * "new" PAN ID.
+   354		 */
+   355		if (local->hw.flags & IEEE802154_HW_AFILT) {
+   356			ret = drv_set_pan_id(local, coord->pan_id);
+   357			if (ret < 0)
+   358				goto free_parent;
+   359		}
+   360	
+   361		ret = mac802154_perform_association(sdata, parent, &short_addr);
+   362		if (ret)
+   363			goto reset_panid;
+   364	
+   365		if (local->hw.flags & IEEE802154_HW_AFILT) {
+   366			ret = drv_set_short_addr(local, short_addr);
+   367			if (ret < 0)
+   368				goto reset_panid;
+   369		}
+   370	
+   371		wpan_dev->pan_id = coord->pan_id;
+   372		wpan_dev->short_addr = short_addr;
+   373		wpan_dev->parent = parent;
+   374	
+   375		return 0;
+   376	
+   377	reset_panid:
+   378		if (local->hw.flags & IEEE802154_HW_AFILT)
+ > 379			drv_set_pan_id(local, IEEE802154_PAN_ID_BROADCAST);
+   380	
+   381	free_parent:
+   382		kfree(parent);
+   383		return ret;
+   384	}
+   385	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
