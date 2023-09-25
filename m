@@ -1,107 +1,157 @@
-Return-Path: <netdev+bounces-36103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5636E7AD4EE
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:56:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171BD7AD532
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 09E8C2813F9
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:56:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BACF828175A
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5B314007;
-	Mon, 25 Sep 2023 09:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 190D914013;
+	Mon, 25 Sep 2023 10:01:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C84F13FE7
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 09:56:17 +0000 (UTC)
-Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4116910C7;
-	Mon, 25 Sep 2023 02:56:08 -0700 (PDT)
-Received: from 8bytes.org (pd9fe9df8.dip0.t-ipconnect.de [217.254.157.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id 27E6E1A1EA9;
-	Mon, 25 Sep 2023 11:56:06 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1695635766;
-	bh=9PqcnP0fBBXYm0nOdc0nJm0+qTAxRYNwHHGdJDVyqnY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=do7SoP/ej6m+DzfP4zanqVSPHmELmY4rQuPveywCzYUG9GioGs2VSc4FX38kVa6kt
-	 wij9Buf7fttF4+WTjZNXOCViquEeFNwnQGeE+JJxIwZrJ6koxAZdyvOCsEQaGP2ztI
-	 9hsYO5tXUSh/zasJgIHtxaYPZ4vmZS6RUmmVLuQSWX+5zZ1jz6PZlvBaTuMJkKm8sq
-	 LZhnJzcpHy3eIAxEwxoAQU20Ap/BrMLgkVdi131b2HnLrigEVAYynHMUY3q/gfljoY
-	 vhMDTuZpUhXdn6DgG3Bx19EPCc3Hf3w4DD7BlRsnrSUlwyA51GhnKacwD6kVdB4a9+
-	 Y/BgwZcbGa0gA==
-Date: Mon, 25 Sep 2023 11:56:05 +0200
-From: Joerg Roedel <joro@8bytes.org>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Will Deacon <will@kernel.org>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Gerd Bayer <gbayer@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Pierre Morel <pmorel@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Lu Baolu <baolu.lu@linux.intel.com>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Yong Wu <yong.wu@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Orson Zhai <orsonzhai@gmail.com>,
-	Baolin Wang <baolin.wang@linux.alibaba.com>,
-	Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Thierry Reding <thierry.reding@gmail.com>,
-	Krishna Reddy <vdumpa@nvidia.com>,
-	Jonathan Hunter <jonathanh@nvidia.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	iommu@lists.linux.dev, asahi@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
- IOTLB flushing
-Message-ID: <ZRFZNbR_3p9nhQEU@8bytes.org>
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D53E134A2;
+	Mon, 25 Sep 2023 10:01:37 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0AE2139;
+	Mon, 25 Sep 2023 03:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695636095; x=1727172095;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=T6W5WChOpHM1gx/o+m3VmK+oZ2R/XvO/t+sl5tnTSdw=;
+  b=ZnnZKrrYrJc5kBZOdla3kwtWi7XXWPfvmtpwtOjWlEpVUZDcO2E9g7rt
+   ykHhFlqQhkGV6XMUH/weNaiRFJmEaw9KvkwObOBvFuBconC/g+xn2qU4N
+   yrWAVlq1KTMpx7pb3+pOsr10AvgZBYPMZ/5AZnv9/71RCLwVs1YBSfdTu
+   aBVKyhlY7fzL/EUa2Lj4+89wEaJePZSo4brlFSyQJtMrSqyrUOC4E8hGp
+   nyG2lcpWQwaS1mQPxuuI5ZcduldfPOJ4hg7+3B/AOuk2jRSW+fLEL8t5p
+   AHA9kVAKfQi4UIBk2oW9kyU2sP6Ho74YUxqvPxOh8wdwXYptypzy+L9S9
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="445325056"
+X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
+   d="scan'208";a="445325056"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 03:01:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="697923544"
+X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
+   d="scan'208";a="697923544"
+Received: from unknown (HELO axxiablr2..) ([10.190.162.200])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 03:01:30 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Subject: [PATCH bpf-next v2 0/8] Add a test for SHARED_UMEM feature
+Date: Mon, 25 Sep 2023 15:52:41 +0530
+Message-Id: <20230925102249.1847195-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Aug 25, 2023 at 12:11:15PM +0200, Niklas Schnelle wrote:
-> Niklas Schnelle (6):
->       iommu: Allow .iotlb_sync_map to fail and handle s390's -ENOMEM return
->       s390/pci: prepare is_passed_through() for dma-iommu
->       s390/pci: Use dma-iommu layer
->       iommu/s390: Disable deferred flush for ISM devices
->       iommu/dma: Allow a single FQ in addition to per-CPU FQs
->       iommu/dma: Use a large flush queue and timeout for shadow_on_flush
+Implement a test for the SHARED_UMEM feature in this patch set and make
+necessary changes/improvements. Ensure that the framework now supports
+different streams for different sockets.
 
-Applied, thanks.
+v1->v2
+	- Remove generate_mac_addresses() and generate mac addresses based on
+	  the number of sockets in __test_spec_init() function. [Magnus]
+	- Update Makefile to include find_bit.c for compiling xskxceiver.
+	- Add bitmap_full() function to verify all bits are set to break the while loop
+	  in the receive_pkts() and send_pkts() functions.
+	- Replace __test_and_set_bit() function with __set_bit() function.
+	- Add single return check for wait_for_tx_completion() function call.
+ 
+Patch series summary:
+
+1: Move the packet stream from the ifobject struct to the xsk_socket_info
+   struct to enable the use of different streams for different sockets
+   This will facilitate the sending and receiving of data from multiple
+   sockets simultaneously using the SHARED_XDP_UMEM feature.
+
+   It gives flexibility of send/recive individual traffic on particular
+   socket.
+
+2: Rename the header file to a generic name so that it can be used by all
+   future XDP programs.
+
+3: Move the src_mac and dst_mac fields from the ifobject structure to the
+   xsk_socket_info structure to achieve per-socket MAC address assignment.
+   Require this in order to steer traffic to various sockets in subsequent
+   patches.
+
+4: Improve the receive_pkt() function to enable it to receive packets from
+   multiple sockets. Define a sock_num variable to iterate through all the
+   sockets in the Rx path. Add nb_valid_entries to check that all the
+   expected number of packets are received.
+
+5: The pkt_set() function no longer needs the umem parameter. This commit
+   removes the umem parameter from the pkt_set() function.
+
+6: Iterate over all the sockets in the send pkts function. Update
+   send_pkts() to handle multiple sockets for sending packets.
+   Multiple TX sockets are utilized alternately based on the batch size
+   for improve packet transmission.
+
+7: Modify xsk_update_xskmap() to accept the index as an argument, enabling
+   the addition of multiple sockets to xskmap.
+
+8: Add a new test for testing shared umem feature. This is accomplished by
+   adding a new XDP program and using the multiple sockets. The new  XDP
+   program redirects the packets based on the destination MAC address.
+
+Tushar Vyavahare (8):
+  selftests/xsk: move pkt_stream to the xsk_socket_info
+  selftests/xsk: rename xsk_xdp_metadata.h to xsk_xdp_common.h
+  selftests/xsk: move src_mac and dst_mac to the xsk_socket_info
+  selftests/xsk: iterate over all the sockets in the receive pkts
+    function
+  selftests/xsk: remove unnecessary parameter from pkt_set() function
+    call
+  selftests/xsk: iterate over all the sockets in the send pkts function
+  selftests/xsk: modify xsk_update_xskmap() to accept the index as an
+    argument
+  selftests/xsk: add a test for shared umem feature
+
+ tools/testing/selftests/bpf/Makefile          |   4 +-
+ .../selftests/bpf/progs/xsk_xdp_progs.c       |  22 +-
+ tools/testing/selftests/bpf/xsk.c             |   3 +-
+ tools/testing/selftests/bpf/xsk.h             |   2 +-
+ tools/testing/selftests/bpf/xsk_xdp_common.h  |  12 +
+ .../testing/selftests/bpf/xsk_xdp_metadata.h  |   5 -
+ tools/testing/selftests/bpf/xskxceiver.c      | 513 +++++++++++-------
+ tools/testing/selftests/bpf/xskxceiver.h      |  13 +-
+ 8 files changed, 363 insertions(+), 211 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/xsk_xdp_common.h
+ delete mode 100644 tools/testing/selftests/bpf/xsk_xdp_metadata.h
+
+-- 
+2.34.1
+
 
