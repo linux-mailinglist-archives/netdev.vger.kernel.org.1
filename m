@@ -1,158 +1,134 @@
-Return-Path: <netdev+bounces-36115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384647AD5DD
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:28:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CAE7AD5F9
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D72F728244A
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7896828288B
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0415E88;
-	Mon, 25 Sep 2023 10:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7960D63D8;
+	Mon, 25 Sep 2023 10:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1827C14000;
-	Mon, 25 Sep 2023 10:28:08 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679DF8E;
-	Mon, 25 Sep 2023 03:28:06 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A3201C0002;
-	Mon, 25 Sep 2023 10:27:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695637685;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BA715E94
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:31:05 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9111E8E
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:31:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695637863;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CtO8T+sDShN7p7U0G6qKR0fuN42cZzhkfeW3eGEM+Oc=;
-	b=LVvprKIVChYwTJzlxBd2ZNYXBHm9J7hWY1K7wpTo7zgvqzqBZGISmFtj5OfIFjje66P6S6
-	HlEwH3l0nVjpj8nD5vuMQ04HpzK0kR9ZM/U4jh0pWSEMRb4F5bMp+1A6JeZwWYC3nZTpNn
-	/U6LnsAPSh0QZnEt3y0Lr0BoJp0UQrIcws9zjf3FD4NOdCmt44AIAujr+TSxw3+AlvXtxH
-	hfW+hGSVKZ+Hawd0vhvwNMVNosgsJYz2ky2HPFjrWkgsQ6PX7giQJvvsZAQmr4u96kgbX/
-	2NKS6FPh8EB5P2zy/eURoCGbCNJb1KY9NL1nF8B1faIJpM3bP2F6JtT1GYIe7w==
-Date: Mon, 25 Sep 2023 12:27:58 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
- JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add support for QMC HDLC
-Message-ID: <20230925122758.43963736@bootlin.com>
-In-Reply-To: <5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
-	<20230922075913.422435-9-herve.codina@bootlin.com>
-	<5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
-	<20230925101703.1bf083f1@bootlin.com>
-	<5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0DpECY4xgD810waS/rgF1VksorNZHYkHpCmfPvNqmEU=;
+	b=IaIBF0wuzevVZu/c0N750UtEr3vmKh+mtCKD7is1UWXGp0Fys6ACwVzpSBkaIYRxtqpu6F
+	hfpMuRNSQjnVAtMoltQQzDWXZHClgnAJ+cvry6t0QSwm+mTv1qi08wc7e3lw2k4LL9LxLF
+	3brRY4TYGhJG+qqYa7OB9AbL0d+Z3mo=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-486-s3HKYWhRNY-ZdxDoOTE-4Q-1; Mon, 25 Sep 2023 06:31:02 -0400
+X-MC-Unique: s3HKYWhRNY-ZdxDoOTE-4Q-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2c135cf124cso70486311fa.2
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:31:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695637861; x=1696242661;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0DpECY4xgD810waS/rgF1VksorNZHYkHpCmfPvNqmEU=;
+        b=DCrNGhI+ZbuIsNC00iqeyiKhRPmUjxWDv+S98ecS0e7HRad3eH8BErx5lnvHx1Izev
+         KnV1oKgCiW7pbWi/I2IlhEhV90rhlUmTqWe+jtjUvpbrZ8E64zpY+whnOq0J8aQysjVx
+         UMMIdceYUHoVLUAf70gwDxrYvKswlGfZz8/z16eFcB+30fuI8ULGo9lqRlhrFvlgqVVx
+         lhO7L9+W8CaegZkmfdF/d/IAwCczrcycD3l4nWXatu5aLbMMGgB/rRKSlwz2M867GAZi
+         DeoiLR3Fj+2PHQLCwlptOY13N88ydjig6V8IyDTC+nYRvkL/w2uPStTVIRe8EQoapWlL
+         EFDA==
+X-Gm-Message-State: AOJu0Yx7/Z7ODrrdT+GZw8+WlzlxOwzoImUbrnphT1HS3AGOluRWLWrx
+	Q5SvVwxEu08UO6CuRVfpySjQoc+9EZVg4XYMSS0q+xbXQvmv8/sLdVIw+ufplhcC+t07fbiiZy3
+	TL/UlKBcOYPJfgOu5
+X-Received: by 2002:a2e:8084:0:b0:2bc:fa8f:83c4 with SMTP id i4-20020a2e8084000000b002bcfa8f83c4mr5126299ljg.39.1695637861129;
+        Mon, 25 Sep 2023 03:31:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEx1EwDlCVz04qbWgbyK5nfpeoyXqfQ6Qq2TBRTZPqNjJwRcJMbIuZi7IseWRVL8VlZINlyCw==
+X-Received: by 2002:a2e:8084:0:b0:2bc:fa8f:83c4 with SMTP id i4-20020a2e8084000000b002bcfa8f83c4mr5126286ljg.39.1695637860736;
+        Mon, 25 Sep 2023 03:31:00 -0700 (PDT)
+Received: from step1.lan ([46.6.235.141])
+        by smtp.gmail.com with ESMTPSA id mh2-20020a170906eb8200b0099cc3c7ace2sm6161066ejb.140.2023.09.25.03.30.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 03:30:59 -0700 (PDT)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: virtualization@lists.linux-foundation.org
+Cc: netdev@vger.kernel.org,
+	kvm@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] vringh: don't use vringh_kiov_advance() in vringh_iov_xfer()
+Date: Mon, 25 Sep 2023 12:30:57 +0200
+Message-ID: <20230925103057.104541-1-sgarzare@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 25 Sep 2023 10:21:15 +0200
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
+In the while loop of vringh_iov_xfer(), `partlen` could be 0 if one of
+the `iov` has 0 lenght.
+In this case, we should skip the iov and go to the next one.
+But calling vringh_kiov_advance() with 0 lenght does not cause the
+advancement, since it returns immediately if asked to advance by 0 bytes.
 
-> On 25/09/2023 10:17, Herve Codina wrote:
-> > Hi Krzysztof,
-> > 
-> > On Sat, 23 Sep 2023 19:39:49 +0200
-> > Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
-> >   
-> >> On 22/09/2023 09:58, Herve Codina wrote:  
-> >>> The QMC (QUICC mutichannel controller) is a controller present in some
-> >>> PowerQUICC SoC such as MPC885.
-> >>> The QMC HDLC uses the QMC controller to transfer HDLC data.
-> >>>
-> >>> Additionally, a framer can be connected to the QMC HDLC.
-> >>> If present, this framer is the interface between the TDM bus used by the
-> >>> QMC HDLC and the E1/T1 line.
-> >>> The QMC HDLC can use this framer to get information about the E1/T1 line
-> >>> and configure the E1/T1 line.
-> >>>
-> >>> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> >>> ---
-> >>>  .../soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml      | 24 +++++++++++++++++++
-> >>>  1 file changed, 24 insertions(+)
-> >>>
-> >>> diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> >>> index 82d9beb48e00..61dfd5ef7407 100644
-> >>> --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> >>> +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
-> >>> @@ -101,6 +101,27 @@ patternProperties:
-> >>>            Channel assigned Rx time-slots within the Rx time-slots routed by the
-> >>>            TSA to this cell.
-> >>>  
-> >>> +      compatible:
-> >>> +        const: fsl,qmc-hdlc    
-> >>
-> >> Why this is not a device/SoC specific compatible?  
-> > 
-> > This compatible is present in a QMC channel.
-> > The parent node (the QMC itself) contains a compatible with device/SoC:
-> > --- 8< ---
-> >   compatible:
-> >     items:
-> >       - enum:
-> >           - fsl,mpc885-scc-qmc
-> >           - fsl,mpc866-scc-qmc
-> >       - const: fsl,cpm1-scc-qmc
-> > --- 8< ---
-> > 
-> > At the child level (ie QMC channel), I am not sure that adding device/SoC
-> > makes sense. This compatible indicates that the QMC channel is handled by
-> > the QMC HDLC driver.
-> > At this level, whatever the device/SoC, we have to be QMC compliant.
-> > 
-> > With these details, do you still think I need to change the child (channel)
-> > compatible ?  
-> 
-> From OS point of view, you have a driver binding to this child-level
-> compatible. How do you enforce Linux driver binding based on parent
-> compatible? I looked at your next patch and I did not see it.
+Let's restore the code that was there before commit b8c06ad4d67d
+("vringh: implement vringh_kiov_advance()"), avoiding using
+vringh_kiov_advance().
 
-We do not need to have the child driver binding based on parent.
-We have to ensure that the child handles a QMC channel and the parent provides
-a QMC channel.
+Fixes: b8c06ad4d67d ("vringh: implement vringh_kiov_advance()")
+Cc: stable@vger.kernel.org
+Reported-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ drivers/vhost/vringh.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
-and a QMC channel driver (child) has to use the QMC API.
+diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+index 955d938eb663..7b8fd977f71c 100644
+--- a/drivers/vhost/vringh.c
++++ b/drivers/vhost/vringh.c
+@@ -123,8 +123,18 @@ static inline ssize_t vringh_iov_xfer(struct vringh *vrh,
+ 		done += partlen;
+ 		len -= partlen;
+ 		ptr += partlen;
++		iov->consumed += partlen;
++		iov->iov[iov->i].iov_len -= partlen;
++		iov->iov[iov->i].iov_base += partlen;
+ 
+-		vringh_kiov_advance(iov, partlen);
++		if (!iov->iov[iov->i].iov_len) {
++			/* Fix up old iov element then increment. */
++			iov->iov[iov->i].iov_len = iov->consumed;
++			iov->iov[iov->i].iov_base -= iov->consumed;
++
++			iov->consumed = 0;
++			iov->i++;
++		}
+ 	}
+ 	return done;
+ }
+-- 
+2.41.0
 
-Best regards,
-Hervé
-
-> 
-> Best regards,
-> Krzysztof
-> 
 
