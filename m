@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-36130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B707AD770
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:03:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2275C7AD773
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id F19051C209AC
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:03:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C7E932814B6
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250961B263;
-	Mon, 25 Sep 2023 12:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB79F1B263;
+	Mon, 25 Sep 2023 12:03:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FEF19BDE
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 12:03:37 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D8211B
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 05:03:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA8819BDE
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 12:03:45 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25D5D180
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 05:03:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695643416;
+	s=mimecast20190719; t=1695643422;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oQjxv/qWpzFGTlwOWGQlwUCcgnofDI2I99l4qJgz63Y=;
-	b=NFECnYnBcdDFPi9RcpMSDg5CoC76PDdwIiOnjHbgiqFCjqY2O72cBSaMnkp2lHaNZlutzB
-	ixAUZZcLQvfsIDDYPIAAM/U0jl7IA33PVCocMstLefEriSwao3vHRIIyYeIeOH1k6I+E7Q
-	9cz1yVVfj/lkgdW8DwxSH6vOLVu3qYQ=
+	bh=4obcSyEH8f0LI+hqbulIObwIk6RPpIYigX0Ml5LHEtM=;
+	b=dwnKcEsq32f1LskFdG/VB+j1BU3pA1+Q9JA2pkXx9tEqtcKC7y2BCIxkKwt3eGVvHrl85S
+	0SyCMx9XTEWDlfnDFd6WG6gofqdIJuD/eupfLGc0qL5s9AXwOytyrfDvIYm4ivuAyV8Tyd
+	mNZAAdVx/x0eIP0f2cDQijF2M7Tg1vU=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-269-DNPjLMOqM3-blp0lhNFq-g-1; Mon, 25 Sep 2023 08:03:31 -0400
-X-MC-Unique: DNPjLMOqM3-blp0lhNFq-g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-136-cDj4weHpMsW5nB2aWNtwwg-1; Mon, 25 Sep 2023 08:03:34 -0400
+X-MC-Unique: cDj4weHpMsW5nB2aWNtwwg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB143101AA42;
-	Mon, 25 Sep 2023 12:03:30 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F33E800B35;
+	Mon, 25 Sep 2023 12:03:33 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4D914711293;
-	Mon, 25 Sep 2023 12:03:29 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A8F8551E3;
+	Mon, 25 Sep 2023 12:03:31 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: David Howells <dhowells@redhat.com>,
@@ -57,9 +57,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	linux-mm@kvack.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 05/12] iov_iter: Renumber ITER_* constants
-Date: Mon, 25 Sep 2023 13:03:02 +0100
-Message-ID: <20230925120309.1731676-6-dhowells@redhat.com>
+Subject: [PATCH v7 06/12] iov_iter: Derive user-backedness from the iterator type
+Date: Mon, 25 Sep 2023 13:03:03 +0100
+Message-ID: <20230925120309.1731676-7-dhowells@redhat.com>
 In-Reply-To: <20230925120309.1731676-1-dhowells@redhat.com>
 References: <20230925120309.1731676-1-dhowells@redhat.com>
 Precedence: bulk
@@ -69,17 +69,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
 	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Renumber the ITER_* iterator-type constants to put things in the same order
-as in the iteration functions and to group user-backed iterators at the
-bottom.
+Use the iterator type to determine whether an iterator is user-backed or
+not rather than using a special flag for it.  Now that ITER_UBUF and
+ITER_IOVEC are 0 and 1, they can be checked with a single comparison.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 cc: Alexander Viro <viro@zeniv.linux.org.uk>
@@ -93,27 +93,50 @@ cc: linux-block@vger.kernel.org
 cc: linux-fsdevel@vger.kernel.org
 cc: linux-mm@kvack.org
 ---
- include/linux/uio.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/uio.h | 4 +---
+ lib/iov_iter.c      | 1 -
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 2000e42a6586..bef8e56aa45c 100644
+index bef8e56aa45c..65d9143f83c8 100644
 --- a/include/linux/uio.h
 +++ b/include/linux/uio.h
-@@ -21,12 +21,12 @@ struct kvec {
+@@ -43,7 +43,6 @@ struct iov_iter {
+ 	bool copy_mc;
+ 	bool nofault;
+ 	bool data_source;
+-	bool user_backed;
+ 	size_t iov_offset;
+ 	/*
+ 	 * Hack alert: overlay ubuf_iovec with iovec + count, so
+@@ -140,7 +139,7 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
  
- enum iter_type {
- 	/* iter types */
-+	ITER_UBUF,
- 	ITER_IOVEC,
--	ITER_KVEC,
- 	ITER_BVEC,
-+	ITER_KVEC,
- 	ITER_XARRAY,
- 	ITER_DISCARD,
--	ITER_UBUF,
- };
+ static inline bool user_backed_iter(const struct iov_iter *i)
+ {
+-	return i->user_backed;
++	return iter_is_ubuf(i) || iter_is_iovec(i);
+ }
  
- #define ITER_SOURCE	1	// == WRITE
+ /*
+@@ -380,7 +379,6 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
+ 	*i = (struct iov_iter) {
+ 		.iter_type = ITER_UBUF,
+ 		.copy_mc = false,
+-		.user_backed = true,
+ 		.data_source = direction,
+ 		.ubuf = buf,
+ 		.count = count,
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 27234a820eeb..227c9f536b94 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -290,7 +290,6 @@ void iov_iter_init(struct iov_iter *i, unsigned int direction,
+ 		.iter_type = ITER_IOVEC,
+ 		.copy_mc = false,
+ 		.nofault = false,
+-		.user_backed = true,
+ 		.data_source = direction,
+ 		.__iov = iov,
+ 		.nr_segs = nr_segs,
 
 
