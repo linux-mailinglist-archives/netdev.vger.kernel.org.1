@@ -1,103 +1,112 @@
-Return-Path: <netdev+bounces-36179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F8B7AE1B0
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 00:29:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 455F07AE1DB
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 00:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id F11F7281422
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:29:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 38C121C208F8
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:45:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2A526280;
-	Mon, 25 Sep 2023 22:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEA11D69E;
+	Mon, 25 Sep 2023 22:45:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8E02511F
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 22:29:29 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849829C;
-	Mon, 25 Sep 2023 15:29:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B1312B62
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 22:45:40 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC96126;
+	Mon, 25 Sep 2023 15:45:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695680967; x=1727216967;
+  t=1695681937; x=1727217937;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=8PypOCGoMrPok+L7rMhkomn18WRPydckIeBZ6owwxss=;
-  b=kST938BKBOK0BNsuBGV87dzm29MYB3whlPdvkaNAyBO3oPKgmkmeKXou
-   udzMEUYcY4VyscKgHD+bpIq/lVuiq7xkjsjmBw+k8Ao93R6gPKwmc59yx
-   AXHJXlyPPTf9ZD8QEZO2lEuO1HxxPj9+w2o+/muWMA0i3uk9shxjEWalz
-   c4ao6jefB54nOt40Q1dsAbAMw3R0NOZ50Yj+dF6cx39iTgFtV0aWu1ljv
-   Tvsjxi11Ley04sk6qZo7fcvxWh/w3uD9Z9+ne+kLavTpRdwtydk2aQcLi
-   KsUg8tfHPirpRYpCfaMT2fLuZ4/GtZYRNOqA0/lyIhv/yfD3Fwp5HauEC
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="467708992"
+  bh=zUDSVdchkkkfvB06x5QdbcNsbfxlSREH70QteQRmCcs=;
+  b=J+e2Emjb592zI+qjGG0LfhPEP2vaKsTjnz9MchB9FvafSiEQkdkp040I
+   yYmDcR34WsSpd1p1/aWmFz8rJTYqq0B1xtUZHDXAQHF932f3Frhsj1GdH
+   9QScpZ15U3IFUAs2y/1kSeV/DlzwK2yzQgFYME0lU0NT72WiTYptRqZA/
+   M20QWnJbD7MSX72eMyeKsnblPYr8jgTL3ZTyruXJwqx5SxblX+cNnGa53
+   4dxQDn9q8OVrfBRaEPVlZhOLlCneZcHNCBTkQbr5wmATcnxPHetj/rcwW
+   A/NHbWNV7H8KKsCjDSwqQ8BjOqJeSsvH9E/S5UJfTZiPzmRwwqBdKFuwd
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="380292392"
 X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="467708992"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 15:29:26 -0700
+   d="scan'208";a="380292392"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 15:45:36 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="725196527"
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="995579627"
 X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="725196527"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Sep 2023 15:29:23 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+   d="scan'208";a="995579627"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Sep 2023 15:45:36 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 25 Sep 2023 15:29:22 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ 15.1.2507.32; Mon, 25 Sep 2023 15:45:35 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 25 Sep 2023 15:29:21 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ 15.1.2507.32; Mon, 25 Sep 2023 15:45:35 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Mon, 25 Sep 2023 15:29:21 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.32 via Frontend Transport; Mon, 25 Sep 2023 15:45:35 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Mon, 25 Sep 2023 15:29:21 -0700
+ 15.1.2507.32; Mon, 25 Sep 2023 15:45:34 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iozin74epQ1viv9Stjfza4qGdZYrmMBbQIscf4B3vikrjo7UU3swIiGr0OUizGuT9/WbsLtyFdnd1Dbayb2PUSBJB/mK+0zC1ZBbFZj6VuJz4Al1V3eFbPhKufmxn7/Bxf4m1TuZABVzzV6r+KAt6ag5VPY/C1oC+l88LEivTiSWRh4Kcxp0OMeBqouRAEc1EHS1dkre1xAt/NkHRw7IOMf9yVuQCnYczD/+XWpai76m7GpBmdCbyQeUtL/woZxlHG+8t0BbWaO3ifa1i+cZ+mnbgzgJdgO8z2gLP3Y1l9DoITQWC3kaxqOdz0fDP285NlkfBFzpIscoeTxkwwBUfQ==
+ b=JhomtWpSB84ez3itfBdKR/1FFjMC0cNpObjWn/xyDlT1fU7pV6P0NMk5WT1nl+BSsJcrsw+I5XicmgfzX4vosgrmJM7ON4LDzF9bPlNWZ4w2PGOhwlmiquay2BJBgPXmKOE8I5COdWLJoBLzA9PrXhWgGp+zll1AMK/jwDsH4pQpWnZK/M/SMlbF2pgDUmvnqyiZjRQ95odEgcvH+7e8718hVRhc9ql9KhMQr8Lb9bKC513i/X8xiailOjLF1k4uHse1W1Ma0jVtbuBwPFJEBebmfzjPrxG6sLLYobHYB2TyYaoZEwpLNHIvoGB8tW1kxFsXn54MnwoShm7ZPzvpCA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CqqXodC/13716a8XRxFEvoIzn/fmR+CjrKnuXluO4GQ=;
- b=WQfY8bgYj+X9ZqkUneEuGGMtKY4lGEOhD+aETqhiS+2F39tryJ81wsKlCRBlydaB+R7fg8r9xpSxkntRjwK79f89qA2W+C7menVr68VKsK7GgUfGb8CKkUxKpEcdpEqrL4/DqTM+LESMzRATkP1ymudTVeJICZx+Loy0XH9EHnH72589PZVU/UkgfxC/6xEbvTQ0xQGIO0dt9Nw4e1dIVtuA7dk/ewcNqvgoWXMAB23KrCKNsRGdrcIIo2SoY+jRH1IWf8pVgz+e6kqojA/tYiddcK4TDeG6BCg1zVkYg0EE7zSSEgE29YcZx3o2u3DRFAgnV9ndvlBO1ee3c5+yEA==
+ bh=/v9Cb19b5MsG5fVOsPQ3Nb5niq1qbjgKwSwbP1QDRg4=;
+ b=DyafIZ+Fg1g/6AzPwF1e2fBsmNKJedKfVwukJTeWLIiP0WRJL2ogMr57D5Juts6cFQvS66pYLIqSuEI6Y7Q/ycoZEL+I6kl40uEPlr3kztR1i3YxkKm99HzYOgWxjEcHQWOjOFaYm3r0yJqTiJ+hWfEiq5vLlGCIp/2uGjQ+WNg0Gc88q7uGh3PWMzb4TEJKOnMAguYO03ZGNNZW9uyrdM7d8cG9ObOhwjnB3FiEYlo+aKrZ2p7rZMJQmzEqD9v3aZxDXaBmlbssWQBs0aakoTMLmH9tR9mTBpDj+qTwTAaTfsgBCaiI7vICvQj9Wf9V5hgsd/OJEE+lA3rzgd5SPA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH0PR11MB7660.namprd11.prod.outlook.com (2603:10b6:510:26f::5) with
+ by PH0PR11MB5829.namprd11.prod.outlook.com (2603:10b6:510:140::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Mon, 25 Sep
- 2023 22:29:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.27; Mon, 25 Sep
+ 2023 22:45:27 +0000
 Received: from CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::9654:610d:227a:104f]) by CO1PR11MB5089.namprd11.prod.outlook.com
  ([fe80::9654:610d:227a:104f%4]) with mapi id 15.20.6813.018; Mon, 25 Sep 2023
- 22:29:17 +0000
-Message-ID: <b109470b-99d1-441d-0648-7b8e4a8c86fd@intel.com>
-Date: Mon, 25 Sep 2023 15:29:14 -0700
+ 22:45:26 +0000
+Message-ID: <d708c1a8-1b7a-c772-9457-f06b59d6235e@intel.com>
+Date: Mon, 25 Sep 2023 15:45:23 -0700
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v2] net: ixp4xx_eth: Support changing the MTU
-To: Linus Walleij <linus.walleij@linaro.org>, Krzysztof Halasa
-	<khalasa@piap.pl>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org>
+Subject: Re: [PATCH 1/4] net: mellanox: drop mlx5_cpumask_default_spread()
 Content-Language: en-US
+To: Yury Norov <yury.norov@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>
+CC: Tariq Toukan <ttoukan.linux@gmail.com>, Valentin Schneider
+	<vschneid@redhat.com>, Maher Sanalla <msanalla@nvidia.com>, Ingo Molnar
+	<mingo@kernel.org>, Mel Gorman <mgorman@suse.de>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra
+	<peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+	<vincent.guittot@linaro.org>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Daniel
+ Bristot de Oliveira <bristot@redhat.com>, Pawel Chmielewski
+	<pawel.chmielewski@intel.com>, Yury Norov <ynorov@nvidia.com>
+References: <20230925020528.777578-1-yury.norov@gmail.com>
+ <20230925020528.777578-2-yury.norov@gmail.com>
 From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org>
+In-Reply-To: <20230925020528.777578-2-yury.norov@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CY5PR19CA0104.namprd19.prod.outlook.com
- (2603:10b6:930:83::21) To CO1PR11MB5089.namprd11.prod.outlook.com
+X-ClientProxiedBy: MW4PR04CA0283.namprd04.prod.outlook.com
+ (2603:10b6:303:89::18) To CO1PR11MB5089.namprd11.prod.outlook.com
  (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -106,254 +115,138 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB7660:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c630ea2-8a85-490a-ffbb-08dbbe16dae5
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB5829:EE_
+X-MS-Office365-Filtering-Correlation-Id: fcd0a46e-c0d9-48e7-f073-08dbbe191c8f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xDB4TinFoqHthOigHC1sxW9BT8LTBAiOx465ye7wgNapFygmIBfGqGbMA0yPlFKTz7ZbEFMNEZfbqEW45BouWY24rUCvcVKYI8WJpsJxQAO+SA4Nie9GDesnwwBCG+Mdpovo3MSjBJw9g7PzeCX7x8utpWMzRGC/oVwmgiXcZASPMKolmYNPK50wTxIaTmVjj7SKOmrXyahk9rWx0lSnkjdZJeqUNIZBKqk5LlSYbIo6UrHuJY4M1uKJ7M0r27Tg29t7OHlDfAL4pXKHZxlCpaWQYepmVdZ6GRfajMu+kcE98ebENyf5kd8uWeHaa8CuSlkmy6jEpu6I9x+wGZ+HlMJOgCqjdmXnUt6JJY66h+BZ62wxkIx6ZRjhmRq19Kbqlbkbt/8KZEbUogCOMIJGMHO9N333R6+6fPEctv0M3oeshkx5OM8UFtVZy+o/bAxDB1hzq/l6zqfXog62UYwfPDqDXFRS+KJCJ78fjVQ5F5szAaMlqcou/ZNzALgUuZ1Gk18oYWVRHENGHGYHoOuuxzrtf9VhrkzEhVGaE4G8NliBRO+F6L2+ZiitGVzM2Gs1M6ikSM/D9/wQ4bhAJMz5X72LnWtllbsYUXa5SlAkqtFhJtiG0cTPuD+4Udq6MKAxs4rTd0iFfuHPCFxpCSdeKw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(366004)(346002)(396003)(230922051799003)(1800799009)(186009)(451199024)(2616005)(6486002)(26005)(6506007)(6512007)(53546011)(82960400001)(38100700002)(86362001)(36756003)(31696002)(83380400001)(8936002)(316002)(4326008)(8676002)(41300700001)(66946007)(66476007)(66556008)(5660300002)(110136005)(31686004)(2906002)(6666004)(966005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: ndlyy9qj4Kw2V7xBlvN1mxGoZFPOcAjvG0dv9AKyZmrChQVMo0xJRsjKhkR6i0juVxQOzesMAsp1mFs0bawHkL8q9jotcAuceJugOiPEX8JprOfCD326GiaD3dHLz1MgwHId+434KxzM0xpK5DZV2HS3cGeaMVOmxnakqgxfSJ4t0tFl9CKlgu99gkolE1trQFEwulmuDSHA/0CeurawDuTHjxMjYwLWaVyEpL7LFj2I+hs3Sy85txhw+jsKmFXA3eMUNzIcT4yXiVOL/aYoBnyUuk30S52LE387Xc2tOhOP6V+mo/8a1LH1VzrIyur+Xxza7LlUZNsKInKwpQmTcKvkhD3W/sZZxtabzbHWHu0Y9tf5L+fbkrxkngSZSvFTFeQEMzzEIuvwb/+EGmmt4z41UsgpNoN2oXvOFgLJB45wCWVLyf9dtXcFeAcjab/dvl+8qeididw2a9eFWycksPn5wNyUc3YqGb9r4GtbCfwp9LruhAePr5ECTLrpuYblMGRQzVtE/kPdJIABE+iyIKP/gvhXWfTtZc15fb2bEHWhFU4nTsY17ShU8xQUGed6gnvz2B+yjPLL95AXsIQJwR/wu0KAlDlfYpgOO3m8AZ+pgMUK+F5yH1RJxPAlH7g/jdGTF4oD7D0W0qZJCpRYpA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(346002)(39860400002)(366004)(230922051799003)(1800799009)(186009)(451199024)(26005)(6666004)(478600001)(2616005)(36756003)(83380400001)(31696002)(86362001)(82960400001)(6486002)(53546011)(5660300002)(6506007)(38100700002)(6512007)(2906002)(4326008)(8676002)(31686004)(54906003)(41300700001)(316002)(66946007)(66556008)(66476007)(7416002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzZUSHk0T0txcHhCcjVDMTJ6K0hsVit3MDZqQ0xoYXlrQ3BrNldyaTdoTkdT?=
- =?utf-8?B?b3hzaUJBc0FsVU9hOFZaZ2RIUkdCZHBkMDM3TitQSlBiMmdHMnc4c1ZaMjYr?=
- =?utf-8?B?Rkg0amwrZ3RMYjhYVXAzTkI3RDFRaHduUklwVit6bnh3NFY2YnluZUFyT0My?=
- =?utf-8?B?SU1XMms3OWk3TUN6cHZTTG1hTGU3dEE1Z2xzcGFrcnFuYUY3UGRmb1hNS1BV?=
- =?utf-8?B?MWJhRWdsNlRJbytOZTVkZWRSZmdQVVFqWHR3ZWFKT0JuUVc0TTVmZGMrREdM?=
- =?utf-8?B?S0ljUW0xQzZ2eVhIRERmdXdDemJodE9MNWJHQ2xjUC9WSXcwK3Y1eEw5d2Rm?=
- =?utf-8?B?VmhRTzltdWxuSWlOL3d5NDFKSTNkdXhtNU9XNTlPNGgyNUd0MjBUN0pkOEZK?=
- =?utf-8?B?SzJ4MVArSm1RNFRHM3BRRzNmZGowKzR0cHV5YVhMWFV0eUJQVUFHSEFrL0dZ?=
- =?utf-8?B?N3Z6K0JaM3JtWW16TFlIR0U2QklaVEZxTUFtUGM4dlk1US9kNXpIbTFNRXRi?=
- =?utf-8?B?WkRFZE1YeC9TQ1E0alk2eGVXTHU0cHVnYktqcnBvYVBpb0xSNFdaSVEvQ0Ex?=
- =?utf-8?B?UVlIVmlPVGJxZWREQ3FudXNzUEhacFVVeU1NVUU1SDlHZmUwS2M0VWdlUDBV?=
- =?utf-8?B?L2Ric3E5TWprSXB3U0Q0L1kwQWJrWndNMXRuaHhvc2dLOFpkU2psbDJwQ2k3?=
- =?utf-8?B?aW9DZWNZdW81RXJMNlFpMWVPUHR3a2FiNGQvZ1Yxbk00TC9GcDZ4TDZ4dVQv?=
- =?utf-8?B?T01wekxGbzdUTjM2MnM3NkRzS1dEMmR5VjhoMEdtcUp5cVJ1OWVHQThHMXQ5?=
- =?utf-8?B?dHRTVWpNWEhHd3V6RmxxNVRWWUxVeXpvQ1ZZblI1bFBSc3Q1UlV6eTBpNUJ0?=
- =?utf-8?B?TWUxa3dzQktGS254NUtJdmZMajdUeVBQVUR5aGp1QUdSbXBlQVRhMGswQTdX?=
- =?utf-8?B?SzhGalNuVmt6VGZ2bWowQUZLV2dCdTVzUDl5cGhvUDVYSjgrOXVnUlBKWG5M?=
- =?utf-8?B?aG12L1NZVGpHNnhmN3Fub2Q4d3FDME1PdzF0YlA5UUFaU2gvcHJCbkFFTEkw?=
- =?utf-8?B?Y210OGNHZ01rcGVUZlZGVnkvL1l6NllQQzZqSVF6MHdjUGVuVmkzUk1jandP?=
- =?utf-8?B?UFFJRmVkSndXbGlNQlU5aXVmL1hzZFFVdjFwbnNzQXlEMXVFRFFnNW5NQ1lM?=
- =?utf-8?B?WFk5bUg1ZnI4dTFLbXI5VHlMdnZ2M0FuVVFBejREbkw2WDBCK21WaHgrWDlC?=
- =?utf-8?B?MFB6N0FZMDR1c0p4SlJiejZ4WGtCUllHR0xicVBPL3FuU3FoSWpPVzB2N0Vo?=
- =?utf-8?B?ZlZOelhtQlRhcUxDWmJpMjZGUzQ4ZHFtRW12QzJteEFFNFc4aG4xdGpJTGxJ?=
- =?utf-8?B?dHFTREc1eit2Y3g4UlVKamF5OXkyemttbjZTYTNMZXRiaWIvcmFJZC9PdGVT?=
- =?utf-8?B?ZHN1TXo2UUVBT25sNHIwUmFyWm10QzdyMUp2cSsvaVlDYkN2KzVWN0pMYWhz?=
- =?utf-8?B?K1pESW1qY1VNVTJpQk9DaVBmbTcrSVFGQnJHcGYrV0ZEakNsdFp5ZS81THYy?=
- =?utf-8?B?OENpdkpyMnEyNmhpSWhrQWNaUC9BbU1oTHdXRXNLQXdIcTBES1h4RXRhMWdL?=
- =?utf-8?B?dU1kRzd3OW9hYkJzSnlLbjFLQlBITkppMnUxMzV6c3l6UWtPZ0FiY2cyN2V3?=
- =?utf-8?B?WGVVZUwzMWlSU29wcTNXV283MWZLV3hJQTZTU0Nwcjh6a2dqZ090dkRSYXdR?=
- =?utf-8?B?eGJmbDlCMG9rLzhteXBOSVhKODlmSjg4WHM5WlptU3NEL1dEeHVUckcxVVg3?=
- =?utf-8?B?QlJFUzRORC9DcWFOZ3ZnY2lxUWp4dzhNRFBUS3hvV2MrNHhIKy9PZVlHMnA0?=
- =?utf-8?B?a2pMVitEb096cTZneTF5UGxER1BXNFZ5eTlGVndySnNnMnd4MkU2UWxBeDZx?=
- =?utf-8?B?cUNrRktFT0FuY0NHNGFWQXZydFRUSGVOQllYTUlSbURGUHJ4TG90S0xFZU5i?=
- =?utf-8?B?V2VBOEhKazNST2dabUhyS3BaVUhOR0R3WmUzQU4ySUx2RFdaanN2ellJQjFE?=
- =?utf-8?B?MDc0Znoza01SMXdJK2poWGYyN2hJRTJsUFVDWHRrVC9xYVpyRHlwTHE3dGRJ?=
- =?utf-8?B?YzdrRUNpREJ5SEY3TXVKZjBhV0pjNFcxcXRCbm45NjFxbjFMVEpkRTVIV3hM?=
- =?utf-8?B?eHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c630ea2-8a85-490a-ffbb-08dbbe16dae5
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QUhiK29qV21zcnhjNHZEaFdIOVdlRURuSjZwRmpnY0dDeXdOY1hYeHQwOWNs?=
+ =?utf-8?B?c21xdlpmT05FZWNVTm9ZUVlRUjVJbkNBUXpLTWpkU3d3SkREVGNuUHdENzF0?=
+ =?utf-8?B?Z0FMeUlIWUFuS29RcWdWQUJCeDJTbkpIUGpsbEc0dGxuQ2o3TmhuK3VLQkZ5?=
+ =?utf-8?B?RC9YOVoxT2lFUjhncHUzU0dvWVBsbDFmZlJZYnBocWRCdlh1N2NKSFdrOXo5?=
+ =?utf-8?B?TVpZU0JoRUMxM3lycUNFQnVzSW5kNTNSbFp2S1NUTytyNTFqa2VZQ1JXdmJP?=
+ =?utf-8?B?dGJKUmZaeXIzakxOc2h2dm9hUWFpQnRKbnJ3QjZHemFaQSt0aE94TDNMN1FC?=
+ =?utf-8?B?VHBiWWJwdjBFb3QySHZpUmJVZWJ5YVgycmt5ZGRDVWR0Y01aSzFkK0N1NUlq?=
+ =?utf-8?B?S2ZEMnkvbnNOZ0RqaWxWUDR4aXRlZUJ0Ymc5cUxZZnBrRUlGZEJRTHJaUjBU?=
+ =?utf-8?B?Y2xWK0RkMHRXU0JaWWFQQk1DQTdvYjh2cUJxNkdQRUJxMExTTW1VckxZRDBz?=
+ =?utf-8?B?dzR3Q0lMdm1Mb0RuaStwOUxhemFyVUgzRzM4NHR6WmhudnlVTmxTS1lycmti?=
+ =?utf-8?B?TWlBSGkyOVJNQXROeU9zQXQrWmc3akJnbmtmamtzMG0xa0FlMldYZWo2TitJ?=
+ =?utf-8?B?THBaUk9wbUt2bXJMTWIya3F3aXJLbU1KMmZXcXpNeHBjZW5nN0ZNT1ZOQThx?=
+ =?utf-8?B?aUU4ajVVZFVraW9RV0Y4R0Q2NDRmeTFuMy9vM2hjMUNVU0UzRHpNSXJhY2x3?=
+ =?utf-8?B?UG5lbkpZYnJseVFpbTdFTTYyVjc1bVJ3ZlZrd2l3cmVSOHZYQ015aUpwVE9L?=
+ =?utf-8?B?MFpuZFk4QWh2dUNrMy9pSHB4NUNWQ3p4OWE3ekhHQmZtT0cwY3RsTzR3Y3px?=
+ =?utf-8?B?QnJ4VHhpdHdRQzFDYUg4NDhmVnNNbVFBaXJjOEE0YmdsSFlDWWxwUmk0bkRI?=
+ =?utf-8?B?YW5MNWJFbllZSEtoMHI2SFRXL2hSQkZKUno1N1pUUFNWSmZHdFZrOGNFUjcr?=
+ =?utf-8?B?QmZpUkRKV3B5dDhJVzVnYjFxSHRIVURROFIwZERUMU9mSlhiK1VMcHg0TUFh?=
+ =?utf-8?B?Z0VTeGFWakJxbllNS0Q2dTBOVFRuY3JyWi8rZ1pTUE16Q0hMZHRYeno4OXVL?=
+ =?utf-8?B?NTN0UW01dFhQU0FaRUdrU1MrS1YvYUxLNFdIVjQ5RlRVS1RLVlNOZUFHSWJo?=
+ =?utf-8?B?bCtENEF0TG40K0h0MzBObTJrVllMYnh5di9YUW1lODNmZHVBUENwdUIwVEFv?=
+ =?utf-8?B?K3FVK1FWSTF2ek5FdFJjRkdRbEJlR0pZdTRuQkpSWUVnZVM2d3dyb25lYjNX?=
+ =?utf-8?B?c0RGME1GU2VzbG1Ld0FEM25ZSzZrM2hQTnpmbTNKbEpnVmpWVjdIVFFWcllk?=
+ =?utf-8?B?QXc1ZC80ZXR0UlozRU5aZytyVVhRVlhIUWJXczBUN2F4TmJOdmtKT0tMTEFw?=
+ =?utf-8?B?UlMzN1RhMWxFWWI3Zi9ZdFdXRnh0eEtlRmY1ckpacjk1dGVQWGZKcWdLNWl1?=
+ =?utf-8?B?QmFjQmVMUDZSbTRGYnRLd0g5NlRsbWF3ZHk3SktPUU8wWkw0TGlObVk3VHBm?=
+ =?utf-8?B?OHdLb3VBY3NPT3J2ZWN5Y2lOLzZCaU4xK0VIUVNXdEd6RWZBUEZoUERNRmtt?=
+ =?utf-8?B?SC84a1ZPWmVMNFJiTDdnLzVGS1dMbTNCc2xEOVlJeHQ3aWVoRTVVampkQmli?=
+ =?utf-8?B?bHdyQ3RQL2ZQTW1MVlBPOCsrMDlmYzk5QStqSHExWG9XY1pHNm02VGJUamF6?=
+ =?utf-8?B?WjB1MmxGUjFSd3ZmcHNuM3ZLNXBNV3phaWhVdGZlTVNwOUZDdmhjZmFQQUIr?=
+ =?utf-8?B?aXI5TGNtbkRXRUVMUmxhVEgyUzk5TEh3Nk1NNlU2VXJzd0h6OHNkWVFKVHY2?=
+ =?utf-8?B?QVVicWFTZVRCUnlwWVZ3OVZzeTJSSS91T1lDVCtJVnQ1RGhnRVY5Z0hiaHBW?=
+ =?utf-8?B?eWtHREkwQUloU0U4L0N3VFVFUEJlWUg1OEpHVkVCVUhzOWRESGVxMHMzdXVw?=
+ =?utf-8?B?SG1lcXlhcGhNdGpiRnZmRTVlWWVXbFdZUjFIZnhEY1FJOFB4NTVHUzFkcXZK?=
+ =?utf-8?B?d1NsL1lYb0ErUTRRa2NaQklUbDdkZ0FOV3RPa21ycmNaeUNLWnk3SXR4eWxF?=
+ =?utf-8?B?cVNSbTZ5b3JIM1JTcTZuT1ZTSGhWcEw2Ky9OajJJNDllMEVyT0h1b2g1VmhN?=
+ =?utf-8?B?WUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcd0a46e-c0d9-48e7-f073-08dbbe191c8f
 X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 22:29:17.5031
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 22:45:26.6744
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FHcH07Yd72PpIgEF8PiSkdPLzFgJ5nMnZmUflpVXuK64rglanrgm7/75djdSlG6WBU03OHNshJgxLFglW/TXZUzQoupce4er+SCmhdcGhBc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7660
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1vMCf2FkZWvb0VzHNm3Bl1Sk0tqyOp04fHa9yrNJ68JRzpcVPz1GspKqG4JZ4YTGWK4SFOUhTakx6Abdobe/9IpqdPM9mXljaqv7drp3hVM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5829
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 9/25/2023 12:09 AM, Linus Walleij wrote:
-> As we don't specify the MTU in the driver, the framework
-> will fall back to 1500 bytes and this doesn't work very
-> well when we try to attach a DSA switch:
+On 9/24/2023 7:05 PM, Yury Norov wrote:
+> The function duplicates existing cpumask_local_spread(), and it's O(N),
+> while cpumask_local_spread() implementation is based on bsearch, and
+> thus is O(log n), so drop mlx5_cpumask_default_spread() and use generic
+> cpumask_local_spread().
 > 
->   eth1: mtu greater than device maximum
->   ixp4xx_eth c800a000.ethernet eth1: error -22 setting
->   MTU to 1504 to include DSA overhead
-> 
-> After locating an out-of-tree patch in OpenWrt I found
-> suitable code to set the MTU on the interface and ported
-> it and updated it. Now the MTU gets set properly.
-> 
-
-Nice!
-
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
 > ---
-> Changes in v2:
-> - Don't just set min/max MTU: implement the interface for actually
->   changing it as well.
-> - Link to v1: https://lore.kernel.org/r/20230923-ixp4xx-eth-mtu-v1-1-9e88b908e1b2@linaro.org
-> ---
->  drivers/net/ethernet/xscale/ixp4xx_eth.c | 64 +++++++++++++++++++++++++++++++-
->  1 file changed, 63 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 28 ++------------------
+>  1 file changed, 2 insertions(+), 26 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-> index 3b0c5f177447..18e52abc005b 100644
-> --- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
-> +++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-> @@ -24,6 +24,7 @@
->  #include <linux/dma-mapping.h>
->  #include <linux/dmapool.h>
->  #include <linux/etherdevice.h>
-> +#include <linux/if_vlan.h>
->  #include <linux/io.h>
->  #include <linux/kernel.h>
->  #include <linux/net_tstamp.h>
-> @@ -63,7 +64,15 @@
->  
->  #define POOL_ALLOC_SIZE		(sizeof(struct desc) * (RX_DESCS + TX_DESCS))
->  #define REGS_SIZE		0x1000
-> -#define MAX_MRU			1536 /* 0x600 */
-> +
-> +/* MRU is said to be 14320 in a code dump, the SW manual says that
-> + * MRU/MTU is 16320 and includes VLAN and ethernet headers.
-> + * See "IXP400 Software Programmer's Guide" section 10.3.2, page 161.
-> + *
-> + * FIXME: we have chosen the safe default (14320) but if you can test
-> + * jumboframes, experiment with 16320 and see what happens!
-> + */
-
-
-Ok, so you're choosing a conservative upper limit that is known to work
-while leaving the higher 16320 value for later if/when someone cares?
-
-> +#define MAX_MRU			(14320 - VLAN_ETH_HLEN)
->  #define RX_BUFF_SIZE		ALIGN((NET_IP_ALIGN) + MAX_MRU, 4)
->  
->  #define NAPI_WEIGHT		16
-> @@ -1182,6 +1191,53 @@ static void destroy_queues(struct port *port)
->  	}
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> index ea0405e0a43f..bd9f857cc52d 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> @@ -828,30 +828,6 @@ static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
+>  	mlx5_irq_release_vector(irq);
 >  }
 >  
-> +static int ixp4xx_do_change_mtu(struct net_device *dev, int new_mtu)
-> +{
-> +	struct port *port = netdev_priv(dev);
-> +	struct npe *npe = port->npe;
-> +	struct msg msg;
-> +	/* adjust for ethernet headers */
-> +	int framesize = new_mtu + VLAN_ETH_HLEN;
-> +	/* max rx/tx 64 byte chunks */
-> +	int chunks = DIV_ROUND_UP(framesize, 64);
-> +
-
-netdev coding style wants all of the declarations in "reverse christmas
-tree" ordering. Assign to the local variables after the block if
-necessary. Something like:
-
-	struct port *port = netdev_priv(dev);
-	struct npe *npe = port->npe;
-	int framesize, chunks;
-	struct msg msg;
-
-	/* adjust for ethernet headers */
-	framesize = new_mtu + VLAN_ETH_HLEN;
-	/* max rx/tx 64 byte chunks */
-	chunks = DIV_ROUND_UP(framesize, 64);
-
-
-> +	memset(&msg, 0, sizeof(msg));
-
-
-You could also use "struct msg msg = {}" instead of memset here.
-
-> +	msg.cmd = NPE_SETMAXFRAMELENGTHS;
-> +	msg.eth_id = port->id;
-> +
-> +	/* Firmware wants to know buffer size in 64 byte chunks */
-> +	msg.byte2 = chunks << 8;
-> +	msg.byte3 = chunks << 8;
-> +
-
-I am not sure I follow the "<< 8" here.
-
-> +	msg.byte4 = msg.byte6 = framesize >> 8;
-> +	msg.byte5 = msg.byte7 = framesize & 0xff;
-> +
-> +	if (npe_send_recv_message(npe, &msg, "ETH_SET_MAX_FRAME_LENGTH"))
-> +		return -EIO;
-> +	netdev_dbg(dev, "set MTU on NPE %s to %d bytes\n",
-> +		   npe_name(npe), new_mtu);
-> +
-> +	return 0;
-> +}
-> +
-> +static int ixp4xx_eth_change_mtu(struct net_device *dev, int new_mtu)
-> +{
-> +	int ret;
-> +
-> +	/* MTU can only be changed when the interface is up. We also
-> +	 * set the MTU from dev->mtu when opening the device.
-> +	 */
-> +	if (dev->flags & IFF_UP) {
-> +		ret = ixp4xx_do_change_mtu(dev, new_mtu);
-> +		if (ret < 0)
-> +			return ret;
-> +	}
-> +
-> +	dev->mtu = new_mtu;
-> +
-> +	return 0;
-> +}
-> +
->  static int eth_open(struct net_device *dev)
->  {
->  	struct port *port = netdev_priv(dev);
-> @@ -1232,6 +1288,8 @@ static int eth_open(struct net_device *dev)
->  	if (npe_send_recv_message(port->npe, &msg, "ETH_SET_FIREWALL_MODE"))
->  		return -EIO;
->  
-> +	ixp4xx_do_change_mtu(dev, dev->mtu);
-> +
->  	if ((err = request_queues(port)) != 0)
->  		return err;
->  
-> @@ -1374,6 +1432,7 @@ static int eth_close(struct net_device *dev)
->  static const struct net_device_ops ixp4xx_netdev_ops = {
->  	.ndo_open = eth_open,
->  	.ndo_stop = eth_close,
-> +	.ndo_change_mtu = ixp4xx_eth_change_mtu,
->  	.ndo_start_xmit = eth_xmit,
->  	.ndo_set_rx_mode = eth_set_mcast_list,
->  	.ndo_eth_ioctl = eth_ioctl,
-> @@ -1488,6 +1547,9 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
->  	ndev->dev.dma_mask = dev->dma_mask;
->  	ndev->dev.coherent_dma_mask = dev->coherent_dma_mask;
->  
-> +	ndev->min_mtu = ETH_MIN_MTU;
-> +	ndev->max_mtu = MAX_MRU;
-> +
->  	netif_napi_add_weight(ndev, &port->napi, eth_poll, NAPI_WEIGHT);
->  
->  	if (!(port->npe = npe_request(NPE_ID(port->id))))
-> 
-
-Functionality-wise the patch seems fine to me, and properly implementing
-the MTU changing is a great addition.
-
-Minor nits on the coding style, but not really a huge issue to me. I had
-some question about how the chunks work but I don't know the hardware so
-I can't really evaluate whether its correct or not.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-> ---
-> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-> change-id: 20230923-ixp4xx-eth-mtu-c041d7efe932
-> 
-
-Curious what this change-id thing represents I've never seen it before..
-I know base-commit is used by git. Would be interested in an explanation
-if you happen to know! :D
-
-> Best regards,
+> -static int mlx5_cpumask_default_spread(int numa_node, int index)
+> -{
+> -	const struct cpumask *prev = cpu_none_mask;
+> -	const struct cpumask *mask;
+> -	int found_cpu = 0;
+> -	int i = 0;
+> -	int cpu;
+> -
+> -	rcu_read_lock();
+> -	for_each_numa_hop_mask(mask, numa_node) {
+> -		for_each_cpu_andnot(cpu, mask, prev) {
+> -			if (i++ == index) {
+> -				found_cpu = cpu;
+> -				goto spread_done;
+> -			}
+> -		}
+> -		prev = mask;
+> -	}
+> -
+> -spread_done:
+> -	rcu_read_unlock();
+> -	return found_cpu;
+> -}
+> -
+>  static struct cpu_rmap *mlx5_eq_table_get_pci_rmap(struct mlx5_core_dev *dev)
+>  {
+>  #ifdef CONFIG_RFS_ACCEL
+> @@ -873,7 +849,7 @@ static int comp_irq_request_pci(struct mlx5_core_dev *dev, u16 vecidx)
+>  	int cpu;
+>  
+>  	rmap = mlx5_eq_table_get_pci_rmap(dev);
+> -	cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vecidx);
+> +	cpu = cpumask_local_spread(vecidx, dev->priv.numa_node);
+>  	irq = mlx5_irq_request_vector(dev, cpu, vecidx, &rmap);
+>  	if (IS_ERR(irq))
+>  		return PTR_ERR(irq);
+> @@ -1125,7 +1101,7 @@ int mlx5_comp_vector_get_cpu(struct mlx5_core_dev *dev, int vector)
+>  	if (mask)
+>  		cpu = cpumask_first(mask);
+>  	else
+> -		cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vector);
+> +		cpu = cpumask_local_spread(vector, dev->priv.numa_node);
+>  
+>  	return cpu;
+>  }
 
