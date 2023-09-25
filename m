@@ -1,225 +1,112 @@
-Return-Path: <netdev+bounces-36078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F39A7AD11D
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:10:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4F27AD1A0
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:26:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E3F8D281716
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:10:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id B5463B20A34
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049BC10942;
-	Mon, 25 Sep 2023 07:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E48210962;
+	Mon, 25 Sep 2023 07:26:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7818D10940
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 07:10:01 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC7E8CF
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 00:09:58 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-5042f391153so6677716e87.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 00:09:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695625797; x=1696230597; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EqZK5rfK2NK1ukLToqkFpZ/nmPOVTvrQx25n2XKJyNo=;
-        b=CzxG0qQw3GsFg3Oyc9/jLQtyimetLOpEJ4xl8VmT9JAhYSoJmude0ArvD9vJp+YOr3
-         7+pWGFXt3tgq+ndwqzAZa8cJ+VgJ1p/HFZ+rADyJmJJAXmNwGSg7x/z7MEQjfDW9Qot6
-         OCCyZCV3/37I36ZLT2AicvkwiKupCMdFVybQxJTuAhsw7ofYdMU0CY4NuOLJ9Q34FoQU
-         dypU/TMO7T8PP7dISAUhHy+biKrN//ubsZPrivSuxoLrHo4EaLlPpSDB9UATTT9ioJJ0
-         O0dcjBLh8pB2nN6PGQOVnxmGYsL7sHeuXt1e/qzL33wpnen7QW9fjSBTvRGWFUTfvK18
-         8Y3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695625797; x=1696230597;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EqZK5rfK2NK1ukLToqkFpZ/nmPOVTvrQx25n2XKJyNo=;
-        b=cMdoe7x37TS6Qu/IILTfKx8c/u9G4DVMjY5QV0xN03HVLbitQx5QGuP4OgC3o7qW3q
-         wvPV/7KL7khbF8II2HEbDuJ8a0XwtGRfj5N6DobNHS4L6g2SA/03exRe5KGhkMB2yToo
-         pyu4I07Y0LCRxYTJqcz+DlEPo4YX1Oe/zSzjJjYkcWSTXJaLpcma3FZr+J1qx1leUq0P
-         YXzj7qIIaCK2DvMZwQkHFgYk8oc+639PaLW1QyimK5s5KKWcdpbMyXUNk+x0D0iTXuat
-         xkbl/Gx9jlkU6G8X9AzfOlS16gs3C2WrNPGuSlYrcLnB7pzczA8nZhK00u6cYAV9dTT9
-         FPig==
-X-Gm-Message-State: AOJu0YzCjI6OeJgZJ1Ren/0o6Qh7NZnU9DAirP8PkVGCmupj3x7AXpf0
-	MfwSiMKtQS3rVJRafEnjwXc7T+ilA90dQuTR2uk=
-X-Google-Smtp-Source: AGHT+IG50fbbZdBe34ijbBMGdi2JJbwAU5TARGF5Cp2x6RxUr7HavmVYcYtcCvmLfjpZDC+IMKAHFQ==
-X-Received: by 2002:a05:6512:2804:b0:4fe:3291:6b50 with SMTP id cf4-20020a056512280400b004fe32916b50mr3511955lfb.7.1695625796579;
-        Mon, 25 Sep 2023 00:09:56 -0700 (PDT)
-Received: from [192.168.1.2] (c-05d8225c.014-348-6c756e10.bbcust.telenor.se. [92.34.216.5])
-        by smtp.gmail.com with ESMTPSA id x27-20020ac259db000000b004ff6fa3f038sm1705221lfn.144.2023.09.25.00.09.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Sep 2023 00:09:56 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 25 Sep 2023 09:09:52 +0200
-Subject: [PATCH net-next v2] net: ixp4xx_eth: Support changing the MTU
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C70EAE2
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 07:26:29 +0000 (UTC)
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id A726AFF;
+	Mon, 25 Sep 2023 00:26:25 -0700 (PDT)
+Received: from localhost.localdomain (unknown [10.190.70.223])
+	by mail-app3 (Coremail) with SMTP id cC_KCgBHT8PENRFlRNjOAA--.43102S4;
+	Mon, 25 Sep 2023 15:24:58 +0800 (CST)
+From: Dinghao Liu <dinghao.liu@zju.edu.cn>
+To: dinghao.liu@zju.edu.cn
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Harry Morris <harrymorris12@gmail.com>,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+Date: Mon, 25 Sep 2023 15:24:22 +0800
+Message-Id: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgBHT8PENRFlRNjOAA--.43102S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7WF4fGFW5ury5Cry8tw48tFb_yoW8XFy3pa
+	1Y9a4UJryjqF4j9a18A3y8Zry5C3W7Ka4ruF95K39ruas8ZryxKan7AFW3JF4rArWUCa1f
+	A3yUAw15urs5AF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvv1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW0oVCq3wA2z4x0Y4vEx4A2
+	jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52
+	x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWU
+	GwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI4
+	8JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY
+	0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r4fKr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjfUoOJ5UUUUU
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAg0HBmUNoyAhBwAOsN
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org>
-X-B4-Tracking: v=1; b=H4sIAEAyEWUC/3WNywrDIBBFfyXMulPUBKpd9T9KFnlM4kCrQW2wB
- P+9kn2Xh8M994BIgSnCvTkg0M6RvaugLg1MdnArIc+VQQnVCqNa5Lx1OSMli+/0wUl0cr7RQqZ
- VUEdboIXzGXyCo4SOcoK+Gssx+fA9n3Z5+n/RXaJEQ1qPRmiSo3q82A3BX31YoS+l/AB+VPnYt
- wAAAA==
-To: Krzysztof Halasa <khalasa@piap.pl>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-As we don't specify the MTU in the driver, the framework
-will fall back to 1500 bytes and this doesn't work very
-well when we try to attach a DSA switch:
+If of_clk_add_provider() fails in ca8210_register_ext_clock(),
+it calls clk_unregister() to release priv->clk and returns an
+error. However, the caller ca8210_probe() then calls ca8210_remove(),
+where priv->clk is freed again in ca8210_unregister_ext_clock(). In
+this case, a use-after-free may happen in the second time we call
+clk_unregister().
 
-  eth1: mtu greater than device maximum
-  ixp4xx_eth c800a000.ethernet eth1: error -22 setting
-  MTU to 1504 to include DSA overhead
+Fix this by nulling priv->clk after the first clk_unregister(). Also
+refine the pointer checking in ca8210_unregister_ext_clock().
 
-After locating an out-of-tree patch in OpenWrt I found
-suitable code to set the MTU on the interface and ported
-it and updated it. Now the MTU gets set properly.
-
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
+Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
 ---
-Changes in v2:
-- Don't just set min/max MTU: implement the interface for actually
-  changing it as well.
-- Link to v1: https://lore.kernel.org/r/20230923-ixp4xx-eth-mtu-v1-1-9e88b908e1b2@linaro.org
----
- drivers/net/ethernet/xscale/ixp4xx_eth.c | 64 +++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
+ drivers/net/ieee802154/ca8210.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-index 3b0c5f177447..18e52abc005b 100644
---- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
-+++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
-@@ -24,6 +24,7 @@
- #include <linux/dma-mapping.h>
- #include <linux/dmapool.h>
- #include <linux/etherdevice.h>
-+#include <linux/if_vlan.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
- #include <linux/net_tstamp.h>
-@@ -63,7 +64,15 @@
- 
- #define POOL_ALLOC_SIZE		(sizeof(struct desc) * (RX_DESCS + TX_DESCS))
- #define REGS_SIZE		0x1000
--#define MAX_MRU			1536 /* 0x600 */
-+
-+/* MRU is said to be 14320 in a code dump, the SW manual says that
-+ * MRU/MTU is 16320 and includes VLAN and ethernet headers.
-+ * See "IXP400 Software Programmer's Guide" section 10.3.2, page 161.
-+ *
-+ * FIXME: we have chosen the safe default (14320) but if you can test
-+ * jumboframes, experiment with 16320 and see what happens!
-+ */
-+#define MAX_MRU			(14320 - VLAN_ETH_HLEN)
- #define RX_BUFF_SIZE		ALIGN((NET_IP_ALIGN) + MAX_MRU, 4)
- 
- #define NAPI_WEIGHT		16
-@@ -1182,6 +1191,53 @@ static void destroy_queues(struct port *port)
- 	}
- }
- 
-+static int ixp4xx_do_change_mtu(struct net_device *dev, int new_mtu)
-+{
-+	struct port *port = netdev_priv(dev);
-+	struct npe *npe = port->npe;
-+	struct msg msg;
-+	/* adjust for ethernet headers */
-+	int framesize = new_mtu + VLAN_ETH_HLEN;
-+	/* max rx/tx 64 byte chunks */
-+	int chunks = DIV_ROUND_UP(framesize, 64);
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.cmd = NPE_SETMAXFRAMELENGTHS;
-+	msg.eth_id = port->id;
-+
-+	/* Firmware wants to know buffer size in 64 byte chunks */
-+	msg.byte2 = chunks << 8;
-+	msg.byte3 = chunks << 8;
-+
-+	msg.byte4 = msg.byte6 = framesize >> 8;
-+	msg.byte5 = msg.byte7 = framesize & 0xff;
-+
-+	if (npe_send_recv_message(npe, &msg, "ETH_SET_MAX_FRAME_LENGTH"))
-+		return -EIO;
-+	netdev_dbg(dev, "set MTU on NPE %s to %d bytes\n",
-+		   npe_name(npe), new_mtu);
-+
-+	return 0;
-+}
-+
-+static int ixp4xx_eth_change_mtu(struct net_device *dev, int new_mtu)
-+{
-+	int ret;
-+
-+	/* MTU can only be changed when the interface is up. We also
-+	 * set the MTU from dev->mtu when opening the device.
-+	 */
-+	if (dev->flags & IFF_UP) {
-+		ret = ixp4xx_do_change_mtu(dev, new_mtu);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	dev->mtu = new_mtu;
-+
-+	return 0;
-+}
-+
- static int eth_open(struct net_device *dev)
+diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
+index aebb19f1b3a4..1d545879c000 100644
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -2760,6 +2760,7 @@ static int ca8210_register_ext_clock(struct spi_device *spi)
+ 	ret = of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
+ 	if (ret) {
+ 		clk_unregister(priv->clk);
++		priv->clk = NULL;
+ 		dev_crit(
+ 			&spi->dev,
+ 			"Failed to register external clock as clock provider\n"
+@@ -2780,7 +2781,7 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
  {
- 	struct port *port = netdev_priv(dev);
-@@ -1232,6 +1288,8 @@ static int eth_open(struct net_device *dev)
- 	if (npe_send_recv_message(port->npe, &msg, "ETH_SET_FIREWALL_MODE"))
- 		return -EIO;
+ 	struct ca8210_priv *priv = spi_get_drvdata(spi);
  
-+	ixp4xx_do_change_mtu(dev, dev->mtu);
-+
- 	if ((err = request_queues(port)) != 0)
- 		return err;
+-	if (!priv->clk)
++	if (IS_ERR_OR_NULL(priv->clk))
+ 		return
  
-@@ -1374,6 +1432,7 @@ static int eth_close(struct net_device *dev)
- static const struct net_device_ops ixp4xx_netdev_ops = {
- 	.ndo_open = eth_open,
- 	.ndo_stop = eth_close,
-+	.ndo_change_mtu = ixp4xx_eth_change_mtu,
- 	.ndo_start_xmit = eth_xmit,
- 	.ndo_set_rx_mode = eth_set_mcast_list,
- 	.ndo_eth_ioctl = eth_ioctl,
-@@ -1488,6 +1547,9 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
- 	ndev->dev.dma_mask = dev->dma_mask;
- 	ndev->dev.coherent_dma_mask = dev->coherent_dma_mask;
- 
-+	ndev->min_mtu = ETH_MIN_MTU;
-+	ndev->max_mtu = MAX_MRU;
-+
- 	netif_napi_add_weight(ndev, &port->napi, eth_poll, NAPI_WEIGHT);
- 
- 	if (!(port->npe = npe_request(NPE_ID(port->id))))
-
----
-base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
-change-id: 20230923-ixp4xx-eth-mtu-c041d7efe932
-
-Best regards,
+ 	of_clk_del_provider(spi->dev.of_node);
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.17.1
 
 
