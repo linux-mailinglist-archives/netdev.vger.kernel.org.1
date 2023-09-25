@@ -1,115 +1,102 @@
-Return-Path: <netdev+bounces-36075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789AA7ACF36
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 06:36:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D567ACF88
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2BAEE280F98
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:36:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AB31128136F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 05:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669FD10E4;
-	Mon, 25 Sep 2023 04:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B18E6FC4;
+	Mon, 25 Sep 2023 05:41:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E865715B0
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 04:36:16 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59809DF
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:36:13 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53368df6093so9681a12.1
-        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695616572; x=1696221372; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=utpCVSnKwmUjnI78nqFvLGOx8w1hMljEMO2FokBLE1I=;
-        b=ybr6RM4CPXpwC9LRY3DBeFzRR8xUW4feAfauDPvuNqGD1XTEgTZJ6PysV1BcIGUkUW
-         YpPV4a1uIofNpKwJGKIAfmzVso2/MAKtqv9JruN5CBBgnotdlr2lHuyMX1lB71iVsovG
-         U/DSoEXgp/YIsyIPnhIsjH8h0SsTWPfJ/j5TEABPMYSUa9VXHeJObZ1U//c60mvSXaAg
-         Uyzfyc0JGX5Df0HeGB5VSwYoZ02krp79yhq9F1wpQIqpxGAD/zrR+ITeyQmSJ8xE1pQY
-         5wKjCRB2yRF4+Gi3Kaxg2BbJo8xffQCdHyjmzOzzwR9xP8YYllbzMcnr9xwnj4Azy0LH
-         qYLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695616572; x=1696221372;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=utpCVSnKwmUjnI78nqFvLGOx8w1hMljEMO2FokBLE1I=;
-        b=tpJxjrMKjc4QHZWr/J/G3r8mn21zkmtsqJC7/ZEvQvT1kSDHwB99q+LBY3/Yot2i5M
-         uR49U2AqPTWsa6EL6MtkzIycn1+5i5hXHt7COhHjR92L3X9Jx9rk+PZZvWZxPDJG6iAn
-         uTX8mq16FX3Bvbd3MVF6+zBy4jSodZRt/lNoA8kQ6uhLVIfN21NyEqwf/5qikxtxvPOf
-         YO1VRUuQlzTdUE2/9GZIAAR+WSRvZ3H2ZYuY2sDAfWG8EsPsAw4Foy/kiPNmLoibqlrd
-         X+YpPCUJAVEADwW6xJ0EqqU91h3m/GzWxlTZ4EeC92sztLBLhN22eroOoCVKfAGgB/Y4
-         pRiw==
-X-Gm-Message-State: AOJu0YwYt2OZGBk2+xYttMzjvbASX8QkwKfvLcjIU0nF8qRbTxSy7adq
-	VPnoXhbEX/j60azUU2CmM1QD09QxRYhzKVXmrz5lVMxDB/4wvN6DuEc=
-X-Google-Smtp-Source: AGHT+IHKR23zBujhctNddZ7OKF7KZBJFI4TepLmmMkO/RSku8CnURNUbVfdbS2tNLuBfQcREKCgWH/+nVYtyPrKezTY=
-X-Received: by 2002:a50:9fc5:0:b0:525:573c:6444 with SMTP id
- c63-20020a509fc5000000b00525573c6444mr23731edf.1.1695616571593; Sun, 24 Sep
- 2023 21:36:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312E46128
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 05:41:31 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49740BF;
+	Sun, 24 Sep 2023 22:41:29 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 85EC6206DF;
+	Mon, 25 Sep 2023 07:41:26 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 45rPA5a5YyjI; Mon, 25 Sep 2023 07:41:25 +0200 (CEST)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 9780420547;
+	Mon, 25 Sep 2023 07:41:25 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 8B52180004A;
+	Mon, 25 Sep 2023 07:41:25 +0200 (CEST)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 25 Sep 2023 07:41:25 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 25 Sep
+ 2023 07:41:24 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id ACE343182ABF; Mon, 25 Sep 2023 07:41:24 +0200 (CEST)
+Date: Mon, 25 Sep 2023 07:41:24 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Zhang Changzhong <zhangchangzhong@huawei.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Xin Long <lucien.xin@gmail.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] xfrm6: fix inet6_dev refcount underflow problem
+Message-ID: <ZREdhN1hl6+6Eic2@gauss3.secunet.de>
+References: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230922210530.2045146-1-i.maximets@ovn.org>
-In-Reply-To: <20230922210530.2045146-1-i.maximets@ovn.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Sep 2023 06:35:58 +0200
-Message-ID: <CANn89iJgeCvJbcapir8WkJv6nYop5CcfxgBrx3BoxEuwp0WA_w@mail.gmail.com>
-Subject: Re: [PATCH net] ipv6: tcp: add a missing nf_reset_ct() in 3WHS handling
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>, 
-	Madhu Koriginja <madhu.koriginja@nxp.com>, Frode Nordahl <frode.nordahl@canonical.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1694776841-30837-1-git-send-email-zhangchangzhong@huawei.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 11:04=E2=80=AFPM Ilya Maximets <i.maximets@ovn.org>=
- wrote:
->
-> Commit b0e214d21203 ("netfilter: keep conntrack reference until
-> IPsecv6 policy checks are done") is a direct copy of the old
-> commit b59c270104f0 ("[NETFILTER]: Keep conntrack reference until
-> IPsec policy checks are done") but for IPv6.  However, it also
-> copies a bug that this old commit had.  That is: when the third
-> packet of 3WHS connection establishment contains payload, it is
-> added into socket receive queue without the XFRM check and the
-> drop of connection tracking context.
->
-> That leads to nf_conntrack module being impossible to unload as
-> it waits for all the conntrack references to be dropped while
-> the packet release is deferred in per-cpu cache indefinitely, if
-> not consumed by the application.
->
-> The issue for IPv4 was fixed in commit 6f0012e35160 ("tcp: add a
-> missing nf_reset_ct() in 3WHS handling") by adding a missing XFRM
-> check and correctly dropping the conntrack context.  However, the
-> issue was introduced to IPv6 code afterwards.  Fixing it the
-> same way for IPv6 now.
->
-> Fixes: b0e214d21203 ("netfilter: keep conntrack reference until IPsecv6 p=
-olicy checks are done")
-> Link: https://lore.kernel.org/netdev/d589a999-d4dd-2768-b2d5-89dec64a4a42=
-@ovn.org/
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-> ---
+On Fri, Sep 15, 2023 at 07:20:41PM +0800, Zhang Changzhong wrote:
+> There are race conditions that may lead to inet6_dev refcount underflow
+> in xfrm6_dst_destroy() and rt6_uncached_list_flush_dev().
+> 
+> One of the refcount underflow bugs is shown below:
+> 	(cpu 1)                	|	(cpu 2)
+> xfrm6_dst_destroy()             |
+>   ...                           |
+>   in6_dev_put()                 |
+> 				|  rt6_uncached_list_flush_dev()
+>   ...				|    ...
+> 				|    in6_dev_put()
+>   rt6_uncached_list_del()       |    ...
+>   ...                           |
+> 
+> xfrm6_dst_destroy() calls rt6_uncached_list_del() after in6_dev_put(),
+> so rt6_uncached_list_flush_dev() has a chance to call in6_dev_put()
+> again for the same inet6_dev.
+> 
+> Fix it by moving in6_dev_put() after rt6_uncached_list_del() in
+> xfrm6_dst_destroy().
+> 
+> Fixes: 510c321b5571 ("xfrm: reuse uncached_list to track xdsts")
+> Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
 
-Nica catch, thanks a lot.
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Applied, thanks a lot!
 
