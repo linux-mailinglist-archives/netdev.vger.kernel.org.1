@@ -1,237 +1,94 @@
-Return-Path: <netdev+bounces-36119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AAD77AD649
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:44:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 893327AD6A7
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 764F81C203DF
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:44:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id C0C3AB209C0
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3DD15EAF;
-	Mon, 25 Sep 2023 10:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37124182CA;
+	Mon, 25 Sep 2023 11:06:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFB215EAD
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:44:44 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0CF9CE
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:44:40 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-52bd9ddb741so7104570a12.0
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695638679; x=1696243479; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YPKwu29nswr19PRfxmThaRgCyfVAPPnrF03AJDF6RVE=;
-        b=KcqjVq0Zh71W300PkvOivm6pkpQGfgR10H3cywkmXHv4wb+rmTH1AhG9os5MCD2nJQ
-         CZ5QNCqyVvGqbxOIO7CaDhWUms9FI5mf+RM99TW4/uxmWCwMNgU0pruoBn3mm4nn81oC
-         ZNFmGW7ZE3Oq41NHUIjG+y9PkYnhJjoIovHWXViUHU+HjvlJ9kL1g+5mQXWYa2Lz5L+s
-         Jho+wiM4mYZzMBgRks+tF5WWcfjoEr0o1AxMQl+TLIgQEDroKMb3fJ6XGhl9FyaczDdN
-         xb7blOSpHRSME6ctzjkUvl701gRcSrBuVSQ0/vnZyVz5vl1NACRnYjvphV52vK+XVyQD
-         5n+g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C7C14009
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 11:06:26 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0BDFD3
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 04:06:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695639984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZQRWTolrc1uePhvYxe9aPNX0v4LbfRDKHKl3Z6tC+kg=;
+	b=bfsx1q8VW72Oto2Qb4GHvuFFwzmPPi95euIBdE1w7RIuAFhKhByObrY9Rz05Nnl5SOmOdh
+	72K32iMtyge4Q4LCJ1aS+LaogL+8Vtkka5N1CO+h6yRrB6Fd7404oizsFj9vJypb5FWlTf
+	BQGwyI9qdhwTJaZND23PE40jxVjfMS4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-497-I_wemmJ8OkG_JnRGitK8yA-1; Mon, 25 Sep 2023 07:06:22 -0400
+X-MC-Unique: I_wemmJ8OkG_JnRGitK8yA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3217fdf913dso4390938f8f.3
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 04:06:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695638679; x=1696243479;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YPKwu29nswr19PRfxmThaRgCyfVAPPnrF03AJDF6RVE=;
-        b=RoKzPG2s82MxQxL+wwXHGP1vA6ktuyHa232MI2TJQbIj5UkCCrh6R0Yppodh66Upw0
-         7MOBFoy4ImWZob6wnqwp1TP80kDb8VQ1AD+kW2DE+bQIQV+eU+vn6C2YPwwXbQPOX97j
-         +RHn5avA+ZoVxvazm80L8J7QZxxBCM0hcr1yu6MKlkNcAFpwHcB41HMG5L3fqbILK9RH
-         XlEdUo0w0NiTeMGFxDkAv0hOK05Hcbgj1VDlsjOi8mMNlyF6sxCelo6ekMJK7EHvQTZC
-         ll0cdaE8SRDWwAhBTY5J7LBqgZ6FnazMych+hGrqHUKuLdE0dUBvkUugq0Iz6cXl2LGl
-         m8VQ==
-X-Gm-Message-State: AOJu0YyAIsHOCPW6QWbXD9tbrjjralu1rZf/pLCD9Yo9ORGFrascyCM+
-	q8FJYeNz51w9131SjC37PXC/iw==
-X-Google-Smtp-Source: AGHT+IFdMo5I5c373VJKI1Qiq+6RT/IKdTELM18C3QX5YTHa873Vh8IoMEaubO6qaZj1vsmpa+IZ6Q==
-X-Received: by 2002:a05:6402:b5b:b0:533:d1cd:62c5 with SMTP id bx27-20020a0564020b5b00b00533d1cd62c5mr3976542edb.17.1695638679365;
-        Mon, 25 Sep 2023 03:44:39 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.100])
-        by smtp.gmail.com with ESMTPSA id l14-20020aa7cace000000b0053331f9094dsm5356947edt.52.2023.09.25.03.44.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Sep 2023 03:44:38 -0700 (PDT)
-Message-ID: <e02ebde7-f208-40a4-bb10-aa5962ee9864@linaro.org>
-Date: Mon, 25 Sep 2023 12:44:35 +0200
+        d=1e100.net; s=20230601; t=1695639981; x=1696244781;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZQRWTolrc1uePhvYxe9aPNX0v4LbfRDKHKl3Z6tC+kg=;
+        b=R3n6YQWikaifwXEDuOFze5lPOFVW7sua9VV8jd7T2EyYq2NUCqey+PzV/7EUvPaGKr
+         1KHFDtWhrbN1p85M1QGh933hB+juZnxosBDEeQOXFU7DQ2aybvkxx2z7KONGkJ5kfEwv
+         oDXBcyh4fB+HO3YUEINpVkY8gh19uLRsmf190KdHBaHmNPcQMbiCfCeiO76TGLtpZmeu
+         ZvcTZ/VjJbOr2KHl4rti/RzHYchd9Rc2m6zd6ygLFrZwIyzEOvsYi0eYFx+RwywbU4ct
+         Gv5rVH8H0ZEm56OsPyng75SvZG7DfTDQ2jIG5Z2EN3LZlsXEGUWoBY6lhvkBGNjPKrdU
+         jiJg==
+X-Gm-Message-State: AOJu0YzTR9h8pEieJH6VWPDEfqEE3pdz8YpvpSrL/smUZwSCca3P+vKX
+	wwpfPUmheFLGgkedgtolimg5jHNzzvN15knHx/kYNF6mNh8weru7cqgcOPkHGscbuuxIknzOCXO
+	zRdp2xQnFZBRYUAo9
+X-Received: by 2002:adf:f68d:0:b0:320:16b:167d with SMTP id v13-20020adff68d000000b00320016b167dmr6027679wrp.63.1695639981767;
+        Mon, 25 Sep 2023 04:06:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3lAC4ITmJN1cbZviSsIr7upH20AuX9eMFgek6yDvi8V904h35Q6YFoYgDWz4VY9q0pBgnbA==
+X-Received: by 2002:adf:f68d:0:b0:320:16b:167d with SMTP id v13-20020adff68d000000b00320016b167dmr6027663wrp.63.1695639981450;
+        Mon, 25 Sep 2023 04:06:21 -0700 (PDT)
+Received: from debian (2a01cb058d23d6002541150e39af35f7.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:2541:150e:39af:35f7])
+        by smtp.gmail.com with ESMTPSA id y8-20020a7bcd88000000b003fee567235bsm2424660wmj.1.2023.09.25.04.06.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 04:06:20 -0700 (PDT)
+Date: Mon, 25 Sep 2023 13:06:18 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Beniamino Galvani <b.galvani@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ipv6: mark address parameters of
+ udp_tunnel6_xmit_skb() as const
+Message-ID: <ZRFpquxdCJdTtcHT@debian>
+References: <20230924153014.786962-1-b.galvani@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add
- support for QMC HDLC
-Content-Language: en-US
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
- Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>,
- Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
- Nicolin Chen <nicoleotsuka@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
- Simon Horman <horms@kernel.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
- <20230922075913.422435-9-herve.codina@bootlin.com>
- <5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
- <20230925101703.1bf083f1@bootlin.com>
- <5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
- <20230925122758.43963736@bootlin.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20230925122758.43963736@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230924153014.786962-1-b.galvani@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 25/09/2023 12:27, Herve Codina wrote:
-> On Mon, 25 Sep 2023 10:21:15 +0200
-> Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
-> 
->> On 25/09/2023 10:17, Herve Codina wrote:
->>> Hi Krzysztof,
->>>
->>> On Sat, 23 Sep 2023 19:39:49 +0200
->>> Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
->>>   
->>>> On 22/09/2023 09:58, Herve Codina wrote:  
->>>>> The QMC (QUICC mutichannel controller) is a controller present in some
->>>>> PowerQUICC SoC such as MPC885.
->>>>> The QMC HDLC uses the QMC controller to transfer HDLC data.
->>>>>
->>>>> Additionally, a framer can be connected to the QMC HDLC.
->>>>> If present, this framer is the interface between the TDM bus used by the
->>>>> QMC HDLC and the E1/T1 line.
->>>>> The QMC HDLC can use this framer to get information about the E1/T1 line
->>>>> and configure the E1/T1 line.
->>>>>
->>>>> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
->>>>> ---
->>>>>  .../soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml      | 24 +++++++++++++++++++
->>>>>  1 file changed, 24 insertions(+)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
->>>>> index 82d9beb48e00..61dfd5ef7407 100644
->>>>> --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
->>>>> +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
->>>>> @@ -101,6 +101,27 @@ patternProperties:
->>>>>            Channel assigned Rx time-slots within the Rx time-slots routed by the
->>>>>            TSA to this cell.
->>>>>  
->>>>> +      compatible:
->>>>> +        const: fsl,qmc-hdlc    
->>>>
->>>> Why this is not a device/SoC specific compatible?  
->>>
->>> This compatible is present in a QMC channel.
->>> The parent node (the QMC itself) contains a compatible with device/SoC:
->>> --- 8< ---
->>>   compatible:
->>>     items:
->>>       - enum:
->>>           - fsl,mpc885-scc-qmc
->>>           - fsl,mpc866-scc-qmc
->>>       - const: fsl,cpm1-scc-qmc
->>> --- 8< ---
->>>
->>> At the child level (ie QMC channel), I am not sure that adding device/SoC
->>> makes sense. This compatible indicates that the QMC channel is handled by
->>> the QMC HDLC driver.
->>> At this level, whatever the device/SoC, we have to be QMC compliant.
->>>
->>> With these details, do you still think I need to change the child (channel)
->>> compatible ?  
->>
->> From OS point of view, you have a driver binding to this child-level
->> compatible. How do you enforce Linux driver binding based on parent
->> compatible? I looked at your next patch and I did not see it.
-> 
-> We do not need to have the child driver binding based on parent.
+On Sun, Sep 24, 2023 at 05:30:14PM +0200, Beniamino Galvani wrote:
+> The function doesn't modify the addresses passed as input, mark them
+> as 'const' to make that clear.
 
-Exactly, that's what I said.
-
-> We have to ensure that the child handles a QMC channel and the parent provides
-> a QMC channel.
-> 
-> A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
-> and a QMC channel driver (child) has to use the QMC API.
-
-How does this solve my concerns? Sorry, I do not understand. Your driver
-is a platform driver and binds to the generic compatible. How do you
-solve regular compatibility issues (need for quirks) if parent
-compatible is not used?
-
-How does being QMC compliant affects driver binding and
-compatibility/quirks?
-
-We are back to my original question and I don't think you answered to
-any of the concerns.
-
-Best regards,
-Krzysztof
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
