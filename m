@@ -1,92 +1,98 @@
-Return-Path: <netdev+bounces-36101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F2B7AD3BB
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:49:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2471B7AD407
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id EC66028161B
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 08:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id CBA73281610
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C31D134A2;
-	Mon, 25 Sep 2023 08:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A213AC9;
+	Mon, 25 Sep 2023 09:01:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F6B10964
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 08:49:28 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 470F3103;
-	Mon, 25 Sep 2023 01:49:25 -0700 (PDT)
-Received: from dinghao.liu$zju.edu.cn ( [10.190.70.223] ) by
- ajax-webmail-mail-app2 (Coremail) ; Mon, 25 Sep 2023 16:48:53 +0800
- (GMT+08:00)
-X-Originating-IP: [10.190.70.223]
-Date: Mon, 25 Sep 2023 16:48:53 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: dinghao.liu@zju.edu.cn
-To: "Miquel Raynal" <miquel.raynal@bootlin.com>
-Cc: "Alexander Aring" <alex.aring@gmail.com>, 
-	"Stefan Schmidt" <stefan@datenfreihafen.org>, 
-	"David S. Miller" <davem@davemloft.net>, 
-	"Eric Dumazet" <edumazet@google.com>, 
-	"Jakub Kicinski" <kuba@kernel.org>, 
-	"Paolo Abeni" <pabeni@redhat.com>, 
-	"Marcel Holtmann" <marcel@holtmann.org>, 
-	"Harry Morris" <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
- 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <20230925102919.356b45ab@xps-13>
-References: <20230925072423.24772-1-dinghao.liu@zju.edu.cn>
- <20230925102919.356b45ab@xps-13>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B9B107A7
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 09:01:56 +0000 (UTC)
+X-Greylist: delayed 378 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Sep 2023 02:01:55 PDT
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EBF9B
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 02:01:55 -0700 (PDT)
+Received: from localhost (unknown [124.16.138.129])
+	by APP-01 (Coremail) with SMTP id qwCowAC3vfV1ShFlTKihAw--.8010S2;
+	Mon, 25 Sep 2023 16:53:09 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	nichen@iscas.ac.cn,
+	izumi.taku@jp.fujitsu.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] fjes: Add missing check for vzalloc
+Date: Mon, 25 Sep 2023 08:53:18 +0000
+Message-Id: <20230925085318.1228225-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <42b77efb.28ab5.18acb86f1c3.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgDHibR1SRFlXhL4AA--.21623W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgEJBmUQRiAzPQAAsR
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAC3vfV1ShFlTKihAw--.8010S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKryDWr4Utr43tw45uFW3KFg_yoW3Krg_ur
+	4IqF13u34j9r1qyr4DArW3Zryjvryvvr1IqwnaqrWaqrWkCan7A34xuwsrX3yUGay3ZFnr
+	Jr9rtr13A34fJjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb2kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVAFwVW8ZwCF
+	04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r
+	18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vI
+	r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr
+	1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
+	x4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjNJ55UUUUU==
+X-Originating-IP: [124.16.138.129]
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkgTWlxdcOobCwKCj4gPiBpbmRleCBhZWJiMTlmMWIzYTQuLjFkNTQ1ODc5YzAwMCAxMDA2NDQK
-PiA+IC0tLSBhL2RyaXZlcnMvbmV0L2llZWU4MDIxNTQvY2E4MjEwLmMKPiA+ICsrKyBiL2RyaXZl
-cnMvbmV0L2llZWU4MDIxNTQvY2E4MjEwLmMKPiA+IEBAIC0yNzYwLDYgKzI3NjAsNyBAQCBzdGF0
-aWMgaW50IGNhODIxMF9yZWdpc3Rlcl9leHRfY2xvY2soc3RydWN0IHNwaV9kZXZpY2UgKnNwaSkK
-PiA+ICAJcmV0ID0gb2ZfY2xrX2FkZF9wcm92aWRlcihucCwgb2ZfY2xrX3NyY19zaW1wbGVfZ2V0
-LCBwcml2LT5jbGspOwo+ID4gIAlpZiAocmV0KSB7Cj4gPiAgCQljbGtfdW5yZWdpc3Rlcihwcml2
-LT5jbGspOwo+ID4gKwkJcHJpdi0+Y2xrID0gTlVMTDsKPiAKPiBUaGlzIGZ1bmN0aW9uIGlzIGEg
-Yml0IGNvbnZvbHV0ZWQuIFlvdSBjb3VsZCBqdXN0IHJldHVybiB0aGUgcmVzdWx0IG9mCj4gb2Zf
-Y2xrX2FkZF9wcm92aWRlcigpIChrZWVwIHRoZSBwcmludGsncyBpZiB5b3Ugd2FudCwgdGhleSBk
-b24ndCBzZWVtCj4gdmVyeSB1c2VmdWwpIGFuZCBsZXQgY2E4MjEwX3VucmVnaXN0ZXJfZXh0X2Ns
-b2NrKCkgZG8gdGhlIGNsZWFudXAuCgpUaGFua3MgZm9yIHlvdXIgYWR2aWNlISBJIHdpbGwgcmVz
-ZW5kIGEgbmV3IHBhdGNoIGFzIHN1Z2dlc3RlZC4KCj4gCj4gPiAgCQlkZXZfY3JpdCgKPiA+ICAJ
-CQkmc3BpLT5kZXYsCj4gPiAgCQkJIkZhaWxlZCB0byByZWdpc3RlciBleHRlcm5hbCBjbG9jayBh
-cyBjbG9jayBwcm92aWRlclxuIgo+ID4gQEAgLTI3ODAsNyArMjc4MSw3IEBAIHN0YXRpYyB2b2lk
-IGNhODIxMF91bnJlZ2lzdGVyX2V4dF9jbG9jayhzdHJ1Y3Qgc3BpX2RldmljZSAqc3BpKQo+ID4g
-IHsKPiA+ICAJc3RydWN0IGNhODIxMF9wcml2ICpwcml2ID0gc3BpX2dldF9kcnZkYXRhKHNwaSk7
-Cj4gPiAgCj4gPiAtCWlmICghcHJpdi0+Y2xrKQo+ID4gKwlpZiAoSVNfRVJSX09SX05VTEwocHJp
-di0+Y2xrKSkKPiAKPiBEb2VzIG5vdCBsb29rIHVzZWZ1bCBhcyB5b3UgYXJlIGVuZm9yY2luZyBw
-cml2LT5jbG9jayB0byBiZSB2YWxpZCBvcgo+IE5VTEwsIGl0IGNhbm5vdCBiZSBhbiBlcnJvciBj
-b2RlLgoKSSBmaW5kIHRoYXQgY2E4MjEwX3JlZ2lzdGVyX2V4dF9jbG9jaygpIHVzZXMgSVNfRVJS
-IHRvIGNoZWNrIHByaXYtPmNsawphZnRlciBjYWxsaW5nIGNsa19yZWdpc3Rlcl9maXhlZF9yYXRl
-KCkuIFNvIEkgdGhpbmsgcHJpdi0+Y2xrIGNvdWxkIGJlCmEgbm9uLW51bGwgcG9pbnRlciBldmVu
-IG9uIGZhaWx1cmUuIEFuZCBhIG51bGwgcG9pbnRlciBjaGVjayBtYXkgbWlzcwp0aGlzIGNhc2Ug
-aW4gY2E4MjEwX3VucmVnaXN0ZXJfZXh0X2Nsb2NrKCkuIAoKUmVnYXJkcywKRGluZ2hhbw==
+Because of the potential failure of the vzalloc(), the hw->hw_info.trace
+could be NULL.
+Therefore, we need to check it and return -ENOMEM in order to transfer
+the error.
+
+Fixes: b6ba737d0b29 ("fjes: ethtool -w and -W support for fjes driver")
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ drivers/net/fjes/fjes_hw.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
+index 704e949484d0..3a06a3cf021d 100644
+--- a/drivers/net/fjes/fjes_hw.c
++++ b/drivers/net/fjes/fjes_hw.c
+@@ -330,6 +330,9 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 	ret = fjes_hw_setup(hw);
+ 
+ 	hw->hw_info.trace = vzalloc(FJES_DEBUG_BUFFER_SIZE);
++	if (!hw->hw_info.trace)
++		return -ENOMEM;
++
+ 	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
+ 
+ 	return ret;
+-- 
+2.25.1
+
 
