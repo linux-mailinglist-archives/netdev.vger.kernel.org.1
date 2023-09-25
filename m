@@ -1,217 +1,132 @@
-Return-Path: <netdev+bounces-36059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE8D7ACDCB
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:03:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B68407ACDD3
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 15E82281351
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 02:03:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id A7102B20956
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 02:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286B9ECD;
-	Mon, 25 Sep 2023 02:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C91ED3;
+	Mon, 25 Sep 2023 02:05:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B76BEA9;
-	Mon, 25 Sep 2023 02:03:49 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E87BD;
-	Sun, 24 Sep 2023 19:03:45 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0VsjlAa9_1695607420;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsjlAa9_1695607420)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Sep 2023 10:03:41 +0800
-Message-ID: <1695607353.8416731-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v14 30/42] virtio_pci: introduce helper to get/set queue reset
-Date: Mon, 25 Sep 2023 10:02:33 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- Mark Gross <markgross@kernel.org>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <bjorn.andersson@linaro.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Vincent Whitchurch <vincent.whitchurch@axis.com>,
- linux-um@lists.infradead.org,
- netdev@vger.kernel.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org,
- kangjie.xu@linux.alibaba.com
-References: <20220801063902.129329-1-xuanzhuo@linux.alibaba.com>
- <20220801063902.129329-31-xuanzhuo@linux.alibaba.com>
- <20230921100112-mutt-send-email-mst@kernel.org>
- <1695347358.2770545-1-xuanzhuo@linux.alibaba.com>
- <20230922064550-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230922064550-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F206CEA9
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 02:05:35 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1574CCA;
+	Sun, 24 Sep 2023 19:05:34 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-59c0d002081so65067137b3.2;
+        Sun, 24 Sep 2023 19:05:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695607533; x=1696212333; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2ofetUYGKfUn8Y5bB/sKf2dY2Hbj366ZFweBVoXSLdk=;
+        b=RR5ooqax/xkraHGJ/4sPxKmV2y2co0eHz78bqOv2mdzOKizZmgSNipt9iGK1UOprq8
+         Q3+jx773UEegEUhBt0yKAqFyXcYk4T8GCDOg0fAEkwYgKcYK1OCCx13Yr32KxibQOGAE
+         XsHnfN5pvHwIxhYFUFy34odXW+NqWvThH9zgEhIaqgwdgm+AieKLEHdBwjCXVPHMU8T0
+         ROcma4CqYUq9HqBQyNWzhVMM/wQzw80uEgo2A2eudSwgPfDTIspTC2fGbx9virjiJEQ5
+         BhVe8DXzoGg7avmbrKi5aSWOoDaM9g0jMdKizzdFFtHzNCDBPxZHQjgdHuYe7QFxSr6X
+         GRNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695607533; x=1696212333;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2ofetUYGKfUn8Y5bB/sKf2dY2Hbj366ZFweBVoXSLdk=;
+        b=aKou8ilEVwvUfuVo5LpHLH46InESDWT1LAU2GqOQ6CQhUmOMgKN0hyE+oZN8IfEY8x
+         +lnAwJWUD0JCxbOZXnfxoz2dFM9BahmaSETiUS9OUGbJ6S8x0a5mGQUoS6Dyz3e2UR7A
+         XfZouvgKv7NUzmuFlj3Zz8MPDTPTH2DpEFbYnXQLy2VKMqG+60nBqgAMJrSmoMI7LeU6
+         jcHlqK/eafAkfLV75U+Nd7b/P968nIfzTtCW5ktcgK8I1VuSs9goJXAUW8hyReUcpCa4
+         DAkkSDXRjGgc97Qq+79FSx4doPxKwIBt893fn1kkepNASGCcgRwm72q443cNFfwRpwQ8
+         M2uw==
+X-Gm-Message-State: AOJu0Yxt/XdM0njheX1hzASh8DB6FCEfJQAG+s13w0PsKonF5zxE3RKq
+	N/Sa7D22e+6JyaAIlRY7h4HhXuMMW1Y=
+X-Google-Smtp-Source: AGHT+IEV0y8VzWJxet49qM1rIgLG05Ph3podhumDhLkyFgatTAhH70X71TzeU9R0NgBnqz06DfgVmA==
+X-Received: by 2002:a81:b186:0:b0:59b:f152:8998 with SMTP id p128-20020a81b186000000b0059bf1528998mr5416624ywh.19.1695607532826;
+        Sun, 24 Sep 2023 19:05:32 -0700 (PDT)
+Received: from localhost ([2607:fb90:3eac:cd78:b6b5:ba0f:9e64:f2e1])
+        by smtp.gmail.com with ESMTPSA id gb8-20020a05690c408800b0059f61be458esm810048ywb.82.2023.09.24.19.05.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Sep 2023 19:05:32 -0700 (PDT)
+From: Yury Norov <yury.norov@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Tariq Toukan <ttoukan.linux@gmail.com>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Maher Sanalla <msanalla@nvidia.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Mel Gorman <mgorman@suse.de>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH 0/4] sched: drop for_each_numa_hop_mask()
+Date: Sun, 24 Sep 2023 19:05:24 -0700
+Message-Id: <20230925020528.777578-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 22 Sep 2023 06:46:39 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Sep 22, 2023 at 09:49:18AM +0800, Xuan Zhuo wrote:
-> > On Thu, 21 Sep 2023 10:02:53 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Mon, Aug 01, 2022 at 02:38:50PM +0800, Xuan Zhuo wrote:
-> > > > Introduce new helpers to implement queue reset and get queue reset
-> > > > status.
-> > > >
-> > > >  https://github.com/oasis-tcs/virtio-spec/issues/124
-> > > >  https://github.com/oasis-tcs/virtio-spec/issues/139
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > ---
-> > > >  drivers/virtio/virtio_pci_modern_dev.c | 39 ++++++++++++++++++++++++++
-> > > >  include/linux/virtio_pci_modern.h      |  2 ++
-> > > >  2 files changed, 41 insertions(+)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio_pci_modern_dev.c b/drivers/virtio/virtio_pci_modern_dev.c
-> > > > index fa2a9445bb18..869cb46bef96 100644
-> > > > --- a/drivers/virtio/virtio_pci_modern_dev.c
-> > > > +++ b/drivers/virtio/virtio_pci_modern_dev.c
-> > > > @@ -3,6 +3,7 @@
-> > > >  #include <linux/virtio_pci_modern.h>
-> > > >  #include <linux/module.h>
-> > > >  #include <linux/pci.h>
-> > > > +#include <linux/delay.h>
-> > > >
-> > > >  /*
-> > > >   * vp_modern_map_capability - map a part of virtio pci capability
-> > > > @@ -474,6 +475,44 @@ void vp_modern_set_status(struct virtio_pci_modern_device *mdev,
-> > > >  }
-> > > >  EXPORT_SYMBOL_GPL(vp_modern_set_status);
-> > > >
-> > > > +/*
-> > > > + * vp_modern_get_queue_reset - get the queue reset status
-> > > > + * @mdev: the modern virtio-pci device
-> > > > + * @index: queue index
-> > > > + */
-> > > > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > > > +{
-> > > > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > > > +
-> > > > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > > > +
-> > > > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > > > +	return vp_ioread16(&cfg->queue_reset);
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(vp_modern_get_queue_reset);
-> > > > +
-> > >
-> > > Actually, this does not validate that the config structure is big
-> > > enough. So it can access some unrelated memory. Don't know whether
-> > > that's exploitable e.g. for CoCo but not nice, anyway.
-> > > Need to validate the size and disable reset if it's too small.
-> >
-> >
-> > static int vp_modern_disable_vq_and_reset(struct virtqueue *vq)
-> > {
-> > 	struct virtio_pci_device *vp_dev = to_vp_device(vq->vdev);
-> > 	struct virtio_pci_modern_device *mdev = &vp_dev->mdev;
-> > 	struct virtio_pci_vq_info *info;
-> > 	unsigned long flags;
-> >
-> > ->	if (!virtio_has_feature(vq->vdev, VIRTIO_F_RING_RESET))
-> > 		return -ENOENT;
-> >
-> > 	vp_modern_set_queue_reset(mdev, vq->index);
-> >
-> >
-> > I checked VIRTIO_F_RING_RESET before call this.
->
-> Yes but the point is that virtio is used with untrusted devices
-> (e.g. for SEV/TDX), so you can't really assume config structures
-> are in sync with feature bits.
+Recently added mlx5_cpumask_default_spread() makes for_each_numa_hop_mask()
+opencoding cpumask_local_spread().
 
-I see.
+This series replaces mlx5_cpumask_default_spread() with generic
+cpumask_local_spread(). And because mlx5_cpumask_default_spread()
+is the only user of for_each_numa_hop_mask() machinery, drops it
+entirely.
 
-I will post a patch to check the length of the common cfg.
+Regarding for_each_numa_hop_mask(), I've got a small series introducing
+a better version of it - for_each_numa_cpu():
 
-Thanks.
+https://lore.kernel.org/netdev/20230430171809.124686-1-yury.norov@gmail.com/T/
 
+But with the lack of interest, I believe it's wotrth to drop
+for_each_numa_hop_mask() and put for_each_numa_cpu() on hold
+until further updates...
 
->
->
-> > Do you mean, we should put the check to this function.
-> >
-> >
-> > Thanks.
-> >
-> >
-> >
-> > >
-> > >
-> > > > +/*
-> > > > + * vp_modern_set_queue_reset - reset the queue
-> > > > + * @mdev: the modern virtio-pci device
-> > > > + * @index: queue index
-> > > > + */
-> > > > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index)
-> > > > +{
-> > > > +	struct virtio_pci_modern_common_cfg __iomem *cfg;
-> > > > +
-> > > > +	cfg = (struct virtio_pci_modern_common_cfg __iomem *)mdev->common;
-> > > > +
-> > > > +	vp_iowrite16(index, &cfg->cfg.queue_select);
-> > > > +	vp_iowrite16(1, &cfg->queue_reset);
-> > > > +
-> > > > +	while (vp_ioread16(&cfg->queue_reset))
-> > > > +		msleep(1);
-> > > > +
-> > > > +	while (vp_ioread16(&cfg->cfg.queue_enable))
-> > > > +		msleep(1);
-> > > > +}
-> > > > +EXPORT_SYMBOL_GPL(vp_modern_set_queue_reset);
-> > > > +
-> > > >  /*
-> > > >   * vp_modern_queue_vector - set the MSIX vector for a specific virtqueue
-> > > >   * @mdev: the modern virtio-pci device
-> > > > diff --git a/include/linux/virtio_pci_modern.h b/include/linux/virtio_pci_modern.h
-> > > > index 05123b9a606f..c4eeb79b0139 100644
-> > > > --- a/include/linux/virtio_pci_modern.h
-> > > > +++ b/include/linux/virtio_pci_modern.h
-> > > > @@ -113,4 +113,6 @@ void __iomem * vp_modern_map_vq_notify(struct virtio_pci_modern_device *mdev,
-> > > >  				       u16 index, resource_size_t *pa);
-> > > >  int vp_modern_probe(struct virtio_pci_modern_device *mdev);
-> > > >  void vp_modern_remove(struct virtio_pci_modern_device *mdev);
-> > > > +int vp_modern_get_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> > > > +void vp_modern_set_queue_reset(struct virtio_pci_modern_device *mdev, u16 index);
-> > > >  #endif
-> > > > --
-> > > > 2.31.0
-> > >
->
+Yury Norov (4):
+  net: mellanox: drop mlx5_cpumask_default_spread()
+  Revert "sched/topology: Introduce for_each_numa_hop_mask()"
+  Revert "sched/topology: Introduce sched_numa_hop_mask()"
+  lib/cpumask: don't mention for_each_numa_hop_mask in
+    cpumask_local_spread()"
+
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 28 ++---------------
+ include/linux/topology.h                     | 25 ---------------
+ kernel/sched/topology.c                      | 33 --------------------
+ lib/cpumask.c                                | 21 -------------
+ 4 files changed, 2 insertions(+), 105 deletions(-)
+
+-- 
+2.39.2
+
 
