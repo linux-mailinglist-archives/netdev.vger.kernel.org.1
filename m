@@ -1,195 +1,119 @@
-Return-Path: <netdev+bounces-36189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3377AE24F
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 01:34:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F107AE2AB
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 01:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6D66E2813ED
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 23:34:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0F9622817BB
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 23:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E068F262B7;
-	Mon, 25 Sep 2023 23:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D74E266B5;
+	Mon, 25 Sep 2023 23:55:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04176262B3
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 23:34:10 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B87E10A
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 16:34:09 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-690d2e13074so5734250b3a.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 16:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1695684849; x=1696289649; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k928c5B/SW0D5lenI2tI7Xku5YnRHi99kcL0QyA4ckQ=;
-        b=E6l+yBitOxF5gsU3EQ7kDn5rRxHPK2p63YK616VuBeaYvo/z+RfJIqngEQyc8EnYHf
-         gxD26AwtfjcVCRH7d7FpDUDpN6IJd2ndLj79LixrYOuAVSAUQ3r7Y76dHvJlgLZ+ZZ+7
-         3j+OWmcUSRBzmP/17irffI9nX8Ey3tiWJlIBDCUwH2r6QOr7gffWvOk81dRWBL8BmPT6
-         gIbmrdMgeeG1c0UxcGSYqLe475jbKyRnSYonjszLlCjjU9deslbAwf16JZePjPvYXHUy
-         iQIdjyNKKZiyAysDYqVG184Nf6jYeHJaxB+hdH1LSelUteIAzIa1zP0Ih3AZHD3ztJKC
-         yUNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695684849; x=1696289649;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k928c5B/SW0D5lenI2tI7Xku5YnRHi99kcL0QyA4ckQ=;
-        b=sxWoOlCSc5xYW4xLzUVZstU2SxmXzR4JVJc4jnDByCi0Wn4/hMcfnjPsZPrlLf7Y4D
-         k1RJwGAYyxnTID8sCAnX3eu47Ltz8ZMv51lgHDHVqFVKGs0e7MTxJMIcs6/p8JSarKbR
-         VTEj1QcPXsElSwsT+mkIesPgcBogNZu4cADEnugBFh2TinAHbVWkkkMab7LQJGIMT8Bp
-         FatlRdHbJsrGBsWbH/BgG1vy5cOm4LTmxzQ1PQiPo3ueGlsoDi0zUSMo74t4LEe8tR8G
-         nq4AVCFMXJ6slNO5Kvr/c81xBGhDzW0MMWA49tFuoBnRdFwIa4Z6bpw2ktJHMMf4ognh
-         hGCg==
-X-Gm-Message-State: AOJu0YwVyxgucTfL3Y5xbAP7c+0yTw0EPhXQNqnfMqjnmTJFATTwiSvw
-	7mg/w8w+HwGjP9SLigubE+P1Zw==
-X-Google-Smtp-Source: AGHT+IF2a/XiGuW4KVVaooEtACFI3mOT4QmTSe/i8UBeZRTJRsf3ApQsCfhuZdIKIn48RGb488StKA==
-X-Received: by 2002:a05:6a00:2347:b0:690:42d5:3eea with SMTP id j7-20020a056a00234700b0069042d53eeamr6738414pfj.30.1695684848791;
-        Mon, 25 Sep 2023 16:34:08 -0700 (PDT)
-Received: from [192.168.86.239] (c-73-223-29-106.hsd1.ca.comcast.net. [73.223.29.106])
-        by smtp.gmail.com with ESMTPSA id x52-20020a056a000bf400b0068fb8080939sm8677974pfu.65.2023.09.25.16.34.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Sep 2023 16:34:08 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BE3107B9
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 23:55:49 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D7FFB;
+	Mon, 25 Sep 2023 16:55:48 -0700 (PDT)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PNddmU003441;
+	Mon, 25 Sep 2023 23:55:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=9WRP/dH5LzRyecuJLSulsR2WIEaltd6yZiyLu9pOr44=;
+ b=MfbXRJkdMSjbeT3E5Tvi6NDku2B1FaLjc2K39/8KHnMz3yQ7702e0b4Ovn+4kMFknUKz
+ wuNcvexdGn8EM0KRJKykDZuxOBbNRZv4FbqOiAgHzfmp/EbBTofwsLAuwp62QGQDjA7b
+ IeFbC0sxcX4rrhrbgGjEQUEqzYH7uqWfz0q72dr172jkYtQu72XF+SBE4/ConN3i7mEB
+ DOqYZ8el/RLNE3zMXPDLS0HX9qOzrWzY3eRIMQs2iRk2zg7zpy03Yiif3u6JNEVg1Bzv
+ 1aHftk4de7XfB7tAVeELxgZ/tjotmUPAQ29xHpuGv0o4uQhB0iEiuQIyf70uaEWtlsqy tw== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tb72shu55-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 23:55:40 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38PNtdAH023250
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 23:55:39 GMT
+Received: from [192.168.142.6] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 25 Sep
+ 2023 16:55:39 -0700
+Message-ID: <dffdbd5c-3d21-5cee-03d6-b89e0caf9a41@quicinc.com>
+Date: Mon, 25 Sep 2023 16:55:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.7\))
-Subject: Re: [PATCH v9 bpf-next 5/9] bpf: udp: Implement batching for sockets
- iterator
-From: Aditi Ghag <aditi.ghag@isovalent.com>
-In-Reply-To: <f85fbac6-a1d7-3f63-9d0f-8eaa261ddb26@linux.dev>
-Date: Mon, 25 Sep 2023 16:34:06 -0700
-Cc: sdf@google.com,
- Martin KaFai Lau <martin.lau@kernel.org>,
- bpf@vger.kernel.org,
- Network Development <netdev@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <0B548508-C9AD-476C-A934-5D9D9B5DECB0@isovalent.com>
-References: <20230519225157.760788-1-aditi.ghag@isovalent.com>
- <20230519225157.760788-6-aditi.ghag@isovalent.com>
- <f85fbac6-a1d7-3f63-9d0f-8eaa261ddb26@linux.dev>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-X-Mailer: Apple Mail (2.3608.120.23.2.7)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 net-next 2/2] net: qrtr: Add support for processing
+ DEL_PROC type control message
+Content-Language: en-US
+To: Sricharan Ramabadhran <quic_srichara@quicinc.com>, <mani@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <quic_viswanat@quicinc.com>, <horms@kernel.org>
+References: <20230920053317.2165867-1-quic_srichara@quicinc.com>
+ <20230920053317.2165867-3-quic_srichara@quicinc.com>
+ <349a7b1c-915f-4f58-260f-900aa7e3db65@quicinc.com>
+ <0db026e7-6017-83ed-4071-c2ea6d72e3d7@quicinc.com>
+From: Chris Lew <quic_clew@quicinc.com>
+In-Reply-To: <0db026e7-6017-83ed-4071-c2ea6d72e3d7@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4QfOrP3wocDMjFYvr6tmtwL2UN1bdoEs
+X-Proofpoint-ORIG-GUID: 4QfOrP3wocDMjFYvr6tmtwL2UN1bdoEs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_18,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ malwarescore=0 adultscore=0 mlxlogscore=740 spamscore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309250184
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-> On Sep 19, 2023, at 5:38 PM, Martin KaFai Lau <martin.lau@linux.dev> =
-wrote:
->=20
-> On 5/19/23 3:51 PM, Aditi Ghag wrote:
->> +static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->> +{
->> +	struct bpf_udp_iter_state *iter =3D seq->private;
->> +	struct udp_iter_state *state =3D &iter->state;
->> +	struct net *net =3D seq_file_net(seq);
->> +	struct udp_table *udptable;
->> +	unsigned int batch_sks =3D 0;
->> +	bool resized =3D false;
->> +	struct sock *sk;
->> +
->> +	/* The current batch is done, so advance the bucket. */
->> +	if (iter->st_bucket_done) {
->> +		state->bucket++;
->> +		iter->offset =3D 0;
->> +	}
->> +
->> +	udptable =3D udp_get_table_seq(seq, net);
->> +
->> +again:
->> +	/* New batch for the next bucket.
->> +	 * Iterate over the hash table to find a bucket with sockets =
-matching
->> +	 * the iterator attributes, and return the first matching socket =
-from
->> +	 * the bucket. The remaining matched sockets from the bucket are =
-batched
->> +	 * before releasing the bucket lock. This allows BPF programs =
-that are
->> +	 * called in seq_show to acquire the bucket lock if needed.
->> +	 */
->> +	iter->cur_sk =3D 0;
->> +	iter->end_sk =3D 0;
->> +	iter->st_bucket_done =3D false;
->> +	batch_sks =3D 0;
->> +
->> +	for (; state->bucket <=3D udptable->mask; state->bucket++) {
->> +		struct udp_hslot *hslot2 =3D =
-&udptable->hash2[state->bucket];
->> +
->> +		if (hlist_empty(&hslot2->head)) {
->> +			iter->offset =3D 0;
->> +			continue;
->> +		}
->> +
->> +		spin_lock_bh(&hslot2->lock);
->> +		udp_portaddr_for_each_entry(sk, &hslot2->head) {
->> +			if (seq_sk_match(seq, sk)) {
->> +				/* Resume from the last iterated socket =
-at the
->> +				 * offset in the bucket before iterator =
-was stopped.
->> +				 */
->> +				if (iter->offset) {
->> +					--iter->offset;
->=20
-> Hi Aditi, I think this part has a bug.
->=20
-> When I run './test_progs -t bpf_iter/udp6' in a machine with some udp =
-so_reuseport sockets, this test is never finished.
->=20
-> A broken case I am seeing is when the bucket has >1 sockets and =
-bpf_seq_read() can only get one sk at a time before it calls =
-bpf_iter_udp_seq_stop().
-
-Just so that I understand the broken case better, are you doing =
-something in your BPF iterator program so that "bpf_seq_read() can only =
-get one sk at a time"?=20
-
->=20
-> I did not try the change yet. However, from looking at the code where =
-iter->offset is changed, --iter->offset here is the most likely culprit =
-and it will make backward progress for the same bucket (state->bucket). =
-Other places touching iter->offset look fine.
->=20
-> It needs a local "int offset" variable for the zero test. Could you =
-help to take a look, add (or modify) a test and fix it?
->=20
-> The progs/bpf_iter_udp[46].c test can be used to reproduce. The =
-test_udp[46] in prog_tests/bpf_iter.c needs to be changed though to =
-ensure there is multiple sk in the same bucket. Probably a few =
-so_reuseport sk should do.
+On 9/23/2023 6:49 PM, Sricharan Ramabadhran wrote:
+>>>    */
+>>>   struct qrtr_node {
+>>>       struct mutex ep_lock;
+>>> @@ -134,6 +138,9 @@ struct qrtr_node {
+>>>       struct sk_buff_head rx_queue;
+>>>       struct list_head item;
+>>> +    struct kthread_worker kworker;
+>>> +    struct task_struct *task;
+>>> +    struct kthread_work read_data;
+>>
+>> I think our own kthread here might have been overkill. I forget why we 
+>> needed it instead of using a workqueue.
+> 
+>    I added a workqueue here because endpoint post is getting called from
+>    atomic contexts and below DEL_PROC handling acquires qrtr_tx_lock.
 
 
-The sock_destroy patch set had added a test with multiple so_reuseport =
-sks in a bucket in order to exercise batching [1]. I was wondering if =
-extending the test with an additional bucket should do it, or some more =
-cases are required (asked for clarification above) to reproduce the =
-issue.=20
+Got it, I think deferring the processing makes sense. I was more 
+focusing on the fact that we are creating our own kthread instead of 
+using the system workqueues.
 
-
-[1] =
-https://elixir.bootlin.com/linux/v6.5/source/tools/testing/selftests/bpf/p=
-rog_tests/sock_destroy.c#L146
-
->=20
-> Thanks.
->=20
->> +					continue;
->> +				}
->> +				if (iter->end_
->=20
-
+Prior to commit e04df98adf7d ("net: qrtr: Remove receive worker"), this 
+was a work_struct. I think we should keep it as a work_struct until we 
+can motivate why a qrtr_node needs it's own kthread.
 
