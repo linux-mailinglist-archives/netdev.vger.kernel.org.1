@@ -1,133 +1,73 @@
-Return-Path: <netdev+bounces-36098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D347AD35A
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:30:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C6AA7AD37F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:37:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2229B281610
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 08:30:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E886E2816C5
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 08:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1665F11CAF;
-	Mon, 25 Sep 2023 08:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC5E11731;
+	Mon, 25 Sep 2023 08:37:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3A411C91
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 08:30:02 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB58C4;
-	Mon, 25 Sep 2023 01:29:59 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0VsoSBCa_1695630596;
-Received: from 30.221.144.144(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VsoSBCa_1695630596)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Sep 2023 16:29:57 +0800
-Message-ID: <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
-Date: Mon, 25 Sep 2023 16:29:53 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610201097B
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 08:37:46 +0000 (UTC)
+Received: from anon.cephalopo.net (anon.cephalopo.net [128.76.233.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D6F0AF
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 01:37:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=lagy.org; s=def2;
+	t=1695631064; bh=MQw8bY5Eo07RQYw8wB4JMaD+LBlEH/x+teKJC4tWyrU=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:From;
+	b=ExGU3swD0CfPIWk7dWZSUruYXnrXxFK1+tdyKojAJmLrJ5hyiddlvIdBdlHBx9H5a
+	 p2t3TmijI2emlOJPSICvLzbatza6xAv5CQqoswH9IlwiuP0RiWVc3bZqNgkmU+QGWm
+	 cQEG9rJa/Kmxu9bhXNWGrvVJ66as59pbwpgb3OmWjzLux2FqB1yN4ZBRjsHmNmNogC
+	 NqEDRlb+iGIboKz6FZohAvAnqACM+JRitSmHG+zS6XUkY/SZf0dmhFIB1+fU68yqUc
+	 jObx7S7cgcncsb1dV6EW9BcmUl04Ccpkcj4hixPADCkPhcIAT6Br2n9NABX+3kDa3e
+	 tkCWs+1vSksFA==
+Authentication-Results: anon.cephalopo.net;
+	auth=pass smtp.auth=u1 smtp.mailfrom=me@lagy.org
+Received: from localhost (unknown [109.70.55.226])
+	by anon.cephalopo.net (Postfix) with ESMTPSA id 7140B11C00BE;
+	Mon, 25 Sep 2023 10:37:44 +0200 (CEST)
+References: <87zg30a0h9.fsf@lagy.org> <20230809125805.2e3f86ac@kernel.org>
+User-agent: mu4e 1.8.13; emacs 29.1
+From: Martin =?utf-8?Q?Kj=C3=A6r_J=C3=B8rgensen?= <me@lagy.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+ nic_swsd@realtek.com
+Subject: Re: r8169 link up but no traffic, and watchdog error
+Date: Mon, 25 Sep 2023 10:36:29 +0200
+In-reply-to: <20230809125805.2e3f86ac@kernel.org>
+Message-ID: <87a5taabs9.fsf@mkjws.danelec-net.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
- closing listen socket
-Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
- jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
- <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+On Wed, Aug 09 2023, Jakub Kicinski <kuba@kernel.org> wrote:
 
-On 9/22/23 7:59 AM, Wenjia Zhang wrote:
+> CC: Heiner
 >
+> On Wed, 09 Aug 2023 13:50:31 +0200 Martin Kj=C3=A6r J=C3=B8rgensen wrote:
 >
-> On 20.09.23 14:08, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> Consider the following scenarios:
->>
->> smc_release
->>     smc_close_active
->> write_lock_bh(&smc->clcsock->sk->sk_callback_lock);
->>         smc->clcsock->sk->sk_user_data = NULL;
->> write_unlock_bh(&smc->clcsock->sk->sk_callback_lock);
->>
->> smc_tcp_syn_recv_sock
->>     smc = smc_clcsock_user_data(sk);
->>     /* now */
->>     /* smc == NULL */
->>
->> Hence, we may read the a NULL value in smc_tcp_syn_recv_sock(). And
->> since we only unset sk_user_data during smc_release, it's safe to
->> drop the incoming tcp reqsock.
->>
->> Fixes:  ("net/smc: net/smc: Limit backlog connections"
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->>   net/smc/af_smc.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index bacdd97..b4acf47 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -125,6 +125,8 @@ static struct sock *smc_tcp_syn_recv_sock(const 
->> struct sock *sk,
->>       struct sock *child;
->>         smc = smc_clcsock_user_data(sk);
->> +    if (unlikely(!smc))
->> +        goto drop;
->>         if (READ_ONCE(sk->sk_ack_backlog) + 
->> atomic_read(&smc->queued_smc_hs) >
->>                   sk->sk_max_ack_backlog)
-
-Hi Wenjia,
-
->
-> this is unfortunately not sufficient for this fix. You have to make 
-> sure that is not a life-time problem. Even so, READ_ONCE() is also 
-> needed in this case.
+> There were some fix in r8169 for power management changes recently.
+> Could you try the latest stable kernel? 6.4.9 ?
 >
 
-Life-time problem? If you means the smc will still be NULL in the 
-future,  I don't really think so, smc is a local variable assigned by 
-smc_clcsock_user_data.
-it's either NULL or a valid and unchanged value.
-
-And READ_ONCE() is needed indeed, considering not make too much change, 
-maybe we can protected following
-
-smc = smc_clcsock_user_data(sk);
-
-with sk_callback_lock， which solves the same problem. What do you think?
-
-Best Wishes
-D. Wythe
-
-
-
-
-
-
-
-
-
-
+Well, neither 6.4.11 nor current debian 'testing' kernel 6.5.3 solved the p=
+roblem.
 
