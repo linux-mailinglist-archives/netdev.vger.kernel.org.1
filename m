@@ -1,224 +1,339 @@
-Return-Path: <netdev+bounces-36187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7E607AE201
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 01:01:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833637AE202
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 01:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C30331C20854
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 23:01:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 858BD1C2086F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 23:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54428250FA;
-	Mon, 25 Sep 2023 23:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047DB25106;
+	Mon, 25 Sep 2023 23:01:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DFA2375B
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 23:01:29 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF25A3;
-	Mon, 25 Sep 2023 16:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695682888; x=1727218888;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BYQo5tJUcfO39S6jxWAUimxiLXFU5V5n8T8CkWXqSRY=;
-  b=lmkhUaBQg8E+oZC555SblA7o96zw8LaudXr23HWqM3d7zuYNfefNRSYG
-   5zqllFdDvus62BjPl0YfPWlSS1aQv91AkeKWdSqeovqSXgd4W9z7DRwjn
-   LeB3/ot+EqzTlU0QMVTnUWqLKOdrwUpaXSOEsaxI9oM0reDICtOwSZvLI
-   bmdRdQvl+8XdzcICBQPbo1t5X4Z11gHiNtmLTiK4gyWfgIYr06oxcZnRW
-   FbAwFMerx37nUFT7AMnZk/TYzWMoD7re6UNx3MrXTH41KhEu4ggBKMr3Q
-   TXK+E7ajUhbCIaVE+x/lXgUNgGWHEwTIK3Vf5GX/TGwbj8Y+txMPab03e
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="371764909"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="371764909"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 16:01:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="748580351"
-X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
-   d="scan'208";a="748580351"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Sep 2023 16:01:25 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 25 Sep 2023 16:01:23 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 25 Sep 2023 16:01:23 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Mon, 25 Sep 2023 16:01:23 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Mon, 25 Sep 2023 16:01:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h2aCi3qft0ywLIV2El6rCURYC4Jj9tGZlNu9L/cGNz+jOLNd/LPHf3qr7yjTO+cV5u7/pU+B1EkMOTh16dW7K0VtBafdzNYVT6WdBAwtOSPJWMLbYQs1m5DzsnUYUuvRRTQ4fcKEMfvTfbaGFMlCgek17usV0i4DJdwRBHG2cTy7TfSM09wnRG2i42x0ov+A8e3R6tajQdQ1rsKB0speMF9ZkKl7J51VpAYLgEbo3vRykfTXlUFFoJwk1RTyI2sVDBD8oRVrOhflTJgx1GF6KPz1URTfMJPb53ZT2xhQnuP221aLEEEkcVdgHvazsZ18MF7uigyUFT+YMpzApaQSyw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w5crwO3mIPjFA6U5EH5UyBzjFFnpQZqEsrbjT4zbNXQ=;
- b=Tr3u3sE75SNBw0npKe9FHo0tRTtQDyspG6zh56PXwKz84PTpZxBUmtJvcX9I8WwyOyxX5lbmfSv8AZ+od9EpIKLhzIAtGosgkSS6lLZZb1bbdGeKSrVd7S7m/zw8StE6dTMbyB+1P9y4AH1ayLbLiTIGc2LEDFInO7Ky4NwNKcEVkmf4cVh+/QVO9fwjBsoVVrLl+AHcO+i9jpGWPAkuuvB97cLerXaK/IyWNQMOs7ldfNn7RRh9M7Q4GSHX4+FWUXXsVPv7hLxvUyU5gtXI40EXIGJIJoGqxWFvKOHyJNX64G1ZnSrZMbVKCrsc2NxZSmufQwkijdJNq095Q7NDUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DM4PR11MB6240.namprd11.prod.outlook.com (2603:10b6:8:a6::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6813.20; Mon, 25 Sep 2023 23:01:19 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::9654:610d:227a:104f]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::9654:610d:227a:104f%4]) with mapi id 15.20.6813.018; Mon, 25 Sep 2023
- 23:01:19 +0000
-Message-ID: <26fc07a6-9d8d-dd6a-9348-36d3ee5c973c@intel.com>
-Date: Mon, 25 Sep 2023 16:01:16 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH 2/4] Revert "sched/topology: Introduce
- for_each_numa_hop_mask()"
-Content-Language: en-US
-To: Yury Norov <yury.norov@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, Tariq Toukan <ttoukan.linux@gmail.com>,
-	Valentin Schneider <vschneid@redhat.com>, Maher Sanalla
-	<msanalla@nvidia.com>, Ingo Molnar <mingo@kernel.org>, Mel Gorman
-	<mgorman@suse.de>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
-	<leon@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Juri Lelli
-	<juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt
-	<rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, "Daniel Bristot de
- Oliveira" <bristot@redhat.com>, Pawel Chmielewski
-	<pawel.chmielewski@intel.com>, Yury Norov <ynorov@nvidia.com>
-References: <20230925020528.777578-1-yury.norov@gmail.com>
- <20230925020528.777578-3-yury.norov@gmail.com>
- <49c0fa46-3787-99c5-2b8b-3da71ce33216@intel.com>
- <CAAH8bW_Lu_wk7q6eu6evV-ejVXJZn0s3ikw=e=r_tJfYOvqg0Q@mail.gmail.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <CAAH8bW_Lu_wk7q6eu6evV-ejVXJZn0s3ikw=e=r_tJfYOvqg0Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW2PR16CA0011.namprd16.prod.outlook.com (2603:10b6:907::24)
- To CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60592375B
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 23:01:39 +0000 (UTC)
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E35139
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 16:01:37 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-d7b91422da8so8836559276.2
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 16:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1695682896; x=1696287696; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EOdsZ0Wic7mT4VdLd7j0Bp6e7zYxxdZKyOdVZzzpji0=;
+        b=NoAfEQPipMxTYESLbGwzM6eriCw6UM81Mqxu2dvIBtvXiYGe2rypOTlJHais1a86th
+         cNCN/xEu/Gp8UQ9R4KgzJQELxZUx49OFdQDMGgz5LCrogjBeX90SVfI2RTGihX7Uy6Hf
+         Gi7oGg0Ledn0wtBZYc2kV2L9vncty968m0kBqEuvMHG9V7mT3szszbhX1VTbq62MiJjQ
+         okBwE5uqi7MmuUQ9P4W3SGR+4nrLippZ8E/J4xjLG+JuNx+0A7v5jZeVgBljNdIfRebT
+         CsumZBEF/P+rKcMRBU7u+LKN+YhERZXtd3WKzVbgwPhwVq4MXL3MWvB+cfcz7tGEYGXM
+         6Vxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695682896; x=1696287696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EOdsZ0Wic7mT4VdLd7j0Bp6e7zYxxdZKyOdVZzzpji0=;
+        b=B8FiujTgMKsJujM5B9AICk2pcMajT2JKbjVBD1wq6kgeLbQuXcp0wBzJZ0PP5Xz/Ae
+         vHTbMpoCdRB1QeDKH1tvGXAwOFUbp2i79j3jOn0UPKneZ/YoHp6I1ax7ZGQlW0Zntmiw
+         DCztVMcD3/BV0TeRU+1arb5jJ0zgbwQOtvsMMlsiy2wwuP5m5gGXTAZNSzWAJSalmG+8
+         MDfl+h+eakBZCmkb7e74JLXmdy0lEacVE3Sragt6eHx6wMf/Kzs65jVQcO8mnz3TQcsI
+         2VtSRQUjWfI/ivGHxvSWCHoYcFcSu9zZYRbqyDoVjPQ+FQaMb1u6bnXmTEzGFanIxKxY
+         8Ugg==
+X-Gm-Message-State: AOJu0YxVexMIrzZ9YO1nDf9kPps7PXgOvZ6geNG+YhadWjQC+G6aez6q
+	sSslevvOz5cIIZxbkXCMBA/P3av87k8LJhTl8P6iFA==
+X-Google-Smtp-Source: AGHT+IF9hvLvhL8A8U9SxTiYzp4Mcuv7rQ71NkXBstgCLzw/3auHFzsHz+VctWm5s+v81epA5krhCSnydSAjp9QY398=
+X-Received: by 2002:a81:4322:0:b0:59f:64b4:9b15 with SMTP id
+ q34-20020a814322000000b0059f64b49b15mr5807005ywa.41.1695682896453; Mon, 25
+ Sep 2023 16:01:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB6240:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1c9d8d49-2e3f-4129-5e90-08dbbe1b5456
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /zPlz0cT7j9kF3DdwTh1ywkM7xTllSqASiwFobp26cS0IulNsjHRFCAi1MNO6L1MY8bp8W2lHg9j2ztWavMev515QVrfBYz04RRfdyZpoEKC+594j8AnI2enT4sTcRcRK44iCwB4rE56Y+eQXNE4Fozs6Qv7J1uzgg/zT7K89O7IVIi9AQevckN+Ug6EDPhxRSEJaJihbMkU+wSvzRvjpmtriQ5rTa3jRNbuat5uFRg+qt9Wsb/BSeGkcCcyG1WCjhlWqrnlV+UXGAp3gRNYMR8ucqQCzTBMdBKaxeq1nkW0QucBMhgUOzZBSusA+3Noyp4NQLpYgl2o5VV070XtC/kjGI7zGNu+0y5+e7ndmEK3OycHjEIdBPe0f3Qk1FRwwGJ5J4LuWGA96bM0iEFnkkTsvJJSOy/H5opwuyGQgWLe3VKMXQsasU2O7KUw3LBiFolP3pO+ZEFzvflpVNlFLRRk+BWAIum8pGC1ITDKbX/+6EJjc+T2QJf9FWR+ikCfF62VYMB+vqcJobng5HjA0e1JmV75OS4F+QyGOPW8I0rnc9dC+70To7uv7NhWyA5g6Smmhy3EtMmzI/XzxgwROBqFtKbzzWbblRS/2hSPT14Yp+ACWaiAqoNk6BOQtgkWOymzBlzm8lV20OPrkE16nA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(396003)(346002)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(6512007)(66899024)(6486002)(53546011)(2906002)(6506007)(2616005)(31696002)(86362001)(6666004)(36756003)(478600001)(8676002)(8936002)(4326008)(82960400001)(41300700001)(83380400001)(38100700002)(5660300002)(31686004)(316002)(26005)(54906003)(66476007)(66556008)(6916009)(66946007)(7416002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UWtBNGUvSit3VWZKVm5LdVFzaXNqMVI0Rmo3NW9VdDRJd1hyS0JaTVFwbnB3?=
- =?utf-8?B?K0h5TFFiMG5HTmhsNm9lY0p2MUhrOFlHS2hCYXA5MXVMRGNQU25wQXBINFdv?=
- =?utf-8?B?N0xwdzdXayswM1JWMTU1SHN5MlhKRkpPbk1ZbCt1VjhjK1dISktvNlZQcGli?=
- =?utf-8?B?N0poNE9vY0taWHdoL2p4TzVOSHpielhFN2dGbk1PVnFHWWRUeU1GYW9ybHdq?=
- =?utf-8?B?dzgzMTRoVjdxOXg3dlh1SVUrVm5SZHJ0YlNQVnBUakJLeWdoWnBHdDFXN3VR?=
- =?utf-8?B?VmdvMndEOHVUaklTaFZiU3RFM3pqclNLNmNBR1hyQTdGc2hPUTFKR05td08v?=
- =?utf-8?B?WTR5QlFoSkxaRXJtQzdQak0xY1NEN0tPNHFVTXZQSVlrbnl1NjZCQlF3ZzRG?=
- =?utf-8?B?UTFsNHhlYlI3WG01eWpUQXJSRS9jMUsvUm9jTDA0TnU2cFJ3MitGelordDBp?=
- =?utf-8?B?MWhtS1ZvMXhaV2tVWmdXOVlGVTMycWdFc1A0eGdmNnlLVHZqYjRyclBJdjNZ?=
- =?utf-8?B?NWVMS3ZsZVJOZGJvZExOUVpXQmZoNU4vQjBKb2tTVXFsbHJscXdLdVlLQU1s?=
- =?utf-8?B?dzhIMWFIMjhNQmc4ckc0VFkwNEZYeWdnOU9LLzYydGNqY1dYdFdPOWJqYXdK?=
- =?utf-8?B?RzRNZmVIYkRoOFpBMy9FUkVUUUw0Vm9YRkpkZHQ2RlpoNlhFSkFIb2FYSWY2?=
- =?utf-8?B?SnlBV3pQSTN4d1dadUpOU0dNVnVsRVovRkptdWdDUytkZ3p1Mm9aajU0cDJi?=
- =?utf-8?B?d1lIcGlIeTFlTjI5UnZua2NNbWNvdVYwOEZ0WkRiMEMyNGplUU9SbkwxVjJY?=
- =?utf-8?B?eG5VaHlUQUpncC9FVGhDN05MN2xXUGNyeXJQdWhYNnlGdUFmY2NrWmxXV2xz?=
- =?utf-8?B?S0FoMHFzM1NnZmJjWmlXK3ZJa2FJbklkK1ArVzFWRVdyUmhkN2l2WGgrTG5a?=
- =?utf-8?B?eFQ4ZEhNMzJEemVocEFsMlpmSmpWOHJCNFhoMmJjNmd1WmdjWUk5c1pzL0Iy?=
- =?utf-8?B?SEFnNHJNV0FxK2s1NW96OVE4ZlgrZVIwNGZPNWUvOFY0Nmo5QzJmdEJJcnAy?=
- =?utf-8?B?cXluRS9QNzhFK2Qzb2M2VEVqMStCeVZEN29kdzdSRHNPNUdhZzZNUE9EMkRN?=
- =?utf-8?B?dkdpZUNMajViSVgwRHIwZUFXa3ZzeTNjWG0vWXU5OGpyZU53TzhzZUw4aVJH?=
- =?utf-8?B?WFowTEtCUjA2OXA2T0ZoSWlXMldHRDFacDMzcFFtMkh5VG9yMXNsV2loQUdi?=
- =?utf-8?B?ajlHUnlTL0Qvd3FxVFVWRjhSSFNVWEMwRFNDVURvcTg1VXlLRVc1RytscFFM?=
- =?utf-8?B?MHJWQlRER3NhdE9PMFZmUG5SNkRYdnpOT1BHQXNZakRyRVhBcU4zZlp5Q2Zw?=
- =?utf-8?B?a2plTU9tYmVZTmtvN3diSU5PLzArOTdvbThqdFh5bDFEaC9scERuOFBvblZN?=
- =?utf-8?B?VXYxQk5EOEl1Z0VLcmIzUW92TEd6aWFlRnBjdURJOVZvRE9zdExySHFFS0NP?=
- =?utf-8?B?bUJVZ3FKbjhTNWp6VUNzbzh5VkdyMnRGbHNqdHkzcHlHRHphdmZzYlhPZUVn?=
- =?utf-8?B?aWdoVHcyTllzNHdwSFU4VWd6Mnp0NzY4YTRxN24yNk5aTDYwMm1DM09ReXhY?=
- =?utf-8?B?T2c3NEZhWloyMnlQMm41VFlmUm1Zbmw1Rk1RVWhIdHhCTUJra1oweFByMVI1?=
- =?utf-8?B?a2V3NzZ2cUFnYU9LOGhaeVNXWW1KNm5HQ0dnK2ZvK3lkYVRwc3hYY1BOQUJq?=
- =?utf-8?B?Vndsa1pLMUdkSUdUZVBTOUd4djU2cE9TL2hrclpQNkZKbmV4UXQwL21VelY0?=
- =?utf-8?B?L3RKSVRIZ0NLZWtIcnhXZ0dWQUU5UG9McXFCbkUzV09wNkdZYUVhMk51eTVl?=
- =?utf-8?B?MEw4M29NencwL0s5Y3BrbDBHWVk5aG1QZ0FmOWRINnRLWTVHSS85Y1lVckRk?=
- =?utf-8?B?RnhlY25zN1FwR2hFcGVhM3o4eUxOeVZjdVRacUN0Z1BUTHlQUXhoZmpFMFJx?=
- =?utf-8?B?elJXdkJ6d3FXZzZ4cmVwNlV1dExyemJoTG1VZ2dFUnh5T0FhSUhBUEthbTBm?=
- =?utf-8?B?ZkY3QXNldjdVcFZ2eWJjZHQrVitvYk9CSXJPak5jR1FxdnhSby8xMldMOHFi?=
- =?utf-8?B?a0dZMUU2T3ZabFUzTXJUVG4vcU5HVFZ5bmFOZ1l1MC94YlgzLzF3WHZZdHIx?=
- =?utf-8?B?WFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c9d8d49-2e3f-4129-5e90-08dbbe1b5456
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 23:01:19.2573
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zTetVg2zNU3QrHDTXA3CSwEQ01A2cqquhpJ0QQqhkAOwii+JxXhTpuBnu7QSmp33jSxYOG7AkdlHMeeCxvAi3dM5wbN8YgtwT6CAd3s/yw4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6240
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230919145951.352548-1-victor@mojatatu.com> <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
+ <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com> <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
+In-Reply-To: <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 25 Sep 2023 19:01:24 -0400
+Message-ID: <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return code
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	paulb@nvidia.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	martin.lau@linux.dev, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Fri, Sep 22, 2023 at 4:12=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 9/20/23 1:20 AM, Jamal Hadi Salim wrote:
+> > On Tue, Sep 19, 2023 at 6:15=E2=80=AFPM Daniel Borkmann <daniel@iogearb=
+ox.net> wrote:
+> >>
+> >> [ +Martin, bpf ]
+> >>
+> >> On 9/19/23 4:59 PM, Victor Nogueira wrote:
+> >>> Currently there is no way to distinguish between an error and a
+> >>> classification verdict. This patch adds the verdict field as a part o=
+f
+> >>> struct tcf_result. That way, tcf_classify can return a proper
+> >>> error number when it fails, and we keep the classification result
+> >>> information encapsulated in struct tcf_result.
+> >>>
+> >>> Also add values SKB_DROP_REASON_TC_EGRESS_ERROR and
+> >>> SKB_DROP_REASON_TC_INGRESS_ERROR to enum skb_drop_reason.
+> >>> With that we can distinguish between a drop from a processing error v=
+ersus
+> >>> a drop from classification.
+> >>>
+> >>> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> >>> ---
+> >>>    include/net/dropreason-core.h |  6 +++++
+> >>>    include/net/sch_generic.h     |  7 ++++++
+> >>>    net/core/dev.c                | 42 ++++++++++++++++++++++++++-----=
+----
+> >>>    net/sched/cls_api.c           | 38 ++++++++++++++++++++-----------
+> >>>    net/sched/sch_cake.c          | 32 +++++++++++++-------------
+> >>>    net/sched/sch_drr.c           | 33 +++++++++++++--------------
+> >>>    net/sched/sch_ets.c           |  6 +++--
+> >>>    net/sched/sch_fq_codel.c      | 29 ++++++++++++------------
+> >>>    net/sched/sch_fq_pie.c        | 28 +++++++++++------------
+> >>>    net/sched/sch_hfsc.c          |  6 +++--
+> >>>    net/sched/sch_htb.c           |  6 +++--
+> >>>    net/sched/sch_multiq.c        |  6 +++--
+> >>>    net/sched/sch_prio.c          |  7 ++++--
+> >>>    net/sched/sch_qfq.c           | 34 +++++++++++++---------------
+> >>>    net/sched/sch_sfb.c           | 29 ++++++++++++------------
+> >>>    net/sched/sch_sfq.c           | 28 +++++++++++------------
+> >>>    16 files changed, 195 insertions(+), 142 deletions(-)
+> >>>
+> >>> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-c=
+ore.h
+> >>> index a587e83fc169..b1c069c8e7f2 100644
+> >>> --- a/include/net/dropreason-core.h
+> >>> +++ b/include/net/dropreason-core.h
+> >>> @@ -80,6 +80,8 @@
+> >>>        FN(IPV6_NDISC_BAD_OPTIONS)      \
+> >>>        FN(IPV6_NDISC_NS_OTHERHOST)     \
+> >>>        FN(QUEUE_PURGE)                 \
+> >>> +     FN(TC_EGRESS_ERROR)             \
+> >>> +     FN(TC_INGRESS_ERROR)            \
+> >>>        FNe(MAX)
+> >>>
+> >>>    /**
+> >>> @@ -345,6 +347,10 @@ enum skb_drop_reason {
+> >>>        SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
+> >>>        /** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
+> >>>        SKB_DROP_REASON_QUEUE_PURGE,
+> >>> +     /** @SKB_DROP_REASON_TC_EGRESS_ERROR: dropped in TC egress HOOK=
+ due to error */
+> >>> +     SKB_DROP_REASON_TC_EGRESS_ERROR,
+> >>> +     /** @SKB_DROP_REASON_TC_INGRESS_ERROR: dropped in TC ingress HO=
+OK due to error */
+> >>> +     SKB_DROP_REASON_TC_INGRESS_ERROR,
+> >>>        /**
+> >>>         * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, whi=
+ch
+> >>>         * shouldn't be used as a real 'reason' - only for tracing cod=
+e gen
+> >>> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> >>> index f232512505f8..9a3f71d2545e 100644
+> >>> --- a/include/net/sch_generic.h
+> >>> +++ b/include/net/sch_generic.h
+> >>> @@ -326,6 +326,7 @@ struct Qdisc_ops {
+> >>>
+> >>>
+> >>>    struct tcf_result {
+> >>> +     u32 verdict;
+> >>>        union {
+> >>>                struct {
+> >>>                        unsigned long   class;
+> >>> @@ -336,6 +337,12 @@ struct tcf_result {
+> >>>        };
+> >>>    };
+> >>>
+> >>> +static inline void tcf_result_set_verdict(struct tcf_result *res,
+> >>> +                                       const u32 verdict)
+> >>> +{
+> >>> +     res->verdict =3D verdict;
+> >>> +}
+> >>> +
+> >>>    struct tcf_chain;
+> >>>
+> >>>    struct tcf_proto_ops {
+> >>> diff --git a/net/core/dev.c b/net/core/dev.c
+> >>> index ccff2b6ef958..1450f4741d9b 100644
+> >>> --- a/net/core/dev.c
+> >>> +++ b/net/core/dev.c
+> >>> @@ -3910,31 +3910,39 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
+> >>>    #endif /* CONFIG_NET_EGRESS */
+> >>>
+> >>>    #ifdef CONFIG_NET_XGRESS
+> >>> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
+> >>> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+> >>> +               struct tcf_result *res)
+> >>>    {
+> >>> -     int ret =3D TC_ACT_UNSPEC;
+> >>> +     int ret =3D 0;
+> >>>    #ifdef CONFIG_NET_CLS_ACT
+> >>>        struct mini_Qdisc *miniq =3D rcu_dereference_bh(entry->miniq);
+> >>> -     struct tcf_result res;
+> >>>
+> >>> -     if (!miniq)
+> >>> +     if (!miniq) {
+> >>> +             tcf_result_set_verdict(res, TC_ACT_UNSPEC);
+> >>>                return ret;
+> >>> +     }
+> >>>
+> >>>        tc_skb_cb(skb)->mru =3D 0;
+> >>>        tc_skb_cb(skb)->post_ct =3D false;
+> >>>
+> >>>        mini_qdisc_bstats_cpu_update(miniq, skb);
+> >>> -     ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, &re=
+s, false);
+> >>> +     ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, res=
+, false);
+> >>> +     if (ret < 0) {
+> >>> +             mini_qdisc_qstats_cpu_drop(miniq);
+> >>> +             return ret;
+> >>> +     }
+> >>>        /* Only tcf related quirks below. */
+> >>> -     switch (ret) {
+> >>> +     switch (res->verdict) {
+> >>>        case TC_ACT_SHOT:
+> >>>                mini_qdisc_qstats_cpu_drop(miniq);
+> >>>                break;
+> >>>        case TC_ACT_OK:
+> >>>        case TC_ACT_RECLASSIFY:
+> >>> -             skb->tc_index =3D TC_H_MIN(res.classid);
+> >>> +             skb->tc_index =3D TC_H_MIN(res->classid);
+> >>>                break;
+> >>>        }
+> >>> +#else
+> >>> +     tcf_result_set_verdict(res, TC_ACT_UNSPEC);
+> >>>    #endif /* CONFIG_NET_CLS_ACT */
+> >>>        return ret;
+> >>>    }
+> >>> @@ -3977,6 +3985,7 @@ sch_handle_ingress(struct sk_buff *skb, struct =
+packet_type **pt_prev, int *ret,
+> >>>                   struct net_device *orig_dev, bool *another)
+> >>>    {
+> >>>        struct bpf_mprog_entry *entry =3D rcu_dereference_bh(skb->dev-=
+>tcx_ingress);
+> >>> +     struct tcf_result res =3D {0};
+> >>>        int sch_ret;
+> >>>
+> >>>        if (!entry)
+> >>> @@ -3994,9 +4003,14 @@ sch_handle_ingress(struct sk_buff *skb, struct=
+ packet_type **pt_prev, int *ret,
+> >>>                if (sch_ret !=3D TC_ACT_UNSPEC)
+> >>>                        goto ingress_verdict;
+> >>>        }
+> >>> -     sch_ret =3D tc_run(tcx_entry(entry), skb);
+> >>> +     sch_ret =3D tc_run(tcx_entry(entry), skb, &res);
+> >>> +     if (sch_ret < 0) {
+> >>> +             kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS_ERROR)=
+;
+> >>> +             *ret =3D NET_RX_DROP;
+> >>> +             return NULL;
+> >>> +     }
+> >>>    ingress_verdict:
+> >>> -     switch (sch_ret) {
+> >>> +     switch (res.verdict) {
+> >>
+> >> This breaks tcx, please move all this logic into tc_run(). No changes =
+to sch_handle_ingress()
+> >> or sch_handle_egress should be necessary, you can then just remap the =
+return code to TC_ACT_SHOT
+> >> in such case.
+> >
+> > I think it is valuable to have a good reason code like
+> > SKB_DROP_REASON_TC_XXX_ERROR to disambiguate between errors vs
+> > verdicts in the case of tc_run() variant.
+> > For tcx_run(), does this look ok (for consistency)?:
+> >
+> > if (static_branch_unlikely(&tcx_needed_key)) {
+> >                  sch_ret =3D tcx_run(entry, skb, true);
+> >                  if (sch_ret !=3D TC_ACT_UNSPEC) {
+> >                          res.verdict =3D sch_ret;
+> >                          goto ingress_verdict;
+> >                  }
+> > }
+>
+> In the above case we don't have 'internal' errors which you want to trace=
+, so I would
+> also love to avoid the cost of zeroing struct tcf_result res which should=
+ be 3x 8b for
+> every packet.
 
+We can move the zeroing inside tc_run() but we declare it in the same
+spot as we do right now. You will still need to set res.verdict as
+above.
+Would that work for you?
 
-On 9/25/2023 3:55 PM, Yury Norov wrote:
-> On Mon, Sep 25, 2023 at 3:46 PM Jacob Keller <jacob.e.keller@intel.com> wrote:
->>
->>
->>
->> On 9/24/2023 7:05 PM, Yury Norov wrote:
->>> Now that the only user of for_each_numa_hop_mask() is switched to using
->>> cpumask_local_spread(), for_each_numa_hop_mask() is a dead code. Thus,
->>> revert commit 06ac01721f7d ("sched/topology: Introduce
->>> for_each_numa_hop_mask()").
->>>
->>> Signed-off-by: Yury Norov <yury.norov@gmail.com>
->>> Signed-off-by: Yury Norov <ynorov@nvidia.com>
->>> ---
->>>  include/linux/topology.h | 18 ------------------
->>>  1 file changed, 18 deletions(-)
->>>
->>> diff --git a/include/linux/topology.h b/include/linux/topology.h
->>> index fea32377f7c7..344c2362755a 100644
->>> --- a/include/linux/topology.h
->>> +++ b/include/linux/topology.h
->>> @@ -261,22 +261,4 @@ sched_numa_hop_mask(unsigned int node, unsigned int hops)
->>>  }
->>>  #endif       /* CONFIG_NUMA */
->>>
->>
->> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->>
->> I might have squashed all of 2 through 4 into a single patch but not a
->> big deal.
-> 
-> I just wanted to keep the changes more trackable. No objections to squash 2-4,
-> whatever maintainers will feel better.
-> 
-> Thanks,
-> Yury
+> I was more thinking like something below could be a better choice. I pres=
+ume your main
+> goal is to trace where these errors originated in the first place, so it =
+might even be
+> useful to capture the actual return code as well.
 
-I'm fine with keeping them separate.
+The main motivation is a few syzkaller bugs which resulted in not
+disambiguating between errors being returned and sometimes
+TC_ACT_SHOT.
+
+> Then you can use perf script, bpf and whatnot to gather further insights =
+into what
+> happened while being less invasive and avoiding the need to extend struct=
+ tcf_result.
+>
+
+We could use trace instead - the reason we have the skb reason is
+being used in the other spots (does this trace require ebpf to be
+usable?).
+
+> This would be quite similar to trace_xdp_exception() as well, and I think=
+ you can guarantee
+> that in fast path all errors are < TC_ACT_UNSPEC anyway.
+>
+
+I am not sure i followed. 0 means success, result codes are returned in res=
+ now.
+
+cheers,
+jamal
+
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 85df22f05c38..4089d195144d 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3925,6 +3925,10 @@ static int tc_run(struct tcx_entry *entry, struct =
+sk_buff *skb)
+>
+>         mini_qdisc_bstats_cpu_update(miniq, skb);
+>         ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, &res,=
+ false);
+> +       if (unlikely(ret < TC_ACT_UNSPEC)) {
+> +               trace_tc_exception(skb->dev, skb->tc_at_ingress, ret);
+> +               ret =3D TC_ACT_SHOT;
+> +       }
+>         /* Only tcf related quirks below. */
+>         switch (ret) {
+>         case TC_ACT_SHOT:
+>
+> Best,
+> Daniel
 
