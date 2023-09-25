@@ -1,330 +1,149 @@
-Return-Path: <netdev+bounces-36150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 332877ADA22
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 16:32:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5477C7ADA34
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 16:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D309D281478
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:32:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id AF565B20987
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3E515E8B;
-	Mon, 25 Sep 2023 14:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708CE1C283;
+	Mon, 25 Sep 2023 14:42:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19EA511C91
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 14:32:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E45C433C8;
-	Mon, 25 Sep 2023 14:32:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695652321;
-	bh=34z6Dw/XTxGct0UO29aEYjxEKS5xFSdcTF4M12XnnkY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U0On9ZghtzWKUIoDiiktZ7mNjyLKaFrbu74v4waDIgT6sJxS5bbPk0IfBEd7jWcF+
-	 CYcFpTM98iYZLe6ZDX8PNQU08rsmpBrL7xi44tswJq4tiArulKgyKtyZYBR8P5zrjY
-	 qfdz6NFGr3k6yEqwXEqu833pIVoyRDhxRuN7s22A5YyFmGbOWZ1hu6x8D7S1gnMi2K
-	 8/2cuNo048L//hejcIQZpoGDfXcLxfU7P4C/KEajzQhGNes0N7wtoPoeaCOW6cYpdb
-	 gp42i8eMGnsZrBQzcPb0QrYsEip8fASux3KAs3FNUnSnp3BHE/zRYyY6M/vvOHWQEt
-	 EbQO6K14N3ypA==
-Date: Mon, 25 Sep 2023 16:31:57 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	jlayton@kernel.org, neilb@suse.de, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] NFSD: convert write_threads, write_maxblksize and
- write_maxconn to netlink commands
-Message-ID: <ZRGZ3biV94qRx/IF@lore-desk>
-References: <b9fefe9a15d8a4c5ab597489902ab2f868199365.1695563204.git.lorenzo@kernel.org>
- <ZRGRHbQ4w2hcEre/@tissot.1015granger.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075701B26E
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 14:42:49 +0000 (UTC)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2070.outbound.protection.outlook.com [40.107.102.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F58101;
+	Mon, 25 Sep 2023 07:42:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R4ou1ETS7GeQPgV4OnNo2Yen3I73IMKlzXBCjTwlMgDBkucdfSPUFc7Pqu5rg/RNJplIuoHZuWOkOZRSEQ6ZrlWGFNlT+7R1WHIRVb7dfUz06v99KZyBWNG59OQst7/QrjHhWxSwocf2E83zPnWXs655qkXch/EMxKBdeuJC+jw/ypD+8cjCblxqMgZwguxZxV0v6mfNqYDuuy+J4hUh/rYlzOC4/B+F+sgLoXiA0mJ7whHwpYpGaTEfOWGUBFPrnUzqzmoUA83t+/QZBt+tB2FLINJ+JNu/gQZisb41mktRkf/G7gYgXllGckHjZVD7V20YJTWfNssLcBhzjIkcbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LyllHnJEB7RQZ70NaFJPAtYlATXRgWs83bRdXCVdKxI=;
+ b=KlWI/8//SteEkKt31bDGi3Mt6RE5ZZgoAlLz1XlVPEJUndeuJWBhJvLTPh3il/Y3jb1bSyZ172yEjS1E1I7Ny3p5sXLfVrzoN1otJY0TqvwndOmYmx78d3rRXMVhAts6SaG/koEIlAkcsxajq9XYGge1lGAZm8/L6ErwytrBdTaSG7zneGPtagHnZ3VEF0uxaVoYRJiegdpUjXMLLyie7ANBc4V2csxob+5dvRhBLUmOh8QxEkn0f+TkEbf7jW4fEKQrjyecDKspW397ElmZ8ngtkVRx2tv7wr2mARRtzRsttyki1aF7E1NaSCB79Teiw5YW3znOyDNzQ7IhVbwCMA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LyllHnJEB7RQZ70NaFJPAtYlATXRgWs83bRdXCVdKxI=;
+ b=VRIHKVKJlPrheXbBy3MnVzqxI8hmI2scUHh/F7a20geY67Nyk6SulwVRJFvmu7GQXj8e+abhoVyw6Sp7o9z2xod7/J8PoDWq1YghXhXafBjiumcbzJfVONghgHred96fq+kRHUi37ooYiBPg9VpWm7GmQgyWcNRUHJ9b4ib0r0TbuL3CFtVDwpyQnlLWsrJ2AVJsTJjQ0En7SGKY0NoiRYBfABH2pmeR8ytIha1tYXzgV/xH66i7G8tMh7+sKVrIa94XuLG08F7fMJ+AP6F8Kz0FgZdwy8+/WXWEXMoT2a4v/XKt52veeNwZNlT1QFsF6Kj234jKwDfIM9Sgcnil9w==
+Received: from MW4PR03CA0238.namprd03.prod.outlook.com (2603:10b6:303:b9::33)
+ by IA0PR12MB7531.namprd12.prod.outlook.com (2603:10b6:208:43f::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Mon, 25 Sep
+ 2023 14:42:45 +0000
+Received: from CO1PEPF000044F3.namprd05.prod.outlook.com
+ (2603:10b6:303:b9:cafe::8e) by MW4PR03CA0238.outlook.office365.com
+ (2603:10b6:303:b9::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
+ Transport; Mon, 25 Sep 2023 14:42:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044F3.mail.protection.outlook.com (10.167.241.73) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.14 via Frontend Transport; Mon, 25 Sep 2023 14:42:44 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Sep
+ 2023 07:42:31 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Sep
+ 2023 07:42:29 -0700
+References: <20230925085318.1228225-1-nichen@iscas.ac.cn>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Petr Machata <petrm@nvidia.com>
+To: Chen Ni <nichen@iscas.ac.cn>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <izumi.taku@jp.fujitsu.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] fjes: Add missing check for vzalloc
+Date: Mon, 25 Sep 2023 16:40:24 +0200
+In-Reply-To: <20230925085318.1228225-1-nichen@iscas.ac.cn>
+Message-ID: <87r0mms4a5.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qYoQUvXl/ddLoVyJ"
-Content-Disposition: inline
-In-Reply-To: <ZRGRHbQ4w2hcEre/@tissot.1015granger.net>
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail202.nvidia.com (10.129.68.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F3:EE_|IA0PR12MB7531:EE_
+X-MS-Office365-Filtering-Correlation-Id: ef323bfb-c31e-46be-dab1-08dbbdd5adec
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yi7VUzGbgmbBuvKu7HvM9mxES6pfP5wE4pcRTgQ7UOLOiX9FmCM/rxVLUVD/Re5LyPJa2X52/P1WgJRo0pinqC4YzJftKbj/nxINt/t6nO1Ajol5O2D5SAp11fcCYRPO3zSj9gMt428QWdIjo72rTxxTVOcET239n65jsEMtYNTpeVbqol9yOCfBdmxvhViauqekajeyXparJLR2v9iTWRGSqh50qktfaiiCLy33PstT3PSOxQvZuVabAgo1t7qjQa6bKcANJnjG/Sx+nQWfXDl0PAsp+NLhbm4WXihGkz4ctvcx3KXQ4Jtnd8/098MQYGwP5vjExnT0rUTVDrFKZvnNu8o1a2p7iVpoc6aTZtQ2gc94rwFxUFqZZHY3TdNrxBGHr+7kSkP1MDPWyW/POyF8tFbqVwhEhtmfHA9L4OmepHJMBv6NQ0+jAbkQQTQOV1ozPH3kWR3qSJKw+86M/OWGe3BdYmlMx4ouYcxnfua3BdqpRrEZCmTG3lRL10Av9Gtxt+q7VaA+aAUHcM6VxWkgisbLl3CQ2L6Iuf1nO9M2C5D1nzFbGtrER40V5IeRyYiGylgc725ZcVnp551Sg4WJzEJGMeUxLTiGS5SAo4g7azmrv1D7k19uIeTtLGqPoEQbhEW6hHndVxzK9XjNWjLG44RbBYFJ+uB24aebN1pqkNPr83M3zvXO4hkfHvE7H168WeXebQrrphaByMiqpqk/4CqxJVN/v4DN6dM1iaw=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(39860400002)(346002)(230922051799003)(1800799009)(451199024)(186009)(82310400011)(40470700004)(36840700001)(46966006)(2616005)(40460700003)(36756003)(86362001)(356005)(40480700001)(7636003)(82740400003)(36860700001)(16526019)(26005)(4744005)(2906002)(426003)(336012)(6666004)(478600001)(47076005)(83380400001)(8936002)(4326008)(5660300002)(8676002)(41300700001)(70206006)(54906003)(6916009)(316002)(70586007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 14:42:44.5784
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef323bfb-c31e-46be-dab1-08dbbdd5adec
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F3.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7531
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
---qYoQUvXl/ddLoVyJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Chen Ni <nichen@iscas.ac.cn> writes:
 
-On Sep 25, Chuck Lever wrote:
-> On Sun, Sep 24, 2023 at 03:52:28PM +0200, Lorenzo Bianconi wrote:
-> > Introduce write_threads, write_maxblksize and write_maxconn netlink
-> > commands similar to the ones available through the procfs.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> > Changes since v1:
-> > - remove write_v4_end_grace command
-> > - add write_maxblksize and write_maxconn netlink commands
-> >=20
-> > This patch can be tested with user-space tool reported below:
-> > https://github.com/LorenzoBianconi/nfsd-netlink.git
-> > ---
-> >  Documentation/netlink/specs/nfsd.yaml |  63 ++++++++++++
-> >  fs/nfsd/netlink.c                     |  51 ++++++++++
-> >  fs/nfsd/netlink.h                     |   9 ++
-> >  fs/nfsd/nfsctl.c                      | 139 ++++++++++++++++++++++++++
-> >  include/uapi/linux/nfsd_netlink.h     |  15 +++
-> >  5 files changed, 277 insertions(+)
->=20
-> This looks pretty close to me. A couple of comments below.
->=20
->=20
-> > diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netl=
-ink/specs/nfsd.yaml
-> > index 403d3e3a04f3..10214fcec8a5 100644
-> > --- a/Documentation/netlink/specs/nfsd.yaml
-> > +++ b/Documentation/netlink/specs/nfsd.yaml
-> > @@ -62,6 +62,18 @@ attribute-sets:
-> >          name: compound-ops
-> >          type: u32
-> >          multi-attr: true
-> > +  -
-> > +    name: server-attr
->=20
-> Or, say, "control-plane" ? "server-attr" doesn't seem very self-
-> explanatory or specific.
+> Because of the potential failure of the vzalloc(), the hw->hw_info.trace
+> could be NULL.
+> Therefore, we need to check it and return -ENOMEM in order to transfer
+> the error.
+>
+> Fixes: b6ba737d0b29 ("fjes: ethtool -w and -W support for fjes driver")
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> ---
+>  drivers/net/fjes/fjes_hw.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
+> index 704e949484d0..3a06a3cf021d 100644
+> --- a/drivers/net/fjes/fjes_hw.c
+> +++ b/drivers/net/fjes/fjes_hw.c
+> @@ -330,6 +330,9 @@ int fjes_hw_init(struct fjes_hw *hw)
+>  	ret = fjes_hw_setup(hw);
+>  
+>  	hw->hw_info.trace = vzalloc(FJES_DEBUG_BUFFER_SIZE);
+> +	if (!hw->hw_info.trace)
+> +		return -ENOMEM;
+> +
 
-ack, fine to me..naming is always hard :)
+I'm not sure, but shouldn't this call fjes_hw_cleanup() to mirror the
+setup() above? Also only if ret=0 I suppose.
 
->=20
->=20
-> > +    attributes:
-> > +      -
-> > +        name: threads
-> > +        type: u32
-> > +      -
-> > +        name: max-blksize
-> > +        type: u32
-> > +      -
-> > +        name: max-conn
-> > +        type: u32
-> > =20
-> >  operations:
-> >    list:
-> > @@ -72,3 +84,54 @@ operations:
-> >        dump:
-[...]
-> > =20
-> > +/**
-> > + * nfsd_nl_threads_set_doit - set the number of running threads
-> > + * @skb: reply buffer
-> > + * @info: netlink metadata and command arguments
-> > + *
-> > + * Return 0 on success or a negative errno.
-> > + */
-> > +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *in=
-fo)
-> > +{
-> > +	u16 nthreads;
-> > +	int ret;
-> > +
-> > +	if (!info->attrs[NFSD_A_SERVER_ATTR_THREADS])
-> > +		return -EINVAL;
-> > +
-> > +	nthreads =3D nla_get_u32(info->attrs[NFSD_A_SERVER_ATTR_THREADS]);
->=20
-> I worry about what happens if someone sends down a value larger than
-> 64K. While not a likely scenario, the behavior is not well defined,
-> and I don't think the implicit type conversions are necessary.
->=20
-> Can nthreads be u32?
+>  	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
+>  
+>  	return ret;
 
-actually this is a leftover of the previous patch. I will fix it in v3.
-
-Regards,
-Lorenzo
-
->=20
->=20
-> > +	ret =3D nfsd_svc(nthreads, genl_info_net(info), get_current_cred());
-> > +	return ret =3D=3D nthreads ? 0 : ret;
-> > +}
-> > +
-> > +static int nfsd_nl_get_dump(struct sk_buff *skb, struct netlink_callba=
-ck *cb,
-> > +			    int cmd, int attr, u32 val)
-> > +{
-> > +	void *hdr;
-> > +
-> > +	if (cb->args[0]) /* already consumed */
-> > +		return 0;
-> > +
-> > +	hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_s=
-eq,
-> > +			  &nfsd_nl_family, NLM_F_MULTI, cmd);
-> > +	if (!hdr)
-> > +		return -ENOBUFS;
-> > +
-> > +	if (nla_put_u32(skb, attr, val))
-> > +		return -ENOBUFS;
-> > +
-> > +	genlmsg_end(skb, hdr);
-> > +	cb->args[0] =3D 1;
-> > +
-> > +	return skb->len;
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_threads_get_dumpit - dump the number of running threads
-> > + * @skb: reply buffer
-> > + * @cb: netlink metadata and command arguments
-> > + *
-> > + * Returns the size of the reply or a negative errno.
-> > + */
-> > +int nfsd_nl_threads_get_dumpit(struct sk_buff *skb, struct netlink_cal=
-lback *cb)
-> > +{
-> > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_THREADS_GET,
-> > +				NFSD_A_SERVER_ATTR_THREADS,
-> > +				nfsd_nrthreads(sock_net(skb->sk)));
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_max_blksize_set_doit - set the nfs block size
-> > + * @skb: reply buffer
-> > + * @info: netlink metadata and command arguments
-> > + *
-> > + * Return 0 on success or a negative errno.
-> > + */
-> > +int nfsd_nl_max_blksize_set_doit(struct sk_buff *skb, struct genl_info=
- *info)
-> > +{
-> > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_id);
-> > +	int ret =3D 0;
-> > +
-> > +	if (!info->attrs[NFSD_A_SERVER_ATTR_MAX_BLKSIZE])
-> > +		return -EINVAL;
-> > +
-> > +	mutex_lock(&nfsd_mutex);
-> > +	if (nn->nfsd_serv) {
-> > +		ret =3D -EBUSY;
-> > +		goto out;
-> > +	}
-> > +
-> > +	nfsd_max_blksize =3D nla_get_u32(info->attrs[NFSD_A_SERVER_ATTR_MAX_B=
-LKSIZE]);
-> > +	nfsd_max_blksize =3D max_t(int, nfsd_max_blksize, 1024);
-> > +	nfsd_max_blksize =3D min_t(int, nfsd_max_blksize, NFSSVC_MAXBLKSIZE);
-> > +	nfsd_max_blksize &=3D ~1023;
-> > +out:
-> > +	mutex_unlock(&nfsd_mutex);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_max_blksize_get_dumpit - dump the nfs block size
-> > + * @skb: reply buffer
-> > + * @cb: netlink metadata and command arguments
-> > + *
-> > + * Returns the size of the reply or a negative errno.
-> > + */
-> > +int nfsd_nl_max_blksize_get_dumpit(struct sk_buff *skb,
-> > +				   struct netlink_callback *cb)
-> > +{
-> > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_BLKSIZE_GET,
-> > +				NFSD_A_SERVER_ATTR_MAX_BLKSIZE,
-> > +				nfsd_max_blksize);
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_max_conn_set_doit - set the max number of connections
-> > + * @skb: reply buffer
-> > + * @info: netlink metadata and command arguments
-> > + *
-> > + * Return 0 on success or a negative errno.
-> > + */
-> > +int nfsd_nl_max_conn_set_doit(struct sk_buff *skb, struct genl_info *i=
-nfo)
-> > +{
-> > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_id);
-> > +
-> > +	if (!info->attrs[NFSD_A_SERVER_ATTR_MAX_CONN])
-> > +		return -EINVAL;
-> > +
-> > +	nn->max_connections =3D nla_get_u32(info->attrs[NFSD_A_SERVER_ATTR_MA=
-X_CONN]);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +/**
-> > + * nfsd_nl_max_conn_get_dumpit - dump the max number of connections
-> > + * @skb: reply buffer
-> > + * @cb: netlink metadata and command arguments
-> > + *
-> > + * Returns the size of the reply or a negative errno.
-> > + */
-> > +int nfsd_nl_max_conn_get_dumpit(struct sk_buff *skb,
-> > +				struct netlink_callback *cb)
-> > +{
-> > +	struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net_i=
-d);
-> > +
-> > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_CONN_GET,
-> > +				NFSD_A_SERVER_ATTR_MAX_CONN,
-> > +				nn->max_connections);
-> > +}
-> > +
-> >  /**
-> >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-> >   * @net: a freshly-created network namespace
-> > diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfs=
-d_netlink.h
-> > index c8ae72466ee6..59d0aa22ba94 100644
-> > --- a/include/uapi/linux/nfsd_netlink.h
-> > +++ b/include/uapi/linux/nfsd_netlink.h
-> > @@ -29,8 +29,23 @@ enum {
-> >  	NFSD_A_RPC_STATUS_MAX =3D (__NFSD_A_RPC_STATUS_MAX - 1)
-> >  };
-> > =20
-> > +enum {
-> > +	NFSD_A_SERVER_ATTR_THREADS =3D 1,
-> > +	NFSD_A_SERVER_ATTR_MAX_BLKSIZE,
-> > +	NFSD_A_SERVER_ATTR_MAX_CONN,
-> > +
-> > +	__NFSD_A_SERVER_ATTR_MAX,
-> > +	NFSD_A_SERVER_ATTR_MAX =3D (__NFSD_A_SERVER_ATTR_MAX - 1)
-> > +};
-> > +
-> >  enum {
-> >  	NFSD_CMD_RPC_STATUS_GET =3D 1,
-> > +	NFSD_CMD_THREADS_SET,
-> > +	NFSD_CMD_THREADS_GET,
-> > +	NFSD_CMD_MAX_BLKSIZE_SET,
-> > +	NFSD_CMD_MAX_BLKSIZE_GET,
-> > +	NFSD_CMD_MAX_CONN_SET,
-> > +	NFSD_CMD_MAX_CONN_GET,
-> > =20
-> >  	__NFSD_CMD_MAX,
-> >  	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
-> > --=20
-> > 2.41.0
-> >=20
->=20
-> --=20
-> Chuck Lever
-
---qYoQUvXl/ddLoVyJ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZRGZ3QAKCRA6cBh0uS2t
-rOgqAP9IOs0km0VrwZNf0Y+k6qHjlCGzOfBPpGLErwb1/BfYxgEA3B0gHC1TWlFY
-sGcIe+SOtT/SsMiwY2FbcKHcEcyMAwc=
-=cV6d
------END PGP SIGNATURE-----
-
---qYoQUvXl/ddLoVyJ--
 
