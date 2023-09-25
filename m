@@ -1,165 +1,158 @@
-Return-Path: <netdev+bounces-36114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCD3D7AD583
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 384647AD5DD
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:28:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id D52EB1C2037C
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D72F728244A
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA3414AB0;
-	Mon, 25 Sep 2023 10:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0415E88;
+	Mon, 25 Sep 2023 10:28:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6741214A90
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:10:54 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3759E1B8;
-	Mon, 25 Sep 2023 03:10:51 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VsqfW0y_1695636647;
-Received: from 30.221.144.144(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VsqfW0y_1695636647)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Sep 2023 18:10:48 +0800
-Message-ID: <a3e80a67-e8b8-ce94-fc11-254d056d37a9@linux.alibaba.com>
-Date: Mon, 25 Sep 2023 18:10:46 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1827C14000;
+	Mon, 25 Sep 2023 10:28:08 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679DF8E;
+	Mon, 25 Sep 2023 03:28:06 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0A3201C0002;
+	Mon, 25 Sep 2023 10:27:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695637685;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CtO8T+sDShN7p7U0G6qKR0fuN42cZzhkfeW3eGEM+Oc=;
+	b=LVvprKIVChYwTJzlxBd2ZNYXBHm9J7hWY1K7wpTo7zgvqzqBZGISmFtj5OfIFjje66P6S6
+	HlEwH3l0nVjpj8nD5vuMQ04HpzK0kR9ZM/U4jh0pWSEMRb4F5bMp+1A6JeZwWYC3nZTpNn
+	/U6LnsAPSh0QZnEt3y0Lr0BoJp0UQrIcws9zjf3FD4NOdCmt44AIAujr+TSxw3+AlvXtxH
+	hfW+hGSVKZ+Hawd0vhvwNMVNosgsJYz2ky2HPFjrWkgsQ6PX7giQJvvsZAQmr4u96kgbX/
+	2NKS6FPh8EB5P2zy/eURoCGbCNJb1KY9NL1nF8B1faIJpM3bP2F6JtT1GYIe7w==
+Date: Mon, 25 Sep 2023 12:27:58 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
+ Add support for QMC HDLC
+Message-ID: <20230925122758.43963736@bootlin.com>
+In-Reply-To: <5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
+References: <20230922075913.422435-1-herve.codina@bootlin.com>
+	<20230922075913.422435-9-herve.codina@bootlin.com>
+	<5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
+	<20230925101703.1bf083f1@bootlin.com>
+	<5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [RFC net-next 0/2] Optimize the parallelism of SMC-R connections
-Content-Language: en-US
-To: Alexandra Winter <wintera@linux.ibm.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1694008530-85087-1-git-send-email-alibuda@linux.alibaba.com>
- <794f9f68-4671-5e5e-45e4-2c8a4de568b3@linux.ibm.com>
- <522d823c-b656-ffb5-bcce-65b96bdfa46d@linux.alibaba.com>
- <c0ba8e0b-f2b2-b65b-e21a-54c3d920ba72@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <c0ba8e0b-f2b2-b65b-e21a-54c3d920ba72@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, 25 Sep 2023 10:21:15 +0200
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
 
+> On 25/09/2023 10:17, Herve Codina wrote:
+> > Hi Krzysztof,
+> > 
+> > On Sat, 23 Sep 2023 19:39:49 +0200
+> > Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
+> >   
+> >> On 22/09/2023 09:58, Herve Codina wrote:  
+> >>> The QMC (QUICC mutichannel controller) is a controller present in some
+> >>> PowerQUICC SoC such as MPC885.
+> >>> The QMC HDLC uses the QMC controller to transfer HDLC data.
+> >>>
+> >>> Additionally, a framer can be connected to the QMC HDLC.
+> >>> If present, this framer is the interface between the TDM bus used by the
+> >>> QMC HDLC and the E1/T1 line.
+> >>> The QMC HDLC can use this framer to get information about the E1/T1 line
+> >>> and configure the E1/T1 line.
+> >>>
+> >>> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> >>> ---
+> >>>  .../soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml      | 24 +++++++++++++++++++
+> >>>  1 file changed, 24 insertions(+)
+> >>>
+> >>> diff --git a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> >>> index 82d9beb48e00..61dfd5ef7407 100644
+> >>> --- a/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> >>> +++ b/Documentation/devicetree/bindings/soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml
+> >>> @@ -101,6 +101,27 @@ patternProperties:
+> >>>            Channel assigned Rx time-slots within the Rx time-slots routed by the
+> >>>            TSA to this cell.
+> >>>  
+> >>> +      compatible:
+> >>> +        const: fsl,qmc-hdlc    
+> >>
+> >> Why this is not a device/SoC specific compatible?  
+> > 
+> > This compatible is present in a QMC channel.
+> > The parent node (the QMC itself) contains a compatible with device/SoC:
+> > --- 8< ---
+> >   compatible:
+> >     items:
+> >       - enum:
+> >           - fsl,mpc885-scc-qmc
+> >           - fsl,mpc866-scc-qmc
+> >       - const: fsl,cpm1-scc-qmc
+> > --- 8< ---
+> > 
+> > At the child level (ie QMC channel), I am not sure that adding device/SoC
+> > makes sense. This compatible indicates that the QMC channel is handled by
+> > the QMC HDLC driver.
+> > At this level, whatever the device/SoC, we have to be QMC compliant.
+> > 
+> > With these details, do you still think I need to change the child (channel)
+> > compatible ?  
+> 
+> From OS point of view, you have a driver binding to this child-level
+> compatible. How do you enforce Linux driver binding based on parent
+> compatible? I looked at your next patch and I did not see it.
 
-On 9/21/23 8:36 PM, Alexandra Winter wrote:
-> On 18.09.23 05:58, D. Wythe wrote:
->> Hi Alexandra,
->>
->> Sorry for the late reply. I have been thinking about the question you mentioned for a while, and this is a great opportunity to discuss this issue.
->> My point is that the purpose of the locks is to minimize the expansion of the number of link groups as much as possible.
->>
->> As we all know, the SMC-R protocol has the following specifications:
->>
->>   * A SMC-R connection MUST be mapped into one link group.
->>   * A link group is usually created by a connection, which is also known
->>     as "First Contact."
->>
->> If we start from scratch, we can design the connection process as follows:
->>
->> 1. Check if there are any available link groups. If so, map the
->>     connection into it and go to step 3.
->> 2. Mark this connection as "First Contact," create a link group, and
->>     mark the new link group as unavailable.
->> 3. Finish connection establishment.
->> 4. If the connection is "First Contact," mark the new link group as
->>     available and map the connection into it.
->>
->> I think there is no logical problem with this process, but there is a practical issue where burst traffic can result in burst link groups.
->>
->> For example, if there are 10,000 incoming connections, based on the above logic, the most extreme scenario would be to create 10,000 link groups.
->> This can cause significant memory pressure and even be used for security attacks.
->>
->> To address this goal, the simplest way is to make each connection process mutually exclusive, having the following process:
->>
->> 1. Block other incoming connections.
->> 2. Check if there are any available link groups. If so, map the
->>     connection into it and go to step 4.
->> 3. Mark this connection as "First Contact," create a link group, and
->>     mark it as unavailable.
->> 4. Finish connection establishment.
->> 5. If the connection is "First Contact," mark the new link group as
->>     available and map the connection into it.
->> 6. Allow other connections to come in.
->>
->> And this is our current process now!
->>
->> Regarding the purpose of the locks, to minimize the expansion of the number of link groups. If we agree with this point, we can observe that
->> in phase 2 going to phase 4, this process will never create a new link group. Obviously, the lock is not needed here.
-> Well, you still have issue of a link group going away. Thread 1 is deleting the last connection from a link group and shutting it down. Thread 2 is adding a 'second' connection (from its poitn ov view) to the linkgroup.
+We do not need to have the child driver binding based on parent.
+We have to ensure that the child handles a QMC channel and the parent provides
+a QMC channel.
 
-Hi Alexandra,
+A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
+and a QMC channel driver (child) has to use the QMC API.
 
-That's right.  But even if we do nothing, the current implements still 
-has this problem.
-And this problem can be solved by the spinlock inside smc_conn_create, 
-rather than the
-pending lock.
+Best regards,
+Hervé
 
-And also deleting the last connection from a link group will not 
-shutting the down right now,
-usually waiting for 10 minutes of idle time.
-
->> Then the last question: why is the lock needed until after smc_clc_send_confirm in the new-LGR case? We can try to move phase 6 ahead as follows:
->>
->> 1. Block other incoming connections.
->> 2. Check if there are any available link groups. If so, map the
->>     connection into it and go to step 4.
->> 3. Mark this connection as "First Contact," create a link group, and
->>     mark it as unavailable.
->> 4. Allow other connections to come in.
->> 5. Finish connection establishment.
->> 6. If the connection is "First Contact," mark the new link group as
->>     available and map the connection into it.
->>
->> There is also no problem with this process! However, note that this logic does not address burst issues.
->> Burst traffic will still result in burst link groups because a new link group can only be marked as available when the "First Contact" is completed,
->> which is after sending the CLC Confirm.
->>
->> Hope my point is helpful to you. If you have any questions, please let me know. Thanks.
->>
->> Best wishes,
->> D. Wythe
-> You are asking exactly the right questions here. Creation of new connections is on the critical path,
-> and if the design can be optimized for parallelism that will increase perfromance, while insufficient
-> locking will create nasty bugs.
-> Many programmers have dealt with these issues before us. I would recommend to consult existing proven
-> patterns; e.g. the ones listed in Paul McKenney's book
-> (https://mirrors.edge.kernel.org/pub/linux/kernel/people/paulmck/perfbook/)
-> e.g. 'Chapter 10.3 Read-Mostly Data Structures' and of course the kernel documentation folder.
-> Improving an existing codebase like smc without breaking is not trivial. Obviuosly a step-by-step approach,
-> works best. So if you can identify actions that can be be done under a smaller (as in more granular) lock
-> instead of under a global lock. OR change a mutex into R/W or RCU.
-> Smaller changes are easier to review (and bisect in case of regressions).
-
-I have to say it's quite hard to make the lock smaller, we have indeed 
-considered the impact of the complexity of the patch on review,
-and this might be the simplest solution we can think of. If this 
-solution is not okay for you, perhaps we can discuss
-whether there is a better solution ?
-
-Best wishes,
-D. Wythe
-
-
-
-
-
-
-
-
+> 
+> Best regards,
+> Krzysztof
+> 
 
