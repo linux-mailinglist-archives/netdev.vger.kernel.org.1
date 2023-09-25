@@ -1,235 +1,217 @@
-Return-Path: <netdev+bounces-36175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38ADA7AE07E
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:55:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DE07AE0EE
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 23:47:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4BBD81C20443
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 20:55:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 850871F24C22
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 21:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E96223776;
-	Mon, 25 Sep 2023 20:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC6224203;
+	Mon, 25 Sep 2023 21:47:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933AF1DA33
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 20:55:44 +0000 (UTC)
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85255C0;
-	Mon, 25 Sep 2023 13:55:41 -0700 (PDT)
-Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-49032a0ff13so2667256e0c.0;
-        Mon, 25 Sep 2023 13:55:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976811170A
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 21:47:21 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D228A2
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 14:47:20 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d852a6749baso11467850276.0
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 14:47:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695675340; x=1696280140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dIA+qziFaiYcJMDJC+/kx6eXDbvvT/HPXUlpCtHOxiU=;
-        b=Ji37eCiw1aGJbbqBRggFFY9ZDbH8T0ei9Rb0kNHSBEYZDHrQlNznrcWJci3ZFWkH6L
-         257mNo61mtK22xJwgPBEZYwXIgQvo1ClduzwXfh9zgHIKCTUJHTz+rDZUWj9WAewIPhK
-         RwQTzkqCMxCfrE5D76oPZ8daim6QVay37L8DL6d3Uq1rrCoslOERa1W59cFTn5jSiIVH
-         1zgPg0yk9ST8LUN/nLg5IeU1ENsdNkMUmnweg3ei5i1t9zNKXvMyz7RzhtgsKX8h7X56
-         frt7gjMbu/pOT5Cux/OJltxlkI1aqR/r6ulL6E0OgHkAgliv56UNtF5unU517pdudiT3
-         X/tg==
+        d=google.com; s=20230601; t=1695678439; x=1696283239; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9kSoxE55K8Ugx6woIwUGCOWl36cKcykhW9tXJWOEJpY=;
+        b=jAK6iQrpDwkSPC1srF4xlv2Q4FNMiy9JHNC806rqH0JG2WwOvOmMU+o8+UebEOeaQv
+         foCxA66BonFs0VynfbcgQYLWzbzm2f1X33kz2i1cah1iP4R5ghN+0luiweDTkVVO3RS4
+         SZcKrpucbDKxCSvbUiMH1xTpT3qkmihE5vjfFmTZy95BPHIYcNlIV0YUoUc2S0D8ij6+
+         9emSzuoF50UWJbFR6L64okSLmeISkcImpHSXp1H4WNrIKkp9hqE1CFhCVrpHpFWnK45e
+         f2hyt4AuyDiIP/1WKUyxxegFSfHKTClPme90z+GTYDFXD4f27D6S9mw2d9lJoHpnSnJj
+         mBGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695675340; x=1696280140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dIA+qziFaiYcJMDJC+/kx6eXDbvvT/HPXUlpCtHOxiU=;
-        b=Po6RAfbfsxYSj7dc/vivkqLfAUwLeQ112b1oRvUsdyI7wMArpR97GJLOF1/2UxhOeV
-         U4tGJngJIKnHx4vSsHPXv+Rqn6z3yLXXv9u1N/BzS0YPcN/VcC1BBiUIB/vmnhHfII6K
-         1RX/Dl84mC3n7yRhiWoWO01KZqaBE71qsi2TdnX2OMV2x7xLNRsB8L38wrgtYZ1SO7KN
-         UEQ3JQYzyGcP7XpuqAK8uBnH1lxM7gzaYE3ZpNL4ff9H7K4BK3vVybyenpG5yjIJkxCW
-         vAwH6ZWot04OBj2UQawBSRWVp7Xprgo75A7sCDnKuPGBJP7hVZbxTYtfBNb13xvXUXFg
-         E/aw==
-X-Gm-Message-State: AOJu0Yw0zP9AZ4fGpllbRRzBy3No3eAZHXd9EJT0ED6VZ93b2iR3rIOq
-	FzR5kxgPLt75OWkq5COJaZds2xTJ0xg5Q/2+c1A=
-X-Google-Smtp-Source: AGHT+IE8OXQ5qBWmBH2Wg+f0Rn0UrvAUxFonYCEfiWSdmlJpE5mh59jI9o8qMwt1vMu66AnDRdbHAFQ8ahoC5NLTvPg=
-X-Received: by 2002:a1f:c6c1:0:b0:48d:1e9:2707 with SMTP id
- w184-20020a1fc6c1000000b0048d01e92707mr4461061vkf.7.1695675340584; Mon, 25
- Sep 2023 13:55:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695678439; x=1696283239;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9kSoxE55K8Ugx6woIwUGCOWl36cKcykhW9tXJWOEJpY=;
+        b=MKGiZr1nrNKAewxzd+/LjpzQtokRwsBS9cZdBBEOAi3YUyo/sTCRvh2ojDcdatKRBI
+         iwjw2clkFvb1E69h6qQpDZQEyWa7NKUzmU9/aJGtjFY1KjL5O2FwA329e2jETBSuJJeJ
+         5lDi70iGqhFVRu1MfFV5wI8AA4NX9C0u7yr2anxvLlyACSndIqfFa4c6428hHtnp0JGA
+         EevcUapD+i3MG7fUVX7l9vTvDor2RLAoBEmKfmU/4wRrlsWxGVlBX/06aVbJoRkXFQCY
+         LOKhVnAecg+hHxBoXHuHQX2wLQqMgq/CXdSL0QyduHDhHGA08AjdJVmrUJB6fI3NWhHb
+         LTNw==
+X-Gm-Message-State: AOJu0YyGgdALN1L3TmbPFa/9qaHi3P06wV1QdWSY+yOCs6a2ssHSngpT
+	SDZlYqIExblX5jh5byDdvwhZF8dPNQ==
+X-Google-Smtp-Source: AGHT+IGNxUAnQaY4xj1Tr5Semp31UI5iqGF+Jr7BeejUHDMX14O9gNNIjXkgC/0ea1JjkcmXc+ifKphnwg==
+X-Received: from prohr-desktop.mtv.corp.google.com ([2620:15c:211:200:146d:2aa0:7ed1:bbb8])
+ (user=prohr job=sendgmr) by 2002:a05:6902:1105:b0:d81:6637:b5b2 with SMTP id
+ o5-20020a056902110500b00d816637b5b2mr89965ybu.0.1695678439382; Mon, 25 Sep
+ 2023 14:47:19 -0700 (PDT)
+Date: Mon, 25 Sep 2023 14:47:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230912122201.3752918-1-paweldembicki@gmail.com>
- <20230912122201.3752918-7-paweldembicki@gmail.com> <20230912213937.wqwiex32ojlojnue@skbuf>
-In-Reply-To: <20230912213937.wqwiex32ojlojnue@skbuf>
-From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
-Date: Mon, 25 Sep 2023 22:55:29 +0200
-Message-ID: <CAJN1KkyV_B4Dhd65WmeetE8ynf+w=_L3XqE55=4+QWNLNRaDsQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 6/8] net: dsa: vsc73xx: introduce tag 8021q
- for vsc73xx
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Simon Horman <simon.horman@corigine.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230925214711.959704-1-prohr@google.com>
+Subject: [PATCH net-next v4] net: add sysctl to disable rfc4862 5.5.3e
+ lifetime handling
+From: Patrick Rohr <prohr@google.com>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Patrick Rohr <prohr@google.com>, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>, Jen Linkova <furry@google.com>, 
+	Jiri Pirko <jiri@resnulli.us>, David Ahern <dsahern@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-wt., 12 wrz 2023 o 23:39 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(a=
-):
->
-> Hi Pawel,
+This change adds a sysctl to opt-out of RFC4862 section 5.5.3e's valid
+lifetime derivation mechanism.
 
-Hi Vladimir,
+RFC4862 section 5.5.3e prescribes that the valid lifetime in a Router
+Advertisement PIO shall be ignored if it less than 2 hours and to reset
+the lifetime of the corresponding address to 2 hours. An in-progress
+6man draft (see draft-ietf-6man-slaac-renum-07 section 4.2) is currently
+looking to remove this mechanism. While this draft has not been moving
+particularly quickly for other reasons, there is widespread consensus on
+section 4.2 which updates RFC4862 section 5.5.3e.
 
->
-> On Tue, Sep 12, 2023 at 02:22:00PM +0200, Pawel Dembicki wrote:
-> > This commit introduces a new tagger based on 802.1q tagging.
-> > It's designed for the vsc73xx driver. The VSC73xx family doesn't have
-> > any tag support for the RGMII port, but it could be based on VLANs.
-> >
-> > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> > ---
-> > diff --git a/net/dsa/tag_vsc73xx_8021q.c b/net/dsa/tag_vsc73xx_8021q.c
-> > new file mode 100644
-> > index 000000000000..9093a71e6eb0
-> > --- /dev/null
-> > +++ b/net/dsa/tag_vsc73xx_8021q.c
-> > @@ -0,0 +1,91 @@
-> > +// SPDX-License-Identifier: GPL-2.0 OR MIT
-> > +/* Copyright (C) 2022 Pawel Dembicki <paweldembicki@gmail.com>
->
-> 2022-2023 by now, maybe?
->
-> > + * Based on tag_sja1105.c:
-> > + * Copyright (c) 2019, Vladimir Oltean <olteanv@gmail.com>
-> > + */
-> > +#include <linux/dsa/8021q.h>
-> > +
-> > +#include "tag.h"
-> > +#include "tag_8021q.h"
-> > +
-> > +#define VSC73XX_8021Q_NAME "vsc73xx-8021q"
-> > +
-> > +static struct sk_buff *vsc73xx_xmit(struct sk_buff *skb, struct net_de=
-vice *netdev)
-> > +{
-> > +     struct dsa_port *dp =3D dsa_slave_to_port(netdev);
-> > +     u16 queue_mapping =3D skb_get_queue_mapping(skb);
-> > +     u16 tx_vid =3D dsa_tag_8021q_standalone_vid(dp);
-> > +     u8 pcp;
-> > +
-> > +     if (skb->offload_fwd_mark) {
-> > +             unsigned int bridge_num =3D dsa_port_bridge_num_get(dp);
-> > +             struct net_device *br =3D dsa_port_bridge_dev_get(dp);
-> > +
-> > +             if (br_vlan_enabled(br))
-> > +                     return skb;
-> > +
-> > +             tx_vid =3D dsa_tag_8021q_bridge_vid(bridge_num);
-> > +     }
-> > +
-> > +     pcp =3D netdev_txq_to_tc(netdev, queue_mapping);
-> > +
-> > +     return dsa_8021q_xmit(skb, netdev, ETH_P_8021Q,
-> > +                           ((pcp << VLAN_PRIO_SHIFT) | tx_vid));
-> > +}
-> > +
-> > +static void vsc73xx_vlan_rcv(struct sk_buff *skb, int *source_port,
-> > +                          int *switch_id, int *vbid, u16 *vid)
-> > +{
-> > +     if (vid_is_dsa_8021q(skb_vlan_tag_get(skb) & VLAN_VID_MASK))
-> > +             return dsa_8021q_rcv(skb, source_port, switch_id, vbid);
-> > +
-> > +     /* Try our best with imprecise RX */
-> > +     *vid =3D skb_vlan_tag_get(skb) & VLAN_VID_MASK;
-> > +}
-> > +
-> > +static struct sk_buff *vsc73xx_rcv(struct sk_buff *skb, struct net_dev=
-ice *netdev)
-> > +{
-> > +     int src_port =3D -1, switch_id =3D -1, vbid =3D -1;
-> > +     u16 vid;
-> > +
-> > +     if (skb_vlan_tag_present(skb)) {
-> > +             /* Normal traffic path. */
-> > +             vsc73xx_vlan_rcv(skb, &src_port, &switch_id, &vbid, &vid)=
-;
-> > +     } else {
-> > +             netdev_warn(netdev, "Couldn't decode source port\n");
-> > +             return NULL;
-> > +     }
-> > +
-> > +     if (vbid >=3D 1)
-> > +             skb->dev =3D dsa_tag_8021q_find_port_by_vbid(netdev, vbid=
-);
-> > +     else if (src_port =3D=3D -1 || switch_id =3D=3D -1)
-> > +             skb->dev =3D dsa_find_designated_bridge_port_by_vid(netde=
-v, vid);
-> > +     else
-> > +             skb->dev =3D dsa_master_find_slave(netdev, switch_id, src=
-_port);
->
-> Hmm, this isn't looking too good.
->
-> I think the fact that you had to add my copyright on what should be such
-> a simple thing as a VLAN-based tagger is a bad sign :)
->
-> It's time to consolidate some more stuff that currently lives in
-> tag_sja1105 and move it into tag_8021q so that you can reuse it more
-> easily.
->
-> I've prepared some (only compile-tested) patches on this branch here:
-> https://github.com/vladimiroltean/linux/commits/pawel-dembicki-vsc73xx-v3
->
-> I need to double-check that they don't introduce regressions,
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Cc: Jen Linkova <furry@google.com>
+Cc: Jiri Pirko <jiri@resnulli.us>
+Cc: David Ahern <dsahern@kernel.org>
+Signed-off-by: Patrick Rohr <prohr@google.com>
+---
+ Documentation/networking/ip-sysctl.rst | 11 ++++++++
+ include/linux/ipv6.h                   |  1 +
+ net/ipv6/addrconf.c                    | 38 +++++++++++++++++---------
+ 3 files changed, 37 insertions(+), 13 deletions(-)
 
-I tested it on my device and I couldn't find any regressions. vlan
-filtering and tagging work as expected.
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/network=
+ing/ip-sysctl.rst
+index a66054d0763a..45d700e04dba 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2304,6 +2304,17 @@ accept_ra_pinfo - BOOLEAN
+ 		- enabled if accept_ra is enabled.
+ 		- disabled if accept_ra is disabled.
+=20
++ra_honor_pio_life - BOOLEAN
++	Whether to use RFC4862 Section 5.5.3e to determine the valid
++	lifetime of an address matching a prefix sent in a Router
++	Advertisement Prefix Information Option.
++
++	- If enabled, the PIO valid lifetime will always be honored.
++	- If disabled, RFC4862 section 5.5.3e is used to determine
++	  the valid lifetime of the address.
++
++	Default: 0 (disabled)
++
+ accept_ra_rt_info_min_plen - INTEGER
+ 	Minimum prefix length of Route Information in RA.
+=20
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 5883551b1ee8..8f3b61f953c4 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -82,6 +82,7 @@ struct ipv6_devconf {
+ 	__u32		ioam6_id_wide;
+ 	__u8		ioam6_enabled;
+ 	__u8		ndisc_evict_nocarrier;
++	__u8		ra_honor_pio_life;
+=20
+ 	struct ctl_table_header *sysctl_header;
+ };
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 47d1dd8501b7..980d0f65b745 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -236,6 +236,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly =
+=3D {
+ 	.ioam6_id               =3D IOAM6_DEFAULT_IF_ID,
+ 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
+ 	.ndisc_evict_nocarrier	=3D 1,
++	.ra_honor_pio_life	=3D 0,
+ };
+=20
+ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly =3D {
+@@ -297,6 +298,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mos=
+tly =3D {
+ 	.ioam6_id               =3D IOAM6_DEFAULT_IF_ID,
+ 	.ioam6_id_wide		=3D IOAM6_DEFAULT_IF_ID_WIDE,
+ 	.ndisc_evict_nocarrier	=3D 1,
++	.ra_honor_pio_life	=3D 0,
+ };
+=20
+ /* Check if link is ready: is it up and is a valid qdisc available */
+@@ -2657,22 +2659,23 @@ int addrconf_prefix_rcv_add_addr(struct net *net, s=
+truct net_device *dev,
+ 			stored_lft =3D ifp->valid_lft - (now - ifp->tstamp) / HZ;
+ 		else
+ 			stored_lft =3D 0;
+-		if (!create && stored_lft) {
++
++		/* RFC4862 Section 5.5.3e:
++		 * "Note that the preferred lifetime of the
++		 *  corresponding address is always reset to
++		 *  the Preferred Lifetime in the received
++		 *  Prefix Information option, regardless of
++		 *  whether the valid lifetime is also reset or
++		 *  ignored."
++		 *
++		 * So we should always update prefered_lft here.
++		 */
++		update_lft =3D !create && stored_lft;
++
++		if (update_lft && !in6_dev->cnf.ra_honor_pio_life) {
+ 			const u32 minimum_lft =3D min_t(u32,
+ 				stored_lft, MIN_VALID_LIFETIME);
+ 			valid_lft =3D max(valid_lft, minimum_lft);
+-
+-			/* RFC4862 Section 5.5.3e:
+-			 * "Note that the preferred lifetime of the
+-			 *  corresponding address is always reset to
+-			 *  the Preferred Lifetime in the received
+-			 *  Prefix Information option, regardless of
+-			 *  whether the valid lifetime is also reset or
+-			 *  ignored."
+-			 *
+-			 * So we should always update prefered_lft here.
+-			 */
+-			update_lft =3D 1;
+ 		}
+=20
+ 		if (update_lft) {
+@@ -6846,6 +6849,15 @@ static const struct ctl_table addrconf_sysctl[] =3D =
+{
+ 		.mode		=3D 0644,
+ 		.proc_handler	=3D proc_dointvec,
+ 	},
++	{
++		.procname	=3D "ra_honor_pio_life",
++		.data		=3D &ipv6_devconf.ra_honor_pio_life,
++		.maxlen		=3D sizeof(u8),
++		.mode		=3D 0644,
++		.proc_handler	=3D proc_dou8vec_minmax,
++		.extra1		=3D SYSCTL_ZERO,
++		.extra2		=3D SYSCTL_ONE,
++	},
+ #ifdef CONFIG_IPV6_ROUTER_PREF
+ 	{
+ 		.procname	=3D "accept_ra_rtr_pref",
+--=20
+2.42.0.515.g380fc7ccd1-goog
 
-> and we
-> should discuss the merging strategy. Probably you're going to submit
-> them together with your patch set.
-
-I prepared the v4 patch series. Please look if that format is ok with you.
-https://github.com/CHKDSK88/linux/commits/vsc73xx-vlan-net-next
-
->
-> With that, you can drop my part of the copyright :) The remainder should
-> look like straightforward use of API which can be written in only a
-> limited number of ways.
-
-Now it is much simpler.
-
->
-> > +     if (!skb->dev) {
-> > +             netdev_warn(netdev, "Couldn't decode source port\n");
-> > +             return NULL;
-> > +     }
-> > +
-> > +     dsa_default_offload_fwd_mark(skb);
-> > +
-> > +     if (dsa_port_is_vlan_filtering(dsa_slave_to_port(skb->dev)) &&
-> > +         eth_hdr(skb)->h_proto =3D=3D htons(ETH_P_8021Q))
-> > +             __vlan_hwaccel_clear_tag(skb);
->
-> Why do you need to do this? We send VLAN-tagged packets to the
-> VLAN-aware bridge intentionally, so that it knows what VLAN they come
-> from (in the dsa_find_designated_bridge_port_by_vid() case). So don't
-> strip it if it's not causing a problem.
->
-
-I dropped it in v4. I needed it when I started with this patch series,
-because bridge in vlan filtering causes double tagged frames (one from
-hardware and one from bridge). But after recent changes it is useless
-and it could be dropped because vlan works as expected without it.
-
-> > +
-> > +     return skb;
-> > +}
 
