@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-36174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609E97AE075
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:51:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38ADA7AE07E
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id DC8391F24F6E
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 20:51:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4BBD81C20443
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 20:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE91B23764;
-	Mon, 25 Sep 2023 20:51:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E96223776;
+	Mon, 25 Sep 2023 20:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506062375F
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 20:51:07 +0000 (UTC)
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34BDFBE;
-	Mon, 25 Sep 2023 13:51:02 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id ada2fe7eead31-452749f6c47so3012934137.1;
-        Mon, 25 Sep 2023 13:51:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933AF1DA33
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 20:55:44 +0000 (UTC)
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85255C0;
+	Mon, 25 Sep 2023 13:55:41 -0700 (PDT)
+Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-49032a0ff13so2667256e0c.0;
+        Mon, 25 Sep 2023 13:55:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695675061; x=1696279861; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695675340; x=1696280140; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gLT6JXItUdbK8gpxFGKaP+4imC55Y5aPeSLP42utcRg=;
-        b=cmWD1mGvN7sErs2tS/1bN+B+MK571qiF4jvgVA90LliVrxm23l7qEkfvoBcyEGAuWS
-         hSKLAk0hXpoZ8H18ZjJH2m1S9100FIg+NC6n45dYIpogL5+yJTkhtxpF3cJ50CHnJOYs
-         BjMcDlxXMbfl09PXN3SVf4iwAk8xe23rlSH3CPdNh8VIvMK7ei+1ynHwGthgRLfuGdBC
-         gnhbp/d1i5a8ZLDlnPcr8QBhjwGUr8shPvQP7rZRW+u5vx6pNG+h6qg8hTnfVF2KIRVl
-         BPaEcLspSh8PYpMkVclmdVzRhI6K0Zf81tF9kfxT3XXLGy/Adcro7HUwVQfYTqAKUXpy
-         eZZA==
+        bh=dIA+qziFaiYcJMDJC+/kx6eXDbvvT/HPXUlpCtHOxiU=;
+        b=Ji37eCiw1aGJbbqBRggFFY9ZDbH8T0ei9Rb0kNHSBEYZDHrQlNznrcWJci3ZFWkH6L
+         257mNo61mtK22xJwgPBEZYwXIgQvo1ClduzwXfh9zgHIKCTUJHTz+rDZUWj9WAewIPhK
+         RwQTzkqCMxCfrE5D76oPZ8daim6QVay37L8DL6d3Uq1rrCoslOERa1W59cFTn5jSiIVH
+         1zgPg0yk9ST8LUN/nLg5IeU1ENsdNkMUmnweg3ei5i1t9zNKXvMyz7RzhtgsKX8h7X56
+         frt7gjMbu/pOT5Cux/OJltxlkI1aqR/r6ulL6E0OgHkAgliv56UNtF5unU517pdudiT3
+         X/tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695675061; x=1696279861;
+        d=1e100.net; s=20230601; t=1695675340; x=1696280140;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gLT6JXItUdbK8gpxFGKaP+4imC55Y5aPeSLP42utcRg=;
-        b=vktlfilba1A4t7Pt0JR1ma+0FeIcfITioYiej3ibhHinyy5TG+HuzB3LXiRaPkW5X0
-         ZfkHZGsu9LRw08yN4L9nI3UgoNuqGPMbK4vkfVznMt1MjmChGiUtFcIQzJ8+GezM2ca1
-         +Q76L86DvkplbJDGk6Uir/KzmKvUVqLTfGiUlxdj4VUQMKMQ6MTeErTNP1E8qAyXK3W9
-         gA7YSYUoibjyEy1b0Jt0Ap11Sgorvz0FR2QB6t08fxy+/j3ER/Smnmp61Ssotkt1I7wS
-         xcoy9aB2zCIODDsB7LdKJrcKwMXUwUgGKleOZQ/DscCY6wB+wyQKKSg8V03E5ju3c1nl
-         UKLg==
-X-Gm-Message-State: AOJu0Yya3yRBFk701yqYfudehGpeL9B8vpXP8WkWr3JoiByVwqn79ADY
-	MFu6K9WykOuFBkQCeifccC7A9UvxNHAt+0EEFrg=
-X-Google-Smtp-Source: AGHT+IGfAvQ8kf3O9EjKf5AXzCA7Xf27mHHDDDAsYtLOnBY50Vko+gP8W+3Arhov0vTpCnY4rfIvw5rvelnJEfRIN+8=
-X-Received: by 2002:a05:6102:2e4:b0:44d:48bf:591c with SMTP id
- j4-20020a05610202e400b0044d48bf591cmr5309437vsj.30.1695675061205; Mon, 25 Sep
- 2023 13:51:01 -0700 (PDT)
+        bh=dIA+qziFaiYcJMDJC+/kx6eXDbvvT/HPXUlpCtHOxiU=;
+        b=Po6RAfbfsxYSj7dc/vivkqLfAUwLeQ112b1oRvUsdyI7wMArpR97GJLOF1/2UxhOeV
+         U4tGJngJIKnHx4vSsHPXv+Rqn6z3yLXXv9u1N/BzS0YPcN/VcC1BBiUIB/vmnhHfII6K
+         1RX/Dl84mC3n7yRhiWoWO01KZqaBE71qsi2TdnX2OMV2x7xLNRsB8L38wrgtYZ1SO7KN
+         UEQ3JQYzyGcP7XpuqAK8uBnH1lxM7gzaYE3ZpNL4ff9H7K4BK3vVybyenpG5yjIJkxCW
+         vAwH6ZWot04OBj2UQawBSRWVp7Xprgo75A7sCDnKuPGBJP7hVZbxTYtfBNb13xvXUXFg
+         E/aw==
+X-Gm-Message-State: AOJu0Yw0zP9AZ4fGpllbRRzBy3No3eAZHXd9EJT0ED6VZ93b2iR3rIOq
+	FzR5kxgPLt75OWkq5COJaZds2xTJ0xg5Q/2+c1A=
+X-Google-Smtp-Source: AGHT+IE8OXQ5qBWmBH2Wg+f0Rn0UrvAUxFonYCEfiWSdmlJpE5mh59jI9o8qMwt1vMu66AnDRdbHAFQ8ahoC5NLTvPg=
+X-Received: by 2002:a1f:c6c1:0:b0:48d:1e9:2707 with SMTP id
+ w184-20020a1fc6c1000000b0048d01e92707mr4461061vkf.7.1695675340584; Mon, 25
+ Sep 2023 13:55:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <4a096ba9cf981a588aa87235bb91e933ee162b3d.1695542544.git.christophe.jaillet@wanadoo.fr>
- <65105d3a8e70e_12c73e29410@willemb.c.googlers.com.notmuch> <f705117e-41dd-cb2f-ed06-6c47876fd6a2@wanadoo.fr>
-In-Reply-To: <f705117e-41dd-cb2f-ed06-6c47876fd6a2@wanadoo.fr>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 25 Sep 2023 22:50:24 +0200
-Message-ID: <CAF=yD-+8Q19sO4XC0dNSiYWSCj03rS9tfV+mVjvZOBnnwpnS5g@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp_tunnel: Use flex array to simplify code
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+References: <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-7-paweldembicki@gmail.com> <20230912213937.wqwiex32ojlojnue@skbuf>
+In-Reply-To: <20230912213937.wqwiex32ojlojnue@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Mon, 25 Sep 2023 22:55:29 +0200
+Message-ID: <CAJN1KkyV_B4Dhd65WmeetE8ynf+w=_L3XqE55=4+QWNLNRaDsQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 6/8] net: dsa: vsc73xx: introduce tag 8021q
+ for vsc73xx
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Simon Horman <simon.horman@corigine.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	netdev@vger.kernel.org
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,73 +80,156 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 25, 2023 at 6:26=E2=80=AFPM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
+wt., 12 wrz 2023 o 23:39 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(a=
+):
 >
-> Le 24/09/2023 =C3=A0 18:00, Willem de Bruijn a =C3=A9crit :
-> > Christophe JAILLET wrote:
-> >> 'n_tables' is small, UDP_TUNNEL_NIC_MAX_TABLES       =3D 4 as a maximu=
-m. So there
-> >> is no real point to allocate the 'entries' pointers array with a dedic=
-ate
-> >> memory allocation.
-> >>
-> >> Using a flexible array for struct udp_tunnel_nic->entries avoids the
-> >> overhead of an additional memory allocation.
-> >>
-> >> This also saves an indirection when the array is accessed.
-> >>
-> >> Finally, __counted_by() can be used for run-time bounds checking if
-> >> configured and supported by the compiler.
-> >>
-> >> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Hi Pawel,
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Hi Vladimir,
 
-> >> ---
-> >>   net/ipv4/udp_tunnel_nic.c | 11 ++---------
-> >>   1 file changed, 2 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/net/ipv4/udp_tunnel_nic.c b/net/ipv4/udp_tunnel_nic.c
-> >> index 029219749785..b6d2d16189c0 100644
-> >> --- a/net/ipv4/udp_tunnel_nic.c
-> >> +++ b/net/ipv4/udp_tunnel_nic.c
-> >> @@ -47,7 +47,7 @@ struct udp_tunnel_nic {
-> >>
-> >>      unsigned int n_tables;
-> >>      unsigned long missed;
-> >> -    struct udp_tunnel_nic_table_entry **entries;
-> >> +    struct udp_tunnel_nic_table_entry *entries[] __counted_by(n_table=
-s);
-> >>   };
-> >>
-> >>   /* We ensure all work structs are done using driver state, but not t=
-he code.
-> >> @@ -725,16 +725,12 @@ udp_tunnel_nic_alloc(const struct udp_tunnel_nic=
-_info *info,
-> >>      struct udp_tunnel_nic *utn;
-> >>      unsigned int i;
-> >>
-> >> -    utn =3D kzalloc(sizeof(*utn), GFP_KERNEL);
-> >> +    utn =3D kzalloc(struct_size(utn, entries, n_tables), GFP_KERNEL);
-> >>      if (!utn)
-> >>              return NULL;
-> >>      utn->n_tables =3D n_tables;
+>
+> On Tue, Sep 12, 2023 at 02:22:00PM +0200, Pawel Dembicki wrote:
+> > This commit introduces a new tagger based on 802.1q tagging.
+> > It's designed for the vsc73xx driver. The VSC73xx family doesn't have
+> > any tag support for the RGMII port, but it could be based on VLANs.
 > >
-> > Should utn->n_tables be initialized before first use of
-> > struct_size(utn, entries, n_tables)?
-> >
+> > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> > ---
+> > diff --git a/net/dsa/tag_vsc73xx_8021q.c b/net/dsa/tag_vsc73xx_8021q.c
+> > new file mode 100644
+> > index 000000000000..9093a71e6eb0
+> > --- /dev/null
+> > +++ b/net/dsa/tag_vsc73xx_8021q.c
+> > @@ -0,0 +1,91 @@
+> > +// SPDX-License-Identifier: GPL-2.0 OR MIT
+> > +/* Copyright (C) 2022 Pawel Dembicki <paweldembicki@gmail.com>
 >
-> It can't be.
-> struct_size() is used to compute the memory size to allocate.
+> 2022-2023 by now, maybe?
 >
-> Before the kzalloc() call, utn does not exist, so we can't write
-> anything to utn->n_tables. It is undefined at this point.
+> > + * Based on tag_sja1105.c:
+> > + * Copyright (c) 2019, Vladimir Oltean <olteanv@gmail.com>
+> > + */
+> > +#include <linux/dsa/8021q.h>
+> > +
+> > +#include "tag.h"
+> > +#include "tag_8021q.h"
+> > +
+> > +#define VSC73XX_8021Q_NAME "vsc73xx-8021q"
+> > +
+> > +static struct sk_buff *vsc73xx_xmit(struct sk_buff *skb, struct net_de=
+vice *netdev)
+> > +{
+> > +     struct dsa_port *dp =3D dsa_slave_to_port(netdev);
+> > +     u16 queue_mapping =3D skb_get_queue_mapping(skb);
+> > +     u16 tx_vid =3D dsa_tag_8021q_standalone_vid(dp);
+> > +     u8 pcp;
+> > +
+> > +     if (skb->offload_fwd_mark) {
+> > +             unsigned int bridge_num =3D dsa_port_bridge_num_get(dp);
+> > +             struct net_device *br =3D dsa_port_bridge_dev_get(dp);
+> > +
+> > +             if (br_vlan_enabled(br))
+> > +                     return skb;
+> > +
+> > +             tx_vid =3D dsa_tag_8021q_bridge_vid(bridge_num);
+> > +     }
+> > +
+> > +     pcp =3D netdev_txq_to_tc(netdev, queue_mapping);
+> > +
+> > +     return dsa_8021q_xmit(skb, netdev, ETH_P_8021Q,
+> > +                           ((pcp << VLAN_PRIO_SHIFT) | tx_vid));
+> > +}
+> > +
+> > +static void vsc73xx_vlan_rcv(struct sk_buff *skb, int *source_port,
+> > +                          int *switch_id, int *vbid, u16 *vid)
+> > +{
+> > +     if (vid_is_dsa_8021q(skb_vlan_tag_get(skb) & VLAN_VID_MASK))
+> > +             return dsa_8021q_rcv(skb, source_port, switch_id, vbid);
+> > +
+> > +     /* Try our best with imprecise RX */
+> > +     *vid =3D skb_vlan_tag_get(skb) & VLAN_VID_MASK;
+> > +}
+> > +
+> > +static struct sk_buff *vsc73xx_rcv(struct sk_buff *skb, struct net_dev=
+ice *netdev)
+> > +{
+> > +     int src_port =3D -1, switch_id =3D -1, vbid =3D -1;
+> > +     u16 vid;
+> > +
+> > +     if (skb_vlan_tag_present(skb)) {
+> > +             /* Normal traffic path. */
+> > +             vsc73xx_vlan_rcv(skb, &src_port, &switch_id, &vbid, &vid)=
+;
+> > +     } else {
+> > +             netdev_warn(netdev, "Couldn't decode source port\n");
+> > +             return NULL;
+> > +     }
+> > +
+> > +     if (vbid >=3D 1)
+> > +             skb->dev =3D dsa_tag_8021q_find_port_by_vbid(netdev, vbid=
+);
+> > +     else if (src_port =3D=3D -1 || switch_id =3D=3D -1)
+> > +             skb->dev =3D dsa_find_designated_bridge_port_by_vid(netde=
+v, vid);
+> > +     else
+> > +             skb->dev =3D dsa_master_find_slave(netdev, switch_id, src=
+_port);
 >
-> It is initialized the line just after, after the allocation, but before
-> any use.
+> Hmm, this isn't looking too good.
+>
+> I think the fact that you had to add my copyright on what should be such
+> a simple thing as a VLAN-based tagger is a bad sign :)
+>
+> It's time to consolidate some more stuff that currently lives in
+> tag_sja1105 and move it into tag_8021q so that you can reuse it more
+> easily.
+>
+> I've prepared some (only compile-tested) patches on this branch here:
+> https://github.com/vladimiroltean/linux/commits/pawel-dembicki-vsc73xx-v3
+>
+> I need to double-check that they don't introduce regressions,
 
-Of course, sorry. I confused __counted_by's reference to a field
-member in the struct, with the normal argument passing of struct_size
-and flex_array_size.
+I tested it on my device and I couldn't find any regressions. vlan
+filtering and tagging work as expected.
+
+> and we
+> should discuss the merging strategy. Probably you're going to submit
+> them together with your patch set.
+
+I prepared the v4 patch series. Please look if that format is ok with you.
+https://github.com/CHKDSK88/linux/commits/vsc73xx-vlan-net-next
+
+>
+> With that, you can drop my part of the copyright :) The remainder should
+> look like straightforward use of API which can be written in only a
+> limited number of ways.
+
+Now it is much simpler.
+
+>
+> > +     if (!skb->dev) {
+> > +             netdev_warn(netdev, "Couldn't decode source port\n");
+> > +             return NULL;
+> > +     }
+> > +
+> > +     dsa_default_offload_fwd_mark(skb);
+> > +
+> > +     if (dsa_port_is_vlan_filtering(dsa_slave_to_port(skb->dev)) &&
+> > +         eth_hdr(skb)->h_proto =3D=3D htons(ETH_P_8021Q))
+> > +             __vlan_hwaccel_clear_tag(skb);
+>
+> Why do you need to do this? We send VLAN-tagged packets to the
+> VLAN-aware bridge intentionally, so that it knows what VLAN they come
+> from (in the dsa_find_designated_bridge_port_by_vid() case). So don't
+> strip it if it's not causing a problem.
+>
+
+I dropped it in v4. I needed it when I started with this patch series,
+because bridge in vlan filtering causes double tagged frames (one from
+hardware and one from bridge). But after recent changes it is useless
+and it could be dropped because vlan works as expected without it.
+
+> > +
+> > +     return skb;
+> > +}
 
