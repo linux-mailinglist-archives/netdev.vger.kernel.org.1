@@ -1,187 +1,139 @@
-Return-Path: <netdev+bounces-36122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD817AD70F
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:35:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CF37AD73F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E1C4E280EE7
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:35:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3F6F6280D5B
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C4E18E22;
-	Mon, 25 Sep 2023 11:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754A618E3F;
+	Mon, 25 Sep 2023 11:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3288118E1E
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 11:35:54 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42F5DA;
-	Mon, 25 Sep 2023 04:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695641753; x=1727177753;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=A0N/3KD/SqIlzzRTtVUghnzqarLjTjUyuOAf9873lpc=;
-  b=BwopjTaaOy+x8lSwycGUkgxA8HK4nUMsV3pJJgdhSU1ail/00xDnOnl8
-   uP/4uLsmOU9g8nq5Y6eW5TD2W5ntLYAD+3bZNPn2oY/Dy2jemO0JMGDvl
-   aLDPvCXlKsy/hbTr1KQ79JF8pMf9rkQFOycs47RFglYcaP6/wM87u+fcF
-   7HbZ+tnvcA+DDqKKJ9b8p/4zA9HNzaEDah/yK7DvbifnjLrnyS8S3BZBR
-   b0YmpWzWw/+xBNn/In2hWNZ/azJ8q7mpArf/GIIfm+ccHZo0HyQvVnCZp
-   WIhy+x/ZfFlN+GrAuzTOHLkDF+n7JHdJlohX3VwRa14vynoIvopiXkluF
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="385058264"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="385058264"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 04:35:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="891652378"
-X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
-   d="scan'208";a="891652378"
-Received: from lkp-server02.sh.intel.com (HELO 32c80313467c) ([10.239.97.151])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Sep 2023 04:34:47 -0700
-Received: from kbuild by 32c80313467c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qkjsR-0001Sr-10;
-	Mon, 25 Sep 2023 11:35:47 +0000
-Date: Mon, 25 Sep 2023 19:35:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	linux-wpan@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>,
-	Romuald Despres <romuald.despres@qorvo.com>,
-	Frederic Blain <frederic.blain@qorvo.com>,
-	Nicolas Schodet <nico@ni.fr.eu.org>,
-	Guilhem Imberton <guilhem.imberton@qorvo.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH wpan-next v4 04/11] mac802154: Handle associating
-Message-ID: <202309251904.eSN2jHxq-lkp@intel.com>
-References: <20230922155029.592018-5-miquel.raynal@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D268F6FD9
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 11:50:31 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF3E9B;
+	Mon, 25 Sep 2023 04:50:30 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PBbbSR000407;
+	Mon, 25 Sep 2023 11:50:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=u/uhG0g/kXxNmlqKDXNg/CTspL0SQq4wEiD1G7ilDOA=;
+ b=gPk0OIhhwM4P/q0SQJ8jShpAnQvbf8wHyamg1+r0ImY1fE+0375sSKWLzFisMCp7SKRW
+ zt4eA1tPDWGVaLSylOF+8molm1X3gDsHxo1PBsaKxL3AKBSBUeCexzTtoEWSg76efouN
+ owxOIY37Dk/22AU/JGGZxVIF9P3MobfeXQ52wrusa/+6/yF0/2Hd5bKTkUn5/YbVo1A3
+ eEDxG5dAbrcW2n5gu14igOHUZ/M/a0GYIzsCoKL+7EBFOnCyFwOn0gLs3kfieVMqDi94
+ xE1xWrNpzomuY0v1bjJIUEfu8OBJKQJg8WT8rcshuP+sivlM+rTFaaHAf5yuqaxYF+mz TQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb7m62ts9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 11:50:27 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38PBbp5h002470;
+	Mon, 25 Sep 2023 11:50:27 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb7m62trt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 11:50:26 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38P9tmFS030719;
+	Mon, 25 Sep 2023 11:50:26 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjhd4d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 11:50:25 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38PBoMN116908974
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Sep 2023 11:50:23 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE75320043;
+	Mon, 25 Sep 2023 11:50:22 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9433F20040;
+	Mon, 25 Sep 2023 11:50:22 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Sep 2023 11:50:22 +0000 (GMT)
+Message-ID: <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
+Date: Mon, 25 Sep 2023 13:50:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922155029.592018-5-miquel.raynal@bootlin.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
+ device
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: t_8wHPH4AWvOWU9GE8aKNKofI0SNlpax
+X-Proofpoint-GUID: RlZnKHlCw6vIphuA58WF_Icozxk9YcXO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_08,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 priorityscore=1501 adultscore=0
+ impostorscore=0 phishscore=0 spamscore=0 mlxlogscore=577 suspectscore=0
+ mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309250086
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Miquel,
 
-kernel test robot noticed the following build warnings:
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master v6.6-rc3 next-20230925]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On 24.09.23 17:16, Wen Gu wrote:
+> This patch introduces a kind of loopback device for SMC-D. The device
+> is created when SMC module is loaded and destroyed when the SMC module
+> is unloaded. The loopback device is a kernel device used only by the
+> SMC module and is not restricted by net namespace, so it can be used
+> for local inter-process or inter-container communication.
+> 
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+>  net/smc/Kconfig        |  13 ++++
+>  net/smc/Makefile       |   2 +-
+>  net/smc/af_smc.c       |  12 +++-
+>  net/smc/smc_loopback.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  net/smc/smc_loopback.h |  33 ++++++++++
+>  5 files changed, 223 insertions(+), 2 deletions(-)
+>  create mode 100644 net/smc/smc_loopback.c
+>  create mode 100644 net/smc/smc_loopback.h
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Miquel-Raynal/ieee802154-Let-PAN-IDs-be-reset/20230923-000250
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230922155029.592018-5-miquel.raynal%40bootlin.com
-patch subject: [PATCH wpan-next v4 04/11] mac802154: Handle associating
-config: i386-randconfig-061-20230925 (https://download.01.org/0day-ci/archive/20230925/202309251904.eSN2jHxq-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230925/202309251904.eSN2jHxq-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309251904.eSN2jHxq-lkp@intel.com/
+Hello Wen Gu,
 
-sparse warnings: (new ones prefixed by >>)
->> net/mac802154/cfg.c:379:39: sparse: sparse: incorrect type in argument 2 (different base types) @@     expected restricted __le16 [usertype] pan_id @@     got int @@
-   net/mac802154/cfg.c:379:39: sparse:     expected restricted __le16 [usertype] pan_id
-   net/mac802154/cfg.c:379:39: sparse:     got int
+thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
 
-vim +379 net/mac802154/cfg.c
+I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
+may want to exploit smcd-loopback. Especially in native environements without containers.
 
-   317	
-   318	static int mac802154_associate(struct wpan_phy *wpan_phy,
-   319				       struct wpan_dev *wpan_dev,
-   320				       struct ieee802154_addr *coord)
-   321	{
-   322		struct ieee802154_local *local = wpan_phy_priv(wpan_phy);
-   323		u64 ceaddr = swab64((__force u64)coord->extended_addr);
-   324		struct ieee802154_sub_if_data *sdata;
-   325		struct ieee802154_pan_device *parent;
-   326		__le16 short_addr;
-   327		int ret;
-   328	
-   329		ASSERT_RTNL();
-   330	
-   331		sdata = IEEE802154_WPAN_DEV_TO_SUB_IF(wpan_dev);
-   332	
-   333		if (wpan_dev->parent) {
-   334			dev_err(&sdata->dev->dev,
-   335				"Device %8phC is already associated\n", &ceaddr);
-   336			return -EPERM;
-   337		}
-   338	
-   339		if (coord->mode == IEEE802154_SHORT_ADDRESSING)
-   340			return -EINVAL;
-   341	
-   342		parent = kzalloc(sizeof(*parent), GFP_KERNEL);
-   343		if (!parent)
-   344			return -ENOMEM;
-   345	
-   346		parent->pan_id = coord->pan_id;
-   347		parent->mode = coord->mode;
-   348		parent->extended_addr = coord->extended_addr;
-   349		parent->short_addr = cpu_to_le16(IEEE802154_ADDR_SHORT_BROADCAST);
-   350	
-   351		/* Set the PAN ID hardware address filter beforehand to avoid dropping
-   352		 * the association response with a destination PAN ID field set to the
-   353		 * "new" PAN ID.
-   354		 */
-   355		if (local->hw.flags & IEEE802154_HW_AFILT) {
-   356			ret = drv_set_pan_id(local, coord->pan_id);
-   357			if (ret < 0)
-   358				goto free_parent;
-   359		}
-   360	
-   361		ret = mac802154_perform_association(sdata, parent, &short_addr);
-   362		if (ret)
-   363			goto reset_panid;
-   364	
-   365		if (local->hw.flags & IEEE802154_HW_AFILT) {
-   366			ret = drv_set_short_addr(local, short_addr);
-   367			if (ret < 0)
-   368				goto reset_panid;
-   369		}
-   370	
-   371		wpan_dev->pan_id = coord->pan_id;
-   372		wpan_dev->short_addr = short_addr;
-   373		wpan_dev->parent = parent;
-   374	
-   375		return 0;
-   376	
-   377	reset_panid:
-   378		if (local->hw.flags & IEEE802154_HW_AFILT)
- > 379			drv_set_pan_id(local, IEEE802154_PAN_ID_BROADCAST);
-   380	
-   381	free_parent:
-   382		kfree(parent);
-   383		return ret;
-   384	}
-   385	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
+If loopback is always created unconditionally, there is no way to opt-out.
 
