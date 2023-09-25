@@ -1,98 +1,148 @@
-Return-Path: <netdev+bounces-36102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2471B7AD407
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 11:02:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346B47AD546
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:02:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id CBA73281610
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4F4CB1C20952
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A213AC9;
-	Mon, 25 Sep 2023 09:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5152414A87;
+	Mon, 25 Sep 2023 10:02:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B9B107A7
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 09:01:56 +0000 (UTC)
-X-Greylist: delayed 378 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Sep 2023 02:01:55 PDT
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77EBF9B
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 02:01:55 -0700 (PDT)
-Received: from localhost (unknown [124.16.138.129])
-	by APP-01 (Coremail) with SMTP id qwCowAC3vfV1ShFlTKihAw--.8010S2;
-	Mon, 25 Sep 2023 16:53:09 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	nichen@iscas.ac.cn,
-	izumi.taku@jp.fujitsu.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] fjes: Add missing check for vzalloc
-Date: Mon, 25 Sep 2023 08:53:18 +0000
-Message-Id: <20230925085318.1228225-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5446314286
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:02:47 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE075FC;
+	Mon, 25 Sep 2023 03:02:45 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38P9IIv5007872;
+	Mon, 25 Sep 2023 10:02:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=oRThFD41Ci0117gK7HXauQTUKRM1npJ8c/LyCqHPDMo=;
+ b=CjJvLPKc4Hb+LXDgu0NU0h7gi5jqB64x910WDlQM1vJXi/Bm+pl/UxyH2ua3SlEagloC
+ QTiOkJEaAeGj9AUZRac+4Kc7fbyLKMHqEllwLLWGn2xoi1gbb2Q1g+4u7Tb92VP0R6T6
+ Dl8EdBPZU+6V6WLc6muVqOFdq+yCNqc6XQnrWdxqNFq7xIG2xOeXf3UzzBk7ra2XOaCJ
+ kBTiml3J56WQzPYpv6DgT8uEgu0i9HkAfcPWcv/BR3lgo6dZlLB8h/Hw97CXh/jBJ5o5
+ kIvlVCaYCM/6P0q+oeRPgi9cLAqqNAcBiaGRweYdfkJ7HlVVQSn2D/yj9duLe3k9M4ma wQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb7euh0u8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 10:02:40 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38P9JVn8010413;
+	Mon, 25 Sep 2023 10:02:40 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb7euh0su-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 10:02:40 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38P90Ghu010996;
+	Mon, 25 Sep 2023 09:43:37 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tabuk0xtx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 09:43:37 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38P9hYHC6554266
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Sep 2023 09:43:34 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1D16320040;
+	Mon, 25 Sep 2023 09:43:34 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC0952004B;
+	Mon, 25 Sep 2023 09:43:33 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Sep 2023 09:43:33 +0000 (GMT)
+Message-ID: <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
+Date: Mon, 25 Sep 2023 11:43:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
+ closing listen socket
+To: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
+ <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
+ <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAC3vfV1ShFlTKihAw--.8010S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrKryDWr4Utr43tw45uFW3KFg_yoW3Krg_ur
-	4IqF13u34j9r1qyr4DArW3Zryjvryvvr1IqwnaqrWaqrWkCan7A34xuwsrX3yUGay3ZFnr
-	Jr9rtr13A34fJjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb2kFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVAFwVW8ZwCF
-	04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r
-	18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vI
-	r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr
-	1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
-	x4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjNJ55UUUUU==
-X-Originating-IP: [124.16.138.129]
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: o5MfwsYE1QDT0AHAM4mxbAkdXlEvuL51
+X-Proofpoint-GUID: RCiW3PxYH-VBcYxaZX_cEG-7XRFcRlb-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_04,2023-09-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=882 spamscore=0 impostorscore=0 lowpriorityscore=0
+ adultscore=0 bulkscore=0 clxscore=1015 phishscore=0 malwarescore=0
+ mlxscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309250073
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Because of the potential failure of the vzalloc(), the hw->hw_info.trace
-could be NULL.
-Therefore, we need to check it and return -ENOMEM in order to transfer
-the error.
 
-Fixes: b6ba737d0b29 ("fjes: ethtool -w and -W support for fjes driver")
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- drivers/net/fjes/fjes_hw.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
-index 704e949484d0..3a06a3cf021d 100644
---- a/drivers/net/fjes/fjes_hw.c
-+++ b/drivers/net/fjes/fjes_hw.c
-@@ -330,6 +330,9 @@ int fjes_hw_init(struct fjes_hw *hw)
- 	ret = fjes_hw_setup(hw);
- 
- 	hw->hw_info.trace = vzalloc(FJES_DEBUG_BUFFER_SIZE);
-+	if (!hw->hw_info.trace)
-+		return -ENOMEM;
-+
- 	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
- 
- 	return ret;
--- 
-2.25.1
+On 25.09.23 10:29, D. Wythe wrote:
+> Hi Wenjia,
+> 
+>>
+>> this is unfortunately not sufficient for this fix. You have to make sure that is not a life-time problem. Even so, READ_ONCE() is also needed in this case.
+>>
+> 
+> Life-time problem? If you means the smc will still be NULL in the future,  I don't really think so, smc is a local variable assigned by smc_clcsock_user_data.
+> it's either NULL or a valid and unchanged value.
+> 
+> And READ_ONCE() is needed indeed, considering not make too much change, maybe we can protected following
+
+The local variable smc is a pointer to the smc_sock structure, so the question is whether you can just do a READ_ONCE
+and then continue to use the content of the smc_sock structure, even though e.g. a smc_close_active() may be going on in 
+parallel. 
+
+> 
+> smc = smc_clcsock_user_data(sk);
+> 
+> with sk_callback_lock， which solves the same problem. What do you think?
+
+In af_ops.syn_recv_sock() and thus also in smc_tcp_syn_recv_sock() 
+sk is defined as const. So you cannot simply do take sk_callback_lock, that will create compiler errors.
+ (same for smc_hs_congested() BTW)
+
+If you are sure the contents of *smc are always valid, then READ_ONCE is all you need.
+
+Maybe it is better to take a step back and consider what needs to be protected when (lifetime).
+Just some thoughts (there may be ramifications that I am not aware of):
+Maybe clcsock->sk->sk_user_data could be set to point to smc_sock as soon as the clc socket is created?
+Isn't the smc socket always valid as long as the clc socket exists? 
+Then sk_user_data would no longer indicate whether the callback functions were set to smc values, but would that matter?
+Are there scenarios where it matters whether the old or the new callback function is called?
+Why are the values restored in smc_close_active() if the clc socket is released shortly after anyhow?
+
+You see I am wondering whether adding more locking, there is a way to make sure structures are safe to use.
+
 
 
