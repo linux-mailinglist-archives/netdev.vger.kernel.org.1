@@ -1,156 +1,149 @@
-Return-Path: <netdev+bounces-36082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C929D7AD248
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:47:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 600EC7AD25E
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 09:53:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 656B71F2450F
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:47:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E631F1F24590
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 07:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2130F10A37;
-	Mon, 25 Sep 2023 07:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4F511187;
+	Mon, 25 Sep 2023 07:53:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C55BCA5D;
-	Mon, 25 Sep 2023 07:47:37 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CC7FF;
-	Mon, 25 Sep 2023 00:47:33 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3C471C000A;
-	Mon, 25 Sep 2023 07:47:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1695628052;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ThyHS05ydQoxH/bSwHr8OdaIUfcQUC2ILgoMwJVFYr4=;
-	b=gneWysS1thG64xcYgV9B5Q8Gn5+yngBBlc5x824QyPp2c7PzQI7wLQDx04UP1ox10czcO6
-	B2c1PlnGWnAq7hp5tmUCvpUUXZrTcvvI1Qp/TYWvPG9MIDpLhQ7nv2dUAk67yJqPbQJxFV
-	ISUdCq/usdTpgvyqsJiWPg2l0u8cEvfMQV17avNLh3cO2VAt2SjA44YE3waUGuBbq8UQrt
-	VZwm+IgPE3H5YqKCe3UAtJkky0hG0xYsqx9Y4oBoyE6Do2qXh8VNygP+FC/O7PlBovtW0N
-	QMimc5MAbDLr8/Zoh8KVirbAl2OOmdLCKAVACzxT93B//Vem2ZAmgtUzo4AZeg==
-Message-ID: <e0191a5e-dadf-4f55-b421-1d1ffee8e53a@arinc9.com>
-Date: Mon, 25 Sep 2023 10:47:02 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2304F11C96
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 07:53:17 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7826D3
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 00:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1695628395; x=1727164395;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SNvL6BCRK4Mz1B+W+0YovcCop6PU/XDx2MDBI222O/Y=;
+  b=RBPeoN930UnkTps3RE2cRLJXm9rrHKaBfvem3gtXf0m1/GxuYWsClNMN
+   ZaBxR+nAi54t+dmvM5ZPfkzRR1jIVNA9l2FHy5w+GkJ65tYRyiIUGomBd
+   F+Ene83v3izaWfczUWPIkaiHxfllZVv/4ZkSmGev/Nh8+0QLRjfZHZJjX
+   2HiSBkhvJ1AQypUou1dVHKWN8+1rd5tSOB7jSGgmSaUijjQpX87epTiaT
+   L1fvbznyot0/jdqY32rX+GAhZhNyr+upcMattMLxG7IjmWoT4SFkrd9tj
+   nwbIm5kYrMA31EN0pT9e1PpDypbfNFbsi1CiirvjJpQue0YJ2HDeTZl4E
+   Q==;
+X-CSE-ConnectionGUID: Z8nQQlu0QNmF4uGWZaPn0A==
+X-CSE-MsgGUID: ZRaBkCuwTJOsPZGC+7TwDA==
+X-ThreatScanner-Verdict: Negative
+X-IronPort-AV: E=Sophos;i="6.03,174,1694761200"; 
+   d="scan'208";a="173390641"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Sep 2023 00:53:15 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 25 Sep 2023 00:52:34 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Mon, 25 Sep 2023 00:52:31 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <Jose.Abreu@synopsys.com>, <linux@armlinux.org.uk>,
+	<hkallweit1@gmail.com>, <UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next] net: pcs: xpcs: Add 2500BASE-X case in get state for XPCS drivers
+Date: Mon, 25 Sep 2023 13:21:42 +0530
+Message-ID: <20230925075142.266026-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/10] define and enforce phylink bindings
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Conor Dooley <conor+dt@kernel.org>,
- George McCollister <george.mccollister@gmail.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Marcin Wojtas <mw@semihalf.com>, Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Daniel Golle <daniel@makrotopia.org>, Landen Chao
- <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>, Marek Vasut <marex@denx.de>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- John Crispin <john@phrozen.org>, Madalin Bucur <madalin.bucur@nxp.com>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- Oleksij Rempel <linux@rempel-privat.de>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, Sekhar Nori <nsekhar@ti.com>,
- Shyam Pandey <radhey.shyam.pandey@xilinx.com>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org
-References: <20230916110902.234273-1-arinc.unal@arinc9.com>
- <ZQ2LMe9aa1ViBcSH@shell.armlinux.org.uk>
- <6c1bb7df-34cd-4db9-95b6-959c87b68588@arinc9.com>
- <4856b212-5bc5-4783-a184-b34a4a915878@lunn.ch>
- <5650a2a3-a36f-441e-b4c2-aa7c751b5af5@arinc9.com>
- <410dfe3c-6f99-4054-88f8-0acbd134cfce@lunn.ch>
- <228f24db-0a26-4d38-8f73-a9691262cc5f@arinc9.com>
- <2be01f7e-8bd0-42c5-bc82-b1da29b83e24@lunn.ch>
- <78e70cc9-a6ca-439b-bfca-3119299249de@arinc9.com>
- <29cd6190-a565-4f95-9de0-41ed7c7772e6@lunn.ch>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <29cd6190-a565-4f95-9de0-41ed7c7772e6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 24.09.2023 17:55, Andrew Lunn wrote:
-> On Sun, Sep 24, 2023 at 10:49:49AM +0300, Arınç ÜNAL wrote:
->> On 24/09/2023 06:15, Andrew Lunn wrote:
->>>>> There is a MAC driver currently under review which does not have a PHY
->>>>> at all. The MAC is directly connected to a switch, all within one
->>>>> IC. The link is always running at 5Gbps, the link is always up. It is
->>>>> physically impossible to connect a PHY, so get_link_settings just
->>>>> returns hard coded values.
->>>>
->>>> The fixed-link property would be used to describe the link of the MAC here.
->>>
->>> Fixed-link make sense for a general purpose MAC which could be
->>> connected to a PHY, or could also be used without a PHY. fixed-link
->>> simplifies the code in that the MAC driver does not see a difference,
->>> it all looks like a PHY.
->>>
->>> However for a MAC which cannot be connected to a PHY, there is no need
->>> to emulate a PHY. The MAC driver will be simpler. So i would not
->>> recommend a fixed-link in this situation.
->>
->> There's a link, it must be described.
-> 
-> Why must it be described?
-> 
-> Lets take this to the extreme to make a point. The chip has a ground
-> pin. Must i describe that?
+Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
+Update the port mode and autonegotiation
 
-I think it depends on how important the information is, to be put on the
-devicetree. I don't think a ground pin of an SoC is important enough to be
-described on the devicetree. It could be described as a text on the
-relevant devicetree document though. I've recently submitted a patch that
-does a similar thing. I've described which pin groups represent which pins.
+Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+---
+ drivers/net/pcs/pcs-xpcs.c | 31 +++++++++++++++++++++++++++++++
+ drivers/net/pcs/pcs-xpcs.h |  4 ++++
+ 2 files changed, 35 insertions(+)
 
-https://lore.kernel.org/lkml/20230917162837.277405-2-arinc.unal@arinc9.com/
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 4dbc21f604f2..4f89dcedf0fc 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -1090,6 +1090,30 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
+ 	return 0;
+ }
+ 
++static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
++				    struct phylink_link_state *state)
++{
++	int sts, lpa;
++
++	sts = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
++	lpa = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_LP_BABL);
++	if (sts < 0 || lpa < 0) {
++		state->link = false;
++		return sts;
++	}
++
++	state->link = !!(sts & DW_VR_MII_MMD_STS_LINK_STS);
++	state->an_complete = !!(sts & DW_VR_MII_MMD_STS_AN_CMPL);
++	if (!state->link)
++		return 0;
++
++	state->speed = SPEED_2500;
++	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
++	state->duplex = DUPLEX_FULL;
++
++	return 0;
++}
++
+ static void xpcs_get_state(struct phylink_pcs *pcs,
+ 			   struct phylink_link_state *state)
+ {
+@@ -1127,6 +1151,13 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
+ 			       ERR_PTR(ret));
+ 		}
+ 		break;
++	case DW_2500BASEX:
++		ret = xpcs_get_state_2500basex(xpcs, state);
++		if (ret) {
++			pr_err("xpcs_get_state_2500basex returned %pe\n",
++			       ERR_PTR(ret));
++		}
++		break;
+ 	default:
+ 		return;
+ 	}
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index 39a90417e535..92c838f4b251 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -55,6 +55,10 @@
+ /* Clause 37 Defines */
+ /* VR MII MMD registers offsets */
+ #define DW_VR_MII_MMD_CTRL		0x0000
++#define DW_VR_MII_MMD_STS		0x0001
++#define DW_VR_MII_MMD_STS_LINK_STS	BIT(2)
++#define DW_VR_MII_MMD_STS_AN_CMPL	BIT(5)
++#define DW_VR_MII_MMD_LP_BABL		0x0005
+ #define DW_VR_MII_DIG_CTRL1		0x8000
+ #define DW_VR_MII_AN_CTRL		0x8001
+ #define DW_VR_MII_AN_INTR_STS		0x8002
+-- 
+2.34.1
 
-For an ethernet controller, its link is the core part of the hardware.
-Therefore describing the link was deemed important. Hence certain
-properties were made to describe the link on the devicetree.
-
-All I proposed was to make sure these properties are always defined on the
-devicetree since, for an ethernet controller to exist, it must have a link.
-
-Arınç
 
