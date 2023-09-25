@@ -1,150 +1,101 @@
-Return-Path: <netdev+bounces-36064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03B97ACDD6
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:05:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3446A7ACDFE
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 29C131F2418C
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 02:05:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id D9E4B1F241D5
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 02:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EB0EA9;
-	Mon, 25 Sep 2023 02:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE25C110C;
+	Mon, 25 Sep 2023 02:14:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8A515B0
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 02:05:44 +0000 (UTC)
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F88FE;
-	Sun, 24 Sep 2023 19:05:42 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-59eb8ec5e20so65009327b3.3;
-        Sun, 24 Sep 2023 19:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695607542; x=1696212342; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3Erv5jPUTJ6NOpgZnVC8ZDSsiaEDPSD4W7GSC7tyo4=;
-        b=Bi1shG2CLDCY3BuMYL0NnCLxi+af/HNG0P6Q4Bj6OjpGwZTMboMw9EquA0oq+BN6WH
-         1JzASvtDdloPxJe3H4AzEANwtg0EW0M8maJzSfffgcOPQm7N+6jz0kfNQyfBxuRBHCH3
-         zGcJUsLM2a6vC1rYgaEAH1WoU8uSjrxSQYYuZmYJZUqaWuDAhuj9vJuXKXwcnj5IbU2/
-         iiWVqOzDu5Pnz0FEVAQPVoo89bbdmVL6a7qaeoiKAENXA+JhZEBuhqAc1yRxS4jFV14B
-         DKifjOYLNuBKjzY9Z5stdXjlDeLxNBIjidn8pHICyeLpLft/jJDU/Icz3TRER+jcbuob
-         HWJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695607542; x=1696212342;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v3Erv5jPUTJ6NOpgZnVC8ZDSsiaEDPSD4W7GSC7tyo4=;
-        b=UkRFnz2iuB4Us0WVYOyZHxcfgbYLaa21QDCSjBJYNoeT47XAvsRHZkUQGI3RxOBS1v
-         22wAV5Zud78s9ebsvnLUEJ/S/B4PJw5xP+aBiDdlsAPANIxioGjdsMb294vTDYsiYY19
-         SkfKbjFVT0eTm1QaQGFbCysDIC816BGlDtCu0TJ8Et4putOMz+C4XHRIpXC7wd/toVSJ
-         mulhF0OiMRRS2RMtW15YfAf1dewGbeXzO6FEfjEPQ/Fu64xuimXzwzojEC97gJIAosGJ
-         7VoE/mzBDxRGJYdrdzenWPtQKVnEIgpAgU+jQOvztbxTTO2NzXhiDULXHFOMP2C0Uj37
-         0lrw==
-X-Gm-Message-State: AOJu0Yyb5qp0+TINNdC0vOC4jOCxrQf47QuHpLubFB0dCNPB3kMCtZEe
-	SyXfGpln2VsgaKt2n1l1V55dgNYmPL0=
-X-Google-Smtp-Source: AGHT+IG9HCuFwY+0LujiihwL4awznOH0oe6O5Sn3e5QdHFqMyDHQcOf0mONLO9JzR91UyWARlF+Sqg==
-X-Received: by 2002:a05:690c:c99:b0:59f:5da9:d53c with SMTP id cm25-20020a05690c0c9900b0059f5da9d53cmr4176407ywb.35.1695607541693;
-        Sun, 24 Sep 2023 19:05:41 -0700 (PDT)
-Received: from localhost ([2607:fb90:3eac:cd78:b6b5:ba0f:9e64:f2e1])
-        by smtp.gmail.com with ESMTPSA id cn32-20020a05690c0d2000b005927a79333esm77968ywb.28.2023.09.24.19.05.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Sep 2023 19:05:41 -0700 (PDT)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Tariq Toukan <ttoukan.linux@gmail.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Maher Sanalla <msanalla@nvidia.com>,
-	Ingo Molnar <mingo@kernel.org>,
-	Mel Gorman <mgorman@suse.de>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Pawel Chmielewski <pawel.chmielewski@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Yury Norov <ynorov@nvidia.com>
-Subject: [PATCH 4/4] lib/cpumask: don't mention for_each_numa_hop_mask in cpumask_local_spread()"
-Date: Sun, 24 Sep 2023 19:05:28 -0700
-Message-Id: <20230925020528.777578-5-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230925020528.777578-1-yury.norov@gmail.com>
-References: <20230925020528.777578-1-yury.norov@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095EF10E2
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 02:14:24 +0000 (UTC)
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B2BC6;
+	Sun, 24 Sep 2023 19:14:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1695608062;
+	bh=EkhDackxSfFieoGUWeVtOtGWn3+W1tDL1N3rERMkARA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mMHLk4kVK953Ezes7KGMVBGp451KsgVM3IQb6wnSU+W/2kG1Suop3nSy6ueABtlwM
+	 TnpFH4kadya4Fyyl9uXhfIIzGfxefxOFRMMs+V3v3FuvMe/O4EkQt1MgHUOy3/JxJB
+	 W79zIQJkmAph4rJ+GUjh6EfqiMo1LuDpCxoqkszcluT+JM4+lojR5IwjG5/UP08t8D
+	 3kkH0/IGWsskVHAGwrwsnb4bucB2ag8HIF21e04r0e6pfYGar+Yo7jK1ypiKS3pcc5
+	 /V/P/5NrYbjBuVUgje6HwkfLQJBkkUML5m6HrZyQqUPkFXbiU4lv71PpJKnoKtce4O
+	 +1Uq5g1WmndGw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Rv5zK3Zqsz4xGC;
+	Mon, 25 Sep 2023 12:14:21 +1000 (AEST)
+Date: Mon, 25 Sep 2023 12:14:20 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Lee Jones <lee@kernel.org>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the mfd tree
+Message-ID: <20230925121420.520e91fa@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: multipart/signed; boundary="Sig_/u7varwAHQlwd/t1W6/03L.E";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now that for_each_numa_hop_mask() is reverted, also revert reference to
-it in the comment to cpumask_local_spread().
+--Sig_/u7varwAHQlwd/t1W6/03L.E
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This partially reverts commit 2ac4980c57f5 ("lib/cpumask: update comment
-for cpumask_local_spread()")
+Hi all,
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
-Signed-off-by: Yury Norov <ynorov@nvidia.com>
----
- lib/cpumask.c | 21 ---------------------
- 1 file changed, 21 deletions(-)
+The following commit is also in the net-next tree as different commit
+(but the same patch):
 
-diff --git a/lib/cpumask.c b/lib/cpumask.c
-index a7fd02b5ae26..d341fb71a8a9 100644
---- a/lib/cpumask.c
-+++ b/lib/cpumask.c
-@@ -117,27 +117,6 @@ void __init free_bootmem_cpumask_var(cpumask_var_t mask)
-  *
-  * Returns online CPU according to a numa aware policy; local cpus are returned
-  * first, followed by non-local ones, then it wraps around.
-- *
-- * For those who wants to enumerate all CPUs based on their NUMA distances,
-- * i.e. call this function in a loop, like:
-- *
-- * for (i = 0; i < num_online_cpus(); i++) {
-- *	cpu = cpumask_local_spread(i, node);
-- *	do_something(cpu);
-- * }
-- *
-- * There's a better alternative based on for_each()-like iterators:
-- *
-- *	for_each_numa_hop_mask(mask, node) {
-- *		for_each_cpu_andnot(cpu, mask, prev)
-- *			do_something(cpu);
-- *		prev = mask;
-- *	}
-- *
-- * It's simpler and more verbose than above. Complexity of iterator-based
-- * enumeration is O(sched_domains_numa_levels * nr_cpu_ids), while
-- * cpumask_local_spread() when called for each cpu is
-- * O(sched_domains_numa_levels * nr_cpu_ids * log(nr_cpu_ids)).
-  */
- unsigned int cpumask_local_spread(unsigned int i, int node)
- {
--- 
-2.39.2
+  d6e3854f720f ("dt-bindings: mfd: syscon: Add compatibles for Loongson-1 s=
+yscon")
 
+This is commit
+
+  7e10088bc4e4 ("dt-bindings: mfd: syscon: Add compatibles for Loongson-1 s=
+yscon")
+
+in the net-next tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/u7varwAHQlwd/t1W6/03L.E
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUQ7PwACgkQAVBC80lX
+0GwU8gf+KxcF954ii0iKnlLfcX6hdg017KWY4btd4V1FtYfpQLpbIbMhkhPWVXEw
+juT7N9fhLVk/mbZPN+4pO10TM+9PdmX6mi1vxB77JEV4pENsMVDHLcMNyD42adXr
+Tlr+87DdlnYkXUbeIEfrs1fR2oLbnZSmsBJZY5SsPjfx9+DgUk9bzv7S/m4G08p+
+bKYCabUgVMYXu07UE+TPMczH2kpUldpA/m1epJblv4FZKLcZSeCCgVeCUsqkb/LR
+nwTfG68vHdoPgQ7Dg2/EPCMBFNSCCYxIKWs5NW57EZ78U+9at1fs5zuFzVOqv/6U
+G7FXiRDN7RxuKzCUzLScL5cf7WTyiA==
+=CuD1
+-----END PGP SIGNATURE-----
+
+--Sig_/u7varwAHQlwd/t1W6/03L.E--
 
