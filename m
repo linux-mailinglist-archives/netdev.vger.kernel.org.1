@@ -1,178 +1,115 @@
-Return-Path: <netdev+bounces-36074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DB77ACF09
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 06:16:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789AA7ACF36
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 06:36:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 2CBD3B20977
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:15:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2BAEE280F98
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 04:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E7D63CB;
-	Mon, 25 Sep 2023 04:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669FD10E4;
+	Mon, 25 Sep 2023 04:36:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACD553BA
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 04:15:51 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58A13E1
-	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:15:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695615348;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ruu6yd/F7PRRg3zU9933sMPG2y+61a3R2Ou0YGttbMk=;
-	b=BzyL8BnvDMZM3MwXeVufFBXbkJPyO0gztoOXDezQbU6Ots6F6fULVGojr/8Zf+ESbo+8cp
-	6vZiaRUmgNS0JetbRb3EBsehFp6PVRQDBCF8tIfY3ewXWXu9YRmkoFoW1FnTMXxbgkn4aQ
-	2CuPqgv0qcGkXNYHu9XD10YSdShoyns=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-uYhrKEnBNxiuEyrMNFqaNw-1; Mon, 25 Sep 2023 00:15:47 -0400
-X-MC-Unique: uYhrKEnBNxiuEyrMNFqaNw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-31dc8f0733dso4516608f8f.3
-        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:15:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E865715B0
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 04:36:16 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59809DF
+	for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:36:13 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53368df6093so9681a12.1
+        for <netdev@vger.kernel.org>; Sun, 24 Sep 2023 21:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695616572; x=1696221372; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=utpCVSnKwmUjnI78nqFvLGOx8w1hMljEMO2FokBLE1I=;
+        b=ybr6RM4CPXpwC9LRY3DBeFzRR8xUW4feAfauDPvuNqGD1XTEgTZJ6PysV1BcIGUkUW
+         YpPV4a1uIofNpKwJGKIAfmzVso2/MAKtqv9JruN5CBBgnotdlr2lHuyMX1lB71iVsovG
+         U/DSoEXgp/YIsyIPnhIsjH8h0SsTWPfJ/j5TEABPMYSUa9VXHeJObZ1U//c60mvSXaAg
+         Uyzfyc0JGX5Df0HeGB5VSwYoZ02krp79yhq9F1wpQIqpxGAD/zrR+ITeyQmSJ8xE1pQY
+         5wKjCRB2yRF4+Gi3Kaxg2BbJo8xffQCdHyjmzOzzwR9xP8YYllbzMcnr9xwnj4Azy0LH
+         qYLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695615346; x=1696220146;
+        d=1e100.net; s=20230601; t=1695616572; x=1696221372;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ruu6yd/F7PRRg3zU9933sMPG2y+61a3R2Ou0YGttbMk=;
-        b=MNhuW3XuvxUemPjIRkwy3vSDeVcr5dRW9Y1SPGE/m2cDgwq8fAAhA+qfvYzGrxHeD5
-         N/4Q7HzSI+CoU72ajK/V42yYHKk1sJ6lYh+sZKg++5+K1pft8Wzp3kyDc2mbdp6t16Ky
-         sZgDJU/NDKm75IPKzXdcUuZTyWBgH92NYlmejCJYDBmH7BcLh3xSYobvbCbqDJJZirmV
-         5yB7inUMqQBjkrOCt91AYSEBBwTlhNOT0WooVK/S+TC/W5PeQ7p2K1Tu1vISFC26fgkl
-         7g3D3tjKmOn1M8+FDyCJbzRvhw/8FAalGJprhmJBzELwDKFHp19V2/cETfZep5/ZpoPS
-         WTXQ==
-X-Gm-Message-State: AOJu0YwwMfloGiQKFBFsCCyGOOYuw4CCk+sDmlUDz3SID/8jVGxK15WE
-	5TtluhNZknKuD2+4voxcANO7dLwhsT5mSatnYn1h7FEuBz7PZ3s3c2FTCOCGrZjAT5rSaKBo554
-	Ii3+Dz+49Iay5LbnK5Z1PvGAaoZ85NHw0
-X-Received: by 2002:adf:e508:0:b0:321:64a6:e417 with SMTP id j8-20020adfe508000000b0032164a6e417mr5651729wrm.1.1695615345914;
-        Sun, 24 Sep 2023 21:15:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnA4ZFQjTUBgTF/yRHLzrWbDlET+Op3hd/JEQz2wnKypNLgRCsF6S3FP3xbZGRGT0UII1pqjFKnSqeq1FS/AQ=
-X-Received: by 2002:adf:e508:0:b0:321:64a6:e417 with SMTP id
- j8-20020adfe508000000b0032164a6e417mr5651717wrm.1.1695615345660; Sun, 24 Sep
- 2023 21:15:45 -0700 (PDT)
+        bh=utpCVSnKwmUjnI78nqFvLGOx8w1hMljEMO2FokBLE1I=;
+        b=tpJxjrMKjc4QHZWr/J/G3r8mn21zkmtsqJC7/ZEvQvT1kSDHwB99q+LBY3/Yot2i5M
+         uR49U2AqPTWsa6EL6MtkzIycn1+5i5hXHt7COhHjR92L3X9Jx9rk+PZZvWZxPDJG6iAn
+         uTX8mq16FX3Bvbd3MVF6+zBy4jSodZRt/lNoA8kQ6uhLVIfN21NyEqwf/5qikxtxvPOf
+         YO1VRUuQlzTdUE2/9GZIAAR+WSRvZ3H2ZYuY2sDAfWG8EsPsAw4Foy/kiPNmLoibqlrd
+         X+YpPCUJAVEADwW6xJ0EqqU91h3m/GzWxlTZ4EeC92sztLBLhN22eroOoCVKfAGgB/Y4
+         pRiw==
+X-Gm-Message-State: AOJu0YwYt2OZGBk2+xYttMzjvbASX8QkwKfvLcjIU0nF8qRbTxSy7adq
+	VPnoXhbEX/j60azUU2CmM1QD09QxRYhzKVXmrz5lVMxDB/4wvN6DuEc=
+X-Google-Smtp-Source: AGHT+IHKR23zBujhctNddZ7OKF7KZBJFI4TepLmmMkO/RSku8CnURNUbVfdbS2tNLuBfQcREKCgWH/+nVYtyPrKezTY=
+X-Received: by 2002:a50:9fc5:0:b0:525:573c:6444 with SMTP id
+ c63-20020a509fc5000000b00525573c6444mr23731edf.1.1695616571593; Sun, 24 Sep
+ 2023 21:36:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-4-lulu@redhat.com>
- <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-In-Reply-To: <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Mon, 25 Sep 2023 12:15:08 +0800
-Message-ID: <CACLfguVRPV_8HOy3mQbKvpWRGpM_tnjmC=oQqrEbvEz6YkMi0w@mail.gmail.com>
-Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	stable@vger.kernel.org
+References: <20230922210530.2045146-1-i.maximets@ovn.org>
+In-Reply-To: <20230922210530.2045146-1-i.maximets@ovn.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 25 Sep 2023 06:35:58 +0200
+Message-ID: <CANn89iJgeCvJbcapir8WkJv6nYop5CcfxgBrx3BoxEuwp0WA_w@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: tcp: add a missing nf_reset_ct() in 3WHS handling
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	David Ahern <dsahern@kernel.org>, Florian Westphal <fw@strlen.de>, 
+	Madhu Koriginja <madhu.koriginja@nxp.com>, Frode Nordahl <frode.nordahl@canonical.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 12, 2023 at 3:39=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
+On Fri, Sep 22, 2023 at 11:04=E2=80=AFPM Ilya Maximets <i.maximets@ovn.org>=
+ wrote:
 >
-> On Tue, Sep 12, 2023 at 11:00=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote=
-:
-> >
-> > In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
-> > with reconnect info, After mapping the reconnect pages to userspace
-> > The userspace App will update the reconnect_time in
-> > struct vhost_reconnect_vring, If this is not 0 then it means this
-> > vq is reconnected and will update the last_avail_idx
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
-> >  include/uapi/linux/vduse.h         |  6 ++++++
-> >  2 files changed, 19 insertions(+)
-> >
-> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
-r/vduse_dev.c
-> > index 2c69f4004a6e..680b23dbdde2 100644
-> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, un=
-signed int cmd,
-> >                 struct vduse_vq_info vq_info;
-> >                 struct vduse_virtqueue *vq;
-> >                 u32 index;
-> > +               struct vdpa_reconnect_info *area;
-> > +               struct vhost_reconnect_vring *vq_reconnect;
-> >
-> >                 ret =3D -EFAULT;
-> >                 if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
-> > @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, u=
-nsigned int cmd,
-> >
-> >                 vq_info.ready =3D vq->ready;
-> >
-> > +               area =3D &vq->reconnect_info;
-> > +
-> > +               vq_reconnect =3D (struct vhost_reconnect_vring *)area->=
-vaddr;
-> > +               /*check if the vq is reconnect, if yes then update the =
-last_avail_idx*/
-> > +               if ((vq_reconnect->last_avail_idx !=3D
-> > +                    vq_info.split.avail_index) &&
-> > +                   (vq_reconnect->reconnect_time !=3D 0)) {
-> > +                       vq_info.split.avail_index =3D
-> > +                               vq_reconnect->last_avail_idx;
-> > +               }
-> > +
-> >                 ret =3D -EFAULT;
-> >                 if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
-> >                         break;
-> > diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
-> > index 11bd48c72c6c..d585425803fd 100644
-> > --- a/include/uapi/linux/vduse.h
-> > +++ b/include/uapi/linux/vduse.h
-> > @@ -350,4 +350,10 @@ struct vduse_dev_response {
-> >         };
-> >  };
-> >
-> > +struct vhost_reconnect_vring {
-> > +       __u16 reconnect_time;
-> > +       __u16 last_avail_idx;
-> > +       _Bool avail_wrap_counter;
+> Commit b0e214d21203 ("netfilter: keep conntrack reference until
+> IPsecv6 policy checks are done") is a direct copy of the old
+> commit b59c270104f0 ("[NETFILTER]: Keep conntrack reference until
+> IPsec policy checks are done") but for IPv6.  However, it also
+> copies a bug that this old commit had.  That is: when the third
+> packet of 3WHS connection establishment contains payload, it is
+> added into socket receive queue without the XFRM check and the
+> drop of connection tracking context.
 >
-> Please add a comment for each field.
+> That leads to nf_conntrack module being impossible to unload as
+> it waits for all the conntrack references to be dropped while
+> the packet release is deferred in per-cpu cache indefinitely, if
+> not consumed by the application.
 >
-Sure will do
+> The issue for IPv4 was fixed in commit 6f0012e35160 ("tcp: add a
+> missing nf_reset_ct() in 3WHS handling") by adding a missing XFRM
+> check and correctly dropping the conntrack context.  However, the
+> issue was introduced to IPv6 code afterwards.  Fixing it the
+> same way for IPv6 now.
+>
+> Fixes: b0e214d21203 ("netfilter: keep conntrack reference until IPsecv6 p=
+olicy checks are done")
+> Link: https://lore.kernel.org/netdev/d589a999-d4dd-2768-b2d5-89dec64a4a42=
+@ovn.org/
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
 
-> And I never saw _Bool is used in uapi before, maybe it's better to
-> pack it with last_avail_idx into a __u32.
->
-Thanks will fix this
-> Btw, do we need to track inflight descriptors as well?
->
-I will check this
-Thanks
+Nica catch, thanks a lot.
 
-cindy
-> Thanks
->
-> > +};
-> > +
-> >  #endif /* _UAPI_VDUSE_H_ */
-> > --
-> > 2.34.3
-> >
->
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
