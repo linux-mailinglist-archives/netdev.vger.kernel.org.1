@@ -1,107 +1,359 @@
-Return-Path: <netdev+bounces-36178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A729B7AE191
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 00:13:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F8B7AE1B0
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 00:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id F3585B209E2
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id F11F7281422
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 22:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB4725117;
-	Mon, 25 Sep 2023 22:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2A526280;
+	Mon, 25 Sep 2023 22:29:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0879D1376
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 22:13:02 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE33F11C
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 15:13:01 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d814634fe4bso11255427276.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 15:13:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695679981; x=1696284781; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hj+c4x1e5heMSv1Ho6FR2gxxEUO3CoPALuVd8HaS3W0=;
-        b=MiDNfdx8+SfDtFOcwlaEDKkAbqhh7dHPWPxYSzsqUM8MRBOWghs7QG0XxAbmYENTI8
-         iK5lJ3L9j29D2jKZTDp5lk8Xq2mLWHvIQfyVy9L2usVMulxU5DJBw6HVOXHSRj3bEqcz
-         SbejBLsjLcP97qO+eeUxSH8Knvrb6Yt+Y15sLvc17k34hkAwsRjRdgEH+buP36ouyO+b
-         X8meWAfLYDHwO7w8IJo5ttGbZcN//5Xt1TQb/CouQw0AadYo78VW+RXfaclsrkJPR3HH
-         pujGrv/XV27vIJ+jBL29xeIJ/NcRXhFv90h+BI1p3Ysk0CLJbNdP23Le6FJZcuLQhY/F
-         8Y+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695679981; x=1696284781;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hj+c4x1e5heMSv1Ho6FR2gxxEUO3CoPALuVd8HaS3W0=;
-        b=KHRDYOMresWiql6yPm+C2LjlWxZWFDtX7Jf2pcpnjzshOK7clQXNOPJayvNKDOu8Fw
-         Of6j0o4QvUtlQi2nBR5jTZFxl/+V66SAd29u8aLixIufIEyF90XJ2xg2aEmU1rBbLY2J
-         FvQZ51X5HCe9yrVPqwxomirT0iEPxFeSoZf1IS4WBFN7hRdrLwa1bCyw0aNdqw17uFDu
-         izClsaobwuotXTajfz91GmSxrdV0osxRXhfbkzQ0jN86pa5AQRgt06xrgz5ajs8k4p3x
-         SGoXIktTqLVXK0y9DDU8lBJDS9P1b3batoDsG5GOea/vpqoc5aY5GnUwVoV8yNcb4to7
-         gDtA==
-X-Gm-Message-State: AOJu0YxQU9UwO46nAWOqRrw/X9tGToFcDXZ0IyjBCKk+WObBvk8Ooq+Y
-	QbdqM0oQcv7lpesQM0UTy01dF1UHvg==
-X-Google-Smtp-Source: AGHT+IFDbNY2T9PGT60kVoo0H9wHsXdAhlBB1UtRe1uiZ/2gZC4ZdOOJFxBpedexk1h/rD5oGEAHz2E6+Q==
-X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a25:5050:0:b0:d81:7617:a397 with SMTP id
- e77-20020a255050000000b00d817617a397mr82022ybb.9.1695679980967; Mon, 25 Sep
- 2023 15:13:00 -0700 (PDT)
-Date: Mon, 25 Sep 2023 17:12:41 -0500
-In-Reply-To: <20230921120913.566702-5-daan.j.demeyer@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8E02511F
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 22:29:29 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849829C;
+	Mon, 25 Sep 2023 15:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695680967; x=1727216967;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=8PypOCGoMrPok+L7rMhkomn18WRPydckIeBZ6owwxss=;
+  b=kST938BKBOK0BNsuBGV87dzm29MYB3whlPdvkaNAyBO3oPKgmkmeKXou
+   udzMEUYcY4VyscKgHD+bpIq/lVuiq7xkjsjmBw+k8Ao93R6gPKwmc59yx
+   AXHJXlyPPTf9ZD8QEZO2lEuO1HxxPj9+w2o+/muWMA0i3uk9shxjEWalz
+   c4ao6jefB54nOt40Q1dsAbAMw3R0NOZ50Yj+dF6cx39iTgFtV0aWu1ljv
+   Tvsjxi11Ley04sk6qZo7fcvxWh/w3uD9Z9+ne+kLavTpRdwtydk2aQcLi
+   KsUg8tfHPirpRYpCfaMT2fLuZ4/GtZYRNOqA0/lyIhv/yfD3Fwp5HauEC
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="467708992"
+X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
+   d="scan'208";a="467708992"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2023 15:29:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10843"; a="725196527"
+X-IronPort-AV: E=Sophos;i="6.03,176,1694761200"; 
+   d="scan'208";a="725196527"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Sep 2023 15:29:23 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 25 Sep 2023 15:29:22 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Mon, 25 Sep 2023 15:29:21 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 25 Sep 2023 15:29:21 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 25 Sep 2023 15:29:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iozin74epQ1viv9Stjfza4qGdZYrmMBbQIscf4B3vikrjo7UU3swIiGr0OUizGuT9/WbsLtyFdnd1Dbayb2PUSBJB/mK+0zC1ZBbFZj6VuJz4Al1V3eFbPhKufmxn7/Bxf4m1TuZABVzzV6r+KAt6ag5VPY/C1oC+l88LEivTiSWRh4Kcxp0OMeBqouRAEc1EHS1dkre1xAt/NkHRw7IOMf9yVuQCnYczD/+XWpai76m7GpBmdCbyQeUtL/woZxlHG+8t0BbWaO3ifa1i+cZ+mnbgzgJdgO8z2gLP3Y1l9DoITQWC3kaxqOdz0fDP285NlkfBFzpIscoeTxkwwBUfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CqqXodC/13716a8XRxFEvoIzn/fmR+CjrKnuXluO4GQ=;
+ b=WQfY8bgYj+X9ZqkUneEuGGMtKY4lGEOhD+aETqhiS+2F39tryJ81wsKlCRBlydaB+R7fg8r9xpSxkntRjwK79f89qA2W+C7menVr68VKsK7GgUfGb8CKkUxKpEcdpEqrL4/DqTM+LESMzRATkP1ymudTVeJICZx+Loy0XH9EHnH72589PZVU/UkgfxC/6xEbvTQ0xQGIO0dt9Nw4e1dIVtuA7dk/ewcNqvgoWXMAB23KrCKNsRGdrcIIo2SoY+jRH1IWf8pVgz+e6kqojA/tYiddcK4TDeG6BCg1zVkYg0EE7zSSEgE29YcZx3o2u3DRFAgnV9ndvlBO1ee3c5+yEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH0PR11MB7660.namprd11.prod.outlook.com (2603:10b6:510:26f::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Mon, 25 Sep
+ 2023 22:29:17 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::9654:610d:227a:104f]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::9654:610d:227a:104f%4]) with mapi id 15.20.6813.018; Mon, 25 Sep 2023
+ 22:29:17 +0000
+Message-ID: <b109470b-99d1-441d-0648-7b8e4a8c86fd@intel.com>
+Date: Mon, 25 Sep 2023 15:29:14 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v2] net: ixp4xx_eth: Support changing the MTU
+To: Linus Walleij <linus.walleij@linaro.org>, Krzysztof Halasa
+	<khalasa@piap.pl>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CY5PR19CA0104.namprd19.prod.outlook.com
+ (2603:10b6:930:83::21) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230921120913.566702-5-daan.j.demeyer@gmail.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230925221241.2345534-1-jrife@google.com>
-Subject: Re: [PATCH bpf-next v5 4/9] bpf: Implement cgroup sockaddr hooks for
- unix sockets
-From: Jordan Rife <jrife@google.com>
-To: daan.j.demeyer@gmail.com
-Cc: bpf@vger.kernel.org, kernel-team@meta.com, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, Jordan Rife <jrife@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH0PR11MB7660:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c630ea2-8a85-490a-ffbb-08dbbe16dae5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xDB4TinFoqHthOigHC1sxW9BT8LTBAiOx465ye7wgNapFygmIBfGqGbMA0yPlFKTz7ZbEFMNEZfbqEW45BouWY24rUCvcVKYI8WJpsJxQAO+SA4Nie9GDesnwwBCG+Mdpovo3MSjBJw9g7PzeCX7x8utpWMzRGC/oVwmgiXcZASPMKolmYNPK50wTxIaTmVjj7SKOmrXyahk9rWx0lSnkjdZJeqUNIZBKqk5LlSYbIo6UrHuJY4M1uKJ7M0r27Tg29t7OHlDfAL4pXKHZxlCpaWQYepmVdZ6GRfajMu+kcE98ebENyf5kd8uWeHaa8CuSlkmy6jEpu6I9x+wGZ+HlMJOgCqjdmXnUt6JJY66h+BZ62wxkIx6ZRjhmRq19Kbqlbkbt/8KZEbUogCOMIJGMHO9N333R6+6fPEctv0M3oeshkx5OM8UFtVZy+o/bAxDB1hzq/l6zqfXog62UYwfPDqDXFRS+KJCJ78fjVQ5F5szAaMlqcou/ZNzALgUuZ1Gk18oYWVRHENGHGYHoOuuxzrtf9VhrkzEhVGaE4G8NliBRO+F6L2+ZiitGVzM2Gs1M6ikSM/D9/wQ4bhAJMz5X72LnWtllbsYUXa5SlAkqtFhJtiG0cTPuD+4Udq6MKAxs4rTd0iFfuHPCFxpCSdeKw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(136003)(366004)(346002)(396003)(230922051799003)(1800799009)(186009)(451199024)(2616005)(6486002)(26005)(6506007)(6512007)(53546011)(82960400001)(38100700002)(86362001)(36756003)(31696002)(83380400001)(8936002)(316002)(4326008)(8676002)(41300700001)(66946007)(66476007)(66556008)(5660300002)(110136005)(31686004)(2906002)(6666004)(966005)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzZUSHk0T0txcHhCcjVDMTJ6K0hsVit3MDZqQ0xoYXlrQ3BrNldyaTdoTkdT?=
+ =?utf-8?B?b3hzaUJBc0FsVU9hOFZaZ2RIUkdCZHBkMDM3TitQSlBiMmdHMnc4c1ZaMjYr?=
+ =?utf-8?B?Rkg0amwrZ3RMYjhYVXAzTkI3RDFRaHduUklwVit6bnh3NFY2YnluZUFyT0My?=
+ =?utf-8?B?SU1XMms3OWk3TUN6cHZTTG1hTGU3dEE1Z2xzcGFrcnFuYUY3UGRmb1hNS1BV?=
+ =?utf-8?B?MWJhRWdsNlRJbytOZTVkZWRSZmdQVVFqWHR3ZWFKT0JuUVc0TTVmZGMrREdM?=
+ =?utf-8?B?S0ljUW0xQzZ2eVhIRERmdXdDemJodE9MNWJHQ2xjUC9WSXcwK3Y1eEw5d2Rm?=
+ =?utf-8?B?VmhRTzltdWxuSWlOL3d5NDFKSTNkdXhtNU9XNTlPNGgyNUd0MjBUN0pkOEZK?=
+ =?utf-8?B?SzJ4MVArSm1RNFRHM3BRRzNmZGowKzR0cHV5YVhMWFV0eUJQVUFHSEFrL0dZ?=
+ =?utf-8?B?N3Z6K0JaM3JtWW16TFlIR0U2QklaVEZxTUFtUGM4dlk1US9kNXpIbTFNRXRi?=
+ =?utf-8?B?WkRFZE1YeC9TQ1E0alk2eGVXTHU0cHVnYktqcnBvYVBpb0xSNFdaSVEvQ0Ex?=
+ =?utf-8?B?UVlIVmlPVGJxZWREQ3FudXNzUEhacFVVeU1NVUU1SDlHZmUwS2M0VWdlUDBV?=
+ =?utf-8?B?L2Ric3E5TWprSXB3U0Q0L1kwQWJrWndNMXRuaHhvc2dLOFpkU2psbDJwQ2k3?=
+ =?utf-8?B?aW9DZWNZdW81RXJMNlFpMWVPUHR3a2FiNGQvZ1Yxbk00TC9GcDZ4TDZ4dVQv?=
+ =?utf-8?B?T01wekxGbzdUTjM2MnM3NkRzS1dEMmR5VjhoMEdtcUp5cVJ1OWVHQThHMXQ5?=
+ =?utf-8?B?dHRTVWpNWEhHd3V6RmxxNVRWWUxVeXpvQ1ZZblI1bFBSc3Q1UlV6eTBpNUJ0?=
+ =?utf-8?B?TWUxa3dzQktGS254NUtJdmZMajdUeVBQVUR5aGp1QUdSbXBlQVRhMGswQTdX?=
+ =?utf-8?B?SzhGalNuVmt6VGZ2bWowQUZLV2dCdTVzUDl5cGhvUDVYSjgrOXVnUlBKWG5M?=
+ =?utf-8?B?aG12L1NZVGpHNnhmN3Fub2Q4d3FDME1PdzF0YlA5UUFaU2gvcHJCbkFFTEkw?=
+ =?utf-8?B?Y210OGNHZ01rcGVUZlZGVnkvL1l6NllQQzZqSVF6MHdjUGVuVmkzUk1jandP?=
+ =?utf-8?B?UFFJRmVkSndXbGlNQlU5aXVmL1hzZFFVdjFwbnNzQXlEMXVFRFFnNW5NQ1lM?=
+ =?utf-8?B?WFk5bUg1ZnI4dTFLbXI5VHlMdnZ2M0FuVVFBejREbkw2WDBCK21WaHgrWDlC?=
+ =?utf-8?B?MFB6N0FZMDR1c0p4SlJiejZ4WGtCUllHR0xicVBPL3FuU3FoSWpPVzB2N0Vo?=
+ =?utf-8?B?ZlZOelhtQlRhcUxDWmJpMjZGUzQ4ZHFtRW12QzJteEFFNFc4aG4xdGpJTGxJ?=
+ =?utf-8?B?dHFTREc1eit2Y3g4UlVKamF5OXkyemttbjZTYTNMZXRiaWIvcmFJZC9PdGVT?=
+ =?utf-8?B?ZHN1TXo2UUVBT25sNHIwUmFyWm10QzdyMUp2cSsvaVlDYkN2KzVWN0pMYWhz?=
+ =?utf-8?B?K1pESW1qY1VNVTJpQk9DaVBmbTcrSVFGQnJHcGYrV0ZEakNsdFp5ZS81THYy?=
+ =?utf-8?B?OENpdkpyMnEyNmhpSWhrQWNaUC9BbU1oTHdXRXNLQXdIcTBES1h4RXRhMWdL?=
+ =?utf-8?B?dU1kRzd3OW9hYkJzSnlLbjFLQlBITkppMnUxMzV6c3l6UWtPZ0FiY2cyN2V3?=
+ =?utf-8?B?WGVVZUwzMWlSU29wcTNXV283MWZLV3hJQTZTU0Nwcjh6a2dqZ090dkRSYXdR?=
+ =?utf-8?B?eGJmbDlCMG9rLzhteXBOSVhKODlmSjg4WHM5WlptU3NEL1dEeHVUckcxVVg3?=
+ =?utf-8?B?QlJFUzRORC9DcWFOZ3ZnY2lxUWp4dzhNRFBUS3hvV2MrNHhIKy9PZVlHMnA0?=
+ =?utf-8?B?a2pMVitEb096cTZneTF5UGxER1BXNFZ5eTlGVndySnNnMnd4MkU2UWxBeDZx?=
+ =?utf-8?B?cUNrRktFT0FuY0NHNGFWQXZydFRUSGVOQllYTUlSbURGUHJ4TG90S0xFZU5i?=
+ =?utf-8?B?V2VBOEhKazNST2dabUhyS3BaVUhOR0R3WmUzQU4ySUx2RFdaanN2ellJQjFE?=
+ =?utf-8?B?MDc0Znoza01SMXdJK2poWGYyN2hJRTJsUFVDWHRrVC9xYVpyRHlwTHE3dGRJ?=
+ =?utf-8?B?YzdrRUNpREJ5SEY3TXVKZjBhV0pjNFcxcXRCbm45NjFxbjFMVEpkRTVIV3hM?=
+ =?utf-8?B?eHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c630ea2-8a85-490a-ffbb-08dbbe16dae5
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 22:29:17.5031
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FHcH07Yd72PpIgEF8PiSkdPLzFgJ5nMnZmUflpVXuK64rglanrgm7/75djdSlG6WBU03OHNshJgxLFglW/TXZUzQoupce4er+SCmhdcGhBc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7660
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> @@ -1919,6 +1936,13 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
->  		goto out;
->
->  	if (msg->msg_namelen) {
-> +		err = BPF_CGROUP_RUN_PROG_UNIX_SENDMSG_LOCK(sk,
-> +							    msg->msg_name,
-> +							    &msg->msg_namelen,
-> +							    NULL);
-> +		if (err)
-> +			goto out;
+
+
+On 9/25/2023 12:09 AM, Linus Walleij wrote:
+> As we don't specify the MTU in the driver, the framework
+> will fall back to 1500 bytes and this doesn't work very
+> well when we try to attach a DSA switch:
+> 
+>   eth1: mtu greater than device maximum
+>   ixp4xx_eth c800a000.ethernet eth1: error -22 setting
+>   MTU to 1504 to include DSA overhead
+> 
+> After locating an out-of-tree patch in OpenWrt I found
+> suitable code to set the MTU on the interface and ported
+> it and updated it. Now the MTU gets set properly.
+> 
+
+Nice!
+
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+> Changes in v2:
+> - Don't just set min/max MTU: implement the interface for actually
+>   changing it as well.
+> - Link to v1: https://lore.kernel.org/r/20230923-ixp4xx-eth-mtu-v1-1-9e88b908e1b2@linaro.org
+> ---
+>  drivers/net/ethernet/xscale/ixp4xx_eth.c | 64 +++++++++++++++++++++++++++++++-
+>  1 file changed, 63 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> index 3b0c5f177447..18e52abc005b 100644
+> --- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> +++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/dma-mapping.h>
+>  #include <linux/dmapool.h>
+>  #include <linux/etherdevice.h>
+> +#include <linux/if_vlan.h>
+>  #include <linux/io.h>
+>  #include <linux/kernel.h>
+>  #include <linux/net_tstamp.h>
+> @@ -63,7 +64,15 @@
+>  
+>  #define POOL_ALLOC_SIZE		(sizeof(struct desc) * (RX_DESCS + TX_DESCS))
+>  #define REGS_SIZE		0x1000
+> -#define MAX_MRU			1536 /* 0x600 */
 > +
->  		err = unix_validate_addr(sunaddr, msg->msg_namelen);
->  		if (err)
->  			goto out;
+> +/* MRU is said to be 14320 in a code dump, the SW manual says that
+> + * MRU/MTU is 16320 and includes VLAN and ethernet headers.
+> + * See "IXP400 Software Programmer's Guide" section 10.3.2, page 161.
+> + *
+> + * FIXME: we have chosen the safe default (14320) but if you can test
+> + * jumboframes, experiment with 16320 and see what happens!
+> + */
 
 
-Just an FYI, I /think/ this is going to introduce a bug similar to the one I'm
-addressing in my patch here:
+Ok, so you're choosing a conservative upper limit that is known to work
+while leaving the higher 16320 value for later if/when someone cares?
 
-- https://lore.kernel.org/netdev/20230921234642.1111903-2-jrife@google.com/
+> +#define MAX_MRU			(14320 - VLAN_ETH_HLEN)
+>  #define RX_BUFF_SIZE		ALIGN((NET_IP_ALIGN) + MAX_MRU, 4)
+>  
+>  #define NAPI_WEIGHT		16
+> @@ -1182,6 +1191,53 @@ static void destroy_queues(struct port *port)
+>  	}
+>  }
+>  
+> +static int ixp4xx_do_change_mtu(struct net_device *dev, int new_mtu)
+> +{
+> +	struct port *port = netdev_priv(dev);
+> +	struct npe *npe = port->npe;
+> +	struct msg msg;
+> +	/* adjust for ethernet headers */
+> +	int framesize = new_mtu + VLAN_ETH_HLEN;
+> +	/* max rx/tx 64 byte chunks */
+> +	int chunks = DIV_ROUND_UP(framesize, 64);
+> +
 
-With this change, callers to sock_sendmsg() in kernel space would see their
-value of msg->msg_namelen change if they are using Unix sockets. While it's
-unclear if there are any real systems that would be impacted, it can't hurt to
-insulate callers from these kind of side-effects. I can update my my patch to
-account for possible changes to msg_namelen.
+netdev coding style wants all of the declarations in "reverse christmas
+tree" ordering. Assign to the local variables after the block if
+necessary. Something like:
 
-Also, with this patch series is it possible for AF_INET BPF hooks (connect4,
-sendmsg4, connect6, etc.) to modify the address length?
+	struct port *port = netdev_priv(dev);
+	struct npe *npe = port->npe;
+	int framesize, chunks;
+	struct msg msg;
+
+	/* adjust for ethernet headers */
+	framesize = new_mtu + VLAN_ETH_HLEN;
+	/* max rx/tx 64 byte chunks */
+	chunks = DIV_ROUND_UP(framesize, 64);
+
+
+> +	memset(&msg, 0, sizeof(msg));
+
+
+You could also use "struct msg msg = {}" instead of memset here.
+
+> +	msg.cmd = NPE_SETMAXFRAMELENGTHS;
+> +	msg.eth_id = port->id;
+> +
+> +	/* Firmware wants to know buffer size in 64 byte chunks */
+> +	msg.byte2 = chunks << 8;
+> +	msg.byte3 = chunks << 8;
+> +
+
+I am not sure I follow the "<< 8" here.
+
+> +	msg.byte4 = msg.byte6 = framesize >> 8;
+> +	msg.byte5 = msg.byte7 = framesize & 0xff;
+> +
+> +	if (npe_send_recv_message(npe, &msg, "ETH_SET_MAX_FRAME_LENGTH"))
+> +		return -EIO;
+> +	netdev_dbg(dev, "set MTU on NPE %s to %d bytes\n",
+> +		   npe_name(npe), new_mtu);
+> +
+> +	return 0;
+> +}
+> +
+> +static int ixp4xx_eth_change_mtu(struct net_device *dev, int new_mtu)
+> +{
+> +	int ret;
+> +
+> +	/* MTU can only be changed when the interface is up. We also
+> +	 * set the MTU from dev->mtu when opening the device.
+> +	 */
+> +	if (dev->flags & IFF_UP) {
+> +		ret = ixp4xx_do_change_mtu(dev, new_mtu);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+> +
+> +	dev->mtu = new_mtu;
+> +
+> +	return 0;
+> +}
+> +
+>  static int eth_open(struct net_device *dev)
+>  {
+>  	struct port *port = netdev_priv(dev);
+> @@ -1232,6 +1288,8 @@ static int eth_open(struct net_device *dev)
+>  	if (npe_send_recv_message(port->npe, &msg, "ETH_SET_FIREWALL_MODE"))
+>  		return -EIO;
+>  
+> +	ixp4xx_do_change_mtu(dev, dev->mtu);
+> +
+>  	if ((err = request_queues(port)) != 0)
+>  		return err;
+>  
+> @@ -1374,6 +1432,7 @@ static int eth_close(struct net_device *dev)
+>  static const struct net_device_ops ixp4xx_netdev_ops = {
+>  	.ndo_open = eth_open,
+>  	.ndo_stop = eth_close,
+> +	.ndo_change_mtu = ixp4xx_eth_change_mtu,
+>  	.ndo_start_xmit = eth_xmit,
+>  	.ndo_set_rx_mode = eth_set_mcast_list,
+>  	.ndo_eth_ioctl = eth_ioctl,
+> @@ -1488,6 +1547,9 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
+>  	ndev->dev.dma_mask = dev->dma_mask;
+>  	ndev->dev.coherent_dma_mask = dev->coherent_dma_mask;
+>  
+> +	ndev->min_mtu = ETH_MIN_MTU;
+> +	ndev->max_mtu = MAX_MRU;
+> +
+>  	netif_napi_add_weight(ndev, &port->napi, eth_poll, NAPI_WEIGHT);
+>  
+>  	if (!(port->npe = npe_request(NPE_ID(port->id))))
+> 
+
+Functionality-wise the patch seems fine to me, and properly implementing
+the MTU changing is a great addition.
+
+Minor nits on the coding style, but not really a huge issue to me. I had
+some question about how the chunks work but I don't know the hardware so
+I can't really evaluate whether its correct or not.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+> ---
+> base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+> change-id: 20230923-ixp4xx-eth-mtu-c041d7efe932
+> 
+
+Curious what this change-id thing represents I've never seen it before..
+I know base-commit is used by git. Would be interested in an explanation
+if you happen to know! :D
+
+> Best regards,
 
