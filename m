@@ -1,134 +1,150 @@
-Return-Path: <netdev+bounces-36139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D60037AD837
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C89257AD91F
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 15:29:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9E6FC281773
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:45:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 781AC281214
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 13:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119391A583;
-	Mon, 25 Sep 2023 12:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A1A1B29B;
+	Mon, 25 Sep 2023 13:29:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16DE14A82
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 12:45:54 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6561510C
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 05:45:52 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-3214cdb4b27so5947349f8f.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 05:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1695645951; x=1696250751; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5pS4hHTm1EEOcrv+PR/KnXKIpI3hRXOYngc1s51PQAk=;
-        b=Pgt0RnsfwZc9XX8YYhXlwMSqUBjeAmuAGIAeqB8s/0HSxiyNS7p0fJRZw6bgZ/fMCI
-         64qv7gBLpsG22VMUcD6WSUmL2Dkd5mOctCPcQMJ9T3q6ev09CzSmVMkz84gZMvi4XBkl
-         eyxS28Ei4rKC/4zMwkTudGOv7FRMjfP9Zbxnf0Fwvw1ObWMxVWsTbXCD+e+EfsYVKfJZ
-         P7bZGARbuAZGEXc2Ojfp/23i8DIYF+h+nKcTlzmMeCb2t2U1jL3dj+WgegTfjhfORP5x
-         IXmOouqDeM/j5jlheYgOZ3kT3XqsrK4wR5e8DFb++SG03mWutimTJKi5zRoGfBfxBNHi
-         GjtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695645951; x=1696250751;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5pS4hHTm1EEOcrv+PR/KnXKIpI3hRXOYngc1s51PQAk=;
-        b=t6hLvlj5l3mTRXOtEjbBFQRERj5YnIClrX63xJsEgmr7X63xxSNxDkzFkUggAAd95I
-         CIOwSQ3tbKXt/5ZyXaP9BHp0NE3P24B6Y3vy/ltau9Cq8eONMQ9DcQxaszAxYnDRyRaJ
-         SAvgSwaIp0pGSfAGkUyiaRh6TGo8oQfT+vdN27zUgAfLvh/V2wduIUpMJtwxhpbqry6I
-         54nvUq0yuj/9OzKwi4HqmjGh0EXpmUmmHd8rRNnafvmGbIimbwwPNQMrRLQyBUEJ1uI1
-         hl9pOCf+7Ytkhg1vD9hsR90gO1wDOqjCllid3GIlG0u05Gy+dEDLk0ONpgMJ0FZBux8j
-         tZFg==
-X-Gm-Message-State: AOJu0Yx++s0CV5WWcYiO9BC7V04Y1bIl/C4xUazuvZjA12uuwrvMcyVD
-	bRnWblUaCoqXWtYahZL+G5FREQ==
-X-Google-Smtp-Source: AGHT+IEaLT8rq2bcnfmKUTttqEPiHDTNiTGKY/UxUoDMKH8UtTQA9rcR8OrNiwySdZlgrNIpaqpyKw==
-X-Received: by 2002:a05:6000:185:b0:321:8d08:855e with SMTP id p5-20020a056000018500b003218d08855emr5391088wrx.24.1695645950778;
-        Mon, 25 Sep 2023 05:45:50 -0700 (PDT)
-Received: from ?IPV6:2a02:8011:e80c:0:b095:3966:9c75:5de? ([2a02:8011:e80c:0:b095:3966:9c75:5de])
-        by smtp.gmail.com with ESMTPSA id w10-20020adfde8a000000b0031fba0a746bsm11823765wrl.9.2023.09.25.05.45.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Sep 2023 05:45:50 -0700 (PDT)
-Message-ID: <0ac77924-ee79-4a41-8737-2aa88a0d7ba1@isovalent.com>
-Date: Mon, 25 Sep 2023 13:45:49 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAB913ACF
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 13:29:19 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BDB910E;
+	Mon, 25 Sep 2023 06:29:17 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38PDPV7d011432;
+	Mon, 25 Sep 2023 13:29:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4PUFM8unlv/0l5zmXdSmUGzyRvP6q3M0XEjDrU3Eg64=;
+ b=C0Uy61LFZ/q/AixUr3V5kXAfpOXaRmJENcrAIzvN+w5mYefMdjRxy8ufHyExUGsCTNmC
+ A9i7woizOrgramTOo4NW+m5avQmppKjsmKw4SleNPQSBto9q8JlXdmHiTeq1c1BE38VO
+ uQX7ryUtuP+R9viW2BWU2AdLv7WOQVidJkXLMmEW/bR92lhrPy57qLIb+aZgTOSn0L0O
+ lWwSRepBt4J+/scUuECQ4LgnNP80Y67ilkiRcZUABjEKRtna0GoUZ6JInqlyytdwyaS3
+ wN1BdiJ5lh1/NfSG59I/dQUiFq1Ecee4Z5h4LhZBcg5pwJd/ZCy0iiI0yo1X8NV+KL8d Vg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb8vgm6h8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 13:29:14 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38PCc8bV032081;
+	Mon, 25 Sep 2023 13:29:13 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tb8vgm6gt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 13:29:13 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38PCaRsu030719;
+	Mon, 25 Sep 2023 13:29:12 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjhycq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Sep 2023 13:29:12 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38PDT9gx15401510
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 25 Sep 2023 13:29:09 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F7A42004D;
+	Mon, 25 Sep 2023 13:29:09 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3CEB520040;
+	Mon, 25 Sep 2023 13:29:09 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 25 Sep 2023 13:29:09 +0000 (GMT)
+Message-ID: <c4ba2015-d951-451a-f96c-2946bfb9611c@linux.ibm.com>
+Date: Mon, 25 Sep 2023 15:29:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v5 6/9] bpftool: Add support for cgroup unix
- socket address hooks
-Content-Language: en-GB
-To: Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
-Cc: martin.lau@linux.dev, kernel-team@meta.com, netdev@vger.kernel.org
-References: <20230921120913.566702-1-daan.j.demeyer@gmail.com>
- <20230921120913.566702-7-daan.j.demeyer@gmail.com>
-From: Quentin Monnet <quentin@isovalent.com>
-In-Reply-To: <20230921120913.566702-7-daan.j.demeyer@gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
+ device
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+ <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
+In-Reply-To: <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4XwUEBuC4o2vJ19oSf6slw5IxQ8g9UdF
+X-Proofpoint-ORIG-GUID: OLesoVtNi6RDrGd3HhQj4LKrRCnixe0E
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-25_10,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ mlxlogscore=585 phishscore=0 clxscore=1015 mlxscore=0 suspectscore=0
+ bulkscore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309250098
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 21/09/2023 13:09, Daan De Meyer wrote:
-> Add the necessary plumbing to hook up the new cgroup unix sockaddr
-> hooks into bpftool.
+
+
+On 25.09.23 13:50, Alexandra Winter wrote:
 > 
-> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-> ---
->  .../bpf/bpftool/Documentation/bpftool-cgroup.rst | 16 +++++++++++++---
->  tools/bpf/bpftool/Documentation/bpftool-prog.rst |  8 +++++---
->  tools/bpf/bpftool/bash-completion/bpftool        | 14 +++++++-------
->  tools/bpf/bpftool/cgroup.c                       | 16 +++++++++-------
->  tools/bpf/bpftool/prog.c                         |  7 ++++---
->  5 files changed, 38 insertions(+), 23 deletions(-)
 > 
-> diff --git a/tools/bpf/bpftool/Documentation/bpftool-cgroup.rst b/tools/bpf/bpftool/Documentation/bpftool-cgroup.rst
-> index bd015ec9847b..3e4f5ff24208 100644
-> --- a/tools/bpf/bpftool/Documentation/bpftool-cgroup.rst
-> +++ b/tools/bpf/bpftool/Documentation/bpftool-cgroup.rst
-> @@ -102,21 +105,28 @@ DESCRIPTION
->  		  **post_bind6** return from bind(2) for an inet6 socket (since 4.17);
->  		  **connect4** call to connect(2) for an inet4 socket (since 4.17);
->  		  **connect6** call to connect(2) for an inet6 socket (since 4.17);
-> +		  **connectun** call to connect(2) for a unix socket (since 6.3);
->  		  **sendmsg4** call to sendto(2), sendmsg(2), sendmmsg(2) for an
->  		  unconnected udp4 socket (since 4.18);
->  		  **sendmsg6** call to sendto(2), sendmsg(2), sendmmsg(2) for an
->  		  unconnected udp6 socket (since 4.18);
-> +		  **sendmsgun** call to sendto(2), sendmsg(2), sendmmsg(2) for
-> +		  an unconnected unix socket (since 6.3);
->  		  **recvmsg4** call to recvfrom(2), recvmsg(2), recvmmsg(2) for
->  		  an unconnected udp4 socket (since 5.2);
->  		  **recvmsg6** call to recvfrom(2), recvmsg(2), recvmmsg(2) for
->  		  an unconnected udp6 socket (since 5.2);
-> +		  **recvmsgun** call to recvfrom(2), recvmsg(2), recvmmsg(2) for
-> +		  an unconnected unix socket (since 6.3);
->  		  **sysctl** sysctl access (since 5.2);
->  		  **getsockopt** call to getsockopt (since 5.3);
->  		  **setsockopt** call to setsockopt (since 5.3);
->  		  **getpeername4** call to getpeername(2) for an inet4 socket (since 5.8);
->  		  **getpeername6** call to getpeername(2) for an inet6 socket (since 5.8);
-> +		  **getpeernameun** call to getpeername(2) for a unix socket (since 6.3);
->  		  **getsockname4** call to getsockname(2) for an inet4 socket (since 5.8);
->  		  **getsockname6** call to getsockname(2) for an inet6 socket (since 5.8).
-> +		  **getsocknameun** call to getsockname(2) for a unix socket (since 6.3);
+> On 24.09.23 17:16, Wen Gu wrote:
+>> This patch introduces a kind of loopback device for SMC-D. The device
+>> is created when SMC module is loaded and destroyed when the SMC module
+>> is unloaded. The loopback device is a kernel device used only by the
+>> SMC module and is not restricted by net namespace, so it can be used
+>> for local inter-process or inter-container communication.
+>>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>  net/smc/Kconfig        |  13 ++++
+>>  net/smc/Makefile       |   2 +-
+>>  net/smc/af_smc.c       |  12 +++-
+>>  net/smc/smc_loopback.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  net/smc/smc_loopback.h |  33 ++++++++++
+>>  5 files changed, 223 insertions(+), 2 deletions(-)
+>>  create mode 100644 net/smc/smc_loopback.c
+>>  create mode 100644 net/smc/smc_loopback.h
+> 
+> 
+> Hello Wen Gu,
+> 
+> thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
+> 
+> I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
+> may want to exploit smcd-loopback. Especially in native environements without containers.
+> 
+> If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
+> If loopback is always created unconditionally, there is no way to opt-out.
+> 
 
-Same comment as for v4 - please update the kernel version (6.3) for the
-new entries.
+Another thing came to my mind:
 
-Bpftool changes look good otherwise.
-
-Acked-by: Quentin Monnet <quentin@isovalent.com>
+When loopback is created and registered when the SMC module is loaded, it will implicitly always have highest priority, right?
+That should be stated somewhere.
+Also, if you create a runtime switch this will change, so then you need to decide about priority of loopback vs ISM device (and other future smcd-devices).
 
