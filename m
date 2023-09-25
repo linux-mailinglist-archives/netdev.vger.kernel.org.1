@@ -1,149 +1,122 @@
-Return-Path: <netdev+bounces-36151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5477C7ADA34
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 16:42:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 972937ADB34
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 17:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id AF565B20987
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 14:42:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 53EBAB2099B
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 15:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708CE1C283;
-	Mon, 25 Sep 2023 14:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30171DDEE;
+	Mon, 25 Sep 2023 15:18:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075701B26E
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 14:42:49 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2070.outbound.protection.outlook.com [40.107.102.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F58101;
-	Mon, 25 Sep 2023 07:42:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R4ou1ETS7GeQPgV4OnNo2Yen3I73IMKlzXBCjTwlMgDBkucdfSPUFc7Pqu5rg/RNJplIuoHZuWOkOZRSEQ6ZrlWGFNlT+7R1WHIRVb7dfUz06v99KZyBWNG59OQst7/QrjHhWxSwocf2E83zPnWXs655qkXch/EMxKBdeuJC+jw/ypD+8cjCblxqMgZwguxZxV0v6mfNqYDuuy+J4hUh/rYlzOC4/B+F+sgLoXiA0mJ7whHwpYpGaTEfOWGUBFPrnUzqzmoUA83t+/QZBt+tB2FLINJ+JNu/gQZisb41mktRkf/G7gYgXllGckHjZVD7V20YJTWfNssLcBhzjIkcbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LyllHnJEB7RQZ70NaFJPAtYlATXRgWs83bRdXCVdKxI=;
- b=KlWI/8//SteEkKt31bDGi3Mt6RE5ZZgoAlLz1XlVPEJUndeuJWBhJvLTPh3il/Y3jb1bSyZ172yEjS1E1I7Ny3p5sXLfVrzoN1otJY0TqvwndOmYmx78d3rRXMVhAts6SaG/koEIlAkcsxajq9XYGge1lGAZm8/L6ErwytrBdTaSG7zneGPtagHnZ3VEF0uxaVoYRJiegdpUjXMLLyie7ANBc4V2csxob+5dvRhBLUmOh8QxEkn0f+TkEbf7jW4fEKQrjyecDKspW397ElmZ8ngtkVRx2tv7wr2mARRtzRsttyki1aF7E1NaSCB79Teiw5YW3znOyDNzQ7IhVbwCMA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LyllHnJEB7RQZ70NaFJPAtYlATXRgWs83bRdXCVdKxI=;
- b=VRIHKVKJlPrheXbBy3MnVzqxI8hmI2scUHh/F7a20geY67Nyk6SulwVRJFvmu7GQXj8e+abhoVyw6Sp7o9z2xod7/J8PoDWq1YghXhXafBjiumcbzJfVONghgHred96fq+kRHUi37ooYiBPg9VpWm7GmQgyWcNRUHJ9b4ib0r0TbuL3CFtVDwpyQnlLWsrJ2AVJsTJjQ0En7SGKY0NoiRYBfABH2pmeR8ytIha1tYXzgV/xH66i7G8tMh7+sKVrIa94XuLG08F7fMJ+AP6F8Kz0FgZdwy8+/WXWEXMoT2a4v/XKt52veeNwZNlT1QFsF6Kj234jKwDfIM9Sgcnil9w==
-Received: from MW4PR03CA0238.namprd03.prod.outlook.com (2603:10b6:303:b9::33)
- by IA0PR12MB7531.namprd12.prod.outlook.com (2603:10b6:208:43f::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Mon, 25 Sep
- 2023 14:42:45 +0000
-Received: from CO1PEPF000044F3.namprd05.prod.outlook.com
- (2603:10b6:303:b9:cafe::8e) by MW4PR03CA0238.outlook.office365.com
- (2603:10b6:303:b9::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
- Transport; Mon, 25 Sep 2023 14:42:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000044F3.mail.protection.outlook.com (10.167.241.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.14 via Frontend Transport; Mon, 25 Sep 2023 14:42:44 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Sep
- 2023 07:42:31 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Sep
- 2023 07:42:29 -0700
-References: <20230925085318.1228225-1-nichen@iscas.ac.cn>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Chen Ni <nichen@iscas.ac.cn>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <izumi.taku@jp.fujitsu.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] fjes: Add missing check for vzalloc
-Date: Mon, 25 Sep 2023 16:40:24 +0200
-In-Reply-To: <20230925085318.1228225-1-nichen@iscas.ac.cn>
-Message-ID: <87r0mms4a5.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5211CAA5
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 15:18:27 +0000 (UTC)
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F41FE101;
+	Mon, 25 Sep 2023 08:18:22 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VsthvN7_1695655096;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VsthvN7_1695655096)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Sep 2023 23:18:17 +0800
+Date: Mon, 25 Sep 2023 23:18:16 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+	alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
+ device
+Message-ID: <20230925151816.GC92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+ <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail202.nvidia.com (10.129.68.7)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F3:EE_|IA0PR12MB7531:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef323bfb-c31e-46be-dab1-08dbbdd5adec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yi7VUzGbgmbBuvKu7HvM9mxES6pfP5wE4pcRTgQ7UOLOiX9FmCM/rxVLUVD/Re5LyPJa2X52/P1WgJRo0pinqC4YzJftKbj/nxINt/t6nO1Ajol5O2D5SAp11fcCYRPO3zSj9gMt428QWdIjo72rTxxTVOcET239n65jsEMtYNTpeVbqol9yOCfBdmxvhViauqekajeyXparJLR2v9iTWRGSqh50qktfaiiCLy33PstT3PSOxQvZuVabAgo1t7qjQa6bKcANJnjG/Sx+nQWfXDl0PAsp+NLhbm4WXihGkz4ctvcx3KXQ4Jtnd8/098MQYGwP5vjExnT0rUTVDrFKZvnNu8o1a2p7iVpoc6aTZtQ2gc94rwFxUFqZZHY3TdNrxBGHr+7kSkP1MDPWyW/POyF8tFbqVwhEhtmfHA9L4OmepHJMBv6NQ0+jAbkQQTQOV1ozPH3kWR3qSJKw+86M/OWGe3BdYmlMx4ouYcxnfua3BdqpRrEZCmTG3lRL10Av9Gtxt+q7VaA+aAUHcM6VxWkgisbLl3CQ2L6Iuf1nO9M2C5D1nzFbGtrER40V5IeRyYiGylgc725ZcVnp551Sg4WJzEJGMeUxLTiGS5SAo4g7azmrv1D7k19uIeTtLGqPoEQbhEW6hHndVxzK9XjNWjLG44RbBYFJ+uB24aebN1pqkNPr83M3zvXO4hkfHvE7H168WeXebQrrphaByMiqpqk/4CqxJVN/v4DN6dM1iaw=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(136003)(39860400002)(346002)(230922051799003)(1800799009)(451199024)(186009)(82310400011)(40470700004)(36840700001)(46966006)(2616005)(40460700003)(36756003)(86362001)(356005)(40480700001)(7636003)(82740400003)(36860700001)(16526019)(26005)(4744005)(2906002)(426003)(336012)(6666004)(478600001)(47076005)(83380400001)(8936002)(4326008)(5660300002)(8676002)(41300700001)(70206006)(54906003)(6916009)(316002)(70586007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2023 14:42:44.5784
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef323bfb-c31e-46be-dab1-08dbbdd5adec
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F3.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7531
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-Chen Ni <nichen@iscas.ac.cn> writes:
-
-> Because of the potential failure of the vzalloc(), the hw->hw_info.trace
-> could be NULL.
-> Therefore, we need to check it and return -ENOMEM in order to transfer
-> the error.
+On Mon, Sep 25, 2023 at 01:50:22PM +0200, Alexandra Winter wrote:
 >
-> Fixes: b6ba737d0b29 ("fjes: ethtool -w and -W support for fjes driver")
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-> ---
->  drivers/net/fjes/fjes_hw.c | 3 +++
->  1 file changed, 3 insertions(+)
 >
-> diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
-> index 704e949484d0..3a06a3cf021d 100644
-> --- a/drivers/net/fjes/fjes_hw.c
-> +++ b/drivers/net/fjes/fjes_hw.c
-> @@ -330,6 +330,9 @@ int fjes_hw_init(struct fjes_hw *hw)
->  	ret = fjes_hw_setup(hw);
->  
->  	hw->hw_info.trace = vzalloc(FJES_DEBUG_BUFFER_SIZE);
-> +	if (!hw->hw_info.trace)
-> +		return -ENOMEM;
-> +
+>On 24.09.23 17:16, Wen Gu wrote:
+>> This patch introduces a kind of loopback device for SMC-D. The device
+>> is created when SMC module is loaded and destroyed when the SMC module
+>> is unloaded. The loopback device is a kernel device used only by the
+>> SMC module and is not restricted by net namespace, so it can be used
+>> for local inter-process or inter-container communication.
+>> 
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>  net/smc/Kconfig        |  13 ++++
+>>  net/smc/Makefile       |   2 +-
+>>  net/smc/af_smc.c       |  12 +++-
+>>  net/smc/smc_loopback.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  net/smc/smc_loopback.h |  33 ++++++++++
+>>  5 files changed, 223 insertions(+), 2 deletions(-)
+>>  create mode 100644 net/smc/smc_loopback.c
+>>  create mode 100644 net/smc/smc_loopback.h
+>
+>
+>Hello Wen Gu,
+>
+>thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
+>
+>I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
+>may want to exploit smcd-loopback. Especially in native environements without containers.
+>
+>If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
+>If loopback is always created unconditionally, there is no way to opt-out.
 
-I'm not sure, but shouldn't this call fjes_hw_cleanup() to mirror the
-setup() above? Also only if ret=0 I suppose.
+Hi Sandy,
 
->  	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
->  
->  	return ret;
+After talking to Wen Gu offline, I think the real issue here might be
+we don't have an abstract layer in SMC, something like net/core/dev.c
 
+Without this, we cannot do:
+
+1. Enable/disable those devices dynamically
+   Currently, If we want to disable a SMC-R device to communicate with
+   others, we need to refer to 'ip link set dev xxx down' to disable the
+   netdevice, then Infiniband subsystem will notify SMC that the state of
+   the IB device has changed. We cannot explicitly choose not to use some
+   specific IB/RoCE devices without disable totally.
+   If the loopback device need to support enable/disable itself, I
+   think it might be better to enable this feature for all SMC devices.
+
+2. Do statistics per device
+   Now, we have to relay on IB/RoCE devices' hardware statistics to see
+   how many packets/bytes we have sent through this device.
+
+Both the above issues get worse when the IB/RoCE device is shared by SMC
+and userspace RDMA applications. If SMC-R and userspace RDMA applications
+run at the same time, we can't enable the device to run userspace RDMA
+applications while block it from running SMC. For statistics, we cannot
+tell how many packets/bytes were sent by SMC and how many were sent by
+userspace RDMA applications.
+
+So I think those are better to support in the SMC layer.
+
+Best regards!
+Dust
 
