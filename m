@@ -1,251 +1,156 @@
-Return-Path: <netdev+bounces-36118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 521AB7AD62E
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:38:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7ADC7AD62B
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 12:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id C60F21F249CA
-	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 97202282463
+	for <lists+netdev@lfdr.de>; Mon, 25 Sep 2023 10:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42A014A8C;
-	Mon, 25 Sep 2023 10:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC2B14267;
+	Mon, 25 Sep 2023 10:38:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E7C15E95
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:38:11 +0000 (UTC)
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE02DB3
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:38:08 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-5041bb9ce51so9580364e87.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:38:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7326FCF
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 10:38:01 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8426E9B
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:38:00 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-405524e6769so22487105e9.1
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 03:38:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695638286; x=1696243086; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dSTQ86CTPlF+qTrRT9khZIWguaPLmOH4OSA+go2d1Qg=;
-        b=RjnbaqIuorxsVUEeXWj7dklxcCRNw5CpnWEgGESylO0gt5XXlXlNGYUeiZ5jeiTNGS
-         cUFVsqmnC03b0HWyoQ24njY5i4n7K22N8miWse+tQVmfzvN/p26uHOAn4qfUvQCN4B6F
-         0m5oqELlbZmy5ICaJcaZkR7qtXoLR9P79h7xF3Ly6TXgCq0iLEFJAA2KC+2SbZ9dI0pb
-         yCxYFC6MaBWxiXr+eBwvkgPVzjcLX6dmYyb0FQEu0Iz4JaCdso0cCzVcG3GIANNMqiV0
-         7AEd8rEKaunzs45k9+pJ6XVAlGuMMX/RO71OrcRWydvs4ona21mv3NZfbRnZjkLDEwv7
-         qaBQ==
+        d=gmail.com; s=20230601; t=1695638279; x=1696243079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NNRcMwuERaBl25L7UoycFy039dxy5njWGLf4VQsv18E=;
+        b=BLaKS4LyCkTgyxPd8aJtVuydZ4js/vd0YLE2HbaANsFl3kca9Cuvko4Q5rstcY7yw7
+         wWf6WGAR5/RUj+rvYwzL1Sfd8sW4eExG3TGbLfXrslISMq4OS8vxVxVZ87WMV5bQHDP7
+         Q4GUaQoIZQN7+Akmd6a4bWqz/J2lQxw7yBjX72FTcUzSLp4W0bVhx8jl/6a+tM6Zm5SN
+         2ifZH59WLvPpRChFrHWiZHCneONVt5rcuG3YedzaL4fjPIXH25HGMOczDpCZ5azgkxpp
+         RTk8W6MmdvQwEFM88XLNR4bdUNoRpVD1zjzP60QGl1Rb92QL1KHPJuFiYuIrb6UpSJpR
+         bnzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695638286; x=1696243086;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dSTQ86CTPlF+qTrRT9khZIWguaPLmOH4OSA+go2d1Qg=;
-        b=frE3BxIP207Hg1vRlvRwunKS3JzO91KEWfobNn8bPbQqgMndJPIxDRPv33jYatbdFY
-         D83fFttOqP8F+zHmOrAch/AtbsGCTwEenGheCxPod0WAagM7RuwB54vr9Jxu+i59LsHj
-         WMc4c8EkB2CFS80AV0fgBmM9katTPE9khrfwijcIWYzI3CojAldfE/8PY4obs7rYJUlQ
-         RVyB+GiaT0SkM0hQYh8ZeBU2+gWWY4tO1fENVcNnwxqtn/SfaIE6CQFe/FwhI60WoQqV
-         GQ2/ETD6Tt5rE8rr62bMrwy4otnr4ZYvLgyOeLythIqRq4OVH7AhJFUGLqc9WQkAzcEY
-         1pvg==
-X-Gm-Message-State: AOJu0YzWeWBqLUp5NDMO/mOPtIZekLei4Vmwg5cWgPhdEMb6/bAwjuz+
-	l88CVNcStHHrz9uiecbHvOv0D0LdnZp2xrDIPy2HlQ==
-X-Google-Smtp-Source: AGHT+IEmqbdm/PpwzSHKc3IpFYcUHfdKdvNzaGMufs8eq7u/+Em7HBTUbaNQBIvOhLWne1IScImH7AGynzgVn04Gg1g=
-X-Received: by 2002:a05:6512:4024:b0:503:4c3:c67d with SMTP id
- br36-20020a056512402400b0050304c3c67dmr6313216lfb.21.1695638286623; Mon, 25
- Sep 2023 03:38:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695638279; x=1696243079;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NNRcMwuERaBl25L7UoycFy039dxy5njWGLf4VQsv18E=;
+        b=mixZbDFmPpLvAt7Xpl2WGJhiHUwd59oNYigua5wVyXjV98iXKLsnsi8r6nStWD9bO2
+         EL5joFrK1j7flfvmifAPpWEIRBogYMT6B7OsV/tSm6avRux0G2hW6v1Yn/fUOoFTfl2J
+         WO/c4vc+QQJw9OiaiUMXJAhSIna1jolz3ZZuvW1kfm0UX31x3CNx7+pER7/f6Gtd+xpt
+         AWomvAIg2dRw/JReaKckYYktjBcp64tVgMJSImpSliElIwgUYmffJmlQdSGob8Omk32K
+         vmjFyiFf0WA5xDcoldJ+6RNoQIpoEfYVQZh7odRKn/U8iZkRY5CLvG9SRt6Rn81dUMqI
+         If2Q==
+X-Gm-Message-State: AOJu0YxnHZPigDLfYB5zyobmbH5/rzJ9t4jhXO0htim9gVmhu14GjNLm
+	l9wnV7v+xU5SE6vNPHa+O6c=
+X-Google-Smtp-Source: AGHT+IE5AQhHAI8/TvNxOM3sRp2pbeXe307DqlEQHWBIe0zPxzuD2kspgrU5qEmow/vqxgK3aHlFZw==
+X-Received: by 2002:a05:600c:246:b0:3fb:c075:b308 with SMTP id 6-20020a05600c024600b003fbc075b308mr4957800wmj.12.1695638278655;
+        Mon, 25 Sep 2023 03:37:58 -0700 (PDT)
+Received: from ?IPV6:2a01:c23:bc3d:b00:d4bc:f1ab:d54d:4af1? (dynamic-2a01-0c23-bc3d-0b00-d4bc-f1ab-d54d-4af1.c23.pool.telefonica.de. [2a01:c23:bc3d:b00:d4bc:f1ab:d54d:4af1])
+        by smtp.googlemail.com with ESMTPSA id l18-20020a1c7912000000b003fef3180e7asm14829733wme.44.2023.09.25.03.37.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Sep 2023 03:37:58 -0700 (PDT)
+Message-ID: <4ed0991b-5473-409d-b00a-bf71f0877df5@gmail.com>
+Date: Mon, 25 Sep 2023 12:37:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230912083126.65484-1-linyunsheng@huawei.com>
- <20230912083126.65484-2-linyunsheng@huawei.com> <84282e55-519c-0e17-30c5-b6de54d1001c@redhat.com>
- <15f95505-dba9-4afd-6980-5bdf0a64d507@huawei.com>
-In-Reply-To: <15f95505-dba9-4afd-6980-5bdf0a64d507@huawei.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Mon, 25 Sep 2023 13:37:30 +0300
-Message-ID: <CAC_iWjL_u=R+UK-6rhnv=32qX2P9SY72LFu928Y64u11EVoOPQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 1/6] page_pool: frag API support for 32-bit
- arch with 64-bit DMA
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, brouer@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Alexander Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Guillaume Tucker <guillaume.tucker@collabora.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Linux-MM <linux-mm@kvack.org>, 
-	Matthew Wilcox <willy@infradead.org>, Mel Gorman <mgorman@techsingularity.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: r8169 link up but no traffic, and watchdog error
+To: =?UTF-8?Q?Martin_Kj=C3=A6r_J=C3=B8rgensen?= <me@lagy.org>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, nic_swsd@realtek.com
+References: <87zg30a0h9.fsf@lagy.org> <20230809125805.2e3f86ac@kernel.org>
+ <87a5taabs9.fsf@mkjws.danelec-net.lan>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <87a5taabs9.fsf@mkjws.danelec-net.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi
+On 25.09.2023 10:36, Martin Kjær Jørgensen wrote:
+> 
+> On Wed, Aug 09 2023, Jakub Kicinski <kuba@kernel.org> wrote:
+> 
+>> CC: Heiner
+>>
+>> On Wed, 09 Aug 2023 13:50:31 +0200 Martin Kjær Jørgensen wrote:
+>>
+>> There were some fix in r8169 for power management changes recently.
+>> Could you try the latest stable kernel? 6.4.9 ?
+>>
+> 
+> Well, neither 6.4.11 nor current debian 'testing' kernel 6.5.3 solved the problem.
 
-On Wed, 20 Sept 2023 at 11:59, Yunsheng Lin <linyunsheng@huawei.com> wrote:
->
-> On 2023/9/15 16:28, Jesper Dangaard Brouer wrote:
-> > Hi Lin,
-> >
-> > This looks reasonable, but given you are changing struct-page
-> > (include/linux/mm_types.h) we need to MM-list <linux-mm@kvack.org>.
-> > Also Cc Wilcox.
-> >
-> > I think it was Ilias and Duyck that validated the assumptions, last time
-> > this patch was discussed. Thus I want to see their review before this is
-> > applied.
->
-> FWIW, PAGE_SIZE aligned buffer being PAGE_SIZE aligned in DMA is
-> validated by Duyck:
-> https://lore.kernel.org/all/CAKgT0UfeUAUQpEffxnkc+gzXsjOrHkuMgxU_Aw0VXSJYKzaovQ@mail.gmail.com/
->
-> And I had done researching to find out there seems to be no combination of
-> the above arch with an address space >16TB:
-> https://lore.kernel.org/all/2b570282-24f8-f23b-1ff7-ad836794baa9@huawei.com/
+You can test with latest 5.15 and 6.1 LTS kernels. If either doesn't show the error,
+please bisect. And you could test with vendor driver r8168 or r8125, depending on NIC
+version.
+The tx timeout error is very generic, based on just this info there's not much we can
+do. According to the following log snippet you have 4 NIC's in your system.
 
-Apologies for the late reply.  I just saw you sent a v9, I'll review
-that instead, but I am traveling right now, will take a while
+[    0.750649] r8169 0000:03:00.0: can't disable ASPM; OS doesn't have ASPM control
+[    0.771525] r8169 0000:04:00.0: can't disable ASPM; OS doesn't have ASPM control
+[    0.791797] r8169 0000:08:00.0: can't disable ASPM; OS doesn't have ASPM control
+[    0.807683] r8169 0000:09:00.0: can't disable ASPM; OS doesn't have ASPM control
 
-Thanks
-/Ilias
->
-> >
-> > -Jesper
-> >
-> > On 12/09/2023 10.31, Yunsheng Lin wrote:
-> >> Currently page_pool_alloc_frag() is not supported in 32-bit
-> >> arch with 64-bit DMA because of the overlap issue between
-> >> pp_frag_count and dma_addr_upper in 'struct page' for those
-> >> arches, which seems to be quite common, see [1], which means
-> >> driver may need to handle it when using frag API.
-> >>
-> >> It is assumed that the combination of the above arch with an
-> >> address space >16TB does not exist, as all those arches have
-> >> 64b equivalent, it seems logical to use the 64b version for a
-> >> system with a large address space. It is also assumed that dma
-> >> address is page aligned when we are dma mapping a page aliged
-> >> buffer, see [2].
-> >>
-> >> That means we're storing 12 bits of 0 at the lower end for a
-> >> dma address, we can reuse those bits for the above arches to
-> >> support 32b+12b, which is 16TB of memory.
-> >>
-> >> If we make a wrong assumption, a warning is emitted so that
-> >> user can report to us.
-> >>
-> >> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.com/
-> >> 2. https://lore.kernel.org/all/20230818145145.4b357c89@kernel.org/
-> >>
-> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> >> CC: Liang Chen <liangchen.linux@gmail.com>
-> >> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> CC: Guillaume Tucker <guillaume.tucker@collabora.com>
-> >> ---
-> >>   include/linux/mm_types.h        | 13 +------------
-> >>   include/net/page_pool/helpers.h | 20 ++++++++++++++------
-> >>   net/core/page_pool.c            | 14 +++++++++-----
-> >>   3 files changed, 24 insertions(+), 23 deletions(-)
-> >>
-> >> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> >> index 36c5b43999e6..74b49c4c7a52 100644
-> >> --- a/include/linux/mm_types.h
-> >> +++ b/include/linux/mm_types.h
-> >> @@ -125,18 +125,7 @@ struct page {
-> >>               struct page_pool *pp;
-> >>               unsigned long _pp_mapping_pad;
-> >>               unsigned long dma_addr;
-> >> -            union {
-> >> -                /**
-> >> -                 * dma_addr_upper: might require a 64-bit
-> >> -                 * value on 32-bit architectures.
-> >> -                 */
-> >> -                unsigned long dma_addr_upper;
-> >> -                /**
-> >> -                 * For frag page support, not supported in
-> >> -                 * 32-bit architectures with 64-bit DMA.
-> >> -                 */
-> >> -                atomic_long_t pp_frag_count;
-> >> -            };
-> >> +            atomic_long_t pp_frag_count;
-> >>           };
-> >>           struct {    /* Tail pages of compound page */
-> >>               unsigned long compound_head;    /* Bit zero is set */
-> >> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> >> index 94231533a369..8e1c85de4995 100644
-> >> --- a/include/net/page_pool/helpers.h
-> >> +++ b/include/net/page_pool/helpers.h
-> >> @@ -197,7 +197,7 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
-> >>       page_pool_put_full_page(pool, page, true);
-> >>   }
-> >>   -#define PAGE_POOL_DMA_USE_PP_FRAG_COUNT    \
-> >> +#define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA    \
-> >>           (sizeof(dma_addr_t) > sizeof(unsigned long))
-> >>     /**
-> >> @@ -211,17 +211,25 @@ static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
-> >>   {
-> >>       dma_addr_t ret = page->dma_addr;
-> >>   -    if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> >> -        ret |= (dma_addr_t)page->dma_addr_upper << 16 << 16;
-> >> +    if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
-> >> +        ret <<= PAGE_SHIFT;
-> >>         return ret;
-> >>   }
-> >>   -static inline void page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
-> >> +static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
-> >>   {
-> >> +    if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
-> >> +        page->dma_addr = addr >> PAGE_SHIFT;
-> >> +
-> >> +        /* We assume page alignment to shave off bottom bits,
-> >> +         * if this "compression" doesn't work we need to drop.
-> >> +         */
-> >> +        return addr != (dma_addr_t)page->dma_addr << PAGE_SHIFT;
-> >> +    }
-> >> +
-> >>       page->dma_addr = addr;
-> >> -    if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT)
-> >> -        page->dma_addr_upper = upper_32_bits(addr);
-> >> +    return false;
-> >>   }
-> >>     static inline bool page_pool_put(struct page_pool *pool)
-> >> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> >> index 77cb75e63aca..8a9868ea5067 100644
-> >> --- a/net/core/page_pool.c
-> >> +++ b/net/core/page_pool.c
-> >> @@ -211,10 +211,6 @@ static int page_pool_init(struct page_pool *pool,
-> >>            */
-> >>       }
-> >>   -    if (PAGE_POOL_DMA_USE_PP_FRAG_COUNT &&
-> >> -        pool->p.flags & PP_FLAG_PAGE_FRAG)
-> >> -        return -EINVAL;
-> >> -
-> >>   #ifdef CONFIG_PAGE_POOL_STATS
-> >>       pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
-> >>       if (!pool->recycle_stats)
-> >> @@ -359,12 +355,20 @@ static bool page_pool_dma_map(struct page_pool *pool, struct page *page)
-> >>       if (dma_mapping_error(pool->p.dev, dma))
-> >>           return false;
-> >>   -    page_pool_set_dma_addr(page, dma);
-> >> +    if (page_pool_set_dma_addr(page, dma))
-> >> +        goto unmap_failed;
-> >>         if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
-> >>           page_pool_dma_sync_for_device(pool, page, pool->p.max_len);
-> >>         return true;
-> >> +
-> >> +unmap_failed:
-> >> +    WARN_ON_ONCE("unexpected DMA address, please report to netdev@");
-> >> +    dma_unmap_page_attrs(pool->p.dev, dma,
-> >> +                 PAGE_SIZE << pool->p.order, pool->p.dma_dir,
-> >> +                 DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
-> >> +    return false;
-> >>   }
-> >>     static void page_pool_set_pp_info(struct page_pool *pool,
-> >
-> > .
-> >
+Are some on PCIe extension cards? And does the problem occur with all of your NICs?
+The exact NIC type might provide a hint, best provide a full dmesg log.
+
 
