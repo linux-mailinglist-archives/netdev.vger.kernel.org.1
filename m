@@ -1,142 +1,227 @@
-Return-Path: <netdev+bounces-36348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102107AF4FE
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:24:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCE27AF516
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 6DA85B20B82
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:24:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 762D9B20C11
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AA2499BB;
-	Tue, 26 Sep 2023 20:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4154A536;
+	Tue, 26 Sep 2023 20:28:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9916F4999D
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:24:49 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F1011D;
-	Tue, 26 Sep 2023 13:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695759888; x=1727295888;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iz/QA/QRJh3/5tOMgpZTaVnisYFOlTx2dU19fiu2N1o=;
-  b=Tm5xSHePM8luzZ8rEvYDxLTxwiSA2cDRnn3byJ6erF94rcW4FL3Egeui
-   QtVW51SoOcqFlMdWjG46tgpOG66/Vr8RoCACizXpgEtp0CH2UdbJ3A2Qh
-   NFsgttEIlRQkiib2Y6SWjIDl6FJCPboahpEh1Bm+uQ5mEYM9h/o8qIJvk
-   tF7+sV5v/bS4etI09IvFcxYpwa50qiHvrxgXp4dlAiGHqEsXaBUKqNQ8l
-   tt0AKv8m0a2GXyZEIkN8nYxG9VaCdToY0605WbUNBIojsYT6t0HLOWZDy
-   MWK662/lHXUs7ItfvPe4uhqreq+wTLe0ExccMUGRiHCr+e9CYi0yNpqLJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="384441080"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="384441080"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 13:24:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="814603088"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="814603088"
-Received: from lkp-server02.sh.intel.com (HELO 32c80313467c) ([10.239.97.151])
-  by fmsmga008.fm.intel.com with ESMTP; 26 Sep 2023 13:24:32 -0700
-Received: from kbuild by 32c80313467c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qlEbe-0003Kl-1q;
-	Tue, 26 Sep 2023 20:24:30 +0000
-Date: Wed, 27 Sep 2023 04:23:31 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
-	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
-Subject: Re: [PATCH net-next v8 12/13] net:ethernet:realtek: Update the
- Makefile and Kconfig in the realtek folder
-Message-ID: <202309270412.RCn7zweU-lkp@intel.com>
-References: <20230926114943.16340-13-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966632AB55;
+	Tue, 26 Sep 2023 20:28:11 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D9C121;
+	Tue, 26 Sep 2023 13:28:09 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9ada2e6e75fso1270652166b.2;
+        Tue, 26 Sep 2023 13:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695760088; x=1696364888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hhUE7+jb5BgoIjTNdabRUOLZMoAAgry9rOcnLLRNmzo=;
+        b=AsyLHXJw9z/7LvR3Coz9dCe7TUP+BCMEtjxzVWQju1P5NTuSHLXuQhjriL9dGxsdHg
+         Lq47CVbUUNpxzk8TqEjiBxssSyOh1NK+i6J7WT5iHBGFcoFP6IepOo4YJ0K41cWdMy6T
+         tQ1r0nCNI0WdU18XHBVfK3ggn3XyZ4HWFjoIVTz3GujeCSH52fbLdU2GfA3etr8HqRbr
+         zipl483xDNSXN08RhlfMh047S8RDkItqA51r16UNPTCvW/TRxGq9nKQ7ZQ2znyEQTcOI
+         SIZcNG8WK4giP/omF3ss6VzQmWimIy1tF1nJs2XrbaFGzNjXtiyNTEsuCGSLh6PJC/wb
+         OXcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695760088; x=1696364888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hhUE7+jb5BgoIjTNdabRUOLZMoAAgry9rOcnLLRNmzo=;
+        b=tsw4+RvZrlW9aBtvbosIz7m1w7PWlA0WY/Lp3G3PoQcArSihDIl10U258lZXGkMm+0
+         c40/9kldYTfOEFBQrOB3xMEwWo8YrG/1JiOA9ghf0PExA507ca3i5B7HjDrTt9yvRbje
+         diF/3WDyxbUbJUvUQIbjqe5r/nLPPFFzLUwwi/d6BMm2C+qj0cEt3BLNON7UJIFGW/R5
+         R7YVFHT25s74ggZs1BF4UqNRY9cFNxtww9ruF98hlDaDh/SWR3sS+wcrpgZGFerP725g
+         kzwwNEs2zJWU/qag6+xqjyZv26glOsQktoDOyDcvSe6ySdxBD8db6/8vkfQsUhHC+RdE
+         m5Sw==
+X-Gm-Message-State: AOJu0YxKqNdGJjZIk098/yFQaDPTLl8k+wIVCoCtrxOs1SHpK9Mam9qm
+	7CxAj1u3oShaUVGrwwKa7AX6xxdW2aNivUnP
+X-Google-Smtp-Source: AGHT+IHZcO1rCPXcvmJYA29zBetcT8Hk5S11nSRf+ticer7bcmrOyTfNWubBL05N693WUi98rTP01w==
+X-Received: by 2002:a17:906:1054:b0:9ae:7943:b0ff with SMTP id j20-20020a170906105400b009ae7943b0ffmr11227791ejj.27.1695760087527;
+        Tue, 26 Sep 2023 13:28:07 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:a03f:864b:8201:e534:34f4:1c34:8de7])
+        by smtp.googlemail.com with ESMTPSA id c19-20020a170906529300b00992e94bcfabsm8204664ejm.167.2023.09.26.13.28.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Sep 2023 13:28:07 -0700 (PDT)
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+To: bpf@vger.kernel.org
+Cc: Daan De Meyer <daan.j.demeyer@gmail.com>,
+	martin.lau@linux.dev,
+	kernel-team@meta.com,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next v6 0/9] Add cgroup sockaddr hooks for unix sockets
+Date: Tue, 26 Sep 2023 22:27:39 +0200
+Message-ID: <20230926202753.1482200-1-daan.j.demeyer@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230926114943.16340-13-justinlai0215@realtek.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Justin,
+Changes since v5:
 
-kernel test robot noticed the following build warnings:
+* Fixed kernel version in bpftool documentation (6.3 => 6.7).
+* Added connection mode socket recvmsg() test.
+* Removed bpf_bind() helper for AF_UNIX hooks.
+* Added missing getpeernameun and getsocknameun BPF test programs.
+* Added note for bind() test being unused currently.
 
-[auto build test WARNING on net-next/main]
+Changes since v4:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20230926-195218
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230926114943.16340-13-justinlai0215%40realtek.com
-patch subject: [PATCH net-next v8 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230927/202309270412.RCn7zweU-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230927/202309270412.RCn7zweU-lkp@intel.com/reproduce)
+* Dropped support for intercepting bind() as when using bind() with unix sockets
+  and a pathname sockaddr, bind() will create an inode in the filesystem that
+  needs to be cleaned up. If the address is rewritten, users might try to clean
+  up the wrong file and leak the actual socket file in the filesystem.
+* Changed bpf_sock_addr_set_unix_addr() to use BTF_KFUNC_HOOK_CGROUP_SKB instead
+  of BTF_KFUNC_HOOK_COMMON.
+* Removed unix socket related changes from BPF_CGROUP_PRE_CONNECT_ENABLED() as
+  unix sockets do not support pre-connect.
+* Added tests for getpeernameun and getsocknameun hooks.
+* We now disallow an empty sockaddr in bpf_sock_addr_set_unix_addr() similar to
+  unix_validate_addr().
+* Removed unnecessary cgroup_bpf_enabled() checks
+* Removed unnecessary error checks
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309270412.RCn7zweU-lkp@intel.com/
+Changes since v3:
 
-All warnings (new ones prefixed by >>):
+* Renamed bpf_sock_addr_set_addr() to bpf_sock_addr_set_unix_addr() and
+  made it only operate on AF_UNIX sockaddrs. This is because for the other
+  families, users usually want to configure more than just the address so
+  a generic interface will not fit the bill here. e.g. for AF_INET and AF_INET6,
+  users would generally also want to be able to configure the port which the
+  current interface doesn't support. So we expose an AF_UNIX specific function
+  instead.
+* Made the tests in the new sock addr tests more generic (similar to test_sock_addr.c),
+  this should make it easier to migrate the other sock addr tests in the future.
+* Removed the new kfunc hook and attached to BTF_KFUNC_HOOK_COMMON instead
+* Set uaddrlen to 0 when the family is AF_UNSPEC
+* Pass in the addrlen to the hook from IPv6 code
+* Fixed mount directory mkdir() to ignore EEXIST
 
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:234:6: warning: no previous prototype for 'rtase_tx_clear' [-Wmissing-prototypes]
-     234 | void rtase_tx_clear(struct rtase_private *tp)
-         |      ^~~~~~~~~~~~~~
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:636:6: warning: no previous prototype for 'rtase_rx_clear' [-Wmissing-prototypes]
-     636 | void rtase_rx_clear(struct rtase_private *tp)
-         |      ^~~~~~~~~~~~~~
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:776:6: warning: no previous prototype for 'rtase_hw_set_rx_packet_filter' [-Wmissing-prototypes]
-     776 | void rtase_hw_set_rx_packet_filter(struct net_device *dev)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:879:6: warning: no previous prototype for 'rtase_hw_reset' [-Wmissing-prototypes]
-     879 | void rtase_hw_reset(const struct net_device *dev)
-         |      ^~~~~~~~~~~~~~
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:1027:6: warning: no previous prototype for 'rtase_hw_start' [-Wmissing-prototypes]
-    1027 | void rtase_hw_start(const struct net_device *dev)
-         |      ^~~~~~~~~~~~~~
-   drivers/net/ethernet/realtek/rtase/rtase_main.c: In function 'rtase_open':
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:1140:25: warning: 'sprintf' argument 3 may overlap destination object 'dev' [-Wrestrict]
-    1140 |                         sprintf((char *)&ivec->name, "%s_int%i", dev->name, i);
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/realtek/rtase/rtase_main.c:1105:42: note: destination object referenced by 'restrict'-qualified argument 1 was declared here
-    1105 | static int rtase_open(struct net_device *dev)
-         |                       ~~~~~~~~~~~~~~~~~~~^~~
+Changes since v2:
 
+* Configuring the sock addr is now done via a new kfunc bpf_sock_addr_set()
+* The addrlen is exposed as u32 in bpf_sock_addr_kern
+* Selftests are updated to use the new kfunc
+* Selftests are now added as a new sock_addr test in prog_tests/
+* Added BTF_KFUNC_HOOK_SOCK_ADDR for BPF_PROG_TYPE_CGROUP_SOCK_ADDR
+* __cgroup_bpf_run_filter_sock_addr() now returns the modified addrlen
 
-vim +/rtase_tx_clear +234 drivers/net/ethernet/realtek/rtase/rtase_main.c
+Changes since v1:
 
-9a15ffa44557f94 Justin Lai 2023-09-26  233  
-9a15ffa44557f94 Justin Lai 2023-09-26 @234  void rtase_tx_clear(struct rtase_private *tp)
-9a15ffa44557f94 Justin Lai 2023-09-26  235  {
-9a15ffa44557f94 Justin Lai 2023-09-26  236  	struct rtase_ring *ring;
-9a15ffa44557f94 Justin Lai 2023-09-26  237  	u16 i;
-9a15ffa44557f94 Justin Lai 2023-09-26  238  
-9a15ffa44557f94 Justin Lai 2023-09-26  239  	for (i = 0; i < tp->func_tx_queue_num; i++) {
-9a15ffa44557f94 Justin Lai 2023-09-26  240  		ring = &tp->tx_ring[i];
-9a15ffa44557f94 Justin Lai 2023-09-26  241  		rtase_tx_clear_range(ring, ring->dirty_idx, NUM_DESC);
-9a15ffa44557f94 Justin Lai 2023-09-26  242  		ring->cur_idx = 0;
-9a15ffa44557f94 Justin Lai 2023-09-26  243  		ring->dirty_idx = 0;
-9a15ffa44557f94 Justin Lai 2023-09-26  244  	}
-9a15ffa44557f94 Justin Lai 2023-09-26  245  }
-9a15ffa44557f94 Justin Lai 2023-09-26  246  
+* Split into multiple patches instead of one single patch
+* Added unix support for all socket address hooks instead of only connect()
+* Switched approach to expose the socket address length to the bpf hook
+instead of recalculating the socket address length in kernelspace to
+properly support abstract unix socket addresses
+* Modified socket address hook tests to calculate the socket address length
+once and pass it around everywhere instead of recalculating the actual unix
+socket address length on demand.
+* Added some missing section name tests for getpeername()/getsockname()
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+This patch series extends the cgroup sockaddr hooks to include support for
+unix sockets. To add support for unix sockets, struct bpf_sock_addr is
+extended to expose the unix socket path (sun_path) and the socket address
+length to the bpf program. For unix sockets, the address length is writable,
+for the other socket address hook types, the address length is only readable.
+
+I intend to use these new hooks in systemd to reimplement the LogNamespace=
+feature, which allows running multiple instances of systemd-journald to
+process the logs of different services. systemd-journald also processes
+syslog messages, so currently, using log namespaces means all services running
+in the same log namespace have to live in the same private mount namespace
+so that systemd can mount the journal namespace's associated syslog socket
+over /dev/log to properly direct syslog messages from all services running
+in that log namespace to the correct systemd-journald instance. We want to
+relax this requirement so that processes running in disjoint mount namespaces
+can still run in the same log namespace. To achieve this, we can use these
+new hooks to rewrite the socket address of any connect(), sendto(), ...
+syscalls to /dev/log to the socket address of the journal namespace's syslog
+socket instead, which will transparently do the redirection without requiring
+use of a mount namespace and mounting over /dev/log.
+
+Aside from the above usecase, these hooks can more generally be used to
+transparently redirect unix sockets to different addresses as required by
+services.
+
+Daan De Meyer (9):
+  selftests/bpf: Add missing section name tests for
+    getpeername/getsockname
+  bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+  bpf: Add bpf_sock_addr_set_unix_addr() to allow writing unix sockaddr
+    from bpf
+  bpf: Implement cgroup sockaddr hooks for unix sockets
+  libbpf: Add support for cgroup unix socket address hooks
+  bpftool: Add support for cgroup unix socket address hooks
+  documentation/bpf: Document cgroup unix socket address hooks
+  selftests/bpf: Make sure mount directory exists
+  selftests/bpf: Add tests for cgroup unix socket address hooks
+
+ Documentation/bpf/libbpf/program_types.rst    |  10 +
+ include/linux/bpf-cgroup-defs.h               |   5 +
+ include/linux/bpf-cgroup.h                    |  94 ++-
+ include/linux/filter.h                        |   1 +
+ include/uapi/linux/bpf.h                      |  13 +-
+ kernel/bpf/btf.c                              |   1 +
+ kernel/bpf/cgroup.c                           |  29 +-
+ kernel/bpf/syscall.c                          |  15 +
+ kernel/bpf/verifier.c                         |   5 +-
+ net/core/filter.c                             |  49 +-
+ net/ipv4/af_inet.c                            |   7 +-
+ net/ipv4/ping.c                               |   2 +-
+ net/ipv4/tcp_ipv4.c                           |   2 +-
+ net/ipv4/udp.c                                |   9 +-
+ net/ipv6/af_inet6.c                           |   9 +-
+ net/ipv6/ping.c                               |   2 +-
+ net/ipv6/tcp_ipv6.c                           |   2 +-
+ net/ipv6/udp.c                                |   6 +-
+ net/unix/af_unix.c                            |  36 +-
+ .../bpftool/Documentation/bpftool-cgroup.rst  |  16 +-
+ .../bpftool/Documentation/bpftool-prog.rst    |   8 +-
+ tools/bpf/bpftool/bash-completion/bpftool     |  14 +-
+ tools/bpf/bpftool/cgroup.c                    |  16 +-
+ tools/bpf/bpftool/prog.c                      |   7 +-
+ tools/include/uapi/linux/bpf.h                |  13 +-
+ tools/lib/bpf/libbpf.c                        |  10 +
+ tools/testing/selftests/bpf/bpf_kfuncs.h      |  14 +
+ tools/testing/selftests/bpf/cgroup_helpers.c  |   5 +
+ tools/testing/selftests/bpf/network_helpers.c |  34 +
+ tools/testing/selftests/bpf/network_helpers.h |   1 +
+ .../selftests/bpf/prog_tests/section_names.c  |  45 ++
+ .../selftests/bpf/prog_tests/sock_addr.c      | 614 ++++++++++++++++++
+ .../selftests/bpf/progs/connectun_prog.c      |  40 ++
+ .../selftests/bpf/progs/getpeernameun_prog.c  |  39 ++
+ .../selftests/bpf/progs/getsocknameun_prog.c  |  39 ++
+ .../selftests/bpf/progs/recvmsgun_prog.c      |  39 ++
+ .../selftests/bpf/progs/sendmsgun_prog.c      |  40 ++
+ 37 files changed, 1198 insertions(+), 93 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sock_addr.c
+ create mode 100644 tools/testing/selftests/bpf/progs/connectun_prog.c
+ create mode 100644 tools/testing/selftests/bpf/progs/getpeernameun_prog.c
+ create mode 100644 tools/testing/selftests/bpf/progs/getsocknameun_prog.c
+ create mode 100644 tools/testing/selftests/bpf/progs/recvmsgun_prog.c
+ create mode 100644 tools/testing/selftests/bpf/progs/sendmsgun_prog.c
+
+--
+2.41.0
+
 
