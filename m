@@ -1,105 +1,115 @@
-Return-Path: <netdev+bounces-36225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6AE7AE674
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:11:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1911A7AE69E
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:18:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 03A4C281C79
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:11:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4AE30280E7D
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4280C53B2;
-	Tue, 26 Sep 2023 07:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20ED25683;
+	Tue, 26 Sep 2023 07:18:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DE1539E
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:11:27 +0000 (UTC)
-Received: from out-193.mta0.migadu.com (out-193.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E984EB
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 00:11:26 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695712282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=syqQR+9bPrQHdilL6zKTkrPq1VgSbRvVhw85Q7F9WZ4=;
-	b=B7R2Klencrq0fTtMQPjIqR9iGvs7PJvaVFQliMgF9PNe5Ko1WkYEf6kFLTERkfM5/cf8eh
-	Wu7gwqHpeVik7TI2jErLTf5Uj4xokGz0Gtf2RTq+RaTN/778O4FWJji7emfynVtBDp+U3D
-	lGakHMqUulc7Nj2VfjrRSWWhAZd2It4=
-From: Yajun Deng <yajun.deng@linux.dev>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
-	gregkh@linuxfoundation.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Yajun Deng <yajun.deng@linux.dev>
-Subject: [PATCH RESEND] i40e: fix the wrong PTP frequency calculation
-Date: Tue, 26 Sep 2023 15:10:59 +0800
-Message-Id: <20230926071059.1239033-1-yajun.deng@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8221C32
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:18:49 +0000 (UTC)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9F25DE;
+	Tue, 26 Sep 2023 00:18:47 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-59f7cc71e2eso44146517b3.0;
+        Tue, 26 Sep 2023 00:18:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695712726; x=1696317526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=etITwZ9S1d4OwXd3gmZ2itprSMpUFaDTBdD/d1Zk1lI=;
+        b=r5XfjV06koydMyY+dDmW6ybZOwzGrmNVHcvPqmRBAZaVJVOS535mEtFCHWMre074nU
+         AfsYukvVBXz4IrtJXWNK4xlyB4fDq2oQnpqVr89iiyvOV9Em2or8TalAN0cFCu1lkLKZ
+         mt3Vw1aLYc7M2QhUD54gznS+JVm6tprkI8Eh4rPnaDofnfxAiV1c/F6s87sk9IuwcJiG
+         7pCRF1q/LojDMichfnG6W94uW1lpJZpoeWtf5g6CbM5HIg/Hwkpb8jSwIfO3Y8xJMuGR
+         PGST/4JjEQBSvgOvs0iLVBQvRMTvtNOnFgHzTL9NY6yFT52QV7iJ9XR057EuOvAfIO6N
+         ZUVQ==
+X-Gm-Message-State: AOJu0YyAkLSkHElhuptfdSnW0Lxj73z/uBIZ1O9XDopAxRaSoVMQlIoU
+	FOIljQWSsaOGS/ZC3NeT5DhozwUaNlmmNA==
+X-Google-Smtp-Source: AGHT+IHtPJ1jecUvUiXLjEcB7m7b8/zM25n1MhlAXR/SUQGaaoKQ+209TYB1yXaMj8JB+IWc2cbtcw==
+X-Received: by 2002:a81:524c:0:b0:59b:1bf9:b2db with SMTP id g73-20020a81524c000000b0059b1bf9b2dbmr9143720ywb.13.1695712726461;
+        Tue, 26 Sep 2023 00:18:46 -0700 (PDT)
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com. [209.85.219.175])
+        by smtp.gmail.com with ESMTPSA id d11-20020a0ddb0b000000b0058419c57c66sm2850395ywe.4.2023.09.26.00.18.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Sep 2023 00:18:44 -0700 (PDT)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-d8164e661abso9272468276.1;
+        Tue, 26 Sep 2023 00:18:44 -0700 (PDT)
+X-Received: by 2002:a05:690c:2c8d:b0:59f:b0d9:5df2 with SMTP id
+ ep13-20020a05690c2c8d00b0059fb0d95df2mr3207676ywb.0.1695712724571; Tue, 26
+ Sep 2023 00:18:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230925003416.3863560-1-yoshihiro.shimoda.uh@renesas.com> <7156d89e-ef72-487f-b7ce-b08be461ec1c@lunn.ch>
+In-Reply-To: <7156d89e-ef72-487f-b7ce-b08be461ec1c@lunn.ch>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 26 Sep 2023 09:18:31 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdV4THYuBLTDOnpL+HyQqEpk69F4ZsM4d6+HX4EnDE2EmA@mail.gmail.com>
+Message-ID: <CAMuHMdV4THYuBLTDOnpL+HyQqEpk69F4ZsM4d6+HX4EnDE2EmA@mail.gmail.com>
+Subject: Re: [PATCH net] net: ethernet: renesas: rswitch Fix PHY station
+ management clock setting
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, s.shtylyov@omp.ru, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Tam Nguyen <tam.nguyen.xa@renesas.com>, 
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The new adjustment should be based on the base frequency, not the
-I40E_PTP_40GB_INCVAL in i40e_ptp_adjfine().
+On Tue, Sep 26, 2023 at 8:45=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+> On Mon, Sep 25, 2023 at 09:34:16AM +0900, Yoshihiro Shimoda wrote:
+> > From: Tam Nguyen <tam.nguyen.xa@renesas.com>
+> >
+> > Fix the MPIC.PSMCS value following the programming example in the
+> > section 6.4.2 Management Data Clock (MDC) Setting, Ethernet MAC IP,
+> > S4 Hardware User Manual Rev.1.00.
+> >
+> > The value is calculated by
+> >     MPIC.PSMCS =3D clk[MHz] / ((MDC frequency[MHz] + 1) * 2)
+> > with the input clock frequency of 320MHz and MDC frequency of 2.5MHz.
+> > Otherwise, this driver cannot communicate PHYs on the R-Car S4 Starter
+> > Kit board.
+>
+> If you run this calculation backwards, what frequency does
+> MPIC_PSMCS(0x3f) map to?
+>
+> Is 320MHz really fixed? For all silicon variants? Is it possible to do
+> a clk_get_rate() on a clock to get the actual clock rate?
 
-This issue was introduced in commit 3626a690b717 ("i40e: use
-mul_u64_u64_div_u64 for PTP frequency calculation"), frequency is left
-just as base I40E_PTP_40GB_INCVAL before the commit. After the commit,
-frequency is the I40E_PTP_40GB_INCVAL times the ptp_adj_mult value.
-But then the diff is applied on the wrong value, and no multiplication
-is done afterwards.
+With debugfs enabled, one can just look at /sys/kernel/debug/clk/clk_summar=
+y.
 
-It was accidentally fixed in commit 1060707e3809 ("ptp: introduce helpers
-to adjust by scaled parts per million"). It uses adjust_by_scaled_ppm
-correctly performs the calculation and uses the base adjustment, so
-there's no error here. But it is a new feature and doesn't need to
-backported to the stable releases.
+Gr{oetje,eeting}s,
 
-This issue affects both v6.0 and v6.1, and the v6.1 version is an LTS
-release. Therefore, the patch only needs to be applied to v6.1 stable.
+                        Geert
 
-Fixes: 3626a690b717 ("i40e: use mul_u64_u64_div_u64 for PTP frequency calculation")
-Cc: <stable@vger.kernel.org> # 6.1
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
-Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/i40e/i40e_ptp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index ffea0c9c82f1..97a9efe7b713 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -361,9 +361,9 @@ static int i40e_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- 				   1000000ULL << 16);
- 
- 	if (neg_adj)
--		adj = I40E_PTP_40GB_INCVAL - diff;
-+		adj = freq - diff;
- 	else
--		adj = I40E_PTP_40GB_INCVAL + diff;
-+		adj = freq + diff;
- 
- 	wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
- 	wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
--- 
-2.25.1
-
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
