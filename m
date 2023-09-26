@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-36229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BAA7AE6BA
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:24:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ABD27AE6DA
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7A1FE281002
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 653DD1F254FF
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5D963BE;
-	Tue, 26 Sep 2023 07:24:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769C363D1;
+	Tue, 26 Sep 2023 07:30:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEE763BB
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:24:41 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2403EB;
-	Tue, 26 Sep 2023 00:24:39 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q5mEbg021881;
-	Tue, 26 Sep 2023 07:24:34 GMT
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49DE63AB
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:30:48 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2D1DC;
+	Tue, 26 Sep 2023 00:30:47 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q7P735016783;
+	Tue, 26 Sep 2023 07:30:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=8tY32ey+J+orStTGSZLCWD/fMv5X9gWzCYN4SQZOxSU=;
- b=QB2JtF8jkWVck1VfsUTMYPOMUsdBZj7lgcvcBnCLGHFjNjPD0VQrX3ijIMeviORT4uiz
- l+7lpqZtKXk3P7QgbNMVs1/QhpLrZFO8LP18zeBURvVfvGYb5ooIc4XiB0ggM/W7lO73
- UDBj3nFLrLepASzgJuxr3gY+MCxz3oMFUbprvBc844+o+mC5f29qb6RxqwbwOH9j9Erg
- FqoenYcuYcSw6IMJdt2jBfHa+QEyfF3aZQl+H9qWPQMagp9rGYz5sSvoBfIU6BUtC+UB
- u5UhnTAHigobZIIkm8fJy6+vqnMXZDf5sfeJZ3bc3Xb37TM4ciRCg+H3T17guCrcYRth vQ== 
+ bh=XKB0S+xLh1RPdUjVKo5o+nYaUW7n/k+7Q2ToNYxcMuw=;
+ b=N0gl+gIVaoc//JYhyIxuHBa71Hqt8QNWBpIjW/DUwiNH6sEzSoMPjvr/3fv3iT+iQEJM
+ FjnEtrFBZgOE6f3ITmu9CxpfKv6UMWqnD7IL4YK+ZtT6/7PfWkEYC8wGwIhlN5F1jOE4
+ If1BMpeW9EUywN83ErrATsM9WVZbI7OyiR/nIXLy7525DTcnXeqiiHf67ZQHqfYwdQwy
+ 74/j6gOi5SP79BP77FE1mLjEjhYKOhNJXjs/hHGIfv9/vvIIYZB+R45KCI3LT5DkzVmO
+ SwDwhoQcBInNfk5epVgFyLaoiljpoAgKcjB/+OHE221i97pNNQ9WwEoDDbspAocDWHRm rA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbqbfckw1-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbt0b9h3b-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:24:34 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38Q6toGq010309;
-	Tue, 26 Sep 2023 07:24:33 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbqbfckvb-1
+	Tue, 26 Sep 2023 07:30:44 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38Q7QSjm022421;
+	Tue, 26 Sep 2023 07:30:43 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbt0b9h29-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:24:33 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q4qbnv008394;
-	Tue, 26 Sep 2023 07:24:32 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3taabsj263-1
+	Tue, 26 Sep 2023 07:30:43 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q7IPCs030706;
+	Tue, 26 Sep 2023 07:30:41 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjsb7p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:24:32 +0000
+	Tue, 26 Sep 2023 07:30:41 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38Q7OTpf20906746
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38Q7Ucr913238892
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Sep 2023 07:24:29 GMT
+	Tue, 26 Sep 2023 07:30:38 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B439E2004B;
-	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id AE89D200C2;
+	Tue, 26 Sep 2023 07:30:38 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6D49320040;
-	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 4A9D8200C4;
+	Tue, 26 Sep 2023 07:30:38 +0000 (GMT)
 Received: from [9.152.224.54] (unknown [9.152.224.54])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
-Message-ID: <3f71928e-157a-748e-42ee-4de3c80ed109@linux.ibm.com>
-Date: Tue, 26 Sep 2023 09:24:29 +0200
+	Tue, 26 Sep 2023 07:30:38 +0000 (GMT)
+Message-ID: <3a9fde58-2de5-8ade-b1a2-caeb0ca59086@linux.ibm.com>
+Date: Tue, 26 Sep 2023 09:30:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,34 +72,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
- device
+Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
+ extension and loopback-ism
 Content-Language: en-US
-To: dust.li@linux.alibaba.com, Wen Gu <guwen@linux.alibaba.com>,
-        kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
         alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
- <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
- <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
- <20230925151816.GC92403@linux.alibaba.com>
 From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20230925151816.GC92403@linux.alibaba.com>
+In-Reply-To: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6ts8XhcPOgsswvvfsBOK9qhHd3J-Lbc_
-X-Proofpoint-ORIG-GUID: 9_whUnQEoCXAoQyxNBqwVM-8LEICf3o-
+X-Proofpoint-GUID: Ra5twl3tzEINSAYwQZYwjTK7zsMAQmkW
+X-Proofpoint-ORIG-GUID: sJ07Y0qUDCUJY85-9gi-U7MPG_t_Tb3N
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-09-26_05,2023-09-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=746
- lowpriorityscore=0 suspectscore=0 impostorscore=0 phishscore=0 bulkscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ phishscore=0 mlxlogscore=863 suspectscore=0 adultscore=0 malwarescore=0
+ mlxscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
  definitions=main-2309260062
 X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -111,51 +107,22 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 
-On 25.09.23 17:18, Dust Li wrote:
->> Hello Wen Gu,
->>
->> thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
->>
->> I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
->> may want to exploit smcd-loopback. Especially in native environements without containers.
->>
->> If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
->> If loopback is always created unconditionally, there is no way to opt-out.
-> Hi Sandy,
+On 24.09.23 17:16, Wen Gu wrote:
+> This patch set includes 4 parts:
 > 
-> After talking to Wen Gu offline, I think the real issue here might be
-> we don't have an abstract layer in SMC, something like net/core/dev.c
-> 
-> Without this, we cannot do:
-> 
-> 1. Enable/disable those devices dynamically
->    Currently, If we want to disable a SMC-R device to communicate with
->    others, we need to refer to 'ip link set dev xxx down' to disable the
->    netdevice, then Infiniband subsystem will notify SMC that the state of
->    the IB device has changed. We cannot explicitly choose not to use some
->    specific IB/RoCE devices without disable totally.
->    If the loopback device need to support enable/disable itself, I
->    think it might be better to enable this feature for all SMC devices.
-> 
-> 2. Do statistics per device
->    Now, we have to relay on IB/RoCE devices' hardware statistics to see
->    how many packets/bytes we have sent through this device.
-> 
-> Both the above issues get worse when the IB/RoCE device is shared by SMC
-> and userspace RDMA applications. If SMC-R and userspace RDMA applications
-> run at the same time, we can't enable the device to run userspace RDMA
-> applications while block it from running SMC. For statistics, we cannot
-> tell how many packets/bytes were sent by SMC and how many were sent by
-> userspace RDMA applications.
-> 
-> So I think those are better to support in the SMC layer.
-> 
-> Best regards!
-> Dust
+>  - Patch #1-#3: decouple ISM device hard code from SMC-D stack.
+>  - Patch #4-#8: implement virtual ISM extension defined in SMCv2.1.
+>  - Patch #9-#13: implement loopback-ism device.
+>  - Patch #14-#18: memory copy optimization for the case using loopback.
 
-Thank you very much for your considerations. I also think a generic handling 
-of these requirements in the smc layer would be best. Especially, if we want 
-to add virtio-ism support soon. There we will face the same issues again.
-Let's hear what others think about this.
 
+Your cover letter is very well helpful, thanks a lot for that.
+I really like the way you grouped the patches.
+Just a thought:
+If it takes too long to get this large patchset reviewed, you could
+split it up into smaller sets and get them upstream one after the other. 
+
+I think it is especially valuable to more crisply define the interface between
+SMC-D and the smc-d devices, given that virtio-ism may soon be a third kind of
+smcd device.
 
