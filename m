@@ -1,119 +1,107 @@
-Return-Path: <netdev+bounces-36201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56ABC7AE411
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 05:23:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D901F7AE449
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 05:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 356381C20372
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 03:23:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5516328135E
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 03:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E028139E;
-	Tue, 26 Sep 2023 03:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49C417FE;
+	Tue, 26 Sep 2023 03:52:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C32111B
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 03:23:28 +0000 (UTC)
-X-Greylist: delayed 71822 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Sep 2023 20:23:24 PDT
-Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 87E599D;
-	Mon, 25 Sep 2023 20:23:24 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.192.76.118])
-	by mail-app2 (Coremail) with SMTP id by_KCgBHCrWJThJljucMAQ--.65187S4;
-	Tue, 26 Sep 2023 11:22:54 +0800 (CST)
-From: Dinghao Liu <dinghao.liu@zju.edu.cn>
-To: dinghao.liu@zju.edu.cn
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Harry Morris <harrymorris12@gmail.com>,
-	linux-wpan@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797BF7F;
+	Tue, 26 Sep 2023 03:52:39 +0000 (UTC)
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EEB1C9;
+	Mon, 25 Sep 2023 20:52:38 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3ab2436b57dso5060525b6e.0;
+        Mon, 25 Sep 2023 20:52:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695700357; x=1696305157; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JdjM08gmoXvyztouDjrJfcBPW9vYMWj7EpOPKNnHpmc=;
+        b=cgv783Z5kdvoETuuDNXwnsM4UHaxzAXibssrTRrHMG4KYI2LmJWGo+XN5h92ub0SnR
+         7vcmpFMgN+DYSuhs6pnGxvke911N3zYxhgg9HEp+Oq22KaOKDKcq2R1fVUz1Oq1r/lzj
+         Gn1VfSFYEpSe7GbYJDz7/2yvs1t2XGsFVr5gLFfRjHvH+nR66RG6UA4He1fR24zZbFNh
+         KvvoERCu6suzAGGgvBVnyKW0YaVY2aeRBISQ9VbcBAPTMaPtOhCsBcOOUx+jn+dovBs+
+         u8SwFepyVoHAbhI9s8x5IxL/jvog3OoEbLgzbgdteMkxgUCQDt68T29bFg3fJt22C9QF
+         mwKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695700357; x=1696305157;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JdjM08gmoXvyztouDjrJfcBPW9vYMWj7EpOPKNnHpmc=;
+        b=CfpD2yblzFKij1xcByKvyi6G/n+ucIuNj/H7198g6o6DABaVszhMgctfjYLFGcv4/z
+         gwCSBiX8vPVuC2u/EJunWvZGQMgRs23xcqlCD+UcthYPmmdadyF1GniAAP4S6cq+Fa6w
+         nsz9/MQORcF07AE5EsqvdvpbftyC1zEk5R3/0DmFqa3iTGkjN6EZoPueDPHX0ASSjdr0
+         nD4zgxteEOaFMO2616pC02x/pF6Z5lLi9AnL4IPSxhWU0T3m3QE0RAhboxxIngmUi0D4
+         WRbq1xBpwyvUpLH3dY+d1CJY1YgKBGh0frlqeKNJ5bSsC1uTHuoHwh1uSTOFbqcMAk/p
+         slCw==
+X-Gm-Message-State: AOJu0YxugoJFPMWfikU2tYcZNIVKTAOlyOikIi63IJQDzusRPJn7O6aq
+	DB00pVB2HqgXKRa+MAKXrpU=
+X-Google-Smtp-Source: AGHT+IH3BNod6gFJDP8Q82zw3Hovz34QvgSSdg1d6qqSaJ2TIqFWqx6diC5eKWWqoIx6YxK7qDiuNg==
+X-Received: by 2002:a05:6808:34d:b0:3a8:7c67:7f5 with SMTP id j13-20020a056808034d00b003a87c6707f5mr9369162oie.1.1695700357223;
+        Mon, 25 Sep 2023 20:52:37 -0700 (PDT)
+Received: from john.lan ([2605:59c8:148:ba00:650a:2e28:f286:c10b])
+        by smtp.gmail.com with ESMTPSA id h5-20020aa786c5000000b006889511ab14sm8822575pfo.37.2023.09.25.20.52.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Sep 2023 20:52:36 -0700 (PDT)
+From: John Fastabend <john.fastabend@gmail.com>
+To: daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	jakub@cloudflare.com
+Cc: john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
-Date: Tue, 26 Sep 2023 11:22:44 +0800
-Message-Id: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID:by_KCgBHCrWJThJljucMAQ--.65187S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7WF4fGFW5ury5Cry5JFW3GFg_yoW8Ww1xpa
-	10ka4UJryjqF4jga18ArW8Zry5C3WxtayruF95K39293Zxury8tan7AFW3JF45JFWUCa1r
-	Z3y3Jw15uFs5AF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvm1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E
-	87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-	8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
-	JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IY
-	c2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VU1a9aPUUUUU==
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgEJBmUQRiAzPQANsc
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	edumazet@google.com
+Subject: [PATCH bpf v2 0/3] bpf, sockmap complete fixes for avail bytes
+Date: Mon, 25 Sep 2023 20:52:29 -0700
+Message-Id: <20230926035233.134883-1-john.fastabend@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-If of_clk_add_provider() fails in ca8210_register_ext_clock(),
-it calls clk_unregister() to release priv->clk and returns an
-error. However, the caller ca8210_probe() then calls ca8210_remove(),
-where priv->clk is freed again in ca8210_unregister_ext_clock(). In
-this case, a use-after-free may happen in the second time we call
-clk_unregister().
+With e5c6de5fa0258 ("bpf, sockmap: Incorrectly handling copied_seq") we
+started fixing the available bytes accounting by moving copied_seq to
+where the user actually reads the bytes.
 
-Fix this by removing the first clk_unregister(). Also, priv->clk could
-be an error code on failure of clk_register_fixed_rate(). Use
-IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
+However we missed handling MSG_PEEK correctly and we need to ensure
+that we don't kfree_skb() a skb off the receive_queue when the
+copied_seq number is not incremented by user reads for some time.
 
-Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
----
+v2: drop seq var in tcp_read_skb its no longer necessary per Jakub's
+    suggestion
 
-Changelog:
+John Fastabend (3):
+  bpf: tcp_read_skb needs to pop skb regardless of seq
+  bpf: sockmap, do not inc copied_seq when PEEK flag set
+  bpf: sockmap, add tests for MSG_F_PEEK
 
-v2: -Remove the first clk_unregister() instead of nulling priv->clk.
----
- drivers/net/ieee802154/ca8210.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ net/ipv4/tcp.c                                |  3 +-
+ net/ipv4/tcp_bpf.c                            |  4 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 52 +++++++++++++++++++
+ 3 files changed, 56 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8210.c
-index aebb19f1b3a4..b35c6f59bd1a 100644
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -2759,7 +2759,6 @@ static int ca8210_register_ext_clock(struct spi_device *spi)
- 	}
- 	ret = of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
- 	if (ret) {
--		clk_unregister(priv->clk);
- 		dev_crit(
- 			&spi->dev,
- 			"Failed to register external clock as clock provider\n"
-@@ -2780,7 +2779,7 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
- {
- 	struct ca8210_priv *priv = spi_get_drvdata(spi);
- 
--	if (!priv->clk)
-+	if (IS_ERR_OR_NULL(priv->clk))
- 		return
- 
- 	of_clk_del_provider(spi->dev.of_node);
 -- 
-2.17.1
+2.33.0
 
 
