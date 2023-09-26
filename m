@@ -1,225 +1,271 @@
-Return-Path: <netdev+bounces-36360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F5C7AF596
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:59:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EE717AF5AE
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 23:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DCE11282E78
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:59:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 34806282E29
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 21:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688103D990;
-	Tue, 26 Sep 2023 20:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C2E4999F;
+	Tue, 26 Sep 2023 21:26:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD542AB34
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:59:21 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B97219B1
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:59:19 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99357737980so1189019866b.2
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:59:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E95449986
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:26:34 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F5E903E
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:26:32 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59f8315aabfso99116627b3.0
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:26:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695761958; x=1696366758; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nbm0fl6t7js3aniuoVoiV7uhTyT8SoKhMhmvTfEHKF0=;
-        b=W5eRTqGUHYRciSsKpzlaqpaBB6xXZUH34WS7vYCduqPlqRkZsQuLy+aake7oJ50f7R
-         oOS+jscmDiEDu6lq8RZt7kEk/HRjvhtOFLhhXAJ0AhucjtggdzJTXNT01bra2VrgfqDt
-         YLVTt7IMsC4FONdT1/XlA/V87sOUhrAshhNhRCn5JAplNQuzO3fPrDj75p5s4lodjbyb
-         AhkPO1I7XixIOSWDROP4YB+zbEwjQvmnTG4pqSqgFgjFxqrW9S1toA5KWsLQD8uyRKlK
-         AeKJOQKO2uvB+xoUpH+IOtQMGCAmK1/B6vcv7Y2pmT1S+WVbqyLdKzIBqvbWDrUdlyk+
-         nzNA==
+        d=google.com; s=20230601; t=1695763591; x=1696368391; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1M0ZxDhPpbzbmTdpjKq/EH6B6II7eIRIx4eN4Kr09go=;
+        b=3bGh7LRCdC/lgcxFPQQIjN00i2Ekfksi7wMia56EPExeJinZTvY2ZaMoyyEKlThOuj
+         IkFme7qliWnqCVt/b6GOcouTZBKuYU3PtdWbZucM0pceKHSS62e9kGAm06gzvnhP0J+M
+         JS6sDG8/Ns1+AshDvPjrbmIwjEOlzoHp45KrEz4Z2tmYvAyYDlqcZniBTlRFQZGiRT+4
+         LE+O9LQ/T7/rndrQRlIuAYoNe+qqA1f0gBoZlzyRSSu7rhdmAIWWK20+njNO2AYarsrA
+         IELNQ6E7pdzk6jsXB4zTWDk5MS++Mkycq6PWTqwnddwvaNUiKOeY3Yy/dzRZHiolSycf
+         Lgkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695761958; x=1696366758;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nbm0fl6t7js3aniuoVoiV7uhTyT8SoKhMhmvTfEHKF0=;
-        b=CCLVwUsBG5AG0GVszQihduV2mEkXvVYQT646Yv8gchQNQ8aGb/cD8nqWFXeQFiUz7q
-         XZqDHavJGy88DxIKo1gHq41qhwS7R0MTJ+8sre3qCW7pClKOhTeTZLjsqoRWBbqjMW6U
-         /1n5jMnkChdqpByOUVZAzyVMy3xPWkL1lZDY2OVS/KdJXLOWC9ZYk94aIc3yzTuMJdJc
-         tY5WaIMYx17XSMdgsSRxlvJqcWruIoE8TDcmERe/YBxxFtAWeZb501p4AAjN5eymnQ7J
-         dXaEocbqbm2DmRfZl9btNo3R5N7oS6a0gReiNdbIw62uU3pGkBL0KlMUKSVY1vH5vsSq
-         CRUw==
-X-Gm-Message-State: AOJu0Yys0VkBw7tz86RrI9JxDDjQjTh7z/9ZRThq7G65YTaK6nU8DKn8
-	h29GUjPqZXWlp4v74v2ffKCRrw==
-X-Google-Smtp-Source: AGHT+IENJ0xPYi4uzaeTJwwedZ+8tWUxG3QlM6olVDYu5bRBD5Pc+AxjzgEP0mdOv30vPgdF5uo+og==
-X-Received: by 2002:a17:906:8457:b0:9b2:89ec:7fca with SMTP id e23-20020a170906845700b009b289ec7fcamr5558979ejy.34.1695761957945;
-        Tue, 26 Sep 2023 13:59:17 -0700 (PDT)
-Received: from [192.168.1.145] (host-87-4-82-94.retail.telecomitalia.it. [87.4.82.94])
-        by smtp.gmail.com with ESMTPSA id gu20-20020a170906f29400b009ad8796a6aesm8202912ejb.56.2023.09.26.13.59.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Sep 2023 13:59:17 -0700 (PDT)
-Message-ID: <e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
-Date: Tue, 26 Sep 2023 22:59:14 +0200
+        d=1e100.net; s=20230601; t=1695763591; x=1696368391;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1M0ZxDhPpbzbmTdpjKq/EH6B6II7eIRIx4eN4Kr09go=;
+        b=YN5hB9aWBEY3a5qqnBpQkSHSDNF7trEH6QK5vWlmnEB/VLDR8QCWNtUbZ1Jgm7IHBH
+         tReHTewZmG9k2bCKGRkPvSwmGidtUo99pZNc/3zphwwaLqrh6XsTZXCPBdfHaMRtndEj
+         otSTAyY1VPhoP2m7mO4jI8wGoV0tdsotZ04B1Fx0GxSQrkV27xnQF3niT7UvtIJ5FPCO
+         u+65CZiIJCnKTVQiFEVKfB38mNc9jW3W3Pe3yB3RkEpeunnzRE0DOd1NIN7mdwBZ4amk
+         S6jMcBv/si+hhxZU+iTetBk5wCRKpPDOdXPvhpBAWlk9oPbdWytB5HhcnyRIAa4FJAuu
+         g94Q==
+X-Gm-Message-State: AOJu0Yzyqtbu0h3NzdGuSxT50qV8Lw0513mt1ItQdLdwjSd8f1CbaJCW
+	VdFvWgZ2XW7dLH/W+LMX7HYINrU=
+X-Google-Smtp-Source: AGHT+IEQV9RjRxyay9q2R34lZnRBdbz5E0qy/hCrIJRCmAeZHQblXVs/TIZI/mbc9n0egaw0WBtVQOg=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a81:ae46:0:b0:584:41a6:6cd8 with SMTP id
+ g6-20020a81ae46000000b0058441a66cd8mr1754ywk.8.1695763591286; Tue, 26 Sep
+ 2023 14:26:31 -0700 (PDT)
+Date: Tue, 26 Sep 2023 14:26:29 -0700
+In-Reply-To: <20230926055913.9859-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add
- support for QMC HDLC
-Content-Language: en-US
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
- Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>,
- Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
- Nicolin Chen <nicoleotsuka@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
- Simon Horman <horms@kernel.org>,
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
- <20230922075913.422435-9-herve.codina@bootlin.com>
- <5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
- <20230925101703.1bf083f1@bootlin.com>
- <5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
- <20230925122758.43963736@bootlin.com>
- <e02ebde7-f208-40a4-bb10-aa5962ee9864@linaro.org>
- <20230925154929.2b6a9cab@bootlin.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20230925154929.2b6a9cab@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+References: <20230926055913.9859-1-daniel@iogearbox.net> <20230926055913.9859-2-daniel@iogearbox.net>
+Message-ID: <ZRNMhVfuqPrK3J6O@google.com>
+Subject: Re: [PATCH bpf-next 1/8] meta, bpf: Add bpf programmable meta device
+From: Stanislav Fomichev <sdf@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@kernel.org, 
+	razor@blackwall.org, ast@kernel.org, andrii@kernel.org, 
+	john.fastabend@gmail.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 25/09/2023 15:50, Herve Codina wrote:
->>>>> With these details, do you still think I need to change the child (channel)
->>>>> compatible ?    
->>>>
->>>> From OS point of view, you have a driver binding to this child-level
->>>> compatible. How do you enforce Linux driver binding based on parent
->>>> compatible? I looked at your next patch and I did not see it.  
->>>
->>> We do not need to have the child driver binding based on parent.  
->>
->> Exactly, that's what I said.
->>
->>> We have to ensure that the child handles a QMC channel and the parent provides
->>> a QMC channel.
->>>
->>> A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
->>> and a QMC channel driver (child) has to use the QMC API.  
->>
->> How does this solve my concerns? Sorry, I do not understand. Your driver
->> is a platform driver and binds to the generic compatible. How do you
->> solve regular compatibility issues (need for quirks) if parent
->> compatible is not used?
->>
->> How does being QMC compliant affects driver binding and
->> compatibility/quirks?
->>
->> We are back to my original question and I don't think you answered to
->> any of the concerns.
-> 
-> Well, to be sure that I understand correctly, do you mean that I should
-> provide a compatible for the child (HDLC) with something like this:
-> --- 8< ---
->   compatible:
->     items:
->       - enum:
->           - fsl,mpc885-qmc-hdlc
->           - fsl,mpc866-qmc-hdlc
->       - const: fsl,cpm1-qmc-hdlc
->       - const: fsl,qmc-hdlc
-> --- 8< ---
+On 09/26, Daniel Borkmann wrote:
+> This work adds a new, minimal BPF-programmable device called "meta" we
+> recently presented at LSF/MM/BPF. The latter name derives from the Greek
+> =CE=BC=CE=B5=CF=84=CE=AC, encompassing a wide array of meanings such as "=
+on top of", "beyond".
+> Given business logic is defined by BPF, this device can have many meaning=
+s.
+> The core idea is that BPF programs are executed within the drivers xmit
+> routine and therefore e.g. in case of containers/Pods moving BPF processi=
+ng
+> closer to the source.
+>=20
+> One of the goals was that in case of Pod egress traffic, this allows to
+> move BPF programs from hostns tcx ingress into the device itself, providi=
+ng
+> earlier drop or forward mechanisms, for example, if the BPF program
+> determines that the skb must be sent out of the node, then a redirect to
+> the physical device can take place directly without going through per-CPU
+> backlog queue. This helps to shift processing for such traffic from softi=
+rq
+> to process context, leading to better scheduling decisions and better
+> performance.
+>=20
+> In this initial version, the meta device ships as a pair, but we plan to
+> extend this further so it can also operate in single device mode. The pai=
+r
+> comes with a primary and a peer device. Only the primary device, typicall=
+y
+> residing in hostns, can manage BPF programs for itself and its peer. The
+> peer device is designated for containers/Pods and cannot attach/detach
+> BPF programs. Upon the device creation, the user can set the default poli=
+cy
+> to 'forward' or 'drop' for the case when no BPF program is attached.
+>=20
+> Additionally, the device can be operated in L3 (default) or L2 mode. The
+> management of BPF programs is done via bpf_mprog, so that multi-attach is
+> supported right from the beginning with similar API/dependency controls a=
+s
+> tcx. For details on the latter see commit 053c8e1f235d ("bpf: Add generic
+> attach/detach/query API for multi-progs"). tc BPF compatibility is provid=
+ed,
+> so that existing programs can be easily migrated.
+>=20
+> Going forward, we plan to use meta devices in Cilium as the main device t=
+ype
+> for connecting Pods. They will be operated in L3 mode in order to simplif=
+y
+> a Pod's neighbor management and the peer will operate in default drop mod=
+e,
+> so that no traffic is leaving between the time when a Pod is brought up b=
+y
+> the CNI plugin and programs attached by the agent. Additionally, the prog=
+rams
+> we attach via tcx on the physical devices are using bpf_redirect_peer()
+> for inbound traffic into meta device, hence the latter also supporting th=
+e
+> ndo_get_peer_dev callback. Similarly, we use bpf_redirect_neigh() for the
+> way out, pushing to phys device directly. Also, BIG TCP is supported on m=
+eta
+> device. For the follow-up work in single device mode, we plan to convert
+> Cilium's cilium_host/_net devices into a single one.
+>=20
+> An extensive test suite for checking device operations and the BPF progra=
+m
+> and link management API comes as BPF selftests in this series.
+>=20
+> Co-developed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Link: https://github.com/borkmann/iproute2/commits/pr/meta
+> Link: http://vger.kernel.org/bpfconf2023_material/tcx_meta_netdev_borkman=
+n.pdf (24ff.)
+> ---
+>  MAINTAINERS                    |   9 +
+>  drivers/net/Kconfig            |   9 +
+>  drivers/net/Makefile           |   1 +
+>  drivers/net/meta.c             | 734 +++++++++++++++++++++++++++++++++
+>  include/linux/netdevice.h      |   2 +
+>  include/net/meta.h             |  31 ++
+>  include/uapi/linux/bpf.h       |   2 +
+>  include/uapi/linux/if_link.h   |  25 ++
+>  kernel/bpf/syscall.c           |  30 +-
+>  tools/include/uapi/linux/bpf.h |   2 +
+>  10 files changed, 840 insertions(+), 5 deletions(-)
+>  create mode 100644 drivers/net/meta.c
+>  create mode 100644 include/net/meta.h
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8985a1b0b5ee..ec3edd4caa56 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3774,6 +3774,15 @@ L:	bpf@vger.kernel.org
+>  S:	Maintained
+>  F:	tools/lib/bpf/
+> =20
+> +BPF [META]
+> +M:	Daniel Borkmann <daniel@iogearbox.net>
+> +M:	Nikolay Aleksandrov <razor@blackwall.org>
+> +L:	bpf@vger.kernel.org
+> +L:	netdev@vger.kernel.org
+> +S:	Supported
+> +F:	drivers/net/meta.c
+> +F:	include/net/meta.h
+> +
+>  BPF [MISC]
+>  L:	bpf@vger.kernel.org
+>  S:	Odd Fixes
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 44eeb5d61ba9..9959cdd50b0b 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -448,6 +448,15 @@ config NLMON
+>  	  diagnostics, etc. This is mostly intended for developers or support
+>  	  to debug netlink issues. If unsure, say N.
+> =20
+> +config META
+> +	bool "BPF-programmable meta device"
+> +	depends on BPF_SYSCALL
+> +	help
+> +	  The virtual meta devices can be created in pairs and used to connect
+> +	  two network namespaces. A BPF program can be attached to the device(s=
+)
+> +	  which then gets executed on transmission to implement the driver
+> +	  internal logic.
+> +
+>  config NET_VRF
+>  	tristate "Virtual Routing and Forwarding (Lite)"
+>  	depends on IP_MULTIPLE_TABLES
+> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+> index e26f98f897c5..18eabeb78ece 100644
+> --- a/drivers/net/Makefile
+> +++ b/drivers/net/Makefile
+> @@ -22,6 +22,7 @@ obj-$(CONFIG_MDIO) +=3D mdio.o
+>  obj-$(CONFIG_NET) +=3D loopback.o
+>  obj-$(CONFIG_NETDEV_LEGACY_INIT) +=3D Space.o
+>  obj-$(CONFIG_NETCONSOLE) +=3D netconsole.o
+> +obj-$(CONFIG_META) +=3D meta.o
+>  obj-y +=3D phy/
+>  obj-y +=3D pse-pd/
+>  obj-y +=3D mdio/
+> diff --git a/drivers/net/meta.c b/drivers/net/meta.c
+> new file mode 100644
+> index 000000000000..e464f547b0a6
+> --- /dev/null
+> +++ b/drivers/net/meta.c
+> @@ -0,0 +1,734 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright (c) 2023 Isovalent */
+> +
+> +#include <linux/netdevice.h>
+> +#include <linux/ethtool.h>
+> +#include <linux/etherdevice.h>
+> +#include <linux/filter.h>
+> +#include <linux/netfilter_netdev.h>
+> +#include <linux/bpf_mprog.h>
+> +
+> +#include <net/meta.h>
+> +#include <net/dst.h>
+> +#include <net/tcx.h>
+> +
+> +#define DRV_NAME	"meta"
+> +#define DRV_VERSION	"1.0"
+> +
+> +struct meta {
+> +	/* Needed in fast-path */
+> +	struct net_device __rcu *peer;
+> +	struct bpf_mprog_entry __rcu *active;
+> +	enum meta_action policy;
+> +	struct bpf_mprog_bundle	bundle;
+> +	/* Needed in slow-path */
+> +	enum meta_mode mode;
+> +	bool primary;
+> +	u32 headroom;
+> +};
+> +
+> +static void meta_scrub_minimum(struct sk_buff *skb)
+> +{
 
-Yes, more or less, depending on actual compatibility and SoC-family.
-Maybe "fsl,cpm1-qmc-hdlc" item in the middle is not needed.
+[..]
 
-> 
-> If so, I didn't do that because a QMC channel consumer (driver matching
-> fsl,qmc-hdlc) doesn't contains any SoC specific part.
+> +	skb->skb_iif =3D 0;
+> +	skb->ignore_df =3D 0;
+> +	skb->priority =3D 0;
+> +	skb_dst_drop(skb);
+> +	skb_ext_reset(skb);
+> +	nf_reset_ct(skb);
+> +	nf_reset_trace(skb);
+> +	nf_skip_egress(skb, true);
+> +	ipvs_reset(skb);
 
-Just like hundreds of other drivers. :)
-
-There is a paragraph about specific compatibles here:
-https://www.kernel.org/doc/html/latest/devicetree/bindings/writing-schema.html
-
-
-> It uses the channel as a communication channel to send/receive HDLC frames
-> to/from this communication channel.
-> All the specific SoC part is handled by the QMC controller (parent) itself and
-> not by any consumer (child).
-
-OK, so you guarantee in 100% for this hardware and all future (including
-designs unknown currently), that they will be 100% compatible with
-existing QMC channel consumer (child, matching fsl,qmc-hdlc) driver,
-thus there will be no need for any quirk. Specifically, there will be no
-chances that it would be reasonable to re-use the same driver for child
-(currently fsl,qmc-hdlc) in different parent.
-
-P.S. If you received this email twice, apologies, I have here troubles
-with internet.
-
-Best regards,
-Krzysztof
-
+This looks similar to skb_scrub_packet; what's the difference?
 
