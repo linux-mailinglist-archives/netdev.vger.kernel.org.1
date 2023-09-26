@@ -1,129 +1,106 @@
-Return-Path: <netdev+bounces-36233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A1FF7AE743
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:02:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E497AE748
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9B5121C204F6
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:02:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 186861F2557F
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD0311731;
-	Tue, 26 Sep 2023 08:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD5311C8B;
+	Tue, 26 Sep 2023 08:03:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79BF2906
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 08:02:10 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C89EB8;
-	Tue, 26 Sep 2023 01:02:08 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 53EF0C0006;
-	Tue, 26 Sep 2023 08:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695715326;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0954C6E
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 08:03:16 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76676C9
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 01:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695715394;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uC/2kLEOqWjHhkqWNdblzqZqROUZmT9ZCKkUFCorqtY=;
-	b=cl008PAW3HgvFdBznq2sahoqBDsP8MviZ8w7HJpW/+jZwMdZahu8CNADdHZr+YWNSxBI60
-	TXZCZ0Ig8KxogrEgJ5zSjNN+uLAQ5bRKbjgR2dA4MoSrsI9Z5FjFbJcRP14zcShisJucXB
-	d8EW8JPara8d9CVyPJgBlURdaKUblYDOdH36lUV97x0dxCMkh/UKXLwbwTlDhXkh10fBmF
-	9O/skoVKFZMZ1qo4K4a7A7I7lYl1kVD6PHBCRzA/WjZ9PKmlKXfOxRw1XbIBxHNJf+ScWu
-	+tVm8AmmvLqvYs4RsYYK+0ax+SnhqeDjhmcjIj+TTvdG8cyBPR/JJnZsqPzeAQ==
-Date: Tue, 26 Sep 2023 10:02:02 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Dinghao Liu <dinghao.liu@zju.edu.cn>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Marcel Holtmann <marcel@holtmann.org>, Harry
- Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in
- ca8210_probe
-Message-ID: <20230926100202.011ab841@xps-13>
-In-Reply-To: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
-References: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=ELJLtZNf5BHgiOefmxJ85wHiMzo3vyZFSvRuYmBGd3k=;
+	b=gD6tzs35c9GgQlCnGIbkvfyNk4r5SUP//bPF2ri/sg4tD8sfoUnBrFPbpyNSJ3OcSY2EIu
+	qk3tJwr6m0d7dZcQ6A4f6AXfEUt0bFV3+BVpVH1LkHW++CcP7s854s2RUslyau4e+jM/ku
+	K4+whbFtAMNL4MONlCtOoikTyx+ClWA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-520-MyRLrIp_OHuNuyZBzUHf9g-1; Tue, 26 Sep 2023 04:03:13 -0400
+X-MC-Unique: MyRLrIp_OHuNuyZBzUHf9g-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fbdf341934so75604685e9.3
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 01:03:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695715392; x=1696320192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ELJLtZNf5BHgiOefmxJ85wHiMzo3vyZFSvRuYmBGd3k=;
+        b=K8vqwXTW4LnUrIviMlvYuKatpYhiUwhMLB4/fGTZ0GRmCnMH40X7aK0CxORW8IOmx/
+         ppyipl0wsrVlXkKhic8jhrXXkUmWxveIpzzT/GEBOizZ4Rc7oxaL4Vgy16ujuotjTtlc
+         qmoFMORqmWaaGbFn2/5PXOTrkKgkfWvsBzeTa3+A3sMklwfh8Tb1pmcZ5DPpp7ihvUXL
+         EDgvacC1VU62+d09pNxhIz3k4JWxQqTpjAYEvpo4owAVnaqZWRhENdHPszDCyT4zSYPh
+         Cu96/sJstVXmZQgU67HJjhPZjZ0cYAVKNHvOadW0tYQ2W8Md4+AvWJRxKUUlBFeh051C
+         tkQw==
+X-Gm-Message-State: AOJu0YwkH61d2rTVb+zp1pyg4g0bm3Rw0mPRw6m32BMe++DBE9y4NtiO
+	uv/Lhpvjsx1dVSFEcqxucRTrHHS7iN8UIJfM1nzVeLtgE+FkVGUM5jNFaEkuehgojHCk1fdkSDR
+	20vcy4w1LbrLXzpOIJpnLSfNg/rekJK9u
+X-Received: by 2002:a7b:c8ce:0:b0:3f5:fff8:d4f3 with SMTP id f14-20020a7bc8ce000000b003f5fff8d4f3mr7389497wml.7.1695715392260;
+        Tue, 26 Sep 2023 01:03:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE59rpXl/SGxh4tybcaud/lyyascHkYmT5tXB1hN3iXyjhk5Q4F0p49nyFPjgDbiKxOxjQesT70FqFxc2/btoE=
+X-Received: by 2002:a7b:c8ce:0:b0:3f5:fff8:d4f3 with SMTP id
+ f14-20020a7bc8ce000000b003f5fff8d4f3mr7389478wml.7.1695715391965; Tue, 26 Sep
+ 2023 01:03:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20230923170540.1447301-1-lulu@redhat.com> <20230923170540.1447301-8-lulu@redhat.com>
+ <20230925135047.GE13733@nvidia.com>
+In-Reply-To: <20230925135047.GE13733@nvidia.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 26 Sep 2023 16:02:34 +0800
+Message-ID: <CACLfguUW+u+ADefgRnpRPU8DNj_EKDsrK0sy_Uj8EGtUN6Yu+g@mail.gmail.com>
+Subject: Re: [RFC 7/7] iommufd: Skip the CACHE_COHERENCY and iommu group check
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: jasowang@redhat.com, mst@redhat.com, yi.l.liu@intel.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Dinghao,
+On Mon, Sep 25, 2023 at 9:50=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
+>
+> On Sun, Sep 24, 2023 at 01:05:40AM +0800, Cindy Lu wrote:
+> > This is just the work arround for vdpa, I Will
+> > fix these problems in the next version.
+> >
+> > Skip these 2 checks:
+> > 1.IOMMU_CAP_CACHE_COHERENCY check
+> > 2.iommu_group_get check
+>
+> Uuh, something has gone really, really wrong if you need to skip these
+> checks in the core iommufd code..
+>
+there are problems in this code, I will continue working in this.
+Thanks
+Cindy
+> Jason
+>
 
-dinghao.liu@zju.edu.cn wrote on Tue, 26 Sep 2023 11:22:44 +0800:
-
-> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
-> it calls clk_unregister() to release priv->clk and returns an
-> error. However, the caller ca8210_probe() then calls ca8210_remove(),
-> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
-> this case, a use-after-free may happen in the second time we call
-> clk_unregister().
->=20
-> Fix this by removing the first clk_unregister(). Also, priv->clk could
-> be an error code on failure of clk_register_fixed_rate(). Use
-> IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
->=20
-> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
-
-Missing Cc stable, this needs to be backported.
-
-> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
-> ---
->=20
-> Changelog:
->=20
-> v2: -Remove the first clk_unregister() instead of nulling priv->clk.
-> ---
->  drivers/net/ieee802154/ca8210.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
-210.c
-> index aebb19f1b3a4..b35c6f59bd1a 100644
-> --- a/drivers/net/ieee802154/ca8210.c
-> +++ b/drivers/net/ieee802154/ca8210.c
-> @@ -2759,7 +2759,6 @@ static int ca8210_register_ext_clock(struct spi_dev=
-ice *spi)
->  	}
->  	ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
->  	if (ret) {
-> -		clk_unregister(priv->clk);
->  		dev_crit(
->  			&spi->dev,
->  			"Failed to register external clock as clock provider\n"
-
-I was hoping you would simplify this function a bit more.
-
-> @@ -2780,7 +2779,7 @@ static void ca8210_unregister_ext_clock(struct spi_=
-device *spi)
->  {
->  	struct ca8210_priv *priv =3D spi_get_drvdata(spi);
-> =20
-> -	if (!priv->clk)
-> +	if (IS_ERR_OR_NULL(priv->clk))
->  		return
-> =20
->  	of_clk_del_provider(spi->dev.of_node);
-
-Alex, Stefan, who handles wpan and wpan/next this release?
-
-Thanks,
-Miqu=C3=A8l
 
