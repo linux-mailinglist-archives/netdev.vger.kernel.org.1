@@ -1,382 +1,168 @@
-Return-Path: <netdev+bounces-36341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CDCE7AF490
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 21:58:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E787AF4CA
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:07:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 87B651C2034C
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 19:58:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A49AB281CE4
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5001249991;
-	Tue, 26 Sep 2023 19:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6063F499AB;
+	Tue, 26 Sep 2023 20:07:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05AE41E2A
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 19:58:07 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D087D13A;
-	Tue, 26 Sep 2023 12:58:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695758285; x=1727294285;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qeHOPmX+eKuXOzZte/YkclpWKke2v6iyFctuQOjHwVM=;
-  b=K8Irr+Rj8GXTkhu9lzwYZz8lN5FRcW6cLLMbWHNCw76z0DI1LtxSZYln
-   cfFzpl9AIT+gHjVEuvyQ6irNTbWgQzqueYBmxNziu1fHbtj2KgYhFjuMC
-   OfUqBLTmBPdgFG2wT3ubI7nwDuMzzYCWoU+QHhaFrDNqOznq7kgI/ewe5
-   FHKYz8HdLiMNNTLqrUtUa08yERZnpQ3AH03eR5NZ+Tqi0ju/qWs66P0io
-   aT+NNEIbYMkHLIwA3drI4dLqI7oPvVDi0CnYtvUl4GDiCjCXL7Bl+bR43
-   hxDja5lnlL8fJv3x0TPWX+yQpj0lAMDIwA6T2I6n/HNEfSvVcoWzHSazU
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="361036691"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="361036691"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2023 12:58:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="725553619"
-X-IronPort-AV: E=Sophos;i="6.03,178,1694761200"; 
-   d="scan'208";a="725553619"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Sep 2023 12:58:04 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 26 Sep 2023 12:58:04 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 26 Sep 2023 12:58:04 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.105)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4846B38BA0
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:07:24 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9906F3;
+	Tue, 26 Sep 2023 13:07:22 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 72721120002;
+	Tue, 26 Sep 2023 23:07:21 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 72721120002
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1695758841;
+	bh=s7GCH61T88hlnNWcjUTVgfuSNPZWqf/bbDm9Jbk6EZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=Tx5z0T6DLy1nDXM6Y4/iCmWlbzx3mWrdXlw3OTNS5H/LWBOD1RXBaO7FPbFK/yOEs
+	 fcgbL7O0ncvZmDUX8zucYGIREGqyDSAR43rvplRMx6n9xA1N6mvsZsa555VRbRvv0o
+	 /lWQ77tNebYNzfQ2xUq4pbx96uWH2ik/gtvvcWw7x9Ndjmv+DbxOVeobcOzx++5X0g
+	 JOXABW/QfXdVbMKbBC52GNWu4jYxl2qx70w5kNToFR4U3nICkA8QORtT/qOxfK4Lwz
+	 cHh5duHVAxC70l/6zscy8nnQmNiPVDfr4MupAoJMKC3c7wyYp5ht2xTR8sPKbUVTNg
+	 C4ubgI74/MhGw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 26 Sep 2023 23:07:21 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 26 Sep 2023 12:58:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GhlBDnKWcfulr5vcHK+fwFkBEb33BfEf4rqhtmbR+rwZDwxVinUGmXjBcXFLuxvOlfkuEwSMotMzEDcvYBFMcb4zAyKZHGShRrMFKMt2nY9uqprrygHKcinccf0Kh7ybtqJzKaC6bxKVB5w2VsVc4/Ztyhuc3hXtvss8O3p1vJwf8AGoBwA0wuZ5JWej/xw2M+L6oKxPUZ91umNQb8zxLgc0zEidtNWvXGNWXHC9YAm1JRMoJ/yLWqnlj9UclnVYIcqZbPr0eHClGl6zwAaJ3wDLBSFI1EVcIbiRmYFco4kR4l88tfHmpT2wt2gn/SRyE1DpyrimaXcSzhMNowSHgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4D7Y2/uq13FiLHLliX0PrYguSTjgVIJhK9zsTifMGr8=;
- b=Gx68zqGRK8vYBFZHRM6W0gTv40qqXJFnZAX/3M+osc0g2d/tJUcwt/JcYmHhn+D4fkSZ2paR1ucEWqR0HT8OYGyDvPpQuq6N8bOkiINkcNeW4L2XG0lAiSsfaL9lniVXA31nNoffff+IXG8Ud8TQEIpO5d2Hyqx+FMVKxn4++78glTMixacwPVwo1bHHqcoaUmVb7PHmBkfl/ZU0WuDxpN4FggZIJ1mEnJy+puMeAGso78q5xiD4iPh19lcGMyvrIqrFrfoTOIuUkDSlTW04W42Qt2x0TEX5qGAipjQrjp6K0buwiWv1s2NCM0S70cq3j5XSfDQ3r2N6YsOUe4VO4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com (2603:10b6:a03:fa::30)
- by PH8PR11MB8259.namprd11.prod.outlook.com (2603:10b6:510:1c2::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.38; Tue, 26 Sep
- 2023 19:58:00 +0000
-Received: from BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48]) by BYAPR11MB3672.namprd11.prod.outlook.com
- ([fe80::7666:c666:e6b6:6e48%4]) with mapi id 15.20.6813.027; Tue, 26 Sep 2023
- 19:58:00 +0000
-Message-ID: <f17ed43b-7329-5566-a75e-befebd20d032@intel.com>
-Date: Tue, 26 Sep 2023 21:57:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH net-next 7/9] i40e: Move memory allocation structures to
- i40e_alloc.h
-To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
-CC: <poros@redhat.com>, <mschmidt@redhat.com>, <jesse.brandeburg@intel.com>,
-	<anthony.l.nguyen@intel.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>
-References: <20230926182710.2517901-1-ivecera@redhat.com>
- <20230926182710.2517901-8-ivecera@redhat.com>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20230926182710.2517901-8-ivecera@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0108.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a3::11) To BYAPR11MB3672.namprd11.prod.outlook.com
- (2603:10b6:a03:fa::30)
+ 15.2.1118.30; Tue, 26 Sep 2023 23:07:20 +0300
+Message-ID: <708be048-862f-76ee-6671-16b54e72e5a8@salutedevices.com>
+Date: Tue, 26 Sep 2023 23:00:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3672:EE_|PH8PR11MB8259:EE_
-X-MS-Office365-Filtering-Correlation-Id: e0cfd19b-a24b-4f1f-5eab-08dbbecae2e0
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Aq62RSjKwHBbXlJRqtUsUUE9MwCMoeOFJxz+Y+AmdcMiF+DxKJ7IE6v+s6zw6GpHRLbs9b2shjGg9nFFQGCDOS2lLqj8lJShMJGapOf8VYmedXAVAV4pj9oomn/ZW4N+jpLMYbrFDTuBcmK4plhD6SgmpK2muczSZqhWxVatBgzfLR4tsHmtVmKR8GpHTJnMG+7YHmYHZUxmhT06b9h6P3KhsLwp9O7JCFWv6Ncy3HL8pdf7DUVVpmzUNPaAcpZm7/u8d1MrLFjLeoO3TiwVwBQ8juJh2A3/YgU4OIPuMNuT1NdkGf78X/tjvEziqS0bh5GPIkZQA5hFuGgSf14pqwe/NC81GuaPWqSslA9I5tdx+FhU3wksYMh5zhcj95bz3PTz9CoQY1MG1VyICw9eO9pf3x+hFpVcBruEKfhFCXZKxtKjNEZ4Q+GHtwUd4do9MTzvFOfdoNsMOiOxe5efgvrEA1rvMb5mJ7snYY+KG6BjUWm8XbRT7ok3mRTLr5EtrUBfwqwK54cohifcAGKfREeG5TvTSwAf01AJZZrJHhYdgJjAHltZVQzpVo8SwYy5PjllUQuPkYx2lIdk1aHB/SZkq8mFP0FSbzr5FZDrEGlTJ/9tueMhKsSBFi7mcIiOj5L3oQeZ/2cCj6UC3Ch2EQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3672.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(39860400002)(346002)(376002)(230922051799003)(451199024)(186009)(1800799009)(8936002)(31686004)(38100700002)(6506007)(6486002)(53546011)(2616005)(36756003)(31696002)(82960400001)(86362001)(6666004)(2906002)(66946007)(4326008)(6512007)(83380400001)(26005)(478600001)(41300700001)(8676002)(5660300002)(7416002)(66556008)(66476007)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VmE1RmpKaXJvUnFsU0tBamVyYTNjN1VQbXg2NTJlaTJDWDBlSFJ6OHJJdlZu?=
- =?utf-8?B?WUtkZG9YVDRyZ0tqaFBLOUZKQkJRbXcrZEIrektHa0p0azE0NVFjNmo3RFVF?=
- =?utf-8?B?WVhwUFAvTkRLZTJHWG40cnYwQ0FQekJaa29NcThJVEVrbkMyYno5VXZHNDQ2?=
- =?utf-8?B?cWIvM281eDd0TTNtZFA0eHhJdGN1WDhVS2RicFk5ZFNNbDg0QmYrd0VhdzQ4?=
- =?utf-8?B?NDdwTnh2bnVwaTd2eW9sdmxJUmhzc2hYczFvUG1mRVlWYlh1RU1YYVo0WTIw?=
- =?utf-8?B?c1VPeFdPRURURWJhYkprVUJhSE5uYTlFa1NCcVRGR2wrckhySzJtY0N0MTA3?=
- =?utf-8?B?V0pvTGk4akxiSm1ucmxwa2QrR21vMUZSQVVIekF0empUSEpkYTQ1OWsrbmVZ?=
- =?utf-8?B?bGlhbk1mQkVsSzQraG9qZWo2VFNSNU80bUV4bysxV2RBd0g1VTJXNXpTTitR?=
- =?utf-8?B?K0M5L2pRNUZYSWRqUG9FOThnQnBCMzFQd09Vc3F6Wlc5OWIwM0tPd3NmTFR0?=
- =?utf-8?B?TjA2ZVBxcEU0SzdDUnIvcVIrVGplWmlGTlU3TzIzY0FhNnYrN2NtOE9TL0FI?=
- =?utf-8?B?eWIxc0RrUXUwYmd5V0ttWHpTcDc3czBuYzBabmh4bGVYOFo2aDFhMU44dUFT?=
- =?utf-8?B?a2xRclNmL0xabzhYcXNwc0lPL0JDQjB5cjd4WjA4SXJJTFBXVWZTL2IwWXZ0?=
- =?utf-8?B?bWZzNXJkVzZpVjVMbnlacFZFMjhwUzd4V3cvYW1jTHpUTm02ZW1ZY1NNZDI5?=
- =?utf-8?B?MHVRUEJlVjhRcm9mb1B2THBCNXh0Q0kzbzlleVJmamMrRy96QmMzZE1GS3p0?=
- =?utf-8?B?YzlZMm5Pak1uWjRRVFM2ZmY3bU1WanRsTE5UaitiOEhScWtIS3JTWDFZWlRo?=
- =?utf-8?B?eUlXbXRuOGlwRWNxNERhcGYrNnlKTi9qaWdEcHVOWEZDdjdGQnZSdVNsRWlO?=
- =?utf-8?B?TUJEZGF3M2M5VWpJQ0VjSzBSamlUVTRlS1lId0Nwb3pQekU5dEpsb1poaGM3?=
- =?utf-8?B?S3NoUVZWUWdxeUlmU3IxcTdkQUpYeUUwb2s1bWs4SEFUcXN5SUl1YmtYUEJP?=
- =?utf-8?B?SGxxQzY5RGFOV2psa1ZaQm1Yc2JRU3FXNFV4Qyt2SG1JcEg0OVVkd3NVaHpX?=
- =?utf-8?B?Ui9HKzRxc0dsVFlMQXVINVVEenlqdllQVTJNazRhWVowc1hFcTFmek9Cb2VM?=
- =?utf-8?B?UU5VY1U0UmRSSXBuQ3NHZ1Jvd1YzNUV6bTdwRWlaRXpsQ0RSTC9ZbExSN09j?=
- =?utf-8?B?em5IVWVyanRXNi80cUllRzQxK0JpK21KcDhrRXI1TS90Yk5Rb3ozR0xCUXFx?=
- =?utf-8?B?eU1MaXlreVJJN2lUYTFRTGh3VFBjUDlnWXdzb3JpTXNJTzdId1NDZCtvVFdR?=
- =?utf-8?B?dEJFVnliUVJOTnhCTjdLdmJZSVhreTZYK2RTcEsxOUNlNGNFS3lvUEVKbDBX?=
- =?utf-8?B?RTJyY1Izb3N0RUU0L3R3em1MaGoxQlQ4RkdzMGluNTU4cXJvVmlvOStTTkRX?=
- =?utf-8?B?emhidzcwaHNnTXl0ZXdKd3Y2ZHZPUVFkdVpvbG53dFFLZ0JCN0ZlRklRRGdi?=
- =?utf-8?B?cEtycGZnVnBiY2lTUVlxR1p4UW9SeTZFNkZHYzJ2ckUxZnlUVkR4aEF6VFZy?=
- =?utf-8?B?N1I0Zi9IVXQvV05nSkhLb2MwRmtiaUFKdWVDNVpmWTcyTnd3MmRySU9xbDRs?=
- =?utf-8?B?ei9ITWFZZW9HM2x0Mi9NV2VwTEtyQmw0K3V6cFBWa1NFNnhRVGFnZ2prUnlO?=
- =?utf-8?B?aTg5ZHRxa1JDZE1tcjR5VVgwdjFPQ0xTOWFBSldtMm45b1YwNUpkUHNtR2Ev?=
- =?utf-8?B?a1ZvTUVoOWtiSTlEL1cxd0pWR0hKdmQxbFNIaXZzZ3dWSll5b3VxRFlKTFBp?=
- =?utf-8?B?dE5WWnNTK3NqWXVVZjZnaGpqQ0NuTFpOMWJVZitmbHZiQ21XMUdHbDNTV3Za?=
- =?utf-8?B?TXBPOWFVNWxxN3NrUWZXTEExb3dtcHRCNmlheE5GM1pCTlpjaFhORW15K2Fv?=
- =?utf-8?B?VWlLZ0txT1VMUmxDZnRrZERTQ1ZoaXBLN0VIeGQwMHZVRXkvRThDRG11azJC?=
- =?utf-8?B?eGUxeVRVZmdpeWlmVFF3Z2wzdnplbml3R21BTHN2c2NtNndmSUFrZlozaTRv?=
- =?utf-8?B?UFR4MzBLNVdVeVZibHNYSXNOcWNpVGVYbXY1Z0FZVXQySE9OYUJEZFBFL2dD?=
- =?utf-8?B?eXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0cfd19b-a24b-4f1f-5eab-08dbbecae2e0
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3672.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2023 19:58:00.4019
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BH6NSJYPnGq6CkL3jBTLQR+OtL5EANnULqPy62QOKES/XZqcls7POVLpx+PIaIUVqrIk955XlZtgd9bR3mnhAoWTb8HQ7zJR3PG/9Csei58=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8259
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v1 12/12] test/vsock: io_uring rx/tx tests
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230922052428.4005676-1-avkrasnov@salutedevices.com>
+ <20230922052428.4005676-13-avkrasnov@salutedevices.com>
+ <kfuzqzhrgdk5f5arbq4n3vd6vro6533aeysqhdgqevcqxrdm6e@57ylpkc2t4q4>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <kfuzqzhrgdk5f5arbq4n3vd6vro6533aeysqhdgqevcqxrdm6e@57ylpkc2t4q4>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180148 [Sep 26 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 534 534 808c2ea49f7195c68d40844e073217da4fa0d1e3, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/26 14:54:00 #21988070
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/26/23 20:27, Ivan Vecera wrote:
-> Structures i40e_dma_mem & i40e_virt_mem are defined i40e_osdep.h while
-> memory allocation functions that use them are declared in i40e_alloc.h
-> Move them to i40e_alloc.h and remove this header file dependency on
-> i40e_osdep.h header.
+
+
+On 26.09.2023 16:04, Stefano Garzarella wrote:
+> On Fri, Sep 22, 2023 at 08:24:28AM +0300, Arseniy Krasnov wrote:
+>> This adds set of tests which use io_uring for rx/tx. This test suite is
+>> implemented as separated util like 'vsock_test' and has the same set of
+>> input arguments as 'vsock_test'. These tests only cover cases of data
+>> transmission (no connect/bind/accept etc).
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> ---
+>> Changelog:
+>> v5(big patchset) -> v1:
+>>  * Use LDLIBS instead of LDFLAGS.
+>>
+>> tools/testing/vsock/Makefile           |   7 +-
+>> tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
+>> 2 files changed, 327 insertions(+), 1 deletion(-)
+>> create mode 100644 tools/testing/vsock/vsock_uring_test.c
+>>
+>> diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
+>> index 1a26f60a596c..c84380bfc18d 100644
+>> --- a/tools/testing/vsock/Makefile
+>> +++ b/tools/testing/vsock/Makefile
+>> @@ -1,12 +1,17 @@
+>> # SPDX-License-Identifier: GPL-2.0-only
+>> +ifeq ($(MAKECMDGOALS),vsock_uring_test)
+>> +LDLIBS = -luring
+>> +endif
+>> +
 > 
-> Due to removal of this dependency we have to include i40e_osdep.h in files
-> that requires it.
+> This will fails if for example we call make with more targets,
+> e.g. `make vsock_test vsock_uring_test`.
 > 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_adminq.c |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_adminq.h |  2 +-
->   drivers/net/ethernet/intel/i40e/i40e_alloc.h  | 21 ++++++++++++++++++-
->   drivers/net/ethernet/intel/i40e/i40e_common.c |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_diag.c   |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_hmc.c    |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  2 +-
->   .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  1 +
->   drivers/net/ethernet/intel/i40e/i40e_osdep.h  | 19 -----------------
->   11 files changed, 29 insertions(+), 22 deletions(-)
-
-I very much like this series, but extending i40e_osdep.h usage asks for 
-comment ;) - please try to reorder patches to have less dependency on it 
-first, and afterwards do split
-(IOW first remove&reduce, then split what's left)
-
-(disclaimer: I have not double checked if that's possible)
-
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> index 088ef4696818..bf4de913435e 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
-> @@ -3,6 +3,7 @@
->   
->   #include <linux/delay.h>
->   #include "i40e_alloc.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_register.h"
->   #include "i40e_prototype.h"
->   
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.h b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> index 95c902700f63..2c0341469122 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.h
-> @@ -6,7 +6,7 @@
->   
->   #include <linux/mutex.h>
->   #include "i40e_adminq_cmd.h"
-> -#include "i40e_osdep.h"
-> +#include "i40e_alloc.h"
->   
->   #define I40E_ADMINQ_DESC(R, i)   \
->   	(&(((struct i40e_aq_desc *)((R).desc_buf.va))[i]))
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_alloc.h b/drivers/net/ethernet/intel/i40e/i40e_alloc.h
-> index 5d9a0b56133e..e0186495ef02 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_alloc.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_alloc.h
-> @@ -4,7 +4,7 @@
->   #ifndef _I40E_ALLOC_H_
->   #define _I40E_ALLOC_H_
->   
-> -#include "i40e_osdep.h"
-> +#include <linux/types.h>
->   
->   struct i40e_hw;
->   
-> @@ -21,6 +21,25 @@ enum i40e_memory_type {
->   	i40e_mem_reserved
->   };
->   
-> +/* memory allocation tracking */
-> +struct i40e_dma_mem {
-> +	void *va;
-> +	dma_addr_t pa;
-> +	u32 size;
-> +};
-> +
-> +struct i40e_virt_mem {
-> +	void *va;
-> +	u32 size;
-> +};
-> +
-> +#define i40e_allocate_dma_mem(h, m, unused, s, a) \
-> +			i40e_allocate_dma_mem_d(h, m, s, a)
-> +#define i40e_free_dma_mem(h, m) i40e_free_dma_mem_d(h, m)
-> +
-> +#define i40e_allocate_virt_mem(h, m, s) i40e_allocate_virt_mem_d(h, m, s)
-> +#define i40e_free_virt_mem(h, m) i40e_free_virt_mem_d(h, m)
-> +
->   /* prototype for functions used for dynamic memory allocation */
->   int i40e_allocate_dma_mem(struct i40e_hw *hw,
->   			  struct i40e_dma_mem *mem,
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-> index 6d1042ca0317..8fb8f9e5c5d7 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_common.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-> @@ -7,6 +7,7 @@
->   #include <linux/pci.h>
->   #include "i40e_adminq_cmd.h"
->   #include "i40e_devids.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_prototype.h"
->   #include "i40e_register.h"
->   
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb.c b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-> index 68602fc375f6..7d51e58d94bd 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_dcb.c
-> @@ -3,6 +3,7 @@
->   
->   #include "i40e_alloc.h"
->   #include "i40e_dcb.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_prototype.h"
->   
->   /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_diag.c b/drivers/net/ethernet/intel/i40e/i40e_diag.c
-> index b1ad7c4259b9..824f97931f57 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_diag.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_diag.c
-> @@ -2,6 +2,7 @@
->   /* Copyright(c) 2013 - 2018 Intel Corporation. */
->   
->   #include "i40e_diag.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_prototype.h"
->   
->   /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_hmc.c b/drivers/net/ethernet/intel/i40e/i40e_hmc.c
-> index 0bc398757283..74b3a5b0bc4a 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_hmc.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_hmc.c
-> @@ -3,6 +3,7 @@
->   
->   #include "i40e_alloc.h"
->   #include "i40e_hmc.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_type.h"
->   
->   /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_hmc.h b/drivers/net/ethernet/intel/i40e/i40e_hmc.h
-> index 76610455cb90..78e6e9144331 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_hmc.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_hmc.h
-> @@ -4,7 +4,7 @@
->   #ifndef _I40E_HMC_H_
->   #define _I40E_HMC_H_
->   
-> -#include "i40e_osdep.h"
-> +#include "i40e_alloc.h"
->   #include "i40e_register.h"
->   
->   #define I40E_HMC_MAX_BP_COUNT 512
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_lan_hmc.c b/drivers/net/ethernet/intel/i40e/i40e_lan_hmc.c
-> index 6f40c640e310..08f0c90acd9a 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_lan_hmc.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_lan_hmc.c
-> @@ -4,6 +4,7 @@
->   #include "i40e_alloc.h"
->   #include "i40e_type.h"
->   #include "i40e_lan_hmc.h"
-> +#include "i40e_osdep.h"
->   
->   /* lan specific interface functions */
->   
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_nvm.c b/drivers/net/ethernet/intel/i40e/i40e_nvm.c
-> index 77cdbfc19d47..2e8d2dd4b920 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_nvm.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_nvm.c
-> @@ -3,6 +3,7 @@
->   
->   #include <linux/delay.h>
->   #include "i40e_alloc.h"
-> +#include "i40e_osdep.h"
->   #include "i40e_prototype.h"
->   
->   /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_osdep.h b/drivers/net/ethernet/intel/i40e/i40e_osdep.h
-> index 23be11a45761..f4f02dd722ba 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_osdep.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_osdep.h
-> @@ -28,25 +28,6 @@ do {										\
->   #define rd64(a, reg)		readq((a)->hw_addr + (reg))
->   #define i40e_flush(a)		readl((a)->hw_addr + I40E_GLGEN_STAT)
->   
-> -/* memory allocation tracking */
-> -struct i40e_dma_mem {
-> -	void *va;
-> -	dma_addr_t pa;
-> -	u32 size;
-> -};
+> I'd suggest to use something like this:
+> 
+> --- a/tools/testing/vsock/Makefile
+> +++ b/tools/testing/vsock/Makefile
+> @@ -1,13 +1,11 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> -ifeq ($(MAKECMDGOALS),vsock_uring_test)
+> -LDLIBS = -luring
+> -endif
 > -
-> -#define i40e_allocate_dma_mem(h, m, unused, s, a) \
-> -			i40e_allocate_dma_mem_d(h, m, s, a)
-> -#define i40e_free_dma_mem(h, m) i40e_free_dma_mem_d(h, m)
-> -
-> -struct i40e_virt_mem {
-> -	void *va;
-> -	u32 size;
-> -};
-> -
-> -#define i40e_allocate_virt_mem(h, m, s) i40e_allocate_virt_mem_d(h, m, s)
-> -#define i40e_free_virt_mem(h, m) i40e_free_virt_mem_d(h, m)
-> -
->   #define i40e_debug(h, m, s, ...)				\
->   do {								\
->   	if (((m) & (h)->debug_mask))				\
+>  all: test vsock_perf
+>  test: vsock_test vsock_diag_test
+>  vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+>  vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+>  vsock_perf: vsock_perf.o
+> +
+> +vsock_uring_test: LDLIBS = -luring
+>  vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
+> 
+>  CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
+> 
+>> all: test vsock_perf
+>> test: vsock_test vsock_diag_test
+>> vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+>> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+>> vsock_perf: vsock_perf.o
+>> +vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
+> 
+> Shoud we add this new test to the "test" target as well?
 
+Ok, but in this case, this target will always depend on liburing.
+
+Thanks, Arseniy
+
+> 
+> Stefano
+> 
 
