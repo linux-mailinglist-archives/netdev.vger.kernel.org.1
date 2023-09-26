@@ -1,106 +1,391 @@
-Return-Path: <netdev+bounces-36321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E34757AF1C2
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 19:30:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B740B7AF2BD
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 947B42814CF
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 17:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9B9301C20805
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 18:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DFC37C8A;
-	Tue, 26 Sep 2023 17:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8144450D3;
+	Tue, 26 Sep 2023 18:25:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D150137C85
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 17:30:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27C84C433C8;
-	Tue, 26 Sep 2023 17:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695749410;
-	bh=4BCR5+ia34bKjgZ3WQ5jOW0HdAcDUewCNvoaxlZIikg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pxTD8f9RFgHUxrpUlPk3ZJXa9TAqzdd3SLKBcMb0ooRvgr9o3kknjmYA96UZpArs1
-	 LTIXntUVgKRlOTp+yshSgN680kRTkJLGLH7d9DEeCMec4v3cKy0yInZwDZmnwUW4z3
-	 LpcHkNDg5WaY8Xn053Vn/43gHTuP1DAloEtIqw4gIZL/ci8MIdve7WSREPTcJDT4Uo
-	 frAcf2Vhf/pLCbKztN2kGy+PFRWjfQQv/YVrkW5Yt/y8kru9GTHATd08dIT5JekphW
-	 uPmJT3Kxavr6RO1McwcNjAW478UC3tUYsKKNX1RObSMDBVhssk/dYRtvCfzYspZByL
-	 FI5VE1kDNVxQg==
-Date: Tue, 26 Sep 2023 20:30:06 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: Alexandra Winter <wintera@linux.ibm.com>,
-	Albert Huang <huangjie.albert@bytedance.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	RDMA mailing list <linux-rdma@vger.kernel.org>,
-	Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
- containers.
-Message-ID: <20230926173006.GN1642130@unreal>
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
- <20230926104831.GJ1642130@unreal>
- <76a74084-a900-d559-1f63-deff84e5848a@linux.ibm.com>
- <20230926114104.GL1642130@unreal>
- <20230926120903.GD92403@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF72B42BFA
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 18:25:29 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988CBF3
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 11:25:26 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QHW2fd031623;
+	Tue, 26 Sep 2023 18:25:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=qcppdkim1; bh=VZmzQSqEGRwwVdJ/5L4OV0wj3a48KVlktgPtd+IGygA=;
+ b=fdpXLGSmgWOvzeP9lN8ISgbx5KNlCGSZE93Fbrthgvrpr7heBx/dXX/kbknmpDIQoLSL
+ k9w+L48beXh95gzpi3bmbMnKYlBgivF43CjXJXPJU5CuJRdS4l86Nl8o9BZt2rSoh660
+ JvZYpezBn981fsUHjhSa4/zwPOOsRnxu5AezrtPcvIiOXHiKszhs0ZCKVh8PR2Z7ldX5
+ 6gPAJUO96ssI0at4/cW59888FUUW2m1CVX1DggoXpzTvyxRKybO+GRpHiQNiKhrlbptn
+ rU/pYdNltv1ldd10y4+5rWYNfnzPQbwXf6fk4kXU+tR+x2sEuOvCxS6D8Zw1Tzr8xrAS Xw== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tbexgjvkp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 18:25:12 +0000
+Received: from pps.filterd (NALASPPMTA01.qualcomm.com [127.0.0.1])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 38QILZO1002902;
+	Tue, 26 Sep 2023 18:24:57 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by NALASPPMTA01.qualcomm.com (PPS) with ESMTPS id 3t9s3kufqf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 18:24:57 +0000
+Received: from NALASPPMTA01.qualcomm.com (NALASPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38QILTth002840;
+	Tue, 26 Sep 2023 18:24:57 GMT
+Received: from hu-devc-lv-u22-c.qualcomm.com (hu-subashab-lv.qualcomm.com [10.81.24.15])
+	by NALASPPMTA01.qualcomm.com (PPS) with ESMTPS id 38QIOuWD008484
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 18:24:57 +0000
+Received: by hu-devc-lv-u22-c.qualcomm.com (Postfix, from userid 212624)
+	id 476BD635; Tue, 26 Sep 2023 11:24:56 -0700 (PDT)
+From: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
+        lkp@intel.com
+Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>,
+        Sean Tranchetti <quic_stranche@quicinc.com>
+Subject: [PATCH net-next v2] net: qualcomm: rmnet: Add side band flow control support
+Date: Tue, 26 Sep 2023 11:24:07 -0700
+Message-Id: <20230926182407.964671-1-quic_subashab@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230926120903.GD92403@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: lPeNANG10DgMuhdWBXtcJrg_uGHX0ynX
+X-Proofpoint-GUID: lPeNANG10DgMuhdWBXtcJrg_uGHX0ynX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_13,2023-09-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 spamscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
+ adultscore=0 clxscore=1011 bulkscore=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309260160
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Sep 26, 2023 at 08:09:03PM +0800, Dust Li wrote:
-> On Tue, Sep 26, 2023 at 02:41:04PM +0300, Leon Romanovsky wrote:
-> >On Tue, Sep 26, 2023 at 01:14:04PM +0200, Alexandra Winter wrote:
-> >> 
-> >> 
-> >> On 26.09.23 12:48, Leon Romanovsky wrote:
-> >> > This patch made me wonder, why doesn't SMC use RDMA-CM like all other
-> >> > in-kernel ULPs which work over RDMA?
-> >> > 
-> >> > Thanks
-> >> 
-> >> The idea behind SMC is that it should look an feel to the applications
-> >> like TCP sockets. So for connection management it uses TCP over IP;
-> >> RDMA is just used for the data transfer.
-> >
-> >I think that it is not different from other ULPs. For example, RDS works
-> >over sockets and doesn't touch or reimplement GID management logic.
-> 
-> I think the difference is SMC socket need to be compatible with TCP
-> socket, so it need a tcp socket to fallback when something is not working.
-> 
-> If SMC works with rdmacm, it still need a fallback-to-tcp socket, and
-> the tcp connection has to be established for each SMC socket before the
-> SMC socket got established, that would make rdmacm meaningless.
+Individual rmnet devices map to specific network types such as internet,
+multimedia messaging services, IP multimedia subsystem etc. Each of
+these network types may support varying quality of service for different
+bearers or traffic types.
 
-You still need to perform device-GID-route translations [1], which sounds
-to me very RDMA-CM. I'm not asking you to rewrite the code, but trying
-to get rationale behind reimplementing part of RDMA subsystem.
+The physical device interconnect to radio hardware may support a
+higher data rate than what is actually supported by the radio network.
+Any packets transmitted to the radio hardware which exceed the radio
+network data rate limit maybe dropped. This patch tries to minimize the
+loss of packets by adding support for bearer level flow control within a
+rmnet device by ensuring that the packets transmitted do not exceed the
+limit allowed by the radio network.
 
-Thanks
+In order to support multiple bearers, rmnet must be created as a
+multiqueue TX netdevice. Radio hardware communicates the supported
+bearer information for a given network via side band signalling.
+Consider the following mapping -
 
-[1] 24fb68111d45 ("net/smc: retrieve v2 gid from IB device")
+IPv4 UDP port 1234 - Mark 0x1001 - Queue 1
+IPv6 TCP port 2345 - Mark 0x2001 - Queue 2
 
-> 
-> Best regards,
-> Dust
-> 
-> >
-> >Thanks
+iptables can be used to install filters which mark packets matching these
+specific traffic patterns and the RMNET_QUEUE_MAPPING_ADD operation can
+then be to install the mapping of the mark to the specific txqueue.
+
+If the traffic limit is exceeded for a particular bearer, radio hardware
+would notify that the bearer cannot accept more packets and the
+corresponding txqueue traffic can be stopped using RMNET_QUEUE_DISABLE.
+
+Conversely, if radio hardware can send more traffic for a particular
+bearer, RMNET_QUEUE_ENABLE can be used to allow traffic on that
+particular txqueue. RMNET_QUEUE_MAPPING_REMOVE can be used to remove the
+mark to queue mapping in case the radio network doesn't support that
+particular bearer any longer.
+
+Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
+Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+---
+v1 -> v2
+ Fix incorrect xarray API usage in rmnet_update_queue_map() and remove some
+ unneccessary checks in rmnet_vnd_select_queue() as mentioned by Vadim.
+ Fix UAPI types as reported by kernel test robot.
+
+ .../ethernet/qualcomm/rmnet/rmnet_config.c    | 96 ++++++++++++++++++-
+ .../ethernet/qualcomm/rmnet/rmnet_config.h    |  2 +
+ .../net/ethernet/qualcomm/rmnet/rmnet_vnd.c   | 21 ++++
+ include/uapi/linux/if_link.h                  | 16 ++++
+ 4 files changed, 134 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+index 39d24e07f306..822fb29f47eb 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /* Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
++ * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+  *
+  * RMNET configuration engine
+  */
+@@ -19,6 +20,7 @@
+ static const struct nla_policy rmnet_policy[IFLA_RMNET_MAX + 1] = {
+ 	[IFLA_RMNET_MUX_ID]	= { .type = NLA_U16 },
+ 	[IFLA_RMNET_FLAGS]	= { .len = sizeof(struct ifla_rmnet_flags) },
++	[IFLA_RMNET_QUEUE]	= { .len = sizeof(struct rmnet_queue_mapping) },
+ };
+ 
+ static int rmnet_is_real_dev_registered(const struct net_device *real_dev)
+@@ -88,6 +90,66 @@ static int rmnet_register_real_device(struct net_device *real_dev,
+ 	return 0;
+ }
+ 
++static int rmnet_update_queue_map(struct net_device *dev, u8 operation,
++				  u8 txqueue, u32 mark,
++				  struct netlink_ext_ack *extack)
++{
++	struct rmnet_priv *priv = netdev_priv(dev);
++	struct netdev_queue *q;
++	void *p;
++	u8 txq;
++
++	if (unlikely(txqueue >= dev->num_tx_queues)) {
++		NL_SET_ERR_MSG_MOD(extack, "invalid txqueue");
++		return -EINVAL;
++	}
++
++	switch (operation) {
++	case RMNET_QUEUE_MAPPING_ADD:
++		p = xa_store(&priv->queue_map, mark, xa_mk_value(txqueue),
++			     GFP_ATOMIC);
++		if (xa_is_err(p)) {
++			NL_SET_ERR_MSG_MOD(extack, "unable to add mapping");
++			return -EINVAL;
++		}
++		break;
++	case RMNET_QUEUE_MAPPING_REMOVE:
++		p = xa_erase(&priv->queue_map, mark);
++		if (xa_is_err(p)) {
++			NL_SET_ERR_MSG_MOD(extack, "unable to remove mapping");
++			return -EINVAL;
++		}
++		break;
++	case RMNET_QUEUE_ENABLE:
++	case RMNET_QUEUE_DISABLE:
++		p = xa_load(&priv->queue_map, mark);
++		if (p && xa_is_value(p)) {
++			txq = xa_to_value(p);
++
++			q = netdev_get_tx_queue(dev, txq);
++			if (unlikely(!q)) {
++				NL_SET_ERR_MSG_MOD(extack,
++						   "unsupported queue mapping");
++				return -EINVAL;
++			}
++
++			if (operation == RMNET_QUEUE_ENABLE)
++				netif_tx_wake_queue(q);
++			else
++				netif_tx_stop_queue(q);
++		} else {
++			NL_SET_ERR_MSG_MOD(extack, "invalid queue mapping");
++			return -EINVAL;
++		}
++		break;
++	default:
++		NL_SET_ERR_MSG_MOD(extack, "unsupported operation");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ static void rmnet_unregister_bridge(struct rmnet_port *port)
+ {
+ 	struct net_device *bridge_dev, *real_dev, *rmnet_dev;
+@@ -175,8 +237,24 @@ static int rmnet_newlink(struct net *src_net, struct net_device *dev,
+ 	netdev_dbg(dev, "data format [0x%08X]\n", data_format);
+ 	port->data_format = data_format;
+ 
++	if (data[IFLA_RMNET_QUEUE]) {
++		struct rmnet_queue_mapping *queue_map;
++
++		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
++		if (rmnet_update_queue_map(dev, queue_map->operation,
++					   queue_map->txqueue, queue_map->mark,
++					   extack))
++			goto err3;
++
++		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
++			   queue_map->operation, queue_map->txqueue,
++			   queue_map->mark);
++	}
++
+ 	return 0;
+ 
++err3:
++	hlist_del_init_rcu(&ep->hlnode);
+ err2:
+ 	unregister_netdevice(dev);
+ 	rmnet_vnd_dellink(mux_id, port, ep);
+@@ -352,6 +430,20 @@ static int rmnet_changelink(struct net_device *dev, struct nlattr *tb[],
+ 		}
+ 	}
+ 
++	if (data[IFLA_RMNET_QUEUE]) {
++		struct rmnet_queue_mapping *queue_map;
++
++		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
++		if (rmnet_update_queue_map(dev, queue_map->operation,
++					   queue_map->txqueue, queue_map->mark,
++					   extack))
++			return -EINVAL;
++
++		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
++			   queue_map->operation, queue_map->txqueue,
++			   queue_map->mark);
++	}
++
+ 	return 0;
+ }
+ 
+@@ -361,7 +453,9 @@ static size_t rmnet_get_size(const struct net_device *dev)
+ 		/* IFLA_RMNET_MUX_ID */
+ 		nla_total_size(2) +
+ 		/* IFLA_RMNET_FLAGS */
+-		nla_total_size(sizeof(struct ifla_rmnet_flags));
++		nla_total_size(sizeof(struct ifla_rmnet_flags)) +
++		/* IFLA_RMNET_QUEUE */
++		nla_total_size(sizeof(struct rmnet_queue_mapping));
+ }
+ 
+ static int rmnet_fill_info(struct sk_buff *skb, const struct net_device *dev)
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.h b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.h
+index ed112d51ac5a..ae8300fc5ed7 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.h
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_config.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0-only */
+ /* Copyright (c) 2013-2014, 2016-2018, 2021 The Linux Foundation.
+  * All rights reserved.
++ * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+  *
+  * RMNET Data configuration engine
+  */
+@@ -87,6 +88,7 @@ struct rmnet_priv {
+ 	struct rmnet_pcpu_stats __percpu *pcpu_stats;
+ 	struct gro_cells gro_cells;
+ 	struct rmnet_priv_stats stats;
++	struct xarray queue_map;
+ };
+ 
+ struct rmnet_port *rmnet_get_port_rcu(struct net_device *real_dev);
+diff --git a/drivers/net/ethernet/qualcomm/rmnet/rmnet_vnd.c b/drivers/net/ethernet/qualcomm/rmnet/rmnet_vnd.c
+index 046b5f7d8e7c..cd82613f56f0 100644
+--- a/drivers/net/ethernet/qualcomm/rmnet/rmnet_vnd.c
++++ b/drivers/net/ethernet/qualcomm/rmnet/rmnet_vnd.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /* Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
++ * Copyright (c) 2023, Qualcomm Innovation Center, Inc. All rights reserved.
+  *
+  * RMNET Data virtual network driver
+  */
+@@ -158,6 +159,23 @@ static void rmnet_get_stats64(struct net_device *dev,
+ 	s->tx_dropped = total_stats.tx_drops;
+ }
+ 
++static u16 rmnet_vnd_select_queue(struct net_device *dev,
++				  struct sk_buff *skb,
++				  struct net_device *sb_dev)
++{
++	struct rmnet_priv *priv = netdev_priv(dev);
++	void *p = xa_load(&priv->queue_map, skb->mark);
++	u8 txq;
++
++	if (!p || !xa_is_value(p))
++		return 0;
++
++	txq = xa_to_value(p);
++
++	netdev_dbg(dev, "mark %08x -> txq %02x\n", skb->mark, txq);
++	return txq;
++}
++
+ static const struct net_device_ops rmnet_vnd_ops = {
+ 	.ndo_start_xmit = rmnet_vnd_start_xmit,
+ 	.ndo_change_mtu = rmnet_vnd_change_mtu,
+@@ -167,6 +185,7 @@ static const struct net_device_ops rmnet_vnd_ops = {
+ 	.ndo_init       = rmnet_vnd_init,
+ 	.ndo_uninit     = rmnet_vnd_uninit,
+ 	.ndo_get_stats64 = rmnet_get_stats64,
++	.ndo_select_queue = rmnet_vnd_select_queue,
+ };
+ 
+ static const char rmnet_gstrings_stats[][ETH_GSTRING_LEN] = {
+@@ -334,6 +353,8 @@ int rmnet_vnd_newlink(u8 id, struct net_device *rmnet_dev,
+ 
+ 		priv->mux_id = id;
+ 
++		xa_init(&priv->queue_map);
++
+ 		netdev_dbg(rmnet_dev, "rmnet dev created\n");
+ 	}
+ 
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index fac351a93aed..452867d5246a 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -1368,6 +1368,7 @@ enum {
+ 	IFLA_RMNET_UNSPEC,
+ 	IFLA_RMNET_MUX_ID,
+ 	IFLA_RMNET_FLAGS,
++	IFLA_RMNET_QUEUE,
+ 	__IFLA_RMNET_MAX,
+ };
+ 
+@@ -1378,6 +1379,21 @@ struct ifla_rmnet_flags {
+ 	__u32	mask;
+ };
+ 
++enum {
++	RMNET_QUEUE_OPERATION_UNSPEC,
++	RMNET_QUEUE_MAPPING_ADD,	/* Add new queue <-> mark mapping */
++	RMNET_QUEUE_MAPPING_REMOVE,	/* Remove queue <-> mark mapping */
++	RMNET_QUEUE_ENABLE,		/* Allow traffic on an existing queue */
++	RMNET_QUEUE_DISABLE,		/* Stop traffic on an existing queue */
++};
++
++struct rmnet_queue_mapping {
++	__u8	operation;
++	__u8	txqueue;
++	__u16	padding;
++	__u32	mark;
++};
++
+ /* MCTP section */
+ 
+ enum {
+-- 
+2.34.1
+
 
