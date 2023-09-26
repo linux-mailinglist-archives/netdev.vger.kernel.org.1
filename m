@@ -1,422 +1,230 @@
-Return-Path: <netdev+bounces-36370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B413D7AF632
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 00:13:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 634117AF66E
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 00:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 66985282668
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:13:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AE2AF28141A
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E2E4A546;
-	Tue, 26 Sep 2023 22:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1712F3B28B;
+	Tue, 26 Sep 2023 22:45:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427E14A52D
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 22:13:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 210E7C07618;
-	Tue, 26 Sep 2023 22:13:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695766424;
-	bh=a5Z2neTdugVmg7K1HhjX6bASrU1Jyg72MbNWHLTI7Xs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Ifx44+vt+ujNB4+kNP85xRzvAfLGzzZn8upPJhq31eNwfm314biho9Z3wUF3MGzFK
-	 tYo4XHJHpBXV8NkXUwfM7yJA6qMT+7HXdCAUXy5g0cn/JtQL6Bu2lNjZZa9Ln3MEZ9
-	 fPQkRbP/x8Rv3ziLdp5RUFt6CngwiIlyOy4QmUy4x94pyt6KEvkaUfklBQKtt1NAXf
-	 MDvrimZ+W/0JN2SfziPaZmBv9aAKj/Ld4kBw8WYTS9BlSvM4iFyGJGI1xRn4uPzr3V
-	 i5/rZ2yOkAiqNXhO36AO5F83MrWfc4/jp9D/M0+xHj+e9HgkGAEmmAt0Ugt/3D/zyk
-	 lk2p9a54CnZZw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: linux-nfs@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	chuck.lever@oracle.com,
-	netdev@vger.kernel.org
-Subject: [PATCH v3] NFSD: convert write_threads, write_maxblksize and write_maxconn to netlink commands
-Date: Wed, 27 Sep 2023 00:13:15 +0200
-Message-ID: <27646a34a3ddac3e0b0ad9b49aaf66b3cee5844f.1695766257.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE8E2905
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 22:45:03 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B1726BF;
+	Tue, 26 Sep 2023 15:45:01 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32157c8e4c7so9794456f8f.1;
+        Tue, 26 Sep 2023 15:45:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695768299; x=1696373099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yFQJ8D+sSFOYvK98iDZQWiRqQc78CyhpZfXgoVc4/N8=;
+        b=joVpUxe20IggQRCD0Xo4k0cEdF4sn4efbdtKWyTg60/gX5MbjcumR5DBFSz11OsLQr
+         nrhG4rb6LVKZd2luN3FNYa/cE7qjOPDCk1BQgqToSObPPTJl1gA9RzebmndBz235QrQx
+         AAMnUFTfFtta7fauVP/Txw1/T49gHTeesRImfSPMGggXu3qqWpugU1GyPVSv6x22q1Av
+         R7MCbkyIrBm0JIw7osuru35A1/ibC+3ogJxI0Q4b3ogiYJdrpi1LAPZOi9Gj/tT3ePqe
+         4SZLppnlbrzkgV4F8jj1LZyZQeowSXCrFZITP6GkoySeC9qFVEpxcH1Pi0oND7SXZez4
+         3IqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695768299; x=1696373099;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yFQJ8D+sSFOYvK98iDZQWiRqQc78CyhpZfXgoVc4/N8=;
+        b=Dg8RSqws5Qm8MEpi1UenLGWu0OLvPZ6SOJValFg9mnwBwjtj+8YFNCCqjelaM9zEeZ
+         qPPyoT4zNm7OSflnXns2HzsCALPaX7VP1WWFXJTqxJcs6gl86JpcDuG2zoVRPokOhLNN
+         a/6hsY6ogpknWOd3e0pU8OydpzxeDQXMte5ynb7Et/1wpm8ETXhSEAc/bFQ7Z8/Em5iT
+         tK1AZf6aWARjGnw/o18vY3AenYpsXIWa7OZEUOcr1vF5iqLynFEk7KtUVJUXEb714O1w
+         ZFKddyOLFm+oi+kqxnDdzDJGNPcwvijESfRbGeAiNTYYxgkA1WqYZsBp7HxyS3lRQNL9
+         NG+g==
+X-Gm-Message-State: AOJu0YwLsARqZ3Vktv6pVxd+CJctQmjmVBXnjHhVOhTJnIWeu2oU8ESc
+	Vk9ocS8LDGNpoEhsK/FozP8=
+X-Google-Smtp-Source: AGHT+IHBiO5RzUxun2eesmCq4TU4wyXDvDMgwXx6usXKaVMDNKDG8lWAAEa+cz7bASW4wgcxABFDyg==
+X-Received: by 2002:a5d:6a8a:0:b0:31f:a136:96c6 with SMTP id s10-20020a5d6a8a000000b0031fa13696c6mr55213wru.42.1695768299218;
+        Tue, 26 Sep 2023 15:44:59 -0700 (PDT)
+Received: from skbuf ([188.25.161.12])
+        by smtp.gmail.com with ESMTPSA id k20-20020a170906681400b009adca8ada31sm8458045ejr.12.2023.09.26.15.44.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Sep 2023 15:44:58 -0700 (PDT)
+Date: Wed, 27 Sep 2023 01:44:56 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>,
+	George McCollister <george.mccollister@gmail.com>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH v6 net-next 1/5] net: dsa: propagate extack to
+ ds->ops->port_hsr_join()
+Message-ID: <20230926224456.h6eupvuyyl2qahpo@skbuf>
+References: <20230922133108.2090612-1-lukma@denx.de>
+ <20230922133108.2090612-2-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922133108.2090612-2-lukma@denx.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Introduce write_threads, write_maxblksize and write_maxconn netlink
-commands similar to the ones available through the procfs.
+On Fri, Sep 22, 2023 at 03:31:04PM +0200, Lukasz Majewski wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> Drivers can provide meaningful error messages which state a reason why
+> they can't perform an offload, and dsa_slave_changeupper() already has
+> the infrastructure to propagate these over netlink rather than printing
+> to the kernel log. So pass the extack argument and modify the xrs700x
+> driver's port_hsr_join() prototype.
+> 
+> Also take the opportunity and use the extack for the 2 -EOPNOTSUPP cases
+> from xrs700x_hsr_join().
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
+> Changes for v5:
+> - New patch
+> Changes for v6:
+> - None
+> ---
+>  drivers/net/dsa/xrs700x/xrs700x.c | 18 ++++++++++++------
+>  include/net/dsa.h                 |  3 ++-
+>  net/dsa/port.c                    |  5 +++--
+>  net/dsa/port.h                    |  3 ++-
+>  net/dsa/slave.c                   |  2 +-
+>  5 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
+> index 753fef757f11..5b02e9e426fd 100644
+> --- a/drivers/net/dsa/xrs700x/xrs700x.c
+> +++ b/drivers/net/dsa/xrs700x/xrs700x.c
+> @@ -548,7 +548,8 @@ static void xrs700x_bridge_leave(struct dsa_switch *ds, int port,
+>  }
+>  
+>  static int xrs700x_hsr_join(struct dsa_switch *ds, int port,
+> -			    struct net_device *hsr)
+> +			    struct net_device *hsr,
+> +			    struct netlink_ext_ack *extack)
+>  {
+>  	unsigned int val = XRS_HSR_CFG_HSR_PRP;
+>  	struct dsa_port *partner = NULL, *dp;
+> @@ -562,16 +563,21 @@ static int xrs700x_hsr_join(struct dsa_switch *ds, int port,
+>  	if (ret)
+>  		return ret;
+>  
+> -	/* Only ports 1 and 2 can be HSR/PRP redundant ports. */
+> -	if (port != 1 && port != 2)
+> +	if (port != 1 && port != 2) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Only ports 1 and 2 can offload HSR/PRP");
+>  		return -EOPNOTSUPP;
+> +	}
+>  
+> -	if (ver == HSR_V1)
+> +	if (ver == HSR_V1) {
+>  		val |= XRS_HSR_CFG_HSR;
+> -	else if (ver == PRP_V1)
+> +	} else if (ver == PRP_V1) {
+>  		val |= XRS_HSR_CFG_PRP;
+> -	else
+> +	} else {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Only HSR v1 and PRP v1 can be offloaded");
+>  		return -EOPNOTSUPP;
+> +	}
+>  
+>  	dsa_hsr_foreach_port(dp, ds, hsr) {
+>  		if (dp->index != port) {
+> diff --git a/include/net/dsa.h b/include/net/dsa.h
+> index 0b9c6aa27047..426724808e76 100644
+> --- a/include/net/dsa.h
+> +++ b/include/net/dsa.h
+> @@ -1198,7 +1198,8 @@ struct dsa_switch_ops {
+>  	 * HSR integration
+>  	 */
+>  	int	(*port_hsr_join)(struct dsa_switch *ds, int port,
+> -				 struct net_device *hsr);
+> +				 struct net_device *hsr,
+> +				 struct netlink_ext_ack *extack);
+>  	int	(*port_hsr_leave)(struct dsa_switch *ds, int port,
+>  				  struct net_device *hsr);
+>  
+> diff --git a/net/dsa/port.c b/net/dsa/port.c
+> index 37ab238e8304..5f01bd4f9dec 100644
+> --- a/net/dsa/port.c
+> +++ b/net/dsa/port.c
+> @@ -2024,7 +2024,8 @@ void dsa_shared_port_link_unregister_of(struct dsa_port *dp)
+>  		dsa_shared_port_setup_phy_of(dp, false);
+>  }
+>  
+> -int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr)
+> +int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr,
+> +		      struct netlink_ext_ack *extack)
+>  {
+>  	struct dsa_switch *ds = dp->ds;
+>  	int err;
+> @@ -2034,7 +2035,7 @@ int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr)
+>  
+>  	dp->hsr_dev = hsr;
+>  
+> -	err = ds->ops->port_hsr_join(ds, dp->index, hsr);
+> +	err = ds->ops->port_hsr_join(ds, dp->index, hsr, extack);
+>  	if (err)
+>  		dp->hsr_dev = NULL;
+>  
+> diff --git a/net/dsa/port.h b/net/dsa/port.h
+> index dc812512fd0e..334879964e2c 100644
+> --- a/net/dsa/port.h
+> +++ b/net/dsa/port.h
+> @@ -103,7 +103,8 @@ int dsa_port_phylink_create(struct dsa_port *dp);
+>  void dsa_port_phylink_destroy(struct dsa_port *dp);
+>  int dsa_shared_port_link_register_of(struct dsa_port *dp);
+>  void dsa_shared_port_link_unregister_of(struct dsa_port *dp);
+> -int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr);
+> +int dsa_port_hsr_join(struct dsa_port *dp, struct net_device *hsr,
+> +		      struct netlink_ext_ack *extack);
+>  void dsa_port_hsr_leave(struct dsa_port *dp, struct net_device *hsr);
+>  int dsa_port_tag_8021q_vlan_add(struct dsa_port *dp, u16 vid, bool broadcast);
+>  void dsa_port_tag_8021q_vlan_del(struct dsa_port *dp, u16 vid, bool broadcast);
+> diff --git a/net/dsa/slave.c b/net/dsa/slave.c
+> index 48db91b33390..2b3d89b77121 100644
+> --- a/net/dsa/slave.c
+> +++ b/net/dsa/slave.c
+> @@ -2862,7 +2862,7 @@ static int dsa_slave_changeupper(struct net_device *dev,
+>  		}
+>  	} else if (is_hsr_master(info->upper_dev)) {
+>  		if (info->linking) {
+> -			err = dsa_port_hsr_join(dp, info->upper_dev);
+> +			err = dsa_port_hsr_join(dp, info->upper_dev, extack);
+>  			if (err == -EOPNOTSUPP) {
+>  				NL_SET_ERR_MSG_WEAK_MOD(extack,
+>  							"Offloading not supported");
+> -- 
+> 2.20.1
+> 
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes since v2:
-- use u32 to store nthreads in nfsd_nl_threads_set_doit
-- rename server-attr in control-plane in nfsd.yaml specs
-Changes since v1:
-- remove write_v4_end_grace command
-- add write_maxblksize and write_maxconn netlink commands
-
-This patch can be tested with user-space tool reported below:
-https://github.com/LorenzoBianconi/nfsd-netlink.git
----
- Documentation/netlink/specs/nfsd.yaml |  63 ++++++++++++
- fs/nfsd/netlink.c                     |  51 ++++++++++
- fs/nfsd/netlink.h                     |   9 ++
- fs/nfsd/nfsctl.c                      | 141 ++++++++++++++++++++++++++
- include/uapi/linux/nfsd_netlink.h     |  15 +++
- 5 files changed, 279 insertions(+)
-
-diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/specs/nfsd.yaml
-index 403d3e3a04f3..c6af1653bc1d 100644
---- a/Documentation/netlink/specs/nfsd.yaml
-+++ b/Documentation/netlink/specs/nfsd.yaml
-@@ -62,6 +62,18 @@ attribute-sets:
-         name: compound-ops
-         type: u32
-         multi-attr: true
-+  -
-+    name: control-plane
-+    attributes:
-+      -
-+        name: threads
-+        type: u32
-+      -
-+        name: max-blksize
-+        type: u32
-+      -
-+        name: max-conn
-+        type: u32
- 
- operations:
-   list:
-@@ -72,3 +84,54 @@ operations:
-       dump:
-         pre: nfsd-nl-rpc-status-get-start
-         post: nfsd-nl-rpc-status-get-done
-+    -
-+      name: threads-set
-+      doc: set the number of running threads
-+      attribute-set: control-plane
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - threads
-+    -
-+      name: threads-get
-+      doc: dump the number of running threads
-+      attribute-set: control-plane
-+      dump:
-+        reply:
-+          attributes:
-+            - threads
-+    -
-+      name: max-blksize-set
-+      doc: set the nfs block size
-+      attribute-set: control-plane
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - max-blksize
-+    -
-+      name: max-blksize-get
-+      doc: dump the nfs block size
-+      attribute-set: control-plane
-+      dump:
-+        reply:
-+          attributes:
-+            - max-blksize
-+    -
-+      name: max-conn-set
-+      doc: set the max number of connections
-+      attribute-set: control-plane
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - max-conn
-+    -
-+      name: max-conn-get
-+      doc: dump the max number of connections
-+      attribute-set: control-plane
-+      dump:
-+        reply:
-+          attributes:
-+            - max-conn
-diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-index 0e1d635ec5f9..8f7d72ae60d6 100644
---- a/fs/nfsd/netlink.c
-+++ b/fs/nfsd/netlink.c
-@@ -10,6 +10,21 @@
- 
- #include <uapi/linux/nfsd_netlink.h>
- 
-+/* NFSD_CMD_THREADS_SET - do */
-+static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_CONTROL_PLANE_THREADS + 1] = {
-+	[NFSD_A_CONTROL_PLANE_THREADS] = { .type = NLA_U32, },
-+};
-+
-+/* NFSD_CMD_MAX_BLKSIZE_SET - do */
-+static const struct nla_policy nfsd_max_blksize_set_nl_policy[NFSD_A_CONTROL_PLANE_MAX_BLKSIZE + 1] = {
-+	[NFSD_A_CONTROL_PLANE_MAX_BLKSIZE] = { .type = NLA_U32, },
-+};
-+
-+/* NFSD_CMD_MAX_CONN_SET - do */
-+static const struct nla_policy nfsd_max_conn_set_nl_policy[NFSD_A_CONTROL_PLANE_MAX_CONN + 1] = {
-+	[NFSD_A_CONTROL_PLANE_MAX_CONN] = { .type = NLA_U32, },
-+};
-+
- /* Ops table for nfsd */
- static const struct genl_split_ops nfsd_nl_ops[] = {
- 	{
-@@ -19,6 +34,42 @@ static const struct genl_split_ops nfsd_nl_ops[] = {
- 		.done	= nfsd_nl_rpc_status_get_done,
- 		.flags	= GENL_CMD_CAP_DUMP,
- 	},
-+	{
-+		.cmd		= NFSD_CMD_THREADS_SET,
-+		.doit		= nfsd_nl_threads_set_doit,
-+		.policy		= nfsd_threads_set_nl_policy,
-+		.maxattr	= NFSD_A_CONTROL_PLANE_THREADS,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd	= NFSD_CMD_THREADS_GET,
-+		.dumpit	= nfsd_nl_threads_get_dumpit,
-+		.flags	= GENL_CMD_CAP_DUMP,
-+	},
-+	{
-+		.cmd		= NFSD_CMD_MAX_BLKSIZE_SET,
-+		.doit		= nfsd_nl_max_blksize_set_doit,
-+		.policy		= nfsd_max_blksize_set_nl_policy,
-+		.maxattr	= NFSD_A_CONTROL_PLANE_MAX_BLKSIZE,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd	= NFSD_CMD_MAX_BLKSIZE_GET,
-+		.dumpit	= nfsd_nl_max_blksize_get_dumpit,
-+		.flags	= GENL_CMD_CAP_DUMP,
-+	},
-+	{
-+		.cmd		= NFSD_CMD_MAX_CONN_SET,
-+		.doit		= nfsd_nl_max_conn_set_doit,
-+		.policy		= nfsd_max_conn_set_nl_policy,
-+		.maxattr	= NFSD_A_CONTROL_PLANE_MAX_CONN,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd	= NFSD_CMD_MAX_CONN_GET,
-+		.dumpit	= nfsd_nl_max_conn_get_dumpit,
-+		.flags	= GENL_CMD_CAP_DUMP,
-+	},
- };
- 
- struct genl_family nfsd_nl_family __ro_after_init = {
-diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
-index d83dd6bdee92..41b95651c638 100644
---- a/fs/nfsd/netlink.h
-+++ b/fs/nfsd/netlink.h
-@@ -16,6 +16,15 @@ int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb);
- 
- int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
- 				  struct netlink_callback *cb);
-+int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int nfsd_nl_threads_get_dumpit(struct sk_buff *skb,
-+			       struct netlink_callback *cb);
-+int nfsd_nl_max_blksize_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int nfsd_nl_max_blksize_get_dumpit(struct sk_buff *skb,
-+				   struct netlink_callback *cb);
-+int nfsd_nl_max_conn_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int nfsd_nl_max_conn_get_dumpit(struct sk_buff *skb,
-+				struct netlink_callback *cb);
- 
- extern struct genl_family nfsd_nl_family;
- 
-diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-index b71744e355a8..07e7a09e28e3 100644
---- a/fs/nfsd/nfsctl.c
-+++ b/fs/nfsd/nfsctl.c
-@@ -1694,6 +1694,147 @@ int nfsd_nl_rpc_status_get_done(struct netlink_callback *cb)
- 	return 0;
- }
- 
-+/**
-+ * nfsd_nl_threads_set_doit - set the number of running threads
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	u32 nthreads;
-+	int ret;
-+
-+	if (!info->attrs[NFSD_A_CONTROL_PLANE_THREADS])
-+		return -EINVAL;
-+
-+	nthreads = nla_get_u32(info->attrs[NFSD_A_CONTROL_PLANE_THREADS]);
-+
-+	ret = nfsd_svc(nthreads, genl_info_net(info), get_current_cred());
-+	return ret == nthreads ? 0 : ret;
-+}
-+
-+static int nfsd_nl_get_dump(struct sk_buff *skb, struct netlink_callback *cb,
-+			    int cmd, int attr, u32 val)
-+{
-+	void *hdr;
-+
-+	if (cb->args[0]) /* already consumed */
-+		return 0;
-+
-+	hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
-+			  &nfsd_nl_family, NLM_F_MULTI, cmd);
-+	if (!hdr)
-+		return -ENOBUFS;
-+
-+	if (nla_put_u32(skb, attr, val))
-+		return -ENOBUFS;
-+
-+	genlmsg_end(skb, hdr);
-+	cb->args[0] = 1;
-+
-+	return skb->len;
-+}
-+
-+/**
-+ * nfsd_nl_threads_get_dumpit - dump the number of running threads
-+ * @skb: reply buffer
-+ * @cb: netlink metadata and command arguments
-+ *
-+ * Returns the size of the reply or a negative errno.
-+ */
-+int nfsd_nl_threads_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_THREADS_GET,
-+				NFSD_A_CONTROL_PLANE_THREADS,
-+				nfsd_nrthreads(sock_net(skb->sk)));
-+}
-+
-+/**
-+ * nfsd_nl_max_blksize_set_doit - set the nfs block size
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int nfsd_nl_max_blksize_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct nfsd_net *nn = net_generic(genl_info_net(info), nfsd_net_id);
-+	struct nlattr *attr = info->attrs[NFSD_A_CONTROL_PLANE_MAX_BLKSIZE];
-+	int ret = 0;
-+
-+	if (!attr)
-+		return -EINVAL;
-+
-+	mutex_lock(&nfsd_mutex);
-+	if (nn->nfsd_serv) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	nfsd_max_blksize = nla_get_u32(attr);
-+	nfsd_max_blksize = max_t(int, nfsd_max_blksize, 1024);
-+	nfsd_max_blksize = min_t(int, nfsd_max_blksize, NFSSVC_MAXBLKSIZE);
-+	nfsd_max_blksize &= ~1023;
-+out:
-+	mutex_unlock(&nfsd_mutex);
-+
-+	return ret;
-+}
-+
-+/**
-+ * nfsd_nl_max_blksize_get_dumpit - dump the nfs block size
-+ * @skb: reply buffer
-+ * @cb: netlink metadata and command arguments
-+ *
-+ * Returns the size of the reply or a negative errno.
-+ */
-+int nfsd_nl_max_blksize_get_dumpit(struct sk_buff *skb,
-+				   struct netlink_callback *cb)
-+{
-+	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_BLKSIZE_GET,
-+				NFSD_A_CONTROL_PLANE_MAX_BLKSIZE,
-+				nfsd_max_blksize);
-+}
-+
-+/**
-+ * nfsd_nl_max_conn_set_doit - set the max number of connections
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int nfsd_nl_max_conn_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct nfsd_net *nn = net_generic(genl_info_net(info), nfsd_net_id);
-+	struct nlattr *attr = info->attrs[NFSD_A_CONTROL_PLANE_MAX_CONN];
-+
-+	if (!attr)
-+		return -EINVAL;
-+
-+	nn->max_connections = nla_get_u32(attr);
-+
-+	return 0;
-+}
-+
-+/**
-+ * nfsd_nl_max_conn_get_dumpit - dump the max number of connections
-+ * @skb: reply buffer
-+ * @cb: netlink metadata and command arguments
-+ *
-+ * Returns the size of the reply or a negative errno.
-+ */
-+int nfsd_nl_max_conn_get_dumpit(struct sk_buff *skb,
-+				struct netlink_callback *cb)
-+{
-+	struct nfsd_net *nn = net_generic(sock_net(cb->skb->sk), nfsd_net_id);
-+
-+	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_CONN_GET,
-+				NFSD_A_CONTROL_PLANE_MAX_CONN,
-+				nn->max_connections);
-+}
-+
- /**
-  * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-  * @net: a freshly-created network namespace
-diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
-index c8ae72466ee6..145f4811f3d9 100644
---- a/include/uapi/linux/nfsd_netlink.h
-+++ b/include/uapi/linux/nfsd_netlink.h
-@@ -29,8 +29,23 @@ enum {
- 	NFSD_A_RPC_STATUS_MAX = (__NFSD_A_RPC_STATUS_MAX - 1)
- };
- 
-+enum {
-+	NFSD_A_CONTROL_PLANE_THREADS = 1,
-+	NFSD_A_CONTROL_PLANE_MAX_BLKSIZE,
-+	NFSD_A_CONTROL_PLANE_MAX_CONN,
-+
-+	__NFSD_A_CONTROL_PLANE_MAX,
-+	NFSD_A_CONTROL_PLANE_MAX = (__NFSD_A_CONTROL_PLANE_MAX - 1)
-+};
-+
- enum {
- 	NFSD_CMD_RPC_STATUS_GET = 1,
-+	NFSD_CMD_THREADS_SET,
-+	NFSD_CMD_THREADS_GET,
-+	NFSD_CMD_MAX_BLKSIZE_SET,
-+	NFSD_CMD_MAX_BLKSIZE_GET,
-+	NFSD_CMD_MAX_CONN_SET,
-+	NFSD_CMD_MAX_CONN_GET,
- 
- 	__NFSD_CMD_MAX,
- 	NFSD_CMD_MAX = (__NFSD_CMD_MAX - 1)
--- 
-2.41.0
-
+It would have been good to Cc George here, for the driver-side patch.
+But anyway, it looks ok.
 
