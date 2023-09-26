@@ -1,168 +1,173 @@
-Return-Path: <netdev+bounces-36346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3E787AF4CA
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:07:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B511A7AF4B3
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A49AB281CE4
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:07:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 06ACBB207F0
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6063F499AB;
-	Tue, 26 Sep 2023 20:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F95499A1;
+	Tue, 26 Sep 2023 20:05:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4846B38BA0
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:07:24 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9906F3;
-	Tue, 26 Sep 2023 13:07:22 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 72721120002;
-	Tue, 26 Sep 2023 23:07:21 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 72721120002
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1695758841;
-	bh=s7GCH61T88hlnNWcjUTVgfuSNPZWqf/bbDm9Jbk6EZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=Tx5z0T6DLy1nDXM6Y4/iCmWlbzx3mWrdXlw3OTNS5H/LWBOD1RXBaO7FPbFK/yOEs
-	 fcgbL7O0ncvZmDUX8zucYGIREGqyDSAR43rvplRMx6n9xA1N6mvsZsa555VRbRvv0o
-	 /lWQ77tNebYNzfQ2xUq4pbx96uWH2ik/gtvvcWw7x9Ndjmv+DbxOVeobcOzx++5X0g
-	 JOXABW/QfXdVbMKbBC52GNWu4jYxl2qx70w5kNToFR4U3nICkA8QORtT/qOxfK4Lwz
-	 cHh5duHVAxC70l/6zscy8nnQmNiPVDfr4MupAoJMKC3c7wyYp5ht2xTR8sPKbUVTNg
-	 C4ubgI74/MhGw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 26 Sep 2023 23:07:21 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 26 Sep 2023 23:07:20 +0300
-Message-ID: <708be048-862f-76ee-6671-16b54e72e5a8@salutedevices.com>
-Date: Tue, 26 Sep 2023 23:00:19 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5352C328A1
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:05:12 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D02211F
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso14806391276.1
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695758709; x=1696363509; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LUHQqKLA03cvxOqIb9LV+319kkd0FdCrPANHPM/IRTw=;
+        b=atLFwbr8blVejomJeCh4lmIxX20DbV2RNAqifweKxAWRvnZExZjZrAw4c31yp0sInI
+         k2Hxy3zQagyqWF2rNcnY093lwRXKqSU94jdl1tb/lHJNSgc6KJZCVmEDBtACX+3RtX5G
+         Y6t8S3aIZJ0R1KvnNPmlwJJ4XmU+XFr25Wy2y3xy6l0SNA1QIT0X5LaFaZRqfOr9Bcbi
+         hAxZPer1LDuotdMLhHuR4h+7lWENJyHmJ5RQ+nCamGDs/YI0eFAAMg3ner6O1UseAx77
+         hwR9F7FEDxieu6VbJniVZ9nA/XvlLgwVHTtpwGBV19bLXmn+bTnETagjXvy+tlbgBUIp
+         RkkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695758709; x=1696363509;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LUHQqKLA03cvxOqIb9LV+319kkd0FdCrPANHPM/IRTw=;
+        b=OzX274RcnS4x2DAgA+dxpT5XcdwtS6fuuTJnsIsxBgTJaVOO9I5ofFGEEPEXrdIspK
+         XP4nnnmkwQrSSXAVc5AHz6zR+PlMK8/7Qog0y7aPnvSeVU2yqW/PR8/OcGm0GYdJuD+z
+         Eclc6CIkh4KFBj5jNvGokH9tSSzS1dXG/s5oaJ0fptuTcinikT7+0Cf+z1sCgfPLdbuh
+         Chh3q7I7MXlj89kAPqtEjtewssZ8Tp8KAmqkfjBTol7mgUsxyggLHAS6/qeT4KtLBuIt
+         jUHKfaBlN6tLLmq7dQBUxRp+4mJEit2MV4q6vFboaBGiX9VjwMrV3KtlVLnGAo17XAGh
+         v24A==
+X-Gm-Message-State: AOJu0Yy8GzjGxONZezE0TJ+o9F5kDGLGaBd+3dIYJfhWCPKuFw2JTDQO
+	tUHoALlZjUG2+FUMqnR6yt+qqd94IA==
+X-Google-Smtp-Source: AGHT+IHiar7acMg7OZkqRteQy8u+g7Q3fC4ZlZH6+0avyWJDsbyt98fkghdeToG/rJkXrrHt5fTNug6bGg==
+X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
+ (user=jrife job=sendgmr) by 2002:a5b:752:0:b0:d89:4d2c:d846 with SMTP id
+ s18-20020a5b0752000000b00d894d2cd846mr52999ybq.12.1695758709189; Tue, 26 Sep
+ 2023 13:05:09 -0700 (PDT)
+Date: Tue, 26 Sep 2023 15:05:02 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v1 12/12] test/vsock: io_uring rx/tx tests
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230922052428.4005676-1-avkrasnov@salutedevices.com>
- <20230922052428.4005676-13-avkrasnov@salutedevices.com>
- <kfuzqzhrgdk5f5arbq4n3vd6vro6533aeysqhdgqevcqxrdm6e@57ylpkc2t4q4>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <kfuzqzhrgdk5f5arbq4n3vd6vro6533aeysqhdgqevcqxrdm6e@57ylpkc2t4q4>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
+Message-ID: <20230926200505.2804266-1-jrife@google.com>
+Subject: [PATCH net v6 0/3] Insulate Kernel Space From SOCK_ADDR Hooks
+From: Jordan Rife <jrife@google.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+Cc: dborkman@kernel.org, horms@verge.net.au, pablo@netfilter.org, 
+	kadlec@netfilter.org, fw@strlen.de, santosh.shilimkar@oracle.com, 
+	ast@kernel.org, rdna@fb.com, linux-rdma@vger.kernel.org, 
+	rds-devel@oss.oracle.com, coreteam@netfilter.org, 
+	netfilter-devel@vger.kernel.org, ja@ssi.bg, lvs-devel@vger.kernel.org, 
+	kafai@fb.com, daniel@iogearbox.net, daan.j.demeyer@gmail.com, 
+	Jordan Rife <jrife@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180148 [Sep 26 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 534 534 808c2ea49f7195c68d40844e073217da4fa0d1e3, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/26 14:54:00 #21988070
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+==OVERVIEW==
 
+The sock_sendmsg(), kernel_connect(), and kernel_bind() functions
+provide kernel space equivalents to the sendmsg(), connect(), and bind()
+system calls.
 
-On 26.09.2023 16:04, Stefano Garzarella wrote:
-> On Fri, Sep 22, 2023 at 08:24:28AM +0300, Arseniy Krasnov wrote:
->> This adds set of tests which use io_uring for rx/tx. This test suite is
->> implemented as separated util like 'vsock_test' and has the same set of
->> input arguments as 'vsock_test'. These tests only cover cases of data
->> transmission (no connect/bind/accept etc).
->>
->> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->> ---
->> Changelog:
->> v5(big patchset) -> v1:
->>  * Use LDLIBS instead of LDFLAGS.
->>
->> tools/testing/vsock/Makefile           |   7 +-
->> tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
->> 2 files changed, 327 insertions(+), 1 deletion(-)
->> create mode 100644 tools/testing/vsock/vsock_uring_test.c
->>
->> diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->> index 1a26f60a596c..c84380bfc18d 100644
->> --- a/tools/testing/vsock/Makefile
->> +++ b/tools/testing/vsock/Makefile
->> @@ -1,12 +1,17 @@
->> # SPDX-License-Identifier: GPL-2.0-only
->> +ifeq ($(MAKECMDGOALS),vsock_uring_test)
->> +LDLIBS = -luring
->> +endif
->> +
-> 
-> This will fails if for example we call make with more targets,
-> e.g. `make vsock_test vsock_uring_test`.
-> 
-> I'd suggest to use something like this:
-> 
-> --- a/tools/testing/vsock/Makefile
-> +++ b/tools/testing/vsock/Makefile
-> @@ -1,13 +1,11 @@
->  # SPDX-License-Identifier: GPL-2.0-only
-> -ifeq ($(MAKECMDGOALS),vsock_uring_test)
-> -LDLIBS = -luring
-> -endif
-> -
->  all: test vsock_perf
->  test: vsock_test vsock_diag_test
->  vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
->  vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
->  vsock_perf: vsock_perf.o
-> +
-> +vsock_uring_test: LDLIBS = -luring
->  vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
-> 
->  CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
-> 
->> all: test vsock_perf
->> test: vsock_test vsock_diag_test
->> vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
->> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
->> vsock_perf: vsock_perf.o
->> +vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
-> 
-> Shoud we add this new test to the "test" target as well?
+When used in conjunction with BPF SOCK_ADDR hooks that rewrite the send,
+connect, or bind address, callers may observe that the address passed to
+the call is modified. This is a problem not just in theory, but in
+practice, with uninsulated calls to kernel_connect() causing issues with
+broken NFS and CIFS mounts.
 
-Ok, but in this case, this target will always depend on liburing.
+commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
+ensured that callers to kernel_connect() are insulated from such effects
+by passing a copy of the address parameter down the stack, but did not
+go far enough:
 
-Thanks, Arseniy
+- There remain many instances of direct calls to sock->ops->connect()
+  throughout the kernel which do not benefit from the change to
+  kernel_connect().
+- sock_sendmsg() and kernel_bind() remain uninsulated from address
+  rewrites and there exist many direct calls to sock->ops->bind()
+  throughout the kernel.
 
-> 
-> Stefano
-> 
+This patch series is the first step to ensuring all socket operations in
+kernel space are safe to use with BPF SOCK_ADDR hooks. It
+
+1) Wraps direct calls to sock->ops->connect() with kernel_connect() to
+   insulate them.
+2) Introduces an address copy to sock_sendmsg() to insulate both calls
+   to kernel_sendmsg() and sock_sendmsg() in kernel space.
+3) Introduces an address copy to kernel_bind() and wraps direct calls to
+   sock->ops->bind() to insulate them.
+
+Earlier versions of this patch series wrapped all calls to
+sock->ops->conect() and sock->ops->bind() throughout the kernel, but
+this was pared down to instances occuring only in net to avoid merge
+conflicts. A set of patches to various trees will be made as a follow up
+to this series to address this gap.
+
+==CHANGELOG==
+
+V5->V6
+------
+- Preserve original value of msg->msg_namelen in sock_sendmsg() in
+  anticipation of this patch that adds support for SOCK_ADDR hooks to
+  Unix sockets and the ability to modify msg->msg_namelen:
+  - https://lore.kernel.org/bpf/202309231339.L2O0CrMU-lkp@intel.com/T/#m181770af51156bdaa70fd4a4cb013ba11f28e101
+
+V4->V5
+------
+- Removed non-net changes to avoid potential merge conflicts.
+
+V3->V4
+------
+- Removed address length precondition checks from kernel_connect() and
+  kernel_bind().
+- Reordered variable declarations in sock_sendmsg() to maintain reverse
+  xmas tree order.
+
+V2->V3
+------
+- Added "Fixes" tags
+- Added address length precondition checks to kernel_connect() and
+  kernel_bind().
+
+V1->V2
+------
+- Split up single patch into patch series.
+- Wrapped all direct calls to sock->ops->connect() with kernel_connect()
+  instead of pushing the address deeper into the stack to avoid
+  duplication of address copy logic and to encourage a consistent
+  interface.
+- Moved address copy up the stack to sock_sendmsg() to avoid duplication
+  of address copy logic.
+- Introduced address copy to kernel_bind() and insulated direct calls to
+  sock->ops->bind().
+
+Jordan Rife (3):
+  net: replace calls to sock->ops->connect() with kernel_connect()
+  net: prevent rewrite of msg_name and msg_namelen in sock_sendmsg()
+  net: prevent address rewrite in kernel_bind()
+
+ net/netfilter/ipvs/ip_vs_sync.c |  8 ++++----
+ net/rds/tcp_connect.c           |  4 ++--
+ net/rds/tcp_listen.c            |  2 +-
+ net/socket.c                    | 36 ++++++++++++++++++++++++++-------
+ 4 files changed, 36 insertions(+), 14 deletions(-)
+
+-- 
+2.42.0.515.g380fc7ccd1-goog
+
 
