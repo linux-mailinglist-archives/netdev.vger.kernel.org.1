@@ -1,272 +1,546 @@
-Return-Path: <netdev+bounces-36365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4197AF5B8
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 23:29:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C677C7AF5BD
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 23:35:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3CEFF283B11
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 21:29:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 44981284262
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 21:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F61F4B23D;
-	Tue, 26 Sep 2023 21:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E804A538;
+	Tue, 26 Sep 2023 21:35:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EA54A552
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:29:02 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6972BA275
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:29:00 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-690b7cb71aeso7340916b3a.0
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:29:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80C8347AA
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:35:23 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314E216E9B
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:35:21 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59c12d31d04so189220237b3.1
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:35:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695763740; x=1696368540; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JZ7x1sGJs3IwI2EHRWherpwDYB2HwErhY7l2CYJSHl8=;
-        b=VJIuaHiWKyIqjyfefgBHHnrzx1bPs6hpgjKgZkpdlvzWpBF1epF9oc6phvRSxezdsF
-         2wnyEHTfBcq9kjMIivQIxor8T/f84K53NS8ky5knTzHpKLhghakZ2tXKeRZ4yD+Fz+E3
-         zJYrcsrG2SEUInFEiXGd6DYDpAiPd+5Yd2BK4=
+        d=google.com; s=20230601; t=1695764120; x=1696368920; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jP/3l20q4cmJeUJEOiPdOqwschqpcs+QMox+RO44YzI=;
+        b=wijFVfwBs2JlWUuBx+FvoW2zEO+V8RBH1XfyjsW8jeRrJ6Wc5fT5EEY2yVceDxRmUB
+         vqZZoznRIkvZcEavN8a341EinKVAglRO9yIAbert9dIBWTo1r2txBbGXfNpDUKtDaWsg
+         w5x5Ass8ybsW2SwiQIaEyWY1INsJfdvVc1RW6LDj0fJBupmt2jZhK9VQ+X5WfvosDPog
+         pHW1LQEl4ezQixgZGZ/KOpToj7IrjgD7ZuY6HeVdMcBiChb9Tme60E2TX1qpkJgsBZOV
+         RPU0cFnS0KT3TWoRQqxoqrTag7NLam6r37yEX85cRNjx0MRqDEJKjvBXGj1cYngt+Eq/
+         WhfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695763740; x=1696368540;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JZ7x1sGJs3IwI2EHRWherpwDYB2HwErhY7l2CYJSHl8=;
-        b=JL/DsieLWe65Trjl1Dps9Jz96bb9y87f19RNzn2zaYDY7exD3U3EhVD83Ko+JCxaU/
-         LXGd+hUNSqLxAP6CsW2v+xJe6ubAx6QIrbw7AfhBRFJZMJ6lCRNgvp36yb1OqchG0ToO
-         R1L4ZhZfpQ58VQE7o0Cb6rwgNwL6kQW5CNHLNp8uF3yzGG4Ns/3v1WydCF+m22zEFHgc
-         KYeN2XWMTw/ZaTnAOKi6DOBHSPj68yVTmi0ss3bm45OrRzMBwrg1FLCPN9ALBZYQ6I7d
-         RcEu1Xn7pyth1J+Ouwso2VyzrhnrERySL27Q8sf7e3ubdpH9sRpr3XN08AH93y72ZXqI
-         B3Yg==
-X-Gm-Message-State: AOJu0YynbkCSOZnD5oGKYjXu+RXnu8hfeX5zm4yUI2FF5/pi5msWrcfX
-	mKLNdbbGDnTaEjO9NYjKf/C9bA==
-X-Google-Smtp-Source: AGHT+IGliQVWRvnnGx8nZVCufY9sGes+j8Ixl6hIyxdTACxOhy8mzzlzOZKuwqC7TvNTBKSNs5S2GQ==
-X-Received: by 2002:a62:ee06:0:b0:68f:a92a:8509 with SMTP id e6-20020a62ee06000000b0068fa92a8509mr4687125pfi.7.1695763739823;
-        Tue, 26 Sep 2023 14:28:59 -0700 (PDT)
-Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:f39:c3f2:a3b:4fcd])
-        by smtp.gmail.com with ESMTPSA id f15-20020aa78b0f000000b0068fece2c190sm10337251pfd.70.2023.09.26.14.28.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 14:28:59 -0700 (PDT)
-From: Douglas Anderson <dianders@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Hayes Wang <hayeswang@realtek.com>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-usb@vger.kernel.org,
-	Grant Grundler <grundler@chromium.org>,
-	Edward Hill <ecgh@chromium.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	bjorn@mork.no,
-	edumazet@google.com,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH 3/3] r8152: Block future register access if register access fails
-Date: Tue, 26 Sep 2023 14:27:28 -0700
-Message-ID: <20230926142724.3.Ib2affdbfdc2527aaeef9b46d4f23f7c04147faeb@changeid>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-In-Reply-To: <20230926212824.1512665-1-dianders@chromium.org>
-References: <20230926212824.1512665-1-dianders@chromium.org>
+        d=1e100.net; s=20230601; t=1695764120; x=1696368920;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jP/3l20q4cmJeUJEOiPdOqwschqpcs+QMox+RO44YzI=;
+        b=TE6w+USfzuP8RmvANu7QmrIiQsLBBZJh+QmrPU/srlRdB0TzXXoezCK5gnLg13wgsP
+         9DMR45ouiFNlpcelrKD+VFnOIsnYGVdj6RTrPyLf8MgIMKzD5JOmbNXT6dvLG+gXT/JV
+         t+K5u7DZON5jgXAkhxBIy53BLHiPHAV+T4KnMEsTplZvHweybFS36BhhvrtT1RE1/NJk
+         /t5UkbeCjfY690yEZWS/ZwasAxWGZBHLPuZWPc6xxW9EZQXLrWgY9dW3N08r4ieN9MuF
+         cmlPK3C/2Tl+dtmARgeRkCBfUFdti6k9qNmW72QAOozeBrosl0KL0tHMxK6y9OfSKC6v
+         mRtA==
+X-Gm-Message-State: AOJu0YwXP34DHZIe276bl4ddDKfxxvgHlb6qPAT8nTtoYMGfySflWs+u
+	Sb6wpv0zJEKgrdDzl7ZVmFDx6dY=
+X-Google-Smtp-Source: AGHT+IFNcELhqN8EuhZbVyT32gCvl5RwkmGGRugGxRYwjXLBFu83Sq7Ys0P/z2CEcPqKL+MjC1zEMns=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a81:ac49:0:b0:59e:ee51:52a1 with SMTP id
+ z9-20020a81ac49000000b0059eee5152a1mr2145ywj.10.1695764120414; Tue, 26 Sep
+ 2023 14:35:20 -0700 (PDT)
+Date: Tue, 26 Sep 2023 14:35:18 -0700
+In-Reply-To: <20230926055913.9859-8-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+References: <20230926055913.9859-1-daniel@iogearbox.net> <20230926055913.9859-8-daniel@iogearbox.net>
+Message-ID: <ZRNOlsMhyILat405@google.com>
+Subject: Re: [PATCH bpf-next 7/8] selftests/bpf: Add netlink helper library
+From: Stanislav Fomichev <sdf@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@kernel.org, 
+	razor@blackwall.org, ast@kernel.org, andrii@kernel.org, 
+	john.fastabend@gmail.com, donald.hunter@gmail.com, kuba@kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-As talked about in the patch ("r8152: Retry register reads/writes"),
-much of the r8152 driver doesn't check for error codes when modifying
-the adapter's registers. Specifically, the worst part of this appears
-to be when the driver does a read-modify-write of a register. If the
-read is garbage (because the read failed) and the write succeeds, we
-end up writing modified garbage to the adapter and this appears to be
-able to hard wedge it.
+On 09/26, Daniel Borkmann wrote:
+> Add a basic netlink helper library for the BPF selftests. This has been
+> taken and cut down/cleaned up from iproute2. More can be added at some
+> later point in time when needed, but for now this covers basics such as
+> device creation which we need for BPF selftests / BPF CI.
 
-After we added the retries, it should be nearly impossible to see this
-problem. After all, the problem shows up if the register read failed
-and _then_ the register write worked. If the read fails for many times
-in a row, chances are things are really dead and no future writes will
-succeed.
+Should the netlink code be based on ynl
+(https://lore.kernel.org/all/20230825122756.7603-1-donald.hunter@gmail.com/)?
+Or it doesn't have full rtnl support yet?
 
-However, nearly impossible isn't actually impossible. To be safe,
-let's fully lock out all register access if all of our retries
-fail. When we do this, we'll try to queue up a USB reset and try to
-unlock register access after the reset. To avoid looping forever,
-we'll only attempt this a handful of times.
-
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
----
-This patch was tested with REGISTER_ACCESS_TRIES set to 1, effectively
-disabling the patch ("r8152: Retry register reads/writes"). I also
-decreased the timeout back to 500ms so I could use kgdb to reproduce
-failures. To confirm that the reset queuing worked, I allowed queueing
-a reset even if pre-reset was running. That worked fine, but did cause
-a double-reset.
-
- drivers/net/usb/r8152.c | 80 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 69 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 976d6caf2f04..a7a55849fa1a 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -953,6 +953,10 @@ struct r8152 {
- 	u8 version;
- 	u8 duplex;
- 	u8 autoneg;
-+
-+	bool reg_access_fail;
-+	bool in_pre_reset;
-+	unsigned int reg_access_reset_count;
- };
- 
- /**
-@@ -1210,14 +1214,22 @@ static unsigned int agg_buf_sz = 16384;
-  */
- #define REGISTER_ACCESS_TRIES	3
- 
-+/* If register access fails too many times, stop trying to access the registers
-+ * and issue a reset to fix the issue.
-+ */
-+#define REGISTER_ACCESS_MAX_RESETS	3
-+
- static
- int r8152_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request,
- 		      __u8 requesttype, __u16 value, __u16 index, void *data,
--		      __u16 size, const char *msg_tag)
-+		      __u16 size, const char *msg_tag, struct r8152 *tp)
- {
- 	int i;
- 	int ret;
- 
-+	if (tp && tp->reg_access_fail)
-+		return -EIO;
-+
- 	for (i = 0; i < REGISTER_ACCESS_TRIES; i++) {
- 		ret = usb_control_msg(udev, pipe, request, requesttype,
- 				      value, index, data, size,
-@@ -1233,14 +1245,54 @@ int r8152_control_msg(struct usb_device *udev, unsigned int pipe, __u8 request,
- 			break;
- 	}
- 
--	if (ret < 0) {
-+	if (ret >= 0) {
-+		if (tp)
-+			tp->reg_access_reset_count = 0;
-+
-+		if (i != 0)
-+			dev_warn(&udev->dev,
-+				 "Needed %d tries to %s %d bytes at %#06x/%#06x\n",
-+				 i + 1, msg_tag, size, value, index);
-+
-+		return ret;
-+	}
-+
-+	dev_err(&udev->dev,
-+		"Failed to %s %d bytes at %#06x/%#06x (%d)\n",
-+		msg_tag, size, value, index, ret);
-+
-+	/* If tp is NULL then we're called from early probe or from the
-+	 * r8153_ecm module. In either case, the retries above are pretty much
-+	 * all we can do. Bail.
-+	 */
-+	if (!tp)
-+		return ret;
-+
-+	/* Block all future register access until we reset. This prevents the
-+	 * parts of the driver that do read-modify-write without checking for
-+	 * errors from writing back modified garbage to the adapter.
-+	 */
-+	tp->reg_access_fail = true;
-+
-+	/* Failing to access registers in pre-reset is not surprising since we
-+	 * wouldn't be resetting if things were behaving normally. The register
-+	 * access we do in pre-reset isn't truly mandatory--we're just reusing
-+	 * the disable() function and trying to be nice by powering the
-+	 * adapter down before resetting it.
-+	 *
-+	 * If we're in pre-reset, we'll return right away and not try to queue
-+	 * up yet another reset. We know the post-reset is already coming.
-+	 */
-+	if (tp->in_pre_reset)
-+		return ret;
-+
-+	if (tp->reg_access_reset_count < REGISTER_ACCESS_MAX_RESETS) {
-+		usb_queue_reset_device(tp->intf);
-+		tp->reg_access_reset_count++;
-+	} else if (tp->reg_access_reset_count == REGISTER_ACCESS_MAX_RESETS) {
- 		dev_err(&udev->dev,
--			"Failed to %s %d bytes at %#06x/%#06x (%d)\n",
--			msg_tag, size, value, index, ret);
--	} else if (i != 0) {
--		dev_warn(&udev->dev,
--			 "Needed %d tries to %s %d bytes at %#06x/%#06x\n",
--			 i + 1, msg_tag, size, value, index);
-+			"Tried to reset %d times; giving up.\n",
-+			REGISTER_ACCESS_MAX_RESETS);
- 	}
- 
- 	return ret;
-@@ -1258,7 +1310,7 @@ int get_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- 
- 	ret = r8152_control_msg(tp->udev, tp->pipe_ctrl_in,
- 				RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
--				value, index, tmp, size, "read");
-+				value, index, tmp, size, "read", tp);
- 
- 	if (ret < 0)
- 		memset(data, 0xff, size);
-@@ -1282,7 +1334,7 @@ int set_registers(struct r8152 *tp, u16 value, u16 index, u16 size, void *data)
- 
- 	ret = r8152_control_msg(tp->udev, tp->pipe_ctrl_out,
- 				RTL8152_REQ_SET_REGS, RTL8152_REQT_WRITE,
--				value, index, tmp, size, "write");
-+				value, index, tmp, size, "write", tp);
- 
- 	kfree(tmp);
- 
-@@ -8317,7 +8369,9 @@ static int rtl8152_pre_reset(struct usb_interface *intf)
- 	napi_disable(&tp->napi);
- 	if (netif_carrier_ok(netdev)) {
- 		mutex_lock(&tp->control);
-+		tp->in_pre_reset = true;
- 		tp->rtl_ops.disable(tp);
-+		tp->in_pre_reset = false;
- 		mutex_unlock(&tp->control);
- 	}
- 
-@@ -8333,6 +8387,10 @@ static int rtl8152_post_reset(struct usb_interface *intf)
- 	if (!tp)
- 		return 0;
- 
-+	mutex_lock(&tp->control);
-+	tp->reg_access_fail = false;
-+	mutex_unlock(&tp->control);
-+
- 	/* reset the MAC address in case of policy change */
- 	if (determine_ethernet_addr(tp, &sa) >= 0) {
- 		rtnl_lock();
-@@ -9542,7 +9600,7 @@ static u8 __rtl_get_hw_ver(struct usb_device *udev)
- 	ret = r8152_control_msg(udev, usb_rcvctrlpipe(udev, 0),
- 				RTL8152_REQ_GET_REGS, RTL8152_REQT_READ,
- 				PLA_TCR0, MCU_TYPE_PLA, tmp, sizeof(*tmp),
--				"read");
-+				"read", NULL);
- 	if (ret > 0)
- 		ocp_data = (__le32_to_cpu(*tmp) >> 16) & VERSION_MASK;
- 
--- 
-2.42.0.515.g380fc7ccd1-goog
-
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  tools/testing/selftests/bpf/Makefile          |  19 +-
+>  tools/testing/selftests/bpf/netlink_helpers.c | 358 ++++++++++++++++++
+>  tools/testing/selftests/bpf/netlink_helpers.h |  46 +++
+>  3 files changed, 418 insertions(+), 5 deletions(-)
+>  create mode 100644 tools/testing/selftests/bpf/netlink_helpers.c
+>  create mode 100644 tools/testing/selftests/bpf/netlink_helpers.h
+> 
+> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+> index 47365161b6fc..b8186ceb31dc 100644
+> --- a/tools/testing/selftests/bpf/Makefile
+> +++ b/tools/testing/selftests/bpf/Makefile
+> @@ -579,11 +579,20 @@ endef
+>  # Define test_progs test runner.
+>  TRUNNER_TESTS_DIR := prog_tests
+>  TRUNNER_BPF_PROGS_DIR := progs
+> -TRUNNER_EXTRA_SOURCES := test_progs.c cgroup_helpers.c trace_helpers.c	\
+> -			 network_helpers.c testing_helpers.c		\
+> -			 btf_helpers.c flow_dissector_load.h		\
+> -			 cap_helpers.c test_loader.c xsk.c disasm.c	\
+> -			 json_writer.c unpriv_helpers.c 		\
+> +TRUNNER_EXTRA_SOURCES := test_progs.c		\
+> +			 cgroup_helpers.c	\
+> +			 trace_helpers.c	\
+> +			 network_helpers.c	\
+> +			 testing_helpers.c	\
+> +			 btf_helpers.c		\
+> +			 cap_helpers.c		\
+> +			 unpriv_helpers.c 	\
+> +			 netlink_helpers.c	\
+> +			 test_loader.c		\
+> +			 xsk.c			\
+> +			 disasm.c		\
+> +			 json_writer.c 		\
+> +			 flow_dissector_load.h	\
+>  			 ip_check_defrag_frags.h
+>  TRUNNER_EXTRA_FILES := $(OUTPUT)/urandom_read $(OUTPUT)/bpf_testmod.ko	\
+>  		       $(OUTPUT)/liburandom_read.so			\
+> diff --git a/tools/testing/selftests/bpf/netlink_helpers.c b/tools/testing/selftests/bpf/netlink_helpers.c
+> new file mode 100644
+> index 000000000000..caf36eb1d032
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/netlink_helpers.c
+> @@ -0,0 +1,358 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/* Taken & modified from iproute2's libnetlink.c
+> + * Authors: Alexey Kuznetsov, <kuznet@ms2.inr.ac.ru>
+> + */
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <time.h>
+> +#include <sys/socket.h>
+> +
+> +#include "netlink_helpers.h"
+> +
+> +static int rcvbuf = 1024 * 1024;
+> +
+> +void rtnl_close(struct rtnl_handle *rth)
+> +{
+> +	if (rth->fd >= 0) {
+> +		close(rth->fd);
+> +		rth->fd = -1;
+> +	}
+> +}
+> +
+> +int rtnl_open_byproto(struct rtnl_handle *rth, unsigned int subscriptions,
+> +		      int protocol)
+> +{
+> +	socklen_t addr_len;
+> +	int sndbuf = 32768;
+> +	int one = 1;
+> +
+> +	memset(rth, 0, sizeof(*rth));
+> +	rth->proto = protocol;
+> +	rth->fd = socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, protocol);
+> +	if (rth->fd < 0) {
+> +		perror("Cannot open netlink socket");
+> +		return -1;
+> +	}
+> +	if (setsockopt(rth->fd, SOL_SOCKET, SO_SNDBUF,
+> +		       &sndbuf, sizeof(sndbuf)) < 0) {
+> +		perror("SO_SNDBUF");
+> +		goto err;
+> +	}
+> +	if (setsockopt(rth->fd, SOL_SOCKET, SO_RCVBUF,
+> +		       &rcvbuf, sizeof(rcvbuf)) < 0) {
+> +		perror("SO_RCVBUF");
+> +		goto err;
+> +	}
+> +
+> +	/* Older kernels may no support extended ACK reporting */
+> +	setsockopt(rth->fd, SOL_NETLINK, NETLINK_EXT_ACK,
+> +		   &one, sizeof(one));
+> +
+> +	memset(&rth->local, 0, sizeof(rth->local));
+> +	rth->local.nl_family = AF_NETLINK;
+> +	rth->local.nl_groups = subscriptions;
+> +
+> +	if (bind(rth->fd, (struct sockaddr *)&rth->local,
+> +		 sizeof(rth->local)) < 0) {
+> +		perror("Cannot bind netlink socket");
+> +		goto err;
+> +	}
+> +	addr_len = sizeof(rth->local);
+> +	if (getsockname(rth->fd, (struct sockaddr *)&rth->local,
+> +			&addr_len) < 0) {
+> +		perror("Cannot getsockname");
+> +		goto err;
+> +	}
+> +	if (addr_len != sizeof(rth->local)) {
+> +		fprintf(stderr, "Wrong address length %d\n", addr_len);
+> +		goto err;
+> +	}
+> +	if (rth->local.nl_family != AF_NETLINK) {
+> +		fprintf(stderr, "Wrong address family %d\n",
+> +			rth->local.nl_family);
+> +		goto err;
+> +	}
+> +	rth->seq = time(NULL);
+> +	return 0;
+> +err:
+> +	rtnl_close(rth);
+> +	return -1;
+> +}
+> +
+> +int rtnl_open(struct rtnl_handle *rth, unsigned int subscriptions)
+> +{
+> +	return rtnl_open_byproto(rth, subscriptions, NETLINK_ROUTE);
+> +}
+> +
+> +static int __rtnl_recvmsg(int fd, struct msghdr *msg, int flags)
+> +{
+> +	int len;
+> +
+> +	do {
+> +		len = recvmsg(fd, msg, flags);
+> +	} while (len < 0 && (errno == EINTR || errno == EAGAIN));
+> +	if (len < 0) {
+> +		fprintf(stderr, "netlink receive error %s (%d)\n",
+> +			strerror(errno), errno);
+> +		return -errno;
+> +	}
+> +	if (len == 0) {
+> +		fprintf(stderr, "EOF on netlink\n");
+> +		return -ENODATA;
+> +	}
+> +	return len;
+> +}
+> +
+> +static int rtnl_recvmsg(int fd, struct msghdr *msg, char **answer)
+> +{
+> +	struct iovec *iov = msg->msg_iov;
+> +	char *buf;
+> +	int len;
+> +
+> +	iov->iov_base = NULL;
+> +	iov->iov_len = 0;
+> +
+> +	len = __rtnl_recvmsg(fd, msg, MSG_PEEK | MSG_TRUNC);
+> +	if (len < 0)
+> +		return len;
+> +	if (len < 32768)
+> +		len = 32768;
+> +	buf = malloc(len);
+> +	if (!buf) {
+> +		fprintf(stderr, "malloc error: not enough buffer\n");
+> +		return -ENOMEM;
+> +	}
+> +	iov->iov_base = buf;
+> +	iov->iov_len = len;
+> +	len = __rtnl_recvmsg(fd, msg, 0);
+> +	if (len < 0) {
+> +		free(buf);
+> +		return len;
+> +	}
+> +	if (answer)
+> +		*answer = buf;
+> +	else
+> +		free(buf);
+> +	return len;
+> +}
+> +
+> +static void rtnl_talk_error(struct nlmsghdr *h, struct nlmsgerr *err,
+> +			    nl_ext_ack_fn_t errfn)
+> +{
+> +	fprintf(stderr, "RTNETLINK answers: %s\n",
+> +		strerror(-err->error));
+> +}
+> +
+> +static int __rtnl_talk_iov(struct rtnl_handle *rtnl, struct iovec *iov,
+> +			   size_t iovlen, struct nlmsghdr **answer,
+> +			   bool show_rtnl_err, nl_ext_ack_fn_t errfn)
+> +{
+> +	struct sockaddr_nl nladdr = { .nl_family = AF_NETLINK };
+> +	struct iovec riov;
+> +	struct msghdr msg = {
+> +		.msg_name	= &nladdr,
+> +		.msg_namelen	= sizeof(nladdr),
+> +		.msg_iov	= iov,
+> +		.msg_iovlen	= iovlen,
+> +	};
+> +	unsigned int seq = 0;
+> +	struct nlmsghdr *h;
+> +	int i, status;
+> +	char *buf;
+> +
+> +	for (i = 0; i < iovlen; i++) {
+> +		h = iov[i].iov_base;
+> +		h->nlmsg_seq = seq = ++rtnl->seq;
+> +		if (answer == NULL)
+> +			h->nlmsg_flags |= NLM_F_ACK;
+> +	}
+> +	status = sendmsg(rtnl->fd, &msg, 0);
+> +	if (status < 0) {
+> +		perror("Cannot talk to rtnetlink");
+> +		return -1;
+> +	}
+> +	/* change msg to use the response iov */
+> +	msg.msg_iov = &riov;
+> +	msg.msg_iovlen = 1;
+> +	i = 0;
+> +	while (1) {
+> +next:
+> +		status = rtnl_recvmsg(rtnl->fd, &msg, &buf);
+> +		++i;
+> +		if (status < 0)
+> +			return status;
+> +		if (msg.msg_namelen != sizeof(nladdr)) {
+> +			fprintf(stderr,
+> +				"Sender address length == %d!\n",
+> +				msg.msg_namelen);
+> +			exit(1);
+> +		}
+> +		for (h = (struct nlmsghdr *)buf; status >= sizeof(*h); ) {
+> +			int len = h->nlmsg_len;
+> +			int l = len - sizeof(*h);
+> +
+> +			if (l < 0 || len > status) {
+> +				if (msg.msg_flags & MSG_TRUNC) {
+> +					fprintf(stderr, "Truncated message!\n");
+> +					free(buf);
+> +					return -1;
+> +				}
+> +				fprintf(stderr,
+> +					"Malformed message: len=%d!\n",
+> +					len);
+> +				exit(1);
+> +			}
+> +			if (nladdr.nl_pid != 0 ||
+> +			    h->nlmsg_pid != rtnl->local.nl_pid ||
+> +			    h->nlmsg_seq > seq || h->nlmsg_seq < seq - iovlen) {
+> +				/* Don't forget to skip that message. */
+> +				status -= NLMSG_ALIGN(len);
+> +				h = (struct nlmsghdr *)((char *)h + NLMSG_ALIGN(len));
+> +				continue;
+> +			}
+> +			if (h->nlmsg_type == NLMSG_ERROR) {
+> +				struct nlmsgerr *err = (struct nlmsgerr *)NLMSG_DATA(h);
+> +				int error = err->error;
+> +
+> +				if (l < sizeof(struct nlmsgerr)) {
+> +					fprintf(stderr, "ERROR truncated\n");
+> +					free(buf);
+> +					return -1;
+> +				}
+> +				if (error) {
+> +					errno = -error;
+> +					if (rtnl->proto != NETLINK_SOCK_DIAG &&
+> +					    show_rtnl_err)
+> +						rtnl_talk_error(h, err, errfn);
+> +				}
+> +				if (i < iovlen) {
+> +					free(buf);
+> +					goto next;
+> +				}
+> +				if (error) {
+> +					free(buf);
+> +					return -i;
+> +				}
+> +				if (answer)
+> +					*answer = (struct nlmsghdr *)buf;
+> +				else
+> +					free(buf);
+> +				return 0;
+> +			}
+> +			if (answer) {
+> +				*answer = (struct nlmsghdr *)buf;
+> +				return 0;
+> +			}
+> +			fprintf(stderr, "Unexpected reply!\n");
+> +			status -= NLMSG_ALIGN(len);
+> +			h = (struct nlmsghdr *)((char *)h + NLMSG_ALIGN(len));
+> +		}
+> +		free(buf);
+> +		if (msg.msg_flags & MSG_TRUNC) {
+> +			fprintf(stderr, "Message truncated!\n");
+> +			continue;
+> +		}
+> +		if (status) {
+> +			fprintf(stderr, "Remnant of size %d!\n", status);
+> +			exit(1);
+> +		}
+> +	}
+> +}
+> +
+> +static int __rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
+> +		       struct nlmsghdr **answer, bool show_rtnl_err,
+> +		       nl_ext_ack_fn_t errfn)
+> +{
+> +	struct iovec iov = {
+> +		.iov_base	= n,
+> +		.iov_len	= n->nlmsg_len,
+> +	};
+> +
+> +	return __rtnl_talk_iov(rtnl, &iov, 1, answer, show_rtnl_err, errfn);
+> +}
+> +
+> +int rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
+> +	      struct nlmsghdr **answer)
+> +{
+> +	return __rtnl_talk(rtnl, n, answer, true, NULL);
+> +}
+> +
+> +int addattr(struct nlmsghdr *n, int maxlen, int type)
+> +{
+> +	return addattr_l(n, maxlen, type, NULL, 0);
+> +}
+> +
+> +int addattr8(struct nlmsghdr *n, int maxlen, int type, __u8 data)
+> +{
+> +	return addattr_l(n, maxlen, type, &data, sizeof(__u8));
+> +}
+> +
+> +int addattr16(struct nlmsghdr *n, int maxlen, int type, __u16 data)
+> +{
+> +	return addattr_l(n, maxlen, type, &data, sizeof(__u16));
+> +}
+> +
+> +int addattr32(struct nlmsghdr *n, int maxlen, int type, __u32 data)
+> +{
+> +	return addattr_l(n, maxlen, type, &data, sizeof(__u32));
+> +}
+> +
+> +int addattr64(struct nlmsghdr *n, int maxlen, int type, __u64 data)
+> +{
+> +	return addattr_l(n, maxlen, type, &data, sizeof(__u64));
+> +}
+> +
+> +int addattrstrz(struct nlmsghdr *n, int maxlen, int type, const char *str)
+> +{
+> +	return addattr_l(n, maxlen, type, str, strlen(str)+1);
+> +}
+> +
+> +int addattr_l(struct nlmsghdr *n, int maxlen, int type, const void *data,
+> +	      int alen)
+> +{
+> +	int len = RTA_LENGTH(alen);
+> +	struct rtattr *rta;
+> +
+> +	if (NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len) > maxlen) {
+> +		fprintf(stderr, "%s: Message exceeded bound of %d\n",
+> +			__func__, maxlen);
+> +		return -1;
+> +	}
+> +	rta = NLMSG_TAIL(n);
+> +	rta->rta_type = type;
+> +	rta->rta_len = len;
+> +	if (alen)
+> +		memcpy(RTA_DATA(rta), data, alen);
+> +	n->nlmsg_len = NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len);
+> +	return 0;
+> +}
+> +
+> +int addraw_l(struct nlmsghdr *n, int maxlen, const void *data, int len)
+> +{
+> +	if (NLMSG_ALIGN(n->nlmsg_len) + NLMSG_ALIGN(len) > maxlen) {
+> +		fprintf(stderr, "%s: Message exceeded bound of %d\n",
+> +			__func__, maxlen);
+> +		return -1;
+> +	}
+> +
+> +	memcpy(NLMSG_TAIL(n), data, len);
+> +	memset((void *) NLMSG_TAIL(n) + len, 0, NLMSG_ALIGN(len) - len);
+> +	n->nlmsg_len = NLMSG_ALIGN(n->nlmsg_len) + NLMSG_ALIGN(len);
+> +	return 0;
+> +}
+> +
+> +struct rtattr *addattr_nest(struct nlmsghdr *n, int maxlen, int type)
+> +{
+> +	struct rtattr *nest = NLMSG_TAIL(n);
+> +
+> +	addattr_l(n, maxlen, type, NULL, 0);
+> +	return nest;
+> +}
+> +
+> +int addattr_nest_end(struct nlmsghdr *n, struct rtattr *nest)
+> +{
+> +	nest->rta_len = (void *)NLMSG_TAIL(n) - (void *)nest;
+> +	return n->nlmsg_len;
+> +}
+> diff --git a/tools/testing/selftests/bpf/netlink_helpers.h b/tools/testing/selftests/bpf/netlink_helpers.h
+> new file mode 100644
+> index 000000000000..68116818a47e
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/netlink_helpers.h
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +#ifndef NETLINK_HELPERS_H
+> +#define NETLINK_HELPERS_H
+> +
+> +#include <string.h>
+> +#include <linux/netlink.h>
+> +#include <linux/rtnetlink.h>
+> +
+> +struct rtnl_handle {
+> +	int			fd;
+> +	struct sockaddr_nl	local;
+> +	struct sockaddr_nl	peer;
+> +	__u32			seq;
+> +	__u32			dump;
+> +	int			proto;
+> +	FILE			*dump_fp;
+> +#define RTNL_HANDLE_F_LISTEN_ALL_NSID		0x01
+> +#define RTNL_HANDLE_F_SUPPRESS_NLERR		0x02
+> +#define RTNL_HANDLE_F_STRICT_CHK		0x04
+> +	int			flags;
+> +};
+> +
+> +#define NLMSG_TAIL(nmsg) \
+> +	((struct rtattr *) (((void *) (nmsg)) + NLMSG_ALIGN((nmsg)->nlmsg_len)))
+> +
+> +typedef int (*nl_ext_ack_fn_t)(const char *errmsg, uint32_t off,
+> +			       const struct nlmsghdr *inner_nlh);
+> +
+> +int rtnl_open(struct rtnl_handle *rth, unsigned int subscriptions)
+> +	      __attribute__((warn_unused_result));
+> +void rtnl_close(struct rtnl_handle *rth);
+> +int rtnl_talk(struct rtnl_handle *rtnl, struct nlmsghdr *n,
+> +	      struct nlmsghdr **answer)
+> +	      __attribute__((warn_unused_result));
+> +
+> +int addattr(struct nlmsghdr *n, int maxlen, int type);
+> +int addattr8(struct nlmsghdr *n, int maxlen, int type, __u8 data);
+> +int addattr16(struct nlmsghdr *n, int maxlen, int type, __u16 data);
+> +int addattr32(struct nlmsghdr *n, int maxlen, int type, __u32 data);
+> +int addattr64(struct nlmsghdr *n, int maxlen, int type, __u64 data);
+> +int addattrstrz(struct nlmsghdr *n, int maxlen, int type, const char *data);
+> +int addattr_l(struct nlmsghdr *n, int maxlen, int type, const void *data, int alen);
+> +int addraw_l(struct nlmsghdr *n, int maxlen, const void *data, int len);
+> +struct rtattr *addattr_nest(struct nlmsghdr *n, int maxlen, int type);
+> +int addattr_nest_end(struct nlmsghdr *n, struct rtattr *nest);
+> +#endif /* NETLINK_HELPERS_H */
+> -- 
+> 2.34.1
+> 
 
