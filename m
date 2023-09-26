@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-36195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E007AE3BC
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 04:47:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CF477AE3BE
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 04:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 735161C2083C
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 02:47:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id DAA5E1C20444
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 02:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57961100;
-	Tue, 26 Sep 2023 02:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8947F;
+	Tue, 26 Sep 2023 02:47:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA357F
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 02:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587AB1100
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 02:47:25 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D92FF10A
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:47:09 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E545F10A
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:47:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695696428;
+	s=mimecast20190719; t=1695696443;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PbkEy7nXr1l5VA1EBNnZyo/vTZ0cPvoDisYtJVR0B78=;
-	b=LoKi+dsMjd/hRh/rWGKH++5GB1vbdVqxAo8s/Eyj1PvCwtxsAkAa94aPLrjqUAtR6fG6E2
-	N6QS7Q2K93s3FgQgSAvrZDtwiLavLnZtt1KY6Cx9B35zstZYnRcXtJtVAJukW8qTyc0JDO
-	wCSEBUy6ABQOvlNUe0MCrfrr+FhxTj0=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ItET0pMqX+FXEFMhJ+U3a+Ugm6kdUA0QYgdt+0g1epA=;
+	b=NsEThshGwCV3AzOIpbSqRUaw3bFthILlH6V/sAe+DKtASA5khBNq0TmVoQic9C3nRBksW0
+	rj/qmOFawdoQ2glJ7DuncKA6i0fyX220ePM8m6kC8DW0upqnvWmzkY5aLtgeKyoPfLEJz6
+	jIhDpmkShYFMDK/Ot4oiYxBFhbtOCXw=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-e62fqxzTO02MHedEKxMG6A-1; Mon, 25 Sep 2023 22:47:07 -0400
-X-MC-Unique: e62fqxzTO02MHedEKxMG6A-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5043c0cbb62so8855557e87.1
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:47:06 -0700 (PDT)
+ us-mta-645--pITxQ3gPsWjJ5olCYPGHQ-1; Mon, 25 Sep 2023 22:47:21 -0400
+X-MC-Unique: -pITxQ3gPsWjJ5olCYPGHQ-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5030ed95acdso11579849e87.2
+        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:47:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695696425; x=1696301225;
+        d=1e100.net; s=20230601; t=1695696440; x=1696301240;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PbkEy7nXr1l5VA1EBNnZyo/vTZ0cPvoDisYtJVR0B78=;
-        b=Yi0rP5fq4IJ1RHDU3KhRjsBD/k3D9hsFBeT5YjEIFpugJpaoTEHweewlKqkomn4D5c
-         NqE6P3ErZyJUm9MbICYoAaq9Fkkmh+sRy72UreqE+zcLP+DGuf7R8I67OOhAzjysvcP7
-         g2sulIi6KG5X0ThLxEZkXUjhbU5C9tRN1Gx3K8aGb69LIeu0ClvwJf5BROk1DtmNUxU9
-         NTAgAPM7YJh8/PyRdPvAgndVnzxlK8cNQ+TeyQyizcOBWbQWqMIgYnGqxE6eVKOtsW6D
-         r16gQ4xlX/AcMe7/0TKBPMLXLY37BVse/HMX7SULAX7QGhIW2q5LQkvZvq3Kv+KWhdqG
-         mFzg==
-X-Gm-Message-State: AOJu0YwZAVgWMHEZNFDpDCE8gpU+wsavStAiGML+8ar6HDW/0teC5g16
-	1/kBjjthdCnX/fvlV7aslgRiI6WG/2H5KPNNj8+5VNgGwZY0ov5Yq2VCfKDgIguh0wb+9rOV0aT
-	L3EaHMGrQGJLytUSMdOFQZvLTvJtQ1AYh
-X-Received: by 2002:a05:6512:3daa:b0:503:1adf:b4d5 with SMTP id k42-20020a0565123daa00b005031adfb4d5mr8558589lfv.52.1695696425634;
-        Mon, 25 Sep 2023 19:47:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHCEVaBqO/+URj99AR2MxQjceBS7mj2Mlw1O/b53LZJbHeEMTYn3ctrlVFyFihUW9jZ0zcY9enbbfrCL1KLUJg=
-X-Received: by 2002:a05:6512:3daa:b0:503:1adf:b4d5 with SMTP id
- k42-20020a0565123daa00b005031adfb4d5mr8558574lfv.52.1695696425334; Mon, 25
- Sep 2023 19:47:05 -0700 (PDT)
+        bh=ItET0pMqX+FXEFMhJ+U3a+Ugm6kdUA0QYgdt+0g1epA=;
+        b=NxjERWAAy4yXAdDUloDlYH0uZz8CxD14PHEUurC4ybS+jau7KNTnzENLHlYS/NKC8I
+         XFUJz+rFPMlnu6SnF6ZKPdx+LcAFYEJsyJb0HVMT6mnyv5HRC7gvBKfzkA27mTh61bww
+         1Wg8l8rXkUpd/rJ4dfRLDIAt305JTb/1nlSVdaInH5isGplpwA/ZgW7JLn31QzfqrrTc
+         KoXeQgnW42jvJPQStyO377Kw/TXfnPcwYw6mNUMMsQ41WM7qy87E/PZE92FUV2My1TtE
+         ezeXqH7T2ersg6zuhsbrbC2Ri+rC6k2WFW9hf74WhDVLXElvj0h8SysFSifRMJMhhTaG
+         V+4A==
+X-Gm-Message-State: AOJu0YxODdfecjdLS8vJXrmz0baIKzwJ7BWNonncZtdJUj3HFSsH3RrS
+	AzexSmVax0K48S3bBqWvlLX9J+dE88EWtLCRZ59rsaIEnXYQJ4IDOqayJt0ldVvZT0eQ8/IAEGn
+	TUoQL2s5Wk7EGFHM5oKcrzPlr0NFe89Xf
+X-Received: by 2002:a05:6512:29a:b0:503:303:9e2d with SMTP id j26-20020a056512029a00b0050303039e2dmr6664863lfp.5.1695696439800;
+        Mon, 25 Sep 2023 19:47:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEVfoDQ70MvGrrFuSM5F4u5jc1N+fSkvSpE6P8ei76cf78SA8yD0wv/BtCLlpJJLc55YsUP/ur6WGFsVmTMMm4=
+X-Received: by 2002:a05:6512:29a:b0:503:303:9e2d with SMTP id
+ j26-20020a056512029a00b0050303039e2dmr6664849lfp.5.1695696439422; Mon, 25 Sep
+ 2023 19:47:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230923170540.1447301-1-lulu@redhat.com>
-In-Reply-To: <20230923170540.1447301-1-lulu@redhat.com>
+References: <20230923170540.1447301-1-lulu@redhat.com> <20230923170540.1447301-6-lulu@redhat.com>
+In-Reply-To: <20230923170540.1447301-6-lulu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 26 Sep 2023 10:46:54 +0800
-Message-ID: <CACGkMEvx5V8+-LZa8-G4VCXYiJVm0DL8pu_Ao0rvPtK48-FTDQ@mail.gmail.com>
-Subject: Re: [RFC 0/7] vdpa: Add support for iommufd
+Date: Tue, 26 Sep 2023 10:47:08 +0800
+Message-ID: <CACGkMEtWhYPy==_OEEEO=cV7A5Wv-UGMt7FvPeMW4goNtO51FA@mail.gmail.com>
+Subject: Re: [RFC 5/7] vdpa: Add new vdpa_config_ops
 To: Cindy Lu <lulu@redhat.com>
 Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
 	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
@@ -82,103 +82,106 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Sep 24, 2023 at 1:05=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
+On Sun, Sep 24, 2023 at 1:06=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
 >
-> Hi All
-> Really apologize for the delay, this is the draft RFC for
-> iommufd support for vdpa, This code provides the basic function
-> for iommufd support
+> Add new vdpa_config_ops to support iommufd
 >
-> The code was tested and passed in device vdpa_sim_net
-> The qemu code is
-> https://gitlab.com/lulu6/gitlabqemutmp/-/tree/iommufdRFC
-> The kernel code is
-> https://gitlab.com/lulu6/vhost/-/tree/iommufdRFC
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  include/linux/vdpa.h | 34 +++++++++++++++++++++++++++++++++-
+>  1 file changed, 33 insertions(+), 1 deletion(-)
 >
-> ToDo
-> 1. this code is out of date and needs to clean and rebase on the latest c=
-ode
-> 2. this code has some workaround, I Skip the check for
-> iommu_group and CACHE_COHERENCY, also some misc issues like need to add
-> mutex for iommfd operations
-> 3. only test in emulated device, other modes not tested yet
+> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+> index 6d0f5e4e82c2..4ada5bd6f90e 100644
+> --- a/include/linux/vdpa.h
+> +++ b/include/linux/vdpa.h
+> @@ -5,6 +5,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/device.h>
+>  #include <linux/interrupt.h>
+> +#include <linux/iommufd.h>
+>  #include <linux/vhost_iotlb.h>
+>  #include <linux/virtio_net.h>
+>  #include <linux/if_ether.h>
+> @@ -91,6 +92,12 @@ struct vdpa_device {
+>         struct vdpa_mgmt_dev *mdev;
+>         unsigned int ngroups;
+>         unsigned int nas;
+> +       struct iommufd_access *iommufd_access;
+> +       struct iommufd_device *iommufd_device;
+> +       struct iommufd_ctx *iommufd_ictx;
+> +       unsigned long *vq_bitmap;
+> +       atomic_t iommufd_users;
+> +       bool iommufd_attached;
+>  };
 >
-> After addressed these problems I will send out a new version for RFC. I w=
-ill
-> provide the code in 3 weeks
+>  /**
+> @@ -282,6 +289,15 @@ struct vdpa_map_file {
+>   *                             @iova: iova to be unmapped
+>   *                             @size: size of the area
+>   *                             Returns integer: success (0) or error (< =
+0)
+> + * @bind_iommufd:              use vdpa_iommufd_physical_bind for an IOM=
+MU
+> + *                             backed device.
+> + *                             otherwise use vdpa_iommufd_emulated_bind
+> + * @unbind_iommufd:            use vdpa_iommufd_physical_unbind for an I=
+OMMU
+> + *                             backed device.
+> + *                             otherwise, use vdpa_iommufd_emulated_unbi=
+nd
+> + * @attach_ioas:               use vdpa_iommufd_physical_attach_ioas for=
+ an
+> + *                             IOMMU backed device.
+> + * @detach_ioas:               Opposite of attach_ioas
 
-Something more needs to be done after a quick glance at the codes.
+Those should be marked as mandatory only for parents with specific
+translations (e.g simulator and mlx5_vdpa).
 
-1) The support for device with platform IOMMU support
-2) The support for multiple ASes per device
-
-...
+Or anything I missed?
 
 Thanks
 
+
+>   * @free:                      Free resources that belongs to vDPA (opti=
+onal)
+>   *                             @vdev: vdpa device
+>   */
+> @@ -341,6 +357,12 @@ struct vdpa_config_ops {
+>                          u64 iova, u64 size);
+>         int (*set_group_asid)(struct vdpa_device *vdev, unsigned int grou=
+p,
+>                               unsigned int asid);
+> +       /* IOMMUFD ops */
+> +       int (*bind_iommufd)(struct vdpa_device *vdev, struct iommufd_ctx =
+*ictx,
+> +                           u32 *out_device_id);
+> +       void (*unbind_iommufd)(struct vdpa_device *vdev);
+> +       int (*attach_ioas)(struct vdpa_device *vdev, u32 *pt_id);
+> +       int (*detach_ioas)(struct vdpa_device *vdev);
 >
-> Thanks
-> Cindy
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> The test step is
-> 1. create vdpa_sim device
-> ...
-> vdpa dev add name vdpa15 mgmtdev vdpasim_net
-> ...
-> 2. load the VM with the command
->   -object iommufd,id=3Diommufd0 \
->   -device virtio-net-pci,netdev=3Dvhost-vdpa1,disable-legacy=3Don,disable=
--modern=3Doff\
->   -netdev type=3Dvhost-vdpa,vhostdev=3D/dev/vhost-vdpa-0,id=3Dvhost-vdpa1=
-,iommufd=3Diommufd0\
+>         /* Free device resources */
+>         void (*free)(struct vdpa_device *vdev);
+> @@ -510,4 +532,14 @@ struct vdpa_mgmt_dev {
+>  int vdpa_mgmtdev_register(struct vdpa_mgmt_dev *mdev);
+>  void vdpa_mgmtdev_unregister(struct vdpa_mgmt_dev *mdev);
 >
-> 3. in guest VM you can find the vdpa_sim port works well.
-> [root@ubuntunew ~]# ifconfig eth0
-> eth0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         inet6 fe80::5054:ff:fe12:3456  prefixlen 64  scopeid 0x20<link>
->         ether 52:54:00:12:34:56  txqueuelen 1000  (Ethernet)
->         RX packets 53  bytes 9108 (8.8 KiB)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 53  bytes 9108 (8.8 KiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> [root@ubuntunew ~]# ./test.sh eth0
-> [  172.815279] pktgen: Packet Generator for packet performance testing. V=
-ersion: 2.75
-> Adding queue 0 of eth0
-> Configuring devices eth0@0
-> Running... ctrl^C to stop
->
-> [root@ubuntunew ~]# ifconfig eth0
-> eth0: flags=3D4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         inet6 fe80::5054:ff:fe12:3456  prefixlen 64  scopeid 0x20<link>
->         ether 52:54:00:12:34:56  txqueuelen 1000  (Ethernet)
->         RX packets 183455  bytes 11748533 (11.2 MiB)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 183473  bytes 11749685 (11.2 MiB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
->
-> Cindy Lu (7):
->   vhost/iommufd: Add the functions support iommufd
->   Kconfig: Add the new file vhost/iommufd
->   vhost: Add 3 new uapi to support iommufd
->   vdpa: change the map/unmap process to support iommufd
->   vdpa: Add new vdpa_config_ops
->   vdpa_sim :Add support for iommufd
->   iommufd: Skip the CACHE_COHERENCY and iommu group check
->
->  drivers/iommu/iommufd/device.c   |   6 +-
->  drivers/vdpa/vdpa_sim/vdpa_sim.c |   8 ++
->  drivers/vhost/Kconfig            |   1 +
->  drivers/vhost/Makefile           |   1 +
->  drivers/vhost/iommufd.c          | 151 +++++++++++++++++++++++
->  drivers/vhost/vdpa.c             | 201 +++++++++++++++++++++++++++++++
->  drivers/vhost/vhost.h            |  21 ++++
->  include/linux/vdpa.h             |  34 +++++-
->  include/uapi/linux/vhost.h       |  71 +++++++++++
->  9 files changed, 490 insertions(+), 4 deletions(-)
->  create mode 100644 drivers/vhost/iommufd.c
->
+> -#endif /* _LINUX_VDPA_H */
+> +int vdpa_iommufd_physical_bind(struct vdpa_device *vdpa,
+> +                              struct iommufd_ctx *ictx, u32 *out_device_=
+id);
+> +void vdpa_iommufd_physical_unbind(struct vdpa_device *vdpa);
+> +int vdpa_iommufd_physical_attach_ioas(struct vdpa_device *vdpa, u32 *pt_=
+id);
+> +int vdpa_iommufd_emulated_bind(struct vdpa_device *vdpa,
+> +                              struct iommufd_ctx *ictx, u32 *out_device_=
+id);
+> +void vdpa_iommufd_emulated_unbind(struct vdpa_device *vdpa);
+> +int vdpa_iommufd_emulated_attach_ioas(struct vdpa_device *vdpa, u32 *pt_=
+id);
+> +int vdpa_iommufd_emulated_detach_ioas(struct vdpa_device *vdpa);
+> +
+> +#endif
 > --
 > 2.34.3
 >
