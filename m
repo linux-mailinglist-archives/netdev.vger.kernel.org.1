@@ -1,157 +1,621 @@
-Return-Path: <netdev+bounces-36372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BDB7AF66F
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 00:45:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79F67AF628
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 00:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 86AF32810D9
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:45:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id AFD2AB20A0E
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD539499AA;
-	Tue, 26 Sep 2023 22:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEB1499B6;
+	Tue, 26 Sep 2023 22:11:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101633FB18
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 22:45:48 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D44B2D7E
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 15:45:47 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QLVSkx013971
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:43:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=wxhXptQjJOrFJRtqV5IW758CNegeu5i64T5b0qElJjE=;
- b=Glz5fufCoDKrrXWWOExPkhCtT7Xr5cG10nUeIk/+QmzGbxl4IKEzbdJaa/sfxl3a4+O9
- BcH7WJFhbCbqyKu7adamvpcBArgOjMHCmsM182Uc1S7lUob6e7Q4asxCOBb23zodmbR5
- d1/aPgaLE3ujl8bvTodNsl0SvozBmAQ62Q4w4qQvGCJ8mM4CRbnNBFzJ97Xhmuiv9bHi
- /xZcMd84btQblu98SVKuveC9qrGMA/vGElT6DfX1XT974gPpvSzEhG22k5yHOi4lTFKH
- /mxihWtBSzlZ3pNp5/9wOfS5ZR8Nw49OxDdEr7cmBi4tZP8p8Hx3tuWyzmHwY7RpC8fx bw== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tc79eg8p4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:42:59 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38QK5cr0030736
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:42:59 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjjx70t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 21:42:59 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38QLguo13408538
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Sep 2023 21:42:56 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F77058055;
-	Tue, 26 Sep 2023 21:42:56 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D25EC58059;
-	Tue, 26 Sep 2023 21:42:55 +0000 (GMT)
-Received: from li-8d37cfcc-31b9-11b2-a85c-83226d7135c9.austin.ibm.com (unknown [9.24.4.46])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 Sep 2023 21:42:55 +0000 (GMT)
-From: Nick Child <nnac123@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: dwilder@us.ibm.com, wilder@us.ibm.com, pradeeps@linux.vnet.ibm.com,
-        nick.child@ibm.com, Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net] ibmveth: Remove condition to recompute TCP header checksum.
-Date: Tue, 26 Sep 2023 16:42:51 -0500
-Message-Id: <20230926214251.58503-1-nnac123@linux.ibm.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A849728E24;
+	Tue, 26 Sep 2023 22:11:10 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E15613AA6;
+	Tue, 26 Sep 2023 15:11:07 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-534659061afso2548029a12.3;
+        Tue, 26 Sep 2023 15:11:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695766266; x=1696371066; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bdIaoJw3nIpmwF6S7NNMH0if6G5+yXlWjE302gi7GAY=;
+        b=Tv+BuDhc5iaL/6EjvY0YNQlQtsdK63gKOutXYzAc6I2S7GOuRM3S2BcRZgVsI6T6vw
+         np/zkI2CZjDOmrlLWwLoD3GGrq4zIgdNIcl8LzJGbbmlpyUyyct7bIyFSHkl/5zHa39o
+         T7AN/U95/PCZPonjyn7zQvk82jB7/TwP2vgllcAfJ3C0/nIx5FtymxlN4+fdeh7yCF+9
+         xCAfzbOdPc3HcpW1Av4iVc658yJF81iZf7oWt7T5AkS1ccg4VIIPdBVXB/0a+YhKWm1x
+         1yihUSwkChFCMEYIFpfuE8oKn11KkApy7zlRwWoR/x7dy/cgIiiT+rJesd1dVeQ+JJMr
+         KJFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695766266; x=1696371066;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bdIaoJw3nIpmwF6S7NNMH0if6G5+yXlWjE302gi7GAY=;
+        b=U5vp1i/wX9C6DMHd5EC2qX1jHrPp5RlQ260Deku8SswuRfeGQT4sfH863wEC8BEh5O
+         G6MiZgb4yaC0kju9gZha0fHUPtz/3FLJF2OQ7KYE92zeqa0Jlc7hq8upWK45eaxydy1B
+         B4iTigf4TntwQC6oHu+1r6sZAu2mSC4o6bD+JYFg46kZTAXwpMeUPbRyRQZYvOMqhFIU
+         pJaHl4mh9LCI8bLid2oWZVyQJ2yZsYWCIcxxLVIdVoj1fDRqsExZwQpc9+SdfYRGEYzH
+         imVq20tSYWG+Y129vY2XzSBcasI1leaOJNXVLIdF4bIBHhFV9jHdhGJ8zSXuUzudFGI1
+         Pk/Q==
+X-Gm-Message-State: AOJu0YwflbdcHk52YlMMHULZ+lU3bc3Lyht0epldXg2G5NgU+Rj6yPZB
+	DcSrY6ex0f5f+sUvInljKu59xELo39Rg4WVGtTJOkObcBWI=
+X-Google-Smtp-Source: AGHT+IE1oQG4DApgdjrUV46wQBYjOo+pBMZZkHGc0fPo1AinR1A41FuK4yw7LU7UbNEF0gJFgSuJMkj+4R611iZZ+xg=
+X-Received: by 2002:a17:907:78d1:b0:9ae:6d0:84ec with SMTP id
+ kv17-20020a17090778d100b009ae06d084ecmr29042ejc.25.1695766265813; Tue, 26 Sep
+ 2023 15:11:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _OTYI6RadF0_25ZUwZ6AAKREon4rHPLt
-X-Proofpoint-ORIG-GUID: _OTYI6RadF0_25ZUwZ6AAKREon4rHPLt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-26_15,2023-09-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- spamscore=0 impostorscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0
- mlxlogscore=615 mlxscore=0 priorityscore=1501 clxscore=1011 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2309260184
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230919214800.3803828-1-andrii@kernel.org> <20230919214800.3803828-4-andrii@kernel.org>
+ <20230926-augen-biodiesel-fdb05e859aac@brauner>
+In-Reply-To: <20230926-augen-biodiesel-fdb05e859aac@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Tue, 26 Sep 2023 15:10:54 -0700
+Message-ID: <CAEf4BzaH64kkccc1P-hqQj6Mccr3Q6x059G=A95d=KfU=yBMJQ@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf-next 03/13] bpf: introduce BPF token object
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	keescook@chromium.org, lennart@poettering.net, kernel-team@meta.com, 
+	sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: David Wilder <dwilder@us.ibm.com>
+On Tue, Sep 26, 2023 at 9:21=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> On Tue, Sep 19, 2023 at 02:47:50PM -0700, Andrii Nakryiko wrote:
+> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
+> > allow delegating privileged BPF functionality, like loading a BPF
+> > program or creating a BPF map, from privileged process to a *trusted*
+> > unprivileged process, all while have a good amount of control over whic=
+h
+> > privileged operations could be performed using provided BPF token.
+> >
+> > This is achieved through mounting BPF FS instance with extra delegation
+> > mount options, which determine what operations are delegatable, and als=
+o
+> > constraining it to the owning user namespace (as mentioned in the
+> > previous patch).
+> >
+> > BPF token itself is just a derivative from BPF FS and can be created
+> > through a new bpf() syscall command, BPF_TOKEN_CREAT, which accepts
+> > a path specification (using the usual fd + string path combo) to a BPF
+> > FS mount. Currently, BPF token "inherits" delegated command, map types,
+> > prog type, and attach type bit sets from BPF FS as is. In the future,
+> > having an BPF token as a separate object with its own FD, we can allow
+> > to further restrict BPF token's allowable set of things either at the c=
+reation
+> > time or after the fact, allowing the process to guard itself further
+> > from, e.g., unintentionally trying to load undesired kind of BPF
+> > programs. But for now we keep things simple and just copy bit sets as i=
+s.
+> >
+> > When BPF token is created from BPF FS mount, we take reference to the
+> > BPF super block's owning user namespace, and then use that namespace fo=
+r
+> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
+> > capabilities that are normally only checked against init userns (using
+> > capable()), but now we check them using ns_capable() instead (if BPF
+> > token is provided). See bpf_token_capable() for details.
+> >
+> > Such setup means that BPF token in itself is not sufficient to grant BP=
+F
+> > functionality. User namespaced process has to *also* have necessary
+> > combination of capabilities inside that user namespace. So while
+> > previously CAP_BPF was useless when granted within user namespace, now
+> > it gains a meaning and allows container managers and sys admins to have
+> > a flexible control over which processes can and need to use BPF
+> > functionality within the user namespace (i.e., container in practice).
+> > And BPF FS delegation mount options and derived BPF tokens serve as
+> > a per-container "flag" to grant overall ability to use bpf() (plus furt=
+her
+> > restrict on which parts of bpf() syscalls are treated as namespaced).
+> >
+> > The alternative to creating BPF token object was:
+> >   a) not having any extra object and just pasing BPF FS path to each
+> >      relevant bpf() command. This seems suboptimal as it's racy (mount
+> >      under the same path might change in between checking it and using =
+it
+> >      for bpf() command). And also less flexible if we'd like to further
+> >      restrict ourselves compared to all the delegated functionality
+> >      allowed on BPF FS.
+> >   b) use non-bpf() interface, e.g., ioctl(), but otherwise also create
+> >      a dedicated FD that would represent a token-like functionality. Th=
+is
+> >      doesn't seem superior to having a proper bpf() command, so
+> >      BPF_TOKEN_CREATE was chosen.
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+> >  include/linux/bpf.h            |  42 ++++++++
+> >  include/uapi/linux/bpf.h       |  39 +++++++
+> >  kernel/bpf/Makefile            |   2 +-
+> >  kernel/bpf/inode.c             |   4 +-
+> >  kernel/bpf/syscall.c           |  17 +++
+> >  kernel/bpf/token.c             | 189 +++++++++++++++++++++++++++++++++
+> >  tools/include/uapi/linux/bpf.h |  39 +++++++
+> >  7 files changed, 330 insertions(+), 2 deletions(-)
+> >  create mode 100644 kernel/bpf/token.c
+> >
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index 026923a60cad..ae13538f5465 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -51,6 +51,8 @@ struct module;
+> >  struct bpf_func_state;
+> >  struct ftrace_ops;
+> >  struct cgroup;
+> > +struct bpf_token;
+> > +struct user_namespace;
+> >
+> >  extern struct idr btf_idr;
+> >  extern spinlock_t btf_idr_lock;
+> > @@ -1572,6 +1574,13 @@ struct bpf_mount_opts {
+> >       u64 delegate_attachs;
+> >  };
+> >
+> > +struct bpf_token {
+> > +     struct work_struct work;
+> > +     atomic64_t refcnt;
+> > +     struct user_namespace *userns;
+> > +     u64 allowed_cmds;
+> > +};
+> > +
+> >  struct bpf_struct_ops_value;
+> >  struct btf_member;
+> >
+> > @@ -2162,6 +2171,8 @@ static inline void bpf_map_dec_elem_count(struct =
+bpf_map *map)
+> >
+> >  extern int sysctl_unprivileged_bpf_disabled;
+> >
+> > +bool bpf_token_capable(const struct bpf_token *token, int cap);
+> > +
+> >  static inline bool bpf_allow_ptr_leaks(void)
+> >  {
+> >       return perfmon_capable();
+> > @@ -2196,6 +2207,14 @@ int bpf_link_new_fd(struct bpf_link *link);
+> >  struct bpf_link *bpf_link_get_from_fd(u32 ufd);
+> >  struct bpf_link *bpf_link_get_curr_or_next(u32 *id);
+> >
+> > +void bpf_token_inc(struct bpf_token *token);
+> > +void bpf_token_put(struct bpf_token *token);
+> > +int bpf_token_create(union bpf_attr *attr);
+> > +int bpf_token_new_fd(struct bpf_token *token);
+> > +struct bpf_token *bpf_token_get_from_fd(u32 ufd);
+> > +
+> > +bool bpf_token_allow_cmd(const struct bpf_token *token, enum bpf_cmd c=
+md);
+> > +
+> >  int bpf_obj_pin_user(u32 ufd, int path_fd, const char __user *pathname=
+);
+> >  int bpf_obj_get_user(int path_fd, const char __user *pathname, int fla=
+gs);
+> >
+> > @@ -2557,6 +2576,29 @@ static inline int bpf_obj_get_user(const char __=
+user *pathname, int flags)
+> >       return -EOPNOTSUPP;
+> >  }
+> >
+> > +static inline bool bpf_token_capable(const struct bpf_token *token, in=
+t cap)
+> > +{
+> > +     return capable(cap) || (cap !=3D CAP_SYS_ADMIN && capable(CAP_SYS=
+_ADMIN));
+> > +}
+> > +
+> > +static inline void bpf_token_inc(struct bpf_token *token)
+> > +{
+> > +}
+> > +
+> > +static inline void bpf_token_put(struct bpf_token *token)
+> > +{
+> > +}
+> > +
+> > +static inline int bpf_token_new_fd(struct bpf_token *token)
+> > +{
+> > +     return -EOPNOTSUPP;
+> > +}
+> > +
+> > +static inline struct bpf_token *bpf_token_get_from_fd(u32 ufd)
+> > +{
+> > +     return ERR_PTR(-EOPNOTSUPP);
+> > +}
+> > +
+> >  static inline void __dev_flush(void)
+> >  {
+> >  }
+> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > index 73b155e52204..36e98c6f8944 100644
+> > --- a/include/uapi/linux/bpf.h
+> > +++ b/include/uapi/linux/bpf.h
+> > @@ -847,6 +847,37 @@ union bpf_iter_link_info {
+> >   *           Returns zero on success. On error, -1 is returned and *er=
+rno*
+> >   *           is set appropriately.
+> >   *
+> > + * BPF_TOKEN_CREATE
+> > + *   Description
+> > + *           Create BPF token with embedded information about what
+> > + *           BPF-related functionality it allows:
+> > + *           - a set of allowed bpf() syscall commands;
+> > + *           - a set of allowed BPF map types to be created with
+> > + *           BPF_MAP_CREATE command, if BPF_MAP_CREATE itself is allow=
+ed;
+> > + *           - a set of allowed BPF program types and BPF program atta=
+ch
+> > + *           types to be loaded with BPF_PROG_LOAD command, if
+> > + *           BPF_PROG_LOAD itself is allowed.
+> > + *
+> > + *           BPF token is created (derived) from an instance of BPF FS=
+,
+> > + *           assuming it has necessary delegation mount options specif=
+ied.
+> > + *           BPF FS mount is specified with openat()-style path FD + s=
+tring.
+> > + *           This BPF token can be passed as an extra parameter to var=
+ious
+> > + *           bpf() syscall commands to grant BPF subsystem functionali=
+ty to
+> > + *           unprivileged processes.
+> > + *
+> > + *           When created, BPF token is "associated" with the owning
+> > + *           user namespace of BPF FS instance (super block) that it w=
+as
+> > + *           derived from, and subsequent BPF operations performed wit=
+h
+> > + *           BPF token would be performing capabilities checks (i.e.,
+> > + *           CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN) withi=
+n
+> > + *           that user namespace. Without BPF token, such capabilities
+> > + *           have to be granted in init user namespace, making bpf()
+> > + *           syscall incompatible with user namespace, for the most pa=
+rt.
+> > + *
+> > + *   Return
+> > + *           A new file descriptor (a nonnegative integer), or -1 if a=
+n
+> > + *           error occurred (in which case, *errno* is set appropriate=
+ly).
+> > + *
+> >   * NOTES
+> >   *   eBPF objects (maps and programs) can be shared between processes.
+> >   *
+> > @@ -901,6 +932,8 @@ enum bpf_cmd {
+> >       BPF_ITER_CREATE,
+> >       BPF_LINK_DETACH,
+> >       BPF_PROG_BIND_MAP,
+> > +     BPF_TOKEN_CREATE,
+> > +     __MAX_BPF_CMD,
+> >  };
+> >
+> >  enum bpf_map_type {
+> > @@ -1694,6 +1727,12 @@ union bpf_attr {
+> >               __u32           flags;          /* extra flags */
+> >       } prog_bind_map;
+> >
+> > +     struct { /* struct used by BPF_TOKEN_CREATE command */
+> > +             __u32           flags;
+> > +             __u32           bpffs_path_fd;
+> > +             __u64           bpffs_pathname;
+> > +     } token_create;
+> > +
+> >  } __attribute__((aligned(8)));
+> >
+> >  /* The description below is an attempt at providing documentation to e=
+BPF
+> > diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+> > index f526b7573e97..4ce95acfcaa7 100644
+> > --- a/kernel/bpf/Makefile
+> > +++ b/kernel/bpf/Makefile
+> > @@ -6,7 +6,7 @@ cflags-nogcse-$(CONFIG_X86)$(CONFIG_CC_IS_GCC) :=3D -fn=
+o-gcse
+> >  endif
+> >  CFLAGS_core.o +=3D $(call cc-disable-warning, override-init) $(cflags-=
+nogcse-yy)
+> >
+> > -obj-$(CONFIG_BPF_SYSCALL) +=3D syscall.o verifier.o inode.o helpers.o =
+tnum.o log.o
+> > +obj-$(CONFIG_BPF_SYSCALL) +=3D syscall.o verifier.o inode.o helpers.o =
+tnum.o log.o token.o
+> >  obj-$(CONFIG_BPF_SYSCALL) +=3D bpf_iter.o map_iter.o task_iter.o prog_=
+iter.o link_iter.o
+> >  obj-$(CONFIG_BPF_SYSCALL) +=3D hashtab.o arraymap.o percpu_freelist.o =
+bpf_lru_list.o lpm_trie.o map_in_map.o bloom_filter.o
+> >  obj-$(CONFIG_BPF_SYSCALL) +=3D local_storage.o queue_stack_maps.o ring=
+buf.o
+> > diff --git a/kernel/bpf/inode.c b/kernel/bpf/inode.c
+> > index 8f66b57d3546..82f11fbffd3e 100644
+> > --- a/kernel/bpf/inode.c
+> > +++ b/kernel/bpf/inode.c
+> > @@ -603,11 +603,13 @@ static int bpf_show_options(struct seq_file *m, s=
+truct dentry *root)
+> >  {
+> >       struct bpf_mount_opts *opts =3D root->d_sb->s_fs_info;
+> >       umode_t mode =3D d_inode(root)->i_mode & S_IALLUGO & ~S_ISVTX;
+> > +     u64 mask;
+> >
+> >       if (mode !=3D S_IRWXUGO)
+> >               seq_printf(m, ",mode=3D%o", mode);
+> >
+> > -     if (opts->delegate_cmds =3D=3D ~0ULL)
+> > +     mask =3D (1ULL << __MAX_BPF_CMD) - 1;
+> > +     if ((opts->delegate_cmds & mask) =3D=3D mask)
+> >               seq_printf(m, ",delegate_cmds=3Dany");
+> >       else if (opts->delegate_cmds)
+> >               seq_printf(m, ",delegate_cmds=3D0x%llx", opts->delegate_c=
+mds);
+> > diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> > index f024caee0bba..93338faa43d5 100644
+> > --- a/kernel/bpf/syscall.c
+> > +++ b/kernel/bpf/syscall.c
+> > @@ -5302,6 +5302,20 @@ static int bpf_prog_bind_map(union bpf_attr *att=
+r)
+> >       return ret;
+> >  }
+> >
+> > +#define BPF_TOKEN_CREATE_LAST_FIELD token_create.bpffs_pathname
+> > +
+> > +static int token_create(union bpf_attr *attr)
+> > +{
+> > +     if (CHECK_ATTR(BPF_TOKEN_CREATE))
+> > +             return -EINVAL;
+> > +
+> > +     /* no flags are supported yet */
+> > +     if (attr->token_create.flags)
+> > +             return -EINVAL;
+> > +
+> > +     return bpf_token_create(attr);
+> > +}
+> > +
+> >  static int __sys_bpf(int cmd, bpfptr_t uattr, unsigned int size)
+> >  {
+> >       union bpf_attr attr;
+> > @@ -5435,6 +5449,9 @@ static int __sys_bpf(int cmd, bpfptr_t uattr, uns=
+igned int size)
+> >       case BPF_PROG_BIND_MAP:
+> >               err =3D bpf_prog_bind_map(&attr);
+> >               break;
+> > +     case BPF_TOKEN_CREATE:
+> > +             err =3D token_create(&attr);
+> > +             break;
+> >       default:
+> >               err =3D -EINVAL;
+> >               break;
+> > diff --git a/kernel/bpf/token.c b/kernel/bpf/token.c
+> > new file mode 100644
+> > index 000000000000..f6ea3eddbee6
+> > --- /dev/null
+> > +++ b/kernel/bpf/token.c
+> > @@ -0,0 +1,189 @@
+> > +#include <linux/bpf.h>
+> > +#include <linux/vmalloc.h>
+> > +#include <linux/anon_inodes.h>
+> > +#include <linux/fdtable.h>
+> > +#include <linux/file.h>
+> > +#include <linux/fs.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/idr.h>
+> > +#include <linux/namei.h>
+> > +#include <linux/user_namespace.h>
+> > +
+> > +bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > +{
+> > +     /* BPF token allows ns_capable() level of capabilities */
+> > +     if (token) {
+> > +             if (ns_capable(token->userns, cap))
+> > +                     return true;
+> > +             if (cap !=3D CAP_SYS_ADMIN && ns_capable(token->userns, C=
+AP_SYS_ADMIN))
+> > +                     return true;
+> > +     }
+> > +     /* otherwise fallback to capable() checks */
+> > +     return capable(cap) || (cap !=3D CAP_SYS_ADMIN && capable(CAP_SYS=
+_ADMIN));
+> > +}
+> > +
+> > +void bpf_token_inc(struct bpf_token *token)
+> > +{
+> > +     atomic64_inc(&token->refcnt);
+> > +}
+> > +
+> > +static void bpf_token_free(struct bpf_token *token)
+> > +{
+> > +     put_user_ns(token->userns);
+> > +     kvfree(token);
+> > +}
+> > +
+> > +static void bpf_token_put_deferred(struct work_struct *work)
+> > +{
+> > +     struct bpf_token *token =3D container_of(work, struct bpf_token, =
+work);
+> > +
+> > +     bpf_token_free(token);
+> > +}
+> > +
+> > +void bpf_token_put(struct bpf_token *token)
+> > +{
+> > +     if (!token)
+> > +             return;
+> > +
+> > +     if (!atomic64_dec_and_test(&token->refcnt))
+> > +             return;
+> > +
+> > +     INIT_WORK(&token->work, bpf_token_put_deferred);
+> > +     schedule_work(&token->work);
+> > +}
+> > +
+> > +static int bpf_token_release(struct inode *inode, struct file *filp)
+> > +{
+> > +     struct bpf_token *token =3D filp->private_data;
+> > +
+> > +     bpf_token_put(token);
+> > +     return 0;
+> > +}
+> > +
+> > +static ssize_t bpf_dummy_read(struct file *filp, char __user *buf, siz=
+e_t siz,
+> > +                           loff_t *ppos)
+> > +{
+> > +     /* We need this handler such that alloc_file() enables
+> > +      * f_mode with FMODE_CAN_READ.
+> > +      */
+> > +     return -EINVAL;
+> > +}
+> > +
+> > +static ssize_t bpf_dummy_write(struct file *filp, const char __user *b=
+uf,
+> > +                            size_t siz, loff_t *ppos)
+> > +{
+> > +     /* We need this handler such that alloc_file() enables
+> > +      * f_mode with FMODE_CAN_WRITE.
+> > +      */
+> > +     return -EINVAL;
+> > +}
+> > +
+> > +static void bpf_token_show_fdinfo(struct seq_file *m, struct file *fil=
+p)
+> > +{
+> > +     struct bpf_token *token =3D filp->private_data;
+> > +     u64 mask;
+> > +
+> > +     mask =3D (1ULL << __MAX_BPF_CMD) - 1;
+> > +     if ((token->allowed_cmds & mask) =3D=3D mask)
+> > +             seq_printf(m, "allowed_cmds:\tany\n");
+> > +     else
+> > +             seq_printf(m, "allowed_cmds:\t0x%llx\n", token->allowed_c=
+mds);
+> > +}
+> > +
+> > +static const struct file_operations bpf_token_fops =3D {
+> > +     .release        =3D bpf_token_release,
+> > +     .read           =3D bpf_dummy_read,
+> > +     .write          =3D bpf_dummy_write,
+> > +     .show_fdinfo    =3D bpf_token_show_fdinfo,
+> > +};
+> > +
+> > +static struct bpf_token *bpf_token_alloc(void)
+> > +{
+> > +     struct bpf_token *token;
+> > +
+> > +     token =3D kvzalloc(sizeof(*token), GFP_USER);
+> > +     if (!token)
+> > +             return NULL;
+> > +
+> > +     atomic64_set(&token->refcnt, 1);
+> > +
+> > +     return token;
+> > +}
+> > +
+> > +int bpf_token_create(union bpf_attr *attr)
+> > +{
+> > +     struct path path;
+> > +     struct bpf_mount_opts *mnt_opts;
+> > +     struct bpf_token *token;
+> > +     int ret;
+> > +
+> > +     ret =3D user_path_at(attr->token_create.bpffs_path_fd,
+> > +                        u64_to_user_ptr(attr->token_create.bpffs_pathn=
+ame),
+> > +                        LOOKUP_FOLLOW | LOOKUP_EMPTY, &path);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     if (path.mnt->mnt_root !=3D path.dentry) {
+> > +             ret =3D -EINVAL;
+> > +             goto out;
+> > +     }
+> > +     ret =3D path_permission(&path, MAY_ACCESS);
+> > +     if (ret)
+> > +             goto out;
+> > +
+> > +     token =3D bpf_token_alloc();
+> > +     if (!token) {
+> > +             ret =3D -ENOMEM;
+> > +             goto out;
+> > +     }
+> > +
+> > +     /* remember bpffs owning userns for future ns_capable() checks */
+> > +     token->userns =3D get_user_ns(path.dentry->d_sb->s_user_ns);
+> > +
+> > +     mnt_opts =3D path.dentry->d_sb->s_fs_info;
+> > +     token->allowed_cmds =3D mnt_opts->delegate_cmds;
+> > +
+> > +     ret =3D bpf_token_new_fd(token);
+> > +     if (ret < 0)
+> > +             bpf_token_free(token);
+> > +out:
+> > +     path_put(&path);
+> > +     return ret;
+> > +}
+> > +
+> > +#define BPF_TOKEN_INODE_NAME "bpf-token"
+> > +
+> > +/* Alloc anon_inode and FD for prepared token.
+> > + * Returns fd >=3D 0 on success; negative error, otherwise.
+> > + */
+> > +int bpf_token_new_fd(struct bpf_token *token)
+> > +{
+> > +     return anon_inode_getfd(BPF_TOKEN_INODE_NAME, &bpf_token_fops, to=
+ken, O_CLOEXEC);
+>
+> It's unnecessary to use the anonymous inode infrastructure for bpf
+> tokens. It adds even more moving parts and makes reasoning about it even
+> harder. Just keep it all in bpffs. IIRC, something like the following
+> (broken, non-compiling draft) should work:
+>
+> /* bpf_token_file - get an unlinked file living in bpffs */
+> struct file *bpf_token_file(...)
+> {
+>         inode =3D bpf_get_inode(bpffs_mnt->mnt_sb, dir, mode);
+>         inode->i_op =3D &bpf_token_iop;
+>         inode->i_fop =3D &bpf_token_fops;
+>
+>         // some other stuff you might want or need
+>
+>         res =3D alloc_file_pseudo(inode, bpffs_mnt, "bpf-token", O_RDWR, =
+&bpf_token_fops);
+> }
+>
+> Now set your private data that you might need, reserve an fd, install
+> the file into the fdtable and return the fd. You should have an unlinked
+> bpffs file that serves as your bpf token.
 
-In some OVS environments the TCP pseudo header checksum may need to be
-recomputed. Currently this is only done when the interface instance is
-configured for "Trunk Mode". We found the issue also occurs in some
-Kubernetes environments, these environments do not use "Trunk Mode",
-therefor the condition is removed.
+Just to make sure I understand. You are saying that instead of having
+`struct bpf_token *` and passing that into internal APIs
+(bpf_token_capable() and bpf_token_allow_xxx()), I should just pass
+around `struct super_block *` representing BPF FS instance? Or `struct
+bpf_mount_opts *` maybe? Or 'struct vfsmount *'? (Any preferences
+here?). Is that right?
 
-Performance tests with this change show only a fractional decrease in
-throughput (< 0.2%).
+The point is not to have a struct bpf_token that keeps its own
+refcount, doesn't maintain its own allowed_xxx masks, and doesn't keep
+a refcnt on userns.
 
-Fixes: 7525de2516fb ("ibmveth: Set CHECKSUM_PARTIAL if NULL TCP CSUM.")
-Signed-off-by: David Wilder <dwilder@us.ibm.com>
-Reviewed-by: Nick Child <nnac123@linux.ibm.com>
----
-Hello, I (Nick Child) am submitting on behalf of the
-author (David Wilder) since he is having patch submission issues.
-Apologies for any inconvenience.
-
-
- drivers/net/ethernet/ibm/ibmveth.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-index 113fcb3e353e..748ee25cee8d 100644
---- a/drivers/net/ethernet/ibm/ibmveth.c
-+++ b/drivers/net/ethernet/ibm/ibmveth.c
-@@ -1303,24 +1303,23 @@ static void ibmveth_rx_csum_helper(struct sk_buff *skb,
- 	 * the user space for finding a flow. During this process, OVS computes
- 	 * checksum on the first packet when CHECKSUM_PARTIAL flag is set.
- 	 *
--	 * So, re-compute TCP pseudo header checksum when configured for
--	 * trunk mode.
-+	 * So, re-compute TCP pseudo header checksum.
- 	 */
-+
- 	if (iph_proto == IPPROTO_TCP) {
- 		struct tcphdr *tcph = (struct tcphdr *)(skb->data + iphlen);
-+
- 		if (tcph->check == 0x0000) {
- 			/* Recompute TCP pseudo header checksum  */
--			if (adapter->is_active_trunk) {
--				tcphdrlen = skb->len - iphlen;
--				if (skb_proto == ETH_P_IP)
--					tcph->check =
--					 ~csum_tcpudp_magic(iph->saddr,
--					iph->daddr, tcphdrlen, iph_proto, 0);
--				else if (skb_proto == ETH_P_IPV6)
--					tcph->check =
--					 ~csum_ipv6_magic(&iph6->saddr,
--					&iph6->daddr, tcphdrlen, iph_proto, 0);
--			}
-+			tcphdrlen = skb->len - iphlen;
-+			if (skb_proto == ETH_P_IP)
-+				tcph->check =
-+				 ~csum_tcpudp_magic(iph->saddr,
-+				iph->daddr, tcphdrlen, iph_proto, 0);
-+			else if (skb_proto == ETH_P_IPV6)
-+				tcph->check =
-+				 ~csum_ipv6_magic(&iph6->saddr,
-+				&iph6->daddr, tcphdrlen, iph_proto, 0);
- 			/* Setup SKB fields for checksum offload */
- 			skb_partial_csum_set(skb, iphlen,
- 					     offsetof(struct tcphdr, check));
--- 
-2.39.3
-
+Should I worry about refcounting of the super_block? It was a nice
+property that I could store bpf_token inside the program for some
+future checks that could happen during attach time after the BPF
+program is loaded and verified. How do I achieve the same if I need a
+super_block around? Is there some get/put-like APIs for super_block
+(or vfsmount?) that I can use for that? I'm sorry if it's stupid
+questions, just trying to cover all the ground before I reimplement
+portions of this patch set again. Thanks for understanding!
 
