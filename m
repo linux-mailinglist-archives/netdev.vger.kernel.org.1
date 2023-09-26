@@ -1,154 +1,225 @@
-Return-Path: <netdev+bounces-36359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A7C7AF581
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:47:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9F5C7AF596
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C5592282B65
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:47:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id DCE11282E78
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC09347AA;
-	Tue, 26 Sep 2023 20:47:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688103D990;
+	Tue, 26 Sep 2023 20:59:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826D423D7
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:47:36 +0000 (UTC)
-Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19BD126
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:47:34 -0700 (PDT)
-Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-6c4717c4745so19897600a34.0
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:47:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695761254; x=1696366054;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD542AB34
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:59:21 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B97219B1
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:59:19 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-99357737980so1189019866b.2
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:59:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1695761958; x=1696366758; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=GJ5a3zk1rHi4N82X3qGwLU8uWGH8yvH6bBrokHLs9o0=;
-        b=YRlJ3yljf+Y46iWfxewWKTGHbIx8UbNTOilbo11pka3nabAsyxiqdf/6NVhy4loI+u
-         r/jmy6PUpNHem8RmDdv0s/4U7LfrfKdhGRZ0UXqCkhH4LgBk4YoJnKkRzmY+MHdofxKY
-         gKd51N3koktT6aKLaGlHQbn/L//V1cBWiiE/pcPQSnOd3f0dGlA+e74Fr2+ZSMEoQQVY
-         Y0k8U+MZjKYFvc4jlBw4HXBrnUbtM8hBs2Ad8k2KAwlCFTiuGfZtTekkVlKFMKiojUa1
-         K160moknm24O1uOZV1t3NJ1yKHWzrqQwzXf37HMXgUqehXHWI1sBP0sB1c2lDzoG3h5k
-         H8gw==
-X-Gm-Message-State: AOJu0YxsmFTJiar6+PP4CScKjcrGcQ/riZkRey7l2OZTJqWBs+p8oYTS
-	rsDpvNIX7qKZMrwZ2Fm0AFAJqrKIzu+bsV+d6K+T5O11oY18
-X-Google-Smtp-Source: AGHT+IGZgqz85XcIEHVAoIFbsTTXwuT11bJzo5JFaYBR0VmJ3pBMeSTFPQi6zR14HqQowAAxRfYxIOOzL/RG+FAvKErLj9lYn44X
+        bh=nbm0fl6t7js3aniuoVoiV7uhTyT8SoKhMhmvTfEHKF0=;
+        b=W5eRTqGUHYRciSsKpzlaqpaBB6xXZUH34WS7vYCduqPlqRkZsQuLy+aake7oJ50f7R
+         oOS+jscmDiEDu6lq8RZt7kEk/HRjvhtOFLhhXAJ0AhucjtggdzJTXNT01bra2VrgfqDt
+         YLVTt7IMsC4FONdT1/XlA/V87sOUhrAshhNhRCn5JAplNQuzO3fPrDj75p5s4lodjbyb
+         AhkPO1I7XixIOSWDROP4YB+zbEwjQvmnTG4pqSqgFgjFxqrW9S1toA5KWsLQD8uyRKlK
+         AeKJOQKO2uvB+xoUpH+IOtQMGCAmK1/B6vcv7Y2pmT1S+WVbqyLdKzIBqvbWDrUdlyk+
+         nzNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695761958; x=1696366758;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nbm0fl6t7js3aniuoVoiV7uhTyT8SoKhMhmvTfEHKF0=;
+        b=CCLVwUsBG5AG0GVszQihduV2mEkXvVYQT646Yv8gchQNQ8aGb/cD8nqWFXeQFiUz7q
+         XZqDHavJGy88DxIKo1gHq41qhwS7R0MTJ+8sre3qCW7pClKOhTeTZLjsqoRWBbqjMW6U
+         /1n5jMnkChdqpByOUVZAzyVMy3xPWkL1lZDY2OVS/KdJXLOWC9ZYk94aIc3yzTuMJdJc
+         tY5WaIMYx17XSMdgsSRxlvJqcWruIoE8TDcmERe/YBxxFtAWeZb501p4AAjN5eymnQ7J
+         dXaEocbqbm2DmRfZl9btNo3R5N7oS6a0gReiNdbIw62uU3pGkBL0KlMUKSVY1vH5vsSq
+         CRUw==
+X-Gm-Message-State: AOJu0Yys0VkBw7tz86RrI9JxDDjQjTh7z/9ZRThq7G65YTaK6nU8DKn8
+	h29GUjPqZXWlp4v74v2ffKCRrw==
+X-Google-Smtp-Source: AGHT+IENJ0xPYi4uzaeTJwwedZ+8tWUxG3QlM6olVDYu5bRBD5Pc+AxjzgEP0mdOv30vPgdF5uo+og==
+X-Received: by 2002:a17:906:8457:b0:9b2:89ec:7fca with SMTP id e23-20020a170906845700b009b289ec7fcamr5558979ejy.34.1695761957945;
+        Tue, 26 Sep 2023 13:59:17 -0700 (PDT)
+Received: from [192.168.1.145] (host-87-4-82-94.retail.telecomitalia.it. [87.4.82.94])
+        by smtp.gmail.com with ESMTPSA id gu20-20020a170906f29400b009ad8796a6aesm8202912ejb.56.2023.09.26.13.59.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Sep 2023 13:59:17 -0700 (PDT)
+Message-ID: <e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
+Date: Tue, 26 Sep 2023 22:59:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1a0e:b0:3a8:74ff:6c01 with SMTP id
- bk14-20020a0568081a0e00b003a874ff6c01mr55641oib.5.1695761254082; Tue, 26 Sep
- 2023 13:47:34 -0700 (PDT)
-Date: Tue, 26 Sep 2023 13:47:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002c6cf80606492f14@google.com>
-Subject: [syzbot] [bpf?] WARNING in bpf_mprog_pos_before
-From: syzbot <syzbot+b97d20ed568ce0951a06@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add
+ support for QMC HDLC
+Content-Language: en-US
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+ Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
+ Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>,
+ Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+ Nicolin Chen <nicoleotsuka@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+ Simon Horman <horms@kernel.org>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <20230922075913.422435-1-herve.codina@bootlin.com>
+ <20230922075913.422435-9-herve.codina@bootlin.com>
+ <5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
+ <20230925101703.1bf083f1@bootlin.com>
+ <5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
+ <20230925122758.43963736@bootlin.com>
+ <e02ebde7-f208-40a4-bb10-aa5962ee9864@linaro.org>
+ <20230925154929.2b6a9cab@bootlin.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20230925154929.2b6a9cab@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On 25/09/2023 15:50, Herve Codina wrote:
+>>>>> With these details, do you still think I need to change the child (channel)
+>>>>> compatible ?    
+>>>>
+>>>> From OS point of view, you have a driver binding to this child-level
+>>>> compatible. How do you enforce Linux driver binding based on parent
+>>>> compatible? I looked at your next patch and I did not see it.  
+>>>
+>>> We do not need to have the child driver binding based on parent.  
+>>
+>> Exactly, that's what I said.
+>>
+>>> We have to ensure that the child handles a QMC channel and the parent provides
+>>> a QMC channel.
+>>>
+>>> A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
+>>> and a QMC channel driver (child) has to use the QMC API.  
+>>
+>> How does this solve my concerns? Sorry, I do not understand. Your driver
+>> is a platform driver and binds to the generic compatible. How do you
+>> solve regular compatibility issues (need for quirks) if parent
+>> compatible is not used?
+>>
+>> How does being QMC compliant affects driver binding and
+>> compatibility/quirks?
+>>
+>> We are back to my original question and I don't think you answered to
+>> any of the concerns.
+> 
+> Well, to be sure that I understand correctly, do you mean that I should
+> provide a compatible for the child (HDLC) with something like this:
+> --- 8< ---
+>   compatible:
+>     items:
+>       - enum:
+>           - fsl,mpc885-qmc-hdlc
+>           - fsl,mpc866-qmc-hdlc
+>       - const: fsl,cpm1-qmc-hdlc
+>       - const: fsl,qmc-hdlc
+> --- 8< ---
 
-syzbot found the following issue on:
+Yes, more or less, depending on actual compatibility and SoC-family.
+Maybe "fsl,cpm1-qmc-hdlc" item in the middle is not needed.
 
-HEAD commit:    81335f90e8a8 bpf: unconditionally reset backtrack_state ma..
-git tree:       bpf
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=111d5132680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f4894cf58531f
-dashboard link: https://syzkaller.appspot.com/bug?extid=b97d20ed568ce0951a06
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1570bfc1680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=126c6856680000
+> 
+> If so, I didn't do that because a QMC channel consumer (driver matching
+> fsl,qmc-hdlc) doesn't contains any SoC specific part.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/15d122573dad/disk-81335f90.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/74edf542067b/vmlinux-81335f90.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/22fa248ded38/bzImage-81335f90.xz
+Just like hundreds of other drivers. :)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b97d20ed568ce0951a06@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5108 at include/linux/bpf_mprog.h:198 bpf_mprog_total include/linux/bpf_mprog.h:198 [inline]
-WARNING: CPU: 0 PID: 5108 at include/linux/bpf_mprog.h:198 bpf_mprog_pos_before+0x18c/0x280 kernel/bpf/mprog.c:200
-Modules linked in:
-CPU: 0 PID: 5108 Comm: syz-executor123 Not tainted 6.6.0-rc1-syzkaller-00198-g81335f90e8a8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-RIP: 0010:bpf_mprog_total include/linux/bpf_mprog.h:198 [inline]
-RIP: 0010:bpf_mprog_pos_before+0x18c/0x280 kernel/bpf/mprog.c:200
-Code: 89 e8 48 c1 e8 03 42 80 3c 38 00 0f 85 d8 00 00 00 4d 3b 65 00 0f 85 26 ff ff ff e8 3e 50 e3 ff 83 eb 01 eb 38 e8 34 50 e3 ff <0f> 0b e9 3a ff ff ff e8 28 50 e3 ff 4c 89 f2 48 b8 00 00 00 00 00
-RSP: 0018:ffffc90003aafad0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88801e873b80 RSI: ffffffff81a47e4c RDI: 0000000000000005
-RBP: 0000000000000040 R08: 0000000000000005 R09: 000000000000003f
-R10: 0000000000000040 R11: 0000000000000000 R12: 0000000000000000
-R13: ffff88801fdb0418 R14: ffffc90003aafb98 R15: dffffc0000000000
-FS:  0000555556eea380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8e2323b0d0 CR3: 00000000750ca000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_mprog_attach+0x720/0xfe0 kernel/bpf/mprog.c:258
- tcx_prog_attach+0x2bd/0xbd0 kernel/bpf/tcx.c:39
- bpf_prog_attach kernel/bpf/syscall.c:3848 [inline]
- __sys_bpf+0x413e/0x4e90 kernel/bpf/syscall.c:5344
- __do_sys_bpf kernel/bpf/syscall.c:5439 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5437 [inline]
- __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5437
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f8e231c3cb9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc80795988 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f8e231c3cb9
-RDX: 0000000000000020 RSI: 0000000020000080 RDI: 0000000000000008
-RBP: 0000000000000000 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+There is a paragraph about specific compatibles here:
+https://www.kernel.org/doc/html/latest/devicetree/bindings/writing-schema.html
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> It uses the channel as a communication channel to send/receive HDLC frames
+> to/from this communication channel.
+> All the specific SoC part is handled by the QMC controller (parent) itself and
+> not by any consumer (child).
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+OK, so you guarantee in 100% for this hardware and all future (including
+designs unknown currently), that they will be 100% compatible with
+existing QMC channel consumer (child, matching fsl,qmc-hdlc) driver,
+thus there will be no need for any quirk. Specifically, there will be no
+chances that it would be reasonable to re-use the same driver for child
+(currently fsl,qmc-hdlc) in different parent.
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+P.S. If you received this email twice, apologies, I have here troubles
+with internet.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Best regards,
+Krzysztof
 
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
