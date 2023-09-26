@@ -1,77 +1,121 @@
-Return-Path: <netdev+bounces-36253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24D667AEAAA
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:45:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFA4D7AEAB6
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A3A55281BA0
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:45:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C2C5C1C204F7
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2374241FC;
-	Tue, 26 Sep 2023 10:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A6818E1B;
+	Tue, 26 Sep 2023 10:48:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D4363AE
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 10:45:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C46EC433C8;
-	Tue, 26 Sep 2023 10:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E381125A9
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 10:48:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8F71C433C7;
+	Tue, 26 Sep 2023 10:48:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695725108;
-	bh=Jr19cp7yaOhQeqgjjuOGhureNw6Qt3kSFYQrp6ys3gM=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=dmpSq5h+4p12H+CMfVLWGr6ETOYNhl3F6Sk3hs5OTdZaCgxg9vXopsoT8+iBApq4X
-	 BVCDUlNVkY5y4xOAwrLaE2L8WChSIa8aZpfpJTIbw0ABQVSgPZ0QP8Vh2QYOM4F98B
-	 7M1FAFV4042aYxcHwDZllNMcsluHKgmogCVm9e9xvV3NJB+C54aIGl8no7cVXRq5DJ
-	 vJNcXWYxkTDnNE0unGYbhe2eH2KRopax6YE61l8RGtt97NU5D1XTOdbvIpHP0f/hTW
-	 /g5Z5Dkp080NoP6XJfXiFgb7SEDZ6bYBHex0spKL/7E4zCEaUVBnmvS4S8/6TZUZeD
-	 WPfDzWJBCI2TA==
-From: Kalle Valo <kvalo@kernel.org>
-To: roynatech@gmail.com
-Cc: johannes@sipsolutions.net,  davem@davemloft.net,  edumazet@google.com,
-  kuba@kernel.org,  pabeni@redhat.com,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] mac80211: fix station hash table max_size config
- dependency
-References: <20230923032834.9694-1-roynatech@gmail.com>
-Date: Tue, 26 Sep 2023 13:47:08 +0300
-In-Reply-To: <20230923032834.9694-1-roynatech@gmail.com>
-	(roynatech@gmail.com's message of "Sat, 23 Sep 2023 03:28:34 +0000")
-Message-ID: <87bkdpjjo3.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1695725316;
+	bh=gfpodpHfgZZFmWpZek88hhLj+CrA/PUJ6CzxGFqNpDs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RacYjwlWhlo3fxqW7MYGVcgelHBOGGA2WF7lAZ7BUr4nK0qk1yNlFAIWyiwGsak30
+	 Vwbz1+6aRSBTpL7QVVrRjm6HnZC304KdKOMqmrw2hJh5X6YWR8y8lSps7WknviAAhg
+	 06QCITk6NDNHytVf6a7jkh6QIYQSSGPSgd5Wt733z/Hr2OyprsVh/nKIQ6u8E5gcNs
+	 HW12F4xlgBqU8O/ovsCkYjSLaoQBH31X68GVlHCfpqEUS0tobwnPA+U/MZyzCkPgYd
+	 Nie/z1bFdKRwbH/5j/uM3KBZybZhnl3XqLnNFEtii375Gu7rCKVCvIHoawyGPosH7X
+	 bP6QfsBWmFJNA==
+Date: Tue, 26 Sep 2023 13:48:31 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Albert Huang <huangjie.albert@bytedance.com>
+Cc: Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	RDMA mailing list <linux-rdma@vger.kernel.org>,
+	Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
+ containers.
+Message-ID: <20230926104831.GJ1642130@unreal>
+References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230925023546.9964-1-huangjie.albert@bytedance.com>
 
-roynatech@gmail.com writes:
+On Mon, Sep 25, 2023 at 10:35:45AM +0800, Albert Huang wrote:
+> If the netdevice is within a container and communicates externally
+> through network technologies like VXLAN, we won't be able to find
+> routing information in the init_net namespace. To address this issue,
+> we need to add a struct net parameter to the smc_ib_find_route function.
+> This allow us to locate the routing information within the corresponding
+> net namespace, ensuring the correct completion of the SMC CLC interaction.
+> 
+> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> ---
+>  net/smc/af_smc.c | 3 ++-
+>  net/smc/smc_ib.c | 7 ++++---
+>  net/smc/smc_ib.h | 2 +-
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index bacdd971615e..7a874da90c7f 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+>  		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
+>  	struct smc_clc_first_contact_ext *fce =
+>  		smc_get_clc_first_contact_ext(clc_v2, false);
+> +	struct net *net = sock_net(&smc->sk);
+>  	int rc;
+>  
+>  	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
+> @@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+>  		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+>  		ini->smcrv2.uses_gateway = false;
+>  	} else {
+> -		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
+> +		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+>  				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+>  				      ini->smcrv2.nexthop_mac,
+>  				      &ini->smcrv2.uses_gateway))
+> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> index 9b66d6aeeb1a..89981dbe46c9 100644
+> --- a/net/smc/smc_ib.c
+> +++ b/net/smc/smc_ib.c
+> @@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
+>  	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
+>  }
+>  
+> -int smc_ib_find_route(__be32 saddr, __be32 daddr,
+> +int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+>  		      u8 nexthop_mac[], u8 *uses_gateway)
+>  {
+>  	struct neighbour *neigh = NULL;
+> @@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
+>  
+>  	if (daddr == cpu_to_be32(INADDR_NONE))
+>  		goto out;
+> -	rt = ip_route_output_flow(&init_net, &fl4, NULL);
+> +	rt = ip_route_output_flow(net, &fl4, NULL);
 
-> From: roynatech2544 <whiteshell2544@naver.com>
->
-> Commit ebd82b3 ("mac80211: make station hash table max_size configurable") introduced config
-> MAC80211_STA_HASH_MAX_SIZE, which is defined unconditionally even if MAC80211 is not set.
-> It doesn't look like it is dependent of MAC80211_DEBUG_MENU either, as its only user is sta_info.c
-> which is compiled unconditionally when MAC80211 != n. And without this config set somewhere, compile
-> would error out.
->
-> Make it depend on MAC80211 to correctly hide the config when MAC80211=n
->
-> Fixes: ebd82b3 ("mac80211: make station hash table max_size configurable")
+This patch made me wonder, why doesn't SMC use RDMA-CM like all other
+in-kernel ULPs which work over RDMA?
 
-The commit id in fixes tag is too short, more info in the wiki link
-below.
-
-> Signed-off-by: roynatech2544 <whiteshell2544@naver.com>
-
-Please use your full legal name, no pseudonyms please. See wiki.
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Thanks
 
