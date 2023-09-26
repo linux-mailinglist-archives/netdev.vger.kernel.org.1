@@ -1,74 +1,58 @@
-Return-Path: <netdev+bounces-36311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83ED97AEE52
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 16:07:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF6D7AEE84
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 16:46:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3711E2811D4
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E966B28155E
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8F22AB35;
-	Tue, 26 Sep 2023 14:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B6226E09;
+	Tue, 26 Sep 2023 14:46:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7F91C296
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:07:05 +0000 (UTC)
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 057A4FC
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:07:04 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32329d935d4so3997301f8f.2
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1695737222; x=1696342022; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3fL7byGgITI5Pp0Gd+G4m6HpKfvXhtfMbVSSCjqe9VQ=;
-        b=BnCASo/Tc6qi8EZNvvmtD3lpKkDK5Jr10FBAjpayIpuUuTWRz+oWq5JIEXd8y8Oi9y
-         5MbEsapYW42020HkaAUkZGGEG1TxizLzNgG+0sLORgH4dbUuOe8B/yo8Fmac0/LSOWRm
-         vnGYrva4u1M3QdsYVkLOiU+wVOiOkkW6MJfbPxtqcvKSqClcAfBYIYkWKqwkXtUjOM4a
-         x1IuOqaJZ37If7bT35bvHgR3EZNHfQX4+jROIFzLAhXQ5pAOWeAeHA1lubjEQ2FT4o52
-         rbIf4hqF71maWXWVBUQiz1x+Dqla2Elt4xhwbwveJAOhcRqLxHIR6LZRcHoWWPTK/ivS
-         32Kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695737222; x=1696342022;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3fL7byGgITI5Pp0Gd+G4m6HpKfvXhtfMbVSSCjqe9VQ=;
-        b=pwzWw+b7li7B0R06Xs6HKzw52/O8d2xFSeqFoo+E8n3UPUhAp/pFVwD+scGP1bLiNW
-         zIggT6bRLc7B9ishY7M4Ejq9EsF1YW5VO2kUN4TDmnxPpoRqTPQ/D2GhFA9EqAKeC9En
-         xtvxLD0eeJsfZ9Qu811izWYlloltxU3EKPX+IGqP8vKTv9+ZLY/HmcPKhlIZbrpojFUr
-         JBXH9K/V7YvtQqoRV7dSbqdhB18dhcBQxgXH3HLNnKuMFXdBdI7BI9Bae2wAkG0Ltjee
-         Iuitf4p1kegyHObnpfBKrcKaKj+2vBUm0WFSL8TXbmbHQFSftwcBtjSU55Qz2kQrLaGy
-         a4lg==
-X-Gm-Message-State: AOJu0YznzEJaAzTE4u7CWABqcAs/SApGWGk5TUMlx76Bm1ERU6wM4g4u
-	5UgkrJnVEYcZgbUqJH14RVOATQ==
-X-Google-Smtp-Source: AGHT+IHrmM3RsXnpLcivnylPyp5TD1hIjaMqvfDzbaCd3y/aleld6b+go0DyjpPmtjDYj1lye7oReA==
-X-Received: by 2002:a5d:4c85:0:b0:317:6ef1:7939 with SMTP id z5-20020a5d4c85000000b003176ef17939mr9042370wrs.23.1695737222048;
-        Tue, 26 Sep 2023 07:07:02 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id b1-20020a5d4d81000000b003215c6e30cbsm14632256wru.104.2023.09.26.07.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 07:07:01 -0700 (PDT)
-Date: Tue, 26 Sep 2023 17:06:58 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Peter Ujfalusi <peter.ujfalusi@gmail.com>
-Cc: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	MD Danish Anwar <danishanwar@ti.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vignesh Raghavendra <vigneshr@ti.com>, dmaengine@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH 3/3 net] dmaengine: ti: k3-udma-glue: clean up
- k3_udma_glue_tx_get_irq() return
-Message-ID: <bf2cee83-ca8d-4d95-9e83-843a2ad63959@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9B6266BA
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 14:46:31 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99AE6E6
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:46:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hmu/g01FVzZRJFkBit/YRRr4Q0IO9hiVE+7zWP268BM=; b=L8+7oR8m5zW8lcQZmKFfSQOzg5
+	Jfc1qeYbvECuHsbah+o++6nsXqwvs4UJkxHJr/gHpWCQVwr78KptLjRYXKKQ2fftK3JE4dZgV0XZS
+	TEdDfD0MVS/pPbsXPAaWA4knziZTouuvPV2TNpDlQEpnHL9DizEMU8KS21J4Q9gtdR6jFHON8TecH
+	QH0Ce7IVch4xXw9uvxy7ajgXmtUnGchmD8sw+psbn5eM/WhDJq8XVhNPujDsh4s52I1+PxoNhG/1f
+	SoGybYm+iS7PkBO5n8hfKed7jil5Ncd5pRabxxYdfRNn5KoF6VjWJSvIo1s0RkuGSFCc7TMysUJV0
+	YPAXpaLQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36334)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ql9KS-0002am-2V;
+	Tue, 26 Sep 2023 15:46:24 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ql9KR-0000UU-KH; Tue, 26 Sep 2023 15:46:23 +0100
+Date: Tue, 26 Sep 2023 15:46:23 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, Jose.Abreu@synopsys.com, hkallweit1@gmail.com,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next] net: pcs: xpcs: Add 2500BASE-X case in get
+ state for XPCS drivers
+Message-ID: <ZRLuv77VSTXSZSc7@shell.armlinux.org.uk>
+References: <20230925075142.266026-1-Raju.Lakkaraju@microchip.com>
+ <fbkzmsznag5yjypbzmbmvtzfgdgx3v4pc6njmelrz3x7pvlojq@rh3tqyo5sr26>
+ <ZRLEazyb0yS1Oxft@shell.armlinux.org.uk>
+ <jhmdppifw4qverxedn6l3bk3tuwyuww7rcvqvtzbxhh5livowv@3jpc4m3kfgno>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,78 +61,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4c2073cc-e7ef-4f16-9655-1a46cfed9fe9@moroto.mountain>
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <jhmdppifw4qverxedn6l3bk3tuwyuww7rcvqvtzbxhh5livowv@3jpc4m3kfgno>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The k3_udma_glue_tx_get_irq() function currently returns negative error
-codes on error, zero on error and positive values for success.  This
-complicates life for the callers who need to propagate the error code.
-Also GCC will not warn about unsigned comparisons when you check:
+On Tue, Sep 26, 2023 at 03:09:47PM +0300, Serge Semin wrote:
+> Hi Russell
+> 
+> On Tue, Sep 26, 2023 at 12:45:47PM +0100, Russell King (Oracle) wrote:
+> > On Tue, Sep 26, 2023 at 02:39:21PM +0300, Serge Semin wrote:
+> > > Hi Raju
+> > > 
+> > > On Mon, Sep 25, 2023 at 01:21:42PM +0530, Raju Lakkaraju wrote:
+> > > > Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
+> > > > Update the port mode and autonegotiation
+> > > > 
+> > > > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> > > > ---
+> > > >  drivers/net/pcs/pcs-xpcs.c | 31 +++++++++++++++++++++++++++++++
+> > > >  drivers/net/pcs/pcs-xpcs.h |  4 ++++
+> > > >  2 files changed, 35 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> > > > index 4dbc21f604f2..4f89dcedf0fc 100644
+> > > > --- a/drivers/net/pcs/pcs-xpcs.c
+> > > > +++ b/drivers/net/pcs/pcs-xpcs.c
+> > > > @@ -1090,6 +1090,30 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
+> > > >  	return 0;
+> > > >  }
+> > > >  
+> > > > +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
+> > > > +				    struct phylink_link_state *state)
+> > > > +{
+> > > > +	int sts, lpa;
+> > > > +
+> > > > +	sts = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
+> > > 
+> > > > +	lpa = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_LP_BABL);
+> > > > +	if (sts < 0 || lpa < 0) {
+> > > > +		state->link = false;
+> > > > +		return sts;
+> > > > +	}
+> > > 
+> > > The HW manual says: "The host uses this page to know the link
+> > > partner's ability when the base page is received through Clause 37
+> > > auto-negotiation." Seeing xpcs_config_2500basex() disables
+> > > auto-negotiation and lpa value is unused anyway why do you even need
+> > > to read the LP_BABL register?
+> > 
+> 
+> > Since you have access to the hardware manual, what does it say about
+> > clause 37 auto-negotiation when operating in 2500base-X mode?
+> 
+> Here are the parts which mention 37 & SGMII AN in the 2.5G context:
+> 
+> 1. "Clause 37 (& SGMII) auto-negotiation is supported in 2.5G mode if
+>     the link partner is also operating in the equivalent 2.5G mode."
+> 
+> 2. "During the Clause 37/SGMII as the auto-negotiation link timer
+>     operates with a faster clock in the 2.5G mode, the timeout duration
+>     reduces by a factor of 2.5. To restore the standard specified timeout
+>     period, the respective registers must be re-programmed."
+> 
+> I guess the entire 2.5G-thing understanding could be generalized by
+> the next sentence from the HW manual: "The 2.5G mode of operation is
+> functionally the same as 1000BASE-X/KX mode, except that the
+> clock-rate is 2.5 times the original rate. In this mode, the
+> Serdes/PHY operates at a serial baud-rate of 3.125 Gbps and DWC_xpcs
+> data-path and the GMII interface to MAC operates at 312.5 MHz (instead
+> of 125 MHz)." Thus here is another info regarding AN in that context:
+> 
+> 3. "The DWC_xpcs operates either in 10/100/1000Mbps rate or
+> 25/250/2500Mbps rates respectively with SGMII auto-negotiation. The
+> DWC_xpcs cannot support switching or negotiation between 1G and 2.5G
+> rates using auto-negotiation."
 
-	if (unsigned_irq <= 0)
+Thanks for the clarification.
 
-All the callers have been fixed now but let's just make this easy going
-forward.
+So this hardware, just like Marvell hardware, operates 2500BASE-X merely
+by up-clocking, and all the features that were available at 1000BASE-X
+are also available at 2500BASE-X, including the in-band signalling.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/dma/ti/k3-udma-glue.c                | 3 +++
- drivers/net/ethernet/ti/am65-cpsw-nuss.c     | 4 ++--
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 +---
- 3 files changed, 6 insertions(+), 5 deletions(-)
+Therefore, I think rather than disabling AN outright, the
+PHYLINK_PCS_NEG_* mode passed in should be checked to determine whether
+inband should be used or not.
 
-diff --git a/drivers/dma/ti/k3-udma-glue.c b/drivers/dma/ti/k3-udma-glue.c
-index 789193ed0386..c278d5facf7d 100644
---- a/drivers/dma/ti/k3-udma-glue.c
-+++ b/drivers/dma/ti/k3-udma-glue.c
-@@ -558,6 +558,9 @@ int k3_udma_glue_tx_get_irq(struct k3_udma_glue_tx_channel *tx_chn)
- 		tx_chn->virq = k3_ringacc_get_ring_irq_num(tx_chn->ringtxcq);
- 	}
- 
-+	if (!tx_chn->virq)
-+		return -ENXIO;
-+
- 	return tx_chn->virq;
- }
- EXPORT_SYMBOL_GPL(k3_udma_glue_tx_get_irq);
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 31e84c503e22..24120605502f 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -1747,10 +1747,10 @@ static int am65_cpsw_nuss_init_tx_chns(struct am65_cpsw_common *common)
- 		}
- 
- 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
--		if (tx_chn->irq <= 0) {
-+		if (tx_chn->irq < 0) {
- 			dev_err(dev, "Failed to get tx dma irq %d\n",
- 				tx_chn->irq);
--			ret = tx_chn->irq ?: -ENXIO;
-+			ret = tx_chn->irq;
- 			goto err;
- 		}
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 89c0c3449d98..3c611b9aaecf 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -317,9 +317,7 @@ static int prueth_init_tx_chns(struct prueth_emac *emac)
- 		}
- 
- 		ret = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
--		if (ret <= 0) {
--			if (!ret)
--				ret = -EINVAL;
-+		if (ret < 0) {
- 			netdev_err(ndev, "failed to get tx irq\n");
- 			goto fail;
- 		}
 -- 
-2.39.2
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
