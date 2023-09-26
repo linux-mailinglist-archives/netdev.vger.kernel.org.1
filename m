@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-36289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C557AEBE4
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:50:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C43B7AEBDC
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A7021282A2C
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:50:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C5A4D282460
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C30273EC;
-	Tue, 26 Sep 2023 11:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB0627728;
+	Tue, 26 Sep 2023 11:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F34286A6
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 11:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B24926E3B
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 11:50:24 +0000 (UTC)
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02DC5121;
-	Tue, 26 Sep 2023 04:50:26 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38QBo6GI1882027, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38QBo6GI1882027
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237AE198;
+	Tue, 26 Sep 2023 04:50:20 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 38QBo2vaD882046, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 38QBo2vaD882046
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Sep 2023 19:50:06 +0800
+	Tue, 26 Sep 2023 19:50:02 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Tue, 26 Sep 2023 19:50:00 +0800
+ 15.1.2507.17; Tue, 26 Sep 2023 19:50:01 +0800
 Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Tue, 26 Sep
- 2023 19:50:00 +0800
+ 2023 19:50:01 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -39,9 +39,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
         Justin Lai
 	<justinlai0215@realtek.com>
-Subject: [PATCH net-next v8 11/13] net:ethernet:realtek:rtase: Add a Makefile in the rtase folder
-Date: Tue, 26 Sep 2023 19:49:41 +0800
-Message-ID: <20230926114943.16340-12-justinlai0215@realtek.com>
+Subject: [PATCH net-next v8 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
+Date: Tue, 26 Sep 2023 19:49:42 +0800
+Message-ID: <20230926114943.16340-13-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230926114943.16340-1-justinlai0215@realtek.com>
 References: <20230926114943.16340-1-justinlai0215@realtek.com>
@@ -60,39 +60,55 @@ X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
 X-KSE-AntiSpam-Interceptor-Info: fallback
 X-KSE-Antivirus-Interceptor-Info: fallback
 X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a Makefile in the rtase folder to build rtase driver.
+1. Add the RTASE entry in the Kconfig.
+2. Add the CONFIG_RTASE entry in the Makefile.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- drivers/net/ethernet/realtek/rtase/Makefile | 10 ++++++++++
- 1 file changed, 10 insertions(+)
- create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ drivers/net/ethernet/realtek/Kconfig  | 17 +++++++++++++++++
+ drivers/net/ethernet/realtek/Makefile |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/rtase/Makefile b/drivers/net/ethernet/realtek/rtase/Makefile
-new file mode 100644
-index 000000000000..f29b14687950
---- /dev/null
-+++ b/drivers/net/ethernet/realtek/rtase/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+# Copyright(c) 2023 Realtek Semiconductor Corp. All rights reserved.
+diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
+index 93d9df55b361..57ef924deebd 100644
+--- a/drivers/net/ethernet/realtek/Kconfig
++++ b/drivers/net/ethernet/realtek/Kconfig
+@@ -113,4 +113,21 @@ config R8169
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called r8169.  This is recommended.
+ 
++config RTASE
++	tristate "Realtek Automotive Switch 9054/9068/9072/9075/9068/9071 PCIe Interface support"
++	depends on PCI
++	select CRC32
++	help
++	  Say Y here if you have a Realtek Ethernet adapter belonging to
++	  the following families:
++	  RTL9054 5GBit Ethernet
++	  RTL9068 5GBit Ethernet
++	  RTL9072 5GBit Ethernet
++	  RTL9075 5GBit Ethernet
++	  RTL9068 5GBit Ethernet
++	  RTL9071 5GBit Ethernet
 +
-+#
-+# Makefile for the Realtek PCIe driver
-+#
++	  To compile this driver as a module, choose M here: the module
++	  will be called rtase. This is recommended.
 +
-+obj-$(CONFIG_RTASE) += rtase.o
-+
-+rtase-objs := rtase_main.o
+ endif # NET_VENDOR_REALTEK
+diff --git a/drivers/net/ethernet/realtek/Makefile b/drivers/net/ethernet/realtek/Makefile
+index 2e1d78b106b0..0c1c16f63e9a 100644
+--- a/drivers/net/ethernet/realtek/Makefile
++++ b/drivers/net/ethernet/realtek/Makefile
+@@ -8,3 +8,4 @@ obj-$(CONFIG_8139TOO) += 8139too.o
+ obj-$(CONFIG_ATP) += atp.o
+ r8169-objs += r8169_main.o r8169_firmware.o r8169_phy_config.o
+ obj-$(CONFIG_R8169) += r8169.o
++obj-$(CONFIG_RTASE) += rtase/
 -- 
 2.34.1
 
