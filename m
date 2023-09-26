@@ -1,133 +1,121 @@
-Return-Path: <netdev+bounces-36241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471277AE899
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:06:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7898A7AE8B1
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 583A0281677
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:06:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 20FA5281720
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A2112B72;
-	Tue, 26 Sep 2023 09:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AC912B75;
+	Tue, 26 Sep 2023 09:12:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033DDE56A
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:06:13 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55EC2DE;
-	Tue, 26 Sep 2023 02:06:11 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vsw82Mw_1695719167;
-Received: from 30.221.147.7(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Vsw82Mw_1695719167)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Sep 2023 17:06:08 +0800
-Message-ID: <ab417654-8aba-f357-8ac5-16c4c2b291e1@linux.alibaba.com>
-Date: Tue, 26 Sep 2023 17:06:06 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF10F1849
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:12:46 +0000 (UTC)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11167EB;
+	Tue, 26 Sep 2023 02:12:42 -0700 (PDT)
+Received: from [192.168.1.103] (31.173.84.78) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Tue, 26 Sep
+ 2023 12:12:39 +0300
+Subject: Re: [PATCH net v2] net: ethernet: renesas: rswitch Fix PHY station
+ management clock setting
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, <s.shtylyov@omp.ru>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>, Tam Nguyen
+	<tam.nguyen.xa@renesas.com>, Kuninori Morimoto
+	<kuninori.morimoto.gx@renesas.com>
+References: <20230926081156.3930074-1-yoshihiro.shimoda.uh@renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <5cffcbce-9521-e896-d2e2-93585e6068ee@omp.ru>
+Date: Tue, 26 Sep 2023 12:12:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.14.0
-Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
- closing listen socket
+In-Reply-To: <20230926081156.3930074-1-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Alexandra Winter <wintera@linux.ibm.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
- <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
- <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
- <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
- <c03dad67-169a-bf6d-1915-a9bb722a7259@linux.alibaba.com>
- <d18e1a78-3b3a-8f23-6db1-20c16795d3ef@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <d18e1a78-3b3a-8f23-6db1-20c16795d3ef@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [31.173.84.78]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.59, Database issued on: 09/26/2023 08:47:48
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 180129 [Sep 26 2023]
+X-KSE-AntiSpam-Info: Version: 5.9.59.0
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 534 534 808c2ea49f7195c68d40844e073217da4fa0d1e3
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.78 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.78 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;31.173.84.78:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: {rdns complete}
+X-KSE-AntiSpam-Info: {fromrtbl complete}
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.78
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/26/2023 08:54:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/26/2023 6:37:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello!
 
+   You missed a colon after rswitch.
+   And historically we used simpler prefixes, like just sh_eth or ravb...
 
-On 9/26/23 3:18 PM, Alexandra Winter wrote:
->
-> On 26.09.23 05:00, D. Wythe wrote:
->> You are right. The key point is how to ensure the valid of smc sock during the life time of clc sock, If so, READ_ONCE is good
->> enough. Unfortunately, I found  that there are no such guarantee, so it's still a life-time problem.
-> Did you discover a scenario, where clc sock could live longer than smc sock?
-> Wouldn't that be a dangerous scenario in itself? I still have some hope that the lifetime of an smc socket is by design longer
-> than that of the corresponding tcp socket.
+On 9/26/23 11:11 AM, Yoshihiro Shimoda wrote:
 
+> Fix the MPIC.PSMCS value following the programming example in the
+> section 6.4.2 Management Data Clock (MDC) Setting, Ethernet MAC IP,
+> S4 Hardware User Manual Rev.1.00.
+> 
+> The value is calculated by
+>     MPIC.PSMCS = clk[MHz] / (MDC frequency[MHz] * 2) - 1
+> with the input clock frequency from clk_get_rate() and MDC frequency
+> of 2.5MHz. Otherwise, this driver cannot communicate PHYs on the R-Car
+> S4 Starter Kit board.
+> 
+> Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
+> Reported-by: Tam Nguyen <tam.nguyen.xa@renesas.com>
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> Tested-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+[...]
 
-Hi Alexandra,
-
-Yes there is. Considering scenario:
-
-tcp_v4_rcv(skb)
-
-/* req sock */
-reqsk = _inet_lookup_skb(skb)
-
-/* listen sock */
-sk = reqsk(reqsk)->rsk_listener;
-sock_hold(sk);
-tcp_check_req(sk)
-
-
-                                                 smc_release /* release 
-smc listen sock */
-                                                 __smc_release
-smc_close_active()         /*  smc_sk->sk_state = SMC_CLOSED; */
-                                                     if 
-(smc_sk->sk_state == SMC_CLOSED)
-smc_clcsock_release();
-sock_release(clcsk);        /* close clcsock */
-     sock_put(sk);              /* might not  the final refcnt */
-
-sock_put(smc_sk)    /* might be the final refcnt of smc_sock  */
-
-syn_recv_sock(sk...)
-/* might be the final refcnt of tcp listen sock */
-sock_put(sk);
-
-Fortunately, this scenario only affects smc_syn_recv_sock and 
-smc_hs_congested, as other callbacks already have locks to protect smc,
-which can guarantee that the sk_user_data is either NULL (set in 
-smc_close_active) or valid under the lock.
-
-> Considering the const, maybe
->> we need to do :
->>
->> 1. hold a refcnt of smc_sock for syn_recv_sock to keep smc sock valid during life time of clc sock
->> 2. put the refcnt of smc_sock in sk_destruct in tcp_sock to release the very smc sock .
->>
->> In that way, we can always make sure the valid of smc sock during the life time of clc sock. Then we can use READ_ONCE rather
->> than lock.  What do you think ?
-> I am not sure I fully understand the details what you propose to do. And it is not only syn_recv_sock(), right?
-> You need to consider all relations between smc socks and tcp socks; fallback to tcp, initial creation, children of listen sockets, variants of shutdown, ... Preferrably a single simple mechanism covers all situations. Maybe there is such a mechanism already today?
-> (I don't think clcsock->sk->sk_user_data or sk_callback_lock provide this general coverage)
-> If we really have a gap, a general refcnt'ing on smc sock could be a solution, but needs to be designed carefully.
-
-You are right , we need designed it with care, we will try the 
-referenced solutions internally first, and I will also send some RFCs so 
-that everyone can track the latest progress
-and make it can be all agreed.
-> Many thanks to you and the team to help make smc more stable and robust.
-
-Our pleasure 😁.  The stability of smc is important to us too.
-
-Best wishes,
-D. Wythe
-
-
+MBR, Sergey
 
