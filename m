@@ -1,176 +1,161 @@
-Return-Path: <netdev+bounces-36228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE1E17AE6AF
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:22:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BAA7AE6BA
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9F20C280F6A
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7A1FE281002
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D3363B1;
-	Tue, 26 Sep 2023 07:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5D963BE;
+	Tue, 26 Sep 2023 07:24:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A6C5683
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:22:03 +0000 (UTC)
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01on2102.outbound.protection.outlook.com [40.107.113.102])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CC4F11F;
-	Tue, 26 Sep 2023 00:22:02 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JeLkVDz3VmYeu6v7FwsWGdVZkELnuWrRbFab/mqwWFQveIsqUD+JGVZbr0gsmy5V2f2L5kM/Xf1HVfNk/B7njZUs/RFRUZjXQnTBJ/zlSVLpj2MSEEuFvTEKhxR5JgAWUobwxDWN1iI7qJxJhinI8T9S8SpxZYctlcv+vTdrzEurVR8L3HLkIJg1ZDhkEhREPxikZ8rBanS4tl+xKvxN0x/vtqITy8GSWc530+COHDWE70czxibgMY1dZZDEMPVZkVa7JQ2Txea2+7zR9oKfILUEkq/3naibC8aIkRvvFvFjnuJEsmkn1I0JeUatBdkTlmLlXPH95DtlR7oBx8qNgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NLHBlbcXcbCo0fX1FjgDBTSvJYLwG3aDy54qcd35kVg=;
- b=ZS/q0/oWJHq3bDRKBaA7FAcC+oFkdhhLIEIsfufBvcBOYXFoXW+Wd+aasgr3PRWlxelEB4oq2+HgnC72bSaryuViuBPReV0ti2IhPhe2rhFgL7as/10MZT61wMnht+VsjXBcfxmlJ96uwAmpgFl3xujMDftps45aGiX+ib9o6RdqVNe/Ua1nCBEm4DH7+DrZBgWI9fa1JsvTCnl5b8eBHE4E97J5mMrPzlGmkkJW7MTL0YU4vakEQeYytCFduKdNadtYp7QJGmRk15DNILJWwd6rjwLJ0oE0XknCFAJyrP8xA9f7OUGdwqJoEs8S4tycZK9FGBa01MP1hP5W0a+BDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NLHBlbcXcbCo0fX1FjgDBTSvJYLwG3aDy54qcd35kVg=;
- b=flxv1lo57aveunDNibJCT+6I/QDaFGh/35FpgOZYpkP34AVBlqZhTONqtRORSPWGMdmrYmcRIA2UN8yvvvInEiNbZR3KSf9tSXVwh7nq6LAS5Jhry9/Jr0/gHPonaqdlfVK/Ov/S3qD1yuCW6qY012k75IAJ/WIwzCRl5CUnh/Y=
-Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
- (2603:1096:404:8028::13) by OS3PR01MB6007.jpnprd01.prod.outlook.com
- (2603:1096:604:d5::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Tue, 26 Sep
- 2023 07:21:59 +0000
-Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
- ([fe80::1dc4:e923:9916:c0f7]) by TYBPR01MB5341.jpnprd01.prod.outlook.com
- ([fe80::1dc4:e923:9916:c0f7%6]) with mapi id 15.20.6813.027; Tue, 26 Sep 2023
- 07:21:59 +0000
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, Tam
- Nguyen <tam.nguyen.xa@renesas.com>, Kuninori Morimoto
-	<kuninori.morimoto.gx@renesas.com>
-Subject: RE: [PATCH net] net: ethernet: renesas: rswitch Fix PHY station
- management clock setting
-Thread-Topic: [PATCH net] net: ethernet: renesas: rswitch Fix PHY station
- management clock setting
-Thread-Index: AQHZ70gLPZK+4KBkgE+5y4WMpBuX/7Arl4+AgAEbrPA=
-Date: Tue, 26 Sep 2023 07:21:59 +0000
-Message-ID:
- <TYBPR01MB534186322164085E74430B4BD8C3A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-References: <20230925003416.3863560-1-yoshihiro.shimoda.uh@renesas.com>
- <7156d89e-ef72-487f-b7ce-b08be461ec1c@lunn.ch>
-In-Reply-To: <7156d89e-ef72-487f-b7ce-b08be461ec1c@lunn.ch>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYBPR01MB5341:EE_|OS3PR01MB6007:EE_
-x-ms-office365-filtering-correlation-id: f576eadb-ecc8-4a08-0330-08dbbe6145b0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 46oXvpMdyAdQ+NL+3xw3kbDZN7Y0dlKo8Sr4wopehPgCMBz5PgfuR7Mj4W40jTDs4R3Ts63xW6+swkQ4tD7BlYH5fYLo3TWAuAbtTVo0Xcr9Ypgh1kTwh3Ueu7HV2egr/6sgj4z18mxFwvJLwOS70kEDPuoAMxwBoMmyq7P8EtmoPuThCzLg8hQx0oz4SGC4M5ioQoPmQqSlWvtWXZXCOUWP15Cs3kBuugIovRnbykihl0P0ik4ADqjsp83o+DdYDu3aYgGbgPcEeGUhp3IrYb9+c7c6QsCb4Yq7nPpkvH4GjR+JewNyGUH4E333D0TtfiJCChrqVQkNQHmFoosJG3uDbAMIju9SbRBi0HyNC9e3Roh4FpZa/DI/dzLKBA9x+IO8JLGRHsDDABH3TC9uYMyhZX1arrW3auGhzVVcX4lR3L8E52M0Sx4hRY+Y2S8NOEZfZ+ie/IOehYL3T6uuvKP2bvwp/RJ52XpmTpP8HG1njpRm0iCd1eeG+GFN+3MDaa2XZBjoghlacpAVzSfJIAqcgseee4o2DDQ1pfay0MYj/SwEnaZ+XyaVuVyNlJO2nFNxDJcOfJjcumsn9zRQiqfvYqlo7gHRQrthlchbo8zKJ571HXMRPCksFnZ3d747
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYBPR01MB5341.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(376002)(136003)(39860400002)(346002)(230922051799003)(451199024)(1800799009)(186009)(2906002)(5660300002)(52536014)(4326008)(38100700002)(38070700005)(55016003)(41300700001)(6916009)(8936002)(8676002)(66476007)(107886003)(66556008)(66946007)(66446008)(64756008)(76116006)(6506007)(9686003)(7696005)(86362001)(83380400001)(122000001)(316002)(478600001)(71200400001)(33656002)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?e0oiEP8E4ZqoaTWEqM8DGBNR1ROwZ/uEfryL4hjl7kWUyBjApL0Rin1wu3pl?=
- =?us-ascii?Q?FgMT7DUkL85ktM5NK9e0mcsDeSG9tIw29HYkwMgzxGwppAZFL2LTl1TSPMJW?=
- =?us-ascii?Q?7fTWeJc74yyoq77AQr6lAueJQlQA/x+6yusmTx+uVW8PASTZ4YXE3zkOMGh2?=
- =?us-ascii?Q?scLleGEgG60Cw7jTgH4fazkwdKx8/qkePjsXbn4sxkeaSgXr5RWo85/UiUIp?=
- =?us-ascii?Q?OEIOUfKMUXXVGkbeQ5fG/X/ExF2v4x13s4XOmdeVJOs3cyU97dRVIz4R8xuo?=
- =?us-ascii?Q?RXaWrNTiDenPl9+ADc7iAIxVQNcaL3D0TWaVf60IZ0rJAeYXUsHjY+jWr60v?=
- =?us-ascii?Q?QJH83bfJY7QfncUQLyt0NaAbVYHkeVIp5Sgl0IioAVVN6R33vSEzB3CvX3ff?=
- =?us-ascii?Q?61+OoE0/sMSSUDJayO632dwwQvWYPBXl5pfqLVyBbH+EhbdvmNBGWjFNl/81?=
- =?us-ascii?Q?tgY7VzAAXVqkRAVhwbA1iFNH/hLHkuKOjLfJf8a7kXhWYHEdhOz1xohWRM11?=
- =?us-ascii?Q?g+wriPRL7wWt3T4DCl83Nucu8HBeoRMC+xSPK2ThL5B96QbJ/GiLo2NuX2Zg?=
- =?us-ascii?Q?a1GOX1kBQWkNUHh4YQIwfDweUo0QRwmh8A8CbF3EPTUThH1Wxz6wFIJs5QbD?=
- =?us-ascii?Q?IHJbHOFFtAnB5Bc4G7EtfjOzlU62sBbyCb+ipyOIQljrUHoE4QJwub5t2fWY?=
- =?us-ascii?Q?ZwrcDBXqwgFtdQ1NnfgavK308nethgmiP/VQNyaby5+ug+1d/mXZk3EqRWnN?=
- =?us-ascii?Q?259X4J32ECx87kik8j21yN5hGtSA0mipIAHblPCN66jt3KX06zJMd5nRLrk3?=
- =?us-ascii?Q?mEPrvi1nZ+GjCMh+qDj9oFNJKdwoBxuGUkfkoIxNdwA4BiMxPSCPEgU+pGod?=
- =?us-ascii?Q?YFR++YHQCbIxb29ktQirGjJzKbFw1e7E1WlXn1dnIbkv3r9ln/A+g4mbT9SV?=
- =?us-ascii?Q?2NKdJfnmapUPlA3W2Jbsn6HQ8J++sLXdFlaCZHOTQ6kjCGcNQV46Rb/a/xoV?=
- =?us-ascii?Q?UCKi2XGBlgdRxhz3HNRppNNwWf0G87yw3ZaYlfEw9LwvF0Y2sZOyOg18PR1c?=
- =?us-ascii?Q?5CFC/3FZ9qdvRSLhkJk5zBu0OHIp+VFMXeSYiYeiji563S5mkaoG8tGgZ7CI?=
- =?us-ascii?Q?Boa8fbVayxXSLQ/grhtPG6vix0OvyO8NvI2oC96JuGL5uQBriTVhMJSG1yDt?=
- =?us-ascii?Q?GkAf1b2wqmbpo1MvyJk0xpF8iE4+pvxrQnt9Q0wBO5gB3Ng7kr3Uz9WWCosK?=
- =?us-ascii?Q?T3AJfrt4nrI3jl2wt5IMqoLANLynyGUMe/RVTor/t8+Ey2qIdkPLIwmi99K/?=
- =?us-ascii?Q?hKMPIu9tihtu6YzHBbnyRR05k/qeC8O+FUkp+TQvx+ZB17nRWxaIQzGLGA27?=
- =?us-ascii?Q?mi436siRDEnDuGHnIfsHmhulpf58MtWeZIKIHkXFo1rF1DMYILbZEJoGLIn4?=
- =?us-ascii?Q?BfKFgX64tqwW+QTAzuKbXQLdMPrOGOE98UJVjqpOPzzC+FXVA3mhZAAFhf/a?=
- =?us-ascii?Q?CSpQCCggL7kPsQsiT3cgQWiME3eD/TjA3rY5734NkweApEdPQbZ+kpX4P4SP?=
- =?us-ascii?Q?R0Byw5+Ju0GIaEEs5jOvDQb+WWSOdWohcaS6hmMrJh9VEkWCP/i2ICsd4r5x?=
- =?us-ascii?Q?LIncHjA3WP+Sh63MudRQY76ULTp78gq9RPBf77KFLp9g3HO0emzzbk8Ywk8/?=
- =?us-ascii?Q?cHpS4Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEE763BB
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:24:41 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2403EB;
+	Tue, 26 Sep 2023 00:24:39 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q5mEbg021881;
+	Tue, 26 Sep 2023 07:24:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8tY32ey+J+orStTGSZLCWD/fMv5X9gWzCYN4SQZOxSU=;
+ b=QB2JtF8jkWVck1VfsUTMYPOMUsdBZj7lgcvcBnCLGHFjNjPD0VQrX3ijIMeviORT4uiz
+ l+7lpqZtKXk3P7QgbNMVs1/QhpLrZFO8LP18zeBURvVfvGYb5ooIc4XiB0ggM/W7lO73
+ UDBj3nFLrLepASzgJuxr3gY+MCxz3oMFUbprvBc844+o+mC5f29qb6RxqwbwOH9j9Erg
+ FqoenYcuYcSw6IMJdt2jBfHa+QEyfF3aZQl+H9qWPQMagp9rGYz5sSvoBfIU6BUtC+UB
+ u5UhnTAHigobZIIkm8fJy6+vqnMXZDf5sfeJZ3bc3Xb37TM4ciRCg+H3T17guCrcYRth vQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbqbfckw1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 07:24:34 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38Q6toGq010309;
+	Tue, 26 Sep 2023 07:24:33 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbqbfckvb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 07:24:33 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q4qbnv008394;
+	Tue, 26 Sep 2023 07:24:32 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3taabsj263-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 07:24:32 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38Q7OTpf20906746
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Sep 2023 07:24:29 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B439E2004B;
+	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D49320040;
+	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 26 Sep 2023 07:24:29 +0000 (GMT)
+Message-ID: <3f71928e-157a-748e-42ee-4de3c80ed109@linux.ibm.com>
+Date: Tue, 26 Sep 2023 09:24:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYBPR01MB5341.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f576eadb-ecc8-4a08-0330-08dbbe6145b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2023 07:21:59.2976
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TZJHLKJ2xJJLKdJLut+3eFrRbPOMiE4NNKMRPiqrMQV2AmHkEw+1sHlGHQHK2rygWa2FzSTKtMLMDOanOrspvdbwvYutS8Tvfm/UGWlVa4K6JubfkIQ6W4UVA8DxGlvE
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS3PR01MB6007
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
+ device
+Content-Language: en-US
+To: dust.li@linux.alibaba.com, Wen Gu <guwen@linux.alibaba.com>,
+        kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+ <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
+ <20230925151816.GC92403@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20230925151816.GC92403@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6ts8XhcPOgsswvvfsBOK9qhHd3J-Lbc_
+X-Proofpoint-ORIG-GUID: 9_whUnQEoCXAoQyxNBqwVM-8LEICf3o-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_05,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=746
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2309260062
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Andrew,
 
-> From: Andrew Lunn, Sent: Monday, September 25, 2023 11:18 PM
->=20
-> On Mon, Sep 25, 2023 at 09:34:16AM +0900, Yoshihiro Shimoda wrote:
-> > From: Tam Nguyen <tam.nguyen.xa@renesas.com>
-> >
-> > Fix the MPIC.PSMCS value following the programming example in the
-> > section 6.4.2 Management Data Clock (MDC) Setting, Ethernet MAC IP,
-> > S4 Hardware User Manual Rev.1.00.
-> >
-> > The value is calculated by
-> >     MPIC.PSMCS =3D clk[MHz] / ((MDC frequency[MHz] + 1) * 2)
-> > with the input clock frequency of 320MHz and MDC frequency of 2.5MHz.
-> > Otherwise, this driver cannot communicate PHYs on the R-Car S4 Starter
-> > Kit board.
->=20
-> If you run this calculation backwards, what frequency does
-> MPIC_PSMCS(0x3f) map to?
 
-Thank you for your review! I completely misunderstood the formula. In
-other words, the formula cannot calculate backwards. The correct
-formula is:
+On 25.09.23 17:18, Dust Li wrote:
+>> Hello Wen Gu,
+>>
+>> thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
+>>
+>> I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
+>> may want to exploit smcd-loopback. Especially in native environements without containers.
+>>
+>> If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
+>> If loopback is always created unconditionally, there is no way to opt-out.
+> Hi Sandy,
+> 
+> After talking to Wen Gu offline, I think the real issue here might be
+> we don't have an abstract layer in SMC, something like net/core/dev.c
+> 
+> Without this, we cannot do:
+> 
+> 1. Enable/disable those devices dynamically
+>    Currently, If we want to disable a SMC-R device to communicate with
+>    others, we need to refer to 'ip link set dev xxx down' to disable the
+>    netdevice, then Infiniband subsystem will notify SMC that the state of
+>    the IB device has changed. We cannot explicitly choose not to use some
+>    specific IB/RoCE devices without disable totally.
+>    If the loopback device need to support enable/disable itself, I
+>    think it might be better to enable this feature for all SMC devices.
+> 
+> 2. Do statistics per device
+>    Now, we have to relay on IB/RoCE devices' hardware statistics to see
+>    how many packets/bytes we have sent through this device.
+> 
+> Both the above issues get worse when the IB/RoCE device is shared by SMC
+> and userspace RDMA applications. If SMC-R and userspace RDMA applications
+> run at the same time, we can't enable the device to run userspace RDMA
+> applications while block it from running SMC. For statistics, we cannot
+> tell how many packets/bytes were sent by SMC and how many were sent by
+> userspace RDMA applications.
+> 
+> So I think those are better to support in the SMC layer.
+> 
+> Best regards!
+> Dust
 
-MPIC.PSMCS =3D clk[MHz] / (MDC frequency[MHz] * 2) - 1
+Thank you very much for your considerations. I also think a generic handling 
+of these requirements in the smc layer would be best. Especially, if we want 
+to add virtio-ism support soon. There we will face the same issues again.
+Let's hear what others think about this.
 
-> Is 320MHz really fixed? For all silicon variants? Is it possible to do
-> a clk_get_rate() on a clock to get the actual clock rate?
-
-320MHz is really fixed on the current existing all silicon variants.
-Yes, it is possible to do a clk_get_rate() on a clock to get the actual
-clock rate. So, I'll use clk_get_rate() on v2.
-
-Best regards,
-Yoshihiro Shimoda
-
-> 	Andrew
 
