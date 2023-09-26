@@ -1,118 +1,154 @@
-Return-Path: <netdev+bounces-36292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6FB7AEC42
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:17:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2EE7AECE2
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id BB5B71C20756
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:17:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 34632B209A5
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D16C2770B;
-	Tue, 26 Sep 2023 12:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5161A289;
+	Tue, 26 Sep 2023 12:31:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2561107B9
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:17:05 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B947EB;
-	Tue, 26 Sep 2023 05:17:04 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QAIpAg025962;
-	Tue, 26 Sep 2023 05:16:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pfpt0220;
- bh=dWXOIzKr3YvQCTmxETjYvRovohbbY4Yz4fKJ63rQShU=;
- b=QnHtq83nQHQZprgW55t1ZotopZuXmwfcrVKbEKnY9WVMMMAn7o/pkQehG5aNPUaCQb01
- 5Pemb+ZQB9MkTC+IS3RkwvMotswwokhUmpag8uuSp34s0iV9DftS2S81IznzOIvNrDRI
- +UOU+njRFOenP9v/3SntO6jNwW7w5dnB74r7puHEujuNpqCvIULUwIi6kOwpy0H4MBGK
- QNxb/DJm7kMzLPLFigE4hdXQhFvMZEi9gIAapzetWjdUAQI53xmCRcGPGZuHkh7Gd8Te
- WRJGKtQ0b4TGfFbTCNgw1jP2wrjEY2RRTtLVAxXJN2uzBL43g4P6xYlQs2AjjJlmNiRy Ow== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3t9yhm0ugq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 05:16:38 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 26 Sep
- 2023 05:16:36 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 26 Sep 2023 05:16:36 -0700
-Received: from [10.193.38.177] (unknown [10.193.38.177])
-	by maili.marvell.com (Postfix) with ESMTP id A980C3F7053;
-	Tue, 26 Sep 2023 05:16:33 -0700 (PDT)
-Message-ID: <f8d79f01-38d6-9385-f213-b34779b8bb54@marvell.com>
-Date: Tue, 26 Sep 2023 14:16:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1F27EC8
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:31:06 +0000 (UTC)
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3A7910A;
+	Tue, 26 Sep 2023 05:31:02 -0700 (PDT)
+X-IronPort-AV: E=Sophos;i="6.03,177,1694703600"; 
+   d="scan'208";a="181033875"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie6.idc.renesas.com with ESMTP; 26 Sep 2023 21:31:02 +0900
+Received: from localhost.localdomain (unknown [10.166.15.32])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 2A1224004CFB;
+	Tue, 26 Sep 2023 21:31:02 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Tam Nguyen <tam.nguyen.xa@renesas.com>,
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Subject: [PATCH net v3] rswitch: Fix PHY station management clock setting
+Date: Tue, 26 Sep 2023 21:30:54 +0900
+Message-Id: <20230926123054.3976752-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] Re: [PATCH net-next v5 3/7] net: macsec: indicate next pn
- update when offloading
-To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>,
-        Sabrina Dubroca
-	<sd@queasysnail.net>,
-        Dmitry Bezrukov <dbezrukov@marvell.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <richardcochran@gmail.com>,
-        <sebastian.tobuschat@oss.nxp.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230920092237.121033-1-radu-nicolae.pirea@oss.nxp.com>
- <20230920092237.121033-4-radu-nicolae.pirea@oss.nxp.com>
- <ZQxdLZJa0EpnxpCl@hog> <040a3ede-22f7-bed4-0dbf-10b68a9c7fe1@oss.nxp.com>
-Content-Language: en-US
-From: Igor Russkikh <irusskikh@marvell.com>
-In-Reply-To: <040a3ede-22f7-bed4-0dbf-10b68a9c7fe1@oss.nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: 10_H8fETF35UtVTdIfCOJoVNFs9nbO9a
-X-Proofpoint-ORIG-GUID: 10_H8fETF35UtVTdIfCOJoVNFs9nbO9a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-26_08,2023-09-25_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi guys,
+Fix the MPIC.PSMCS value following the programming example in the
+section 6.4.2 Management Data Clock (MDC) Setting, Ethernet MAC IP,
+S4 Hardware User Manual Rev.1.00.
 
-> On 21.09.2023 18:11, Sabrina Dubroca wrote:
->> 2023-09-20, 12:22:33 +0300, Radu Pirea (NXP OSS) wrote:
->>> Indicate next PN update using update_pn flag in macsec_context.
->>> Offloaded MACsec implementations does not know whether or not the
->>> MACSEC_SA_ATTR_PN attribute was passed for an SA update and assume
->>> that next PN should always updated, but this is not always true.
->>
->> This should probably go through net so that we can fix some drivers
->> that are currently doing the wrong thing. octeontx2 should be
->> fixable. atlantic looks like it would reset the PN to whatever was
->> read during the last dump, and it's unclear if that can be fixed
->> (AFAIU set_egress_sa_record writes the whole config at once).  mscc
+The value is calculated by
+    MPIC.PSMCS = clk[MHz] / (MDC frequency[MHz] * 2) - 1
+with the input clock frequency from clk_get_rate() and MDC frequency
+of 2.5MHz. Otherwise, this driver cannot communicate PHYs on the R-Car
+S4 Starter Kit board.
 
-Thats correct, atlantic hardware requires full table to be in data buffer registers.
-I really doubt its possible to skip PN writing.
+Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
+Reported-by: Tam Nguyen <tam.nguyen.xa@renesas.com>
+Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Tested-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+---
+Changes from v2:
+https://lore.kernel.org/all/20230926081156.3930074-1-yoshihiro.shimoda.uh@renesas.com/
+ - Change subject.
 
->> doesn't seem to modify the PN (even if requested -- should it should
->> reject the update), and mlx5 doesn't allow PN update (by storing the
->> initial value of next_pn on SA creation).
-> 
-> I updated octeontx2, mssc and mlx5. Atlantic is unclear.
-> 
-> Mark, Igor, in the atlantic MACsec driver, can the SAs be updated
-> without a PN update?
+Changes from v1:
+https://lore.kernel.org/all/20230925003416.3863560-1-yoshihiro.shimoda.uh@renesas.com/
+ - Revise the formula on the commit description.
+ - Calculate the PSMCS value by using clk_get_raate().
+ -- So, change author and Add Reported-by.
 
-Reviewed the code and the docs I have - my view is it can not.
-All the packed record in macsec_api.c:set_egress_sa_record is expected by hardware in full.
+ drivers/net/ethernet/renesas/rswitch.c | 13 ++++++++++++-
+ drivers/net/ethernet/renesas/rswitch.h |  2 ++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-Regards,
-  Igor
+diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+index ea9186178091..fc01ad3f340d 100644
+--- a/drivers/net/ethernet/renesas/rswitch.c
++++ b/drivers/net/ethernet/renesas/rswitch.c
+@@ -4,6 +4,7 @@
+  * Copyright (C) 2022 Renesas Electronics Corporation
+  */
+ 
++#include <linux/clk.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/err.h>
+ #include <linux/etherdevice.h>
+@@ -1049,7 +1050,7 @@ static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
+ static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
+ {
+ 	rswitch_modify(etha->addr, MPIC, MPIC_PSMCS_MASK | MPIC_PSMHT_MASK,
+-		       MPIC_PSMCS(0x05) | MPIC_PSMHT(0x06));
++		       MPIC_PSMCS(etha->psmcs) | MPIC_PSMHT(0x06));
+ 	rswitch_modify(etha->addr, MPSM, 0, MPSM_MFF_C45);
+ }
+ 
+@@ -1693,6 +1694,12 @@ static void rswitch_etha_init(struct rswitch_private *priv, int index)
+ 	etha->index = index;
+ 	etha->addr = priv->addr + RSWITCH_ETHA_OFFSET + index * RSWITCH_ETHA_SIZE;
+ 	etha->coma_addr = priv->addr;
++
++	/* MPIC.PSMCS = (clk [MHz] / (MDC frequency [MHz] * 2) - 1.
++	 * Calculating PSMCS value as MDC frequency = 2.5MHz. So, multiply
++	 * both the numerator and the denominator by 10.
++	 */
++	etha->psmcs = clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
+ }
+ 
+ static int rswitch_device_alloc(struct rswitch_private *priv, int index)
+@@ -1900,6 +1907,10 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 	spin_lock_init(&priv->lock);
+ 
++	priv->clk = devm_clk_get(&pdev->dev, NULL);
++	if (IS_ERR(priv->clk))
++		return PTR_ERR(priv->clk);
++
+ 	attr = soc_device_match(rswitch_soc_no_speed_change);
+ 	if (attr)
+ 		priv->etha_no_runtime_change = true;
+diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
+index f0c16a37ea55..04f49a7a5843 100644
+--- a/drivers/net/ethernet/renesas/rswitch.h
++++ b/drivers/net/ethernet/renesas/rswitch.h
+@@ -915,6 +915,7 @@ struct rswitch_etha {
+ 	bool external_phy;
+ 	struct mii_bus *mii;
+ 	phy_interface_t phy_interface;
++	u32 psmcs;
+ 	u8 mac_addr[MAX_ADDR_LEN];
+ 	int link;
+ 	int speed;
+@@ -1012,6 +1013,7 @@ struct rswitch_private {
+ 	struct rswitch_mfwd mfwd;
+ 
+ 	spinlock_t lock;	/* lock interrupt registers' control */
++	struct clk *clk;
+ 
+ 	bool etha_no_runtime_change;
+ 	bool gwca_halt;
+-- 
+2.25.1
+
 
