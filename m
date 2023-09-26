@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-36342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B511A7AF4B3
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:05:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79D817AF4BA
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 22:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 06ACBB207F0
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:05:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9C72B281EFC
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 20:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F95499A1;
-	Tue, 26 Sep 2023 20:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE77499A2;
+	Tue, 26 Sep 2023 20:05:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5352C328A1
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:05:12 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D02211F
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:10 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso14806391276.1
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A86C328A1
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:05:15 +0000 (UTC)
+Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87DEF194
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:13 -0700 (PDT)
+Received: by mail-io1-xd4a.google.com with SMTP id ca18e2360f4ac-790d3e93a25so1240220339f.0
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695758709; x=1696363509; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=LUHQqKLA03cvxOqIb9LV+319kkd0FdCrPANHPM/IRTw=;
-        b=atLFwbr8blVejomJeCh4lmIxX20DbV2RNAqifweKxAWRvnZExZjZrAw4c31yp0sInI
-         k2Hxy3zQagyqWF2rNcnY093lwRXKqSU94jdl1tb/lHJNSgc6KJZCVmEDBtACX+3RtX5G
-         Y6t8S3aIZJ0R1KvnNPmlwJJ4XmU+XFr25Wy2y3xy6l0SNA1QIT0X5LaFaZRqfOr9Bcbi
-         hAxZPer1LDuotdMLhHuR4h+7lWENJyHmJ5RQ+nCamGDs/YI0eFAAMg3ner6O1UseAx77
-         hwR9F7FEDxieu6VbJniVZ9nA/XvlLgwVHTtpwGBV19bLXmn+bTnETagjXvy+tlbgBUIp
-         RkkA==
+        d=google.com; s=20230601; t=1695758712; x=1696363512; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3bPJjIsPmHmwi+Eu0+GyNZUXrMn22SrOLV+oVGGBzwU=;
+        b=QdxdKR018VDb7P3I3YlQobzqnoLNRUnnCyIuGMfXhO9cqkO5AeiTcdqria2tHKPDqw
+         wo2i8J7WCXOfI8amssYt0W3+RqJXhJ27F8F6YRyBmXzo+o5Tcqao8vUjxqMoJvjYzjnv
+         lLX4BP13ETlo2B5wYSw+8IX5XvhhkPZBXnx/nAzM35gjVDFiCq0SWSspZDiifpEpPlxa
+         cCfnM7yNy67zdgarNHxXAmptNAZm42yEhLU5QVXf1DNqnaKk8EBQqYedhkiEBJyFtvzH
+         QgB25oVoXgBNvKH7Syx7latiVYRf7ARFpU/eqy6j21L/5jxx+q68OK265WvrHn54JYpl
+         F2pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695758709; x=1696363509;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LUHQqKLA03cvxOqIb9LV+319kkd0FdCrPANHPM/IRTw=;
-        b=OzX274RcnS4x2DAgA+dxpT5XcdwtS6fuuTJnsIsxBgTJaVOO9I5ofFGEEPEXrdIspK
-         XP4nnnmkwQrSSXAVc5AHz6zR+PlMK8/7Qog0y7aPnvSeVU2yqW/PR8/OcGm0GYdJuD+z
-         Eclc6CIkh4KFBj5jNvGokH9tSSzS1dXG/s5oaJ0fptuTcinikT7+0Cf+z1sCgfPLdbuh
-         Chh3q7I7MXlj89kAPqtEjtewssZ8Tp8KAmqkfjBTol7mgUsxyggLHAS6/qeT4KtLBuIt
-         jUHKfaBlN6tLLmq7dQBUxRp+4mJEit2MV4q6vFboaBGiX9VjwMrV3KtlVLnGAo17XAGh
-         v24A==
-X-Gm-Message-State: AOJu0Yy8GzjGxONZezE0TJ+o9F5kDGLGaBd+3dIYJfhWCPKuFw2JTDQO
-	tUHoALlZjUG2+FUMqnR6yt+qqd94IA==
-X-Google-Smtp-Source: AGHT+IHiar7acMg7OZkqRteQy8u+g7Q3fC4ZlZH6+0avyWJDsbyt98fkghdeToG/rJkXrrHt5fTNug6bGg==
+        d=1e100.net; s=20230601; t=1695758712; x=1696363512;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3bPJjIsPmHmwi+Eu0+GyNZUXrMn22SrOLV+oVGGBzwU=;
+        b=muK54qXZdwTbNEg3KlQenS6gVFKVu5aG7SOWNQnxUFla4Ph7nhF6NFbxdqTeNEE4ry
+         fu3xmg7qsyt8kox2d1Ovfy4gJ3kyuzeXIw6UG8J3v7+wNQ0zkBVENsfd0nYST5Nu56GN
+         mE8RUU9ke4ScEl6n9IU/dgjMXmuJDP4sejJrzcYdQxiLCDZhXRquv8ZJ12W4mLOb00KP
+         z1ORYZPDCDjvyMuua7hncMy6H1hpNQ8D1Vvty1vd1PyUiTYNsWfZRrvf+Q5cQWCRDiNx
+         dwGiCiQCim3+DhFyV52UYpL4uMFOszmduu+wZNya5orVDf3r3Rtuf4gYoGRRhyKVTRw0
+         nxDg==
+X-Gm-Message-State: AOJu0Yx+1VQWA3jwT6Wt+tcd9pE6BCnBHffvYZGE7uNaH8wiqS/PrmV3
+	no1/9JwhUaVSMWAZUDt8hixO/pG0SQ==
+X-Google-Smtp-Source: AGHT+IEzIkpre/+4lLTj1Y3n0rLDVitTTn2Hh0vxS4CExp5VXmGekw+m4PiW3pEg4WIhcV6yD7AarCtsHA==
 X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a5b:752:0:b0:d89:4d2c:d846 with SMTP id
- s18-20020a5b0752000000b00d894d2cd846mr52999ybq.12.1695758709189; Tue, 26 Sep
- 2023 13:05:09 -0700 (PDT)
-Date: Tue, 26 Sep 2023 15:05:02 -0500
+ (user=jrife job=sendgmr) by 2002:a05:6638:3a0c:b0:43c:e73c:74e7 with SMTP id
+ cn12-20020a0566383a0c00b0043ce73c74e7mr39988jab.3.1695758712659; Tue, 26 Sep
+ 2023 13:05:12 -0700 (PDT)
+Date: Tue, 26 Sep 2023 15:05:03 -0500
+In-Reply-To: <20230926200505.2804266-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20230926200505.2804266-1-jrife@google.com>
 X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-Message-ID: <20230926200505.2804266-1-jrife@google.com>
-Subject: [PATCH net v6 0/3] Insulate Kernel Space From SOCK_ADDR Hooks
+Message-ID: <20230926200505.2804266-2-jrife@google.com>
+Subject: [PATCH net v6 1/3] net: replace calls to sock->ops->connect() with kernel_connect()
 From: Jordan Rife <jrife@google.com>
 To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
@@ -69,104 +71,60 @@ Cc: dborkman@kernel.org, horms@verge.net.au, pablo@netfilter.org,
 	rds-devel@oss.oracle.com, coreteam@netfilter.org, 
 	netfilter-devel@vger.kernel.org, ja@ssi.bg, lvs-devel@vger.kernel.org, 
 	kafai@fb.com, daniel@iogearbox.net, daan.j.demeyer@gmail.com, 
-	Jordan Rife <jrife@google.com>
+	Jordan Rife <jrife@google.com>, stable@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-==OVERVIEW==
-
-The sock_sendmsg(), kernel_connect(), and kernel_bind() functions
-provide kernel space equivalents to the sendmsg(), connect(), and bind()
-system calls.
-
-When used in conjunction with BPF SOCK_ADDR hooks that rewrite the send,
-connect, or bind address, callers may observe that the address passed to
-the call is modified. This is a problem not just in theory, but in
-practice, with uninsulated calls to kernel_connect() causing issues with
-broken NFS and CIFS mounts.
-
 commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
-ensured that callers to kernel_connect() are insulated from such effects
-by passing a copy of the address parameter down the stack, but did not
-go far enough:
+ensured that kernel_connect() will not overwrite the address parameter
+in cases where BPF connect hooks perform an address rewrite. This change
+replaces direct calls to sock->ops->connect() in net with kernel_connect()
+to make these call safe.
 
-- There remain many instances of direct calls to sock->ops->connect()
-  throughout the kernel which do not benefit from the change to
-  kernel_connect().
-- sock_sendmsg() and kernel_bind() remain uninsulated from address
-  rewrites and there exist many direct calls to sock->ops->bind()
-  throughout the kernel.
+Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
+Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
+Cc: stable@vger.kernel.org
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Jordan Rife <jrife@google.com>
+---
+ net/netfilter/ipvs/ip_vs_sync.c | 4 ++--
+ net/rds/tcp_connect.c           | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-This patch series is the first step to ensuring all socket operations in
-kernel space are safe to use with BPF SOCK_ADDR hooks. It
-
-1) Wraps direct calls to sock->ops->connect() with kernel_connect() to
-   insulate them.
-2) Introduces an address copy to sock_sendmsg() to insulate both calls
-   to kernel_sendmsg() and sock_sendmsg() in kernel space.
-3) Introduces an address copy to kernel_bind() and wraps direct calls to
-   sock->ops->bind() to insulate them.
-
-Earlier versions of this patch series wrapped all calls to
-sock->ops->conect() and sock->ops->bind() throughout the kernel, but
-this was pared down to instances occuring only in net to avoid merge
-conflicts. A set of patches to various trees will be made as a follow up
-to this series to address this gap.
-
-==CHANGELOG==
-
-V5->V6
-------
-- Preserve original value of msg->msg_namelen in sock_sendmsg() in
-  anticipation of this patch that adds support for SOCK_ADDR hooks to
-  Unix sockets and the ability to modify msg->msg_namelen:
-  - https://lore.kernel.org/bpf/202309231339.L2O0CrMU-lkp@intel.com/T/#m181770af51156bdaa70fd4a4cb013ba11f28e101
-
-V4->V5
-------
-- Removed non-net changes to avoid potential merge conflicts.
-
-V3->V4
-------
-- Removed address length precondition checks from kernel_connect() and
-  kernel_bind().
-- Reordered variable declarations in sock_sendmsg() to maintain reverse
-  xmas tree order.
-
-V2->V3
-------
-- Added "Fixes" tags
-- Added address length precondition checks to kernel_connect() and
-  kernel_bind().
-
-V1->V2
-------
-- Split up single patch into patch series.
-- Wrapped all direct calls to sock->ops->connect() with kernel_connect()
-  instead of pushing the address deeper into the stack to avoid
-  duplication of address copy logic and to encourage a consistent
-  interface.
-- Moved address copy up the stack to sock_sendmsg() to avoid duplication
-  of address copy logic.
-- Introduced address copy to kernel_bind() and insulated direct calls to
-  sock->ops->bind().
-
-Jordan Rife (3):
-  net: replace calls to sock->ops->connect() with kernel_connect()
-  net: prevent rewrite of msg_name and msg_namelen in sock_sendmsg()
-  net: prevent address rewrite in kernel_bind()
-
- net/netfilter/ipvs/ip_vs_sync.c |  8 ++++----
- net/rds/tcp_connect.c           |  4 ++--
- net/rds/tcp_listen.c            |  2 +-
- net/socket.c                    | 36 ++++++++++++++++++++++++++-------
- 4 files changed, 36 insertions(+), 14 deletions(-)
-
+diff --git a/net/netfilter/ipvs/ip_vs_sync.c b/net/netfilter/ipvs/ip_vs_sync.c
+index da5af28ff57b5..6e4ed1e11a3b7 100644
+--- a/net/netfilter/ipvs/ip_vs_sync.c
++++ b/net/netfilter/ipvs/ip_vs_sync.c
+@@ -1505,8 +1505,8 @@ static int make_send_sock(struct netns_ipvs *ipvs, int id,
+ 	}
+ 
+ 	get_mcast_sockaddr(&mcast_addr, &salen, &ipvs->mcfg, id);
+-	result = sock->ops->connect(sock, (struct sockaddr *) &mcast_addr,
+-				    salen, 0);
++	result = kernel_connect(sock, (struct sockaddr *)&mcast_addr,
++				salen, 0);
+ 	if (result < 0) {
+ 		pr_err("Error connecting to the multicast addr\n");
+ 		goto error;
+diff --git a/net/rds/tcp_connect.c b/net/rds/tcp_connect.c
+index f0c477c5d1db4..d788c6d28986f 100644
+--- a/net/rds/tcp_connect.c
++++ b/net/rds/tcp_connect.c
+@@ -173,7 +173,7 @@ int rds_tcp_conn_path_connect(struct rds_conn_path *cp)
+ 	 * own the socket
+ 	 */
+ 	rds_tcp_set_callbacks(sock, cp);
+-	ret = sock->ops->connect(sock, addr, addrlen, O_NONBLOCK);
++	ret = kernel_connect(sock, addr, addrlen, O_NONBLOCK);
+ 
+ 	rdsdebug("connect to address %pI6c returned %d\n", &conn->c_faddr, ret);
+ 	if (ret == -EINPROGRESS)
 -- 
 2.42.0.515.g380fc7ccd1-goog
 
