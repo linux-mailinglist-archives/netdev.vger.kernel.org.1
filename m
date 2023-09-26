@@ -1,182 +1,155 @@
-Return-Path: <netdev+bounces-36302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5350A7AED7C
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:59:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D78567AED9B
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 15:04:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id A8157B2099B
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:59:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 27B52B20981
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8572869D;
-	Tue, 26 Sep 2023 12:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B325D28DA8;
+	Tue, 26 Sep 2023 13:04:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D122770B
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:59:36 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D931BCCB
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:59:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D902770B
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 13:04:41 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D55F3
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 06:04:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695733173;
+	s=mimecast20190719; t=1695733479;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UqxXzmMvP8NFAv3ZN9+oJyNJ16533RmhYaiAN1MoQNI=;
-	b=BGjl4YQYduUvQd6v/XeJ2Tnlq/MfJZmulDXB4o/tih/L0tkflO67b8howbuTI6cndsx4oZ
-	b4JKolwj4LMyq0FW2f2wdmQNEaepWVy9K5t4SJwiES4bT/uH63+n7JxvdHUFkLfvdw1qmw
-	/ngUeLWnGSnERpsmxphvvPst6veQxLY=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pw3uLk1RX7EItsMeljDJQUwIv63n45/6NY/27SYTAmo=;
+	b=FOdNHx0O7Mzvr+gNApSPjRGbXufqoyCY6rUhahLgkbA50Qcg8XnOstCw4iz8udCis89Wvb
+	jVZ7p9LL8wAWDG5JVgvRDc11Vn2t1JQiwKWPVSOW25VJjhTbemtGVGCSahTuMpsKkdc/I0
+	rXPEKg1j+M6ZUWGYWXTcXAqcDgDMc1g=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-568-dGYr1QQvNyiI_HAEv0Ub5w-1; Tue, 26 Sep 2023 08:59:31 -0400
-X-MC-Unique: dGYr1QQvNyiI_HAEv0Ub5w-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3ae3a936494so11609803b6e.2
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:59:31 -0700 (PDT)
+ us-mta-371-zCEMO5MHOeCoHwi3iIkp2Q-1; Tue, 26 Sep 2023 09:04:37 -0400
+X-MC-Unique: zCEMO5MHOeCoHwi3iIkp2Q-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-99388334de6so753048466b.0
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 06:04:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695733171; x=1696337971;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqxXzmMvP8NFAv3ZN9+oJyNJ16533RmhYaiAN1MoQNI=;
-        b=MUttTAt+z1ndDoNOTMupX1K6skfhQG1aT/QPAEud7VMyFDFGX4OooTbKhEt1HWpNAT
-         kidNQQM7+AudIqY9QDW+1NFEBfOzVOWP9bmSwoK2/f3X+iVDZUkbCEuy/YI2MRntz/sp
-         UIzYdjjkewyBPFaPjEFavro6n7ohZlrg6LuWpxV/OaZ1p+Q3DImplfXEwwRvovv9Z8g3
-         nA1XprijPhUyJF3LL4E75hzOi78dbZR+VWZL2L4h1vPDRHW9FIG11REcgLeelJNDAJL3
-         q/cVCON6xp9qL5dL7EGeWPWWo6tqTnfxfhwKGvDSjpq7jvhkOqCsKZP5nQAjXWyOFlkw
-         GIUg==
-X-Gm-Message-State: AOJu0YwvNiAkO490yLT0ULgK7S+FAlU8Z0dK7T3PDnAiSk/7m036dpRz
-	gd6wWtd8J7BS4kxciXeHTgJDI6qx6FZpMCtx95NS8lbKE+Rhvh8gCHsugAxwI3zoGVAcL8yNbKz
-	DHhmcNcTtaUnA3Hkitlltykpe
-X-Received: by 2002:aca:d17:0:b0:3ae:5c14:8686 with SMTP id 23-20020aca0d17000000b003ae5c148686mr579418oin.2.1695733170911;
-        Tue, 26 Sep 2023 05:59:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkwflebs1+GFyASqCe4hFg5FMJnbHZG3/VB40LZYpDYGNgdspzcMuDcuwxht0BuZ+jXyYfEQ==
-X-Received: by 2002:aca:d17:0:b0:3ae:5c14:8686 with SMTP id 23-20020aca0d17000000b003ae5c148686mr579404oin.2.1695733170597;
-        Tue, 26 Sep 2023 05:59:30 -0700 (PDT)
-Received: from ?IPV6:240d:1a:c0d:9f00:f0fd:a9ac:beeb:ad24? ([240d:1a:c0d:9f00:f0fd:a9ac:beeb:ad24])
-        by smtp.gmail.com with ESMTPSA id i13-20020aa78d8d000000b00689f8dc26c2sm9875306pfr.133.2023.09.26.05.59.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Sep 2023 05:59:30 -0700 (PDT)
-Message-ID: <f6c4aa78-1ecc-d654-ba3a-23e0ae935e49@redhat.com>
-Date: Tue, 26 Sep 2023 21:59:26 +0900
+        d=1e100.net; s=20230601; t=1695733476; x=1696338276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pw3uLk1RX7EItsMeljDJQUwIv63n45/6NY/27SYTAmo=;
+        b=DAq35Bfz2iPjwYJgc/+8nie/MKy0Fq/jIYcvRm54gqsnue4MRu3P+T5H+nuPgp1BGi
+         xpxrPAAKtGY5sDh2Ao2aw/H4VVdCMDPMD1hEKbnRpsfTqIl+5kpxFQ4s2AxIS0Woj4We
+         hl/E1v+NzuTOZlnS8hHaMj/gi6hX2Kkv+UtTRLf7HJagdi092GWjV/Qr6cIq/4oeQwU1
+         6fMaHG743ve7H2IQwSlSYbxfCvfAjuC32ACDzjFPDA6brCfxiN80RBbCC3HdWnFniBjv
+         hdUJykmXHJIgcmpLT2R0+cbKs/60SGbA9RFgn7nTeFNiZksXfRHKRVTiYrzd4mbYpHnY
+         4ysw==
+X-Gm-Message-State: AOJu0YwETw0KeZRo2soLqVjQfDnD7TzVFnCdexmkHnZ+rUKTugTdked4
+	9zmIymRFygxsGjR5baYKJi0Kd9UVLphFwhqepE/WZ92t18EFQy7CttgMfnneLfPxSta4KQIH1sU
+	9OkvKBvieFSEcR0hH
+X-Received: by 2002:a17:906:3299:b0:9ae:6196:a4d0 with SMTP id 25-20020a170906329900b009ae6196a4d0mr8605611ejw.17.1695733476617;
+        Tue, 26 Sep 2023 06:04:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEPT+qJWI4CE1FK30C7JELaHKq82GsQA7VABRt7UrHezh/PpcrPOPNsUXvYOw92dsnA/haacQ==
+X-Received: by 2002:a17:906:3299:b0:9ae:6196:a4d0 with SMTP id 25-20020a170906329900b009ae6196a4d0mr8605597ejw.17.1695733476299;
+        Tue, 26 Sep 2023 06:04:36 -0700 (PDT)
+Received: from sgarzare-redhat ([46.6.146.182])
+        by smtp.gmail.com with ESMTPSA id r11-20020a170906704b00b00999bb1e01dfsm7746690ejj.52.2023.09.26.06.04.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Sep 2023 06:04:35 -0700 (PDT)
+Date: Tue, 26 Sep 2023 15:04:31 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [PATCH net-next v1 12/12] test/vsock: io_uring rx/tx tests
+Message-ID: <kfuzqzhrgdk5f5arbq4n3vd6vro6533aeysqhdgqevcqxrdm6e@57ylpkc2t4q4>
+References: <20230922052428.4005676-1-avkrasnov@salutedevices.com>
+ <20230922052428.4005676-13-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH] tipc: Fix uninit-value access in
- tipc_nl_node_reset_link_stats()
-To: Jon Maloy <jmaloy@redhat.com>
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org,
- syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com, ying.xue@windriver.com
-References: <20230924060325.3779150-1-syoshida@redhat.com>
- <a9f6e851-5f41-a114-a7f8-493c639c664d@redhat.com>
-Content-Language: en-US
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <a9f6e851-5f41-a114-a7f8-493c639c664d@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230922052428.4005676-13-avkrasnov@salutedevices.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/26/23 20:19, Jon Maloy wrote:
-> 
-> 
-> On 2023-09-24 02:03, Shigeru Yoshida wrote:
->> syzbot reported the following uninit-value access issue:
->>
->> =====================================================
->> BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
->> BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
->>   strlen lib/string.c:418 [inline]
->>   strstr+0xb8/0x2f0 lib/string.c:756
->>   tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
->>   genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
->>   genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
->>   genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
->>   netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
->>   genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
->>   netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->>   netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
->>   netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
->>   sock_sendmsg_nosec net/socket.c:730 [inline]
->>   sock_sendmsg net/socket.c:753 [inline]
->>   ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
->>   ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
->>   __sys_sendmsg net/socket.c:2624 [inline]
->>   __do_sys_sendmsg net/socket.c:2633 [inline]
->>   __se_sys_sendmsg net/socket.c:2631 [inline]
->>   __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
->>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>
->> Uninit was created at:
->>   slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
->>   slab_alloc_node mm/slub.c:3478 [inline]
->>   kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
->>   kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
->>   __alloc_skb+0x318/0x740 net/core/skbuff.c:650
->>   alloc_skb include/linux/skbuff.h:1286 [inline]
->>   netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
->>   netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
->>   sock_sendmsg_nosec net/socket.c:730 [inline]
->>   sock_sendmsg net/socket.c:753 [inline]
->>   ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
->>   ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
->>   __sys_sendmsg net/socket.c:2624 [inline]
->>   __do_sys_sendmsg net/socket.c:2633 [inline]
->>   __se_sys_sendmsg net/socket.c:2631 [inline]
->>   __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
->>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
->>
->> Link names must be null-terminated strings. If a link name which is not
->> null-terminated is passed through netlink, strstr() and similar functions
->> can cause buffer overrun. This causes the above issue.
->>
->> This patch fixes this issue by returning -EINVAL if a non-null-terminated
->> link name is passed.
->>
->> Fixes: ae36342b50a9 ("tipc: add link stat reset to new netlink api")
->> Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574
->> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
->> ---
->>   net/tipc/node.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/net/tipc/node.c b/net/tipc/node.c
->> index 3105abe97bb9..f167bdafc034 100644
->> --- a/net/tipc/node.c
->> +++ b/net/tipc/node.c
->> @@ -2586,6 +2586,10 @@ int tipc_nl_node_reset_link_stats(struct sk_buff *skb, struct genl_info *info)
->>         link_name = nla_data(attrs[TIPC_NLA_LINK_NAME]);
->>   +    if (link_name[strnlen(link_name,
->> +                  nla_len(attrs[TIPC_NLA_LINK_NAME]))] != '\0')
->> +        return -EINVAL;
->> +
->>       err = -EINVAL;
->>       if (!strcmp(link_name, tipc_bclink_name)) {
->>           err = tipc_bclink_reset_stats(net, tipc_bc_sndlink(net));
-> Acked-by: Jon Maloy <jmaloy@redhat.com>
+On Fri, Sep 22, 2023 at 08:24:28AM +0300, Arseniy Krasnov wrote:
+>This adds set of tests which use io_uring for rx/tx. This test suite is
+>implemented as separated util like 'vsock_test' and has the same set of
+>input arguments as 'vsock_test'. These tests only cover cases of data
+>transmission (no connect/bind/accept etc).
+>
+>Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>---
+> Changelog:
+> v5(big patchset) -> v1:
+>  * Use LDLIBS instead of LDFLAGS.
+>
+> tools/testing/vsock/Makefile           |   7 +-
+> tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
+> 2 files changed, 327 insertions(+), 1 deletion(-)
+> create mode 100644 tools/testing/vsock/vsock_uring_test.c
+>
+>diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
+>index 1a26f60a596c..c84380bfc18d 100644
+>--- a/tools/testing/vsock/Makefile
+>+++ b/tools/testing/vsock/Makefile
+>@@ -1,12 +1,17 @@
+> # SPDX-License-Identifier: GPL-2.0-only
+>+ifeq ($(MAKECMDGOALS),vsock_uring_test)
+>+LDLIBS = -luring
+>+endif
+>+
 
-Thanks! syzbot reported very similar issue regarding bearer name too.
-I've sent a patch for that issue.
+This will fails if for example we call make with more targets,
+e.g. `make vsock_test vsock_uring_test`.
 
-Thanks,
-Shigeru 
+I'd suggest to use something like this:
+
+--- a/tools/testing/vsock/Makefile
++++ b/tools/testing/vsock/Makefile
+@@ -1,13 +1,11 @@
+  # SPDX-License-Identifier: GPL-2.0-only
+-ifeq ($(MAKECMDGOALS),vsock_uring_test)
+-LDLIBS = -luring
+-endif
+-
+  all: test vsock_perf
+  test: vsock_test vsock_diag_test
+  vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+  vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+  vsock_perf: vsock_perf.o
++
++vsock_uring_test: LDLIBS = -luring
+  vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
+
+  CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
+
+> all: test vsock_perf
+> test: vsock_test vsock_diag_test
+> vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+> vsock_perf: vsock_perf.o
+>+vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
+
+Shoud we add this new test to the "test" target as well?
+
+Stefano
 
 
