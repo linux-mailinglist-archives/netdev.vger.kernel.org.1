@@ -1,139 +1,124 @@
-Return-Path: <netdev+bounces-36199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 599607AE3D1
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 04:57:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AB27AE3E1
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 05:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BA10328189E
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 02:57:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E2AB71F25236
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 03:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C67F1102;
-	Tue, 26 Sep 2023 02:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F851102;
+	Tue, 26 Sep 2023 03:01:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBF37F
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 02:57:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9249F
-	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:57:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695697063;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n8rCoPOuaYDCIDe0rlK/tHfmdP2Iqj9+uLvJ1lMY8pc=;
-	b=Pf7E7FZn2JfcDosl1+6xhlzVOHZjTIMcotJVMtAyqLSdGCF2r1se7Ip8rxSFiDHFxDrglT
-	tVdctKMDRLK8Ut5SohELb3MbHJDQ5aweJWHhPEmfZ6l5345kE/O/IjtMOsXaetCzaASTVZ
-	0ojo8Nomoj83rNMMyKNyqcFwYf1V0ME=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-19-oClSNFQhMbSBehYWJqIf_Q-1; Mon, 25 Sep 2023 22:57:41 -0400
-X-MC-Unique: oClSNFQhMbSBehYWJqIf_Q-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c135cf13e1so103328161fa.0
-        for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 19:57:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695697060; x=1696301860;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=n8rCoPOuaYDCIDe0rlK/tHfmdP2Iqj9+uLvJ1lMY8pc=;
-        b=fFM16+m17Ez5GNgMtKQ87UwdHeg3xUwiOz9zfIIdskIvROmRh9On1KvcLuVyarPvZb
-         Tpagad9+GGXIpUOx1CSbHw8YeoUTU3QeNlIN/2mCPSzgYxzWhwZxx5WE6b/HxTApy4sx
-         YbAEgW5eoHwmHWZHvbTrhG7LVqzMskKLZrzgxyp5Ee0zR5gEJf+zRgfNp7dnL65ClCUp
-         wvtGR2eC0BVHJoBbbCdDmE9zZqyv0EdrCf0/mtMeg+C2rIoLhibSLrQ1igm1S15U2fvV
-         9vINj1oNAYQ+VnE9oRlXqBTtih+VbjTIOSm9wbA0ki1bs1zAZvPmDrg9ic3R7fUTptPl
-         VJbA==
-X-Gm-Message-State: AOJu0YwgLCYi8x+418higS+3CxTSU6+noNVcu/acjbrstWnTHOyIKwet
-	drB96ESNPh5xHrBVbHIM8A1LPGhwkvZIVb7BK9OOh1mOgfN9aQuLX//aNT8LjEN0kAWRS0QdE5k
-	FqN/Q7BfTfkrvRIxN56yPq7h1CG+jvEcZ
-X-Received: by 2002:ac2:48ac:0:b0:503:a76:4eeb with SMTP id u12-20020ac248ac000000b005030a764eebmr5830376lfg.16.1695697060332;
-        Mon, 25 Sep 2023 19:57:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF3RwYqaYdD2D197Rxxx50AyfpQufQFfgo1/JwgJGy62/rNkyDXHkQuYdQhZ6f74/Yi67MydQBhjJAzFfg+eVI=
-X-Received: by 2002:ac2:48ac:0:b0:503:a76:4eeb with SMTP id
- u12-20020ac248ac000000b005030a764eebmr5830366lfg.16.1695697060053; Mon, 25
- Sep 2023 19:57:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7C47F
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 03:01:02 +0000 (UTC)
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44044FF;
+	Mon, 25 Sep 2023 20:00:59 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VsvCxfb_1695697255;
+Received: from 30.221.147.7(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VsvCxfb_1695697255)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Sep 2023 11:00:56 +0800
+Message-ID: <c03dad67-169a-bf6d-1915-a9bb722a7259@linux.alibaba.com>
+Date: Tue, 26 Sep 2023 11:00:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230925103057.104541-1-sgarzare@redhat.com>
-In-Reply-To: <20230925103057.104541-1-sgarzare@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 26 Sep 2023 10:57:29 +0800
-Message-ID: <CACGkMEvWKCoB+u2GO2mRroZDmmxcvd8+ytUjpu6wNcBOAu5RYQ@mail.gmail.com>
-Subject: Re: [PATCH] vringh: don't use vringh_kiov_advance() in vringh_iov_xfer()
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.14.0
+Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
+ closing listen socket
+Content-Language: en-US
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com, jaka@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
+ <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
+ <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
+ <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 25, 2023 at 6:31=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> In the while loop of vringh_iov_xfer(), `partlen` could be 0 if one of
-> the `iov` has 0 lenght.
-> In this case, we should skip the iov and go to the next one.
-> But calling vringh_kiov_advance() with 0 lenght does not cause the
-> advancement, since it returns immediately if asked to advance by 0 bytes.
->
-> Let's restore the code that was there before commit b8c06ad4d67d
-> ("vringh: implement vringh_kiov_advance()"), avoiding using
-> vringh_kiov_advance().
->
-> Fixes: b8c06ad4d67d ("vringh: implement vringh_kiov_advance()")
-> Cc: stable@vger.kernel.org
-> Reported-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Acked-by: Jason Wang <jasowang@redhat.com>
 
-Thanks
+On 9/25/23 5:43 PM, Alexandra Winter wrote:
+> On 25.09.23 10:29, D. Wythe wrote:
+>> Hi Wenjia,
+>>
+>>> this is unfortunately not sufficient for this fix. You have to make sure that is not a life-time problem. Even so, READ_ONCE() is also needed in this case.
+>>>
+>> Life-time problem? If you means the smc will still be NULL in the future,  I don't really think so, smc is a local variable assigned by smc_clcsock_user_data.
+>> it's either NULL or a valid and unchanged value.
+>>
+>> And READ_ONCE() is needed indeed, considering not make too much change, maybe we can protected following
+> The local variable smc is a pointer to the smc_sock structure, so the question is whether you can just do a READ_ONCE
+> and then continue to use the content of the smc_sock structure, even though e.g. a smc_close_active() may be going on in
+> parallel.
+>
+>> smc = smc_clcsock_user_data(sk);
+>>
+>> with sk_callback_lock， which solves the same problem. What do you think?
+> In af_ops.syn_recv_sock() and thus also in smc_tcp_syn_recv_sock()
+> sk is defined as const. So you cannot simply do take sk_callback_lock, that will create compiler errors.
+>   (same for smc_hs_congested() BTW)
+>
+> If you are sure the contents of *smc are always valid, then READ_ONCE is all you need.
 
-> ---
->  drivers/vhost/vringh.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 955d938eb663..7b8fd977f71c 100644
-> --- a/drivers/vhost/vringh.c
-> +++ b/drivers/vhost/vringh.c
-> @@ -123,8 +123,18 @@ static inline ssize_t vringh_iov_xfer(struct vringh =
-*vrh,
->                 done +=3D partlen;
->                 len -=3D partlen;
->                 ptr +=3D partlen;
-> +               iov->consumed +=3D partlen;
-> +               iov->iov[iov->i].iov_len -=3D partlen;
-> +               iov->iov[iov->i].iov_base +=3D partlen;
->
-> -               vringh_kiov_advance(iov, partlen);
-> +               if (!iov->iov[iov->i].iov_len) {
-> +                       /* Fix up old iov element then increment. */
-> +                       iov->iov[iov->i].iov_len =3D iov->consumed;
-> +                       iov->iov[iov->i].iov_base -=3D iov->consumed;
-> +
-> +                       iov->consumed =3D 0;
-> +                       iov->i++;
-> +               }
->         }
->         return done;
->  }
-> --
-> 2.41.0
->
+
+Hi Alexandra,
+
+You are right. The key point is how to ensure the valid of smc sock 
+during the life time of clc sock, If so, READ_ONCE is good
+enough. Unfortunately, I found  that there are no such guarantee, so 
+it's still a life-time problem.  Considering the const, maybe
+we need to do :
+
+1. hold a refcnt of smc_sock for syn_recv_sock to keep smc sock valid 
+during life time of clc sock
+2. put the refcnt of smc_sock in sk_destruct in tcp_sock to release the 
+very smc sock .
+
+In that way, we can always make sure the valid of smc sock during the 
+life time of clc sock. Then we can use READ_ONCE rather
+than lock.  What do you think ?
+
+> Maybe it is better to take a step back and consider what needs to be protected when (lifetime).
+> Just some thoughts (there may be ramifications that I am not aware of):
+> Maybe clcsock->sk->sk_user_data could be set to point to smc_sock as soon as the clc socket is created?
+> Isn't the smc socket always valid as long as the clc socket exists?
+> Then sk_user_data would no longer indicate whether the callback functions were set to smc values, but would that matter?
+> Are there scenarios where it matters whether the old or the new callback function is called?
+> Why are the values restored in smc_close_active() if the clc socket is released shortly after anyhow?
+
+That's a good question, We have discussed internally and found that this 
+is indeed possible. We can completely not to unset sk_user_data,
+which can reduce many unnecessary judgments and locks, and no side 
+effects found. We will try this approach internally and conduct multiple
+rounds of testing. However, in any case, returning to the initial issue, 
+the prerequisite for everything is to ensure the valid of smc sock
+during the life time of clc sock. So we must have a mechanism to work it 
+out. and holding referenced solutions might be a good try, what do you
+think?
+
+Best Wishes,
+D. Wythe
+
+
 
 
