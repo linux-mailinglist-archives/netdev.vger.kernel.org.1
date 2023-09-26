@@ -1,122 +1,126 @@
-Return-Path: <netdev+bounces-36260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFB77AEB13
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:10:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9617AEB25
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id B85D71C20829
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:10:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id AAF401F2583A
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:14:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F211266BF;
-	Tue, 26 Sep 2023 11:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58286266BF;
+	Tue, 26 Sep 2023 11:14:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28735381;
-	Tue, 26 Sep 2023 11:10:38 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39852E5;
-	Tue, 26 Sep 2023 04:10:37 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c571029a36so9430295ad.1;
-        Tue, 26 Sep 2023 04:10:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695726637; x=1696331437; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lw4LOW9v/3DFm9VyRP52ODXPQwHjn/OUSwNkQdFfjXk=;
-        b=YpE7J6YhxDp7p3+dbKKk+mECu/1WTZ+gQpFRLA1KIoiuPOuRnrHX5fp3Sy/thLL4gp
-         dtHxt+BQsxJi9PtONk704MUs8KcWQm9FdcXJvgLhvJ4P7D5xoqiunKWDCHhxBGUIguFX
-         By29mCzMHD+4a32iqjZDrct6LdjY3dbmadxKJy/i89QBCRf7sgBANyRYl06GC1PKUGW6
-         7bbfv5wW8VuM5Exe5KJgGXu3hoF5GT3SZ6M16QZrQs5pnnwV+amS+hbJO7EZrcRSfoeB
-         fZRCWKP6mvbyeXJo3Hhvidefe2yvSt3qkjTg5a1+ztO1SQHfJUTdBMG+b4I7Fxzqhilc
-         2H3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695726637; x=1696331437;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lw4LOW9v/3DFm9VyRP52ODXPQwHjn/OUSwNkQdFfjXk=;
-        b=nuf4N76bJjbKRpNJaWrh0zo0++Dz2EQbspxh15Dj4wDWbs+BsEGDbbAaba4LZxeGW7
-         474TGVtiW7gxQ4XU0AEBFxwpzKHLeDvCWPJpZGQu/bYfswOTU+oNUv0OEgTNTenhNTSg
-         O7i5iwsmOPLLkgSeTqb2P0br+w+P0SsyraXWU44akwRbXHKFweg+R+9eFns+k7VGS1rS
-         F7GWIzUBEFl3R8B+y31WLCqSgRGv2MEAJG761GbuvE6Dd2sh3isLL4slqVke+Hde5GHc
-         pSpJmdHpsjVODF5tCezkb3oexEueD9u+mjj30FOahlLrP7JSVj/0O2+jZ64y7e+bfD3n
-         MYQg==
-X-Gm-Message-State: AOJu0Yxo1Kanke/v5rczBoZtgTmdfMPWWPPDjUxDJll4GC3ce/Hg5LXL
-	cls7uO68Hl2ozF2jMc/w9Tc=
-X-Google-Smtp-Source: AGHT+IGOAAXOyVjv/e8Cm+Y5b01Cz9RxiLJ3YUtO8aGN9PmwqbVaYwOGZ3EHuPY7/KX2pncQs5U6Hg==
-X-Received: by 2002:a17:903:2acf:b0:1c6:9312:187 with SMTP id lw15-20020a1709032acf00b001c693120187mr435027plb.3.1695726636512;
-        Tue, 26 Sep 2023 04:10:36 -0700 (PDT)
-Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:87f:ba12:de84:998e])
-        by smtp.gmail.com with ESMTPSA id g11-20020a170902740b00b001bafd5cf769sm10675422pll.2.2023.09.26.04.10.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 04:10:36 -0700 (PDT)
-From: Fabio Estevam <festevam@gmail.com>
-To: kuba@kernel.org
-Cc: wei.fang@nxp.com,
-	shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com,
-	linux-imx@nxp.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	shawnguo@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Fabio Estevam <festevam@denx.de>,
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: [PATCH v2 net-next] dt-bindings: net: fec: Add imx8dxl description
-Date: Tue, 26 Sep 2023 08:10:17 -0300
-Message-Id: <20230926111017.320409-1-festevam@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D02125DD
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 11:14:32 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCDEE9;
+	Tue, 26 Sep 2023 04:14:31 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QB6MbT028500;
+	Tue, 26 Sep 2023 11:14:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=SVmZkxj6SA3hzapomKc3tjR/6ySaAdnYPzjaecJ/A6k=;
+ b=cDU9yZQ1VZWTpkoyMCNxxBlw+FMkr0sWUE6gPN8uAvsxAzfUc5AxQZG2ogTe4kvxbiA0
+ 824xW2lvns1Esk4q6urv2dPZ1c+Y/EOqjh7OJ7vHayCP1biQpVAgMGVr7Ro7fR5nn2ie
+ n4OwZipqqWkyFXZ8x0mNKhf7UiUSKD7ir7loVMN5QV/CsRjNKtOaeRxXYczxwoLpoO+t
+ CgXmCIY05gQLIawrx/+8ZxEaquP3PFFPHTWLi57znLGIppwubdStSsiDPYvz13BEnkd7
+ R+pD5ZGoe5KdU5Ju2YbfeRaMyMzVuqMa98pJH19wMpjY7axNPb/3Rhz6Zgg9k2/8dPbU Qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbwueghwu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 11:14:09 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38QB6xDq032579;
+	Tue, 26 Sep 2023 11:14:09 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbwueghwc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 11:14:08 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38QB17k1008126;
+	Tue, 26 Sep 2023 11:14:08 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqyb6pu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 11:14:08 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38QBE4W722610496
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 26 Sep 2023 11:14:05 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E27C720043;
+	Tue, 26 Sep 2023 11:14:04 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A918220040;
+	Tue, 26 Sep 2023 11:14:04 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 26 Sep 2023 11:14:04 +0000 (GMT)
+Message-ID: <76a74084-a900-d559-1f63-deff84e5848a@linux.ibm.com>
+Date: Tue, 26 Sep 2023 13:14:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
+ containers.
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>,
+        Albert Huang <huangjie.albert@bytedance.com>
+Cc: Karsten Graul <kgraul@linux.ibm.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        RDMA mailing list <linux-rdma@vger.kernel.org>,
+        Jason Gunthorpe <jgg@nvidia.com>
+References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
+ <20230926104831.GJ1642130@unreal>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20230926104831.GJ1642130@unreal>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZDkRJrc-8DDCrdra6qNLwn3HL9C1tAGf
+X-Proofpoint-GUID: 5cpoe31gYOgKmzBmR1uCO4D8uepyTSlx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_07,2023-09-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ bulkscore=0 clxscore=1011 mlxlogscore=540 lowpriorityscore=0
+ suspectscore=0 spamscore=0 priorityscore=1501 adultscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309260095
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Fabio Estevam <festevam@denx.de>
 
-The imx8dl FEC has the same programming model as the one on the imx8qxp.
 
-Add the imx8dl compatible string.
+On 26.09.23 12:48, Leon Romanovsky wrote:
+> This patch made me wonder, why doesn't SMC use RDMA-CM like all other
+> in-kernel ULPs which work over RDMA?
+> 
+> Thanks
 
-Signed-off-by: Fabio Estevam <festevam@denx.de>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
----
-Changes since v1:
-- Sent as a standalone patch to netdev folks.
-- Collected Conor's ack.
-
- Documentation/devicetree/bindings/net/fsl,fec.yaml | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/Documentation/devicetree/bindings/net/fsl,fec.yaml b/Documentation/devicetree/bindings/net/fsl,fec.yaml
-index b494e009326e..8948a11c994e 100644
---- a/Documentation/devicetree/bindings/net/fsl,fec.yaml
-+++ b/Documentation/devicetree/bindings/net/fsl,fec.yaml
-@@ -59,6 +59,7 @@ properties:
-           - const: fsl,imx6sx-fec
-       - items:
-           - enum:
-+              - fsl,imx8dxl-fec
-               - fsl,imx8qxp-fec
-           - const: fsl,imx8qm-fec
-           - const: fsl,imx6sx-fec
--- 
-2.34.1
-
+The idea behind SMC is that it should look an feel to the applications
+like TCP sockets. So for connection management it uses TCP over IP;
+RDMA is just used for the data transfer.
 
