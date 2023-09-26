@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-36245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89EA37AE98B
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:48:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006FD7AE999
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:54:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id E012B1F256AE
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:48:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 35DC9B2096D
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DAD134D6;
-	Tue, 26 Sep 2023 09:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471CC15E90;
+	Tue, 26 Sep 2023 09:54:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C11E6D38
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:48:44 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAEBFB3;
-	Tue, 26 Sep 2023 02:48:40 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D60C6C0008;
-	Tue, 26 Sep 2023 09:48:36 +0000 (UTC)
-Date: Tue, 26 Sep 2023 11:47:56 +0200
-From: Remi Pommarel <repk@triplefau.lt>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] net: stmmac: remove unneeded
- stmmac_poll_controller
-Message-ID: <ZRKozLps8dmDmQgc@pilgrim>
-References: <20230906091330.6817-1-repk@triplefau.lt>
- <626de62327fa25706ab1aaab32d7ba3a93ab26e4.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7683134D1;
+	Tue, 26 Sep 2023 09:54:50 +0000 (UTC)
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22340BE;
+	Tue, 26 Sep 2023 02:54:48 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-27758c8f62aso2798044a91.0;
+        Tue, 26 Sep 2023 02:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695722087; x=1696326887; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5dnCUvijMsimGrTWPpfu5Agx/K3HlKGuGAYzpWTEyOs=;
+        b=TsfH/6QQE4Ec2oLmj0QfqoAZ1tydrsONkUzIC/NzQX8dtylhKmYZDRHfjYgchx5hBp
+         ndhfI3g/hhHmcPCjQH5OWfzcOsQjhYyKErfbUVykLhWL0jPyb5noOk0J0XtEv9Z2A1jc
+         FJh49ar4mv54Yxx549dnOdswvCqYcCeLIRzqSxSsgioyjxY+ZltqT3F3w+h1xB0/tLF7
+         G1pzChzAXZOveaI4M1D11khcPG/L4rizJ7QkuBjFUNsdw/eHKmbA5Q1GWPbXyhaHV1G1
+         P2OBbLgGPaKE2lKOv3/LCCt4uBYOsY6cFpxUVWc+6481kcD9oDewUh4lXikzf/t376Pm
+         kP2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695722087; x=1696326887;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5dnCUvijMsimGrTWPpfu5Agx/K3HlKGuGAYzpWTEyOs=;
+        b=aW59GIb1GISKY486pxNhO6aTJkpfgmUOXxCZoyBDnR2a1NOZgRk280G54m92AMJ8El
+         75ruufjz0MnOo/DIxGPdgjTPPed9a7Balt1lvyY9JM5vKbQzfJknrypBB8GJq0QODRCc
+         0xGFuRoinvaOo81s41MNhuDPe77Oc20hwIvTKPlkvZF4FQ4NyvI0rs2Nt3rqPahf9mGL
+         ygYSMjFUjy1oJ3IYm2jAW5iq/2R5BaWxlH0kMM5Vypo99UkYEjE0xNtMk5wLV2SJB47L
+         uGZaKefVvm55tk8SBL1yeDNvR0SLQexnm0njFWKNDN0I7qiPxvSjvDr/FkuvO5LG5sRb
+         tz0A==
+X-Gm-Message-State: AOJu0YwRcNCmeegEKwDppnAiXI1e8t/52hnhxQuOhLOp053d2v7w/Zyz
+	vzsGfj9iXJE4Qq/MUhgX10k4YfAT4b1zHZL0d9NvXFsmy1u6tA==
+X-Google-Smtp-Source: AGHT+IGqgqY7gPaWD8IB1m6kzpOSXZFtxJY0UbbwDIP1TXvWNzPtGlJv5iI6HrxgQw0AQqQSvihy5aN2SIsdyluNFnA=
+X-Received: by 2002:a17:90b:3ec5:b0:269:5adb:993 with SMTP id
+ rm5-20020a17090b3ec500b002695adb0993mr5938269pjb.22.1695722087455; Tue, 26
+ Sep 2023 02:54:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <626de62327fa25706ab1aaab32d7ba3a93ab26e4.camel@redhat.com>
-X-GND-Sasl: repk@triplefau.lt
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+References: <20230921120913.566702-5-daan.j.demeyer@gmail.com> <20230925221241.2345534-1-jrife@google.com>
+In-Reply-To: <20230925221241.2345534-1-jrife@google.com>
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Tue, 26 Sep 2023 11:54:36 +0200
+Message-ID: <CAO8sHc=K1042abA1AVPA8Dn_cEt7-jGQgrUHSWFiUE9KXy5Chg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 4/9] bpf: Implement cgroup sockaddr hooks for
+ unix sockets
+To: Jordan Rife <jrife@google.com>
+Cc: bpf@vger.kernel.org, kernel-team@meta.com, martin.lau@linux.dev, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 07, 2023 at 11:23:16AM +0200, Paolo Abeni wrote:
-> On Wed, 2023-09-06 at 11:13 +0200, Remi Pommarel wrote:
-> > Using netconsole netpoll_poll_dev could be called from interrupt
-> > context, thus using disable_irq() would cause the following kernel
-> > warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
-> > 
-> >   BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
-> >   in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
-> >   CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
-> >   Hardware name: aml (r1) (DT)
-> >   Call trace:
-> >    dump_backtrace+0x0/0x270
-> >    show_stack+0x14/0x20
-> >    dump_stack_lvl+0x8c/0xac
-> >    dump_stack+0x18/0x30
-> >    ___might_sleep+0x150/0x194
-> >    __might_sleep+0x64/0xbc
-> >    synchronize_irq+0x8c/0x150
-> >    disable_irq+0x2c/0x40
-> >    stmmac_poll_controller+0x140/0x1a0
-> >    netpoll_poll_dev+0x6c/0x220
-> >    netpoll_send_skb+0x308/0x390
-> >    netpoll_send_udp+0x418/0x760
-> >    write_msg+0x118/0x140 [netconsole]
-> >    console_unlock+0x404/0x500
-> >    vprintk_emit+0x118/0x250
-> >    dev_vprintk_emit+0x19c/0x1cc
-> >    dev_printk_emit+0x90/0xa8
-> >    __dev_printk+0x78/0x9c
-> >    _dev_warn+0xa4/0xbc
-> >    ath10k_warn+0xe8/0xf0 [ath10k_core]
-> >    ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
-> >    ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
-> >    __napi_poll+0x58/0x1f4
-> >    net_rx_action+0x504/0x590
-> >    _stext+0x1b8/0x418
-> >    run_ksoftirqd+0x74/0xa4
-> >    smpboot_thread_fn+0x210/0x3c0
-> >    kthread+0x1fc/0x210
-> >    ret_from_fork+0x10/0x20
-> > 
-> > Since [0] .ndo_poll_controller is only needed if driver doesn't or
-> > partially use NAPI. Because stmmac does so, stmmac_poll_controller
-> > can be removed fixing the above warning.
-> > 
-> > [0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
-> > 
-> > Cc: <stable@vger.kernel.org> # 5.15.x
-> > Signed-off-by: Remi Pommarel <repk@triplefau.lt>
-> 
-> I'm sorry for the incremental feedback, but we also need a suitable
-> Fixes tag, thanks!
+> > @@ -1919,6 +1936,13 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> >               goto out;
+> >
+> >       if (msg->msg_namelen) {
+> > +             err = BPF_CGROUP_RUN_PROG_UNIX_SENDMSG_LOCK(sk,
+> > +                                                         msg->msg_name,
+> > +                                                         &msg->msg_namelen,
+> > +                                                         NULL);
+> > +             if (err)
+> > +                     goto out;
+> > +
+> >               err = unix_validate_addr(sunaddr, msg->msg_namelen);
+> >               if (err)
+> >                       goto out;
+>
+>
+> Just an FYI, I /think/ this is going to introduce a bug similar to the one I'm
+> addressing in my patch here:
+>
+> - https://lore.kernel.org/netdev/20230921234642.1111903-2-jrife@google.com/
+>
+> With this change, callers to sock_sendmsg() in kernel space would see their
+> value of msg->msg_namelen change if they are using Unix sockets. While it's
+> unclear if there are any real systems that would be impacted, it can't hurt to
+> insulate callers from these kind of side-effects. I can update my my patch to
+> account for possible changes to msg_namelen.
 
-I didn't include Fixes tag because it would go back up to the initial
-driver support commit [0]. I can't be sure that this commit includes
-necessary NAPI implementation to be able to get rid of
-.ndo_poll_controller callback back then. And I am not able to test it on
-older version than 5.15.x hence I only included the 5.15.x Cc tag
-version prerequisite.
+That would be great! I think it makes sense to apply the same concept to unix
+sockets so insulating changes to the msg_namelen seems like the way to go.
 
-But I surely can add a Fixed tag if it is ok for it to be [0].
+> Also, with this patch series is it possible for AF_INET BPF hooks (connect4,
+> sendmsg4, connect6, etc.) to modify the address length?
 
-Also sorry for the long replying delay.
+This is not yet allowed. We only allow changing the unix sockaddr length at the
+moment. Maybe in the future we'd want to allow changing INET6 addr lengths
+as well but currently we don't allow this.
 
-[0] commit 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers")
 
--- 
-Remi
+On Tue, 26 Sept 2023 at 00:13, Jordan Rife <jrife@google.com> wrote:
+>
+> > @@ -1919,6 +1936,13 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
+> >               goto out;
+> >
+> >       if (msg->msg_namelen) {
+> > +             err = BPF_CGROUP_RUN_PROG_UNIX_SENDMSG_LOCK(sk,
+> > +                                                         msg->msg_name,
+> > +                                                         &msg->msg_namelen,
+> > +                                                         NULL);
+> > +             if (err)
+> > +                     goto out;
+> > +
+> >               err = unix_validate_addr(sunaddr, msg->msg_namelen);
+> >               if (err)
+> >                       goto out;
+>
+>
+> Just an FYI, I /think/ this is going to introduce a bug similar to the one I'm
+> addressing in my patch here:
+>
+> - https://lore.kernel.org/netdev/20230921234642.1111903-2-jrife@google.com/
+>
+> With this change, callers to sock_sendmsg() in kernel space would see their
+> value of msg->msg_namelen change if they are using Unix sockets. While it's
+> unclear if there are any real systems that would be impacted, it can't hurt to
+> insulate callers from these kind of side-effects. I can update my my patch to
+> account for possible changes to msg_namelen.
+>
+> Also, with this patch series is it possible for AF_INET BPF hooks (connect4,
+> sendmsg4, connect6, etc.) to modify the address length?
 
