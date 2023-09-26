@@ -1,151 +1,127 @@
-Return-Path: <netdev+bounces-36235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797257AE753
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:05:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A607AE765
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D0CD6281B55
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:05:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id EDFEF1C204F7
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9FA11CB8;
-	Tue, 26 Sep 2023 08:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAF111CB7;
+	Tue, 26 Sep 2023 08:07:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AA02906;
-	Tue, 26 Sep 2023 08:05:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB07C433C7;
-	Tue, 26 Sep 2023 08:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695715524;
-	bh=+Amk36a0CBOiKu5+FtjGQvFX395/lzfG991XVrUkCKk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RLx2TLWKtN7VAMAOy6Z+yt+5L2H3WvCxgk6fo3xEAFTVDZv0mPqQm9oryMdet+1qZ
-	 obrB5TY2nE/qbUSfaI1uId3y2yRK2qnxEYYQpqf8IMXRqLpaWcyp6r1h8W5YGqDDxg
-	 /Ipk9rb4CjRrT7bowSHMduOUAEuaFMTD7nXxu83iUI+O1xmmOj2PJsMoiGARKNDMsM
-	 m8lXDTJPRNGVXjXTr34wm+BzlG4p+UzrUM7cd5TVxTprWIBaR+mK3IXevwTFE0yWC2
-	 SIHL7mRKLFjL2iR5rLVY4OdrYFjdV9kMecllhx3OCPX+UXN+tAGab3AHw/soEZdxZb
-	 tvxNd43ZGN+BA==
-Date: Tue, 26 Sep 2023 11:04:22 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Song Liu <song@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v3 02/13] mm: introduce execmem_text_alloc() and
- execmem_free()
-Message-ID: <20230926080422.GP3303@kernel.org>
-References: <20230918072955.2507221-1-rppt@kernel.org>
- <20230918072955.2507221-3-rppt@kernel.org>
- <CAPhsuW5-=H1V=VXUYxyGnUdJuNUpRt44QmpwjkDUD=9i0itjuw@mail.gmail.com>
- <20230923153808.GI3303@kernel.org>
- <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEA44C6E
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 08:07:15 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B0DFB;
+	Tue, 26 Sep 2023 01:07:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=eg4t+n3zm3o8ChFzdnYGpONlsKgP9BOQ3n+qZ2QhXVw=;
+	t=1695715634; x=1696925234; b=O1nmQbY7T0Yhum1VfhyxTGecEAemp0d41xVXYxrn/IDmptw
+	Y+IMifUAD+6of0vNUdIJvbV1xkxT1x02P6o+ipfDQrZxVa1lYTI2LUEMy2rnpcICYkAqcYlUHMcec
+	wp1ro2JDq24onZQRwOL6ZRSFSWr9VTEGFDw8TQx5+1Eiz4zdsTEBxPimlOwHoeOhiSFaTUxqdv0RB
+	f69roSvZaWDL2sq+E4Z82pLaknMGMzRZd7arjwKaIXyLm/MzUb+Hs8SF8sg9ZHzytjJwRBL6Wx9/1
+	foj2I5AsmLl3hKwx9JjF21Q3TeHSWdrG1cf3Q0Ni13VZKTElHYIme1r7XDZNOgyw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1ql368-005LDu-0Z;
+	Tue, 26 Sep 2023 10:07:12 +0200
+Message-ID: <790f9d0914e2baba66c394f4e21ef118e44d9775.camel@sipsolutions.net>
+Subject: Re: netif_carrier_on() race
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Date: Tue, 26 Sep 2023 10:07:11 +0200
+In-Reply-To: <346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+References: 
+	<346b21d87c69f817ea3c37caceb34f1f56255884.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Sep 23, 2023 at 03:36:01PM -0700, Song Liu wrote:
-> On Sat, Sep 23, 2023 at 8:39 AM Mike Rapoport <rppt@kernel.org> wrote:
-> >
-> > On Thu, Sep 21, 2023 at 03:34:18PM -0700, Song Liu wrote:
-> > > On Mon, Sep 18, 2023 at 12:30 AM Mike Rapoport <rppt@kernel.org> wrote:
-> > > >
-> > >
-> > > [...]
-> > >
-> > > > diff --git a/arch/s390/kernel/module.c b/arch/s390/kernel/module.c
-> > > > index 42215f9404af..db5561d0c233 100644
-> > > > --- a/arch/s390/kernel/module.c
-> > > > +++ b/arch/s390/kernel/module.c
-> > > > @@ -21,6 +21,7 @@
-> > > >  #include <linux/moduleloader.h>
-> > > >  #include <linux/bug.h>
-> > > >  #include <linux/memory.h>
-> > > > +#include <linux/execmem.h>
-> > > >  #include <asm/alternative.h>
-> > > >  #include <asm/nospec-branch.h>
-> > > >  #include <asm/facility.h>
-> > > > @@ -76,7 +77,7 @@ void *module_alloc(unsigned long size)
-> > > >  #ifdef CONFIG_FUNCTION_TRACER
-> > > >  void module_arch_cleanup(struct module *mod)
-> > > >  {
-> > > > -       module_memfree(mod->arch.trampolines_start);
-> > > > +       execmem_free(mod->arch.trampolines_start);
-> > > >  }
-> > > >  #endif
-> > > >
-> > > > @@ -510,7 +511,7 @@ static int module_alloc_ftrace_hotpatch_trampolines(struct module *me,
-> > > >
-> > > >         size = FTRACE_HOTPATCH_TRAMPOLINES_SIZE(s->sh_size);
-> > > >         numpages = DIV_ROUND_UP(size, PAGE_SIZE);
-> > > > -       start = module_alloc(numpages * PAGE_SIZE);
-> > > > +       start = execmem_text_alloc(EXECMEM_FTRACE, numpages * PAGE_SIZE);
-> > >
-> > > This should be EXECMEM_MODULE_TEXT?
-> >
-> > This is an ftrace trampoline, so I think it should be FTRACE type of
-> > allocation.
-> 
-> Yeah, I was aware of the ftrace trampoline. My point was, ftrace trampoline
-> doesn't seem to have any special requirements. Therefore, it is probably not
-> necessary to have a separate type just for it.
+Focusing on this part for a moment, because it affects not just
+wireless:
 
-Since ftrace trampolines are currently used only on s390 and x86 which
-enforce the same range for all executable allocations there are no special
-requirements indeed. But I think that explicitly marking these allocations
-as FTRACE makes it clearer what are they used for and I don't see downsides
-to having a type for FTRACE.
- 
-> AFAICT, kprobe, ftrace, and BPF (JIT and trampoline) can share the same
-> execmem_type. We may need some work for some archs, but nothing is
-> fundamentally different among these.
+> Then, in netif_carrier_on(), we immediately set the carrier on bit, so
+> that you can actually immediately see this from userspace if you ask
+> rtnetlink, however, it's not actually immediately _functional_ - it
+> still needs to schedule and run the linkwatch work first, to call
+> dev_activate() to change the (TX queue) qdisc(s) away from noop.
+>=20
+> Also, even though you can already query the carrier state and see it on,
+> the actual rtnetlink _event_ for this only happens from the linkwatch
+> work as well, via netdev_state_change().
+>=20
+> All of this makes sense since you need to hold RTNL for all those state
+> changes/notifier chains, but it does lead to the first race/consistency
+> problem: if you query at just the right time you can see carrier being
+> on, however, if the carrier is actually removed again and the linkwatch
+> work didn't run yet, there might never be an event for the carrier on,
+> iow, you might have:
+>=20
+>  netif_carrier_on()
+>  query from userspace and see carrier on
+>  netif_carrier_off()
+>  linkwatch work runs and sends only carrier off event
 
-Using the same type for all generated code implies that all types of the
-generated code must live in the same range and I don't think we want to
-impose this limitation on architectures.
+and also because, as Andrew mentioned, you can have the exact opposite
+problem...
 
-For example, RISC-V deliberately added a range for BPF code to allow
-relative addressing, see commit 7f3631e88ee6 ("riscv, bpf: Provide RISC-V
-specific JIT image alloc/free").
- 
-> Thanks,
-> Song
+It can actually happen that something _else_ sends an event, so even if
+userspace does't query but waits for a carrier on event, you could end
+up with:
 
--- 
-Sincerely yours,
-Mike.
+* netif_carrier_on()
+
+* something else triggers netdev_state_change(),
+  even userspace setting link alias
+
+  netdev_state_change()
+   -> sends an rtnetlink event saying carrier is on
+
+* userspace transmits but frames are dropped
+
+* linkwatch work runs and enables qdiscs only now
+
+
+
+To address this issue, we could introduce a new state, say
+__LINK_STATE_CARRIER_COMPLETE or something like that, which is used when
+communicating carrier state to userspace, and only set/cleared in
+dev_activate()/dev_deactivate(). That way, any events to userspace (or
+userspace querying) wouldn't show the carrier state until it's actually
+fully reflected in software (qdiscs) too.
+
+This doesn't fully solve _my_ (wifi) problem, but perhaps lets me work
+around it in userspace by querying for the carrier state, if it's
+reflected correctly ("fully ready to transmit") then we can do that.
+Right now, we can't even do that.
+
+But would it break something else? There's also a way to query it via
+ethtool, which perhaps should _not_ be converted to _COMPLETE since you
+could argue the ethtool link state is about the physical link, and with
+this change the carrier becomes about the logical link in a fashion?
+
+
+johannes
 
