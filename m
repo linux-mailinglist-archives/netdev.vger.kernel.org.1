@@ -1,123 +1,129 @@
-Return-Path: <netdev+bounces-36232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD107AE6FF
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:38:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1FF7AE743
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 119822818A0
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9B5121C204F6
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA186D38;
-	Tue, 26 Sep 2023 07:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD0311731;
+	Tue, 26 Sep 2023 08:02:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC6963B3
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 07:37:59 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07009F3;
-	Tue, 26 Sep 2023 00:37:56 -0700 (PDT)
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q7OWik023749;
-	Tue, 26 Sep 2023 07:37:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fWR1/uuDBcY3PfqAN7mQ2K/NuZL/nN/N9hnZrtG/ukM=;
- b=Pm3RxKuirlYJznbgUZeqEHWes2ve8xrZp2FH4L9c8+XW5WxVo8berTUrnxYBdDXdSsWO
- ZyRqBUN5WLopFY4XqqsdG9oi6PZo4MTI9ZCrEqwNELFIydcvfTlLPIF3/vyvkfV10Let
- 7kpcEmg4sVVEUcJsRScmdzsrsbluVHW4ixXurqEjdjWMBoD+YxAAEFaLAfQ682PQKcPl
- zYDaBf/qonPUgQFmXrwELAozWyyLdu9rHK4R6CAeM1Y4q5Gt+VJpDAL1HQggNDMvOBpf
- b1hoJ+biZ+zp737WS8Rb2lpcN1VF8yrp7f/+Gx2LdBKnzr9HhaKHnb73RXYp1xWgo0eM tQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbtvu8c58-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:37:52 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38Q7Ze0B024089;
-	Tue, 26 Sep 2023 07:37:51 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tbtvu8c4k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:37:51 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38Q5fQN6008126;
-	Tue, 26 Sep 2023 07:37:51 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqya0u2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Sep 2023 07:37:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38Q7bl8Q45089198
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 26 Sep 2023 07:37:47 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8132920080;
-	Tue, 26 Sep 2023 07:37:47 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55D5B2007A;
-	Tue, 26 Sep 2023 07:37:47 +0000 (GMT)
-Received: from [9.152.224.54] (unknown [9.152.224.54])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 26 Sep 2023 07:37:47 +0000 (GMT)
-Message-ID: <d488ff86-8b99-e669-dfbf-ee05bb7b1536@linux.ibm.com>
-Date: Tue, 26 Sep 2023 09:37:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79BF2906
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 08:02:10 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C89EB8;
+	Tue, 26 Sep 2023 01:02:08 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 53EF0C0006;
+	Tue, 26 Sep 2023 08:02:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695715326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uC/2kLEOqWjHhkqWNdblzqZqROUZmT9ZCKkUFCorqtY=;
+	b=cl008PAW3HgvFdBznq2sahoqBDsP8MviZ8w7HJpW/+jZwMdZahu8CNADdHZr+YWNSxBI60
+	TXZCZ0Ig8KxogrEgJ5zSjNN+uLAQ5bRKbjgR2dA4MoSrsI9Z5FjFbJcRP14zcShisJucXB
+	d8EW8JPara8d9CVyPJgBlURdaKUblYDOdH36lUV97x0dxCMkh/UKXLwbwTlDhXkh10fBmF
+	9O/skoVKFZMZ1qo4K4a7A7I7lYl1kVD6PHBCRzA/WjZ9PKmlKXfOxRw1XbIBxHNJf+ScWu
+	+tVm8AmmvLqvYs4RsYYK+0ax+SnhqeDjhmcjIj+TTvdG8cyBPR/JJnZsqPzeAQ==
+Date: Tue, 26 Sep 2023 10:02:02 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Dinghao Liu <dinghao.liu@zju.edu.cn>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Marcel Holtmann <marcel@holtmann.org>, Harry
+ Morris <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in
+ ca8210_probe
+Message-ID: <20230926100202.011ab841@xps-13>
+In-Reply-To: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
+References: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [RFC net-next 0/2] Optimize the parallelism of SMC-R connections
-Content-Language: en-US
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1694008530-85087-1-git-send-email-alibuda@linux.alibaba.com>
- <794f9f68-4671-5e5e-45e4-2c8a4de568b3@linux.ibm.com>
- <522d823c-b656-ffb5-bcce-65b96bdfa46d@linux.alibaba.com>
- <c0ba8e0b-f2b2-b65b-e21a-54c3d920ba72@linux.ibm.com>
- <a3e80a67-e8b8-ce94-fc11-254d056d37a9@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <a3e80a67-e8b8-ce94-fc11-254d056d37a9@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HpqpkSkRMLNDjhQjDjslhy6XgQIHzkDi
-X-Proofpoint-GUID: NTjuWDrNpg3BuHopxLXWXaKAPm2017Ae
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-26_05,2023-09-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- spamscore=0 malwarescore=0 suspectscore=0 impostorscore=0 adultscore=0
- bulkscore=0 phishscore=0 mlxscore=0 mlxlogscore=499 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309260065
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Dinghao,
 
+dinghao.liu@zju.edu.cn wrote on Tue, 26 Sep 2023 11:22:44 +0800:
 
-On 25.09.23 12:10, D. Wythe wrote:
-> That's right.  But even if we do nothing, the current implements still has this problem.
-> And this problem can be solved by the spinlock inside smc_conn_create, rather than the
-> pending lock.
-> 
+> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
+> it calls clk_unregister() to release priv->clk and returns an
+> error. However, the caller ca8210_probe() then calls ca8210_remove(),
+> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
+> this case, a use-after-free may happen in the second time we call
+> clk_unregister().
+>=20
+> Fix this by removing the first clk_unregister(). Also, priv->clk could
+> be an error code on failure of clk_register_fixed_rate(). Use
+> IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
+>=20
+> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driver")
 
-May I kindly propose to fix this problem first and then do performance improvements after that?
+Missing Cc stable, this needs to be backported.
 
+> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> ---
+>=20
+> Changelog:
+>=20
+> v2: -Remove the first clk_unregister() instead of nulling priv->clk.
+> ---
+>  drivers/net/ieee802154/ca8210.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/ca8=
+210.c
+> index aebb19f1b3a4..b35c6f59bd1a 100644
+> --- a/drivers/net/ieee802154/ca8210.c
+> +++ b/drivers/net/ieee802154/ca8210.c
+> @@ -2759,7 +2759,6 @@ static int ca8210_register_ext_clock(struct spi_dev=
+ice *spi)
+>  	}
+>  	ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk);
+>  	if (ret) {
+> -		clk_unregister(priv->clk);
+>  		dev_crit(
+>  			&spi->dev,
+>  			"Failed to register external clock as clock provider\n"
 
-> And also deleting the last connection from a link group will not shutting the down right now,
-> usually waiting for 10 minutes of idle time.
+I was hoping you would simplify this function a bit more.
 
-Still the new connection could come in just the moment when the 10 minutes are over. 
+> @@ -2780,7 +2779,7 @@ static void ca8210_unregister_ext_clock(struct spi_=
+device *spi)
+>  {
+>  	struct ca8210_priv *priv =3D spi_get_drvdata(spi);
+> =20
+> -	if (!priv->clk)
+> +	if (IS_ERR_OR_NULL(priv->clk))
+>  		return
+> =20
+>  	of_clk_del_provider(spi->dev.of_node);
+
+Alex, Stefan, who handles wpan and wpan/next this release?
+
+Thanks,
+Miqu=C3=A8l
 
