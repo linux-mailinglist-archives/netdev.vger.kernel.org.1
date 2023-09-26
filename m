@@ -1,83 +1,123 @@
-Return-Path: <netdev+bounces-36244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EB967AE96D
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:39:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EA37AE98B
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:48:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E9F482810A6
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:39:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E012B1F256AE
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 09:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E41134D0;
-	Tue, 26 Sep 2023 09:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DAD134D6;
+	Tue, 26 Sep 2023 09:48:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70FE12B70
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:39:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78FBDC433C7;
-	Tue, 26 Sep 2023 09:39:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695721155;
-	bh=AnTJXPiJiPV4M7FfzIw4U1feaoScrcoS51aixAIgF3w=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=DP4/3ICboAtuex0rLt47pvfLL3/RpYL6P55AKFzcXmVGZnH0i6TjpWMJrlhHiYn9k
-	 MhAXJZRWAp9kThHiH/VTOGUh5AskLNX4OMUIOUStCAqYAJ/tQuLHukGzMdqgpbayHR
-	 zmReRYdRUWY18/wvTO9lm8rsdEzMPn6Feb4r06u9zm7pmBgPHy4Ax7zrlY7GDPiV03
-	 IMDkQMwDydoyY33amfyXPO9eMuD3bxS9UxxZl1cfLcK6FNpKmuZ1lB7UShYo5P725S
-	 ZO1IfpRmkWfsLGQREkgTfxuiqzUkJys4aG4nec+fY6NHcDv/52mBXOZbGdimMUETzh
-	 LBUzEWnj+nhkA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- Mark Zhang <markzhang@nvidia.com>, netdev@vger.kernel.org,
- Or Har-Toov <ohartoov@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
- Patrisious Haddad <phaddad@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>
-In-Reply-To: <cover.1695204156.git.leon@kernel.org>
-References: <cover.1695204156.git.leon@kernel.org>
-Subject: Re: [PATCH rdma-next 0/6] Add 800Gb (XDR) speed support
-Message-Id: <169572115099.2612409.2085687465811625783.b4-ty@kernel.org>
-Date: Tue, 26 Sep 2023 12:39:10 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C11E6D38
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:48:44 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAEBFB3;
+	Tue, 26 Sep 2023 02:48:40 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D60C6C0008;
+	Tue, 26 Sep 2023 09:48:36 +0000 (UTC)
+Date: Tue, 26 Sep 2023 11:47:56 +0200
+From: Remi Pommarel <repk@triplefau.lt>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: stmmac: remove unneeded
+ stmmac_poll_controller
+Message-ID: <ZRKozLps8dmDmQgc@pilgrim>
+References: <20230906091330.6817-1-repk@triplefau.lt>
+ <626de62327fa25706ab1aaab32d7ba3a93ab26e4.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.12-dev-a055d
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <626de62327fa25706ab1aaab32d7ba3a93ab26e4.camel@redhat.com>
+X-GND-Sasl: repk@triplefau.lt
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-On Wed, 20 Sep 2023 13:07:39 +0300, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
+On Thu, Sep 07, 2023 at 11:23:16AM +0200, Paolo Abeni wrote:
+> On Wed, 2023-09-06 at 11:13 +0200, Remi Pommarel wrote:
+> > Using netconsole netpoll_poll_dev could be called from interrupt
+> > context, thus using disable_irq() would cause the following kernel
+> > warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
+> > 
+> >   BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
+> >   in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
+> >   CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
+> >   Hardware name: aml (r1) (DT)
+> >   Call trace:
+> >    dump_backtrace+0x0/0x270
+> >    show_stack+0x14/0x20
+> >    dump_stack_lvl+0x8c/0xac
+> >    dump_stack+0x18/0x30
+> >    ___might_sleep+0x150/0x194
+> >    __might_sleep+0x64/0xbc
+> >    synchronize_irq+0x8c/0x150
+> >    disable_irq+0x2c/0x40
+> >    stmmac_poll_controller+0x140/0x1a0
+> >    netpoll_poll_dev+0x6c/0x220
+> >    netpoll_send_skb+0x308/0x390
+> >    netpoll_send_udp+0x418/0x760
+> >    write_msg+0x118/0x140 [netconsole]
+> >    console_unlock+0x404/0x500
+> >    vprintk_emit+0x118/0x250
+> >    dev_vprintk_emit+0x19c/0x1cc
+> >    dev_printk_emit+0x90/0xa8
+> >    __dev_printk+0x78/0x9c
+> >    _dev_warn+0xa4/0xbc
+> >    ath10k_warn+0xe8/0xf0 [ath10k_core]
+> >    ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
+> >    ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
+> >    __napi_poll+0x58/0x1f4
+> >    net_rx_action+0x504/0x590
+> >    _stext+0x1b8/0x418
+> >    run_ksoftirqd+0x74/0xa4
+> >    smpboot_thread_fn+0x210/0x3c0
+> >    kthread+0x1fc/0x210
+> >    ret_from_fork+0x10/0x20
+> > 
+> > Since [0] .ndo_poll_controller is only needed if driver doesn't or
+> > partially use NAPI. Because stmmac does so, stmmac_poll_controller
+> > can be removed fixing the above warning.
+> > 
+> > [0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
+> > 
+> > Cc: <stable@vger.kernel.org> # 5.15.x
+> > Signed-off-by: Remi Pommarel <repk@triplefau.lt>
 > 
-> Hi,
-> 
-> This series extends RDMA subsystem and mlx5_ib driver to support 800Gb
-> (XDR) speed which was added to IBTA v1.7 specification.
-> 
-> [...]
+> I'm sorry for the incremental feedback, but we also need a suitable
+> Fixes tag, thanks!
 
-Applied, thanks!
+I didn't include Fixes tag because it would go back up to the initial
+driver support commit [0]. I can't be sure that this commit includes
+necessary NAPI implementation to be able to get rid of
+.ndo_poll_controller callback back then. And I am not able to test it on
+older version than 5.15.x hence I only included the 5.15.x Cc tag
+version prerequisite.
 
-[1/6] IB/core: Add support for XDR link speed
-      https://git.kernel.org/rdma/rdma/c/703289ce43f740
-[2/6] IB/mlx5: Expose XDR speed through MAD
-      https://git.kernel.org/rdma/rdma/c/561b4a3ac65597
-[3/6] IB/mlx5: Add support for 800G_8X lane speed
-      https://git.kernel.org/rdma/rdma/c/948f0bf5ad6ac1
-[4/6] IB/mlx5: Rename 400G_8X speed to comply to naming convention
-      https://git.kernel.org/rdma/rdma/c/b28ad32442bec2
-[5/6] IB/mlx5: Adjust mlx5 rate mapping to support 800Gb
-      https://git.kernel.org/rdma/rdma/c/4f4db190893fb8
-[6/6] RDMA/ipoib: Add support for XDR speed in ethtool
-      https://git.kernel.org/rdma/rdma/c/8dc0fd2f5693ab
+But I surely can add a Fixed tag if it is ok for it to be [0].
 
-Best regards,
+Also sorry for the long replying delay.
+
+[0] commit 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers")
+
 -- 
-Leon Romanovsky <leon@kernel.org>
+Remi
 
