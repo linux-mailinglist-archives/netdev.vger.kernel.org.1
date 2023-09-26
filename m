@@ -1,154 +1,91 @@
-Return-Path: <netdev+bounces-36293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A2EE7AECE2
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:31:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1A17AED07
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 34632B209A5
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:31:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E0A732812BC
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5161A289;
-	Tue, 26 Sep 2023 12:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7F0266B7;
+	Tue, 26 Sep 2023 12:41:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1F27EC8
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:31:06 +0000 (UTC)
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3A7910A;
-	Tue, 26 Sep 2023 05:31:02 -0700 (PDT)
-X-IronPort-AV: E=Sophos;i="6.03,177,1694703600"; 
-   d="scan'208";a="181033875"
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 26 Sep 2023 21:31:02 +0900
-Received: from localhost.localdomain (unknown [10.166.15.32])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 2A1224004CFB;
-	Tue, 26 Sep 2023 21:31:02 +0900 (JST)
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: s.shtylyov@omp.ru,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Tam Nguyen <tam.nguyen.xa@renesas.com>,
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
-Subject: [PATCH net v3] rswitch: Fix PHY station management clock setting
-Date: Tue, 26 Sep 2023 21:30:54 +0900
-Message-Id: <20230926123054.3976752-1-yoshihiro.shimoda.uh@renesas.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAF76FD2
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:41:04 +0000 (UTC)
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 69B94FC;
+	Tue, 26 Sep 2023 05:41:01 -0700 (PDT)
+Received: from dinghao.liu$zju.edu.cn ( [10.192.76.118] ) by
+ ajax-webmail-mail-app2 (Coremail) ; Tue, 26 Sep 2023 20:40:40 +0800
+ (GMT+08:00)
+X-Originating-IP: [10.192.76.118]
+Date: Tue, 26 Sep 2023 20:40:40 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: dinghao.liu@zju.edu.cn
+To: "Miquel Raynal" <miquel.raynal@bootlin.com>
+Cc: "Alexander Aring" <alex.aring@gmail.com>, 
+	"Stefan Schmidt" <stefan@datenfreihafen.org>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, 
+	"Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, 
+	"Marcel Holtmann" <marcel@holtmann.org>, 
+	"Harry Morris" <harrymorris12@gmail.com>, linux-wpan@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in
+ ca8210_probe
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.2-cmXT5 build
+ 20230825(e13b6a3b) Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
+In-Reply-To: <20230926100202.011ab841@xps-13>
+References: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
+ <20230926100202.011ab841@xps-13>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Message-ID: <38f11c6a.2d287.18ad18184c8.Coremail.dinghao.liu@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:by_KCgDHibRJ0RJldU0UAQ--.23767W
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgIKBmURl6BBWgAAsU
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix the MPIC.PSMCS value following the programming example in the
-section 6.4.2 Management Data Clock (MDC) Setting, Ethernet MAC IP,
-S4 Hardware User Manual Rev.1.00.
-
-The value is calculated by
-    MPIC.PSMCS = clk[MHz] / (MDC frequency[MHz] * 2) - 1
-with the input clock frequency from clk_get_rate() and MDC frequency
-of 2.5MHz. Otherwise, this driver cannot communicate PHYs on the R-Car
-S4 Starter Kit board.
-
-Fixes: 3590918b5d07 ("net: ethernet: renesas: Add support for "Ethernet Switch"")
-Reported-by: Tam Nguyen <tam.nguyen.xa@renesas.com>
-Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Tested-by: Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
----
-Changes from v2:
-https://lore.kernel.org/all/20230926081156.3930074-1-yoshihiro.shimoda.uh@renesas.com/
- - Change subject.
-
-Changes from v1:
-https://lore.kernel.org/all/20230925003416.3863560-1-yoshihiro.shimoda.uh@renesas.com/
- - Revise the formula on the commit description.
- - Calculate the PSMCS value by using clk_get_raate().
- -- So, change author and Add Reported-by.
-
- drivers/net/ethernet/renesas/rswitch.c | 13 ++++++++++++-
- drivers/net/ethernet/renesas/rswitch.h |  2 ++
- 2 files changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index ea9186178091..fc01ad3f340d 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -4,6 +4,7 @@
-  * Copyright (C) 2022 Renesas Electronics Corporation
-  */
- 
-+#include <linux/clk.h>
- #include <linux/dma-mapping.h>
- #include <linux/err.h>
- #include <linux/etherdevice.h>
-@@ -1049,7 +1050,7 @@ static void rswitch_rmac_setting(struct rswitch_etha *etha, const u8 *mac)
- static void rswitch_etha_enable_mii(struct rswitch_etha *etha)
- {
- 	rswitch_modify(etha->addr, MPIC, MPIC_PSMCS_MASK | MPIC_PSMHT_MASK,
--		       MPIC_PSMCS(0x05) | MPIC_PSMHT(0x06));
-+		       MPIC_PSMCS(etha->psmcs) | MPIC_PSMHT(0x06));
- 	rswitch_modify(etha->addr, MPSM, 0, MPSM_MFF_C45);
- }
- 
-@@ -1693,6 +1694,12 @@ static void rswitch_etha_init(struct rswitch_private *priv, int index)
- 	etha->index = index;
- 	etha->addr = priv->addr + RSWITCH_ETHA_OFFSET + index * RSWITCH_ETHA_SIZE;
- 	etha->coma_addr = priv->addr;
-+
-+	/* MPIC.PSMCS = (clk [MHz] / (MDC frequency [MHz] * 2) - 1.
-+	 * Calculating PSMCS value as MDC frequency = 2.5MHz. So, multiply
-+	 * both the numerator and the denominator by 10.
-+	 */
-+	etha->psmcs = clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
- }
- 
- static int rswitch_device_alloc(struct rswitch_private *priv, int index)
-@@ -1900,6 +1907,10 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 		return -ENOMEM;
- 	spin_lock_init(&priv->lock);
- 
-+	priv->clk = devm_clk_get(&pdev->dev, NULL);
-+	if (IS_ERR(priv->clk))
-+		return PTR_ERR(priv->clk);
-+
- 	attr = soc_device_match(rswitch_soc_no_speed_change);
- 	if (attr)
- 		priv->etha_no_runtime_change = true;
-diff --git a/drivers/net/ethernet/renesas/rswitch.h b/drivers/net/ethernet/renesas/rswitch.h
-index f0c16a37ea55..04f49a7a5843 100644
---- a/drivers/net/ethernet/renesas/rswitch.h
-+++ b/drivers/net/ethernet/renesas/rswitch.h
-@@ -915,6 +915,7 @@ struct rswitch_etha {
- 	bool external_phy;
- 	struct mii_bus *mii;
- 	phy_interface_t phy_interface;
-+	u32 psmcs;
- 	u8 mac_addr[MAX_ADDR_LEN];
- 	int link;
- 	int speed;
-@@ -1012,6 +1013,7 @@ struct rswitch_private {
- 	struct rswitch_mfwd mfwd;
- 
- 	spinlock_t lock;	/* lock interrupt registers' control */
-+	struct clk *clk;
- 
- 	bool etha_no_runtime_change;
- 	bool gwca_halt;
--- 
-2.25.1
-
+PiBNaXNzaW5nIENjIHN0YWJsZSwgdGhpcyBuZWVkcyB0byBiZSBiYWNrcG9ydGVkLgoKSSB3aWxs
+IGNjIHN0YWJsZSAoc3RhYmxlQHZnZXIua2VybmVsLm9yZykgZm9yIHRoZSBuZXh0IHZlcnNpb24s
+IHRoYW5rcyEKPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9pZWVlODAyMTU0L2NhODIxMC5j
+IGIvZHJpdmVycy9uZXQvaWVlZTgwMjE1NC9jYTgyMTAuYwo+ID4gaW5kZXggYWViYjE5ZjFiM2E0
+Li5iMzVjNmY1OWJkMWEgMTAwNjQ0Cj4gPiAtLS0gYS9kcml2ZXJzL25ldC9pZWVlODAyMTU0L2Nh
+ODIxMC5jCj4gPiArKysgYi9kcml2ZXJzL25ldC9pZWVlODAyMTU0L2NhODIxMC5jCj4gPiBAQCAt
+Mjc1OSw3ICsyNzU5LDYgQEAgc3RhdGljIGludCBjYTgyMTBfcmVnaXN0ZXJfZXh0X2Nsb2NrKHN0
+cnVjdCBzcGlfZGV2aWNlICpzcGkpCj4gPiAgCX0KPiA+ICAJcmV0ID0gb2ZfY2xrX2FkZF9wcm92
+aWRlcihucCwgb2ZfY2xrX3NyY19zaW1wbGVfZ2V0LCBwcml2LT5jbGspOwo+ID4gIAlpZiAocmV0
+KSB7Cj4gPiAtCQljbGtfdW5yZWdpc3Rlcihwcml2LT5jbGspOwo+ID4gIAkJZGV2X2NyaXQoCj4g
+PiAgCQkJJnNwaS0+ZGV2LAo+ID4gIAkJCSJGYWlsZWQgdG8gcmVnaXN0ZXIgZXh0ZXJuYWwgY2xv
+Y2sgYXMgY2xvY2sgcHJvdmlkZXJcbiIKPiAKPiBJIHdhcyBob3BpbmcgeW91IHdvdWxkIHNpbXBs
+aWZ5IHRoaXMgZnVuY3Rpb24gYSBiaXQgbW9yZS4KCkkgdW5kZXJzdGFuZC4gSW4gdGhlIG5leHQg
+cGF0Y2ggdmVyc2lvbiwgSSB3aWxsIGp1c3QgcmV0dXJuIG9mX2Nsa19hZGRfcHJvdmlkZXIoKS4g
+Cgo+IAo+ID4gQEAgLTI3ODAsNyArMjc3OSw3IEBAIHN0YXRpYyB2b2lkIGNhODIxMF91bnJlZ2lz
+dGVyX2V4dF9jbG9jayhzdHJ1Y3Qgc3BpX2RldmljZSAqc3BpKQo+ID4gIHsKPiA+ICAJc3RydWN0
+IGNhODIxMF9wcml2ICpwcml2ID0gc3BpX2dldF9kcnZkYXRhKHNwaSk7Cj4gPiAgCj4gPiAtCWlm
+ICghcHJpdi0+Y2xrKQo+ID4gKwlpZiAoSVNfRVJSX09SX05VTEwocHJpdi0+Y2xrKSkKPiA+ICAJ
+CXJldHVybgo+ID4gIAo+ID4gIAlvZl9jbGtfZGVsX3Byb3ZpZGVyKHNwaS0+ZGV2Lm9mX25vZGUp
+Owo+IAo+IEFsZXgsIFN0ZWZhbiwgd2hvIGhhbmRsZXMgd3BhbiBhbmQgd3Bhbi9uZXh0IHRoaXMg
+cmVsZWFzZT8KPgogCklzIHRoZXJlIGFueSBwcm9ibGVtIEkgbmVlZCB0byBoYW5kbGUgaW4gdGhl
+IG5leHQgcGF0Y2g/CgpSZWdhcmRzLApEaW5naGFvCg==
 
