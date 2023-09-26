@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-36299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39A07AED54
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:56:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F17D7AED5A
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id E61A0B20997
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:56:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 8DED5B20992
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2271127EC8;
-	Tue, 26 Sep 2023 12:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF4527EE6;
+	Tue, 26 Sep 2023 12:56:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1343211
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BD427EE3
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:56:31 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 098A111D
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:55:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD5F10C
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:56:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695732958;
+	s=mimecast20190719; t=1695732989;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=t4iH3vwVxFoPswV3u1qhZq4zjltOD47zGEuJH78n1q8=;
-	b=He8T1iUOw+/JiwJFI6AXLU8mK9wC2o1tBRe/v2RmRwkUW+naovHjUmznaLkIYfBmlpxKVa
-	i6hH3zJbLjB5YwnLoEP39HaX10cXPUdnAvtJXt5MhdK0VhR9U8wzcn0vv8XmbMHDwfdWLF
-	WKSE05Q1X5evFsuj+ubU1H6mfOMU9tE=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CddDDC+YI+osxwaqHzSITH6Nt7h9FcyMOVgoijeQ4uU=;
+	b=JY88stOQC2k7ngNsJFDjYXTfjM2j3OqPO1LRDU6CEwv5Vxc6HZU/iRzv1G33Q9vigs7c/C
+	22VRZs5RO2XXwlljb8AItavMYGrIHou2whuGILwfqolN6MpNB54QcCwDSG9pXdLHwQSO/S
+	Fns1agtptNMHNvUja9eX+R8ydEUYQRM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-156-3EiL8i8sP-qjabUY-o-fKA-1; Tue, 26 Sep 2023 08:55:56 -0400
-X-MC-Unique: 3EiL8i8sP-qjabUY-o-fKA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9adb6dd9e94so728871666b.2
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:55:56 -0700 (PDT)
+ us-mta-178-ImA5nVlDMeqeQeO0tvIQ_A-1; Tue, 26 Sep 2023 08:56:28 -0400
+X-MC-Unique: ImA5nVlDMeqeQeO0tvIQ_A-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-94a35b0d4ceso727361666b.3
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:56:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695732955; x=1696337755;
+        d=1e100.net; s=20230601; t=1695732986; x=1696337786;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t4iH3vwVxFoPswV3u1qhZq4zjltOD47zGEuJH78n1q8=;
-        b=cmUf2ei3+Wzfo21/ERa4QsyuswPBiYGTkwEWQCmHcjATYlfnI2LKN7B5QIFVeIOJTx
-         +tvs51VeWCiPzoK2vtFY5YYXSvG3/mZhrHXmTP6inpIlTyZO/a+laGEFj7jMKTgEL9km
-         KNPWntDWIErLWHBSvluUJ9CFP86TNybLFVrQxIXKMjT+R0gCftGm6V1uPI1ZQl029ym6
-         bK4enugyoSH8WATAToQN2FID4fg6dc8B0Mzq8ePfB+Lub88aRRlLEisGrOtlWYWYKVNE
-         nRmmOLSXCqTrryq5iWt5yhDuH+trekWW3vncXyaaBImFqiU/fkZzPf/dKF+zftn1H6gd
-         MvBA==
-X-Gm-Message-State: AOJu0YxE5YKvj3ujM+6xfDlGS5rGfXVSuqn8xP3EX9MJ+wfPXr1EuwFP
-	PNjX0Ido0BbqZ35c2qha/+ZX+7uMxyUkN8vi+8OMjcKSdl0AIksBpF6hVEK+mkxRstU0zKOAQL6
-	xWflRbSEudhkfCTHI
-X-Received: by 2002:a17:906:30d5:b0:9ad:c763:c3fd with SMTP id b21-20020a17090630d500b009adc763c3fdmr9300569ejb.28.1695732955240;
-        Tue, 26 Sep 2023 05:55:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHBoqKi4bGW4XT84p8pcKtRJrDw9HwrTduGHjeF7FIg3KEpK5irhsbqg/b4oWx2SfDz4/fEpA==
-X-Received: by 2002:a17:906:30d5:b0:9ad:c763:c3fd with SMTP id b21-20020a17090630d500b009adc763c3fdmr9300558ejb.28.1695732954899;
-        Tue, 26 Sep 2023 05:55:54 -0700 (PDT)
+        bh=CddDDC+YI+osxwaqHzSITH6Nt7h9FcyMOVgoijeQ4uU=;
+        b=otyuv4i8v5eAxd9uiqHagaZ+WLxUDyKBLNDiesLGxvFxA+GLAIFkRFG0IpNx1flAbn
+         1eQlPFz5fBSAA6W+3QejRs/JKLA1/B2fg67m/zh6RFGw8uE5oQSFM87Zjhvyvn2b4/6w
+         PB0Pueql1V7dw0PkfbWYPmjlcsRcp5z33cb/vbasOqByMRgwdcI9jKxHEapgMIMZKI1L
+         FF3UWgQOsYRY3PTKjcOG0sfTWIp+Y0d1MXi3US3m9HAXZJNw+Qnos9jsJOKOX/XpI+IL
+         jT0+844tWco03zmxvqI5c+NasZzQIlXYweqEFRwohjSSU4opsBINAN8Sga1R1+GVyb7R
+         25yA==
+X-Gm-Message-State: AOJu0Yz7Zydd2KnQUh+T6KKd4k6UAdxmDPuJnBDr/lBtgphV75AYwGP/
+	sJindcNmQQTI8jnV2ywBV/uNpGDxwA+Zf6wLk3UuI6O04kq+QakQ4xCdPKBrtawLDOtsjsKozG3
+	GtUyqWgsBhDfUwa/V
+X-Received: by 2002:a17:906:1053:b0:9ae:76a2:7022 with SMTP id j19-20020a170906105300b009ae76a27022mr7553814ejj.38.1695732986331;
+        Tue, 26 Sep 2023 05:56:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFYIrhN3P+JunkiZ5FgZXx3Bbhz4TDm2/Kn4vGreEaUXS+V3cU+FHm9hTpW1zj5nQMrff4I8w==
+X-Received: by 2002:a17:906:1053:b0:9ae:76a2:7022 with SMTP id j19-20020a170906105300b009ae76a27022mr7553804ejj.38.1695732986087;
+        Tue, 26 Sep 2023 05:56:26 -0700 (PDT)
 Received: from sgarzare-redhat ([46.6.146.182])
-        by smtp.gmail.com with ESMTPSA id e8-20020a170906374800b0099cf840527csm7748029ejc.153.2023.09.26.05.55.52
+        by smtp.gmail.com with ESMTPSA id u12-20020a1709064acc00b009a1e73f2b4bsm7729413ejt.48.2023.09.26.05.56.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 05:55:54 -0700 (PDT)
-Date: Tue, 26 Sep 2023 14:55:50 +0200
+        Tue, 26 Sep 2023 05:56:25 -0700 (PDT)
+Date: Tue, 26 Sep 2023 14:56:21 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Arseniy Krasnov <avkrasnov@salutedevices.com>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
@@ -69,10 +69,10 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>,
 	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
 	oxffffaa@gmail.com
-Subject: Re: [PATCH net-next v1 02/12] vsock: read from socket's error queue
-Message-ID: <3oys2ouhlkitsjx7q7utp7wkitnnl4kisl2r54wwa2addd644p@jzyu7ubfrcog>
+Subject: Re: [PATCH net-next v1 08/12] vsock: enable setting SO_ZEROCOPY
+Message-ID: <ynuctxau4ta4pk763ut7gfdaqzcuyve7uf2a2iltyspravs5uf@xrtqtbhuuvwq>
 References: <20230922052428.4005676-1-avkrasnov@salutedevices.com>
- <20230922052428.4005676-3-avkrasnov@salutedevices.com>
+ <20230922052428.4005676-9-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,7 +81,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230922052428.4005676-3-avkrasnov@salutedevices.com>
+In-Reply-To: <20230922052428.4005676-9-avkrasnov@salutedevices.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
@@ -90,93 +90,114 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 08:24:18AM +0300, Arseniy Krasnov wrote:
->This adds handling of MSG_ERRQUEUE input flag in receive call. This flag
->is used to read socket's error queue instead of data queue. Possible
->scenario of error queue usage is receiving completions for transmission
->with MSG_ZEROCOPY flag. This patch also adds new defines: 'SOL_VSOCK'
->and 'VSOCK_RECVERR'.
+On Fri, Sep 22, 2023 at 08:24:24AM +0300, Arseniy Krasnov wrote:
+>For AF_VSOCK, zerocopy tx mode depends on transport, so this option must
+>be set in AF_VSOCK implementation where transport is accessible (if
+>transport is not set during setting SO_ZEROCOPY: for example socket is
+>not connected, then SO_ZEROCOPY will be enabled, but once transport will
+>be assigned, support of this type of transmission will be checked).
+>
+>To handle SO_ZEROCOPY, AF_VSOCK implementation uses SOCK_CUSTOM_SOCKOPT
+>bit, thus handling SOL_SOCKET option operations, but all of them except
+>SO_ZEROCOPY will be forwarded to the generic handler by calling
+>'sock_setsockopt()'.
 >
 >Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
 >---
 > Changelog:
 > v5(big patchset) -> v1:
->  * R-b tag removed, due to added defines to 'include/uapi/linux/vsock.h'.
->    Both 'SOL_VSOCK' and 'VSOCK_RECVERR' are needed by userspace, so
->    they were placed to 'include/uapi/linux/vsock.h'. At the same time,
->    the same define for 'SOL_VSOCK' was placed to 'include/linux/socket.h'.
->    This is needed because this file contains SOL_XXX defines for different
->    types of socket, so it prevents situation when another new SOL_XXX
->    will use constant 287.
+>  * Compact 'if' conditions.
+>  * Rename 'zc_val' to 'zerocopy'.
+>  * Use 'zerocopy' value directly in 'sock_valbool_flag()', without
+>    ?: operator.
+>  * Set 'SOCK_CUSTOM_SOCKOPT' bit for connectible sockets only, as
+>    suggested by Bobby Eshleman <bobbyeshleman@gmail.com>.
 >
-> include/linux/socket.h     | 1 +
-> include/uapi/linux/vsock.h | 9 +++++++++
-> net/vmw_vsock/af_vsock.c   | 6 ++++++
-> 3 files changed, 16 insertions(+)
-> create mode 100644 include/uapi/linux/vsock.h
+> net/vmw_vsock/af_vsock.c | 46 ++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 44 insertions(+), 2 deletions(-)
 >
->diff --git a/include/linux/socket.h b/include/linux/socket.h
->index 39b74d83c7c4..cfcb7e2c3813 100644
->--- a/include/linux/socket.h
->+++ b/include/linux/socket.h
->@@ -383,6 +383,7 @@ struct ucred {
-> #define SOL_MPTCP	284
-> #define SOL_MCTP	285
-> #define SOL_SMC		286
->+#define SOL_VSOCK	287
->
-> /* IPX options */
-> #define IPX_TYPE	1
->diff --git a/include/uapi/linux/vsock.h b/include/uapi/linux/vsock.h
->new file mode 100644
->index 000000000000..b25c1347a3b8
->--- /dev/null
->+++ b/include/uapi/linux/vsock.h
-
-We already have include/uapi/linux/vm_sockets.h
-
-Should we include these changes there instead of creating a new header?
-
->@@ -0,0 +1,9 @@
->+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->+#ifndef _UAPI_LINUX_VSOCK_H
->+#define _UAPI_LINUX_VSOCK_H
->+
->+#define SOL_VSOCK	287
-
-Why we need to re-define this also here?
-
-In that case, should we protect with some guards to avoid double
-defines?
-
->+
->+#define VSOCK_RECVERR	1
->+
->+#endif /* _UAPI_LINUX_VSOCK_H */
 >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index d841f4de33b0..4fd11bf34bc7 100644
+>index 482300eb88e0..c05a42e02a17 100644
 >--- a/net/vmw_vsock/af_vsock.c
 >+++ b/net/vmw_vsock/af_vsock.c
->@@ -110,6 +110,8 @@
-> #include <linux/workqueue.h>
-> #include <net/sock.h>
-> #include <net/af_vsock.h>
->+#include <linux/errqueue.h>
->+#include <uapi/linux/vsock.h>
+>@@ -1406,8 +1406,16 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+> 			goto out;
+> 		}
 >
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
->@@ -2137,6 +2139,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	int err;
+>-		if (vsock_msgzerocopy_allow(transport))
+>+		if (vsock_msgzerocopy_allow(transport)) {
+> 			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
+>+		} else if (sock_flag(sk, SOCK_ZEROCOPY)) {
+>+			/* If this option was set before 'connect()',
+>+			 * when transport was unknown, check that this
+>+			 * feature is supported here.
+>+			 */
+>+			err = -EOPNOTSUPP;
+>+			goto out;
+>+		}
 >
-> 	sk = sock->sk;
+> 		err = vsock_auto_bind(vsk);
+> 		if (err)
+>@@ -1643,7 +1651,7 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+> 	const struct vsock_transport *transport;
+> 	u64 val;
+>
+>-	if (level != AF_VSOCK)
+>+	if (level != AF_VSOCK && level != SOL_SOCKET)
+> 		return -ENOPROTOOPT;
+>
+> #define COPY_IN(_v)                                       \
+>@@ -1666,6 +1674,34 @@ static int vsock_connectible_setsockopt(struct socket *sock,
+>
+> 	transport = vsk->transport;
+>
+>+	if (level == SOL_SOCKET) {
+>+		int zerocopy;
 >+
->+	if (unlikely(flags & MSG_ERRQUEUE))
->+		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, VSOCK_RECVERR);
+>+		if (optname != SO_ZEROCOPY) {
+>+			release_sock(sk);
+>+			return sock_setsockopt(sock, level, optname, optval, optlen);
+>+		}
 >+
-> 	vsk = vsock_sk(sk);
-> 	err = 0;
+>+		/* Use 'int' type here, because variable to
+>+		 * set this option usually has this type.
+>+		 */
+>+		COPY_IN(zerocopy);
+>+
+>+		if (zerocopy < 0 || zerocopy > 1) {
+>+			err = -EINVAL;
+>+			goto exit;
+>+		}
+>+
+>+		if (transport && !vsock_msgzerocopy_allow(transport)) {
+>+			err = -EOPNOTSUPP;
+>+			goto exit;
+>+		}
+>+
+>+		sock_valbool_flag(sk, SOCK_ZEROCOPY,
+>+				  zerocopy);
+
+it's not necessary to wrap this call.
+
+>+		goto exit;
+>+	}
+>+
+> 	switch (optname) {
+> 	case SO_VM_SOCKETS_BUFFER_SIZE:
+> 		COPY_IN(val);
+>@@ -2322,6 +2358,12 @@ static int vsock_create(struct net *net, struct socket *sock,
+> 		}
+> 	}
 >
+>+	/* SOCK_DGRAM doesn't have 'setsockopt' callback set in its
+>+	 * proto_ops, so there is no handler for custom logic.
+>+	 */
+>+	if (sock_type_connectible(sock->type))
+>+		set_bit(SOCK_CUSTOM_SOCKOPT, &sk->sk_socket->flags);
+>+
+> 	vsock_insert_unbound(vsk);
+>
+> 	return 0;
 >-- 
 >2.25.1
 >
