@@ -1,162 +1,118 @@
-Return-Path: <netdev+bounces-36291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929667AEC2C
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:09:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6FB7AEC42
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 14:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 40DC8281626
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:09:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id BB5B71C20756
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 12:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E520273F6;
-	Tue, 26 Sep 2023 12:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D16C2770B;
+	Tue, 26 Sep 2023 12:17:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E07107B9
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:09:53 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0656EB
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:09:51 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c012232792so146764371fa.0
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:09:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695730190; x=1696334990; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+GKgszZtN3P50Dp8VaZAYZUAl1lrWBw1x/OPcHu3sLo=;
-        b=WQClluey9oUKgKbTl//ZCnU5kEdFrXYqqRgQioG+jij6F4ogCUFqWOfIj+M8RAiok+
-         ogUK60RCFTTGzRgHnRCPcWpbGP9upTWNp9iMuQHmpt9LpjBuIop+icOu1dASz7RErq/b
-         k/xqbSjDR5k1BYRE0a3Y6Qv7fd4DvJAEUqnjU0SHXy8cEyWEaxuDhzzu8uGmSdR4RNvO
-         6Hi6FaZdNaQ7+2+BaVXVVjjChoUVM7N1RBLuRVuLTG0FWOK1HOh/qn5ADYjnBD5aKKLN
-         Z7h3RkaiQkphD0A4wx8/6DzzH3oqUxfx3zJP3popAX9BXAwBd/EN7o0nyZ16CmYgYA7v
-         ybzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695730190; x=1696334990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+GKgszZtN3P50Dp8VaZAYZUAl1lrWBw1x/OPcHu3sLo=;
-        b=oIbi+mT6KuLDPilXV+dcEUcsIrbGjVWPi63eCFBku3ar5Y1pYEfe5sXhN/Q9XsXYUQ
-         Iqp7zw+qjv8FUPQ997zJ5CkwL4dxHYYdf32U6HbnMR8IdNR0zoxUjhszhA6WubvtunVe
-         oL3i0v70sUChRqh7oE3x41rUkAkz+RHR/uJ4qWfTqa1yViwG2cvn81aLSRd89cpb91EH
-         /aRIM5FFphuTEfMfQ0jY6iJOFz3xALXDGRGEMtedQrAHKhyQc8mK3ko9lBZ9LO2KyP51
-         W9ecqtqSAQ9OPyYUXbpq1ivYUOwCIV8gnRu86G9B91VbecdRSJBQRvWhwyR4ft04Ocrm
-         nUWA==
-X-Gm-Message-State: AOJu0YzKlKVeu7D+NScwWaB782gH6R4eguENaU9hZcwbnQehhTJl+sfj
-	YAFvKjIdNdEsKukxf63SKqI=
-X-Google-Smtp-Source: AGHT+IHwLTJybw8tOMn7xAzMEPpoKUZR/sIqPsxSX2svpGLRfWH94jgwHuzUY+oVsL3O9I+KFE8krA==
-X-Received: by 2002:a2e:97c3:0:b0:2b9:ed84:b2bf with SMTP id m3-20020a2e97c3000000b002b9ed84b2bfmr8651641ljj.33.1695730189877;
-        Tue, 26 Sep 2023 05:09:49 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id t12-20020a2e9d0c000000b002bfb71c076asm2596086lji.43.2023.09.26.05.09.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 05:09:49 -0700 (PDT)
-Date: Tue, 26 Sep 2023 15:09:47 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, Jose.Abreu@synopsys.com, hkallweit1@gmail.com, 
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next] net: pcs: xpcs: Add 2500BASE-X case in get
- state for XPCS drivers
-Message-ID: <jhmdppifw4qverxedn6l3bk3tuwyuww7rcvqvtzbxhh5livowv@3jpc4m3kfgno>
-References: <20230925075142.266026-1-Raju.Lakkaraju@microchip.com>
- <fbkzmsznag5yjypbzmbmvtzfgdgx3v4pc6njmelrz3x7pvlojq@rh3tqyo5sr26>
- <ZRLEazyb0yS1Oxft@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2561107B9
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 12:17:05 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B947EB;
+	Tue, 26 Sep 2023 05:17:04 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38QAIpAg025962;
+	Tue, 26 Sep 2023 05:16:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pfpt0220;
+ bh=dWXOIzKr3YvQCTmxETjYvRovohbbY4Yz4fKJ63rQShU=;
+ b=QnHtq83nQHQZprgW55t1ZotopZuXmwfcrVKbEKnY9WVMMMAn7o/pkQehG5aNPUaCQb01
+ 5Pemb+ZQB9MkTC+IS3RkwvMotswwokhUmpag8uuSp34s0iV9DftS2S81IznzOIvNrDRI
+ +UOU+njRFOenP9v/3SntO6jNwW7w5dnB74r7puHEujuNpqCvIULUwIi6kOwpy0H4MBGK
+ QNxb/DJm7kMzLPLFigE4hdXQhFvMZEi9gIAapzetWjdUAQI53xmCRcGPGZuHkh7Gd8Te
+ WRJGKtQ0b4TGfFbTCNgw1jP2wrjEY2RRTtLVAxXJN2uzBL43g4P6xYlQs2AjjJlmNiRy Ow== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3t9yhm0ugq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 26 Sep 2023 05:16:38 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 26 Sep
+ 2023 05:16:36 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 26 Sep 2023 05:16:36 -0700
+Received: from [10.193.38.177] (unknown [10.193.38.177])
+	by maili.marvell.com (Postfix) with ESMTP id A980C3F7053;
+	Tue, 26 Sep 2023 05:16:33 -0700 (PDT)
+Message-ID: <f8d79f01-38d6-9385-f213-b34779b8bb54@marvell.com>
+Date: Tue, 26 Sep 2023 14:16:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRLEazyb0yS1Oxft@shell.armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Re: [PATCH net-next v5 3/7] net: macsec: indicate next pn
+ update when offloading
+To: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>,
+        Sabrina Dubroca
+	<sd@queasysnail.net>,
+        Dmitry Bezrukov <dbezrukov@marvell.com>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <richardcochran@gmail.com>,
+        <sebastian.tobuschat@oss.nxp.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20230920092237.121033-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230920092237.121033-4-radu-nicolae.pirea@oss.nxp.com>
+ <ZQxdLZJa0EpnxpCl@hog> <040a3ede-22f7-bed4-0dbf-10b68a9c7fe1@oss.nxp.com>
+Content-Language: en-US
+From: Igor Russkikh <irusskikh@marvell.com>
+In-Reply-To: <040a3ede-22f7-bed4-0dbf-10b68a9c7fe1@oss.nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: 10_H8fETF35UtVTdIfCOJoVNFs9nbO9a
+X-Proofpoint-ORIG-GUID: 10_H8fETF35UtVTdIfCOJoVNFs9nbO9a
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-26_08,2023-09-25_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Russell
+Hi guys,
 
-On Tue, Sep 26, 2023 at 12:45:47PM +0100, Russell King (Oracle) wrote:
-> On Tue, Sep 26, 2023 at 02:39:21PM +0300, Serge Semin wrote:
-> > Hi Raju
-> > 
-> > On Mon, Sep 25, 2023 at 01:21:42PM +0530, Raju Lakkaraju wrote:
-> > > Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
-> > > Update the port mode and autonegotiation
-> > > 
-> > > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> > > ---
-> > >  drivers/net/pcs/pcs-xpcs.c | 31 +++++++++++++++++++++++++++++++
-> > >  drivers/net/pcs/pcs-xpcs.h |  4 ++++
-> > >  2 files changed, 35 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-> > > index 4dbc21f604f2..4f89dcedf0fc 100644
-> > > --- a/drivers/net/pcs/pcs-xpcs.c
-> > > +++ b/drivers/net/pcs/pcs-xpcs.c
-> > > @@ -1090,6 +1090,30 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
-> > >  	return 0;
-> > >  }
-> > >  
-> > > +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
-> > > +				    struct phylink_link_state *state)
-> > > +{
-> > > +	int sts, lpa;
-> > > +
-> > > +	sts = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
-> > 
-> > > +	lpa = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_LP_BABL);
-> > > +	if (sts < 0 || lpa < 0) {
-> > > +		state->link = false;
-> > > +		return sts;
-> > > +	}
-> > 
-> > The HW manual says: "The host uses this page to know the link
-> > partner's ability when the base page is received through Clause 37
-> > auto-negotiation." Seeing xpcs_config_2500basex() disables
-> > auto-negotiation and lpa value is unused anyway why do you even need
-> > to read the LP_BABL register?
+> On 21.09.2023 18:11, Sabrina Dubroca wrote:
+>> 2023-09-20, 12:22:33 +0300, Radu Pirea (NXP OSS) wrote:
+>>> Indicate next PN update using update_pn flag in macsec_context.
+>>> Offloaded MACsec implementations does not know whether or not the
+>>> MACSEC_SA_ATTR_PN attribute was passed for an SA update and assume
+>>> that next PN should always updated, but this is not always true.
+>>
+>> This should probably go through net so that we can fix some drivers
+>> that are currently doing the wrong thing. octeontx2 should be
+>> fixable. atlantic looks like it would reset the PN to whatever was
+>> read during the last dump, and it's unclear if that can be fixed
+>> (AFAIU set_egress_sa_record writes the whole config at once).  mscc
+
+Thats correct, atlantic hardware requires full table to be in data buffer registers.
+I really doubt its possible to skip PN writing.
+
+>> doesn't seem to modify the PN (even if requested -- should it should
+>> reject the update), and mlx5 doesn't allow PN update (by storing the
+>> initial value of next_pn on SA creation).
 > 
-
-> Since you have access to the hardware manual, what does it say about
-> clause 37 auto-negotiation when operating in 2500base-X mode?
-
-Here are the parts which mention 37 & SGMII AN in the 2.5G context:
-
-1. "Clause 37 (& SGMII) auto-negotiation is supported in 2.5G mode if
-    the link partner is also operating in the equivalent 2.5G mode."
-
-2. "During the Clause 37/SGMII as the auto-negotiation link timer
-    operates with a faster clock in the 2.5G mode, the timeout duration
-    reduces by a factor of 2.5. To restore the standard specified timeout
-    period, the respective registers must be re-programmed."
-
-I guess the entire 2.5G-thing understanding could be generalized by
-the next sentence from the HW manual: "The 2.5G mode of operation is
-functionally the same as 1000BASE-X/KX mode, except that the
-clock-rate is 2.5 times the original rate. In this mode, the
-Serdes/PHY operates at a serial baud-rate of 3.125 Gbps and DWC_xpcs
-data-path and the GMII interface to MAC operates at 312.5 MHz (instead
-of 125 MHz)." Thus here is another info regarding AN in that context:
-
-3. "The DWC_xpcs operates either in 10/100/1000Mbps rate or
-25/250/2500Mbps rates respectively with SGMII auto-negotiation. The
-DWC_xpcs cannot support switching or negotiation between 1G and 2.5G
-rates using auto-negotiation."
-
--Serge(y)
-
+> I updated octeontx2, mssc and mlx5. Atlantic is unclear.
 > 
-> Thanks.
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Mark, Igor, in the atlantic MACsec driver, can the SAs be updated
+> without a PN update?
+
+Reviewed the code and the docs I have - my view is it can not.
+All the packed record in macsec_api.c:set_egress_sa_record is expected by hardware in full.
+
+Regards,
+  Igor
 
