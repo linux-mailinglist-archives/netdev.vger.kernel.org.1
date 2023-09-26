@@ -1,106 +1,151 @@
-Return-Path: <netdev+bounces-36234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E497AE748
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:03:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 797257AE753
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 10:05:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 186861F2557F
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:03:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D0CD6281B55
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 08:05:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD5311C8B;
-	Tue, 26 Sep 2023 08:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9FA11CB8;
+	Tue, 26 Sep 2023 08:05:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0954C6E
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 08:03:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76676C9
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 01:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695715394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ELJLtZNf5BHgiOefmxJ85wHiMzo3vyZFSvRuYmBGd3k=;
-	b=gD6tzs35c9GgQlCnGIbkvfyNk4r5SUP//bPF2ri/sg4tD8sfoUnBrFPbpyNSJ3OcSY2EIu
-	qk3tJwr6m0d7dZcQ6A4f6AXfEUt0bFV3+BVpVH1LkHW++CcP7s854s2RUslyau4e+jM/ku
-	K4+whbFtAMNL4MONlCtOoikTyx+ClWA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-520-MyRLrIp_OHuNuyZBzUHf9g-1; Tue, 26 Sep 2023 04:03:13 -0400
-X-MC-Unique: MyRLrIp_OHuNuyZBzUHf9g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fbdf341934so75604685e9.3
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 01:03:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695715392; x=1696320192;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ELJLtZNf5BHgiOefmxJ85wHiMzo3vyZFSvRuYmBGd3k=;
-        b=K8vqwXTW4LnUrIviMlvYuKatpYhiUwhMLB4/fGTZ0GRmCnMH40X7aK0CxORW8IOmx/
-         ppyipl0wsrVlXkKhic8jhrXXkUmWxveIpzzT/GEBOizZ4Rc7oxaL4Vgy16ujuotjTtlc
-         qmoFMORqmWaaGbFn2/5PXOTrkKgkfWvsBzeTa3+A3sMklwfh8Tb1pmcZ5DPpp7ihvUXL
-         EDgvacC1VU62+d09pNxhIz3k4JWxQqTpjAYEvpo4owAVnaqZWRhENdHPszDCyT4zSYPh
-         Cu96/sJstVXmZQgU67HJjhPZjZ0cYAVKNHvOadW0tYQ2W8Md4+AvWJRxKUUlBFeh051C
-         tkQw==
-X-Gm-Message-State: AOJu0YwkH61d2rTVb+zp1pyg4g0bm3Rw0mPRw6m32BMe++DBE9y4NtiO
-	uv/Lhpvjsx1dVSFEcqxucRTrHHS7iN8UIJfM1nzVeLtgE+FkVGUM5jNFaEkuehgojHCk1fdkSDR
-	20vcy4w1LbrLXzpOIJpnLSfNg/rekJK9u
-X-Received: by 2002:a7b:c8ce:0:b0:3f5:fff8:d4f3 with SMTP id f14-20020a7bc8ce000000b003f5fff8d4f3mr7389497wml.7.1695715392260;
-        Tue, 26 Sep 2023 01:03:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE59rpXl/SGxh4tybcaud/lyyascHkYmT5tXB1hN3iXyjhk5Q4F0p49nyFPjgDbiKxOxjQesT70FqFxc2/btoE=
-X-Received: by 2002:a7b:c8ce:0:b0:3f5:fff8:d4f3 with SMTP id
- f14-20020a7bc8ce000000b003f5fff8d4f3mr7389478wml.7.1695715391965; Tue, 26 Sep
- 2023 01:03:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AA02906;
+	Tue, 26 Sep 2023 08:05:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEB07C433C7;
+	Tue, 26 Sep 2023 08:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695715524;
+	bh=+Amk36a0CBOiKu5+FtjGQvFX395/lzfG991XVrUkCKk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RLx2TLWKtN7VAMAOy6Z+yt+5L2H3WvCxgk6fo3xEAFTVDZv0mPqQm9oryMdet+1qZ
+	 obrB5TY2nE/qbUSfaI1uId3y2yRK2qnxEYYQpqf8IMXRqLpaWcyp6r1h8W5YGqDDxg
+	 /Ipk9rb4CjRrT7bowSHMduOUAEuaFMTD7nXxu83iUI+O1xmmOj2PJsMoiGARKNDMsM
+	 m8lXDTJPRNGVXjXTr34wm+BzlG4p+UzrUM7cd5TVxTprWIBaR+mK3IXevwTFE0yWC2
+	 SIHL7mRKLFjL2iR5rLVY4OdrYFjdV9kMecllhx3OCPX+UXN+tAGab3AHw/soEZdxZb
+	 tvxNd43ZGN+BA==
+Date: Tue, 26 Sep 2023 11:04:22 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Song Liu <song@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev, netdev@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v3 02/13] mm: introduce execmem_text_alloc() and
+ execmem_free()
+Message-ID: <20230926080422.GP3303@kernel.org>
+References: <20230918072955.2507221-1-rppt@kernel.org>
+ <20230918072955.2507221-3-rppt@kernel.org>
+ <CAPhsuW5-=H1V=VXUYxyGnUdJuNUpRt44QmpwjkDUD=9i0itjuw@mail.gmail.com>
+ <20230923153808.GI3303@kernel.org>
+ <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230923170540.1447301-1-lulu@redhat.com> <20230923170540.1447301-8-lulu@redhat.com>
- <20230925135047.GE13733@nvidia.com>
-In-Reply-To: <20230925135047.GE13733@nvidia.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 26 Sep 2023 16:02:34 +0800
-Message-ID: <CACLfguUW+u+ADefgRnpRPU8DNj_EKDsrK0sy_Uj8EGtUN6Yu+g@mail.gmail.com>
-Subject: Re: [RFC 7/7] iommufd: Skip the CACHE_COHERENCY and iommu group check
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: jasowang@redhat.com, mst@redhat.com, yi.l.liu@intel.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAPhsuW6TxG87ZBwQ_027iiE+_UmXweZEPh8wKHkHo7wA+qXZUg@mail.gmail.com>
 
-On Mon, Sep 25, 2023 at 9:50=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Sun, Sep 24, 2023 at 01:05:40AM +0800, Cindy Lu wrote:
-> > This is just the work arround for vdpa, I Will
-> > fix these problems in the next version.
+On Sat, Sep 23, 2023 at 03:36:01PM -0700, Song Liu wrote:
+> On Sat, Sep 23, 2023 at 8:39 AM Mike Rapoport <rppt@kernel.org> wrote:
 > >
-> > Skip these 2 checks:
-> > 1.IOMMU_CAP_CACHE_COHERENCY check
-> > 2.iommu_group_get check
->
-> Uuh, something has gone really, really wrong if you need to skip these
-> checks in the core iommufd code..
->
-there are problems in this code, I will continue working in this.
-Thanks
-Cindy
-> Jason
->
+> > On Thu, Sep 21, 2023 at 03:34:18PM -0700, Song Liu wrote:
+> > > On Mon, Sep 18, 2023 at 12:30 AM Mike Rapoport <rppt@kernel.org> wrote:
+> > > >
+> > >
+> > > [...]
+> > >
+> > > > diff --git a/arch/s390/kernel/module.c b/arch/s390/kernel/module.c
+> > > > index 42215f9404af..db5561d0c233 100644
+> > > > --- a/arch/s390/kernel/module.c
+> > > > +++ b/arch/s390/kernel/module.c
+> > > > @@ -21,6 +21,7 @@
+> > > >  #include <linux/moduleloader.h>
+> > > >  #include <linux/bug.h>
+> > > >  #include <linux/memory.h>
+> > > > +#include <linux/execmem.h>
+> > > >  #include <asm/alternative.h>
+> > > >  #include <asm/nospec-branch.h>
+> > > >  #include <asm/facility.h>
+> > > > @@ -76,7 +77,7 @@ void *module_alloc(unsigned long size)
+> > > >  #ifdef CONFIG_FUNCTION_TRACER
+> > > >  void module_arch_cleanup(struct module *mod)
+> > > >  {
+> > > > -       module_memfree(mod->arch.trampolines_start);
+> > > > +       execmem_free(mod->arch.trampolines_start);
+> > > >  }
+> > > >  #endif
+> > > >
+> > > > @@ -510,7 +511,7 @@ static int module_alloc_ftrace_hotpatch_trampolines(struct module *me,
+> > > >
+> > > >         size = FTRACE_HOTPATCH_TRAMPOLINES_SIZE(s->sh_size);
+> > > >         numpages = DIV_ROUND_UP(size, PAGE_SIZE);
+> > > > -       start = module_alloc(numpages * PAGE_SIZE);
+> > > > +       start = execmem_text_alloc(EXECMEM_FTRACE, numpages * PAGE_SIZE);
+> > >
+> > > This should be EXECMEM_MODULE_TEXT?
+> >
+> > This is an ftrace trampoline, so I think it should be FTRACE type of
+> > allocation.
+> 
+> Yeah, I was aware of the ftrace trampoline. My point was, ftrace trampoline
+> doesn't seem to have any special requirements. Therefore, it is probably not
+> necessary to have a separate type just for it.
 
+Since ftrace trampolines are currently used only on s390 and x86 which
+enforce the same range for all executable allocations there are no special
+requirements indeed. But I think that explicitly marking these allocations
+as FTRACE makes it clearer what are they used for and I don't see downsides
+to having a type for FTRACE.
+ 
+> AFAICT, kprobe, ftrace, and BPF (JIT and trampoline) can share the same
+> execmem_type. We may need some work for some archs, but nothing is
+> fundamentally different among these.
+
+Using the same type for all generated code implies that all types of the
+generated code must live in the same range and I don't think we want to
+impose this limitation on architectures.
+
+For example, RISC-V deliberately added a range for BPF code to allow
+relative addressing, see commit 7f3631e88ee6 ("riscv, bpf: Provide RISC-V
+specific JIT image alloc/free").
+ 
+> Thanks,
+> Song
+
+-- 
+Sincerely yours,
+Mike.
 
