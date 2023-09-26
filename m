@@ -1,517 +1,165 @@
-Return-Path: <netdev+bounces-36319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBCC7AF094
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 18:21:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C9227AF0EE
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 18:41:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8DCFA2816ED
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 16:21:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 660BE1C20833
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 16:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD9F33982;
-	Tue, 26 Sep 2023 16:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E67F286B4;
+	Tue, 26 Sep 2023 16:41:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7297631A8B;
-	Tue, 26 Sep 2023 16:21:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E06F5C433C8;
-	Tue, 26 Sep 2023 16:21:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695745276;
-	bh=il2c9PwkqYyTG1jHOzbY1MvMcvzoBdMMgsAXYbzx4i0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b9riywJkFigYP2bkgOJbcOgOSvdu0N6ZQlI/GNrt+AAcWiSm+BYhp87GmCF/auJqp
-	 eMn7m1Oo8++m/lYtXoEPfxbnkRUmlkoe5Nn1dpiCoZSpRd+Lhgh0jEe9qiJelchKYr
-	 q5L9SFf7+lSmxPTA4ZiGPY3GpeQEzpv/JEDd2TDiUANu3XwFiI5gDazm5wAoxqQAsX
-	 Z0M3xyh+5S8MSncnMS25mGZTFNq0Tr2JSSRhkenfcLMJgxiQKuxI/snP6CIRMTw2Ar
-	 i0lEntawkDvVj8AldjPpwLjtx7bMX4YFkoJnrWRiHAk3nm4443ByAsHLry6W27/4rO
-	 1iCJMa9b5maCA==
-Date: Tue, 26 Sep 2023 18:21:12 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	lennart@poettering.net, kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v5 bpf-next 03/13] bpf: introduce BPF token object
-Message-ID: <20230926-augen-biodiesel-fdb05e859aac@brauner>
-References: <20230919214800.3803828-1-andrii@kernel.org>
- <20230919214800.3803828-4-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F043A1FA1
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 16:41:11 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71167199
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695746465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9YAyRg25y1ds+4WMOQ2HhwyFuV1Nm/hS+8w3y9qqUyQ=;
+	b=ZKerJDtjqwgwk7OOFSz2q/lUaiN7G5diUcDWRF6AO8uOFmLyjwkcnx/7lZIv0EBGcnYsoL
+	39TFpfJpUZ/d9+KegKhycJqOgeQyCA2f78khQ9aYijgvm+jYFRwksHTub/KsMnHF4r/GVN
+	SVF/mzLuQd69yH+M5cuvWDhz5xGcqUM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-132-NaCzMlRzNu6pK3CMxW0T7A-1; Tue, 26 Sep 2023 12:41:04 -0400
+X-MC-Unique: NaCzMlRzNu6pK3CMxW0T7A-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9ae0bf9c0b4so795822566b.0
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 09:41:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695746463; x=1696351263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9YAyRg25y1ds+4WMOQ2HhwyFuV1Nm/hS+8w3y9qqUyQ=;
+        b=Q+tBYuc94vsStKwMqFOEYn94p5+uQvlY7YdqhGagQ3YkGxFWZsUsk1rarNeqVs5Ayz
+         i4cbqll6UgQTxCE3sylBy9Z31lyC1aJlH7lQSl+PsYR2CHILxAMCJkqltT8plZIif0i8
+         iLSQ5UeDhPdcLRG2io9aC4rWICDop42Y7XcD5+nS3K6HF39W9QxjWMakqEsVccGvT2hK
+         rt+LC3UtpEyQZB7SPgRFzW/UAKcK4vPPFyqsmC55uodsmZM9kAQAOjY90l+AF2AMO/1v
+         GxUXTs7vdf1REspsgTb0xeGVMLE0ewedx1eXkUt64uz4sGakO16XaYR9ErQyzXR4PbYK
+         P+eQ==
+X-Gm-Message-State: AOJu0Ywng1cahX4RdwqKub4kaULE8Lz7yiBSINDC8dahv178zC3vfiqU
+	BiYyG+weqmlzKoF34JC7FYYbOZS/WOyYMXS3cjPZ6bdlILYEesi6U/KXbwn3ZdpoYsi4WM2u4VA
+	iZLveaUSstiZPoo7cNZm4JiB412nTqoKY
+X-Received: by 2002:a17:906:218a:b0:9ad:7d5c:3d4b with SMTP id 10-20020a170906218a00b009ad7d5c3d4bmr9170360eju.35.1695746462968;
+        Tue, 26 Sep 2023 09:41:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyLnGtjl16ZbEydnXM+tv4CysWF7HTsyNruFiTtg08cjTqOpFUagw9oPsSkwzQbGl91B9XtcGprebhtCWXQ+0=
+X-Received: by 2002:a17:906:218a:b0:9ad:7d5c:3d4b with SMTP id
+ 10-20020a170906218a00b009ad7d5c3d4bmr9170343eju.35.1695746462665; Tue, 26 Sep
+ 2023 09:41:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230919214800.3803828-4-andrii@kernel.org>
+References: <20230926032244.11560-1-dinghao.liu@zju.edu.cn>
+ <20230926100202.011ab841@xps-13> <adf9d668-0906-3004-d4e8-a7775844a985@datenfreihafen.org>
+In-Reply-To: <adf9d668-0906-3004-d4e8-a7775844a985@datenfreihafen.org>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Tue, 26 Sep 2023 12:40:51 -0400
+Message-ID: <CAK-6q+gfN7GtwfpUvOjNsNE9LSMTGrdLE6+-dgUEkVaA6SK1zw@mail.gmail.com>
+Subject: Re: [PATCH] [v2] ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>, Dinghao Liu <dinghao.liu@zju.edu.cn>, 
+	Alexander Aring <alex.aring@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Harry Morris <harrymorris12@gmail.com>, 
+	linux-wpan@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Sep 19, 2023 at 02:47:50PM -0700, Andrii Nakryiko wrote:
-> Add new kind of BPF kernel object, BPF token. BPF token is meant to
-> allow delegating privileged BPF functionality, like loading a BPF
-> program or creating a BPF map, from privileged process to a *trusted*
-> unprivileged process, all while have a good amount of control over which
-> privileged operations could be performed using provided BPF token.
-> 
-> This is achieved through mounting BPF FS instance with extra delegation
-> mount options, which determine what operations are delegatable, and also
-> constraining it to the owning user namespace (as mentioned in the
-> previous patch).
-> 
-> BPF token itself is just a derivative from BPF FS and can be created
-> through a new bpf() syscall command, BPF_TOKEN_CREAT, which accepts
-> a path specification (using the usual fd + string path combo) to a BPF
-> FS mount. Currently, BPF token "inherits" delegated command, map types,
-> prog type, and attach type bit sets from BPF FS as is. In the future,
-> having an BPF token as a separate object with its own FD, we can allow
-> to further restrict BPF token's allowable set of things either at the creation
-> time or after the fact, allowing the process to guard itself further
-> from, e.g., unintentionally trying to load undesired kind of BPF
-> programs. But for now we keep things simple and just copy bit sets as is.
-> 
-> When BPF token is created from BPF FS mount, we take reference to the
-> BPF super block's owning user namespace, and then use that namespace for
-> checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
-> capabilities that are normally only checked against init userns (using
-> capable()), but now we check them using ns_capable() instead (if BPF
-> token is provided). See bpf_token_capable() for details.
-> 
-> Such setup means that BPF token in itself is not sufficient to grant BPF
-> functionality. User namespaced process has to *also* have necessary
-> combination of capabilities inside that user namespace. So while
-> previously CAP_BPF was useless when granted within user namespace, now
-> it gains a meaning and allows container managers and sys admins to have
-> a flexible control over which processes can and need to use BPF
-> functionality within the user namespace (i.e., container in practice).
-> And BPF FS delegation mount options and derived BPF tokens serve as
-> a per-container "flag" to grant overall ability to use bpf() (plus further
-> restrict on which parts of bpf() syscalls are treated as namespaced).
-> 
-> The alternative to creating BPF token object was:
->   a) not having any extra object and just pasing BPF FS path to each
->      relevant bpf() command. This seems suboptimal as it's racy (mount
->      under the same path might change in between checking it and using it
->      for bpf() command). And also less flexible if we'd like to further
->      restrict ourselves compared to all the delegated functionality
->      allowed on BPF FS.
->   b) use non-bpf() interface, e.g., ioctl(), but otherwise also create
->      a dedicated FD that would represent a token-like functionality. This
->      doesn't seem superior to having a proper bpf() command, so
->      BPF_TOKEN_CREATE was chosen.
-> 
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->  include/linux/bpf.h            |  42 ++++++++
->  include/uapi/linux/bpf.h       |  39 +++++++
->  kernel/bpf/Makefile            |   2 +-
->  kernel/bpf/inode.c             |   4 +-
->  kernel/bpf/syscall.c           |  17 +++
->  kernel/bpf/token.c             | 189 +++++++++++++++++++++++++++++++++
->  tools/include/uapi/linux/bpf.h |  39 +++++++
->  7 files changed, 330 insertions(+), 2 deletions(-)
->  create mode 100644 kernel/bpf/token.c
-> 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 026923a60cad..ae13538f5465 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -51,6 +51,8 @@ struct module;
->  struct bpf_func_state;
->  struct ftrace_ops;
->  struct cgroup;
-> +struct bpf_token;
-> +struct user_namespace;
->  
->  extern struct idr btf_idr;
->  extern spinlock_t btf_idr_lock;
-> @@ -1572,6 +1574,13 @@ struct bpf_mount_opts {
->  	u64 delegate_attachs;
->  };
->  
-> +struct bpf_token {
-> +	struct work_struct work;
-> +	atomic64_t refcnt;
-> +	struct user_namespace *userns;
-> +	u64 allowed_cmds;
-> +};
-> +
->  struct bpf_struct_ops_value;
->  struct btf_member;
->  
-> @@ -2162,6 +2171,8 @@ static inline void bpf_map_dec_elem_count(struct bpf_map *map)
->  
->  extern int sysctl_unprivileged_bpf_disabled;
->  
-> +bool bpf_token_capable(const struct bpf_token *token, int cap);
-> +
->  static inline bool bpf_allow_ptr_leaks(void)
->  {
->  	return perfmon_capable();
-> @@ -2196,6 +2207,14 @@ int bpf_link_new_fd(struct bpf_link *link);
->  struct bpf_link *bpf_link_get_from_fd(u32 ufd);
->  struct bpf_link *bpf_link_get_curr_or_next(u32 *id);
->  
-> +void bpf_token_inc(struct bpf_token *token);
-> +void bpf_token_put(struct bpf_token *token);
-> +int bpf_token_create(union bpf_attr *attr);
-> +int bpf_token_new_fd(struct bpf_token *token);
-> +struct bpf_token *bpf_token_get_from_fd(u32 ufd);
-> +
-> +bool bpf_token_allow_cmd(const struct bpf_token *token, enum bpf_cmd cmd);
-> +
->  int bpf_obj_pin_user(u32 ufd, int path_fd, const char __user *pathname);
->  int bpf_obj_get_user(int path_fd, const char __user *pathname, int flags);
->  
-> @@ -2557,6 +2576,29 @@ static inline int bpf_obj_get_user(const char __user *pathname, int flags)
->  	return -EOPNOTSUPP;
->  }
->  
-> +static inline bool bpf_token_capable(const struct bpf_token *token, int cap)
-> +{
-> +	return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> +}
-> +
-> +static inline void bpf_token_inc(struct bpf_token *token)
-> +{
-> +}
-> +
-> +static inline void bpf_token_put(struct bpf_token *token)
-> +{
-> +}
-> +
-> +static inline int bpf_token_new_fd(struct bpf_token *token)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static inline struct bpf_token *bpf_token_get_from_fd(u32 ufd)
-> +{
-> +	return ERR_PTR(-EOPNOTSUPP);
-> +}
-> +
->  static inline void __dev_flush(void)
->  {
->  }
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 73b155e52204..36e98c6f8944 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -847,6 +847,37 @@ union bpf_iter_link_info {
->   *		Returns zero on success. On error, -1 is returned and *errno*
->   *		is set appropriately.
->   *
-> + * BPF_TOKEN_CREATE
-> + *	Description
-> + *		Create BPF token with embedded information about what
-> + *		BPF-related functionality it allows:
-> + *		- a set of allowed bpf() syscall commands;
-> + *		- a set of allowed BPF map types to be created with
-> + *		BPF_MAP_CREATE command, if BPF_MAP_CREATE itself is allowed;
-> + *		- a set of allowed BPF program types and BPF program attach
-> + *		types to be loaded with BPF_PROG_LOAD command, if
-> + *		BPF_PROG_LOAD itself is allowed.
-> + *
-> + *		BPF token is created (derived) from an instance of BPF FS,
-> + *		assuming it has necessary delegation mount options specified.
-> + *		BPF FS mount is specified with openat()-style path FD + string.
-> + *		This BPF token can be passed as an extra parameter to various
-> + *		bpf() syscall commands to grant BPF subsystem functionality to
-> + *		unprivileged processes.
-> + *
-> + *		When created, BPF token is "associated" with the owning
-> + *		user namespace of BPF FS instance (super block) that it was
-> + *		derived from, and subsequent BPF operations performed with
-> + *		BPF token would be performing capabilities checks (i.e.,
-> + *		CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN) within
-> + *		that user namespace. Without BPF token, such capabilities
-> + *		have to be granted in init user namespace, making bpf()
-> + *		syscall incompatible with user namespace, for the most part.
-> + *
-> + *	Return
-> + *		A new file descriptor (a nonnegative integer), or -1 if an
-> + *		error occurred (in which case, *errno* is set appropriately).
-> + *
->   * NOTES
->   *	eBPF objects (maps and programs) can be shared between processes.
->   *
-> @@ -901,6 +932,8 @@ enum bpf_cmd {
->  	BPF_ITER_CREATE,
->  	BPF_LINK_DETACH,
->  	BPF_PROG_BIND_MAP,
-> +	BPF_TOKEN_CREATE,
-> +	__MAX_BPF_CMD,
->  };
->  
->  enum bpf_map_type {
-> @@ -1694,6 +1727,12 @@ union bpf_attr {
->  		__u32		flags;		/* extra flags */
->  	} prog_bind_map;
->  
-> +	struct { /* struct used by BPF_TOKEN_CREATE command */
-> +		__u32		flags;
-> +		__u32		bpffs_path_fd;
-> +		__u64		bpffs_pathname;
-> +	} token_create;
-> +
->  } __attribute__((aligned(8)));
->  
->  /* The description below is an attempt at providing documentation to eBPF
-> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-> index f526b7573e97..4ce95acfcaa7 100644
-> --- a/kernel/bpf/Makefile
-> +++ b/kernel/bpf/Makefile
-> @@ -6,7 +6,7 @@ cflags-nogcse-$(CONFIG_X86)$(CONFIG_CC_IS_GCC) := -fno-gcse
->  endif
->  CFLAGS_core.o += $(call cc-disable-warning, override-init) $(cflags-nogcse-yy)
->  
-> -obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o
-> +obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o token.o
->  obj-$(CONFIG_BPF_SYSCALL) += bpf_iter.o map_iter.o task_iter.o prog_iter.o link_iter.o
->  obj-$(CONFIG_BPF_SYSCALL) += hashtab.o arraymap.o percpu_freelist.o bpf_lru_list.o lpm_trie.o map_in_map.o bloom_filter.o
->  obj-$(CONFIG_BPF_SYSCALL) += local_storage.o queue_stack_maps.o ringbuf.o
-> diff --git a/kernel/bpf/inode.c b/kernel/bpf/inode.c
-> index 8f66b57d3546..82f11fbffd3e 100644
-> --- a/kernel/bpf/inode.c
-> +++ b/kernel/bpf/inode.c
-> @@ -603,11 +603,13 @@ static int bpf_show_options(struct seq_file *m, struct dentry *root)
->  {
->  	struct bpf_mount_opts *opts = root->d_sb->s_fs_info;
->  	umode_t mode = d_inode(root)->i_mode & S_IALLUGO & ~S_ISVTX;
-> +	u64 mask;
->  
->  	if (mode != S_IRWXUGO)
->  		seq_printf(m, ",mode=%o", mode);
->  
-> -	if (opts->delegate_cmds == ~0ULL)
-> +	mask = (1ULL << __MAX_BPF_CMD) - 1;
-> +	if ((opts->delegate_cmds & mask) == mask)
->  		seq_printf(m, ",delegate_cmds=any");
->  	else if (opts->delegate_cmds)
->  		seq_printf(m, ",delegate_cmds=0x%llx", opts->delegate_cmds);
-> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-> index f024caee0bba..93338faa43d5 100644
-> --- a/kernel/bpf/syscall.c
-> +++ b/kernel/bpf/syscall.c
-> @@ -5302,6 +5302,20 @@ static int bpf_prog_bind_map(union bpf_attr *attr)
->  	return ret;
->  }
->  
-> +#define BPF_TOKEN_CREATE_LAST_FIELD token_create.bpffs_pathname
-> +
-> +static int token_create(union bpf_attr *attr)
-> +{
-> +	if (CHECK_ATTR(BPF_TOKEN_CREATE))
-> +		return -EINVAL;
-> +
-> +	/* no flags are supported yet */
-> +	if (attr->token_create.flags)
-> +		return -EINVAL;
-> +
-> +	return bpf_token_create(attr);
-> +}
-> +
->  static int __sys_bpf(int cmd, bpfptr_t uattr, unsigned int size)
->  {
->  	union bpf_attr attr;
-> @@ -5435,6 +5449,9 @@ static int __sys_bpf(int cmd, bpfptr_t uattr, unsigned int size)
->  	case BPF_PROG_BIND_MAP:
->  		err = bpf_prog_bind_map(&attr);
->  		break;
-> +	case BPF_TOKEN_CREATE:
-> +		err = token_create(&attr);
-> +		break;
->  	default:
->  		err = -EINVAL;
->  		break;
-> diff --git a/kernel/bpf/token.c b/kernel/bpf/token.c
-> new file mode 100644
-> index 000000000000..f6ea3eddbee6
-> --- /dev/null
-> +++ b/kernel/bpf/token.c
-> @@ -0,0 +1,189 @@
-> +#include <linux/bpf.h>
-> +#include <linux/vmalloc.h>
-> +#include <linux/anon_inodes.h>
-> +#include <linux/fdtable.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/kernel.h>
-> +#include <linux/idr.h>
-> +#include <linux/namei.h>
-> +#include <linux/user_namespace.h>
-> +
-> +bool bpf_token_capable(const struct bpf_token *token, int cap)
-> +{
-> +	/* BPF token allows ns_capable() level of capabilities */
-> +	if (token) {
-> +		if (ns_capable(token->userns, cap))
-> +			return true;
-> +		if (cap != CAP_SYS_ADMIN && ns_capable(token->userns, CAP_SYS_ADMIN))
-> +			return true;
-> +	}
-> +	/* otherwise fallback to capable() checks */
-> +	return capable(cap) || (cap != CAP_SYS_ADMIN && capable(CAP_SYS_ADMIN));
-> +}
-> +
-> +void bpf_token_inc(struct bpf_token *token)
-> +{
-> +	atomic64_inc(&token->refcnt);
-> +}
-> +
-> +static void bpf_token_free(struct bpf_token *token)
-> +{
-> +	put_user_ns(token->userns);
-> +	kvfree(token);
-> +}
-> +
-> +static void bpf_token_put_deferred(struct work_struct *work)
-> +{
-> +	struct bpf_token *token = container_of(work, struct bpf_token, work);
-> +
-> +	bpf_token_free(token);
-> +}
-> +
-> +void bpf_token_put(struct bpf_token *token)
-> +{
-> +	if (!token)
-> +		return;
-> +
-> +	if (!atomic64_dec_and_test(&token->refcnt))
-> +		return;
-> +
-> +	INIT_WORK(&token->work, bpf_token_put_deferred);
-> +	schedule_work(&token->work);
-> +}
-> +
-> +static int bpf_token_release(struct inode *inode, struct file *filp)
-> +{
-> +	struct bpf_token *token = filp->private_data;
-> +
-> +	bpf_token_put(token);
-> +	return 0;
-> +}
-> +
-> +static ssize_t bpf_dummy_read(struct file *filp, char __user *buf, size_t siz,
-> +			      loff_t *ppos)
-> +{
-> +	/* We need this handler such that alloc_file() enables
-> +	 * f_mode with FMODE_CAN_READ.
-> +	 */
-> +	return -EINVAL;
-> +}
-> +
-> +static ssize_t bpf_dummy_write(struct file *filp, const char __user *buf,
-> +			       size_t siz, loff_t *ppos)
-> +{
-> +	/* We need this handler such that alloc_file() enables
-> +	 * f_mode with FMODE_CAN_WRITE.
-> +	 */
-> +	return -EINVAL;
-> +}
-> +
-> +static void bpf_token_show_fdinfo(struct seq_file *m, struct file *filp)
-> +{
-> +	struct bpf_token *token = filp->private_data;
-> +	u64 mask;
-> +
-> +	mask = (1ULL << __MAX_BPF_CMD) - 1;
-> +	if ((token->allowed_cmds & mask) == mask)
-> +		seq_printf(m, "allowed_cmds:\tany\n");
-> +	else
-> +		seq_printf(m, "allowed_cmds:\t0x%llx\n", token->allowed_cmds);
-> +}
-> +
-> +static const struct file_operations bpf_token_fops = {
-> +	.release	= bpf_token_release,
-> +	.read		= bpf_dummy_read,
-> +	.write		= bpf_dummy_write,
-> +	.show_fdinfo	= bpf_token_show_fdinfo,
-> +};
-> +
-> +static struct bpf_token *bpf_token_alloc(void)
-> +{
-> +	struct bpf_token *token;
-> +
-> +	token = kvzalloc(sizeof(*token), GFP_USER);
-> +	if (!token)
-> +		return NULL;
-> +
-> +	atomic64_set(&token->refcnt, 1);
-> +
-> +	return token;
-> +}
-> +
-> +int bpf_token_create(union bpf_attr *attr)
-> +{
-> +	struct path path;
-> +	struct bpf_mount_opts *mnt_opts;
-> +	struct bpf_token *token;
-> +	int ret;
-> +
-> +	ret = user_path_at(attr->token_create.bpffs_path_fd,
-> +			   u64_to_user_ptr(attr->token_create.bpffs_pathname),
-> +			   LOOKUP_FOLLOW | LOOKUP_EMPTY, &path);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (path.mnt->mnt_root != path.dentry) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +	ret = path_permission(&path, MAY_ACCESS);
-> +	if (ret)
-> +		goto out;
-> +
-> +	token = bpf_token_alloc();
-> +	if (!token) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
-> +
-> +	/* remember bpffs owning userns for future ns_capable() checks */
-> +	token->userns = get_user_ns(path.dentry->d_sb->s_user_ns);
-> +
-> +	mnt_opts = path.dentry->d_sb->s_fs_info;
-> +	token->allowed_cmds = mnt_opts->delegate_cmds;
-> +
-> +	ret = bpf_token_new_fd(token);
-> +	if (ret < 0)
-> +		bpf_token_free(token);
-> +out:
-> +	path_put(&path);
-> +	return ret;
-> +}
-> +
-> +#define BPF_TOKEN_INODE_NAME "bpf-token"
-> +
-> +/* Alloc anon_inode and FD for prepared token.
-> + * Returns fd >= 0 on success; negative error, otherwise.
-> + */
-> +int bpf_token_new_fd(struct bpf_token *token)
-> +{
-> +	return anon_inode_getfd(BPF_TOKEN_INODE_NAME, &bpf_token_fops, token, O_CLOEXEC);
+Hi,
 
-It's unnecessary to use the anonymous inode infrastructure for bpf
-tokens. It adds even more moving parts and makes reasoning about it even
-harder. Just keep it all in bpffs. IIRC, something like the following
-(broken, non-compiling draft) should work:
+On Tue, Sep 26, 2023 at 4:29=E2=80=AFAM Stefan Schmidt
+<stefan@datenfreihafen.org> wrote:
+>
+> Hello.
+>
+> On 26.09.23 10:02, Miquel Raynal wrote:
+> > Hi Dinghao,
+> >
+> > dinghao.liu@zju.edu.cn wrote on Tue, 26 Sep 2023 11:22:44 +0800:
+> >
+> >> If of_clk_add_provider() fails in ca8210_register_ext_clock(),
+> >> it calls clk_unregister() to release priv->clk and returns an
+> >> error. However, the caller ca8210_probe() then calls ca8210_remove(),
+> >> where priv->clk is freed again in ca8210_unregister_ext_clock(). In
+> >> this case, a use-after-free may happen in the second time we call
+> >> clk_unregister().
+> >>
+> >> Fix this by removing the first clk_unregister(). Also, priv->clk could
+> >> be an error code on failure of clk_register_fixed_rate(). Use
+> >> IS_ERR_OR_NULL to catch this case in ca8210_unregister_ext_clock().
+> >>
+> >> Fixes: ded845a781a5 ("ieee802154: Add CA8210 IEEE 802.15.4 device driv=
+er")
+> >
+> > Missing Cc stable, this needs to be backported.
+> >
+> >> Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
+> >> ---
+> >>
+> >> Changelog:
+> >>
+> >> v2: -Remove the first clk_unregister() instead of nulling priv->clk.
+> >> ---
+> >>   drivers/net/ieee802154/ca8210.c | 3 +--
+> >>   1 file changed, 1 insertion(+), 2 deletions(-)
+> >>
+> >> diff --git a/drivers/net/ieee802154/ca8210.c b/drivers/net/ieee802154/=
+ca8210.c
+> >> index aebb19f1b3a4..b35c6f59bd1a 100644
+> >> --- a/drivers/net/ieee802154/ca8210.c
+> >> +++ b/drivers/net/ieee802154/ca8210.c
+> >> @@ -2759,7 +2759,6 @@ static int ca8210_register_ext_clock(struct spi_=
+device *spi)
+> >>      }
+> >>      ret =3D of_clk_add_provider(np, of_clk_src_simple_get, priv->clk)=
+;
+> >>      if (ret) {
+> >> -            clk_unregister(priv->clk);
+> >>              dev_crit(
+> >>                      &spi->dev,
+> >>                      "Failed to register external clock as clock provi=
+der\n"
+> >
+> > I was hoping you would simplify this function a bit more.
+> >
+> >> @@ -2780,7 +2779,7 @@ static void ca8210_unregister_ext_clock(struct s=
+pi_device *spi)
+> >>   {
+> >>      struct ca8210_priv *priv =3D spi_get_drvdata(spi);
+> >>
+> >> -    if (!priv->clk)
+> >> +    if (IS_ERR_OR_NULL(priv->clk))
+> >>              return
+> >>
+> >>      of_clk_del_provider(spi->dev.of_node);
+> >
+> > Alex, Stefan, who handles wpan and wpan/next this release?
+>
+> IIRC it would be me for wpan and Alex for wpan-next.
 
-/* bpf_token_file - get an unlinked file living in bpffs */
-struct file *bpf_token_file(...)
-{
-        inode = bpf_get_inode(bpffs_mnt->mnt_sb, dir, mode);
-        inode->i_op = &bpf_token_iop;
-        inode->i_fop = &bpf_token_fops;
+That's okay for me.
 
-	// some other stuff you might want or need
+- Alex
 
-        res = alloc_file_pseudo(inode, bpffs_mnt, "bpf-token", O_RDWR, &bpf_token_fops);
-}
-
-Now set your private data that you might need, reserve an fd, install
-the file into the fdtable and return the fd. You should have an unlinked
-bpffs file that serves as your bpf token.
 
