@@ -1,71 +1,67 @@
-Return-Path: <netdev+bounces-36270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 826CB7AEB70
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:26:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA7087AEB98
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 13:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E0D59281DC4
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id D77641C2042A
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 11:39:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19D826E14;
-	Tue, 26 Sep 2023 11:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6A726E20;
+	Tue, 26 Sep 2023 11:39:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F21A569D;
-	Tue, 26 Sep 2023 11:26:07 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C65E9;
-	Tue, 26 Sep 2023 04:26:01 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b962c226ceso144683361fa.3;
-        Tue, 26 Sep 2023 04:26:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B0C525E
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 11:39:26 +0000 (UTC)
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53346EB
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 04:39:25 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-5043a01ee20so11582668e87.0
+        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 04:39:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695727560; x=1696332360; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1695728363; x=1696333163; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+La3l4QJeXsp9Kjml5oMSUKYjgR6+RcPlKBCRGbxUVA=;
-        b=NYIusXcDyH2+d0VSPOXanbSOJMrU4yFFCZUqInEdoyxxSi8DzrFjV/6RduyxoybpD+
-         YlUOwOVtTaipAkvm1lFPhMd2vMzW/D2/G2jWTcL+RYf9Y0IXCA5fCQhkMLEoh+BWE8K7
-         FQGqMMH+I2JtXQC+YomjdAt61zEpw6x+7vR/Z9S2iHpdhqjFQx0u2KbdWinbF8ebokGp
-         aFSFnnrLVtL1R9snCdI2fpTQXZgwIXhx2ewgu7Ss2s+nXyp3dxD9ahf+NJsFekZuBU65
-         P0nNQ8WbHZlHeZKfeTRPSaGqQ0MmQGJEkw47HCYtXNnpkqJrQ+Z/MyW0Y+WFDJ1wqWFv
-         gwOA==
+        bh=3M/7yykiHRRlT31gWUmkabwEeLWgyFyD6tirZw5/WcM=;
+        b=RfHKIjh1890yxF6CuZ4BUG10LJXiwk5nuWP1w5hdRYyKYifw327HXu8n1H7KPmnPtf
+         aRUjcU99dhSJAI9/yvYQ30Cvx7GyipTlzfm6+NZAeJ+qom770xyjRAJinqii9InTMcq/
+         UnoZ1RDQyk2HLYSdmr4VCrBfiyTmjoyN+HH7nHq+r5Q1w3ebEf6nKrzdELl44hkOSrj+
+         3bfnHY1f30IwhVm534E3rt9SjXE1vJgtGeQxN3GpAWZxZDbYnwZ8ds8sC896kvwevZNh
+         BoC1sSTC34qyZiBR6t9hm8BTG+0J/piko0sOBuAdqkxuPmIj02JV7sE68QA73uMKwn/g
+         HjEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695727560; x=1696332360;
+        d=1e100.net; s=20230601; t=1695728363; x=1696333163;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+La3l4QJeXsp9Kjml5oMSUKYjgR6+RcPlKBCRGbxUVA=;
-        b=ku/yYhaeFWKk/ymy05tCjQnFbXGF4JpWhdPmNgaQVxk+xATyxH80t9HW0FHl/0FSN3
-         6yWKEcVREtpTeEtFXDWqv2+tvoaAsv9hQLNYr7J0LqkOnxx3d+gPtADktGBlawaEgA3Z
-         owcsNFoGp92lCGFB3nEplzkuD8rBfFYpJxwYHDBfYTtbZoRiKZb/0m6woX0N6aVJEfaF
-         1zsOscCHhLt8mn0n+GFK3M/1l6snRM81riK0qJvqNpaqLhqb4pmzMwcyX2NZCwYd1WIJ
-         Ka8EnbiKLwnaf6d54FhHPLB6gygd8cGSDLCVSQB2hqvpRQFvv0wSMxp53niBkaFr8wLl
-         Z9yQ==
-X-Gm-Message-State: AOJu0Yx5NIhokFPT+f05Fapkk8dCybdhsHE2ZihsPlGTTaW5G7F+/fi1
-	g5gH7S/4eI22Whr9SG1+cgM=
-X-Google-Smtp-Source: AGHT+IEvmx+5EHYSLC77siv1F1Hb04SJWpdevDTLmF9HM1gC4Y/v8GV0GGsuSP0bvyOLYr16VCNfEg==
-X-Received: by 2002:a2e:9dc3:0:b0:2bf:f5c9:2dce with SMTP id x3-20020a2e9dc3000000b002bff5c92dcemr8000692ljj.30.1695727559653;
-        Tue, 26 Sep 2023 04:25:59 -0700 (PDT)
+        bh=3M/7yykiHRRlT31gWUmkabwEeLWgyFyD6tirZw5/WcM=;
+        b=OPQrPntbqwqugxCqoWLo1zBL9lKoR/8iRqRwZ9weNFrtsFBBbGwDhoMnHHnB259Eoy
+         Sjd4FqxFZYnd/ZnyY8HBcE1qLsEFBi0nVgPQ+TT/luOvgkyVx/mnaW8+uR3B6Jy5+vnY
+         JqPW74q98gkOmXMtY5sRZADufCTaxStcKaWiVwA72FBOd/BgFbZQzecpOIbQW76pXX9d
+         5IMG9tpdL39b1PDJ8UUGM09TREI4fArCRN+aIRH213tFRr4KeylndI2TK1Vu1b7trA0d
+         ASYH45o5A2E/sN8qqABWFcLj8qjnFx7M53GNyvSGPLj0fdPpkOybXgHBp0tOeujO/2q3
+         d04A==
+X-Gm-Message-State: AOJu0YyLexfNCCzPGR4WR6OclPBPJH6SaLA0xPqKJmEJIfAi/pRJvBxY
+	ugiWBTb5TZjNQjKgL7DczXw=
+X-Google-Smtp-Source: AGHT+IEHUB7a112vmGAMr6+iCCj/LvIGcbVsKchJKLgmecYhKLY5F+gMi5LKoelRIEyP1BmAVLEBVw==
+X-Received: by 2002:ac2:485c:0:b0:503:28cb:c072 with SMTP id 28-20020ac2485c000000b0050328cbc072mr7432041lfy.30.1695728363377;
+        Tue, 26 Sep 2023 04:39:23 -0700 (PDT)
 Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id g17-20020a2e9cd1000000b002c02f371e37sm2596182ljj.52.2023.09.26.04.25.58
+        by smtp.gmail.com with ESMTPSA id r27-20020ac25a5b000000b004fdd6b72bfdsm2160547lfn.117.2023.09.26.04.39.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Sep 2023 04:25:59 -0700 (PDT)
-Date: Tue, 26 Sep 2023 14:25:56 +0300
+        Tue, 26 Sep 2023 04:39:22 -0700 (PDT)
+Date: Tue, 26 Sep 2023 14:39:21 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
-To: Rohan G Thomas <rohan.g.thomas@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH net-next 1/1] net: stmmac: xgmac: EST interrupts handling
-Message-ID: <xwcwjtyy5yx6pruoa3vmssnjzkbeahmfyym4e5lrq2efcwwiym@2upf4ko4mah5>
-References: <20230923031031.21434-1-rohan.g.thomas@intel.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, Jose.Abreu@synopsys.com, 
+	linux@armlinux.org.uk, hkallweit1@gmail.com, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next] net: pcs: xpcs: Add 2500BASE-X case in get
+ state for XPCS drivers
+Message-ID: <fbkzmsznag5yjypbzmbmvtzfgdgx3v4pc6njmelrz3x7pvlojq@rh3tqyo5sr26>
+References: <20230925075142.266026-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,199 +70,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230923031031.21434-1-rohan.g.thomas@intel.com>
+In-Reply-To: <20230925075142.266026-1-Raju.Lakkaraju@microchip.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rohan
+Hi Raju
 
-On Sat, Sep 23, 2023 at 11:10:31AM +0800, Rohan G Thomas wrote:
-> Enabled the following EST related interrupts:
->   1) Constant Gate Control Error (CGCE)
->   2) Head-of-Line Blocking due to Scheduling (HLBS)
->   3) Head-of-Line Blocking due to Frame Size (HLBF)
->   4) Base Time Register error (BTRE)
->   5) Switch to S/W owned list Complete (SWLC)
-> Also, add EST errors into the ethtool statistic.
+On Mon, Sep 25, 2023 at 01:21:42PM +0530, Raju Lakkaraju wrote:
+> Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
+> Update the port mode and autonegotiation
 > 
-> The commit e49aa315cb01 ("net: stmmac: EST interrupts handling and
-> error reporting") and commit 9f298959191b ("net: stmmac: Add EST
-> errors into ethtool statistic") add EST interrupts handling and error
-> reporting support to DWMAC4 core. This patch enables the same support
-> for XGMAC.
-
-So, this is basically a copy of what was done for the DW QoS Eth
-IP-core (DW GMAC v4.x/v5.x). IMO it would be better to factor it out
-into a separate module together with the rest of the setup methods
-like it's done for TC or PTP. But since it implies some much more work
-I guess we can leave it as is for now...
-
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-
--Serge(y)
-
-> 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 > ---
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    | 27 ++++++
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 89 +++++++++++++++++++
->  2 files changed, 116 insertions(+)
+>  drivers/net/pcs/pcs-xpcs.c | 31 +++++++++++++++++++++++++++++++
+>  drivers/net/pcs/pcs-xpcs.h |  4 ++++
+>  2 files changed, 35 insertions(+)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 7a8f47e7b728..75782b8cdfe9 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -289,6 +289,33 @@
->  #define XGMAC_PTOV_SHIFT		23
->  #define XGMAC_SSWL			BIT(1)
->  #define XGMAC_EEST			BIT(0)
-> +#define XGMAC_MTL_EST_STATUS		0x00001058
-> +#define XGMAC_BTRL			GENMASK(15, 8)
-> +#define XGMAC_BTRL_SHIFT		8
-> +#define XGMAC_BTRL_MAX			GENMASK(15, 8)
-> +#define XGMAC_CGCE			BIT(4)
-> +#define XGMAC_HLBS			BIT(3)
-> +#define XGMAC_HLBF			BIT(2)
-> +#define XGMAC_BTRE			BIT(1)
-> +#define XGMAC_SWLC			BIT(0)
-> +#define XGMAC_MTL_EST_SCH_ERR		0x00001060
-> +#define XGMAC_MTL_EST_FRM_SZ_ERR	0x00001064
-> +#define XGMAC_MTL_EST_FRM_SZ_CAP	0x00001068
-> +#define XGMAC_SZ_CAP_HBFS_MASK		GENMASK(14, 0)
-> +#define XGMAC_SZ_CAP_HBFQ_SHIFT		16
-> +#define XGMAC_SZ_CAP_HBFQ_MASK(val)	\
-> +	({					\
-> +		typeof(val) _val = (val);	\
-> +		(_val > 4 ? GENMASK(18, 16) :	\
-> +		 _val > 2 ? GENMASK(17, 16) :	\
-> +		 BIT(16));			\
-> +	})
-> +#define XGMAC_MTL_EST_INT_EN		0x00001070
-> +#define XGMAC_IECGCE			BIT(4)
-> +#define XGMAC_IEHS			BIT(3)
-> +#define XGMAC_IEHF			BIT(2)
-> +#define XGMAC_IEBE			BIT(1)
-> +#define XGMAC_IECC			BIT(0)
->  #define XGMAC_MTL_EST_GCL_CONTROL	0x00001080
->  #define XGMAC_BTR_LOW			0x0
->  #define XGMAC_BTR_HIGH			0x1
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index f352be269deb..0af0aefa6656 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -1469,9 +1469,97 @@ static int dwxgmac3_est_configure(void __iomem *ioaddr, struct stmmac_est *cfg,
->  		ctrl &= ~XGMAC_EEST;
->  
->  	writel(ctrl, ioaddr + XGMAC_MTL_EST_CONTROL);
-> +
-> +	/* Configure EST interrupt */
-> +	if (cfg->enable)
-> +		ctrl = XGMAC_IECGCE | XGMAC_IEHS | XGMAC_IEHF | XGMAC_IEBE |
-> +		       XGMAC_IECC;
-> +	else
-> +		ctrl = 0;
-> +
-> +	writel(ctrl, ioaddr + XGMAC_MTL_EST_INT_EN);
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 4dbc21f604f2..4f89dcedf0fc 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -1090,6 +1090,30 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
 >  	return 0;
 >  }
 >  
-> +static void dwxgmac3_est_irq_status(void __iomem *ioaddr,
-> +				    struct net_device *dev,
-> +				    struct stmmac_extra_stats *x, u32 txqcnt)
+> +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
+> +				    struct phylink_link_state *state)
 > +{
-> +	u32 status, value, feqn, hbfq, hbfs, btrl;
-> +	u32 txqcnt_mask = BIT(txqcnt) - 1;
+> +	int sts, lpa;
 > +
-> +	status = readl(ioaddr + XGMAC_MTL_EST_STATUS);
-> +
-> +	value = XGMAC_CGCE | XGMAC_HLBS | XGMAC_HLBF | XGMAC_BTRE | XGMAC_SWLC;
-> +
-> +	/* Return if there is no error */
-> +	if (!(status & value))
-> +		return;
-> +
-> +	if (status & XGMAC_CGCE) {
-> +		/* Clear Interrupt */
-> +		writel(XGMAC_CGCE, ioaddr + XGMAC_MTL_EST_STATUS);
-> +
-> +		x->mtl_est_cgce++;
+> +	sts = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
+
+> +	lpa = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_LP_BABL);
+> +	if (sts < 0 || lpa < 0) {
+> +		state->link = false;
+> +		return sts;
 > +	}
+
+The HW manual says: "The host uses this page to know the link
+partner's ability when the base page is received through Clause 37
+auto-negotiation." Seeing xpcs_config_2500basex() disables
+auto-negotiation and lpa value is unused anyway why do you even need
+to read the LP_BABL register?
+
 > +
-> +	if (status & XGMAC_HLBS) {
-> +		value = readl(ioaddr + XGMAC_MTL_EST_SCH_ERR);
-> +		value &= txqcnt_mask;
+> +	state->link = !!(sts & DW_VR_MII_MMD_STS_LINK_STS);
+
+> +	state->an_complete = !!(sts & DW_VR_MII_MMD_STS_AN_CMPL);
+
+Similarly AN is disabled in the xpcs_config_2500basex() method. Why do
+you need the parsing above? It isn't supposed to indicate any useful
+value since AN is disabled.
+
+-Serge(y)
+
+> +	if (!state->link)
+> +		return 0;
 > +
-> +		x->mtl_est_hlbs++;
+> +	state->speed = SPEED_2500;
+> +	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
+> +	state->duplex = DUPLEX_FULL;
 > +
-> +		/* Clear Interrupt */
-> +		writel(value, ioaddr + XGMAC_MTL_EST_SCH_ERR);
-> +
-> +		/* Collecting info to shows all the queues that has HLBS
-> +		 * issue. The only way to clear this is to clear the
-> +		 * statistic.
-> +		 */
-> +		if (net_ratelimit())
-> +			netdev_err(dev, "EST: HLB(sched) Queue 0x%x\n", value);
-> +	}
-> +
-> +	if (status & XGMAC_HLBF) {
-> +		value = readl(ioaddr + XGMAC_MTL_EST_FRM_SZ_ERR);
-> +		feqn = value & txqcnt_mask;
-> +
-> +		value = readl(ioaddr + XGMAC_MTL_EST_FRM_SZ_CAP);
-> +		hbfq = (value & XGMAC_SZ_CAP_HBFQ_MASK(txqcnt)) >>
-> +			XGMAC_SZ_CAP_HBFQ_SHIFT;
-> +		hbfs = value & XGMAC_SZ_CAP_HBFS_MASK;
-> +
-> +		x->mtl_est_hlbf++;
-> +
-> +		/* Clear Interrupt */
-> +		writel(feqn, ioaddr + XGMAC_MTL_EST_FRM_SZ_ERR);
-> +
-> +		if (net_ratelimit())
-> +			netdev_err(dev, "EST: HLB(size) Queue %u Size %u\n",
-> +				   hbfq, hbfs);
-> +	}
-> +
-> +	if (status & XGMAC_BTRE) {
-> +		if ((status & XGMAC_BTRL) == XGMAC_BTRL_MAX)
-> +			x->mtl_est_btrlm++;
-> +		else
-> +			x->mtl_est_btre++;
-> +
-> +		btrl = (status & XGMAC_BTRL) >> XGMAC_BTRL_SHIFT;
-> +
-> +		if (net_ratelimit())
-> +			netdev_info(dev, "EST: BTR Error Loop Count %u\n",
-> +				    btrl);
-> +
-> +		writel(XGMAC_BTRE, ioaddr + XGMAC_MTL_EST_STATUS);
-> +	}
-> +
-> +	if (status & XGMAC_SWLC) {
-> +		writel(XGMAC_SWLC, ioaddr + XGMAC_MTL_EST_STATUS);
-> +		netdev_info(dev, "EST: SWOL has been switched\n");
-> +	}
+> +	return 0;
 > +}
 > +
->  static void dwxgmac3_fpe_configure(void __iomem *ioaddr, u32 num_txq,
->  				   u32 num_rxq, bool enable)
+>  static void xpcs_get_state(struct phylink_pcs *pcs,
+>  			   struct phylink_link_state *state)
 >  {
-> @@ -1541,6 +1629,7 @@ const struct stmmac_ops dwxgmac210_ops = {
->  	.config_l4_filter = dwxgmac2_config_l4_filter,
->  	.set_arp_offload = dwxgmac2_set_arp_offload,
->  	.est_configure = dwxgmac3_est_configure,
-> +	.est_irq_status = dwxgmac3_est_irq_status,
->  	.fpe_configure = dwxgmac3_fpe_configure,
->  };
->  
+> @@ -1127,6 +1151,13 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
+>  			       ERR_PTR(ret));
+>  		}
+>  		break;
+> +	case DW_2500BASEX:
+> +		ret = xpcs_get_state_2500basex(xpcs, state);
+> +		if (ret) {
+> +			pr_err("xpcs_get_state_2500basex returned %pe\n",
+> +			       ERR_PTR(ret));
+> +		}
+> +		break;
+>  	default:
+>  		return;
+>  	}
+> diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+> index 39a90417e535..92c838f4b251 100644
+> --- a/drivers/net/pcs/pcs-xpcs.h
+> +++ b/drivers/net/pcs/pcs-xpcs.h
+> @@ -55,6 +55,10 @@
+>  /* Clause 37 Defines */
+>  /* VR MII MMD registers offsets */
+>  #define DW_VR_MII_MMD_CTRL		0x0000
+> +#define DW_VR_MII_MMD_STS		0x0001
+> +#define DW_VR_MII_MMD_STS_LINK_STS	BIT(2)
+> +#define DW_VR_MII_MMD_STS_AN_CMPL	BIT(5)
+> +#define DW_VR_MII_MMD_LP_BABL		0x0005
+>  #define DW_VR_MII_DIG_CTRL1		0x8000
+>  #define DW_VR_MII_AN_CTRL		0x8001
+>  #define DW_VR_MII_AN_INTR_STS		0x8002
 > -- 
-> 2.26.2
+> 2.34.1
 > 
 > 
 
