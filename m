@@ -1,160 +1,174 @@
-Return-Path: <netdev+bounces-36209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29FD7AE4CD
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:00:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9C67AE4D2
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 07:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1D09A281D46
-	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 05:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id E04961C2048A
+	for <lists+netdev@lfdr.de>; Tue, 26 Sep 2023 05:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8B21C28;
-	Tue, 26 Sep 2023 05:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C2C1C08;
+	Tue, 26 Sep 2023 05:02:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619971877
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:00:43 +0000 (UTC)
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2056.outbound.protection.outlook.com [40.107.255.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0902FE6;
-	Mon, 25 Sep 2023 22:00:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C6zgkHyAMZMqi4AUxoXVinc64/A9ZmMbc9j6HgA9eaS3/d423ZwpYO9a5CbGBq8wJk3FYTG3j8WHcYH58pGyIrHKUVe8i8kIpxHpRRo6FbHZpcJLGy2HviUrSE6KaDllIrprWwMdKjY3/iz6hTSoz2J7WpJ6hdYswBbcfR/kMyRZiFmNlz88m9W1p6NbeaE5ZBDb/1VjHNhaRRsCEtQAr2dpssoED0zwjAa8+uhADWBhieymJnJccUMmVA060Qx63xEYemGTIUSt3c8psFvsfGxZEPe6rX1gaTNgXk52ebDoHmT6PSl6l8es3yGMjNHarxFSuRFnzSeXqL0mMihzBQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s+d57ygvPLWNbJub+HBNEhkYaga1m2TUe7bjH0aUJ3c=;
- b=nBntsL6U/zU+AZXIf0UiuCl8ragqrKW35SbCVx8P3tnr1VBt8AEJZyKcyVBTfaNkq1WYZrFYOR0j0bv8GBFwvixrxgNnw1dbZibON+yZ10XAy8j39eY+HkVteymCo2VwkmLHc3cZydU65JrfNsbkTzUIbvKqeFCaAityuzykl/gpcd/Sj41bN0lFkXUc1FIiMl7cXeDnY09OC6voTRX2kGsiqDiXRKkQ8H2YYpEndh/GpksGAC1VohgbwOfkaA+ajy7MCLPxqV2iRKtji++4/SooTh8B1iAG84tOJx/dgdhDWK3c943PX/C/ko+Ab4NoOJstAGCHwP94D0pHFetIig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s+d57ygvPLWNbJub+HBNEhkYaga1m2TUe7bjH0aUJ3c=;
- b=qakiJg0Ub6iHW07jEScoEtUFd+oJ8B97XBqLPr/QAY4fjTyJ84GLI3MPJZiG9MQWhpFv+ECadT6gYEOP89p+MRUcx+3JWgpCnxMP26Hn+icTYYSz0H/O6GlIA71LWNxeGSscY3r+KD9rNefyt5qQ4lNDcrrZQPD80xSotNjbAwQuMKF6Z77o7fhGH/kRG7/Zwkd7Jf4g/DbEUuGSGEbyH+bosxuUNjILh2UEd4UCaqc/ceBRn8oPIeFCpGwIxx1NAXvmXf3HrqiVM6Gdz04GCsyn3qlJvweOFFYKjeyeZjBem8vakcmEfF9h/7I3gXNMt3eKPjQUvqk2EvScz/3jlA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com (2603:1096:301:2b::5)
- by PSAPR06MB4088.apcprd06.prod.outlook.com (2603:1096:301:32::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Tue, 26 Sep
- 2023 05:00:38 +0000
-Received: from PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::e5ee:587c:9e8e:1dbd]) by PSAPR06MB3942.apcprd06.prod.outlook.com
- ([fe80::e5ee:587c:9e8e:1dbd%4]) with mapi id 15.20.6813.027; Tue, 26 Sep 2023
- 05:00:38 +0000
-From: liming.wu@jaguarmicro.com
-To: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>
-Cc: kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	398776277@qq.com,
-	Liming Wu <liming.wu@jaguarmicro.com>
-Subject: [PATCH 2/2] tools/virtio: Add hints when module is not installed
-Date: Tue, 26 Sep 2023 13:00:20 +0800
-Message-Id: <20230926050021.717-2-liming.wu@jaguarmicro.com>
-X-Mailer: git-send-email 2.34.0.windows.1
-In-Reply-To: <20230926050021.717-1-liming.wu@jaguarmicro.com>
-References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR02CA0025.apcprd02.prod.outlook.com
- (2603:1096:4:195::21) To PSAPR06MB3942.apcprd06.prod.outlook.com
- (2603:1096:301:2b::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00751877
+	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 05:02:12 +0000 (UTC)
+Received: from out-210.mta1.migadu.com (out-210.mta1.migadu.com [IPv6:2001:41d0:203:375::d2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6460FD9
+	for <netdev@vger.kernel.org>; Mon, 25 Sep 2023 22:02:10 -0700 (PDT)
+Message-ID: <7075f350-80c7-b3a9-c1e7-65b8546dbc1f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695704528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TBaeHqvtqkjYIBXgCaqzXwR2YJjTmZY3k6QbF3dkWCE=;
+	b=n2LfIbqSxbJ3/0w0tjR6dVhjMAXAv6nFDZgQLI8aPoCvXdmeKNVMUW0ZLIQM7DBY4YfSm/
+	Thy3m0bU9M3iZQMwwkAObB8yo/Qon1t5jItz8xnHH0jgUr6aaBvHChnsr0pHKvv0BYAirP
+	RwH5NWTRm24298vJGCIKUZiKR66bnbA=
+Date: Mon, 25 Sep 2023 22:02:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PSAPR06MB3942:EE_|PSAPR06MB4088:EE_
-X-MS-Office365-Filtering-Correlation-Id: fc5a3800-4d75-4049-7a21-08dbbe4d86c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	e9kFslG+IiWTbmhx8ITI4AgUBSHAToHxbvZUOHl2fkKBqDVVlExmvjl5NuM36GfGYtYhjkzpdF2JDliUmPau63efC8qAbqBLbIrpBCeyqFqDQOOM3BQRhFh/DPO68/g0G1oze5l/SxRzd1LvYBC4k/ca1jBHbSddhw+pHTCz/tPeADoOlr8ptVhz34qvzIHf78b9YPle6WRLEO26+ZNJp/u6M22WTVxPFdDh8TavymBhhUxE9msMFJCoZZAZbkD/rnoF9wNr6jAm9y6Y1KXYZHI7/uu6xeJKGiISmxuyg5olMORKv3dnre9J1evudDaXZ4cCb4ITuW/p5yCbZtzprIVXIOOVJcSqzvwuZ6VgW+W1XycFhSPh3uRiBAZRHp3k+9ZybeC3ZnbqCU0cKZHwK+0u2+mEK7oDVNLwaa/3Baqa8QgHnB4SR9WlP6CCPpjRzyGjnVQG4BOSEEjnGBsZ//ATpr/8vuccp6E2pYgZqJVTPhzkEkQ2Jx20lA2dv0XfLIVP5fa6pvpbMsQKVBqhIAJwMGostZx0IsREeNi6Uc/op7hKgeBAIKbN4ntUT0v1z5KmePG0zn94xEED8ALhpwmrqrphoMMY+tV/Hd/krSjf4dnB6TrdfWYk7yeIoYcP
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PSAPR06MB3942.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(39830400003)(136003)(366004)(230922051799003)(1800799009)(186009)(451199024)(107886003)(1076003)(26005)(4326008)(8936002)(8676002)(316002)(66556008)(478600001)(41300700001)(110136005)(6636002)(66946007)(5660300002)(9686003)(6512007)(52116002)(4744005)(2616005)(2906002)(66476007)(6486002)(6506007)(6666004)(86362001)(36756003)(38100700002)(38350700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?+65P2qFy40MQ+bw2HNGPNkLkCgK26L6zx3uEFey4QDPt7aKq136wc79XEL9I?=
- =?us-ascii?Q?UhKxHHj/Qxzl38AyxEvNuYi0hgfVUuhQBj5/rBR+giufYiTkFOVcXV73d9ML?=
- =?us-ascii?Q?sgMQOPO6OIjd53dciJ7ghRdGFFcaALQ1RSuqXQKFS07gfFJ7XZe6LoxrY6fY?=
- =?us-ascii?Q?aFVFFc20ipaAQ4Zok2Aqnef5JATxn+3Vm4gU/iQZYD/G3ID8O+rRCqPTRRtn?=
- =?us-ascii?Q?z3j0EupkgGvese6wJgvAoLRhY7BYkSTIyBfT10pEbuwzLOV5dYL2F8D+5dJD?=
- =?us-ascii?Q?LyJGEeK7sd86KQ0pe4oc20EuwX+6W1WJY9CJHwxyx/N4JSZQTB105dHwXFk1?=
- =?us-ascii?Q?TPWjp0M5fBIq1ydmTzMWUJi+KqeUFazlu2QDagWxbkaefR6WGQLexPRiAW4u?=
- =?us-ascii?Q?t6hw448hjs4MIUszS4E2pEtKAjNuojmQgv/NWpBL1pHaeoGFA1BTfaVWzpWF?=
- =?us-ascii?Q?MrJj6TNl3/rtDWOe/HoUe3fQyj7GiRKZI/gFb8eAaYYs9OyliGC7RvW6pXdu?=
- =?us-ascii?Q?wT6JYmV7rNm/pSF4FOb22xomelwuiYl2pT8c0XtduPNZpLF3E/t3Zr+zltqG?=
- =?us-ascii?Q?GiXDH77XByuBlkQ7FCvWf2dGBgFkOjTD8VyOL1EDNK/FqqZzW6Xhx4SjT3nE?=
- =?us-ascii?Q?qE5ojS8a+duYLiYorLC0TePqSrl/dysrEgXs+jc7i6C3xo0hYXl7k9nxkO98?=
- =?us-ascii?Q?BV7rEq43hX8tMnoGNMcVaOuF3mg6KISKp9Be+wEsEJSS+GIPdRoBvueS1r/8?=
- =?us-ascii?Q?AT3VUeveYD5vLyaLiSlNsFUQSJBYYlHJSy53VoN6azvGJIKI3yyw4nQbYHv0?=
- =?us-ascii?Q?E48IpWabYHgd5ykSGMKqGoLQgFv/BhzNpGqFFi/k7VIe51OUwgbeMfykwkGx?=
- =?us-ascii?Q?xST/BAStKnRYbBYSAYZ1/Nojskg1jq8C53bOWEX+0a34X3fbwD1iWysjmubk?=
- =?us-ascii?Q?mOs7SylM5P3cnOr7iyJijRMi6uy3rhqJAMyIF1EhKovO7T6fw2+a9SdnXRYb?=
- =?us-ascii?Q?9AHk665eOFQQocSIKIdinb2V1joRHeiupTty29gOUVZmxbShABcwncjWJeTz?=
- =?us-ascii?Q?1rmxFgs+mAGmC95Hulrx3JDtjqeMj/2hzNlcKFqHExlXBEAe6v6B866LFd+x?=
- =?us-ascii?Q?Q923sLR+MclOgi18JFW/IC2Bpwa+zx083vsgE4m/OKbDxosIzvFBe+Fe/RMH?=
- =?us-ascii?Q?2HAFi7LzIWI2Vvj6sl98KmYjkoWgu8irQPTO9Dj3S3MQvb+pZHOlImMUidaP?=
- =?us-ascii?Q?r7VeS8GFMarlIHEQFFsvj9cSDlaDRmgco6c3Izgm5AWzOXW9WpGGLNr0s9Mt?=
- =?us-ascii?Q?tTtiFiBzpOc8nhcvq29dwJ1guJpQCyCqNoXKGninR6XOCkQbc0IwzcDvWGCq?=
- =?us-ascii?Q?22lyjvOtwjt66voWv0rOJXkG1eFWXD47Sxgfr/tgJhbREQ4aWMvHhzYmIJCM?=
- =?us-ascii?Q?IzLu07idGR5mdg5mbQFffrzcamck+fZCjGsNMV6nk9uWNPP7iaaUmRUlY23b?=
- =?us-ascii?Q?tX2cZaXsBXe64CybZaoMscQFozsYXF3VRLVBoN3Kis57n5BYQJwqoUQxx/HB?=
- =?us-ascii?Q?F75hPOKTyoZGEUFfRLy3kJqGkAUak92Z6nbAw2mWKQvHeCObN4GaQIxtjAEF?=
- =?us-ascii?Q?aQ=3D=3D?=
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc5a3800-4d75-4049-7a21-08dbbe4d86c8
-X-MS-Exchange-CrossTenant-AuthSource: PSAPR06MB3942.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Sep 2023 05:00:38.7986
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /jVj1swQ7BbH6mUy3y1nzeNARZa6IdmbhVpARYVVBfshJA23+YykoR3bd+GbWGZz5xzyVN6C4UKXmWULvzRWct9TsRtjHApKyKY8/o0DC7Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PSAPR06MB4088
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+Subject: Re: [PATCH v9 bpf-next 5/9] bpf: udp: Implement batching for sockets
+ iterator
+Content-Language: en-US
+To: Aditi Ghag <aditi.ghag@isovalent.com>
+Cc: sdf@google.com, Martin KaFai Lau <martin.lau@kernel.org>,
+ bpf@vger.kernel.org, Network Development <netdev@vger.kernel.org>
+References: <20230519225157.760788-1-aditi.ghag@isovalent.com>
+ <20230519225157.760788-6-aditi.ghag@isovalent.com>
+ <f85fbac6-a1d7-3f63-9d0f-8eaa261ddb26@linux.dev>
+ <0B548508-C9AD-476C-A934-5D9D9B5DECB0@isovalent.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <0B548508-C9AD-476C-A934-5D9D9B5DECB0@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,RCVD_IN_VALIDITY_RPBL,SPF_HELO_PASS,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Liming Wu <liming.wu@jaguarmicro.com>
+On 9/25/23 4:34 PM, Aditi Ghag wrote:
+> 
+> 
+>> On Sep 19, 2023, at 5:38 PM, Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 5/19/23 3:51 PM, Aditi Ghag wrote:
+>>> +static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
+>>> +{
+>>> +	struct bpf_udp_iter_state *iter = seq->private;
+>>> +	struct udp_iter_state *state = &iter->state;
+>>> +	struct net *net = seq_file_net(seq);
+>>> +	struct udp_table *udptable;
+>>> +	unsigned int batch_sks = 0;
+>>> +	bool resized = false;
+>>> +	struct sock *sk;
+>>> +
+>>> +	/* The current batch is done, so advance the bucket. */
+>>> +	if (iter->st_bucket_done) {
+>>> +		state->bucket++;
+>>> +		iter->offset = 0;
+>>> +	}
+>>> +
+>>> +	udptable = udp_get_table_seq(seq, net);
+>>> +
+>>> +again:
+>>> +	/* New batch for the next bucket.
+>>> +	 * Iterate over the hash table to find a bucket with sockets matching
+>>> +	 * the iterator attributes, and return the first matching socket from
+>>> +	 * the bucket. The remaining matched sockets from the bucket are batched
+>>> +	 * before releasing the bucket lock. This allows BPF programs that are
+>>> +	 * called in seq_show to acquire the bucket lock if needed.
+>>> +	 */
+>>> +	iter->cur_sk = 0;
+>>> +	iter->end_sk = 0;
+>>> +	iter->st_bucket_done = false;
+>>> +	batch_sks = 0;
+>>> +
+>>> +	for (; state->bucket <= udptable->mask; state->bucket++) {
+>>> +		struct udp_hslot *hslot2 = &udptable->hash2[state->bucket];
+>>> +
+>>> +		if (hlist_empty(&hslot2->head)) {
+>>> +			iter->offset = 0;
+>>> +			continue;
+>>> +		}
+>>> +
+>>> +		spin_lock_bh(&hslot2->lock);
+>>> +		udp_portaddr_for_each_entry(sk, &hslot2->head) {
+>>> +			if (seq_sk_match(seq, sk)) {
+>>> +				/* Resume from the last iterated socket at the
+>>> +				 * offset in the bucket before iterator was stopped.
+>>> +				 */
+>>> +				if (iter->offset) {
+>>> +					--iter->offset;
+>>
+>> Hi Aditi, I think this part has a bug.
+>>
+>> When I run './test_progs -t bpf_iter/udp6' in a machine with some udp so_reuseport sockets, this test is never finished.
+>>
+>> A broken case I am seeing is when the bucket has >1 sockets and bpf_seq_read() can only get one sk at a time before it calls bpf_iter_udp_seq_stop().
+> 
+> Just so that I understand the broken case better, are you doing something in your BPF iterator program so that "bpf_seq_read() can only get one sk at a time"?
+> 
+>>
+>> I did not try the change yet. However, from looking at the code where iter->offset is changed, --iter->offset here is the most likely culprit and it will make backward progress for the same bucket (state->bucket). Other places touching iter->offset look fine.
+>>
+>> It needs a local "int offset" variable for the zero test. Could you help to take a look, add (or modify) a test and fix it?
+>>
+>> The progs/bpf_iter_udp[46].c test can be used to reproduce. The test_udp[46] in prog_tests/bpf_iter.c needs to be changed though to ensure there is multiple sk in the same bucket. Probably a few so_reuseport sk should do.
+> 
+> 
+> The sock_destroy patch set had added a test with multiple so_reuseport sks in a bucket in order to exercise batching [1]. I was wondering if extending the test with an additional bucket should do it, or some more cases are required (asked for clarification above) to reproduce the issue.
 
-Need to insmod vhost_test.ko before run virtio_test.
-Give some hints to users.
+Number of bucket should not matter. It should only need a bucket to have 
+multiple sockets.
 
-Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
----
- tools/virtio/virtio_test.c | 4 ++++
- 1 file changed, 4 insertions(+)
+I did notice test_udp_server() has 5 so_reuseport udp sk in the same bucket when 
+trying to understand how this issue was missed. It is enough on the hashtable 
+side. This is the easier part and one start_reuseport_server() call will do. 
+Having multiple sk in a bucket is not enough to reprod though.
 
-diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
-index 028f54e6854a..ce2c4d93d735 100644
---- a/tools/virtio/virtio_test.c
-+++ b/tools/virtio/virtio_test.c
-@@ -135,6 +135,10 @@ static void vdev_info_init(struct vdev_info* dev, unsigned long long features)
- 	dev->buf = malloc(dev->buf_size);
- 	assert(dev->buf);
- 	dev->control = open("/dev/vhost-test", O_RDWR);
-+
-+	if (dev->control < 0)
-+		fprintf(stderr, "Install vhost_test module" \
-+		"(./vhost_test/vhost_test.ko) firstly\n");
- 	assert(dev->control >= 0);
- 	r = ioctl(dev->control, VHOST_SET_OWNER, NULL);
- 	assert(r >= 0);
--- 
-2.34.1
+The bpf prog 'iter_udp6_server' in the sock_destroy test is not doing 
+bpf_seq_printf(). bpf_seq_printf() is necessary to reproduce the issue. The 
+read() buf from the userspace program side also needs to be small. It needs to 
+hit the "if (seq->count >= size) break;" condition in the "while (1)" loop in 
+the kernel/bpf/bpf_iter.c.
+
+You can try to add both to the sock_destroy test. I was suggesting 
+bpf_iter/udp[46] test instead (i.e. the test_udp[46] function) because the 
+bpf_seq_printf and the buf[] size are all aligned to reprod the problem already. 
+  Try to add a start_reuseport_server(..., 5) to the beginning of test_udp6() in 
+prog_tests/bpf_iter.c to ensure there is multiple udp sk in a bucket. It should 
+be enough to reprod.
+
+In the final fix, I don't have strong preference on where the test should be.
+Modifying one of the two existing tests (i.e. sock_destroy or bpf_iter) or a 
+completely new test.
+
+Let me know if you have problem reproducing it. Thanks.
+
+> 
+> 
+> [1] https://elixir.bootlin.com/linux/v6.5/source/tools/testing/selftests/bpf/prog_tests/sock_destroy.c#L146
+> 
+>>
+>> Thanks.
+>>
+>>> +					continue;
+>>> +				}
+>>> +				if (iter->end_
+>>
+> 
 
 
