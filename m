@@ -1,155 +1,69 @@
-Return-Path: <netdev+bounces-36413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562577AFA52
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:50:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 276DD7AFA5A
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 558C71C20869
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 05:49:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AD31C28139A
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 05:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA6A14A97;
-	Wed, 27 Sep 2023 05:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7438714F69;
+	Wed, 27 Sep 2023 05:50:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C15E13FF1;
-	Wed, 27 Sep 2023 05:49:55 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 63645170E;
-	Tue, 26 Sep 2023 22:49:53 -0700 (PDT)
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id AE48620B74C0;
-	Tue, 26 Sep 2023 22:49:52 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com AE48620B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1695793792;
-	bh=zYLgfwVrqDBS5frwkU8WzeM8Y0joHuphXzHL6ORt8IQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Pp/754cU2V+m654v727QrXirT71pL8pHi7Htgxvk49n2VPSfi6SwI3wBlvLBbpSCN
-	 3ZZB1cSIoEW/kYqMfBTKoZKuQxBYc0jh6YwEuTmwktm9ATqCp5kw0OBa9pDTlNgGmq
-	 zcU46rYDR40PJ5T4AHo3KS2YJKRi6g2rRNqEndTs=
-From: Sonia Sharma <sosha@linux.microsoft.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sosha@microsoft.com,
-	kys@microsoft.com,
-	mikelley@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	longli@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH v5 net-next] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
-Date: Tue, 26 Sep 2023 22:49:47 -0700
-Message-Id: <1695793787-21107-1-git-send-email-sosha@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F63C14F67
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 05:50:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE5BC433C7;
+	Wed, 27 Sep 2023 05:50:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695793841;
+	bh=ukaVewD6Ow36ozXZyc50lB+Up0oYTVoEBye3cUBjsl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VFVZM0WaTbX8IzgNfWB/+nnCRvAIuLTuLl92HlRXE08qPst2pLLXEj8YN/Vz6IIQG
+	 tOalVEN9Swi/yFXO9dmzIHX6uxLrGEL3dGlqBt9X3uCvX2h/ULr3yDZ0JHZEEidMi3
+	 omXSTz5h84MwoWSAijg+eyYyMho88pj5JizQd1JVlYpVBy48MHnygjDIXfUsTuDy9S
+	 evjL9rBTHu64QLHm4Rpz8cletGeYTcYVnJ7aSEPN9xAPQSKUa1mXzEKKR1sAB8N/Md
+	 /eXHuBsT0uLYxpJ/owZrZWxmyoGW3NvfNRVcrRtpE7dzPNGXWAUtsHNjkHwUAqOSjc
+	 BhzzC+aKgKBhQ==
+Date: Wed, 27 Sep 2023 07:50:33 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jordan Rife <jrife@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
+	netdev@vger.kernel.org, dborkman@kernel.org, pablo@netfilter.org,
+	kadlec@netfilter.org, fw@strlen.de, santosh.shilimkar@oracle.com,
+	ast@kernel.org, rdna@fb.com, stable@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net v5 1/3] net: replace calls to sock->ops->connect()
+ with kernel_connect()
+Message-ID: <20230927055033.GB224399@kernel.org>
+References: <20230921234642.1111903-1-jrife@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230921234642.1111903-1-jrife@google.com>
 
-From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
+On Thu, Sep 21, 2023 at 06:46:40PM -0500, Jordan Rife wrote:
+> commit 0bdf399342c5 ("net: Avoid address overwrite in kernel_connect")
+> ensured that kernel_connect() will not overwrite the address parameter
+> in cases where BPF connect hooks perform an address rewrite. This change
+> replaces direct calls to sock->ops->connect() in net with kernel_connect()
+> to make these call safe.
+> 
+> Link: https://lore.kernel.org/netdev/20230912013332.2048422-1-jrife@google.com/
+> Fixes: d74bad4e74ee ("bpf: Hooks for sys_connect")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Jordan Rife <jrife@google.com>
 
-The switch statement in netvsc_send_completion() is incorrectly validating
-the length of incoming network packets by falling through to the next case.
-Avoid the fallthrough. Instead break after a case match and then process
-the complete() call.
-The current code has not caused any known failures. But nonetheless, the
-code should be corrected as a different ordering of the switch cases might
-cause a length check to fail when it should not.
-
-Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
-
----
-Changes in v3:
-* added return statement in default case as pointed by Michael Kelley.
-Changes in v4:
-* added fixes tag
-* modified commit message to explain the issue fixed by patch.
-Changes in v5:
-* Dropped fixes tag as suggested by Simon Horman.
-* fixed indentation
----
- drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 82e9796c8f5e..0f7e4d377776 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		fallthrough;
-+		break;
- 
- 	case NVSP_MSG5_TYPE_SUBCHANNEL:
- 		if (msglen < sizeof(struct nvsp_message_header) +
-@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
- 				   msglen);
- 			return;
- 		}
--		/* Copy the response back */
--		memcpy(&net_device->channel_init_pkt, nvsp_packet,
--		       sizeof(struct nvsp_message));
--		complete(&net_device->channel_init_wait);
- 		break;
- 
- 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
-@@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
- 
- 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
- 					desc, budget);
--		break;
-+		return;
- 
- 	default:
- 		netdev_err(ndev,
- 			   "Unknown send completion type %d received!!\n",
- 			   nvsp_packet->hdr.msg_type);
-+		return;
- 	}
-+
-+	/* Copy the response back */
-+	memcpy(&net_device->channel_init_pkt, nvsp_packet,
-+	   sizeof(struct nvsp_message));
-+	complete(&net_device->channel_init_wait);
- }
- 
- static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
--- 
-2.25.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
