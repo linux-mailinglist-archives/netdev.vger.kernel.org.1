@@ -1,120 +1,184 @@
-Return-Path: <netdev+bounces-36425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672047AFBAD
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:08:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE0C37AFBF5
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id B1DF4B20993
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:08:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3BE01281C72
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8471C2AD;
-	Wed, 27 Sep 2023 07:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CC71C680;
+	Wed, 27 Sep 2023 07:24:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9C32903
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 07:08:22 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2EF1BF
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 00:08:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695798499;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E630D368;
+	Wed, 27 Sep 2023 07:24:28 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3584BF;
+	Wed, 27 Sep 2023 00:24:26 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D1DB71C0005;
+	Wed, 27 Sep 2023 07:24:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695799465;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4kaLfJmtB6MqdF1sxC45vDWpKHYD0ArvO2N0519Wf3c=;
-	b=KosUzUhHwJAOdYxTMf5qAJZNs9nM7CCReNDb6P1a7CPYun5N0wbXEGqzxpEd6NyTmI0wYQ
-	TM7FR6H6C0/44e+ng2I5+D4W1/WsBe9EFidN2ax8sFVVRkPNptBOgAp6LXUszBriB54WiL
-	sLv82i50aDizNQfBzXDSN82Qmp5df00=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-polHlrETPIugM8oCdkdXCA-1; Wed, 27 Sep 2023 03:08:16 -0400
-X-MC-Unique: polHlrETPIugM8oCdkdXCA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0605F3C0C4A0;
-	Wed, 27 Sep 2023 07:08:16 +0000 (UTC)
-Received: from [10.45.225.119] (unknown [10.45.225.119])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D90D492B16;
-	Wed, 27 Sep 2023 07:08:14 +0000 (UTC)
-Message-ID: <16cc3132-9d2c-04de-51b6-88e4476b4d26@redhat.com>
-Date: Wed, 27 Sep 2023 09:08:13 +0200
+	bh=Y7lheL/fPD30+qWF6kotkKYQgHBfzDpYHPBkU7rqwKc=;
+	b=CUxDSg3duEvh2iFUudjI4nwvl79l+61/0VAmFQSu2LRxhgpcqiWvVArxluGLfvz8i5H50g
+	/1E6SCgjLvpCudreDT7YjSUJNoddPGTSsaP4qgW8mWZk1r2YQFIKYrFJ/YEM0vSjcRIouF
+	jAG7C/ETkfGIPjGdzUf59swSIoGJQUGcVuuayMkzk8au+5Sk7KAiVV36+GbS/U8eAaBUBo
+	Pb/APoI1htl9U6jlR0NLt4TNlSJhGv0qMJmsS+9RrcsdPKtRdRr7gPHjPd+Eba7D0t9cHn
+	BMVN9LDMWuIFiKvBLMP4Ihx4uyZvHi66OO4LFFFAfTsgo3N8lhrCfO7XudhEyQ==
+Date: Wed, 27 Sep 2023 09:24:18 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
+ Add support for QMC HDLC
+Message-ID: <20230927092418.6a5326ce@bootlin.com>
+In-Reply-To: <e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
+References: <20230922075913.422435-1-herve.codina@bootlin.com>
+	<20230922075913.422435-9-herve.codina@bootlin.com>
+	<5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
+	<20230925101703.1bf083f1@bootlin.com>
+	<5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
+	<20230925122758.43963736@bootlin.com>
+	<e02ebde7-f208-40a4-bb10-aa5962ee9864@linaro.org>
+	<20230925154929.2b6a9cab@bootlin.com>
+	<e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH net-next 7/9] i40e: Move memory allocation structures to
- i40e_alloc.h
-Content-Language: en-US
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-Cc: poros@redhat.com, mschmidt@redhat.com, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- linux-kernel@vger.kernel.org
-References: <20230926182710.2517901-1-ivecera@redhat.com>
- <20230926182710.2517901-8-ivecera@redhat.com>
- <f17ed43b-7329-5566-a75e-befebd20d032@intel.com>
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <f17ed43b-7329-5566-a75e-befebd20d032@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Krzysztof,
 
+On Tue, 26 Sep 2023 22:59:14 +0200
+Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
 
-On 26. 09. 23 21:57, Przemek Kitszel wrote:
-> On 9/26/23 20:27, Ivan Vecera wrote:
->> Structures i40e_dma_mem & i40e_virt_mem are defined i40e_osdep.h while
->> memory allocation functions that use them are declared in i40e_alloc.h
->> Move them to i40e_alloc.h and remove this header file dependency on
->> i40e_osdep.h header.
->>
->> Due to removal of this dependency we have to include i40e_osdep.h in 
->> files
->> that requires it.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->>   drivers/net/ethernet/intel/i40e/i40e_adminq.c |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_adminq.h |  2 +-
->>   drivers/net/ethernet/intel/i40e/i40e_alloc.h  | 21 ++++++++++++++++++-
->>   drivers/net/ethernet/intel/i40e/i40e_common.c |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_diag.c   |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_hmc.c    |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  2 +-
->>   .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  1 +
->>   drivers/net/ethernet/intel/i40e/i40e_osdep.h  | 19 -----------------
->>   11 files changed, 29 insertions(+), 22 deletions(-)
+> On 25/09/2023 15:50, Herve Codina wrote:
+> >>>>> With these details, do you still think I need to change the child (channel)
+> >>>>> compatible ?      
+> >>>>
+> >>>> From OS point of view, you have a driver binding to this child-level
+> >>>> compatible. How do you enforce Linux driver binding based on parent
+> >>>> compatible? I looked at your next patch and I did not see it.    
+> >>>
+> >>> We do not need to have the child driver binding based on parent.    
+> >>
+> >> Exactly, that's what I said.
+> >>  
+> >>> We have to ensure that the child handles a QMC channel and the parent provides
+> >>> a QMC channel.
+> >>>
+> >>> A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
+> >>> and a QMC channel driver (child) has to use the QMC API.    
+> >>
+> >> How does this solve my concerns? Sorry, I do not understand. Your driver
+> >> is a platform driver and binds to the generic compatible. How do you
+> >> solve regular compatibility issues (need for quirks) if parent
+> >> compatible is not used?
+> >>
+> >> How does being QMC compliant affects driver binding and
+> >> compatibility/quirks?
+> >>
+> >> We are back to my original question and I don't think you answered to
+> >> any of the concerns.  
+> > 
+> > Well, to be sure that I understand correctly, do you mean that I should
+> > provide a compatible for the child (HDLC) with something like this:
+> > --- 8< ---
+> >   compatible:
+> >     items:
+> >       - enum:
+> >           - fsl,mpc885-qmc-hdlc
+> >           - fsl,mpc866-qmc-hdlc
+> >       - const: fsl,cpm1-qmc-hdlc
+> >       - const: fsl,qmc-hdlc
+> > --- 8< ---  
 > 
-> I very much like this series, but extending i40e_osdep.h usage asks for 
-> comment 😉 - please try to reorder patches to have less dependency on it 
-> first, and afterwards do split
-> (IOW first remove&reduce, then split what's left)
+> Yes, more or less, depending on actual compatibility and SoC-family.
+> Maybe "fsl,cpm1-qmc-hdlc" item in the middle is not needed.
+
+Ok,
+I will keep "fsl,cpm1-qmc-hdlc". The CPM1 is the co-processor present in these
+SoCs and it handles the QMC controller. So, it makes sense to have it in this
+binding.
+
+I plan to add support for other SoCs in the future and for these SoCs, the
+co-processor is not the CPM1. So, it makes sense to keep "fsl,cpm1-qmc-hdlc"
+to identify the co-processor.
+
 > 
-> (disclaimer: I have not double checked if that's possible)
+> > 
+> > If so, I didn't do that because a QMC channel consumer (driver matching
+> > fsl,qmc-hdlc) doesn't contains any SoC specific part.  
+> 
+> Just like hundreds of other drivers. :)
+> 
+> There is a paragraph about specific compatibles here:
+> https://www.kernel.org/doc/html/latest/devicetree/bindings/writing-schema.html
+> 
+> 
+> > It uses the channel as a communication channel to send/receive HDLC frames
+> > to/from this communication channel.
+> > All the specific SoC part is handled by the QMC controller (parent) itself and
+> > not by any consumer (child).  
+> 
+> OK, so you guarantee in 100% for this hardware and all future (including
+> designs unknown currently), that they will be 100% compatible with
+> existing QMC channel consumer (child, matching fsl,qmc-hdlc) driver,
+> thus there will be no need for any quirk. Specifically, there will be no
+> chances that it would be reasonable to re-use the same driver for child
+> (currently fsl,qmc-hdlc) in different parent.
 
-I will move the patch 5 after i40e_osdep split and memory allocation 
-clean-up patches. This should simplify the changes.
+Right,
+compatible strings with SoC and co-processor will be added in the next iteration.
 
-Thanks for comment...
+Thanks for your feedback.
 
-Ivan
+Best regards,
+Hervé
 
+> 
+> P.S. If you received this email twice, apologies, I have here troubles
+> with internet.
+> 
+> Best regards,
+> Krzysztof
+> 
 
