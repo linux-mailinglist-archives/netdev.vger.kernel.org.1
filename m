@@ -1,114 +1,147 @@
-Return-Path: <netdev+bounces-36569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73D27B0914
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 17:43:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0BD7B096E
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 17:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DF0C92819AD
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:43:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C0470281D20
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C87F4885C;
-	Wed, 27 Sep 2023 15:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEFC48EB5;
+	Wed, 27 Sep 2023 15:57:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0795B4884C
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:43:50 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8A183F8;
-	Wed, 27 Sep 2023 08:41:05 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 72A161C0004;
-	Wed, 27 Sep 2023 15:40:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695829242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NdBAHYlEMRazScx1K7OUaAItlYn6RWWuijpEXQAx/ZQ=;
-	b=IHiLAVR63G54JpOVVygaSY0HTXhwFj3Yv81Hl+5as40iNALhOH7JNSDM/z8GzX9yq5i84L
-	B7vgd2A/LzYHrUEFnJqkZowD0LUhbvVh4EgcVo+hapjE2Qb+KL52knth2ozuBmxZgJAjxm
-	s0YXGKr84Vy+kZh02xwn/lk+6zIOKPRZCjIPEIMjnyobGYXnTQUdTNkVtJKy0fCWBft/1U
-	HXB/MhJERavdXR8dXlJB2cybdw8UndxFCMgytoItWeBysfpjnaSGc7Xx+HcWr6s4rjtqin
-	eXDGKCOkIB38bj17e2+kEOo3BRuBPMhd5i1/x8O7cLP6K20KH4PaVbu5MEZRog==
-Date: Wed, 27 Sep 2023 17:40:37 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
- <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
- Despres <romuald.despres@qorvo.com>, Frederic Blain
- <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
- Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH wpan-next v4 07/11] mac802154: Handle association
- requests from peers
-Message-ID: <20230927174037.25708dec@xps-13>
-In-Reply-To: <CAK-6q+j_vgK_5JQH0YZbqZq30J3eGccMdwB-AHKV6pQKJGmMwA@mail.gmail.com>
-References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
-	<20230922155029.592018-8-miquel.raynal@bootlin.com>
-	<CAK-6q+j_vgK_5JQH0YZbqZq30J3eGccMdwB-AHKV6pQKJGmMwA@mail.gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7EC48EA5
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:57:39 +0000 (UTC)
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A35019C
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:57:38 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3af5b5d7e18so641805b6e.1
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:57:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1695830257; x=1696435057; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U12JJAnjiahk1YYSHY2AOK7uoafy6UzrARbQWR95I14=;
+        b=bf2cz5qAyxBKuen4poe4AulrKtPhVsoYbGpbG87L6/WPrnH2OUdWaQMyL1qFw2LJFV
+         PGxYn/tUIqrbHPLFOCSTCOhB3IU1f2Yml2KnwFGBQGhQs4abfsooawFYQcKD1xPigsYM
+         UH9PDmXrOq3W4PL856fvR58aZd65waeoseMzw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695830257; x=1696435057;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U12JJAnjiahk1YYSHY2AOK7uoafy6UzrARbQWR95I14=;
+        b=I1sp6BjTg2bVXBUcOhH43gvi8HvGh5rfi5uYA0tZtJ7mTuN1Vq8QqwBZGmVBgxH+Wt
+         lXqVItSHU5LmZ6Cxxso6HJCULWIMojW/Q0eTdkqLgrRzHzLhIJ1b8yxMYN6v+92Vtagz
+         /hR72613FjG4YMBwPnvT6OJ0NB0e19USnHSMezxhN3DM8cpWZdwdz0ffXLJKEoeiGrMG
+         VGEQCnfLGqfdor3ZIVjVVFcv71eZJhPJ6pt/lJ0DKuK2rOeDBteLjeY9IE9RQEBaH+8p
+         zGCm9HwM9alHWTsKrSTY1anAYreYLOfIWCb3a1FXgoHWKOqrkqYghmngV4WsxeXwIIXa
+         JaAQ==
+X-Gm-Message-State: AOJu0YxoMD111UZ8CI+5OVKFCmlU/N15TRz22xCqQbqbXQf4NWQhROqc
+	veoF/d6Uex73psqUqBpvENFSbw==
+X-Google-Smtp-Source: AGHT+IEwJW0cXq1CpxTK5Y460G4lfkt5QpcCMRT3yT0/yChvW5lXfO7XfXAcPyN2gr3gGMerxBJmgQ==
+X-Received: by 2002:a05:6808:1807:b0:3a0:5e17:4311 with SMTP id bh7-20020a056808180700b003a05e174311mr2931489oib.5.1695830257420;
+        Wed, 27 Sep 2023 08:57:37 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id bf25-20020a056a000d9900b00690ca4356f1sm11628516pfb.198.2023.09.27.08.57.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 08:57:36 -0700 (PDT)
+Date: Wed, 27 Sep 2023 08:57:36 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Alex Elder <elder@kernel.org>, Pravin B Shelar <pshelar@ovn.org>,
+	Shaokun Zhang <zhangshaokun@hisilicon.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dev@openvswitch.org, linux-parisc@vger.kernel.org,
+	llvm@lists.linux.dev, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 00/14] Batch 1: Annotate structs with __counted_by
+Message-ID: <202309270854.67756EAC2@keescook>
+References: <20230922172449.work.906-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230922172449.work.906-kees@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Alexander,
+On Fri, Sep 22, 2023 at 10:28:42AM -0700, Kees Cook wrote:
+> This is the batch 1 of patches touching netdev for preparing for
+> the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by to structs that would
+> benefit from the annotation.
+> 
+> Since the element count member must be set before accessing the annotated
+> flexible array member, some patches also move the member's initialization
+> earlier. (These are noted in the individual patches.)
 
-aahringo@redhat.com wrote on Tue, 26 Sep 2023 21:37:23 -0400:
+Hi, just checking on this batch of changes. Is it possible to take the
+1-13 subset:
 
-> Hi,
->=20
-> On Fri, Sep 22, 2023 at 11:51=E2=80=AFAM Miquel Raynal
-> <miquel.raynal@bootlin.com> wrote:
-> >
-> > Coordinators may have to handle association requests from peers which
-> > want to join the PAN. The logic involves:
-> > - Acknowledging the request (done by hardware)
-> > - If requested, a random short address that is free on this PAN should
-> >   be chosen for the device.
-> > - Sending an association response with the short address allocated for
-> >   the peer and expecting it to be ack'ed.
-> >
-> > If anything fails during this procedure, the peer is considered not
-> > associated. =20
->=20
-> I thought a coordinator can also reject requests for _any_ reason and
-> it's very user specific whatever that reason is.
+> Kees Cook (14):
+>   ipv4: Annotate struct fib_info with __counted_by
+>   ipv4/igmp: Annotate struct ip_sf_socklist with __counted_by
+>   ipv6: Annotate struct ip6_sf_socklist with __counted_by
+>   net: hns: Annotate struct ppe_common_cb with __counted_by
+>   net: enetc: Annotate struct enetc_int_vector with __counted_by
+>   net: hisilicon: Annotate struct rcb_common_cb with __counted_by
+>   net: mana: Annotate struct mana_rxq with __counted_by
+>   net: ipa: Annotate struct ipa_power with __counted_by
+>   net: mana: Annotate struct hwc_dma_buf with __counted_by
+>   net: openvswitch: Annotate struct dp_meter_instance with __counted_by
+>   net: enetc: Annotate struct enetc_psfp_gate with __counted_by
+>   net: openvswitch: Annotate struct dp_meter with __counted_by
+>   net: tulip: Annotate struct mediatable with __counted_by
 
-Absolutely.
+I'll respin 14 and add it to the next batch:
 
-> If we have such a case (that it is very user specific what to do
-> exactly) this should be able to be controlled by the user space to
-> have there a logic to tell the kernel to accept or reject the
-> association.
+>   net: sched: Annotate struct tc_pedit with __counted_by
 
-Agreed (not implemented yet, though).
+After these 13, there are  32 more patches to various drivers and
+protocols...
 
-> However, I am fine with this solution, but I think we might want to
-> change this behaviour in the future so that an application in the user
-> space has the logic to tell the kernel to accept or reject an
-> association. That would make sense?
+Thanks!
 
-Definitely, yes.
+-Kees
 
-Thanks,
-Miqu=C3=A8l
+-- 
+Kees Cook
 
