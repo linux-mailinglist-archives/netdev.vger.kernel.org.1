@@ -1,277 +1,284 @@
-Return-Path: <netdev+bounces-36409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD017AF8EF
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 05:58:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31BDA7AFA14
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3F279281E3C
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 03:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B60E9281330
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 05:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E7F14266;
-	Wed, 27 Sep 2023 03:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB69613FF8;
+	Wed, 27 Sep 2023 05:29:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7544C134D9
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 03:58:20 +0000 (UTC)
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C875E221BF
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:58:16 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6910ea9cca1so7892586b3a.1
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 20:58:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1695787096; x=1696391896; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlhF0jeSPJwYp+AIaSV7vaQC1+utwBR42k7VCmw4a48=;
-        b=RxVOA7z/DE6rX2TKVQ0/23U0pCygTHuw5Fkwylzn6UDmICsF3BY0mRRKVUVfUzc5Og
-         dM/2+VysdK6J8KVbm6rgxAAry6F695qzNEl7Prt45lY/CYAKC3M/gzMiil/fS9f/grr+
-         g7rHtAFx+hHKeinSiNma7X2sPxGap+1Jxcy8Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695787096; x=1696391896;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlhF0jeSPJwYp+AIaSV7vaQC1+utwBR42k7VCmw4a48=;
-        b=AbhtyMbyMb5ptMiNyVRiqAeD/UrMQ8q2S+sA0hHZkta+UuYoZscLySuidPj64tlYNZ
-         pdLAVQnV7ZcFnQI0HXOlDv32hRzH9C7feP29+7iyq2CFypdCJYVy5m50OJOCVrm5uJDx
-         kWfeuW+zQaHzCp3sumF4nDFrdV7s+jjSHy00938yEffYIeL9q9vswxbKTSHMaMnZk3Du
-         fWocHQbKdOS89dRSVzAPvb7Ndvi7FKkT+u8wRGMaw1aCXtZCFa8lBW7nhi/hnSDg+GPa
-         n9z7tNv/FRMfiOyNmq6xTDFR3Std9RzxGUScSdF4BxfPaxmSd1jALw+gLANyjDFe03V6
-         Raiw==
-X-Gm-Message-State: AOJu0YzKlTUtJ0cTjmRUWyabdCkNzvNcKHxkKtCtrE8PQ84GDrrV0tjL
-	wNgjZ2jm9D+FsgS1i1wmRDNSPw==
-X-Google-Smtp-Source: AGHT+IGVtsTvtMg+L28q4Rm0tITBRTjtDMM7ZYaN1holkr5J9bdUllLtrlYfaqgK+cMF6G0USjL7/A==
-X-Received: by 2002:a05:6a00:1412:b0:68f:c215:a825 with SMTP id l18-20020a056a00141200b0068fc215a825mr986775pfu.12.1695787095500;
-        Tue, 26 Sep 2023 20:58:15 -0700 (PDT)
-Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id k67-20020a633d46000000b00577bc070c6bsm9736097pga.68.2023.09.26.20.58.14
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Sep 2023 20:58:14 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gospo@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net-next v2 9/9] bnxt_en: Update VNIC resource calculation for VFs
-Date: Tue, 26 Sep 2023 20:57:34 -0700
-Message-Id: <20230927035734.42816-10-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20230927035734.42816-1-michael.chan@broadcom.com>
-References: <20230927035734.42816-1-michael.chan@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9131FD9
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 05:29:09 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2049.outbound.protection.outlook.com [40.107.243.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6228895;
+	Tue, 26 Sep 2023 22:29:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IHf0l+7MGug6lSSmarCDJsXM/14Q7sQmQki5zomdgFWA8gIlJn16YyCkQ8n6St5jTxPLK6ca+fHD9VIPIg4lQxRbxu0kMNuaDDvrraZK+j3SwwxzhkEacbge0enb/LmmqzJ5FnPEtLpemuMx+j4JkUhrcV4dSBBynG4ulRic7+UO5FFSPoDKMcbX+s3j1gAREtSH31jtp7nDQRfZi5ZqsgE7iEmB0oaTRvZlA/KicRe12Tqcl/Gy/4UcAFvNCONZMwb50iY7Ju/lTysp9otXrQe4vFfKsawO72fKS17+2Ktx4zdNnLhNnvm7Ib11fI0bslha8oPkW86cMvExqWkATQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K9QXXFI/IR7A0H/qHr/ppVt/dv/3Q4R0YRp8RUp9/lY=;
+ b=cngX7rHJMM0p8xrCVllw6+Aga3Ss8G92k4OXJXfdMTJwIbfvAFmMw/LzfpsQaeP0SGW+Cz3/ArrPxJGcGI4Fs5W9GbL8aDZa8JRRxf/Iqvd0uEEXWfceDHvrbM2UUBkmiaDXRksNCNYkaFqBOpT4+F9n/0dp1Xxoyurfx92wx+3CnwOFgZs4+aJAMtd6KCn6UYW8VxaMv23w08mNUqeDWyESg2RRuEwAC1B7jdYqYauoSbl7DOqiiwBxwQQo6cOqv9bzlF3be/kYxIt5m+kSveApvIUI9LWrdF0uU1VdlUPQp1/ZOGRwU37VnZ19JXquC7/5QsHDw6UzV6OBowrWxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linux.alibaba.com smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K9QXXFI/IR7A0H/qHr/ppVt/dv/3Q4R0YRp8RUp9/lY=;
+ b=NTbyUkjdPeVZGEadGZuxDdni/n88AjmUHYheFS9yKw3Fhzv63M+teDYymppzcXLV7bVTokKZpJ5NRy3nBSIaRtjUYL86oJKbgtoUYjujEMI3JxvnUBQoQvBShxwgy/ZGThAXaJbpS/dxt4b1m7vSoL4e7UrquVlgnQKfi1swazs=
+Received: from MW2PR16CA0066.namprd16.prod.outlook.com (2603:10b6:907:1::43)
+ by DM4PR12MB6208.namprd12.prod.outlook.com (2603:10b6:8:a5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Wed, 27 Sep
+ 2023 05:29:06 +0000
+Received: from MWH0EPF000989E9.namprd02.prod.outlook.com
+ (2603:10b6:907:1:cafe::f7) by MW2PR16CA0066.outlook.office365.com
+ (2603:10b6:907:1::43) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21 via Frontend
+ Transport; Wed, 27 Sep 2023 05:29:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989E9.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.14 via Frontend Transport; Wed, 27 Sep 2023 05:29:05 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
+ 2023 00:29:03 -0500
+Date: Wed, 27 Sep 2023 00:28:23 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+CC: Linus Torvalds <torvalds@linux-foundation.org>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <eperezma@redhat.com>, <jasowang@redhat.com>,
+	<shannon.nelson@amd.com>, <yuanyaogoog@chromium.org>,
+	<yuehaibing@huawei.com>, Thomas Lendacky <thomas.lendacky@amd.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>
+Subject: Re: [GIT PULL] virtio: features
+Message-ID: <20230927052823.d46gc7wjbpfnykpr@amd.com>
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <20230926130451.axgodaa6tvwqs3ut@amd.com>
+ <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000007f6b1b06064f33ba"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E9:EE_|DM4PR12MB6208:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc0c937f-cdef-40c8-c742-08dbbf1aaad9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	uJWtBsTLEWT37Zi5s+S2DOMyA18DcL5CNj0RFTXjYokCQgoMPTwtBdhyQBXJ/yuHNlAV1LIIW8hkXhQ/UQ3LkyU796GS3v1lX6c/i5O8Pk3QOKlITrB23t7ZrUzvADcQlO65wRR4hcIoJESYoH/zf1A++m1zkiGJpbGrD21z/ht43HTBenmDEEZ+HU70KyW2IvRyuf94/qjI78Qi5AXnpN2q3jfZ4ACyASFMqCWazxn6hGDNGYyPtcpJaSdXSfw4CXA7NU5qcb8UVCAIfvIharcpyokk80sbj1IlpOqwL1IadgZ3ydvTuhQhNZx+Ej6MiAMiku8a1NhbJ6nhBUqwcNzkkl2FqDhwhrZW04I8KW/5dd4pUTno5H23SMmkxhMnfo3hR5xpWQ7G/Pgmeg5CtZwpbYM77IdULq+EQ1GGD4Z0W7XHGJAAMsbhrIZfbkllHeOVst+vuf3OGI7cFUAUrVJTtnDKRU9I7Sv2b0ZtODc/xepzRlTObF2hLhZ4isC3NoGp3NfdYLwdqSeFmSTwIHOu7H3F45oVvZzOc/H1LgM6hFDJwANShLFh4hbvmUTvDvUeFE8EHBrU0nUbnT11yPXILsjCYsptnt3aW3CdYYBpjKAePHYzNmEjqkxnCA9ghRyNvG7g/pxL/vwXW8SIsgR9Ij7iPXZQYPk6N47TNw8HWPLS11wpynwmDJks5zjSBD6IgZCg7awClY6kfoJ+xLhmuUwzmsyxpeC7lcbSQ6VX9txfznmFVjBKPaWnyIFQ
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(1800799009)(186009)(451199024)(82310400011)(46966006)(40470700004)(36840700001)(5660300002)(81166007)(36860700001)(44832011)(47076005)(8676002)(4326008)(8936002)(356005)(82740400003)(83380400001)(41300700001)(54906003)(70206006)(70586007)(7416002)(26005)(316002)(16526019)(1076003)(66574015)(426003)(6916009)(336012)(2906002)(86362001)(40460700003)(66899024)(478600001)(6666004)(36756003)(40480700001)(966005)(2616005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 05:29:05.7948
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc0c937f-cdef-40c8-c742-08dbbf1aaad9
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E9.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6208
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000007f6b1b06064f33ba
-Content-Transfer-Encoding: 8bit
+On Wed, Sep 27, 2023 at 09:47:39AM +0800, Xuan Zhuo wrote:
+> On Tue, 26 Sep 2023 08:04:51 -0500, Michael Roth <michael.roth@amd.com> wrote:
+> > On Sun, Sep 03, 2023 at 06:13:38PM -0400, Michael S. Tsirkin wrote:
+> > > The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0bc2c:
+> > >
+> > >   Linux 6.5 (2023-08-27 14:49:51 -0700)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> > >
+> > > for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> > >
+> > >   virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-03 18:10:24 -0400)
+> > >
+> > > ----------------------------------------------------------------
+> > > virtio: features
+> > >
+> > > a small pull request this time around, mostly because the
+> > > vduse network got postponed to next relase so we can be sure
+> > > we got the security store right.
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> > > ----------------------------------------------------------------
+> > > Eugenio P閞ez (4):
+> > >       vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+> > >       vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature
+> > >       vdpa: add get_backend_features vdpa operation
+> > >       vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> > >
+> > > Jason Wang (1):
+> > >       virtio_vdpa: build affinity masks conditionally
+> > >
+> > > Xuan Zhuo (12):
+> > >       virtio_ring: check use_dma_api before unmap desc for indirect
+> > >       virtio_ring: put mapping error check in vring_map_one_sg
+> > >       virtio_ring: introduce virtqueue_set_dma_premapped()
+> > >       virtio_ring: support add premapped buf
+> > >       virtio_ring: introduce virtqueue_dma_dev()
+> > >       virtio_ring: skip unmap for premapped
+> > >       virtio_ring: correct the expression of the description of virtqueue_resize()
+> > >       virtio_ring: separate the logic of reset/enable from virtqueue_resize
+> > >       virtio_ring: introduce virtqueue_reset()
+> > >       virtio_ring: introduce dma map api for virtqueue
+> > >       virtio_ring: introduce dma sync api for virtqueue
+> > >       virtio_net: merge dma operations when filling mergeable buffers
+> >
+> > This ^ patch (upstream commit 295525e29a) seems to cause a
+> > network-related regression when using SWIOTLB in the guest. I noticed
+> > this initially testing SEV guests, which use SWIOTLB by default, but
+> > it can also be seen with normal guests when forcing SWIOTLB via
+> > swiotlb=force kernel cmdline option. I see it with both 6.6-rc1 and
+> > 6.6-rc2 (haven't tried rc3 yet, but don't see any related changes
+> > there), and reverting 714073495f seems to avoid the issue.
+> >
+> > Steps to reproduce:
+> >
+> > 1) Boot QEMU/KVM guest with 6.6-rc2 with swiotlb=force via something like the following cmdline:
+> >
+> >    qemu-system-x86_64 \
+> >    -machine q35 -smp 4,maxcpus=255 -cpu EPYC-Milan-v2 \
+> >    -enable-kvm -m 16G,slots=5,maxmem=256G -vga none \
+> >    -device virtio-scsi-pci,id=scsi0,disable-legacy=on,iommu_platform=true \
+> >    -drive file=/home/mroth/storage/ubuntu-18.04-seves2.qcow2,if=none,id=drive0,snapshot=off \
+> >    -device scsi-hd,id=hd0,drive=drive0,bus=scsi0.0 \
+> >    -device virtio-net-pci,netdev=netdev0,id=net0,disable-legacy=on,iommu_platform=true,romfile= \
+> >    -netdev tap,script=/home/mroth/qemu-ifup,id=netdev0 \
+> >    -L /home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/qemu \
+> >    -drive if=pflash,format=raw,unit=0,file=/home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_CODE.fd,readonly \
+> >    -drive if=pflash,format=raw,unit=1,file=/home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_VARS.fd \
+> >    -debugcon file:debug.log -global isa-debugcon.iobase=0x402 -msg timestamp=on \
+> >    -kernel /boot/vmlinuz-6.6.0-rc2-vanilla0+ \
+> >    -initrd /boot/initrd.img-6.6.0-rc2-vanilla0+ \
+> >    -append "root=UUID=d72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=ttyS0,115200n8 earlyprintk=serial,ttyS0,115200 debug=1 sev=debug page_poison=0 spec_rstack_overflow=off swiotlb=force"
+> >
+> > 2) scp a small file from the host to the guest IP via its virtio-net device.
+> >    Smaller file sizes succeed, but the larger the file the more likely
+> >    it will fail. e.g.:
+> >
+> >    mroth@host:~$ dd if=/dev/zero of=test bs=1K count=19
+> >    19+0 records in
+> >    19+0 records out
+> >    19456 bytes (19 kB, 19 KiB) copied, 0.000940134 s, 20.7 MB/s
+> >    mroth@host:~$ scp test vm0:
+> >    test                                                                    100%   19KB  10.1MB/s   00:00
+> >    mroth@host:~$ dd if=/dev/zero of=test bs=1K count=20
+> >    20+0 records in
+> >    20+0 records out
+> >    20480 bytes (20 kB, 20 KiB) copied, 0.00093774 s, 21.8 MB/s
+> >    mroth@host:~$ scp test vm0:
+> >    test                                                                      0%    0     0.0KB/s   --:-- ETA
+> >    client_loop: send disconnect: Broken pipe
+> >    lost connection
+> >    mroth@host:~$
+> 
+> 
+> Hi Michael,
+> 
+> Thanks for the report.
+> 
+> Cloud you try this fix?  I reproduce this issue, and that works for me.
 
-From: Vikas Gupta <vikas.gupta@broadcom.com>
+Hello,
 
-Newer versions of firmware will pre-reserve 1 VNIC for every possible
-PF and VF function.  Update the driver logic to take this into account
-when assigning VNICs to the VFs.  These pre-reserved VNICs for the
-inactive VFs should be subtracted from the global pool before
-assigning them to the active VFs.
+This seems to resolve the issue for me.
 
-Not doing so may cause discrepancies that ultimately may cause some VFs to
-have insufficient VNICs to support features such as aRFS.
+Thanks for the quick fix.
 
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c       | 17 +++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h       |  2 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 12 ++++++++++--
- 3 files changed, 29 insertions(+), 2 deletions(-)
+-Mike
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index d0a255bd71da..82833326a852 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -12215,6 +12215,20 @@ static void bnxt_init_dflt_coal(struct bnxt *bp)
- 	bp->stats_coal_ticks = BNXT_DEF_STATS_COAL_TICKS;
- }
- 
-+/* FW that pre-reserves 1 VNIC per function */
-+static bool bnxt_fw_pre_resv_vnics(struct bnxt *bp)
-+{
-+	u16 fw_maj = BNXT_FW_MAJ(bp), fw_bld = BNXT_FW_BLD(bp);
-+
-+	if (!(bp->flags & BNXT_FLAG_CHIP_P5) &&
-+	    (fw_maj > 218 || (fw_maj == 218 && fw_bld >= 18)))
-+		return true;
-+	if ((bp->flags & BNXT_FLAG_CHIP_P5) &&
-+	    (fw_maj > 216 || (fw_maj == 216 && fw_bld >= 172)))
-+		return true;
-+	return false;
-+}
-+
- static int bnxt_fw_init_one_p1(struct bnxt *bp)
- {
- 	int rc;
-@@ -12271,6 +12285,9 @@ static int bnxt_fw_init_one_p2(struct bnxt *bp)
- 	if (rc)
- 		return -ENODEV;
- 
-+	if (bnxt_fw_pre_resv_vnics(bp))
-+		bp->fw_cap |= BNXT_FW_CAP_PRE_RESV_VNICS;
-+
- 	bnxt_hwrm_func_qcfg(bp);
- 	bnxt_hwrm_vnic_qcaps(bp);
- 	bnxt_hwrm_port_led_qcaps(bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index ae03c5ba83ad..5d8252272cc9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2014,6 +2014,7 @@ struct bnxt {
- 	#define BNXT_FW_CAP_PTP				BIT_ULL(32)
- 	#define BNXT_FW_CAP_THRESHOLD_TEMP_SUPPORTED	BIT_ULL(33)
- 	#define BNXT_FW_CAP_DFLT_VLAN_TPID_PCP		BIT_ULL(34)
-+	#define BNXT_FW_CAP_PRE_RESV_VNICS		BIT_ULL(35)
- 
- 	u32			fw_dbg_cap;
- 
-@@ -2054,6 +2055,7 @@ struct bnxt {
- #define BNXT_FW_VER_CODE(maj, min, bld, rsv)			\
- 	((u64)(maj) << 48 | (u64)(min) << 32 | (u64)(bld) << 16 | (rsv))
- #define BNXT_FW_MAJ(bp)		((bp)->fw_ver_code >> 48)
-+#define BNXT_FW_BLD(bp)		(((bp)->fw_ver_code >> 16) & 0xffff)
- 
- 	u16			vxlan_fw_dst_port_id;
- 	u16			nge_fw_dst_port_id;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-index 98c167ff0ffb..38fe44838639 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
-@@ -552,7 +552,6 @@ static int bnxt_hwrm_func_vf_resc_cfg(struct bnxt *bp, int num_vfs, bool reset)
- 		vf_rx_rings = hw_resc->max_rx_rings - bp->rx_nr_rings;
- 	vf_tx_rings = hw_resc->max_tx_rings - bp->tx_nr_rings;
- 	vf_vnics = hw_resc->max_vnics - bp->nr_vnics;
--	vf_vnics = min_t(u16, vf_vnics, vf_rx_rings);
- 	vf_rss = hw_resc->max_rsscos_ctxs - bp->rsscos_nr_ctxs;
- 
- 	req->min_rsscos_ctx = cpu_to_le16(BNXT_VF_MIN_RSS_CTX);
-@@ -574,11 +573,20 @@ static int bnxt_hwrm_func_vf_resc_cfg(struct bnxt *bp, int num_vfs, bool reset)
- 		vf_cp_rings /= num_vfs;
- 		vf_tx_rings /= num_vfs;
- 		vf_rx_rings /= num_vfs;
--		vf_vnics /= num_vfs;
-+		if ((bp->fw_cap & BNXT_FW_CAP_PRE_RESV_VNICS) &&
-+		    vf_vnics >= pf->max_vfs) {
-+			/* Take into account that FW has pre-reserved 1 VNIC for
-+			 * each pf->max_vfs.
-+			 */
-+			vf_vnics = (vf_vnics - pf->max_vfs + num_vfs) / num_vfs;
-+		} else {
-+			vf_vnics /= num_vfs;
-+		}
- 		vf_stat_ctx /= num_vfs;
- 		vf_ring_grps /= num_vfs;
- 		vf_rss /= num_vfs;
- 
-+		vf_vnics = min_t(u16, vf_vnics, vf_rx_rings);
- 		req->min_cmpl_rings = cpu_to_le16(vf_cp_rings);
- 		req->min_tx_rings = cpu_to_le16(vf_tx_rings);
- 		req->min_rx_rings = cpu_to_le16(vf_rx_rings);
--- 
-2.30.1
-
-
---0000000000007f6b1b06064f33ba
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
-J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
-9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHHFwvuZa52TfGX8i7ovVgvbgZNhbqub
-533Tlvl1cKmiMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDky
-NzAzNTgxNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCprI1B6LVetrN6F024qkZP+xg9cQYztjk9E2Xi5yHj9T611i9k
-baNzP7d7av+n8HLaF6MSv+PAlRT02CHT2qJ9K5gOKSArvIF0kLE3T+dVlFE7TxJiK7wt8dBVRXBx
-3klzFUUUTFYoJdILYx4jQ6atjhVMn1dtaUkJh1iMIO0otUi1eRBrwP8vME+Y9NQdIqakSlDu1QB5
-Jysw8Vu7MxqP1m5AuQBlBcSiIv3tCbmXhobpmkNBebOJlmjfBDunMx3Pqn3PR+OmRqXArm1BR20h
-EKELc8dMRvaqxdHINWAEpq/EhrOKNuPes4Td2wt2Gp/0nU8n8qXEE9W+GwNiOR9z
---0000000000007f6b1b06064f33ba--
+> Thanks.
+> 
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 98dc9b49d56b..9ece27dc5144 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *rq, void *buf, u32 len)
+> 
+>         --dma->ref;
+> 
+> -       if (dma->ref) {
+> -               if (dma->need_sync && len) {
+> -                       offset = buf - (head + sizeof(*dma));
+> +       if (dma->need_sync && len) {
+> +               offset = buf - (head + sizeof(*dma));
+> 
+> -                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr, offset,
+> -                                                               len, DMA_FROM_DEVICE);
+> -               }
+> +               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr,
+> +                                                       offset, len,
+> +                                                       DMA_FROM_DEVICE);
+> +       }
+> 
+> +       if (dma->ref)
+>                 return;
+> -       }
+> 
+>         virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+>                                          DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
+> 
+> 
+> >
+> > Thanks,
+> >
+> > Mike
+> >
+> > >
+> > > Yuan Yao (1):
+> > >       virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+> > >
+> > > Yue Haibing (1):
+> > >       vdpa/mlx5: Remove unused function declarations
+> > >
+> > >  drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+> > >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+> > >  drivers/vhost/vdpa.c               |  15 +-
+> > >  drivers/virtio/virtio_ring.c       | 412 ++++++++++++++++++++++++++++++++-----
+> > >  drivers/virtio/virtio_vdpa.c       |  17 +-
+> > >  include/linux/vdpa.h               |   4 +
+> > >  include/linux/virtio.h             |  22 ++
+> > >  include/uapi/linux/vhost_types.h   |   4 +
+> > >  9 files changed, 625 insertions(+), 90 deletions(-)
+> > >
 
