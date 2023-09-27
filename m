@@ -1,182 +1,126 @@
-Return-Path: <netdev+bounces-36522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1599F7B03C9
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:17:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10687B0426
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 6DC35B209D3
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:17:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id DD8461C203D9
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4247E286AD;
-	Wed, 27 Sep 2023 12:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311A428DB3;
+	Wed, 27 Sep 2023 12:29:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C03107BE
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 12:17:48 +0000 (UTC)
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A859194;
-	Wed, 27 Sep 2023 05:17:44 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0Vt-RWub_1695817060;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vt-RWub_1695817060)
-          by smtp.aliyun-inc.com;
-          Wed, 27 Sep 2023 20:17:41 +0800
-Date: Wed, 27 Sep 2023 20:17:40 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Albert Huang <huangjie.albert@bytedance.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0543241FC;
+	Wed, 27 Sep 2023 12:29:37 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9609E193;
+	Wed, 27 Sep 2023 05:29:35 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-406402933edso24203735e9.2;
+        Wed, 27 Sep 2023 05:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695817774; x=1696422574; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MqrlAO5sztrD1NimOBbmkaeWGCBRbknzZR3MhxUtqJk=;
+        b=naup93iuZZIHBNrg7x06YTu29vDlozLnf14gcX4NkFnP6km2GgY81WxeMEtmhst4r4
+         pXuXP5UsTUccFlTLz/3epMlW9SKXP711dtH7vsqqO4DE2HMfn40P5M8tSfLVfoTYjDtd
+         Ra9cAQ3K3SITOUIk0S0ssbYv9Klv1NvLXP8tQq9RRUEX0QzPr0ZCVRIKigu3OJJqDcUR
+         IrTbxI0Q6wEzatIL5UdCIo6GQiWUKeoGYIsjb7VmLQOmivsF2oR5aTspp5Uq2W+Aq3IO
+         DfWMVnDTGHoNOc8uqjbhNlm5aRmz/FTM4J3z5Y3Z2YvCWbDCcuMWudGChxsLsD2i/zN9
+         An5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695817774; x=1696422574;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MqrlAO5sztrD1NimOBbmkaeWGCBRbknzZR3MhxUtqJk=;
+        b=hKJJDlEhKrkL1CRTAcLW2N/P8UBEoB9JHpo2DQeJS/gQxofnwyHjaGF9Pe071uyHw1
+         NRX9WUVFy3D46ZZfp7z1Efw+G5Q6SXFVU9GXTux9bFyTao41jHGplag/ceVvfr2Me1g7
+         oa20BYvfJuJeVoSYaC470OQaxkz0qbJyMquosi/C2gb5nA66yQDhuyujahyZjUbQNT/q
+         Ew2JRSmXhk36jqS5sKobKKTqfWCRtAvi2zGFN94d6HPw4v9/Ju9iwe6GUrO9IZxEaYUj
+         lg355CAvqDnndUXZCFJeMgxbKTXFur3LRN0Xsx9CyYWmPwkkHTO2qPAgUzUoMRD5mk+f
+         ESig==
+X-Gm-Message-State: AOJu0Yw2cpzrqIBF94V8mn2QEhAikQsmPQHx87MlUcTcGMyiq7I3L4fb
+	nbRpYzUDbk+5UEOkTTkLMfI=
+X-Google-Smtp-Source: AGHT+IF5xtLdTh5ebA3MvomjOgILvnz4IhFIHGw6vrUOiVXXmVjun0KXM08k7tob5hnd5+T2RFQvmA==
+X-Received: by 2002:a5d:5348:0:b0:315:8a13:ef17 with SMTP id t8-20020a5d5348000000b003158a13ef17mr1430106wrv.65.1695817773679;
+        Wed, 27 Sep 2023 05:29:33 -0700 (PDT)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id 8-20020a05600c230800b004042dbb8925sm4521218wmo.38.2023.09.27.05.29.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 05:29:33 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
- containers.
-Message-ID: <20230927121740.GF92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
- <20230927034209.GE92403@linux.alibaba.com>
- <20230927055528.GP1642130@unreal>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH 1/2] dt-bindings: net: snps,dwmac: DMA Arbitration scheme
+Date: Wed, 27 Sep 2023 14:29:27 +0200
+Message-Id: <20230927122928.22033-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927055528.GP1642130@unreal>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 08:55:28AM +0300, Leon Romanovsky wrote:
->On Wed, Sep 27, 2023 at 11:42:09AM +0800, Dust Li wrote:
->> On Mon, Sep 25, 2023 at 10:35:45AM +0800, Albert Huang wrote:
->> >If the netdevice is within a container and communicates externally
->> >through network technologies like VXLAN, we won't be able to find
->> >routing information in the init_net namespace. To address this issue,
->> 
->> Thanks for your founding !
->> 
->> I think this is a more generic problem, but not just related to VXLAN ?
->> If we use SMC-R v2 and the netdevice is in a net namespace which is not
->> init_net, we should always fail, right ? If so, I'd prefer this to be a bugfix.
->
->BTW, does this patch take into account net namespace of ib_device?
+Document new binding snps,arbit to program the DMA to use Arbitration
+scheme. (Rx has priority over Tx)
 
-I think this patch is irrelevant with the netns of ib_device.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-SMC has a global smc_ib_devices list reported by ib_client, and checked
-the netns using rdma_dev_access_netns. So I think we should have handled
-that well.
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 5c2769dc689a..4499f221c29b 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -442,6 +442,12 @@ properties:
+     description:
+       Use Address-Aligned Beats
+ 
++  snps,arbit:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      Program the DMA to use Arbitration scheme.
++      (Rx has priority over Tx)
++
+   snps,fixed-burst:
+     $ref: /schemas/types.yaml#/definitions/flag
+     description:
+-- 
+2.40.1
 
-Best regards,
-Dust
-
->
->Thanks
->
->> 
->> Best regards,
->> Dust
->> 
->> >we need to add a struct net parameter to the smc_ib_find_route function.
->> >This allow us to locate the routing information within the corresponding
->> >net namespace, ensuring the correct completion of the SMC CLC interaction.
->> >
->> >Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
->> >---
->> > net/smc/af_smc.c | 3 ++-
->> > net/smc/smc_ib.c | 7 ++++---
->> > net/smc/smc_ib.h | 2 +-
->> > 3 files changed, 7 insertions(+), 5 deletions(-)
->> >
->> >diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> >index bacdd971615e..7a874da90c7f 100644
->> >--- a/net/smc/af_smc.c
->> >+++ b/net/smc/af_smc.c
->> >@@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->> > 		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
->> > 	struct smc_clc_first_contact_ext *fce =
->> > 		smc_get_clc_first_contact_ext(clc_v2, false);
->> >+	struct net *net = sock_net(&smc->sk);
->> > 	int rc;
->> > 
->> > 	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
->> >@@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->> > 		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->> > 		ini->smcrv2.uses_gateway = false;
->> > 	} else {
->> >-		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
->> >+		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
->> > 				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
->> > 				      ini->smcrv2.nexthop_mac,
->> > 				      &ini->smcrv2.uses_gateway))
->> >diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
->> >index 9b66d6aeeb1a..89981dbe46c9 100644
->> >--- a/net/smc/smc_ib.c
->> >+++ b/net/smc/smc_ib.c
->> >@@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
->> > 	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
->> > }
->> > 
->> >-int smc_ib_find_route(__be32 saddr, __be32 daddr,
->> >+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->> > 		      u8 nexthop_mac[], u8 *uses_gateway)
->> > {
->> > 	struct neighbour *neigh = NULL;
->> >@@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
->> > 
->> > 	if (daddr == cpu_to_be32(INADDR_NONE))
->> > 		goto out;
->> >-	rt = ip_route_output_flow(&init_net, &fl4, NULL);
->> >+	rt = ip_route_output_flow(net, &fl4, NULL);
->> > 	if (IS_ERR(rt))
->> > 		goto out;
->> > 	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
->> >@@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
->> > 	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
->> > 	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
->> > 		struct in_device *in_dev = __in_dev_get_rcu(ndev);
->> >+		struct net *net = dev_net(ndev);
->> > 		const struct in_ifaddr *ifa;
->> > 		bool subnet_match = false;
->> > 
->> >@@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
->> > 		}
->> > 		if (!subnet_match)
->> > 			goto out;
->> >-		if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
->> >+		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
->> > 						       smcrv2->daddr,
->> > 						       smcrv2->nexthop_mac,
->> > 						       &smcrv2->uses_gateway))
->> >diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
->> >index 4df5f8c8a0a1..ef8ac2b7546d 100644
->> >--- a/net/smc/smc_ib.h
->> >+++ b/net/smc/smc_ib.h
->> >@@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *lnk,
->> > int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
->> > 			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
->> > 			 struct smc_init_info_smcrv2 *smcrv2);
->> >-int smc_ib_find_route(__be32 saddr, __be32 daddr,
->> >+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->> > 		      u8 nexthop_mac[], u8 *uses_gateway);
->> > bool smc_ib_is_valid_local_systemid(void);
->> > int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
->> >-- 
->> >2.37.1 (Apple Git-137.1)
->> 
 
