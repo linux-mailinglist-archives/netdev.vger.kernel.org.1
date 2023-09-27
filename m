@@ -1,144 +1,87 @@
-Return-Path: <netdev+bounces-36465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04567AFDF9
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:15:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13767AFE41
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 12CF71C20840
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:15:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 79EE3B20C3D
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAC91D6A8;
-	Wed, 27 Sep 2023 08:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E06D13AF9;
+	Wed, 27 Sep 2023 08:25:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFFF1D6AC
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:15:16 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE55212F;
-	Wed, 27 Sep 2023 01:15:07 -0700 (PDT)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38R7gTHF031164;
-	Wed, 27 Sep 2023 08:14:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=67eu2ybDU1XYjgg2Q/TGZX+vfsvD66d0X+669lZQ+tA=;
- b=o0IpBFuFysvjJL3Ze4IJ3zvNuGXv6+bplRRYbLKXNEXevoj2YkReJKwBHMAnt+b3MGrF
- wRbZWS6hCMFQsCeNZ3bt3axE6SQCl7dlT0nQTROUwtLkTXLsAu4fBxtP8OjsCMHZGYmi
- QjyEc+dmQPO0YNfal6l9stEu2iGtICKa6EeBOqJF+Du0lTDDSQx7CUn7/3bT3l1jGmME
- r7HZcMKI9ynNhD8Mt23WRepaitFqolWOGPwAG3ipFlRXPH6lEOUJ5471qscoNp5Ln5DD
- tEMAAiXKM6+NvEkUNn+w/d+wp/0aGjoXmai4kXV2IxJj2Mw3uZRzwIWsAY1gp708FilH 5A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcg84933t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 08:14:56 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38R7wl1p024814;
-	Wed, 27 Sep 2023 08:14:55 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcg84933k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 08:14:55 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38R80du9008185;
-	Wed, 27 Sep 2023 08:14:55 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqyj6fj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 08:14:55 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38R8EpjU20513426
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 27 Sep 2023 08:14:51 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BFA0B2004B;
-	Wed, 27 Sep 2023 08:14:51 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9604920040;
-	Wed, 27 Sep 2023 08:14:51 +0000 (GMT)
-Received: from [9.152.224.54] (unknown [9.152.224.54])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 27 Sep 2023 08:14:51 +0000 (GMT)
-Message-ID: <de8af4f8-6ee9-a76e-a9de-9321f4d43bc8@linux.ibm.com>
-Date: Wed, 27 Sep 2023 10:14:50 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA1D33F1
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:25:24 +0000 (UTC)
+Received: from ganesha.gnumonks.org (unknown [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC5E13A;
+	Wed, 27 Sep 2023 01:25:22 -0700 (PDT)
+Received: from [78.30.34.192] (port=39392 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qlPqu-00B95F-Su; Wed, 27 Sep 2023 10:25:02 +0200
+Date: Wed, 27 Sep 2023 10:24:59 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: joao@overdrivepizza.com
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	rkannoth@marvell.com, wojciech.drewek@intel.com,
+	steen.hegenlund@microhip.com, keescook@chromium.org,
+	Joao Moreira <joao.moreira@intel.com>
+Subject: Re: [PATCH v2 0/2] Prevent potential write out of bounds
+Message-ID: <ZRPm2/KsmDmFTOcS@calendula>
+References: <20230927020221.85292-1-joao@overdrivepizza.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
- closing listen socket
-To: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
- <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
- <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
- <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
- <c03dad67-169a-bf6d-1915-a9bb722a7259@linux.alibaba.com>
- <d18e1a78-3b3a-8f23-6db1-20c16795d3ef@linux.ibm.com>
- <ab417654-8aba-f357-8ac5-16c4c2b291e1@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <ab417654-8aba-f357-8ac5-16c4c2b291e1@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RlG49Eg1QZIZi5-mVF4CJgyeputY_zcP
-X-Proofpoint-ORIG-GUID: OGM3AD7b1kabLu7RWeN3ua6mIOH2-6qd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_03,2023-09-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- phishscore=0 clxscore=1015 mlxlogscore=693 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 suspectscore=0 impostorscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309270065
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230927020221.85292-1-joao@overdrivepizza.com>
+X-Spam-Score: -1.9 (-)
+X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RDNS_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 26.09.23 11:06, D. Wythe wrote:
->> Considering the const, maybe
->>> we need to do :
->>>
->>> 1. hold a refcnt of smc_sock for syn_recv_sock to keep smc sock valid during life time of clc sock
->>> 2. put the refcnt of smc_sock in sk_destruct in tcp_sock to release the very smc sock .
->>>
->>> In that way, we can always make sure the valid of smc sock during the life time of clc sock. Then we can use READ_ONCE rather
->>> than lock.  What do you think ?
->> I am not sure I fully understand the details what you propose to do. And it is not only syn_recv_sock(), right?
->> You need to consider all relations between smc socks and tcp socks; fallback to tcp, initial creation, children of listen sockets, variants of shutdown, ... Preferrably a single simple mechanism covers all situations. Maybe there is such a mechanism already today?
->> (I don't think clcsock->sk->sk_user_data or sk_callback_lock provide this general coverage)
->> If we really have a gap, a general refcnt'ing on smc sock could be a solution, but needs to be designed carefully.
+On Tue, Sep 26, 2023 at 07:02:19PM -0700, joao@overdrivepizza.com wrote:
+> From: Joao Moreira <joao.moreira@intel.com>
 > 
-> You are right , we need designed it with care, we will try the referenced solutions internally first, and I will also send some RFCs so that everyone can track the latest progress
-> and make it can be all agreed.
->> Many thanks to you and the team to help make smc more stable and robust.
+> The function flow_rule_alloc in net/core/flow_offload.c [2] gets an
+> unsigned int num_actions (line 10) and later traverses the actions in
+> the rule (line 24) setting hw.stats to FLOW_ACTION_HW_STATS_DONT_CARE.
 > 
-> Our pleasure 😁.  The stability of smc is important to us too.
+> Within the same file, the loop in the line 24 compares a signed int
+> (i) to an unsigned int (num_actions), and then uses i as an array
+> index. If an integer overflow happens, then the array within the loop
+> is wrongly indexed, causing a write out of bounds.
 > 
-> Best wishes,
-> D. Wythe
+> After checking with maintainers, it seems that the front-end caps the
+> maximum value of num_action, thus it is not possible to reach the given
+> write out of bounds, yet, still, to prevent disasters it is better to
+> fix the signedness here.
+> 
+> Similarly, also it is also good to ensure that an overflow won't happen
+> in net/netfilter/nf_tables_offload.c's function nft_flow_rule_create by
+> making the variable unsigned and ensuring that it returns an error if
+> its value reaches UINT_MAX.
+> 
+> This issue was observed by the commit author while reviewing a write-up
+> regarding a CVE within the same subsystem [1].
 
+I keep spinning around this, this is not really an issue.
 
-Just one more thought: I noticed that 
-9744d2bf1976 ("smc: Fix use-after-free in tcp_write_timer_handler().")
-states that unlike MPTCP, smc_clcsock_release() does not call __tcp_close().
-(which matches your explanation). 
-Maybe we something similar to the MPTCP approach could also solve this issue?
+No frontend uses this amount of actions.
 
+Probably cap this to uint16_t because 2^16 actions is more than
+sufficient by now.
 
