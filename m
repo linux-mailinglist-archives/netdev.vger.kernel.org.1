@@ -1,121 +1,244 @@
-Return-Path: <netdev+bounces-36391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 578D47AF7B4
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 03:37:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E727AF7C6
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 03:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 6C0661C2083A
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 01:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3EE4E281A4B
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 01:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5BE186A;
-	Wed, 27 Sep 2023 01:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA56A4C6C;
+	Wed, 27 Sep 2023 01:50:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C499804
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:37:39 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A7B5277
-	for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 18:37:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695778658;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8FSPOrGsZPPuOb1xbGdmbpSAkvWmok6p4XRywUEGr6A=;
-	b=d7ChtemhJrKJqVJIiZCKVYpqBCRpPCbf2zsXlsonUl0RfpTkMzHXjf7eE9ITqX1F+9ZR+N
-	UbSoQqZ3jXbX+uhjKHQYVoYfnRjLu5FhBjxm04bUcgiDmJir4nfU5OYgAQMTvzyQUF8oqf
-	AkZx8X/MQSmwqc8DCic73m8qYX6EAUQ=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-nuZj3bumMr2MpdWIIK-dUQ-1; Tue, 26 Sep 2023 21:37:35 -0400
-X-MC-Unique: nuZj3bumMr2MpdWIIK-dUQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9b282c72954so466720366b.3
-        for <netdev@vger.kernel.org>; Tue, 26 Sep 2023 18:37:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695778654; x=1696383454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8FSPOrGsZPPuOb1xbGdmbpSAkvWmok6p4XRywUEGr6A=;
-        b=HDE+TRZIlXO1V5JKa1FWvQWkcWHWGwlPpHWgje2FYeU4ArtWEr673uTpoZrmA49zwH
-         cDSySET373eevrqC90MGnkNkhbLuVbeN1yp3d51o7013sTtxrpRGnYF0siecZGTTVC0y
-         nmE8SEz+ksiFDGaHoJAyeRIcyqFOmW8auF0ZQT+gJ0dpHzwV75WWc05whNh26vMPB0K7
-         fijyva5Cw2OsDfkuz47HlKw76XjWRhc33shzFmv3nBzDiPLQ0WefShpkH/Vw8qyNoVnW
-         YVmxo7kets+u0Ph3mGjJLlsfSM+cb0XcRUwj2XHIgeOpdDyEYsZJ0cWwfjK776TqWJ1c
-         AObg==
-X-Gm-Message-State: AOJu0YzC/wz3eo+933owjz8ZrrslUCvUGL+2MP9uRBlP7sHsFdwjlPA9
-	dbUR3XhrLrRr/JlzpkC5G10dnTRKqJf+6dO3QxetFOCqwJLJktjuoEFxRYtJLi2zXvLI6g+HTPS
-	xuGDLBVEEQ21LNVK+EcfE7knvFegtHeVj
-X-Received: by 2002:a17:906:5dae:b0:9a1:ea01:35b1 with SMTP id n14-20020a1709065dae00b009a1ea0135b1mr303919ejv.62.1695778654754;
-        Tue, 26 Sep 2023 18:37:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHFo3vNisBp7330YnyG4faJfX+OOPuaqXwu9lTZhRetZ+vqzEwSOWdTF5BN2y7CPnYMMgixy3MJG1blaQjXsgE=
-X-Received: by 2002:a17:906:5dae:b0:9a1:ea01:35b1 with SMTP id
- n14-20020a1709065dae00b009a1ea0135b1mr303908ejv.62.1695778654503; Tue, 26 Sep
- 2023 18:37:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F15C1108
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:50:04 +0000 (UTC)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71AE4EDC;
+	Tue, 26 Sep 2023 18:50:01 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsyF-Ei_1695779398;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsyF-Ei_1695779398)
+          by smtp.aliyun-inc.com;
+          Wed, 27 Sep 2023 09:49:58 +0800
+Message-ID: <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [GIT PULL] virtio: features
+Date: Wed, 27 Sep 2023 09:47:39 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ <kvm@vger.kernel.org>,
+ <virtualization@lists.linux-foundation.org>,
+ <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>,
+ <eperezma@redhat.com>,
+ <jasowang@redhat.com>,
+ <shannon.nelson@amd.com>,
+ <xuanzhuo@linux.alibaba.com>,
+ <yuanyaogoog@chromium.org>,
+ <yuehaibing@huawei.com>,
+ Thomas Lendacky <thomas.lendacky@amd.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20230903181338-mutt-send-email-mst@kernel.org>
+ <20230926130451.axgodaa6tvwqs3ut@amd.com>
+In-Reply-To: <20230926130451.axgodaa6tvwqs3ut@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230922155029.592018-1-miquel.raynal@bootlin.com> <20230922155029.592018-8-miquel.raynal@bootlin.com>
-In-Reply-To: <20230922155029.592018-8-miquel.raynal@bootlin.com>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Tue, 26 Sep 2023 21:37:23 -0400
-Message-ID: <CAK-6q+j_vgK_5JQH0YZbqZq30J3eGccMdwB-AHKV6pQKJGmMwA@mail.gmail.com>
-Subject: Re: [PATCH wpan-next v4 07/11] mac802154: Handle association requests
- from peers
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	linux-wpan@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, 
-	Romuald Despres <romuald.despres@qorvo.com>, Frederic Blain <frederic.blain@qorvo.com>, 
-	Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem Imberton <guilhem.imberton@qorvo.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi,
-
-On Fri, Sep 22, 2023 at 11:51=E2=80=AFAM Miquel Raynal
-<miquel.raynal@bootlin.com> wrote:
+On Tue, 26 Sep 2023 08:04:51 -0500, Michael Roth <michael.roth@amd.com> wro=
+te:
+> On Sun, Sep 03, 2023 at 06:13:38PM -0400, Michael S. Tsirkin wrote:
+> > The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0=
+bc2c:
+> >
+> >   Linux 6.5 (2023-08-27 14:49:51 -0700)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/fo=
+r_linus
+> >
+> > for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> >
+> >   virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-=
+03 18:10:24 -0400)
+> >
+> > ----------------------------------------------------------------
+> > virtio: features
+> >
+> > a small pull request this time around, mostly because the
+> > vduse network got postponed to next relase so we can be sure
+> > we got the security store right.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> > ----------------------------------------------------------------
+> > Eugenio P=E9=96=9Eez (4):
+> >       vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
+> >       vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend featu=
+re
+> >       vdpa: add get_backend_features vdpa operation
+> >       vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+> >
+> > Jason Wang (1):
+> >       virtio_vdpa: build affinity masks conditionally
+> >
+> > Xuan Zhuo (12):
+> >       virtio_ring: check use_dma_api before unmap desc for indirect
+> >       virtio_ring: put mapping error check in vring_map_one_sg
+> >       virtio_ring: introduce virtqueue_set_dma_premapped()
+> >       virtio_ring: support add premapped buf
+> >       virtio_ring: introduce virtqueue_dma_dev()
+> >       virtio_ring: skip unmap for premapped
+> >       virtio_ring: correct the expression of the description of virtque=
+ue_resize()
+> >       virtio_ring: separate the logic of reset/enable from virtqueue_re=
+size
+> >       virtio_ring: introduce virtqueue_reset()
+> >       virtio_ring: introduce dma map api for virtqueue
+> >       virtio_ring: introduce dma sync api for virtqueue
+> >       virtio_net: merge dma operations when filling mergeable buffers
 >
-> Coordinators may have to handle association requests from peers which
-> want to join the PAN. The logic involves:
-> - Acknowledging the request (done by hardware)
-> - If requested, a random short address that is free on this PAN should
->   be chosen for the device.
-> - Sending an association response with the short address allocated for
->   the peer and expecting it to be ack'ed.
+> This ^ patch (upstream commit 295525e29a) seems to cause a
+> network-related regression when using SWIOTLB in the guest. I noticed
+> this initially testing SEV guests, which use SWIOTLB by default, but
+> it can also be seen with normal guests when forcing SWIOTLB via
+> swiotlb=3Dforce kernel cmdline option. I see it with both 6.6-rc1 and
+> 6.6-rc2 (haven't tried rc3 yet, but don't see any related changes
+> there), and reverting 714073495f seems to avoid the issue.
 >
-> If anything fails during this procedure, the peer is considered not
-> associated.
+> Steps to reproduce:
+>
+> 1) Boot QEMU/KVM guest with 6.6-rc2 with swiotlb=3Dforce via something li=
+ke the following cmdline:
+>
+>    qemu-system-x86_64 \
+>    -machine q35 -smp 4,maxcpus=3D255 -cpu EPYC-Milan-v2 \
+>    -enable-kvm -m 16G,slots=3D5,maxmem=3D256G -vga none \
+>    -device virtio-scsi-pci,id=3Dscsi0,disable-legacy=3Don,iommu_platform=
+=3Dtrue \
+>    -drive file=3D/home/mroth/storage/ubuntu-18.04-seves2.qcow2,if=3Dnone,=
+id=3Ddrive0,snapshot=3Doff \
+>    -device scsi-hd,id=3Dhd0,drive=3Ddrive0,bus=3Dscsi0.0 \
+>    -device virtio-net-pci,netdev=3Dnetdev0,id=3Dnet0,disable-legacy=3Don,=
+iommu_platform=3Dtrue,romfile=3D \
+>    -netdev tap,script=3D/home/mroth/qemu-ifup,id=3Dnetdev0 \
+>    -L /home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/=
+qemu \
+>    -drive if=3Dpflash,format=3Draw,unit=3D0,file=3D/home/mroth/storage/AM=
+DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_CODE.fd,readonly \
+>    -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D/home/mroth/storage/AM=
+DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_VARS.fd \
+>    -debugcon file:debug.log -global isa-debugcon.iobase=3D0x402 -msg time=
+stamp=3Don \
+>    -kernel /boot/vmlinuz-6.6.0-rc2-vanilla0+ \
+>    -initrd /boot/initrd.img-6.6.0-rc2-vanilla0+ \
+>    -append "root=3DUUID=3Dd72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=
+=3DttyS0,115200n8 earlyprintk=3Dserial,ttyS0,115200 debug=3D1 sev=3Ddebug p=
+age_poison=3D0 spec_rstack_overflow=3Doff swiotlb=3Dforce"
+>
+> 2) scp a small file from the host to the guest IP via its virtio-net devi=
+ce.
+>    Smaller file sizes succeed, but the larger the file the more likely
+>    it will fail. e.g.:
+>
+>    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D19
+>    19+0 records in
+>    19+0 records out
+>    19456 bytes (19 kB, 19 KiB) copied, 0.000940134 s, 20.7 MB/s
+>    mroth@host:~$ scp test vm0:
+>    test                                                                  =
+  100%   19KB  10.1MB/s   00:00
+>    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D20
+>    20+0 records in
+>    20+0 records out
+>    20480 bytes (20 kB, 20 KiB) copied, 0.00093774 s, 21.8 MB/s
+>    mroth@host:~$ scp test vm0:
+>    test                                                                  =
+    0%    0     0.0KB/s   --:-- ETA
+>    client_loop: send disconnect: Broken pipe
+>    lost connection
+>    mroth@host:~$
 
-I thought a coordinator can also reject requests for _any_ reason and
-it's very user specific whatever that reason is.
 
-If we have such a case (that it is very user specific what to do
-exactly) this should be able to be controlled by the user space to
-have there a logic to tell the kernel to accept or reject the
-association.
+Hi Michael,
 
-However, I am fine with this solution, but I think we might want to
-change this behaviour in the future so that an application in the user
-space has the logic to tell the kernel to accept or reject an
-association. That would make sense?
+Thanks for the report.
 
-- Alex
+Cloud you try this fix?  I reproduce this issue, and that works for me.
 
+Thanks.
+
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 98dc9b49d56b..9ece27dc5144 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *rq=
+, void *buf, u32 len)
+
+        --dma->ref;
+
+-       if (dma->ref) {
+-               if (dma->need_sync && len) {
+-                       offset =3D buf - (head + sizeof(*dma));
++       if (dma->need_sync && len) {
++               offset =3D buf - (head + sizeof(*dma));
+
+-                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma=
+->addr, offset,
+-                                                               len, DMA_FR=
+OM_DEVICE);
+-               }
++               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr,
++                                                       offset, len,
++                                                       DMA_FROM_DEVICE);
++       }
+
++       if (dma->ref)
+                return;
+-       }
+
+        virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+                                         DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU=
+_SYNC);
+
+
+>
+> Thanks,
+>
+> Mike
+>
+> >
+> > Yuan Yao (1):
+> >       virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
+> >
+> > Yue Haibing (1):
+> >       vdpa/mlx5: Remove unused function declarations
+> >
+> >  drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
+> >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
+> >  drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
+> >  drivers/vhost/vdpa.c               |  15 +-
+> >  drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++++++=
++++-----
+> >  drivers/virtio/virtio_vdpa.c       |  17 +-
+> >  include/linux/vdpa.h               |   4 +
+> >  include/linux/virtio.h             |  22 ++
+> >  include/uapi/linux/vhost_types.h   |   4 +
+> >  9 files changed, 625 insertions(+), 90 deletions(-)
+> >
 
