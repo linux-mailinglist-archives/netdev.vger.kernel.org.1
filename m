@@ -1,231 +1,208 @@
-Return-Path: <netdev+bounces-36615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20B1F7B0C3C
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:54:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2F27B0C89
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 21:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2C399283498
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:54:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B2855281D9D
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 19:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E169636AE9;
-	Wed, 27 Sep 2023 18:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A1B3FB3B;
+	Wed, 27 Sep 2023 19:33:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FEE4EACC;
-	Wed, 27 Sep 2023 18:54:03 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7013AF4;
-	Wed, 27 Sep 2023 11:54:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695840841; x=1727376841;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=rEio5OUWkLWu70cdY/WqqWjIbwWKIHztNodo6ShExDw=;
-  b=KxxxseHrG/dqoJPtZUOdDsh4oQYxBWl/HrjVy5IZa8rGAxPQLFlZDw/a
-   65dxnEEQcS9FtAoiIqHGIrn2g/305Xxq2UCPJb03/yrNbaXdoxZIZCqhC
-   ZXqI7mb7PAVEbENqDxXNHh2K0IRUKm7TuArb2TQX6QZmr8z2j8mZGB+SR
-   11QCKP28v/UdIQjh9mGde2jCsoQGFYCy8DK/VKB7rtdujKWRDSBI7NSre
-   pr+Ugs/owke15VUjWWT+AVjEJAUHY3+wLO86o1ml7MTzcAIhf8NzWqBlz
-   VG0cn7ipfeFppFLC2PtQUamggXLCOFgSKXe2o9v6ex/eCI2AOIw3Zt1/m
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="372254616"
-X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
-   d="scan'208";a="372254616"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 11:54:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="819549438"
-X-IronPort-AV: E=Sophos;i="6.03,182,1694761200"; 
-   d="scan'208";a="819549438"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Sep 2023 11:53:58 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 27 Sep 2023 11:53:55 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 27 Sep 2023 11:53:55 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.44) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 27 Sep 2023 11:53:54 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77FECF4F7;
+	Wed, 27 Sep 2023 19:33:41 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2086.outbound.protection.outlook.com [40.107.95.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B639ACC;
+	Wed, 27 Sep 2023 12:33:39 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g25VPdryDmz/gntLeQ2y7BjmvpU9XGhbw7nUKvx4gonq/yM1Ws3CRzoUETKenSES3L4QFQ1J6Y6RUExfcuFvrG/AlEpWdQ1o8cce83i30Q6p0jJtcST7hASIac/DEjlzU5Ybbm0Qufk3ds2EW6PUq9j2ZiKMHQYP6cLXLCD03wNKxDbjapR//P+qTc4pEUq0Jki1lOZbVvuC7xbqYFl3pZxybIOEWnsLVV0hNJepONllS/eZHll0O6qG8UocE0/qbWIBa1GD7oE7mZSqMbRrf5PEWLJdkMGwCGUKdfcYb427KbNdUMoT77bbDTB9Xb5pmYxCZPRabu08P2r2wfSEKw==
+ b=OngXH/fj2ZXeMBZBWQnvHSO8NUAxvNm2IAoKQA3kxVWTikvkEHEhhB4pEJSMKgX7T7Zsh17ZFQGbPfs9hX0IbBWA7xNgYhJIluBqiy2mL2HK89V15fg0y3NtNmUMQcI5pv3v4yLkOgZEuo3YHfRGUfkh314Tjf8pXNN6vhz/bk5MvLYIvoW/NAIyDhjwVgG3MAmahBszKP7Syn1ZoB3QGu5VLKVXIdk0fv/lnYczpUKtTizV2At7TbtBrZF4Tq8yrpVQBOJOpYW8CCyn8pL/BzEzZ7xPgIJTl9ylYrMk+KtLTnufhpT3zm8Zdq/UdSCxXUM2ObFZbcoC3zivgK6T0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gBbLLBh/DklYFzISpEUeL5rmBwgvOjXeJQYtNvC1JnE=;
- b=T3lloSXzpIty2fm7EtiT7+Jul6TWDzjdeeLmIus6QPbIxMij2ANOslzgEDAiaZhnPDsu46hRDxqtUkBOkK/T6Li/pJkQ33mKz2npH5hN/p3zhBRXq4GWkPOEqT9RdgZTM1LSkwb3Rr84EttIlqLATh6KOpYzk9WBzSn/QoS4VI4oFTEN2NAN/G0hhumWHqjZGRd/a6OrQs44O/Ink3xJ0/djFrNgpALi7+UvrndvQs7Gpp3LJH/FXKzrDFvPVU8W4DbAZ0yWTBYRDYiumWTMTs0pEBheL5MsgaUD4DV9HXZnusTKP6fqLiReReAmrLUMisFubUbUe5LpmkH0BZ+QaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by IA1PR11MB7174.namprd11.prod.outlook.com (2603:10b6:208:41a::7) with
+ bh=zziH9t7vbk/m59jbFMUiSGdEkSs6z+MpaZ6XBEHoRfk=;
+ b=RPMOeodLizLCRLNuhRfy279tTrntXQZGKwCufNgkbfgUQ5AO8vVNY6uwqpa9MLGkXGGf1/Px592wSo/fOiKVFsJXFEhPDQUxiO9Ym/cD34SPzQGxrB0p65NGP8IK0ZFlPDA8sMvapkbLgQLPUgFYgB0j3aMdIBZO6jewk5xVytVcrPTvkDU/imh1Cr3Ce+JPONdtHSCUe/0ocEmVSzUSg1euyZxP+yjYBmyOa95GWCV0zUSffCCKc4hC4pZE6wmPwQjt6Yd/Z0MDeid0lQ0OANrJL0D52/a90xPHGz42MD5vAmvX+nU6HaSzODMcsg5jFgUm1t0yLSrgDLdETbY0Hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zziH9t7vbk/m59jbFMUiSGdEkSs6z+MpaZ6XBEHoRfk=;
+ b=ULt+xNZq8/VBSjqkOp1r1eiHye5Z+QhJNBdGSCx9FJKtNJ9kCL2o76re2Vwtb9ZM6JeWNB7YH59VQNMMHkvPRqznwmKOrw9FpXWdEy1lFZs2P6NF1yoJTr/FvXl3mdzPoPNBYP9T0v97UgnDKPAz8hQGU43sf6W7YwuQ5Oua/fo=
+Received: from SA9P221CA0020.NAMP221.PROD.OUTLOOK.COM (2603:10b6:806:25::25)
+ by PH7PR12MB7331.namprd12.prod.outlook.com (2603:10b6:510:20e::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.20; Wed, 27 Sep
- 2023 18:53:48 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::ed7a:2765:f0ce:35cf]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::ed7a:2765:f0ce:35cf%5]) with mapi id 15.20.6813.017; Wed, 27 Sep 2023
- 18:53:48 +0000
-Message-ID: <12121654-ca48-c0b2-f914-460c018ce0d9@intel.com>
-Date: Wed, 27 Sep 2023 11:53:42 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [Intel-wired-lan] [PATCH net-next v5 0/7] introduce DEFINE_FLEX()
- macro
-Content-Language: en-US
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: <netdev@vger.kernel.org>, Steven Zou <steven.zou@intel.com>,
-	<edumazet@google.com>, David Laight <David.Laight@aculab.com>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-hardening@vger.kernel.org>, "Jakub
- Kicinski" <kuba@kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	"Kees Cook" <keescook@chromium.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>
-References: <20230912115937.1645707-1-przemyslaw.kitszel@intel.com>
- <202309120916.5313AE37C5@keescook>
- <5c59cc11-f6b3-3ac2-d26f-9470f57d7570@intel.com>
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <5c59cc11-f6b3-3ac2-d26f-9470f57d7570@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR03CA0139.namprd03.prod.outlook.com
- (2603:10b6:303:8c::24) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Wed, 27 Sep
+ 2023 19:33:37 +0000
+Received: from SN1PEPF0002BA4E.namprd03.prod.outlook.com
+ (2603:10b6:806:25:cafe::72) by SA9P221CA0020.outlook.office365.com
+ (2603:10b6:806:25::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6792.35 via Frontend
+ Transport; Wed, 27 Sep 2023 19:33:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SN1PEPF0002BA4E.mail.protection.outlook.com (10.167.242.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.14 via Frontend Transport; Wed, 27 Sep 2023 19:33:35 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
+ 2023 14:33:26 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
+ (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
+ 2023 12:32:48 -0700
+Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
+ Transport; Wed, 27 Sep 2023 14:32:44 -0500
+From: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<michal.simek@amd.com>, <linux@armlinux.org.uk>
+CC: <f.fainelli@gmail.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <git@amd.com>, Radhey Shyam Pandey
+	<radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next v7 0/3] net: axienet: Introduce dmaengine
+Date: Thu, 28 Sep 2023 01:02:28 +0530
+Message-ID: <1695843151-1919509-1-git-send-email-radhey.shyam.pandey@amd.com>
+X-Mailer: git-send-email 2.1.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|IA1PR11MB7174:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f6ee07b-a311-4c00-3649-08dbbf8b1509
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4E:EE_|PH7PR12MB7331:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5cae31b-ac08-4699-e2fa-08dbbf90a42b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6GBGPQcTQmmefjH4lgggD/OtJFlRZh4r0t9bm+uNXefw91e3FiKTysPR313BQv550j2+uQm4V4uV6SYD0htONnRXbDLEPuEfzkRyjS54zp417q4e9UgJzhuYDm8IosqGjA+1SDVe9r+nQxZSIyo12cYuVcZ+YGt4NTSJ62/T/FEA4Gk2wxEpg3qeZXy/QuPyZbH3zyGOYZuuu65Ojl43SMCR4ydFmu0fTeMfKW8N6MA+8qkvRd5qDPyI/t6AkCEvFmVUx35fy2mL4um2vPtriT4YGIlnfi8lmCEUKH8aQ1v2258ZD8NUou+xqPnns9dZsgWqC83qp8gR3nM4yjopRRUUGAlUSX+xSeh06lOin/5Frw3PdkAkA6R9MLjpS5+2sY2d1qeWxkXO3q3np6hkbxNszoQoMBqwAHam2TT+kX4Ws4zEaujpiNeamBNMK/hsPK3m6yOanUAx4qDNziYJOXIR93aOLGe2SZUwYNjZ4cpzlcEPrazLsgDHRABtReTsqxqg4C7Ltx4rkASMpX7LeveDHcen2xUlAeHxHoh3Hln/7CIC2oLTTI4kSdkzYi6LUF0v/zi10yJS7DMd4Es0n1M7QxU3mwFcgTcs/6O5pocXCOYJJFH/oCkO9hsZCt0nh5y1Vbw5W0A5DttJgW/UaA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(136003)(376002)(346002)(230922051799003)(1800799009)(186009)(451199024)(2616005)(107886003)(966005)(6486002)(82960400001)(6666004)(53546011)(6506007)(6512007)(37006003)(66476007)(54906003)(66946007)(66556008)(6636002)(316002)(86362001)(8936002)(26005)(4326008)(8676002)(6862004)(41300700001)(478600001)(36756003)(5660300002)(31686004)(31696002)(2906002)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TTJRVkxGQVlwRjRJbHNMSWk5ejB2MGlZSzRJOFdqSnNnWGZFYy9XNERQL214?=
- =?utf-8?B?WThPZVhzWEVVd215Wno1d1ZPTDJCZFRKU2RnYmRRUElYb1ZUYTdQbjMyWXpI?=
- =?utf-8?B?eTlScjJiRUhHcWE1dUZGbEQrbXNFRUFSZU1mL2kvekczU2pNRUtZTzR0cWo5?=
- =?utf-8?B?T2lXYnNiU3YxUXNDbDFRcnV4TXVTQWhVZ2J3OXlmQW1IYndjdGFpdnNzdGF3?=
- =?utf-8?B?MXNFQzVqbFB5MDBDNXZQeHVNSFE3eXp6dVZPS2VHNkhHUXpNNHIyNGVZSUt3?=
- =?utf-8?B?MkczZC9BTGltSnJ4N1dhUXFWbWF6SHM4YWU2Y1dteGZ1S0xXd1ZoMTBTZzBq?=
- =?utf-8?B?Y2dhY3FjZy9Pbzh5OG04NVBwWnZSdjJsS3BJZjdIUXdoOTEwWk1zazZlUSth?=
- =?utf-8?B?N1YrWXhmR29DTWx4TU9RMzZGNXNWeFRrUmZHNnVJT0R0NDRjMzlxNlNKUjBI?=
- =?utf-8?B?THR3STNMNzdnU2VuYlREREVTS1BnVXYrbVZtOW52clFvSDJraXhZWTkxUU1l?=
- =?utf-8?B?YTE1RzBiR3NTLy96Z3ZpYTNVcGRwemVVRkY4Mll0QkdNNDZheURtcmNQYk4z?=
- =?utf-8?B?cEMwaXc1eVAzb0drVjRrb0daUFRBR05xVUc1ekVETk9aYm93THRKZ3dxTDE2?=
- =?utf-8?B?MXk5K0VEUS9Fd040SmFzbEF4NGFJMC9MN3BjRnVnVkUyeEdiclZqY2J3MzY2?=
- =?utf-8?B?ME9EMzNQNHZERy9hZUpZcnA2ekY1Sy8vbHppcWlja1JUak45MEpMTEhZdFdo?=
- =?utf-8?B?b2kvcXU4MGlrdVBlbWw4WkttbSszdkc4Zm9JY1dLTE0rZ3NjYzVJNHpsd0Rn?=
- =?utf-8?B?Q1cwR2YvdHVIOTVWR2NqS1M0YWhaVis3dENocXpDUEtFUjRFUE9zaVI5ZWpo?=
- =?utf-8?B?Zjh1NEVWQVR2TTNXRFQwRGtraUZZenJXSE52QVJrQmZ2MEpvMkpiTGJ1dzZY?=
- =?utf-8?B?NHY4U0NFWG5sZDh2RWVxaUU5d01BbFRvM3dpemxlNHBHQkFXOHRUWUxTR0JC?=
- =?utf-8?B?UmI3YmhoT0lFZWErYkVlL3F1ZnVweEpUVWZ3aDNsdHlMaEYzeS92N3BEOGFy?=
- =?utf-8?B?WUNPdXFjbGJ2Qzd5eXFXc2MydFpSaXg4aUF3ellYOWZJS0dQMC9KNUFwMG9w?=
- =?utf-8?B?cmo4SzlqSUJtRmRaeXlBdVBEcXIveitac2NVSW02WmxIdU1xL21WZXJsMlgw?=
- =?utf-8?B?S0l4djhGbG9sMmhWM015cU9raG9FRElZeC9KeXVnQUpQbzJsVmwyM2NETDZL?=
- =?utf-8?B?OXVUQ1dMRGVTdWNIYjZCL1BIT29veEdERjBha1ZNZ21zMG1qTXVpQjFMT2cw?=
- =?utf-8?B?dDBvUUsrMFNoSnVSdGNlV3NUTmtRUFlKbU5ubk1OdFdWOFJFVE5Bd3l3VmFq?=
- =?utf-8?B?dHJaNU1xNExTSkp3TGNDR2FnK2xtNjlIb2QrM04zVW14OHRydEZSd1NTYyt1?=
- =?utf-8?B?RXZoR3RuY1ROMUkxc2RuV00zTUwrOUdJVFE5TmNMK21FNWt6bGhKYVB3NjNN?=
- =?utf-8?B?TzAzcVlyTko2U0MzYmppeWM0a3h4MjE2d2hMSVMzb0hKeWdhNmRqczRac2Y2?=
- =?utf-8?B?MEg0NmhmQ2VJc0JnazJtSUxMNGR3M21LNXNTRStqb2NjOFVvMlNKK1ZLMHBz?=
- =?utf-8?B?UUtYQVQzQ2wwKytsYWdLYllXOVFqekVBYTVnVitZY0d1VXA5QWhPYjVlUkgx?=
- =?utf-8?B?SkJlZ1I5b2J6SHdjZjhBa3FsRUFQTlRtbjFaZmwxczRjOEpNVVhBblROejJM?=
- =?utf-8?B?QytyQ2laT1dHZ2VZVnQ1TG9zWUNDQ25hdWhKQzMwWmRhQzVjOGJ2RlBEczl2?=
- =?utf-8?B?RjFLQk4rZUQycFhoTStHRHhZcTJHeUlqeURUbHBTbnZ5ZG95Y1cyaGRWVVNW?=
- =?utf-8?B?ZU15MjVsblNqWDQrYUZ5aTR0UU1PQnltUE9jK0hBUnNxNHVISUhIMzVUR2pa?=
- =?utf-8?B?dE5LWUJ0TWNteVJFUmVyeGZ1NFBhSUVTNW1iSVA4ZXlOcE5XajBYR0EwTlBH?=
- =?utf-8?B?MVNZemsrTWZCTUJzNE11UXZ0QmUxVXJTd1JSY2YrS0FocUJwWi9XTVFkTW42?=
- =?utf-8?B?U1NQVWgyek0zVVVyaEtVL083d0NNUWJVbFd1czlLMURWV1RLMXAza1Rkc1Bk?=
- =?utf-8?B?b1NSNldIajBMYTZSR3hud0VSUzQwSWZOOXpTN3hIV2p5L0s0MDZvSDBrQmsz?=
- =?utf-8?B?U1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f6ee07b-a311-4c00-3649-08dbbf8b1509
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 18:53:48.0052
+X-Microsoft-Antispam-Message-Info:
+	b1ZlH2rirmEKwyWxlPICh2raUY+3J2BYuOJL3amRhLymZ+aaDOh5WikaGLctNdzGH8XABy0JBJuNzD23Ps5RRjLQDZH9a++aIUqEbKpoT5Kget32KklM9Ak5Mjnm13usv1AcHkef5E5XzbJ58aelvt8uJwxzoKWLXVpu7F2ePfnAytBafKgxWo9RQyZ4/8or3EaOdoeeHAGUaX3b9/a3JkE9NAU8s9+hq8o2Hk5ULLK0y5hFjpqiNM/ToSYDFD8Sdaum0Btvj9XNOr1sFV7dEcXcItP4790dBtG+4VmpARoHWwgjPLgysOmwDppyEaBEVT/mNEuGtcE7wPus8NJxMyMt0mD35jfOZ1MpRyr2HQNSwqcVZHML4qFdNFkenj/nllo5RrxwxuRYUkSej0M/AUkKsZDSPcr/1AODK02bXr0DPOdHil+/9zb7V0n2dxn90KfvZWC0ASkDOwS9Nm595XgqMZ8W2qoB093wgw6Wbt0j+MOQxv7iqjdmVk/PWopFU+IRyzQTMdzp1/nhIptx03bN0uCSQZc+vY4NivaNmLnKvOhzNC03hzQGIaN1U5QeGRPJXqdTTiFJstVkMpkGfW1VVIAnEavQrDttjL77iZZ5IAWJp77ak4K4asyp3J2T7yplq+JwhB7Vl4IVM9kVXNXC5lQP17ohChK6fFnsFXAUlcrRpkqrnqMEpSYybjw5l/WUnRSXOXk7Nys3+4nJdQ6GbuxqkGjMrBEeYwiTWPbssz4mAhb/sQbGHBBsfLMf8zs3IMUQyXJXw2qCtuGnAYy1lg5BWF242+xWZwxp29Q=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(39860400002)(396003)(136003)(230922051799003)(1800799009)(186009)(82310400011)(451199024)(40470700004)(46966006)(36840700001)(316002)(7416002)(478600001)(2906002)(5660300002)(4326008)(110136005)(8936002)(8676002)(70586007)(70206006)(966005)(6666004)(66899024)(2616005)(26005)(40460700003)(41300700001)(426003)(54906003)(83380400001)(36860700001)(47076005)(356005)(36756003)(86362001)(40480700001)(82740400003)(336012)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 19:33:35.3123
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AzhNbLaxlCcaxdGQXLxaAt190N4P6BsKbOjxM93kU0hMuMYZJBKmb04hcBAnBbs5eKcdKaw1GDaXTpjZ6iLxaeeNb2BsKgs/raLxLOrc7A0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7174
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5cae31b-ac08-4699-e2fa-08dbbf90a42b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA4E.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7331
+X-Spam-Status: No, score=-1.1 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	FORGED_SPF_HELO,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The axiethernet driver can use the dmaengine framework to communicate
+with the xilinx DMAengine driver(AXIDMA, MCDMA). The inspiration behind
+this dmaengine adoption is to reuse the in-kernel xilinx dma engine
+driver[1] and remove redundant dma programming sequence[2] from the
+ethernet driver. This simplifies the ethernet driver and also makes
+it generic to be hooked to any complaint dma IP i.e AXIDMA, MCDMA
+without any modification.
 
+The dmaengine framework was extended for metadata API support during
+the axidma RFC[3] discussion. However, it still needs further
+enhancements to make it well suited for ethernet usecases.
 
-On 9/19/2023 4:10 AM, Przemek Kitszel wrote:
-> On 9/12/23 18:16, Kees Cook wrote:
->> On Tue, Sep 12, 2023 at 07:59:30AM -0400, Przemek Kitszel wrote:
->>> Add DEFINE_FLEX() macro, that helps on-stack allocation of structures
->>> with trailing flex array member.
->>> Expose __struct_size() macro which reads size of data allocated
->>> by DEFINE_FLEX().
->>>
->>> Accompany new macros introduction with actual usage,
->>> in the ice driver - hence targeting for netdev tree.
->>>
->>> Obvious benefits include simpler resulting code, less heap usage,
->>> less error checking. Less obvious is the fact that compiler has
->>> more room to optimize, and as a whole, even with more stuff on the 
->>> stack,
->>> we end up with overall better (smaller) report from bloat-o-meter:
->>> add/remove: 8/6 grow/shrink: 7/18 up/down: 2211/-2270 (-59)
->>> (individual results in each patch).
->>>
->>> v5: same as v4, just not RFC
->>> v4: _Static_assert() to ensure compiletime const count param
->>> v3: tidy up 1st patch
->>> v2: Kees: reusing __struct_size() instead of doubling it as a new macro
->>>
->>> Przemek Kitszel (7):
->>>    overflow: add DEFINE_FLEX() for on-stack allocs
->>>    ice: ice_sched_remove_elems: replace 1 elem array param by u32
->>>    ice: drop two params of ice_aq_move_sched_elems()
->>>    ice: make use of DEFINE_FLEX() in ice_ddp.c
->>>    ice: make use of DEFINE_FLEX() for struct ice_aqc_add_tx_qgrp
->>>    ice: make use of DEFINE_FLEX() for struct ice_aqc_dis_txq_item
->>>    ice: make use of DEFINE_FLEX() in ice_switch.c
->>
->> Looks good to me! Feel free to pick up via netdev.
->>
->> -Kees
->>
-> 
-> Thanks!
-> 
-> Patchwork [1] says it's "Awaiting Upstream", which is the same for most 
-> of the "to: IWL" patches. That means it's delegated to Tony?
+Comments, suggestions, thoughts to implement remaining functional
+features are very welcome!
 
-netdev maintainers,
+[1]: https://github.com/torvalds/linux/blob/master/drivers/dma/xilinx/xilinx_dma.c
+[2]: https://github.com/torvalds/linux/blob/master/drivers/net/ethernet/xilinx/xilinx_axienet_main.c#L238
+[3]: http://lkml.iu.edu/hypermail/linux/kernel/1804.0/00367.html
+[4]: https://lore.kernel.org/all/20221124102745.2620370-1-sarath.babu.naidu.gaddam@amd.com
 
-As this has non-Intel changes and is marked for 'net-next', do you want 
-to take this or prefer me to take via IWL and send as PR?
+Changes in v7:
+- Fix comment spaces.
+- In xmit use correct XAE_FEATURE_PARTIAL_TX_CSUM define.
+- Rename app to app_metadata.
+- Switch to __netif_rx.
+- In axienet_rx_submit_desc() add mapping error handling.
+- Introduce new workaround 4/4 patch to enable lkp_test
+  build coverage. To be dropped for mainline.
 
-Thanks,
-Tony
+Changes in v6:
+- Remove patchset 1-7 as it was applied to dmaengine tree in v5 version.
+- Added Krzysztof reviewed-by tag for dmaengine binding patch.
+- Rename struct axi_skbuff to skbuf_dma_descriptor and removed
+  __packed attribute.
+- Drop kmem_cache implementation and switch to using ring buffers.
+- Remove __inline from axienet_init_dmaengine().
+- Name labels after the target.
+- Add error check for platform_get_irq_optional().
+- Fix double space and no empty lines between call and its error check.
 
-> By any means, minimizing "usage examples" to just ice driver makes it 
-> easy to merge via Tony's tree.
-> 
-> [1] 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20230912115937.1645707-2-przemyslaw.kitszel@intel.com/
+Changes in v5:
+- Fix git am failure on net-next
+- Addressed DT binding review comments i.e Modified commit description to
+  remove dmaengine framework references and instead describe how
+  axiethernet IP uses DMA channels.
+- Fix "^[tr]x_chan[0-9]|1[0-5]$" -> "^[tr]x_chan([0-9]|1[0-5])$"
+- Drop generic dmas description.
+- Fix kmem_cache resource leak.
+- Merge Xilinx DMA enhancements and optimization[4] into this series.
+
+Changes in V4:
+- Updated commit description about tx/rx channels name(1/3).
+- Removed "dt-bindings" and "dmaengine" strings in subject(1/3).
+- Extended dmas and dma-names to support MCDMA channel names(1/3).
+- Rename has_dmas to use_dmaegine(2/3).
+- Remove the AXIENET_USE_DMA(2/3).
+- Remove the AXIENET_USE_DMA(3/3).
+- Add dev_err_probe for dma_request_chan error handling(3/3).
+- Add kmem_cache_destroy for create in axienet_setup_dma_chan(3/3).
+
+Changes in V3:
+- Moved RFC to PATCH.
+- Removed ethtool get/set coalesce, will be added later.
+- Added backward comapatible support.
+- Split the dmaengine support patch of V2 into two patches(2/3 and 3/3).
+https://lore.kernel.org/all/20220920055703.13246-4-sarath.babu.naidu.gaddam@amd.com/
+
+Changes in V2:
+- Add ethtool get/set coalesce and DMA reset using DMAengine framework.
+- Add performance numbers.
+- Remove .txt and change the name of file to xlnx,axiethernet.yaml.
+- Fix DT check warning(Fix DT check warning('device_type' does not match
+   any of the regexes:'pinctrl-[0-9]+' From schema: Documentation/
+   devicetree/bindings/net/xilinx_axienet.yaml).
+
+Radhey Shyam Pandey (2):
+  dt-bindings: net: xlnx,axi-ethernet: Introduce DMA support
+  net: axienet: Introduce dmaengine support
+
+Sarath Babu Naidu Gaddam (1):
+  net: axienet: Preparatory changes for dmaengine support
+
+ .../bindings/net/xlnx,axi-ethernet.yaml       |  16 +
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  35 +
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 667 ++++++++++++++----
+ 4 files changed, 596 insertions(+), 123 deletions(-)
+
+-- 
+2.34.1
+
 
