@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-36520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CF27B03A0
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4366C7B03A9
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 81A61B20B38
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:13:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C2E512829F6
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7742868A;
-	Wed, 27 Sep 2023 12:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4F1628691;
+	Wed, 27 Sep 2023 12:14:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB47C27EFA
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 12:12:58 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A270CE5;
-	Wed, 27 Sep 2023 05:12:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=d5tO3SJe0PbhXSHcNIaSFxP5tmPTcC6s9xX4wQoAzZ0=; b=ZablrPU2QM8KpWRjlgYITy1Ms6
-	Qh21MIe3GVHTRiYyahZs34c2IRIM0yVs4mCf2Dbe3m8oWACYw2839DrDwpLotGLIzRPyjA2m5Y9Ah
-	C4Nvtp4I9EMvxnpBLXFKrtEN5txZh59RL6soVOvpFDtPz3WXtWMqclIgPUYqdPduoh6I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qlTPD-007dgP-5g; Wed, 27 Sep 2023 14:12:39 +0200
-Date: Wed, 27 Sep 2023 14:12:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: kuba@kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	l00g33k@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Fabio Estevam <festevam@denx.de>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH v3 net] net: dsa: mv88e6xxx: Avoid EEPROM timeout when
- EEPROM is absent
-Message-ID: <3f3acf78-f4be-47ff-a976-b60b327c2c28@lunn.ch>
-References: <20230922124741.360103-1-festevam@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D15F266DF
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 12:14:16 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A60D513A
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 05:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ule30H4ne7GbYXZKo+WbKjrzor6H5Pa/Yz/nAE86P2s=; b=Wr3B9nyR6QmLXW8k0ksxGfnWLb
+	wVgPLQxS6DmZULfQcpm1XwOR2lRqr+4XTMpMDhgnLqjmEOhWYOvR/munGREimjoPweeach0zL6xtx
+	Y5fVzerPlAtqeIjEqvunAoj+Rqf4nrzl/8GXt/N+rFk7pG1k+x2rTvF+Yz4zKuS/oVRqXL3u57OuN
+	Au4Iv/+DEYspIlRalH1FfdJlASPHsoT85jYPAsdJa5A1BdR4OaRgPDMBzWwyoB8Gga834chM4NFUk
+	5B4hvmjzLuryI8ubH+5AOfaqgEkglOTdA5TxOTKgThO0K0LadcIbp03loxqXYU0MZNtkKEhXqB2IF
+	hPSZfNXw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44226 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1qlTQS-0003rn-08;
+	Wed, 27 Sep 2023 13:13:56 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1qlTQS-008BWe-Va; Wed, 27 Sep 2023 13:13:57 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "Ar__n__ __NAL" <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next] net: dsa: mt753x: remove
+ mt753x_phylink_pcs_link_up()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230922124741.360103-1-festevam@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1qlTQS-008BWe-Va@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 27 Sep 2023 13:13:56 +0100
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 09:47:41AM -0300, Fabio Estevam wrote:
-> From: Fabio Estevam <festevam@denx.de>
-> 
-> Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
-> before HW reset") the following error is seen on a imx8mn board with
-> a 88E6320 switch:
-> 
-> mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
-> 
-> This board does not have an EEPROM attached to the switch though.
-> 
-> This problem is well explained by Andrew Lunn:
-> 
-> "If there is an EEPROM, and the EEPROM contains a lot of data, it could
-> be that when we perform a hardware reset towards the end of probe, it
-> interrupts an I2C bus transaction, leaving the I2C bus in a bad state,
-> and future reads of the EEPROM do not work.
-> 
-> The work around for this was to poll the EEInt status and wait for it
-> to go true before performing the hardware reset.
-> 
-> However, we have discovered that for some boards which do not have an
-> EEPROM, EEInt never indicates complete. As a result,
-> mv88e6xxx_g1_wait_eeprom_done() spins for a second and then prints a
-> warning.
-> 
-> We probably need a different solution than calling
-> mv88e6xxx_g1_wait_eeprom_done(). The datasheet for 6352 documents the
-> EEPROM Command register:
-> 
-> bit 15 is:
-> 
->   EEPROM Unit Busy. This bit must be set to a one to start an EEPROM
->   operation (see EEOp below). Only one EEPROM operation can be
->   executing at one time so this bit must be zero before setting it to
->   a one.  When the requested EEPROM operation completes this bit will
->   automatically be cleared to a zero. The transition of this bit from
->   a one to a zero can be used to generate an interrupt (the EEInt in
->   Global 1, offset 0x00).
-> 
-> and more interesting is bit 11:
-> 
->   Register Loader Running. This bit is set to one whenever the
->   register loader is busy executing instructions contained in the
->   EEPROM."
-> 
-> Change to using mv88e6xxx_g2_eeprom_wait() to fix the timeout error
-> when the EEPROM chip is not present.
->   
-> Fixes: 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done before HW reset")
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Fabio Estevam <festevam@denx.de>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Remove the mt753x_phylink_pcs_link_up() function for two reasons:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+1) priv->pcs[i].pcs.neg_mode is set true, meaning it doesn't take a
+   MLO_AN_FIXED anymore, but one of PHYLINK_PCS_NEG_*. However, this
+   is inconsequential due to...
+2) priv->pcs[port].pcs.ops is always initialised to point at
+   mt7530_pcs_ops, which does not have a pcs_link_up() member.
 
-    Andrew
+So, let's remove mt753x_phylink_pcs_link_up() entirely.
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/dsa/mt7530.c | 11 -----------
+ 1 file changed, 11 deletions(-)
+
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 035a34b50f31..0d62c69dfbb6 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2824,15 +2824,6 @@ static void mt753x_phylink_mac_link_down(struct dsa_switch *ds, int port,
+ 	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
+ }
+ 
+-static void mt753x_phylink_pcs_link_up(struct phylink_pcs *pcs,
+-				       unsigned int mode,
+-				       phy_interface_t interface,
+-				       int speed, int duplex)
+-{
+-	if (pcs->ops->pcs_link_up)
+-		pcs->ops->pcs_link_up(pcs, mode, interface, speed, duplex);
+-}
+-
+ static void mt753x_phylink_mac_link_up(struct dsa_switch *ds, int port,
+ 				       unsigned int mode,
+ 				       phy_interface_t interface,
+@@ -2921,8 +2912,6 @@ mt7531_cpu_port_config(struct dsa_switch *ds, int port)
+ 		return ret;
+ 	mt7530_write(priv, MT7530_PMCR_P(port),
+ 		     PMCR_CPU_PORT_SETTING(priv->id));
+-	mt753x_phylink_pcs_link_up(&priv->pcs[port].pcs, MLO_AN_FIXED,
+-				   interface, speed, DUPLEX_FULL);
+ 	mt753x_phylink_mac_link_up(ds, port, MLO_AN_FIXED, interface, NULL,
+ 				   speed, DUPLEX_FULL, true, true);
+ 
+-- 
+2.30.2
+
 
