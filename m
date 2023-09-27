@@ -1,144 +1,233 @@
-Return-Path: <netdev+bounces-36624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFB157B0EB5
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 00:01:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0782F7B0ECC
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 00:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 09FF2B20A28
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 22:01:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id EE5462815EE
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 22:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C614CFC4;
-	Wed, 27 Sep 2023 22:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BC24CFCA;
+	Wed, 27 Sep 2023 22:13:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D97D11C8A
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 22:01:08 +0000 (UTC)
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7780FB;
-	Wed, 27 Sep 2023 15:01:05 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bffd6c1460so191972011fa.3;
-        Wed, 27 Sep 2023 15:01:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAA638FBA
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 22:13:03 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 081CCFB
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:13:02 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-504a7f9204eso1559872e87.3
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:13:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695852064; x=1696456864; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A8ITScod0vDIBUawt6Tv12trYCl8zUPCwWwUD13fHVI=;
-        b=Gz1zhHoFCVzWqyZnYnjJjddyEKHcF7lxk4YcdZeSCmTFtGrOSJsTSwLYaDS8zVwFgs
-         B1OnLVG/b7/tcFQgIYE9VweykSoVqtrDSD+cccFVQ9TWGsBbee7/Ull4UmCfp8AKuI+y
-         Joj2zWZZCs2UITHgyL6hMbeR0e4xJxtTWl1FOY317rhfQeivY1sizLO0id0BTJVTwHHa
-         nkvCsft6UiZCm0gCrj7Qu3f972igGEvr+76Qxw5GMYwUNnST6ET42saFGPIGoW75qf6R
-         fKHA2ddmL2VkjzEG268uSsnNMYyb+n/N2AQ5YwFNHsGCHFyN8fjuR1iQtFDx2+8hFwGe
-         43Iw==
+        d=linaro.org; s=google; t=1695852780; x=1696457580; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4o04zX1PQmfEMIWCBtx3WpuptkLPmUQ26jN5D5PP4KU=;
+        b=s4sOAbCn4I+NvAq46K0lMT+pIr7gSQLFHwKI25w3yAmVUsAX/CHhspA7x1mGiJV47S
+         M3YY8uZ1ddG/b4ayay2afNi2/7kFba6R4/u35eoBHnMxf0E8Y42Apzj+bNURnm9atxhd
+         HtPKc8idyVg0I3IBx3G+s2/AIfWiIKr4E+tWsbieRh3Rv0ulttwB08Bg7hpCKA7MgRoM
+         zE+cqiipnmiDJiHDwhUem0X5a32W85CgoZjoGDjc6+dUESwXyy//M+ywczh1HT5U5paa
+         RIMDG9DZOQR4XXffz+EmFZdtScqcmKP2Y8gaR+6C7iXGb0k71BxJOopJSDByEsKCLuoC
+         Okzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695852064; x=1696456864;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A8ITScod0vDIBUawt6Tv12trYCl8zUPCwWwUD13fHVI=;
-        b=ppcLtQ5u1kAFHgaupTxHMK/ZSJA60pekJ2zRz/8frJGkdL6uLcvCt+/3XSvaKSHOlc
-         oRp88U5QpD6+lavRZ825bl7ZDvqObtJZcliTWErcvX/d2TNd1zcqnYZk/MP4ijBARwKs
-         F+ECSDWNaHEcCTlAQfaS3K9s2kaleaFE/jTs5YuhL+mdvH4YKTTZ/mWiTrKuPDL5Y8lm
-         PABSNXpmDB10po07eYteN4ciiXQQa9TTgcPRotW2aL1arW1nrSqlMWcWEwGeAUGKbG14
-         lplue7fijisC4eQe9CRIcmCFIcZ3UK95UR8We0a1ZUZjudYx4lsKeL6wiijXtlxdTl8p
-         ye9A==
-X-Gm-Message-State: AOJu0YygTaC6mMy/8KYsDq/ugXRR176jFoRkpiLPc6mSIsHaFKhIJ45k
-	0YDNkShNfKHKJC2h2f8qcnxbkbe50Gk2CNoIMO//V2PlWndz4w==
-X-Google-Smtp-Source: AGHT+IGz+lwkUhRRZ4suBaYVlSkCf5qNKc3ngIEPXOqsxXN1SzlUlMYfq3pGi/EgkJrLllGFPiz1JP0uBXCJh7MTJrs=
-X-Received: by 2002:a2e:96c9:0:b0:2bf:fde1:2586 with SMTP id
- d9-20020a2e96c9000000b002bffde12586mr3194217ljj.1.1695852063721; Wed, 27 Sep
- 2023 15:01:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695852780; x=1696457580;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4o04zX1PQmfEMIWCBtx3WpuptkLPmUQ26jN5D5PP4KU=;
+        b=g+qoWc4CtdZiFOnU6fD91gfAncJ0kTYT7VEhh9V8ZJy+CQEqno9ObDFhY/EOpXgF4a
+         gyYlgy0sU6ThO/MTMB/Rdm35LIbka82L/VTASLxEBH9SPcWelYQrxHVvakMj5XlgwTVD
+         Y8HRxLyY0xnJZfHu+DurOJZ2cLao5fJ1ZjvF+LYxiZsNZRszU5xlW+FV81MvpnHjUs4Q
+         6shY1WcIQ8llyRBv6yQ1104FMpQfxgzqHD8rZHwf3bFDHoUyhD3L2Ol7jsU3N5HaKxQN
+         mqOVDyw/bLj1w96zs1j/1wlUYAAAT6hk4StiMK5TrcD058B9LlRmBRMGQ4ANfv3dSp51
+         Qr8A==
+X-Gm-Message-State: AOJu0Yy2gz2fxoKhUP7ODmqxlEHz12laaHxo4bcJU9oOschGLUXPoMs/
+	OGWzjwyj/U9fmyC2Y/F8EFpzWQ==
+X-Google-Smtp-Source: AGHT+IFggn2TsJ/lc1oyY7CPbyTwiAJwUaav5Tgt/ENvAW5Y2Vy0Vk7tSNHnPTZnIkpiPet4bDKkJw==
+X-Received: by 2002:a19:7b1d:0:b0:503:905:c5a3 with SMTP id w29-20020a197b1d000000b005030905c5a3mr2437090lfc.35.1695852780212;
+        Wed, 27 Sep 2023 15:13:00 -0700 (PDT)
+Received: from [192.168.1.2] (c-21d3225c.014-348-6c756e10.bbcust.telenor.se. [92.34.211.33])
+        by smtp.gmail.com with ESMTPSA id v2-20020a056512096200b00502e2347ef0sm2793521lft.193.2023.09.27.15.12.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 15:12:59 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 28 Sep 2023 00:12:56 +0200
+Subject: [PATCH net-next v3] net: ixp4xx_eth: Support changing the MTU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230920181344.571274-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230920181344.571274-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 27 Sep 2023 15:00:50 -0700
-Message-ID: <CABBYNZLxyLzJ2yNyOFvOoGvMPqMtEr5+6q5PYinO7aFvBe6SPA@mail.gmail.com>
-Subject: Re: pull-request: bluetooth 2023-09-20
-To: davem@davemloft.net, kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230928-ixp4xx-eth-mtu-v3-1-cb18eaa0edb9@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAOeoFGUC/3WNywrCMBQFf6Vk7ZU8Wtq48j/ERZJe24CmJYkhU
+ vrvhqwUcTkcZs5GAnqLgZyajXhMNtjFFRCHhphZuQnBjoUJp1xQyQXYvLY5A8YZHvEJhrZs7PG
+ GUnBSpNXjzeYavBCHERzmSK5lmW2Ii3/Vp8Tq/i+aGDCQOAxa0gGZ5ue7dcovx8VPtZX4p9/9+
+ Lz4QgqjlO47o+mXv+/7G6MyOA/3AAAA
+To: Krzysztof Halasa <khalasa@piap.pl>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.3
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+As we don't specify the MTU in the driver, the framework
+will fall back to 1500 bytes and this doesn't work very
+well when we try to attach a DSA switch:
 
-On Wed, Sep 20, 2023 at 11:13=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> The following changes since commit 4a0f07d71b0483cc08c03cefa7c85749e187c2=
-14:
->
->   net/handshake: Fix memory leak in __sock_create() and sock_alloc_file()=
- (2023-09-20 11:54:49 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git t=
-ags/for-net-2023-09-20
->
-> for you to fetch changes up to b938790e70540bf4f2e653dcd74b232494d06c8f:
->
->   Bluetooth: hci_codec: Fix leaking content of local_codecs (2023-09-20 1=
-1:03:11 -0700)
->
-> ----------------------------------------------------------------
-> bluetooth pull request for net:
->
->  - Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
->  - Fix handling of listen for ISO unicast
->  - Fix build warnings
->  - Fix leaking content of local_codecs
->  - Add shutdown function for QCA6174
->  - Delete unused hci_req_prepare_suspend() declaration
->  - Fix hci_link_tx_to RCU lock usage
->  - Avoid redundant authentication
->
-> ----------------------------------------------------------------
-> Luiz Augusto von Dentz (4):
->       Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FIL=
-TER
->       Bluetooth: ISO: Fix handling of listen for unicast
->       Bluetooth: hci_core: Fix build warnings
->       Bluetooth: hci_codec: Fix leaking content of local_codecs
->
-> Rocky Liao (1):
->       Bluetooth: btusb: add shutdown function for QCA6174
->
-> Yao Xiao (1):
->       Bluetooth: Delete unused hci_req_prepare_suspend() declaration
->
-> Ying Hsu (2):
->       Bluetooth: Fix hci_link_tx_to RCU lock usage
->       Bluetooth: Avoid redundant authentication
->
->  drivers/bluetooth/btusb.c        |  1 +
->  include/net/bluetooth/hci_core.h |  2 +-
->  net/bluetooth/hci_conn.c         | 63 ++++++++++++++++++++++------------=
-------
->  net/bluetooth/hci_core.c         | 14 +++++++--
->  net/bluetooth/hci_event.c        |  1 +
->  net/bluetooth/hci_request.h      |  2 --
->  net/bluetooth/hci_sync.c         | 14 ++++-----
->  net/bluetooth/iso.c              |  9 ++++--
->  8 files changed, 60 insertions(+), 46 deletions(-)
+  eth1: mtu greater than device maximum
+  ixp4xx_eth c800a000.ethernet eth1: error -22 setting
+  MTU to 1504 to include DSA overhead
 
-Looks like this still hasn't been pulled, any problems with the pull-reques=
-t?
+After locating an out-of-tree patch in OpenWrt I found
+suitable code to set the MTU on the interface and ported
+it and updated it. Now the MTU gets set properly.
 
---=20
-Luiz Augusto von Dentz
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+Changes in v3:
+- Fix some coding style and initialization style.
+- Collect Jacob's review tag.
+- Link to v2: https://lore.kernel.org/r/20230925-ixp4xx-eth-mtu-v2-1-393caab75cb0@linaro.org
+
+Changes in v2:
+- Don't just set min/max MTU: implement the interface for actually
+  changing it as well.
+- Link to v1: https://lore.kernel.org/r/20230923-ixp4xx-eth-mtu-v1-1-9e88b908e1b2@linaro.org
+---
+ drivers/net/ethernet/xscale/ixp4xx_eth.c | 65 +++++++++++++++++++++++++++++++-
+ 1 file changed, 64 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/xscale/ixp4xx_eth.c b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+index 3b0c5f177447..910094ab553c 100644
+--- a/drivers/net/ethernet/xscale/ixp4xx_eth.c
++++ b/drivers/net/ethernet/xscale/ixp4xx_eth.c
+@@ -24,6 +24,7 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/dmapool.h>
+ #include <linux/etherdevice.h>
++#include <linux/if_vlan.h>
+ #include <linux/io.h>
+ #include <linux/kernel.h>
+ #include <linux/net_tstamp.h>
+@@ -63,7 +64,15 @@
+ 
+ #define POOL_ALLOC_SIZE		(sizeof(struct desc) * (RX_DESCS + TX_DESCS))
+ #define REGS_SIZE		0x1000
+-#define MAX_MRU			1536 /* 0x600 */
++
++/* MRU is said to be 14320 in a code dump, the SW manual says that
++ * MRU/MTU is 16320 and includes VLAN and ethernet headers.
++ * See "IXP400 Software Programmer's Guide" section 10.3.2, page 161.
++ *
++ * FIXME: we have chosen the safe default (14320) but if you can test
++ * jumboframes, experiment with 16320 and see what happens!
++ */
++#define MAX_MRU			(14320 - VLAN_ETH_HLEN)
+ #define RX_BUFF_SIZE		ALIGN((NET_IP_ALIGN) + MAX_MRU, 4)
+ 
+ #define NAPI_WEIGHT		16
+@@ -1182,6 +1191,54 @@ static void destroy_queues(struct port *port)
+ 	}
+ }
+ 
++static int ixp4xx_do_change_mtu(struct net_device *dev, int new_mtu)
++{
++	struct port *port = netdev_priv(dev);
++	struct npe *npe = port->npe;
++	int framesize, chunks;
++	struct msg msg = {};
++
++	/* adjust for ethernet headers */
++	framesize = new_mtu + VLAN_ETH_HLEN;
++	/* max rx/tx 64 byte chunks */
++	chunks = DIV_ROUND_UP(framesize, 64);
++
++	msg.cmd = NPE_SETMAXFRAMELENGTHS;
++	msg.eth_id = port->id;
++
++	/* Firmware wants to know buffer size in 64 byte chunks */
++	msg.byte2 = chunks << 8;
++	msg.byte3 = chunks << 8;
++
++	msg.byte4 = msg.byte6 = framesize >> 8;
++	msg.byte5 = msg.byte7 = framesize & 0xff;
++
++	if (npe_send_recv_message(npe, &msg, "ETH_SET_MAX_FRAME_LENGTH"))
++		return -EIO;
++	netdev_dbg(dev, "set MTU on NPE %s to %d bytes\n",
++		   npe_name(npe), new_mtu);
++
++	return 0;
++}
++
++static int ixp4xx_eth_change_mtu(struct net_device *dev, int new_mtu)
++{
++	int ret;
++
++	/* MTU can only be changed when the interface is up. We also
++	 * set the MTU from dev->mtu when opening the device.
++	 */
++	if (dev->flags & IFF_UP) {
++		ret = ixp4xx_do_change_mtu(dev, new_mtu);
++		if (ret < 0)
++			return ret;
++	}
++
++	dev->mtu = new_mtu;
++
++	return 0;
++}
++
+ static int eth_open(struct net_device *dev)
+ {
+ 	struct port *port = netdev_priv(dev);
+@@ -1232,6 +1289,8 @@ static int eth_open(struct net_device *dev)
+ 	if (npe_send_recv_message(port->npe, &msg, "ETH_SET_FIREWALL_MODE"))
+ 		return -EIO;
+ 
++	ixp4xx_do_change_mtu(dev, dev->mtu);
++
+ 	if ((err = request_queues(port)) != 0)
+ 		return err;
+ 
+@@ -1374,6 +1433,7 @@ static int eth_close(struct net_device *dev)
+ static const struct net_device_ops ixp4xx_netdev_ops = {
+ 	.ndo_open = eth_open,
+ 	.ndo_stop = eth_close,
++	.ndo_change_mtu = ixp4xx_eth_change_mtu,
+ 	.ndo_start_xmit = eth_xmit,
+ 	.ndo_set_rx_mode = eth_set_mcast_list,
+ 	.ndo_eth_ioctl = eth_ioctl,
+@@ -1488,6 +1548,9 @@ static int ixp4xx_eth_probe(struct platform_device *pdev)
+ 	ndev->dev.dma_mask = dev->dma_mask;
+ 	ndev->dev.coherent_dma_mask = dev->coherent_dma_mask;
+ 
++	ndev->min_mtu = ETH_MIN_MTU;
++	ndev->max_mtu = MAX_MRU;
++
+ 	netif_napi_add_weight(ndev, &port->napi, eth_poll, NAPI_WEIGHT);
+ 
+ 	if (!(port->npe = npe_request(NPE_ID(port->id))))
+
+---
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+change-id: 20230923-ixp4xx-eth-mtu-c041d7efe932
+
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
+
 
