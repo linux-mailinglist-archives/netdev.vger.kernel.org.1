@@ -1,116 +1,106 @@
-Return-Path: <netdev+bounces-36467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39F2B7AFE42
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:25:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74EDD7AFE69
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DE61E2812CE
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:25:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 9897FB20C53
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:29:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B7C1C6B6;
-	Wed, 27 Sep 2023 08:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF601F616;
+	Wed, 27 Sep 2023 08:29:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F305384
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:25:45 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3520C1B5
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:25:44 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7D0291BF20C;
-	Wed, 27 Sep 2023 08:25:41 +0000 (UTC)
-Message-ID: <8dc83d57-3e92-1d50-321c-fff6fde58bac@ovn.org>
-Date: Wed, 27 Sep 2023 10:26:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4926A53AE
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:29:28 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1239CD7
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:29:26 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-523100882f2so12269536a12.2
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:29:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695803365; x=1696408165; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vqzMLrutU/O6W+UgakqlkbwTrx1oB6pMeuXfKi5IFhk=;
+        b=CDQRBdR7nRJ3YnayfbI9c+ZMbHbZETcn+Lroddc68KepHY7tFhMR/XPmMmBC+gptfs
+         mw1F97r+fGVFhbnRKqqLJLbEVp2kZ5Q3JtkQAfTPETHqjuQmy4DOat0bQX0j7PXHlyEs
+         GXM1p84BE6SrgUISMCapAkkZWR7fhiRIHK9A/ZsyppKwBja2vFAwPV3Qemd96y+gdQDn
+         ajCutqNp9E/DJ3BxLsdW478xeumEv/sD5bZeELt+vE/Kbz+jWxag2RvWQ/Ce3Qfb61hq
+         SKB1Sf4O3MQl2sf1ZeyY5SJNiyfo9fi7By9cUhe7ZqhdhKb9DzAMJ3WiE0JSlQELrG+h
+         jK2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695803365; x=1696408165;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vqzMLrutU/O6W+UgakqlkbwTrx1oB6pMeuXfKi5IFhk=;
+        b=TLoc4bDLcrJN0EVxwX+e42AAtZK0qFO0GrUjueIt78V7hd5qbIfmRvxBvYzcBzODrt
+         YGiV0RI/ulgNjxPllaPtOwrEVJFZ6wxQ5VSJcim6U7wNJivAXWr0tSgP3PbfCZB1jNBO
+         dyTtJjUFOkFejamKD9Sj+TIWMMKfZBnXuyeRaROqycjIqVxHeQfyRbn+NKhck8F8xjpB
+         nw/wtRa4fPbcXD5DkfwUpAOm0XqbkQBdiXKy7R/LkjQln02pxiIEwRi6oSgAtH6KwzNs
+         iDVhbDE3NUmzJPISpaqFejF+qqieKjpwBgCsYbUXqOVC5hgx/SLv1hxP7eA4o6OADtZU
+         oAYA==
+X-Gm-Message-State: AOJu0Yy5EGsXlCb9SSG65dVTgNYxYV2SsDJaT1UZM98mh9d/9ZUVyqzm
+	SOM6CrBDmpYdiiSQ2iFMaG4=
+X-Google-Smtp-Source: AGHT+IGEvtWog5f46DQVKz2/HPmkwyHuufDzJwb3m/0rrIctLdakAOfl6oDV0S96vLRTi2Q5xclp+g==
+X-Received: by 2002:a50:ec8e:0:b0:525:680a:6b89 with SMTP id e14-20020a50ec8e000000b00525680a6b89mr1297725edr.12.1695803364420;
+        Wed, 27 Sep 2023 01:29:24 -0700 (PDT)
+Received: from localhost.localdomain ([105.29.162.58])
+        by smtp.gmail.com with ESMTPSA id f3-20020a056402068300b005256771db39sm7763953edy.58.2023.09.27.01.29.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 01:29:23 -0700 (PDT)
+From: David Kahurani <k.kahurani@gmail.com>
+To: xen-devel@lists.xenproject.org
+Cc: netdev@vger.kernel.org,
+	wei.liu@kernel.org,
+	paul@xen.org,
+	David Kahurani <k.kahurani@gmail.com>
+Subject: [PATCH] net/xen-netback: Break build if netback slots > max_skbs + 1
+Date: Wed, 27 Sep 2023 11:29:18 +0300
+Message-Id: <20230927082918.197030-1-k.kahurani@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Cc: dev@openvswitch.org, i.maximets@ovn.org
-Subject: Re: [ovs-dev] [RFC PATCH 1/7] net: openvswitch: Move NSH buffer out
- of do_execute_actions
-Content-Language: en-US
-To: Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org
-References: <20230927001308.749910-1-npiggin@gmail.com>
- <20230927001308.749910-2-npiggin@gmail.com>
-From: Ilya Maximets <i.maximets@ovn.org>
-In-Reply-To: <20230927001308.749910-2-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NEUTRAL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 9/27/23 02:13, Nicholas Piggin wrote:
-> This takes do_execute_actions stack use from 544 bytes to 288
-> bytes. execute_push_nsh uses 336 bytes, but it is a leaf call not
-> involved in recursion.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  net/openvswitch/actions.c | 27 +++++++++++++++++----------
->  1 file changed, 17 insertions(+), 10 deletions(-)
+If XEN_NETBK_LEGACY_SLOTS_MAX and MAX_SKB_FRAGS have a difference of
+more than 1, with MAX_SKB_FRAGS being the lesser value, it opens up a
+path for null-dereference. It was also noted that some distributions
+were modifying upstream behaviour in that direction which necessitates
+this patch.
 
-Hi, Nicholas.  I made the same change about a week ago:
-  https://lore.kernel.org/netdev/20230921194314.1976605-1-i.maximets@ovn.org/
-So, you can drop this patch from your set.
+Signed-off-by: David Kahurani <k.kahurani@gmail.com>
+---
+ drivers/net/xen-netback/netback.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards, Ilya Maximets.
-
-> 
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index fd66014d8a76..8933caa92794 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -1286,6 +1286,21 @@ static int execute_dec_ttl(struct sk_buff *skb, struct sw_flow_key *key)
->  	return 0;
->  }
->  
-> +static noinline_for_stack int execute_push_nsh(struct sk_buff *skb,
-> +					       struct sw_flow_key *key,
-> +					       const struct nlattr *attr)
-> +{
-> +	u8 buffer[NSH_HDR_MAX_LEN];
-> +	struct nshhdr *nh = (struct nshhdr *)buffer;
-> +	int err;
-> +
-> +	err = nsh_hdr_from_nlattr(attr, nh, NSH_HDR_MAX_LEN);
-> +	if (likely(!err))
-> +		err = push_nsh(skb, key, nh);
-> +
-> +	return err;
-> +}
-> +
->  /* Execute a list of actions against 'skb'. */
->  static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
->  			      struct sw_flow_key *key,
-> @@ -1439,17 +1454,9 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
->  			err = pop_eth(skb, key);
->  			break;
->  
-> -		case OVS_ACTION_ATTR_PUSH_NSH: {
-> -			u8 buffer[NSH_HDR_MAX_LEN];
-> -			struct nshhdr *nh = (struct nshhdr *)buffer;
-> -
-> -			err = nsh_hdr_from_nlattr(nla_data(a), nh,
-> -						  NSH_HDR_MAX_LEN);
-> -			if (unlikely(err))
-> -				break;
-> -			err = push_nsh(skb, key, nh);
-> +		case OVS_ACTION_ATTR_PUSH_NSH:
-> +			err = execute_push_nsh(skb, key, nla_data(a));
->  			break;
-> -		}
->  
->  		case OVS_ACTION_ATTR_POP_NSH:
->  			err = pop_nsh(skb, key);
+diff --git a/drivers/net/xen-netback/netback.c b/drivers/net/xen-netback/netback.c
+index 88f760a7cbc3..df032e33787f 100644
+--- a/drivers/net/xen-netback/netback.c
++++ b/drivers/net/xen-netback/netback.c
+@@ -1005,6 +1005,7 @@ static void xenvif_tx_build_gops(struct xenvif_queue *queue,
+ 			break;
+ 		}
+ 
++		BUILD_BUG_ON(XEN_NETBK_LEGACY_SLOTS_MAX > MAX_SKB_FRAGS + 1);
+ 		if (ret >= XEN_NETBK_LEGACY_SLOTS_MAX - 1 && data_len < txreq.size)
+ 			data_len = txreq.size;
+ 
+-- 
+2.25.1
 
 
