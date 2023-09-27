@@ -1,74 +1,51 @@
-Return-Path: <netdev+bounces-36426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE0C37AFBF5
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:24:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B907AFC0A
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3BE01281C72
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:24:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AAC3B281C9F
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9CC71C680;
-	Wed, 27 Sep 2023 07:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C1114AA4;
+	Wed, 27 Sep 2023 07:27:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E630D368;
-	Wed, 27 Sep 2023 07:24:28 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3584BF;
-	Wed, 27 Sep 2023 00:24:26 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D1DB71C0005;
-	Wed, 27 Sep 2023 07:24:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695799465;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y7lheL/fPD30+qWF6kotkKYQgHBfzDpYHPBkU7rqwKc=;
-	b=CUxDSg3duEvh2iFUudjI4nwvl79l+61/0VAmFQSu2LRxhgpcqiWvVArxluGLfvz8i5H50g
-	/1E6SCgjLvpCudreDT7YjSUJNoddPGTSsaP4qgW8mWZk1r2YQFIKYrFJ/YEM0vSjcRIouF
-	jAG7C/ETkfGIPjGdzUf59swSIoGJQUGcVuuayMkzk8au+5Sk7KAiVV36+GbS/U8eAaBUBo
-	Pb/APoI1htl9U6jlR0NLt4TNlSJhGv0qMJmsS+9RrcsdPKtRdRr7gPHjPd+Eba7D0t9cHn
-	BMVN9LDMWuIFiKvBLMP4Ihx4uyZvHi66OO4LFFFAfTsgo3N8lhrCfO7XudhEyQ==
-Date: Wed, 27 Sep 2023 09:24:18 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
- Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
- JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v6 08/30] dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc:
- Add support for QMC HDLC
-Message-ID: <20230927092418.6a5326ce@bootlin.com>
-In-Reply-To: <e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
-References: <20230922075913.422435-1-herve.codina@bootlin.com>
-	<20230922075913.422435-9-herve.codina@bootlin.com>
-	<5efae150-3d92-81b8-5c25-68846d27132e@linaro.org>
-	<20230925101703.1bf083f1@bootlin.com>
-	<5b804a1a-6bfd-429d-ad84-696b7ecef72d@linaro.org>
-	<20230925122758.43963736@bootlin.com>
-	<e02ebde7-f208-40a4-bb10-aa5962ee9864@linaro.org>
-	<20230925154929.2b6a9cab@bootlin.com>
-	<e8ee6529-b194-4588-96c0-1459f214d005@linaro.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817C663DB
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 07:27:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC65EC433C7;
+	Wed, 27 Sep 2023 07:27:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695799667;
+	bh=uXmzZw+CSsAvM8Urfx0gAJMtEEVDIe/sd4WOWNPVU0M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o5+/4tc91kAuxHqAiFvEgJvVSI9YZ8YNSeL7FNa7zwURbHQTfqqhJYCyDGUSZcF5a
+	 9M/6EfeW+3OgDcu4qpYgq3+w37NS23f67lecD8NOhHK89nlX7F6zDQG74mlZ/IBIAp
+	 UShWAJs44HJ1BBURBtegStLXQBZc6Wlo2vDt7MHUO6IBfWfoAsjMXYtZ2BVnOGrWVn
+	 ajXirFPtN2riEwzDOKn3G2j2CE/m07z2QbteJjat4c53wM/4A1KZDZMGBBtBWs9Kci
+	 uAoiubAVNrkHeEpfkiV9qasEVkVtgrFWzeaORVexcRaDSrnkY8LNCROmUkUYuFYaQO
+	 6Ldn9+wbwPQLQ==
+From: Roger Quadros <rogerq@kernel.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	vladimir.oltean@nxp.com
+Cc: horms@kernel.org,
+	s-vadapalli@ti.com,
+	srk@ti.com,
+	vigneshr@ti.com,
+	p-varis@ti.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rogerq@kernel.org
+Subject: [PATCH v5 net-next 0/4] net: ethernet: am65-cpsw: Add mqprio, frame pre-emption & coalescing
+Date: Wed, 27 Sep 2023 10:27:37 +0300
+Message-Id: <20230927072741.21221-1-rogerq@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,108 +54,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi Krzysztof,
+Hi,
 
-On Tue, 26 Sep 2023 22:59:14 +0200
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org> wrote:
+This series adds mqprio qdisc offload in channel mode,
+Frame Pre-emption MAC merge support and RX/TX coalesing
+for AM65 CPSW driver.
 
-> On 25/09/2023 15:50, Herve Codina wrote:
-> >>>>> With these details, do you still think I need to change the child (channel)
-> >>>>> compatible ?      
-> >>>>
-> >>>> From OS point of view, you have a driver binding to this child-level
-> >>>> compatible. How do you enforce Linux driver binding based on parent
-> >>>> compatible? I looked at your next patch and I did not see it.    
-> >>>
-> >>> We do not need to have the child driver binding based on parent.    
-> >>
-> >> Exactly, that's what I said.
-> >>  
-> >>> We have to ensure that the child handles a QMC channel and the parent provides
-> >>> a QMC channel.
-> >>>
-> >>> A QMC controller (parent) has to implement the QMC API (include/soc/fsl/qe/qmc.h)
-> >>> and a QMC channel driver (child) has to use the QMC API.    
-> >>
-> >> How does this solve my concerns? Sorry, I do not understand. Your driver
-> >> is a platform driver and binds to the generic compatible. How do you
-> >> solve regular compatibility issues (need for quirks) if parent
-> >> compatible is not used?
-> >>
-> >> How does being QMC compliant affects driver binding and
-> >> compatibility/quirks?
-> >>
-> >> We are back to my original question and I don't think you answered to
-> >> any of the concerns.  
-> > 
-> > Well, to be sure that I understand correctly, do you mean that I should
-> > provide a compatible for the child (HDLC) with something like this:
-> > --- 8< ---
-> >   compatible:
-> >     items:
-> >       - enum:
-> >           - fsl,mpc885-qmc-hdlc
-> >           - fsl,mpc866-qmc-hdlc
-> >       - const: fsl,cpm1-qmc-hdlc
-> >       - const: fsl,qmc-hdlc
-> > --- 8< ---  
-> 
-> Yes, more or less, depending on actual compatibility and SoC-family.
-> Maybe "fsl,cpm1-qmc-hdlc" item in the middle is not needed.
+Comparted to v4, this series picks up the coalesing patch.
 
-Ok,
-I will keep "fsl,cpm1-qmc-hdlc". The CPM1 is the co-processor present in these
-SoCs and it handles the QMC controller. So, it makes sense to have it in this
-binding.
+Changelog information in each patch file.
 
-I plan to add support for other SoCs in the future and for these SoCs, the
-co-processor is not the CPM1. So, it makes sense to keep "fsl,cpm1-qmc-hdlc"
-to identify the co-processor.
+cheers,
+-roger
 
-> 
-> > 
-> > If so, I didn't do that because a QMC channel consumer (driver matching
-> > fsl,qmc-hdlc) doesn't contains any SoC specific part.  
-> 
-> Just like hundreds of other drivers. :)
-> 
-> There is a paragraph about specific compatibles here:
-> https://www.kernel.org/doc/html/latest/devicetree/bindings/writing-schema.html
-> 
-> 
-> > It uses the channel as a communication channel to send/receive HDLC frames
-> > to/from this communication channel.
-> > All the specific SoC part is handled by the QMC controller (parent) itself and
-> > not by any consumer (child).  
-> 
-> OK, so you guarantee in 100% for this hardware and all future (including
-> designs unknown currently), that they will be 100% compatible with
-> existing QMC channel consumer (child, matching fsl,qmc-hdlc) driver,
-> thus there will be no need for any quirk. Specifically, there will be no
-> chances that it would be reasonable to re-use the same driver for child
-> (currently fsl,qmc-hdlc) in different parent.
+Grygorii Strashko (2):
+  net: ethernet: ti: am65-cpsw: add mqprio qdisc offload in channel mode
+  net: ethernet: ti: am65-cpsw: add sw tx/rx irq coalescing based on
+    hrtimers
 
-Right,
-compatible strings with SoC and co-processor will be added in the next iteration.
+Roger Quadros (2):
+  net: ethernet: ti: am65-cpsw: Move code to avoid forward declaration
+  net: ethernet: ti: am65-cpsw-qos: Add Frame Preemption MAC Merge
+    support
 
-Thanks for your feedback.
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 229 ++++++++
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    |  61 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |   9 +
+ drivers/net/ethernet/ti/am65-cpsw-qos.c     | 550 +++++++++++++++++---
+ drivers/net/ethernet/ti/am65-cpsw-qos.h     | 112 ++++
+ 5 files changed, 879 insertions(+), 82 deletions(-)
 
-Best regards,
-Hervé
 
-> 
-> P.S. If you received this email twice, apologies, I have here troubles
-> with internet.
-> 
-> Best regards,
-> Krzysztof
-> 
+base-commit: 0bb80ecc33a8fb5a682236443c1e740d5c917d1d
+-- 
+2.34.1
+
 
