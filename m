@@ -1,121 +1,141 @@
-Return-Path: <netdev+bounces-36574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E5927B09CC
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:16:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B4A7B0A3D
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:32:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1294D282109
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id DB55F281F31
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A20038FA1;
-	Wed, 27 Sep 2023 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3266E136C;
+	Wed, 27 Sep 2023 16:32:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0000830FB6
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 16:16:36 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6D67392;
-	Wed, 27 Sep 2023 09:16:35 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F1F6B1FB;
-	Wed, 27 Sep 2023 09:17:11 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4C3893F59C;
-	Wed, 27 Sep 2023 09:16:28 -0700 (PDT)
-Message-ID: <96c0892f-20e6-db1f-f310-9b09d419aa6a@arm.com>
-Date: Wed, 27 Sep 2023 17:16:23 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172A43C699
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 16:32:42 +0000 (UTC)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC39DE;
+	Wed, 27 Sep 2023 09:32:39 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 21C3D40003;
+	Wed, 27 Sep 2023 16:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695832356;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uzRiLFiE96j5NL7WdLRQOP7BxkPSHo+tKBTr1xJAHQs=;
+	b=oVxsmLmr1QcdLdX+GqOgV/9cSAzUpOwHqs/oQQJYOOLPeVFM2D93hSjArz7bqsQPidvP8c
+	a1Mx0bFN3pN4lWyGVeQHKU925Wqamzm42rzaRFs9i1sxEuA96JxWqRUow37WCXsdAzfU5n
+	TxxmWw2A3gxWR1H1sjfeifeygp6EjmqAsDSIOkgr0HwoM4HWuW+rtiM9iyaAZGNDDL6rHX
+	OrOMDGc1krienB8n9H9Ybwv61rcd7kwIrSks5nDDhKWrlCUMUMODwxoZtRO2lwO6BhBiXJ
+	VTpv+6h9tI336phloScM1/ieYlRKVywqiyfUH1XI3tvBGO+9D127OIOdcW10bw==
+Date: Wed, 27 Sep 2023 18:32:30 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, linux-can@vger.kernel.org, =?UTF-8?B?SsOpcsOpbWll?=
+ Dautheribes <jeremie.dautheribes@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, sylvain.girard@se.com,
+ pascal.eberhard@se.com, stable@vger.kernel.org
+Subject: Re: [PATCH net] can: sja1000: Always restart the Tx queue after an
+ overrun
+Message-ID: <20230927183214.39c2986b@xps-13>
+In-Reply-To: <20230927-mystified-speak-d6aff435e38d-mkl@pengutronix.de>
+References: <20230922154727.591672-1-miquel.raynal@bootlin.com>
+	<20230927-fantasize-refuse-7fef75242672-mkl@pengutronix.de>
+	<20230927-mystified-speak-d6aff435e38d-mkl@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
- IOTLB flushing
-Content-Language: en-GB
-To: Jason Gunthorpe <jgg@ziepe.ca>, Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Alexandra Winter
- <wintera@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
- Alyssa Rosenzweig <alyssa@rosenzweig.io>,
- David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
- Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Yong Wu <yong.wu@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Orson Zhai <orsonzhai@gmail.com>, Baolin Wang
- <baolin.wang@linux.alibaba.com>, Chunyan Zhang <zhang.lyra@gmail.com>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>,
- Thierry Reding <thierry.reding@gmail.com>, Krishna Reddy
- <vdumpa@nvidia.com>, Jonathan Hunter <jonathanh@nvidia.com>,
- Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
- asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
- linux-doc@vger.kernel.org
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
- <ZRLy_AaJiXxZ2AfK@8bytes.org> <20230926160832.GM13795@ziepe.ca>
- <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
- <ZRP8CiBui7suB5D6@8bytes.org>
- <b06a14de270a63050b0d027c24b333dba25001a4.camel@linux.ibm.com>
- <e1efbbd827e34800bd7fb0ea687645cc6c65e1ab.camel@linux.ibm.com>
- <6dab29f58ac1ccd58caaee031f98f4d0d382cbcd.camel@linux.ibm.com>
- <a672b6b122c7a5f708614346885c190a6960aaea.camel@linux.ibm.com>
- <20230927154009.GN13795@ziepe.ca>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20230927154009.GN13795@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 27/09/2023 4:40 pm, Jason Gunthorpe wrote:
-> On Wed, Sep 27, 2023 at 05:24:20PM +0200, Niklas Schnelle wrote:
-> 
->> Ok, another update. On trying it out again this problem actually also
->> occurs when applying this v12 on top of v6.6-rc3 too. Also I guess
->> unlike my prior thinking it probably doesn't occur with
->> iommu.forcedac=1 since that still allows IOVAs below 4 GiB and we might
->> be the only ones who don't support those. From my point of view this
->> sounds like a mlx5_core issue they really should call
->> dma_set_mask_and_coherent() before their first call to
->> dma_alloc_coherent() not after. So I guess I'll send a v13 of this
->> series rebased on iommu/core and with an additional mlx5 patch and then
->> let's hope we can get that merged in a way that doesn't leave us with
->> broken ConnectX VFs for too long.
-> 
-> Yes, OK. It definitely sounds wrong that mlx5 is doing dma allocations before
-> setting it's dma_set_mask_and_coherent(). Please link to this thread
-> and we can get Leon or Saeed to ack it for Joerg.
-> 
-> (though wondering why s390 is the only case that ever hit this?)
+Hi Marc,
 
-Probably because most systems happen to be able to satisfy the 
-allocation within the default 32-bit mask - the whole bottom 4GB of IOVA 
-space being reserved is pretty atypical.
+mkl@pengutronix.de wrote on Wed, 27 Sep 2023 11:33:32 +0200:
 
-TBH it makes me wonder the opposite - how this ever worked on s390 
-before? And I think the answer to that is "by pure chance", since upon 
-inspection the existing s390_pci_dma_ops implementation appears to pay 
-absolutely no attention to the device's DMA masks whatsoever :(
+> On 27.09.2023 11:30:16, Marc Kleine-Budde wrote:
+> > On 22.09.2023 17:47:27, Miquel Raynal wrote: =20
+> > > Upstream commit 717c6ec241b5 ("can: sja1000: Prevent overrun stalls w=
+ith
+> > > a soft reset on Renesas SoCs") fixes an issue with Renesas own SJA1000
+> > > CAN controller reception: the Rx buffer is only 5 messages long, so w=
+hen
+> > > the bus loaded (eg. a message every 50us), overrun may easily
+> > > happen. Upon an overrun situation, due to a possible internal crossta=
+lk
+> > > situation, the controller enters a frozen state which only can be
+> > > unlocked with a soft reset (experimentally). The solution was to offl=
+oad
+> > > a call to sja1000_start() in a threaded handler. This needs to happen=
+ in
+> > > process context as this operation requires to sleep. sja1000_start()
+> > > basically enters "reset mode", performs a proper software reset and
+> > > returns back into "normal mode".
+> > >=20
+> > > Since this fix was introduced, we no longer observe any stalls in
+> > > reception. However it was sporadically observed that the transmit path
+> > > would now freeze. Further investigation blamed the fix mentioned abov=
+e,
+> > > and especially the reset operation. Reproducing the reset in a loop
+> > > helped identifying what could possibly go wrong. The sja1000 is a sin=
+gle
+> > > Tx queue device, which leverages the netdev helpers to process one Tx
+> > > message at a time. The logic is: the queue is stopped, the message se=
+nt
+> > > to the transceiver, once properly transmitted the controller sets a
+> > > status bit which triggers an interrupt, in the interrupt handler the
+> > > transmission status is checked and the queue woken up. Unfortunately,=
+ if
+> > > an overrun happens, we might perform the soft reset precisely between
+> > > the transmission of the buffer to the transceiver and the advent of t=
+he
+> > > transmission status bit. We would then stop the transmission operation
+> > > without re-enabling the queue, leading to all further transmissions to
+> > > be ignored.
+> > >=20
+> > > The reset interrupt can only happen while the device is "open", and
+> > > after a reset we anyway want to resume normal operations, no matter i=
+f a
+> > > packet to transmit got dropped in the process, so we shall wake up the
+> > > queue. Restarting the device and waking-up the queue is exactly what
+> > > sja1000_set_mode(CAN_MODE_START) does. In order to be consistent about
+> > > the queue state, we must acquire a lock both in the reset handler and=
+ in
+> > > the transmit path to ensure serialization of both operations. As the
+> > > reset handler might still be called after the transmission of a frame=
+ to
+> > > the transceiver but before it actually gets transmitted, we must ensu=
+re
+> > > we don't leak the skb, so we free it (the behavior is consistent, no
+> > > matter if there was an skb on the stack or not). =20
+> >=20
+> > Can you make use of netif_tx_disable() and netif_wake_queue() in
+> > sja1000_reset_interrupt() instead of the lock? =20
+>=20
+> ...or netif_tx_lock()/netif_tx_unlock().
 
-Robin.
+As that's also a spinlock behind I guess it would fit. A quick look
+does not seem to show any specific constraint in using it, so let's go
+for it.
+
+Thanks,
+Miqu=C3=A8l
 
