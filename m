@@ -1,137 +1,196 @@
-Return-Path: <netdev+bounces-36601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FEA7B0BC4
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:14:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E8D7B0BEC
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 94274284BDC
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:14:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8F7B1283E86
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469024C86C;
-	Wed, 27 Sep 2023 18:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990E04CFAE;
+	Wed, 27 Sep 2023 18:28:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFF14B227
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:14:24 +0000 (UTC)
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 617DBEB;
-	Wed, 27 Sep 2023 11:14:23 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-578e33b6fb7so7895250a12.3;
-        Wed, 27 Sep 2023 11:14:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137A1262AD
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:28:05 +0000 (UTC)
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBDCDD
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:28:04 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a707bc2397so1770706b6e.0
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695838463; x=1696443263; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jq+VxeX6yPtc75wO/O6xkDPUJ9EYRWMtvf8PqV0DLZc=;
-        b=G8ZKkpP10HzAxCu4ygdkNxVTO1Nd+6CYN6RyY2kQIQ+5o5RmB2mRkwonRKSA/szc6K
-         a6cZlM4//UkL+bKdT4cr4kpV7W83irHqL7yvMX2k9eW/JxfKsXkpyt4N6zCyZzsgVBKS
-         MI7orFbBIPp1ng1ECX0M49PLx9r8BRDUAT8KVbuHOXtYkSU2cCtq4QACD3MViXgQSAvY
-         u5z0MKHne/AJDYCJua2UT3/piSsbnPMZrrTUNLeZKvswcU4YQHFDvhWxHuUYY9PCY/L8
-         +AP/Zsd0Y88HIgZJJwbU/0KpYAlXd32LeUUF183/oNnmnqoIfetnn2T92D0OY3vqAaVe
-         y05g==
+        d=gmail.com; s=20230601; t=1695839283; x=1696444083; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Z8SxYQHK3aEziaESVM6XkdTJOxrhF2ghym6v8e8Xs0=;
+        b=jjUdOdPGIeHshL1htdiTvPrCGyvvEif4weU4qWBv9ySNVmqMg+4SFJ0ajoTvcgLagR
+         BGWaOanIWJlodmkHB9wIVN3Qd2JncivaPBP4rXuav1kqpTBqZmjO3FuT1jqlh10fh6Z2
+         VbskzNnwCLZv/1KKw6g0t+tGj1CAMTWVQRiZVNubGsiyP8dugUTFwqzHPVIwjDCCb21Z
+         93juKMhH72ykYa0RoF443r9vNLJ4Zcpvl5ryfQsn5oG8AIbVAisD3fTwsQnwv/zrAoy7
+         L/Fe0X0Di6eIgBAvLJH8x+ZuY7AC3P5xct4p8wz5Xnm3UPUVQyeo93sbBlikAgu1TRMJ
+         ZjlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695838463; x=1696443263;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jq+VxeX6yPtc75wO/O6xkDPUJ9EYRWMtvf8PqV0DLZc=;
-        b=Auzg/504iE1K47M6eCR5r5SYzDKKouUCUTXURNCoQJYUWGqqf3JgKosDgy2LQ6Z7Zx
-         wd/Sju//FxfYGaOgrsvae3A7nFR9Qk08+mPUsnowMkwlwIhgYYBThZJJ+g5Jx4lH8G5o
-         IZxGvKXgKXlALwWm8kuDUOV64sDeObqV1ujCCtDVfVUNbxAzX7+buM0fNdYqMDkhUPEF
-         WEVTrtyw8i0P2zLBo2xam/XHkh9xOeBMkOSE3ZjNhXR2Aibqd3qLmPsmsmcTHruQUOxW
-         +JblZaf5x24OdW9wbQaciibN107Iw5UE6LGGRKAUuLKUA7E9244xjMrOWxRc7ETVNECj
-         lTPA==
-X-Gm-Message-State: AOJu0Yx5l/ORMpqvrwM9T3DgCcRq4iV3yra8E97nfWUK3EGDdthAC1W7
-	Qe1xsFW4K9h4EA0yFUjyBmc=
-X-Google-Smtp-Source: AGHT+IGMPOvhhOHHbDoo4pelaJxsrX5/Ixdl0FbELXJqXsLid9awUR156a+UtivLuhoqnFzNxbbBXQ==
-X-Received: by 2002:a17:90b:1205:b0:269:3771:7342 with SMTP id gl5-20020a17090b120500b0026937717342mr2247872pjb.18.1695838462709;
-        Wed, 27 Sep 2023 11:14:22 -0700 (PDT)
-Received: from 377044c6c369.cse.ust.hk (191host097.mobilenet.cse.ust.hk. [143.89.191.97])
-        by smtp.gmail.com with ESMTPSA id 28-20020a17090a191c00b0026801e06ac1sm13368921pjg.30.2023.09.27.11.14.19
+        d=1e100.net; s=20230601; t=1695839283; x=1696444083;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+Z8SxYQHK3aEziaESVM6XkdTJOxrhF2ghym6v8e8Xs0=;
+        b=H3XZj9uPDeKiFlrsMyMXtxcgBelCZ5PFeqCMYrvDcaTEEXlnhwXRWZ/KDYYNYYB2Uh
+         dcVl9mCbwvdwI7j9W/qLXRIvHtJxsbnARsSON9TghJOE+xNjz8pIY76TBWx7JNNiAiZU
+         zIMDdk63huI0r8Vs+K/3KezDL9SD5lCvtKyOBZkmUNSLNTUE4qNmKZTmUHnpLADxnVaY
+         U+kxdrbJm5FZMc3MieICSlTfabmW3qjfy6RvYI3faB9q0jMojubmGXz6NS/4nqreQo//
+         dF+ji6T91koWZClSrSbFK61MEQEAselvsdhfJF9bIrYo9uCZYF/cE+XOFI1/wTM93okq
+         ZDoQ==
+X-Gm-Message-State: AOJu0YxKd71nccufiabBUnbP8est+NqijZ0r1KOJnqOGvMs+b2ixL8iK
+	E0Foag8BnuVURyyt8Qn2C+w6lvRcnS0=
+X-Google-Smtp-Source: AGHT+IG+goqeLjr4xTZTmKHKOrhWXYoUDY9nrvZJJf84CTbNOqUyjvvMj4Qd2mARS3YAM3LgXah0xA==
+X-Received: by 2002:a05:6808:3a13:b0:3ae:df5:6d0d with SMTP id gr19-20020a0568083a1300b003ae0df56d0dmr3501656oib.2.1695839283308;
+        Wed, 27 Sep 2023 11:28:03 -0700 (PDT)
+Received: from dmoe.c.googlers.com.com (25.11.145.34.bc.googleusercontent.com. [34.145.11.25])
+        by smtp.gmail.com with ESMTPSA id o9-20020a639a09000000b0056c2f1a2f6bsm11658599pge.41.2023.09.27.11.28.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 11:14:22 -0700 (PDT)
-From: Chengfeng Ye <dg573847474@gmail.com>
-To: jmaloy@redhat.com,
-	ying.xue@windriver.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
+        Wed, 27 Sep 2023 11:28:02 -0700 (PDT)
+From: David Morley <morleyd.kernel@gmail.com>
+To: David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	Chengfeng Ye <dg573847474@gmail.com>
-Subject: [PATCH] tipc: fix a potential deadlock on &tx->lock
-Date: Wed, 27 Sep 2023 18:14:14 +0000
-Message-Id: <20230927181414.59928-1-dg573847474@gmail.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	David Morley <morleyd@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Yuchung Cheng <ycheng@google.com>
+Subject: [PATCH net-next 1/2] tcp: record last received ipv6 flowlabel
+Date: Wed, 27 Sep 2023 18:27:45 +0000
+Message-ID: <20230927182747.2005960-1-morleyd.kernel@gmail.com>
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-It seems that tipc_crypto_key_revoke() could be be invoked by
-wokequeue tipc_crypto_work_rx() under process context and
-timer/rx callback under softirq context, thus the lock acquisition
-on &tx->lock seems better use spin_lock_bh() to prevent possible
-deadlock.
+From: David Morley <morleyd@google.com>
 
-This flaw was found by an experimental static analysis tool I am
-developing for irq-related deadlock.
+In order to better estimate whether a data packet has been
+retransmitted or is the result of a TLP, we save the last received
+ipv6 flowlabel.
 
-tipc_crypto_work_rx() <workqueue>
---> tipc_crypto_key_distr()
---> tipc_bcast_xmit()
---> tipc_bcbase_xmit()
---> tipc_bearer_bc_xmit()
---> tipc_crypto_xmit()
---> tipc_ehdr_build()
---> tipc_crypto_key_revoke()
---> spin_lock(&tx->lock)
-<timer interrupt>
-   --> tipc_disc_timeout()
-   --> tipc_bearer_xmit_skb()
-   --> tipc_crypto_xmit()
-   --> tipc_ehdr_build()
-   --> tipc_crypto_key_revoke()
-   --> spin_lock(&tx->lock) <deadlock here>
+To make space for this field we resize the "ato" field in
+inet_connection_sock as the current value of TCP_DELACK_MAX can be
+fully contained in 8 bits and add a compile_time_assert ensuring this
+field is the required size.
 
-Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+Signed-off-by: David Morley <morleyd@google.com>
+Signed-off-by: Neal Cardwell <ncardwell@google.com>
+Signed-off-by: Yuchung Cheng <ycheng@google.com>
+Tested-by: David Morley <morleyd@google.com>
 ---
- net/tipc/crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/inet_connection_sock.h |  5 ++++-
+ include/net/tcp.h                  |  2 ++
+ net/ipv4/tcp_input.c               | 15 +++++++++++++++
+ net/ipv4/tcp_timer.c               |  2 +-
+ 4 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
-index 302fd749c424..43c3f1c971b8 100644
---- a/net/tipc/crypto.c
-+++ b/net/tipc/crypto.c
-@@ -1441,14 +1441,14 @@ static int tipc_crypto_key_revoke(struct net *net, u8 tx_key)
- 	struct tipc_crypto *tx = tipc_net(net)->crypto_tx;
- 	struct tipc_key key;
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index 5d2fcc137b88..d6d9d1c1985a 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -114,7 +114,10 @@ struct inet_connection_sock {
+ 		__u8		  quick;	 /* Scheduled number of quick acks	   */
+ 		__u8		  pingpong;	 /* The session is interactive		   */
+ 		__u8		  retry;	 /* Number of attempts			   */
+-		__u32		  ato;		 /* Predicted tick of soft clock	   */
++		#define ATO_BITS 8
++		__u32		  ato:ATO_BITS,	 /* Predicted tick of soft clock	   */
++				  lrcv_flowlabel:20, /* last received ipv6 flowlabel	   */
++				  unused:4;
+ 		unsigned long	  timeout;	 /* Currently scheduled timeout		   */
+ 		__u32		  lrcvtime;	 /* timestamp of last received data packet */
+ 		__u16		  last_seg_size; /* Size of last incoming segment	   */
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 91688d0dadcd..8a3720c7d082 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -131,6 +131,8 @@ void tcp_time_wait(struct sock *sk, int state, int timeo);
+ #define TCP_FIN_TIMEOUT_MAX (120 * HZ) /* max TCP_LINGER2 value (two minutes) */
  
--	spin_lock(&tx->lock);
-+	spin_lock_bh(&tx->lock);
- 	key = tx->key;
- 	WARN_ON(!key.active || tx_key != key.active);
+ #define TCP_DELACK_MAX	((unsigned)(HZ/5))	/* maximal time to delay before sending an ACK */
++static_assert(1<<ATO_BITS > TCP_DELACK_MAX);
++
+ #if HZ >= 100
+ #define TCP_DELACK_MIN	((unsigned)(HZ/25))	/* minimal time to delay before sending an ACK */
+ #define TCP_ATO_MIN	((unsigned)(HZ/25))
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 584825ddd0a0..abe7494361c0 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -765,6 +765,16 @@ void tcp_rcv_space_adjust(struct sock *sk)
+ 	tp->rcvq_space.time = tp->tcp_mstamp;
+ }
  
- 	/* Free the active key */
- 	tipc_crypto_key_set_state(tx, key.passive, 0, key.pending);
- 	tipc_crypto_key_detach(tx->aead[key.active], &tx->lock);
--	spin_unlock(&tx->lock);
-+	spin_unlock_bh(&tx->lock);
++static void tcp_save_lrcv_flowlabel(struct sock *sk, const struct sk_buff *skb)
++{
++#if IS_ENABLED(CONFIG_IPV6)
++	struct inet_connection_sock *icsk = inet_csk(sk);
++
++	if (skb->protocol == htons(ETH_P_IPV6))
++		icsk->icsk_ack.lrcv_flowlabel = ntohl(ip6_flowlabel(ipv6_hdr(skb)));
++#endif
++}
++
+ /* There is something which you must keep in mind when you analyze the
+  * behavior of the tp->ato delayed ack timeout interval.  When a
+  * connection starts up, we want to ack as quickly as possible.  The
+@@ -813,6 +823,7 @@ static void tcp_event_data_recv(struct sock *sk, struct sk_buff *skb)
+ 		}
+ 	}
+ 	icsk->icsk_ack.lrcvtime = now;
++	tcp_save_lrcv_flowlabel(sk, skb);
  
- 	pr_warn("%s: key is revoked\n", tx->name);
- 	return -EKEYREVOKED;
+ 	tcp_ecn_check_ce(sk, skb);
+ 
+@@ -4506,6 +4517,9 @@ static void tcp_rcv_spurious_retrans(struct sock *sk, const struct sk_buff *skb)
+ 	if (TCP_SKB_CB(skb)->seq == tcp_sk(sk)->duplicate_sack[0].start_seq &&
+ 	    sk_rethink_txhash(sk))
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAREHASH);
++
++	/* Save last flowlabel after a spurious retrans. */
++	tcp_save_lrcv_flowlabel(sk, skb);
+ }
+ 
+ static void tcp_send_dupack(struct sock *sk, const struct sk_buff *skb)
+@@ -4822,6 +4836,7 @@ static void tcp_data_queue_ofo(struct sock *sk, struct sk_buff *skb)
+ 	u32 seq, end_seq;
+ 	bool fragstolen;
+ 
++	tcp_save_lrcv_flowlabel(sk, skb);
+ 	tcp_ecn_check_ce(sk, skb);
+ 
+ 	if (unlikely(tcp_try_rmem_schedule(sk, skb, skb->truesize))) {
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index 3f61c6a70a1f..0862b73dd3b5 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -322,7 +322,7 @@ void tcp_delack_timer_handler(struct sock *sk)
+ 	if (inet_csk_ack_scheduled(sk)) {
+ 		if (!inet_csk_in_pingpong_mode(sk)) {
+ 			/* Delayed ACK missed: inflate ATO. */
+-			icsk->icsk_ack.ato = min(icsk->icsk_ack.ato << 1, icsk->icsk_rto);
++			icsk->icsk_ack.ato = min_t(u32, icsk->icsk_ack.ato << 1, icsk->icsk_rto);
+ 		} else {
+ 			/* Delayed ACK missed: leave pingpong mode and
+ 			 * deflate ATO.
 -- 
-2.17.1
+2.42.0.582.g8ccd20d70d-goog
 
 
