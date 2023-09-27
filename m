@@ -1,171 +1,213 @@
-Return-Path: <netdev+bounces-36564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 057437B07EC
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 17:15:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8775F7B07F1
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 17:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 94E7E281CDE
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:15:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id A5D93B20974
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906293AC29;
-	Wed, 27 Sep 2023 15:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFB127EE5;
+	Wed, 27 Sep 2023 15:16:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1541F38FB6
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:15:08 +0000 (UTC)
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40439F5
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:15:07 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77574c6cab0so94307485a.3
-        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695827706; x=1696432506; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ORIn1A7s/0tWSsc9QSeckLC4AflhU8YOvNqZo+tbNd0=;
-        b=KvKy8dVq/fzvp+MImLwVnmPRR4S9mcnDotWa54pgLhl/CBF9ROSaO2zLMR9HIq6RIB
-         mStBpzPBVX7De/nITI6bBTSU5YVEafZ2pUhrSTHPB6DpiwChTVkX44njzGgFUF3bwsUh
-         v4heq2mMYyRo/mcbu4EuSLBMx/X3SCnunh9oIlVB+7am1vtJBTriTfPSIn4h+n54c04d
-         izXNcwBC72hVwLRMRtyZbg1kmYwK3s+SWAOQVlFmq00os9je3rcd4hVxyXKL8bzaJhtG
-         h661wa7zLsS3feA1Qaz2GyguUXvoPCswyHppqtS+XV0hkCcKZC54uqiL7WtHaAlIHsnw
-         IwXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695827706; x=1696432506;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ORIn1A7s/0tWSsc9QSeckLC4AflhU8YOvNqZo+tbNd0=;
-        b=wSV+9yvZUgOxum+aX4VX5oyU9Mm0eu7SLs/SfQWe/Jhl8iw946DM/slF/KGn28Cj3Z
-         aXGpYgp1V2EF/z8TCCfhevGJs+6AS3mwpohE64/af6jUITsKLuuqPBCx1M12TIdaw1RW
-         e148yMLqDQchTrIuzf8HQBrTRofDFyuwUKdMPUCE7ZTnYIxNtaKX9KcFDe1q+1oT9nU1
-         gQPYoOiMSeMUL3qBA2gfVJYUZFUrghiHvbwRrqqjjiIb7teUXKvYzg2J6t+zRVEBpgGn
-         4H8JFn1CuD7MT7TQMB4cCneeV3jWJjZcUnorCxwi5b0k09eoqgg4yZODjxPxUnj8gn9B
-         LEDg==
-X-Gm-Message-State: AOJu0YweDQJ6t+fMB2TVgaf82ZzM+CEmyva8bdBUurJ0eETXetNe0ZFP
-	MqRF4uywilRh4x4/zDYmWQo=
-X-Google-Smtp-Source: AGHT+IFfW98Wrz1BIDURkn1XB/nO0ZKUTNCJ5e7ptWA4YnKtWYCZB7CXFPWK9648tBAd8xyVRnA2yw==
-X-Received: by 2002:a05:620a:2456:b0:76f:19fd:5063 with SMTP id h22-20020a05620a245600b0076f19fd5063mr2208738qkn.34.1695827706230;
-        Wed, 27 Sep 2023 08:15:06 -0700 (PDT)
-Received: from soy.nyc.corp.google.com ([2620:0:1003:416:3cb2:ba69:4389:2a97])
-        by smtp.gmail.com with ESMTPSA id r25-20020a05620a03d900b00767e2668536sm5533069qkm.17.2023.09.27.08.15.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 08:15:05 -0700 (PDT)
-From: Neal Cardwell <ncardwell.sw@gmail.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,
-	Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>
-Subject: [PATCH net 2/2] tcp: fix delayed ACKs for MSS boundary condition
-Date: Wed, 27 Sep 2023 11:15:01 -0400
-Message-ID: <20230927151501.1549078-2-ncardwell.sw@gmail.com>
-X-Mailer: git-send-email 2.42.0.515.g380fc7ccd1-goog
-In-Reply-To: <20230927151501.1549078-1-ncardwell.sw@gmail.com>
-References: <20230927151501.1549078-1-ncardwell.sw@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D09E125C8
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:16:51 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99CF3121;
+	Wed, 27 Sep 2023 08:16:49 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38REdBKl008435;
+	Wed, 27 Sep 2023 15:16:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=v9WDm3swDxscG39kJoxW69ln7dXHTF+Bl/xaN5IviGE=;
+ b=oh4ZMEcSSsC5E/Ob9R4hjNaeeiUeZW2bvP5n97p9Neoq2h1plFTI7ywIozx+0yt15qc0
+ djfHAqkD4tn/0vlf60JAmDqo7rGyo3mxGX9ampwaieZWN8yWOOWBH8GnmSOA3tC2Fce9
+ E+J52mE8Rqpr5zudvjdZ5MV/NSJ9O7DI9BO5Bb4NJsg53vfo8lO7yMb7PQ1mjiV1Ye+d
+ TQmbKaPAU3gssC0fO103YPIZmK9tdH3iwWEe8ImietQJnTklvn/KyrfVD4RQlS55RDTn
+ SWCHZcI2NCWNsy6dIhQsSYwfSfYpDT3ZczGaNxtLQK2Cm4rQDKjApYXFIRbWgnWeDhk3 cA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcnrejp0s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 15:16:44 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38REdiol011469;
+	Wed, 27 Sep 2023 15:16:44 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcnrejnyw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 15:16:43 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38RDlpZW008192;
+	Wed, 27 Sep 2023 15:16:42 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tabbnce06-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 15:16:42 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RFGdGj27460316
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 27 Sep 2023 15:16:39 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5733420043;
+	Wed, 27 Sep 2023 15:16:39 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E06C20040;
+	Wed, 27 Sep 2023 15:16:39 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 27 Sep 2023 15:16:39 +0000 (GMT)
+Message-ID: <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
+Date: Wed, 27 Sep 2023 17:16:38 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
+ extension and loopback-ism
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: D3TzLw2NxL2MMA3iaphM9MHelsWsd5FI
+X-Proofpoint-ORIG-GUID: bDksIiKl37y27rHIoRyXx7P-b45IYNCI
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 4 URL's were un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-27_09,2023-09-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=629 mlxscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309270127
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Neal Cardwell <ncardwell@google.com>
 
-This commit fixes poor delayed ACK behavior that can cause poor TCP
-latency in a particular boundary condition: when an application makes
-a TCP socket write that is an exact multiple of the MSS size.
 
-The problem is that there is painful boundary discontinuity in the
-current delayed ACK behavior. With the current delayed ACK behavior,
-we have:
+On 24.09.23 17:16, Wen Gu wrote:
+> Wen Gu (18):
+>   net/smc: decouple ism_dev from SMC-D device dump
+>   net/smc: decouple ism_dev from SMC-D DMB registration
+>   net/smc: extract v2 check helper from SMC-D device registration
+>   net/smc: support SMCv2.x supplemental features negotiation
+>   net/smc: reserve CHID range for SMC-D virtual device
+>   net/smc: extend GID to 128bits only for virtual ISM device
+>   net/smc: disable SEID on non-s390 architecture
+>   net/smc: enable virtual ISM device feature bit
+>   net/smc: introduce SMC-D loopback device
+>   net/smc: implement ID-related operations of loopback
+>   net/smc: implement some unsupported operations of loopback
+>   net/smc: implement DMB-related operations of loopback
+>   net/smc: register loopback device as SMC-Dv2 device
+>   net/smc: add operation for getting DMB attribute
+>   net/smc: add operations for DMB attach and detach
+>   net/smc: avoid data copy from sndbuf to peer RMB in SMC-D
+>   net/smc: modify cursor update logic when sndbuf mapped to RMB
+>   net/smc: add interface implementation of loopback device
+> 
+>  drivers/s390/net/ism_drv.c    |  20 +-
+>  include/net/smc.h             |  32 ++-
+>  include/uapi/linux/smc.h      |   3 +
+>  include/uapi/linux/smc_diag.h |   2 +
+>  net/smc/Kconfig               |  13 ++
+>  net/smc/Makefile              |   2 +-
+>  net/smc/af_smc.c              |  88 ++++++--
+>  net/smc/smc.h                 |   7 +
+>  net/smc/smc_cdc.c             |  56 ++++-
+>  net/smc/smc_cdc.h             |   1 +
+>  net/smc/smc_clc.c             |  64 ++++--
+>  net/smc/smc_clc.h             |  10 +-
+>  net/smc/smc_core.c            | 111 +++++++++-
+>  net/smc/smc_core.h            |   9 +-
+>  net/smc/smc_diag.c            |  11 +-
+>  net/smc/smc_ism.c             | 100 ++++++---
+>  net/smc/smc_ism.h             |  24 ++-
+>  net/smc/smc_loopback.c        | 489 ++++++++++++++++++++++++++++++++++++++++++
+>  net/smc/smc_loopback.h        |  54 +++++
+>  net/smc/smc_pnet.c            |   4 +-
+>  20 files changed, 996 insertions(+), 104 deletions(-)
+>  create mode 100644 net/smc/smc_loopback.c
+>  create mode 100644 net/smc/smc_loopback.h
 
-(1) If an app reads > 1*MSS data, tcp_cleanup_rbuf() ACKs immediately
-    because of:
 
-     tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
+Hello Wen Gu,
 
-(2) If an app reads < 1*MSS data and either (a) app is not ping-pong or
-    (b) we received two packets <1*MSS, then tcp_cleanup_rbuf() ACKs
-    immediately beecause of:
+I applied and built your patches and noticed some things that you may want to consider in the next version:
 
-     ((icsk->icsk_ack.pending & ICSK_ACK_PUSHED2) ||
-      ((icsk->icsk_ack.pending & ICSK_ACK_PUSHED) &&
-       !inet_csk_in_pingpong_mode(sk))) &&
+Series should be split up [2]
 
-(3) *However*: if an app reads exactly 1*MSS of data,
-    tcp_cleanup_rbuf() does not send an immediate ACK. This is true
-    even if the app is not ping-pong and the 1*MSS of data had the PSH
-    bit set, suggesting the sending application completed an
-    application write.
+Several lines exceed 80 columns [1][3]
 
-Thus if the app is not ping-pong, we have this painful case where
->1*MSS gets an immediate ACK, and <1*MSS gets an immediate ACK, but a
-write whose last skb is an exact multiple of 1*MSS can get a 40ms
-delayed ACK. This means that any app that transfers data in one
-direction and takes care to align write size or packet size with MSS
-can suffer this problem. With receive zero copy making 4KB MSS values
-more common, it is becoming more common to have application writes
-naturally align with MSS, and more applications are likely to
-encounter this delayed ACK problem.
+'git clang-format HEAD~18' finds several formatting issues.
+	Maybe not all of them need to be fixed.
 
-The fix in this commit is to refine the delayed ACK heuristics with a
-simple check: immediately ACK a received 1*MSS skb with PSH bit set if
-the app reads all data. Why? If an skb has a len of exactly 1*MSS and
-has the PSH bit set then it is likely the end of an application
-write. So more data may not be arriving soon, and yet the data sender
-may be waiting for an ACK if cwnd-bound or using TX zero copy. Thus we
-set ICSK_ACK_PUSHED in this case so that tcp_cleanup_rbuf() will send
-an ACK immediately if the app reads all of the data and is not
-ping-pong. Note that this logic is also executed for the case where
-len > MSS, but in that case this logic does not matter (and does not
-hurt) because tcp_cleanup_rbuf() will always ACK immediately if the
-app reads data and there is more than an MSS of unACKed data.
+codespell *.patch
+0006-net-smc-extend-GID-to-128bits-only-for-virtual-ISM-d.patch:7: protocal ==> protocol
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Neal Cardwell <ncardwell@google.com>
-Reviewed-by: Yuchung Cheng <ycheng@google.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_input.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+With your patches applied I get some new warnings [4]:
+Seems there are some ntoh conversions missing
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 06fe1cf645d5a..8afb0950a6979 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -253,6 +253,19 @@ static void tcp_measure_rcv_mss(struct sock *sk, const struct sk_buff *skb)
- 		if (unlikely(len > icsk->icsk_ack.rcv_mss +
- 				   MAX_TCP_OPTION_SPACE))
- 			tcp_gro_dev_warn(sk, skb, len);
-+		/* If the skb has a len of exactly 1*MSS and has the PSH bit
-+		 * set then it is likely the end of an application write. So
-+		 * more data may not be arriving soon, and yet the data sender
-+		 * may be waiting for an ACK if cwnd-bound or using TX zero
-+		 * copy. So we set ICSK_ACK_PUSHED here so that
-+		 * tcp_cleanup_rbuf() will send an ACK immediately if the app
-+		 * reads all of the data and is not ping-pong. If len > MSS
-+		 * then this logic does not matter (and does not hurt) because
-+		 * tcp_cleanup_rbuf() will always ACK immediately if the app
-+		 * reads data and there is more than an MSS of unACKed data.
-+		 */
-+		if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_PSH)
-+			icsk->icsk_ack.pending |= ICSK_ACK_PUSHED;
- 	} else {
- 		/* Otherwise, we make more careful check taking into account,
- 		 * that SACKs block is variable.
--- 
-2.42.0.515.g380fc7ccd1-goog
+  CHECK   net/smc/af_smc.c
+net/smc/af_smc.c:723:32: warning: cast to restricted __be64
+net/smc/af_smc.c:1427:52: warning: cast to restricted __be64
+  CHECK   net/smc/smc_pnet.c
+  CHECK   net/smc/smc_ib.c
+  CHECK   net/smc/smc_clc.c
+net/smc/smc_clc.c:954:72: warning: incorrect type in argument 1 (different base types)
+net/smc/smc_clc.c:954:72:    expected unsigned short [usertype] chid
+net/smc/smc_clc.c:954:72:    got restricted __be16 [usertype] chid
+net/smc/smc_clc.c:1050:29: warning: incorrect type in assignment (different base types)
+net/smc/smc_clc.c:1050:29:    expected unsigned long long [usertype] gid
+net/smc/smc_clc.c:1050:29:    got restricted __be64 [usertype]
+net/smc/smc_clc.c:1051:31: warning: incorrect type in assignment (different base types)
+net/smc/smc_clc.c:1051:31:    expected unsigned long long [usertype] token
+net/smc/smc_clc.c:1051:31:    got restricted __be64 [usertype]
+
+
+[1] linux/Documentation/process/coding-style.rst
+[2] https://www.kernel.org/doc/html/v6.3/process/maintainer-netdev.html?highlight=network
+[3] scripts/checkpatch.pl --strict --max-line-length=80 --git HEAD-18
+[4] make C=2 CF=-D__CHECK_ENDIAN__ M=net/smc -Wunused-function -Wimplicit-fallthrough -Wincompatible-function-pointer-types-strict
+
+
+
+When I installed the patches, I noticed that 
+> smcd info
+showed an SEID, even though I had no ISM device --> good
+
+
+> smcd device
+FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+0000 0                   0000   Yes       2
+
+This needs some improvements.., but I'm not sure what is the best way to display virtual smcd interfaces in the smc-tools.
+
+
+I was able to do SMC transfers via the smcd-loopback feature :-D
+
 
 
