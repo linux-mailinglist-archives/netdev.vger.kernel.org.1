@@ -1,250 +1,178 @@
-Return-Path: <netdev+bounces-36514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765D67B0218
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:43:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4097D7B02C6
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 13:25:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9B75B1C2089C
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:43:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 7A029B20AAD
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2902F14288;
-	Wed, 27 Sep 2023 10:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8112C266DE;
+	Wed, 27 Sep 2023 11:25:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21286AA4
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 10:43:29 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7229139
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 03:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695811407; x=1727347407;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Dw23sqyuUWOc7PdWJTvKQS/VTXp5Khnn+koeSLqD4l4=;
-  b=W/cayy26e0YE71XEwTC37Hlea6OZZiVaYRz9cCYbhYhFFSbktVkLvCA4
-   H2/SblUlDsRMDjb5Ftl3FpdJSkNT68Eg9DMhtli8A6iwgn5RGsBKkfgCE
-   0tbkRrAvUK0ZEQlqodjI935Vbj4KzwPuss9mL04cpGu+cKITqXQXmwQFH
-   wY1KwEp46E821G+h8DRIihBZdHMRx0rcse/OU2dwcmDMGBB53tpiP/hHJ
-   WXswXBu0/mMrZ3+EWx703kekhZYa1ujHDFAQB5dWw/85EAUC43CHhvdqR
-   jY8ZqJgD4VWJZW78J9tXWHwoo0lYuYDtnfGAH7cacSnggzmWPTuRJUfla
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="412704676"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="412704676"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 03:43:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="922729569"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="922729569"
-Received: from unknown (HELO fedora.iind.intel.com) ([10.138.157.125])
-  by orsmga005.jf.intel.com with ESMTP; 27 Sep 2023 03:43:24 -0700
-From: Aniruddha Paul <aniruddha.paul@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: marcin.szycik@intel.com,
-	netdev@vger.kernel.org,
-	Aniruddha Paul <aniruddha.paul@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-next,v1] ice: Fix VF-VF filter rules in switchdev mode
-Date: Wed, 27 Sep 2023 16:12:53 +0530
-Message-Id: <20230927104253.1729049-1-aniruddha.paul@intel.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86B86D19
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:25:08 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72228F3;
+	Wed, 27 Sep 2023 04:25:07 -0700 (PDT)
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38RB8ZfJ023157;
+	Wed, 27 Sep 2023 11:24:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ukKTZnSC4IUGOzm2dwsJIW4yCSu7IaynshNH9BezX44=;
+ b=NffwGDkpt3O3XCbGuzhkAED5ru3+k0e8hiNyyXgfRIwZ3lTxVWxb8rXYkULNOlXcLckN
+ peMowhk4Biy57/wr4fgENcltJ6YfxhmWUPHYEBBypsLxcO64CCco1zwdg40ouswcqudn
+ H7TL36M9culsMFTc+GIRcQfvACTH7MuP52ejM4VBMtc24d5jan3WJcaTZ+H4yS5z2ES+
+ m7Wopyv89/pCV35iFmG0JtXwTt7S8o22ipoCs0bFZlLTYCy5qFW/itPEr3+/CRt5wRWS
+ kLDCNC5kx9KtA/1JrLGwY/4MsdZ7yGcVMMbUL9iPiiRR1nL55X1Gsw251vHHIWSZtRLj ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tchpmtjde-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 11:24:09 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38RBG0oQ030327;
+	Wed, 27 Sep 2023 11:24:09 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tchpmtjcq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 11:24:08 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38R9vgip030392;
+	Wed, 27 Sep 2023 11:24:07 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tad21tgsc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 27 Sep 2023 11:24:07 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RBO48i46203340
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 27 Sep 2023 11:24:04 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 080D320043;
+	Wed, 27 Sep 2023 11:24:04 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A7BC2004B;
+	Wed, 27 Sep 2023 11:24:03 +0000 (GMT)
+Received: from [9.152.212.236] (unknown [9.152.212.236])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 27 Sep 2023 11:24:03 +0000 (GMT)
+Message-ID: <b06a14de270a63050b0d027c24b333dba25001a4.camel@linux.ibm.com>
+Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and
+ optimized IOTLB flushing
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Joerg Roedel <joro@8bytes.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Robin
+ Murphy <robin.murphy@arm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Julian
+ Ruess <julianr@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Suravee
+ Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Hector Martin
+ <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig
+ <alyssa@rosenzweig.io>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu
+ <baolu.lu@linux.intel.com>, Andy Gross <agross@kernel.org>,
+        Bjorn Andersson
+ <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Yong Wu
+ <yong.wu@mediatek.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Orson Zhai
+ <orsonzhai@gmail.com>,
+        Baolin Wang <baolin.wang@linux.alibaba.com>,
+        Chunyan
+ Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec
+ <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Thierry
+ Reding <thierry.reding@gmail.com>,
+        Krishna Reddy <vdumpa@nvidia.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux.dev, asahi@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
+Date: Wed, 27 Sep 2023 13:24:03 +0200
+In-Reply-To: <ZRP8CiBui7suB5D6@8bytes.org>
+References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
+	 <ZRLy_AaJiXxZ2AfK@8bytes.org> <20230926160832.GM13795@ziepe.ca>
+	 <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
+	 <ZRP8CiBui7suB5D6@8bytes.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bLtkRXrEY3SfXBdyvYi4Yk-ISraKqz9W
+X-Proofpoint-ORIG-GUID: 0_s5ZArBvU0BtJm2m4rsOO0oeH2MXCgb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-27_06,2023-09-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ spamscore=0 mlxlogscore=646 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309270092
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Any packet leaving VSI i.e VF's VSI is considered as
-egress traffic by HW, thus failing to match the added
-rule.
+On Wed, 2023-09-27 at 11:55 +0200, Joerg Roedel wrote:
+> Hi Niklas,
+>=20
+> On Wed, Sep 27, 2023 at 10:55:23AM +0200, Niklas Schnelle wrote:
+> > The problem is that something seems to  be broken in the iommu/core
+> > branch. Regardless of whether I have my DMA API conversion on top or
+> > with the base iommu/core branch I can not use ConnectX-4 VFs.
+>=20
+> Have you already tried to bisect the issue in the iommu/core branch?
+> The result might sched some light on the issue.
+>=20
+> Regards,
+>=20
+> 	Joerg
 
-Mark the direction for redirect rules as below:
-1. VF-VF - Egress
-2. Uplink-VF - Ingress
-3. VF-Uplink - Egress
-4. Link_Partner-Uplink - Ingress
-5. Link_Partner-VF - Ingress
+Hi Joerg,
 
-Fixes: 0960a27bd479 ("ice: Add direction metadata")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Aniruddha Paul <aniruddha.paul@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 90 ++++++++++++++-------
- 1 file changed, 62 insertions(+), 28 deletions(-)
+Working on it, somehow I must have messed up earlier. It now looks like
+it might in fact be caused by my DMA API conversion rebase and the
+"s390/pci: Use dma-iommu layer" commit. Maybe there is some interaction
+with Jason's patches that I haven't thought about. So sorry for any
+wrong blame.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index 37b54db91df2..0e75fc6b3c06 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -630,32 +630,61 @@ bool ice_is_tunnel_supported(struct net_device *dev)
- 	return ice_tc_tun_get_type(dev) != TNL_LAST;
- }
- 
--static int
--ice_eswitch_tc_parse_action(struct ice_tc_flower_fltr *fltr,
--			    struct flow_action_entry *act)
-+static bool ice_tc_is_dev_uplink(struct net_device *dev)
-+{
-+	return netif_is_ice(dev) || ice_is_tunnel_supported(dev);
-+}
-+
-+static int ice_tc_setup_redirect_action(struct net_device *filter_dev,
-+					struct ice_tc_flower_fltr *fltr,
-+					struct net_device *target_dev)
- {
- 	struct ice_repr *repr;
- 
-+	fltr->action.fltr_act = ICE_FWD_TO_VSI;
-+
-+	if (ice_is_port_repr_netdev(filter_dev) &&
-+	    ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_is_port_repr_netdev(filter_dev) &&
-+		   ice_tc_is_dev_uplink(target_dev)) {
-+		repr = ice_netdev_to_repr(filter_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi->back->switchdev.uplink_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_tc_is_dev_uplink(filter_dev) &&
-+		   ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
-+	} else {
-+		NL_SET_ERR_MSG_MOD(fltr->extack,
-+				   "Unsupported netdevice in switchdev mode");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ice_eswitch_tc_parse_action(struct net_device *filter_dev,
-+				       struct ice_tc_flower_fltr *fltr,
-+				       struct flow_action_entry *act)
-+{
-+	int err;
-+
- 	switch (act->id) {
- 	case FLOW_ACTION_DROP:
- 		fltr->action.fltr_act = ICE_DROP_PACKET;
- 		break;
- 
- 	case FLOW_ACTION_REDIRECT:
--		fltr->action.fltr_act = ICE_FWD_TO_VSI;
--
--		if (ice_is_port_repr_netdev(act->dev)) {
--			repr = ice_netdev_to_repr(act->dev);
--
--			fltr->dest_vsi = repr->src_vsi;
--			fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
--		} else if (netif_is_ice(act->dev) ||
--			   ice_is_tunnel_supported(act->dev)) {
--			fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
--		} else {
--			NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported netdevice in switchdev mode");
--			return -EINVAL;
--		}
-+		err = ice_tc_setup_redirect_action(filter_dev, fltr, act->dev);
-+		if (err)
-+			return err;
- 
- 		break;
- 
-@@ -696,10 +725,6 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 		goto exit;
- 	}
- 
--	/* egress traffic is always redirect to uplink */
--	if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS)
--		fltr->dest_vsi = vsi->back->switchdev.uplink_vsi;
--
- 	rule_info.sw_act.fltr_act = fltr->action.fltr_act;
- 	if (fltr->action.fltr_act != ICE_DROP_PACKET)
- 		rule_info.sw_act.vsi_handle = fltr->dest_vsi->idx;
-@@ -713,13 +738,21 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 	rule_info.flags_info.act_valid = true;
- 
- 	if (fltr->direction == ICE_ESWITCH_FLTR_INGRESS) {
-+		/* Uplink to VF */
- 		rule_info.sw_act.flag |= ICE_FLTR_RX;
- 		rule_info.sw_act.src = hw->pf_id;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
--	} else {
-+	} else if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
-+		   fltr->dest_vsi == vsi->back->switchdev.uplink_vsi) {
-+		/* VF to Uplink */
- 		rule_info.sw_act.flag |= ICE_FLTR_TX;
- 		rule_info.sw_act.src = vsi->idx;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
-+	} else {
-+		/* VF to VF */
-+		rule_info.sw_act.flag |= ICE_FLTR_TX;
-+		rule_info.sw_act.src = vsi->idx;
-+		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
- 	}
- 
- 	/* specify the cookie as filter_rule_id */
-@@ -1745,16 +1778,17 @@ ice_tc_parse_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr,
- 
- /**
-  * ice_parse_tc_flower_actions - Parse the actions for a TC filter
-+ * @filter_dev: Pointer to device on which filter is being added
-  * @vsi: Pointer to VSI
-  * @cls_flower: Pointer to TC flower offload structure
-  * @fltr: Pointer to TC flower filter structure
-  *
-  * Parse the actions for a TC filter
-  */
--static int
--ice_parse_tc_flower_actions(struct ice_vsi *vsi,
--			    struct flow_cls_offload *cls_flower,
--			    struct ice_tc_flower_fltr *fltr)
-+static int ice_parse_tc_flower_actions(struct net_device *filter_dev,
-+				       struct ice_vsi *vsi,
-+				       struct flow_cls_offload *cls_flower,
-+				       struct ice_tc_flower_fltr *fltr)
- {
- 	struct flow_rule *rule = flow_cls_offload_flow_rule(cls_flower);
- 	struct flow_action *flow_action = &rule->action;
-@@ -1769,7 +1803,7 @@ ice_parse_tc_flower_actions(struct ice_vsi *vsi,
- 
- 	flow_action_for_each(i, act, flow_action) {
- 		if (ice_is_eswitch_mode_switchdev(vsi->back))
--			err = ice_eswitch_tc_parse_action(fltr, act);
-+			err = ice_eswitch_tc_parse_action(filter_dev, fltr, act);
- 		else
- 			err = ice_tc_parse_action(vsi, fltr, act);
- 		if (err)
-@@ -1856,7 +1890,7 @@ ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
- 	if (err < 0)
- 		goto err;
- 
--	err = ice_parse_tc_flower_actions(vsi, f, fltr);
-+	err = ice_parse_tc_flower_actions(netdev, vsi, f, fltr);
- 	if (err < 0)
- 		goto err;
- 
--- 
-2.40.1
-
+Thanks,
+Niklas
 
