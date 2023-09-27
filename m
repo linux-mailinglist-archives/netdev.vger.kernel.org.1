@@ -1,420 +1,156 @@
-Return-Path: <netdev+bounces-36494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E137AFFFD
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:27:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D757AFFE8
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:26:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 541CB281E58
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:27:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D9BD3281BFA
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27EE224DC;
-	Wed, 27 Sep 2023 09:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8684721101;
+	Wed, 27 Sep 2023 09:26:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C011121A04
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 09:27:30 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4405B194;
-	Wed, 27 Sep 2023 02:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695806848; x=1727342848;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uQQzqPksS02qnnap/mW0aZWT5FiVA4znGia14q3h/OQ=;
-  b=L5g8yxPdS9OjwdNhqSODQqZgN3TMQbbFrQ5RRNAbSHJyGFuFIkS29NPG
-   j+fDqqBqYesz9y5tZnMspoQICbgPZ7oM5JiZvWlOrrpKSiPoJnVhJ3n8X
-   P/eQBAQLemPIw161B+hjoNm/EYdoe+ZutfZE4X5y1B1nL4XtGEaU91MUw
-   tn5PDj4vLuHvhDxrU+fWbOIBlG6QlRLwb7hV1BDg6gbfD3DcSmr5+Amok
-   XI7RH8deQlLeoKHJaBYgDPJUFn1Ph0kYCEJFfrjTf1Of9b1clWtGbaMgz
-   P8hI99ET6TQidZJKCKNr0WuE9FQWt9Aq+pDsMxwYxKQYMb1MsLAcbieK+
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="412692394"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="412692394"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 02:27:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="778479331"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="778479331"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orsmga008.jf.intel.com with ESMTP; 27 Sep 2023 02:27:23 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net-next 4/4] ice: dpll: implement phase related callbacks
-Date: Wed, 27 Sep 2023 11:24:35 +0200
-Message-Id: <20230927092435.1565336-5-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
-References: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10AE1C2BA
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 09:26:28 +0000 (UTC)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24A64EB;
+	Wed, 27 Sep 2023 02:26:27 -0700 (PDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01C3F1FB;
+	Wed, 27 Sep 2023 02:27:05 -0700 (PDT)
+Received: from [10.57.0.175] (unknown [10.57.0.175])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE5E73F59C;
+	Wed, 27 Sep 2023 02:26:19 -0700 (PDT)
+Message-ID: <068aeebd-df24-5097-96e3-ebaaa7a763fd@arm.com>
+Date: Wed, 27 Sep 2023 10:26:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
+ IOTLB flushing
+Content-Language: en-GB
+To: Niklas Schnelle <schnelle@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Joerg Roedel <joro@8bytes.org>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+ Julian Ruess <julianr@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ Alexandra Winter <wintera@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
+ Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+ David Woodhouse <dwmw2@infradead.org>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>, Yong Wu <yong.wu@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+ Orson Zhai <orsonzhai@gmail.com>, Baolin Wang
+ <baolin.wang@linux.alibaba.com>, Chunyan Zhang <zhang.lyra@gmail.com>,
+ Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
+ Samuel Holland <samuel@sholland.org>,
+ Thierry Reding <thierry.reding@gmail.com>, Krishna Reddy
+ <vdumpa@nvidia.com>, Jonathan Hunter <jonathanh@nvidia.com>,
+ Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, iommu@lists.linux.dev,
+ asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-arm-msm@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org,
+ linux-doc@vger.kernel.org
+References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
+ <ZRLy_AaJiXxZ2AfK@8bytes.org> <20230926160832.GM13795@ziepe.ca>
+ <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement callback op related to phase-offset measurement for input pins
-to provide user with measured value.
-Implement callback ops related to phase-adjust get and set to allow
-the user with control over adjustable value of phase on pin's signal.
-Fill pin-adjust(-min/-max) limit values on pin-properties structure.
+On 2023-09-27 09:55, Niklas Schnelle wrote:
+> On Tue, 2023-09-26 at 13:08 -0300, Jason Gunthorpe wrote:
+>> On Tue, Sep 26, 2023 at 05:04:28PM +0200, Joerg Roedel wrote:
+>>> Hi Niklas,
+>>>
+>>> On Fri, Aug 25, 2023 at 12:11:15PM +0200, Niklas Schnelle wrote:
+>>>> Niklas Schnelle (6):
+>>>>        iommu: Allow .iotlb_sync_map to fail and handle s390's -ENOMEM return
+>>>>        s390/pci: prepare is_passed_through() for dma-iommu
+>>>>        s390/pci: Use dma-iommu layer
+>>>>        iommu/s390: Disable deferred flush for ISM devices
+>>>>        iommu/dma: Allow a single FQ in addition to per-CPU FQs
+>>>>        iommu/dma: Use a large flush queue and timeout for shadow_on_flush
+>>>
+>>> Turned out this series has non-trivial conflicts with Jasons
+>>> default-domain work so I had to remove it from the IOMMU tree for now.
+>>> Can you please rebase it to the latest iommu/core branch and re-send? I
+>>> will take it into the tree again then.
+>>
+>> Niklas, I think you just 'take yours' to resolve this. All the
+>> IOMMU_DOMAIN_PLATFORM related and .default_domain = parts should be
+>> removed. Let me know if you need anything
+>>
+>> Thanks,
+>> Jason
+> 
+> Hi Joerg, Hi Jason,
+> 
+> I've run into an unfortunate problem, not with the rebase itself but
+> with the iommu/core branch.
+> 
+> Jason is right, I basically need to just remove the platform ops and
+> .default_domain ops. This seems to work fine for an NVMe both in the
+> host and also when using the IOMMU with vfio-pci + KVM. I've already
+> pushed the result of that to my git.kernel.org:
+> https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/log/?h=b4/dma_iommu
+> 
+> The problem is that something seems to  be broken in the iommu/core
+> branch. Regardless of whether I have my DMA API conversion on top or
+> with the base iommu/core branch I can not use ConnectX-4 VFs.
+> 
+> # lspci
+> 111a:00:00.0 Ethernet controller: Mellanox Technologies MT27710 Family [ConnectX-4 Lx Virtual Function]
+> # dmesg | grep mlx
+> [    3.189749] mlx5_core 111a:00:00.0: mlx5_mdev_init:1802:(pid 464): Failed initializing cmdif SW structs, aborting
+> [    3.189783] mlx5_core: probe of 111a:00:00.0 failed with error -12
+> 
+> This same card works on v6.6-rc3 both with and without my DMA API
+> conversion patch series applied. Looking at mlx5_mdev_init() ->
+> mlx5_cmd_init(). The -ENOMEM seems to come from the following
+> dma_pool_create():
+> 
+> cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
+> 
+> I'll try to debug this further but wanted to let you know already in
+> case you have some ideas.
 
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_dpll.c | 224 +++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_dpll.h |  10 +-
- 2 files changed, 230 insertions(+), 4 deletions(-)
+I could imagine that potentially something in the initial default domain 
+conversion somehow interferes with the DMA ops in a way that ends up 
+causing alloc_cmd_page() to fail (maybe calling zpci_dma_init_device() 
+at the wrong point, or too many times?). FWIW I see nothing that would 
+obviously affect dma_pool_create() itself.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index 1faee9cb944d..6f7a2916f6c2 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -878,6 +878,203 @@ ice_dpll_output_direction(const struct dpll_pin *pin, void *pin_priv,
- 	return 0;
- }
- 
-+/**
-+ * ice_dpll_pin_phase_adjust_get - callback for get pin phase adjust value
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @phase_adjust: on success holds pin phase_adjust value
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for getting phase adjust value of a pin.
-+ *
-+ * Context: Acquires pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_pin_phase_adjust_get(const struct dpll_pin *pin, void *pin_priv,
-+			      const struct dpll_device *dpll, void *dpll_priv,
-+			      s32 *phase_adjust,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_pf *pf = p->pf;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	*phase_adjust = p->phase_adjust;
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_dpll_pin_phase_adjust_set - helper for setting a pin phase adjust value
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @phase_adjust: phase_adjust to be set
-+ * @extack: error reporting
-+ * @type: type of a pin
-+ *
-+ * Helper for dpll subsystem callback. Handler for setting phase adjust value
-+ * of a pin.
-+ *
-+ * Context: Acquires pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_pin_phase_adjust_set(const struct dpll_pin *pin, void *pin_priv,
-+			      const struct dpll_device *dpll, void *dpll_priv,
-+			      s32 phase_adjust,
-+			      struct netlink_ext_ack *extack,
-+			      enum ice_dpll_pin_type type)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
-+	u8 flag, flags_en = 0;
-+	int ret;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	if (phase_adjust == p->phase_adjust) {
-+		mutex_unlock(&pf->dplls.lock);
-+		return 0;
-+	}
-+	switch (type) {
-+	case ICE_DPLL_PIN_TYPE_INPUT:
-+		flag = ICE_AQC_SET_CGU_IN_CFG_FLG1_UPDATE_DELAY;
-+		if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN)
-+			flags_en |= ICE_AQC_SET_CGU_IN_CFG_FLG2_ESYNC_EN;
-+		if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_INPUT_EN)
-+			flags_en |= ICE_AQC_SET_CGU_IN_CFG_FLG2_INPUT_EN;
-+		ret = ice_aq_set_input_pin_cfg(&pf->hw, p->idx, flag, flags_en,
-+					       0, phase_adjust);
-+		break;
-+	case ICE_DPLL_PIN_TYPE_OUTPUT:
-+		flag = ICE_AQC_SET_CGU_OUT_CFG_UPDATE_PHASE;
-+		if (p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_OUT_EN)
-+			flag |= ICE_AQC_SET_CGU_OUT_CFG_OUT_EN;
-+		if (p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_EN)
-+			flag |= ICE_AQC_SET_CGU_OUT_CFG_ESYNC_EN;
-+		ret = ice_aq_set_output_pin_cfg(&pf->hw, p->idx, flag, 0, 0,
-+						phase_adjust);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+	}
-+	if (!ret)
-+		p->phase_adjust = phase_adjust;
-+	mutex_unlock(&pf->dplls.lock);
-+	if (ret)
-+		NL_SET_ERR_MSG_FMT(extack,
-+				   "err:%d %s failed to set pin phase_adjust:%d for pin:%u on dpll:%u\n",
-+				   ret,
-+				   ice_aq_str(pf->hw.adminq.sq_last_status),
-+				   phase_adjust, p->idx, d->dpll_idx);
-+
-+	return ret;
-+}
-+
-+/**
-+ * ice_dpll_input_phase_adjust_set - callback for set input pin phase adjust
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @phase_adjust: phase_adjust to be set
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Wraps a handler for setting phase adjust on input
-+ * pin.
-+ *
-+ * Context: Calls a function which acquires pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_input_phase_adjust_set(const struct dpll_pin *pin, void *pin_priv,
-+				const struct dpll_device *dpll, void *dpll_priv,
-+				s32 phase_adjust,
-+				struct netlink_ext_ack *extack)
-+{
-+	return ice_dpll_pin_phase_adjust_set(pin, pin_priv, dpll, dpll_priv,
-+					     phase_adjust, extack,
-+					     ICE_DPLL_PIN_TYPE_INPUT);
-+}
-+
-+/**
-+ * ice_dpll_output_phase_adjust_set - callback for set output pin phase adjust
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @phase_adjust: phase_adjust to be set
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Wraps a handler for setting phase adjust on output
-+ * pin.
-+ *
-+ * Context: Calls a function which acquires pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_output_phase_adjust_set(const struct dpll_pin *pin, void *pin_priv,
-+				 const struct dpll_device *dpll, void *dpll_priv,
-+				 s32 phase_adjust,
-+				 struct netlink_ext_ack *extack)
-+{
-+	return ice_dpll_pin_phase_adjust_set(pin, pin_priv, dpll, dpll_priv,
-+					     phase_adjust, extack,
-+					     ICE_DPLL_PIN_TYPE_OUTPUT);
-+}
-+
-+#define ICE_DPLL_PHASE_OFFSET_DIVIDER	100
-+#define ICE_DPLL_PHASE_OFFSET_FACTOR		\
-+	(DPLL_PHASE_OFFSET_DIVIDER / ICE_DPLL_PHASE_OFFSET_DIVIDER)
-+/**
-+ * ice_dpll_phase_offset_get - callback for get dpll phase shift value
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @dpll: registered dpll pointer
-+ * @dpll_priv: private data pointer passed on dpll registration
-+ * @phase_adjust: on success holds pin phase_adjust value
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for getting phase shift value between
-+ * dpll's input and output.
-+ *
-+ * Context: Acquires pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
-+			  const struct dpll_device *dpll, void *dpll_priv,
-+			  s64 *phase_offset, struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll *d = dpll_priv;
-+	struct ice_pf *pf = d->pf;
-+
-+	mutex_lock(&pf->dplls.lock);
-+	if (d->active_input == pin)
-+		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
-+	else
-+		*phase_offset = 0;
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_rclk_state_on_pin_set - set a state on rclk pin
-  * @pin: pointer to a pin
-@@ -993,6 +1190,9 @@ static const struct dpll_pin_ops ice_dpll_input_ops = {
- 	.prio_get = ice_dpll_input_prio_get,
- 	.prio_set = ice_dpll_input_prio_set,
- 	.direction_get = ice_dpll_input_direction,
-+	.phase_adjust_get = ice_dpll_pin_phase_adjust_get,
-+	.phase_adjust_set = ice_dpll_input_phase_adjust_set,
-+	.phase_offset_get = ice_dpll_phase_offset_get,
- };
- 
- static const struct dpll_pin_ops ice_dpll_output_ops = {
-@@ -1001,6 +1201,8 @@ static const struct dpll_pin_ops ice_dpll_output_ops = {
- 	.state_on_dpll_get = ice_dpll_output_state_get,
- 	.state_on_dpll_set = ice_dpll_output_state_set,
- 	.direction_get = ice_dpll_output_direction,
-+	.phase_adjust_get = ice_dpll_pin_phase_adjust_get,
-+	.phase_adjust_set = ice_dpll_output_phase_adjust_set,
- };
- 
- static const struct dpll_device_ops ice_dpll_ops = {
-@@ -1031,6 +1233,8 @@ static u64 ice_generate_clock_id(struct ice_pf *pf)
-  */
- static void ice_dpll_notify_changes(struct ice_dpll *d)
- {
-+	bool pin_notified = false;
-+
- 	if (d->prev_dpll_state != d->dpll_state) {
- 		d->prev_dpll_state = d->dpll_state;
- 		dpll_device_change_ntf(d->dpll);
-@@ -1039,7 +1243,14 @@ static void ice_dpll_notify_changes(struct ice_dpll *d)
- 		if (d->prev_input)
- 			dpll_pin_change_ntf(d->prev_input);
- 		d->prev_input = d->active_input;
--		if (d->active_input)
-+		if (d->active_input) {
-+			dpll_pin_change_ntf(d->active_input);
-+			pin_notified = true;
-+		}
-+	}
-+	if (d->prev_phase_offset != d->phase_offset) {
-+		d->prev_phase_offset = d->phase_offset;
-+		if (!pin_notified && d->active_input)
- 			dpll_pin_change_ntf(d->active_input);
- 	}
- }
-@@ -1065,7 +1276,7 @@ ice_dpll_update_state(struct ice_pf *pf, struct ice_dpll *d, bool init)
- 
- 	ret = ice_get_cgu_state(&pf->hw, d->dpll_idx, d->prev_dpll_state,
- 				&d->input_idx, &d->ref_state, &d->eec_mode,
--				&d->phase_shift, &d->dpll_state);
-+				&d->phase_offset, &d->dpll_state);
- 
- 	dev_dbg(ice_pf_to_dev(pf),
- 		"update dpll=%d, prev_src_idx:%u, src_idx:%u, state:%d, prev:%d mode:%d\n",
-@@ -1656,6 +1867,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 				return ret;
- 			pins[i].prop.capabilities |=
- 				DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE;
-+			pins[i].prop.phase_range.min =
-+				pf->dplls.input_phase_adj_max;
-+			pins[i].prop.phase_range.max =
-+				-pf->dplls.input_phase_adj_max;
-+		} else {
-+			pins[i].prop.phase_range.min =
-+				pf->dplls.output_phase_adj_max,
-+			pins[i].prop.phase_range.max =
-+				-pf->dplls.output_phase_adj_max;
- 		}
- 		pins[i].prop.capabilities |=
- 			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index 9c524c4bdfd7..5f23f82d31a9 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -19,6 +19,7 @@
-  * @state: state of a pin
-  * @prop: pin properties
-  * @freq: current frequency of a pin
-+ * @phase_adjust: current phase adjust value
-  */
- struct ice_dpll_pin {
- 	struct dpll_pin *pin;
-@@ -30,6 +31,7 @@ struct ice_dpll_pin {
- 	u8 state[ICE_DPLL_RCLK_NUM_MAX];
- 	struct dpll_pin_properties prop;
- 	u32 freq;
-+	s32 phase_adjust;
- };
- 
- /** ice_dpll - store info required for DPLL control
-@@ -40,7 +42,8 @@ struct ice_dpll_pin {
-  * @prev_input_idx: previously selected input index
-  * @ref_state: state of dpll reference signals
-  * @eec_mode: eec_mode dpll is configured for
-- * @phase_shift: phase shift delay of a dpll
-+ * @phase_offset: phase offset of active pin vs dpll signal
-+ * @prev_phase_offset: previous phase offset of active pin vs dpll signal
-  * @input_prio: priorities of each input
-  * @dpll_state: current dpll sync state
-  * @prev_dpll_state: last dpll sync state
-@@ -55,7 +58,8 @@ struct ice_dpll {
- 	u8 prev_input_idx;
- 	u8 ref_state;
- 	u8 eec_mode;
--	s64 phase_shift;
-+	s64 phase_offset;
-+	s64 prev_phase_offset;
- 	u8 *input_prio;
- 	enum dpll_lock_status dpll_state;
- 	enum dpll_lock_status prev_dpll_state;
-@@ -78,6 +82,8 @@ struct ice_dpll {
-  * @cgu_state_acq_err_num: number of errors returned during periodic work
-  * @base_rclk_idx: idx of first pin used for clock revocery pins
-  * @clock_id: clock_id of dplls
-+ * @input_phase_adj_max: max phase adjust value for an input pins
-+ * @output_phase_adj_max: max phase adjust value for an output pins
-  */
- struct ice_dplls {
- 	struct kthread_worker *kworker;
--- 
-2.38.1
+Robin.
 
+> Either way as it doesn't seem to be related
+> to the DMA API conversion I can sent that out again regardless if you
+> want, really don't want to miss another cycle.
+> 
+> Thanks,
+> Niklas
 
