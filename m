@@ -1,72 +1,88 @@
-Return-Path: <netdev+bounces-36489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E917AFFE9
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:26:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9647B0005
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id A33231C2087B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0092A281CB7
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B58210F9;
-	Wed, 27 Sep 2023 09:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EE6224DC;
+	Wed, 27 Sep 2023 09:27:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311AA1C2BA
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 09:26:34 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A207F3;
-	Wed, 27 Sep 2023 02:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=qfYeV0mrUskADI6kvUE3qnG1PQGSpjmorA6QIfYZs4E=; b=T0I0TLBW7+PUBIN/h5ANXCHLiI
-	okhgJ9NsFg/rdLas2o0yGamLfpYUCdOzttLZYJwMzStw1KteKcFykQN4GtztPZfHkBwGHdJ6/elbF
-	EDFWskh1i8J24IRoufVN/OUoUIUhUS3WkJ/9FmDnKUgxWC/kExEBSX/2tg6eW3e4fwqNyXdamM4er
-	EzgxL5bQnCckge9cdIhavxE7GYgKOKWrqDZ93xMKH2cUmWMNGONr+qYIxM3K8tFyHuDopFTDgWSZO
-	GS41L/NqK+jta2t2RCBZtoBmcR/lVPhMtkgOXJdxg9uukH6WAMgO/TU9sASogTbCKap9JHDArJo9T
-	PpZNXyRg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qlQoR-000T6Z-2P;
-	Wed, 27 Sep 2023 09:26:31 +0000
-Date: Wed, 27 Sep 2023 02:26:31 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-spdx@vger.kernel.org, Prarit Bhargava <prarit@redhat.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>, jschlst@samba.org
-Subject: Re: [PATCH] net: appletalk: remove cops support
-Message-ID: <ZRP1R65q43PZj7pc@infradead.org>
-References: <20230927090029.44704-2-gregkh@linuxfoundation.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F47821356;
+	Wed, 27 Sep 2023 09:27:53 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7971212A;
+	Wed, 27 Sep 2023 02:27:50 -0700 (PDT)
+Received: from canpemm500010.china.huawei.com (unknown [172.30.72.55])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RwWPV5H60ztT71;
+	Wed, 27 Sep 2023 17:23:26 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
+ (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 27 Sep
+ 2023 17:27:47 +0800
+From: Liu Jian <liujian56@huawei.com>
+To: <john.fastabend@gmail.com>, <jakub@cloudflare.com>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
+	<song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
+	<sdf@google.com>, <haoluo@google.com>, <jolsa@kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <dsahern@kernel.org>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <liujian56@huawei.com>
+Subject: [PATCH bpf-next v5 0/7] add BPF_F_PERMANENT flag for sockmap skmsg redirect
+Date: Wed, 27 Sep 2023 17:30:06 +0800
+Message-ID: <20230927093013.1951659-1-liujian56@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927090029.44704-2-gregkh@linuxfoundation.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ canpemm500010.china.huawei.com (7.192.105.118)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 11:00:30AM +0200, Greg Kroah-Hartman wrote:
-> The COPS Appletalk support is very old, never said to actually work
-> properly, and the firmware code for the devices are under a very suspect
-> license.  Remove it all to clear up the license issue, if it is still
-> needed and actually used by anyone, we can add it back later once the
-> license is cleared up.
+v4->v5: Fix one refcount bug caused by patch1.
+v3->v4: Change the two helpers's description.
+	Let BPF_F_PERMANENT takes precedence over apply/cork_bytes.
 
-Looks good:
+Liu Jian (7):
+  bpf, sockmap: add BPF_F_PERMANENT flag for skmsg redirect
+  selftests/bpf: Add txmsg permanently test for sockmap
+  selftests/bpf: Add txmsg redir permanently test for sockmap
+  selftests/bpf: add skmsg verdict tests
+  selftests/bpf: add two skmsg verdict tests for BPF_F_PERMANENT flag
+  selftests/bpf: add tests for verdict skmsg to itself
+  selftests/bpf: add tests for verdict skmsg to closed socket
 
-Acked-by: Christoph Hellwig <hch@lst.de>
+ include/linux/skmsg.h                         |   1 +
+ include/uapi/linux/bpf.h                      |  45 +++++--
+ net/core/skmsg.c                              |   6 +-
+ net/core/sock_map.c                           |   4 +-
+ net/ipv4/tcp_bpf.c                            |  12 +-
+ tools/include/uapi/linux/bpf.h                |  45 +++++--
+ .../selftests/bpf/prog_tests/sockmap_basic.c  | 122 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_kern.h   |   3 +-
+ .../bpf/progs/test_sockmap_msg_verdict.c      |  25 ++++
+ tools/testing/selftests/bpf/test_sockmap.c    |  41 +++++-
+ 10 files changed, 272 insertions(+), 32 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_msg_verdict.c
+
+-- 
+2.34.1
 
 
