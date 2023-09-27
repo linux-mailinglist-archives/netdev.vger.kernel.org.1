@@ -1,158 +1,241 @@
-Return-Path: <netdev+bounces-36611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE937B0BED
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:28:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AFC47B0C1A
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id A34BC1C209D4
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:28:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id B54AFB20BFD
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC9D4CFB0;
-	Wed, 27 Sep 2023 18:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4813B20B04;
+	Wed, 27 Sep 2023 18:44:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1344CFA9
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:28:10 +0000 (UTC)
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF820DD
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:28:08 -0700 (PDT)
-Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-57be74614c0so505195eaf.1
-        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:28:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695839288; x=1696444088; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iOy7sCbnNqQgGbvteCdWRECvuP3hTLAyMWSL0WbbTkM=;
-        b=IAvwteSFF+y0gsj2e2NOfnBTqHMtbIsSw6n6HeIwXF3v+1OwCadeRltFNDqSw9OQhX
-         F7TTC6lbfcy7X8Y4rrY01r7XW6bIw1ptEy/PHvmsIyDeV6pTlTumiapDcBZk6ED+68LH
-         PPsItMAcygJkgSLemDgrlQJdEJ26u0sdQSLQ8fM2rJUgluJRC41BaxuTkdsgLIiLb/zk
-         pPnFT77tcCWVr3nQAXfbTPO33xdAD0uwCItWs/W0hicCBCHy3rENdlbr12TJOhndkjFk
-         Tdkw2eF5n2PH8Er4HAOM+l64I4yiNIlY/zON3bf9fWgr25HZsYGVF4Zk4NTWrWpqL4cZ
-         0X6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695839288; x=1696444088;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iOy7sCbnNqQgGbvteCdWRECvuP3hTLAyMWSL0WbbTkM=;
-        b=ttBRBo9r0py6QkdvUbLh+qsUo/Bu5PBl87Bx541wwOW8XkCSwYLUj9MjeCjlKgu8HF
-         9gJrEWp71iq3qErYu4xBr0AqHnELzIN/MuZ7DlQ8aXgO0oaZjxpSKfQsxksXiAnjGN7U
-         Pxa3WjO8T7EK/BMWFD29tJ5gwwaR8bENx4VneMO8gqQKbvuQCUK71tSYmi9U8RLtz19U
-         i5VONvSDc6+KUvyqNx5WsTD8Tk9FCUqeSOTL3KZpnDr9tiFwZ/LoWZLGIZ2JHyPZLoeG
-         U2bmeVCJMrBtrRSLC0QesPrsa0xxYiBRcKFE75jBiMi0qqvG/hFp2dj0wCB288UdX10W
-         NyPw==
-X-Gm-Message-State: AOJu0YxF/r3XbxBnasvwv5mVUx0bh2zsiaUR46nwk96ASBm2V2LFDkO/
-	/s1Go/O4snChYKu6qY10inQ=
-X-Google-Smtp-Source: AGHT+IEAd54hFIbPv6Mq/SJitJHpP+h5loPQxf2z1XcvYoXEWQcC/Pa7qJPFlSZkSNlB9zYj/p+SGA==
-X-Received: by 2002:a05:6359:a1d:b0:147:4660:372 with SMTP id el29-20020a0563590a1d00b0014746600372mr2534666rwb.1.1695839287944;
-        Wed, 27 Sep 2023 11:28:07 -0700 (PDT)
-Received: from dmoe.c.googlers.com.com (25.11.145.34.bc.googleusercontent.com. [34.145.11.25])
-        by smtp.gmail.com with ESMTPSA id o9-20020a639a09000000b0056c2f1a2f6bsm11658599pge.41.2023.09.27.11.28.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 11:28:07 -0700 (PDT)
-From: David Morley <morleyd.kernel@gmail.com>
-To: David Miller <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC4915ACD
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:44:52 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897088F;
+	Wed, 27 Sep 2023 11:44:50 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 9A9F16017F;
+	Wed, 27 Sep 2023 20:44:45 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1695840285; bh=1qH0GP+R/GxKsrMPBQpHw00MqLdFqpwgjdZGJ+r6ZEA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sVT6Uh1gy/o/m8pM+U/ZhbrAwq2iy1TGXvfKXNyvYPYC+gYcATKMmdMvCtfxPoHQu
+	 b9HTSyQY/zEdRNOeXmc0HQ0Def+mA0RpFQ7d+y20bmLIL+o/c9377mwSVaj55EYBlR
+	 ViRQdpa65yDgZhA4OjQIouthiX+J5SLHM3SnEjC5x6QQY7P4IwC3io7XoPkm9atdwM
+	 U/CwCv6+YSzaHbRDN1I/36LZWKKd8xcwpi5qewle1UmHAI3fzQ5Gz+lIfhO1umGkY0
+	 x24x6pFBL5x2+SiiAveb4YsrjHIC6YXhnqWA+R2dUIOoxEB9sl19s5PHB1mhRh8FR7
+	 uYMN0bB6g8flQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id yD9YtxdCfPDu; Wed, 27 Sep 2023 20:44:42 +0200 (CEST)
+Received: from defiant.home (78-2-200-97.adsl.net.t-com.hr [78.2.200.97])
+	by domac.alu.hr (Postfix) with ESMTPSA id CD65260174;
+	Wed, 27 Sep 2023 20:44:41 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1695840282; bh=1qH0GP+R/GxKsrMPBQpHw00MqLdFqpwgjdZGJ+r6ZEA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EcAG9J8u9wKDk+Xcgc9K1XzL3IXinf4+1pXGuUc2emwv8uH1npi+6Z+cSmgyLcgKS
+	 geHdtDa6XP0B266Qr8IzwVts5iP0umKsyddtGukypt/O9iG5FkgvifN1oWj/meXifs
+	 z8so6vrK3OGZU/aUkep0ILj2NI31nIHPfvJoy8WgXxs2vLzyp2OL/gc9r5nG9492iv
+	 njsgG8doaX6aO0NRU2Web/GJhBa0QU3Q+ZC/nHQxfs7vA6RlDYr20SJP6aP3u84Pfb
+	 BLaFxMrB2Clg3woGJ92LQ871QeZ8OWE1BpgXdO9Mhd/x9I9ZvOYEM/R8QtWz9ZQJqm
+	 GPzxCTCkmUTFg==
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+To: Heiner Kallweit <hkallweit1@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
-	David Morley <morleyd@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Yuchung Cheng <ycheng@google.com>
-Subject: [PATCH net-next 2/2] tcp: change data receiver flowlabel after one dup
-Date: Wed, 27 Sep 2023 18:27:46 +0000
-Message-ID: <20230927182747.2005960-2-morleyd.kernel@gmail.com>
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-In-Reply-To: <20230927182747.2005960-1-morleyd.kernel@gmail.com>
-References: <20230927182747.2005960-1-morleyd.kernel@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Marco Elver <elver@google.com>
+Subject: [PATCH RFC v1 1/3] r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+Date: Wed, 27 Sep 2023 20:41:57 +0200
+Message-Id: <20230927184158.243575-1-mirsad.todorovac@alu.unizg.hr>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: David Morley <morleyd@google.com>
+KCSAN reported the following data-race:
 
-This commit changes the data receiver repath behavior to occur after
-receiving a single duplicate. This can help recover ACK connectivity
-quicker if a TLP was sent along a nonworking path.
+==================================================================
+BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
 
-For instance, consider the case where we have an initially nonworking
-forward path and reverse path and subsequently switch to only working
-forward paths. Before this patch we would have the following behavior.
+write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+sch_direct_xmit (net/sched/sch_generic.c:342)
+__dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+__ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+ip_finish_output (net/ipv4/ip_output.c:328)
+ip_output (net/ipv4/ip_output.c:435)
+ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+udp_send_skb (net/ipv4/udp.c:963)
+udp_sendmsg (net/ipv4/udp.c:1246)
+inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+sock_sendmsg (net/socket.c:730 net/socket.c:753)
+__sys_sendto (net/socket.c:2177)
+__x64_sys_sendto (net/socket.c:2185)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
 
-+---------+--------+--------+----------+----------+----------+
-| Event   | For FL | Rev FL | FP Works | RP Works | Data Del |
-+---------+--------+--------+----------+----------+----------+
-| Initial | A      | 1      | N        | N        | 0        |
-+---------+--------+--------+----------+----------+----------+
-| TLP     | A      | 1      | N        | N        | 0        |
-+---------+--------+--------+----------+----------+----------+
-| RTO 1   | B      | 1      | Y        | N        | 1        |
-+---------+--------+--------+----------+----------+----------+
-| RTO 2   | C      | 1      | Y        | N        | 2        |
-+---------+--------+--------+----------+----------+----------+
-| RTO 3   | D      | 2      | Y        | Y        | 3        |
-+---------+--------+--------+----------+----------+----------+
+read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+__napi_poll (net/core/dev.c:6527)
+net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+__do_softirq (kernel/softirq.c:553)
+__irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+irq_exit_rcu (kernel/softirq.c:647)
+common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+call_cpuidle (kernel/sched/idle.c:135)
+do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
 
-This patch gets rid of at least RTO 3, avoiding additional unnecessary
-repaths of a working forward path to a (potentially) nonworking one.
+value changed: 0x002f4815 -> 0x002f4816
 
-In addition, this commit changes the behavior to avoid repathing upon
-rx of duplicate data if the local endpoint is in CA_Loss (in which
-case the RTOs will already be changing the outgoing flowlabel).
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+==================================================================
 
-Signed-off-by: David Morley <morleyd@google.com>
-Signed-off-by: Neal Cardwell <ncardwell@google.com>
-Signed-off-by: Yuchung Cheng <ycheng@google.com>
-Tested-by: David Morley <morleyd@google.com>
+The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+==================
+   4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+   4252         smp_wmb();
+   4253
+ → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+   4255
+   4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+   4257                                                 R8169_TX_STOP_THRS,
+   4258                                                 R8169_TX_START_THRS);
+
+The read side is the function rtl_tx():
+
+   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+   4356                    int budget)
+   4357 {
+   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+   4359         struct sk_buff *skb;
+   4360
+   4361         dirty_tx = tp->dirty_tx;
+   4362
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+   4365                 u32 status;
+   4366
+   4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+   4368                 if (status & DescOwn)
+   4369                         break;
+   4370
+   4371                 skb = tp->tx_skb[entry].skb;
+   4372                 rtl8169_unmap_tx_skb(tp, entry);
+   4373
+   4374                 if (skb) {
+   4375                         pkts_compl++;
+   4376                         bytes_compl += skb->len;
+   4377                         napi_consume_skb(skb, budget);
+   4378                 }
+   4379                 dirty_tx++;
+   4380         }
+   4381
+   4382         if (tp->dirty_tx != dirty_tx) {
+   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+   4385
+   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+   4387                                               rtl_tx_slots_avail(tp),
+   4388                                               R8169_TX_START_THRS);
+   4389                 /*
+   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+   4391                  * too close. Let's kick an extra TxPoll request when a burst
+   4392                  * of start_xmit activity is detected (if it is not detected,
+   4393                  * it is slow enough). -- FR
+   4394                  * If skb is NULL then we come here again once a tx irq is
+   4395                  * triggered after the last fragment is marked transmitted.
+   4396                  */
+ → 4397                 if (tp->cur_tx != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+   4399         }
+   4400 }
+
+Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+line 4363:
+
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+
+but the same solution is required for protecting the other access to tp->cur_tx:
+
+ → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+
+The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+might have suffered read tearing under some compiler optimisations.
+
+The fix eliminated the KCSAN data-race report for this bug.
+
+It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+and line 4397. This test should certainly not be cached by the compiler in some register
+for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+4254 in the meantime.
+
+Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Marco Elver <elver@google.com>
+Cc: netdev@vger.kernel.org
+Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 ---
- net/ipv4/tcp_input.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+v1:
+ the initial patch proposal. fixes the KCSAN warning.
 
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index abe7494361c0..f77fbdb3103d 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4511,15 +4511,23 @@ static void tcp_rcv_spurious_retrans(struct sock *sk, const struct sk_buff *skb)
- {
- 	/* When the ACK path fails or drops most ACKs, the sender would
- 	 * timeout and spuriously retransmit the same segment repeatedly.
--	 * The receiver remembers and reflects via DSACKs. Leverage the
--	 * DSACK state and change the txhash to re-route speculatively.
-+	 * If it seems our ACKs are not reaching the other side,
-+	 * based on receiving a duplicate data segment with new flowlabel
-+	 * (suggesting the sender suffered an RTO), and we are not already
-+	 * repathing due to our own RTO, then rehash the socket to repath our
-+	 * packets.
- 	 */
--	if (TCP_SKB_CB(skb)->seq == tcp_sk(sk)->duplicate_sack[0].start_seq &&
-+#if IS_ENABLED(CONFIG_IPV6)
-+	if (inet_csk(sk)->icsk_ca_state != TCP_CA_Loss &&
-+	    skb->protocol == htons(ETH_P_IPV6) &&
-+	    (tcp_sk(sk)->inet_conn.icsk_ack.lrcv_flowlabel !=
-+	     ntohl(ip6_flowlabel(ipv6_hdr(skb)))) &&
- 	    sk_rethink_txhash(sk))
- 		NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPDUPLICATEDATAREHASH);
- 
- 	/* Save last flowlabel after a spurious retrans. */
- 	tcp_save_lrcv_flowlabel(sk, skb);
-+#endif
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 6351a2dc13bc..281aaa851847 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 * If skb is NULL then we come here again once a tx irq is
+ 		 * triggered after the last fragment is marked transmitted.
+ 		 */
+-		if (tp->cur_tx != dirty_tx && skb)
++		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
+ 	}
  }
- 
- static void tcp_send_dupack(struct sock *sk, const struct sk_buff *skb)
 -- 
-2.42.0.582.g8ccd20d70d-goog
+2.34.1
 
 
