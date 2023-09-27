@@ -1,147 +1,209 @@
-Return-Path: <netdev+bounces-36571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0BD7B096E
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 17:57:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64CC37B098C
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:03:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C0470281D20
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:57:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1601F281FD8
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEFC48EB5;
-	Wed, 27 Sep 2023 15:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4EC48EBA;
+	Wed, 27 Sep 2023 16:03:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7EC48EA5
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 15:57:39 +0000 (UTC)
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A35019C
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:57:38 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3af5b5d7e18so641805b6e.1
-        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:57:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0018111AB;
+	Wed, 27 Sep 2023 16:03:46 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6996491;
+	Wed, 27 Sep 2023 09:03:45 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9a64619d8fbso1481336066b.0;
+        Wed, 27 Sep 2023 09:03:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1695830257; x=1696435057; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U12JJAnjiahk1YYSHY2AOK7uoafy6UzrARbQWR95I14=;
-        b=bf2cz5qAyxBKuen4poe4AulrKtPhVsoYbGpbG87L6/WPrnH2OUdWaQMyL1qFw2LJFV
-         PGxYn/tUIqrbHPLFOCSTCOhB3IU1f2Yml2KnwFGBQGhQs4abfsooawFYQcKD1xPigsYM
-         UH9PDmXrOq3W4PL856fvR58aZd65waeoseMzw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695830257; x=1696435057;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1695830623; x=1696435423; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U12JJAnjiahk1YYSHY2AOK7uoafy6UzrARbQWR95I14=;
-        b=I1sp6BjTg2bVXBUcOhH43gvi8HvGh5rfi5uYA0tZtJ7mTuN1Vq8QqwBZGmVBgxH+Wt
-         lXqVItSHU5LmZ6Cxxso6HJCULWIMojW/Q0eTdkqLgrRzHzLhIJ1b8yxMYN6v+92Vtagz
-         /hR72613FjG4YMBwPnvT6OJ0NB0e19USnHSMezxhN3DM8cpWZdwdz0ffXLJKEoeiGrMG
-         VGEQCnfLGqfdor3ZIVjVVFcv71eZJhPJ6pt/lJ0DKuK2rOeDBteLjeY9IE9RQEBaH+8p
-         zGCm9HwM9alHWTsKrSTY1anAYreYLOfIWCb3a1FXgoHWKOqrkqYghmngV4WsxeXwIIXa
-         JaAQ==
-X-Gm-Message-State: AOJu0YxoMD111UZ8CI+5OVKFCmlU/N15TRz22xCqQbqbXQf4NWQhROqc
-	veoF/d6Uex73psqUqBpvENFSbw==
-X-Google-Smtp-Source: AGHT+IEwJW0cXq1CpxTK5Y460G4lfkt5QpcCMRT3yT0/yChvW5lXfO7XfXAcPyN2gr3gGMerxBJmgQ==
-X-Received: by 2002:a05:6808:1807:b0:3a0:5e17:4311 with SMTP id bh7-20020a056808180700b003a05e174311mr2931489oib.5.1695830257420;
-        Wed, 27 Sep 2023 08:57:37 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id bf25-20020a056a000d9900b00690ca4356f1sm11628516pfb.198.2023.09.27.08.57.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 08:57:36 -0700 (PDT)
-Date: Wed, 27 Sep 2023 08:57:36 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Alex Elder <elder@kernel.org>, Pravin B Shelar <pshelar@ovn.org>,
-	Shaokun Zhang <zhangshaokun@hisilicon.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dev@openvswitch.org, linux-parisc@vger.kernel.org,
-	llvm@lists.linux.dev, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 00/14] Batch 1: Annotate structs with __counted_by
-Message-ID: <202309270854.67756EAC2@keescook>
-References: <20230922172449.work.906-kees@kernel.org>
+        bh=Ji/hBwx8+isn2luTSLK88rkw0mw2KsvkgWhx3gQ5C1A=;
+        b=SuhKstCZCjlKLeIa600rlLEAIBrcuCWl0L8aA9A5Y/R5Vh7l1XAzDgDvQU/xp1MzEc
+         OM4WHogcpapx+OzKot0Rhk6pp1GkpuoqO9VSh0dRm8A6U5qz0CkHqp4au9llthiDOwC2
+         1qI1sI19jYrDOnab6UOVzuKqLisjlDA8T6QNkosRBTxaX1U4C+dvOCOEdbJjXQaR5+4Z
+         eaywyI6DGowJuMTYCLkVI/YSO3La+CQeZeBWPSKgZJ5ie//8ofXkPzLedKC/TzAlLKQw
+         3OmVQ97gG3Msg+FzyfcrXhJpJvOeVuzDWMer971YI2Jdr71/woUSn6x6+PHGgforGfLZ
+         hE9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695830623; x=1696435423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ji/hBwx8+isn2luTSLK88rkw0mw2KsvkgWhx3gQ5C1A=;
+        b=mybJGfBJNBulSrLOonQwGWTZJ9EmP9rSB/1KvK/rAy9kDyhyP6UCPvQkVW3K1AjJ+v
+         h0RNit61Ed8vsDu91om6h+FzdzukWzceX9vALdJGjdC/0Gyv9f7MUVtfUG7mnsTRj0Tg
+         kPg4zeaO6YvHEZV/ktCdIUj7rE8nWmMzWhHKiSnvLWfqwT40E1Ox5WacLplY2ns6Fvu3
+         m+X1jr4UBfUPq7XbDeClIo7KE+RBG3R2jdIiMuGR2lo1qeX21oRdabjiv0KkPicVutei
+         L1O7viUVRIBmZ1qQ+eWxdPI+4EUQQADHO2hYXQ/a0QdGDOoFh9qA9SJdriEpHZOY4zt8
+         nUTg==
+X-Gm-Message-State: AOJu0Yw+s68l320YPRXBRuGZiPAKso6W3KRMKMAY4p8vL7r9JV987Y38
+	4EivnJnlAonGnRzleypk9iJ+keJn+F81JVLT/fM=
+X-Google-Smtp-Source: AGHT+IG6yWhEHFsOWCaJgQIq+JART08DJ4Xp3AmdWnErHVXMsInwmUfTtgtJjxk6hR3l5zD2i1H8cIc+VQDdy/G+Ck4=
+X-Received: by 2002:a17:906:7494:b0:9ad:ece6:eeb with SMTP id
+ e20-20020a170906749400b009adece60eebmr1913065ejl.32.1695830623284; Wed, 27
+ Sep 2023 09:03:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230922172449.work.906-kees@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+References: <20230919214800.3803828-1-andrii@kernel.org> <20230919214800.3803828-4-andrii@kernel.org>
+ <20230926-augen-biodiesel-fdb05e859aac@brauner> <CAEf4BzaH64kkccc1P-hqQj6Mccr3Q6x059G=A95d=KfU=yBMJQ@mail.gmail.com>
+ <20230927-kaution-ventilator-33a41ee74d63@brauner>
+In-Reply-To: <20230927-kaution-ventilator-33a41ee74d63@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 27 Sep 2023 09:03:31 -0700
+Message-ID: <CAEf4BzZ2a7ZR75ka6bjXex=qrf9bQBEyDBN5tPtkfWbErhuOTw@mail.gmail.com>
+Subject: Re: [PATCH v5 bpf-next 03/13] bpf: introduce BPF token object
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	keescook@chromium.org, lennart@poettering.net, kernel-team@meta.com, 
+	sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 10:28:42AM -0700, Kees Cook wrote:
-> This is the batch 1 of patches touching netdev for preparing for
-> the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
-> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by to structs that would
-> benefit from the annotation.
-> 
-> Since the element count member must be set before accessing the annotated
-> flexible array member, some patches also move the member's initialization
-> earlier. (These are noted in the individual patches.)
+On Wed, Sep 27, 2023 at 2:52=E2=80=AFAM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> > > > +#define BPF_TOKEN_INODE_NAME "bpf-token"
+> > > > +
+> > > > +/* Alloc anon_inode and FD for prepared token.
+> > > > + * Returns fd >=3D 0 on success; negative error, otherwise.
+> > > > + */
+> > > > +int bpf_token_new_fd(struct bpf_token *token)
+> > > > +{
+> > > > +     return anon_inode_getfd(BPF_TOKEN_INODE_NAME, &bpf_token_fops=
+, token, O_CLOEXEC);
+> > >
+> > > It's unnecessary to use the anonymous inode infrastructure for bpf
+> > > tokens. It adds even more moving parts and makes reasoning about it e=
+ven
+> > > harder. Just keep it all in bpffs. IIRC, something like the following
+> > > (broken, non-compiling draft) should work:
+> > >
+> > > /* bpf_token_file - get an unlinked file living in bpffs */
+> > > struct file *bpf_token_file(...)
+> > > {
+> > >         inode =3D bpf_get_inode(bpffs_mnt->mnt_sb, dir, mode);
+> > >         inode->i_op =3D &bpf_token_iop;
+> > >         inode->i_fop =3D &bpf_token_fops;
+> > >
+> > >         // some other stuff you might want or need
+> > >
+> > >         res =3D alloc_file_pseudo(inode, bpffs_mnt, "bpf-token", O_RD=
+WR, &bpf_token_fops);
+> > > }
+> > >
+> > > Now set your private data that you might need, reserve an fd, install
+> > > the file into the fdtable and return the fd. You should have an unlin=
+ked
+> > > bpffs file that serves as your bpf token.
+> >
+> > Just to make sure I understand. You are saying that instead of having
+> > `struct bpf_token *` and passing that into internal APIs
+> > (bpf_token_capable() and bpf_token_allow_xxx()), I should just pass
+> > around `struct super_block *` representing BPF FS instance? Or `struct
+> > bpf_mount_opts *` maybe? Or 'struct vfsmount *'? (Any preferences
+> > here?). Is that right?
+>
+> No, that's not what I meant.
+>
+> So, what you're doing right now to create a bpf token file descriptor is:
+>
+> return anon_inode_getfd(BPF_TOKEN_INODE_NAME, &bpf_token_fops, token, O_C=
+LOEXEC);
+>
+> which is using the anonymous inode infrastructure. That is an entirely
+> different filesystems (glossing over details) that is best leveraged for
+> stuff like kvm fds and other stuff that doesn't need or have its own
+> filesytem implementation.
+>
+> But you do have your own filesystem implementation so why abuse another
+> one to create bpf token fds when they can just be created directly from
+> the bpffs instance.
+>
+> IOW, everything stays the same apart from the fact that bpf token fds
+> are actually file descriptors referring to a detached bpffs file instead
+> of an anonymous inode file. IOW, bpf tokens are actual bpffs objects
+> tied to a bpffs instance.
 
-Hi, just checking on this batch of changes. Is it possible to take the
-1-13 subset:
+Ah, ok, this is a much smaller change than what I was about to make.
+I'm glad I asked and thanks for elaborating! I'll use
+alloc_file_pseudo() using bpffs mount in the next revision.
 
-> Kees Cook (14):
->   ipv4: Annotate struct fib_info with __counted_by
->   ipv4/igmp: Annotate struct ip_sf_socklist with __counted_by
->   ipv6: Annotate struct ip6_sf_socklist with __counted_by
->   net: hns: Annotate struct ppe_common_cb with __counted_by
->   net: enetc: Annotate struct enetc_int_vector with __counted_by
->   net: hisilicon: Annotate struct rcb_common_cb with __counted_by
->   net: mana: Annotate struct mana_rxq with __counted_by
->   net: ipa: Annotate struct ipa_power with __counted_by
->   net: mana: Annotate struct hwc_dma_buf with __counted_by
->   net: openvswitch: Annotate struct dp_meter_instance with __counted_by
->   net: enetc: Annotate struct enetc_psfp_gate with __counted_by
->   net: openvswitch: Annotate struct dp_meter with __counted_by
->   net: tulip: Annotate struct mediatable with __counted_by
-
-I'll respin 14 and add it to the next batch:
-
->   net: sched: Annotate struct tc_pedit with __counted_by
-
-After these 13, there are  32 more patches to various drivers and
-protocols...
-
-Thanks!
-
--Kees
-
--- 
-Kees Cook
+>
+> **BROKEN BROKEN BROKEN AND UGLY**
+>
+> int bpf_token_create(union bpf_attr *attr)
+> {
+>         struct inode *inode;
+>         struct path path;
+>         struct bpf_mount_opts *mnt_opts;
+>         struct bpf_token *token;
+>         struct fd fd;
+>         int fd, ret;
+>         struct file *file;
+>
+>         fd =3D fdget(attr->token_create.bpffs_path_fd);
+>         if (!fd.file)
+>                 goto cleanup;
+>
+>         if (fd.file->f_path->dentry !=3D fd.file->f_path->dentry->d_sb->s=
+_root)
+>                 goto cleanup;
+>
+>         inode =3D bpf_get_inode(fd.file->f_path->mnt->mnt_sb, NULL, 12341=
+23412341234);
+>         if (!inode)
+>                 goto cleanup;
+>
+>         fd =3D get_unused_fd_flags(O_RDWR | O_CLOEXEC);
+>         if (fd < 0)
+>                 goto cleanup;
+>
+>         clear_nlink(inode); /* make sure it is unlinked */
+>
+>         file =3D alloc_file_pseudo(inode, fd.file->f_path->mnt, "bpf-toke=
+n", O_RDWR, &&bpf_token_fops);
+>         if (IS_ERR(file))
+>                 goto cleanup;
+>
+>         token =3D bpf_token_alloc();
+>         if (!token)
+>                 goto cleanup;
+>
+>         /* remember bpffs owning userns for future ns_capable() checks */
+>         token->userns =3D get_user_ns(path.dentry->d_sb->s_user_ns);
+>
+>         mnt_opts =3D path.dentry->d_sb->s_fs_info;
+>         token->allowed_cmds =3D mnt_opts->delegate_cmds;
+>         token->allowed_maps =3D mnt_opts->delegate_maps;
+>         token->allowed_progs =3D mnt_opts->delegate_progs;
+>         token->allowed_attachs =3D mnt_opts->delegate_attachs;
+>
+>         file->private_data =3D token;
+>         fd_install(fd, file);
+>         return fd;
+>
+> cleanup:
+>         // cleanup stuff here
+>         return -SOME_ERROR;
+> }
 
