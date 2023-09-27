@@ -1,123 +1,213 @@
-Return-Path: <netdev+bounces-36582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13C827B0A9F
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:47:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1C97B0AA3
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 81161281E30
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:47:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3B7372819A2
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8C64B20D;
-	Wed, 27 Sep 2023 16:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1AA431A79;
+	Wed, 27 Sep 2023 16:49:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3423E46A
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 16:47:39 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9186CEB;
-	Wed, 27 Sep 2023 09:47:37 -0700 (PDT)
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="366934607"
-X-IronPort-AV: E=Sophos;i="6.03,181,1694761200"; 
-   d="scan'208";a="366934607"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 09:47:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="922853712"
-X-IronPort-AV: E=Sophos;i="6.03,181,1694761200"; 
-   d="scan'208";a="922853712"
-Received: from pinksteam.jf.intel.com ([10.165.239.231])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 09:47:37 -0700
-From: joao@overdrivepizza.com
-To: pablo@netfilter.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	joao@overdrivepizza.com
-Cc: kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	rkannoth@marvell.com,
-	wojciech.drewek@intel.com,
-	steen.hegenlund@microhip.com,
-	keescook@chromium.org,
-	Joao Moreira <joao.moreira@intel.com>
-Subject: [PATCH v3 2/2] Make num_actions unsigned
-Date: Wed, 27 Sep 2023 09:47:15 -0700
-Message-ID: <20230927164715.76744-3-joao@overdrivepizza.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20230927164715.76744-1-joao@overdrivepizza.com>
-References: <20230927164715.76744-1-joao@overdrivepizza.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E2A15AC2
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 16:49:42 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095F692;
+	Wed, 27 Sep 2023 09:49:40 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B9E921BF20F;
+	Wed, 27 Sep 2023 16:49:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695833379;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e8L5ZWdpo4N4GFeHWJm5tH9g9V1bEgLFF4uB75vchXU=;
+	b=akPzOryUHEM0DKSx2WIXrrSm1KKhjjR9+gwyd6wYgWjWgduqjkKtYxh0STZMpZHvxvw4sk
+	/N5uKNJZ3QZHZ8MXGgrGCi0u1YOU40Op2ZbrK5rYX7zFeQfTGb5dz0/ebI2P9QUdXg2NGj
+	QCnwHuvx+qcgC30K9igZGDVt3yuMIKwkJbqMMuPXP0uaIn9OYZ8DQZMSl9aHh8G4XfWutx
+	fmUd6zVW1xUHWGixn36Pok+pfffJYUfGdDuQPsoA1hlR12fxrae57WpkUURRrk4HdVxpAS
+	BenLTn5W9mXZo0wA5/KtnYTH1Q3k21aFx7ZcpCHLdgX3F2Bfu6l7cYIgZ3WUVw==
+Date: Wed, 27 Sep 2023 18:49:32 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org, David Girault
+ <david.girault@qorvo.com>, Romuald Despres <romuald.despres@qorvo.com>,
+ Frederic Blain <frederic.blain@qorvo.com>, Nicolas Schodet
+ <nico@ni.fr.eu.org>, Guilhem Imberton <guilhem.imberton@qorvo.com>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v5 00/11] ieee802154: Associations between
+ devices
+Message-ID: <20230927184932.75398c98@xps-13>
+In-Reply-To: <20230927164714.128476-1-miquel.raynal@bootlin.com>
+References: <20230927164714.128476-1-miquel.raynal@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NEUTRAL autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Joao Moreira <joao.moreira@intel.com>
+Hello,
 
-Currently, in nft_flow_rule_create function, num_actions is a signed
-integer. Yet, it is processed within a loop which increments its
-value. To prevent an overflow from occurring, make it unsigned and
-also check if it reaches 256 when being incremented.
+Send e-mail failed in the middle of the operation because of
+connectivity issues, I'll resend the full thread later. Please ignore
+this.
 
-Accordingly to discussions around v2, 256 actions are more than enough
-for the frontend actions.
+Sorry for the noise,
+Miqu=C3=A8l
 
-After checking with maintainers, it was mentioned that front-end will
-cap the num_actions value and that it is not possible to reach such
-condition for an overflow. Yet, for correctness, it is still better to
-fix this.
+miquel.raynal@bootlin.com wrote on Wed, 27 Sep 2023
+18:47:03 +0200:
 
-This issue was observed by the commit author while reviewing a write-up
-regarding a CVE within the same subsystem [1].
-
-1 - https://nickgregory.me/post/2022/03/12/cve-2022-25636/
-
-Signed-off-by: Joao Moreira <joao.moreira@intel.com>
----
- net/netfilter/nf_tables_offload.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_offload.c
-index 12ab78fa5d84..9a86db1f0e07 100644
---- a/net/netfilter/nf_tables_offload.c
-+++ b/net/netfilter/nf_tables_offload.c
-@@ -90,7 +90,8 @@ struct nft_flow_rule *nft_flow_rule_create(struct net *net,
- {
- 	struct nft_offload_ctx *ctx;
- 	struct nft_flow_rule *flow;
--	int num_actions = 0, err;
-+	unsigned int num_actions = 0;
-+	int err;
- 	struct nft_expr *expr;
- 
- 	expr = nft_expr_first(rule);
-@@ -99,6 +100,10 @@ struct nft_flow_rule *nft_flow_rule_create(struct net *net,
- 		    expr->ops->offload_action(expr))
- 			num_actions++;
- 
-+		/* 2^8 is enough for frontend actions, avoid overflow */
-+		if (num_actions == 256)
-+			return ERR_PTR(-ENOMEM);
-+
- 		expr = nft_expr_next(expr);
- 	}
- 
--- 
-2.42.0
-
+> Hello,
+>=20
+> Now that we can discover our peer coordinators or make ourselves
+> dynamically discoverable, we may use the information about surrounding
+> devices to create PANs dynamically. This involves of course:
+> * Requesting an association to a coordinator, waiting for the response
+> * Sending a disassociation notification to a coordinator
+> * Receiving an association request when we are coordinator, answering
+>   the request (for now all devices are accepted up to a limit, to be
+>   refined)
+> * Sending a disassociation notification to a child
+> * Users may request the list of associated devices (the parent and the
+>   children).
+>=20
+> Here are a few example of userspace calls that can be made:
+> iwpan dev <dev> associate pan_id 2 coord $COORD
+> iwpan dev <dev> list_associations
+> iwpan dev <dev> disassociate ext_addr $COORD
+>=20
+> I used a small using hwsim to scan for a coordinator, associate with
+> it, look at the associations on both sides, disassociate from it and
+> check the associations again:
+> ./assoc-demo
+> *** Scan ***
+> PAN 0x0002 (on wpan1)
+> 	coordinator 0x060f3b35169a498f
+> 	page 0
+> 	channel 13
+> 	preamble code 0
+> 	mean prf 0
+> 	superframe spec. 0xcf11
+> 	LQI ff
+> *** End of scan ***
+> Associating wpan1 with coord0 0x060f3b35169a498f...
+> Dumping coord0 assoc:
+> child : 0x0b6f / 0xba7633ae47ccfb21
+> Dumping wpan1 assoc:
+> parent: 0xffff / 0x060f3b35169a498f
+> Disassociating from wpan1
+> Dumping coord0 assoc:
+> Dumping wpan1 assoc:
+>=20
+> I could also successfully interact with a smaller device running Zephir,
+> using its command line interface to associate and then disassociate from
+> the Linux coordinator.
+>=20
+> Thanks!
+> Miqu=C3=A8l
+>=20
+> Changes in v5:
+> * Fixed (again) the helper supposed to check whether a device requesting
+>   association/disassociation is already (or not) in our PAN. We don't
+>   nee to check short addresses there.
+> * Changed the name of the helper a second time to make it more relevant
+>   and understandable:
+>   cfg802154_device_in_pan() -> cfg802154_pan_device_is_matching()
+> * Fixed a kernel test robot report where we would use an int instead of
+>   a __le16. Solved that by using cpu_to_le16 like in the other places
+>   where we use definitions as arguments.
+>=20
+> Changes in v4:
+> * Ensured any disassociation would only be processed if the destination
+>   pan ID matches ours.
+> * Association requests should be made using extended addressing, it's
+>   the specification, so ensure this is true. Doing so helps reducing the
+>   checks down the road.
+> * Updated a copyright from 2021 to 2023.
+> * Improved the comment for cfg802154_device_in_pan() and only accept
+>   extended addressing when using this internal function because there is
+>   no point in checking short addresses here.
+> * Move nl802154_prepare_wpan_dev_dump() and
+>   nl802154_finish_wpan_dev_dump() outside of a
+>   CONFIG_IEEE802154_NL802154_EXPERIMENTAL #ifdef bloc as now used in
+>   regular code (not only experimental).
+> * Added a missing return value in the kernel doc of
+>   cfg802154_device_is_associated().
+>=20
+> Changes in v3:
+> * Clarify a helper which compares if two devices seem to be identical by
+>   adding two comments. This is a static function that is only used by
+>   the PAN management core to operate or not an
+>   association/disassociation request. In this helper, a new check is
+>   introduced to be sure we compare fields which have been populated.
+> * Dropped the "association_generation" counter and all its uses along
+>   the code. I tried to mimic some other counter but I agree it is not
+>   super useful and could be dropped anyway.
+> * Dropped a faulty sequence number hardcoded to 10. This had no impact
+>   because a few lines later the same entry was set to a valid value.
+>=20
+> Changes in v2:
+> * Drop the misleading IEEE802154_ADDR_LONG_BROADCAST definition and its
+>   only use which was useless anyway.
+> * Clarified how devices are defined when the user requests to associate
+>   with a coordinator: for now only the extended address of the
+>   coordinator is relevant so this is the only address we care about.
+> * Drop a useless NULL check before a kfree() call.
+> * Add a check when allocating a child short address: it must be
+>   different than ours.
+> * Rebased on top of v6.5.
+>=20
+>=20
+> Miquel Raynal (11):
+>   ieee802154: Let PAN IDs be reset
+>   ieee802154: Internal PAN management
+>   ieee802154: Add support for user association requests
+>   mac802154: Handle associating
+>   ieee802154: Add support for user disassociation requests
+>   mac802154: Handle disassociations
+>   mac802154: Handle association requests from peers
+>   ieee802154: Add support for limiting the number of associated devices
+>   mac802154: Follow the number of associated devices
+>   mac802154: Handle disassociation notifications from peers
+>   ieee802154: Give the user the association list
+>=20
+>  include/net/cfg802154.h         |  70 ++++++
+>  include/net/ieee802154_netdev.h |  60 +++++
+>  include/net/nl802154.h          |  22 +-
+>  net/ieee802154/Makefile         |   2 +-
+>  net/ieee802154/core.c           |  24 ++
+>  net/ieee802154/nl802154.c       | 225 +++++++++++++++++-
+>  net/ieee802154/pan.c            | 103 +++++++++
+>  net/ieee802154/rdev-ops.h       |  30 +++
+>  net/ieee802154/trace.h          |  38 +++
+>  net/mac802154/cfg.c             | 170 ++++++++++++++
+>  net/mac802154/ieee802154_i.h    |  27 +++
+>  net/mac802154/main.c            |   2 +
+>  net/mac802154/rx.c              |  25 ++
+>  net/mac802154/scan.c            | 397 ++++++++++++++++++++++++++++++++
+>  14 files changed, 1180 insertions(+), 15 deletions(-)
+>  create mode 100644 net/ieee802154/pan.c
+>=20
 
