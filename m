@@ -1,125 +1,200 @@
-Return-Path: <netdev+bounces-36509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48E607B011B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:55:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF6B7B0136
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 77A6EB20ACE
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:55:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3E9641C20856
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF441B269;
-	Wed, 27 Sep 2023 09:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38DD1241F8;
+	Wed, 27 Sep 2023 10:03:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862C29A5
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 09:55:39 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6E31A7;
-	Wed, 27 Sep 2023 02:55:37 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-405361bb9cdso107558995e9.0;
-        Wed, 27 Sep 2023 02:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695808535; x=1696413335; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/HYhwZ/7bxR1wXXL8tJKudSxvRyVwCadBP+II+DAtS8=;
-        b=XuptnEBF7hl1sQfLPXhbeyUPtD1ajiOeHYapuV185KYU8gzl5Iy9+jB3qvXUUlhfr5
-         8O5QVVu8pAyAAd3JGkV2TYbKCgJAXBVlvnXW1JwbEXNALx11mba2bSfypREUIg5Kft6C
-         is9gJGVlHHTlIg4RlS33naKxdxXYqBqe5S3BAZUXt++dum+8fue0DcRcoOzHfVje4Qf8
-         npPwyoaoexZNxWglqRVDuakZ+Pvyq62SoRibXlDFXFsQNMTu83tXbB6EvGn4bmV0TtJ8
-         MXiBEAoEZzghG5n00YOYH/tZiouhLpiK4Ys0p/jSbnfTdOipYPvQxVn6q9e8b671RgmL
-         4cKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695808535; x=1696413335;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/HYhwZ/7bxR1wXXL8tJKudSxvRyVwCadBP+II+DAtS8=;
-        b=LcLb2cRN3L+bFxLv3WcheCWY999j1MpSO4TJlFg7oW2SVOO/UEgiJ2cWu4qb9DjokJ
-         EY8g9yp2NY4eZdpvqISwzb297Z19KouIxJ2jwY2FYCk9qQk0YcKzSQk4GgHZSQCSVE9K
-         kKaO6XOsK7jDybv4mRO5eC/i016qTBjQydg9ioXJONt2reeKf+dSeQaW+iXIU88Xy1tC
-         ob/NuZUDBE7M2IsVbvhcp/0EeEK/0VXzkJFUnFkQnlHFvjxTGCzCnTjlEuj0LDW7x2br
-         Gizyf3R2XCIOE2MbfmmeFncCyU/DzHMs3T/LyLCW59eXyl61WYTMts954TkbtM/9ZYQJ
-         oZ6g==
-X-Gm-Message-State: AOJu0Yy70FRK2JGCavV56FEmY6hDJ3aERBCSfhuVILinAQ+zjuXTieqm
-	rVYuXnJ+n7OPKBrqXBjm5o8=
-X-Google-Smtp-Source: AGHT+IFjbKyRaaXwH6Cw/tAjqVxx4RVo2vtMmj/5lGv/qxpdVvrhcgHhsiOEDCC757jGv/sr3NmW0g==
-X-Received: by 2002:a05:600c:240a:b0:402:e6a2:c8c7 with SMTP id 10-20020a05600c240a00b00402e6a2c8c7mr1443000wmp.7.1695808535196;
-        Wed, 27 Sep 2023 02:55:35 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id z5-20020a7bc7c5000000b004060f0a0fd5sm4667343wmk.13.2023.09.27.02.55.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 02:55:34 -0700 (PDT)
-Message-ID: <6513fc16.7b0a0220.d972c.48cf@mx.google.com>
-X-Google-Original-Message-ID: <ZRP8FC7KLj4T4iKC@Ansuel-xps.>
-Date: Wed, 27 Sep 2023 11:55:32 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: sfp: add quirk for Fiberstone
- GPON-ONU-34-20BI
-References: <20230919124720.8210-1-ansuelsmth@gmail.com>
- <ZQmkv9o329m98CUG@shell.armlinux.org.uk>
- <5615a39b3402e7499fd531c928845e102fba6f1c.camel@redhat.com>
- <ZRP7FU3BglzFBfgX@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C160533F1
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 10:03:43 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762BEF3;
+	Wed, 27 Sep 2023 03:03:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=4pd2/n2780eiJB/dOK5SpuCHwElxjpXPNMC83G98Ob0=; t=1695809021; x=1697018621; 
+	b=gQfhHEAXomVuxB6e+irlQeKb85cSt44kvK63AQXPMF8/0legt1Fg8+HYdZi8Flu5uSTgvpaPNQm
+	4MgnVcoFx1NyQflJgfdqgby0DBHtLOxfhlC+5sC3zHsrUf+9LIq4c+dCBH3EqdOd3Quj0MYzwV4K+
+	ALe+F4moCOBDAjEQW4WZm+2OSwTjhKgoEvqkQUuudBtKi/rA9VaKJVEU2fFhpMZgaTDz2IssMIuLN
+	tbUSXhCwV2OIO119h53TAavJU4IUBK60aaGwADM3LOgMEDZuwb0labvzPOhJm4HLUa0DIhyvJjbax
+	XuU0zo5GUJvtQU6t0NULeMs+VkQswu4tV/jg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qlROM-007TqW-2D;
+	Wed, 27 Sep 2023 12:03:38 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: pull-request: wireless-2023-09-27
+Date: Wed, 27 Sep 2023 11:58:36 +0200
+Message-ID: <20230927095835.25803-2-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZRP7FU3BglzFBfgX@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 10:51:17AM +0100, Russell King (Oracle) wrote:
-> On Thu, Sep 21, 2023 at 04:40:45PM +0200, Paolo Abeni wrote:
-> > Hi Russel,
-> > 
-> > On Tue, 2023-09-19 at 14:40 +0100, Russell King (Oracle) wrote:
-> > > On Tue, Sep 19, 2023 at 02:47:20PM +0200, Christian Marangi wrote:
-> > > > Fiberstone GPON-ONU-34-20B can operate at 2500base-X, but report 1.2GBd
-> > > > NRZ in their EEPROM.
-> > > > 
-> > > > The module also require the ignore tx fault fixup similar to Huawei MA5671A
-> > > > as it gets disabled on error messages with serial redirection enabled.
-> > > 
-> > > I'll send you shortly a different approach for the "ignore tx fault"
-> > > thing that I'd like you to test please.
-> > 
-> > Said patch is not blocking this one, am I correct?
-> 
-> Correct, but Christian has not responded in any way despite me sending
-> him the patch that I'd like tested, which is very disappointing.
->
+Hi,
 
-I'm with you with the disappointment... I was helping a guy adding
-support for this upstream and then magically disappeared... Tried to
-send private email asking to test your followup patch but still no
-response... Sorry for not answering your email, was hoping to have a
-response and just give you a positive feedback but I think this won't
-come...
+Here's a first wireless fixes pull request for the 6.6 cycle.
+There are quite a number of fixes here.
 
-> This is what I fear - that merging his patch removes the incentive to
-> test my patch. Oh well, I guess I will just send my patch that I can't
-> test to be merged anyway, and to hell with it. If it breaks this and
-> other modules, I'm sure someone will eventually send a report about
-> that.
+Note that this has conflicts with wireless-next, which I guess
+then Stephen will report between net and wireless-next after
+this is pulled, rather than between wireless and wireless-next.
 
--- 
-	Ansuel
+I'm planning to merge wireless back into wireless-next once you
+pull it into net (just to make sure we don't have to respin)
+and resolve most of the conflicts, which will likely only leave
+a fairly trivial conflict in a staging driver when pulling it
+(wireless-next) into net-next, I can send that with a resolution
+attached.
+
+Please pull and let me know if there's any problem.
+
+Thanks,
+johannes
+
+
+
+The following changes since commit bd6c11bc43c496cddfc6cf603b5d45365606dbd5:
+
+  Merge tag 'net-next-6.6' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-08-29 11:33:01 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2023-09-27
+
+for you to fetch changes up to 22061bfc57fe08c77141dc876b4af75603c4d61d:
+
+  wifi: iwlwifi: mvm: Fix incorrect usage of scan API (2023-09-27 11:46:30 +0200)
+
+----------------------------------------------------------------
+Quite a collection of fixes this time, really too many
+to list individually. Many stack fixes, even rfkill
+(found by simulation and the new eevdf scheduler)!
+
+Also a bigger maintainers file cleanup, to remove old
+and redundant information.
+
+----------------------------------------------------------------
+Aditya Kumar Singh (1):
+      wifi: cfg80211: validate AP phy operation before starting it
+
+Arnd Bergmann (1):
+      wifi: iwlwifi: dbg_ini: fix structure packing
+
+Ben Greear (1):
+      wifi: iwlwifi: Ensure ack flag is properly cleared.
+
+Benjamin Berg (2):
+      wifi: cfg80211: avoid leaking stack data into trace
+      wifi: mac80211: Create resources for disabled links
+
+Christophe JAILLET (1):
+      wifi: iwlwifi: mvm: Fix a memory corruption issue
+
+Felix Fietkau (2):
+      wifi: mac80211: fix mesh id corruption on 32 bit systems
+      wifi: mt76: mt76x02: fix MT76x0 external LNA gain handling
+
+Gregory Greenman (1):
+      iwlwifi: mvm: handle PS changes in vif_cfg_changed
+
+Gustavo A. R. Silva (3):
+      wifi: mwifiex: Fix tlv_buf_left calculation
+      wifi: mwifiex: Replace one-element array with flexible-array member in struct mwifiex_ie_types_rxba_sync
+      wifi: mwifiex: Sanity check tlv_len and tlv_bitmap_len
+
+Ilan Peer (2):
+      wifi: cfg80211: Fix 6GHz scan configuration
+      wifi: iwlwifi: mvm: Fix incorrect usage of scan API
+
+Jeff Johnson (1):
+      MAINTAINERS: wifi: ath12k: add wiki link
+
+Johannes Berg (6):
+      wifi: cfg80211: fix cqm_config access race
+      wifi: cfg80211: add missing kernel-doc for cqm_rssi_work
+      rfkill: sync before userspace visibility/changes
+      wifi: mac80211: fix potential key use-after-free
+      wifi: mac80211: fix potential key leak
+      wifi: mac80211: work around Cisco AP 9115 VHT MPDU length
+
+Juerg Haefliger (1):
+      wifi: brcmfmac: Replace 1-element arrays with flexible arrays
+
+Kalle Valo (5):
+      MAINTAINERS: wifi: remove generic wiki links from drivers
+      MAINTAINERS: wifi: rtlwifi: remove git tree
+      MAINTAINERS: wifi: rtl8xxxu: remove git tree
+      MAINTAINERS: wifi: wl12xx: remove git tree
+      MAINTAINERS: wifi: hostap: remove maintainer and web page
+
+Lorenzo Bianconi (1):
+      wifi: mt76: fix lock dependency problem for wed_lock
+
+Pin-yen Lin (1):
+      wifi: mwifiex: Fix oob check condition in mwifiex_process_rx_packet
+
+Sascha Hauer (1):
+      wifi: rtw88: rtw8723d: Fix MAC address offset in EEPROM
+
+Wen Gong (2):
+      wifi: cfg80211/mac80211: hold link BSSes when assoc fails for MLO connection
+      wifi: mac80211: allow transmitting EAPOL frames with tainted key
+
+ MAINTAINERS                                        |  10 +-
+ .../broadcom/brcm80211/brcmfmac/fwil_types.h       |   9 +-
+ drivers/net/wireless/intel/iwlwifi/fw/error-dump.h |   6 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   2 +-
+ .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  | 115 ++++++++++----------
+ drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/tx.c        |   3 +
+ .../net/wireless/marvell/mwifiex/11n_rxreorder.c   |  22 +++-
+ drivers/net/wireless/marvell/mwifiex/fw.h          |   2 +-
+ drivers/net/wireless/marvell/mwifiex/sta_rx.c      |  16 +--
+ drivers/net/wireless/mediatek/mt76/dma.c           |   8 +-
+ .../net/wireless/mediatek/mt76/mt76x02_eeprom.c    |   7 --
+ drivers/net/wireless/mediatek/mt76/mt76x2/eeprom.c |  13 ++-
+ drivers/net/wireless/realtek/rtw88/rtw8723d.h      |   1 +
+ include/net/cfg80211.h                             |   6 +-
+ net/mac80211/cfg.c                                 |   6 +-
+ net/mac80211/ibss.c                                |   2 +-
+ net/mac80211/ieee80211_i.h                         |   3 +-
+ net/mac80211/key.c                                 |  22 ++--
+ net/mac80211/mesh.c                                |   8 +-
+ net/mac80211/mesh_plink.c                          |   2 +-
+ net/mac80211/mlme.c                                |  45 ++++++--
+ net/mac80211/tx.c                                  |   3 +-
+ net/mac80211/vht.c                                 |  16 ++-
+ net/rfkill/core.c                                  |  32 ++++--
+ net/wireless/core.c                                |  14 +--
+ net/wireless/core.h                                |   7 +-
+ net/wireless/mlme.c                                |   3 +-
+ net/wireless/nl80211.c                             | 116 +++++++++++++++------
+ net/wireless/scan.c                                |   4 +
+ 30 files changed, 331 insertions(+), 174 deletions(-)
+
 
