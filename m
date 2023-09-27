@@ -1,51 +1,67 @@
-Return-Path: <netdev+bounces-36516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79CD27B02F6
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 13:29:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1E27B036E
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 931AA1C2087B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 92B7E1C20842
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 12:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 415311D6B4;
-	Wed, 27 Sep 2023 11:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F142514AA9;
+	Wed, 27 Sep 2023 12:03:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2D83D64
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:29:36 +0000 (UTC)
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1577F180;
-	Wed, 27 Sep 2023 04:29:33 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38RBTKIp028294;
-	Wed, 27 Sep 2023 06:29:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1695814160;
-	bh=/uygrMTt+sS6fKj6H6SonG1Pv9RkLKarrN56GecG968=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Oodd9r3X4XG3ypLQwNcaz2MwI031FYdcqKdG33Xz8OQEaYJ5Rin3MxO6v1Z7XeCdi
-	 RjCwWHrfXy/dXMFJs8hyKV3jynq6R9W1dJzbgWJ6ZMKGtbr50riRdoiylGGjerkY2x
-	 V7KfZYRfNzpIfFpkorUwV1Anhl0M1PHALuuO0BlE=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38RBTKh6009677
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 27 Sep 2023 06:29:20 -0500
-Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 27
- Sep 2023 06:29:20 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 27 Sep 2023 06:29:20 -0500
-Received: from [10.250.135.44] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38RBTDeg067437;
-	Wed, 27 Sep 2023 06:29:14 -0500
-Message-ID: <20c88067-17f6-097b-be51-b6bf82cba619@ti.com>
-Date: Wed, 27 Sep 2023 14:29:12 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB482C9D
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 12:03:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEDC9FC
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 05:03:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695816190;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OIJdWPFNkLfDudtONt3WjWlis6fmp6gJVF1FOUUG9fU=;
+	b=dJ/V5CGeFo375LDmCLRFuQBwzQlU96E1RGWtDKZIEGxn+6Pili4+/ZBknZkUVYnajA8bWi
+	ulKq4jeuGzNmz59yQO27UkMSt9/knazeJuM4sy0Svj4fUWqGxP3rVxd5Fr+oO3HZXANuQK
+	44VpopSZGQ5u7428AxThkH1Nn0GbYZ0=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-okpOu4MBNR-slWFkax51QA-1; Wed, 27 Sep 2023 08:03:09 -0400
+X-MC-Unique: okpOu4MBNR-slWFkax51QA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-77407e21d49so1791223685a.0
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 05:03:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695816189; x=1696420989;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OIJdWPFNkLfDudtONt3WjWlis6fmp6gJVF1FOUUG9fU=;
+        b=a/s8C5fnzGJfucw+5IVDFWUpcTKMSRayGEV1KspTic7Sgdjro0DUqgtENEkVnwsQl2
+         zIGC+Xnj03bBHXCPZ3lL5UYZ9TaMn+konO49J14Q6j41vhK4SRO48c9f26247LSdibGw
+         KmC01DprXcNK60C+J4n0il7AoZLAzx7H1B52p3GRqvXZwrEBqXlxj+SghwznYafIWls/
+         mzPu0DQPRj+SUo4OAZw1QXrwcTfsi45IzLWAfw4FVSAxBjoWh7xDt8Ha8f3gf4IsFBW9
+         aT67IBfabey1lEWAMEys0W1tEjaF9+lQ7LYAzPMMSKH0K3YJxzp0Og+O+4tajmFatIsy
+         FxZg==
+X-Gm-Message-State: AOJu0YxKhd/8wpCLSSdGYBEss+M46roivBF/3/rpHifPWqV+GNzW91bb
+	OfvjUnF9cokA1L0ljzYy+T7U13rpokB3is9HMKL3H3l0JgahFXmm4jduEmReLOZekeAH6Z2AK4y
+	ERa9CsR43ej7TR8e2
+X-Received: by 2002:a05:620a:3885:b0:774:108a:b537 with SMTP id qp5-20020a05620a388500b00774108ab537mr1323439qkn.42.1695816188941;
+        Wed, 27 Sep 2023 05:03:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/e4xgrXENJoifhRKXLsQ1PlmJmOxOGeD34II+VIHXNNhkFbt7ctmSpSSOxYIwcBi5qLWAQQ==
+X-Received: by 2002:a05:620a:3885:b0:774:108a:b537 with SMTP id qp5-20020a05620a388500b00774108ab537mr1323395qkn.42.1695816188475;
+        Wed, 27 Sep 2023 05:03:08 -0700 (PDT)
+Received: from [10.16.200.42] (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id w15-20020ae9e50f000000b0077423f849c3sm3607412qkf.24.2023.09.27.05.03.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Sep 2023 05:03:07 -0700 (PDT)
+Message-ID: <2010c7a4-8754-2563-cd55-35bdd854d04e@redhat.com>
+Date: Wed, 27 Sep 2023 08:03:06 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,43 +69,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH 2/3 net] net: ti: icssg-prueth: Fix signedness bug in
- prueth_init_tx_chns()
+ Thunderbird/102.13.0
+Subject: Re: [PATCH] net: appletalk: remove cops support
 Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>,
-        Andrew Lunn
-	<andrew@lunn.ch>,
-        Grygorii Strashko <grygorii.strashko@ti.com>,
-        "Vignesh
- Raghavendra" <vigneshr@ti.com>, <netdev@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-References: <34770474-0345-4223-9c11-9039b74d03b4@moroto.mountain>
-From: Roger Quadros <rogerq@ti.com>
-In-Reply-To: <34770474-0345-4223-9c11-9039b74d03b4@moroto.mountain>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To: Christoph Hellwig <hch@infradead.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-spdx@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ jschlst@samba.org
+References: <20230927090029.44704-2-gregkh@linuxfoundation.org>
+ <ZRP1R65q43PZj7pc@infradead.org>
+From: Prarit Bhargava <prarit@redhat.com>
+In-Reply-To: <ZRP1R65q43PZj7pc@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 26.9.2023 17.05, Dan Carpenter wrote:
-> The "tx_chn->irq" variable is unsigned so the error checking does not
-> work correctly.
+On 9/27/23 05:26, Christoph Hellwig wrote:
+> On Wed, Sep 27, 2023 at 11:00:30AM +0200, Greg Kroah-Hartman wrote:
+>> The COPS Appletalk support is very old, never said to actually work
+>> properly, and the firmware code for the devices are under a very suspect
+>> license.  Remove it all to clear up the license issue, if it is still
+>> needed and actually used by anyone, we can add it back later once the
+>> license is cleared up.
 > 
-> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Looks good:
+> 
+> Acked-by: Christoph Hellwig <hch@lst.de>
+> 
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+Ditto.
+
+Acked-by: Prarit Bhargava <prarit@redhat.com>
+
+P.
+
 
