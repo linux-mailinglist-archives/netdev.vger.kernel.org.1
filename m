@@ -1,71 +1,120 @@
-Return-Path: <netdev+bounces-36424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A527AFB01
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:25:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 672047AFBAD
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 054DCB20901
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 06:25:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id B1DF4B20993
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FF11C289;
-	Wed, 27 Sep 2023 06:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8471C2AD;
+	Wed, 27 Sep 2023 07:08:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75C113FF1
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 06:25:22 +0000 (UTC)
-Received: from jari.cn (unknown [218.92.28.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0C0509C;
-	Tue, 26 Sep 2023 23:25:20 -0700 (PDT)
-Received: from chenguohua$jari.cn ( [182.148.12.64] ) by
- ajax-webmail-localhost.localdomain (Coremail) ; Wed, 27 Sep 2023 14:24:03
- +0800 (GMT+08:00)
-X-Originating-IP: [182.148.12.64]
-Date: Wed, 27 Sep 2023 14:24:03 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: chenguohua@jari.cn
-To: 3chas3@gmail.com
-Cc: linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] atm: Clean up errors in atm_tcp.h
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.1-cmXT6 build
- 20230419(ff23bf83) Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4e503810-ca60-4ec8-a188-7102c18937cf-zhkzyfz.cn
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9C32903
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 07:08:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2EF1BF
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 00:08:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1695798499;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4kaLfJmtB6MqdF1sxC45vDWpKHYD0ArvO2N0519Wf3c=;
+	b=KosUzUhHwJAOdYxTMf5qAJZNs9nM7CCReNDb6P1a7CPYun5N0wbXEGqzxpEd6NyTmI0wYQ
+	TM7FR6H6C0/44e+ng2I5+D4W1/WsBe9EFidN2ax8sFVVRkPNptBOgAp6LXUszBriB54WiL
+	sLv82i50aDizNQfBzXDSN82Qmp5df00=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-9-polHlrETPIugM8oCdkdXCA-1; Wed, 27 Sep 2023 03:08:16 -0400
+X-MC-Unique: polHlrETPIugM8oCdkdXCA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0605F3C0C4A0;
+	Wed, 27 Sep 2023 07:08:16 +0000 (UTC)
+Received: from [10.45.225.119] (unknown [10.45.225.119])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5D90D492B16;
+	Wed, 27 Sep 2023 07:08:14 +0000 (UTC)
+Message-ID: <16cc3132-9d2c-04de-51b6-88e4476b4d26@redhat.com>
+Date: Wed, 27 Sep 2023 09:08:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <32b04d0b.86a.18ad54f1174.Coremail.chenguohua@jari.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:AQAAfwBn+D2DyhNlPee9AA--.626W
-X-CM-SenderInfo: xfkh0w5xrk3tw6md2xgofq/1tbiAQAHEWUSpy8ANAAAsc
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=2.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_PBL,RDNS_NONE,T_SPF_HELO_PERMERROR,T_SPF_PERMERROR
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH net-next 7/9] i40e: Move memory allocation structures to
+ i40e_alloc.h
+Content-Language: en-US
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
+Cc: poros@redhat.com, mschmidt@redhat.com, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org
+References: <20230926182710.2517901-1-ivecera@redhat.com>
+ <20230926182710.2517901-8-ivecera@redhat.com>
+ <f17ed43b-7329-5566-a75e-befebd20d032@intel.com>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <f17ed43b-7329-5566-a75e-befebd20d032@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
+	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Rml4IHRoZSBmb2xsb3dpbmcgZXJyb3JzIHJlcG9ydGVkIGJ5IGNoZWNrcGF0Y2g6CgpFUlJPUjog
-c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCgpTaWduZWQtb2ZmLWJ5OiBH
-dW9IdWEgQ2hlbmcgPGNoZW5ndW9odWFAamFyaS5jbj4KLS0tCiBpbmNsdWRlL2xpbnV4L2F0bV90
-Y3AuaCB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigt
-KQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvYXRtX3RjcC5oIGIvaW5jbHVkZS9saW51eC9h
-dG1fdGNwLmgKaW5kZXggMjU1ODQzOWQ4NDliLi4yNjM1OTY1ZTg5ODIgMTAwNjQ0Ci0tLSBhL2lu
-Y2x1ZGUvbGludXgvYXRtX3RjcC5oCisrKyBiL2luY2x1ZGUvbGludXgvYXRtX3RjcC5oCkBAIC0x
-Myw3ICsxMyw3IEBAIHN0cnVjdCBhdG1fdmNjOwogc3RydWN0IG1vZHVsZTsKIAogc3RydWN0IGF0
-bV90Y3Bfb3BzIHsKLQlpbnQgKCphdHRhY2gpKHN0cnVjdCBhdG1fdmNjICp2Y2MsaW50IGl0Zik7
-CisJaW50ICgqYXR0YWNoKShzdHJ1Y3QgYXRtX3ZjYyAqdmNjLCBpbnQgaXRmKTsKIAlpbnQgKCpj
-cmVhdGVfcGVyc2lzdGVudCkoaW50IGl0Zik7CiAJaW50ICgqcmVtb3ZlX3BlcnNpc3RlbnQpKGlu
-dCBpdGYpOwogCXN0cnVjdCBtb2R1bGUgKm93bmVyOwotLSAKMi4xNy4xCg==
+
+
+On 26. 09. 23 21:57, Przemek Kitszel wrote:
+> On 9/26/23 20:27, Ivan Vecera wrote:
+>> Structures i40e_dma_mem & i40e_virt_mem are defined i40e_osdep.h while
+>> memory allocation functions that use them are declared in i40e_alloc.h
+>> Move them to i40e_alloc.h and remove this header file dependency on
+>> i40e_osdep.h header.
+>>
+>> Due to removal of this dependency we have to include i40e_osdep.h in 
+>> files
+>> that requires it.
+>>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>>   drivers/net/ethernet/intel/i40e/i40e_adminq.c |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_adminq.h |  2 +-
+>>   drivers/net/ethernet/intel/i40e/i40e_alloc.h  | 21 ++++++++++++++++++-
+>>   drivers/net/ethernet/intel/i40e/i40e_common.c |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_diag.c   |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_hmc.c    |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  2 +-
+>>   .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  1 +
+>>   drivers/net/ethernet/intel/i40e/i40e_osdep.h  | 19 -----------------
+>>   11 files changed, 29 insertions(+), 22 deletions(-)
+> 
+> I very much like this series, but extending i40e_osdep.h usage asks for 
+> comment 😉 - please try to reorder patches to have less dependency on it 
+> first, and afterwards do split
+> (IOW first remove&reduce, then split what's left)
+> 
+> (disclaimer: I have not double checked if that's possible)
+
+I will move the patch 5 after i40e_osdep split and memory allocation 
+clean-up patches. This should simplify the changes.
+
+Thanks for comment...
+
+Ivan
+
 
