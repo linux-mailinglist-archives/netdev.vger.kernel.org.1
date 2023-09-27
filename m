@@ -1,161 +1,149 @@
-Return-Path: <netdev+bounces-36502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585087B0015
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:28:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB8E7B0020
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 11:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DAF90282F96
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:28:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 8659BB20968
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31CB423768;
-	Wed, 27 Sep 2023 09:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD3423761;
+	Wed, 27 Sep 2023 09:30:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0240A262A3;
-	Wed, 27 Sep 2023 09:27:58 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79443EB;
-	Wed, 27 Sep 2023 02:27:56 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4RwWS26kzBzrTBL;
-	Wed, 27 Sep 2023 17:25:38 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by canpemm500010.china.huawei.com
- (7.192.105.118) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 27 Sep
- 2023 17:27:53 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <john.fastabend@gmail.com>, <jakub@cloudflare.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yonghong.song@linux.dev>, <kpsingh@kernel.org>,
-	<sdf@google.com>, <haoluo@google.com>, <jolsa@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>
-CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, <liujian56@huawei.com>
-Subject: [PATCH bpf-next v5 7/7] selftests/bpf: add tests for verdict skmsg to closed socket
-Date: Wed, 27 Sep 2023 17:30:13 +0800
-Message-ID: <20230927093013.1951659-8-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230927093013.1951659-1-liujian56@huawei.com>
-References: <20230927093013.1951659-1-liujian56@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D5813AF0
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 09:30:34 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734BAC0
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 02:30:32 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qlQs6-0006ea-UJ; Wed, 27 Sep 2023 11:30:18 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qlQs5-009JAV-Np; Wed, 27 Sep 2023 11:30:17 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 545D522990E;
+	Wed, 27 Sep 2023 09:30:17 +0000 (UTC)
+Date: Wed, 27 Sep 2023 11:30:16 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	=?utf-8?B?SsOpcsOpbWll?= Dautheribes <jeremie.dautheribes@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	sylvain.girard@se.com, pascal.eberhard@se.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] can: sja1000: Always restart the Tx queue after an
+ overrun
+Message-ID: <20230927-fantasize-refuse-7fef75242672-mkl@pengutronix.de>
+References: <20230922154727.591672-1-miquel.raynal@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dxm6ua2k77nc2p6g"
+Content-Disposition: inline
+In-Reply-To: <20230922154727.591672-1-miquel.raynal@bootlin.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
 
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
- 1 file changed, 34 insertions(+), 8 deletions(-)
+--dxm6ua2k77nc2p6g
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-index 1fcfa30720c6..dabea0997982 100644
---- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-@@ -476,9 +476,10 @@ static void test_sockmap_skb_verdict_fionread(bool pass_prog)
- 		test_sockmap_drop_prog__destroy(drop);
- }
- 
--static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self)
-+static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is_self,
-+				     bool target_shutdown)
- {
--	int key, sent, recvd, recv_fd;
-+	int key, sent, recvd, recv_fd, target_fd;
- 	int err, map, verdict, s, c0, c1, p0, p1;
- 	struct test_sockmap_msg_verdict *skel;
- 	char buf[256] = "0123456789";
-@@ -522,18 +523,22 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 		skel->bss->skmsg_redir_flags = BPF_F_INGRESS;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = p1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 1;
-+			target_fd = c1;
- 			recv_fd = c1;
- 		}
- 	} else {
- 		skel->bss->skmsg_redir_flags = 0;
- 		if (is_self) {
- 			skel->bss->skmsg_redir_key = 0;
-+			target_fd = p1;
- 			recv_fd = c1;
- 		} else {
- 			skel->bss->skmsg_redir_key = 2;
-+			target_fd = p0;
- 			recv_fd = c0;
- 		}
- 	}
-@@ -546,6 +551,19 @@ static void test_sockmap_msg_verdict(bool is_ingress, bool is_permanent, bool is
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
- 	ASSERT_EQ(recvd, sizeof(buf), "recv_timeout(recv_fd)");
- 
-+	if (target_shutdown) {
-+		signal(SIGPIPE, SIG_IGN);
-+		close(target_fd);
-+		sent = send(p1, &buf, sizeof(buf), 0);
-+		if (is_permanent) {
-+			ASSERT_EQ(sent, -1, "xsend(p1)");
-+			ASSERT_EQ(errno, EPIPE, "xsend(p1)");
-+		} else {
-+			ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
-+		}
-+		goto out_close;
-+	}
-+
- 	sent = xsend(p1, &buf, sizeof(buf), 0);
- 	ASSERT_EQ(sent, sizeof(buf), "xsend(p1)");
- 	recvd = recv_timeout(recv_fd, &buf, sizeof(buf), SOCK_NONBLOCK, IO_TIMEOUT_SEC);
-@@ -600,15 +618,23 @@ void test_sockmap_basic(void)
- 	if (test__start_subtest("sockmap skb_verdict fionread on drop"))
- 		test_sockmap_skb_verdict_fionread(false);
- 	if (test__start_subtest("sockmap msg_verdict"))
--		test_sockmap_msg_verdict(false, false, false);
-+		test_sockmap_msg_verdict(false, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress"))
--		test_sockmap_msg_verdict(true, false, false);
-+		test_sockmap_msg_verdict(true, false, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent"))
--		test_sockmap_msg_verdict(false, true, false);
-+		test_sockmap_msg_verdict(false, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent"))
--		test_sockmap_msg_verdict(true, true, false);
-+		test_sockmap_msg_verdict(true, true, false, false);
- 	if (test__start_subtest("sockmap msg_verdict permanent self"))
--		test_sockmap_msg_verdict(false, true, true);
-+		test_sockmap_msg_verdict(false, true, true, false);
- 	if (test__start_subtest("sockmap msg_verdict ingress permanent self"))
--		test_sockmap_msg_verdict(true, true, true);
-+		test_sockmap_msg_verdict(true, true, true, false);
-+	if (test__start_subtest("sockmap msg_verdict permanent shutdown"))
-+		test_sockmap_msg_verdict(false, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress permanent shutdown"))
-+		test_sockmap_msg_verdict(true, true, false, true);
-+	if (test__start_subtest("sockmap msg_verdict shutdown"))
-+		test_sockmap_msg_verdict(false, false, false, true);
-+	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
-+		test_sockmap_msg_verdict(true, false, false, true);
- }
--- 
-2.34.1
+On 22.09.2023 17:47:27, Miquel Raynal wrote:
+> Upstream commit 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with
+> a soft reset on Renesas SoCs") fixes an issue with Renesas own SJA1000
+> CAN controller reception: the Rx buffer is only 5 messages long, so when
+> the bus loaded (eg. a message every 50us), overrun may easily
+> happen. Upon an overrun situation, due to a possible internal crosstalk
+> situation, the controller enters a frozen state which only can be
+> unlocked with a soft reset (experimentally). The solution was to offload
+> a call to sja1000_start() in a threaded handler. This needs to happen in
+> process context as this operation requires to sleep. sja1000_start()
+> basically enters "reset mode", performs a proper software reset and
+> returns back into "normal mode".
+>=20
+> Since this fix was introduced, we no longer observe any stalls in
+> reception. However it was sporadically observed that the transmit path
+> would now freeze. Further investigation blamed the fix mentioned above,
+> and especially the reset operation. Reproducing the reset in a loop
+> helped identifying what could possibly go wrong. The sja1000 is a single
+> Tx queue device, which leverages the netdev helpers to process one Tx
+> message at a time. The logic is: the queue is stopped, the message sent
+> to the transceiver, once properly transmitted the controller sets a
+> status bit which triggers an interrupt, in the interrupt handler the
+> transmission status is checked and the queue woken up. Unfortunately, if
+> an overrun happens, we might perform the soft reset precisely between
+> the transmission of the buffer to the transceiver and the advent of the
+> transmission status bit. We would then stop the transmission operation
+> without re-enabling the queue, leading to all further transmissions to
+> be ignored.
+>=20
+> The reset interrupt can only happen while the device is "open", and
+> after a reset we anyway want to resume normal operations, no matter if a
+> packet to transmit got dropped in the process, so we shall wake up the
+> queue. Restarting the device and waking-up the queue is exactly what
+> sja1000_set_mode(CAN_MODE_START) does. In order to be consistent about
+> the queue state, we must acquire a lock both in the reset handler and in
+> the transmit path to ensure serialization of both operations. As the
+> reset handler might still be called after the transmission of a frame to
+> the transceiver but before it actually gets transmitted, we must ensure
+> we don't leak the skb, so we free it (the behavior is consistent, no
+> matter if there was an skb on the stack or not).
 
+Can you make use of netif_tx_disable() and netif_wake_queue() in
+sja1000_reset_interrupt() instead of the lock?
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--dxm6ua2k77nc2p6g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUT9iMACgkQvlAcSiqK
+BOj+Sgf9EFmkkY2TP/KQ/K5jYDPETjFgCqGsMLuc3LvUxZdp4gp0mW5uQaSi3WVR
+8R/2KoFOmJT2N0o/r6SZenLIPQ6HcyKEZNMb9cyFXuUnl9HnVFTkMXXdPCVlw2GR
+8zurqbmqeg5tdLAqp7oejzrZWNNm0za/OxmSCbfNkqo0k0rKB6vJgTkB8WVsdLzA
++U1vE+6EnVxW+t1o1++M18BjxOSLNPxqpbhVv5jHJea9DVbfDVH0bi8vg8uenTch
+oIvYwum5B/GToNZGZmrH/nxY6TmPh1AKvnYUueZQTAPb1vIdykpNPOOevf6MIw15
+1flC3WhQK2N8uwsl9lk8/oIBzZfKSQ==
+=pedi
+-----END PGP SIGNATURE-----
+
+--dxm6ua2k77nc2p6g--
 
