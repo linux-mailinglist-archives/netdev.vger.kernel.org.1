@@ -1,338 +1,495 @@
-Return-Path: <netdev+bounces-36536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EACC07B055A
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:27:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C847B057A
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 15:32:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 61B5EB20A0B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 13:27:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 798F9B20C81
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 13:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D2FA28DCC;
-	Wed, 27 Sep 2023 13:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1313328CD;
+	Wed, 27 Sep 2023 13:32:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7838C04
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 13:27:26 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB39011D
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 06:27:23 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9b1ebc80d0aso1109635766b.0
-        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 06:27:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695821242; x=1696426042; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qtdeMiCSUA42XqdTGIn8qU1ZmDRSv+rgZ+x8Os0VGew=;
-        b=W/Tr+CxZGOaVG8BaZLOQJVaOk0jt3BeuvCBcNfc0V3pHUt0uPp4/DoizV3ylZmXEGN
-         em4W59MvzfljQ3Phw1Z3aX8w9yOCwMPsZD6ME2d2H6Vqspd2PQsWIHE95/+rE+5VA7uD
-         5q1HeeXHMdT2odpDNa8HwtX50EmAXPJP0taaMup1HP0wwhrDclfAujBYKE4vQpEI4v/w
-         KemAa2D4hEcfUZ+tSkUOxtB1tusFXHu7G4w4eIJ0fzaXckTiBN8by3eZqpdTTAbczqjN
-         p1IHVrLKyok8qgCtG7oUILz4Pt8WPlFKw9gDPRBqKoMVNplxEnTvceKIaUTRLfWRSZOS
-         Aj1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695821242; x=1696426042;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qtdeMiCSUA42XqdTGIn8qU1ZmDRSv+rgZ+x8Os0VGew=;
-        b=HxPHcwiz3NhBqluk7FMzf6mfCvZpbkesxVZdi0Y6INyjwoJXXoNQW5v9PQqIY7kLJy
-         Z92kU7FcAqhYL84sUO7AGXDP08FRfWYVZxGPK4PNGcwQ6EAIIpa3umgSPABrx03QaxiR
-         aOGoAP8efUZb9CZP4v+ylayLCoY4EgFTTifx6s58W9FMS4aEALS9t8qdA9pkb0/1C9gR
-         d3SVzNUdUjOJJQJe70dnZXQ1E6TfueSPv74AqV04G6Bt1qUU8E/J2V2csZpjnxUe9tpt
-         qKrM7+1UZj8w+UYichVtJP0qNexoj+cEmpNcPmoynPngij0Cws3A/ckKO0t4x+flI8sd
-         bmxQ==
-X-Gm-Message-State: AOJu0Yyw2picbd1DUW4cSJLe7VDyAlT7hXP3DCvx41CFwKJccIm2V3jb
-	2ahUx0XwF7TJd9s6I9aCKjqTaA==
-X-Google-Smtp-Source: AGHT+IEG9HJ17DjMHwori0MJKhy5I50vAo2y+Pi/y0x/Y8Hfru1ANcSNgd9yVs29n4kp9nS6nQzGlQ==
-X-Received: by 2002:a17:907:1c8e:b0:9ae:76b4:c039 with SMTP id nb14-20020a1709071c8e00b009ae76b4c039mr2103456ejc.31.1695821242055;
-        Wed, 27 Sep 2023 06:27:22 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id gs10-20020a170906f18a00b009ae40563b7csm9278778ejb.21.2023.09.27.06.27.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Sep 2023 06:27:21 -0700 (PDT)
-Date: Wed, 27 Sep 2023 13:27:15 +0000
-From: Matt Bobrowski <mattbobrowski@google.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
-	Yonghong Song <yhs@fb.com>, Marek Majkowski <marek@cloudflare.com>,
-	Lorenz Bauer <lmb@cloudflare.com>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: bpf indirect calls
-Message-ID: <ZRQtsyYM810Oh4px@google.com>
-References: <157046883614.2092443.9861796174814370924.stgit@alrua-x1>
- <20191007204234.p2bh6sul2uakpmnp@ast-mbp.dhcp.thefacebook.com>
- <87sgo3lkx9.fsf@toke.dk>
- <20191009015117.pldowv6n3k5p3ghr@ast-mbp.dhcp.thefacebook.com>
- <87o8yqjqg0.fsf@toke.dk>
- <20191010044156.2hno4sszysu3c35g@ast-mbp.dhcp.thefacebook.com>
- <87v9srijxa.fsf@toke.dk>
- <20191016022849.weomgfdtep4aojpm@ast-mbp>
- <8736fshk7b.fsf@toke.dk>
- <20191019200939.kiwuaj7c4bg25vqs@ast-mbp>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CF2328D1
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 13:32:10 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D44139
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 06:32:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695821528; x=1727357528;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vYeJ3JEmDVs1DqJz8lHzS3cG6RUbDIwKE6BeGsDQTms=;
+  b=bHPH9Os8BEetUa0wAGLxF2XwwORQZhqH9bq0s8N7Hom80uwroDD2jKR6
+   tk2Q9h2t+yTdrz0traSJtZjZzRMwzHYIsHm39L2Ui65dFKVQg3Ys+hzQe
+   0BuGPUnP68JWl4F/WW8vMT2CF/bM9Q/eoZKstzMyMLZ+skvSvgO+mFila
+   OiFNzIXJrn9I/bnZFVUoMAv2VAvRoqmdJW0EcPxlwclObnM5TT+H9YHwK
+   v5IDqhBguaJLAS1DPhsTHGKOkjU/8uf8JyIQyYS2lnTklG39uY/aoyXTK
+   Dd9nqjnevkjsdMNAEUT9jgFi0chg7yOFu2b2s40FC/3D6w0Y83R37KUY1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="362076390"
+X-IronPort-AV: E=Sophos;i="6.03,181,1694761200"; 
+   d="scan'208";a="362076390"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 06:32:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10846"; a="864834204"
+X-IronPort-AV: E=Sophos;i="6.03,181,1694761200"; 
+   d="scan'208";a="864834204"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga002.fm.intel.com with ESMTP; 27 Sep 2023 06:32:03 -0700
+Received: from kord.igk.intel.com (kord.igk.intel.com [10.123.220.9])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id CEB02312E9;
+	Wed, 27 Sep 2023 14:32:02 +0100 (IST)
+From: Konrad Knitter <konrad.knitter@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Konrad Knitter <konrad.knitter@intel.com>,
+	Marcin Domagala <marcinx.domagala@intel.com>,
+	Eric Joyner <eric.joyner@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v1] ice: read internal temperature sensor
+Date: Wed, 27 Sep 2023 15:38:57 +0200
+Message-Id: <20230927133857.559432-1-konrad.knitter@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191019200939.kiwuaj7c4bg25vqs@ast-mbp>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 19, 2019 at 01:09:42PM -0700, Alexei Starovoitov wrote:
-> On Wed, Oct 16, 2019 at 03:51:52PM +0200, Toke Høiland-Jørgensen wrote:
-> > Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> > 
-> > > On Mon, Oct 14, 2019 at 02:35:45PM +0200, Toke Høiland-Jørgensen wrote:
-> > >> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> > >> 
-> > >> > On Wed, Oct 09, 2019 at 10:03:43AM +0200, Toke Høiland-Jørgensen wrote:
-> > >> >> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> > >> >> 
-> > >> >> > Please implement proper indirect calls and jumps.
-> > >> >> 
-> > >> >> I am still not convinced this will actually solve our problem; but OK, I
-> > >> >> can give it a shot.
-> > >> >
-> > >> > If you're not convinced let's talk about it first.
-> > >> >
-> > >> > Indirect calls is a building block for debugpoints.
-> > >> > Let's not call them tracepoints, because Linus banned any discusion
-> > >> > that includes that name.
-> > >> > The debugpoints is a way for BPF program to insert points in its
-> > >> > code to let external facility to do tracing and debugging.
-> > >> >
-> > >> > void (*debugpoint1)(struct xdp_buff *, int code);
-> > >> > void (*debugpoint2)(struct xdp_buff *);
-> > >> > void (*debugpoint3)(int len);
-> > >> 
-> > >> So how would these work? Similar to global variables (i.e., the loader
-> > >> creates a single-entry PROG_ARRAY map for each one)? Presumably with
-> > >> some BTF to validate the argument types?
-> > >> 
-> > >> So what would it take to actually support this? It doesn't quite sound
-> > >> trivial to add?
-> > >
-> > > Depends on definition of 'trivial' :)
-> > 
-> > Well, I don't know... :)
-> > 
-> > > The kernel has a luxury of waiting until clean solution is implemented
-> > > instead of resorting to hacks.
-> > 
-> > It would be helpful if you could give an opinion on what specific
-> > features are missing in the kernel to support these indirect calls. A
-> > few high-level sentences is fine (e.g., "the verifier needs to be able
-> > to do X, and llvm/libbpf needs to have support for Y")... I'm trying to
-> > gauge whether this is something it would even make sense for me to poke
-> > into, or if I'm better off waiting for someone who actually knows what
-> > they are doing to work on this :)
-> 
-> I have to reveal a secret first...
-> llvm supports indirect calls since 2017 ;)
-> 
-> It can compile the following:
-> struct trace_kfree_skb {
-> 	struct sk_buff *skb;
-> 	void *location;
-> };
-> 
-> typedef void (*fn)(struct sk_buff *skb);
-> static fn func;
-> 
-> SEC("tp_btf/kfree_skb")
-> int trace_kfree_skb(struct trace_kfree_skb *ctx)
-> {
-> 	struct sk_buff *skb = ctx->skb;
-> 	fn f = *(volatile fn *)&func;
-> 
-> 	if (f)
-> 		f(skb);
-> 	return 0;
-> }
-> 
-> into proper BPF assembly:
-> ; 	struct sk_buff *skb = ctx->skb;
->        0:	79 11 00 00 00 00 00 00	r1 = *(u64 *)(r1 + 0)
-> ; 	fn f = *(volatile fn *)&func;
->        1:	18 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00	r2 = 0 ll
->        3:	79 22 00 00 00 00 00 00	r2 = *(u64 *)(r2 + 0)
-> ; 	if (f)
->        4:	15 02 01 00 00 00 00 00	if r2 == 0 goto +1 <LBB0_2>
-> ; 		f(skb);
->        5:	8d 00 00 00 02 00 00 00	callx 2
-> 0000000000000030 LBB0_2:
-> ; 	return 0;
->        6:	b7 00 00 00 00 00 00 00	r0 = 0
->        7:	95 00 00 00 00 00 00 00	exit
-> 
-> Indirect call is encoded as JMP|CALL|X
-> Normal call is JMP|CALL|K
-> 
-> What's left to do is to teach the verifier to parse BTF of global data.
-> Then teach it to recognize that r2 at insn 1 is PTR_TO_BTF_ID
-> where btf_id is DATASEC '.bss'
-> Then load r2+0 is also PTR_TO_BTF_ID where btf_id is VAR 'func'.
-> New bool flag to reg_state is needed to tell whether if(rX==NULL) check
-> was completed.
-> Then at insn 5 the verifier will see that R2 is PTR_TO_BTF_ID and !NULL
-> and it's a pointer to a function.
-> Depending on function prototype the verifier would need to check that
-> R1's type match to arg1 of func proto.
-> For simplicity we don't need to deal with pointers to stack,
-> pointers to map, etc. Only PTR_TO_BTF_ID where btf_id is a kernel
-> data structure or scalar is enough to get a lot of mileage out of
-> this indirect call feature.
-> That's mostly it.
-> 
-> Few other safety checks would be needed to make sure that writes
-> into 'r2+0' are also of correct type.
-> We also need partial map_update bpf_sys command to populate
-> function pointer with another bpf program that has matching
-> function proto.
-> 
-> I think it's not trivial verifier work, but not hard either.
-> I'm happy to do it as soon as I find time to work on it.
+Since 4.30 firmware exposes internal thermal sensor reading via admin
+queue commands. Expose those readouts via hwmon API when supported.
 
-Alexei,
+Driver provides current reading from HW as well as device specific
+thresholds for thermal alarm (Warning, Critical, Fatal) events.
 
-Sorry to resurrect this incredibly old thread, but I was wondering
-whether BPF indirect calls are supported in the latest kernel
-versions?
+$ sensors
 
-I was performing some experiments within a BPF program today which
-leveraged indirect calls, but I was continuously running into BPF
-verifier errors, specifically errors related to an "unknown opcode 8d"
-being used within the BPF program. It turns out that the encoded
-opcode "8d" decodes to "BPF_JMP | BPF_CALL | BPF_X", which apparently
-is forbidden based on the bpf_opcode_in_insntable() check, but given
-this thread I wasn't exactly sure what the status was on indirect
-calls support?
+Output
+=========================================================
+ice-pci-b100
+Adapter: PCI adapter
+temp1:        +62.0Â°C  (high = +95.0Â°C, crit = +105.0Â°C)
+                       (emerg = +115.0Â°C)
 
-Note that the example BPF program that I was attempting to load on a
-6.4 kernel was as follows:
-```
-struct {
-  __uint(type, BPF_MAP_TYPE_ARRAY);
-  __type(key, u32);
-  __type(value, u64);
-  __uint(max_entries, 32);
-} map SEC(".maps");
+Co-developed-by: Marcin Domagala <marcinx.domagala@intel.com>
+Signed-off-by: Marcin Domagala <marcinx.domagala@intel.com>
+Co-developed-by: Eric Joyner <eric.joyner@intel.com>
+Signed-off-by: Eric Joyner <eric.joyner@intel.com>
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+---
+ drivers/net/ethernet/intel/ice/Makefile       |   1 +
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  28 ++++
+ drivers/net/ethernet/intel/ice/ice_common.c   |  57 +++++++-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_hwmon.c    | 126 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_hwmon.h    |   7 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   5 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
+ 9 files changed, 230 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.h
 
-static void testing(void) {
-  bpf_printk("testing");
-}
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 8757bec23fb3..b4c8f5303e57 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -36,6 +36,7 @@ ice-y := ice_main.o	\
+ 	 ice_repr.o	\
+ 	 ice_tc_lib.o	\
+ 	 ice_fwlog.o	\
++	 ice_hwmon.o	\
+ 	 ice_debugfs.o
+ ice-$(CONFIG_PCI_IOV) +=	\
+ 	ice_sriov.o		\
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 2d5fb9bec045..5a0413e126ed 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -648,6 +648,7 @@ struct ice_pf {
+ #define ICE_MAX_VF_AGG_NODES		32
+ 	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
+ 	struct ice_dplls dplls;
++	struct device *hwmon_dev;
+ };
+ 
+ extern struct workqueue_struct *ice_lag_wq;
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index eb4c13b754a4..a32f96dfea28 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -117,6 +117,7 @@ struct ice_aqc_list_caps_elem {
+ #define ICE_AQC_CAPS_NET_VER				0x004C
+ #define ICE_AQC_CAPS_PENDING_NET_VER			0x004D
+ #define ICE_AQC_CAPS_RDMA				0x0051
++#define ICE_AQC_CAPS_SENSOR_READING			0x0067
+ #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
+ #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
+ #define ICE_AQC_CAPS_NVM_MGMT				0x0080
+@@ -1375,6 +1376,30 @@ struct ice_aqc_get_phy_rec_clk_out {
+ 	__le16 node_handle;
+ };
+ 
++/* Get sensor reading (direct 0x0632) */
++struct ice_aqc_get_sensor_reading {
++	u8 sensor;
++	u8 format;
++	u8 reserved[6];
++	__le32 addr_high;
++	__le32 addr_low;
++};
++
++/* Get sensor reading response (direct 0x0632) */
++struct ice_aqc_get_sensor_reading_resp {
++	union {
++		u8 raw[8];
++		/* Output data for sensor 0x00, format 0x00 */
++		struct {
++			s8 temp;
++			u8 temp_warning_threshold;
++			u8 temp_critical_threshold;
++			u8 temp_fatal_threshold;
++			u8 reserved[4];
++		} s0f0;
++	} data;
++};
++
+ struct ice_aqc_link_topo_params {
+ 	u8 lport_num;
+ 	u8 lport_num_valid;
+@@ -2411,6 +2436,8 @@ struct ice_aq_desc {
+ 		struct ice_aqc_restart_an restart_an;
+ 		struct ice_aqc_set_phy_rec_clk_out set_phy_rec_clk_out;
+ 		struct ice_aqc_get_phy_rec_clk_out get_phy_rec_clk_out;
++		struct ice_aqc_get_sensor_reading get_sensor_reading;
++		struct ice_aqc_get_sensor_reading_resp get_sensor_reading_resp;
+ 		struct ice_aqc_gpio read_write_gpio;
+ 		struct ice_aqc_sff_eeprom read_write_sff_param;
+ 		struct ice_aqc_set_port_id_led set_port_id_led;
+@@ -2585,6 +2612,7 @@ enum ice_adminq_opc {
+ 	ice_aqc_opc_set_mac_lb				= 0x0620,
+ 	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
+ 	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
++	ice_aqc_opc_get_sensor_reading			= 0x0632,
+ 	ice_aqc_opc_get_link_topo			= 0x06E0,
+ 	ice_aqc_opc_read_i2c				= 0x06E2,
+ 	ice_aqc_opc_write_i2c				= 0x06E3,
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index d4e259b816b9..347008cecc23 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -2457,6 +2457,26 @@ ice_parse_fdir_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+ 		  dev_p->num_flow_director_fltr);
+ }
+ 
++/**
++ * ice_parse_sensor_reading_cap - Parse ICE_AQC_CAPS_SENSOR_READING cap
++ * @hw: pointer to the HW struct
++ * @dev_p: pointer to device capabilities structure
++ * @cap: capability element to parse
++ *
++ * Parse ICE_AQC_CAPS_SENSOR_READING for device capability for reading
++ * enabled sensors.
++ */
++static void
++ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
++			     struct ice_aqc_list_caps_elem *cap)
++{
++	dev_p->supported_sensors = le32_to_cpu(cap->number);
++
++	ice_debug(hw, ICE_DBG_INIT,
++		  "dev caps: supported sensors (bitmap) = 0x%x\n",
++		  dev_p->supported_sensors);
++}
++
+ /**
+  * ice_parse_dev_caps - Parse device capabilities
+  * @hw: pointer to the HW struct
+@@ -2502,9 +2522,12 @@ ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+ 		case ICE_AQC_CAPS_1588:
+ 			ice_parse_1588_dev_caps(hw, dev_p, &cap_resp[i]);
+ 			break;
+-		case  ICE_AQC_CAPS_FD:
++		case ICE_AQC_CAPS_FD:
+ 			ice_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
+ 			break;
++		case ICE_AQC_CAPS_SENSOR_READING:
++			ice_parse_sensor_reading_cap(hw, dev_p, &cap_resp[i]);
++			break;
+ 		default:
+ 			/* Don't list common capabilities as unknown */
+ 			if (!found)
+@@ -5299,6 +5322,38 @@ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
+ 	return status;
+ }
+ 
++/**
++ * ice_aq_get_sensor_reading
++ * @hw: pointer to the HW struct
++ * @sensor: sensor type
++ * @format: requested response format
++ * @data: pointer to data to be read from the sensor
++ *
++ * Get sensor reading (0x0632)
++ */
++int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
++			      struct ice_aqc_get_sensor_reading_resp *data)
++{
++	struct ice_aqc_get_sensor_reading *cmd;
++	struct ice_aq_desc desc;
++	int status;
++
++	if (!data)
++		return -EINVAL;
++
++	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sensor_reading);
++	cmd = &desc.params.get_sensor_reading;
++	cmd->sensor = sensor;
++	cmd->format = format;
++
++	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
++	if (!status)
++		memcpy(data, &desc.params.get_sensor_reading_resp,
++		       sizeof(*data));
++
++	return status;
++}
++
+ /**
+  * ice_replay_pre_init - replay pre initialization
+  * @hw: pointer to the HW struct
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 4a75c0c89301..e23787c17505 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -240,6 +240,8 @@ ice_aq_set_phy_rec_clk_out(struct ice_hw *hw, u8 phy_output, bool enable,
+ int
+ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
+ 			   u8 *flags, u16 *node_handle);
++int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
++			      struct ice_aqc_get_sensor_reading_resp *data);
+ void
+ ice_stat_update40(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
+ 		  u64 *prev_stat, u64 *cur_stat);
+diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.c b/drivers/net/ethernet/intel/ice/ice_hwmon.c
+new file mode 100644
+index 000000000000..7cc8055abfcc
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_hwmon.c
+@@ -0,0 +1,126 @@
++#include "ice.h"
++#include "ice_hwmon.h"
++#include "ice_adminq_cmd.h"
++
++#include <linux/hwmon.h>
++
++#define ICE_INTERNAL_TEMP_SENSOR 0
++#define ICE_INTERNAL_TEMP_SENSOR_FORMAT 0
++
++#define TEMP_FROM_REG(reg) ((reg) * 1000)
++
++static const struct hwmon_channel_info *ice_hwmon_info[] = {
++	HWMON_CHANNEL_INFO(temp,
++			   HWMON_T_INPUT | HWMON_T_MAX |
++			   HWMON_T_CRIT | HWMON_T_EMERGENCY),
++	NULL
++};
++
++static int ice_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
++			  u32 attr, int channel, long *val)
++{
++	struct ice_aqc_get_sensor_reading_resp resp;
++	struct ice_pf *pf = dev_get_drvdata(dev);
++	int ret;
++
++	if (type != hwmon_temp)
++		return -EOPNOTSUPP;
++
++	ret = ice_aq_get_sensor_reading(&pf->hw,
++					ICE_INTERNAL_TEMP_SENSOR,
++					ICE_INTERNAL_TEMP_SENSOR_FORMAT,
++					&resp);
++	if (ret) {
++		dev_warn(dev, "%s HW read failure (%d)\n", __func__, ret);
++		return ret;
++	}
++
++	switch (attr) {
++	case hwmon_temp_input:
++		*val = TEMP_FROM_REG(resp.data.s0f0.temp);
++		break;
++	case hwmon_temp_max:
++		*val = TEMP_FROM_REG(resp.data.s0f0.temp_warning_threshold);
++		break;
++	case hwmon_temp_crit:
++		*val = TEMP_FROM_REG(resp.data.s0f0.temp_critical_threshold);
++		break;
++	case hwmon_temp_emergency:
++		*val = TEMP_FROM_REG(resp.data.s0f0.temp_fatal_threshold);
++		break;
++	default:
++		dev_warn(dev, "%s unsupported attribute (%d)\n",
++			 __func__, attr);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static umode_t ice_hwmon_is_visible(const void *data,
++				    enum hwmon_sensor_types type, u32 attr,
++				    int channel)
++{
++	if (type != hwmon_temp)
++		return 0;
++
++	switch (attr) {
++	case hwmon_temp_input:
++	case hwmon_temp_crit:
++	case hwmon_temp_max:
++	case hwmon_temp_emergency:
++		return 0444;
++	}
++
++	return 0;
++}
++
++static const struct hwmon_ops ice_hwmon_ops = {
++	.is_visible = ice_hwmon_is_visible,
++	.read = ice_hwmon_read
++};
++
++static const struct hwmon_chip_info ice_chip_info = {
++	.ops = &ice_hwmon_ops,
++	.info = ice_hwmon_info
++};
++
++static bool ice_is_internal_reading_supported(struct ice_pf *pf)
++{
++	if (pf->hw.pf_id)
++		return false;
++
++	unsigned long sensors = pf->hw.dev_caps.supported_sensors;
++	if (!_test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors))
++		return false;
++
++	return true;
++};
++
++void ice_hwmon_init(struct ice_pf *pf)
++{
++	struct device *dev = ice_pf_to_dev(pf);
++	struct device *hdev;
++
++	if (!ice_is_internal_reading_supported(pf))
++		return;
++
++	hdev = hwmon_device_register_with_info(dev, "ice", pf, &ice_chip_info,
++					       NULL);
++	if (IS_ERR(hdev)) {
++		dev_warn(dev,
++			 "hwmon_device_register_with_info returns error (%ld)",
++			 PTR_ERR(hdev));
++		return;
++	}
++	pf->hwmon_dev = hdev;
++}
++
++void ice_hwmon_exit(struct ice_pf *pf)
++{
++	if (!ice_is_internal_reading_supported(pf))
++		return;
++	if (!pf->hwmon_dev)
++		return;
++	hwmon_device_unregister(pf->hwmon_dev);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.h b/drivers/net/ethernet/intel/ice/ice_hwmon.h
+new file mode 100644
+index 000000000000..f95d0f91503e
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_hwmon.h
+@@ -0,0 +1,7 @@
++#ifndef _ICE_HWMON_H_
++#define _ICE_HWMON_H_
++
++void ice_hwmon_init(struct ice_pf *pf);
++void ice_hwmon_exit(struct ice_pf *pf);
++
++#endif /* _ICE_HWMON_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 3363c69d49da..d49f67ea3d81 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -13,6 +13,7 @@
+ #include "ice_dcb_lib.h"
+ #include "ice_dcb_nl.h"
+ #include "ice_devlink.h"
++#include "ice_hwmon.h"
+ /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
+  * ice tracepoint functions. This must be done exactly once across the
+  * ice driver.
+@@ -4725,6 +4726,8 @@ static void ice_init_features(struct ice_pf *pf)
+ 
+ 	if (ice_init_lag(pf))
+ 		dev_warn(dev, "Failed to init link aggregation support\n");
++
++	ice_hwmon_init(pf);
+ }
+ 
+ static void ice_deinit_features(struct ice_pf *pf)
+@@ -5233,6 +5236,8 @@ static void ice_remove(struct pci_dev *pdev)
+ 		ice_free_vfs(pf);
+ 	}
+ 
++	ice_hwmon_exit(pf);
++
+ 	ice_service_task_stop(pf);
+ 	ice_aq_cancel_waiting_tasks(pf);
+ 	set_bit(ICE_DOWN, pf->state);
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index e68425bd0713..805c6aa67384 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -377,6 +377,8 @@ struct ice_hw_func_caps {
+ 	struct ice_ts_func_info ts_func_info;
+ };
+ 
++#define ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT	0
++
+ /* Device wide capabilities */
+ struct ice_hw_dev_caps {
+ 	struct ice_hw_common_caps common_cap;
+@@ -385,6 +387,8 @@ struct ice_hw_dev_caps {
+ 	u32 num_flow_director_fltr;	/* Number of FD filters available */
+ 	struct ice_ts_dev_info ts_dev_info;
+ 	u32 num_funcs;
++	/* bitmap of supported sensors */
++	u32 supported_sensors;
+ };
+ 
+ /* MAC info */
 
-struct iter_ctx {
-  void (*f) (void);
-};
-static u64 iter_callback(struct bpf_map *map, u32 *key,
-                         u64 *value, struct iter_ctx *ctx) {
-  if (ctx->f) {
-    ctx->f();
-  }
-  return 0;
-}
+base-commit: 85b90747fa80e6b5daae9fc82240dbfff869ef1e
+-- 
+2.35.3
 
-SEC("lsm.s/file_open")
-int BPF_PROG(file_open, struct file *file)
-{
-  struct iter_ctx iter_ctx = {
-    .f = testing,
-  };
-  bpf_for_each_map_elem(&map, iter_callback, &iter_ctx, 0);
-  return 0;
-}
-```
-
-This BPF program produced the following disassembly:
-```
-0000000000000000 <testing>:
-       0:       18 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r1 = 0x0 ll
-       2:       b7 02 00 00 08 00 00 00 r2 = 0x8
-       3:       85 00 00 00 06 00 00 00 call 0x6
-       4:       95 00 00 00 00 00 00 00 exit
-
-0000000000000028 <iter_callback>:
-       5:       79 41 00 00 00 00 00 00 r1 = *(u64 *)(r4 + 0x0)
-       6:       15 01 01 00 00 00 00 00 if r1 == 0x0 goto +0x1 <LBB2_2>
-       7:       8d 00 00 00 01 00 00 00 callx r1
-
-0000000000000040 <LBB2_2>:
-       8:       b7 00 00 00 00 00 00 00 r0 = 0x0
-       9:       95 00 00 00 00 00 00 00 exit
-
-Disassembly of section lsm.s/file_open:
-
-0000000000000000 <file_open>:
-       0:       18 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r1 = 0x0 ll
-       2:       7b 1a f8 ff 00 00 00 00 *(u64 *)(r10 - 0x8) = r1
-       3:       bf a3 00 00 00 00 00 00 r3 = r10
-       4:       07 03 00 00 f8 ff ff ff r3 += -0x8
-       5:       18 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r1 = 0x0 ll
-       7:       18 02 00 00 28 00 00 00 00 00 00 00 00 00 00 00 r2 = 0x28 ll
-       9:       b7 04 00 00 00 00 00 00 r4 = 0x0
-      10:       85 00 00 00 a4 00 00 00 call 0xa4
-      11:       b7 00 00 00 00 00 00 00 r0 = 0x0
-      12:       95 00 00 00 00 00 00 00 exit
-```
-
-What's interesting though is that with a somewhat similar BPF program
-which made use of indirect calls, the BPF verifier generated no errors:
-
-```
-static __attribute__((noinline)) void testing(void) {
-  bpf_printk("testing");
-}
-
-SEC("lsm.s/file_open")
-int BPF_PROG(file_open, struct file *file)
-{
-  void (*f) (void) = testing;
-  f();
-  return 0;
-}
-```
-
-This BPF program produced the following disassembly:
-```
-0000000000000000 <testing>:
-       0:       18 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 r1 = 0x0 ll
-       2:       b7 02 00 00 08 00 00 00 r2 = 0x8
-       3:       85 00 00 00 06 00 00 00 call 0x6
-       4:       95 00 00 00 00 00 00 00 exit
-
-Disassembly of section lsm.s/file_open:
-
-0000000000000000 <file_open>:
-       0:       85 10 00 00 ff ff ff ff call -0x1
-       1:       b7 00 00 00 00 00 00 00 r0 = 0x0
-       2:       95 00 00 00 00 00 00 00 exit
-```
-
-The fundamental difference between the two call instructions if I'm
-not mistaken is that one attempts to perform a call using an immediate
-value as its source operand, whereas the other attempts to perform a
-call using a source register as its source operand. AFAIU, the latter
-is not currently permitted by the BPF verifier. Is that right?
-
-/M
 
