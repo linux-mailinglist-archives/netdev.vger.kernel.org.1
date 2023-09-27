@@ -1,224 +1,286 @@
-Return-Path: <netdev+bounces-36560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA50E7B0731
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:42:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B0D7B0720
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 16:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 85C001C20905
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:42:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7A1A3282923
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 14:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AA51D545;
-	Wed, 27 Sep 2023 14:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062E07464;
+	Wed, 27 Sep 2023 14:40:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E3E7464
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 14:42:22 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15ABF9;
-	Wed, 27 Sep 2023 07:42:18 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38REeoSf013717;
-	Wed, 27 Sep 2023 14:41:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=SA0vmiS/p2eSmGSBAdVBC3GbqSanJU141RtIeVTT6OM=;
- b=TGpXx0Ln9HtdYNuFyOP8Hq5Zocf8QxQDnVI5kwwA4PAFAl/hhJowWiFhv3Xf2BfMbdC1
- OOoI5mBUpLFB8uRUcmNYwei9TldVUR0ZNj2vjFMu89fbqX93HpnGRHiWYey5kr1N54tP
- z3T4HZZeyqIn05a1apvR4Awqq6tuQ2Gbc/bGQ3HpAHVdOdzOvtoby2ytC07g7Wcy4S/U
- 3MxjOkq/QtwX+TT7VLWTv6JJ9F8cVb4wPqewSJE6KwkVTwl9gptyoPjD12MltW03r2g4
- 1MOtZHO0acF77JzuVw6YKJihtCL0WGNuuvZ4YEPscljp+MOj6IrXF2OMFxidjM9s8euj nA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcnh8sqcw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 14:41:30 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38REfDmF017965;
-	Wed, 27 Sep 2023 14:41:17 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcnh8snj3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 14:41:17 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38RChTDb030454;
-	Wed, 27 Sep 2023 14:31:15 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tad21un14-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 14:31:15 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38REVCoW44892656
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 27 Sep 2023 14:31:12 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4205820043;
-	Wed, 27 Sep 2023 14:31:12 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 91F0E20040;
-	Wed, 27 Sep 2023 14:31:11 +0000 (GMT)
-Received: from [9.152.212.236] (unknown [9.152.212.236])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 27 Sep 2023 14:31:11 +0000 (GMT)
-Message-ID: <6dab29f58ac1ccd58caaee031f98f4d0d382cbcd.camel@linux.ibm.com>
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and
- optimized IOTLB flushing
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Joerg Roedel <joro@8bytes.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Matthew Rosato <mjrosato@linux.ibm.com>,
-        Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        Robin
- Murphy <robin.murphy@arm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Julian
- Ruess <julianr@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Suravee
- Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Hector Martin
- <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig
- <alyssa@rosenzweig.io>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu
- <baolu.lu@linux.intel.com>, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson
- <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Yong Wu
- <yong.wu@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Orson Zhai
- <orsonzhai@gmail.com>,
-        Baolin Wang <baolin.wang@linux.alibaba.com>,
-        Chunyan
- Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec
- <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Thierry
- Reding <thierry.reding@gmail.com>,
-        Krishna Reddy <vdumpa@nvidia.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux.dev, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
-Date: Wed, 27 Sep 2023 16:31:11 +0200
-In-Reply-To: <e1efbbd827e34800bd7fb0ea687645cc6c65e1ab.camel@linux.ibm.com>
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
-	 <ZRLy_AaJiXxZ2AfK@8bytes.org> <20230926160832.GM13795@ziepe.ca>
-	 <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
-	 <ZRP8CiBui7suB5D6@8bytes.org>
-	 <b06a14de270a63050b0d027c24b333dba25001a4.camel@linux.ibm.com>
-	 <e1efbbd827e34800bd7fb0ea687645cc6c65e1ab.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9753233E5
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 14:39:59 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BAB8FC;
+	Wed, 27 Sep 2023 07:39:55 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8EDCB1C000F;
+	Wed, 27 Sep 2023 14:39:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1695825594;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SkXlD0luF0Ph8Z90prch5he0VcI9hgbZDKRxkPhFKe0=;
+	b=coqe1hu/5uluLvq4RPzJXMv+zSEsG/e5D6kawz8xCkqf7nLe01IklTIvQgBCg4vE1jx9TI
+	tTLdw/vUf3pddB0lIA3mmj/HClhtDr3PNzTEHKy+XbHVmq/xsKliWFyqpjg29iDYmLHGGO
+	5akjdKKwBcemJT3fKOmPraw+P/ZoZkJthmxqjh1XdZO3y5yvmX93wtBNA0y4VZ0issml7M
+	4fexOLvb3MMSYy9AclUszF7lQdjur0Wmq7gXfB1UxUjYe04ADlYlb2rrAe8dIR6i3Q7VtF
+	AplZJHcUnnLvuCE+foRuVpzcI9R9VotYlcXdDs6gTCsqGXaUueIkmqi/g6E3dQ==
+Date: Wed, 27 Sep 2023 16:39:48 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt
+ <stefan@datenfreihafen.org>, linux-wpan@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Girault <david.girault@qorvo.com>, Romuald
+ Despres <romuald.despres@qorvo.com>, Frederic Blain
+ <frederic.blain@qorvo.com>, Nicolas Schodet <nico@ni.fr.eu.org>, Guilhem
+ Imberton <guilhem.imberton@qorvo.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH wpan-next v4 07/11] mac802154: Handle association
+ requests from peers
+Message-ID: <20230927163948.672a479b@xps-13>
+In-Reply-To: <CAK-6q+jFmvXGWOJFvHagC06mnbu6O1=Ndg8auNkGXTaqSf-7rg@mail.gmail.com>
+References: <20230922155029.592018-1-miquel.raynal@bootlin.com>
+	<20230922155029.592018-8-miquel.raynal@bootlin.com>
+	<CAK-6q+iTOapHF7ftqtRQBsNUYEKqjS0Mkq4O-A2C2tbupStk0A@mail.gmail.com>
+	<20230925094343.598c81d1@xps-13>
+	<CAK-6q+jFmvXGWOJFvHagC06mnbu6O1=Ndg8auNkGXTaqSf-7rg@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9DVW-bLHKWJTvCvlDlYeq4_osgrJTxpT
-X-Proofpoint-ORIG-GUID: HDx50Cd-5cLuaqZZQuVFQjoyrLSQCgHY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_09,2023-09-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- clxscore=1015 bulkscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 spamscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309270124
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-09-27 at 15:20 +0200, Niklas Schnelle wrote:
-> On Wed, 2023-09-27 at 13:24 +0200, Niklas Schnelle wrote:
-> > On Wed, 2023-09-27 at 11:55 +0200, Joerg Roedel wrote:
-> > > Hi Niklas,
-> > >=20
-> > > On Wed, Sep 27, 2023 at 10:55:23AM +0200, Niklas Schnelle wrote:
-> > > > The problem is that something seems to  be broken in the iommu/core
-> > > > branch. Regardless of whether I have my DMA API conversion on top o=
-r
-> > > > with the base iommu/core branch I can not use ConnectX-4 VFs.
-> > >=20
-> > > Have you already tried to bisect the issue in the iommu/core branch?
-> > > The result might sched some light on the issue.
-> > >=20
-> > > Regards,
-> > >=20
-> > > 	Joerg
-> >=20
-> > Hi Joerg,
-> >=20
-> > Working on it, somehow I must have messed up earlier. It now looks like
-> > it might in fact be caused by my DMA API conversion rebase and the
-> > "s390/pci: Use dma-iommu layer" commit. Maybe there is some interaction
-> > with Jason's patches that I haven't thought about. So sorry for any
-> > wrong blame.
-> >=20
-> > Thanks,
-> > Niklas
->=20
+Hi Alexander,
+
+aahringo@redhat.com wrote on Tue, 26 Sep 2023 21:31:09 -0400:
+
 > Hi,
 >=20
-> I tracked the problem=C2=A0down from mlx5_core's alloc_cmd_page() via
-> dma_alloc_coherent(), ops->alloc, iommu_dma_alloc_remap(), and
-> __iommu_dma_alloc_noncontiguous() to a failed iommu_dma_alloc_iova().
-> The allocation here is for 4K so nothing crazy.
+> On Mon, Sep 25, 2023 at 3:43=E2=80=AFAM Miquel Raynal <miquel.raynal@boot=
+lin.com> wrote:
+> >
+> > Hi Alexander,
+> >
+> > aahringo@redhat.com wrote on Sun, 24 Sep 2023 20:13:34 -0400:
+> > =20
+> > > Hi,
+> > >
+> > > On Fri, Sep 22, 2023 at 11:51=E2=80=AFAM Miquel Raynal
+> > > <miquel.raynal@bootlin.com> wrote: =20
+> > > >
+> > > > Coordinators may have to handle association requests from peers whi=
+ch
+> > > > want to join the PAN. The logic involves:
+> > > > - Acknowledging the request (done by hardware)
+> > > > - If requested, a random short address that is free on this PAN sho=
+uld
+> > > >   be chosen for the device.
+> > > > - Sending an association response with the short address allocated =
+for
+> > > >   the peer and expecting it to be ack'ed.
+> > > >
+> > > > If anything fails during this procedure, the peer is considered not
+> > > > associated.
+> > > >
+> > > > Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> > > > ---
+> > > >  include/net/cfg802154.h         |   7 ++
+> > > >  include/net/ieee802154_netdev.h |   6 ++
+> > > >  net/ieee802154/core.c           |   7 ++
+> > > >  net/ieee802154/pan.c            |  30 +++++++
+> > > >  net/mac802154/ieee802154_i.h    |   2 +
+> > > >  net/mac802154/rx.c              |   8 ++
+> > > >  net/mac802154/scan.c            | 142 ++++++++++++++++++++++++++++=
+++++
+> > > >  7 files changed, 202 insertions(+)
+> > > >
+> > > > diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
+> > > > index 9b036ab20079..c844ae63bc04 100644
+> > > > --- a/include/net/cfg802154.h
+> > > > +++ b/include/net/cfg802154.h
+> > > > @@ -583,4 +583,11 @@ struct ieee802154_pan_device *
+> > > >  cfg802154_device_is_child(struct wpan_dev *wpan_dev,
+> > > >                           struct ieee802154_addr *target);
+> > > >
+> > > > +/**
+> > > > + * cfg802154_get_free_short_addr - Get a free address among the kn=
+own devices
+> > > > + * @wpan_dev: the wpan device
+> > > > + * @return: a random short address expectedly unused on our PAN
+> > > > + */
+> > > > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev);
+> > > > +
+> > > >  #endif /* __NET_CFG802154_H */
+> > > > diff --git a/include/net/ieee802154_netdev.h b/include/net/ieee8021=
+54_netdev.h
+> > > > index 16194356cfe7..4de858f9929e 100644
+> > > > --- a/include/net/ieee802154_netdev.h
+> > > > +++ b/include/net/ieee802154_netdev.h
+> > > > @@ -211,6 +211,12 @@ struct ieee802154_association_req_frame {
+> > > >         struct ieee802154_assoc_req_pl assoc_req_pl;
+> > > >  };
+> > > >
+> > > > +struct ieee802154_association_resp_frame {
+> > > > +       struct ieee802154_hdr mhr;
+> > > > +       struct ieee802154_mac_cmd_pl mac_pl;
+> > > > +       struct ieee802154_assoc_resp_pl assoc_resp_pl;
+> > > > +};
+> > > > +
+> > > >  struct ieee802154_disassociation_notif_frame {
+> > > >         struct ieee802154_hdr mhr;
+> > > >         struct ieee802154_mac_cmd_pl mac_pl;
+> > > > diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+> > > > index a08d75dd56ad..1670a71327a7 100644
+> > > > --- a/net/ieee802154/core.c
+> > > > +++ b/net/ieee802154/core.c
+> > > > @@ -200,11 +200,18 @@ EXPORT_SYMBOL(wpan_phy_free);
+> > > >
+> > > >  static void cfg802154_free_peer_structures(struct wpan_dev *wpan_d=
+ev)
+> > > >  {
+> > > > +       struct ieee802154_pan_device *child, *tmp;
+> > > > +
+> > > >         mutex_lock(&wpan_dev->association_lock);
+> > > >
+> > > >         kfree(wpan_dev->parent);
+> > > >         wpan_dev->parent =3D NULL;
+> > > >
+> > > > +       list_for_each_entry_safe(child, tmp, &wpan_dev->children, n=
+ode) {
+> > > > +               list_del(&child->node);
+> > > > +               kfree(child);
+> > > > +       }
+> > > > +
+> > > >         mutex_unlock(&wpan_dev->association_lock);
+> > > >  }
+> > > >
+> > > > diff --git a/net/ieee802154/pan.c b/net/ieee802154/pan.c
+> > > > index 9e1f1973c294..e99c64054dcb 100644
+> > > > --- a/net/ieee802154/pan.c
+> > > > +++ b/net/ieee802154/pan.c
+> > > > @@ -73,3 +73,33 @@ cfg802154_device_is_child(struct wpan_dev *wpan_=
+dev,
+> > > >         return NULL;
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(cfg802154_device_is_child);
+> > > > +
+> > > > +__le16 cfg802154_get_free_short_addr(struct wpan_dev *wpan_dev)
+> > > > +{
+> > > > +       struct ieee802154_pan_device *child;
+> > > > +       __le16 addr;
+> > > > +
+> > > > +       lockdep_assert_held(&wpan_dev->association_lock);
+> > > > +
+> > > > +       do {
+> > > > +               get_random_bytes(&addr, 2);
+> > > > +               if (addr =3D=3D cpu_to_le16(IEEE802154_ADDR_SHORT_B=
+ROADCAST) ||
+> > > > +                   addr =3D=3D cpu_to_le16(IEEE802154_ADDR_SHORT_U=
+NSPEC))
+> > > > +                       continue;
+> > > > +
+> > > > +               if (wpan_dev->short_addr =3D=3D addr)
+> > > > +                       continue;
+> > > > +
+> > > > +               if (wpan_dev->parent && wpan_dev->parent->short_add=
+r =3D=3D addr)
+> > > > +                       continue;
+> > > > +
+> > > > +               list_for_each_entry(child, &wpan_dev->children, nod=
+e)
+> > > > +                       if (child->short_addr =3D=3D addr)
+> > > > +                               continue;
+> > > > +
+> > > > +               break;
+> > > > +       } while (1);
+> > > > + =20
+> > >
+> > > I still believe that this random 2 bytes and check if it's already
+> > > being used is wrong here. We need something to use the next free
+> > > available number according to the data we are storing here. =20
+> >
+> > This issue I still have in mind is when you have this typology:
+> >
+> > device A -------> device B --------> device C <-------- device D
+> > (leaf)            (coord)            (PAN coord)            (leaf)
+> >
+> > B associates with C
+> > A associates with B
+> > D associates with C
+> >
+> > If B and C run Linux's stack, they will always have the same short
+> > address. Yes this can be handled (realignment procedure). But any time
+> > this happens, you'll have a load of predictable realignments when A and
+> > D get in range with B or C.
+> > =20
 >=20
-> On second look I also noticed:
->=20
-> nvme 2007:00:00.0: Using 42-bit DMA addresses
->=20
-> for the NVMe that is working. The problem here seems to be that we set
-> iommu_dma_forcedac =3D true in s390_iommu_probe_finalize() because we
-> have currently have a reserved region over the first 4 GiB anyway so
-> will always use IOVAs larger than that. That however is too late since
-> iommu_dma_set_pci_32bit_workaround() is already checked in
-> __iommu_probe_device() which is called just before ops-
-> > probe_finalize(). So I moved setting iommu_dma_forcedac =3D true to
-> zpci_init_iommu() and that gets rid of the notice for the NVMe but I
-> still get a failure of iommu_dma_alloc_iova() in
-> __iommu_dma_alloc_noncontiguous(). So I'll keep digging.
->=20
-> Thanks,
-> Niklas
+> I see that it can be "more" predictable, but what happens when there
+> is the same short address case with the random number generator? It
+> sounds to me like there needs to be a kind of duplicate address
+> detection going on and then choose another one, if 802.15.4 even
+> handles this case...
 
+Yes it may happen, and yes it is handled by the spec (I did not
+implement it yet). When such a situation occurs (two devices using the
+same short address in a given PAN), the third-party device which
+detects the faulty situation must notify its coordinator and the
+coordinator (IIRC) must allocate a new short address as part of a
+realignment procedure.
 
-Ok I think I got it and this doesn't seem strictly s390x specific but
-I'd think should happen with iommu.forcedac=3D1 everywhere.
+> I am also thinking that there is only one number left and the random
+> generator runs multiple times to find the last one aka "it's random
+> you can never be sure", when it always returns the same address.
 
-The reason iommu_dma_alloc_iova() fails seems to be that mlx5_core does
-dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64)) in=C2=A0
-mlx5_pci_init()->set_dma_caps() which happens after it already called
-mlx5_mdev_init()->mlx5_cmd_init()->alloc_cmd_page() so for the
-dma_alloc_coherent() in there the dev->coherent_dma_mask is still
-DMA_BIT_MASK(32) for which we can't find an IOVA because well we don't
-have IOVAs below 4 GiB. Not entirely sure what caused this not to be
-enforced before.
+I'll try to summarize the two issues and solutions we have:
+- incremental short address: if two coordinators distribute
+  short addresses in a PAN, at the time we perform a realignment
+  procedure, if Coord A has allocated 1 short address (0) and Coord B
+  in the same PAN has allocated 10 short addresses (from 0 to 9), you
+  know that the device that needs a new address will be given 1, which
+  will lead to a realignment, then 2, then 3... and produce a *lot* of
+  noise. However despite being long on big network, we can assume the
+  time to find the relevant address is bounded.
+- random short address: no conflict should happen following a
+  realignment procedure (assuming regular-sized networks, probability
+  is very low, close to 1/65000) however in case we have a huge
+  network, the time taken to find a free slot is unbounded.
+
+At this stage I believe the former issue is more likely to happen than
+the second, but the second is a bit critical as it can lead to DoS
+situations. One easy way to mitigate this is to limit the number of
+devices on the network (as you said in another mail, we can refuse
+devices arbitrarily), which is the first denial procedure I've
+implemented, knowing that it should be improved as well, as that can be
+done later without much additional constraints.
+
+> However, that's only my thoughts about it and hopefully can be
+> improved in future.
+
+Yes, I am not convinced this is the perfect choice but at least it's
+simple enough and will work like a charm on small networks.
 
 Thanks,
-Niklas
+Miqu=C3=A8l
 
