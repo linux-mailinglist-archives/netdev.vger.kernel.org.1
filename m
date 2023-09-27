@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-36607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0944A7B0BC9
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:14:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 170EE7B0BC8
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:14:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B0C6C285316
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:14:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id A07E81C2092C
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 18:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A824CFB6;
-	Wed, 27 Sep 2023 18:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E29A84C874;
+	Wed, 27 Sep 2023 18:14:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1BD4CFA4
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:14:38 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2045.outbound.protection.outlook.com [40.107.212.45])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C6910E
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:14:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84965689
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 18:14:35 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2080.outbound.protection.outlook.com [40.107.243.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A48A1
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 11:14:33 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QcIXhMGOqvU1I/9nSwmMN4XVZLIgCIoedmaXjwXkl9s92AnKmeqlS8OlVOFqI/kciCDS35g+K+6wiC+OZEd2zcTDsylaCsAP447m1mIVjyq6HKs2bT1qWB4Ii5uqR3Lhoa/y20l5BECC9UCwAD4oCYa5h3KhS62yDZ9oJ85+4ZKx2RBvAfV+bY/J/0OgPWr1fMwBUWO+dby9qWTef7iJHn7jd+IRyQ572xDpBM/HqRnAhaxtMtszACbQJ9lQPCdjgozzMCjPOCOvwBhaPDJEc8kxiDzSkNJKTbBmBxL1qTYt7s4c2Bb6wyXurYFMr6+dkxd7JiCu2vvHlmvn/bUbog==
+ b=Gaw1YsyjidvU0ruhqG4zY0Iot6GNdIVv58ue2IW91oo1NsK93wuDLcrhdf40BGfyxhR+OW03+TJHefzfnoit/VKU4q2bl9FnBM/o4o2014h0XKRdIeqetQ6mUlqNI6f2Q8E6lmeJqA/JBR9wEpr5ZIczDIu7oElDrD87+24slADVxMpHMZ3FWSrzGpRvaGayMeXHldHkb27nqZ4rc30JENHBTw+XrcQU4GjDjvpBcmuqsREhmj+ZxWPz8OWyuIELcTPQrVN+vBik1Bk4jYI7Es66GWrJpU2rfRRmS2PiPlpUBVSOlkq3P1h+yIfZe16KbOlVsJiBRMhYOaJ4asQFvg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=52p/798zbF3BF0+uj64akK/35N7ptMmGuo9L+VOmIuM=;
- b=PR05AKxfA0knK3pdjht4I3HqBsxDYSlXyg/nv7xAO725+jiPO0r3Krh8XEQSSMr+tcuakg81NC8hqgIvXH87ZQkqP75ezJBHtIrJ+gb9ZG5t8Wfm6detPFsapyRiz8rzCmWt5I/ycUuq/683LrWSj+gnrW83VB9/OoTp1a/YXgXDTRqGOLn2X2fWAlT5DTiRLrTO3HrRGPK+0Ts1OqTCVtzz6Th+biHqMwqfPy5FWpIXUlOyywHZYOIQ8hSPrlBQ7UWPjI7hueTRXdO/svDNmmB52Z+IYK8qW4TgwABMdYLl05pAPQnrVKtwBRkVJplIii7OyNbsvptMUe/s5QHhsQ==
+ bh=KjPAnN451aNNaJlzdm5VfBuLdylxxOwXUrQiWWX3nJY=;
+ b=eUzqHIP18cPUaAHCvj8fbRG+Stl5Ial9DSyXixBgVP/91vZbw60ZPm66UlfERkJUxdwFaMglhly7DKvX5pM4UQeQ7DbyEkLWGXrImGK52NdAdWAkE8t4JJQoZVYsE5DJ3HiMtNYGeBbo3FzzjWLFLpMMPxRusXe+8r+MmdUc1med8s3Ak9NBPsGPy7SLnDoM+VBYKYC6Cxq6pNNZ8AP0D5AXTzZ3sfUwiwhjBbTXOJuMKWxVk82dJTK8lwR4h5T1gPletrHHloTlWc9em/mBx+TZF6qG+Db3n86DfOw6O2icGZEy0YruLn9Mpu8TM6scORUSZS4tZUHYqDsSIO5AMQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=52p/798zbF3BF0+uj64akK/35N7ptMmGuo9L+VOmIuM=;
- b=b1mUFy3kSmfIIZe+qb5fyzMtkZzgiixSPOaTmr+DRkWDoF+UPu6MWdaj6FrwFFtm/6pRcb/kR1RCUA8Zd43V19m2Tlw7xmO5rhtSYsMtfjyaJV0M1ylbKTZx/9EX2eoBWhjujFHAND/lEP0paES2LYwmrV674XjRYMFoQFyWc+0=
-Received: from DM6PR11CA0068.namprd11.prod.outlook.com (2603:10b6:5:14c::45)
- by SJ2PR12MB7962.namprd12.prod.outlook.com (2603:10b6:a03:4c2::14) with
+ bh=KjPAnN451aNNaJlzdm5VfBuLdylxxOwXUrQiWWX3nJY=;
+ b=wIeOnZbg1hsc1beYBMX7GyKeKM3k3fhwjGQ/3ILHCWXfQwzoKz6MdbCDuGfh8k8DwkoteZOoeiV1r1W3PQ/WrxarCuLacpcllWoCgLf+e5SNNx9tZYHgbKnZs7FaTo2Q3h2s8a/6CjT7uZqPSvW+rfFBJrRdzEdodvfLDec1hKs=
+Received: from PH8PR20CA0005.namprd20.prod.outlook.com (2603:10b6:510:23c::13)
+ by DM6PR12MB4354.namprd12.prod.outlook.com (2603:10b6:5:28f::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.28; Wed, 27 Sep
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21; Wed, 27 Sep
  2023 18:14:31 +0000
-Received: from DS2PEPF00003445.namprd04.prod.outlook.com
- (2603:10b6:5:14c:cafe::a9) by DM6PR11CA0068.outlook.office365.com
- (2603:10b6:5:14c::45) with Microsoft SMTP Server (version=TLS1_2,
+Received: from SA2PEPF000015C7.namprd03.prod.outlook.com
+ (2603:10b6:510:23c:cafe::8c) by PH8PR20CA0005.outlook.office365.com
+ (2603:10b6:510:23c::13) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.22 via Frontend
  Transport; Wed, 27 Sep 2023 18:14:30 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
@@ -49,23 +49,23 @@ X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS2PEPF00003445.mail.protection.outlook.com (10.167.17.72) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SA2PEPF000015C7.mail.protection.outlook.com (10.167.241.197) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6838.14 via Frontend Transport; Wed, 27 Sep 2023 18:14:29 +0000
-Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6838.14 via Frontend Transport; Wed, 27 Sep 2023 18:14:30 +0000
+Received: from SATLEXMB08.amd.com (10.181.40.132) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
- 2023 13:14:27 -0500
+ 2023 13:14:30 -0500
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB08.amd.com
  (10.181.40.132) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 27 Sep
- 2023 11:14:27 -0700
+ 2023 11:14:29 -0700
 Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27 via Frontend
- Transport; Wed, 27 Sep 2023 13:14:25 -0500
+ Transport; Wed, 27 Sep 2023 13:14:27 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
@@ -75,9 +75,9 @@ CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<linux@armlinux.org.uk>, <sgoutham@marvell.com>, <gakula@marvell.com>,
 	<sbhatta@marvell.com>, <hkelam@marvell.com>, <saeedm@nvidia.com>,
 	<leon@kernel.org>
-Subject: [PATCH v4 net-next 3/7] net: ethtool: record custom RSS contexts in the XArray
-Date: Wed, 27 Sep 2023 19:13:34 +0100
-Message-ID: <97db46739ad095e0ed50f0dbd90e1b506c2991de.1695838185.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v4 net-next 4/7] net: ethtool: let the core choose RSS context IDs
+Date: Wed, 27 Sep 2023 19:13:35 +0100
+Message-ID: <692201a4fd89cdf8ead6517fe0166d47385767ec.1695838185.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1695838185.git.ecree.xilinx@gmail.com>
 References: <cover.1695838185.git.ecree.xilinx@gmail.com>
@@ -91,26 +91,26 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003445:EE_|SJ2PR12MB7962:EE_
-X-MS-Office365-Filtering-Correlation-Id: ca15b160-47fd-4f99-0a2a-08dbbf8597f9
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C7:EE_|DM6PR12MB4354:EE_
+X-MS-Office365-Filtering-Correlation-Id: a06ee7a4-0629-4bc3-ad24-08dbbf859822
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	jGboHPJJ+W7iJI2bkEKIrv3Olg78D08V2vo+EflvoGtOEI9+rROd7iOjNt61jpfVI3eb2abWtcMwVGTQjFw+OFsq32mzlUpWoyts+kjhPBpko4VnTO+5mwFsPO/5E0Iy1EQyv7vk/naFi3GGGDhOBnACA0F77v9DlIih/laZMj7aMqzwghAgXANhQSgJrNpa+HwHkl2tkzL2CgXjaEzuyFpw3O4Sv3qCGdUWAhhmLOPamXN6qmlUtIDokSoWi2QLEVE/lPL+0kSZsBV9SYFCqzd077fgvKo+rpUG7y9HTCDRPEXUoQdLip5PWhhsZFfm4BtOGH0U0kmgfts3E3EiavdwkDh+DdxqEzPjVn1NJACGdB054TYaORVUiO09by3Ftg1G8M6dUwxs5rYDClJXWkGyZVtYcvNuMteBpqVftUr5YdxZ6r4ysSYmrq6Va8C1kjWX0E5xrcISN/0ENbBejNrgEHdoZ3U/Sg84jMzAKWK4ASulMKg6kGEmXVuJ4D783XO6M+B6tXE3GG4zBsB2QB86vC1g/cHieFIQc/PY243vVWe/OoYoQIF22Pegh+T4d7dKgohnT7LBB8j0JhkwW2d+U1C6Ao8WqAmW77WsrSiuD/g/QG4VAMwAwGgbVErH7x0OtO5cwSg3U68UrSbvmT5L9CJ4Ah6cGoNmBZCCCjOW32GT0Zr7BMDqkxvIXFl/IsadN42nMUQfjseDuXkVE+7H++QxnDizkQh2ITvKAUbM9m/F/kVwgdCQYaCFOwv2CCQ2pv34fr3zGJjQj9BahA==
+	VIJ4p2ZVWQAWV2MzX/OOdVhnYm+4IuyNWXzBq7XoFDxjKrfXOqAGyiv0csY17fS7Lwwe/WSv1gKRpa34+foq6WmOAC+8JdEzqVK2QO98C/9RIYagFyxh9y7vygslxQFR5vaVITPqQYrqeds00OYUwPJAYT/9OzADowDF07FqlUULC1KLFoNycZFvDh/yy5R18b6gnI7UOdInPK3bu6wMv5n1NPwOLRtRb0C1nQD5Wwa3uUzqe4D0bfIsLYod61R3ZYShODbefvG+E5fGXQXGaxhUSuYjeGmfd8rZFPDR9yWhIZgKDXZR5BQABZStznPKUTm4w5o36T8mV5YxuSNayzLdb6AnT7nNodtRclHooDwdZXJwjM+4HnboHwGdTmPnCyywHKRGTqvxFv+TJ1VVYFixIm8r84eJyEFLI1xwxlnJZ44RVYccCIGTMVXgI5QodrAqjntvjl3tEDNXQtqb4HLkCPh/UfvdH4shMgIjXs8fr52syfAugut44ifm1WD7omW/45yRpoFGOKEsjSydArgGSmJArIFdM9Qq6Wyvl2jLRZg/WqhW4k01KLugXKnaNssNoRWoquLAlKZxnQ59PB2jGFd3c2wBfD0ZLKwu2QDWpN+KCv86wvDBD4fdqsGgdBJETQaHGrWW/uMo23DzB/vKfJEZ/w7pSzfAHI0SSyEoG5/BdFBzOJr2VdN494Z8DWUNnFTIktLi9M6Mn4ozO7B4pYlhgIk4My4a0NB7UZfx+DwV1LSCh+FE4VHRL0q8QVdTNKWK8Du6VE9E46hk8Q==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(396003)(376002)(346002)(136003)(230922051799003)(82310400011)(1800799009)(451199024)(186009)(40470700004)(36840700001)(46966006)(2876002)(66899024)(40460700003)(356005)(2906002)(47076005)(478600001)(82740400003)(36756003)(336012)(6666004)(26005)(86362001)(426003)(83380400001)(9686003)(81166007)(55446002)(40480700001)(36860700001)(8936002)(41300700001)(4326008)(316002)(8676002)(5660300002)(70206006)(7416002)(70586007)(110136005)(54906003)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(451199024)(82310400011)(1800799009)(186009)(40470700004)(46966006)(36840700001)(40480700001)(66899024)(336012)(426003)(2906002)(41300700001)(2876002)(83380400001)(86362001)(40460700003)(6666004)(82740400003)(478600001)(36756003)(81166007)(356005)(9686003)(54906003)(316002)(55446002)(70586007)(110136005)(70206006)(7416002)(4326008)(26005)(8676002)(8936002)(5660300002)(36860700001)(47076005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 18:14:29.5074
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2023 18:14:30.6397
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ca15b160-47fd-4f99-0a2a-08dbbf8597f9
+X-MS-Exchange-CrossTenant-Network-Message-Id: a06ee7a4-0629-4bc3-ad24-08dbbf859822
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003445.namprd04.prod.outlook.com
+	SA2PEPF000015C7.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7962
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4354
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -120,171 +120,214 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-Since drivers are still choosing the context IDs, we have to force the
- XArray to use the ID they've chosen rather than picking one ourselves,
- and handle the case where they give us an ID that's already in use.
+Add a new API to create/modify/remove RSS contexts, that passes in the
+ newly-chosen context ID (not as a pointer) rather than leaving the
+ driver to choose it on create.  Also pass in the ctx, allowing drivers
+ to easily use its private data area to store their hardware-specific
+ state.
+Keep the existing .set_rxfh_context API for now as a fallback, but
+ deprecate it.
 
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- include/linux/ethtool.h | 14 ++++++++
- net/ethtool/ioctl.c     | 73 +++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 85 insertions(+), 2 deletions(-)
+ include/linux/ethtool.h | 40 ++++++++++++++++++++++++---
+ net/core/dev.c          | 15 ++++++++---
+ net/ethtool/ioctl.c     | 60 ++++++++++++++++++++++++++++++-----------
+ 3 files changed, 93 insertions(+), 22 deletions(-)
 
 diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index bb11cb2f477d..229a23571008 100644
+index 229a23571008..975fda7218f8 100644
 --- a/include/linux/ethtool.h
 +++ b/include/linux/ethtool.h
-@@ -194,6 +194,17 @@ static inline u8 *ethtool_rxfh_context_key(struct ethtool_rxfh_context *ctx)
- 	return (u8 *)(ethtool_rxfh_context_indir(ctx) + ctx->indir_size);
- }
- 
-+static inline size_t ethtool_rxfh_context_size(u32 indir_size, u32 key_size,
-+					       u16 priv_size)
-+{
-+	size_t indir_bytes = array_size(indir_size, sizeof(u32));
-+	size_t flex_len;
-+
-+	flex_len = size_add(size_add(indir_bytes, key_size),
-+			    ALIGN(priv_size, sizeof(u32)));
-+	return struct_size((struct ethtool_rxfh_context *)0, data, flex_len);
-+}
-+
- /* declare a link mode bitmap */
- #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
- 	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
-@@ -731,6 +742,8 @@ struct ethtool_mm_stats {
-  *	will remain unchanged.
-  *	Returns a negative error code or zero. An error code must be returned
-  *	if at least one unsupported change was requested.
-+ * @rxfh_priv_size: size of the driver private data area the core should
-+ *	allocate for an RSS context.
+@@ -747,10 +747,33 @@ struct ethtool_mm_stats {
   * @get_rxfh_context: Get the contents of the RX flow hash indirection table,
   *	hash key, and/or hash function assiciated to the given rss context.
   *	Returns a negative error code or zero.
-@@ -824,6 +837,7 @@ struct ethtool_ops {
- 	u32     cap_link_lanes_supported:1;
- 	u32	supported_coalesce_params;
- 	u32	supported_ring_params;
-+	u16	rxfh_priv_size;
- 	void	(*get_drvinfo)(struct net_device *, struct ethtool_drvinfo *);
- 	int	(*get_regs_len)(struct net_device *);
- 	void	(*get_regs)(struct net_device *, struct ethtool_regs *, void *);
+- * @set_rxfh_context: Create, remove and configure RSS contexts. Allows setting
++ * @create_rxfh_context: Create a new RSS context with the specified RX flow
++ *	hash indirection table, hash key, and hash function.
++ *	Arguments which are set to %NULL or zero will be populated to
++ *	appropriate defaults by the driver.
++ *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
++ *	note that the indir table, hkey and hfunc are not yet populated as
++ *	of this call.  The driver does not need to update these; the core
++ *	will do so if this op succeeds.
++ *	If the driver provides this method, it must also provide
++ *	@modify_rxfh_context and @remove_rxfh_context.
++ *	Returns a negative error code or zero.
++ * @modify_rxfh_context: Reconfigure the specified RSS context.  Allows setting
+  *	the contents of the RX flow hash indirection table, hash key, and/or
+- *	hash function associated to the given context. Arguments which are set
+- *	to %NULL or zero will remain unchanged.
++ *	hash function associated with the given context.
++ *	Arguments which are set to %NULL or zero will remain unchanged.
++ *	The &struct ethtool_rxfh_context for this context is passed in @ctx;
++ *	note that it will still contain the *old* settings.  The driver does
++ *	not need to update these; the core will do so if this op succeeds.
++ *	Returns a negative error code or zero. An error code must be returned
++ *	if at least one unsupported change was requested.
++ * @remove_rxfh_context: Remove the specified RSS context.
++ *	The &struct ethtool_rxfh_context for this context is passed in @ctx.
++ *	Returns a negative error code or zero.
++ * @set_rxfh_context: Deprecated API to create, remove and configure RSS
++ *	contexts. Allows setting the contents of the RX flow hash indirection
++ *	table, hash key, and/or hash function associated to the given context.
++ *	Arguments which are set to %NULL or zero will remain unchanged.
+  *	Returns a negative error code or zero. An error code must be returned
+  *	if at least one unsupported change was requested.
+  * @get_channels: Get number of channels.
+@@ -901,6 +924,17 @@ struct ethtool_ops {
+ 			    const u8 *key, const u8 hfunc);
+ 	int	(*get_rxfh_context)(struct net_device *, u32 *indir, u8 *key,
+ 				    u8 *hfunc, u32 rss_context);
++	int	(*create_rxfh_context)(struct net_device *,
++				       struct ethtool_rxfh_context *ctx,
++				       const u32 *indir, const u8 *key,
++				       const u8 hfunc, u32 rss_context);
++	int	(*modify_rxfh_context)(struct net_device *,
++				       struct ethtool_rxfh_context *ctx,
++				       const u32 *indir, const u8 *key,
++				       const u8 hfunc, u32 rss_context);
++	int	(*remove_rxfh_context)(struct net_device *,
++				       struct ethtool_rxfh_context *ctx,
++				       u32 rss_context);
+ 	int	(*set_rxfh_context)(struct net_device *, const u32 *indir,
+ 				    const u8 *key, const u8 hfunc,
+ 				    u32 *rss_context, bool delete);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 05e95abdfd17..637218adca22 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10882,16 +10882,23 @@ static void netdev_rss_contexts_free(struct net_device *dev)
+ 	struct ethtool_rxfh_context *ctx;
+ 	unsigned long context;
+ 
+-	if (dev->ethtool_ops->set_rxfh_context)
++	if (dev->ethtool_ops->create_rxfh_context ||
++	    dev->ethtool_ops->set_rxfh_context)
+ 		xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
+ 			u32 *indir = ethtool_rxfh_context_indir(ctx);
+ 			u8 *key = ethtool_rxfh_context_key(ctx);
+ 			u32 concast = context;
+ 
+ 			xa_erase(&dev->ethtool->rss_ctx, context);
+-			dev->ethtool_ops->set_rxfh_context(dev, indir, key,
+-							   ctx->hfunc, &concast,
+-							   true);
++			if (dev->ethtool_ops->create_rxfh_context)
++				dev->ethtool_ops->remove_rxfh_context(dev, ctx,
++								      context);
++			else
++				dev->ethtool_ops->set_rxfh_context(dev, indir,
++								   key,
++								   ctx->hfunc,
++								   &concast,
++								   true);
+ 			kfree(ctx);
+ 		}
+ 	xa_destroy(&dev->ethtool->rss_ctx);
 diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index de78b24fffc9..1d13bc8fbb75 100644
+index 1d13bc8fbb75..c23d2bd3cd2a 100644
 --- a/net/ethtool/ioctl.c
 +++ b/net/ethtool/ioctl.c
-@@ -1249,6 +1249,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- {
- 	int ret;
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
-+	struct ethtool_rxfh_context *ctx = NULL;
- 	struct ethtool_rxnfc rx_rings;
- 	struct ethtool_rxfh rxfh;
- 	u32 dev_indir_size = 0, dev_key_size = 0, i;
-@@ -1256,7 +1257,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	u8 *hkey = NULL;
- 	u8 *rss_config;
- 	u32 rss_cfg_offset = offsetof(struct ethtool_rxfh, rss_config[0]);
--	bool delete = false;
-+	bool create = false, delete = false;
- 
- 	if (!ops->get_rxnfc || !ops->set_rxfh)
- 		return -EOPNOTSUPP;
-@@ -1275,6 +1276,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+@@ -1274,7 +1274,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 	if (rxfh.rsvd8[0] || rxfh.rsvd8[1] || rxfh.rsvd8[2] || rxfh.rsvd32)
+ 		return -EINVAL;
  	/* Most drivers don't handle rss_context, check it's 0 as well */
- 	if (rxfh.rss_context && !ops->set_rxfh_context)
+-	if (rxfh.rss_context && !ops->set_rxfh_context)
++	if (rxfh.rss_context && !(ops->create_rxfh_context ||
++				  ops->set_rxfh_context))
  		return -EOPNOTSUPP;
-+	create = rxfh.rss_context == ETH_RXFH_CONTEXT_ALLOC;
+ 	create = rxfh.rss_context == ETH_RXFH_CONTEXT_ALLOC;
  
- 	/* If either indir, hash key or function is valid, proceed further.
- 	 * Must request at least one change: indir size, hash key or function.
-@@ -1332,13 +1334,42 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+@@ -1349,8 +1350,24 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 		}
+ 		ctx->indir_size = dev_indir_size;
+ 		ctx->key_size = dev_key_size;
+-		ctx->hfunc = rxfh.hfunc;
+ 		ctx->priv_size = ops->rxfh_priv_size;
++		/* Initialise to an empty context */
++		ctx->indir_no_change = ctx->key_no_change = 1;
++		ctx->hfunc = ETH_RSS_HASH_NO_CHANGE;
++		if (ops->create_rxfh_context) {
++			u32 limit = dev->ethtool->rss_ctx_max_id ?: U32_MAX;
++			u32 ctx_id;
++
++			/* driver uses new API, core allocates ID */
++			ret = xa_alloc(&dev->ethtool->rss_ctx, &ctx_id, ctx,
++				       XA_LIMIT(1, limit), GFP_KERNEL_ACCOUNT);
++			if (ret < 0) {
++				kfree(ctx);
++				goto out;
++			}
++			WARN_ON(!ctx_id); /* can't happen */
++			rxfh.rss_context = ctx_id;
++		}
+ 	} else if (rxfh.rss_context) {
+ 		ctx = xa_load(&dev->ethtool->rss_ctx, rxfh.rss_context);
+ 		if (!ctx) {
+@@ -1359,15 +1376,34 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
  		}
  	}
  
-+	if (create) {
-+		if (delete) {
-+			ret = -EINVAL;
-+			goto out;
+-	if (rxfh.rss_context)
+-		ret = ops->set_rxfh_context(dev, indir, hkey, rxfh.hfunc,
+-					    &rxfh.rss_context, delete);
+-	else
++	if (rxfh.rss_context) {
++		if (ops->create_rxfh_context) {
++			if (create)
++				ret = ops->create_rxfh_context(dev, ctx, indir,
++							       hkey, rxfh.hfunc,
++							       rxfh.rss_context);
++			else if (delete)
++				ret = ops->remove_rxfh_context(dev, ctx,
++							       rxfh.rss_context);
++			else
++				ret = ops->modify_rxfh_context(dev, ctx, indir,
++							       hkey, rxfh.hfunc,
++							       rxfh.rss_context);
++		} else {
++			ret = ops->set_rxfh_context(dev, indir, hkey,
++						    rxfh.hfunc,
++						    &rxfh.rss_context, delete);
 +		}
-+		ctx = kzalloc(ethtool_rxfh_context_size(dev_indir_size,
-+							dev_key_size,
-+							ops->rxfh_priv_size),
-+			      GFP_KERNEL_ACCOUNT);
-+		if (!ctx) {
-+			ret = -ENOMEM;
-+			goto out;
-+		}
-+		ctx->indir_size = dev_indir_size;
-+		ctx->key_size = dev_key_size;
-+		ctx->hfunc = rxfh.hfunc;
-+		ctx->priv_size = ops->rxfh_priv_size;
-+	} else if (rxfh.rss_context) {
-+		ctx = xa_load(&dev->ethtool->rss_ctx, rxfh.rss_context);
-+		if (!ctx) {
-+			ret = -ENOENT;
-+			goto out;
-+		}
-+	}
-+
- 	if (rxfh.rss_context)
- 		ret = ops->set_rxfh_context(dev, indir, hkey, rxfh.hfunc,
- 					    &rxfh.rss_context, delete);
- 	else
++	} else {
  		ret = ops->set_rxfh(dev, indir, hkey, rxfh.hfunc);
--	if (ret)
-+	if (ret) {
-+		if (create)
-+			/* failed to create, free our new tracking entry */
-+			kfree(ctx);
- 		goto out;
 +	}
+ 	if (ret) {
+-		if (create)
++		if (create) {
+ 			/* failed to create, free our new tracking entry */
++			if (ops->create_rxfh_context)
++				xa_erase(&dev->ethtool->rss_ctx, rxfh.rss_context);
+ 			kfree(ctx);
++		}
+ 		goto out;
+ 	}
  
- 	if (copy_to_user(useraddr + offsetof(struct ethtool_rxfh, rss_context),
- 			 &rxfh.rss_context, sizeof(rxfh.rss_context)))
-@@ -1351,6 +1382,44 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 		else if (rxfh.indir_size != ETH_RXFH_INDIR_NO_CHANGE)
+@@ -1383,12 +1419,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
  			dev->priv_flags |= IFF_RXFH_CONFIGURED;
  	}
-+	/* Update rss_ctx tracking */
-+	if (create) {
-+		/* Ideally this should happen before calling the driver,
-+		 * so that we can fail more cleanly; but we don't have the
-+		 * context ID until the driver picks it, so we have to
-+		 * wait until after.
-+		 */
-+		if (WARN_ON(xa_load(&dev->ethtool->rss_ctx, rxfh.rss_context))) {
-+			/* context ID reused, our tracking is screwed */
-+			kfree(ctx);
-+			goto out;
-+		}
-+		/* Allocate the exact ID the driver gave us */
-+		if (xa_is_err(xa_store(&dev->ethtool->rss_ctx, rxfh.rss_context,
-+				       ctx, GFP_KERNEL))) {
-+			kfree(ctx);
-+			goto out;
-+		}
-+		ctx->indir_no_change = rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE;
-+		ctx->key_no_change = !rxfh.key_size;
-+	}
-+	if (delete) {
-+		WARN_ON(xa_erase(&dev->ethtool->rss_ctx, rxfh.rss_context) != ctx);
-+		kfree(ctx);
-+	} else if (ctx) {
-+		if (indir) {
-+			for (i = 0; i < dev_indir_size; i++)
-+				ethtool_rxfh_context_indir(ctx)[i] = indir[i];
-+			ctx->indir_no_change = 0;
-+		}
-+		if (hkey) {
-+			memcpy(ethtool_rxfh_context_key(ctx), hkey,
-+			       dev_key_size);
-+			ctx->key_no_change = 0;
-+		}
-+		if (rxfh.hfunc != ETH_RSS_HASH_NO_CHANGE)
-+			ctx->hfunc = rxfh.hfunc;
-+	}
- 
- out:
- 	kfree(rss_config);
+ 	/* Update rss_ctx tracking */
+-	if (create) {
+-		/* Ideally this should happen before calling the driver,
+-		 * so that we can fail more cleanly; but we don't have the
+-		 * context ID until the driver picks it, so we have to
+-		 * wait until after.
+-		 */
++	if (create && !ops->create_rxfh_context) {
++		/* driver uses old API, it chose context ID */
+ 		if (WARN_ON(xa_load(&dev->ethtool->rss_ctx, rxfh.rss_context))) {
+ 			/* context ID reused, our tracking is screwed */
+ 			kfree(ctx);
+@@ -1400,8 +1432,6 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 			kfree(ctx);
+ 			goto out;
+ 		}
+-		ctx->indir_no_change = rxfh.indir_size == ETH_RXFH_INDIR_NO_CHANGE;
+-		ctx->key_no_change = !rxfh.key_size;
+ 	}
+ 	if (delete) {
+ 		WARN_ON(xa_erase(&dev->ethtool->rss_ctx, rxfh.rss_context) != ctx);
 
