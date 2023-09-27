@@ -1,182 +1,155 @@
-Return-Path: <netdev+bounces-36622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933D17B0D5D
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 22:26:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDD367B0DFB
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 23:19:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 809EB1C20912
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 20:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E253A282374
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 21:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45714CFB8;
-	Wed, 27 Sep 2023 20:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487144CFA1;
+	Wed, 27 Sep 2023 21:19:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC6234CE5
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 20:26:33 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B652192;
-	Wed, 27 Sep 2023 13:26:30 -0700 (PDT)
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38RK7P9a011293;
-	Wed, 27 Sep 2023 20:25:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=h1PUEk2RydOs9qTeLOD9LBjXv0RxbTCx5if1FEQd2bE=;
- b=RfXXU1JWrIeRv8ozX9Nmw67Z1W7jRB9mJo1eN0ftEUuAHQuojUYqRBuXzIY3lVQuGKyg
- /W5JqgRgMZ8r/M8AdJMPYPtSMRm2XVCBGhZdt7Y5As/swP5rvJRyqJgiDsjJsI7PzEsO
- GGodzzlbkV3IVibkOnlCWthSwaELR+cp7ta2UwtpYigPe6aIcHkGKKYfy+Bwdp5G7Odx
- EqgCD6hIdpv4+FJL32LayNsv51lMWBF4FAuqlmFDxyTH4Ve3NFkt6iqegtSBFfFlCIvA
- yshwaYtjbxuT4k0L33Rbwyjh2QESzZEFcfcDTEFot1JhRFICVL0bzfBFqWUaj/X5nQYp BQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcu0pggq8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 20:25:37 +0000
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38RKPa4x007459;
-	Wed, 27 Sep 2023 20:25:36 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tcu0pggpp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 20:25:36 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38RJvBAB030466;
-	Wed, 27 Sep 2023 20:25:35 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tad21wtv5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Sep 2023 20:25:34 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38RKPX1B66781646
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 27 Sep 2023 20:25:33 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AEE2058055;
-	Wed, 27 Sep 2023 20:25:33 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 284835804B;
-	Wed, 27 Sep 2023 20:25:29 +0000 (GMT)
-Received: from [9.61.175.8] (unknown [9.61.175.8])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 27 Sep 2023 20:25:29 +0000 (GMT)
-Message-ID: <a3d8cd82-91ac-0d46-d7d2-c444062a199c@linux.ibm.com>
-Date: Wed, 27 Sep 2023 16:25:28 -0400
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECC315ACD;
+	Wed, 27 Sep 2023 21:19:23 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D119012A;
+	Wed, 27 Sep 2023 14:19:20 -0700 (PDT)
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 53CE120B74C0;
+	Wed, 27 Sep 2023 14:19:20 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 53CE120B74C0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1695849560;
+	bh=zYLgfwVrqDBS5frwkU8WzeM8Y0joHuphXzHL6ORt8IQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=r9RGtuVkjU1msQKVhEeBLsmKxlWXSVP2EZq8TN2Sb7w0wdbOpbquGZzhVyne/SZTw
+	 w7mzMl985oAl20ftM4fLyW7g6uoUSPCToBkWmmSMXLIhkfhdn6Z0lVh+lscZ13UhhW
+	 zZJtOhcjGS4yfEOlvSx+ZDI66y+PX1Tc/CP5eSD8=
+From: Sonia Sharma <sosha@linux.microsoft.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sosha@microsoft.com,
+	kys@microsoft.com,
+	mikelley@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	longli@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net-next v6] net: hv_netvsc: fix netvsc_send_completion to avoid multiple message length checks
+Date: Wed, 27 Sep 2023 14:19:16 -0700
+Message-Id: <1695849556-20746-1-git-send-email-sosha@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-17.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v12 0/6] iommu/dma: s390 DMA API conversion and optimized
- IOTLB flushing
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@ziepe.ca>, Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Hector Martin <marcan@marcan.st>, Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Lu Baolu <baolu.lu@linux.intel.com>, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Yong Wu <yong.wu@mediatek.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Orson Zhai <orsonzhai@gmail.com>,
-        Baolin Wang
- <baolin.wang@linux.alibaba.com>,
-        Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
-        Jernej Skrabec <jernej.skrabec@gmail.com>,
-        Samuel Holland <samuel@sholland.org>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Krishna Reddy
- <vdumpa@nvidia.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux.dev, asahi@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
-        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
-References: <20230825-dma_iommu-v12-0-4134455994a7@linux.ibm.com>
- <ZRLy_AaJiXxZ2AfK@8bytes.org> <20230926160832.GM13795@ziepe.ca>
- <cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com>
- <ZRP8CiBui7suB5D6@8bytes.org>
- <b06a14de270a63050b0d027c24b333dba25001a4.camel@linux.ibm.com>
- <e1efbbd827e34800bd7fb0ea687645cc6c65e1ab.camel@linux.ibm.com>
- <6dab29f58ac1ccd58caaee031f98f4d0d382cbcd.camel@linux.ibm.com>
- <a672b6b122c7a5f708614346885c190a6960aaea.camel@linux.ibm.com>
- <20230927154009.GN13795@ziepe.ca>
-From: Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20230927154009.GN13795@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MZTnsmsGUITwt1HRAwGX6vmSx-ob7yF1
-X-Proofpoint-ORIG-GUID: Wu1NKWtULkpe9Fba-31Ww5rbudahWoCV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_12,2023-09-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1011
- spamscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 mlxscore=0 phishscore=0 mlxlogscore=999 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2309270171
-X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 9/27/23 11:40 AM, Jason Gunthorpe wrote:
-> On Wed, Sep 27, 2023 at 05:24:20PM +0200, Niklas Schnelle wrote:
-> 
->> Ok, another update. On trying it out again this problem actually also
->> occurs when applying this v12 on top of v6.6-rc3 too. Also I guess
->> unlike my prior thinking it probably doesn't occur with
->> iommu.forcedac=1 since that still allows IOVAs below 4 GiB and we might
->> be the only ones who don't support those. From my point of view this
->> sounds like a mlx5_core issue they really should call
->> dma_set_mask_and_coherent() before their first call to
->> dma_alloc_coherent() not after. So I guess I'll send a v13 of this
->> series rebased on iommu/core and with an additional mlx5 patch and then
->> let's hope we can get that merged in a way that doesn't leave us with
->> broken ConnectX VFs for too long.
-> 
-> Yes, OK. It definitely sounds wrong that mlx5 is doing dma allocations before
-> setting it's dma_set_mask_and_coherent(). Please link to this thread
-> and we can get Leon or Saeed to ack it for Joerg.
-> 
+From: Sonia Sharma <sonia.sharma@linux.microsoft.com>
 
-Hi Niklas,
+The switch statement in netvsc_send_completion() is incorrectly validating
+the length of incoming network packets by falling through to the next case.
+Avoid the fallthrough. Instead break after a case match and then process
+the complete() call.
+The current code has not caused any known failures. But nonetheless, the
+code should be corrected as a different ordering of the switch cases might
+cause a length check to fail when it should not.
 
-I bisected the start of this issue to the following commit (only noticeable on s390 when you apply this subject series on top):
+Signed-off-by: Sonia Sharma <sonia.sharma@linux.microsoft.com>
 
-06cd555f73caec515a14d42ef052221fa2587ff9 ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+---
+Changes in v3:
+* added return statement in default case as pointed by Michael Kelley.
+Changes in v4:
+* added fixes tag
+* modified commit message to explain the issue fixed by patch.
+Changes in v5:
+* Dropped fixes tag as suggested by Simon Horman.
+* fixed indentation
+---
+ drivers/net/hyperv/netvsc.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-Which went in during the merge window.  Please include with your fix and/or report to the mlx5 maintainers.  Looks like the changes in this patch match what you and Jason describe; it splits up mlx5_cmd_init() and moves part of the call earlier.  The net result is we first call mlx5_mdev_init>mlx5_cmd_init->alloc_cmd_page->dma_alloc_coherent and then sometime later call mlx5_pci_init->set_dma_caps->dma_set_mask_and_coherent. 
-
-Prior to this patch, we would not drive mlx5_cmd_init (and thus that first dma_alloc_coherent) until mlx5_init_one which happens _after_ mlx5_pci_init->set_dma_caps->dma_set_mask_and_coherent.
-
-Thanks,
-Matt
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index 82e9796c8f5e..0f7e4d377776 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -851,7 +851,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RECV_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -860,7 +860,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_SEND_BUF_COMPLETE:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -869,7 +869,7 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		fallthrough;
++		break;
+ 
+ 	case NVSP_MSG5_TYPE_SUBCHANNEL:
+ 		if (msglen < sizeof(struct nvsp_message_header) +
+@@ -878,10 +878,6 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 				   msglen);
+ 			return;
+ 		}
+-		/* Copy the response back */
+-		memcpy(&net_device->channel_init_pkt, nvsp_packet,
+-		       sizeof(struct nvsp_message));
+-		complete(&net_device->channel_init_wait);
+ 		break;
+ 
+ 	case NVSP_MSG1_TYPE_SEND_RNDIS_PKT_COMPLETE:
+@@ -904,13 +900,19 @@ static void netvsc_send_completion(struct net_device *ndev,
+ 
+ 		netvsc_send_tx_complete(ndev, net_device, incoming_channel,
+ 					desc, budget);
+-		break;
++		return;
+ 
+ 	default:
+ 		netdev_err(ndev,
+ 			   "Unknown send completion type %d received!!\n",
+ 			   nvsp_packet->hdr.msg_type);
++		return;
+ 	}
++
++	/* Copy the response back */
++	memcpy(&net_device->channel_init_pkt, nvsp_packet,
++	       sizeof(struct nvsp_message));
++	complete(&net_device->channel_init_wait);
+ }
+ 
+ static u32 netvsc_get_next_send_section(struct netvsc_device *net_device)
+-- 
+2.25.1
 
 
