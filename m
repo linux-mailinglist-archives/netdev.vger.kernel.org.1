@@ -1,87 +1,83 @@
-Return-Path: <netdev+bounces-36461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69EA97AFD6B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:59:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3097AFD3C
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 09:58:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1AE9028458B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:59:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8873F2822D4
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 07:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC59208A3;
-	Wed, 27 Sep 2023 07:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A821CAAB;
+	Wed, 27 Sep 2023 07:58:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4441D53F;
-	Wed, 27 Sep 2023 07:58:44 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D28A126;
-	Wed, 27 Sep 2023 00:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695801523; x=1727337523;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=x8lW1juYjWSYOWLt8EtR7D38LHmGWtHNirCMAwpnvV8=;
-  b=iKRQx1mwJz8FtycHzbgGu5YEySElLKAD34mlUpYplb5yy4cWbcpkpj7a
-   5d81uxcohWh9ZlxiaW0g6fET69uCJngO9r01aONDMCV70qe+2AnE2rPu4
-   leR2I4DuZlUV7YdOb9ahOAnxywYdXz1awMAAFtc1kBcziN+z+sC7b5yX/
-   geiO18ojlTWar8tP13HatJ5PpnGZo2YohCenjByS7TFn5+W0B5Ai04KYJ
-   ZndinME16TjqLQbmKBSCmAxddxnv0bGwrUCv9R5OyfGHFdlF3EnYi2VOu
-   P7zAb6NAzSTKGV6UaJmbtqwuPtu+oqbInKn+LDbjSuZ92bqKiFJGTiJkc
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="366818307"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="366818307"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2023 00:58:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10845"; a="725714106"
-X-IronPort-AV: E=Sophos;i="6.03,179,1694761200"; 
-   d="scan'208";a="725714106"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga006.jf.intel.com with ESMTP; 27 Sep 2023 00:58:35 -0700
-Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 927EC7EAC3;
-	Wed, 27 Sep 2023 08:58:33 +0100 (IST)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: bpf@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	David Ahern <dsahern@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6481CA92
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 07:57:57 +0000 (UTC)
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4A2180
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 00:57:54 -0700 (PDT)
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A458D3F212
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 07:57:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1695801472;
+	bh=ip6/ccZiNvOX6hccEjrHN08lTPqfzJb4ULfAfkXBgJM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=j2ApeW2x05hDbbSseCK5OFJGwMUDtu7AwAqJibNbPWR8XMRLfgg94QcaUW82WUhmE
+	 6epeOkdojGKynyxY1++uET1fEvanGgi4+A6WX2420PfkBgCkpBt2WirEgBpA7IXvKB
+	 +5phKPvUMOPtzunDXweVwbaVfN/A2qpT2jvLo6nBg6PtmT7eHqGMaby5Ao7d0LzfLe
+	 WDdJdgLvezfI5E/elZJON385pzSYxffqGhDB33HBLZeVdPLB2+/nBKkc1DNCEZmTpp
+	 KpQTGr0d3eH5Nk+eJQXgNjkLqCD8eYhVa4toP3UhUWuiO04FxiZ69jXfXYm5tAc5Cd
+	 2ZuNLkB+Lv9vQ==
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6927a39c466so11107443b3a.0
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 00:57:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695801471; x=1696406271;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ip6/ccZiNvOX6hccEjrHN08lTPqfzJb4ULfAfkXBgJM=;
+        b=IaKfVLBHpXv8zcmf9nIYSCzMJCjPgYYVQ1WZMZJvMW/pDsS5dCWAqMb+iI+jnUUQSl
+         Vret5AgRvr6FDJBqz6P4MH3qEqTAxwYiggwmWHzjYJrGwFy+xY94Y5FokHWtiyLXrWUY
+         ixRwUvkrwd91zbMFr/2EP8DeCuHTMjjBG3GNHgLjyAGQv3DQvmWO0kxGuLHgFh9sZ464
+         fyhkyLSxYQvqPQedB1rPCMHgdH7xj2kfZyAa0OsRLbDPdy55opr1WI+q/4ZERn+/z+kF
+         dxtkxxerXwfd4jNKzT8uqxyo3MTM+z5nayNJe/+0c0ctKEc8teDNCKveppbm1SC576oC
+         FjUg==
+X-Gm-Message-State: AOJu0YzZlTOSPDxZ2kGmvIvNrTxCYCK7RzrfkeMp7wtkf8jasDkf5ZPR
+	ALc1Gu9Zl+bv0EFc0d9aeeW8G4fTGco1RH4T8Jwezoq0hPSVibyVF1pS9xwTYXS8cC34p4Mq/wC
+	zu2ODnhDadkgMgSlO8gH7AdlLKIlXaImYtg==
+X-Received: by 2002:a05:6a00:3908:b0:68b:e6e0:5047 with SMTP id fh8-20020a056a00390800b0068be6e05047mr1315125pfb.14.1695801470956;
+        Wed, 27 Sep 2023 00:57:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHx/mG27sIh93gB6l2LsEMvHdKnrXh9xI6T0JaEJiOHd6Tv23J+iWR3GET7sPIMo+r+pFJuyQ==
+X-Received: by 2002:a05:6a00:3908:b0:68b:e6e0:5047 with SMTP id fh8-20020a056a00390800b0068be6e05047mr1315106pfb.14.1695801470608;
+        Wed, 27 Sep 2023 00:57:50 -0700 (PDT)
+Received: from zlab.. ([2403:5814:1313:1:68e8:66ff:feab:9acb])
+        by smtp.gmail.com with ESMTPSA id s4-20020a056a00178400b00692b6fe1c7asm8660643pfg.179.2023.09.27.00.57.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 00:57:50 -0700 (PDT)
+From: Trent Lloyd <trent.lloyd@canonical.com>
+To: Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	Anatoly Burakov <anatoly.burakov@intel.com>,
-	Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Maryam Tahhan <mtahhan@redhat.com>,
-	xdp-hints@xdp-project.net,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: Trent Lloyd <trent.lloyd@canonical.com>,
+	linux-kernel@vger.kernel.org,
+	bridge@lists.linux-foundation.org,
 	netdev@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Tariq Toukan <tariqt@mellanox.com>,
-	Saeed Mahameed <saeedm@mellanox.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [RFC bpf-next v2 24/24] mlx5: implement RX checksum XDP hint
-Date: Wed, 27 Sep 2023 09:51:24 +0200
-Message-ID: <20230927075124.23941-25-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230927075124.23941-1-larysa.zaremba@intel.com>
-References: <20230927075124.23941-1-larysa.zaremba@intel.com>
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH] bridge: MTU auto tuning ignores IFLA_MTU on NEWLINK
+Date: Wed, 27 Sep 2023 07:57:12 +0000
+Message-Id: <20230927075713.1253681-1-trent.lloyd@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,212 +86,244 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement .xmo_rx_csum() callback to expose checksum information
-to XDP code.
+Commit 804b854d374e ("net: bridge: disable bridge MTU auto tuning if it
+was set manually") disabled auto-tuning of the bridge MTU when the MTU
+was explicitly set by the user, however that would only happen when the
+MTU was set after creation. This commit ensures auto-tuning is also
+disabled when the MTU is set during bridge creation.
 
-This version contains a lot of logic, duplicated from skb path, because
-refactoring would be much more complex than implementation itself, checksum
-code is too coupled with the skb concept.
+Currently when the br_netdev_ops br_change_mtu function is called, the
+flag BROPT_MTU_SET_BY_USER is set. However this function is only called
+when the MTU is changed after interface creation and is not called if
+the MTU is specified during creation with IFLA_MTU (br_dev_newlink).
 
-Intended logic differences from the skb path:
-- when checksum does not cover the whole packet, no fixups are performed,
-  such packet is treated as one without complete checksum. Just to prevent
-  the patch from ballooning from hints-unrelated code.
-- with hints API, we can now inform about both complete and validated
-  checksum statuses, that is why XDP_CHECKSUM_VERIFIED is ORed to the
-  status. I hope this represents HW logic well.
+br_change_mtu also does not get called if the MTU is set to the same
+value it currently has, which makes it difficult to work around this
+issue (especially for the default MTU of 1500) as you have to first
+change the MTU to some other value and then back to the desired value.
 
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+Add new selftests to ensure the bridge MTU is handled correctly:
+ - Bridge created with user-specified MTU (1500)
+ - Bridge created with user-specified MTU (2000)
+ - Bridge created without user-specified MTU
+ - Bridge created with user-specified MTU set after creation (2000)
+
+Regression risk: Any workload which erroneously specified an MTU during
+creation but accidentally relied upon auto-tuning to a different value
+may be broken by this change.
+
+Link: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2034099
+Fixes: 804b854d374e ("net: bridge: disable bridge MTU auto tuning if it was set manually")
+Signed-off-by: Trent Lloyd <trent.lloyd@canonical.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en/txrx.h |  10 ++
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 100 ++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   |  12 +--
- include/linux/mlx5/device.h                   |   2 +-
- 4 files changed, 112 insertions(+), 12 deletions(-)
+ net/bridge/br_netlink.c                       |   3 +
+ .../selftests/drivers/net/bridge/Makefile     |  10 ++
+ .../drivers/net/bridge/bridge-user-mtu.sh     | 148 ++++++++++++++++++
+ .../drivers/net/bridge/net_forwarding_lib.sh  |   1 +
+ 4 files changed, 162 insertions(+)
+ create mode 100644 tools/testing/selftests/drivers/net/bridge/Makefile
+ create mode 100755 tools/testing/selftests/drivers/net/bridge/bridge-user-mtu.sh
+ create mode 120000 tools/testing/selftests/drivers/net/bridge/net_forwarding_lib.sh
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-index 879d698b6119..9467a0dea6ae 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-@@ -506,4 +506,14 @@ static inline struct mlx5e_mpw_info *mlx5e_get_mpw_info(struct mlx5e_rq *rq, int
+diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+index 10f0d33d8ccf..8aff7d077848 100644
+--- a/net/bridge/br_netlink.c
++++ b/net/bridge/br_netlink.c
+@@ -1559,6 +1559,9 @@ static int br_dev_newlink(struct net *src_net, struct net_device *dev,
+ 		spin_unlock_bh(&br->lock);
+ 	}
  
- 	return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info + array_size(i, isz));
- }
++	if (tb[IFLA_MTU])
++		br_opt_toggle(br, BROPT_MTU_SET_BY_USER, true);
 +
-+static inline u8 get_ip_proto(void *data, int network_depth, __be16 proto)
+ 	err = br_changelink(dev, tb, data, extack);
+ 	if (err)
+ 		br_dev_delete(dev, NULL);
+diff --git a/tools/testing/selftests/drivers/net/bridge/Makefile b/tools/testing/selftests/drivers/net/bridge/Makefile
+new file mode 100644
+index 000000000000..23e407c75a7f
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bridge/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0
++# Makefile for net selftests
++
++TEST_PROGS := \
++	bridge-user-mtu.sh
++
++TEST_FILES := \
++	net_forwarding_lib.sh
++
++include ../../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/bridge/bridge-user-mtu.sh b/tools/testing/selftests/drivers/net/bridge/bridge-user-mtu.sh
+new file mode 100755
+index 000000000000..07e0ac972b00
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bridge/bridge-user-mtu.sh
+@@ -0,0 +1,148 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Ensure a bridge MTU does not automatically change when it has been specified
++# by the user.
++#
++# To run independently:
++# make TARGETS=drivers/net/bridge kselftest
++
++ALL_TESTS="
++	bridge_created_with_user_specified_mtu
++	bridge_created_without_user_specified_mtu
++	bridge_with_late_user_specified_mtu
++"
++
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "${lib_dir}"/net_forwarding_lib.sh
++
++setup_prepare()
 +{
-+	void *ip_p = data + network_depth;
-+
-+	return (proto == htons(ETH_P_IP)) ? ((struct iphdr *)ip_p)->protocol :
-+					    ((struct ipv6hdr *)ip_p)->nexthdr;
++	for i in 1 3 5; do
++		ip link add "vtest${i}" mtu 9000 type veth peer name "vtest${i}b" mtu 9000
++	done
 +}
 +
-+#define short_frame(size) ((size) <= ETH_ZLEN + ETH_FCS_LEN)
- #endif
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-index d7cd14687ce8..d11a62cded2c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-@@ -270,10 +270,110 @@ static int mlx5e_xdp_rx_vlan_tag(const struct xdp_md *ctx, __be16 *vlan_proto,
- 	return 0;
- }
- 
-+static __be16 xdp_buff_last_ethertype(const struct xdp_buff *xdp,
-+				      int *network_offset)
++cleanup()
 +{
-+	__be16 proto = ((struct ethhdr *)xdp->data)->h_proto;
-+	struct vlan_hdr *remaining_data = xdp->data + ETH_HLEN;
-+	u8 allowed_depth = VLAN_MAX_DEPTH;
-+
-+	while (eth_type_vlan(proto)) {
-+		struct vlan_hdr *next_data = remaining_data + 1;
-+
-+		if ((void *)next_data > xdp->data_end || !--allowed_depth)
-+			return 0;
-+		proto = remaining_data->h_vlan_encapsulated_proto;
-+		remaining_data = next_data;
-+	}
-+
-+	*network_offset = (void *)remaining_data - xdp->data;
-+	return proto;
++	for interface in vtest1 vtest3 vtest5 br-test0 br-test1 br-test2; do
++		if [[ -d "/sys/class/net/${interface}" ]]; then
++			ip link del "${interface}" &> /dev/null
++		fi
++	done
 +}
 +
-+static bool xdp_csum_needs_fixup(const struct xdp_buff *xdp, int network_depth,
-+				 __be16 proto)
++check_mtu()
 +{
-+	struct ipv6hdr *ip6;
-+	struct iphdr   *ip4;
-+	int pkt_len;
-+
-+	if (network_depth > ETH_HLEN)
-+		return true;
-+
-+	switch (proto) {
-+	case htons(ETH_P_IP):
-+		ip4 = (struct iphdr *)(xdp->data + network_depth);
-+		pkt_len = network_depth + ntohs(ip4->tot_len);
-+		break;
-+	case htons(ETH_P_IPV6):
-+		ip6 = (struct ipv6hdr *)(xdp->data + network_depth);
-+		pkt_len = network_depth + sizeof(*ip6) + ntohs(ip6->payload_len);
-+		break;
-+	default:
-+		return true;
-+	}
-+
-+	if (likely(pkt_len >= xdp->data_end - xdp->data))
-+		return false;
-+
-+	return true;
++	cur_mtu=$(<"/sys/class/net/$1/mtu")
++	[[ ${cur_mtu} -eq $2 ]]
++	exit_status=$?
++	return "${exit_status}"
 +}
 +
-+static int mlx5e_xdp_rx_csum(const struct xdp_md *ctx,
-+			     enum xdp_csum_status *csum_status,
-+			     __wsum *csum)
++check_bridge_user_specified_mtu()
 +{
-+	const struct mlx5e_xdp_buff *_ctx = (void *)ctx;
-+	const struct mlx5_cqe64 *cqe = _ctx->cqe;
-+	const struct mlx5e_rq *rq = _ctx->rq;
-+	__be16 last_ethertype;
-+	int network_offset;
-+	u8 lro_num_seg;
++	if [[ -z $1 ]]
++	then
++		exit 1
++	fi
++	mtu=$1
 +
-+	lro_num_seg = be32_to_cpu(cqe->srqn) >> 24;
-+	if (lro_num_seg) {
-+		*csum_status = XDP_CHECKSUM_VERIFIED;
-+		return 0;
-+	}
++	RET=0
 +
-+	if (test_bit(MLX5E_RQ_STATE_NO_CSUM_COMPLETE, &rq->state) ||
-+	    get_cqe_tls_offload(cqe))
-+		goto csum_unnecessary;
++	ip link add dev br-test0 mtu "${mtu}" type bridge
++	ip link set br-test0 up
++	check_mtu br-test0 "${mtu}"
++	check_err $? "Bridge was not created with the user-specified MTU"
 +
-+	if (short_frame(ctx->data_end - ctx->data))
-+		goto csum_unnecessary;
++	check_mtu vtest1 9000
++	check_err $? "vtest1 does not have MTU 9000"
 +
-+	last_ethertype = xdp_buff_last_ethertype(&_ctx->xdp, &network_offset);
-+	if (last_ethertype != htons(ETH_P_IP) && last_ethertype != htons(ETH_P_IPV6))
-+		goto csum_unnecessary;
-+	if (unlikely(get_ip_proto(_ctx->xdp.data, network_offset,
-+				  last_ethertype) == IPPROTO_SCTP))
-+		goto csum_unnecessary;
++	ip link set dev vtest1 master br-test0
++	check_mtu br-test0 "${mtu}"
++	check_err $? "Bridge user-specified MTU incorrectly changed after adding an interface"
 +
-+	*csum_status = XDP_CHECKSUM_COMPLETE;
-+	*csum = csum_unfold((__force __sum16)cqe->check_sum);
++	log_test "Bridge created with user-specified MTU (${mtu})"
 +
-+	if (test_bit(MLX5E_RQ_STATE_CSUM_FULL, &rq->state))
-+		goto csum_unnecessary;
-+
-+	if (unlikely(xdp_csum_needs_fixup(&_ctx->xdp, network_offset,
-+					  last_ethertype)))
-+		*csum_status = 0;
-+
-+csum_unnecessary:
-+	if (likely((cqe->hds_ip_ext & CQE_L3_OK) &&
-+		   (cqe->hds_ip_ext & CQE_L4_OK))) {
-+		*csum_status |= XDP_CHECKSUM_VERIFIED;
-+	}
-+
-+	return *csum_status ? 0 : -ENODATA;
++	ip link del br-test0
 +}
 +
- const struct xdp_metadata_ops mlx5e_xdp_metadata_ops = {
- 	.xmo_rx_timestamp		= mlx5e_xdp_rx_timestamp,
- 	.xmo_rx_hash			= mlx5e_xdp_rx_hash,
- 	.xmo_rx_vlan_tag		= mlx5e_xdp_rx_vlan_tag,
-+	.xmo_rx_csum			= mlx5e_xdp_rx_csum,
- };
- 
- /* returns true if packet was consumed by xdp */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 3fd11b0761e0..c303ab8b928c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -1374,16 +1374,6 @@ static inline void mlx5e_enable_ecn(struct mlx5e_rq *rq, struct sk_buff *skb)
- 	rq->stats->ecn_mark += !!rc;
- }
- 
--static u8 get_ip_proto(struct sk_buff *skb, int network_depth, __be16 proto)
--{
--	void *ip_p = skb->data + network_depth;
--
--	return (proto == htons(ETH_P_IP)) ? ((struct iphdr *)ip_p)->protocol :
--					    ((struct ipv6hdr *)ip_p)->nexthdr;
--}
--
--#define short_frame(size) ((size) <= ETH_ZLEN + ETH_FCS_LEN)
--
- #define MAX_PADDING 8
- 
- static void
-@@ -1493,7 +1483,7 @@ static inline void mlx5e_handle_csum(struct net_device *netdev,
- 		goto csum_unnecessary;
- 
- 	if (likely(is_last_ethertype_ip(skb, &network_depth, &proto))) {
--		if (unlikely(get_ip_proto(skb, network_depth, proto) == IPPROTO_SCTP))
-+		if (unlikely(get_ip_proto(skb->data, network_depth, proto) == IPPROTO_SCTP))
- 			goto csum_unnecessary;
- 
- 		stats->csum_complete++;
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 0805f8231452..26298c824050 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -911,7 +911,7 @@ static inline bool cqe_is_tunneled(struct mlx5_cqe64 *cqe)
- 	return cqe->tls_outer_l3_tunneled & 0x1;
- }
- 
--static inline u8 get_cqe_tls_offload(struct mlx5_cqe64 *cqe)
-+static inline u8 get_cqe_tls_offload(const struct mlx5_cqe64 *cqe)
- {
- 	return (cqe->tls_outer_l3_tunneled >> 3) & 0x3;
- }
++bridge_created_with_user_specified_mtu() {
++	# Check two user-specified MTU values
++	# - 1500: To ensure the default MTU (1500) is not special-cased, you
++	#         should be able to lock a bridge to the default MTU.
++	# - 2000: Ensure bridges are actually created with a user-specified MTU
++	check_bridge_user_specified_mtu 1500
++	check_bridge_user_specified_mtu 2000
++}
++
++bridge_created_without_user_specified_mtu()
++{
++	RET=0
++	ip link add dev br-test1 type bridge
++	ip link set br-test1 up
++	check_mtu br-test1 1500
++	check_err $? "Bridge was not created with the user-specified MTU"
++
++	ip link set dev vtest3 master br-test1
++	check_mtu br-test1 9000
++	check_err $? "Bridge without user-specified MTU did not change MTU"
++
++	log_test "Bridge created without user-specified MTU"
++
++	ip link del br-test1
++}
++
++check_bridge_late_user_specified_mtu()
++{
++	if [[ -z $1 ]]
++	then
++		exit 1
++	fi
++	mtu=$1
++
++	RET=0
++	ip link add dev br-test2 type bridge
++	ip link set br-test2 up
++	check_mtu br-test2 1500
++	check_err $? "Bridge was not created with default MTU (1500)"
++
++	ip link set br-test2 mtu "${mtu}"
++	check_mtu br-test2 "${mtu}"
++	check_err $? "User-specified MTU set after creation was not set"
++	check_mtu vtest5 9000
++	check_err $? "vtest5 does not have MTU 9000"
++
++	ip link set dev vtest5 master br-test2
++	check_mtu br-test2 "${mtu}"
++	check_err $? "Bridge late-specified MTU incorrectly changed after adding an interface"
++
++	log_test "Bridge created without user-specified MTU and changed after (${mtu})"
++
++	ip link del br-test2
++}
++
++bridge_with_late_user_specified_mtu()
++{
++	# Note: Unfortunately auto-tuning is not disabled when you set the MTU
++	# to it's current value, including the default of 1500. The reason is
++	# that dev_set_mtu_ext skips notifying any handlers if the MTU is set
++	# to the current value. Normally that makes sense, but is confusing
++	# since you might expect "ip link set br0 mtu 1500" to lock the MTU to
++	# 1500 but that will only happen if the MTU was not already 1500. So we
++	# only check a non-default value of 2000 here unlike the earlier
++	# bridge_created_with_user_specified_mtu test
++
++	# Check one user-specified MTU value
++	# - 2000: Ensure bridges actually change to a user-specified MTU
++	check_bridge_late_user_specified_mtu 2000
++}
++
++trap cleanup EXIT
++
++setup_prepare
++tests_run
++
++exit "${EXIT_STATUS}"
+diff --git a/tools/testing/selftests/drivers/net/bridge/net_forwarding_lib.sh b/tools/testing/selftests/drivers/net/bridge/net_forwarding_lib.sh
+new file mode 120000
+index 000000000000..39c96828c5ef
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/bridge/net_forwarding_lib.sh
+@@ -0,0 +1 @@
++../../../net/forwarding/lib.sh
+\ No newline at end of file
 -- 
-2.41.0
+2.34.1
 
 
