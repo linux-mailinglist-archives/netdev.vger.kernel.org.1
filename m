@@ -1,196 +1,133 @@
-Return-Path: <netdev+bounces-36479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32CF97AFE86
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:32:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9007AFEAD
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 10:35:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9FE752843E3
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 017CA28436F
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 08:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4E01D545;
-	Wed, 27 Sep 2023 08:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B8F23B7;
+	Wed, 27 Sep 2023 08:35:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCA8208CA
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:32:02 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23AE191
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:32:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695803519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ale7t5nl21L3c6+f7HGf39TkfmwA9pSSLTtCbVSuLOg=;
-	b=etwyQr0K8p1yQQFMYL9Q7PR40lIp+5B6afE+UO7C/FThkJatCHlMDdTnfZUIbR5SHRi7MB
-	RhcQyxFCKnJiQcYsiEQAqc9rLrzyTD2/eelDH60w6J0bBKUs/VQqlTlM2dZccQvhnwi80c
-	+7Oq8wmW7Yzp784chw3g6qqlBxh+9D4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-630-JaT273wkOba_BfGclRbSbw-1; Wed, 27 Sep 2023 04:31:56 -0400
-X-MC-Unique: JaT273wkOba_BfGclRbSbw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 01216185A797;
-	Wed, 27 Sep 2023 08:31:56 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.119])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4417B200A6D2;
-	Wed, 27 Sep 2023 08:31:54 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: poros@redhat.com,
-	mschmidt@redhat.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH net-next v2 9/9] i40e: Move DDP specific macros and structures to i40e_ddp.c
-Date: Wed, 27 Sep 2023 10:31:35 +0200
-Message-ID: <20230927083135.3237206-10-ivecera@redhat.com>
-In-Reply-To: <20230927083135.3237206-1-ivecera@redhat.com>
-References: <20230927083135.3237206-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6895F7E5
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 08:35:03 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D80F3CE0
+	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:35:00 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so1047985e9.0
+        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:35:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1695803699; x=1696408499; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6EzRH8HpBFbjaPAR694gwUNSGbvhoAReDe5zSrIsMYc=;
+        b=KmBhERYxNja03evkVTIwrf3H+zWoAIWfShVsFLB8O3LHVpn+QsMnv0ilaAbaZacSfm
+         cfUHsIEAIO2FPRJwdjGYkFaqsfGyoMts3bHIsFU48IPwIUTNmU2tseM8qUWU9eY4+kdq
+         8V1A690j8lMoSEav6P6nM28+spVIJ1whoUljlkN9HAe1N0afh4hHB3EGvQdkMhSVqMW1
+         RjKUhaBkLIAOkkzVP/SMqanPkYp7r/Hlz5o4ZGR/T8Q+LRsI7vaS0S9H9UAOwU6OqZve
+         jwa+BUMeazmBHnJ/tHg8OAEaOQ6DDDMpHdKSpxs5xorki9QbCMEm3qgzxyUERVMooD0N
+         qy2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695803699; x=1696408499;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6EzRH8HpBFbjaPAR694gwUNSGbvhoAReDe5zSrIsMYc=;
+        b=Wj3SH/IhGvvtbSJ3sxxqiN/q7OaEL9PnFUPRT6xlJIP/ME5v88Bx6zeDT0/koHUv3U
+         Fc+j0A9xi9Qa4SQgDwid2r5hf+FTO+FXH3qdmwJJczMKb+fvLCYw+jfq/lOikKjxiE+H
+         bhqYqL7F5f/pRb9AKjLTeyS8kfFrZnp/gj6uFkt3b7XN0OyDQcpQh0t6ZoCl++hNyiT/
+         j9eXeThhwCcCTd7KV261jG1L6Q4kGrTXeyMuvQH7bW8ytyAylznNATCWeOwKtccdHPSS
+         w2ekHc90m4neoM+EdsPwgwkd0Z8vaKvoMx/mCK24s0Wy2fbdlUK6aS7wl2t0r5GAVtEi
+         sL2Q==
+X-Gm-Message-State: AOJu0YzXu+LgivMxwg+vTGFXdSaozxRYtl+TSjGupfGHBLmRjX9+r/Xt
+	NH1ZpxlibB/QkU3RrvrVmja0bQ==
+X-Google-Smtp-Source: AGHT+IFuym5R8Qhlx0EFOvWxJLW34MZWMA5h5QfqPC2FB+6Of5cJKCozwBEzMLcTtleEgixAGH9LwQ==
+X-Received: by 2002:a05:600c:365a:b0:405:36d7:4579 with SMTP id y26-20020a05600c365a00b0040536d74579mr1220226wmq.28.1695803699132;
+        Wed, 27 Sep 2023 01:34:59 -0700 (PDT)
+Received: from [192.168.0.105] (haunt.prize.volia.net. [93.72.109.136])
+        by smtp.gmail.com with ESMTPSA id k12-20020a7bc40c000000b003fc04d13242sm20153631wmi.0.2023.09.27.01.34.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Sep 2023 01:34:58 -0700 (PDT)
+Message-ID: <9ac9b0bf-88e9-5156-a01c-507ae331dd9e@blackwall.org>
+Date: Wed, 27 Sep 2023 11:34:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] bridge: MTU auto tuning ignores IFLA_MTU on NEWLINK
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+To: Trent Lloyd <trent.lloyd@canonical.com>, Roopa Prabhu <roopa@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, bridge@lists.linux-foundation.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230927075713.1253681-1-trent.lloyd@canonical.com>
+ <3dccacd8-4249-87f8-690c-6083374dc9d1@blackwall.org>
+In-Reply-To: <3dccacd8-4249-87f8-690c-6083374dc9d1@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Move several DDP related macros and structures from i40e.h header
-to i40e_ddp.c where are privately used. Make static i40e_ddp_load()
-function that is also used only in i40e_ddp and move declaration of
-i40e_ddp_flash() used by i40e_ethtool.c to i40e_prototype.h
+On 9/27/23 11:10, Nikolay Aleksandrov wrote:
+> On 9/27/23 10:57, Trent Lloyd wrote:
+>> Commit 804b854d374e ("net: bridge: disable bridge MTU auto tuning if it
+>> was set manually") disabled auto-tuning of the bridge MTU when the MTU
+>> was explicitly set by the user, however that would only happen when the
+>> MTU was set after creation. This commit ensures auto-tuning is also
+>> disabled when the MTU is set during bridge creation.
+>>
+>> Currently when the br_netdev_ops br_change_mtu function is called, the
+>> flag BROPT_MTU_SET_BY_USER is set. However this function is only called
+>> when the MTU is changed after interface creation and is not called if
+>> the MTU is specified during creation with IFLA_MTU (br_dev_newlink).
+>>
+>> br_change_mtu also does not get called if the MTU is set to the same
+>> value it currently has, which makes it difficult to work around this
+>> issue (especially for the default MTU of 1500) as you have to first
+>> change the MTU to some other value and then back to the desired value.
+>>
+> 
+> Yep, I think I also described this in the commit message of my patch.
+> 
+>> Add new selftests to ensure the bridge MTU is handled correctly:
+>>   - Bridge created with user-specified MTU (1500)
+>>   - Bridge created with user-specified MTU (2000)
+>>   - Bridge created without user-specified MTU
+>>   - Bridge created with user-specified MTU set after creation (2000)
+>>
+>> Regression risk: Any workload which erroneously specified an MTU during
+>> creation but accidentally relied upon auto-tuning to a different value
+>> may be broken by this change.
+>>
+> 
+> Hmm, you're right. There's a risk of regression. Also it acts 
+> differently when set to 1500 as you've mentioned. I think they should 
+> act the same, also bridge's fake rtable RTAX_MTU is not set.
+> 
 
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h        | 24 -------------------
- drivers/net/ethernet/intel/i40e/i40e_ddp.c    | 22 +++++++++++++++--
- .../net/ethernet/intel/i40e/i40e_prototype.h  |  5 ++++
- 3 files changed, 25 insertions(+), 26 deletions(-)
+The last part about RTAX_MTU is probably a separate issue. :)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 107826c040c1..214744de120d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -4,7 +4,6 @@
- #ifndef _I40E_H_
- #define _I40E_H_
- 
--#include <linux/ethtool.h>
- #include <linux/pci.h>
- #include <linux/ptp_clock_kernel.h>
- #include <linux/types.h>
-@@ -296,29 +295,6 @@ struct i40e_udp_port_config {
- 	u8 filter_index;
- };
- 
--#define I40_DDP_FLASH_REGION 100
--#define I40E_PROFILE_INFO_SIZE 48
--#define I40E_MAX_PROFILE_NUM 16
--#define I40E_PROFILE_LIST_SIZE \
--	(I40E_PROFILE_INFO_SIZE * I40E_MAX_PROFILE_NUM + 4)
--#define I40E_DDP_PROFILE_PATH "intel/i40e/ddp/"
--#define I40E_DDP_PROFILE_NAME_MAX 64
--
--int i40e_ddp_load(struct net_device *netdev, const u8 *data, size_t size,
--		  bool is_add);
--int i40e_ddp_flash(struct net_device *netdev, struct ethtool_flash *flash);
--
--struct i40e_ddp_profile_list {
--	u32 p_count;
--	struct i40e_profile_info p_info[];
--};
--
--struct i40e_ddp_old_profile_list {
--	struct list_head list;
--	size_t old_ddp_size;
--	u8 old_ddp_buf[];
--};
--
- /* macros related to FLX_PIT */
- #define I40E_FLEX_SET_FSIZE(fsize) (((fsize) << \
- 				    I40E_PRTQF_FLX_PIT_FSIZE_SHIFT) & \
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ddp.c b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-index 21b3518c4096..6b68b6575a1d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
-@@ -4,6 +4,24 @@
- #include <linux/firmware.h>
- #include "i40e.h"
- 
-+#define I40_DDP_FLASH_REGION		100
-+#define I40E_PROFILE_INFO_SIZE		48
-+#define I40E_MAX_PROFILE_NUM		16
-+#define I40E_PROFILE_LIST_SIZE		\
-+	(I40E_PROFILE_INFO_SIZE * I40E_MAX_PROFILE_NUM + 4)
-+#define I40E_DDP_PROFILE_PATH		"intel/i40e/ddp/"
-+#define I40E_DDP_PROFILE_NAME_MAX	64
-+
-+struct i40e_ddp_profile_list {
-+	u32 p_count;
-+	struct i40e_profile_info p_info[];
-+};
-+
-+struct i40e_ddp_old_profile_list {
-+	struct list_head list;
-+	size_t old_ddp_size;
-+	u8 old_ddp_buf[];
-+};
- 
- /**
-  * i40e_ddp_profiles_eq - checks if DDP profiles are the equivalent
-@@ -261,8 +279,8 @@ static bool i40e_ddp_is_pkg_hdr_valid(struct net_device *netdev,
-  * Checks correctness and loads DDP profile to the NIC. The function is
-  * also used for rolling back previously loaded profile.
-  **/
--int i40e_ddp_load(struct net_device *netdev, const u8 *data, size_t size,
--		  bool is_add)
-+static int i40e_ddp_load(struct net_device *netdev, const u8 *data, size_t size,
-+			 bool is_add)
- {
- 	u8 profile_info_sec[sizeof(struct i40e_profile_section_header) +
- 			    sizeof(struct i40e_profile_info)];
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_prototype.h b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-index 2001fefa0c52..46b9a05ceb91 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_prototype.h
-@@ -4,6 +4,7 @@
- #ifndef _I40E_PROTOTYPE_H_
- #define _I40E_PROTOTYPE_H_
- 
-+#include <linux/ethtool.h>
- #include <linux/avf/virtchnl.h>
- #include "i40e_debug.h"
- #include "i40e_type.h"
-@@ -497,4 +498,8 @@ int
- i40e_add_pinfo_to_list(struct i40e_hw *hw,
- 		       struct i40e_profile_segment *profile,
- 		       u8 *profile_info_sec, u32 track_id);
-+
-+/* i40e_ddp */
-+int i40e_ddp_flash(struct net_device *netdev, struct ethtool_flash *flash);
-+
- #endif /* _I40E_PROTOTYPE_H_ */
--- 
-2.41.0
+>> Link: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2034099
+>> Fixes: 804b854d374e ("net: bridge: disable bridge MTU auto tuning if 
+>> it was set manually")
+>> Signed-off-by: Trent Lloyd <trent.lloyd@canonical.com>
+>> ---
+> 
 
 
