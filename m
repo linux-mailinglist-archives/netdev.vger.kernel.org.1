@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-36392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E727AF7C6
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 03:50:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24BE67AF7C9
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 03:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3EE4E281A4B
-	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 01:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C776A281A89
+	for <lists+netdev@lfdr.de>; Wed, 27 Sep 2023 01:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA56A4C6C;
-	Wed, 27 Sep 2023 01:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56CA4C81;
+	Wed, 27 Sep 2023 01:51:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F15C1108
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 01:50:04 +0000 (UTC)
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71AE4EDC;
-	Tue, 26 Sep 2023 18:50:01 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsyF-Ei_1695779398;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsyF-Ei_1695779398)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0133C4C80;
+	Wed, 27 Sep 2023 01:51:49 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D7995BAB;
+	Tue, 26 Sep 2023 18:51:47 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VsyS9RB_1695779503;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VsyS9RB_1695779503)
           by smtp.aliyun-inc.com;
-          Wed, 27 Sep 2023 09:49:58 +0800
-Message-ID: <1695779259.7440922-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [GIT PULL] virtio: features
-Date: Wed, 27 Sep 2023 09:47:39 +0800
+          Wed, 27 Sep 2023 09:51:44 +0800
+Message-ID: <1695779406.5695555-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v13 12/12] virtio_net: merge dma operations when filling mergeable buffers
+Date: Wed, 27 Sep 2023 09:50:06 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- <kvm@vger.kernel.org>,
- <virtualization@lists.linux-foundation.org>,
- <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>,
- <eperezma@redhat.com>,
- <jasowang@redhat.com>,
- <shannon.nelson@amd.com>,
- <xuanzhuo@linux.alibaba.com>,
- <yuanyaogoog@chromium.org>,
- <yuehaibing@huawei.com>,
- Thomas Lendacky <thomas.lendacky@amd.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20230903181338-mutt-send-email-mst@kernel.org>
- <20230926130451.axgodaa6tvwqs3ut@amd.com>
-In-Reply-To: <20230926130451.axgodaa6tvwqs3ut@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux-foundation.org,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org,
+ Christoph Hellwig <hch@infradead.org>
+References: <20230810123057.43407-1-xuanzhuo@linux.alibaba.com>
+ <20230810123057.43407-13-xuanzhuo@linux.alibaba.com>
+ <20230926120055-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230926120055-mutt-send-email-mst@kernel.org>
 X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
 	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
 	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
@@ -58,187 +57,404 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Tue, 26 Sep 2023 08:04:51 -0500, Michael Roth <michael.roth@amd.com> wro=
-te:
-> On Sun, Sep 03, 2023 at 06:13:38PM -0400, Michael S. Tsirkin wrote:
-> > The following changes since commit 2dde18cd1d8fac735875f2e4987f11817cc0=
-bc2c:
+On Tue, 26 Sep 2023 12:01:34 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Thu, Aug 10, 2023 at 08:30:57PM +0800, Xuan Zhuo wrote:
+> > Currently, the virtio core will perform a dma operation for each
+> > buffer. Although, the same page may be operated multiple times.
 > >
-> >   Linux 6.5 (2023-08-27 14:49:51 -0700)
+> > This patch, the driver does the dma operation and manages the dma
+> > address based the feature premapped of virtio core.
 > >
-> > are available in the Git repository at:
+> > This way, we can perform only one dma operation for the pages of the
+> > alloc frag. This is beneficial for the iommu device.
 > >
-> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/fo=
-r_linus
+> > kernel command line: intel_iommu=on iommu.passthrough=0
 > >
-> > for you to fetch changes up to 1acfe2c1225899eab5ab724c91b7e1eb2881b9ab:
+> >        |  strict=0  | strict=1
+> > Before |  775496pps | 428614pps
+> > After  | 1109316pps | 742853pps
 > >
-> >   virtio_ring: fix avail_wrap_counter in virtqueue_add_packed (2023-09-=
-03 18:10:24 -0400)
-> >
-> > ----------------------------------------------------------------
-> > virtio: features
-> >
-> > a small pull request this time around, mostly because the
-> > vduse network got postponed to next relase so we can be sure
-> > we got the security store right.
-> >
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> > ----------------------------------------------------------------
-> > Eugenio P=E9=96=9Eez (4):
-> >       vdpa: add VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK flag
-> >       vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend featu=
-re
-> >       vdpa: add get_backend_features vdpa operation
-> >       vdpa_sim: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-> >
-> > Jason Wang (1):
-> >       virtio_vdpa: build affinity masks conditionally
-> >
-> > Xuan Zhuo (12):
-> >       virtio_ring: check use_dma_api before unmap desc for indirect
-> >       virtio_ring: put mapping error check in vring_map_one_sg
-> >       virtio_ring: introduce virtqueue_set_dma_premapped()
-> >       virtio_ring: support add premapped buf
-> >       virtio_ring: introduce virtqueue_dma_dev()
-> >       virtio_ring: skip unmap for premapped
-> >       virtio_ring: correct the expression of the description of virtque=
-ue_resize()
-> >       virtio_ring: separate the logic of reset/enable from virtqueue_re=
-size
-> >       virtio_ring: introduce virtqueue_reset()
-> >       virtio_ring: introduce dma map api for virtqueue
-> >       virtio_ring: introduce dma sync api for virtqueue
-> >       virtio_net: merge dma operations when filling mergeable buffers
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 >
-> This ^ patch (upstream commit 295525e29a) seems to cause a
-> network-related regression when using SWIOTLB in the guest. I noticed
-> this initially testing SEV guests, which use SWIOTLB by default, but
-> it can also be seen with normal guests when forcing SWIOTLB via
-> swiotlb=3Dforce kernel cmdline option. I see it with both 6.6-rc1 and
-> 6.6-rc2 (haven't tried rc3 yet, but don't see any related changes
-> there), and reverting 714073495f seems to avoid the issue.
->
-> Steps to reproduce:
->
-> 1) Boot QEMU/KVM guest with 6.6-rc2 with swiotlb=3Dforce via something li=
-ke the following cmdline:
->
->    qemu-system-x86_64 \
->    -machine q35 -smp 4,maxcpus=3D255 -cpu EPYC-Milan-v2 \
->    -enable-kvm -m 16G,slots=3D5,maxmem=3D256G -vga none \
->    -device virtio-scsi-pci,id=3Dscsi0,disable-legacy=3Don,iommu_platform=
-=3Dtrue \
->    -drive file=3D/home/mroth/storage/ubuntu-18.04-seves2.qcow2,if=3Dnone,=
-id=3Ddrive0,snapshot=3Doff \
->    -device scsi-hd,id=3Dhd0,drive=3Ddrive0,bus=3Dscsi0.0 \
->    -device virtio-net-pci,netdev=3Dnetdev0,id=3Dnet0,disable-legacy=3Don,=
-iommu_platform=3Dtrue,romfile=3D \
->    -netdev tap,script=3D/home/mroth/qemu-ifup,id=3Dnetdev0 \
->    -L /home/mroth/storage/AMDSEV2/snp-release-2023-09-23/usr/local/share/=
-qemu \
->    -drive if=3Dpflash,format=3Draw,unit=3D0,file=3D/home/mroth/storage/AM=
-DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_CODE.fd,readonly \
->    -drive if=3Dpflash,format=3Draw,unit=3D1,file=3D/home/mroth/storage/AM=
-DSEV2/snp-release-2023-09-23/usr/local/share/qemu/OVMF_VARS.fd \
->    -debugcon file:debug.log -global isa-debugcon.iobase=3D0x402 -msg time=
-stamp=3Don \
->    -kernel /boot/vmlinuz-6.6.0-rc2-vanilla0+ \
->    -initrd /boot/initrd.img-6.6.0-rc2-vanilla0+ \
->    -append "root=3DUUID=3Dd72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=
-=3DttyS0,115200n8 earlyprintk=3Dserial,ttyS0,115200 debug=3D1 sev=3Ddebug p=
-age_poison=3D0 spec_rstack_overflow=3Doff swiotlb=3Dforce"
->
-> 2) scp a small file from the host to the guest IP via its virtio-net devi=
-ce.
->    Smaller file sizes succeed, but the larger the file the more likely
->    it will fail. e.g.:
->
->    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D19
->    19+0 records in
->    19+0 records out
->    19456 bytes (19 kB, 19 KiB) copied, 0.000940134 s, 20.7 MB/s
->    mroth@host:~$ scp test vm0:
->    test                                                                  =
-  100%   19KB  10.1MB/s   00:00
->    mroth@host:~$ dd if=3D/dev/zero of=3Dtest bs=3D1K count=3D20
->    20+0 records in
->    20+0 records out
->    20480 bytes (20 kB, 20 KiB) copied, 0.00093774 s, 21.8 MB/s
->    mroth@host:~$ scp test vm0:
->    test                                                                  =
-    0%    0     0.0KB/s   --:-- ETA
->    client_loop: send disconnect: Broken pipe
->    lost connection
->    mroth@host:~$
+> Hi Xuan Zhuo,
+> looks like this patch is causing regressions. Do you have time to debug
+> or should I revert?
 
 
-Hi Michael,
+I have sended a fix to Michael Roth.
 
-Thanks for the report.
-
-Cloud you try this fix?  I reproduce this issue, and that works for me.
+I will wait his response. If that is ok, I will post that fix commit.
 
 Thanks.
 
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 98dc9b49d56b..9ece27dc5144 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *rq=
-, void *buf, u32 len)
-
-        --dma->ref;
-
--       if (dma->ref) {
--               if (dma->need_sync && len) {
--                       offset =3D buf - (head + sizeof(*dma));
-+       if (dma->need_sync && len) {
-+               offset =3D buf - (head + sizeof(*dma));
-
--                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma=
-->addr, offset,
--                                                               len, DMA_FR=
-OM_DEVICE);
--               }
-+               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr,
-+                                                       offset, len,
-+                                                       DMA_FROM_DEVICE);
-+       }
-
-+       if (dma->ref)
-                return;
--       }
-
-        virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
-                                         DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU=
-_SYNC);
-
-
 >
-> Thanks,
+> > ---
+> >  drivers/net/virtio_net.c | 228 ++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 202 insertions(+), 26 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 486b5849033d..16adb5ef18f8 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -126,6 +126,14 @@ static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = {
+> >  #define VIRTNET_SQ_STATS_LEN	ARRAY_SIZE(virtnet_sq_stats_desc)
+> >  #define VIRTNET_RQ_STATS_LEN	ARRAY_SIZE(virtnet_rq_stats_desc)
+> >
+> > +/* The dma information of pages allocated at a time. */
+> > +struct virtnet_rq_dma {
+> > +	dma_addr_t addr;
+> > +	u32 ref;
+> > +	u16 len;
+> > +	u16 need_sync;
+> > +};
+> > +
+> >  /* Internal representation of a send virtqueue */
+> >  struct send_queue {
+> >  	/* Virtqueue associated with this send _queue */
+> > @@ -175,6 +183,12 @@ struct receive_queue {
+> >  	char name[16];
+> >
+> >  	struct xdp_rxq_info xdp_rxq;
+> > +
+> > +	/* Record the last dma info to free after new pages is allocated. */
+> > +	struct virtnet_rq_dma *last_dma;
+> > +
+> > +	/* Do dma by self */
+> > +	bool do_dma;
+> >  };
+> >
+> >  /* This structure can contain rss message with maximum settings for indirection table and keysize
+> > @@ -549,6 +563,156 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+> >  	return skb;
+> >  }
+> >
+> > +static void virtnet_rq_unmap(struct receive_queue *rq, void *buf, u32 len)
+> > +{
+> > +	struct page *page = virt_to_head_page(buf);
+> > +	struct virtnet_rq_dma *dma;
+> > +	void *head;
+> > +	int offset;
+> > +
+> > +	head = page_address(page);
+> > +
+> > +	dma = head;
+> > +
+> > +	--dma->ref;
+> > +
+> > +	if (dma->ref) {
+> > +		if (dma->need_sync && len) {
+> > +			offset = buf - (head + sizeof(*dma));
+> > +
+> > +			virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr, offset,
+> > +								len, DMA_FROM_DEVICE);
+> > +		}
+> > +
+> > +		return;
+> > +	}
+> > +
+> > +	virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+> > +					 DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
+> > +	put_page(page);
+> > +}
+> > +
+> > +static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
+> > +{
+> > +	void *buf;
+> > +
+> > +	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> > +	if (buf && rq->do_dma)
+> > +		virtnet_rq_unmap(rq, buf, *len);
+> > +
+> > +	return buf;
+> > +}
+> > +
+> > +static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
+> > +{
+> > +	void *buf;
+> > +
+> > +	buf = virtqueue_detach_unused_buf(rq->vq);
+> > +	if (buf && rq->do_dma)
+> > +		virtnet_rq_unmap(rq, buf, 0);
+> > +
+> > +	return buf;
+> > +}
+> > +
+> > +static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
+> > +{
+> > +	struct virtnet_rq_dma *dma;
+> > +	dma_addr_t addr;
+> > +	u32 offset;
+> > +	void *head;
+> > +
+> > +	if (!rq->do_dma) {
+> > +		sg_init_one(rq->sg, buf, len);
+> > +		return;
+> > +	}
+> > +
+> > +	head = page_address(rq->alloc_frag.page);
+> > +
+> > +	offset = buf - head;
+> > +
+> > +	dma = head;
+> > +
+> > +	addr = dma->addr - sizeof(*dma) + offset;
+> > +
+> > +	sg_init_table(rq->sg, 1);
+> > +	rq->sg[0].dma_address = addr;
+> > +	rq->sg[0].length = len;
+> > +}
+> > +
+> > +static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+> > +{
+> > +	struct page_frag *alloc_frag = &rq->alloc_frag;
+> > +	struct virtnet_rq_dma *dma;
+> > +	void *buf, *head;
+> > +	dma_addr_t addr;
+> > +
+> > +	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> > +		return NULL;
+> > +
+> > +	head = page_address(alloc_frag->page);
+> > +
+> > +	if (rq->do_dma) {
+> > +		dma = head;
+> > +
+> > +		/* new pages */
+> > +		if (!alloc_frag->offset) {
+> > +			if (rq->last_dma) {
+> > +				/* Now, the new page is allocated, the last dma
+> > +				 * will not be used. So the dma can be unmapped
+> > +				 * if the ref is 0.
+> > +				 */
+> > +				virtnet_rq_unmap(rq, rq->last_dma, 0);
+> > +				rq->last_dma = NULL;
+> > +			}
+> > +
+> > +			dma->len = alloc_frag->size - sizeof(*dma);
+> > +
+> > +			addr = virtqueue_dma_map_single_attrs(rq->vq, dma + 1,
+> > +							      dma->len, DMA_FROM_DEVICE, 0);
+> > +			if (virtqueue_dma_mapping_error(rq->vq, addr))
+> > +				return NULL;
+> > +
+> > +			dma->addr = addr;
+> > +			dma->need_sync = virtqueue_dma_need_sync(rq->vq, addr);
+> > +
+> > +			/* Add a reference to dma to prevent the entire dma from
+> > +			 * being released during error handling. This reference
+> > +			 * will be freed after the pages are no longer used.
+> > +			 */
+> > +			get_page(alloc_frag->page);
+> > +			dma->ref = 1;
+> > +			alloc_frag->offset = sizeof(*dma);
+> > +
+> > +			rq->last_dma = dma;
+> > +		}
+> > +
+> > +		++dma->ref;
+> > +	}
+> > +
+> > +	buf = head + alloc_frag->offset;
+> > +
+> > +	get_page(alloc_frag->page);
+> > +	alloc_frag->offset += size;
+> > +
+> > +	return buf;
+> > +}
+> > +
+> > +static void virtnet_rq_set_premapped(struct virtnet_info *vi)
+> > +{
+> > +	int i;
+> > +
+> > +	/* disable for big mode */
+> > +	if (!vi->mergeable_rx_bufs && vi->big_packets)
+> > +		return;
+> > +
+> > +	for (i = 0; i < vi->max_queue_pairs; i++) {
+> > +		if (virtqueue_set_dma_premapped(vi->rq[i].vq))
+> > +			continue;
+> > +
+> > +		vi->rq[i].do_dma = true;
+> > +	}
+> > +}
+> > +
+> >  static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
+> >  {
+> >  	unsigned int len;
+> > @@ -835,7 +999,7 @@ static struct page *xdp_linearize_page(struct receive_queue *rq,
+> >  		void *buf;
+> >  		int off;
+> >
+> > -		buf = virtqueue_get_buf(rq->vq, &buflen);
+> > +		buf = virtnet_rq_get_buf(rq, &buflen, NULL);
+> >  		if (unlikely(!buf))
+> >  			goto err_buf;
+> >
+> > @@ -1126,7 +1290,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
+> >  		return -EINVAL;
+> >
+> >  	while (--*num_buf > 0) {
+> > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
+> > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
+> >  				 dev->name, *num_buf,
+> > @@ -1351,7 +1515,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+> >  	while (--num_buf) {
+> >  		int num_skb_frags;
+> >
+> > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
+> > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
+> >  				 dev->name, num_buf,
+> > @@ -1414,7 +1578,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+> >  err_skb:
+> >  	put_page(page);
+> >  	while (num_buf-- > 1) {
+> > -		buf = virtqueue_get_buf(rq->vq, &len);
+> > +		buf = virtnet_rq_get_buf(rq, &len, NULL);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers missing\n",
+> >  				 dev->name, num_buf);
+> > @@ -1524,7 +1688,6 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+> >  static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> >  			     gfp_t gfp)
+> >  {
+> > -	struct page_frag *alloc_frag = &rq->alloc_frag;
+> >  	char *buf;
+> >  	unsigned int xdp_headroom = virtnet_get_headroom(vi);
+> >  	void *ctx = (void *)(unsigned long)xdp_headroom;
+> > @@ -1533,17 +1696,21 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> >
+> >  	len = SKB_DATA_ALIGN(len) +
+> >  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > -	if (unlikely(!skb_page_frag_refill(len, alloc_frag, gfp)))
+> > +
+> > +	buf = virtnet_rq_alloc(rq, len, gfp);
+> > +	if (unlikely(!buf))
+> >  		return -ENOMEM;
+> >
+> > -	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+> > -	get_page(alloc_frag->page);
+> > -	alloc_frag->offset += len;
+> > -	sg_init_one(rq->sg, buf + VIRTNET_RX_PAD + xdp_headroom,
+> > -		    vi->hdr_len + GOOD_PACKET_LEN);
+> > +	virtnet_rq_init_one_sg(rq, buf + VIRTNET_RX_PAD + xdp_headroom,
+> > +			       vi->hdr_len + GOOD_PACKET_LEN);
+> > +
+> >  	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+> > -	if (err < 0)
+> > +	if (err < 0) {
+> > +		if (rq->do_dma)
+> > +			virtnet_rq_unmap(rq, buf, 0);
+> >  		put_page(virt_to_head_page(buf));
+> > +	}
+> > +
+> >  	return err;
+> >  }
+> >
+> > @@ -1620,23 +1787,22 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> >  	unsigned int headroom = virtnet_get_headroom(vi);
+> >  	unsigned int tailroom = headroom ? sizeof(struct skb_shared_info) : 0;
+> >  	unsigned int room = SKB_DATA_ALIGN(headroom + tailroom);
+> > -	char *buf;
+> > +	unsigned int len, hole;
+> >  	void *ctx;
+> > +	char *buf;
+> >  	int err;
+> > -	unsigned int len, hole;
+> >
+> >  	/* Extra tailroom is needed to satisfy XDP's assumption. This
+> >  	 * means rx frags coalescing won't work, but consider we've
+> >  	 * disabled GSO for XDP, it won't be a big issue.
+> >  	 */
+> >  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> > -	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> > +
+> > +	buf = virtnet_rq_alloc(rq, len + room, gfp);
+> > +	if (unlikely(!buf))
+> >  		return -ENOMEM;
+> >
+> > -	buf = (char *)page_address(alloc_frag->page) + alloc_frag->offset;
+> >  	buf += headroom; /* advance address leaving hole at front of pkt */
+> > -	get_page(alloc_frag->page);
+> > -	alloc_frag->offset += len + room;
+> >  	hole = alloc_frag->size - alloc_frag->offset;
+> >  	if (hole < len + room) {
+> >  		/* To avoid internal fragmentation, if there is very likely not
+> > @@ -1650,11 +1816,15 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> >  		alloc_frag->offset += hole;
+> >  	}
+> >
+> > -	sg_init_one(rq->sg, buf, len);
+> > +	virtnet_rq_init_one_sg(rq, buf, len);
+> > +
+> >  	ctx = mergeable_len_to_ctx(len + room, headroom);
+> >  	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+> > -	if (err < 0)
+> > +	if (err < 0) {
+> > +		if (rq->do_dma)
+> > +			virtnet_rq_unmap(rq, buf, 0);
+> >  		put_page(virt_to_head_page(buf));
+> > +	}
+> >
+> >  	return err;
+> >  }
+> > @@ -1775,13 +1945,13 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+> >  		void *ctx;
+> >
+> >  		while (stats.packets < budget &&
+> > -		       (buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx))) {
+> > +		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
+> >  			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &stats);
+> >  			stats.packets++;
+> >  		}
+> >  	} else {
+> >  		while (stats.packets < budget &&
+> > -		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
+> > +		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
+> >  			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, &stats);
+> >  			stats.packets++;
+> >  		}
+> > @@ -3553,8 +3723,11 @@ static void free_receive_page_frags(struct virtnet_info *vi)
+> >  {
+> >  	int i;
+> >  	for (i = 0; i < vi->max_queue_pairs; i++)
+> > -		if (vi->rq[i].alloc_frag.page)
+> > +		if (vi->rq[i].alloc_frag.page) {
+> > +			if (vi->rq[i].do_dma && vi->rq[i].last_dma)
+> > +				virtnet_rq_unmap(&vi->rq[i], vi->rq[i].last_dma, 0);
+> >  			put_page(vi->rq[i].alloc_frag.page);
+> > +		}
+> >  }
+> >
+> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
+> > @@ -3591,9 +3764,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
+> >  	}
+> >
+> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
+> > -		struct virtqueue *vq = vi->rq[i].vq;
+> > -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
+> > -			virtnet_rq_free_unused_buf(vq, buf);
+> > +		struct receive_queue *rq = &vi->rq[i];
+> > +
+> > +		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
+> > +			virtnet_rq_free_unused_buf(rq->vq, buf);
+> >  		cond_resched();
+> >  	}
+> >  }
+> > @@ -3767,6 +3941,8 @@ static int init_vqs(struct virtnet_info *vi)
+> >  	if (ret)
+> >  		goto err_free;
+> >
+> > +	virtnet_rq_set_premapped(vi);
+> > +
+> >  	cpus_read_lock();
+> >  	virtnet_set_affinity(vi);
+> >  	cpus_read_unlock();
+> > --
+> > 2.32.0.3.g01195cf9f
 >
-> Mike
->
-> >
-> > Yuan Yao (1):
-> >       virtio_ring: fix avail_wrap_counter in virtqueue_add_packed
-> >
-> > Yue Haibing (1):
-> >       vdpa/mlx5: Remove unused function declarations
-> >
-> >  drivers/net/virtio_net.c           | 230 ++++++++++++++++++---
-> >  drivers/vdpa/mlx5/core/mlx5_vdpa.h |   3 -
-> >  drivers/vdpa/vdpa_sim/vdpa_sim.c   |   8 +
-> >  drivers/vhost/vdpa.c               |  15 +-
-> >  drivers/virtio/virtio_ring.c       | 412 +++++++++++++++++++++++++++++=
-+++-----
-> >  drivers/virtio/virtio_vdpa.c       |  17 +-
-> >  include/linux/vdpa.h               |   4 +
-> >  include/linux/virtio.h             |  22 ++
-> >  include/uapi/linux/vhost_types.h   |   4 +
-> >  9 files changed, 625 insertions(+), 90 deletions(-)
-> >
 
