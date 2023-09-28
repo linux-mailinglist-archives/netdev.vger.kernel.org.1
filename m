@@ -1,57 +1,74 @@
-Return-Path: <netdev+bounces-36825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C857B1E94
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:36:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 259677B1E98
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A6D63281E92
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:36:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id CA40028201F
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658553B79E;
-	Thu, 28 Sep 2023 13:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914663B7A0;
+	Thu, 28 Sep 2023 13:37:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511363AC3D;
-	Thu, 28 Sep 2023 13:36:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29908C433C9;
-	Thu, 28 Sep 2023 13:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695908199;
-	bh=buWFvyKvzLE7yL9fD5WstGeTidrhh5FjGgosGmcwWnE=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AF43AC3D;
+	Thu, 28 Sep 2023 13:37:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30ED8C433C8;
+	Thu, 28 Sep 2023 13:36:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1695908220;
+	bh=+wQRUm2msRT1Vv6LzHjx16q1r07oTZukLX6w4Q72cRo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lRZGCX4uM6nkWatFx7vCXHkNlUNWjWo3yiUsyXT5+Lkn/x8HZJejO0I56+C12vAKX
-	 mJorU9/7Rn6Ix0Ka5F16XmmPqoZp9ssId88f4t8jGBd5LG3pi3bYUgRYoyrjq/dSho
-	 uY2qKIzOuhL41R7wpANqI/+vSXk08AD6BuvSdqIKwzx773+Z4U6NnerejQug+Kw1lB
-	 xByiAv/JNY1zsOIEfRX7SVieCdeeCAn5w8+m5gTLdMzUCJT55WBUK+tOSakelTU7FJ
-	 hgJuQcyIknhUrLOVHIfPUJ1dER7tKcRDGcTRvSbJiQ8GoVB5/Bm2tgTPp5vxcQ1ghX
-	 AMYeIKxgZBZ3A==
-Date: Thu, 28 Sep 2023 15:36:29 +0200
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH v2 net-next 03/15] phy: ethernet: add configuration
- interface for copper backplane Ethernet PHYs
-Message-ID: <20230928133629.GM24230@kernel.org>
-References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
- <20230923134904.3627402-4-vladimir.oltean@nxp.com>
+	b=fQY4RQBXMdvdqFGAIafv/Phk7Y1oE+EJjzKjC3TRuINAbWxqzcqLPwyX0a9VAn7db
+	 lrLv0OwYBTVD2TtgiIEZJRfo0bKqoMi2GBhCLXf4v+k2xekgAHOfI6frhHYfLI3c4k
+	 s478XPbm0PhMMeW0NqTPzj3Xl+SvTPCIBgs7SdE0=
+Date: Thu, 28 Sep 2023 15:36:55 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: j.granados@samsung.com
+Cc: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org,
+	josh@joshtriplett.org, Kees Cook <keescook@chromium.org>,
+	Phillip Potter <phil@philpotter.co.uk>,
+	Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Corey Minyard <minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Robin Holt <robinmholt@gmail.com>, Steve Wahl <steve.wahl@hpe.com>,
+	Russ Weight <russell.h.weight@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Song Liu <song@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH 01/15] cdrom: Remove now superfluous sentinel element
+ from ctl_table array
+Message-ID: <2023092855-cultivate-earthy-4d25@gregkh>
+References: <20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com>
+ <20230928-jag-sysctl_remove_empty_elem_drivers-v1-1-e59120fca9f9@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,53 +77,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230923134904.3627402-4-vladimir.oltean@nxp.com>
+In-Reply-To: <20230928-jag-sysctl_remove_empty_elem_drivers-v1-1-e59120fca9f9@samsung.com>
 
-On Sat, Sep 23, 2023 at 04:48:52PM +0300, Vladimir Oltean wrote:
-> In Layerscape and QorIQ SoCs, compliance with the backplane Ethernet
-> protocol is bolted on top of the SerDes lanes using an external IP core,
-> that is modeled as an Ethernet PHY. This means that dynamic tuning of
-> the electrical equalization parameters of the link needs to be
-> communicated with the consumer of the generic PHY.
+On Thu, Sep 28, 2023 at 03:21:26PM +0200, Joel Granados via B4 Relay wrote:
+> From: Joel Granados <j.granados@samsung.com>
 > 
-> Create a small layer of glue API between a networking PHY (dealing with
-> the AN/LT logic for backplanes) and a generic PHY by extending the
-> phy_configure() API with a new struct phy_configure_opts_ethernet.
+> This commit comes at the tail end of a greater effort to remove the
+> empty elements at the end of the ctl_table arrays (sentinels) which
+> will reduce the overall build time size of the kernel and run time
+> memory bloat by ~64 bytes per sentinel (further information Link :
+> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
 > 
-> There are 2 directions of interest. In the "local TX training", the
-> generic PHY consumer gets requests over the wire from the link partner
-> regarding changes we should make to our TX equalization. In the "remote
-> TX training" direction, the generic PHY is the producer of requests,
-> based on its RX status, and the generic PHY consumer polls for these
-> requests until we are happy. Each request is also sent (externally to
-> the generic PHY layer) to the link partner board, for it to adjust its
-> TX equalization.
+> Remove sentinel element from cdrom_table
 > 
-> struct phy_configure_opts_ethernet is valid when phy_set_mode_ext() has
-> been called with PHY_MODE_ETHERNET or PHY_MODE_ETHTOOL, same as with
-> other union phy_configure_opts types.
+> Signed-off-by: Joel Granados <j.granados@samsung.com>
+> ---
+>  drivers/cdrom/cdrom.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+> index cc2839805983..451907ade389 100644
+> --- a/drivers/cdrom/cdrom.c
+> +++ b/drivers/cdrom/cdrom.c
+> @@ -3654,8 +3654,7 @@ static struct ctl_table cdrom_table[] = {
+>  		.maxlen		= sizeof(int),
+>  		.mode		= 0644,
+>  		.proc_handler	= cdrom_sysctl_handler
+> -	},
+> -	{ }
+> +	}
 
-...
+You should have the final entry as "}," so as to make any future
+additions to the list to only contain that entry, that's long been the
+kernel style for lists like this.
 
-> +/**
-> + * struct phy_configure_opts_ethernet - Ethernet PHY configuration set
+So your patches will just remove one line, not 2 and add 1, making it a
+smaller diff.
 
-nit: please include documentation of the structure members - type,
-local_tx, and remote_tx - here.
+thanks,
 
-> + *
-> + * This structure is used to represent the configuration state of an Ethernet
-> + * PHY (of various media types).
-> + */
-> +struct phy_configure_opts_ethernet {
-> +	enum ethernet_phy_configure_type type;
-> +	union {
-> +		struct c72_phy_configure_local_tx local_tx;
-> +		struct c72_phy_configure_remote_tx remote_tx;
-> +	};
-> +};
-
-...
+greg k-h
 
