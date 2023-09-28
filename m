@@ -1,132 +1,113 @@
-Return-Path: <netdev+bounces-36660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB6D7B1135
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 05:32:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0887B1212
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 99580281853
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 03:32:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 14C591C20A0E
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 05:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231276ABC;
-	Thu, 28 Sep 2023 03:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5198C1862D;
+	Thu, 28 Sep 2023 05:27:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0E21C3E
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:32:20 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEEB94
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 20:32:17 -0700 (PDT)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38S3JYGj006915;
-	Thu, 28 Sep 2023 03:32:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=mHNRkCEOtSjnaNw6l9cVI6oEcAxDQWdqYDYN/GRpQ+g=;
- b=msJc0U4al7V25lnaJGvjPiSWRrQREzFGnacggutC/QmKiJhpjZ79z9Q+iO/WArsadgvI
- QuCH5toCUwA1SWeAKy+ufCMBmS5K5WlFcMW1hhHPQ55eZ3irSn1D1+mhsfHIu53a4f5M
- lhTycq6OrR8Qsj9mzeK3fTXcgAM85syeS8UQzELQyUmlrLRyJF0NkRFIAAzHsCIATFTF
- SeZp8y45QvRnPhgn5MZ5samwkn0NlYXeYbOsWj+Aa6j86Jcwzv9otzSRZX2FTRRNQN9N
- WAxJCsqHQDFcXLBhJD4PZ3MTX0B7YxjLD+XudT32Ael+fipk6pEPQWgRNiWNAfb647JK Ag== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tcvg98mcj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Sep 2023 03:32:00 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 38S3VxF0018442
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Sep 2023 03:31:59 GMT
-Received: from [10.110.119.147] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 27 Sep
- 2023 20:31:58 -0700
-Message-ID: <1f0069a7-8581-acc0-1ab8-bd5dd95cdb49@quicinc.com>
-Date: Wed, 27 Sep 2023 21:31:54 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3D91401F
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 05:27:18 +0000 (UTC)
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425BF122;
+	Wed, 27 Sep 2023 22:27:17 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1a1fa977667so6756190fac.1;
+        Wed, 27 Sep 2023 22:27:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695878836; x=1696483636; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wzesFe1jUNQkPNQFdz5fZZnHB3+mM1DdWesfa223dqw=;
+        b=BQ2ljgXrtuBJOjZC6tQxEBme5CHiwvVhgfp75Ex9YEYWt8Ai4EBFkLVAGn6JfCb+lf
+         nIH/1s4G7VIflbA1w00+qBobAd5UtWwAcOlmi1sYYymsr56z6DgDPb3RQKsid3TH+06c
+         qD0F9N9gn86q7IWov/QFeopSD+b09c2fYq650KMypfKRYQ2RNTxMke/3gTXMdje68mTa
+         rP5GUbqIhM+2jPm97GidPVWHZs9WlnBrdWWr91qGg1hxLb+EQpVYgstIaOk8J8ErQOVr
+         uVHucof8LcHXcED40KJOtxLhLtwHOFKCb7MHo7qJ27Jf6OWNZ77TLNQsY/A0O8I3MoKF
+         bz8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695878836; x=1696483636;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wzesFe1jUNQkPNQFdz5fZZnHB3+mM1DdWesfa223dqw=;
+        b=MvjwfzgbEykQI+HtihAVqhuAKveAJC8XEqsUOvvXDkrYXgShEsy20RBg+dyfCcxcyE
+         C3Nf2Cc63RRbHsdlVlAR3bHrvBD99/iAn1vVtszbtBOy1ohWGMtV9MG0HiV8wC5yvlhz
+         kHjHWpkULB6ubea4EekP+8r2Xyx0tw34gSI0jNgQeS1eADXf4Iq+rDs3cKNk21zNiH0K
+         pR9q6vFVBtVtgdv5ARB7miQm0u6/0RZaMNFzJT//OT280HnRv2ZLIDVEeD1bJj2108ZD
+         SMIvp0S+fS+AMBZwWW+K+lL9JEFORRHeekYHQnKrAFqtYWdQe3w0BqWDSNp2QOk9tSNm
+         Fi3Q==
+X-Gm-Message-State: AOJu0YxkOTN5BFjKf9Y3y70cwX3vJcVlR5EuPHJHQPSXr6YWnxKhC19Y
+	ZNfaGa9Ou5ZPYRC51NjZQTU=
+X-Google-Smtp-Source: AGHT+IFJXcHHA5X6azHZlNsxivV559BAGdYTUvTtxMNa7qEf5tC4yYwTjURVt2H1DdhShafl29eDig==
+X-Received: by 2002:a05:6870:a3d0:b0:1d6:53e6:7c8a with SMTP id h16-20020a056870a3d000b001d653e67c8amr275275oak.14.1695878835722;
+        Wed, 27 Sep 2023 22:27:15 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id k17-20020a637b51000000b0056b27af8715sm12106368pgn.43.2023.09.27.22.27.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Sep 2023 22:27:14 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 1BF6281645D0; Thu, 28 Sep 2023 12:27:09 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Networking <netdev@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [PATCH net-next v2 0/2] Documentation fixes for dpll subsystem
+Date: Thu, 28 Sep 2023 12:27:06 +0700
+Message-ID: <20230928052708.44820-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Subject: Re: [PATCH net-next v2] net: qualcomm: rmnet: Add side band flow
- control support
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <netdev@vger.kernel.org>, <lkp@intel.com>
-CC: Sean Tranchetti <quic_stranche@quicinc.com>
-References: <20230926182407.964671-1-quic_subashab@quicinc.com>
- <8cbd0969-0c1f-3c19-778b-4af9b3ad6417@linux.dev>
-Content-Language: en-US
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <8cbd0969-0c1f-3c19-778b-4af9b3ad6417@linux.dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+X-Developer-Signature: v=1; a=openpgp-sha256; l=746; i=bagasdotme@gmail.com; h=from:subject; bh=OK23hv7Zwua1zwPy0Cj9i0AXbUnptkGgpi+7Mjq4dQw=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDKmivF4PDRV3ffuQZH8ttTTxtaa5rNoJqbSHV2PCX5nr9 V+s+Pijo5SFQYyLQVZMkWVSIl/T6V1GIhfa1zrCzGFlAhnCwMUpABMRMWRkuHNm7c0ZOZfNo6JX mdplfPnmv3fyj70M702vPTh4jLFnWirD/6IN33wKrModZyV949r6QPBJIbtTfJOo10z9m/1c0Q6 HWAE=
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: cdUIC4GyqV6Ez7m2-v9rYzEYk2tJsSjR
-X-Proofpoint-GUID: cdUIC4GyqV6Ez7m2-v9rYzEYk2tJsSjR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_17,2023-09-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 adultscore=0
- bulkscore=0 suspectscore=0 mlxscore=0 mlxlogscore=917 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309280030
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Here is a mini docs fixes for dpll subsystem. The fixes are all code
+block-related.
+
+This series is triggered because I was emailed by kernel test robot,
+alerting htmldocs warnings (see patch [1/2]).
+
+Changes since v1 [1]:
+  * Collect Reviewed-by tags
+  * Rebase on current net-next
+
+[1]: https://lore.kernel.org/all/20230918093240.29824-1-bagasdotme@gmail.com/
+
+Bagas Sanjaya (2):
+  Documentation: dpll: Fix code blocks
+  Documentation: dpll: wrap DPLL_CMD_PIN_GET output in a code block
+
+ Documentation/driver-api/dpll.rst | 27 +++++++++++++++------------
+ 1 file changed, 15 insertions(+), 12 deletions(-)
 
 
-On 9/27/2023 6:12 PM, Vadim Fedorenko wrote:
-> On 26/09/2023 19:24, Subash Abhinov Kasiviswanathan wrote:
->> Individual rmnet devices map to specific network types such as internet,
->> multimedia messaging services, IP multimedia subsystem etc. Each of
->> these network types may support varying quality of service for different
->> bearers or traffic types.
->>
-> 
->> +static u16 rmnet_vnd_select_queue(struct net_device *dev,
->> +                  struct sk_buff *skb,
->> +                  struct net_device *sb_dev)
->> +{
->> +    struct rmnet_priv *priv = netdev_priv(dev);
->> +    void *p = xa_load(&priv->queue_map, skb->mark);
-> 
-> Reverse X-mas tree, please.
+base-commit: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
+-- 
+An old man doll... just what I always wanted! - Clara
 
-We need to get priv first though. Alternatively, i could do the 
-following but it is just more verbose for the sake of the formatting.
-
-	struct rmnet_priv *priv;
-	void *p;
-
-	priv = netdev_priv(dev);
-	p = xa_load(&priv->queue_map, skb->mark);
-
-> 
->> +    u8 txq;
->> +
->> +    if (!p || !xa_is_value(p))
->> +        return 0;
->> +
->> +    txq = xa_to_value(p);
->> +
->> +    netdev_dbg(dev, "mark %08x -> txq %02x\n", skb->mark, txq);
->> +    return txq;
->> +}
->> +
-> 
-> 
 
