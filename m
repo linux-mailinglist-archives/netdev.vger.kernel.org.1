@@ -1,46 +1,42 @@
-Return-Path: <netdev+bounces-36768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 495217B1AA4
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:21:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 715517B1B0C
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id F07732819EA
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 11:21:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 244BB2819BC
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 11:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE70E374EB;
-	Thu, 28 Sep 2023 11:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73CA37C86;
+	Thu, 28 Sep 2023 11:35:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4D71862D
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 11:21:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A139C433C8;
-	Thu, 28 Sep 2023 11:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98237746A
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 11:35:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C042EC43391;
+	Thu, 28 Sep 2023 11:35:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695900080;
-	bh=lju9IoH2uZH9cWxqe1taqQyexyQZqmya5S1kEljTcWs=;
+	s=k20201202; t=1695900920;
+	bh=eCdzVXY1VW+2ruFXsRtXnBv1KXcCjRb+xOzc64++GNk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jfwZ0pWL7tw5NjqLiZugoorRseDVCmloceUtFXaWA1uJmOgW1drltxw4xqFFDeJbx
-	 LAZSokzSyILd+0NlZ2AG77Gb/lbyWbW1h6vlEvdWY23SPADa6imA1l50n151ih3sYS
-	 /HFfcIZXCSt3eoKjggRe4lFiuBpy6q+tGph6o+AxS1qk8zYoijh+7Dr1eEMQmuz3Co
-	 77Py07t/1zCi+5TkuzfJ0HAeiu8vYcNmnwADo/40Inkfu+0BDl2Br+bG7ozfEz5FXM
-	 F1sJuGCH1C1UEDAGS5e2H9+q2mGy722H/ceDBkVq07gwf+EFGVVsLnqMORT7a/WOaB
-	 KL+oIqkfwckTA==
-Date: Thu, 28 Sep 2023 13:21:08 +0200
+	b=hiE+tKDmxeDv1cLRdfZl6ITFhCHm+TZYouLVEIOC2CT7DvBdJ9XZrHGREw/3/YV7B
+	 Jn0VXSBK3QGgeE3nzWfiqctPqUd0jIVGcVKEVvcAEYSkDUbxc64EuH7JOjUmX0Bwk1
+	 OTBB9W1X02y+NSblhN1h+nDD4+OBBlCgUb+s4k4jeFRfAawApyStDh7YQisNnZvgLv
+	 wHCQWsiL7mHJBoehWhs9/iJvtNeBfITcs1UuOoz0m6Ku+qYcEpZViHZOShOrRocz7S
+	 t3Qx+v8Gasbc8Z4XVe3lydAjQkXCMyaBXSk3uVwYneF3sn2dmFCDA/ReJc1uibbAaJ
+	 dsWNuiTeJrtZw==
+Date: Thu, 28 Sep 2023 13:35:09 +0200
 From: Simon Horman <horms@kernel.org>
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bpoirier@nvidia.com, corbet@lwn.net,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	gregkh@linuxfoundation.org, keescook@chromium.org, Jason@zx2c4.com,
-	djwong@kernel.org, jack@suse.cz, linyunsheng@huawei.com,
-	ulf.hansson@linaro.org
-Subject: Re: [PATCH net-next v5 1/2] pktgen: Automate flag enumeration for
- unknown flag handling
-Message-ID: <20230928112108.GE24230@kernel.org>
-References: <20230920125658.46978-1-liangchen.linux@gmail.com>
+To: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+Cc: chris.snook@gmail.com, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: atl1c: switch to napi_consume_skb()
+Message-ID: <20230928113509.GF24230@kernel.org>
+References: <20230921005623.3768-1-liew.s.piaw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,98 +45,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230920125658.46978-1-liangchen.linux@gmail.com>
+In-Reply-To: <20230921005623.3768-1-liew.s.piaw@gmail.com>
 
-On Wed, Sep 20, 2023 at 08:56:57PM +0800, Liang Chen wrote:
-> When specifying an unknown flag, it will print all available flags.
-> Currently, these flags are provided as fixed strings, which requires
-> manual updates when flags change. Replacing it with automated flag
-> enumeration.
++ Eric Dumazet
+
+On Thu, Sep 21, 2023 at 08:56:23AM +0800, Sieng-Piaw Liew wrote:
+> Switch to napi_consume_skb() to take advantage of bulk free, and skb
+> reuse through skb cache in conjunction with napi_build_skb().
 > 
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
-> ---
->  Changes from v3:
-> - check "n == IPSEC_SHIFT" instead of string comparison
-> - use snprintf and check that the result does not overrun pkg_dev->result[]
-> - avoid double '\n' at the end
-> - move "return" in the OK case to remove "else" and decrease indent
-> ---
->  net/core/pktgen.c | 38 ++++++++++++++++++++++----------------
->  1 file changed, 22 insertions(+), 16 deletions(-)
+> When parameter 'budget' = 0, indicating non-NAPI context,
+> dev_consume_skb_any() is called internally.
 > 
-> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-> index f56b8d697014..48306a101fd9 100644
-> --- a/net/core/pktgen.c
-> +++ b/net/core/pktgen.c
-> @@ -1318,9 +1318,10 @@ static ssize_t pktgen_if_write(struct file *file,
->  		return count;
+> Signed-off-by: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+>  drivers/net/ethernet/atheros/atl1c/atl1c_main.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> index 74b78164cf74..46cdc32b4e31 100644
+> --- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> +++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
+> @@ -842,7 +842,8 @@ static int atl1c_sw_init(struct atl1c_adapter *adapter)
+>  }
+>  
+>  static inline void atl1c_clean_buffer(struct pci_dev *pdev,
+> -				struct atl1c_buffer *buffer_info)
+> +				      struct atl1c_buffer *buffer_info,
+> +				      int budget)
+>  {
+>  	u16 pci_driection;
+>  	if (buffer_info->flags & ATL1C_BUFFER_FREE)
+> @@ -861,7 +862,7 @@ static inline void atl1c_clean_buffer(struct pci_dev *pdev,
+>  				       buffer_info->length, pci_driection);
 >  	}
->  	if (!strcmp(name, "flag")) {
-> +		bool disable = false;
->  		__u32 flag;
->  		char f[32];
-> -		bool disable = false;
-> +		char *end;
+>  	if (buffer_info->skb)
+> -		dev_consume_skb_any(buffer_info->skb);
+> +		napi_consume_skb(buffer_info->skb, budget);
+>  	buffer_info->dma = 0;
+>  	buffer_info->skb = NULL;
+>  	ATL1C_SET_BUFFER_STATE(buffer_info, ATL1C_BUFFER_FREE);
+> @@ -882,7 +883,7 @@ static void atl1c_clean_tx_ring(struct atl1c_adapter *adapter,
+>  	ring_count = tpd_ring->count;
+>  	for (index = 0; index < ring_count; index++) {
+>  		buffer_info = &tpd_ring->buffer_info[index];
+> -		atl1c_clean_buffer(pdev, buffer_info);
+> +		atl1c_clean_buffer(pdev, buffer_info, 0);
+>  	}
 >  
->  		memset(f, 0, 32);
->  		len = strn_len(&user_buffer[i], sizeof(f) - 1);
-> @@ -1332,28 +1333,33 @@ static ssize_t pktgen_if_write(struct file *file,
->  		i += len;
+>  	netdev_tx_reset_queue(netdev_get_tx_queue(adapter->netdev, queue));
+> @@ -909,7 +910,7 @@ static void atl1c_clean_rx_ring(struct atl1c_adapter *adapter, u32 queue)
 >  
->  		flag = pktgen_read_flag(f, &disable);
-> -
->  		if (flag) {
->  			if (disable)
->  				pkt_dev->flags &= ~flag;
->  			else
->  				pkt_dev->flags |= flag;
-> -		} else {
-> -			sprintf(pg_result,
-> -				"Flag -:%s:- unknown\nAvailable flags, (prepend ! to un-set flag):\n%s",
-> -				f,
-> -				"IPSRC_RND, IPDST_RND, UDPSRC_RND, UDPDST_RND, "
-> -				"MACSRC_RND, MACDST_RND, TXSIZE_RND, IPV6, "
-> -				"MPLS_RND, VID_RND, SVID_RND, FLOW_SEQ, "
-> -				"QUEUE_MAP_RND, QUEUE_MAP_CPU, UDPCSUM, "
-> -				"NO_TIMESTAMP, "
-> -#ifdef CONFIG_XFRM
-> -				"IPSEC, "
-> -#endif
-> -				"NODE_ALLOC\n");
-> +
-> +			sprintf(pg_result, "OK: flags=0x%x", pkt_dev->flags);
->  			return count;
+>  	for (j = 0; j < rfd_ring->count; j++) {
+>  		buffer_info = &rfd_ring->buffer_info[j];
+> -		atl1c_clean_buffer(pdev, buffer_info);
+> +		atl1c_clean_buffer(pdev, buffer_info, 0);
+>  	}
+>  	/* zero out the descriptor ring */
+>  	memset(rfd_ring->desc, 0, rfd_ring->size);
+> @@ -1607,7 +1608,7 @@ static int atl1c_clean_tx(struct napi_struct *napi, int budget)
+>  			total_bytes += buffer_info->skb->len;
+>  			total_packets++;
 >  		}
-> -		sprintf(pg_result, "OK: flags=0x%x", pkt_dev->flags);
-> +
-> +		/* Unknown flag */
-> +		end = pkt_dev->result + sizeof(pkt_dev->result);
-> +		pg_result += sprintf(pg_result,
-> +			"Flag -:%s:- unknown\n"
-> +			"Available flags, (prepend ! to un-set flag):\n", f);
-> +
-> +		for (int n = 0; n < NR_PKT_FLAGS && pg_result < end; n++) {
-> +			if (!IS_ENABLED(CONFIG_XFRM) && n == IPSEC_SHIFT)
-> +				continue;
-> +			pg_result += snprintf(pg_result, end - pg_result,
-> +					      "%s, ", pkt_flag_names[n]);
-> +		}
-> +		if (!WARN_ON_ONCE(pg_result >= end)) {
-> +			/* Remove the comma and whitespace at the end */
-> +			*(pg_result - 2) = '\0';
-
-Hi Liang Chen,
-
-Should the string have a trailing '\n' in keeping with the current formatting?
-
-> +		}
-> +
->  		return count;
->  	}
->  	if (!strcmp(name, "dst_min") || !strcmp(name, "dst")) {
+> -		atl1c_clean_buffer(pdev, buffer_info);
+> +		atl1c_clean_buffer(pdev, buffer_info, budget);
+>  		if (++next_to_clean == tpd_ring->count)
+>  			next_to_clean = 0;
+>  		atomic_set(&tpd_ring->next_to_clean, next_to_clean);
+> @@ -2151,7 +2152,7 @@ static void atl1c_tx_rollback(struct atl1c_adapter *adpt,
+>  	while (index != tpd_ring->next_to_use) {
+>  		tpd = ATL1C_TPD_DESC(tpd_ring, index);
+>  		buffer_info = &tpd_ring->buffer_info[index];
+> -		atl1c_clean_buffer(adpt->pdev, buffer_info);
+> +		atl1c_clean_buffer(adpt->pdev, buffer_info, 0);
+>  		memset(tpd, 0, sizeof(struct atl1c_tpd_desc));
+>  		if (++index == tpd_ring->count)
+>  			index = 0;
 > -- 
-> 2.31.1
+> 2.34.1
 > 
 > 
 
