@@ -1,162 +1,132 @@
-Return-Path: <netdev+bounces-36735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D229D7B184D
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:33:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 762CF7B185D
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id D7CC9B20A84
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:33:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A7C0E2822CF
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6042D290E;
-	Thu, 28 Sep 2023 10:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05D430F99;
+	Thu, 28 Sep 2023 10:39:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5881C27
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 10:33:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0969C122
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:33:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695897193;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xV0R5SFMvS2ZVoPQYyT8pFrz9wk+csz0/k3+o9zh82Q=;
-	b=imvF42guhciYSlUftvJYR7PAd0FjvTv5ic5pppQx4YJWImhF1znk15su6R9pjrXc3loJxL
-	dw+6ujzhGH/qHcC/DroUd3XkRxlnkoA6I28T5sgLF8aRKa7KIwt7kLdIVA7JvKF84MfLOB
-	I7QQDsZ+txBCPZSxkTbSYW6vxbeRfSQ=
-Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
- [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-RG1kaMuhNhSwj9XM7QQnZw-1; Thu, 28 Sep 2023 06:33:11 -0400
-X-MC-Unique: RG1kaMuhNhSwj9XM7QQnZw-1
-Received: by mail-vk1-f199.google.com with SMTP id 71dfb90a1353d-49ab22f0e07so199899e0c.1
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:33:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695897191; x=1696501991;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xV0R5SFMvS2ZVoPQYyT8pFrz9wk+csz0/k3+o9zh82Q=;
-        b=eS/+1S30zMDJy6r+wTP3+Qcc88UCujcmnBT70+temVJyZBBqmHkEUEnqEkrNgZ28gP
-         het7ikoLRka0FdWsazcQ8Ln0EHXbPe6H1SYXmUfUEL0/fDPPm99LHvyeJEFSc6+Smsp/
-         h4OtY81NMyYspsfmgqJlAlZDO1IigOO3bL4NltqI4fXkPq+9TnXxlkInZ1egyUxxHbu2
-         LM0S71kHY4bJM9gZG00ykRxHwTiXb9g+Oi/Q1yaJAekdORMTXR+KCDJPBmTjwP319g0+
-         6tWMdaHmAvAS9kwJnkbpIJ8OMNW4bOJgkZMvWJnb1SKF/bX2qZU8e6VMmGx2Trek/VtO
-         1xhw==
-X-Gm-Message-State: AOJu0Yy8UMhIRP6Knq5frKIHQ0OJojMQa8Wc/ti4l/vYIhaJMz341yr5
-	beE8JkjG1znzb1X6KIsx2ksIqe4/6yTkTJ5IrUD+bhSJI51dEwZSmMQsYKQIJJ7OsxE7/2ocr0B
-	Fv+1nH4qZHpudfoCn
-X-Received: by 2002:a05:6122:36a6:b0:493:5938:c8a1 with SMTP id ec38-20020a05612236a600b004935938c8a1mr310250vkb.0.1695897191291;
-        Thu, 28 Sep 2023 03:33:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEjrP8S7WYTplZaxjRLlrLON7meM0ludEGFSEkAKJ7AQUs7g8AMLCUUxWGOKhqlkPfB4hAxRQ==
-X-Received: by 2002:a05:6122:36a6:b0:493:5938:c8a1 with SMTP id ec38-20020a05612236a600b004935938c8a1mr310242vkb.0.1695897190960;
-        Thu, 28 Sep 2023 03:33:10 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-233-183.dyn.eolo.it. [146.241.233.183])
-        by smtp.gmail.com with ESMTPSA id r1-20020a0c9e81000000b00656e2464719sm1374297qvd.92.2023.09.28.03.33.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 03:33:10 -0700 (PDT)
-Message-ID: <7b83b400cff5ecb7e150e4c0a4bca861ff08b392.camel@redhat.com>
-Subject: Re: [net-next PATCH v3 01/10] netdev-genl: spec: Extend netdev
- netlink spec in YAML for queue
-From: Paolo Abeni <pabeni@redhat.com>
-To: Amritha Nambiar <amritha.nambiar@intel.com>, netdev@vger.kernel.org, 
-	kuba@kernel.org
-Cc: sridhar.samudrala@intel.com
-Date: Thu, 28 Sep 2023 12:33:08 +0200
-In-Reply-To: <169516244040.7377.16515332696427625794.stgit@anambiarhost.jf.intel.com>
-References: 
-	<169516206704.7377.12938469824609831999.stgit@anambiarhost.jf.intel.com>
-	 <169516244040.7377.16515332696427625794.stgit@anambiarhost.jf.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64C81C27;
+	Thu, 28 Sep 2023 10:39:30 +0000 (UTC)
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A842B12A;
+	Thu, 28 Sep 2023 03:39:27 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Rx92b6X4fz4f3khw;
+	Thu, 28 Sep 2023 18:39:19 +0800 (CST)
+Received: from [10.67.109.184] (unknown [10.67.109.184])
+	by APP4 (Coremail) with SMTP id gCh0CgCHHd3bVxVlJRxmBg--.31819S2;
+	Thu, 28 Sep 2023 18:39:24 +0800 (CST)
+Message-ID: <8fd3cb4e-bcf0-44d4-b907-7e0795ee90ce@huaweicloud.com>
+Date: Thu, 28 Sep 2023 18:39:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
+ Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
+References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
+ <20230919035711.3297256-5-pulehui@huaweicloud.com>
+ <87lecqobyb.fsf@all.your.base.are.belong.to.us>
+Content-Language: en-US
+From: Pu Lehui <pulehui@huaweicloud.com>
+In-Reply-To: <87lecqobyb.fsf@all.your.base.are.belong.to.us>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgCHHd3bVxVlJRxmBg--.31819S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJr1UZw45CrWkGw17tw1UZFb_yoW8ZFyxpa
+	9xua17K3yvgrWSkwnFqF18JFZ5WF4fA3WYyr1aqw1Fya1UCr92gF47KF4j9a48Zrs2k3Wj
+	vF4jqa1Duw4DZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
+	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
+	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
+	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIE
+	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UZ18PUUUUU=
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-09-19 at 15:27 -0700, Amritha Nambiar wrote:
-> Add support in netlink spec(netdev.yaml) for queue information.
-> Add code generated from the spec.
->=20
-> Note: The "q-type" attribute currently takes values 0 and 1 for rx
-> and tx queue type respectively. I haven't figured out the ynl
-> library changes to support string user input ("rx" and "tx") to
-> enum value conversion in the generated file.
->=20
-> Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> ---
->  Documentation/netlink/specs/netdev.yaml |   52 ++++++++++
->  include/uapi/linux/netdev.h             |   17 +++
->  net/core/netdev-genl-gen.c              |   26 +++++
->  net/core/netdev-genl-gen.h              |    3 +
->  net/core/netdev-genl.c                  |   10 ++
->  tools/include/uapi/linux/netdev.h       |   17 +++
->  tools/net/ynl/generated/netdev-user.c   |  159 +++++++++++++++++++++++++=
-++++++
->  tools/net/ynl/generated/netdev-user.h   |  101 ++++++++++++++++++++
->  8 files changed, 385 insertions(+)
->=20
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netl=
-ink/specs/netdev.yaml
-> index c46fcc78fc04..7b5d4cdff48b 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -55,6 +55,10 @@ definitions:
->          name: hash
->          doc:
->            Device is capable of exposing receive packet hash via bpf_xdp_=
-metadata_rx_hash().
-> +  -
-> +    name: queue-type
-> +    type: enum
-> +    entries: [ rx, tx ]
-> =20
->  attribute-sets:
->    -
-> @@ -89,6 +93,32 @@ attribute-sets:
->          enum: xdp-rx-metadata
->          enum-as-flags: true
-> =20
-> +  -
-> +    name: queue
-> +    attributes:
-> +      -
-> +        name: q-id
-
-Why not 'queue-id' or 'id'?
-
-> +        doc: queue index
-> +        type: u32
-> +      -
-> +        name: ifindex
-> +        doc: netdev ifindex
-> +        type: u32
-> +        checks:
-> +          min: 1
-> +      -
-> +        name: q-type
-
-Same here?
 
 
+On 2023/9/28 17:59, Björn Töpel wrote:
+> Pu Lehui <pulehui@huaweicloud.com> writes:
+> 
+>> From: Pu Lehui <pulehui@huawei.com>
+>>
+>> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
+>> the TCC can be propagated from the parent process to the subprocess, but
+>> the TCC of the parent process cannot be restored when the subprocess
+>> exits. Since the RV64 TCC is initialized before saving the callee saved
+>> registers into the stack, we cannot use the callee saved register to
+>> pass the TCC, otherwise the original value of the callee saved register
+>> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
+>> similar to x86_64, i.e. using a non-callee saved register to transfer
+>> the TCC between functions, and saving that register to the stack to
+>> protect the TCC value. At the same time, we also consider the scenario
+>> of mixing trampoline.
+> 
+> Hi!
+> 
+> The RISC-V JIT tries to minimize the stack usage, e.g. it doesn't have a
+> fixed pro/epilogue like some of the other JITs. I think we can do better
+> here, so that the pass-TCC-via-register can be used, and the additional
+> stack access can be avoided.
+> 
+> Today, the TCC is passed via a register (a6) and can be viewed as a
+> "state" variable/transparent argument/return value. As you point out, we
+> loose this when we do a call. On (any) calls we move the TCC to a
+> callee-saved register.
+> 
+> WDYT about the following scheme:
+> 
+> 1 Pickup the arm64 bpf2bpf/tailmix mechanism of just clearing the TCC
+>    for the main program.
+> 2 For BPF helper calls, move TCC to s6, perform the call, and restore
+>    a6. Dito for kfunc calls (BPF_PSEUDO_KFUNC_CALL).
+> 3 For all other calls, a6 is passed transparently.
+> 
+> For 2 bpf_jit_get_func_addr() can be used to determine if the callee is
+> a BPF helper or not.
+> 
+> In summary; Determine in the JIT if we're leaving BPF-land, and need to
+> move the TCC to a callee-saved reg, or not, and save us a bunch of stack
+> store/loads.
+> 
 
-Cheers,
+Sorry, I am on holiday, will deal with it after the holiday.
 
-Paolo
+> 
+> Björn
 
 
