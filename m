@@ -1,210 +1,142 @@
-Return-Path: <netdev+bounces-36899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D07C07B2201
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 18:17:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C52BA7B2202
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 18:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5C008282260
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:17:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9966E1C20AF9
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8E74F15C;
-	Thu, 28 Sep 2023 16:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF5651224;
+	Thu, 28 Sep 2023 16:17:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB61813AFB
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 16:16:57 +0000 (UTC)
-Received: from out-204.mta1.migadu.com (out-204.mta1.migadu.com [95.215.58.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAC22D6
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 09:16:54 -0700 (PDT)
-Message-ID: <5d8e302c-a28d-d4f4-eb91-4b54eb89490b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695917813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mJXzX4YeZuur6vzraw211+ziEWxb7cjFsR3/hk3mgcI=;
-	b=Aery4wKawpKHsf86RLnvjI2U6DiUQ1egN70ecnHn4Fok30Ae1Jm346bsSvZDjXAHEi1IG/
-	eA8trbMotd7g9Sk27y/5hWmFT6IZpJFjJVrNTFAg5NmbGOEOoGIb9BOWn+SHK0T/dprzN9
-	P3SDRXBhsUUEREhqkfZGClQ6CrjiGh4=
-Date: Fri, 29 Sep 2023 00:16:45 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5557113AFB;
+	Thu, 28 Sep 2023 16:17:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 601E1C433C8;
+	Thu, 28 Sep 2023 16:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695917849;
+	bh=dDlJclctJebD1exFPzxNAZrB7CQjcpVHlD7ElW0MgAw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fssBEPbw9W11EX4fKT2YjN4xVBR9E4vNZDA1X2y4drhUW8Bjk3Z9zAxW5o8wwBEad
+	 JeDFtQ0g38ymn6Q1QguLfri9a9El0WiROYUxy/kHjgAZXvSd4+QfNXVDIR0O9otK/s
+	 AVO4cha55o9JqXtpDNIn6uLQaR9A/DxPG4liRa1nHhXy9peftFZ2YMbjaewjeRRfHj
+	 iaHi8wG1WfykOpc4NYCtvJmDBr9mfame119bQAB1Vn7Wi+qpPu4KD11kXPq1d668i1
+	 QCydqFcEOv1E6KXpIvQGzXiYiyu+XEAxVqR7nuS94wWiZKfrVfr+jmcHW4JZJQTwM/
+	 JnyvUk+qktCcA==
+Date: Thu, 28 Sep 2023 18:17:25 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: Persisting mounts between 'ip netns' invocations
+Message-ID: <20230928-geldbeschaffung-gekehrt-81ed7fba768d@brauner>
+References: <87a5t68zvw.fsf@toke.dk>
+ <2aa087b5-cbcf-e736-00d4-d962a9deda75@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6] net/core: Introduce netdev_core_stats_inc()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>
-References: <20230928100418.521594-1-yajun.deng@linux.dev>
- <CANn89iL9uy58ZrZRPEtrvQ7ckv5hVTq8shx3OesQA6SWoUOP=g@mail.gmail.com>
- <c43a3dde-fa4d-4a87-6f96-397813db5bd6@linux.dev>
- <CANn89i+iT11qzCidTrHHRMQiYR-nXtbPNAUJGaEg0NQMCq_8CA@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-In-Reply-To: <CANn89i+iT11qzCidTrHHRMQiYR-nXtbPNAUJGaEg0NQMCq_8CA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <2aa087b5-cbcf-e736-00d4-d962a9deda75@6wind.com>
 
+On Thu, Sep 28, 2023 at 11:54:23AM +0200, Nicolas Dichtel wrote:
+> + Eric
+> 
+> Le 28/09/2023 à 10:29, Toke Høiland-Jørgensen a écrit :
+> > Hi everyone
+> > 
+> > I recently ran into this problem again, and so I figured I'd ask if
+> > anyone has any good idea how to solve it:
+> > 
+> > When running a command through 'ip netns exec', iproute2 will
+> > "helpfully" create a new mount namespace and remount /sys inside it,
+> > AFAICT to make sure /sys/class/net/* refers to the right devices inside
+> > the namespace. This makes sense, but unfortunately it has the side
+> > effect that no mount commands executed inside the ns persist. In
+> > particular, this makes it difficult to work with bpffs; even when
+> > mounting a bpffs inside the ns, it will disappear along with the
+> > namespace as soon as the process exits.
+> > 
+> > To illustrate:
+> > 
+> > # ip netns exec <nsname> bpftool map pin id 2 /sys/fs/bpf/mymap
+> > # ip netns exec <nsname> ls /sys/fs/bpf
+> > <nothing>
+> > 
+> > This happens because namespaces are cleaned up as soon as they have no
+> > processes, unless they are persisted by some other means. For the
+> > network namespace itself, iproute2 will bind mount /proc/self/ns/net to
+> > /var/run/netns/<nsname> (in the root mount namespace) to persist the
+> > namespace. I tried implementing something similar for the mount
+> > namespace, but that doesn't work; I can't manually bind mount the 'mnt'
+> > ns reference either:
+> > 
+> > # mount -o bind /proc/104444/ns/mnt /var/run/netns/mnt/testns
+> > mount: /run/netns/mnt/testns: wrong fs type, bad option, bad superblock on /proc/104444/ns/mnt, missing codepage or helper program, or other error.
+> >        dmesg(1) may have more information after failed mount system call.
+> > 
+> > When running strace on that mount command, it seems the move_mount()
+> > syscall returns EINVAL, which, AFAICT, is because the mount namespace
+> > file references itself as its namespace, which means it can't be
+> > bind-mounted into the containing mount namespace.
+> > 
+> > So, my question is, how to overcome this limitation? I know it's
+> > possible to get a reference to the namespace of a running process, but
+> > there is no guarantee there is any processes running inside the
+> > namespace (hence the persisting bind mount for the netns). So is there
+> > some other way to persist the mount namespace reference, so we can pick
+> > it back up on the next 'ip netns' invocation?
+> > 
+> > Hoping someone has a good idea :)
+> We ran into similar problems. The only solution we found was to use nsenter
+> instead of 'ip netns exec'.
+> 
+> To be able to bind mount a mount namespace on a file, the directory of this file
+> should be private. For example:
+> 
+> mkdir -p /run/foo
+> mount --make-rshared /
+> mount --bind /run/foo /run/foo
+> mount --make-private /run/foo
+> touch /run/foo/ns
+> unshare --mount --propagation=slave -- sh -c 'yes $$ 2>/dev/null' | {
+>         read -r pid &&
+>         mount --bind /proc/$pid/ns/mnt /run/foo/ns
+> }
+> nsenter --mount=/run/foo/ns ls /
+> 
+> But this doesn't work under 'ip netns exec'.
 
-On 2023/9/28 23:44, Eric Dumazet wrote:
-> On Thu, Sep 28, 2023 at 5:40 PM Yajun Deng <yajun.deng@linux.dev> wrote:
->>
->> On 2023/9/28 22:18, Eric Dumazet wrote:
->>> On Thu, Sep 28, 2023 at 12:04 PM Yajun Deng <yajun.deng@linux.dev> wrote:
->>>> Although there is a kfree_skb_reason() helper function that can be used to
->>>> find the reason why this skb is dropped, but most callers didn't increase
->>>> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
->>>>
->>>> For the users, people are more concerned about why the dropped in ip
->>>> is increasing.
->>>>
->>>> Introduce netdev_core_stats_inc() for trace the caller of the dropped
->>>> skb. Also, add __code to netdev_core_stats_alloc(), as it's called
->>>> unlinkly.
->>>>
->>>> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
->>>> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>>> ---
->>>> v6: merge netdev_core_stats and netdev_core_stats_inc together
->>>> v5: Access the per cpu pointer before reach the relevant offset.
->>>> v4: Introduce netdev_core_stats_inc() instead of export dev_core_stats_*_inc()
->>>> v3: __cold should be added to the netdev_core_stats_alloc().
->>>> v2: use __cold instead of inline in dev_core_stats().
->>>> v1: https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@linux.dev/
->>>> ---
->>>>    include/linux/netdevice.h | 21 ++++-----------------
->>>>    net/core/dev.c            | 17 +++++++++++++++--
->>>>    2 files changed, 19 insertions(+), 19 deletions(-)
->>>>
->>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>>> index 7e520c14eb8c..eb1fa04fbccc 100644
->>>> --- a/include/linux/netdevice.h
->>>> +++ b/include/linux/netdevice.h
->>>> @@ -4002,32 +4002,19 @@ static __always_inline bool __is_skb_forwardable(const struct net_device *dev,
->>>>           return false;
->>>>    }
->>>>
->>>> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev);
->>>> -
->>>> -static inline struct net_device_core_stats __percpu *dev_core_stats(struct net_device *dev)
->>>> -{
->>>> -       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
->>>> -       struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
->>>> -
->>>> -       if (likely(p))
->>>> -               return p;
->>>> -
->>>> -       return netdev_core_stats_alloc(dev);
->>>> -}
->>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset);
->>>>
->>>>    #define DEV_CORE_STATS_INC(FIELD)                                              \
->>>>    static inline void dev_core_stats_##FIELD##_inc(struct net_device *dev)                \
->>>>    {                                                                              \
->>>> -       struct net_device_core_stats __percpu *p;                               \
->>>> -                                                                               \
->>>> -       p = dev_core_stats(dev);                                                \
->>>> -       if (p)                                                                  \
->>>> -               this_cpu_inc(p->FIELD);                                         \
->>> Note that we were using this_cpu_inc() which implied :
->>> - IRQ safety, and
->>> - a barrier paired with :
->>>
->>> net/core/dev.c:10548:                   storage->rx_dropped +=
->>> READ_ONCE(core_stats->rx_dropped);
->>> net/core/dev.c:10549:                   storage->tx_dropped +=
->>> READ_ONCE(core_stats->tx_dropped);
->>> net/core/dev.c:10550:                   storage->rx_nohandler +=
->>> READ_ONCE(core_stats->rx_nohandler);
->>> net/core/dev.c:10551:                   storage->rx_otherhost_dropped
->>> += READ_ONCE(core_stats->rx_otherhost_dropped);
->>>
->>>
->>>> +       netdev_core_stats_inc(dev,                                              \
->>>> +                       offsetof(struct net_device_core_stats, FIELD));         \
->>>>    }
->>>>    DEV_CORE_STATS_INC(rx_dropped)
->>>>    DEV_CORE_STATS_INC(tx_dropped)
->>>>    DEV_CORE_STATS_INC(rx_nohandler)
->>>>    DEV_CORE_STATS_INC(rx_otherhost_dropped)
->>>> +#undef DEV_CORE_STATS_INC
->>>>
->>>>    static __always_inline int ____dev_forward_skb(struct net_device *dev,
->>>>                                                  struct sk_buff *skb,
->>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>> index 606a366cc209..88a32c392c1d 100644
->>>> --- a/net/core/dev.c
->>>> +++ b/net/core/dev.c
->>>> @@ -10497,7 +10497,8 @@ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
->>>>    }
->>>>    EXPORT_SYMBOL(netdev_stats_to_stats64);
->>>>
->>>> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
->>>> +static __cold struct net_device_core_stats __percpu *netdev_core_stats_alloc(
->>>> +               struct net_device *dev)
->>>>    {
->>>>           struct net_device_core_stats __percpu *p;
->>>>
->>>> @@ -10510,7 +10511,19 @@ struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device
->>>>           /* This READ_ONCE() pairs with the cmpxchg() above */
->>>>           return READ_ONCE(dev->core_stats);
->>>>    }
->>>> -EXPORT_SYMBOL(netdev_core_stats_alloc);
->>>> +
->>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset)
->>>> +{
->>>> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
->>>> +       struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
->>>> +
->>>> +       if (unlikely(!p))
->>>> +               p = netdev_core_stats_alloc(dev);
->>>> +
->>>> +       if (p)
->>>> +               (*(unsigned long *)((void *)this_cpu_ptr(p) + offset))++;
->>> While here you are using a ++ operation that :
->>>
->>> - is not irq safe
->>> - might cause store-tearing.
->>>
->>> I would suggest a preliminary patch converting the "unsigned long" fields in
->>> struct net_device_core_stats to local_t
->> Do you mean it needs to revert the commit 6510ea973d8d ("net: Use
->> this_cpu_inc() to increment
->>
->> net->core_stats") first? But it would allocate memory which breaks on
->> PREEMPT_RT.
-> I think I provided an (untested) alternative.
->
-> unsigned long __percpu *field = (__force unsigned long __percpu *)
-> ((__force u8 *)p + offset);
-> this_cpu_inc(field);
+Afaiu, each ip netns exec invocation allocates a new mount namespace.
+If you run multiple concurrent ip netns exec command and leave them
+around then they all get a separate mount namespace. Not sure what the
+design behind that was. So even if you could persist the mount namespace
+of one there's still no way for ip netns exec to pick that up iiuc.
 
-unsigned long __percpu *field = (__force unsigned long __percpu *)
-((__force u8 *)p + offset);
-this_cpu_inc(*(int *)field);
+So imho, the solution is to change ip netns exec to persist a mount
+namespace and netns namespace pair. unshare does this easily via:
 
-This would compiler success. But I didn't test it.
-This cold look complex.
-Shoud I base v3? Export dev_core_stats_*_inc() intead of introduce netdev_core_stats_inc().
-That would be easy.
+sudo mkdir /run/mntns
+sudo mount --bind /run/mntns /run/mntns
+sudo mount --make-slave /run/mntns
 
->
->>> You might be able tweak this to
->>>
->>> unsigned long __percpu *field = (unsigned long __percpu) ((u8 *)p + offset);
->>> this_cpu_inc(field);
+sudo mkdir /run/netns
+
+sudo touch /run/mntns/mnt1
+sudo touch /run/netns/net1
+
+sudo unshare --mount=/run/mntns/mnt1 --net=/run/netns/net1 true
+
+So I'd probably patch iproute2.
 
