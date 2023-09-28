@@ -1,174 +1,94 @@
-Return-Path: <netdev+bounces-36919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3760F7B2461
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 19:51:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6227B246D
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 19:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DDB3C281DAF
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 17:51:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 052421C20A51
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 17:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C427513B6;
-	Thu, 28 Sep 2023 17:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1CC513CB;
+	Thu, 28 Sep 2023 17:53:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C692D79CC
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 17:51:34 +0000 (UTC)
-Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09DF4DD
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 10:51:31 -0700 (PDT)
-Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38SF23RS028319;
-	Thu, 28 Sep 2023 17:51:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to :
- mime-version; s=pps0720; bh=mZrC/t7ae+Z2o86iz704abLpUMsth0bb5IgGpyWjrnM=;
- b=APaa5kKkE4mpyTjbaPlvnbYIWIT9A784n1fDZhZsP48Q4BO9uSG32bZsfAF52jrU1bOT
- 1h7DtIZq8CfCoiXJzZq8iCLGpdSe2PlQIjBXHSbzsrerYmN3AzKoVoUge3gno+oOKne0
- TZt5ZpPcmFxaL8khHe4Ax9IRzjtiszQvxqsciJsyNpAD6ZY84bLt17ZecVDpe5s/3MjB
- a3q5Nj2zzP41qNl43/8ndPzzA6qoqUz03rp+3yjfOcXzoZpJvReW4KIp/RtMFfifP+Ul
- Z6IbclgwAUZ5SJhoTsDmi8nxYS4v/OvpF1TAywHM0NXqhjlAEPK6WdmkxzbGRG8AthqO KA== 
-Received: from p1lg14878.it.hpe.com ([16.230.97.204])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 3td85nbqpt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Sep 2023 17:51:30 +0000
-Received: from p1lg14885.dc01.its.hpecorp.net (unknown [10.119.18.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id AA426130DF;
-	Thu, 28 Sep 2023 17:51:23 +0000 (UTC)
-Received: from swahl-home.5wahls.com (unknown [16.231.227.36])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by p1lg14885.dc01.its.hpecorp.net (Postfix) with ESMTPS id DAC6681566E;
-	Thu, 28 Sep 2023 17:51:16 +0000 (UTC)
-Date: Thu, 28 Sep 2023 12:51:15 -0500
-From: Steve Wahl <steve.wahl@hpe.com>
-To: j.granados@samsung.com
-Cc: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org,
-        josh@joshtriplett.org, Kees Cook <keescook@chromium.org>,
-        Phillip Potter <phil@philpotter.co.uk>,
-        Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Doug Gilbert <dgilbert@interlog.com>,
-        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Corey Minyard <minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Robin Holt <robinmholt@gmail.com>,
-        Steve Wahl <steve.wahl@hpe.com>,
-        Russ Weight <russell.h.weight@intel.com>,
-        "Rafael J. Wysocki" <rafael@kernel.org>, Song Liu <song@kernel.org>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
-        David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-        linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH 11/15] sgi-xp: Remove the now superfluous sentinel
- element from ctl_table array
-Message-ID: <ZRW9Eywl831h/YhW@swahl-home.5wahls.com>
-References: <20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com>
- <=?utf-8?q?=3C20230928-jag-sysctl=5Fremove=5Fempty=5Felem=5Fdrive?=>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <=?utf-8?q?=3C20230928-jag-sysctl=5Fremove=5Fempty=5Felem=5Fdrive?=>
-X-Proofpoint-GUID: Nn4LE58Uwxj5yW_giMAYbDXFmg_PvMN5
-X-Proofpoint-ORIG-GUID: Nn4LE58Uwxj5yW_giMAYbDXFmg_PvMN5
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44B679CC;
+	Thu, 28 Sep 2023 17:53:28 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A083ADD;
+	Thu, 28 Sep 2023 10:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=+2NeppKoPOd4YQz6nJcEifAHl4BALODLgDqAjaWDWoI=; b=hrdrym07dNmzgGqtwMAO60ISgD
+	BlYZHtJj4WC2/8gMiEeDgWqc2qtFqVwDKDBO59FFnyAql0YQCGHRMEyJjJflbIpTwvjXwNS4TITuM
+	N3IrZ7HVlXMZwqLIWthKUGWgamXkjw9uV9uImyFa54FeOcueBja9Wr5QSo2a9SXxdflk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qlvCG-007leL-E5; Thu, 28 Sep 2023 19:53:08 +0200
+Date: Thu, 28 Sep 2023 19:53:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 08/12] net: ethernet: stmmac: stm32: support the
+ phy-supply regulator binding
+Message-ID: <12332a87-e8c3-4cf3-849a-080e4e3f4521@lunn.ch>
+References: <20230928122427.313271-1-christophe.roullier@foss.st.com>
+ <20230928122427.313271-9-christophe.roullier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-28_16,2023-09-28_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- spamscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=777 phishscore=0
- malwarescore=0 impostorscore=0 priorityscore=1501 clxscore=1011
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2309280155
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230928122427.313271-9-christophe.roullier@foss.st.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 03:21:36PM +0200, Joel Granados via B4 Relay wrote:
-> From: Joel Granados <j.granados@samsung.com>
-> 
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which
-> will reduce the overall build time size of the kernel and run time
-> memory bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
-> 
-> Remove sentinel from xpc_sys_xpc_hb and xpc_sys_xpc
-> 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
-> ---
->  drivers/misc/sgi-xp/xpc_main.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/misc/sgi-xp/xpc_main.c b/drivers/misc/sgi-xp/xpc_main.c
-> index 6da509d692bb..c898092ff3ac 100644
-> --- a/drivers/misc/sgi-xp/xpc_main.c
-> +++ b/drivers/misc/sgi-xp/xpc_main.c
-> @@ -109,8 +109,7 @@ static struct ctl_table xpc_sys_xpc_hb[] = {
->  	 .mode = 0644,
->  	 .proc_handler = proc_dointvec_minmax,
->  	 .extra1 = &xpc_hb_check_min_interval,
-> -	 .extra2 = &xpc_hb_check_max_interval},
-> -	{}
-> +	 .extra2 = &xpc_hb_check_max_interval}
->  };
->  static struct ctl_table xpc_sys_xpc[] = {
->  	{
-> @@ -120,8 +119,7 @@ static struct ctl_table xpc_sys_xpc[] = {
->  	 .mode = 0644,
->  	 .proc_handler = proc_dointvec_minmax,
->  	 .extra1 = &xpc_disengage_min_timelimit,
-> -	 .extra2 = &xpc_disengage_max_timelimit},
-> -	{}
-> +	 .extra2 = &xpc_disengage_max_timelimit}
->  };
->  
->  static struct ctl_table_header *xpc_sysctl;
-> 
-> -- 
-> 2.30.2
-> 
+> +static int phy_power_on(struct stm32_dwmac *bsp_priv, bool enable)
 
-I assume you'll match the rest of the changes with regards to the
-trailing comma.
+I find this function name confusing, since 50% of the time it does not
+actually power the PHY on. You never call it with anything other than
+a static true/false value. So it might was well be two functions,
+phy_power_on() and phy_power_off().
 
-Reviewed-by: Steve Wahl <steve.wahl@hpe.com>
+> +{
+> +	int ret;
+> +	struct device *dev = bsp_priv->dev;
+> +
+> +	if (!bsp_priv->regulator)
+> +		return 0;
+> +
+> +	if (enable) {
+> +		ret = regulator_enable(bsp_priv->regulator);
+> +		if (ret)
+> +			dev_err(dev, "fail to enable phy-supply\n");
 
--- 
-Steve Wahl, Hewlett Packard Enterprise
+Not all PHYs are usable in 0 picoseconds. You probably want a delay
+here. Otherwise the first few accesses to it might not work.
+
+      Andrew
 
