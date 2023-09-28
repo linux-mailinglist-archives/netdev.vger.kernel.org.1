@@ -1,192 +1,122 @@
-Return-Path: <netdev+bounces-36718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1257C7B167A
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:53:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 143947B16B4
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C41651C20943
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:53:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 332321C208B5
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC1731A8B;
-	Thu, 28 Sep 2023 08:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9008B3399E;
+	Thu, 28 Sep 2023 08:57:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB1E20B04
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:53:52 +0000 (UTC)
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C6E19E
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:53:49 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-6515d44b562so75758176d6.3
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:53:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695891229; x=1696496029; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GWjbhr/i5AJOQnijAmkEKk5R/r8HjHHMJzDBwWijXks=;
-        b=JsZutkatV5I1AVeiID19gh5dID4UJP0DooQS2V51KZRt2Ey+a1y5/21Mweq0EoHrLw
-         wowYvPuvFg20kx9xiDC96pmakwDmfD+o8vu8gPO/T7uzt3haaCoNyK6EPty1FPjiGwRP
-         1U3wgwKDV9dTX8TRFPs9uKb2s4ByMlifc1AmXxADSe2nLU7Osbcp13ajSsyuwL83YY+P
-         T+Mt8uJHfRAXz0/FLlwMeuxyDow6W97X6mhebYYVX92xLdLWZkPCX6cMgaFOrpFI9hZT
-         GUOZq1diVN4ziZLKVpKFGfQ+oyecAukAweDyjx0Znfz5vIioVG4C4HY1bpeZxg+kgvCd
-         bplQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695891229; x=1696496029;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GWjbhr/i5AJOQnijAmkEKk5R/r8HjHHMJzDBwWijXks=;
-        b=MZvcJX89hbsd/xvbFB9PGoiSBl7zcLTt3u6dlli3nRVoyabWBXrYTj8FFGB5BcnpW2
-         A4bDNFOhfA68lIFAM9K+Kwkg/NYK8HWIJfKpFXSJQvl0JY3tzJCQ9bApaBK1v0TpKv4u
-         WVN5SJ3K5f1KX83G7PzQguZn5JELqi4u4h4nTY2YyoSNP8bPAwBWxJxorgwYRv0G88MN
-         EnmM66zYfMcUwHvJb4PKkK5Sux3V3M1+rTYF2nPr/IlopJuTN7AtzrJc7rCgz8asu4M2
-         PV1vzsLkCUVMExwSRLP8DQHde05asavPg6fitcoHS2YNhkeV0aHb08SVLVZo5uJeP9uv
-         RJjw==
-X-Gm-Message-State: AOJu0YwWmvVwyh1djIc84AHon9F8cyBdXIecIpTPqRy1r5+W5OrOzaIL
-	2+8m/FyOorjAz0BTc0GeETHrt5kz67fYIl0WAQ==
-X-Google-Smtp-Source: AGHT+IGIQbJM7Pn/6613DIt+LjutOir/PYlM42z5Mk+Lc7As4H8TuIURnv52jE+Q93dafRQ/5JUBRcWEhGuFzF1qk20=
-X-Received: by 2002:a05:6214:3d0a:b0:658:2857:ed69 with SMTP id
- ol10-20020a0562143d0a00b006582857ed69mr637779qvb.1.1695891228930; Thu, 28 Sep
- 2023 01:53:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1415C3399A
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:57:08 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBD01721;
+	Thu, 28 Sep 2023 01:57:03 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38S8eieG001387;
+	Thu, 28 Sep 2023 08:56:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=+ADnxpkM7TAKCoPJthsbqz4OgNVoOWCyY4HXjRSWMFU=;
+ b=T2/O+yfyrBeONtNEf4JzWpq58wdhXBFm9MBlciOU3l2GwrFI34yTX+3uL6K6l5QOBfVP
+ /qSwI3TfNyfX1FwblQE0DdmXiC1IGvAytSxa1Cxgt6ILwUnT/h00QLahG4pyn/Exq+oZ
+ yHmhoQekYWl+GRRKJRMgTTtBZhvK2EDKivmR+ZhT6zNGH0OiIGEbdjnEqRaKNUoPFXQq
+ eCmxeHhW9slSY51EWfvVMtlOAjQfgTZ2wSAmt79dAzY6mmtnr31p1zNybZ6pqtDuBDev
+ NVqXfMkrJoqGIW4nDLs4/R6LqMhwOCQ+Lm44IGUcW0fo3Ix5TiCP3y7plraCwuW//ixd tA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3td5cjskfu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 08:56:52 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38S8g44D007494;
+	Thu, 28 Sep 2023 08:56:51 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3td5cjskfa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 08:56:51 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38S7cvQj030732;
+	Thu, 28 Sep 2023 08:56:50 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjkac6t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 08:56:50 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38S8ukTI14811760
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Sep 2023 08:56:46 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6F2032004B;
+	Thu, 28 Sep 2023 08:56:46 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 28C8820043;
+	Thu, 28 Sep 2023 08:56:46 +0000 (GMT)
+Received: from [9.152.224.54] (unknown [9.152.224.54])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 28 Sep 2023 08:56:46 +0000 (GMT)
+Message-ID: <1fc9a6aa-019d-f3f5-7cac-3b78388c2730@linux.ibm.com>
+Date: Thu, 28 Sep 2023 10:56:45 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
+ extension and loopback-ism
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3u0mE6isZQEWaMZr66BtMn3nV5SCHNz_
+X-Proofpoint-ORIG-GUID: P9AZLsMBMclMYv_-x57oqCKi10nuGGfa
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927151501.1549078-1-ncardwell.sw@gmail.com> <20230927151501.1549078-2-ncardwell.sw@gmail.com>
-In-Reply-To: <20230927151501.1549078-2-ncardwell.sw@gmail.com>
-From: Xin Guo <guoxin0309@gmail.com>
-Date: Thu, 28 Sep 2023 16:53:38 +0800
-Message-ID: <CAMaK5_gz=B5wJhaC5MtgwiQi9Tm8fkhLdiWQLz9DX+jf0S7P=Q@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] tcp: fix delayed ACKs for MSS boundary condition
-To: Neal Cardwell <ncardwell.sw@gmail.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-28_06,2023-09-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=782 mlxscore=0
+ impostorscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015
+ suspectscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309280073
+X-Spam-Status: No, score=-3.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Neal:
-Cannot understand "if an app reads > 1*MSS data" , " If an app reads <
-1*MSS data" and " if an app reads exactly 1*MSS of data" in the commit
-message.
-In my view, it should be like:"if an app reads and received data > 1*MSS",
-" If an app reads and received data < 1*MSS" and " if an app reads and
-received data exactly 1*MSS".
 
-Regards
-Guo Xin
 
-Neal Cardwell <ncardwell.sw@gmail.com> =E4=BA=8E2023=E5=B9=B49=E6=9C=8827=
-=E6=97=A5=E5=91=A8=E4=B8=89 23:15=E5=86=99=E9=81=93=EF=BC=9A
->
-> From: Neal Cardwell <ncardwell@google.com>
->
-> This commit fixes poor delayed ACK behavior that can cause poor TCP
-> latency in a particular boundary condition: when an application makes
-> a TCP socket write that is an exact multiple of the MSS size.
->
-> The problem is that there is painful boundary discontinuity in the
-> current delayed ACK behavior. With the current delayed ACK behavior,
-> we have:
->
-> (1) If an app reads > 1*MSS data, tcp_cleanup_rbuf() ACKs immediately
->     because of:
->
->      tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
->
-> (2) If an app reads < 1*MSS data and either (a) app is not ping-pong or
->     (b) we received two packets <1*MSS, then tcp_cleanup_rbuf() ACKs
->     immediately beecause of:
->
->      ((icsk->icsk_ack.pending & ICSK_ACK_PUSHED2) ||
->       ((icsk->icsk_ack.pending & ICSK_ACK_PUSHED) &&
->        !inet_csk_in_pingpong_mode(sk))) &&
->
-> (3) *However*: if an app reads exactly 1*MSS of data,
->     tcp_cleanup_rbuf() does not send an immediate ACK. This is true
->     even if the app is not ping-pong and the 1*MSS of data had the PSH
->     bit set, suggesting the sending application completed an
->     application write.
->
-> Thus if the app is not ping-pong, we have this painful case where
-> >1*MSS gets an immediate ACK, and <1*MSS gets an immediate ACK, but a
-> write whose last skb is an exact multiple of 1*MSS can get a 40ms
-> delayed ACK. This means that any app that transfers data in one
-> direction and takes care to align write size or packet size with MSS
-> can suffer this problem. With receive zero copy making 4KB MSS values
-> more common, it is becoming more common to have application writes
-> naturally align with MSS, and more applications are likely to
-> encounter this delayed ACK problem.
->
-> The fix in this commit is to refine the delayed ACK heuristics with a
-> simple check: immediately ACK a received 1*MSS skb with PSH bit set if
-> the app reads all data. Why? If an skb has a len of exactly 1*MSS and
-> has the PSH bit set then it is likely the end of an application
-> write. So more data may not be arriving soon, and yet the data sender
-> may be waiting for an ACK if cwnd-bound or using TX zero copy. Thus we
-> set ICSK_ACK_PUSHED in this case so that tcp_cleanup_rbuf() will send
-> an ACK immediately if the app reads all of the data and is not
-> ping-pong. Note that this logic is also executed for the case where
-> len > MSS, but in that case this logic does not matter (and does not
-> hurt) because tcp_cleanup_rbuf() will always ACK immediately if the
-> app reads data and there is more than an MSS of unACKed data.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Neal Cardwell <ncardwell@google.com>
-> Reviewed-by: Yuchung Cheng <ycheng@google.com>
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/ipv4/tcp_input.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 06fe1cf645d5a..8afb0950a6979 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -253,6 +253,19 @@ static void tcp_measure_rcv_mss(struct sock *sk, con=
-st struct sk_buff *skb)
->                 if (unlikely(len > icsk->icsk_ack.rcv_mss +
->                                    MAX_TCP_OPTION_SPACE))
->                         tcp_gro_dev_warn(sk, skb, len);
-> +               /* If the skb has a len of exactly 1*MSS and has the PSH =
-bit
-> +                * set then it is likely the end of an application write.=
- So
-> +                * more data may not be arriving soon, and yet the data s=
-ender
-> +                * may be waiting for an ACK if cwnd-bound or using TX ze=
-ro
-> +                * copy. So we set ICSK_ACK_PUSHED here so that
-> +                * tcp_cleanup_rbuf() will send an ACK immediately if the=
- app
-> +                * reads all of the data and is not ping-pong. If len > M=
-SS
-> +                * then this logic does not matter (and does not hurt) be=
-cause
-> +                * tcp_cleanup_rbuf() will always ACK immediately if the =
-app
-> +                * reads data and there is more than an MSS of unACKed da=
-ta.
-> +                */
-> +               if (TCP_SKB_CB(skb)->tcp_flags & TCPHDR_PSH)
-> +                       icsk->icsk_ack.pending |=3D ICSK_ACK_PUSHED;
->         } else {
->                 /* Otherwise, we make more careful check taking into acco=
-unt,
->                  * that SACKs block is variable.
-> --
-> 2.42.0.515.g380fc7ccd1-goog
->
->
+On 27.09.23 17:16, Alexandra Winter wrote:
+> Hello Wen Gu,
+> 
+> I applied and built your patches and noticed some things that you may want to consider in the next version:
+
+
+FYI, patchwork basically complains about many the same issues:
+https://patchwork.kernel.org/project/netdevbpf/list/?series=787037&state=*
+
+In general you should run those check BEFORE you send the patches and not rely on patchwork.
 
