@@ -1,181 +1,80 @@
-Return-Path: <netdev+bounces-36698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C5077B14F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:33:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD5DF7B152A
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id F4141282A2D
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:33:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0778B282A1F
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA2B30FAE;
-	Thu, 28 Sep 2023 07:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1985831A71;
+	Thu, 28 Sep 2023 07:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E32E64F
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:33:15 +0000 (UTC)
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF9792;
-	Thu, 28 Sep 2023 00:33:14 -0700 (PDT)
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-59c04237bf2so162535637b3.0;
-        Thu, 28 Sep 2023 00:33:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695886393; x=1696491193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=geNha/O49ZCv7df3vTVQZ8/LqB7mDG8SKl0+M/7A6cs=;
-        b=N7IuEm2bZQMV0AqjuPOjb4QXldaCZ5poVoaF4fKyjoHAllTMRuA4TwrYy9ghgRKo+5
-         zzi9bxFtXyrslUQe/5jD7AuWJPyON9BdKWEovYzDcc6GxIHO01hNifjsCOKfAl6aliUg
-         rWBob8wdqTALnw7HvDG7xdRntCqk/AZ6MJL71tt6uMyT78DBzx/KrWOgjOT1YsWfU1RS
-         CjOiIM/Kn1uaQXq1H4uZ800fZ48nzdCxdsiwu7k0XcVVpJYgL8NECWCOV70FXiVs9Pqp
-         o614KDvJpRow7scbajGmKbFMzqtnxG+/MkmhUeiwrI8yglfp2MELL/84+c9pwoCgkObv
-         WT0w==
-X-Gm-Message-State: AOJu0YyXNKP9kpbRxvkW4FiKo5TfIREuQzv9F+SOGsKQpvIBM0/xsE0X
-	k4/muTuEEFAGL76CT0dPpxgNm4TzRj+eDQ==
-X-Google-Smtp-Source: AGHT+IETH6wkKnGSs3qtL6Q54Ny40BG7hY5Vor1e/GpFfEVkwUDy40Mf7BdC4kR46tkA2CKwL43MFA==
-X-Received: by 2002:a81:c309:0:b0:59b:5696:c33 with SMTP id r9-20020a81c309000000b0059b56960c33mr430888ywk.46.1695886392898;
-        Thu, 28 Sep 2023 00:33:12 -0700 (PDT)
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com. [209.85.128.176])
-        by smtp.gmail.com with ESMTPSA id b145-20020a0dd997000000b00583d1fa1fccsm4352778ywe.0.2023.09.28.00.33.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Sep 2023 00:33:11 -0700 (PDT)
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-59c04237bf2so162535247b3.0;
-        Thu, 28 Sep 2023 00:33:11 -0700 (PDT)
-X-Received: by 2002:a0d:dd83:0:b0:583:d6bb:4e96 with SMTP id
- g125-20020a0ddd83000000b00583d6bb4e96mr509648ywe.8.1695886391465; Thu, 28 Sep
- 2023 00:33:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066B1538C
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 69E04C433CA;
+	Thu, 28 Sep 2023 07:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695886824;
+	bh=pjqPuAcv283NJ+TTvlNQXtbmZPqANr6CrDjBHJ/KfnY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=T6649gcgKr76DAgluac1RhPWkNH/YnWbRi1O3EJTCHk7+/de9yncQV36OOqLVVJhZ
+	 Alcu50t3hIMxfo/Pzj+hWn0jycBiRrNLPnfbcUyqLBhUy26ZNMoZ21yyIDoAtrfTP5
+	 odoKL+kw189JSjvOro9botquGe6E/E4tYSrTadibwfqiKVFSuH0LQt3vvhH0zOPR3Q
+	 L7VKNAKKA7YX7anLeZXffIdzR42GLO5HDwoSi9adnCe+znOQH8folYRZkr6a18rQul
+	 bDAu2jea33cjv0LH4piKqZSzUr+L6atBUsAJZ/GPSS140pTk/CQiMD9NaLNEB0F3zB
+	 piIRfFGrJ0qDw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4DD6FC395E0;
+	Thu, 28 Sep 2023 07:40:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230926123054.3976752-1-yoshihiro.shimoda.uh@renesas.com>
- <c88ebcd5-614d-41ce-9f13-bc3c0e4920d7@lunn.ch> <TYBPR01MB5341BA14DCF0BEEFBBED95D0D8C1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-In-Reply-To: <TYBPR01MB5341BA14DCF0BEEFBBED95D0D8C1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 28 Sep 2023 09:32:58 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdW+f_XJNFBDOkVN06NQ93vBgd4yYSQ00APX9imasHnSiw@mail.gmail.com>
-Message-ID: <CAMuHMdW+f_XJNFBDOkVN06NQ93vBgd4yYSQ00APX9imasHnSiw@mail.gmail.com>
-Subject: Re: [PATCH net v3] rswitch: Fix PHY station management clock setting
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, Tam Nguyen <tam.nguyen.xa@renesas.com>, 
-	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH] net: sfp: add quirk for Fiberstone GPON-ONU-34-20BI
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169588682431.24360.15438983222452175812.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Sep 2023 07:40:24 +0000
+References: <20230919124720.8210-1-ansuelsmth@gmail.com>
+In-Reply-To: <20230919124720.8210-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Shimoda-san,
+Hello:
 
-On Thu, Sep 28, 2023 at 4:13=E2=80=AFAM Yoshihiro Shimoda
-<yoshihiro.shimoda.uh@renesas.com> wrote:
-> > From: Andrew Lunn, Sent: Wednesday, September 27, 2023 9:44 PM
-> > > +   /* MPIC.PSMCS =3D (clk [MHz] / (MDC frequency [MHz] * 2) - 1.
-> > > +    * Calculating PSMCS value as MDC frequency =3D 2.5MHz. So, multi=
-ply
-> > > +    * both the numerator and the denominator by 10.
-> > > +    */
-> > > +   etha->psmcs =3D clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
-> > >  }
-> > >
-> > >  static int rswitch_device_alloc(struct rswitch_private *priv, int in=
-dex)
-> > > @@ -1900,6 +1907,10 @@ static int renesas_eth_sw_probe(struct platfor=
-m_device *pdev)
-> > >             return -ENOMEM;
-> > >     spin_lock_init(&priv->lock);
-> > >
-> > > +   priv->clk =3D devm_clk_get(&pdev->dev, NULL);
-> > > +   if (IS_ERR(priv->clk))
-> > > +           return PTR_ERR(priv->clk);
-> > > +
-> >
-> > /**
-> >  * clk_get_rate - obtain the current clock rate (in Hz) for a clock sou=
-rce.
-> >  *              This is only valid once the clock source has been enabl=
-ed.
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Whether clk_get_rate() works when the clock is still disabled actually
-depends on the clock driver implementation/hardware.  It's not
-guaranteed, so generic code cannot make that assumption.
-It should work fine on all Renesas on-SoC clock generators.
+On Tue, 19 Sep 2023 14:47:20 +0200 you wrote:
+> Fiberstone GPON-ONU-34-20B can operate at 2500base-X, but report 1.2GBd
+> NRZ in their EEPROM.
+> 
+> The module also require the ignore tx fault fixup similar to Huawei MA5671A
+> as it gets disabled on error messages with serial redirection enabled.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> 
+> [...]
 
-> >  * @clk: clock source
-> >  */
-> > unsigned long clk_get_rate(struct clk *clk);
-> >
-> > I don't see the clock being enabled anywhere.
->
-> Since GENPD_FLAG_PM_CLK is set in the drivers/pmdomain/renesas/rcar-gen4-=
-sysc.c,
-> pm_runtime_get_sync() will enable the clock. That's why this code works c=
-orrectly
-> without clk_enable() calling.
->
-> > Also, is the clock documented in the device tree binding?
->
-> Yes, but this is a "clocks" property only though. In the dt-bindings doc:
-> ---
-> examples:
-> ...
->         clocks =3D <&cpg CPG_MOD 1505>;
-> ---
->
-> And, in the drivers/clk/renesas/r8a779f0-cpg-mssr.c:
-> ---
->         DEF_FIXED("rsw2",       R8A779F0_CLK_RSW2,      CLK_PLL5_DIV2,  5=
-, 1),
-> ...
->         DEF_MOD("rswitch2",     1505,   R8A779F0_CLK_RSW2),
-> ---
-> So, the device will get the paranet clock " R8A779F0_CLK_RSW2".
-> And according to the clk_summary in the debugfs:
-> ---
-> # grep rsw /sys/kernel/debug/clk/clk_summary
->              rsw2                     1        1        0   320000000    =
-      0     0  50000         Y
->                 rswitch2              1        1        0   320000000    =
-      0     0  50000         Y
-> ---
->
-> I found that i2c-rcar.c and pwm-rcar.c are also the same implementation
-> which call clk_get_rate() without clk_enable(). But, perhaps, we should e=
-nable
-> the clock by clk API?
->
-> To Geert-san, do you have any opinion?
+Here is the summary with links:
+  - [net-next] net: sfp: add quirk for Fiberstone GPON-ONU-34-20BI
+    https://git.kernel.org/netdev/net-next/c/d387e34fec40
 
-As the device is part of a clock domain, the clock is managed through
-Runtime PM, and there is no need to enable or disable manually.
-Just make sure to call pm_runtime_resume_and_get() before accessing
-any register of the device.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Calling clk_get_rate() at any time is fine.
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
