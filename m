@@ -1,72 +1,109 @@
-Return-Path: <netdev+bounces-36827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BAD67B1EA7
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:38:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF997B1EB1
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 7A3EE1C20A2F
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5B782281EE1
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F9D3B7A2;
-	Thu, 28 Sep 2023 13:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDCCE3B7A4;
+	Thu, 28 Sep 2023 13:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B8C3AC3D;
-	Thu, 28 Sep 2023 13:38:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8C1FC433C8;
-	Thu, 28 Sep 2023 13:38:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695908308;
-	bh=g8ZXaIN93ZfxE2Ei93hCloVx+lzo8p+xJHZE3EoTyxw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EeY+yq0WZRpbvxIHDdodVZpavSilaGC0SGuJCGzimdgcDrwyAnwfIjvG4EmzVMy9p
-	 z1EMiBqgmcKaiWq/o0am3uM67cTFY2oALRIcaP5s3SKfjEtFzoxfTZBnprkCQkeIW0
-	 9XtS45BVAUaqF+GEI5YlLptRXEVSBHmvxSgZ0qEbAkaraft+IrUoYFvSqqycC5Zpiq
-	 WkLg+aGILOrpJclpz5YkV1NxrcOqD0ilEOd4QMQWal4Qnt4XvuGM4V5U4+7Nj7zpsT
-	 hR0Kctvufbs3vRS1oanzoQWtQYAp3k5YTFhbBRQcwgjNu9SmmLJK3CxHz8vfeTzewt
-	 X4kJ3LY5lDi5w==
-Date: Thu, 28 Sep 2023 15:38:13 +0200
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH v2 net-next 07/15] net: phylink: centralize
- phy_interface_mode_is_8023z() && phylink_autoneg_inband() checks
-Message-ID: <20230928133813.GN24230@kernel.org>
-References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
- <20230923134904.3627402-8-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B4F3AC3D
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:40:22 +0000 (UTC)
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805C211F;
+	Thu, 28 Sep 2023 06:40:20 -0700 (PDT)
+Received: from [78.30.34.192] (port=35960 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qlrFW-0028r0-1Y; Thu, 28 Sep 2023 15:40:16 +0200
+Date: Thu, 28 Sep 2023 15:40:13 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: joao@overdrivepizza.com
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	rkannoth@marvell.com, wojciech.drewek@intel.com,
+	steen.hegenlund@microhip.com, keescook@chromium.org,
+	Joao Moreira <joao.moreira@intel.com>
+Subject: Re: [PATCH v3 1/2] Make loop indexes unsigned
+Message-ID: <ZRWCPTVd7b6+a7N5@calendula>
+References: <20230927164715.76744-1-joao@overdrivepizza.com>
+ <20230927164715.76744-2-joao@overdrivepizza.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230923134904.3627402-8-vladimir.oltean@nxp.com>
+In-Reply-To: <20230927164715.76744-2-joao@overdrivepizza.com>
+X-Spam-Score: -1.9 (-)
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Sep 23, 2023 at 04:48:56PM +0300, Vladimir Oltean wrote:
-> In a future change, we will extend the PHY interface modes for which
-> phylink allows the PCS to handle autoneg. Group the existing occurences
+On Wed, Sep 27, 2023 at 09:47:14AM -0700, joao@overdrivepizza.com wrote:
+> From: Joao Moreira <joao.moreira@intel.com>
+> 
+> Both flow_rule_alloc and offload_action_alloc functions received an
+> unsigned num_actions parameters which are then operated within a loop.
+> The index of this loop is declared as a signed int. If it was possible
+> to pass a large enough num_actions to these functions, it would lead to
+> an out of bounds write.
+> 
+> After checking with maintainers, it was mentioned that front-end will
+> cap the num_actions value and that it is not possible to reach this
+> function with such a large number. Yet, for correctness, it is still
+> better to fix this.
+> 
+> This issue was observed by the commit author while reviewing a write-up
+> regarding a CVE within the same subsystem [1].
+> 
+> 1 - https://nickgregory.me/post/2022/03/12/cve-2022-25636/
+> 
+> Signed-off-by: Joao Moreira <joao.moreira@intel.com>
+> ---
+>  net/core/flow_offload.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/flow_offload.c b/net/core/flow_offload.c
+> index bc5169482710..bc3f53a09d8f 100644
+> --- a/net/core/flow_offload.c
+> +++ b/net/core/flow_offload.c
+> @@ -10,7 +10,7 @@
+>  struct flow_rule *flow_rule_alloc(unsigned int num_actions)
+>  {
+>  	struct flow_rule *rule;
+> -	int i;
+> +	unsigned int i;
 
-nit: occurrences
+With the 2^8 cap, I don't think this patch is required anymore.
 
-...
+>  
+>  	rule = kzalloc(struct_size(rule, action.entries, num_actions),
+>  		       GFP_KERNEL);
+> @@ -31,7 +31,7 @@ EXPORT_SYMBOL(flow_rule_alloc);
+>  struct flow_offload_action *offload_action_alloc(unsigned int num_actions)
+>  {
+>  	struct flow_offload_action *fl_action;
+> -	int i;
+> +	unsigned int i;
+>  
+>  	fl_action = kzalloc(struct_size(fl_action, action.entries, num_actions),
+>  			    GFP_KERNEL);
+> -- 
+> 2.42.0
+> 
 
