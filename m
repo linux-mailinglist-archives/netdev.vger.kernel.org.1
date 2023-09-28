@@ -1,136 +1,77 @@
-Return-Path: <netdev+bounces-36798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713047B1CB2
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:40:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCB2B7B1CBA
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B975A2829AE
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:40:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 954F82829C6
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287E1347B7;
-	Thu, 28 Sep 2023 12:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE50374FF;
+	Thu, 28 Sep 2023 12:42:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112DF8BFF
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 12:40:11 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3462139;
-	Thu, 28 Sep 2023 05:40:08 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BEFEDFF803;
-	Thu, 28 Sep 2023 12:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1695904805;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EZE2REsMNc2mXuGaMpgEFAlQvcHuSlVOm9/Mjr1E1/U=;
-	b=o1pVvjLuwW2grIpSsEqE9yI7+oF52h2SqpQ9B0r6YXZh/1hTAgvmyLvpSBiIJh0kpi7YiQ
-	ER8ZofzXmje5zZKAmn/FehD4xUENVDfdWMIngyzU4579y7sAm3WtEZbQ2Ifb4AS9pIqbjd
-	uNtiOOg+mlm22Tb64tfBUScCgPeKZ4BTVFdDEPPOh8L4bi7cG86tyN5sAIN2u4jQB2QDXu
-	4onienvj+BsTjNra/tnjqBwFUUakHZeW0p5S9A6ns4JKo6Cna0suuSEvJWK8RIgHzl25NF
-	D/ncq+fxLC2npgJwqUzUAWfK0Ke2+RSrBNhAMGcRialqWBxB4cNdgyudJpPjjg==
-Date: Thu, 28 Sep 2023 14:39:58 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Maxim Georgiev <glipus@gmail.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Richard Cochran
- <richardcochran@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Gerhard Engleder <gerhard@engleder-embedded.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Russell King <linux@armlinux.org.uk>, Heiner
- Kallweit <hkallweit1@gmail.com>, Jacob Keller <jacob.e.keller@intel.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>,
- UNGLinuxDriver@microchip.com, Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, Simon Horman <simon.horman@corigine.com>,
- Casper Andersson <casper.casan@gmail.com>, Sergey Organov
- <sorganov@gmail.com>, Michal Kubecek <mkubecek@suse.cz>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 net-next 12/12] net: remove phy_has_hwtstamp() ->
- phy_mii_ioctl() decision from converted drivers
-Message-ID: <20230928143958.298ee225@kmaincent-XPS-13-7390>
-In-Reply-To: <20230928121214.170e31b0@kmaincent-XPS-13-7390>
-References: <20230801142824.1772134-1-vladimir.oltean@nxp.com>
- <20230801142824.1772134-13-vladimir.oltean@nxp.com>
- <20230928121214.170e31b0@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7058BF4
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 12:42:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2714C433C8;
+	Thu, 28 Sep 2023 12:42:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695904971;
+	bh=Jtx2o5xpKA5SOo7oGfW5jDPzdyBgHKowCU3rfSEsVTI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C4/BsBeoFQD46BDCiT2rFr/Fj9dPITWOizkTbzv46Jnol47La5IGJPIlL64Bb6hiA
+	 NQA8/OXZrkAZjAID6n9FOewpK8lXR1SJh5BELq/lTu63nNmJ3XT1v7yMgd0mU5Ce3u
+	 jVLGlR1lBJyh7wQLqY7bUzP2b8sQxT6ic6xPjXmlN6yqXpaw7JtLpeiRW1bIcPJAKO
+	 +3KoOoSy4IbFL52u9weYQsfjfSLBSbJ7ou3Of7/gMCmFIdBga1JFLf261+aJcYG0sb
+	 JWOHTo0B03Qj0tJR7s0VBJKIbKhru8Mq/2a9L4tfT++gVI9/VP6qJjltc2DKdUYbK2
+	 0+LC27BC8HGRQ==
+Date: Thu, 28 Sep 2023 14:42:36 +0200
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Vadim Pasternak <vadimp@nvidia.com>, mlxsw@nvidia.com
+Subject: Re: [PATCH net-next 0/3] mlxsw: Provide enhancements and new feature
+Message-ID: <20230928124236.GI24230@kernel.org>
+References: <cover.1695396848.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1695396848.git.petrm@nvidia.com>
 
-On Thu, 28 Sep 2023 12:12:14 +0200
-K=C3=B6ry Maincent <kory.maincent@bootlin.com> wrote:
+On Fri, Sep 22, 2023 at 07:18:35PM +0200, Petr Machata wrote:
+> Vadim Pasternak writes:
+> 
+> Patch #1 - Optimize transaction size for efficient retrieval of module
+>            data.
+> Patch #3 - Enable thermal zone binding with new cooling device.
+> Patch #4 - Employ standard macros for dividing buffer into the chunks.
+> 
+> Vadim Pasternak (3):
+>   mlxsw: reg: Limit MTBR register payload to a single data record
+>   mlxsw: core: Extend allowed list of external cooling devices for
+>     thermal zone binding
+>   mlxsw: i2c: Utilize standard macros for dividing buffer into chunks
+> 
+>  drivers/net/ethernet/mellanox/mlxsw/core_env.c     | 2 +-
+>  drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c   | 2 +-
+>  drivers/net/ethernet/mellanox/mlxsw/core_thermal.c | 1 +
+>  drivers/net/ethernet/mellanox/mlxsw/i2c.c          | 4 +---
+>  drivers/net/ethernet/mellanox/mlxsw/reg.h          | 6 +++---
+>  5 files changed, 7 insertions(+), 8 deletions(-)
 
-> On Tue,  1 Aug 2023 17:28:24 +0300
-> Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
->=20
-> > It is desirable that the new .ndo_hwtstamp_set() API gives more
-> > uniformity, less overhead and future flexibility w.r.t. the PHY
-> > timestamping behavior.
-> >=20
-> > Currently there are some drivers which allow PHY timestamping through
-> > the procedure mentioned in Documentation/networking/timestamping.rst.
-> > They don't do anything locally if phy_has_hwtstamp() is set, except for
-> > lan966x which installs PTP packet traps.
-> >=20
-> > Centralize that behavior in a new dev_set_hwtstamp_phylib() code
-> > function, which calls either phy_mii_ioctl() for the phylib PHY,
-> > or .ndo_hwtstamp_set() of the netdev, based on a single policy
-> > (currently simplistic: phy_has_hwtstamp()).
-> >=20
-> > Any driver converted to .ndo_hwtstamp_set() will automatically opt into
-> > the centralized phylib timestamping policy. Unconverted drivers still
-> > get to choose whether they let the PHY handle timestamping or not.
-> >=20
-> > Netdev drivers with integrated PHY drivers that don't use phylib
-> > presumably don't set dev->phydev, and those will always see
-> > HWTSTAMP_SOURCE_NETDEV requests even when converted. The timestamping
-> > policy will remain 100% up to them. =20
->=20
-> > +static int dev_set_hwtstamp_phylib(struct net_device *dev,
-> > +				   struct kernel_hwtstamp_config *cfg,
-> > +				   struct netlink_ext_ack *extack)
-> > +{ =20
-> ...
->=20
-> > +	if (phy_ts) {
-> > +		err =3D phy_hwtstamp_set(dev->phydev, cfg, extack);
-> > +		if (err) {
-> > +			if (changed)
-> > +				ops->ndo_hwtstamp_set(dev, &old_cfg, NULL);
-> > +			return err;
-> > +		}
-> > +	} =20
->=20
-> In this case the copy_from_user function will be call 2 times, one in
-> dev_set_hwtstamp and one in the mii_ts.hwtstamp callback of the PHY drive=
-r.
-> Should we create also a copied_from_user flag? Other idea?
+For series,
 
-oops sorry for the noise the issue I face seems elsewhere.
-If I understand it well, two call of copy_from_user consecutive will behave=
- the
-same.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
