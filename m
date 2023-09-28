@@ -1,90 +1,112 @@
-Return-Path: <netdev+bounces-36845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9807C7B1FF4
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:45:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B92F7B1FF6
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:46:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id B5A531C2097F
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BAFDC2827A2
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFAF3FB08;
-	Thu, 28 Sep 2023 14:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40C23B2BE;
+	Thu, 28 Sep 2023 14:46:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067AB3B2AE
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 14:45:07 +0000 (UTC)
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6D31A1
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:45:02 -0700 (PDT)
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso1704654366b.1
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:45:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695912301; x=1696517101;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=91dHlTlXNCIf2/mTTpM1oLN+DVcQdYlY6t1IKajEJ48=;
-        b=mAVJjkTRhj6AJGjmtYL8hZDN02Lb4Sl7U9wbTc8OFarD66IpLXFFhc+T7WcA2unRgj
-         eKywae3awewfI+0yo7P8QegA5GVhKbhcB5NYMxD1vlgl5VqZeAHoUGv/JQ1c/X6c20RB
-         hpoEwBtAGten2wzjJ2zGxWnOX5RoV66erJiVbKStUho0n2n9XQYE5FoyMKW7bIGcFuJk
-         eEW2TxR8MydfmLolkRABP1rVNMUC2fYWF8Iq79LtQl9oSvURwcOs+5yMD7wGbIm17IwU
-         FjMCDeRW3a1FamGS6JOmAG0Br0j5q0wh/kvkqemcVSrwbnfRGqtaRcKPAPvkou3i1bgY
-         yv1w==
-X-Gm-Message-State: AOJu0YzdOruiKv19euyH9kbaYX/7gu0mCeGMP1/Ho2gYbIy7cJzlAGAK
-	l7VdjeauD36DLvXqq64dxFjo53tdF7E=
-X-Google-Smtp-Source: AGHT+IHYqxQxZf8S662gQpm5gCNZbGDbn0SdYAP38R13WnumWtKByWRBZwq7ma/hMwWINnHBsIv67A==
-X-Received: by 2002:a17:907:2e01:b0:99b:ed44:1a79 with SMTP id ig1-20020a1709072e0100b0099bed441a79mr1392581ejc.3.1695912300897;
-        Thu, 28 Sep 2023 07:45:00 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-001.fbsv.net. [2a03:2880:31ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id bu10-20020a170906a14a00b0099bd7b26639sm11047960ejb.6.2023.09.28.07.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 07:45:00 -0700 (PDT)
-Date: Thu, 28 Sep 2023 07:44:58 -0700
-From: Breno Leitao <leitao@debian.org>
-To: jlbec@evilplan.org, hch@lst.de
-Cc: netdev@vger.kernel.org
-Subject: configfs: Create config_item from netconsole
-Message-ID: <ZRWRal5bW93px4km@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB67E38BD6
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 14:46:19 +0000 (UTC)
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B9E180;
+	Thu, 28 Sep 2023 07:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=mRqhWMIMcGuvyFgNpvTVrYcSiIxSRbOQ0ouvdqRZILs=; b=XiqIRxPYnpAo2sfITfIEUqafxd
+	cjdvaUDYFEbJUZriPNSmHqwWzxKACw8HZBiZeT2uusVp30pN6f8AMuDarmvegbrPaB4AejY6aHV2P
+	B7ZS03wjXKqeqMr1JDhYaNihI+GdNLNWCNfYpRtu5H/MnWr1i/i7LLJd+HzgggD8+mdgqvG7HD5J9
+	3aUzpecuqYRaeF2h0WyJa/I9bSjoxHAfE+zZ+6I+x/x40RNIsZpV1Qjwk6um9VGm6kATE2gekVBOi
+	YbUbG9uQuWHFHtEmBPmr4oa1x3kOBnvjUV50gvd+yI+/lW38YFzLljKzFHKoDm24kWqD9Foso497B
+	0jK3PSEg==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1qlsHN-000BGU-Fc; Thu, 28 Sep 2023 16:46:13 +0200
+Received: from [185.17.218.86] (helo=localhost)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1qlsHM-0002Zw-PQ; Thu, 28 Sep 2023 16:46:12 +0200
+From: esben@geanix.com
+To: Harini Katakam <harini.katakam@amd.com>
+Cc: <davem@davemloft.net>,  <kuba@kernel.org>,  <edumazet@google.com>,
+  <pabeni@redhat.com>,  <jsc@umbraculum.org>,
+  <christophe.jaillet@wanadoo.fr>,  <netdev@vger.kernel.org>,
+  <linux-arm-kernel@lists.infradead.org>,  <linux-kernel@vger.kernel.org>,
+  <harinikatakamlinux@gmail.com>,  <michal.simek@amd.com>,
+  <radhey.shyam.pandey@amd.com>
+Subject: Re: [PATCH net-next] MAINTAINERS: Add an obsolete entry for LL
+ TEMAC driver
+In-Reply-To: <20230920115047.31345-1-harini.katakam@amd.com> (Harini Katakam's
+	message of "Wed, 20 Sep 2023 17:20:47 +0530")
+References: <20230920115047.31345-1-harini.katakam@amd.com>
+Date: Thu, 28 Sep 2023 16:46:12 +0200
+Message-ID: <878r8qxsnf.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27045/Thu Sep 28 09:39:25 2023)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Right now there is a limitation in netconsole, where it is impossible to
-disable or modify the target created from the command line parameter.
-(netconsole=...).
+Harini Katakam <harini.katakam@amd.com> writes:
 
-"netconsole" cmdline parameter sets the remote IP, and if the remote IP
-changes, the machine needs to be rebooted (with the new remote IP set in
-the command line parameter).
+> LL TEMAC IP is no longer supported. Hence add an entry marking the
+> driver as obsolete.
 
-I am planning to reuse the dynamic netconsole mechanism for
-the 'command line' target, i.e., create a `cmdline` configfs_item for
-the "command line" target, so, the user can modify the "command line"
-target in configfs in runtime. Something as :
+Ok. But while that might mean that no new designs should use LL TEMAC
+IP, why do we need to declare the driver for it obsolete?
 
-	echo 0 > /sys/kernel/config/netconsole/cmdline/enabled
-	echo <new-IP> > /sys/kernel/config/netconsole/cmdline/remote_ip
-	echo 1 > /sys/kernel/config/netconsole/cmdline/enabled
+Existing designs using LL TEMAC IP might need to upgrade Linux kernel
+also.
 
-I didn't find a configfs API to register a configfs_item into a
-config_group. Basically the make_item() callbacks are called once the
-inode is created by the user at mkdir(2) time, but now I need to create
-it at the driver initialization.
+/Esben
 
-Should I create a configfs_register_item() to solve this problem?
-
-Thanks!
+>
+> Signed-off-by: Harini Katakam <harini.katakam@amd.com>
+> ---
+> This is an old driver with no bindings doc and hence the maintainers
+> entry does not contain a link to documentation.
+> ---
+>  MAINTAINERS | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3dde038545d8..820a7817f02f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -23696,6 +23696,11 @@ F:	Documentation/devicetree/bindings/gpio/xlnx,gpio-xilinx.yaml
+>  F:	drivers/gpio/gpio-xilinx.c
+>  F:	drivers/gpio/gpio-zynq.c
+>  
+> +XILINX LL TEMAC ETHERNET DRIVER
+> +L:	netdev@vger.kernel.org
+> +S:	Obsolete
+> +F:	drivers/net/ethernet/xilinx/ll_temac*
+> +
+>  XILINX PWM DRIVER
+>  M:	Sean Anderson <sean.anderson@seco.com>
+>  S:	Maintained
 
