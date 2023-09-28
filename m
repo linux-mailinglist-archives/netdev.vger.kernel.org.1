@@ -1,231 +1,84 @@
-Return-Path: <netdev+bounces-36656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E10C7B1118
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 05:12:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04587B111B
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 05:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 479B7281838
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 03:12:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id F29281C204F3
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 03:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F205235;
-	Thu, 28 Sep 2023 03:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569B35236;
+	Thu, 28 Sep 2023 03:13:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553A646A5
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:12:08 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5169B10A
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 20:12:05 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c02e232c48so211605001fa.1
-        for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 20:12:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1695870723; x=1696475523; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0bgXgmlh1GQN4CTcdXTwNhD1V43Sfr+5et+8avDcRvU=;
-        b=gH74imOQ4FHW9Jqs8EQiMbaAR3yrBwjBKIZZlrMPpMwDWPJRcp5xUsaMEcN0RNsAgl
-         /BD8IEMrJMlf1le3Rj78eEf7/i8sJkbtMrvnQRaz2LNAOG0lHgIKPVrRQCWSL52XVZRs
-         AXbPrtjwc9UtppqZD6QKmC2ZmC7YyqCGyGqZaZa1vcAfUUuHRhVjrZ+B7t0v90//gCCt
-         VnCVd3sJ1Y/4CMIFce/+Gh/Cbt2ixS2qnoog4w1GcU/dCWIDnfQ9qqokekbi2Ri17iG9
-         eognQ09Jy4yTF3ktO9FfPHm/+40PfQ9SpZ9I7cn9Yc8KeeKVw1nBiSJc38TxEZbkRfRj
-         7MoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695870723; x=1696475523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0bgXgmlh1GQN4CTcdXTwNhD1V43Sfr+5et+8avDcRvU=;
-        b=DV0qGw1i4b4NNjs2nvfiijf6SJwhzdhNTcSeTWIW1xBE0qOHovWH9Mq5JH5TdVOczO
-         hKQpV9UE87cNedy4L7TjupE7j6iDYEw1z954sTDrEhaam8eZzjk6801MN0wnK1ihMPLK
-         JSA+cqVWwlKmx3M6B4wvTkS32cEDjxotWnTb/fg2G2I6zn2ER4+r+pqrgfoiYjUZELhN
-         FVyrBMo7TFS/H8vAER6CuQQZB6z8eziwP+teWbMDhE5dp5gu44rjCs+ZwM8N3Qdjfrgl
-         915rL6Dcy2vSVlOsvYQoHVX6/YGa79mBHiuUFkYPEIWATvC1DOsLTtILniOpdxm39z8T
-         bwtA==
-X-Gm-Message-State: AOJu0Ywyy7DO0T7SI86ovB8iXly9hBrBjEpAX8ktQxwf0+Kf+PgYDf06
-	FSEP36r0u7ohwGQBNrTOCbc4fHmjJUbkNV94KuczTg==
-X-Google-Smtp-Source: AGHT+IFTkZJ4/q7vliYQ72XDcISPvWIwkniBbFNC/u0b2JMniQDgzT1TKU1pudIlDb/h5AgGmk2WIfS+SYeITjrwU+w=
-X-Received: by 2002:a2e:b002:0:b0:2c0:17bc:124e with SMTP id
- y2-20020a2eb002000000b002c017bc124emr3443023ljk.38.1695870723542; Wed, 27 Sep
- 2023 20:12:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176041872
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:13:23 +0000 (UTC)
+Received: from jari.cn (unknown [218.92.28.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 70AD494;
+	Wed, 27 Sep 2023 20:13:22 -0700 (PDT)
+Received: from wangkailong$jari.cn ( [182.148.12.64] ) by
+ ajax-webmail-localhost.localdomain (Coremail) ; Thu, 28 Sep 2023 11:12:00
+ +0800 (GMT+08:00)
+X-Originating-IP: [182.148.12.64]
+Date: Thu, 28 Sep 2023 11:12:00 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "KaiLong Wang" <wangkailong@jari.cn>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] ipv6: Clean up errors in ipv6.h
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.1-cmXT6 build
+ 20230419(ff23bf83) Copyright (c) 2002-2023 www.mailtech.cn
+ mispb-4e503810-ca60-4ec8-a188-7102c18937cf-zhkzyfz.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
- <20230927034209.GE92403@linux.alibaba.com> <20230927055528.GP1642130@unreal>
-In-Reply-To: <20230927055528.GP1642130@unreal>
-From: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Date: Thu, 28 Sep 2023 11:11:51 +0800
-Message-ID: <CABKxMyOzCnJuWJskLT2rm64r8tLH7VU8jHL308oZs6--XOcLnQ@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH net-next] net/smc: add support for
- netdevice in containers.
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Dust Li <dust.li@linux.alibaba.com>, Karsten Graul <kgraul@linux.ibm.com>, 
-	Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Message-ID: <1f323424.8ac.18ad9c59948.Coremail.wangkailong@jari.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:AQAAfwDHZD8A7xRltYC+AA--.637W
+X-CM-SenderInfo: 5zdqwypdlo00nj6mt2flof0/1tbiAQAIB2UT+K8AFwACs6
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
+X-Spam-Status: No, score=2.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_PBL,RDNS_NONE,T_SPF_HELO_PERMERROR,T_SPF_PERMERROR,XPRIO
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Leon Romanovsky <leon@kernel.org> =E4=BA=8E2023=E5=B9=B49=E6=9C=8827=E6=97=
-=A5=E5=91=A8=E4=B8=89 13:55=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Wed, Sep 27, 2023 at 11:42:09AM +0800, Dust Li wrote:
-> > On Mon, Sep 25, 2023 at 10:35:45AM +0800, Albert Huang wrote:
-> > >If the netdevice is within a container and communicates externally
-> > >through network technologies like VXLAN, we won't be able to find
-> > >routing information in the init_net namespace. To address this issue,
-> >
-> > Thanks for your founding !
-> >
-> > I think this is a more generic problem, but not just related to VXLAN ?
-> > If we use SMC-R v2 and the netdevice is in a net namespace which is not
-> > init_net, we should always fail, right ? If so, I'd prefer this to be a=
- bugfix.
->
-> BTW, does this patch take into account net namespace of ib_device?
->
-> Thanks
->
-
-As dust said, the ib_device works well.
-
-bool rdma_dev_access_netns(const struct ib_device *dev, const struct net *n=
-et)
-{
-return (ib_devices_shared_netns ||
-net_eq(read_pnet(&dev->coredev.rdma_net), net));
-}
-EXPORT_SYMBOL(rdma_dev_access_netns);
-
-thanks!
-
-BR
-Albert.
-
-
-> >
-> > Best regards,
-> > Dust
-> >
-> > >we need to add a struct net parameter to the smc_ib_find_route functio=
-n.
-> > >This allow us to locate the routing information within the correspondi=
-ng
-> > >net namespace, ensuring the correct completion of the SMC CLC interact=
-ion.
-> > >
-> > >Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > >---
-> > > net/smc/af_smc.c | 3 ++-
-> > > net/smc/smc_ib.c | 7 ++++---
-> > > net/smc/smc_ib.h | 2 +-
-> > > 3 files changed, 7 insertions(+), 5 deletions(-)
-> > >
-> > >diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> > >index bacdd971615e..7a874da90c7f 100644
-> > >--- a/net/smc/af_smc.c
-> > >+++ b/net/smc/af_smc.c
-> > >@@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct sm=
-c_sock *smc,
-> > >             (struct smc_clc_msg_accept_confirm_v2 *)aclc;
-> > >     struct smc_clc_first_contact_ext *fce =3D
-> > >             smc_get_clc_first_contact_ext(clc_v2, false);
-> > >+    struct net *net =3D sock_net(&smc->sk);
-> > >     int rc;
-> > >
-> > >     if (!ini->first_contact_peer || aclc->hdr.version =3D=3D SMC_V1)
-> > >@@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct sm=
-c_sock *smc,
-> > >             memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_AL=
-EN);
-> > >             ini->smcrv2.uses_gateway =3D false;
-> > >     } else {
-> > >-            if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
-> > >+            if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr=
-,
-> > >                                   smc_ib_gid_to_ipv4(aclc->r0.lcl.gid=
-),
-> > >                                   ini->smcrv2.nexthop_mac,
-> > >                                   &ini->smcrv2.uses_gateway))
-> > >diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> > >index 9b66d6aeeb1a..89981dbe46c9 100644
-> > >--- a/net/smc/smc_ib.c
-> > >+++ b/net/smc/smc_ib.c
-> > >@@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smci=
-bdev, u8 ibport)
-> > >     return smcibdev->pattr[ibport - 1].state =3D=3D IB_PORT_ACTIVE;
-> > > }
-> > >
-> > >-int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> > >+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
-> > >                   u8 nexthop_mac[], u8 *uses_gateway)
-> > > {
-> > >     struct neighbour *neigh =3D NULL;
-> > >@@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> > >
-> > >     if (daddr =3D=3D cpu_to_be32(INADDR_NONE))
-> > >             goto out;
-> > >-    rt =3D ip_route_output_flow(&init_net, &fl4, NULL);
-> > >+    rt =3D ip_route_output_flow(net, &fl4, NULL);
-> > >     if (IS_ERR(rt))
-> > >             goto out;
-> > >     if (rt->rt_uses_gateway && rt->rt_gw_family !=3D AF_INET)
-> > >@@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct n=
-et_device *ndev,
-> > >     if (smcrv2 && attr->gid_type =3D=3D IB_GID_TYPE_ROCE_UDP_ENCAP &&
-> > >         smc_ib_gid_to_ipv4((u8 *)&attr->gid) !=3D cpu_to_be32(INADDR_=
-NONE)) {
-> > >             struct in_device *in_dev =3D __in_dev_get_rcu(ndev);
-> > >+            struct net *net =3D dev_net(ndev);
-> > >             const struct in_ifaddr *ifa;
-> > >             bool subnet_match =3D false;
-> > >
-> > >@@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct n=
-et_device *ndev,
-> > >             }
-> > >             if (!subnet_match)
-> > >                     goto out;
-> > >-            if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
-> > >+            if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr=
-,
-> > >                                                    smcrv2->daddr,
-> > >                                                    smcrv2->nexthop_ma=
-c,
-> > >                                                    &smcrv2->uses_gate=
-way))
-> > >diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
-> > >index 4df5f8c8a0a1..ef8ac2b7546d 100644
-> > >--- a/net/smc/smc_ib.h
-> > >+++ b/net/smc/smc_ib.h
-> > >@@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *ln=
-k,
-> > > int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
-> > >                      unsigned short vlan_id, u8 gid[], u8 *sgid_index=
-,
-> > >                      struct smc_init_info_smcrv2 *smcrv2);
-> > >-int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> > >+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
-> > >                   u8 nexthop_mac[], u8 *uses_gateway);
-> > > bool smc_ib_is_valid_local_systemid(void);
-> > > int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *=
-cb);
-> > >--
-> > >2.37.1 (Apple Git-137.1)
-> >
+Rml4IHRoZSBmb2xsb3dpbmcgZXJyb3JzIHJlcG9ydGVkIGJ5IGNoZWNrcGF0Y2g6CgpFUlJPUjog
+c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCgpTaWduZWQtb2ZmLWJ5OiBL
+YWlMb25nIFdhbmcgPHdhbmdrYWlsb25nQGphcmkuY24+Ci0tLQogaW5jbHVkZS9uZXQvaXB2Ni5o
+IHwgMTIgKysrKysrLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCA2IGRl
+bGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2lwdjYuaCBiL2luY2x1ZGUvbmV0
+L2lwdjYuaAppbmRleCBiMzQ0NGM4YTZmNzQuLjkwOWUwNTJmZTAxMiAxMDA2NDQKLS0tIGEvaW5j
+bHVkZS9uZXQvaXB2Ni5oCisrKyBiL2luY2x1ZGUvbmV0L2lwdjYuaApAQCAtMjYxLDE3ICsyNjEs
+MTcgQEAgZXh0ZXJuIGludCBzeXNjdGxfbWxkX3FydjsKIAogLyogTUlCcyAqLwogCi0jZGVmaW5l
+IElQNl9JTkNfU1RBVFMobmV0LCBpZGV2LGZpZWxkKQkJXAorI2RlZmluZSBJUDZfSU5DX1NUQVRT
+KG5ldCwgaWRldiwgZmllbGQpCQlcCiAJCV9ERVZJTkMobmV0LCBpcHY2LCAsIGlkZXYsIGZpZWxk
+KQotI2RlZmluZSBfX0lQNl9JTkNfU1RBVFMobmV0LCBpZGV2LGZpZWxkKQlcCisjZGVmaW5lIF9f
+SVA2X0lOQ19TVEFUUyhuZXQsIGlkZXYsIGZpZWxkKQlcCiAJCV9ERVZJTkMobmV0LCBpcHY2LCBf
+XywgaWRldiwgZmllbGQpCi0jZGVmaW5lIElQNl9BRERfU1RBVFMobmV0LCBpZGV2LGZpZWxkLHZh
+bCkJXAorI2RlZmluZSBJUDZfQUREX1NUQVRTKG5ldCwgaWRldiwgZmllbGQsIHZhbCkJXAogCQlf
+REVWQUREKG5ldCwgaXB2NiwgLCBpZGV2LCBmaWVsZCwgdmFsKQotI2RlZmluZSBfX0lQNl9BRERf
+U1RBVFMobmV0LCBpZGV2LGZpZWxkLHZhbCkJXAorI2RlZmluZSBfX0lQNl9BRERfU1RBVFMobmV0
+LCBpZGV2LCBmaWVsZCwgdmFsKQlcCiAJCV9ERVZBREQobmV0LCBpcHY2LCBfXywgaWRldiwgZmll
+bGQsIHZhbCkKLSNkZWZpbmUgSVA2X1VQRF9QT19TVEFUUyhuZXQsIGlkZXYsZmllbGQsdmFsKSAg
+IFwKKyNkZWZpbmUgSVA2X1VQRF9QT19TVEFUUyhuZXQsIGlkZXYsIGZpZWxkLCB2YWwpICAgXAog
+CQlfREVWVVBEKG5ldCwgaXB2NiwgLCBpZGV2LCBmaWVsZCwgdmFsKQotI2RlZmluZSBfX0lQNl9V
+UERfUE9fU1RBVFMobmV0LCBpZGV2LGZpZWxkLHZhbCkgICBcCisjZGVmaW5lIF9fSVA2X1VQRF9Q
+T19TVEFUUyhuZXQsIGlkZXYsIGZpZWxkLCB2YWwpICAgXAogCQlfREVWVVBEKG5ldCwgaXB2Niwg
+X18sIGlkZXYsIGZpZWxkLCB2YWwpCiAjZGVmaW5lIElDTVA2X0lOQ19TVEFUUyhuZXQsIGlkZXYs
+IGZpZWxkKQlcCiAJCV9ERVZJTkNBVE9NSUMobmV0LCBpY21wdjYsICwgaWRldiwgZmllbGQpCi0t
+IAoyLjE3LjEK
 
