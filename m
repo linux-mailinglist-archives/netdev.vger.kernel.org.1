@@ -1,92 +1,181 @@
-Return-Path: <netdev+bounces-36697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6E2D7B14CA
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5077B14F0
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0BDD51C20355
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:26:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id F4141282A2D
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B4E30F91;
-	Thu, 28 Sep 2023 07:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA2B30FAE;
+	Thu, 28 Sep 2023 07:33:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814E3523B
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:26:34 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB90D95;
-	Thu, 28 Sep 2023 00:26:31 -0700 (PDT)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Rx4gg16HhzNnty;
-	Thu, 28 Sep 2023 15:22:39 +0800 (CST)
-Received: from [10.174.179.215] (10.174.179.215) by
- canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 28 Sep 2023 15:26:28 +0800
-Subject: Re: [PATCH net-next] xfrm: Remove unused function declarations
-To: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <leon@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230729122858.25776-1-yuehaibing@huawei.com>
-From: Yue Haibing <yuehaibing@huawei.com>
-Message-ID: <de3b9e86-92c6-108b-272a-9480f9b91f21@huawei.com>
-Date: Thu, 28 Sep 2023 15:26:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7E32E64F
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:33:15 +0000 (UTC)
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EF9792;
+	Thu, 28 Sep 2023 00:33:14 -0700 (PDT)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-59c04237bf2so162535637b3.0;
+        Thu, 28 Sep 2023 00:33:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695886393; x=1696491193;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=geNha/O49ZCv7df3vTVQZ8/LqB7mDG8SKl0+M/7A6cs=;
+        b=N7IuEm2bZQMV0AqjuPOjb4QXldaCZ5poVoaF4fKyjoHAllTMRuA4TwrYy9ghgRKo+5
+         zzi9bxFtXyrslUQe/5jD7AuWJPyON9BdKWEovYzDcc6GxIHO01hNifjsCOKfAl6aliUg
+         rWBob8wdqTALnw7HvDG7xdRntCqk/AZ6MJL71tt6uMyT78DBzx/KrWOgjOT1YsWfU1RS
+         CjOiIM/Kn1uaQXq1H4uZ800fZ48nzdCxdsiwu7k0XcVVpJYgL8NECWCOV70FXiVs9Pqp
+         o614KDvJpRow7scbajGmKbFMzqtnxG+/MkmhUeiwrI8yglfp2MELL/84+c9pwoCgkObv
+         WT0w==
+X-Gm-Message-State: AOJu0YyXNKP9kpbRxvkW4FiKo5TfIREuQzv9F+SOGsKQpvIBM0/xsE0X
+	k4/muTuEEFAGL76CT0dPpxgNm4TzRj+eDQ==
+X-Google-Smtp-Source: AGHT+IETH6wkKnGSs3qtL6Q54Ny40BG7hY5Vor1e/GpFfEVkwUDy40Mf7BdC4kR46tkA2CKwL43MFA==
+X-Received: by 2002:a81:c309:0:b0:59b:5696:c33 with SMTP id r9-20020a81c309000000b0059b56960c33mr430888ywk.46.1695886392898;
+        Thu, 28 Sep 2023 00:33:12 -0700 (PDT)
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com. [209.85.128.176])
+        by smtp.gmail.com with ESMTPSA id b145-20020a0dd997000000b00583d1fa1fccsm4352778ywe.0.2023.09.28.00.33.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Sep 2023 00:33:11 -0700 (PDT)
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-59c04237bf2so162535247b3.0;
+        Thu, 28 Sep 2023 00:33:11 -0700 (PDT)
+X-Received: by 2002:a0d:dd83:0:b0:583:d6bb:4e96 with SMTP id
+ g125-20020a0ddd83000000b00583d6bb4e96mr509648ywe.8.1695886391465; Thu, 28 Sep
+ 2023 00:33:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230729122858.25776-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230926123054.3976752-1-yoshihiro.shimoda.uh@renesas.com>
+ <c88ebcd5-614d-41ce-9f13-bc3c0e4920d7@lunn.ch> <TYBPR01MB5341BA14DCF0BEEFBBED95D0D8C1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+In-Reply-To: <TYBPR01MB5341BA14DCF0BEEFBBED95D0D8C1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 28 Sep 2023 09:32:58 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdW+f_XJNFBDOkVN06NQ93vBgd4yYSQ00APX9imasHnSiw@mail.gmail.com>
+Message-ID: <CAMuHMdW+f_XJNFBDOkVN06NQ93vBgd4yYSQ00APX9imasHnSiw@mail.gmail.com>
+Subject: Re: [PATCH net v3] rswitch: Fix PHY station management clock setting
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, Tam Nguyen <tam.nguyen.xa@renesas.com>, 
+	Kuninori Morimoto <kuninori.morimoto.gx@renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-ping..
+Hi Shimoda-san,
 
-On 2023/7/29 20:28, Yue Haibing wrote:
-> commit a269fbfc4e9f ("xfrm: state: remove extract_input indirection from xfrm_state_afinfo")
-> left behind this.
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+On Thu, Sep 28, 2023 at 4:13=E2=80=AFAM Yoshihiro Shimoda
+<yoshihiro.shimoda.uh@renesas.com> wrote:
+> > From: Andrew Lunn, Sent: Wednesday, September 27, 2023 9:44 PM
+> > > +   /* MPIC.PSMCS =3D (clk [MHz] / (MDC frequency [MHz] * 2) - 1.
+> > > +    * Calculating PSMCS value as MDC frequency =3D 2.5MHz. So, multi=
+ply
+> > > +    * both the numerator and the denominator by 10.
+> > > +    */
+> > > +   etha->psmcs =3D clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
+> > >  }
+> > >
+> > >  static int rswitch_device_alloc(struct rswitch_private *priv, int in=
+dex)
+> > > @@ -1900,6 +1907,10 @@ static int renesas_eth_sw_probe(struct platfor=
+m_device *pdev)
+> > >             return -ENOMEM;
+> > >     spin_lock_init(&priv->lock);
+> > >
+> > > +   priv->clk =3D devm_clk_get(&pdev->dev, NULL);
+> > > +   if (IS_ERR(priv->clk))
+> > > +           return PTR_ERR(priv->clk);
+> > > +
+> >
+> > /**
+> >  * clk_get_rate - obtain the current clock rate (in Hz) for a clock sou=
+rce.
+> >  *              This is only valid once the clock source has been enabl=
+ed.
+
+Whether clk_get_rate() works when the clock is still disabled actually
+depends on the clock driver implementation/hardware.  It's not
+guaranteed, so generic code cannot make that assumption.
+It should work fine on all Renesas on-SoC clock generators.
+
+> >  * @clk: clock source
+> >  */
+> > unsigned long clk_get_rate(struct clk *clk);
+> >
+> > I don't see the clock being enabled anywhere.
+>
+> Since GENPD_FLAG_PM_CLK is set in the drivers/pmdomain/renesas/rcar-gen4-=
+sysc.c,
+> pm_runtime_get_sync() will enable the clock. That's why this code works c=
+orrectly
+> without clk_enable() calling.
+>
+> > Also, is the clock documented in the device tree binding?
+>
+> Yes, but this is a "clocks" property only though. In the dt-bindings doc:
 > ---
->  include/net/xfrm.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> index 151ca95dd08d..cdce217a5853 100644
-> --- a/include/net/xfrm.h
-> +++ b/include/net/xfrm.h
-> @@ -1669,7 +1669,6 @@ int pktgen_xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb);
->  #endif
->  
->  void xfrm_local_error(struct sk_buff *skb, int mtu);
-> -int xfrm4_extract_input(struct xfrm_state *x, struct sk_buff *skb);
->  int xfrm4_rcv_encap(struct sk_buff *skb, int nexthdr, __be32 spi,
->  		    int encap_type);
->  int xfrm4_transport_finish(struct sk_buff *skb, int async);
-> @@ -1689,7 +1688,6 @@ int xfrm4_protocol_deregister(struct xfrm4_protocol *handler, unsigned char prot
->  int xfrm4_tunnel_register(struct xfrm_tunnel *handler, unsigned short family);
->  int xfrm4_tunnel_deregister(struct xfrm_tunnel *handler, unsigned short family);
->  void xfrm4_local_error(struct sk_buff *skb, u32 mtu);
-> -int xfrm6_extract_input(struct xfrm_state *x, struct sk_buff *skb);
->  int xfrm6_rcv_spi(struct sk_buff *skb, int nexthdr, __be32 spi,
->  		  struct ip6_tnl *t);
->  int xfrm6_rcv_encap(struct sk_buff *skb, int nexthdr, __be32 spi,
-> 
+> examples:
+> ...
+>         clocks =3D <&cpg CPG_MOD 1505>;
+> ---
+>
+> And, in the drivers/clk/renesas/r8a779f0-cpg-mssr.c:
+> ---
+>         DEF_FIXED("rsw2",       R8A779F0_CLK_RSW2,      CLK_PLL5_DIV2,  5=
+, 1),
+> ...
+>         DEF_MOD("rswitch2",     1505,   R8A779F0_CLK_RSW2),
+> ---
+> So, the device will get the paranet clock " R8A779F0_CLK_RSW2".
+> And according to the clk_summary in the debugfs:
+> ---
+> # grep rsw /sys/kernel/debug/clk/clk_summary
+>              rsw2                     1        1        0   320000000    =
+      0     0  50000         Y
+>                 rswitch2              1        1        0   320000000    =
+      0     0  50000         Y
+> ---
+>
+> I found that i2c-rcar.c and pwm-rcar.c are also the same implementation
+> which call clk_get_rate() without clk_enable(). But, perhaps, we should e=
+nable
+> the clock by clk API?
+>
+> To Geert-san, do you have any opinion?
+
+As the device is part of a clock domain, the clock is managed through
+Runtime PM, and there is no need to enable or disable manually.
+Just make sure to call pm_runtime_resume_and_get() before accessing
+any register of the device.
+
+Calling clk_get_rate() at any time is fine.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
