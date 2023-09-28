@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-36810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8372F7B1DAB
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:20:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEEFC7B1DC2
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id A00001C20ADD
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AFAC2281F7A
 	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB83F3B7BC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04F53B7A4;
 	Thu, 28 Sep 2023 13:20:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE80A3AC31
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:20:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BDC20C116D7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A63F3AC11
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:20:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DE621C2BCFE;
 	Thu, 28 Sep 2023 13:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1695907236;
-	bh=nAi5VbjqEwCdzEJp+fv2i3DZ2flYuZxXsPFVaGvUXhY=;
+	bh=zIDxsd9iCOvFOj9DYvrPAPNadW1ey6fN+cIKsMZCqhc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=OCqp5Ov4BuszVW/bn2+B72ZJ/xR3YaoFzsxv1aU/Z/A6Yiz+vQBMRZYu9gRm50imR
-	 K11dYBBDgVq7Y+4mkAEjfyc9Mr2Vddg80rfjalPbMOLCeYjxvJUtGTGjCtMsQDIyZG
-	 69ACgpYY7cXbxiYCo8BeXxnyR6MXKMP9H8DMEu8plDx2Klk4byrQhBa6ZGR4w53klP
-	 15pmoFTU9JD5o+tjgr5bW2Ty0Kf+493NXvptiLCb5TLwX7ifpFHe46htbDlZMKsRft
-	 zFi2JB642EhNoMROZ50HGgRbYl+dJbDORovyFGMJkDrtkq9P9uVJgrhrn2mVRPayZD
-	 w/mbiY4QoFQhQ==
+	b=OISr+Gl47t4J5Ofhto3vlWMy86C6uu8ym8OtKfFQbRwyT+VaM7wgFlJuz/HCr+xCm
+	 OA57l0Effamm2KHBymdgD6w6EiqN1o7hkWZVgWLHm/NYa6oHMDlF1XJkemJlPJwai/
+	 G6ygvKPFFpkGiRaHU26124C+zSi5X7HlgbbiV2sjLOaSZeE0J+ULsPLCoqh8cSqulb
+	 wDYLKRvMmv1al/pRqEQigp7T3N+LwVN8O0VA23O5UOVMdIHFbWzqjUnAsgyUw1x6Bo
+	 Wc4VdNw7Y0IG0xTgMjGIK/EmM6Li6br/4xe4KZpg0D9C5CMhxoNWc39MRxL0mHLewY
+	 jvpcKSuHIGOBw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DA3E732D1;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C56BAE732D5;
 	Thu, 28 Sep 2023 13:20:36 +0000 (UTC)
 From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
-Date: Thu, 28 Sep 2023 15:21:32 +0200
-Subject: [PATCH 07/15] macintosh: Remove the now superfluous sentinel
+Date: Thu, 28 Sep 2023 15:21:33 +0200
+Subject: [PATCH 08/15] infiniband: Remove the now superfluous sentinel
  element from ctl_table array
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -44,7 +44,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Message-Id:
- <20230928-jag-sysctl_remove_empty_elem_drivers-v1-7-e59120fca9f9@samsung.com>
+ <20230928-jag-sysctl_remove_empty_elem_drivers-v1-8-e59120fca9f9@samsung.com>
 References:
  <20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com>
 In-Reply-To:
@@ -85,17 +85,18 @@ Cc: linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
  intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
  Joel Granados <j.granados@samsung.com>
 X-Mailer: b4 0.13-dev-86aa5
-X-Developer-Signature: v=1; a=openpgp-sha256; l=964; i=j.granados@samsung.com;
- h=from:subject:message-id; bh=ZdDGNSOnPHmccRg9DswRbcjrpwllnv7treH59axwgKs=;
- b=owEB7QES/pANAwAKAbqXzVK3lkFPAcsmYgBlFX3dFNTsUUB9JSBv/bi9fMcZELcv/Pd6Ielps
- Tv0fYg6ZTyJAbMEAAEKAB0WIQSuRwlXJeYxJc7LJ5C6l81St5ZBTwUCZRV93QAKCRC6l81St5ZB
- T86TDACD/olsUJCMaYNGhUK8fOC4ygULgoETxczjsUrJ3FqFvf/W9eYaJd8QqGpcMOYjw1h96ab
- o9zfYcNrx79mUCqL0BoqwuQuu11iB7mdcubin7N6ctOUnQ8WGw8URbiLP3jjYc91vkQPgtLk2Mk
- wvNRnAFG9xEe1DMlr4I7VrAIvMnA/9NYZ+Qw9UvC2pl8wNvR52krqU2VCn6kBWoexdWZws8BTQi
- jxm4KCrIsTy+GCeGsGQLYA2bO8Hc1og/PrMiZ0UzRkQAqsoVN3pdMsPMw9cbOYg+DdC9+C1sfp6
- Bl28JzSUEdBKn/gw5xOg2CuQYrwFvPIIKyQ5PxT7cnZcGIF8XtUJLAhQ8fbQ+lGxfqRvNEJPWpK
- FkouzOuPr0ghUqJ7B4QCGC+U0ubZrPdVrUHvniAcEBtCff5KXZJOiMn45G46hZB4ZKH91Egk66L
- 7ibjw96S82RLY88IHUBdKyX4xWoP14f8vilMOHLoR27kPe4oc4fVlOZcjQtA3ARSiai4o=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1398;
+ i=j.granados@samsung.com; h=from:subject:message-id;
+ bh=oMVRgRy513gbjpJ/8gwXhcFvr0Ll4WG0wpO8gVUy5SI=;
+ b=owEB7QES/pANAwAKAbqXzVK3lkFPAcsmYgBlFX3evpOp/5vnYyEzJdxXZ21uRM3BLLBrF9iet
+ 6magp65Z8CJAbMEAAEKAB0WIQSuRwlXJeYxJc7LJ5C6l81St5ZBTwUCZRV93gAKCRC6l81St5ZB
+ TyMpC/9vIPQcmOkywGCjv6hB2J+JNumv5GkIZJVtZPgvAg/hlP+WJUP4Xiq8mnVZ+z/ct5AeldL
+ adjJKMeeGFJgbYiNGurLY6hsGZ16i5ASdNvVUppbOlhDPfHOHF2HfaJdbQ0laRpGROkZnN0YMum
+ RZZPsHt+esqZvTZm3ZPZ5g8tuvbrngmHfcEwkGqCRYTk3HPxIT+IqwTfkKcTDXtrjWRD0hyRQTJ
+ O7RtIfDK2Cr+VjIm9dIE08jgnQzbEcKCfot2tHi2ncOeTnsEjyF5v+HrAeAx2Z9AOA61TBQJ1OM
+ zIfqU45B0jYFpyxPzvNSMvGNipoc8HbzsxzCseMIJ2QCIgwQW/gzh7/WDvNZMtFlmvXlKC4Puxt
+ d0apigmOn9JdY6eAG9E+Bzix/Mv1Tg1NKLdAFJm80g6Q2zoCz6H3B0Llq5gC5hRDfFZYbc1qSkK
+ W+txzQYUtii1iMXK9mtF7hn+t/HUfLOdmAsDy67zTTpjFr6uw5KigDBqR/a7fSmIUspYU=
 X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
  fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
 X-Endpoint-Received:
@@ -111,19 +112,20 @@ will reduce the overall build time size of the kernel and run time
 memory bloat by ~64 bytes per sentinel (further information Link :
 https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
 
-Remove sentinel from mac_hid_files
+Remove sentinel from iwcm_ctl_table and ucma_ctl_table
 
 Signed-off-by: Joel Granados <j.granados@samsung.com>
 ---
- drivers/macintosh/mac_hid.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/infiniband/core/iwcm.c | 3 +--
+ drivers/infiniband/core/ucma.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/macintosh/mac_hid.c b/drivers/macintosh/mac_hid.c
-index d8c4d5664145..5a228c7d9aeb 100644
---- a/drivers/macintosh/mac_hid.c
-+++ b/drivers/macintosh/mac_hid.c
-@@ -235,8 +235,7 @@ static struct ctl_table mac_hid_files[] = {
- 		.maxlen		= sizeof(int),
+diff --git a/drivers/infiniband/core/iwcm.c b/drivers/infiniband/core/iwcm.c
+index 2b47073c61a6..fefb9ae75789 100644
+--- a/drivers/infiniband/core/iwcm.c
++++ b/drivers/infiniband/core/iwcm.c
+@@ -110,8 +110,7 @@ static struct ctl_table iwcm_ctl_table[] = {
+ 		.maxlen		= sizeof(default_backlog),
  		.mode		= 0644,
  		.proc_handler	= proc_dointvec,
 -	},
@@ -131,7 +133,21 @@ index d8c4d5664145..5a228c7d9aeb 100644
 +	}
  };
  
- static struct ctl_table_header *mac_hid_sysctl_header;
+ /*
+diff --git a/drivers/infiniband/core/ucma.c b/drivers/infiniband/core/ucma.c
+index bf42650f125b..92ad24ddf12a 100644
+--- a/drivers/infiniband/core/ucma.c
++++ b/drivers/infiniband/core/ucma.c
+@@ -70,8 +70,7 @@ static struct ctl_table ucma_ctl_table[] = {
+ 		.maxlen		= sizeof max_backlog,
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec,
+-	},
+-	{ }
++	}
+ };
+ 
+ struct ucma_file {
 
 -- 
 2.30.2
