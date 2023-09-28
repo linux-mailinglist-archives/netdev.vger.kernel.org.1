@@ -1,129 +1,167 @@
-Return-Path: <netdev+bounces-36853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67A37B201A
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:49:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20AB57B2070
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 17:05:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E3BCD282AB3
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:49:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C409928149A
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA6AE41A81;
-	Thu, 28 Sep 2023 14:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41754B22B;
+	Thu, 28 Sep 2023 15:05:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9C73FB3C
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 14:49:43 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9866419E;
-	Thu, 28 Sep 2023 07:49:41 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qlsKf-0005VN-5n; Thu, 28 Sep 2023 16:49:37 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>,
-	Phil Sutter <phil@nwl.cc>
-Subject: [PATCH net-next 4/4] netfilter: nf_tables: Utilize NLA_POLICY_NESTED_ARRAY
-Date: Thu, 28 Sep 2023 16:49:01 +0200
-Message-ID: <20230928144916.18339-5-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230928144916.18339-1-fw@strlen.de>
-References: <20230928144916.18339-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141323FB07
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 15:05:52 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12F961B5;
+	Thu, 28 Sep 2023 08:05:51 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38SEk0A1016005;
+	Thu, 28 Sep 2023 15:05:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=vMb+aAFI53ERmvbLOOTAtUBUQQ2YlNOdAoSkYas6PIs=;
+ b=fqxXj/gGnysYI56fZBP5xMx1inty/A4K5R5fY99jdQinjZ5cgH5jpPPimvK6mUC1Vn6r
+ ZoKo6oRD1yzduE26+WMRxLKF9pGDAr9VPlnSAnSzN6Wm0ghuFgFv1nq5/XQklxZtbe1J
+ TRqXGf4vauENod9ioPWeMoAKBy9+M5np3v4PlqmUBw5j53nI6Baba41OzsI6gwWycYF1
+ 6HAIClkwOGYUNLmUH6XwlNNeOH6OOIvjirJMa8cpfBNXlUD3bnk+3O5ahU/1iTtseidq
+ nDsreta227ePBS3fWAfd5uzzdo60IqnhDgP04EI6Fe0SpVVCkSpvddXIeBxt1ASKSLE+ Tw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdbath78n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 15:05:29 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38SEWP4Z017327;
+	Thu, 28 Sep 2023 15:05:13 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdbath4rm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 15:05:12 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38SDN3Zm008143;
+	Thu, 28 Sep 2023 15:04:26 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taaqywhhd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 15:04:26 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38SF4Mla40239544
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Sep 2023 15:04:23 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CFD662004D;
+	Thu, 28 Sep 2023 15:04:22 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D54B820040;
+	Thu, 28 Sep 2023 15:04:21 +0000 (GMT)
+Received: from [9.171.80.248] (unknown [9.171.80.248])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 28 Sep 2023 15:04:21 +0000 (GMT)
+Message-ID: <00bbbf48440c1889ecd16a590ebb746b820a4f48.camel@linux.ibm.com>
+Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
+ containers.
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Albert Huang <huangjie.albert@bytedance.com>,
+        Karsten Graul
+	 <kgraul@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Jan Karcher
+	 <jaka@linux.ibm.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 28 Sep 2023 17:04:21 +0200
+In-Reply-To: <20230925023546.9964-1-huangjie.albert@bytedance.com>
+References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _N-fuUIetudV9Wfdz9MzlhKJuUTHPCUW
+X-Proofpoint-ORIG-GUID: yxZhCqvuEiIotfJ6ZZcsgkArZ504hZj_
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-28_14,2023-09-28_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 spamscore=0 impostorscore=0 suspectscore=0 mlxscore=0
+ phishscore=0 clxscore=1011 priorityscore=1501 bulkscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309280130
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Phil Sutter <phil@nwl.cc>
+On Mon, 2023-09-25 at 10:35 +0800, Albert Huang wrote:
+> If the netdevice is within a container and communicates externally
+> through network technologies like VXLAN, we won't be able to find
+> routing information in the init_net namespace. To address this issue,
+> we need to add a struct net parameter to the smc_ib_find_route function.
+> This allow us to locate the routing information within the corresponding
+> net namespace, ensuring the correct completion of the SMC CLC interaction.
+>=20
+> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> ---
+>  net/smc/af_smc.c | 3 ++-
+>  net/smc/smc_ib.c | 7 ++++---
+>  net/smc/smc_ib.h | 2 +-
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+>=20
 
-Mark attributes which are supposed to be arrays of nested attributes
-with known content as such. Originally suggested for
-NFTA_RULE_EXPRESSIONS only, but does apply to others as well.
+I'm trying to test this patch on s390x but I'm running into the same
+issue I ran into with the original SMC namespace
+support:https://lore.kernel.org/netdev/8701fa4557026983a9ec687cfdd7ac5b3b85=
+fd39.camel@linux.ibm.com/
 
-Suggested-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nf_tables_api.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Just like back then I'm using a server and a client network namespace
+on the same system with two ConnectX-4 VFs from the same card and port.
+Both TCP/IP traffic as well as user-space RDMA via "qperf =E2=80=A6 rc_bw" =
+and
+`qperf =E2=80=A6 rc_lat` work between namespaces and definitely go via the
+card.
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index f993c237afd0..7e2e76086d25 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -3316,7 +3316,7 @@ static const struct nla_policy nft_rule_policy[NFTA_RULE_MAX + 1] = {
- 	[NFTA_RULE_CHAIN]	= { .type = NLA_STRING,
- 				    .len = NFT_CHAIN_MAXNAMELEN - 1 },
- 	[NFTA_RULE_HANDLE]	= { .type = NLA_U64 },
--	[NFTA_RULE_EXPRESSIONS]	= { .type = NLA_NESTED },
-+	[NFTA_RULE_EXPRESSIONS]	= NLA_POLICY_NESTED_ARRAY(nft_expr_policy),
- 	[NFTA_RULE_COMPAT]	= { .type = NLA_NESTED },
- 	[NFTA_RULE_POSITION]	= { .type = NLA_U64 },
- 	[NFTA_RULE_USERDATA]	= { .type = NLA_BINARY,
-@@ -4254,12 +4254,16 @@ static const struct nla_policy nft_set_policy[NFTA_SET_MAX + 1] = {
- 	[NFTA_SET_OBJ_TYPE]		= { .type = NLA_U32 },
- 	[NFTA_SET_HANDLE]		= { .type = NLA_U64 },
- 	[NFTA_SET_EXPR]			= { .type = NLA_NESTED },
--	[NFTA_SET_EXPRESSIONS]		= { .type = NLA_NESTED },
-+	[NFTA_SET_EXPRESSIONS]		= NLA_POLICY_NESTED_ARRAY(nft_expr_policy),
-+};
-+
-+static const struct nla_policy nft_concat_policy[NFTA_SET_FIELD_MAX + 1] = {
-+	[NFTA_SET_FIELD_LEN]	= { .type = NLA_U32 },
- };
- 
- static const struct nla_policy nft_set_desc_policy[NFTA_SET_DESC_MAX + 1] = {
- 	[NFTA_SET_DESC_SIZE]		= { .type = NLA_U32 },
--	[NFTA_SET_DESC_CONCAT]		= { .type = NLA_NESTED },
-+	[NFTA_SET_DESC_CONCAT]		= NLA_POLICY_NESTED_ARRAY(nft_concat_policy),
- };
- 
- static struct nft_set *nft_set_lookup(const struct nft_table *table,
-@@ -4715,10 +4719,6 @@ static int nf_tables_getset(struct sk_buff *skb, const struct nfnl_info *info,
- 	return err;
- }
- 
--static const struct nla_policy nft_concat_policy[NFTA_SET_FIELD_MAX + 1] = {
--	[NFTA_SET_FIELD_LEN]	= { .type = NLA_U32 },
--};
--
- static int nft_set_desc_concat_parse(const struct nlattr *attr,
- 				     struct nft_set_desc *desc)
- {
-@@ -5500,7 +5500,7 @@ static const struct nla_policy nft_set_elem_policy[NFTA_SET_ELEM_MAX + 1] = {
- 	[NFTA_SET_ELEM_OBJREF]		= { .type = NLA_STRING,
- 					    .len = NFT_OBJ_MAXNAMELEN - 1 },
- 	[NFTA_SET_ELEM_KEY_END]		= { .type = NLA_NESTED },
--	[NFTA_SET_ELEM_EXPRESSIONS]	= { .type = NLA_NESTED },
-+	[NFTA_SET_ELEM_EXPRESSIONS]	= NLA_POLICY_NESTED_ARRAY(nft_expr_policy),
- };
- 
- static const struct nla_policy nft_set_elem_list_policy[NFTA_SET_ELEM_LIST_MAX + 1] = {
-@@ -5508,7 +5508,7 @@ static const struct nla_policy nft_set_elem_list_policy[NFTA_SET_ELEM_LIST_MAX +
- 					    .len = NFT_TABLE_MAXNAMELEN - 1 },
- 	[NFTA_SET_ELEM_LIST_SET]	= { .type = NLA_STRING,
- 					    .len = NFT_SET_MAXNAMELEN - 1 },
--	[NFTA_SET_ELEM_LIST_ELEMENTS]	= { .type = NLA_NESTED },
-+	[NFTA_SET_ELEM_LIST_ELEMENTS]	= NLA_POLICY_NESTED_ARRAY(nft_set_elem_policy),
- 	[NFTA_SET_ELEM_LIST_SET_ID]	= { .type = NLA_U32 },
- };
- 
--- 
-2.41.0
+I did use "rdma system set netns exclusive" then moved the RDMA devices
+into the namespaces with "rdma dev set <rdma_dev> netns <namespace>". I
+also verified with "ip netns exec <namespace> rdma dev"
+that the RDMA devices are in the network namespace and as seen by the
+qperf runs normal RDMA does work.
 
+For reference the smc_chck tool gives me the following output:
+
+Server started on port 37373
+[DEBUG] Interfaces to check: eno4378
+Test with target IP 10.10.93.12 and port 37373
+  Live test (SMC-D and SMC-R)
+[DEBUG] Running client: smc_run /tmp/echo-clt.x0q8iO 10.10.93.12 -p
+37373
+[DEBUG] Client result: TCP 0x05000000/0x03030000
+     Failed  (TCP fallback), reasons:
+          Client:        0x05000000   Peer declined during handshake
+          Server:        0x03030000   No SMC devices found (R and D)
+
+I also checked that SMC is generally working, once I add an ISM device
+I do get SMC-D between the namespaces. Any ideas what could break SMC-R
+here?
+
+Thanks,
+Niklas
 
