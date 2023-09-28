@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-36876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A454C7B20B6
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 17:15:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 349687B20BA
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 17:15:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 58CE3281971
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A7CCE28306E
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:15:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD0F4E267;
-	Thu, 28 Sep 2023 15:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37284E278;
+	Thu, 28 Sep 2023 15:15:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F428BED;
-	Thu, 28 Sep 2023 15:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EF78BED;
+	Thu, 28 Sep 2023 15:15:51 +0000 (UTC)
 Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05BD9195;
-	Thu, 28 Sep 2023 08:15:46 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0711A8;
+	Thu, 28 Sep 2023 08:15:48 -0700 (PDT)
 Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38SEae6X029789;
-	Thu, 28 Sep 2023 17:15:19 +0200
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38SECwxs029787;
+	Thu, 28 Sep 2023 17:15:20 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	from:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	selector1; bh=lbCIG+MToj0X/mn3qzQ6AnM9K0ejKwmc+J/sXL5Pwhk=; b=Li
-	gDIZJAzBuz9vdjys6D9Ux9aPFmOU2XBXlp9FbxTysQ0TMdr6yz6w/AHk5PJgHN/M
-	d0fEnsB8Ptw5bnCANXntYkBNLJ4V+Tby6IaNMHhg3kmhu+sCGk0xmQec9oJ/CD5U
-	RMcotuAqM0GN6nJnoha5y8NYPur5JObVvAHP2YJ6NurSt5LzTC2VOijh/au7X5bd
-	16zPilcogLQVpwkKkRo9H3rQD4NEJeP09XHUYg+QIK7xsjwySnTjtUz9cn4iF0yI
-	mZhj8GS75++iLiJ4FtqW6WE3CZm3X5qzqucHjsBoU8iuoe5ZrOHc6GfsVSAFTf4m
-	UMmXxBx0oK3aDz1k4XBw==
+	selector1; bh=P3XV1IaVNFLkdLdID+Fpncm54gnI4v+2MxfVHgWirNY=; b=7b
+	SpNQ0YXXZ8qL93YzFZkjM/pdeV0SoCRB4tvQ5dEJla6+MrkvyEFw4E45qIPIJ5CR
+	L9rZi+XEq67jxIeccif/EQ4tuHc3G5qLWmrfULJaMqETPvkF2L6CBMeRddYSbdZp
+	MKiZqscIPx36WCau2MvSgl72H6qeQd+iwuzMcrniMj4x2CyXY8LFAuz+1GTbXUNM
+	1wkKib07WDYW2WOksv5CcL7De/0kB+ji1P28DnVtzliOzzg9GyZnOpLHM599bn6P
+	TdHGN3bmYHTo5ALYW8Ev315/atdvp4xZ3wFDfgK2wqfODCqvz9TvttGHnu11hrgy
+	vaJgsAbt6w9EotJ7GZwQ==
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tcq63cugy-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tcq63cuh3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Sep 2023 17:15:19 +0200 (MEST)
+	Thu, 28 Sep 2023 17:15:20 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D8703100057;
-	Thu, 28 Sep 2023 17:15:18 +0200 (CEST)
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id B3B5B100057;
+	Thu, 28 Sep 2023 17:15:19 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CE22B24553D;
-	Thu, 28 Sep 2023 17:15:18 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id AA8A024553D;
+	Thu, 28 Sep 2023 17:15:19 +0200 (CEST)
 Received: from localhost (10.201.21.249) by SHFDAG1NODE2.st.com (10.75.129.70)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 28 Sep
- 2023 17:15:17 +0200
+ 2023 17:15:18 +0200
 From: Christophe Roullier <christophe.roullier@foss.st.com>
 To: "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet
@@ -67,9 +67,9 @@ To: "David S . Miller" <davem@davemloft.net>,
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v3 03/12] dt-bindings: net: add phy-supply property for stm32
-Date: Thu, 28 Sep 2023 17:15:03 +0200
-Message-ID: <20230928151512.322016-4-christophe.roullier@foss.st.com>
+Subject: [PATCH v3 04/12] net: ethernet: stmmac: rework glue to simplify management for next stm32
+Date: Thu, 28 Sep 2023 17:15:04 +0200
+Message-ID: <20230928151512.322016-5-christophe.roullier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230928151512.322016-1-christophe.roullier@foss.st.com>
 References: <20230928151512.322016-1-christophe.roullier@foss.st.com>
@@ -93,28 +93,195 @@ X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Phandle to a regulator that provides power to the PHY. This
-regulator will be managed during the PHY power on/off sequence.
+Change glue to be more generic and manage easily next stm32 products.
+The goal of this commit is to have one stm32mp1_set_mode function which
+can manage different STM32 SOC. SOC can have different SYSCFG register
+bitfields. so in pmcsetr we defined the bitfields corresponding to the SOC.
 
 Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 ---
- Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
- 1 file changed, 3 insertions(+)
+ .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 70 +++++++++++++------
+ 1 file changed, 48 insertions(+), 22 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-index 67840cab02d2d..8114c325a4eed 100644
---- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-@@ -78,6 +78,9 @@ properties:
-       encompases the glue register, the offset of the control register and
-       the mask to set bitfield in control register
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+index ab4324ed46dac..52106e0d7359f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+@@ -23,10 +23,6 @@
  
-+  phy-supply:
-+    description: PHY regulator
+ #define SYSCFG_MCU_ETH_MASK		BIT(23)
+ #define SYSCFG_MP1_ETH_MASK		GENMASK(23, 16)
+-#define SYSCFG_PMCCLRR_OFFSET		0x40
+-
+-#define SYSCFG_PMCR_ETH_CLK_SEL		BIT(16)
+-#define SYSCFG_PMCR_ETH_REF_CLK_SEL	BIT(17)
+ 
+ /* CLOCK feed to PHY*/
+ #define ETH_CK_F_25M	25000000
+@@ -46,9 +42,6 @@
+  * RMII  |   1	 |   0	  |   0	   |  n/a  |
+  *------------------------------------------
+  */
+-#define SYSCFG_PMCR_ETH_SEL_MII		BIT(20)
+-#define SYSCFG_PMCR_ETH_SEL_RGMII	BIT(21)
+-#define SYSCFG_PMCR_ETH_SEL_RMII	BIT(23)
+ #define SYSCFG_PMCR_ETH_SEL_GMII	0
+ #define SYSCFG_MCU_ETH_SEL_MII		0
+ #define SYSCFG_MCU_ETH_SEL_RMII		1
+@@ -90,12 +83,25 @@ struct stm32_dwmac {
+ 	int eth_ref_clk_sel_reg;
+ 	int irq_pwr_wakeup;
+ 	u32 mode_reg;		 /* MAC glue-logic mode register */
++	u32 mode_mask;
+ 	struct regmap *regmap;
+ 	u32 speed;
+ 	const struct stm32_ops *ops;
+ 	struct device *dev;
+ };
+ 
++struct stm32_syscfg_pmcsetr {
++	u32 eth1_clk_sel;
++	u32 eth1_ref_clk_sel;
++	u32 eth1_selmii;
++	u32 eth1_sel_rgmii;
++	u32 eth1_sel_rmii;
++	u32 eth2_clk_sel;
++	u32 eth2_ref_clk_sel;
++	u32 eth2_sel_rgmii;
++	u32 eth2_sel_rmii;
++};
 +
-   st,ext-phyclk:
-     description:
-       set this property in RMII mode when you have PHY without crystal 50MHz and want to
+ struct stm32_ops {
+ 	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
+ 	int (*clk_prepare)(struct stm32_dwmac *dwmac, bool prepare);
+@@ -103,7 +109,8 @@ struct stm32_ops {
+ 	void (*resume)(struct stm32_dwmac *dwmac);
+ 	int (*parse_data)(struct stm32_dwmac *dwmac,
+ 			  struct device *dev);
+-	u32 syscfg_eth_mask;
++	u32 syscfg_clr_off;
++	struct stm32_syscfg_pmcsetr pmcsetr;
+ };
+ 
+ static int stm32_dwmac_init(struct plat_stmmacenet_data *plat_dat)
+@@ -175,7 +182,7 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 	case PHY_INTERFACE_MODE_MII:
+ 		if (clk_rate == ETH_CK_F_25M && dwmac->ext_phyclk)
+ 			dwmac->enable_eth_ck = true;
+-		val = SYSCFG_PMCR_ETH_SEL_MII;
++		val = dwmac->ops->pmcsetr.eth1_selmii;
+ 		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_MII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_GMII:
+@@ -183,16 +190,17 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 		if (clk_rate == ETH_CK_F_25M &&
+ 		    (dwmac->eth_clk_sel_reg || dwmac->ext_phyclk)) {
+ 			dwmac->enable_eth_ck = true;
+-			val |= SYSCFG_PMCR_ETH_CLK_SEL;
++			val |= dwmac->ops->pmcsetr.eth1_clk_sel;
+ 		}
+ 		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_GMII\n");
+ 		break;
+ 	case PHY_INTERFACE_MODE_RMII:
+-		val = SYSCFG_PMCR_ETH_SEL_RMII;
++		val = dwmac->ops->pmcsetr.eth1_sel_rmii | dwmac->ops->pmcsetr.eth2_sel_rmii;
+ 		if ((clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_50M) &&
+ 		    (dwmac->eth_ref_clk_sel_reg || dwmac->ext_phyclk)) {
+ 			dwmac->enable_eth_ck = true;
+-			val |= SYSCFG_PMCR_ETH_REF_CLK_SEL;
++			val |= dwmac->ops->pmcsetr.eth1_ref_clk_sel;
++			val |= dwmac->ops->pmcsetr.eth2_ref_clk_sel;
+ 		}
+ 		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RMII\n");
+ 		break;
+@@ -200,11 +208,12 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 	case PHY_INTERFACE_MODE_RGMII_ID:
+ 	case PHY_INTERFACE_MODE_RGMII_RXID:
+ 	case PHY_INTERFACE_MODE_RGMII_TXID:
+-		val = SYSCFG_PMCR_ETH_SEL_RGMII;
++		val = dwmac->ops->pmcsetr.eth1_sel_rgmii | dwmac->ops->pmcsetr.eth2_sel_rgmii;
+ 		if ((clk_rate == ETH_CK_F_25M || clk_rate == ETH_CK_F_125M) &&
+ 		    (dwmac->eth_clk_sel_reg || dwmac->ext_phyclk)) {
+ 			dwmac->enable_eth_ck = true;
+-			val |= SYSCFG_PMCR_ETH_CLK_SEL;
++			val |= dwmac->ops->pmcsetr.eth1_clk_sel;
++			val |= dwmac->ops->pmcsetr.eth2_clk_sel;
+ 		}
+ 		pr_debug("SYSCFG init : PHY_INTERFACE_MODE_RGMII\n");
+ 		break;
+@@ -216,12 +225,12 @@ static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 	}
+ 
+ 	/* Need to update PMCCLRR (clear register) */
+-	regmap_write(dwmac->regmap, reg + SYSCFG_PMCCLRR_OFFSET,
+-		     dwmac->ops->syscfg_eth_mask);
++	regmap_write(dwmac->regmap, reg + dwmac->ops->syscfg_clr_off,
++		     dwmac->mode_mask);
+ 
+ 	/* Update PMCSETR (set register) */
+ 	return regmap_update_bits(dwmac->regmap, reg,
+-				 dwmac->ops->syscfg_eth_mask, val);
++				 dwmac->mode_mask, val);
+ }
+ 
+ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
+@@ -247,7 +256,7 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
+ 	}
+ 
+ 	return regmap_update_bits(dwmac->regmap, reg,
+-				 dwmac->ops->syscfg_eth_mask, val << 23);
++				 SYSCFG_MCU_ETH_MASK, val << 23);
+ }
+ 
+ static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac)
+@@ -290,10 +299,17 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+ 		return PTR_ERR(dwmac->regmap);
+ 
+ 	err = of_property_read_u32_index(np, "st,syscon", 1, &dwmac->mode_reg);
++	if (err) {
++		dev_err(dev, "Can't get sysconfig register offset (%d)\n", err);
++		return err;
++	}
++
++	dwmac->mode_mask = SYSCFG_MP1_ETH_MASK;
++	err = of_property_read_u32_index(np, "st,syscon", 2, &dwmac->mode_mask);
+ 	if (err)
+-		dev_err(dev, "Can't get sysconfig mode offset (%d)\n", err);
++		pr_debug("Warning sysconfig register mask not set\n");
+ 
+-	return err;
++	return 0;
+ }
+ 
+ static int stm32mp1_parse_data(struct stm32_dwmac *dwmac,
+@@ -499,7 +515,6 @@ static SIMPLE_DEV_PM_OPS(stm32_dwmac_pm_ops,
+ static struct stm32_ops stm32mcu_dwmac_data = {
+ 	.set_mode = stm32mcu_set_mode,
+ 	.suspend = stm32mcu_suspend,
+-	.syscfg_eth_mask = SYSCFG_MCU_ETH_MASK
+ };
+ 
+ static struct stm32_ops stm32mp1_dwmac_data = {
+@@ -508,7 +523,18 @@ static struct stm32_ops stm32mp1_dwmac_data = {
+ 	.suspend = stm32mp1_suspend,
+ 	.resume = stm32mp1_resume,
+ 	.parse_data = stm32mp1_parse_data,
+-	.syscfg_eth_mask = SYSCFG_MP1_ETH_MASK
++	.syscfg_clr_off = 0x44,
++	.pmcsetr = {
++		.eth1_clk_sel		= BIT(16),
++		.eth1_ref_clk_sel	= BIT(17),
++		.eth1_selmii		= BIT(20),
++		.eth1_sel_rgmii		= BIT(21),
++		.eth1_sel_rmii		= BIT(23),
++		.eth2_clk_sel		= 0,
++		.eth2_ref_clk_sel	= 0,
++		.eth2_sel_rgmii		= 0,
++		.eth2_sel_rmii		= 0
++	}
+ };
+ 
+ static const struct of_device_id stm32_dwmac_match[] = {
 -- 
 2.25.1
 
