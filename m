@@ -1,185 +1,181 @@
-Return-Path: <netdev+bounces-36905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AEF57B22A6
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 18:42:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AAB97B22CA
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 18:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 98290B209C2
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:42:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C2FAC281CBE
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2903D39A;
-	Thu, 28 Sep 2023 16:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652134F12D;
+	Thu, 28 Sep 2023 16:49:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A1F3419B
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 16:42:28 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A1A1AD;
-	Thu, 28 Sep 2023 09:42:23 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0Vt26VCS_1695919339;
-Received: from 30.39.212.64(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vt26VCS_1695919339)
-          by smtp.aliyun-inc.com;
-          Fri, 29 Sep 2023 00:42:21 +0800
-Message-ID: <1a6ef713-e5fd-3af7-fd57-966d6ddda9a4@linux.alibaba.com>
-Date: Fri, 29 Sep 2023 00:42:17 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF88B499BA
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 16:49:27 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0761B1;
+	Thu, 28 Sep 2023 09:49:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a4R9XEtKkRpEQehDOLQIBm5g8VAVAn7T/c4vKoolht7ZX1sWx58pvywFZuIgQN4JPzLC5JerhxJxKTGQjQDdBHNxfOaJy3Ng2eE7plhOpdWIWsk7q2lrsMS5bf5Nl8oTXzHNKjeI4dVuiAc1WQ2PX1FgguUzbjNx+h9idaykA9xwPIbfUPs8Fb7RLBaoHf0IrzRHVk2k8m9YRuhhBBLwX148rlwDrpGr3M/5CSaHBDGtmMxifH4+GmgoA3sFWMBAm9Zgid1vI9YHSD8GMXjLbIHBQZ8dYanYaDo6SKzVczle1ZoNbCL+4/nhDRJYYkIsMjLoUMntg7Jsq0GW0ko8MA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kmPn4qWmP7KfJ+WpATYZhbiwWGz86s/5qlts7hBoVyU=;
+ b=RmcyoeJGvRlMgm3LSl5km1v4rX9UMzw47ULMK8FU7924FgiYOEs3s3F8rMrsrlgl4OIhCVlJ7gae8XI7U2T9x0d6QG7I/kM5btvhNAGuksDUDtHxsK3pD8ruga8lbnWBLP9gqwlvrdzmEAS2iyYmyQl0BnR6wJ/1IhjEQVrmQGdXX/GRUmvPRJuiE1z3MdBZGNJt5LTxPxoAJmVylM3g0tEUZ/LUzrRf7DhmQ+/HUnRx/q/o5T2IqJ+6LK9C0KwJKbovbxKZGXFQo4M82roGtGPZXpI4blS6nDYwsSZuPzrzt2+iDNR5rlVaOfJhW49oy3D0qtojswjLKy+xijSF3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kmPn4qWmP7KfJ+WpATYZhbiwWGz86s/5qlts7hBoVyU=;
+ b=AITdJdfkEGe3A9zJOBgRVszgLoA+KLWIQDKi2wMxD8G6zb0Vu8TYzJ/qkZZre86MZsuY/bp1IfmviCqadzpYiU7FOM3k7xsU+rmOFj5Ykg8P1ud2Y9IvsjxvmXbS1mv//xM9xdREhKq+Kv5Md/GCEnA4MBnlRO6lHLnC07aiU5/MOZkHmCbw3pCmkLbW1NVhwq0XxBWG0Roz41+fYGzbMDJb0NTNMJoQ/HE32BPhzKJj5Ds5Bi3y4TeOmYY2JShwcyvgn4KGOgiTpRi5FZnl3b4CxB32Zi8mKfzz+NEh6BVcb3y5C2/e9amiggRR47fG3S3KjV7z5tVGeD4ZpNmGiQ==
+Received: from CY5PR17CA0051.namprd17.prod.outlook.com (2603:10b6:930:12::6)
+ by LV2PR12MB5847.namprd12.prod.outlook.com (2603:10b6:408:174::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Thu, 28 Sep
+ 2023 16:49:24 +0000
+Received: from CY4PEPF0000E9CF.namprd03.prod.outlook.com
+ (2603:10b6:930:12:cafe::c9) by CY5PR17CA0051.outlook.office365.com
+ (2603:10b6:930:12::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25 via Frontend
+ Transport; Thu, 28 Sep 2023 16:49:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CY4PEPF0000E9CF.mail.protection.outlook.com (10.167.241.142) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.19 via Frontend Transport; Thu, 28 Sep 2023 16:49:23 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 28 Sep
+ 2023 09:49:11 -0700
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Thu, 28 Sep 2023 09:49:11 -0700
+Received: from c-237-113-220-225.mtl.labs.mlnx (10.127.8.12) by
+ mail.nvidia.com (10.126.190.181) with Microsoft SMTP Server id 15.2.986.41
+ via Frontend Transport; Thu, 28 Sep 2023 09:49:08 -0700
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: <eperezma@redhat.com>, <gal@nvidia.com>, "Michael S . Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Xuan Zhuo
+	<xuanzhuo@linux.alibaba.com>
+CC: <virtualization@lists.linux-foundation.org>, Dragos Tatulea
+	<dtatulea@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>
+Subject: [PATCH vhost v2 00/16] vdpa: Add support for vq descriptor mappings
+Date: Thu, 28 Sep 2023 19:45:11 +0300
+Message-ID: <20230928164550.980832-2-dtatulea@nvidia.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
- extension and loopback-ism
-To: Alexandra Winter <wintera@linux.ibm.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
- <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9CF:EE_|LV2PR12MB5847:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8db0220f-8086-40a5-dfef-08dbc042dec2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	SZi14fszrvs9BzkjD8+sAFU/+ddmcDw+RMNt7Szjw5xxdgHhq9zjNf+nGXxK4Y69MfiyyOIm3x3n+WgczFaU8cFNDQmQEEu1KNCHkjXI07p2kc/kciR28FLZDtEvWEAPScxvIzO7lQnqOOeA2AcoR6nA2ROjS6qFnZqG79ZwL/jr4Rgk1NtsllbHOzWrZn9VKR8S7XCP1JFA+StoITbFZBBRXkc9OEmzfCy4TMnpOFz0Inw4qp2EC639R/xSVN8jqDdbUwhd4u82E8Yvxo8SKjOFCqiWpldb5lEE2R6V+6oi+OXyRJvIdlEAUzurDBsWIfR+q//PansxuwuZOHFYihPNh3suxvJp8JH8dR3AUVtSAt4wn6rZ39w3cnuaFRnPvsIQoMsYqjXQjTVk7iBxVGxDzl/T1jstjLYdJ+cyCXbeoKw+RZT9xtQCCDTCQKpJWQ+fHStYhyh2Lm8lN5dQFtR2s4T2hFhfTEK0wgmGTmA2ChMGliYBKFR9YFs/8BFw8pSWU7kK1tbsl0kGoDKrfT+VllBMyI8dgN4dCb67KjJbLYjLzW/qZ9vXjg2PV9AXP/UqjShNzF7r0nJcbQ7A+wVWAjEkWG8URD2A8YwQES+gnPg9wZxcG323sBW4Kvgb0h+RFMgUIKR9Z+z+yYsbQyBi7fG+izB8frUMcVfGO9GhqcQlWPoJkvNnVKp1L1Uh6kIXNMnLSaL2LHwS6wMaiL4LrBrjIufidmBzHgy5EGrzYnX7cnZuH7MQXEeE2oQQvyy8q26JH/wLEqGiWOEyVoqgGE0cjzZvPziRD0cmo7s=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(39860400002)(136003)(346002)(396003)(230922051799003)(64100799003)(82310400011)(451199024)(186009)(1800799009)(46966006)(40470700004)(36840700001)(26005)(40460700003)(7416002)(2906002)(478600001)(356005)(336012)(966005)(2616005)(6666004)(36756003)(86362001)(47076005)(426003)(40480700001)(316002)(36860700001)(83380400001)(7636003)(41300700001)(70206006)(54906003)(82740400003)(1076003)(70586007)(110136005)(8676002)(8936002)(4326008)(5660300002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2023 16:49:23.9807
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8db0220f-8086-40a5-dfef-08dbc042dec2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9CF.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5847
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+This patch series adds support for vq descriptor table mappings which
+are used to improve vdpa live migration downtime. The improvement comes
+from using smaller mappings which take less time to create and destroy
+in hw.
 
+The first part adds the vdpa core changes from Si-Wei [0].
 
-On 2023/9/27 23:16, Alexandra Winter wrote:
-> 
-> 
-> On 24.09.23 17:16, Wen Gu wrote:
->> Wen Gu (18):
->>    net/smc: decouple ism_dev from SMC-D device dump
->>    net/smc: decouple ism_dev from SMC-D DMB registration
->>    net/smc: extract v2 check helper from SMC-D device registration
->>    net/smc: support SMCv2.x supplemental features negotiation
->>    net/smc: reserve CHID range for SMC-D virtual device
->>    net/smc: extend GID to 128bits only for virtual ISM device
->>    net/smc: disable SEID on non-s390 architecture
->>    net/smc: enable virtual ISM device feature bit
->>    net/smc: introduce SMC-D loopback device
->>    net/smc: implement ID-related operations of loopback
->>    net/smc: implement some unsupported operations of loopback
->>    net/smc: implement DMB-related operations of loopback
->>    net/smc: register loopback device as SMC-Dv2 device
->>    net/smc: add operation for getting DMB attribute
->>    net/smc: add operations for DMB attach and detach
->>    net/smc: avoid data copy from sndbuf to peer RMB in SMC-D
->>    net/smc: modify cursor update logic when sndbuf mapped to RMB
->>    net/smc: add interface implementation of loopback device
->>
->>   drivers/s390/net/ism_drv.c    |  20 +-
->>   include/net/smc.h             |  32 ++-
->>   include/uapi/linux/smc.h      |   3 +
->>   include/uapi/linux/smc_diag.h |   2 +
->>   net/smc/Kconfig               |  13 ++
->>   net/smc/Makefile              |   2 +-
->>   net/smc/af_smc.c              |  88 ++++++--
->>   net/smc/smc.h                 |   7 +
->>   net/smc/smc_cdc.c             |  56 ++++-
->>   net/smc/smc_cdc.h             |   1 +
->>   net/smc/smc_clc.c             |  64 ++++--
->>   net/smc/smc_clc.h             |  10 +-
->>   net/smc/smc_core.c            | 111 +++++++++-
->>   net/smc/smc_core.h            |   9 +-
->>   net/smc/smc_diag.c            |  11 +-
->>   net/smc/smc_ism.c             | 100 ++++++---
->>   net/smc/smc_ism.h             |  24 ++-
->>   net/smc/smc_loopback.c        | 489 ++++++++++++++++++++++++++++++++++++++++++
->>   net/smc/smc_loopback.h        |  54 +++++
->>   net/smc/smc_pnet.c            |   4 +-
->>   20 files changed, 996 insertions(+), 104 deletions(-)
->>   create mode 100644 net/smc/smc_loopback.c
->>   create mode 100644 net/smc/smc_loopback.h
-> 
-> 
-> Hello Wen Gu,
-> 
-> I applied and built your patches and noticed some things that you may want to consider in the next version:
-> 
-> Series should be split up [2]
-> 
-> Several lines exceed 80 columns [1][3]
-> 
-> 'git clang-format HEAD~18' finds several formatting issues.
-> 	Maybe not all of them need to be fixed.
-> 
-> codespell *.patch
-> 0006-net-smc-extend-GID-to-128bits-only-for-virtual-ISM-d.patch:7: protocal ==> protocol
-> 
-> With your patches applied I get some new warnings [4]:
-> Seems there are some ntoh conversions missing
-> 
->    CHECK   net/smc/af_smc.c
-> net/smc/af_smc.c:723:32: warning: cast to restricted __be64
-> net/smc/af_smc.c:1427:52: warning: cast to restricted __be64
->    CHECK   net/smc/smc_pnet.c
->    CHECK   net/smc/smc_ib.c
->    CHECK   net/smc/smc_clc.c
-> net/smc/smc_clc.c:954:72: warning: incorrect type in argument 1 (different base types)
-> net/smc/smc_clc.c:954:72:    expected unsigned short [usertype] chid
-> net/smc/smc_clc.c:954:72:    got restricted __be16 [usertype] chid
-> net/smc/smc_clc.c:1050:29: warning: incorrect type in assignment (different base types)
-> net/smc/smc_clc.c:1050:29:    expected unsigned long long [usertype] gid
-> net/smc/smc_clc.c:1050:29:    got restricted __be64 [usertype]
-> net/smc/smc_clc.c:1051:31: warning: incorrect type in assignment (different base types)
-> net/smc/smc_clc.c:1051:31:    expected unsigned long long [usertype] token
-> net/smc/smc_clc.c:1051:31:    got restricted __be64 [usertype]
-> 
-> 
-> [1] linux/Documentation/process/coding-style.rst
-> [2] https://www.kernel.org/doc/html/v6.3/process/maintainer-netdev.html?highlight=network
-> [3] scripts/checkpatch.pl --strict --max-line-length=80 --git HEAD-18
-> [4] make C=2 CF=-D__CHECK_ENDIAN__ M=net/smc -Wunused-function -Wimplicit-fallthrough -Wincompatible-function-pointer-types-strict
-> 
-> 
+The second part adds support in mlx5_vdpa:
+- Refactor the mr code to be able to cleanly add descriptor mappings.
+- Add hardware descriptor mr support.
+- Properly update iotlb for cvq during ASID switch.
 
-Hi Sandy,
+Changes in v2:
 
-Thank you very much for your detailed comments. They are really helpful.
-I will check and fix them in my next version.
+- The "vdpa/mlx5: Enable hw support for vq descriptor mapping" change
+  was split off into two patches to avoid merge conflicts into the tree
+  of Linus.
 
-> 
-> When I installed the patches, I noticed that
->> smcd info
-> showed an SEID, even though I had no ISM device --> good
-> 
+  The first patch contains only changes for mlx5_ifc.h. This must be
+  applied into the mlx5-next tree [1] first. Once this patch is applied
+  on mlx5-next, the change has to be pulled fom mlx5-next into the vhost
+  tree and only then the remaining patches can be applied.
 
-Yes, virtual ISM device will return the right SEID (same as that returned
-by ISM device) on s390 arch.
+[0] https://lore.kernel.org/virtualization/1694248959-13369-1-git-send-email-si-wei.liu@oracle.com
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/log/?h=mlx5-next
 
-> 
->> smcd device
-> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-> 0000 0                   0000   Yes       2
-> 
-> This needs some improvements.., but I'm not sure what is the best way to display virtual smcd interfaces in the smc-tools.
-> 
+Dragos Tatulea (13):
+  vdpa/mlx5: Expose descriptor group mkey hw capability
+  vdpa/mlx5: Create helper function for dma mappings
+  vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
+  vdpa/mlx5: Take cvq iotlb lock during refresh
+  vdpa/mlx5: Collapse "dvq" mr add/delete functions
+  vdpa/mlx5: Rename mr destroy functions
+  vdpa/mlx5: Allow creation/deletion of any given mr struct
+  vdpa/mlx5: Move mr mutex out of mr struct
+  vdpa/mlx5: Improve mr update flow
+  vdpa/mlx5: Introduce mr for vq descriptor
+  vdpa/mlx5: Enable hw support for vq descriptor mapping
+  vdpa/mlx5: Make iotlb helper functions more generic
+  vdpa/mlx5: Update cvq iotlb mapping on ASID change
 
-Right. My idea is to add the display of the device's name and GID
-along with the PCI information (all zero) to indicate it's virtual
-smcd device.
+Si-Wei Liu (3):
+  vdpa: introduce dedicated descriptor group for virtqueue
+  vhost-vdpa: introduce descriptor group backend feature
+  vhost-vdpa: uAPI to get dedicated descriptor group id
 
-> 
-> I was able to do SMC transfers via the smcd-loopback feature :-D
-> 
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h |  31 +++--
+ drivers/vdpa/mlx5/core/mr.c        | 191 ++++++++++++++++-------------
+ drivers/vdpa/mlx5/core/resources.c |   6 +-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c  | 100 ++++++++++-----
+ drivers/vhost/vdpa.c               |  27 ++++
+ include/linux/mlx5/mlx5_ifc.h      |   8 +-
+ include/linux/mlx5/mlx5_ifc_vdpa.h |   7 +-
+ include/linux/vdpa.h               |  11 ++
+ include/uapi/linux/vhost.h         |   8 ++
+ include/uapi/linux/vhost_types.h   |   5 +
+ 10 files changed, 264 insertions(+), 130 deletions(-)
 
-Glad to hear this. I will improve the issues you mentioned in the next
-version and next version will be split up.
+-- 
+2.41.0
 
-Thank you very much.
-Wen Gu
 
