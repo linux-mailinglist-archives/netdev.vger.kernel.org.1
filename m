@@ -1,46 +1,41 @@
-Return-Path: <netdev+bounces-36800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522DE7B1D25
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:57:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 105287B1D54
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 09CBC28215B
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:57:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id F41861C209A5
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5997D38DE9;
-	Thu, 28 Sep 2023 12:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB4738BBF;
+	Thu, 28 Sep 2023 13:06:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6750D38DD8
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 12:57:34 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B11B180;
-	Thu, 28 Sep 2023 05:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/gAK+0HU4BRJbpDbE0lx3+xHhzKN8MJD+iMJ8Z2LG5c=; b=6YfhPlsRClQsXgn5a+7EhGiYL0
-	rgJ66LHggseErlxf/K8GhMXe6ioHrM10HSWjXgR/gcwhFrEZcicF6lyOEoacQvPLGXoHtzecVDmZ3
-	kxuNJVwfiu/96/A5Ne/4JJdIAAYHOMwVkwqx87ZIaQhiNhRmor9XxUYeljFSPjW0b1QQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qlqZt-007k9v-14; Thu, 28 Sep 2023 14:57:13 +0200
-Date: Thu, 28 Sep 2023 14:57:13 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, pkshih@realtek.com, larry.chiu@realtek.com
-Subject: Re: [PATCH net-next v9 02/13] net:ethernet:realtek:rtase: Implement
- the .ndo_open function
-Message-ID: <714dbb7d-3fb8-481e-aba1-01a1be992950@lunn.ch>
-References: <20230928104920.113511-1-justinlai0215@realtek.com>
- <20230928104920.113511-3-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0D81118
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:06:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1939C433C8;
+	Thu, 28 Sep 2023 13:05:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695906361;
+	bh=ztN4tmVjK6DmLj67wYolMBra3pmwbiRgHSjRQXIHMPQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A7LKGs3DhLaZG++qJ/3LGwvrMbNHB0gcMN1mU0ATgHwPwj+QW0lby6MCP8lL9Ik37
+	 6btM+I+4LhAdKe1Hm53Sqzf8/AJub30SXYdI5jfaiThqwn6JCeIGhQdHF4vFQYWmPo
+	 45Zrq5bpt3NqIrb0Udv1kTKT7xzDFUPYoyHNpCwu5m4gpzq3vPUtnwQKZj6dc4O3R7
+	 VQbeMZj+ShqHYeU9aCE31OwnuoEKUi4ae3tCrgl2yY69ZfkFO/VLCPp2+dBf+lrhjR
+	 eE6jv+rrHgHhOjQSDkS7wkunTabo7lCu/lRekGupLGAERZZm/0Kz5ByF7xJvFLShsE
+	 xCkF0Sx7Ib1TA==
+Date: Thu, 28 Sep 2023 15:05:55 +0200
+From: Simon Horman <horms@kernel.org>
+To: liuhaoran <liuhaoran14@163.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] net: hsr: Add error handling in hsr_portdev_setup()
+Message-ID: <20230928130555.GJ24230@kernel.org>
+References: <20230923122402.33851-1-liuhaoran14@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,51 +44,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230928104920.113511-3-justinlai0215@realtek.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230923122402.33851-1-liuhaoran14@163.com>
 
-> diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
-> index bae04cfea060..5314fceb72a2 100644
-> --- a/drivers/net/ethernet/realtek/rtase/rtase.h
-> +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
-> @@ -51,8 +51,6 @@
+On Sat, Sep 23, 2023 at 08:24:02PM +0800, liuhaoran wrote:
+> This patch adds error-handling for the hsr_port_get_hsr()
+> inside the hsr_portdev_setup().
+> 
+> Signed-off-by: liuhaoran <liuhaoran14@163.com>
+
+Please sign off using your real name, which is commonly of the form:
+
+	Signed-off-by: First Last <me@example.com>
+
+Please consider targeting this against 'net' as it appears to be a bug fix.
+
+	Subject: [PATCH net] ...
+
+If not, please target the patch against net-next.
+
+If so, please consider using including a fixes tag, immediately
+above your Signed-off-by (and any other) tags.
+
+This may be the correct tag, but I'm not completely sure.
+
+Fixes: e0a4b99773d3 ("hsr: use upper/lower device infrastructure")
+
+> ---
+>  net/hsr/hsr_slave.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+> index e5742f2a2d52..ac7d6bdef47e 100644
+> --- a/net/hsr/hsr_slave.c
+> +++ b/net/hsr/hsr_slave.c
+> @@ -141,6 +141,10 @@ static int hsr_portdev_setup(struct hsr_priv *hsr, struct net_device *dev,
+>  	}
 >  
->  #define RX_BUF_SIZE (1522 + 1)
->  
-> -#define IVEC_NAME_SIZE IFNAMSIZ + 10
-> -
->  /*****************************************************************************/
->  enum rtase_registers {
->  	RTASE_MAC0   = 0x0000,
-> @@ -261,6 +259,8 @@ union rx_desc {
->  #define RTASE_IDLESLOPE_INT_SHIFT 25
->  #define RTASE_IDLESLOPE_INT_MASK  GENMASK(31, 25)
->  
-> +#define IVEC_NAME_SIZE IFNAMSIZ + 10
+>  	master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
 > +
+> +	if (!master)
+> +		return -ENODEV;
 
-Please try to avoid moving things around which you just added in the
-previous patch.
+I think this needs to jump to an unwind label.
 
-> +static int rtase_open(struct net_device *dev)
-> +{
-> +	struct rtase_private *tp = netdev_priv(dev);
-> +	struct rtase_int_vector *ivec = &tp->int_vector[0];
-> +	const struct pci_dev *pdev = tp->pdev;
-> +	int ret;
-> +	u16 i;
-> +
+		goto fail_upper_dev_link;
 
-> +	netif_carrier_on(dev);
-> +	netif_wake_queue(dev);
-> +	netdev_info(dev, "link up\n");
+But I also think the unwind label should be renamed.
+to reflect what they do, rather than where they are called from.
 
-No need to spam the log with this. Given the hardware architecture,
-the link is always going to be up.
-
-    Andrew
+-- 
+pw-bot: changes-requested
 
