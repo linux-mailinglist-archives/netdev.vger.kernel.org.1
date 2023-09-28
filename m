@@ -1,237 +1,215 @@
-Return-Path: <netdev+bounces-36649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DA67B10AB
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 04:12:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E917B10B0
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 04:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D5DA3281577
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 02:12:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1E4632815B0
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 02:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338801872;
-	Thu, 28 Sep 2023 02:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60AA442C;
+	Thu, 28 Sep 2023 02:13:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE5C2F3F
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 02:12:18 +0000 (UTC)
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC8BAC
-	for <netdev@vger.kernel.org>; Wed, 27 Sep 2023 19:12:16 -0700 (PDT)
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38S1pqMO005141;
-	Thu, 28 Sep 2023 02:12:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	PPS06212021; bh=JWIqgXe/ojI3AC0Vt78Aq25tmG9XbOEF3OkI/lRm6hQ=; b=
-	nN3sBoJcjL8gAdHRKuC50brylYYM06orRN6VZyrlYvSYyYXMRu0zJPl5XXt6SqNK
-	oX5C/PcQST17Iw7op/YBQICKAxBPrQBZXUfWzdslg6A+1+BJTXcjg8N9M/3h7D0L
-	iI6MCPGpbcoDU3dc6tOs31+QjabHty32rlrvt37u+tksylYE0VLaimEordLDUhiG
-	6tDQ9rKCjjY+VbVqQhDo/HO1SXbmvFFwrEh1skrwSWv3F2NmIkY7Mth8vRjOMrma
-	KmffntyTK6J0/lXxeBHbSNirqbdgdPbBABSh35d3/z34jpuhVOeGoraMMl2biOc3
-	LhOZt9GoKWsKlHc182Pxpg==
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2168.outbound.protection.outlook.com [104.47.56.168])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3t9q06cjp2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 28 Sep 2023 02:12:02 +0000 (GMT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107AA468A
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 02:13:24 +0000 (UTC)
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2101.outbound.protection.outlook.com [40.107.114.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C18AC;
+	Wed, 27 Sep 2023 19:13:23 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DMWzireZ5FxdN+Sg6EF037Oj6+Wk9dcnM0qiImMlxZURRJ03MgsfJX545JbMxE6zFttkHevSGDW4ClCkm0Ewtgc2mZ/y4abWwYy0dDyjBi/4OuG+i/XpFkEokNxOTbohtScW04FKg1eEWVZk5ooT63O5w0UoaCRjIzf2fq7KjrQl3aNZPJNj7hYV8DgX9PsNnEqIKITgRpxTYecrD5grsH5Pu7zBxkjQ2BKNsDVGoWxDa/o/iIzJMyYUo3iBXCDI2fDcb1MiEnEDZAIQUg51PZgSsXrS5+8TF5ZafdHCsB5xM5vfvGW2VW72ZvY6pr4oRkVDtNmC7hdpHpjrumPJbw==
+ b=dODEe7gmrjdWfmP2Af6dYr8CJwHb0K9S8h8lgUHJxtTnUVAn1dN5Ow7d8Kl09O2UpbfAjmtUT7kIZd7zS+dsiasSMCx60f9s6WtazKs916re9Aad8mtW1w/JUNKgnL/mqGSm/wscWBjn3XMeVH0TAewJ0Fd8Vyf5uHTR1j/6eiBLiXHQACITq7l9PTdHzybzAnPhwIz8kCeqLDbsm3WtxP4qYTR/lnpvlAW9VWfIijoa5XYflcJNctKFy9VllAVZ4yoi1An2E9HLd10UriWg2Zm2BBfq4zYUQL41FEElUHwU6rcw4zSO/+nlsGtftcV5MfkqFZy7Mfe843RPevf9Wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JWIqgXe/ojI3AC0Vt78Aq25tmG9XbOEF3OkI/lRm6hQ=;
- b=nYM5JXLBbDzW20J65XbZX9gnZx5ws9t01/hIt4WFhDn/Qf9Gh0HtmJEV2qvRBRwWOvTtzQnfLjjltbU+8vDrO18F0BMLeYQHKg0tqTrsK8XmViKsDG0B83LUq6JWtb2OCr3ePiPiaQ86E/SBCituWQPLwRn9PGJNCiSeNPri3r1rO9Ktnm8a8uGCoJOygbh/ML5Nla6tip0cTTq1IpN63poFrC3gQN2MbPowIzm5zW1KW0cvDD5U4v3wTP7cE19UTGXCcTSmAnd2Kia3X6GzCP/2CpleMSJTl2t7ABozwzdpEUOUWQCX7DiPB6H89yUKkPYHlWiZw8dGC1d0EB1e0Q==
+ bh=vrpMNM8FXCR161NffR5FTH5maCWVIhJ2sDo+NpAdvH8=;
+ b=ZfQK6daTO0ll7RCpfyat+gYcIP8IpxF8yncPEm8Odp2PDkBg4V/7NJCzcmvTU5Wr+MFcR4RdzvhB8OANq9FsCgBaPp6MS0KdMEe8Q2Y95izl4RMK4ddLEBMWOPuX3KQYpZcPzzrGzXeVJy/eZbBT6Yc7FhccTXJZBTt1XHaAbdbJIXklf1IHt8aaBc4s/oln5ZWH4mxtP0wQ7d++89fWdYIcqckm78wEa87C92cwTZAJc2RqOysufp6XvjvLG6at9NYOXN7fpW5UzePT613wLQVipQfF0j/QRofhIPdWobunuTmn30VccJ15APSWRoMxhO0x8pLglYZ9iedGCgEsiQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-Received: from DM6PR11MB3404.namprd11.prod.outlook.com (2603:10b6:5:59::29) by
- DM4PR11MB6094.namprd11.prod.outlook.com (2603:10b6:8:ab::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6813.20; Thu, 28 Sep 2023 02:11:59 +0000
-Received: from DM6PR11MB3404.namprd11.prod.outlook.com
- ([fe80::2854:196d:481:6d95]) by DM6PR11MB3404.namprd11.prod.outlook.com
- ([fe80::2854:196d:481:6d95%5]) with mapi id 15.20.6813.027; Thu, 28 Sep 2023
- 02:11:58 +0000
-Message-ID: <05faefff-181d-3a69-8b74-69381c62cdb7@windriver.com>
-Date: Thu, 28 Sep 2023 10:11:59 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH v3 1/1] net-next: fix IPSTATS_MIB_OUTFORWDATAGRAMS
- increment after fragment check
-Content-Language: en-US
-To: davem@davemloft.net, sahern@kernel.org, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, filip.pudak@windriver.com
-References: <20230914051623.2180843-2-heng.guo@windriver.com>
- <20230921092345.19898-1-heng.guo@windriver.com>
- <20230921092345.19898-2-heng.guo@windriver.com>
-From: heng guo <heng.guo@windriver.com>
-In-Reply-To: <20230921092345.19898-2-heng.guo@windriver.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TY2PR06CA0011.apcprd06.prod.outlook.com
- (2603:1096:404:42::23) To DM6PR11MB3404.namprd11.prod.outlook.com
- (2603:10b6:5:59::29)
+ smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
+ dkim=pass header.d=renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vrpMNM8FXCR161NffR5FTH5maCWVIhJ2sDo+NpAdvH8=;
+ b=QyKMI6IcA82wOSWbyHXN7OxYPuORMfmgL87vn5p9/2btA4kdX2jyBk6gTdp6pfKvfRa/dEKXUXBrhS9FCELBeYzZR7P0d9wzhCluEhOJvFwD8e3PKyYbXrikM6ogwNr55ZZEHC4PYcvtpXGY15ZzRvHrVi7aNYNITfonavSFB58=
+Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
+ (2603:1096:404:8028::13) by TYCPR01MB9717.jpnprd01.prod.outlook.com
+ (2603:1096:400:208::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.21; Thu, 28 Sep
+ 2023 02:13:18 +0000
+Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
+ ([fe80::1dc4:e923:9916:c0f7]) by TYBPR01MB5341.jpnprd01.prod.outlook.com
+ ([fe80::1dc4:e923:9916:c0f7%6]) with mapi id 15.20.6813.027; Thu, 28 Sep 2023
+ 02:13:18 +0000
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: Andrew Lunn <andrew@lunn.ch>, "Geert Uytterhoeven (geert@linux-m68k.org)"
+	<geert@linux-m68k.org>
+CC: "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, Tam
+ Nguyen <tam.nguyen.xa@renesas.com>, Kuninori Morimoto
+	<kuninori.morimoto.gx@renesas.com>
+Subject: RE: [PATCH net v3] rswitch: Fix PHY station management clock setting
+Thread-Topic: [PATCH net v3] rswitch: Fix PHY station management clock setting
+Thread-Index: AQHZ8HVQ3VCH2935SU+nC4wlSYXzu7Aun5cAgADdkEA=
+Date: Thu, 28 Sep 2023 02:13:18 +0000
+Message-ID:
+ <TYBPR01MB5341BA14DCF0BEEFBBED95D0D8C1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+References: <20230926123054.3976752-1-yoshihiro.shimoda.uh@renesas.com>
+ <c88ebcd5-614d-41ce-9f13-bc3c0e4920d7@lunn.ch>
+In-Reply-To: <c88ebcd5-614d-41ce-9f13-bc3c0e4920d7@lunn.ch>
+Accept-Language: ja-JP, en-US
+Content-Language: ja-JP
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TYBPR01MB5341:EE_|TYCPR01MB9717:EE_
+x-ms-office365-filtering-correlation-id: 067b4589-8596-42f8-936c-08dbbfc87b6b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 4lBV1UkfBGKi50rmY8GS9EUKk3xHad0DaqZ/i9nEkAi+Lwig3ywN1dE5/8k8XiLvF/6j9PaNuzOxz1pz7BsWZv90C0b9L0OIWhNZFw1PIa02OOmrGNXdADb6qsAebuqHHhZb7DliRX7C3NMGDB9zFttpfdq1/8536GRt0oI4UM1SNtdfbaw3Ij6J3e/cdPVwahbpOYBzemX0c8CCu0K788iESnTGFp0xkwLYKm7drTfkuLjtaGkWE01nVJgxJIa+JemfXghbY9W2QjqbAB8sVQljRNlJmzAHQzCRM6CnX3UVHQTagU08i/Bh1CjEZPXhv5fTXOJed2j3/MdxVnPKo9K1vGShgMfd+PtHgVeT3ukx0IqL12rAtYBfsCHeavzBkiaQLZCPeFIp+xHUl86Ka8lZh6qIh+x6RwZ0VGbM58IiIDTxMbugDKbipVsY4hhETyZoLIsXvkmSeTFvCMqgjddLXoI0wIGrgk1cUzrs0ZQYorC5ex9vEko4pvFJLHCbRYtN9/IyEXUrcEAYs7vQgwOqoJAGedV+U2ot8pjMJHBCpbjf5SMYfja0s/e3JCQQMNcI9xVE+mIDT/hxbERUQo4CZm0lFmiLcqLU3+bRX9xoH9ZnRWs3j67dskOgK/nS
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYBPR01MB5341.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(39860400002)(366004)(346002)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(107886003)(9686003)(7696005)(6506007)(86362001)(122000001)(55016003)(38070700005)(38100700002)(33656002)(83380400001)(110136005)(76116006)(2906002)(66476007)(54906003)(64756008)(66946007)(316002)(66446008)(8936002)(41300700001)(4326008)(8676002)(66556008)(5660300002)(52536014)(71200400001)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?w8ZIiq5Zn8iFep7kZ5rUFa1lJq73WMvX8hBTyJ4/LAYTbVcrba57UdSyRuvR?=
+ =?us-ascii?Q?1gkM+5nn2Wd4vcEnfQZztklsYfOEYRSBdlF3q6S92EnFSVwYy0oIyNk0Nopr?=
+ =?us-ascii?Q?vZv8d5q6VNIp/LnfIOZEBPPZFPnUS/MgvMS6RpOspKQ9+jv5ANrSvPq6W+w6?=
+ =?us-ascii?Q?WTM1H+IR253wgv30prpYWckAlb6FHRnNXFaGEwAQtu3hj8ULfFuVz21+TD6W?=
+ =?us-ascii?Q?N/2aMX6eIkmCDK9msc89xIRSJH3EAciwWs7Hzi789bDck/pIkCp+SUlMivhn?=
+ =?us-ascii?Q?oNDxV1rIAv1+SGids5FxUGP8C9Hv6yPhDE05socRWO5K8h6fJMYNVyI6+AlF?=
+ =?us-ascii?Q?mI3Rr4S+WmcUEUbD2bIWdEpBi7SIc6recFlg1liFO3/BjOJFFuzhQ8T9TT7c?=
+ =?us-ascii?Q?bP6ioBvUlphxTBnYffn1tTQ2ca/yjNJikKedcnsvJn2AjrbdU46F+tdfmgmY?=
+ =?us-ascii?Q?AHMdK6k6ClbcJeLpuGLsgmidvUQkriHyAbkgvTNOfGG+Mrd0zOocIf4Zoszn?=
+ =?us-ascii?Q?UlVxuHwoNUwXxiEjycjRfWVbjPmchUMy+/sq4OsCNUvFySGM2tLGesbBAenS?=
+ =?us-ascii?Q?tmDG2E5I1QYw8SaUiZN+rosnflzgXAXN9wZbOx/JNs1DpeEUAwy0/mSgYIZC?=
+ =?us-ascii?Q?wtIVe/guWsE47d4LyVDX9xaMsuE9eDB+e0REcY2X4e+cqNmZpF1X8+Y8f3C1?=
+ =?us-ascii?Q?cYweArMV9/St+Y/VuwH/IjuNQhFZkSLqeJ9gVUSb8dW2neD3vO9n3BujdxAE?=
+ =?us-ascii?Q?qRmPfgQFlh9rLG2hvlW7HFmKzzA2KUqpMJtpcC48Lw8ltmFIC8tv1uQg8ZcQ?=
+ =?us-ascii?Q?noB15XAVJ2Qj/lOe4qyCD1XLopSOmvLrU/PsAQu9jzUNB0Yhr2zFTzPcUqiz?=
+ =?us-ascii?Q?SqQerv6n+0qun7LNzjD7rxOeCavAKoKCWSDf4B3ZVWIiPBe9thJsh38OS2rp?=
+ =?us-ascii?Q?M9gbRfrK46j0URUfEZwCt++p64RKZ+XeDoDWjnDxhgqRF4POZe015f263xL4?=
+ =?us-ascii?Q?qZ+3w4QnWQTsU3ulYNTvWzcknwCXLjgQXckO51r4+Kwu3PrZBpCtqe2TD/1U?=
+ =?us-ascii?Q?faw9B1r4mMpuMrhsQQ9EvfbXu9r3YCYRQdBZYH9l5SVMpbX7f6GcH7w61r7Z?=
+ =?us-ascii?Q?uoT3kNDQKsxt3azCnTlszDAuAlMACiwIacW3a/4Nyhrw7ilhG1PZFI0oF7wC?=
+ =?us-ascii?Q?R3lCEfSPmWAmAc5+ZdOJlVvZBNXdQTcQpDPL6Utf7PKo3Dru0/trZLl6epgK?=
+ =?us-ascii?Q?oWZs72LVFaatgWVJwJ11m8gQJbPfz0RyDnEL7GrLaJm+EXteLhGJdnD4dsU/?=
+ =?us-ascii?Q?cPSQAlOtySbpmzbFy1o6Kcqvh9GXyiIAL9QYHQNaXGcMiUQvhTu2VM48sDrG?=
+ =?us-ascii?Q?REDy2BX6KSONxf9hr/Mgvltlcdc/QL/oU4xOs94/yRdUFaXmTyYZcBSC0fCp?=
+ =?us-ascii?Q?LIHb4WSnDlpd9INShZO5pjM4lzhzyODtBeRYrvK0DosCcuRqcUHfKSnvL1qe?=
+ =?us-ascii?Q?cNEY56SOQPpwSEfhsNGpXqVr2rcTVeov9/IO2U7gwg3qWuXFLhh2/z2eGQyq?=
+ =?us-ascii?Q?ixtv0sUvbPhUOPwhHLFawc1jQlPID26EIYpX/CvN8cGdjdpKdBObT9+SoAK5?=
+ =?us-ascii?Q?pG/Latzbz1VQKmExgjJvpGDZhKLtZPCnKyZUU2+SLbWetdYoFa0QTGEY/tz3?=
+ =?us-ascii?Q?tuQdSQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3404:EE_|DM4PR11MB6094:EE_
-X-MS-Office365-Filtering-Correlation-Id: d75b30ec-9162-48b0-3ec8-08dbbfc84b85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	4ul8GJRgBM8ikV742Tro7h9JtAypMY1NJCsm0OezG7oqJMD/9C2mTZZzZZu1iakJ7l2crFA+wNLdsb+VvxckqtNmdDxM7FvtTgJxDHgUxBx+vdvM/QnUVgmmWQj3uumOADkFiBpJIr9yTuB6n+zH8rwe0e9iF7q4bVTcwNAKJGjtiM7ImNN3r3W8cgEx1tzHTqeK5vpMAv7jDJ01R5DJLvmX7an9KA4ijMXqX1QeEVK9rBA/WW7H7857MY5Z0PjSr2pB9r7mzZ8aJfUo/XfEsekjVFfI3e/bV8WahegofG9imijH732ToM7HAeqt33St0oyzyi8v+72g9D7zzhllMKUJ9eLFvtDSkIPkNgxhWM3WXpPdIOeDeMR/QXx9ufxek+YSZwiZ8+KZgU7IQgAubcydxd/VOeNXrbjM59WkD133e+uMt4mRgdMMWrw9wwshmlOTBB03eTiQKVlGV1LbFp6xx5GKZ5Bxf0LUQ6KjAgmKNMcM+w7/dJc+ntigahj6oiR/o4vHNNaSAtm4kgBYrPwTCP2CzxhJHkKJmLiEpZhYRjfgnOJ46VLBFQ60kaKj5P60/dBMuM7jGMeoiuSRUXNv8MlLnD4A9x4wPSL443mD7MSkpuoHXI2jhKlVG4NNDqMYxygJU3GDlGP/FpXlsQ==
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3404.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(396003)(376002)(39850400004)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(31686004)(2906002)(38100700002)(31696002)(6506007)(86362001)(6486002)(53546011)(83380400001)(36756003)(478600001)(6512007)(4326008)(26005)(66556008)(316002)(66946007)(8936002)(2616005)(8676002)(66476007)(5660300002)(107886003)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?dkpTVkFGckRDSWJCWmpQTndJTWYyVDB6Y1N3RzdsaEhkSDhlZXZxeTMvNFIr?=
- =?utf-8?B?bGlwZGxTWDRlK1g2b1lTY09ISHJEQTQ5NkFvd2VOei94UDFwai9mSjNPUERN?=
- =?utf-8?B?OVE0ME5JOXp4aFBCWnZRdHlOYjZRTGlRSmV6SFZzRW9oSjFEZlhqOGduemto?=
- =?utf-8?B?TTZobXVvTUxLdzJTRWV6TDNwUnp3TUpOT2xNQURqN2x5OEhydEZpUFl5eUkw?=
- =?utf-8?B?VEJZVG9NZUZyUlc4ZWFzNHJCcTVUdnBsTTlMeDhRd3FjenZUZVR2YW5aWWRm?=
- =?utf-8?B?QmU0Ris3dGl4RnV4UjVYV3d4TEFWT3EyVVFkYWcvdXprZkVPdWtGdittdjhj?=
- =?utf-8?B?TWhpTUcrMzJwekU4NU9FN0hidDVtVlFuNVl3dXZVeGNiSS8wTTVNVjRFbnlZ?=
- =?utf-8?B?YWcvYitScVBmSUJqOE1TYkYwb055WW9ueVRtRnZnWElvNXplaEdhTFQzVTQ1?=
- =?utf-8?B?eUVFdFhyamtzdU1EWFhySXZKWGkvVExvM0tCSVpLc0RWVXlGaG9hOTVRK0NV?=
- =?utf-8?B?ZWFic0ZVS284dVdVS1Q4cVpVMWdqT25CL2JaSjNQZlh0UlhkSVZLajREOG9v?=
- =?utf-8?B?cGZvdzhqQmtzcW1CeVhiK2lja2FSNVpDd1d0WEhkdktYWUl2LzVNMDB1MWc5?=
- =?utf-8?B?cEtDOXA2VzMrMGU3am82c1EyTFFiSDZldWJNM09ZdnI1R2NqVVlodlFWemo4?=
- =?utf-8?B?MVhVdVBKQVVBZzVGczlkaFk5cVNYUHVranl3WE9EaHdMZkIzYTEvcENkemZI?=
- =?utf-8?B?d1lpdWlNZWFpZnBGTFJXQUdjYVY1bEtXTmtpM3hUT3VmYTRIRDExMVNpSlpY?=
- =?utf-8?B?TkJoa3YrYTducG5FbzdvOW8wYk5YRmlsNVBabjhkL3RnOEpFeWxyYXI1NDRh?=
- =?utf-8?B?Y1BFL2tCVUU2MG01WXA1c01BS3pGT1VvQUN1aDUwcHB3MWtRR3g4YnU1R0Iw?=
- =?utf-8?B?QkVqMkc2MWM5bnVVL204bnJjYlpJNFBUbkhlT2RuQ3BLMEl0eGFZSjBxQStN?=
- =?utf-8?B?aysyR2FybHNyRkRHN0s3d2tJc0RvVmlyMjhMbkgzZVJWYk5BcituTGluaGp1?=
- =?utf-8?B?VEJiQjJVdjRhcjBPbzlJZEJUbW1iQnd6Qi9Qc0lmZ2phS09PUmthZ251TElw?=
- =?utf-8?B?aFRZR3hyNlFkYXhRdmptUmc4bXVFdTlVay9hc0w5dTJsOU40Tk44UkhiZEh0?=
- =?utf-8?B?UDMrOWtjY0pWRmlMWjUyeEJ0TFFoK2I3QWNOcFhCRmc4YnJULzFWYUNaMXRr?=
- =?utf-8?B?MXZGY3lVcVk1bExMdHBNb1BTWjRBUTZIY1JSMjlGbUpWak1uQWRIQ2FVNkxW?=
- =?utf-8?B?VEk2L3czSmpXSFdnTWJQVmQrYy90UksvcUY4SThucmNQNWJMTU1UZUZ0d2Z5?=
- =?utf-8?B?K1ROSVYzRGRROU0yU05waUZyck9Mcm9jM3Y4aVhQb3hHY0hwZWZ5MkR1aThX?=
- =?utf-8?B?OWtqZG9lVHBIaXNGbGlSUFFabUl3MFUyUnhUSDZXcEgwRnBsUytrbDRIcXdF?=
- =?utf-8?B?Zyt5N1FiSWtzYml4QmN2QzFvYlBsSEdLbHJWVU9YTFJBbEtmMEFTcS9QUHk1?=
- =?utf-8?B?L3BLaCtxT09IVnhlVzF4RzVoYnhOc2thekpiMEtrcVcwd0lucjlFbVo4SEZl?=
- =?utf-8?B?NmhKMXd3SStmeWljWTNtNTRqVWdJTXVLS3ZiZm9NM3BCdjhyTHc1WU9LS2p4?=
- =?utf-8?B?RCsveHZjak9WbWtqMzBZVmRabU9qVDVHdGdyMlFpVWU2MWZEVDdrc2hOemgv?=
- =?utf-8?B?Q0ZubFMwNFFWdm5DQmd5L3dhbUZYR0JuTGNNd1JYekt2czBrc1BZVEVINzBZ?=
- =?utf-8?B?SDRMTWpYdVY4aEEzSXFBc2pzTWNwNXJsM1h1cVVDWHhwbmN5cEU4S3ZBSVJV?=
- =?utf-8?B?T0dGeUZzcE9sdGx6cUtUTXg2czZVejB0Y05HWUNJV0V2d1hRTWQvMVJwTC9C?=
- =?utf-8?B?RGk2dXhGa3JlUnhiZjdqU2YwMFVOR0pnM3dlNEhJb3B6K3JpNXp2NlpXWDlv?=
- =?utf-8?B?OWYzcEZKbEp2bDhseVB4Z2gwZ2dzVGRXVG5rU21vNkJLM0c2RFNPOEZlelhE?=
- =?utf-8?B?bUNHRERhV2hGRTNtbkd0cFZVZG1mb1dyVUlHdDhaZW1NcFF3Q251QlE5c1d0?=
- =?utf-8?Q?0KyDUzDlZE5vwltSsgYYurs1u?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d75b30ec-9162-48b0-3ec8-08dbbfc84b85
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3404.namprd11.prod.outlook.com
+X-OriginatorOrg: renesas.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Sep 2023 02:11:58.7841
+X-MS-Exchange-CrossTenant-AuthSource: TYBPR01MB5341.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 067b4589-8596-42f8-936c-08dbbfc87b6b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Sep 2023 02:13:18.7586
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cJ6b8jEZOnTX7gdGJZy69f4MfwU1+PxdQqMAPN1PA0C+/LcZerH83o7mBzoa0ZZn/YI1Cba3TohaOJzSs8gb5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6094
-X-Proofpoint-GUID: FKhTH-M9x-ta77DvzsWz-7Rq4KVQqb54
-X-Proofpoint-ORIG-GUID: FKhTH-M9x-ta77DvzsWz-7Rq4KVQqb54
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-27_17,2023-09-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- phishscore=0 mlxlogscore=908 mlxscore=0 adultscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 clxscore=1015 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2309180000 definitions=main-2309280018
-X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QcBkeWqsXnJUMayfgDX23B3jNAJ8BGsAa3ZMGs6VSiplgc85wir6Wukh6TFllsf+L1pGtBQ582hMY1xBfRY64did9g/DDB3GdG8lDVnUvsEtHbqwfDrdRViNir/sf8ja
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB9717
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Could you please take time to review this patch?
+Hello Andrew,
 
+> From: Andrew Lunn, Sent: Wednesday, September 27, 2023 9:44 PM
+>=20
+> > +
+> > +	/* MPIC.PSMCS =3D (clk [MHz] / (MDC frequency [MHz] * 2) - 1.
+> > +	 * Calculating PSMCS value as MDC frequency =3D 2.5MHz. So, multiply
+> > +	 * both the numerator and the denominator by 10.
+> > +	 */
+> > +	etha->psmcs =3D clk_get_rate(priv->clk) / 100000 / (25 * 2) - 1;
+> >  }
+> >
+> >  static int rswitch_device_alloc(struct rswitch_private *priv, int inde=
+x)
+> > @@ -1900,6 +1907,10 @@ static int renesas_eth_sw_probe(struct platform_=
+device *pdev)
+> >  		return -ENOMEM;
+> >  	spin_lock_init(&priv->lock);
+> >
+> > +	priv->clk =3D devm_clk_get(&pdev->dev, NULL);
+> > +	if (IS_ERR(priv->clk))
+> > +		return PTR_ERR(priv->clk);
+> > +
+>=20
+> /**
+>  * clk_get_rate - obtain the current clock rate (in Hz) for a clock sourc=
+e.
+>  *		  This is only valid once the clock source has been enabled.
+>  * @clk: clock source
+>  */
+> unsigned long clk_get_rate(struct clk *clk);
+>=20
+> I don't see the clock being enabled anywhere.
 
-Thanks a lot,
+Since GENPD_FLAG_PM_CLK is set in the drivers/pmdomain/renesas/rcar-gen4-sy=
+sc.c,
+pm_runtime_get_sync() will enable the clock. That's why this code works cor=
+rectly
+without clk_enable() calling.
 
-Heng
+> Also, is the clock documented in the device tree binding?
 
-On 9/21/23 17:23, Heng Guo wrote:
-> According to RFC 4293 "3.2.3. IP Statistics Tables",
->    +-------+------>------+----->-----+----->-----+
->    | InForwDatagrams (6) | OutForwDatagrams (6)  |
->    |                     V                       +->-+ OutFragReqds
->    |                 InNoRoutes                  |   | (packets)
->    / (local packet (3)                           |   |
->    |  IF is that of the address                  |   +--> OutFragFails
->    |  and may not be the receiving IF)           |   |    (packets)
-> the IPSTATS_MIB_OUTFORWDATAGRAMS should be counted before fragment
-> check.
->
-> The existing implementation, instead, would incease the counter after
-> fragment check: ip_exceeds_mtu() in ipv4 and ip6_pkt_too_big() in ipv6.
->
-> So move IPSTATS_MIB_OUTFORWDATAGRAMS counter to ip_forward() for ipv4 and
-> ip6_forward() for ipv6.
->
-> Reviewed-by: Filip Pudak <filip.pudak@windriver.com>
-> Signed-off-by: Heng Guo <heng.guo@windriver.com>
-> ---
->   net/ipv4/ip_forward.c | 4 ++--
->   net/ipv6/ip6_output.c | 6 ++----
->   2 files changed, 4 insertions(+), 6 deletions(-)
->
-> diff --git a/net/ipv4/ip_forward.c b/net/ipv4/ip_forward.c
-> index 66fac1216d46..8b65f12583eb 100644
-> --- a/net/ipv4/ip_forward.c
-> +++ b/net/ipv4/ip_forward.c
-> @@ -66,8 +66,6 @@ static int ip_forward_finish(struct net *net, struct sock *sk, struct sk_buff *s
->   {
->   	struct ip_options *opt	= &(IPCB(skb)->opt);
->   
-> -	__IP_INC_STATS(net, IPSTATS_MIB_OUTFORWDATAGRAMS);
-> -
->   #ifdef CONFIG_NET_SWITCHDEV
->   	if (skb->offload_l3_fwd_mark) {
->   		consume_skb(skb);
-> @@ -130,6 +128,8 @@ int ip_forward(struct sk_buff *skb)
->   	if (opt->is_strictroute && rt->rt_uses_gateway)
->   		goto sr_failed;
->   
-> +	__IP_INC_STATS(net, IPSTATS_MIB_OUTFORWDATAGRAMS);
-> +
->   	IPCB(skb)->flags |= IPSKB_FORWARDED;
->   	mtu = ip_dst_mtu_maybe_forward(&rt->dst, true);
->   	if (ip_exceeds_mtu(skb, mtu)) {
-> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-> index 54fc4c711f2c..8a9199ab97ef 100644
-> --- a/net/ipv6/ip6_output.c
-> +++ b/net/ipv6/ip6_output.c
-> @@ -448,10 +448,6 @@ static int ip6_forward_proxy_check(struct sk_buff *skb)
->   static inline int ip6_forward_finish(struct net *net, struct sock *sk,
->   				     struct sk_buff *skb)
->   {
-> -	struct dst_entry *dst = skb_dst(skb);
-> -
-> -	__IP6_INC_STATS(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTFORWDATAGRAMS);
-> -
->   #ifdef CONFIG_NET_SWITCHDEV
->   	if (skb->offload_l3_fwd_mark) {
->   		consume_skb(skb);
-> @@ -619,6 +615,8 @@ int ip6_forward(struct sk_buff *skb)
->   		}
->   	}
->   
-> +	__IP6_INC_STATS(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTFORWDATAGRAMS);
-> +
->   	mtu = ip6_dst_mtu_maybe_forward(dst, true);
->   	if (mtu < IPV6_MIN_MTU)
->   		mtu = IPV6_MIN_MTU;
+Yes, but this is a "clocks" property only though. In the dt-bindings doc:
+---
+examples:
+...
+        clocks =3D <&cpg CPG_MOD 1505>;
+---
+
+And, in the drivers/clk/renesas/r8a779f0-cpg-mssr.c:
+---
+        DEF_FIXED("rsw2",       R8A779F0_CLK_RSW2,      CLK_PLL5_DIV2,  5, =
+1),
+...
+        DEF_MOD("rswitch2",     1505,   R8A779F0_CLK_RSW2),
+---
+So, the device will get the paranet clock " R8A779F0_CLK_RSW2".
+And according to the clk_summary in the debugfs:
+---
+# grep rsw /sys/kernel/debug/clk/clk_summary
+             rsw2                     1        1        0   320000000      =
+    0     0  50000         Y
+                rswitch2              1        1        0   320000000      =
+    0     0  50000         Y
+---
+
+I found that i2c-rcar.c and pwm-rcar.c are also the same implementation
+which call clk_get_rate() without clk_enable(). But, perhaps, we should ena=
+ble
+the clock by clk API?
+
+To Geert-san, do you have any opinion?
+
+Best regards,
+Yoshihiro Shimoda
+
+>       Andrew
 
