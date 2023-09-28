@@ -1,108 +1,204 @@
-Return-Path: <netdev+bounces-36830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A674B7B1EF7
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:50:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F2A7B1F08
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 15:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 598DD28118B
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 73972281CAF
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 13:56:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28923B7BC;
-	Thu, 28 Sep 2023 13:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C266E3C695;
+	Thu, 28 Sep 2023 13:56:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37003AC3D
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:50:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 31ADBC433C7;
-	Thu, 28 Sep 2023 13:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695909026;
-	bh=Mk5VJpCLhizvHMR7qQ+55ID3ZfkiRBaA1JzYcVPLxqs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PieMZH2ohuiKLlRTqTMsE/yX0rPJFxExRLxCWS+DAR6xpUM4VoMT1v3NxQR8fx2Ls
-	 elS+nCpE3hiGN5NmwI3oVASELbDGG7CmLcRgR+rXo0ptA8G4FOeb5eI+Kk51ZN6keD
-	 0SnUDV+P61RHbC8/wADdigtVzgqCVnC3f3jbT5DkIRI4CNSwMfIM+WbOStane63gs0
-	 EJqzBa1buy0W6NCbNdqrnQ1BTf2paPCWAn7SUAL61LMDUvqQgsFiEHvk9QhkojNF5K
-	 q616VZCVulObzKdKZ+zQ+DE1elQDakN1ZnEBLv2Yoa8Ce4NtxhyBJgFqMt3/6nLIsT
-	 9QGTNIkMBxAKw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12E2FC43170;
-	Thu, 28 Sep 2023 13:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077933C686
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 13:56:11 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD42D19C;
+	Thu, 28 Sep 2023 06:56:09 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38SDdwE9011105;
+	Thu, 28 Sep 2023 13:55:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : date : subject :
+ content-type : message-id : to : cc : content-transfer-encoding :
+ mime-version; s=pp1; bh=7YWFzEl6wImcRaco2nBjK1nY0Gsj359awacK8TSbAyA=;
+ b=e6E4J1FpGW/MttKb29T1JSpGhF2ggZ9gQSDNloR+QlaIYWRNLkCq1Mq8rX1WVQ5qv5uy
+ Ea3P0hXSTi/p2nRMrleT3un9rTne0tYHRvIj3ZGEboOy+BQDc9qE7mRlDiFMqtM7TpJW
+ P1W7gma2L1YVXGF6nn9J7zgEy8dTAruHMgv9gIt/RPMUnx37DFGELF+gcR8axDh1Jimz
+ UBQBTq/MRnXI/e2aBwk5pRTwX+l/Jbbu7VIRJdH14WGHSGeAnnlJcW2W+p+2W9ZmrOp9
+ /OzMvUKJ25lNrj5CNV5g6q2B33OBTiVklpnETCJKy68Y21RYtihT4bXY9O57s2AEP0eg sw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3td7p0dyjr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 13:55:59 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38SDk8IP029613;
+	Thu, 28 Sep 2023 13:55:58 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3td7p0dyhr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 13:55:58 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38SCB6xK030392;
+	Thu, 28 Sep 2023 13:55:57 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tad224ada-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 28 Sep 2023 13:55:57 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38SDtsuJ23331528
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 28 Sep 2023 13:55:54 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AC9BE20043;
+	Thu, 28 Sep 2023 13:55:54 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 519AA20040;
+	Thu, 28 Sep 2023 13:55:54 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 28 Sep 2023 13:55:54 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+Date: Thu, 28 Sep 2023 15:55:47 +0200
+Subject: [PATCH net] net/mlx5: fix calling mlx5_cmd_init() before DMA mask
+ is set
 Content-Type: text/plain; charset="utf-8"
+Message-Id: <20230928-mlx5_init_fix-v1-1-79749d45ce60@linux.ibm.com>
+X-B4-Tracking: v=1; b=H4sIAOKFFWUC/x2MWwqAIBAArxL7nVCava4SEWZbLZSFRgji3ZM+Z
+ 2AmgENL6KDPAlh8ydFlEpR5BnpXZkNGS2LgBRdFx1t2Hl5OZOiZVvJMV7WcpV6U4A2k5raY9P8
+ bwOADY4wfaNspNGQAAAA=
+To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Shay Drory <shayd@nvidia.com>,
+        Moshe Shemesh <moshe@nvidia.com>, Heiko Carstens <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Niklas Schnelle <schnelle@linux.ibm.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3327;
+ i=schnelle@linux.ibm.com; h=from:subject:message-id;
+ bh=NA7Oh67Tj0uc/EsbJ3FQ2S/ba9LUghLw/dRgo0jeWNE=;
+ b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGFJFWx/Pza6bdlMq2PHDXJEflSIWKXwWCRc23EtJmsiuH
+ Kj799XrjlIWBjEOBlkxRZZFXc5+6wqmmO4J6u+AmcPKBDKEgYtTACbieZ2R4VxtissJ/7V8/zaL
+ MMxOVj8nq3x1S32d75En73+nXg/LVmL4Z/WX96/hpttTTP4qH+V/cv6KsfvSAKE4vaLpysxxOzO
+ NeQA=
+X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
+ fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BXkdPTVzkiYOcaO5cXp72ZMrpllRU6ip
+X-Proofpoint-ORIG-GUID: leOd-UmwHl-uRqBXxwxdgs7m0aK8DaEw
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next 01/15] net/mlx5: Call mlx5_sf_id_erase() once in
- mlx5_sf_dealloc()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169590902607.28614.2700544642191541684.git-patchwork-notify@kernel.org>
-Date: Thu, 28 Sep 2023 13:50:26 +0000
-References: <20230920063552.296978-2-saeed@kernel.org>
-In-Reply-To: <20230920063552.296978-2-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, jiri@nvidia.com, shayd@nvidia.com
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-28_13,2023-09-28_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 bulkscore=0 phishscore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 clxscore=1011
+ malwarescore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2309280117
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
+reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
+called in probe_one() before mlx5_pci_init(). This is a problem because
+mlx5_pci_init() is where the DMA and coherent mask is set but
+mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+allocation is done during probe before the correct mask is set. This
+causes probe to fail initialization of the cmdif SW structs on s390x
+after that is converted to the common dma-iommu code. This is because on
+s390x DMA addresses below 4 GiB are reserved on current machines and
+unlike the old s390x specific DMA API implementation common code
+enforces DMA masks. Fix this by switching the order of the
+mlx5_mdev_init() and mlx5_pci_init() in probe_one().
 
-This series was applied to netdev/net-next.git (main)
-by Saeed Mahameed <saeedm@nvidia.com>:
+Link: https://lore.kernel.org/linux-iommu/cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com/
+Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+---
+Note: I ran into this while testing the linked series for converting
+s390x to use dma-iommu. The existing s390x specific DMA API
+implementation doesn't respect DMA masks and is thus not affected
+despite of course also only supporting DMA addresses above 4 GiB.
+That said ConnectX VFs are the primary users of native PCI on s390x and
+we'd really like to get the DMA API conversion into v6.7 so this has
+high priority for us.
+---
+ drivers/net/ethernet/mellanox/mlx5/core/main.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-On Tue, 19 Sep 2023 23:35:38 -0700 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Before every call of mlx5_sf_dealloc(), there is a call to
-> mlx5_sf_id_erase(). So move it to the beginning of mlx5_sf_dealloc().
-> Also remove redundant mlx5_sf_id_erase() call from mlx5_sf_free()
-> as it is called only from mlx5_sf_dealloc().
-> 
-> [...]
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index 15561965d2af..06744dedd928 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -1908,10 +1908,6 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto adev_init_err;
+ 	}
+ 
+-	err = mlx5_mdev_init(dev, prof_sel);
+-	if (err)
+-		goto mdev_init_err;
+-
+ 	err = mlx5_pci_init(dev, pdev, id);
+ 	if (err) {
+ 		mlx5_core_err(dev, "mlx5_pci_init failed with error code %d\n",
+@@ -1919,6 +1915,10 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto pci_init_err;
+ 	}
+ 
++	err = mlx5_mdev_init(dev, prof_sel);
++	if (err)
++		goto mdev_init_err;
++
+ 	err = mlx5_init_one(dev);
+ 	if (err) {
+ 		mlx5_core_err(dev, "mlx5_init_one failed with error code %d\n",
+@@ -1939,10 +1939,10 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	return 0;
+ 
+ err_init_one:
+-	mlx5_pci_close(dev);
+-pci_init_err:
+ 	mlx5_mdev_uninit(dev);
+ mdev_init_err:
++	mlx5_pci_close(dev);
++pci_init_err:
+ 	mlx5_adev_idx_free(dev->priv.adev_idx);
+ adev_init_err:
+ 	mlx5_devlink_free(devlink);
 
-Here is the summary with links:
-  - [net-next,01/15] net/mlx5: Call mlx5_sf_id_erase() once in mlx5_sf_dealloc()
-    https://git.kernel.org/netdev/net-next/c/2597ee190b4e
-  - [net-next,02/15] net/mlx5: Use devlink port pointer to get the pointer of container SF struct
-    https://git.kernel.org/netdev/net-next/c/9caeb1475c3e
-  - [net-next,03/15] net/mlx5: Convert SF port_indices xarray to function_ids xarray
-    https://git.kernel.org/netdev/net-next/c/2284a4836251
-  - [net-next,04/15] net/mlx5: Move state lock taking into mlx5_sf_dealloc()
-    https://git.kernel.org/netdev/net-next/c/9497036dfbb8
-  - [net-next,05/15] net/mlx5: Rename mlx5_sf_deactivate_all() to mlx5_sf_del_all()
-    https://git.kernel.org/netdev/net-next/c/a65362f2be8d
-  - [net-next,06/15] net/mlx5: Push common deletion code into mlx5_sf_del()
-    https://git.kernel.org/netdev/net-next/c/a3cc822beacc
-  - [net-next,07/15] net/mlx5: Remove SF table reference counting
-    https://git.kernel.org/netdev/net-next/c/2fe6545ef541
-  - [net-next,08/15] net/mlx5: Remove redundant max_sfs check and field from struct mlx5_sf_dev_table
-    https://git.kernel.org/netdev/net-next/c/7c35cd836f21
-  - [net-next,09/15] net/mlx5e: Consider aggregated port speed during rate configuration
-    https://git.kernel.org/netdev/net-next/c/8d88e198dcaf
-  - [net-next,10/15] net/mlx5e: Check police action rate for matchall filter
-    https://git.kernel.org/netdev/net-next/c/4291ab7112ea
-  - [net-next,11/15] net/mlx5: Bridge, Enable mcast in smfs steering mode
-    https://git.kernel.org/netdev/net-next/c/653b7eb9d744
-  - [net-next,12/15] net/mlx5: DR, Add check for multi destination FTE
-    https://git.kernel.org/netdev/net-next/c/f6f46e7173cb
-  - [net-next,13/15] net/mlx5: DR, Handle multi destination action in the right order
-    https://git.kernel.org/netdev/net-next/c/3b81bcbaee28
-  - [net-next,14/15] net/mlx5: Add a health error syndrome for pci data poisoned
-    https://git.kernel.org/netdev/net-next/c/e0cc92fd945a
-  - [net-next,15/15] net/mlx5: Enable 4 ports multiport E-switch
-    https://git.kernel.org/netdev/net-next/c/e738e3550452
+---
+base-commit: 6465e260f48790807eef06b583b38ca9789b6072
+change-id: 20230928-mlx5_init_fix-c465b5cda327
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Niklas Schnelle
+Linux on Z Development
 
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen
+Geschäftsführung: David Faller
+Sitz der Gesellschaft: Böblingen / Registergericht: Amtsgericht Stuttgart, HRB 243294
+IBM Data Privacy Statement - https://www.ibm.com/privacy 
 
 
