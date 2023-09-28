@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-36739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1ECC7B1874
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:44:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACF737B187C
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1D5DA1C2094B
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:44:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id A597EB20A96
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFEA347B4;
-	Thu, 28 Sep 2023 10:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0C534CC7;
+	Thu, 28 Sep 2023 10:46:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6602817F5;
-	Thu, 28 Sep 2023 10:44:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41AB9C433C7;
-	Thu, 28 Sep 2023 10:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880DB31A8D;
+	Thu, 28 Sep 2023 10:46:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C6EDC433C8;
+	Thu, 28 Sep 2023 10:46:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695897861;
-	bh=FvmhE1zWN7G0I1REAabVQr+yUPNKpb+BRUhnlZA70m4=;
+	s=k20201202; t=1695897962;
+	bh=h+CNXH1b6Tz9pCCf5S9IaQ4Eb6+7xgTE44+TmH9sZW8=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=pGUVE5en0exvjekKAMOQnWXPVBsU97kTtTAS0PxYVpySk8PdEzqhSspiONSumjOpg
-	 ozkApq+2UPkiSa5V7km9Ay2W6zLXQE6oq4+gHtLgeGrP/e5umP7HIT10yXz8gQrO0I
-	 5v18VrJGdBpPOM5iHlp2yAIogcDlDFzA0paoEzu4UorjvXAM96HAKR4PokXNJvP2hQ
-	 h+jNwrGBL6OVV4USGMfQP7BDoX5gc6cWWJbchN8tl0aFYVikFUa1/ShAsJHk/6j/pd
-	 hOz8MAVGdlks3O9dUQtcdqok/ktvvC8LSrBUV5TJNqddYbwtkUC2lAx2vi7K7gsRqZ
-	 og9jKDYKcUc/w==
+	b=THpJNRRpXy1xb+2sMAW+kvqp1dtP8aXZmfthzvlK38+OXQEowIh0VJ1mffL0zLUkT
+	 QyL5PsTLVmJJHNQ9vrMwOncvfY/GFNLs2IFKBDwOQ8iJlI9eJOOwttlnL6C+t/RjaY
+	 Aqho0D/vXyaiQpUAtScMv9abO0TTtc3nQF5bEL4OGH3eqGCwLXwOXNavSTKchMuKvI
+	 aAQC34TA2jewdbmYki8umEkJSHo/tJkfucGtqPB8wo+dB8xTGeB21wNMxFJzUBqONE
+	 mPHmyP4HDUggC/3kiFN0GLL0kq0d96lPyv/pXVopfYRQHgNE7tQSwSVD0l/Z+A7+VX
+	 rZ/vxUE/iCYQg==
 From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
 To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
  linux-riscv@lists.infradead.org, netdev@vger.kernel.org
@@ -40,12 +40,13 @@ Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
  <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
  <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
  <pulehui@huaweicloud.com>
-Subject: Re: [PATCH bpf-next v2 0/6] Zbb support and code simplification for
- RV64 JIT
-In-Reply-To: <20230919035839.3297328-1-pulehui@huaweicloud.com>
+Subject: Re: [PATCH bpf-next v2 1/6] riscv, bpf: Unify 32-bit sign-extension
+ to emit_sextw
+In-Reply-To: <20230919035839.3297328-2-pulehui@huaweicloud.com>
 References: <20230919035839.3297328-1-pulehui@huaweicloud.com>
-Date: Thu, 28 Sep 2023 12:44:18 +0200
-Message-ID: <87h6neo9vh.fsf@all.your.base.are.belong.to.us>
+ <20230919035839.3297328-2-pulehui@huaweicloud.com>
+Date: Thu, 28 Sep 2023 12:45:59 +0200
+Message-ID: <87bkdmo9so.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,16 +58,12 @@ Content-Transfer-Encoding: quoted-printable
 
 Pu Lehui <pulehui@huaweicloud.com> writes:
 
-> Add Zbb support [0] to optimize code size and performance of RV64 JIT.
-> Meanwhile, adjust the code for unification and simplification. Tests
-> test_bpf.ko and test_verifier have passed, as well as the relative
-> testcases of test_progs*.
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> For code unification, add emit_sextw wrapper to unify all the 32-bit
+> sign-extension operations.
+>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
 
-Nice work!
-
-Did you measure how the instruction count changed for, say, test_bpf.ko
-and test_progs?
-
-
-Bj=C3=B6rn
+Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
 
