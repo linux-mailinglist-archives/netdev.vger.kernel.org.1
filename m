@@ -1,109 +1,211 @@
-Return-Path: <netdev+bounces-36701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE1C7B155D
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:51:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0BBD7B156C
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 41BF1B2089F
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:51:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 05F711C20905
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 07:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D45A31A83;
-	Thu, 28 Sep 2023 07:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AE731A9A;
+	Thu, 28 Sep 2023 07:53:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCA030FAE
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:51:24 +0000 (UTC)
-Received: from out-191.mta1.migadu.com (out-191.mta1.migadu.com [95.215.58.191])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A01C18F
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 00:51:22 -0700 (PDT)
-Message-ID: <6bb95279-156d-220c-c294-891c92ca5fd4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695887480;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/o4DvQF5+P1asWm9khV9BxT4OLKo5uZtNGVN8+1BhuA=;
-	b=SBXAHMQFpNJOJD/ZrXu0NhrMON5nSjA2S1zQeRvBQHaDR3BeAFonw6NdlqApzVRgyB42Zn
-	MA3DvA3rSXCQTW+Hhj0dqq3JXjKMvv6zpmLCmJkT0xgdscGmURCPEmoNB3sssP7U2VAJ6U
-	UXs37AxME4vtW6mSwC6IlboDJF0sKuA=
-Date: Thu, 28 Sep 2023 08:51:17 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F5430F94
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:53:30 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C17C1
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 00:53:28 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qllpn-0001KQ-JF; Thu, 28 Sep 2023 09:53:19 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qllpm-009WkC-In; Thu, 28 Sep 2023 09:53:18 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2CBB322A28F;
+	Thu, 28 Sep 2023 07:53:18 +0000 (UTC)
+Date: Thu, 28 Sep 2023 09:53:17 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	=?utf-8?B?SsOpcsOpbWll?= Dautheribes <jeremie.dautheribes@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	sylvain.girard@se.com, pascal.eberhard@se.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] can: sja1000: Always restart the Tx queue after an
+ overrun
+Message-ID: <20230928-headphone-premiere-d92deb9c29e5-mkl@pengutronix.de>
+References: <20230927164442.128204-1-miquel.raynal@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2] net: qualcomm: rmnet: Add side band flow
- control support
-Content-Language: en-US
-To: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, lkp@intel.com
-Cc: Sean Tranchetti <quic_stranche@quicinc.com>
-References: <20230926182407.964671-1-quic_subashab@quicinc.com>
- <8cbd0969-0c1f-3c19-778b-4af9b3ad6417@linux.dev>
- <1f0069a7-8581-acc0-1ab8-bd5dd95cdb49@quicinc.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <1f0069a7-8581-acc0-1ab8-bd5dd95cdb49@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ubhnszgeqgcjawt6"
+Content-Disposition: inline
+In-Reply-To: <20230927164442.128204-1-miquel.raynal@bootlin.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 28.09.2023 04:31, Subash Abhinov Kasiviswanathan (KS) wrote:
-> 
-> 
-> On 9/27/2023 6:12 PM, Vadim Fedorenko wrote:
->> On 26/09/2023 19:24, Subash Abhinov Kasiviswanathan wrote:
->>> Individual rmnet devices map to specific network types such as internet,
->>> multimedia messaging services, IP multimedia subsystem etc. Each of
->>> these network types may support varying quality of service for different
->>> bearers or traffic types.
->>>
->>
->>> +static u16 rmnet_vnd_select_queue(struct net_device *dev,
->>> +                  struct sk_buff *skb,
->>> +                  struct net_device *sb_dev)
->>> +{
->>> +    struct rmnet_priv *priv = netdev_priv(dev);
->>> +    void *p = xa_load(&priv->queue_map, skb->mark);
->>
->> Reverse X-mas tree, please.
-> 
-> We need to get priv first though. Alternatively, i could do the following but it 
-> is just more verbose for the sake of the formatting.
-> 
->      struct rmnet_priv *priv;
->      void *p;
-> 
->      priv = netdev_priv(dev);
->      p = xa_load(&priv->queue_map, skb->mark);
 
-I think you can move xa_load only.
+--ubhnszgeqgcjawt6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
->>
->>> +    u8 txq;
->>> +
->>> +    if (!p || !xa_is_value(p))
->>> +        return 0;
->>> +
->>> +    txq = xa_to_value(p);
->>> +
->>> +    netdev_dbg(dev, "mark %08x -> txq %02x\n", skb->mark, txq);
->>> +    return txq;
->>> +}
->>> +
->>
->>
+On 27.09.2023 18:44:42, Miquel Raynal wrote:
+> Upstream commit 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with
+> a soft reset on Renesas SoCs") fixes an issue with Renesas own SJA1000
+> CAN controller reception: the Rx buffer is only 5 messages long, so when
+> the bus loaded (eg. a message every 50us), overrun may easily
+> happen. Upon an overrun situation, due to a possible internal crosstalk
+> situation, the controller enters a frozen state which only can be
+> unlocked with a soft reset (experimentally). The solution was to offload
+> a call to sja1000_start() in a threaded handler. This needs to happen in
+> process context as this operation requires to sleep. sja1000_start()
+> basically enters "reset mode", performs a proper software reset and
+> returns back into "normal mode".
+>=20
+> Since this fix was introduced, we no longer observe any stalls in
+> reception. However it was sporadically observed that the transmit path
+> would now freeze. Further investigation blamed the fix mentioned above,
+> and especially the reset operation. Reproducing the reset in a loop
+> helped identifying what could possibly go wrong. The sja1000 is a single
+> Tx queue device, which leverages the netdev helpers to process one Tx
+> message at a time. The logic is: the queue is stopped, the message sent
+> to the transceiver, once properly transmitted the controller sets a
+> status bit which triggers an interrupt, in the interrupt handler the
+> transmission status is checked and the queue woken up. Unfortunately, if
+> an overrun happens, we might perform the soft reset precisely between
+> the transmission of the buffer to the transceiver and the advent of the
+> transmission status bit. We would then stop the transmission operation
+> without re-enabling the queue, leading to all further transmissions to
+> be ignored.
+>=20
+> The reset interrupt can only happen while the device is "open", and
+> after a reset we anyway want to resume normal operations, no matter if a
+> packet to transmit got dropped in the process, so we shall wake up the
+> queue. Restarting the device and waking-up the queue is exactly what
+> sja1000_set_mode(CAN_MODE_START) does. In order to be consistent about
+> the queue state, we must acquire a lock both in the reset handler and in
+> the transmit path to ensure serialization of both operations. As the
+> reset handler might still be called after the transmission of a frame to
+> the transceiver but before it actually gets transmitted, we must ensure
+> we don't leak the skb, so we free it (the behavior is consistent, no
+> matter if there was an skb on the stack or not).
+>=20
+> Fixes: 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with a soft re=
+set on Renesas SoCs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> ---
+>=20
+> Changes in v2:
+> * As Marc sugested, use netif_tx_{,un}lock() instead of our own
+>   spin_lock.
+>=20
+>  drivers/net/can/sja1000/sja1000.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/can/sja1000/sja1000.c b/drivers/net/can/sja1000/=
+sja1000.c
+> index ae47fc72aa96..91e3fb3eed20 100644
+> --- a/drivers/net/can/sja1000/sja1000.c
+> +++ b/drivers/net/can/sja1000/sja1000.c
+> @@ -297,6 +297,7 @@ static netdev_tx_t sja1000_start_xmit(struct sk_buff =
+*skb,
+>  	if (can_dropped_invalid_skb(dev, skb))
+>  		return NETDEV_TX_OK;
+> =20
+> +	netif_tx_lock(dev);
+>  	netif_stop_queue(dev);
+> =20
+>  	fi =3D dlc =3D cf->can_dlc;
+> @@ -335,6 +336,8 @@ static netdev_tx_t sja1000_start_xmit(struct sk_buff =
+*skb,
+> =20
+>  	sja1000_write_cmdreg(priv, cmd_reg_val);
+> =20
+> +	netif_tx_unlock(dev);
+> +
 
+I think netif_tx_lock() should be used in a different way. As far as I
+understand it, you should call it only in the sja1000_reset_interrupt(),
+where you want to tx path to interfere.
+
+Please test the new code with lockdep enabled.
+
+Marc
+
+>  	return NETDEV_TX_OK;
+>  }
+> =20
+> @@ -396,7 +399,13 @@ static irqreturn_t sja1000_reset_interrupt(int irq, =
+void *dev_id)
+>  	struct net_device *dev =3D (struct net_device *)dev_id;
+> =20
+>  	netdev_dbg(dev, "performing a soft reset upon overrun\n");
+> -	sja1000_start(dev);
+> +
+> +	netif_tx_lock(dev);
+> +
+> +	can_free_echo_skb(dev, 0);
+> +	sja1000_set_mode(dev, CAN_MODE_START);
+> +
+> +	netif_tx_unlock(dev);
+> =20
+>  	return IRQ_HANDLED;
+>  }
+> --=20
+> 2.34.1
+>=20
+>=20
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--ubhnszgeqgcjawt6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUVMOoACgkQvlAcSiqK
+BOglxgf+Kwi7Em2vSA6/cuQGPluAhGuXsyUHgOY0hkuRW47y63FhXrkUTylD0/Jy
+Bf5WX2gm+fFQZvo3BJphPalQq7pQopv4ewDBKBC1wtRWFSqQqaFS86eIzQ2su19f
+Ox9QliSCS6QI91K+5eZguv0FnsHn48mDe076NpLUrERsQjb0M9ocxjeNChknqk+3
+JZQILGjmF/moHS8oISZj6YCQ8dj/EnBZVieKJFWHunbxqep2Q9U/j897apUjOGXr
+N1Okes5SIA+ou51FxRgR/jhywyZUIjyMN0uNc3K5lufHQHKBt0GKqyTIZCzrYd+X
+maJNukSC0G55y55Gx2ZkNC4iO2mljQ==
+=Pj/g
+-----END PGP SIGNATURE-----
+
+--ubhnszgeqgcjawt6--
 
