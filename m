@@ -1,203 +1,131 @@
-Return-Path: <netdev+bounces-36704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA8F7B15F7
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:24:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3017B1602
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2265B282665
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:24:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 10A9DB20A43
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6EA328DF;
-	Thu, 28 Sep 2023 08:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898D133993;
+	Thu, 28 Sep 2023 08:29:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C899F847B
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:23:58 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FAA195
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:23:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E433989
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:29:28 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037A7B7
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:29:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695889435;
+	s=mimecast20190719; t=1695889766;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TM7F2V+whzsqECetEhOwq9nYpakVVR6ES249GfF2OOE=;
-	b=LdPPCiPZ8PtIcYZ+tJ3J46jdif1hnX9tf+Fw7wVb/F9M9cUeOsVRmFwM6oHEkmWydCcaG4
-	08P84VGEmd0SIVj2rQ61G9O07xKxMnvSFktQV/uWtlYcEy/vMkrAkfqC6TWERQaKyutbYW
-	+/D6O4xWfCQbene/4nrluRrZZWb2Iww=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=C2a6LqA41kHTYejtD6Zn0gAUZKMovtpeoJa3mXbkQMs=;
+	b=IxGZb+C85uau7rrcTBRtYIOOEzpu5Dfe6Kr8FFHdYQrEFXkY2SyIZxO4s6PeMVLgFIEF8u
+	1ObSAN3AnXoT3LUoA1qv102vEFSsJD4NcqMBhV86UNfUVuUnbmfGBf7LDDBHU1c27eLyF/
+	2oCZlsDOGX9jG7CF743DaaqZwUjix0w=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-393-qw_vjyJnOhWRh5k7XKQEBw-1; Thu, 28 Sep 2023 04:23:54 -0400
-X-MC-Unique: qw_vjyJnOhWRh5k7XKQEBw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9adcb9ecc16so293627766b.0
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:23:53 -0700 (PDT)
+ us-mta-630-ga7YOrLGNPOMgGfggoUOKA-1; Thu, 28 Sep 2023 04:29:23 -0400
+X-MC-Unique: ga7YOrLGNPOMgGfggoUOKA-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-532eb7faea1so10280690a12.2
+        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:29:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695889433; x=1696494233;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20230601; t=1695889762; x=1696494562;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=TM7F2V+whzsqECetEhOwq9nYpakVVR6ES249GfF2OOE=;
-        b=uem6vwFtnIbQzVyGys5q2GOk+zdsgPgwqR+Q+TyI2U6eww4Eu5rem37e1ilxA/EJ5b
-         IGCHTSOogz+ssc5k2M4cEDyY9dHAjEm6VykLT2IdeVP5K86+h80F0m+iLsnhQbhoGSM1
-         38HHX/QTSVCXwzzEoga4eS0eQQ8X+/qs/ytl/VBdfghIU2sfEXAo3+R3HFHGtnqNDX5Z
-         gtPPKuEhQCi2qnnPrpP1pghNT90ZvKulrUcP8GuIH+d4vCk7kg08xz3hrd9JkJFvF2Yl
-         eZrX5Xfn3R1Jk8ZZebheT5ayAZlTo/Dd/25vT1gwUxGQuD6VoRS9ftX14j1L3Mg309Bs
-         D84g==
-X-Gm-Message-State: AOJu0YxHxA7u12B9kHN2RtNnh45cpZcYjdpvURhcxaSN3bdP4kObX3uQ
-	Rs/H5mwUFBwj4tbl56Wi+pcaeUCLY4Vcep4ge/XzX59WQ7bBPLURTz57zSuHeaNF3SBNPpT+C76
-	ZyzcnhClYerueD8iH
-X-Received: by 2002:a17:906:2258:b0:9ad:e66a:413f with SMTP id 24-20020a170906225800b009ade66a413fmr522599ejr.3.1695889432884;
-        Thu, 28 Sep 2023 01:23:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEPuTntWZq4jrbubxAaZ/VaidO22QNmhzvK8g+giZ+Tt7KVFKqUVF9torBrPsxrDdQaKls0VQ==
-X-Received: by 2002:a17:906:2258:b0:9ad:e66a:413f with SMTP id 24-20020a170906225800b009ade66a413fmr522583ejr.3.1695889432534;
-        Thu, 28 Sep 2023 01:23:52 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-233-183.dyn.eolo.it. [146.241.233.183])
-        by smtp.gmail.com with ESMTPSA id ck17-20020a170906c45100b00992e14af9c3sm10557001ejb.143.2023.09.28.01.23.51
+        bh=C2a6LqA41kHTYejtD6Zn0gAUZKMovtpeoJa3mXbkQMs=;
+        b=Cuoux23NPCmnRCquZyFjlM78EaXcdN0Dpf4Jh0Ldmk3otWS/Abhve+4VQ6PYijsVg5
+         L+rizXlZn9t5UBpTxRDJifjrnAJ8sFgZOoWFgmKq4QioKSNqUCh6EUj/iWpEvF+7PP2U
+         XuZAE58SDVM6Elu6IFZXRzNnh1eAqZUFNJocOaaHxse/I+h1Z/UXB+zXCrqOQWs20Bxr
+         K0VZlyN7Zz5owqzTyhHW1/V4dQeAtdNC6WkqZ7AzZhoC+lfkU8wyABwbo7NUyqPWzQ8l
+         +Yhrmj9+rSiQPuLnLo+G+T9cvAckOyMLPNJHhqckqLt2eRDeMgMdN/Wpzgo3qcmTs30S
+         xKeA==
+X-Gm-Message-State: AOJu0YxkmZSlBY+8nAoASy85Jj2nu8ZNiIYVwSP68Vrvtm719qsHwvax
+	Qt4ruaO+hjY7r3vs1t2xZ6H9sS9eur7Vw2PJqJ7p0D8u4ZMyJhUdi9QTlxwGApaGxKcMTH8Zv9R
+	HUuOJSEzEBTKh3DaO
+X-Received: by 2002:aa7:cd74:0:b0:530:df47:f172 with SMTP id ca20-20020aa7cd74000000b00530df47f172mr560775edb.15.1695889762732;
+        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHKLk8j/n8RrrFIlitg8C8yJoSVGCOYrRpk3kk1bte0swFS7RYyRzSEIwVZphn7atMruYMHzA==
+X-Received: by 2002:aa7:cd74:0:b0:530:df47:f172 with SMTP id ca20-20020aa7cd74000000b00530df47f172mr560762edb.15.1695889762404;
+        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ds11-20020a0564021ccb00b00536368246afsm71580edb.50.2023.09.28.01.29.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 01:23:51 -0700 (PDT)
-Message-ID: <619e3735d99c8642b7b84a151515c2fee99ff694.camel@redhat.com>
-Subject: Re: [PATCH net-next v5] net/core: Introduce netdev_core_stats_inc()
- for trace
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yajun Deng <yajun.deng@linux.dev>, davem@davemloft.net,
- edumazet@google.com,  kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Lobakin
-	 <aleksander.lobakin@intel.com>
-Date: Thu, 28 Sep 2023 10:23:50 +0200
-In-Reply-To: <20230919135517.286766-1-yajun.deng@linux.dev>
-References: <20230919135517.286766-1-yajun.deng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 30896E262BB; Thu, 28 Sep 2023 10:29:07 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: netdev@vger.kernel.org, bpf@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>, Christian Brauner <brauner@kernel.org>
+Subject: Persisting mounts between 'ip netns' invocations
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 28 Sep 2023 10:29:07 +0200
+Message-ID: <87a5t68zvw.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-09-19 at 21:55 +0800, Yajun Deng wrote:
-> Although there is a kfree_skb_reason() helper function that can be used t=
-o
-> find the reason why this skb is dropped, but most callers didn't increase
-> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
->=20
-> For the users, people are more concerned about why the dropped in ip
-> is increasing.
->=20
-> Introduce netdev_core_stats_inc() for trace. Also, move dev_core_stats()
-> and netdev_core_stats_alloc() to dev.c, as they are not called externally=
-.
->=20
-> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
-> v5: Access the per cpu pointer before reach the relevant offset.
-> v4: Introduce netdev_core_stats_inc() instead of export dev_core_stats_*_=
-inc()
-> v3: __cold should be added to the netdev_core_stats_alloc().
-> v2: use __cold instead of inline in dev_core_stats().
-> v1: https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@li=
-nux.dev/
-> ---
->  include/linux/netdevice.h | 21 ++++-----------------
->  net/core/dev.c            | 26 ++++++++++++++++++++++++--
->  2 files changed, 28 insertions(+), 19 deletions(-)
->=20
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index db3d8429d50d..4c258d44c7d2 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -4001,32 +4001,19 @@ static __always_inline bool __is_skb_forwardable(=
-const struct net_device *dev,
->  	return false;
->  }
-> =20
-> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct ne=
-t_device *dev);
-> -
-> -static inline struct net_device_core_stats __percpu *dev_core_stats(stru=
-ct net_device *dev)
-> -{
-> -	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() *=
-/
-> -	struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->core_stats)=
-;
-> -
-> -	if (likely(p))
-> -		return p;
-> -
-> -	return netdev_core_stats_alloc(dev);
-> -}
-> +void netdev_core_stats_inc(struct net_device *dev, u32 offset);
-> =20
->  #define DEV_CORE_STATS_INC(FIELD)						\
->  static inline void dev_core_stats_##FIELD##_inc(struct net_device *dev)	=
-	\
->  {										\
-> -	struct net_device_core_stats __percpu *p;				\
-> -										\
-> -	p =3D dev_core_stats(dev);						\
-> -	if (p)									\
-> -		this_cpu_inc(p->FIELD);						\
-> +	netdev_core_stats_inc(dev,						\
-> +			offsetof(struct net_device_core_stats, FIELD));		\
->  }
->  DEV_CORE_STATS_INC(rx_dropped)
->  DEV_CORE_STATS_INC(tx_dropped)
->  DEV_CORE_STATS_INC(rx_nohandler)
->  DEV_CORE_STATS_INC(rx_otherhost_dropped)
-> +#undef DEV_CORE_STATS_INC
-> =20
->  static __always_inline int ____dev_forward_skb(struct net_device *dev,
->  					       struct sk_buff *skb,
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 606a366cc209..4bc0161bc0d6 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10497,7 +10497,8 @@ void netdev_stats_to_stats64(struct rtnl_link_sta=
-ts64 *stats64,
->  }
->  EXPORT_SYMBOL(netdev_stats_to_stats64);
-> =20
-> -struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct ne=
-t_device *dev)
-> +static __cold struct net_device_core_stats __percpu *netdev_core_stats_a=
-lloc(
-> +		struct net_device *dev)
->  {
->  	struct net_device_core_stats __percpu *p;
-> =20
-> @@ -10510,7 +10511,28 @@ struct net_device_core_stats __percpu *netdev_co=
-re_stats_alloc(struct net_device
->  	/* This READ_ONCE() pairs with the cmpxchg() above */
->  	return READ_ONCE(dev->core_stats);
->  }
-> -EXPORT_SYMBOL(netdev_core_stats_alloc);
-> +
-> +static inline struct net_device_core_stats __percpu *netdev_core_stats(
-> +		struct net_device *dev)
+Hi everyone
 
-I'm sorry for the delayed feedback - conference and traveling in the
-way.
+I recently ran into this problem again, and so I figured I'd ask if
+anyone has any good idea how to solve it:
 
-It looks like the 'inline' keyword above is a left-over of a previous
-revision? The compiler should generate the same code even without it,
-right? If so, it should be better drop it.
+When running a command through 'ip netns exec', iproute2 will
+"helpfully" create a new mount namespace and remount /sys inside it,
+AFAICT to make sure /sys/class/net/* refers to the right devices inside
+the namespace. This makes sense, but unfortunately it has the side
+effect that no mount commands executed inside the ns persist. In
+particular, this makes it difficult to work with bpffs; even when
+mounting a bpffs inside the ns, it will disappear along with the
+namespace as soon as the process exits.
 
-Cheers,
+To illustrate:
 
-Paolo
+# ip netns exec <nsname> bpftool map pin id 2 /sys/fs/bpf/mymap
+# ip netns exec <nsname> ls /sys/fs/bpf
+<nothing>
+
+This happens because namespaces are cleaned up as soon as they have no
+processes, unless they are persisted by some other means. For the
+network namespace itself, iproute2 will bind mount /proc/self/ns/net to
+/var/run/netns/<nsname> (in the root mount namespace) to persist the
+namespace. I tried implementing something similar for the mount
+namespace, but that doesn't work; I can't manually bind mount the 'mnt'
+ns reference either:
+
+# mount -o bind /proc/104444/ns/mnt /var/run/netns/mnt/testns
+mount: /run/netns/mnt/testns: wrong fs type, bad option, bad superblock on /proc/104444/ns/mnt, missing codepage or helper program, or other error.
+       dmesg(1) may have more information after failed mount system call.
+
+When running strace on that mount command, it seems the move_mount()
+syscall returns EINVAL, which, AFAICT, is because the mount namespace
+file references itself as its namespace, which means it can't be
+bind-mounted into the containing mount namespace.
+
+So, my question is, how to overcome this limitation? I know it's
+possible to get a reference to the namespace of a running process, but
+there is no guarantee there is any processes running inside the
+namespace (hence the persisting bind mount for the netns). So is there
+some other way to persist the mount namespace reference, so we can pick
+it back up on the next 'ip netns' invocation?
+
+Hoping someone has a good idea :)
+
+-Toke
 
 
