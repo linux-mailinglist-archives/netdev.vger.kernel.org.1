@@ -1,131 +1,87 @@
-Return-Path: <netdev+bounces-36705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3017B1602
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:29:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F29E7B161A
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 10A9DB20A43
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0F575282A1D
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 08:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898D133993;
-	Thu, 28 Sep 2023 08:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E845D15B6;
+	Thu, 28 Sep 2023 08:34:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4E433989
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:29:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037A7B7
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:29:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695889766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=C2a6LqA41kHTYejtD6Zn0gAUZKMovtpeoJa3mXbkQMs=;
-	b=IxGZb+C85uau7rrcTBRtYIOOEzpu5Dfe6Kr8FFHdYQrEFXkY2SyIZxO4s6PeMVLgFIEF8u
-	1ObSAN3AnXoT3LUoA1qv102vEFSsJD4NcqMBhV86UNfUVuUnbmfGBf7LDDBHU1c27eLyF/
-	2oCZlsDOGX9jG7CF743DaaqZwUjix0w=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-ga7YOrLGNPOMgGfggoUOKA-1; Thu, 28 Sep 2023 04:29:23 -0400
-X-MC-Unique: ga7YOrLGNPOMgGfggoUOKA-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-532eb7faea1so10280690a12.2
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:29:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F73F110B
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 08:34:15 +0000 (UTC)
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D48DCAC
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:34:13 -0700 (PDT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6c4e17f37acso20037535a34.1
+        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 01:34:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695889762; x=1696494562;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C2a6LqA41kHTYejtD6Zn0gAUZKMovtpeoJa3mXbkQMs=;
-        b=Cuoux23NPCmnRCquZyFjlM78EaXcdN0Dpf4Jh0Ldmk3otWS/Abhve+4VQ6PYijsVg5
-         L+rizXlZn9t5UBpTxRDJifjrnAJ8sFgZOoWFgmKq4QioKSNqUCh6EUj/iWpEvF+7PP2U
-         XuZAE58SDVM6Elu6IFZXRzNnh1eAqZUFNJocOaaHxse/I+h1Z/UXB+zXCrqOQWs20Bxr
-         K0VZlyN7Zz5owqzTyhHW1/V4dQeAtdNC6WkqZ7AzZhoC+lfkU8wyABwbo7NUyqPWzQ8l
-         +Yhrmj9+rSiQPuLnLo+G+T9cvAckOyMLPNJHhqckqLt2eRDeMgMdN/Wpzgo3qcmTs30S
-         xKeA==
-X-Gm-Message-State: AOJu0YxkmZSlBY+8nAoASy85Jj2nu8ZNiIYVwSP68Vrvtm719qsHwvax
-	Qt4ruaO+hjY7r3vs1t2xZ6H9sS9eur7Vw2PJqJ7p0D8u4ZMyJhUdi9QTlxwGApaGxKcMTH8Zv9R
-	HUuOJSEzEBTKh3DaO
-X-Received: by 2002:aa7:cd74:0:b0:530:df47:f172 with SMTP id ca20-20020aa7cd74000000b00530df47f172mr560775edb.15.1695889762732;
-        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKLk8j/n8RrrFIlitg8C8yJoSVGCOYrRpk3kk1bte0swFS7RYyRzSEIwVZphn7atMruYMHzA==
-X-Received: by 2002:aa7:cd74:0:b0:530:df47:f172 with SMTP id ca20-20020aa7cd74000000b00530df47f172mr560762edb.15.1695889762404;
-        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ds11-20020a0564021ccb00b00536368246afsm71580edb.50.2023.09.28.01.29.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Sep 2023 01:29:22 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 30896E262BB; Thu, 28 Sep 2023 10:29:07 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: netdev@vger.kernel.org, bpf@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>, Christian Brauner <brauner@kernel.org>
-Subject: Persisting mounts between 'ip netns' invocations
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 28 Sep 2023 10:29:07 +0200
-Message-ID: <87a5t68zvw.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1695890053; x=1696494853;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5gnCChu3OPSULseuxsND/OC3A1/+wMaTTBp9NGU091g=;
+        b=Pb6di5RC1Cf8O+NtE26bE/4hpUktzzPo/fIh/E2Rem70dOD7MFVzoScYC2ERqlJAQQ
+         xhmMR32+Z1xzEvXgVFF25vWV5QIhcK2xkjZ0sDXIK+MTYOWsk7g/r6snBKvlUeCRaK7s
+         Cd1qSjxqjdQwpX0sPnQpC5pkCtzjCDn8OKdCuaWaNX83zvf1Oez6KaJkB//KUpNAHKp6
+         zXmR8jBeaUhh3iS8Btttf5eghYHk7tllfSyadhINROr4Dc7Mu00uLDbh4TSSqwRGwmTU
+         wLSBUZpnLDGAwmoeyKF8JlUZTpmW6qCEX8n0mfHIUdDKApuLNrHjchZGvzd3BJMRbEiM
+         66Fg==
+X-Gm-Message-State: AOJu0Yz2aa25BKvv12m8MtZr0KMRbEJy5l1b/kjSnfsJDGuk+phR5JTd
+	Z/UoOb1HeNnEWn8nzX63RD5MjkmQsX9ntxbOs4O+kIu1AId9
+X-Google-Smtp-Source: AGHT+IF9KchoAbdBn8cAF3kwm11v8WwkvIJGdTzNT7wPWDxuCnjFJvdAMeVTMBnzh5aDQ1IM6YlCQX0DcmnNmkK7BVifFzdxX4Sb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6830:22d2:b0:6bd:b74:2dab with SMTP id
+ q18-20020a05683022d200b006bd0b742dabmr137988otc.2.1695890053216; Thu, 28 Sep
+ 2023 01:34:13 -0700 (PDT)
+Date: Thu, 28 Sep 2023 01:34:13 -0700
+In-Reply-To: <0000000000003dcc9306031affdd@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003341ba0606672c7a@google.com>
+Subject: Re: [syzbot] [kernel?] INFO: rcu detected stall in
+ sys_clock_nanosleep (5)
+From: syzbot <syzbot+43cc00d616820666f675@syzkaller.appspotmail.com>
+To: edumazet@google.com, hdanton@sina.com, jhs@mojatatu.com, 
+	linux-kernel@vger.kernel.org, michal.kubiak@intel.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi everyone
+syzbot suspects this issue was fixed by commit:
 
-I recently ran into this problem again, and so I figured I'd ask if
-anyone has any good idea how to solve it:
+commit 8c21ab1bae945686c602c5bfa4e3f3352c2452c5
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Tue Aug 29 12:35:41 2023 +0000
 
-When running a command through 'ip netns exec', iproute2 will
-"helpfully" create a new mount namespace and remount /sys inside it,
-AFAICT to make sure /sys/class/net/* refers to the right devices inside
-the namespace. This makes sense, but unfortunately it has the side
-effect that no mount commands executed inside the ns persist. In
-particular, this makes it difficult to work with bpffs; even when
-mounting a bpffs inside the ns, it will disappear along with the
-namespace as soon as the process exits.
+    net/sched: fq_pie: avoid stalls in fq_pie_timer()
 
-To illustrate:
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12958976680000
+start commit:   6709d4b7bc2e net: nfc: Fix use-after-free caused by nfc_ll..
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2cbd298d0aff1140
+dashboard link: https://syzkaller.appspot.com/bug?extid=43cc00d616820666f675
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10858fc0a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14781270a80000
 
-# ip netns exec <nsname> bpftool map pin id 2 /sys/fs/bpf/mymap
-# ip netns exec <nsname> ls /sys/fs/bpf
-<nothing>
+If the result looks correct, please mark the issue as fixed by replying with:
 
-This happens because namespaces are cleaned up as soon as they have no
-processes, unless they are persisted by some other means. For the
-network namespace itself, iproute2 will bind mount /proc/self/ns/net to
-/var/run/netns/<nsname> (in the root mount namespace) to persist the
-namespace. I tried implementing something similar for the mount
-namespace, but that doesn't work; I can't manually bind mount the 'mnt'
-ns reference either:
+#syz fix: net/sched: fq_pie: avoid stalls in fq_pie_timer()
 
-# mount -o bind /proc/104444/ns/mnt /var/run/netns/mnt/testns
-mount: /run/netns/mnt/testns: wrong fs type, bad option, bad superblock on /proc/104444/ns/mnt, missing codepage or helper program, or other error.
-       dmesg(1) may have more information after failed mount system call.
-
-When running strace on that mount command, it seems the move_mount()
-syscall returns EINVAL, which, AFAICT, is because the mount namespace
-file references itself as its namespace, which means it can't be
-bind-mounted into the containing mount namespace.
-
-So, my question is, how to overcome this limitation? I know it's
-possible to get a reference to the namespace of a running process, but
-there is no guarantee there is any processes running inside the
-namespace (hence the persisting bind mount for the netns). So is there
-some other way to persist the mount namespace reference, so we can pick
-it back up on the next 'ip netns' invocation?
-
-Hoping someone has a good idea :)
-
--Toke
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
