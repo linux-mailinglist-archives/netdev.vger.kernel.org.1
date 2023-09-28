@@ -1,101 +1,90 @@
-Return-Path: <netdev+bounces-36844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570B17B1FDD
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:38:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9807C7B1FF4
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 16:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id B04EDB20C6F
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:38:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id B5A531C2097F
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23123F4BC;
-	Thu, 28 Sep 2023 14:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFAF3FB08;
+	Thu, 28 Sep 2023 14:45:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71C753C6A8
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 14:38:29 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5304C19D
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:38:27 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7ab8696d047so4462506241.1
-        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:38:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695911906; x=1696516706; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rLH+mn+CYz4JEjkQnO7COElnE8Isjtmmz94b2JcwmHg=;
-        b=CJN/0KnKRZ66Yy3XwNBToTSTzWGd5fQzspUlQb2zNDwY8tiBsJBjqPwcEbSYHOGgb6
-         aJo3wUL7xJaH0eAHhFctbmVEaG2CHoIna03QBXckyQOyujBCoR7QMZzrFWPBtl7RVuKW
-         o+AUjb+9kSVYohsUbbbU/JGqFSCjKcQCBreoJXGcUH1+TVyyOlL6ismHzSl/v7ovqqks
-         JDo/y+zOtq4yatgBv2XAX1c3+7/uAdhgjpZX2GPuyymsX1QVVAwspqg7HxkCg+nQWufV
-         +Qr1+qsZG9Q9HTePBErMXuPkWjsCr6OItOC2CTfk1dMVBiZoA32i+VHF+i3HKDKUyD/M
-         CftQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067AB3B2AE
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 14:45:07 +0000 (UTC)
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6D31A1
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:45:02 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso1704654366b.1
+        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 07:45:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695911906; x=1696516706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLH+mn+CYz4JEjkQnO7COElnE8Isjtmmz94b2JcwmHg=;
-        b=GuFw1z7ebEiTsRddRtat4z86hbdj4O5id+cqF8lQQX4p+DVw5WhDqw10jo0KCWNmxn
-         W46ToUU+Fv1rx4I2bycrXKasUSyonZpIpX1DiKKeDZzDz9cEAV/MuztVkCnULfC1nBWL
-         y78fr7rA7vP5CW0d/rezjU4ru8GOGakW/DqAa0449szwnMiIbOkYjM3QSEtzVgzjCjqH
-         /FBjZRni+atOz3BrnNJaCh3OVRDS7tg0VeFjFeMEH3Knh+f0GMZ/0IMIhxuXpM4Bbdta
-         rvLF3y+9aAr+aB3GBykYOBh3F3M5FgavpFtgafmvLBzwpq2Fagn2ZB7n35c1N2dsL9ZN
-         iv3Q==
-X-Gm-Message-State: AOJu0YyYysQ1D8Qb+zeoeuOVVxLqR76SVdm2ellZb1qoyB0xBU9ihm6K
-	1towo0bCd6cFOloHj1F9pqAaoNugWoRLW1h+4tegPA==
-X-Google-Smtp-Source: AGHT+IEyzAdLXC2ZpeO4qFRix4x2XjOp+tODTuU6Z3a2feIIEIQ2TQTNcRkLELFSLJUxjEr7u8rN0dzSgvz7Ee/wo/0=
-X-Received: by 2002:a67:f88a:0:b0:452:cfeb:1613 with SMTP id
- h10-20020a67f88a000000b00452cfeb1613mr1291851vso.23.1695911906290; Thu, 28
- Sep 2023 07:38:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695912301; x=1696517101;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=91dHlTlXNCIf2/mTTpM1oLN+DVcQdYlY6t1IKajEJ48=;
+        b=mAVJjkTRhj6AJGjmtYL8hZDN02Lb4Sl7U9wbTc8OFarD66IpLXFFhc+T7WcA2unRgj
+         eKywae3awewfI+0yo7P8QegA5GVhKbhcB5NYMxD1vlgl5VqZeAHoUGv/JQ1c/X6c20RB
+         hpoEwBtAGten2wzjJ2zGxWnOX5RoV66erJiVbKStUho0n2n9XQYE5FoyMKW7bIGcFuJk
+         eEW2TxR8MydfmLolkRABP1rVNMUC2fYWF8Iq79LtQl9oSvURwcOs+5yMD7wGbIm17IwU
+         FjMCDeRW3a1FamGS6JOmAG0Br0j5q0wh/kvkqemcVSrwbnfRGqtaRcKPAPvkou3i1bgY
+         yv1w==
+X-Gm-Message-State: AOJu0YzdOruiKv19euyH9kbaYX/7gu0mCeGMP1/Ho2gYbIy7cJzlAGAK
+	l7VdjeauD36DLvXqq64dxFjo53tdF7E=
+X-Google-Smtp-Source: AGHT+IHYqxQxZf8S662gQpm5gCNZbGDbn0SdYAP38R13WnumWtKByWRBZwq7ma/hMwWINnHBsIv67A==
+X-Received: by 2002:a17:907:2e01:b0:99b:ed44:1a79 with SMTP id ig1-20020a1709072e0100b0099bed441a79mr1392581ejc.3.1695912300897;
+        Thu, 28 Sep 2023 07:45:00 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-001.fbsv.net. [2a03:2880:31ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id bu10-20020a170906a14a00b0099bd7b26639sm11047960ejb.6.2023.09.28.07.45.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Sep 2023 07:45:00 -0700 (PDT)
+Date: Thu, 28 Sep 2023 07:44:58 -0700
+From: Breno Leitao <leitao@debian.org>
+To: jlbec@evilplan.org, hch@lst.de
+Cc: netdev@vger.kernel.org
+Subject: configfs: Create config_item from netconsole
+Message-ID: <ZRWRal5bW93px4km@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927151501.1549078-1-ncardwell.sw@gmail.com>
- <20230927151501.1549078-2-ncardwell.sw@gmail.com> <CAMaK5_gz=B5wJhaC5MtgwiQi9Tm8fkhLdiWQLz9DX+jf0S7P=Q@mail.gmail.com>
-In-Reply-To: <CAMaK5_gz=B5wJhaC5MtgwiQi9Tm8fkhLdiWQLz9DX+jf0S7P=Q@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 28 Sep 2023 10:38:09 -0400
-Message-ID: <CADVnQymiStUHkzmrTrm_uzt1Cw-NgZ_4MuF5+BptArJfGRFQsA@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] tcp: fix delayed ACKs for MSS boundary condition
-To: Xin Guo <guoxin0309@gmail.com>
-Cc: Neal Cardwell <ncardwell.sw@gmail.com>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>, 
-	Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023, 4:53=E2=80=AFAM Xin Guo <guoxin0309@gmail.com> wrote:
->
-> Hi Neal:
-> Cannot understand "if an app reads > 1*MSS data" , " If an app reads <
-> 1*MSS data" and " if an app reads exactly 1*MSS of data" in the commit
-> message.
-> In my view, it should be like:"if an app reads and received data > 1*MSS"=
-,
-> " If an app reads and received data < 1*MSS" and " if an app reads and
-> received data exactly 1*MSS".
+Right now there is a limitation in netconsole, where it is impossible to
+disable or modify the target created from the command line parameter.
+(netconsole=...).
 
-AFAICT your suggestion for tweaking the commit message - "if an app
-reads and received" - would be redundant.  Our proposed phrase, "if an
-app reads", is sufficient, because a read of a certain amount of data
-automatically implies that the data has been received. That is, the
-"and received" part is implied already. After all, how would an app
-read data if it has not been received? :-)
+"netconsole" cmdline parameter sets the remote IP, and if the remote IP
+changes, the machine needs to be rebooted (with the new remote IP set in
+the command line parameter).
 
-best regards,
-neal
+I am planning to reuse the dynamic netconsole mechanism for
+the 'command line' target, i.e., create a `cmdline` configfs_item for
+the "command line" target, so, the user can modify the "command line"
+target in configfs in runtime. Something as :
+
+	echo 0 > /sys/kernel/config/netconsole/cmdline/enabled
+	echo <new-IP> > /sys/kernel/config/netconsole/cmdline/remote_ip
+	echo 1 > /sys/kernel/config/netconsole/cmdline/enabled
+
+I didn't find a configfs API to register a configfs_item into a
+config_group. Basically the make_item() callbacks are called once the
+inode is created by the user at mkdir(2) time, but now I need to create
+it at the driver initialization.
+
+Should I create a configfs_register_item() to solve this problem?
+
+Thanks!
 
