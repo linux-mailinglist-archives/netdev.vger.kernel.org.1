@@ -1,124 +1,83 @@
-Return-Path: <netdev+bounces-36732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9467B1823
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:16:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E84AF7B182C
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4AAB71C20869
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:16:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 22C911C208B0
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 963B1347D8;
-	Thu, 28 Sep 2023 10:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C8C2E656;
+	Thu, 28 Sep 2023 10:20:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DA98821
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 10:16:23 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D2C122;
-	Thu, 28 Sep 2023 03:16:21 -0700 (PDT)
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 38SAG7dm118169;
-	Thu, 28 Sep 2023 05:16:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1695896167;
-	bh=oXfJqYkBnSRsMgAuu0wHSkWa8/uJ4JIwbOSV//aCu9g=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=Cu0feTflp8Drj3oJXROZjWP1584/TVeydkttB1NgXtHsTjldVgp+MQZ4nc/O5Mryw
-	 a7DsNwMf/JwoZGfC/Eg7q8uE1Q5piu7/ULbBKp68+DnpjWEmi3BqctFwcxR6vsYqWo
-	 jqkjAVzfBdEn201kvKKIMC0v/zOm2fII9mhRKGa0=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 38SAG76f042215
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 28 Sep 2023 05:16:07 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 28
- Sep 2023 05:16:07 -0500
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 28 Sep 2023 05:16:06 -0500
-Received: from [10.24.69.199] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 38SAG1nT065174;
-	Thu, 28 Sep 2023 05:16:02 -0500
-Message-ID: <5d27cf14-3df6-1771-9323-c54ede6db587@ti.com>
-Date: Thu, 28 Sep 2023 15:46:01 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B023418E
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 10:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 30361C433C9;
+	Thu, 28 Sep 2023 10:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695896425;
+	bh=1Fx/lpeAsDZXfWVv9FZEZCoKvSS5OX8M+5Pu3qaE6Kc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EMQRkxLE1Ha5DjqSg7GWCFM0sVdLYjEYn7ie4MBw8lXoO1BC4i3Sces9isPMA0sgH
+	 ZuVuJb8rSeMXgMtqnU5/9u6UI8IV7ioNZx7n5pHGFW8BJPeVX4uzuTwqDqwRtaiI6n
+	 Hyi1zRuRyhUTg+CMLggF6Tl07pd/2RQoJniykwilnNmDaCUsHz1FqQvMZo+zpGkEz6
+	 PP7I3r3Y2oY1NBDvZecUdBmPbGtq2eHWppqSSbQpNJmXASIlSM8Ue7R95RjwJ8gJmK
+	 qXmbISEh12uTyXDoJZazOaAlkufjyBGyNDIpKEN0pBbakGqfqbz6KHk8JmVKhjhaCM
+	 LQysQKcXxhXGQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 19022E29B00;
+	Thu, 28 Sep 2023 10:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v2] net: ti: icssg_prueth: add TAPRIO offload
- support
-Content-Language: en-US
-To: Roger Quadros <rogerq@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>, <vladimir.oltean@nxp.com>,
-        Simon Horman <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <r-gunasekaran@ti.com>, Roger Quadros <rogerq@ti.com>
-References: <20230921070031.795788-1-danishanwar@ti.com>
- <b3248b40-38a1-47b0-a61d-e81a451fa0a7@kernel.org>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <b3248b40-38a1-47b0-a61d-e81a451fa0a7@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-5.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] ethernet/intel: Use list_for_each_entry() helper
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169589642509.32188.11314004773369005865.git-patchwork-notify@kernel.org>
+Date: Thu, 28 Sep 2023 10:20:25 +0000
+References: <20230919170409.1581074-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230919170409.1581074-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, ruanjinjie@huawei.com,
+ jacob.e.keller@intel.com, rafal.romanowski@intel.com
 
-On 21/09/23 16:12, Roger Quadros wrote:
-> Hi Danish,
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 19 Sep 2023 10:04:09 -0700 you wrote:
+> From: Jinjie Ruan <ruanjinjie@huawei.com>
 > 
-> On 21/09/2023 10:00, MD Danish Anwar wrote:
+> Convert list_for_each() to list_for_each_entry() where applicable.
 > 
-> Can you please retain patch authorhsip?
+> No functional changed.
 > 
->> ICSSG dual-emac f/w supports Enhanced Scheduled Traffic (EST – defined
->> in P802.1Qbv/D2.2 that later got included in IEEE 802.1Q-2018)
->> configuration. EST allows express queue traffic to be scheduled
->> (placed) on the wire at specific repeatable time intervals. In
->> Linux kernel, EST configuration is done through tc command and
->> the taprio scheduler in the net core implements a software only
->> scheduler (SCH_TAPRIO). If the NIC is capable of EST configuration,
->> user indicate "flag 2" in the command which is then parsed by
->> taprio scheduler in net core and indicate that the command is to
->> be offloaded to h/w. taprio then offloads the command to the
->> driver by calling ndo_setup_tc() ndo ops. This patch implements
->> ndo_setup_tc() to offload EST configuration to ICSSG.
->>
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Vignesh Raghavendra <vigneshr@ti.com>
->> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->> ---
-
-[ ... ]
-
->> +	if (!netif_running(ndev)) {
->> +		netdev_err(ndev, "interface is down, link speed unknown\n");
->> +		return -ENETDOWN;
->> +	}
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 > 
-> Do we really need this?
+> [...]
 
-I don't think this is needed. I will drop this and spin next revision.
+Here is the summary with links:
+  - [net-next] ethernet/intel: Use list_for_each_entry() helper
+    https://git.kernel.org/netdev/net-next/c/c1fec890458a
 
+You are awesome, thank you!
 -- 
-Thanks and Regards,
-Danish
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
