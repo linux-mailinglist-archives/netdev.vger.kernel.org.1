@@ -1,44 +1,46 @@
-Return-Path: <netdev+bounces-36799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB2B7B1CBA
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:42:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 522DE7B1D25
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 14:57:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 954F82829C6
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:42:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 09CBC28215B
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CE50374FF;
-	Thu, 28 Sep 2023 12:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5997D38DE9;
+	Thu, 28 Sep 2023 12:57:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7058BF4
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 12:42:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2714C433C8;
-	Thu, 28 Sep 2023 12:42:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695904971;
-	bh=Jtx2o5xpKA5SOo7oGfW5jDPzdyBgHKowCU3rfSEsVTI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C4/BsBeoFQD46BDCiT2rFr/Fj9dPITWOizkTbzv46Jnol47La5IGJPIlL64Bb6hiA
-	 NQA8/OXZrkAZjAID6n9FOewpK8lXR1SJh5BELq/lTu63nNmJ3XT1v7yMgd0mU5Ce3u
-	 jVLGlR1lBJyh7wQLqY7bUzP2b8sQxT6ic6xPjXmlN6yqXpaw7JtLpeiRW1bIcPJAKO
-	 +3KoOoSy4IbFL52u9weYQsfjfSLBSbJ7ou3Of7/gMCmFIdBga1JFLf261+aJcYG0sb
-	 JWOHTo0B03Qj0tJR7s0VBJKIbKhru8Mq/2a9L4tfT++gVI9/VP6qJjltc2DKdUYbK2
-	 0+LC27BC8HGRQ==
-Date: Thu, 28 Sep 2023 14:42:36 +0200
-From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Vadim Pasternak <vadimp@nvidia.com>, mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 0/3] mlxsw: Provide enhancements and new feature
-Message-ID: <20230928124236.GI24230@kernel.org>
-References: <cover.1695396848.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6750D38DD8
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 12:57:34 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B11B180;
+	Thu, 28 Sep 2023 05:57:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/gAK+0HU4BRJbpDbE0lx3+xHhzKN8MJD+iMJ8Z2LG5c=; b=6YfhPlsRClQsXgn5a+7EhGiYL0
+	rgJ66LHggseErlxf/K8GhMXe6ioHrM10HSWjXgR/gcwhFrEZcicF6lyOEoacQvPLGXoHtzecVDmZ3
+	kxuNJVwfiu/96/A5Ne/4JJdIAAYHOMwVkwqx87ZIaQhiNhRmor9XxUYeljFSPjW0b1QQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qlqZt-007k9v-14; Thu, 28 Sep 2023 14:57:13 +0200
+Date: Thu, 28 Sep 2023 14:57:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Justin Lai <justinlai0215@realtek.com>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pkshih@realtek.com, larry.chiu@realtek.com
+Subject: Re: [PATCH net-next v9 02/13] net:ethernet:realtek:rtase: Implement
+ the .ndo_open function
+Message-ID: <714dbb7d-3fb8-481e-aba1-01a1be992950@lunn.ch>
+References: <20230928104920.113511-1-justinlai0215@realtek.com>
+ <20230928104920.113511-3-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,31 +49,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1695396848.git.petrm@nvidia.com>
+In-Reply-To: <20230928104920.113511-3-justinlai0215@realtek.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Sep 22, 2023 at 07:18:35PM +0200, Petr Machata wrote:
-> Vadim Pasternak writes:
-> 
-> Patch #1 - Optimize transaction size for efficient retrieval of module
->            data.
-> Patch #3 - Enable thermal zone binding with new cooling device.
-> Patch #4 - Employ standard macros for dividing buffer into the chunks.
-> 
-> Vadim Pasternak (3):
->   mlxsw: reg: Limit MTBR register payload to a single data record
->   mlxsw: core: Extend allowed list of external cooling devices for
->     thermal zone binding
->   mlxsw: i2c: Utilize standard macros for dividing buffer into chunks
-> 
->  drivers/net/ethernet/mellanox/mlxsw/core_env.c     | 2 +-
->  drivers/net/ethernet/mellanox/mlxsw/core_hwmon.c   | 2 +-
->  drivers/net/ethernet/mellanox/mlxsw/core_thermal.c | 1 +
->  drivers/net/ethernet/mellanox/mlxsw/i2c.c          | 4 +---
->  drivers/net/ethernet/mellanox/mlxsw/reg.h          | 6 +++---
->  5 files changed, 7 insertions(+), 8 deletions(-)
+> diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h b/drivers/net/ethernet/realtek/rtase/rtase.h
+> index bae04cfea060..5314fceb72a2 100644
+> --- a/drivers/net/ethernet/realtek/rtase/rtase.h
+> +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+> @@ -51,8 +51,6 @@
+>  
+>  #define RX_BUF_SIZE (1522 + 1)
+>  
+> -#define IVEC_NAME_SIZE IFNAMSIZ + 10
+> -
+>  /*****************************************************************************/
+>  enum rtase_registers {
+>  	RTASE_MAC0   = 0x0000,
+> @@ -261,6 +259,8 @@ union rx_desc {
+>  #define RTASE_IDLESLOPE_INT_SHIFT 25
+>  #define RTASE_IDLESLOPE_INT_MASK  GENMASK(31, 25)
+>  
+> +#define IVEC_NAME_SIZE IFNAMSIZ + 10
+> +
 
-For series,
+Please try to avoid moving things around which you just added in the
+previous patch.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> +static int rtase_open(struct net_device *dev)
+> +{
+> +	struct rtase_private *tp = netdev_priv(dev);
+> +	struct rtase_int_vector *ivec = &tp->int_vector[0];
+> +	const struct pci_dev *pdev = tp->pdev;
+> +	int ret;
+> +	u16 i;
+> +
 
+> +	netif_carrier_on(dev);
+> +	netif_wake_queue(dev);
+> +	netdev_info(dev, "link up\n");
+
+No need to spam the log with this. Given the hardware architecture,
+the link is always going to be up.
+
+    Andrew
 
