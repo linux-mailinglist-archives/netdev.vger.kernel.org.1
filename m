@@ -1,103 +1,162 @@
-Return-Path: <netdev+bounces-36728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441827B17F9
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 11:59:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD3BA7B1806
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 12:04:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1B65C1C20958
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 09:59:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7A74D281AFA
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 10:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1B1347C5;
-	Thu, 28 Sep 2023 09:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F73347C7;
+	Thu, 28 Sep 2023 10:04:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823822E65C;
-	Thu, 28 Sep 2023 09:59:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6806DC433C7;
-	Thu, 28 Sep 2023 09:59:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1695895168;
-	bh=9srMMotEqbhbBuL+dYXb0BtYM8i9fxU6uHTLigNDg/E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Mu8PV3nmlz33FGq3etKSxi+cMml8leJ/Li1y7N5wrOdfIOj2FZyuUlbyHAa5ZeV4r
-	 XTIhuq+zf4wUpLusnjDuPBc6IWKHEoZbWl5WSAUGep+xKmDMaHjFqNWcGDHAPqTt5I
-	 e7s6grZP5ija4rCqRIpRPQVLMxv9MGdEI+FmiGBiZBS6vCm6ttVdBo5esxqIiPM84H
-	 UAD6mfR9lHciesi4gxZbfAt1m6ICIjDv56CUolSFnUrMbLt2ObZjWKGMNDrn/JSEZx
-	 EFRY1h9sSgOtEfbRMfYGH3vcrcl5xJSuhAGspGiK+ZZf//0LkU1WWWOpoydA10FxRE
-	 VCWzYgOJBr2kw==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
- <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
- <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
- <pulehui@huaweicloud.com>
-Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
-In-Reply-To: <20230919035711.3297256-5-pulehui@huaweicloud.com>
-References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
- <20230919035711.3297256-5-pulehui@huaweicloud.com>
-Date: Thu, 28 Sep 2023 11:59:24 +0200
-Message-ID: <87lecqobyb.fsf@all.your.base.are.belong.to.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6C11D68A
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 10:04:44 +0000 (UTC)
+Received: from out-209.mta1.migadu.com (out-209.mta1.migadu.com [IPv6:2001:41d0:203:375::d1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FAF122
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 03:04:41 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1695895480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Aw98XHwV4z0PxcVRxJq+PgUKGG9cHNgr+8sDuBaS/1Q=;
+	b=TBb/rvo4iC5NqzUiXAVJQLeGsn6GGRPy0R0UkLLMRmkRNBF0HbzkNMfNirj/11yxliPIab
+	WfzLsmayk/t3sK6Udti6nVip0XT0zFJuEm8E3sZbMLPsAdA7EYG/SKUu4J53K58rxvBOYz
+	Dk4VQl/feq6BmK6XhRu5P+mXndxuwEk=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH v6] net/core: Introduce netdev_core_stats_inc()
+Date: Thu, 28 Sep 2023 18:04:18 +0800
+Message-Id: <20230928100418.521594-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
+Although there is a kfree_skb_reason() helper function that can be used to
+find the reason why this skb is dropped, but most callers didn't increase
+one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
 
-> From: Pu Lehui <pulehui@huawei.com>
->
-> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
-> the TCC can be propagated from the parent process to the subprocess, but
-> the TCC of the parent process cannot be restored when the subprocess
-> exits. Since the RV64 TCC is initialized before saving the callee saved
-> registers into the stack, we cannot use the callee saved register to
-> pass the TCC, otherwise the original value of the callee saved register
-> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
-> similar to x86_64, i.e. using a non-callee saved register to transfer
-> the TCC between functions, and saving that register to the stack to
-> protect the TCC value. At the same time, we also consider the scenario
-> of mixing trampoline.
+For the users, people are more concerned about why the dropped in ip
+is increasing.
 
-Hi!
+Introduce netdev_core_stats_inc() for trace the caller of the dropped
+skb. Also, add __code to netdev_core_stats_alloc(), as it's called
+unlinkly.
 
-The RISC-V JIT tries to minimize the stack usage, e.g. it doesn't have a
-fixed pro/epilogue like some of the other JITs. I think we can do better
-here, so that the pass-TCC-via-register can be used, and the additional
-stack access can be avoided.
+Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+v6: merge netdev_core_stats and netdev_core_stats_inc together
+v5: Access the per cpu pointer before reach the relevant offset.
+v4: Introduce netdev_core_stats_inc() instead of export dev_core_stats_*_inc()
+v3: __cold should be added to the netdev_core_stats_alloc().
+v2: use __cold instead of inline in dev_core_stats().
+v1: https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@linux.dev/
+---
+ include/linux/netdevice.h | 21 ++++-----------------
+ net/core/dev.c            | 17 +++++++++++++++--
+ 2 files changed, 19 insertions(+), 19 deletions(-)
 
-Today, the TCC is passed via a register (a6) and can be viewed as a
-"state" variable/transparent argument/return value. As you point out, we
-loose this when we do a call. On (any) calls we move the TCC to a
-callee-saved register.
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 7e520c14eb8c..eb1fa04fbccc 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4002,32 +4002,19 @@ static __always_inline bool __is_skb_forwardable(const struct net_device *dev,
+ 	return false;
+ }
+ 
+-struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev);
+-
+-static inline struct net_device_core_stats __percpu *dev_core_stats(struct net_device *dev)
+-{
+-	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
+-	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
+-
+-	if (likely(p))
+-		return p;
+-
+-	return netdev_core_stats_alloc(dev);
+-}
++void netdev_core_stats_inc(struct net_device *dev, u32 offset);
+ 
+ #define DEV_CORE_STATS_INC(FIELD)						\
+ static inline void dev_core_stats_##FIELD##_inc(struct net_device *dev)		\
+ {										\
+-	struct net_device_core_stats __percpu *p;				\
+-										\
+-	p = dev_core_stats(dev);						\
+-	if (p)									\
+-		this_cpu_inc(p->FIELD);						\
++	netdev_core_stats_inc(dev,						\
++			offsetof(struct net_device_core_stats, FIELD));		\
+ }
+ DEV_CORE_STATS_INC(rx_dropped)
+ DEV_CORE_STATS_INC(tx_dropped)
+ DEV_CORE_STATS_INC(rx_nohandler)
+ DEV_CORE_STATS_INC(rx_otherhost_dropped)
++#undef DEV_CORE_STATS_INC
+ 
+ static __always_inline int ____dev_forward_skb(struct net_device *dev,
+ 					       struct sk_buff *skb,
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 606a366cc209..88a32c392c1d 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10497,7 +10497,8 @@ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
+ }
+ EXPORT_SYMBOL(netdev_stats_to_stats64);
+ 
+-struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
++static __cold struct net_device_core_stats __percpu *netdev_core_stats_alloc(
++		struct net_device *dev)
+ {
+ 	struct net_device_core_stats __percpu *p;
+ 
+@@ -10510,7 +10511,19 @@ struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device
+ 	/* This READ_ONCE() pairs with the cmpxchg() above */
+ 	return READ_ONCE(dev->core_stats);
+ }
+-EXPORT_SYMBOL(netdev_core_stats_alloc);
++
++void netdev_core_stats_inc(struct net_device *dev, u32 offset)
++{
++	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
++	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
++
++	if (unlikely(!p))
++		p = netdev_core_stats_alloc(dev);
++
++	if (p)
++		(*(unsigned long *)((void *)this_cpu_ptr(p) + offset))++;
++}
++EXPORT_SYMBOL_GPL(netdev_core_stats_inc);
+ 
+ /**
+  *	dev_get_stats	- get network device statistics
+-- 
+2.25.1
 
-WDYT about the following scheme:
-
-1 Pickup the arm64 bpf2bpf/tailmix mechanism of just clearing the TCC
-  for the main program.
-2 For BPF helper calls, move TCC to s6, perform the call, and restore
-  a6. Dito for kfunc calls (BPF_PSEUDO_KFUNC_CALL).
-3 For all other calls, a6 is passed transparently.
-
-For 2 bpf_jit_get_func_addr() can be used to determine if the callee is
-a BPF helper or not.
-
-In summary; Determine in the JIT if we're leaving BPF-land, and need to
-move the TCC to a callee-saved reg, or not, and save us a bunch of stack
-store/loads.
-
-
-Bj=C3=B6rn
 
