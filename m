@@ -1,181 +1,342 @@
-Return-Path: <netdev+bounces-36937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 715197B26F0
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 23:00:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B5C07B2743
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 23:14:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id B5498B20B27
-	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 21:00:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 4BB2EB20BF3
+	for <lists+netdev@lfdr.de>; Thu, 28 Sep 2023 21:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB718839;
-	Thu, 28 Sep 2023 21:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7B416416;
+	Thu, 28 Sep 2023 21:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3329CA79
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 21:00:36 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A581019D;
-	Thu, 28 Sep 2023 14:00:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695934833; x=1727470833;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6plKqUY39TQMJV0iebt7XT6W09lt/hQ5+xdiVKqIraw=;
-  b=YW3a7rmJ+9jpZ+pW+HKjkD8JvdjD7VDOQphLl2iDjUJejPKh0+B2UZx6
-   kPg99BkDNSnbZCNXXN96bN13cxKT3gn0QSy+f3H5h5rubaTMTwo92hI7L
-   HbRNSDEBpp1MMu/vLAyuBFERBSKhjO8SFTxYv68WUxCR3O1vcdIGLkctQ
-   aLlG0wiW3Sa9kjSyd8r5HGhhAS8HeOySJOUIf6SVpwtwGK1XcR8GdnY5W
-   QNR/M4FbfosPLc/Qd3KP8RKCcctCf/LBgRj52KK5yW9eoCX5yQnFejS23
-   2PnNrsHKtLHzJNuTn3le+7E9tzhR9cCQyfQ4YF12Cmch5xwtFk/tiaRHt
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="386040043"
-X-IronPort-AV: E=Sophos;i="6.03,185,1694761200"; 
-   d="scan'208";a="386040043"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2023 14:00:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10847"; a="873436155"
-X-IronPort-AV: E=Sophos;i="6.03,185,1694761200"; 
-   d="scan'208";a="873436155"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 28 Sep 2023 14:00:30 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qly7X-0001xJ-3B;
-	Thu, 28 Sep 2023 21:00:27 +0000
-Date: Fri, 29 Sep 2023 05:00:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
-	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
-Subject: Re: [PATCH net-next v9 12/13] net:ethernet:realtek: Update the
- Makefile and Kconfig in the realtek folder
-Message-ID: <202309290449.7BfzQ7jq-lkp@intel.com>
-References: <20230928104920.113511-13-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35B8B15AD9;
+	Thu, 28 Sep 2023 21:14:19 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16DDDF3;
+	Thu, 28 Sep 2023 14:14:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=Djf5vC9R2QQRJ5sa4M5AHJ2h7xGGZ+DqCUCd25RvJM8=; b=agMja51AJkiVlJue+tH+NWnpUp
+	Hg2K0tCkNhHPLI9wH5MR8wksCqdQgP9bDBXEz7LfbZa1rva89y/F7Cazpsz0Mm4gVZxy6wuVBv9M3
+	BC0/qPspeJt7FhPUidpMkzNz+BOou/qbJu0glpiLyzv+ahdtdBdxtV3lSsOp8vlvgEicwfLFJEx5V
+	k6tmI5Lhe4sTCQwveIWaiLe5/yA2aHwuOli41TzqGMZyAPIelFYDpZ9Gyb1vHGYqdHn1bzZFfrAHD
+	ndAvkVgw4yzoVlBh70lDO5EDwFo3ABapJ3D8CKyT03es+u1EEiXHNRTW9nlXrx6U36HKijBtt49ol
+	tXvlp1bg==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qlyKu-000Bkz-Cy; Thu, 28 Sep 2023 23:14:16 +0200
+Received: from [178.197.248.41] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qlyKt-000PSo-S3; Thu, 28 Sep 2023 23:14:16 +0200
+Subject: Re: [PATCH bpf-next 1/8] meta, bpf: Add bpf programmable meta device
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@kernel.org>,
+ bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, martin.lau@kernel.org, razor@blackwall.org,
+ ast@kernel.org, andrii@kernel.org, john.fastabend@gmail.com
+References: <20230926055913.9859-1-daniel@iogearbox.net>
+ <20230926055913.9859-2-daniel@iogearbox.net> <877coa8xp2.fsf@toke.dk>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <11c6240c-ab6b-fba3-d84a-824b3fa36ac9@iogearbox.net>
+Date: Thu, 28 Sep 2023 23:14:14 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230928104920.113511-13-justinlai0215@realtek.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+In-Reply-To: <877coa8xp2.fsf@toke.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27045/Thu Sep 28 09:39:25 2023)
+X-Spam-Status: No, score=-3.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Justin,
+On 9/28/23 11:16 AM, Toke Høiland-Jørgensen wrote:
+> Daniel Borkmann <daniel@iogearbox.net> writes:
+> 
+>> This work adds a new, minimal BPF-programmable device called "meta" we
+>> recently presented at LSF/MM/BPF. The latter name derives from the Greek
+>> μετά, encompassing a wide array of meanings such as "on top of", "beyond".
+>> Given business logic is defined by BPF, this device can have many meanings.
+>> The core idea is that BPF programs are executed within the drivers xmit
+>> routine and therefore e.g. in case of containers/Pods moving BPF processing
+>> closer to the source.
+> 
+> I like the concept, but I think we should change the name (as I believe
+> I also mentioned back when you presented it at LSF/MM/BPF). I know this
+> is basically bikeshedding, but I nevertheless think it is important, for
+> a couple of reasons:
+> 
+> - As you say, meta has a specific meaning, and this device is not a
+>    "meta" device in the common sense of the word: it is not tied to other
+>    devices (so it's not 'on top of' anything), and it is not "about"
+>    anything (as in metadata). It is just a device type that is programmed
+>    by BPF, so let's call it that.
+> 
+> - It's not discoverable; how are people supposed to figure out that they
+>    should go look for a 'meta' device? We also already have multiple
+>    things called 'metadata', so this is just going to create even more
+>    confusion (as we also discussed in relation to 'xdp hints').
+> 
+> - It squats on a pretty widely used term throughout the kernel
+>    (CONFIG_META, 'meta' as the module name). This is related to the above
+>    point; seeing something named 'meta' in lsmod, the natural assumption
+>    wouldn't be that it's a network driver.
+> 
+> I think we should just name the driver 'bpfnet'; it's not pretty, but
+> it's obvious and descriptive. Optionally we could teach 'ip' to
+> understand just 'bpf' as the device type, so you could go 'ip link add
+> type bpf' and get one of these.
 
-kernel test robot noticed the following build warnings:
+I'll think about it, the bpfnet sounds terrible as you also noticed. I
+definitely don't like that. Perhaps meta_net as suggested by Andrii in
+the other thread could be a compromise. Need to sleep over it, my pref
+was actually to keep it shorter.
 
-[auto build test WARNING on net-next/main]
+>> One of the goals was that in case of Pod egress traffic, this allows to
+>> move BPF programs from hostns tcx ingress into the device itself, providing
+>> earlier drop or forward mechanisms, for example, if the BPF program
+>> determines that the skb must be sent out of the node, then a redirect to
+>> the physical device can take place directly without going through per-CPU
+>> backlog queue. This helps to shift processing for such traffic from softirq
+>> to process context, leading to better scheduling decisions and better
+>> performance.
+> 
+> So my only reservation to having this tied to a BPF-only device like
+> this is basically that if this is indeed such a big win, shouldn't we
+> try to make the stack operate in this mode by default? I assume you did
+> the analysis of what it would take to change veth to operate in this
+> mode; so what was the reason you decided to create a new device type
+> instead?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20230928-185229
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230928104920.113511-13-justinlai0215%40realtek.com
-patch subject: [PATCH net-next v9 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
-config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20230929/202309290449.7BfzQ7jq-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20230929/202309290449.7BfzQ7jq-lkp@intel.com/reproduce)
+There are multiple virtual device flavors and veth is not the sole one. Could
+other virtual devices have been extended into veth? Perhaps, but it doesn't
+mean it should. veth has very much connotation of L2 and device pair. In this
+case here the core of it is around having BPF logic as part of the xmit logic
+(with default policies when no BPF is attached), being able to have L3 mode
+and having the option to use them as paired devices but also as just single/
+standalone one which we plan to push as next step after this series.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202309290449.7BfzQ7jq-lkp@intel.com/
+> Some comments on the code below:
+> 
+>> --- /dev/null
+>> +++ b/drivers/net/meta.c
+>> @@ -0,0 +1,734 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/* Copyright (c) 2023 Isovalent */
+>> +
+>> +#include <linux/netdevice.h>
+>> +#include <linux/ethtool.h>
+>> +#include <linux/etherdevice.h>
+>> +#include <linux/filter.h>
+>> +#include <linux/netfilter_netdev.h>
+>> +#include <linux/bpf_mprog.h>
+>> +
+>> +#include <net/meta.h>
+>> +#include <net/dst.h>
+>> +#include <net/tcx.h>
+>> +
+>> +#define DRV_NAME	"meta"
+>> +#define DRV_VERSION	"1.0"
+> 
+> Looking at veth as an example, this will probably never get updated :)
+> 
+> So wouldn't it be better to use the kernel version as the driver
+> version? That way there will at least be some information in this field.
+> I guess we could make the same change for veth.
 
-All warnings (new ones prefixed by >>):
+That's fine, I can change it to something more useful.
 
-   drivers/net/ethernet/realtek/rtase/rtase_main.c: In function 'rtase_open':
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:1140:25: warning: 'snprintf' argument 4 may overlap destination object 'dev' [-Wrestrict]
-    1140 |                         snprintf(ivec->name, sizeof(ivec->name), "%s_int%i", dev->name, i);
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/realtek/rtase/rtase_main.c:1105:42: note: destination object referenced by 'restrict'-qualified argument 1 was declared here
-    1105 | static int rtase_open(struct net_device *dev)
-         |                       ~~~~~~~~~~~~~~~~~~~^~~
+[...]
+>> +static netdev_tx_t meta_xmit(struct sk_buff *skb, struct net_device *dev)
+>> +{
+>> +	struct meta *meta = netdev_priv(dev);
+>> +	enum meta_action ret = READ_ONCE(meta->policy);
+>> +	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
+>> +	const struct bpf_mprog_entry *entry;
+>> +	struct net_device *peer;
+>> +
+>> +	rcu_read_lock();
+>> +	peer = rcu_dereference(meta->peer);
+>> +	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
+>> +		     !pskb_may_pull(skb, ETH_HLEN) ||
+>> +		     skb_orphan_frags(skb, GFP_ATOMIC)))
+>> +		goto drop;
+>> +	meta_scrub_minimum(skb);
+>> +	skb->dev = peer;
+>> +	entry = rcu_dereference(meta->active);
+>> +	if (entry)
+>> +		ret = meta_run(meta, entry, skb, ret);
+>> +	switch (ret) {
+>> +	case META_NEXT:
+>> +	case META_PASS:
+>> +		skb->pkt_type = PACKET_HOST;
+>> +		skb->protocol = eth_type_trans(skb, skb->dev);
+>> +		skb_postpull_rcsum(skb, eth_hdr(skb), ETH_HLEN);
+>> +		__netif_rx(skb);
+>> +		break;
+>> +	case META_REDIRECT:
+>> +		skb_do_redirect(skb);
+>> +		break;
+>> +	case META_DROP:
+> 
+> Why the aliases for the constants? Might as well reuse the TCX names?
 
+The constants are also used for the default configuration of the device
+when no bpf is attached. Using tcx constant names as part of the config
+is confusing, I don't see a reason why it needs to be tied together, it's
+more confusing than it would help anything.
 
-vim +1140 drivers/net/ethernet/realtek/rtase/rtase_main.c
+>> +	default:
+>> +drop:
+>> +		ret_dev = NET_XMIT_DROP;
+>> +		dev_core_stats_tx_dropped_inc(dev);
+>> +		kfree_skb(skb);
+>> +		break;
+>> +	}
+>> +	rcu_read_unlock();
+>> +	return ret_dev;
+>> +}
+>> +
+>> +static int meta_open(struct net_device *dev)
+>> +{
+>> +	struct meta *meta = netdev_priv(dev);
+>> +	struct net_device *peer = rtnl_dereference(meta->peer);
+>> +
+>> +	if (!peer)
+>> +		return -ENOTCONN;
+>> +	if (peer->flags & IFF_UP) {
+>> +		netif_carrier_on(dev);
+>> +		netif_carrier_on(peer);
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +static int meta_close(struct net_device *dev)
+>> +{
+>> +	struct meta *meta = netdev_priv(dev);
+>> +	struct net_device *peer = rtnl_dereference(meta->peer);
+>> +
+>> +	netif_carrier_off(dev);
+>> +	if (peer)
+>> +		netif_carrier_off(peer);
+>> +	return 0;
+>> +}
+>> +
+>> +static int meta_get_iflink(const struct net_device *dev)
+>> +{
+>> +	struct meta *meta = netdev_priv(dev);
+>> +	struct net_device *peer;
+>> +	int iflink = 0;
+>> +
+>> +	rcu_read_lock();
+>> +	peer = rcu_dereference(meta->peer);
+>> +	if (peer)
+>> +		iflink = peer->ifindex;
+>> +	rcu_read_unlock();
+>> +	return iflink;
+>> +}
+>> +
+>> +static void meta_set_multicast_list(struct net_device *dev)
+>> +{
+>> +}
+> 
+> The function name indicates there is some functionality envisioned here?
+> Why is the function empty?
 
-35c3134a765bbcb Justin Lai 2023-09-28  1104  
-1f431ee317f33f8 Justin Lai 2023-09-28  1105  static int rtase_open(struct net_device *dev)
-1f431ee317f33f8 Justin Lai 2023-09-28  1106  {
-1f431ee317f33f8 Justin Lai 2023-09-28  1107  	struct rtase_private *tp = netdev_priv(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1108  	struct rtase_int_vector *ivec = &tp->int_vector[0];
-1f431ee317f33f8 Justin Lai 2023-09-28  1109  	const struct pci_dev *pdev = tp->pdev;
-1f431ee317f33f8 Justin Lai 2023-09-28  1110  	int ret;
-1f431ee317f33f8 Justin Lai 2023-09-28  1111  	u16 i;
-1f431ee317f33f8 Justin Lai 2023-09-28  1112  
-1f431ee317f33f8 Justin Lai 2023-09-28  1113  	rtase_set_rxbufsize(tp, dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1114  
-1f431ee317f33f8 Justin Lai 2023-09-28  1115  	ret = rtase_alloc_desc(tp);
-1f431ee317f33f8 Justin Lai 2023-09-28  1116  	if (ret)
-1f431ee317f33f8 Justin Lai 2023-09-28  1117  		goto err_free_all_allocated_mem;
-1f431ee317f33f8 Justin Lai 2023-09-28  1118  
-1f431ee317f33f8 Justin Lai 2023-09-28  1119  	ret = rtase_init_ring(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1120  	if (ret)
-1f431ee317f33f8 Justin Lai 2023-09-28  1121  		goto err_free_all_allocated_mem;
-1f431ee317f33f8 Justin Lai 2023-09-28  1122  
-1f431ee317f33f8 Justin Lai 2023-09-28  1123  	INIT_DELAYED_WORK(&tp->task, NULL);
-1f431ee317f33f8 Justin Lai 2023-09-28  1124  
-1f431ee317f33f8 Justin Lai 2023-09-28  1125  	rtase_hw_config(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1126  
-1f431ee317f33f8 Justin Lai 2023-09-28  1127  	if (tp->sw_flag & SWF_MSIX_ENABLED) {
-1f431ee317f33f8 Justin Lai 2023-09-28  1128  		ret = request_irq(ivec->irq, rtase_interrupt, 0,
-1f431ee317f33f8 Justin Lai 2023-09-28  1129  				  dev->name, ivec);
-1f431ee317f33f8 Justin Lai 2023-09-28  1130  
-1f431ee317f33f8 Justin Lai 2023-09-28  1131  		/* request other interrupts to handle multiqueue */
-1f431ee317f33f8 Justin Lai 2023-09-28  1132  		for (i = 1; i < tp->int_nums; i++) {
-1f431ee317f33f8 Justin Lai 2023-09-28  1133  			if (ret)
-1f431ee317f33f8 Justin Lai 2023-09-28  1134  				continue;
-1f431ee317f33f8 Justin Lai 2023-09-28  1135  
-1f431ee317f33f8 Justin Lai 2023-09-28  1136  			ivec = &tp->int_vector[i];
-1f431ee317f33f8 Justin Lai 2023-09-28  1137  			if (ivec->status != 1)
-1f431ee317f33f8 Justin Lai 2023-09-28  1138  				continue;
-1f431ee317f33f8 Justin Lai 2023-09-28  1139  
-1f431ee317f33f8 Justin Lai 2023-09-28 @1140  			snprintf(ivec->name, sizeof(ivec->name), "%s_int%i", dev->name, i);
-1f431ee317f33f8 Justin Lai 2023-09-28  1141  			ret = request_irq(ivec->irq, rtase_q_interrupt, 0,
-1f431ee317f33f8 Justin Lai 2023-09-28  1142  					  ivec->name, ivec);
-1f431ee317f33f8 Justin Lai 2023-09-28  1143  		}
-1f431ee317f33f8 Justin Lai 2023-09-28  1144  	} else if (tp->sw_flag & SWF_MSI_ENABLED) {
-1f431ee317f33f8 Justin Lai 2023-09-28  1145  		ret = request_irq(pdev->irq, rtase_interrupt, 0, dev->name,
-1f431ee317f33f8 Justin Lai 2023-09-28  1146  				  ivec);
-1f431ee317f33f8 Justin Lai 2023-09-28  1147  	} else {
-1f431ee317f33f8 Justin Lai 2023-09-28  1148  		ret = request_irq(pdev->irq, rtase_interrupt, IRQF_SHARED,
-1f431ee317f33f8 Justin Lai 2023-09-28  1149  				  dev->name, ivec);
-1f431ee317f33f8 Justin Lai 2023-09-28  1150  	}
-1f431ee317f33f8 Justin Lai 2023-09-28  1151  
-1f431ee317f33f8 Justin Lai 2023-09-28  1152  	if (ret != 0) {
-1f431ee317f33f8 Justin Lai 2023-09-28  1153  		netdev_err(dev, "can't request MSIX interrupt. Error: %d", ret);
-1f431ee317f33f8 Justin Lai 2023-09-28  1154  		goto err_free_all_allocated_mem;
-1f431ee317f33f8 Justin Lai 2023-09-28  1155  	}
-1f431ee317f33f8 Justin Lai 2023-09-28  1156  
-1f431ee317f33f8 Justin Lai 2023-09-28  1157  	rtase_hw_start(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1158  
-1f431ee317f33f8 Justin Lai 2023-09-28  1159  	netif_carrier_on(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1160  	netif_wake_queue(dev);
-1f431ee317f33f8 Justin Lai 2023-09-28  1161  	netdev_info(dev, "link up\n");
-1f431ee317f33f8 Justin Lai 2023-09-28  1162  
-1f431ee317f33f8 Justin Lai 2023-09-28  1163  	goto out;
-1f431ee317f33f8 Justin Lai 2023-09-28  1164  
-1f431ee317f33f8 Justin Lai 2023-09-28  1165  err_free_all_allocated_mem:
-1f431ee317f33f8 Justin Lai 2023-09-28  1166  	rtase_free_desc(tp);
-1f431ee317f33f8 Justin Lai 2023-09-28  1167  
-1f431ee317f33f8 Justin Lai 2023-09-28  1168  out:
-1f431ee317f33f8 Justin Lai 2023-09-28  1169  	return ret;
-1f431ee317f33f8 Justin Lai 2023-09-28  1170  }
-1f431ee317f33f8 Justin Lai 2023-09-28  1171  
+This is a stub callback to deal with multicast filter, given it's a virtual
+dev and it'll receive traffic you push to w/o further config this one is
+empty. See also ndo_set_rx_mode for various other virtual-only devs. I can
+add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+[...]
+>> +static struct net_device *meta_dev_fetch(struct net *net, u32 ifindex, u32 which)
+>> +{
+>> +	struct net_device *dev;
+>> +	struct meta *meta;
+>> +
+>> +	ASSERT_RTNL();
+>> +
+>> +	switch (which) {
+>> +	case BPF_META_PRIMARY:
+>> +	case BPF_META_PEER:
+>> +		break;
+>> +	default:
+>> +		return ERR_PTR(-EINVAL);
+>> +	}
+>> +
+>> +	dev = __dev_get_by_index(net, ifindex);
+>> +	if (!dev)
+>> +		return ERR_PTR(-ENODEV);
+>> +	if (!(dev->priv_flags & IFF_META))
+>> +		return ERR_PTR(-ENXIO);
+> 
+> I don't really think a new flag value is needed here? Can't you just
+> make this check if (dev->netdev_ops == &meta_netdev_ops) ?
+
+Agree, very good point. Will change.
+
+[...]
+>>   #define IS_FD_ARRAY(map) ((map)->map_type == BPF_MAP_TYPE_PERF_EVENT_ARRAY || \
+>> @@ -3720,6 +3721,8 @@ attach_type_to_prog_type(enum bpf_attach_type attach_type)
+>>   		return BPF_PROG_TYPE_LSM;
+>>   	case BPF_TCX_INGRESS:
+>>   	case BPF_TCX_EGRESS:
+>> +	case BPF_META_PRIMARY:
+>> +	case BPF_META_PEER:
+>>   		return BPF_PROG_TYPE_SCHED_CLS;
+>>   	default:
+>>   		return BPF_PROG_TYPE_UNSPEC;
+>> @@ -3771,7 +3774,9 @@ static int bpf_prog_attach_check_attach_type(const struct bpf_prog *prog,
+>>   		return 0;
+>>   	case BPF_PROG_TYPE_SCHED_CLS:
+>>   		if (attach_type != BPF_TCX_INGRESS &&
+>> -		    attach_type != BPF_TCX_EGRESS)
+>> +		    attach_type != BPF_TCX_EGRESS &&
+>> +		    attach_type != BPF_META_PRIMARY &&
+>> +		    attach_type != BPF_META_PEER)
+> 
+> PRIMARY and PEER basically correspond to INGRESS and EGRESS in terms of
+> which packets the program sees, right? So why not just reuse ingress and
+> egress designators, the fact that it's a "peer" attachment is mostly an
+> implementation detail, isn't it? Or should 'mirred' redirection to the
+> device inside a container also be supported? (is it?)
+
+No, ingress/egress is higly confusing here given it can have many meanings.
+You can ingress into the container or ingress into the host, for example, so
+it is not clear without more context. Also in a next step we plan to make
+this device configurable as a single device instead of peered. Then it's
+only 'primary' available where you attach to, much simpler to reason about
+from a mental model.
+
+> Reusing it (and special-casing the tcx attachment) would prevent people
+> from accidentally attaching a tcx program on top of the device (which
+> AFAICT if otherwise possible, right?). Or maybe this is a feature?
+
+You can use tcx with it just fine and maybe some people have a need for it,
+for example, for implementing logic within the container. There is certainly
+no reason to prevent that.
+
+Thanks,
+Daniel
 
