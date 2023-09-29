@@ -1,133 +1,144 @@
-Return-Path: <netdev+bounces-37069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4357B36E7
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:35:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F147B3738
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0336328841C
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:35:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4A6DF2823B1
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ACE51BA8;
-	Fri, 29 Sep 2023 15:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59345521AA;
+	Fri, 29 Sep 2023 15:48:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176C251BA4;
-	Fri, 29 Sep 2023 15:35:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC20C433B6;
-	Fri, 29 Sep 2023 15:35:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696001734;
-	bh=ti/iY/I8rL5lxV45hGyYfqiTkZyE90nEyx2osM8ZrS4=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=LNMo1g0SUF0MshCK7LlJJbQzOUCYhoIrwB0l6YUZb0PbLJcbMcvwykPloDmyIsYoi
-	 xeuehITcBmi1duzE7qO/Gf+8zjPBf4h/K12XsEQitc121OMB5jVeYkH3oXiLB7xWxu
-	 kXUNZMRei9/6rqt0Q0FMOWrglBmLQ6sJLLP/YSybuNwXFYIlkJRtXU6iTpLssd7fwG
-	 O22v6dCSsNK8eDTRkhxq5FT0KmsluuikuLnEg+u32nnRXryeQgN+oHyNvrBL5WohX2
-	 f8izjKJFjvLfLIKunnmccRHUFUKTzmEt2CUc3FVbzHa8YcLJunWI1jUweUpca0UaXk
-	 lp7u+svNF7Etg==
-Received: (nullmailer pid 3601357 invoked by uid 1000);
-	Fri, 29 Sep 2023 15:35:24 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD32516DD;
+	Fri, 29 Sep 2023 15:48:35 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7F4DB;
+	Fri, 29 Sep 2023 08:48:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=1Z4w2GSMgZnLDZe2A+e0eyFLH+sMwC0wx+0SEkVg94U=; b=ZETi8p5eJmyQ+pikvrzTL2VQnT
+	SpKrvo1krgbYOcPDYrCvxjSL9XNde8AEli5vIBXlelhJq6f1H/mG01J+Rsi9j+1UmRFZpEs4sH+Mq
+	cas3d6RjZ4kRJLCdzjr5kdOXwqjQL/0pRnmmzncoz8Pop7Eq/2RVIdaxSYaKrmjaQaZOaCT64pdyp
+	C5XwbZXL1vd94tee4cxWhnUV11MuuQk4vWeH1Yq6KhSzDXoJVDCsrVGvTWEbJD4WFD6c7URKAlUpw
+	aEALK4bZ742/aZAOVJHENN05Ubz9Duaei3Z0tOmtm5/skh6ih/ZDxbcpSAzxsAjzojWpJNWKcWbk0
+	GucHvLaQ==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qmFj3-000N3m-BN; Fri, 29 Sep 2023 17:48:21 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qmFj2-0009rW-RB; Fri, 29 Sep 2023 17:48:20 +0200
+Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return
+ code
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, paulb@nvidia.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com, martin.lau@linux.dev, bpf@vger.kernel.org
+References: <20230919145951.352548-1-victor@mojatatu.com>
+ <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
+ <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
+ <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
+ <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net>
+Date: Fri, 29 Sep 2023 17:48:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: ulf.hansson@linaro.org, Frank Rowand <frowand.list@gmail.com>, edumazet@google.com, jic23@kernel.org, richardcochran@gmail.com, krzysztof.kozlowski+dt@linaro.org, linux-iio@vger.kernel.org, fabrice.gasnier@foss.st.com, linux-mmc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, Oleksii_Moisieiev@epam.com, hugues.fruchet@foss.st.com, linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org, conor+dt@kernel.org, linux-phy@lists.infradead.org, mchehab@kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-i2c@vger.kernel.org, vkoul@kernel.org, linux-spi@vger.kernel.org, olivier.moysan@foss.st.com, linux-serial@vger.kernel.org, arnd@kernel.org, alsa-devel@alsa-project.org, herbert@gondor.apana.org.au, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, dmaengine@vger.kernel.org, alexandre.torgue@foss.st.com, lee@kernel.org, peng.fan@oss.nxp.com, arnaud
- .pouliquen@foss.st.com, catalin.marinas@arm.com, will@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, andi.shyti@kernel.org
-In-Reply-To: <20230929142852.578394-3-gatien.chevallier@foss.st.com>
-References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-3-gatien.chevallier@foss.st.com>
-Message-Id: <169600172300.3601265.2185363377386180804.robh@kernel.org>
-Subject: Re: [PATCH v5 02/11] dt-bindings: treewide: add access-controller
- description
-Date: Fri, 29 Sep 2023 10:35:24 -0500
+In-Reply-To: <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27046/Fri Sep 29 09:41:56 2023)
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-
-On Fri, 29 Sep 2023 16:28:43 +0200, Gatien Chevallier wrote:
-> access-controller is an optional property that allows a peripheral to
-> refer to one or more domain access controller(s).
+On 9/26/23 1:01 AM, Jamal Hadi Salim wrote:
+> On Fri, Sep 22, 2023 at 4:12 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 9/20/23 1:20 AM, Jamal Hadi Salim wrote:
+>>> On Tue, Sep 19, 2023 at 6:15 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>> On 9/19/23 4:59 PM, Victor Nogueira wrote:
+[...]
+>>
+>> In the above case we don't have 'internal' errors which you want to trace, so I would
+>> also love to avoid the cost of zeroing struct tcf_result res which should be 3x 8b for
+>> every packet.
 > 
-> Description of this property is added to all peripheral binding files of
-> the peripheral under the STM32 firewall controllers. It allows an accurate
-> representation of the hardware, where various peripherals are connected
-> to this firewall bus. The firewall can then check the peripheral accesses
-> before allowing it to probe.
+> We can move the zeroing inside tc_run() but we declare it in the same
+> spot as we do right now. You will still need to set res.verdict as
+> above.
+> Would that work for you?
+
+What I'm not following is that with the below you can avoid the unnecessary
+fast path cost (which is only for corner case which is almost never hit) and
+get even better visibility. Are you saying it doesn't work?
+
+>> I was more thinking like something below could be a better choice. I presume your main
+>> goal is to trace where these errors originated in the first place, so it might even be
+>> useful to capture the actual return code as well.
 > 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
+> The main motivation is a few syzkaller bugs which resulted in not
+> disambiguating between errors being returned and sometimes
+> TC_ACT_SHOT.
 > 
-> Changes in V5:
-> 	- Discarded review tags as the content has changed
-> 	- Renamed feature-domains to access-controller
-> 	- Removed extra blank line in st,stm32-timers.yaml
+>> Then you can use perf script, bpf and whatnot to gather further insights into what
+>> happened while being less invasive and avoiding the need to extend struct tcf_result.
 > 
-> Changes in V4:
-> 	- Added Jonathan's tag for IIO
+> We could use trace instead - the reason we have the skb reason is
+> being used in the other spots (does this trace require ebpf to be
+> usable?).
+
+No you can just use regular perf by attaching to the tracepoint, no need for using
+bpf at all here.
+
+>> This would be quite similar to trace_xdp_exception() as well, and I think you can guarantee
+>> that in fast path all errors are < TC_ACT_UNSPEC anyway.
 > 
-> Changes in V2:
-> 	- Add missing "feature-domains" property declaration
-> 	  in bosch,m_can.yaml and st,stm32-cryp.yaml files
-> 
->  Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml   | 4 ++++
->  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml   | 4 ++++
->  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml       | 4 ++++
->  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml    | 4 ++++
->  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml       | 4 ++++
->  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml   | 4 ++++
->  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml       | 4 ++++
->  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml   | 4 ++++
->  Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml | 4 ++++
->  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml    | 4 ++++
->  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml        | 4 ++++
->  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml   | 4 ++++
->  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml    | 4 ++++
->  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml          | 4 ++++
->  Documentation/devicetree/bindings/net/can/bosch,m_can.yaml    | 4 ++++
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml        | 4 ++++
->  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml  | 4 ++++
->  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml       | 4 ++++
->  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml       | 4 ++++
->  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml   | 4 ++++
->  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml     | 4 ++++
->  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml     | 4 ++++
->  Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml | 4 ++++
->  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml      | 4 ++++
->  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml       | 4 ++++
->  Documentation/devicetree/bindings/usb/dwc2.yaml               | 4 ++++
->  26 files changed, 104 insertions(+)
-> 
+> I am not sure i followed. 0 means success, result codes are returned in res now.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+What I was saying is that you don't need the struct change from the patch, but only
+the changes where you rework TC_ACT_SHOT into one of the -E<errors>, and then with
+the below you can pass this through an exception tracepoint.
 
-yamllint warnings/errors:
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 85df22f05c38..4089d195144d 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -3925,6 +3925,10 @@ static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
+>>
+>>          mini_qdisc_bstats_cpu_update(miniq, skb);
+>>          ret = tcf_classify(skb, miniq->block, miniq->filter_list, &res, false);
+>> +       if (unlikely(ret < TC_ACT_UNSPEC)) {
+>> +               trace_tc_exception(skb->dev, skb->tc_at_ingress, ret);
+>> +               ret = TC_ACT_SHOT;
+>> +       }
+>>          /* Only tcf related quirks below. */
+>>          switch (ret) {
+>>          case TC_ACT_SHOT:
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml: access-controller: missing type definition
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230929142852.578394-3-gatien.chevallier@foss.st.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Thanks,
+Daniel
 
