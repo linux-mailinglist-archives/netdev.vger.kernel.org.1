@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-37070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4027B36E9
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:35:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F4357B36E7
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:35:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 11E02285518
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:35:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0336328841C
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5844B51BAC;
-	Fri, 29 Sep 2023 15:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ACE51BA8;
+	Fri, 29 Sep 2023 15:35:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C35A521A1;
-	Fri, 29 Sep 2023 15:35:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 467DBC433C7;
-	Fri, 29 Sep 2023 15:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176C251BA4;
+	Fri, 29 Sep 2023 15:35:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC20C433B6;
+	Fri, 29 Sep 2023 15:35:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696001741;
-	bh=Vpxhihd/k1b+v8lMOi0CPh14iepxvm9nmqyMxT341uM=;
+	s=k20201202; t=1696001734;
+	bh=ti/iY/I8rL5lxV45hGyYfqiTkZyE90nEyx2osM8ZrS4=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=mUohr5GwY4KxfPp7cng5SPhzcshX8/sj0CmBdDbCz8fqwbhKPXDebLlBa2Juv057E
-	 jwSqjrWGp45ntGSONnNvLIICDEOlNaQZuxa5tbSCqpjK4GCmOeRnm58jYtLj6nw3jl
-	 T25k5mR5evmxPyINrndbG+XGppDAWCF8mGAse8m/bPkaUrWWVNCsSbTmAfL06eq1Yl
-	 gFsVkRaE1AAZPC6kxxCv4bJr9S64GajiwxcHKtCyg4W5vVVQPet7IIDbNxNEuu6wl0
-	 yx7/RWDX2kX7fIylD3+eFtTBZ7RvaZ2u2of9sypFtMiNvKuGKzDn5K8xZYwbyn9B7K
-	 p+KEh+G5xjObw==
-Received: (nullmailer pid 3601359 invoked by uid 1000);
+	b=LNMo1g0SUF0MshCK7LlJJbQzOUCYhoIrwB0l6YUZb0PbLJcbMcvwykPloDmyIsYoi
+	 xeuehITcBmi1duzE7qO/Gf+8zjPBf4h/K12XsEQitc121OMB5jVeYkH3oXiLB7xWxu
+	 kXUNZMRei9/6rqt0Q0FMOWrglBmLQ6sJLLP/YSybuNwXFYIlkJRtXU6iTpLssd7fwG
+	 O22v6dCSsNK8eDTRkhxq5FT0KmsluuikuLnEg+u32nnRXryeQgN+oHyNvrBL5WohX2
+	 f8izjKJFjvLfLIKunnmccRHUFUKTzmEt2CUc3FVbzHa8YcLJunWI1jUweUpca0UaXk
+	 lp7u+svNF7Etg==
+Received: (nullmailer pid 3601357 invoked by uid 1000);
 	Fri, 29 Sep 2023 15:35:24 -0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -40,56 +40,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Rob Herring <robh@kernel.org>
 To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: linux-kernel@vger.kernel.org, davem@davemloft.net,
-	lee@kernel.org, conor+dt@kernel.org, catalin.marinas@arm.com,
-	peng.fan@oss.nxp.com, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org,
-	alexandre.torgue@foss.st.com, will@kernel.org,
-	arnaud.pouliquen@foss.st.com, olivier.moysan@foss.st.com,
-	dmaengine@vger.kernel.org, mchehab@kernel.org, edumazet@google.com,
-	linux-i2c@vger.kernel.org, kuba@kernel.org, jic23@kernel.org,
-	andi.shyti@kernel.org, linux-iio@vger.kernel.org,
-	linux-serial@vger.kernel.org, hugues.fruchet@foss.st.com,
-	linux-media@vger.kernel.org, herbert@gondor.apana.org.au,
-	linux-mmc@vger.kernel.org, alsa-devel@alsa-project.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	vkoul@kernel.org, gregkh@linuxfoundation.org,
-	fabrice.gasnier@foss.st.com, linux-phy@lists.infradead.org,
-	linux-crypto@vger.kernel.org, Frank Rowand <frowand.list@gmail.com>,
-	richardcochran@gmail.com, linux-spi@vger.kernel.org, arnd@kernel.org,
-	ulf.han@web.codeaurora.org, sson@linaro.org,
-	krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-	devicetree@vger.kernel.org, Oleksii_Moisieiev@epam.com
-In-Reply-To: <20230929142852.578394-4-gatien.chevallier@foss.st.com>
+Cc: ulf.hansson@linaro.org, Frank Rowand <frowand.list@gmail.com>, edumazet@google.com, jic23@kernel.org, richardcochran@gmail.com, krzysztof.kozlowski+dt@linaro.org, linux-iio@vger.kernel.org, fabrice.gasnier@foss.st.com, linux-mmc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, Oleksii_Moisieiev@epam.com, hugues.fruchet@foss.st.com, linux-arm-kernel@lists.infradead.org, linux-usb@vger.kernel.org, conor+dt@kernel.org, linux-phy@lists.infradead.org, mchehab@kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-i2c@vger.kernel.org, vkoul@kernel.org, linux-spi@vger.kernel.org, olivier.moysan@foss.st.com, linux-serial@vger.kernel.org, arnd@kernel.org, alsa-devel@alsa-project.org, herbert@gondor.apana.org.au, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, dmaengine@vger.kernel.org, alexandre.torgue@foss.st.com, lee@kernel.org, peng.fan@oss.nxp.com, arnaud
+ .pouliquen@foss.st.com, catalin.marinas@arm.com, will@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, andi.shyti@kernel.org
+In-Reply-To: <20230929142852.578394-3-gatien.chevallier@foss.st.com>
 References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-4-gatien.chevallier@foss.st.com>
-Message-Id: <169600172403.3601303.9668793596131154383.robh@kernel.org>
-Subject: Re: [PATCH v5 03/11] dt-bindings: bus: document RIFSC
+ <20230929142852.578394-3-gatien.chevallier@foss.st.com>
+Message-Id: <169600172300.3601265.2185363377386180804.robh@kernel.org>
+Subject: Re: [PATCH v5 02/11] dt-bindings: treewide: add access-controller
+ description
 Date: Fri, 29 Sep 2023 10:35:24 -0500
 
 
-On Fri, 29 Sep 2023 16:28:44 +0200, Gatien Chevallier wrote:
-> Document RIFSC (RIF security controller). RIFSC is a firewall controller
-> composed of different kinds of hardware resources.
+On Fri, 29 Sep 2023 16:28:43 +0200, Gatien Chevallier wrote:
+> access-controller is an optional property that allows a peripheral to
+> refer to one or more domain access controller(s).
+> 
+> Description of this property is added to all peripheral binding files of
+> the peripheral under the STM32 firewall controllers. It allows an accurate
+> representation of the hardware, where various peripherals are connected
+> to this firewall bus. The firewall can then check the peripheral accesses
+> before allowing it to probe.
 > 
 > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 > ---
 > 
 > Changes in V5:
-> 	- Renamed feature-domain* to access-control*
+> 	- Discarded review tags as the content has changed
+> 	- Renamed feature-domains to access-controller
+> 	- Removed extra blank line in st,stm32-timers.yaml
+> 
+> Changes in V4:
+> 	- Added Jonathan's tag for IIO
 > 
 > Changes in V2:
-> 	- Corrected errors highlighted by Rob's robot
-> 	- No longer define the maxItems for the "feature-domains"
-> 	  property
-> 	- Fix example (node name, status)
-> 	- Declare "feature-domain-names" as an optional
-> 	  property for child nodes
-> 	- Fix description of "feature-domains" property
+> 	- Add missing "feature-domains" property declaration
+> 	  in bosch,m_can.yaml and st,stm32-cryp.yaml files
 > 
->  .../bindings/bus/st,stm32mp25-rifsc.yaml      | 105 ++++++++++++++++++
->  1 file changed, 105 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
+>  Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml   | 4 ++++
+>  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml | 4 ++++
+>  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml    | 4 ++++
+>  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml        | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/net/can/bosch,m_can.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml        | 4 ++++
+>  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml  | 4 ++++
+>  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml     | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml     | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/usb/dwc2.yaml               | 4 ++++
+>  26 files changed, 104 insertions(+)
 > 
 
 My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
@@ -98,14 +111,11 @@ on your patch (DT_CHECKER_FLAGS is new in v5.13):
 yamllint warnings/errors:
 
 dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml: access-controller: missing type definition
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml: access-control-provider: missing type definition
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.example.dtb: serial@400e0000: Unevaluated properties are not allowed ('access-controller' was unexpected)
-	from schema $id: http://devicetree.org/schemas/serial/st,stm32-uart.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml: access-controller: missing type definition
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230929142852.578394-4-gatien.chevallier@foss.st.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230929142852.578394-3-gatien.chevallier@foss.st.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
