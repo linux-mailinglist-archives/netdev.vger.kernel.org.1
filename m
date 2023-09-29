@@ -1,68 +1,72 @@
-Return-Path: <netdev+bounces-37011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E137B3123
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:18:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1947B316B
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B9DBA28231A
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 11:18:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 8EFC21C208D8
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 11:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD63916436;
-	Fri, 29 Sep 2023 11:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7725171C5;
+	Fri, 29 Sep 2023 11:31:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6066C157
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:18:31 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2BE1B1
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 04:18:28 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9ada2e6e75fso1938085066b.2
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 04:18:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32764F9CC
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:31:07 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F2094
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 04:31:03 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4065f29e933so3930705e9.1
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 04:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695986307; x=1696591107; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1695987061; x=1696591861; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B9fclgwxgacBkIITICuy/IWzZ2BPswGWBVkjKldpyxs=;
-        b=FoDFbKD9oKlx7BIBdtWjObV4W9ovFERPNgoVmut4R7xD4LPZUIzBT1jckh2ZHPVvao
-         pEj7tajFKr4l/dXhDHTeAaUTV21gRxQrI/6vuHrhcD+vIsDAZw20HTHBIYF4ikuDJOUJ
-         GD/+r840MUOh81KjiNacFTfy63uYnt2dVOTJ8/TpLl2k6uO9Cph5LodTuThysFgogStp
-         M5oDrl0BY4pkn44WIpXBgF7aIUtbLfryJ998ZXUe9p47ijwvLn1OgJEANhZnVfCCcNnu
-         gHAgOg6dD/gxxhWj7lStT8FIynGXugN5sK6resrumQM2fw1cbi5FCA+saA3dUOa4uYEA
-         QQJw==
+        bh=gSP/8WeTsNc7gqTaoiI4XrzGvQH5WRCwOU5sJpgsrfI=;
+        b=1VhyvbxCgOcg2OZ37TBD7IWb38W9Am01o53THq9Nquf8Cve9hOqjMPZ44SGHgwx6aG
+         BFxQOBE6qVgRwBeJTEKBXXTHDkWIGHjJBCKkSB+7VQq/UpUZV/sLXMfN1xvNdtn0hxvi
+         o2CD8nzrCCcw7zBc5xfcOoW4v81GsEIQ++MqO1D87ldYt0z6gMbX+OfQsE0kBjeH3SdS
+         Mj5OreQJsH0gL8OR1fIQiySi1DmDq2wuuA1BOBLu3xtQY7/66MrbsTgv0Ail9eyGe+VC
+         eO5FCY9Tvl21Q2/OZSd4RbAvbFSxALlm0Ofjv6O2KA/J9dlcm1Wl6dtYNDmuae2CgpgH
+         CPOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695986307; x=1696591107;
+        d=1e100.net; s=20230601; t=1695987061; x=1696591861;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=B9fclgwxgacBkIITICuy/IWzZ2BPswGWBVkjKldpyxs=;
-        b=mI8uMbpFAqmR/73M/6Arsy3V113GJX+QvsdyUCk4FlayBwexlPJBlAuTBMCZ5bwcJi
-         yZJEAtkvFA9KljNy9eiPYE8mxztSFueK3kKYx4tt9+loACoOeLb8ec9lq4mBDIhReWo8
-         25SW1oW9iiKxcQyZQiGl/mDjr2DOM2DH98UNQJ/bFYdFcERJOoLZtKxuYoji3Osy89FY
-         cnU7LCXX+Q8eyOzYdnW0uFlOWxUMTLIZ8tZqIGzCyHRP5PlYBnzb+PQ5VB6uICovBHVG
-         M7ZjyWvTZeVgrudkNG7diuOAbQ+5xeSK4hsWJwI8VyWpuh9uqB+/o6lB7+3qezF8oSyw
-         8BKw==
-X-Gm-Message-State: AOJu0YzWB0/1twQP4UtFiGIg9JPQLeqAjEsAeD93IJTAC0gj+rLyfhui
-	iGzrruv9jFB9X9NZyJSYP/+uYA==
-X-Google-Smtp-Source: AGHT+IE0NWeOXAUPU5FsZ8nLtPdSHFzfG2Gab0SY6mUyKINyfytJlJC211a7w21ICtiNNIhJpw9KUg==
-X-Received: by 2002:a17:906:30c2:b0:9ae:7150:af95 with SMTP id b2-20020a17090630c200b009ae7150af95mr3558741ejb.54.1695986306756;
-        Fri, 29 Sep 2023 04:18:26 -0700 (PDT)
+        bh=gSP/8WeTsNc7gqTaoiI4XrzGvQH5WRCwOU5sJpgsrfI=;
+        b=utOJXtiwsA/gdN7C4MIbVP3dmlHLtophdPDRiTTmKJCD9ctnhvkQb3apWqpafZ6xzN
+         sM3hVP6WEp+xfEsZFsT9MzwkwuWQWkq+cBFam31c4JuD8jnkWkXr0Hx5NXauo/gtbyE7
+         TAnvHgeL+9GTxjxSX3aahMbbPDOn7E7AsFGvAZ5zEFmqT1bnHzyrCj0H63xKQq/VqWo+
+         56Tf8jxyiApvoj+fb8C+hWb4pT+5NyAxsMHtZL+vYzmjIzLnIXeff/7H1ULkKC7uPaiM
+         lXDNtrYTE4JzWERQQ30vMEDJkfIARGu59vIceUu4DlpoER5A1FUBZWsLH0/3oLHb+bJE
+         zKcw==
+X-Gm-Message-State: AOJu0Yzbtc/QveqGV8PGGlv+GPQj/H0ZMFvysWBveTe6LWMDYUDt20wn
+	DH3hJFBZz2K3ApW8/Nl6EEwxuRxouJzFzXy5TaQ=
+X-Google-Smtp-Source: AGHT+IHZWsKKJj/loajLfKNuVnqXN7VojbIGALZxZUMN/eaFJjCMgBBBAT/s5UolDvdrthIWtWp+dg==
+X-Received: by 2002:adf:f806:0:b0:320:bb1:5a76 with SMTP id s6-20020adff806000000b003200bb15a76mr3458199wrp.56.1695987061583;
+        Fri, 29 Sep 2023 04:31:01 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id m5-20020a1709062b8500b009928b4e3b9fsm12199832ejg.114.2023.09.29.04.18.25
+        by smtp.gmail.com with ESMTPSA id m4-20020a056402430400b00536031525e5sm3133487edc.91.2023.09.29.04.30.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 04:18:26 -0700 (PDT)
-Date: Fri, 29 Sep 2023 13:18:25 +0200
+        Fri, 29 Sep 2023 04:30:59 -0700 (PDT)
+Date: Fri, 29 Sep 2023 13:30:58 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
-	edumazet@google.com
-Subject: Re: [patch net-next] tools: ynl-gen: lift type requirement for
- attribute subsets
-Message-ID: <ZRaygRMJTnQ1H8+1@nanopsycho>
-References: <20230919142139.1167653-1-jiri@resnulli.us>
- <ffeeac4ea45e5a087aab44ac137a945111d941e7.camel@redhat.com>
+To: David Ahern <dsahern@gmail.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
+	daniel.machon@microchip.com
+Subject: Re: [patch iproute2-next v2 3/5] devlink: introduce support for
+ netns id for nested handle
+Message-ID: <ZRa1cu4TlCuj51gD@nanopsycho>
+References: <20230919115644.1157890-1-jiri@resnulli.us>
+ <20230919115644.1157890-4-jiri@resnulli.us>
+ <3652856a-1cda-c050-04da-fe2204949ff5@gmail.com>
+ <ZQnYDVBeuIRn7uwK@nanopsycho>
+ <5476af84-7f3d-2895-3be3-83b5abc38485@gmail.com>
+ <ZQqfeQiz2OoVHqdS@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,79 +75,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ffeeac4ea45e5a087aab44ac137a945111d941e7.camel@redhat.com>
+In-Reply-To: <ZQqfeQiz2OoVHqdS@nanopsycho>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thu, Sep 28, 2023 at 12:15:22PM CEST, pabeni@redhat.com wrote:
->On Tue, 2023-09-19 at 16:21 +0200, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> In case an attribute is used in a subset, the type has to be currently
->> specified. As the attribute is already defined in the original set, this
->> is a redundant information in yaml file, moreover, may lead to
->> inconsistencies.
->> 
->> Example:
->> attribute-sets:
->>     ...
->>     name: pin
->>     enum-name: dpll_a_pin
->>     attributes:
->>       ...
->>       -
->>         name: parent-id
->>         type: u32
->>       ...
->>   -
->>     name: pin-parent-device
->>     subset-of: pin
->>     attributes:
->>       -
->>         name: parent-id
->>         type: u32             <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
->> 
->> Remove the requirement from schema files to specify the "type" and add
->> check and bail out if "type" is not set.
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Wed, Sep 20, 2023 at 09:30:01AM CEST, jiri@resnulli.us wrote:
+>Tue, Sep 19, 2023 at 08:48:29PM CEST, dsahern@gmail.com wrote:
+>>On 9/19/23 11:19 AM, Jiri Pirko wrote:
+>>>>
+>>>>>  static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
+>>>>>  {
+>>>>>  	struct nlattr *tb[DEVLINK_ATTR_MAX + 1] = {};
+>>>>> @@ -2740,6 +2776,30 @@ static void pr_out_nested_handle(struct nlattr *nla_nested_dl)
+>>>>>  	sprintf(buf, "%s/%s", mnl_attr_get_str(tb[DEVLINK_ATTR_BUS_NAME]),
+>>>>>  		mnl_attr_get_str(tb[DEVLINK_ATTR_DEV_NAME]));
+>>>>>  	print_string(PRINT_ANY, "nested_devlink", " nested_devlink %s", buf);
+>>>>> +
+>>>>> +	if (tb[DEVLINK_ATTR_NETNS_ID]) {
+>>>>> +		int32_t id = mnl_attr_get_u32(tb[DEVLINK_ATTR_NETNS_ID]);
+>>>>> +
+>>>>> +		if (id >= 0) {
+>>>>> +			char *name = netns_name_by_id(id);
+>>>>> +
+>>>>> +			if (name) {
+>>>>> +				print_string(PRINT_ANY,
+>>>>> +					     "nested_devlink_netns",
+>>>>> +					     " nested_devlink_netns %s", name);
+>>>>> +				free(name);
+>>>>> +			} else {
+>>>>> +				print_int(PRINT_ANY,
+>>>>> +					  "nested_devlink_netnsid",
+>>>>> +					  " nested_devlink_netnsid %d", id);
+>>>>> +			}
+>>>>> +		} else {
+>>>>> +			print_string(PRINT_FP, NULL,
+>>>>> +				     " nested_devlink_netnsid %s", "unknown");
+>>>>> +			print_int(PRINT_JSON,
+>>>>> +				  "nested_devlink_netnsid", NULL, id);
+>>>>> +		}
+>>>> Also, devlink in the name here provides no addititional value (devlink
+>>>> is the command name) and why add 'nested'? The attribute is just
+>>>> NETNS_ID, so why not just 'netnsid' here.
+>>> Well, it is a netnsid of the nested devlink instance, not the object
+>>> (e.g. port) itself. Omitting that would be misleading. Any idea how to
+>>> do this differently?
+>>> 
+>>> 
+>>
+>>The attribute is a namespace id, and the value is a namespace id. Given
+>>that, the name here should be netnsid (or nsid - we did a horrible job
+>>with consistency across iproute2 commands). I have not followed the
+>>kernel patches to understand what you mean by nested devlink instance.
 >
->What about updating accordingly the existing specs? They are used as
->references, I think it would be better if the info there would be
->consistent.
+>Please do that. Again, the netnsid is related to the nested instance.
+>Therefore I put the "nested_devlink" in the name. Putting just "netnsid"
+>as you suggest is wrong. Another possibility would be do nest this into
+>object, but:
+>1) I didn't find nice way to do that
+>2) We would break linecards as they expose nested_devlink already
 
-Okay, will check that out. I will try to update some.
+Did you have a chance to check this? I have v3 ready for submission with
+the other changes you requested.
 
-
->
->I think the tool still allows writing something alike:
->
->    attributes:
->      ...
->      -
->        name: parent-id
->        type: u32
->      ...
->  -
->    name: pin-parent-device
->    subset-of: pin
->    attributes:
->      -
->        name: parent-id
->        type: string
->
->(mismatching types). What about adding an explicit test to prevent
->specifying again the types for already defined attributes?
-
-Good point. Will check.
+Thanks!
 
 
 >
->Cheers,
->
->Paolo
->
+>IDK :/
 
