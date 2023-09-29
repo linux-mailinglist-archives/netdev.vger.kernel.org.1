@@ -1,88 +1,130 @@
-Return-Path: <netdev+bounces-36954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AB37B2A0E
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 03:00:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485C57B2A55
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 04:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9A9AE1C20A68
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 01:00:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 653D2281D66
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 02:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A0115B2;
-	Fri, 29 Sep 2023 01:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BCDB17D5;
+	Fri, 29 Sep 2023 02:37:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0901610FA
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:00:15 +0000 (UTC)
-Received: from out-191.mta1.migadu.com (out-191.mta1.migadu.com [IPv6:2001:41d0:203:375::bf])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1AFB4
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 18:00:14 -0700 (PDT)
-Message-ID: <022235bd-0226-c896-02a1-aa7765eaa6ff@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695949212;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qtKt+ZDkUpFphIBKnAoHk52i8tmcI0v9dPl6VlzoB7M=;
-	b=A9bOvlMm//bDoKBydN6sv621PcEys4Q1KWYt6SFL67G5XSVHDWO89gXkAZT1ElNueSITkO
-	lDRHJSTo8A34TQDzwMit2+IM/xNI5MmKvhj+nJk2vOvuQ/Oyqf3BIpuao7qi3HVvlQh9o+
-	mLFO8CQbJAx+IeXSl8gc9qBx9FtAnTU=
-Date: Fri, 29 Sep 2023 02:00:08 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8CA717D2
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 02:37:40 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2841A2
+	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 19:37:38 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59bdb9fe821so265580657b3.0
+        for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 19:37:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1695955058; x=1696559858; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9fNDjspVJr/ayAsGgaCrOKgIRYGYktlfH6pYdojDtfM=;
+        b=0RHaWIw9GdyELJ4ajvBJ3/4Wf7KArLr6jhlcdc6D2BauXzt/BP7kmoTdTG8cy1XN8V
+         az7XdpK6a8w4cVEttDnXcCwrlENT8C1oLt/0ipDz31QE5yRJGmhrMgW+UM8RpXjfGIyi
+         fN0RQyBGRi2ZfCnNsgVL/6YTIsY7HRG2uLSTf2O7DA+z0iOa/wj9SPPjAzsHjoXlEjVD
+         KmwvAphAkWi15gaxisNlYyZb4lIfGUQ0EFCXVHFFgJWTr4ch6T2/Bw0obtrX0KQQwB2B
+         mmFx+ozGj4DQLwMqjc4DJyTDzVO5jt3pgdOxhbLW6gTnfqRF8DVa5/8NKi/QQopE+WM5
+         1W3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695955058; x=1696559858;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9fNDjspVJr/ayAsGgaCrOKgIRYGYktlfH6pYdojDtfM=;
+        b=sdSD6/QcpYEA0qxiWJg8vSv9YU/vsBS6twq+cig7l5n+0jZliKK77PIrdyQjNVVQix
+         8qSBLOlDfJyfl3p7z+WuUk6dkHWUzui1TkYJLPgEvqT3h/FBSo+r64Vty79zqXQvNgzN
+         YL1erQQMfZFSwAhx+4YwF4j2I+Gc/cnf8Y7rFgV6J7wjmEgMADiDlHgB5NyBxxU1sNEl
+         4HN/bQXYIEOOiI8B3avvJPmjkzz6tMAb5IE8KayKroi6csQlGpei9FUgTL4FBx/XyAou
+         TmoyUNhiMgECgeepygQf24jQTStX2Ii4pukiyEGmaKaTHZM12RMd3p3xVULBiCWB63dc
+         Wa2Q==
+X-Gm-Message-State: AOJu0YzW7emMfffpBUtiDwy/2Q4yZgICl+vnDcspZ04Bi5OP+F5qbUMB
+	JVBgcLfIjeZgSoLbu3NYzZ42XCqHN4YyT1lDD8Im/Zxj7kz6r4L4uRLnotcE1i8jIFGPDw948Tf
+	OuqZyqHmaeqQpkL6NYrbacLUpQ914fofxyliToZ+rH5qm2LJNwxbhtWpJ8JVWnXCu
+X-Google-Smtp-Source: AGHT+IH244p4A7/TsBZIkhUS1BEg573rPjXKPmFYA0OVVgZdwGCpQAo30ChlwRAAxjtbecMcVXZ8/tGwPX5e
+X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2b7a])
+ (user=maheshb job=sendgmr) by 2002:a81:ac0e:0:b0:59b:f138:c845 with SMTP id
+ k14-20020a81ac0e000000b0059bf138c845mr39421ywh.2.1695955056958; Thu, 28 Sep
+ 2023 19:37:36 -0700 (PDT)
+Date: Thu, 28 Sep 2023 19:37:21 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 0/2] Documentation fixes for dpll subsystem
-Content-Language: en-US
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
- "David S. Miller" <davem@davemloft.net>
-References: <20230928052708.44820-1-bagasdotme@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20230928052708.44820-1-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
+Message-ID: <20230929023721.1610484-1-maheshb@google.com>
+Subject: [PATCH 0/4] add ptp_gettimex64any() API
+From: Mahesh Bandewar <maheshb@google.com>
+To: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
+	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>, 
+	Mahesh Bandewar <mahesh@bandewar.net>, Mahesh Bandewar <maheshb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 28/09/2023 06:27, Bagas Sanjaya wrote:
-> Here is a mini docs fixes for dpll subsystem. The fixes are all code
-> block-related.
-> 
-> This series is triggered because I was emailed by kernel test robot,
-> alerting htmldocs warnings (see patch [1/2]).
-> 
-> Changes since v1 [1]:
->    * Collect Reviewed-by tags
->    * Rebase on current net-next
-> 
-> [1]: https://lore.kernel.org/all/20230918093240.29824-1-bagasdotme@gmail.com/
-> 
-> Bagas Sanjaya (2):
->    Documentation: dpll: Fix code blocks
->    Documentation: dpll: wrap DPLL_CMD_PIN_GET output in a code block
-> 
->   Documentation/driver-api/dpll.rst | 27 +++++++++++++++------------
->   1 file changed, 15 insertions(+), 12 deletions(-)
-> 
-> 
-> base-commit: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
+The current API to get the sandwich TS for the master-PTP clock read
+supports only the sys-time sandwich. This is not really suitable for
+all the use cases of sandwich TS needs. Ideally it should
+allow a choice of a timebase to use for ts-sandwich need. Updating
+the existing API [gettimex64()] is not an option since it would
+break compatibility.
 
-For the series:
+About the name - This is a superset of current gettimex64. Since 
+the timebase for gettimex64 is fixed and is only 'sys-time / real-time'. 
+I'm appending "any" to add the choice factor. so gettimex64any() would
+give you eXtended time with sandwitch TS of a timebase of your choice.
+If there is a better name, I won't mind changing.
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+The timebase options are -
+   CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_MONOTONIC_RAW, & RAW_CYCLES
+
+Since the ioctl() returns 'stuct ptp_clock_time *', the RAW_CYCLES are
+converted into sec = 10^9 cycles, nsec = remainder-cycles basically
+ns_to_timespec64. Caller can convert the value into raw-cycles
+by using calculations similar to timespec64_to_ns()
+
+The CLOCK_REALTIME option is equivalent of using current gettimex64()
+method.
+
+The first patch adds the ktime_get_cycles64() method to support
+RAW-CYCLES option. The other timebases already have supporting
+methods available.
+
+The second patch adds this new PTP method while the third patch adds the
+ioctl support for this method.
+
+The last patch in the series updates the selftest to exercise this new
+method.
+
+Mahesh Bandewar (4):
+  time: add ktime_get_cycles64() api
+  ptp: add ptp_gettimex64any() support
+  ptp: add ioctl interface for ptp_gettimex64any()
+  selftes/ptp: extend test to include ptp_gettimex64any()
+
+ drivers/ptp/ptp_chardev.c             | 34 ++++++++++++
+ include/linux/ptp_clock_kernel.h      | 57 +++++++++++++++++++
+ include/linux/timekeeping.h           |  1 +
+ include/uapi/linux/ptp_clock.h        | 22 ++++++++
+ kernel/time/timekeeping.c             | 24 ++++++++
+ tools/testing/selftests/Makefile      |  1 +
+ tools/testing/selftests/ptp/testptp.c | 79 ++++++++++++++++++++++++++-
+ 7 files changed, 216 insertions(+), 2 deletions(-)
+
+-- 
+2.42.0.582.g8ccd20d70d-goog
+
 
