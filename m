@@ -1,265 +1,73 @@
-Return-Path: <netdev+bounces-36968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664487B2B3B
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 07:38:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C39C7B2BFC
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 07:48:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 666511C20980
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 05:38:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id EC0FD282637
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 05:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81831FD5;
-	Fri, 29 Sep 2023 05:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761A48820;
+	Fri, 29 Sep 2023 05:48:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798AA17E1
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 05:38:46 +0000 (UTC)
-Received: from out-210.mta0.migadu.com (out-210.mta0.migadu.com [91.218.175.210])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5BA41A2
-	for <netdev@vger.kernel.org>; Thu, 28 Sep 2023 22:38:42 -0700 (PDT)
-Message-ID: <e25b5f3c-bd97-56f0-de86-b93a3172870d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1695965920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2IylT7nMWAJTSHME82z6aOaySj3++vJi55n7xJOKKCw=;
-	b=qFZJ9Wlq8pgzkY2ebidjLO2sKDsFv5UgKFQXKm6YijrYJeteg/9Vq6raUELQsHnvbhLaEL
-	H/7kdOce/CH9ku/oCdYNAnlWS8gQa7mjPcTJIfppvrZiVQeCFkRrLpXNUYgcu9kNkkFr+C
-	bYQ/RUM0EXiahcapixUAdBUPEi7SwIE=
-Date: Fri, 29 Sep 2023 13:38:33 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507A317F2;
+	Fri, 29 Sep 2023 05:48:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 459E7C433C7;
+	Fri, 29 Sep 2023 05:47:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695966483;
+	bh=7ZC2EUS1+5alu8Xvvo5x8YyaDXlFVLmwBFCPCg7iIKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WxhUB415GBUxZOL+xZHYtDTurxK5nBb0W0aJMJpxj5PCUSDRPUTF0nn3N584sqa7p
+	 HTMP0xK4e93SxutPiWMu4AoeW/ir8EKCm/H8v8YLINu3OiXnYfxVli01fBE5/9ozEE
+	 9RuuLWrVrV+ahXUb3xSEJoSBNJy4u9xgP0ua1rdO6qSjRg5Navb3DFz4E9wSvopkkv
+	 leorErorjrd7GVcdU/LBSLpbkK3YPavj8rFTVkRBkcZuWCQgzfz8ABqwtyKI/4V8E6
+	 4jYuzUrrKT991vlxRgHrR8rLEC7CaCbROn5/XuTmkIdrUlUcv+GzECH3RQhQ3FBiWM
+	 GKTBzpFmVxIpg==
+Date: Fri, 29 Sep 2023 07:47:57 +0200
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	decui@microsoft.com, kys@microsoft.com, paulros@microsoft.com,
+	olaf@aepfle.de, vkuznets@redhat.com, davem@davemloft.net,
+	wei.liu@kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, leon@kernel.org, longli@microsoft.com,
+	ssengar@linux.microsoft.com, linux-rdma@vger.kernel.org,
+	daniel@iogearbox.net, john.fastabend@gmail.com, bpf@vger.kernel.org,
+	ast@kernel.org, sharmaajay@microsoft.com, hawk@kernel.org,
+	tglx@linutronix.de, shradhagupta@linux.microsoft.com,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net, 1/3] net: mana: Fix TX CQE error handling
+Message-ID: <20230929054757.GQ24230@kernel.org>
+References: <1695519107-24139-1-git-send-email-haiyangz@microsoft.com>
+ <1695519107-24139-2-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6] net/core: Introduce netdev_core_stats_inc()
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>
-References: <20230928100418.521594-1-yajun.deng@linux.dev>
- <CANn89iL9uy58ZrZRPEtrvQ7ckv5hVTq8shx3OesQA6SWoUOP=g@mail.gmail.com>
- <c43a3dde-fa4d-4a87-6f96-397813db5bd6@linux.dev>
- <CANn89i+iT11qzCidTrHHRMQiYR-nXtbPNAUJGaEg0NQMCq_8CA@mail.gmail.com>
- <5d8e302c-a28d-d4f4-eb91-4b54eb89490b@linux.dev>
- <CANn89i+XQ_LKvr5LHd2QUgTMfZh9Nd1yQTYfRORHUt2_BCkxcg@mail.gmail.com>
- <a94ca1e1-d29a-5d98-bf39-97c7a1f25372@linux.dev>
-In-Reply-To: <a94ca1e1-d29a-5d98-bf39-97c7a1f25372@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1695519107-24139-2-git-send-email-haiyangz@microsoft.com>
 
+On Sat, Sep 23, 2023 at 06:31:45PM -0700, Haiyang Zhang wrote:
+> For an unknown TX CQE error type (probably from a newer hardware),
+> still free the SKB, update the queue tail, etc., otherwise the
+> accounting will be wrong.
+> 
+> Also, TX errors can be triggered by injecting corrupted packets, so
+> replace the WARN_ONCE to ratelimited error logging, because we don't
+> need stack trace here.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
 
-On 2023/9/29 00:32, Yajun Deng wrote:
->
-> On 2023/9/29 00:23, Eric Dumazet wrote:
->> On Thu, Sep 28, 2023 at 6:16 PM Yajun Deng <yajun.deng@linux.dev> wrote:
->>>
->>> On 2023/9/28 23:44, Eric Dumazet wrote:
->>>> On Thu, Sep 28, 2023 at 5:40 PM Yajun Deng <yajun.deng@linux.dev> 
->>>> wrote:
->>>>> On 2023/9/28 22:18, Eric Dumazet wrote:
->>>>>> On Thu, Sep 28, 2023 at 12:04 PM Yajun Deng 
->>>>>> <yajun.deng@linux.dev> wrote:
->>>>>>> Although there is a kfree_skb_reason() helper function that can 
->>>>>>> be used to
->>>>>>> find the reason why this skb is dropped, but most callers didn't 
->>>>>>> increase
->>>>>>> one of rx_dropped, tx_dropped, rx_nohandler and 
->>>>>>> rx_otherhost_dropped.
->>>>>>>
->>>>>>> For the users, people are more concerned about why the dropped 
->>>>>>> in ip
->>>>>>> is increasing.
->>>>>>>
->>>>>>> Introduce netdev_core_stats_inc() for trace the caller of the 
->>>>>>> dropped
->>>>>>> skb. Also, add __code to netdev_core_stats_alloc(), as it's called
->>>>>>> unlinkly.
->>>>>>>
->>>>>>> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
->>>>>>> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>>>>>> ---
->>>>>>> v6: merge netdev_core_stats and netdev_core_stats_inc together
->>>>>>> v5: Access the per cpu pointer before reach the relevant offset.
->>>>>>> v4: Introduce netdev_core_stats_inc() instead of export 
->>>>>>> dev_core_stats_*_inc()
->>>>>>> v3: __cold should be added to the netdev_core_stats_alloc().
->>>>>>> v2: use __cold instead of inline in dev_core_stats().
->>>>>>> v1: 
->>>>>>> https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@linux.dev/
->>>>>>> ---
->>>>>>>     include/linux/netdevice.h | 21 ++++-----------------
->>>>>>>     net/core/dev.c            | 17 +++++++++++++++--
->>>>>>>     2 files changed, 19 insertions(+), 19 deletions(-)
->>>>>>>
->>>>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>>>>>> index 7e520c14eb8c..eb1fa04fbccc 100644
->>>>>>> --- a/include/linux/netdevice.h
->>>>>>> +++ b/include/linux/netdevice.h
->>>>>>> @@ -4002,32 +4002,19 @@ static __always_inline bool 
->>>>>>> __is_skb_forwardable(const struct net_device *dev,
->>>>>>>            return false;
->>>>>>>     }
->>>>>>>
->>>>>>> -struct net_device_core_stats __percpu 
->>>>>>> *netdev_core_stats_alloc(struct net_device *dev);
->>>>>>> -
->>>>>>> -static inline struct net_device_core_stats __percpu 
->>>>>>> *dev_core_stats(struct net_device *dev)
->>>>>>> -{
->>>>>>> -       /* This READ_ONCE() pairs with the write in 
->>>>>>> netdev_core_stats_alloc() */
->>>>>>> -       struct net_device_core_stats __percpu *p = 
->>>>>>> READ_ONCE(dev->core_stats);
->>>>>>> -
->>>>>>> -       if (likely(p))
->>>>>>> -               return p;
->>>>>>> -
->>>>>>> -       return netdev_core_stats_alloc(dev);
->>>>>>> -}
->>>>>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset);
->>>>>>>
->>>>>>>     #define DEV_CORE_STATS_INC(FIELD) \
->>>>>>>     static inline void dev_core_stats_##FIELD##_inc(struct 
->>>>>>> net_device *dev)                \
->>>>>>> { \
->>>>>>> -       struct net_device_core_stats __percpu 
->>>>>>> *p;                               \
->>>>>>> - \
->>>>>>> -       p = dev_core_stats(dev); \
->>>>>>> -       if (p) \
->>>>>>> - this_cpu_inc(p->FIELD); \
->>>>>> Note that we were using this_cpu_inc() which implied :
->>>>>> - IRQ safety, and
->>>>>> - a barrier paired with :
->>>>>>
->>>>>> net/core/dev.c:10548: storage->rx_dropped +=
->>>>>> READ_ONCE(core_stats->rx_dropped);
->>>>>> net/core/dev.c:10549: storage->tx_dropped +=
->>>>>> READ_ONCE(core_stats->tx_dropped);
->>>>>> net/core/dev.c:10550: storage->rx_nohandler +=
->>>>>> READ_ONCE(core_stats->rx_nohandler);
->>>>>> net/core/dev.c:10551: storage->rx_otherhost_dropped
->>>>>> += READ_ONCE(core_stats->rx_otherhost_dropped);
->>>>>>
->>>>>>
->>>>>>> + netdev_core_stats_inc(dev, \
->>>>>>> +                       offsetof(struct net_device_core_stats, 
->>>>>>> FIELD));         \
->>>>>>>     }
->>>>>>>     DEV_CORE_STATS_INC(rx_dropped)
->>>>>>>     DEV_CORE_STATS_INC(tx_dropped)
->>>>>>>     DEV_CORE_STATS_INC(rx_nohandler)
->>>>>>>     DEV_CORE_STATS_INC(rx_otherhost_dropped)
->>>>>>> +#undef DEV_CORE_STATS_INC
->>>>>>>
->>>>>>>     static __always_inline int ____dev_forward_skb(struct 
->>>>>>> net_device *dev,
->>>>>>> struct sk_buff *skb,
->>>>>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>>>>> index 606a366cc209..88a32c392c1d 100644
->>>>>>> --- a/net/core/dev.c
->>>>>>> +++ b/net/core/dev.c
->>>>>>> @@ -10497,7 +10497,8 @@ void netdev_stats_to_stats64(struct 
->>>>>>> rtnl_link_stats64 *stats64,
->>>>>>>     }
->>>>>>>     EXPORT_SYMBOL(netdev_stats_to_stats64);
->>>>>>>
->>>>>>> -struct net_device_core_stats __percpu 
->>>>>>> *netdev_core_stats_alloc(struct net_device *dev)
->>>>>>> +static __cold struct net_device_core_stats __percpu 
->>>>>>> *netdev_core_stats_alloc(
->>>>>>> +               struct net_device *dev)
->>>>>>>     {
->>>>>>>            struct net_device_core_stats __percpu *p;
->>>>>>>
->>>>>>> @@ -10510,7 +10511,19 @@ struct net_device_core_stats __percpu 
->>>>>>> *netdev_core_stats_alloc(struct net_device
->>>>>>>            /* This READ_ONCE() pairs with the cmpxchg() above */
->>>>>>>            return READ_ONCE(dev->core_stats);
->>>>>>>     }
->>>>>>> -EXPORT_SYMBOL(netdev_core_stats_alloc);
->>>>>>> +
->>>>>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset)
->>>>>>> +{
->>>>>>> +       /* This READ_ONCE() pairs with the write in 
->>>>>>> netdev_core_stats_alloc() */
->>>>>>> +       struct net_device_core_stats __percpu *p = 
->>>>>>> READ_ONCE(dev->core_stats);
->>>>>>> +
->>>>>>> +       if (unlikely(!p))
->>>>>>> +               p = netdev_core_stats_alloc(dev);
->>>>>>> +
->>>>>>> +       if (p)
->>>>>>> +               (*(unsigned long *)((void *)this_cpu_ptr(p) + 
->>>>>>> offset))++;
->>>>>> While here you are using a ++ operation that :
->>>>>>
->>>>>> - is not irq safe
->>>>>> - might cause store-tearing.
->>>>>>
->>>>>> I would suggest a preliminary patch converting the "unsigned 
->>>>>> long" fields in
->>>>>> struct net_device_core_stats to local_t
->>>>> Do you mean it needs to revert the commit 6510ea973d8d ("net: Use
->>>>> this_cpu_inc() to increment
->>>>>
->>>>> net->core_stats") first? But it would allocate memory which breaks on
->>>>> PREEMPT_RT.
->>>> I think I provided an (untested) alternative.
->>>>
->>>> unsigned long __percpu *field = (__force unsigned long __percpu *)
->>>> ((__force u8 *)p + offset);
->>>> this_cpu_inc(field);
->>> unsigned long __percpu *field = (__force unsigned long __percpu *)
->>> ((__force u8 *)p + offset);
->>> this_cpu_inc(*(int *)field);
->>>
->>> This would compiler success. But I didn't test it.
->>> This cold look complex.
->> Why exactly ? Not very different from the cast you already had.
-> Okay, I'll test it.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-
-It seems something wrong.
-
-"ip -s a" would see the 'dropped' is increasing. But I cann't trace 
-anything by the following cmd.
-
-"sudo  python3  /usr/share/bcc/tools/trace netdev_core_stats_inc"
-
-If I change back to "(*(unsigned long *)((void *)this_cpu_ptr(p) + 
-offset))++; ", I can trace the caller.
-
-So the following code would accidentally change somthing.
-
-unsigned long __percpu *field = (__force unsigned long __percpu *) 
-((__force u8 *)p + offset);
-
-this_cpu_inc(*field);
-
->>
->>> Shoud I base v3? Export dev_core_stats_*_inc() intead of introduce 
->>> netdev_core_stats_inc().
->>> That would be easy.
->> Well, you tell me, but this does not look incremental to me.
->>
->> I do not think we need 4 different (and maybe more to come if struct
->> net_device_core_stats
->> grows in the future) functions for some hardly used path.
 
