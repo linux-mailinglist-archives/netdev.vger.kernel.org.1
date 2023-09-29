@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-37081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85C57B383B
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 19:00:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF277B383E
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 19:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 16B25280FEC
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:00:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 300A5284D33
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 17:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728904175B;
-	Fri, 29 Sep 2023 17:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 323A34176C;
+	Fri, 29 Sep 2023 17:00:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B5B4123A
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 17:00:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050E31A8
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 10:00:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43FA641749
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 17:00:54 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEFD61B5
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 10:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696006847;
+	s=mimecast20190719; t=1696006852;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+oquGKuGwxfFoQE+GbMX8EY8O13dfuQB8zXuBNfC+6k=;
-	b=FqbvgoZ9dHTt4P/df0fkVAYU+ldi9oLfDP0Uhm+wA9o0MwyH3eDagtcc2R2+ev68UuyEuv
-	JiDDUOUvHYabiH4aVHvLOg9gMWbwAKvjOIbEKvqTBxsjszXeyzA/kHtyWGkrw/t4YvUEY4
-	KhYLpzEO9TyrMIxCPwSlAXvMCoQCb58=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-drVkHA9PODavbdJcMzCG8Q-1; Fri, 29 Sep 2023 13:00:43 -0400
-X-MC-Unique: drVkHA9PODavbdJcMzCG8Q-1
+	bh=KJIb8l8HiWQLqwHnb+OGG6jBumxqOciHnOCpUxHqes8=;
+	b=DweZjqgHhtLgkfed83YruzXz6ayJPe0/v+lECif2730IcnceIXMHVnfvH1Tt6SFZ5dMDlk
+	x2qcMXlZZ78ie767e92jgknonC9V+bW8SDtZkZ5Uxw7jvBcgoOoxo7BvA4ibK/eSCzKUiu
+	1d8MPFpWuB0ubygKPAfenwd+pDy5n/I=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-bhXzHpUdNYKihzMazFXV2A-1; Fri, 29 Sep 2023 13:00:45 -0400
+X-MC-Unique: bhXzHpUdNYKihzMazFXV2A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1DE8F8007A4;
-	Fri, 29 Sep 2023 17:00:43 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CE8E73815F63;
+	Fri, 29 Sep 2023 17:00:44 +0000 (UTC)
 Received: from rhel-developer-toolbox.redhat.com (unknown [10.2.16.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8BAF2C15BB8;
-	Fri, 29 Sep 2023 17:00:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4506BC15BB8;
+	Fri, 29 Sep 2023 17:00:43 +0000 (UTC)
 From: Chris Leech <cleech@redhat.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Christoph Hellwig <hch@lst.de>,
@@ -58,9 +58,9 @@ Cc: Nilesh Javali <njavali@marvell.com>,
 	Hannes Reinecke <hare@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] uio: introduce UIO_DMA_COHERENT type
-Date: Fri, 29 Sep 2023 10:00:21 -0700
-Message-ID: <20230929170023.1020032-2-cleech@redhat.com>
+Subject: [PATCH 2/3] cnic,bnx2,bnx2x: page align uio mmap allocations
+Date: Fri, 29 Sep 2023 10:00:22 -0700
+Message-ID: <20230929170023.1020032-3-cleech@redhat.com>
 In-Reply-To: <20230929170023.1020032-1-cleech@redhat.com>
 References: <20230929170023.1020032-1-cleech@redhat.com>
 Precedence: bulk
@@ -71,114 +71,110 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
+	SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add a UIO memtype specificially for sharing dma_alloc_coherent
-memory with userspace, backed by dma_mmap_coherent.
+Allocations in these drivers that will be mmaped through a uio device
+should be made in multiples of PAGE_SIZE to avoid exposing additional
+kernel memory unintentionally.
 
 Signed-off-by: Chris Leech <cleech@redhat.com>
 ---
- drivers/uio/uio.c          | 34 ++++++++++++++++++++++++++++++++++
- include/linux/uio_driver.h | 12 ++++++++++--
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnx2.c             | 1 +
+ drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c | 8 ++++----
+ drivers/net/ethernet/broadcom/cnic.c             | 9 +++++----
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/uio/uio.c b/drivers/uio/uio.c
-index 62082d64ece0..f8f1f7ba6378 100644
---- a/drivers/uio/uio.c
-+++ b/drivers/uio/uio.c
-@@ -24,6 +24,7 @@
- #include <linux/kobject.h>
- #include <linux/cdev.h>
- #include <linux/uio_driver.h>
-+#include <linux/dma-mapping.h>
+diff --git a/drivers/net/ethernet/broadcom/bnx2.c b/drivers/net/ethernet/broadcom/bnx2.c
+index 0d917a9699c5..84a04eec654a 100644
+--- a/drivers/net/ethernet/broadcom/bnx2.c
++++ b/drivers/net/ethernet/broadcom/bnx2.c
+@@ -837,6 +837,7 @@ bnx2_alloc_stats_blk(struct net_device *dev)
+ 						 BNX2_SBLK_MSIX_ALIGN_SIZE);
+ 	bp->status_stats_size = status_blk_size +
+ 				sizeof(struct statistics_block);
++	bp->status_stats_size = PAGE_ALIGN(bp->status_stats_size);
+ 	status_blk = dma_alloc_coherent(&bp->pdev->dev, bp->status_stats_size,
+ 					&bp->status_blk_mapping, GFP_KERNEL);
+ 	if (!status_blk)
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+index 0d8e61c63c7c..2fcde42a05c1 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+@@ -8270,10 +8270,10 @@ void bnx2x_free_mem_cnic(struct bnx2x *bp)
  
- #define UIO_MAX_DEVICES		(1U << MINORBITS)
+ 	if (!CHIP_IS_E1x(bp))
+ 		BNX2X_PCI_FREE(bp->cnic_sb.e2_sb, bp->cnic_sb_mapping,
+-			       sizeof(struct host_hc_status_block_e2));
++			PAGE_ALIGN(sizeof(struct host_hc_status_block_e2)));
+ 	else
+ 		BNX2X_PCI_FREE(bp->cnic_sb.e1x_sb, bp->cnic_sb_mapping,
+-			       sizeof(struct host_hc_status_block_e1x));
++			PAGE_ALIGN(sizeof(struct host_hc_status_block_e1x)));
  
-@@ -759,6 +760,36 @@ static int uio_mmap_physical(struct vm_area_struct *vma)
- 			       vma->vm_page_prot);
+ 	BNX2X_PCI_FREE(bp->t2, bp->t2_mapping, SRC_T2_SZ);
  }
- 
-+static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
-+{
-+	struct uio_device *idev = vma->vm_private_data;
-+	int mi = uio_find_mem_index(vma);
-+	struct uio_mem *mem;
-+	int rc;
-+
-+	if (mi < 0)
-+		return -EINVAL;
-+	mem = idev->info->mem + mi;
-+
-+	if (mem->dma_addr & ~PAGE_MASK)
-+		return -ENODEV;
-+	if (vma->vm_end - vma->vm_start > mem->size)
-+		return -EINVAL;
-+
-+	/*
-+	 * UIO uses offset to index into the maps for a device.
-+	 * We need to clear vm_pgoff for dma_mmap_coherent.
-+	 */
-+	vma->vm_pgoff = 0;
-+	rc = dma_mmap_coherent(mem->dma_device,
-+				vma,
-+				mem->virtual_addr,
-+				mem->dma_addr,
-+				vma->vm_end - vma->vm_start);
-+	vma->vm_pgoff = mi;
-+	return rc;
-+}
-+
- static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
- {
- 	struct uio_listener *listener = filep->private_data;
-@@ -806,6 +837,9 @@ static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
- 	case UIO_MEM_VIRTUAL:
- 		ret = uio_mmap_logical(vma);
- 		break;
-+	case UIO_MEM_DMA_COHERENT:
-+		ret = uio_mmap_dma_coherent(vma);
-+		break;
- 	default:
- 		ret = -EINVAL;
+@@ -8316,12 +8316,12 @@ int bnx2x_alloc_mem_cnic(struct bnx2x *bp)
+ 	if (!CHIP_IS_E1x(bp)) {
+ 		/* size = the status block + ramrod buffers */
+ 		bp->cnic_sb.e2_sb = BNX2X_PCI_ALLOC(&bp->cnic_sb_mapping,
+-						    sizeof(struct host_hc_status_block_e2));
++					PAGE_ALIGN(sizeof(struct host_hc_status_block_e2)));
+ 		if (!bp->cnic_sb.e2_sb)
+ 			goto alloc_mem_err;
+ 	} else {
+ 		bp->cnic_sb.e1x_sb = BNX2X_PCI_ALLOC(&bp->cnic_sb_mapping,
+-						     sizeof(struct host_hc_status_block_e1x));
++					PAGE_ALIGN(sizeof(struct host_hc_status_block_e1x)));
+ 		if (!bp->cnic_sb.e1x_sb)
+ 			goto alloc_mem_err;
  	}
-diff --git a/include/linux/uio_driver.h b/include/linux/uio_driver.h
-index 47c5962b876b..ede58e984658 100644
---- a/include/linux/uio_driver.h
-+++ b/include/linux/uio_driver.h
-@@ -36,11 +36,18 @@ struct uio_map;
-  */
- struct uio_mem {
- 	const char		*name;
--	phys_addr_t		addr;
-+	union {
-+		phys_addr_t	addr;
-+		dma_addr_t	dma_addr;
-+	};
- 	unsigned long		offs;
- 	resource_size_t		size;
- 	int			memtype;
--	void __iomem		*internal_addr;
-+	union {
-+		void __iomem	*internal_addr;
-+		void 		*virtual_addr;
-+	};
-+	struct device		*dma_device;
- 	struct uio_map		*map;
- };
+diff --git a/drivers/net/ethernet/broadcom/cnic.c b/drivers/net/ethernet/broadcom/cnic.c
+index 7926aaef8f0c..67ec397bd171 100644
+--- a/drivers/net/ethernet/broadcom/cnic.c
++++ b/drivers/net/ethernet/broadcom/cnic.c
+@@ -1026,13 +1026,14 @@ static int __cnic_alloc_uio_rings(struct cnic_uio_dev *udev, int pages)
+ 		return 0;
  
-@@ -158,6 +165,7 @@ extern int __must_check
- #define UIO_MEM_LOGICAL	2
- #define UIO_MEM_VIRTUAL 3
- #define UIO_MEM_IOVA	4
-+#define UIO_MEM_DMA_COHERENT	5
+ 	udev->l2_ring_size = pages * CNIC_PAGE_SIZE;
++	udev->l2_ring_size = PAGE_ALIGN(udev->l2_ring_size);
+ 	udev->l2_ring = dma_alloc_coherent(&udev->pdev->dev, udev->l2_ring_size,
+ 					   &udev->l2_ring_map, GFP_KERNEL);
+ 	if (!udev->l2_ring)
+ 		return -ENOMEM;
  
- /* defines for uio_port->porttype */
- #define UIO_PORT_NONE	0
+ 	udev->l2_buf_size = (cp->l2_rx_ring_size + 1) * cp->l2_single_buf_size;
+-	udev->l2_buf_size = CNIC_PAGE_ALIGN(udev->l2_buf_size);
++	udev->l2_buf_size = PAGE_ALIGN(udev->l2_buf_size);
+ 	udev->l2_buf = dma_alloc_coherent(&udev->pdev->dev, udev->l2_buf_size,
+ 					  &udev->l2_buf_map, GFP_KERNEL);
+ 	if (!udev->l2_buf) {
+@@ -1108,9 +1109,9 @@ static int cnic_init_uio(struct cnic_dev *dev)
+ 		uinfo->mem[1].addr = (unsigned long) cp->status_blk.gen &
+ 					CNIC_PAGE_MASK;
+ 		if (cp->ethdev->drv_state & CNIC_DRV_STATE_USING_MSIX)
+-			uinfo->mem[1].size = BNX2_SBLK_MSIX_ALIGN_SIZE * 9;
++			uinfo->mem[1].size = PAGE_ALIGN(BNX2_SBLK_MSIX_ALIGN_SIZE * 9);
+ 		else
+-			uinfo->mem[1].size = BNX2_SBLK_MSIX_ALIGN_SIZE;
++			uinfo->mem[1].size = PAGE_ALIGN(BNX2_SBLK_MSIX_ALIGN_SIZE);
+ 
+ 		uinfo->name = "bnx2_cnic";
+ 	} else if (test_bit(CNIC_F_BNX2X_CLASS, &dev->flags)) {
+@@ -1118,7 +1119,7 @@ static int cnic_init_uio(struct cnic_dev *dev)
+ 
+ 		uinfo->mem[1].addr = (unsigned long) cp->bnx2x_def_status_blk &
+ 			CNIC_PAGE_MASK;
+-		uinfo->mem[1].size = sizeof(*cp->bnx2x_def_status_blk);
++		uinfo->mem[1].size = PAGE_ALIGN(sizeof(*cp->bnx2x_def_status_blk));
+ 
+ 		uinfo->name = "bnx2x_cnic";
+ 	}
 -- 
 2.41.0
 
