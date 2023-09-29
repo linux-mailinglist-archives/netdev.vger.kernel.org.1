@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-37043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCEEF7B3488
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 16:13:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5837B348B
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 16:13:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 56D59283C53
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 14:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id F19AD284835
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 14:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233D4513AA;
-	Fri, 29 Sep 2023 14:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559A64F156;
+	Fri, 29 Sep 2023 14:13:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2315125F
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 14:13:23 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA707CCE
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:13:20 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-4066241289bso1832155e9.0
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:13:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0964F13A
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 14:13:24 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 112E51B0
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:13:22 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-406619b53caso3071885e9.1
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:13:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1695996799; x=1696601599; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1695996800; x=1696601600; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GkCcF2KTU9N5lkXziHP+LXRrArD0pee4JR3G/zEvesA=;
-        b=cjVZAZi70K0rgd+yj9PK5mhJkiGvhgOAyJpiizEzK22WoAeAwNZIC40co//x+Zw9xy
-         dX4AFiaIoiTSNK2oVUI/p3R6rnSdhe7Oy0X63btpA4flVs4RUi1x+xrB8Oxolpzwk51B
-         FP5S7NuKd+B1aSq29golbdWvcDcd107pDPukk/TRdMJweQJHFCC1rL6jQe9wur8Glp2f
-         Ez83zmSblHM2pttcQCfWSIjZQe+yVHVBPPn30OxNJ1L0C5Ma+AX60nY04qdxemg9PG3p
-         +43aFTM9vI/ohg2T6vgQfWnB/fdlHFEy0juhKyrR57esQLSvLdAuhW3Rf4R0yX7svgLR
-         6WIw==
+        bh=X+rM/QYhS4mcPKAe3LyxGKzK/5QSlJ3sVw7EeYSM6vM=;
+        b=1T2nCuHsyJA2sN+PPQ0EoFaDPUdNCO5brki7BZhNU0tSNfpxvV57AMvHdxShrT7xOX
+         AUKVmopnDS9IQzgjegMNnx5Hkq7ZVS4A2pq4LvNuYdkOel773Cus9prnox3YAEAMqu61
+         4pC4zaQGCFclxPwTLUHtm23N/hMv4a8XRFAgnRHoY47VxtIAnzBM+EG5ldfQCkfwM8lx
+         bh7EdVoldXCJ6HEIduA4W8Aqmsxz9Yq9tmSuhMFFByOUbjBapP7Z03Oy7UiHMIB2452z
+         xPoeTa1JHskE7jQGlSl4wD8bXgJSXrKSqPC7bxCjTBtQOcXEMJ0roZc14kO6Aabin5/1
+         xi3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695996799; x=1696601599;
+        d=1e100.net; s=20230601; t=1695996800; x=1696601600;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GkCcF2KTU9N5lkXziHP+LXRrArD0pee4JR3G/zEvesA=;
-        b=fionQ/cPMg+ElUMV0KhSyyNQ5syx/Ub4OwhF1IInNY9pyAD9FjBeYnNrHM1zYDWqZz
-         rPi5pQrE5Pu0dt3zYL6u24WrPedP9lg7XQ8RpKH6i+BZoTzbcPEaYyL89Bbv8Kdp0ZQ1
-         Q2KFgtvmwCeZinRliVHvwh9Zu9XqXGj9hTUrycZGBOWAB6jyy7WyZpZ4T5hg7D3HzDQb
-         JbCjIfZMwIBGrAmHWFUGAdVAe7EuK0W63iTA+aBezuSDq0Bxuw70OQOlyejQr92j2IPx
-         XuFxtVdYJaxNWx6TPfjpsdhm13G27dV6ckZs5br9cwC9WYaWdH2yoEmAXZxroz/V20Uc
-         9gfQ==
-X-Gm-Message-State: AOJu0Ywxzo9PHL73zlmPAZyG7tb9og+XVXD4dDsOTUTaANsWkiTh3v9H
-	yW1+H2y7uuz+MnZRQUXFZDGJ3w==
-X-Google-Smtp-Source: AGHT+IEFHl050mT4xpHekXYUX/+roBtcsDhNgR8Zd+Bg6bIiJyLUrZtUd7mL6LJND2UCb/uYOMfs+A==
-X-Received: by 2002:a05:600c:2053:b0:406:478e:9e2d with SMTP id p19-20020a05600c205300b00406478e9e2dmr3754793wmg.26.1695996799447;
-        Fri, 29 Sep 2023 07:13:19 -0700 (PDT)
+        bh=X+rM/QYhS4mcPKAe3LyxGKzK/5QSlJ3sVw7EeYSM6vM=;
+        b=Xwt8wbL2QRVPYr4hXNWPFKQywFioH1gfdZVUuSDB4rP4Ls2QEGjkNou+64nK2HNwpK
+         T8/UXdzMV7/uChIdhxH6yl/R0IEtCi0TgwokttvHMahGAIouHxEDjJeAXFVUTgC4IQt3
+         xRlqOdtjYJA6LrXnzjXl48969+sUCcBMOfaLyzDN25S9NB85DI8J5yV0g6CXAcyEI0VW
+         G+29TEU66EynVaeZJjRFMpqWexJ69TBdYSo+yZ3kZbCwgHUMJ6MJcgqeivHGXkaDhleT
+         bGOzAQkx8Nl8OeIHnGKmPthtK+iJ733V7Iv/qIUM7kuGo+pdEhGveMt1fAkqv7tiGODO
+         deDg==
+X-Gm-Message-State: AOJu0Yxs2jzkr2nDi4FKH3qXXyk6pxWcG7ek7r+KTw5pg0VMAzZXr9Rf
+	C8M26n6qzCK8hc18iKFa8F9UIg==
+X-Google-Smtp-Source: AGHT+IHYZ3GYrC4ypaDeWAMu+A+p+4b6o0y1MT67QwkILD3FBUYYnVdMKh2W+05xSbdsP2tRwDq5LQ==
+X-Received: by 2002:a05:600c:21d1:b0:405:3ae6:2413 with SMTP id x17-20020a05600c21d100b004053ae62413mr3992345wmj.25.1695996800556;
+        Fri, 29 Sep 2023 07:13:20 -0700 (PDT)
 Received: from blmsp.fritz.box ([2001:4091:a246:8222:dbda:9cd9:39cc:f174])
-        by smtp.gmail.com with ESMTPSA id t25-20020a7bc3d9000000b00405391f485fsm1513068wmj.41.2023.09.29.07.13.18
+        by smtp.gmail.com with ESMTPSA id t25-20020a7bc3d9000000b00405391f485fsm1513068wmj.41.2023.09.29.07.13.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 07:13:19 -0700 (PDT)
+        Fri, 29 Sep 2023 07:13:20 -0700 (PDT)
 From: Markus Schneider-Pargmann <msp@baylibre.com>
 To: Marc Kleine-Budde <mkl@pengutronix.de>,
 	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
@@ -70,9 +70,9 @@ Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
 	Julien Panis <jpanis@baylibre.com>,
 	Judith Mendez <jm@ti.com>,
 	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH v6 08/14] can: m_can: Use u32 for putidx
-Date: Fri, 29 Sep 2023 16:12:58 +0200
-Message-Id: <20230929141304.3934380-9-msp@baylibre.com>
+Subject: [PATCH v6 09/14] can: m_can: Cache tx putidx
+Date: Fri, 29 Sep 2023 16:12:59 +0200
+Message-Id: <20230929141304.3934380-10-msp@baylibre.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230929141304.3934380-1-msp@baylibre.com>
 References: <20230929141304.3934380-1-msp@baylibre.com>
@@ -84,57 +84,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-putidx is not an integer normally, it is an unsigned field used in
-hardware registers. Use a u32 for it.
+m_can_tx_handler is the only place where data is written to the tx fifo.
+We can calculate the putidx in the driver code here to avoid the
+dependency on the txfqs register.
 
 Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 Reviewed-by: Simon Horman <simon.horman@corigine.com>
 ---
- drivers/net/can/m_can/m_can.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/can/m_can/m_can.c | 8 +++++++-
+ drivers/net/can/m_can/m_can.h | 3 +++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 1c021d99bae2..4e9e5c689b19 100644
+index 4e9e5c689b19..645ce0c9fd01 100644
 --- a/drivers/net/can/m_can/m_can.c
 +++ b/drivers/net/can/m_can/m_can.c
-@@ -485,7 +485,7 @@ static void m_can_clean(struct net_device *net)
- 	struct m_can_classdev *cdev = netdev_priv(net);
+@@ -1503,6 +1503,10 @@ static int m_can_start(struct net_device *dev)
  
- 	if (cdev->tx_skb) {
--		int putidx = 0;
-+		u32 putidx = 0;
+ 	m_can_enable_all_interrupts(cdev);
  
- 		net->stats.tx_errors++;
- 		if (cdev->version > 30)
-@@ -1694,12 +1694,12 @@ static int m_can_close(struct net_device *dev)
++	if (cdev->version > 30)
++		cdev->tx_fifo_putidx = FIELD_GET(TXFQS_TFQPI_MASK,
++						 m_can_read(cdev, M_CAN_TXFQS));
++
  	return 0;
  }
  
--static int m_can_next_echo_skb_occupied(struct net_device *dev, int putidx)
-+static int m_can_next_echo_skb_occupied(struct net_device *dev, u32 putidx)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
- 	/*get wrap around for loopback skb index */
- 	unsigned int wrap = cdev->can.echo_skb_max;
--	int next_idx;
-+	u32 next_idx;
+@@ -1792,7 +1796,7 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
+ 		}
  
- 	/* calculate next index */
- 	next_idx = (++putidx >= wrap ? 0 : putidx);
-@@ -1718,7 +1718,7 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
- 	u32 cccr, fdflags;
- 	u32 txfqs;
- 	int err;
--	int putidx;
-+	u32 putidx;
+ 		/* get put index for frame */
+-		putidx = FIELD_GET(TXFQS_TFQPI_MASK, txfqs);
++		putidx = cdev->tx_fifo_putidx;
  
- 	cdev->tx_skb = NULL;
+ 		/* Construct DLC Field, with CAN-FD configuration.
+ 		 * Use the put index of the fifo as the message marker,
+@@ -1826,6 +1830,8 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
  
+ 		/* Enable TX FIFO element to start transfer  */
+ 		m_can_write(cdev, M_CAN_TXBAR, (1 << putidx));
++		cdev->tx_fifo_putidx = (++cdev->tx_fifo_putidx >= cdev->can.echo_skb_max ?
++					0 : cdev->tx_fifo_putidx);
+ 
+ 		/* stop network queue if fifo full */
+ 		if (m_can_tx_fifo_full(cdev) ||
+diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+index 1e461d305bce..0de42fc5ef1e 100644
+--- a/drivers/net/can/m_can/m_can.h
++++ b/drivers/net/can/m_can/m_can.h
+@@ -101,6 +101,9 @@ struct m_can_classdev {
+ 	u32 tx_max_coalesced_frames_irq;
+ 	u32 tx_coalesce_usecs_irq;
+ 
++	// Store this internally to avoid fetch delays on peripheral chips
++	int tx_fifo_putidx;
++
+ 	struct mram_cfg mcfg[MRAM_CFG_NUM];
+ 
+ 	struct hrtimer hrtimer;
 -- 
 2.40.1
 
