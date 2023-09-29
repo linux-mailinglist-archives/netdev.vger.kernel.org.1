@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-37097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA8957B39BF
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:12:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF3B7B39C0
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 899D328318C
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:11:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1845B1C20B87
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6403266698;
-	Fri, 29 Sep 2023 18:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D3566DC9;
+	Fri, 29 Sep 2023 18:11:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EEF6668D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DF266689
 	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 18:11:53 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19741A4
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797EF199
 	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:11:51 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-692c02adeefso9144427b3a.3
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1bf6ea270b2so112123065ad.0
         for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:11:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google; t=1696011111; x=1696615911; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OH0PiR0WI/UE2sZjCTyFU1iLE9Onm3jTTwerBkotyuo=;
-        b=M6H97+PWjTqOpphNFmzrKJiS8uUoVdZ/atl4aDIURSnYWgxqvCjtOqLmhOrKjlfZtH
-         2x5gg8ZM4LtE14rl5dbuLnCCYn6qyGEW35F/jPX7MxKg3EUisYQlEDna2xhTqQO2o6N/
-         NEB5IX+TqMQapc++UTQ/y80qz8YBaIljJ0RR8=
+        bh=LelDNgIaKJAGv8m5QtAniz9H43KU5lbEctjO62ftcqY=;
+        b=c6JXIVj8+lpK/dfbLFSBBXWCRfw/iOqrSjbUE9h28HcY5xoTuqoUYrChI+t9ZpwZuU
+         JAWSdZxLk04I308cwN7stuS6ROcscZTvhh8N3J6jarqvnP4DwINMJ2qa3nC4A3CEi1Wd
+         J1Cfi7W5VK3YwrWjia9nk4/rIiDGc6c5uqCIs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1696011111; x=1696615911;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OH0PiR0WI/UE2sZjCTyFU1iLE9Onm3jTTwerBkotyuo=;
-        b=JGBbQ3Gyz1l5qWEeBnHyvenhykg/grLxTVlkNmZWB7iuua4R7iRWSF9Gt/LJiwVr+4
-         svw4AU8Ng3frMhtgjiGZ/sv0Fhfs3+N3RrqlYtwmgiab+EloOgQVF5HZ5sGLcRccXit2
-         EwiWvVr402ApvPqxzVY0AjFME5N5RpeeabvUgy9M7BQ06rL1gtvOzbkxv3tKxleSALhy
-         r5k/XE0GqT3CMpasXepjl8+0pOv9PDR/xORV9w63G7kVHxx/9zPjf3HeHoVyc40kgPKU
-         IU0fMwzd+h7NzQccVPL/uaeMcG4cfiSPp83TnT+LoOt80ozj9sMGav+HuaJoL+T8yj12
-         +VdQ==
-X-Gm-Message-State: AOJu0Yz7GPt769GhkhzLKQj0ZNTx+lFMgzqz3kEok61EzHawqlVoTYGi
-	qOhMiw6HTSKcIgHfpp5XB2lYbg==
-X-Google-Smtp-Source: AGHT+IHAY4rhk60X1mRZO3KkP8CVqHVHv0bnb2oq8VCNZiw3pzIiWNqw+uVNR3TmEftzfyciqOQl3Q==
-X-Received: by 2002:a05:6a20:442a:b0:12f:c0c1:d70 with SMTP id ce42-20020a056a20442a00b0012fc0c10d70mr5673020pzb.40.1696011111199;
-        Fri, 29 Sep 2023 11:11:51 -0700 (PDT)
+        bh=LelDNgIaKJAGv8m5QtAniz9H43KU5lbEctjO62ftcqY=;
+        b=pURSHl4cJ1U4XaVdIWzj2u9V66+kfFpYhliFyERGGaLTMTx4lPh8mj+dNfkxvz/bZl
+         LO/Wx75AsyO0QgVV2T4UVGM0QIbp9XlCIAa5QV8YOVkD8ndQ8xWE+1A4kKRtCp7jdOi3
+         adIcwqPh42y15LYmARzwv1jAuiPBZoi3Yb0efx/sgzUeGtnCXDhIpHkyFuuoAt2a5Xal
+         /wV8xKm6xai/f6ANzR0O32jbezSu4SwDlZLbVAcoxY1aZrgYBZuyT9OhqpoprVYYyL1s
+         qq78H1PeWpLWHI8+v/7YoaXTJmywwanaF5/wnaK9TPfFaZkgf0n3S+CLdOrRRKStznag
+         KRjw==
+X-Gm-Message-State: AOJu0Yx4Kv6gjmz0/Wg8s/hxmfNQJyM4aRaWpNI8Tr/Z3OFme0f4/5Ll
+	/i4O247eAIoZGC3+sLPhizUQ2A==
+X-Google-Smtp-Source: AGHT+IFp3bhP+Nqbdbpr+lLgR4vtr77JK8lxcWx2zxMlaCWdtIt61fdrd8th89qUIyLgBpTfPNGTAg==
+X-Received: by 2002:a17:902:e545:b0:1c0:d17a:bfef with SMTP id n5-20020a170902e54500b001c0d17abfefmr4502026plf.30.1696011110955;
+        Fri, 29 Sep 2023 11:11:50 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id u2-20020a17090282c200b001c5fe217fb9sm13142608plz.267.2023.09.29.11.11.50
+        by smtp.gmail.com with ESMTPSA id g10-20020a1709026b4a00b001b8a2edab6asm17075217plt.244.2023.09.29.11.11.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 29 Sep 2023 11:11:50 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
@@ -66,9 +66,9 @@ Cc: Kees Cook <keescook@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH 1/5] chelsio/l2t: Annotate struct l2t_data with __counted_by
-Date: Fri, 29 Sep 2023 11:11:45 -0700
-Message-Id: <20230929181149.3006432-1-keescook@chromium.org>
+Subject: [PATCH 2/5] cxgb4: Annotate struct clip_tbl with __counted_by
+Date: Fri, 29 Sep 2023 11:11:46 -0700
+Message-Id: <20230929181149.3006432-2-keescook@chromium.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230929181042.work.990-kees@kernel.org>
 References: <20230929181042.work.990-kees@kernel.org>
@@ -78,19 +78,19 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2088; i=keescook@chromium.org;
- h=from:subject; bh=A70ndgAnsB63r0Ibz6C+3NACmZt0aUvaCrb1LtGUWWA=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlFxNkvS86dHwSxy8ppyZ4ezGlY0dySlfyX5m8D
- KpLi1xEZTeJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRcTZAAKCRCJcvTf3G3A
- JnXDEACBpLVSApm8BNpQD0pC+7W9QFQ72d157scW1CwY8mp7MuBY9cbc42hxF04FiiP0uxr0uGw
- XLnttDJr1KtImVLWmFl0uTUJ2xvOvLqJgAcPgUHpRHHu4p6f3W4JigMcvvGsLfUiWnHrd2E70bp
- EXieKubhNH+KdSuW1X6a5GdsevlmO37r3NEQ/nOm2IYzC0HZTjokvwhXWWKVx7PdVa1cQrq0fDz
- quZ7/aSDzhr6+fC04zQC3bu3IKGusBFOz/tN8NVAhXu45U5wB41EVV+fRKcODPdVPU2b1dI0RpL
- RtwvZQbS4kgZN4bu3pjCR32LHbyD8Y1N01Thzl3TlndTZo1u+6F5MIgL7EyQErTsPKBc3LXQk2H
- xjyT65i/n3qp12l8Ja1892vv5FIXxnfo6mfq4aXqZtEamwm9FmJAypVESnfvoodbydB/Enrzg99
- uk6ya1qT3/vKaXJ8N3tsc4MOhcwS82XDxjADntekAFtoVjfy9vhxoYUKT+hWXd+41p6BGl2hgKH
- 2wYFDc6IR6RWodoZd7pwH1GFZt/Z+anl5r8+FqFUO8RSQxzUiclCweDbghMn1pLP9Ga9SS1r8O7
- kM5qmK82FMBYrUe+3Zsdv7TlwH2LRPNEXsX+HH3vqdQgn+8ZzHuUBmb16fmcZi3/PVPhM0+TBlf BTl+VEbGPVimvcw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1345; i=keescook@chromium.org;
+ h=from:subject; bh=1xjwdL5f1ZwQtlSjHraq4S6Ct1cTzMptk05f7F0Knyw=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlFxNkClAByZ2t2imOLxlyWRMjihvubRYuwVOju
+ CbJdpqAEYiJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRcTZAAKCRCJcvTf3G3A
+ JmRDD/4xcFd2xErFHHO52g54sKzulxzUwaY7hKB/cJqB+eXbtFGgB2tt9GnWDUYTucvNWfGfrRO
+ WefuPoFa1In2irZrcx0pjDUGznGE0qFXLd86FJtIOeSIEJq35TMjFQOnq6tqhTenU3znVkbQZev
+ 64kT7WHWe+/WYF1syArYm5+LofMLkW1zctxLTdrpIRXBXpxbK9IzCd6gG7yQPGh/nCDZaZJR++k
+ D/oSNxxnkr/cGbxRxhf5s/8qYKXv5Y8uzNPu2q5G9yzEf6e+8urdbYNlDIn4WGlWwpOVsGubTh+
+ ef8O9z++/PzDHpk+g5s6fMxH3IM1sNyQbzRSblOMYA6ciGJzENjrSxqVZKJtIVk/gu4cEYIdRSC
+ MZTZgdpN+v10komKMPQwIO/PiQ/38irV/eA1mWTw5lLAm8tqB6LPg6MgYOuOGXtFoI+neSJYPf/
+ x5hWOqzImqqP2rxs3VchpeExsk3srsZJl6fPJKZxcRQ2K8rIR49s8wzZr3k3xKhPdYXoqMAu6lK
+ whn/87qgrQShDDdmtGChdFZuoQ8jBLDXo1Y37dgkk0uN1pnVazzfaYydiESmJYIMAqDs7eiDSb+
+ dMhc2XY+KeQ78Dvg0PDZtR//QWpS5+pG+iPfaLmlEqG6/1pQASs8+LUwdkJXtia2ClOU5W+qlcR fszdrCV9cNLMyTQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -106,7 +106,7 @@ their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
 (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 functions).
 
-As found with Coccinelle[1], add __counted_by for struct l2t_data.
+As found with Coccinelle[1], add __counted_by for struct clip_tbl.
 
 [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
 
@@ -118,36 +118,22 @@ Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/chelsio/cxgb3/l2t.h | 2 +-
- drivers/net/ethernet/chelsio/cxgb4/l2t.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/chelsio/cxgb3/l2t.h b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
-index ea75f275023f..646ca0bc25bd 100644
---- a/drivers/net/ethernet/chelsio/cxgb3/l2t.h
-+++ b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
-@@ -76,7 +76,7 @@ struct l2t_data {
- 	atomic_t nfree;		/* number of free entries */
- 	rwlock_t lock;
- 	struct rcu_head rcu_head;	/* to handle rcu cleanup */
--	struct l2t_entry l2tab[];
-+	struct l2t_entry l2tab[] __counted_by(nentries);
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
+index 290c1058069a..847c7fc2bbd9 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.h
+@@ -29,7 +29,7 @@ struct clip_tbl {
+ 	atomic_t nfree;
+ 	struct list_head ce_free_head;
+ 	void *cl_list;
+-	struct list_head hash_list[];
++	struct list_head hash_list[] __counted_by(clipt_size);
  };
  
- typedef void (*arp_failure_handler_func)(struct t3cdev * dev,
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/l2t.c b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-index a10a6862a9a4..1e5f5b1a22a6 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
-@@ -59,7 +59,7 @@ struct l2t_data {
- 	rwlock_t lock;
- 	atomic_t nfree;             /* number of free entries */
- 	struct l2t_entry *rover;    /* starting point for next allocation */
--	struct l2t_entry l2tab[];  /* MUST BE LAST */
-+	struct l2t_entry l2tab[] __counted_by(l2t_size);  /* MUST BE LAST */
- };
- 
- static inline unsigned int vlan_prio(const struct l2t_entry *e)
+ enum {
 -- 
 2.34.1
 
