@@ -1,110 +1,107 @@
-Return-Path: <netdev+bounces-36988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E377B2D70
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 10:04:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79487B2D79
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 10:06:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 541CA282B99
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 08:04:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id F13BB1C209A4
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 08:06:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76885C2DB;
-	Fri, 29 Sep 2023 08:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DAFC8EA;
+	Fri, 29 Sep 2023 08:06:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2235C2D7
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 08:04:21 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 739771A7
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:04:20 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9b29186e20aso1114870066b.2
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:04:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1695974659; x=1696579459; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=3BtaexmYkjplHFsMDid295szgBs8UBajcfrSgOPKauc=;
-        b=IVP9t89Nf76gDoh7u+xZh07O4jTFUwkY2WQSrtrT4JrNyeQtCcPoiHSyTJO/wUlCzL
-         slP8mQ5blwFjSvpKqJEAUmjL/FU6q+5TgCBI1Fp5vFEQAHY+WVjMMbbXOlMr80QFpPxy
-         q+9pfs8cUTA++ou50tavq4h1E6MUNEUNylYbiKioFn0ZsRahmkFcZFwdp/tS4CNuw8UE
-         kh3r6DTwc+BXzDkeoiLIsATcwwUCYbFsXlHRXG1TMoO2dzDaZp+rrPwUqcQCnnwDGXFv
-         esalcC9l8EnnSKSU0CEdiPQ8vv+/qdzXKoyHnEY+XpEzucngtf/bbIsoGvtcON9EcYzq
-         AXLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695974659; x=1696579459;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3BtaexmYkjplHFsMDid295szgBs8UBajcfrSgOPKauc=;
-        b=HVkF1btDhFQ7nAePXBVngvjUdA386SGlUN+bnRNoq5P0dwoVHfA6+/T1Han8R1SmA9
-         EryjS3eBbS/V02/ZOYkBgb2jlKh65wimrLzlg0XQbv56a8hBOfpMScB9d2JRAeKdNIj5
-         X+B2cfWLP9/IleL+OYNpJ+on3jMav1tHsa/q88qAznFtD9cUsGgGbXlEzv7IOfTrTvRi
-         ykX5ilNTg73N0snIyU71KbN2TtCMB3KmMunMfWjYx0mf0Ru3dugUYmtG71uHDCO1w0mg
-         Yjb5fq4rLSAoDarLFxxZZ+RWmtOAUrD9uw6bMryFaX6k69f8HWz3ofxfKzHVKVS3P2FL
-         4tiw==
-X-Gm-Message-State: AOJu0YwB6UoWxvWj+nJpyNQAZEuAAEuI3Q/PQ1mi+RXib/NKCAE2G9b/
-	a+EttOqPpd32afBp5B37Bg6V/A==
-X-Google-Smtp-Source: AGHT+IHxRPKLDiFlVladtRrAPh0tbXcK+zBdKj2xQlR2G4AeFCg5MSNU/8Zt/FN1IsWIizJP09+/qQ==
-X-Received: by 2002:a17:906:3116:b0:9ae:3c6c:6ecd with SMTP id 22-20020a170906311600b009ae3c6c6ecdmr3369888ejx.19.1695974658919;
-        Fri, 29 Sep 2023 01:04:18 -0700 (PDT)
-Received: from cloudflare.com (79.184.153.47.ipv4.supernova.orange.pl. [79.184.153.47])
-        by smtp.gmail.com with ESMTPSA id kg28-20020a17090776fc00b0099b921de301sm12049940ejc.159.2023.09.29.01.04.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 01:04:18 -0700 (PDT)
-References: <20230926035300.135096-1-john.fastabend@gmail.com>
-User-agent: mu4e 1.6.10; emacs 28.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: daniel@iogearbox.net, ast@kernel.org, andrii@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, edumazet@google.com
-Subject: Re: [PATCH bpf v3 0/3] bpf, sockmap complete fixes for avail bytes
-Date: Fri, 29 Sep 2023 10:02:55 +0200
-In-reply-to: <20230926035300.135096-1-john.fastabend@gmail.com>
-Message-ID: <87fs2xflrw.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2FEFEBE
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 08:06:09 +0000 (UTC)
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [IPv6:2001:780:45:1d:225:90ff:fe52:c662])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5051A5;
+	Fri, 29 Sep 2023 01:06:07 -0700 (PDT)
+Received: from [78.30.34.192] (port=36492 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1qm8Vc-007w9u-C9; Fri, 29 Sep 2023 10:06:02 +0200
+Date: Fri, 29 Sep 2023 10:05:59 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Joao Moreira <joao@overdrivepizza.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	rkannoth@marvell.com, wojciech.drewek@intel.com,
+	steen.hegenlund@microhip.com, keescook@chromium.org,
+	Joao Moreira <joao.moreira@intel.com>
+Subject: Re: [PATCH v3 1/2] Make loop indexes unsigned
+Message-ID: <ZRaFZ4K3ZHTManT7@calendula>
+References: <20230927164715.76744-1-joao@overdrivepizza.com>
+ <20230927164715.76744-2-joao@overdrivepizza.com>
+ <ZRWCPTVd7b6+a7N5@calendula>
+ <77df92a5627411471f1f374d41ae500c@overdrivepizza.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <77df92a5627411471f1f374d41ae500c@overdrivepizza.com>
+X-Spam-Score: -1.9 (-)
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 25, 2023 at 08:52 PM -07, John Fastabend wrote:
-> With e5c6de5fa0258 ("bpf, sockmap: Incorrectly handling copied_seq") we
-> started fixing the available bytes accounting by moving copied_seq to
-> where the user actually reads the bytes.
->
-> However we missed handling MSG_PEEK correctly and we need to ensure
-> that we don't kfree_skb() a skb off the receive_queue when the
-> copied_seq number is not incremented by user reads for some time.
->
-> v2: drop seq var in tcp_read_skb its no longer necessary per Jakub's
->     suggestion
+On Thu, Sep 28, 2023 at 07:53:14PM -0700, Joao Moreira wrote:
+> On 2023-09-28 06:40, Pablo Neira Ayuso wrote:
+> > On Wed, Sep 27, 2023 at 09:47:14AM -0700, joao@overdrivepizza.com wrote:
+> > > From: Joao Moreira <joao.moreira@intel.com>
+> > > 
+> > > Both flow_rule_alloc and offload_action_alloc functions received an
+> > > unsigned num_actions parameters which are then operated within a loop.
+> > > The index of this loop is declared as a signed int. If it was possible
+> > > to pass a large enough num_actions to these functions, it would lead
+> > > to
+> > > an out of bounds write.
+> > > 
+> > > After checking with maintainers, it was mentioned that front-end will
+> > > cap the num_actions value and that it is not possible to reach this
+> > > function with such a large number. Yet, for correctness, it is still
+> > > better to fix this.
+> > > 
+> > > This issue was observed by the commit author while reviewing a
+> > > write-up
+> > > regarding a CVE within the same subsystem [1].
+> > > 
+> > > 1 - https://nickgregory.me/post/2022/03/12/cve-2022-25636/
+> > > 
+> > > Signed-off-by: Joao Moreira <joao.moreira@intel.com>
+> > > ---
+> > >  net/core/flow_offload.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/net/core/flow_offload.c b/net/core/flow_offload.c
+> > > index bc5169482710..bc3f53a09d8f 100644
+> > > --- a/net/core/flow_offload.c
+> > > +++ b/net/core/flow_offload.c
+> > > @@ -10,7 +10,7 @@
+> > >  struct flow_rule *flow_rule_alloc(unsigned int num_actions)
+> > >  {
+> > >  	struct flow_rule *rule;
+> > > -	int i;
+> > > +	unsigned int i;
+> > 
+> > With the 2^8 cap, I don't think this patch is required anymore.
+> 
+> Hm. While I understand that there is not a significant menace haunting
+> this... would it be good for (1) type correctness and (2) prevent that
+> things blow up if something changes and someone misses this spot?
 
-Credit goes to Simon Horman.
-
-> v3: drop tcp_sock as well its also not used anymore. sorry for the extra
->     noise there.
->
-> John Fastabend (3):
->   bpf: tcp_read_skb needs to pop skb regardless of seq
->   bpf: sockmap, do not inc copied_seq when PEEK flag set
->   bpf: sockmap, add tests for MSG_F_PEEK
->
->  net/ipv4/tcp.c                                | 10 +---
->  net/ipv4/tcp_bpf.c                            |  4 +-
->  .../selftests/bpf/prog_tests/sockmap_basic.c  | 52 +++++++++++++++++++
->  3 files changed, 57 insertions(+), 9 deletions(-)
-
-For the series:
-
-Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
+Nothing is going to change, please remove unnecesary updates. Capping
+to 2^8 for all hardware offload subsystems is sufficient by now. If
+someone needs more than that, it will have to justify it.
 
