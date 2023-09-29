@@ -1,106 +1,152 @@
-Return-Path: <netdev+bounces-37026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECE0A7B3378
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:20:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 971AC7B33A2
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 156EB1C209D1
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4926C283944
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17411A5A3;
-	Fri, 29 Sep 2023 13:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5E71A5BB;
+	Fri, 29 Sep 2023 13:31:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A031A5A6
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 13:20:15 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA036CC3
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 06:20:13 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-658-iSaAYYJJO06RazDCH-kyKA-1; Fri, 29 Sep 2023 09:20:10 -0400
-X-MC-Unique: iSaAYYJJO06RazDCH-kyKA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D45C78002B2;
-	Fri, 29 Sep 2023 13:20:09 +0000 (UTC)
-Received: from hog (unknown [10.45.225.122])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D4AB1005E29;
-	Fri, 29 Sep 2023 13:20:07 +0000 (UTC)
-Date: Fri, 29 Sep 2023 15:20:05 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>, linux-snps-arc@lists.infradead.org,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined
- reference to `crypto_has_aead'
-Message-ID: <ZRbPBdu0ZJ86juff@hog>
-References: <CA+G9fYu2DKDxOEFTeJhH-r_JD8gR1gS8e4YsSrW3rfGegHR4Sg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E756B1A5B6
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 13:31:32 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D9F1A8;
+	Fri, 29 Sep 2023 06:31:31 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38TDCvBN026797;
+	Fri, 29 Sep 2023 13:31:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=KOguaF6iALYcwr27LNhLYvutGdA4b4GGDP7gWC/lIdw=;
+ b=E1dhxl1GaoBJiZnhbyJsXCL3SMKcJe3hVn02fVmAVWTW9BQahWNYP9mmjHSpOqLeB2P7
+ /u34byGz5GO0iumI/Urh7akqLiH6LvJHPeu0/bhWZkLGLjpoQ4AcEN+VTqTuioNcJ8Bu
+ 7dPznadXRwHC3zRHYH9Sk5etiOCKmabjeP6s7HtutqBtm87QbC7Vd4FwNETViutULB5r
+ 9rSX2GN4KSrKlrDUx2i18reNkmHI2DLRdon6x5qH37xbDqi4E8qy1IZh7NtJtqZUc85+
+ FnRj+eFXZgdvjJrGQQ/spwYLitV/ox+S9weGDCiTH+Vv3PHJ+/k/kx2AgLE4zVNaVASr PQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdx32tpvx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 13:31:26 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38TDTeE7014388;
+	Fri, 29 Sep 2023 13:31:25 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdx32tpvb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 13:31:25 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38TBK6KS030735;
+	Fri, 29 Sep 2023 13:31:24 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tacjkmfh6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 13:31:24 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38TDVLIn23265794
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 29 Sep 2023 13:31:22 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC02520040;
+	Fri, 29 Sep 2023 13:31:21 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC6522004B;
+	Fri, 29 Sep 2023 13:31:20 +0000 (GMT)
+Received: from [9.179.2.72] (unknown [9.179.2.72])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 29 Sep 2023 13:31:20 +0000 (GMT)
+Message-ID: <da1d0698-ea4c-12b3-3e20-fc9b65e56a3a@linux.ibm.com>
+Date: Fri, 29 Sep 2023 15:31:20 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
+ extension and loopback-ism
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <2e4bb42a-1a6c-476e-c982-c4d6cfdac63b@linux.ibm.com>
+ <1fc9a6aa-019d-f3f5-7cac-3b78388c2730@linux.ibm.com>
+ <4bac8bcf-5507-0982-fed2-c507fc3264c2@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <4bac8bcf-5507-0982-fed2-c507fc3264c2@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: roAzsINWAF_IAxI5Chgnx5YVqvI05Fmd
+X-Proofpoint-ORIG-GUID: 9pqjkfaYLUZvpVjerG8VUa573a816dfQ
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+G9fYu2DKDxOEFTeJhH-r_JD8gR1gS8e4YsSrW3rfGegHR4Sg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-29_11,2023-09-28_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ impostorscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=991 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309290112
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-09-29, 12:41:51 +0530, Naresh Kamboju wrote:
-> The arc defconfig builds failed on Linux next from Sept 22.
->=20
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
->=20
-> Build log:
-> -----------
-> arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined reference
-> to `crypto_has_aead'
-> arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined reference
-> to `crypto_has_aead'
-> make[3]: *** [/builds/linux/scripts/Makefile.vmlinux:36: vmlinux] Error 1
-> make[3]: Target '__default' not remade because of errors.
 
-Use of crypto_has_aead was added to net/xfrm/xfrm_algo.c in commit
-a1383e2ab102 ("ipsec: Stop using crypto_has_alg").
 
-I guess the problem is that CONFIG_XFRM_ALGO doesn't select
-CONFIG_CRYPTO_AEAD (or _AEAD2?), just CRYPTO_HASH and CRYPTO_SKCIPHER.
+On 28.09.23 19:29, Wen Gu wrote:
+> 
+> 
+> On 2023/9/28 16:56, Alexandra Winter wrote:
+>>
+>>
+>> On 27.09.23 17:16, Alexandra Winter wrote:
+>>> Hello Wen Gu,
+>>>
+>>> I applied and built your patches and noticed some things that you may want to consider in the next version:
+>>
+>>
+>> FYI, patchwork basically complains about many the same issues:
+>> https://patchwork.kernel.org/project/netdevbpf/list/?series=787037&state=*
+>>
+>> In general you should run those check BEFORE you send the patches and not rely on patchwork.
+> Thank you Sandy. I seem to have not seen the specific content of these checks. May I ask how to
+> run those patchwork check locally? So that I can make sure everything is ok before send them.
+> 
 
-Herbert, does that seem reasonable?
+Citing from Documentation/process/maintainer-netdev.rst :
 
--------- 8< --------
-diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-index 3adf31a83a79..d7b16f2c23e9 100644
---- a/net/xfrm/Kconfig
-+++ b/net/xfrm/Kconfig
-@@ -15,6 +15,7 @@ config XFRM_ALGO
- =09tristate
- =09select XFRM
- =09select CRYPTO
-+=09select CRYPTO_AEAD
- =09select CRYPTO_HASH
- =09select CRYPTO_SKCIPHER
-=20
+"patchwork checks
+~~~~~~~~~~~~~~~~
 
---=20
-Sabrina
+Checks in patchwork are mostly simple wrappers around existing kernel
+scripts, the sources are available at:
+
+https://github.com/kuba-moo/nipa/tree/master/tests
+
+**Do not** post your patches just to run them through the checks.
+You must ensure that your patches are ready by testing them locally
+before posting to the mailing list. The patchwork build bot instance
+gets overloaded very easily and netdev@vger really doesn't need more
+traffic if we can help it."
+
+HTH
 
 
