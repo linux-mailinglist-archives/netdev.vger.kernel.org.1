@@ -1,241 +1,228 @@
-Return-Path: <netdev+bounces-37033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29547B341F
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 16:02:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA02A7B344B
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 16:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 85139281E7A
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 14:02:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4C066281FFE
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 14:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66ABC42BF7;
-	Fri, 29 Sep 2023 14:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDB34B214;
+	Fri, 29 Sep 2023 14:09:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282DE3C37;
-	Fri, 29 Sep 2023 14:02:44 +0000 (UTC)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079391A8;
-	Fri, 29 Sep 2023 07:02:41 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20230929140240euoutp01afe66b9e4e0ffa1bcecba49359025df5~JY4WWDxoK3251532515euoutp01d;
-	Fri, 29 Sep 2023 14:02:40 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20230929140240euoutp01afe66b9e4e0ffa1bcecba49359025df5~JY4WWDxoK3251532515euoutp01d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1695996160;
-	bh=Btrm8Ac8d2kEpEoRPdLI6EsuqjId3rLOgFjkXf4LLYQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=AFYNkKpSlDSLgKTy1BFqKkjzrxsiEUyok/P+wi9niUPxPhYWD9cBsK1yjoUw/noIU
-	 XMR9yFl90mqqjH9tb/YgNMjRvuGUqinn8j+EtI2Bt9enmbe4U3pQT008WX8/SYh93R
-	 gdC2CWgh1OKveRJVjaffdbYgq7tqctX33NWhJz6Y=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20230929140239eucas1p1917c6db31ae8d968a725d3a0824c4271~JY4WG4bVE1493514935eucas1p1Q;
-	Fri, 29 Sep 2023 14:02:39 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id B7.4B.11320.FF8D6156; Fri, 29
-	Sep 2023 15:02:39 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20230929140239eucas1p100707358803bb5652bd2e506e93dfaf3~JY4VkDryJ1519215192eucas1p12;
-	Fri, 29 Sep 2023 14:02:39 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20230929140239eusmtrp20681390d79a16dcf189beecae65e74a3~JY4VidnSl1185111851eusmtrp2b;
-	Fri, 29 Sep 2023 14:02:39 +0000 (GMT)
-X-AuditID: cbfec7f4-993ff70000022c38-bd-6516d8ffe5ca
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 3B.14.10549.EF8D6156; Fri, 29
-	Sep 2023 15:02:39 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20230929140238eusmtip2c25894434db9fa8e8bfc2867c15761a4~JY4VOmMMj3161831618eusmtip2F;
-	Fri, 29 Sep 2023 14:02:38 +0000 (GMT)
-Received: from localhost (106.210.248.178) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Fri, 29 Sep 2023 15:02:38 +0100
-Date: Fri, 29 Sep 2023 16:03:47 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Wei Liu <wei.liu@kernel.org>
-CC: Luis Chamberlain <mcgrof@kernel.org>, <willy@infradead.org>,
-	<josh@joshtriplett.org>, Kees Cook <keescook@chromium.org>, Phillip Potter
-	<phil@philpotter.co.uk>, Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann
-	<arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Juergen
-	Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, Jiri Slaby
-	<jirislaby@kernel.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>, "Martin
- K. Petersen" <martin.petersen@oracle.com>, Doug Gilbert
-	<dgilbert@interlog.com>, Sudip Mukherjee <sudipm.mukherjee@gmail.com>, Jason
-	Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Corey Minyard
-	<minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>, "Jason A. Donenfeld"
-	<Jason@zx2c4.com>, David Ahern <dsahern@kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Robin Holt
-	<robinmholt@gmail.com>, Steve Wahl <steve.wahl@hpe.com>, Russ Weight
-	<russell.h.weight@intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, Song
-	Liu <song@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang
-	<haiyangz@microsoft.com>, Dexuan Cui <decui@microsoft.com>, Jani Nikula
-	<jani.nikula@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>, David Airlie
-	<airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	<linux-kernel@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-	<linux-serial@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-	<linuxppc-dev@lists.ozlabs.org>, <linux-rdma@vger.kernel.org>,
-	<openipmi-developer@lists.sourceforge.net>, <netdev@vger.kernel.org>,
-	<linux-raid@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-	<intel-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>
-Subject: Re: [PATCH 14/15] hyper-v/azure: Remove now superfluous sentinel
- element from ctl_table array
-Message-ID: <20230929140347.dzpk5xfdfkxrcln7@localhost>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424133C37
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 14:09:23 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BACA0DB;
+	Fri, 29 Sep 2023 07:09:20 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 38TE5JsB023179;
+	Fri, 29 Sep 2023 14:09:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=6hpkonIYzlGTeNSZH3G+bqnCE7UFtjMK+yvrmruqcbM=;
+ b=ObnGF4yHm68d7n+Z3qXsEWgfks48bpVBTfdsJal9I4J9PqtmwBgun7OQ3uaX4cDfWaVJ
+ otDvA29TlXvINmmor5UnWOxjQokSZ/a0y0ezXwPCW/fgzSaNsX07TDmCMK4hxfVavula
+ wuekDY7KV3hcAnmAl+R1tkPLXACXwUxuknc2R++d4M1OJU4N+4Fd02i2F8Kphbnb8nxl
+ Hq1SI1d7le+6jdZPy5LInMuxYHGpkHRSBw4Xcgjhi6jNuZCZNB5g3ij/XSRSJztxtCR9
+ 7tDnjxnMJT9LeoKqfxQs3/1BuZLh1jX33UgCItUfOfQvqqDk6RxTkVGdy3GydE5LQnkN ag== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdyuk8pa3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 14:09:12 +0000
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 38TDqS89010147;
+	Fri, 29 Sep 2023 14:08:56 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tdyuk8p0e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 14:08:56 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 38TBpAJE008150;
+	Fri, 29 Sep 2023 14:08:50 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3taar05b6p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 29 Sep 2023 14:08:50 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 38TE8lqG45351430
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 29 Sep 2023 14:08:47 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 89B4220040;
+	Fri, 29 Sep 2023 14:08:47 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AB052004B;
+	Fri, 29 Sep 2023 14:08:46 +0000 (GMT)
+Received: from [9.179.2.72] (unknown [9.179.2.72])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 29 Sep 2023 14:08:46 +0000 (GMT)
+Message-ID: <c2117ecb-466c-cc45-04c5-f12adedec217@linux.ibm.com>
+Date: Fri, 29 Sep 2023 16:08:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="pe36q5lo2npaavkw"
-Content-Disposition: inline
-In-Reply-To: <ZRWbGDlXCS4t8tMf@liuwe-devbox-debian-v2>
-X-Originating-IP: [106.210.248.178]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2VTfUxTVxzNfe/1vcpAn8jgBvwoqEtArcJQf3GwzMXF55Zs+0OXZdE4Im+g
-	k9a1osyFpG6IAuNbptQyih20ilSsWNsqQljkY2XaDZDa0c0PmE7q0A3kS9pRH24m+++c8zvn
-	3t+5yRWTwX1MuHinbC+vkCXtjqIDKHPr+PUVPmcov8rSHAPtvScJmCppZeC79tsE+MzFJGiu
-	Z1FwJcuE4MrxOhq6R4ZoMNoOETDQeoeBr3RnabhxkYMTRecJ0HedRXCrJxxOOs0ElB9vR6C5
-	GQd/VsyHxqrp87Ry6MxLA4e5QAT9tRcYODpRTUJZ8SMaumwaGg5X2hD83pJPQV6vhYZOXT4D
-	k6NeEejbvAQ4iwYQ5BYeRtCqDYWxyUkRXL7Vj+CJ3YOgrEYKFcNlJBg8FSQ0qW8wUF1uIKFN
-	P0VDrXE7NB09Q0Kz/ei05D0Ah74eZ+B7k4uAybHpi0cbSok3VnNd3e9wkxMliDuh+oniGk7d
-	JLi+aiviGp9oKc6qdjOc1pTO2WwHGe68IYbTXf6D4KZy1nCuwUTOdDqH5sYMhSRXdLIZvb/o
-	o4CEZH73zn28YuXrHwekTvV0MnvyQjJs6kuECk2wuUgsxmw8truoXBQgDmYNCNfd/oUUyDDC
-	/d+4kED+RriwZ4TJRbOeJZ4aymdceoRbXEPkv67GQ6OEQC4gPJllof0Ril2Kq358+ixOs8vx
-	dU8f6cchrASb3SrGHyBZ4xw8dNcg8g/msan46j014cdB7FpsvVbKCHgu7ijvp/yYZDPwzz4d
-	4W9BshFY7xX75VnsGvxgvJASVl2Mx+rttIAz8Q8NrmfLYTY7EDcN6kjhBTZg00OF4JmHH7Q1
-	zNScj33Wyhl/KcJN3keMQGoRrjk4Qgiu13BWd/9MYj1+fP/5obOx8+FcYc/ZuMR8bEYOwkey
-	gwX3K7j2Vw9VhBarX2imfqGZ+r9mgrwcay/9Rf9PXoZrqgZJASdio3GI0iLmNArj05VpKbwy
-	TsbvlyqT0pTpshTpDnmaCU1/Oru3bdiC9A8eS1sQIUYtaMl0+E59rQOFUzK5jI8KCcp2hPLB
-	QclJnx/gFfLtivTdvLIFRYipqLCgZYkdO4LZlKS9/Kc8v4dXPJ8S4lnhKiK549K7czJdsU2b
-	E6wSWFldsXDJwIL6Hs02Yr7U+mWCalm0s6JwaWCRJPBbzcVoLnZXKKrMXNvR5RqOL35c/dm6
-	6PwvHLGbblfGuWtydW7TvdlUnoob3/CWZPmHjQVvFp/IOdf8akaJzyt5e4Hnk9H6/N9y+8Ii
-	txgt7ZGS4qp8e99lIuLMqSn39uGSI3clPZHuuDvhg4sGN5bFd/Z2uuVOi2jze/vtAatliaVV
-	AdckWze9XBA24jhfWZAa4vDoJyJXZO/6QLa+F8uPiUUJzID0XMzdgc77iqW79oGje0lcYHf+
-	pvJS27qr8HCVL3lz/LYtmpe2beg1bb3YdW5hSupiT10UpUxNio0hFcqkfwAu818d7wQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTe1BUVRzHPfde7l1osBsgXomE1rCGcGEXWH8oOE5TebEam2oiqYQdvAEF
-	u7QLaozNrMMb46XgwALGI1iUWgxkEUQgmpYt3iKIiA0Q4rAyIqmwvJZ225qc6b/P+f7O73N+
-	c+YcHu6wQrrwoqXxnFwqieGTdkS3qev3XRujzpzP6VIC9DcrMFg/o6PgO/0kBhvaPBxK+pMJ
-	aEuuR9BW+AMJN57Mk6BpScHgrm6KgqTKOhJGmlgozm3AQD1Uh2Bi2AUqRrUYFBXqEZTcEsGD
-	Ule4Vm72lcmg53QsDGizbWC6tpGC/JUqHAryHpIw1FJCQtq3LQhmOrMIOH3zCgk9lVkUrC6Z
-	bEDdZcJgNPcugsycNAS6Mmcwrq7aQOvENILF7jkEBdUCKH1cgEPNXCkO7aoRCqqKanDoUq+T
-	UKsJg/b873Ho6M43R6ZESPlmmYKf68cwWDWaD166fBbb788O3XiLXV05g9hi5SDBXr5wC2PH
-	q5oRe22xjGCbVXcotqw+gW1pOUWxDTWebGXrLMauZ4jZsftBbP3FDJI11uTgbG5FB3rXLVQQ
-	KJclxHPuUTJFfBD/YyGIBMIAEIj8AgRC392f7hH58733BR7lYqKPcXLvfeGCqLyNQiIuw+lE
-	+oMsQomMdCay5TG0H7NWU4RnIjueA12FGKUuj7AWXJkfHw/bWNmRWRvJJK2bFhCjHjUQ1kUj
-	Yp70dZGWXQTtwZT3rlEWJmkvpn9uHLewE+3OaO8oKUsDTmueZbI6rFpHOor55Z4Ks7A9vZtp
-	7jtLWa3FGPOHoZa0Fp5jfi2a/nsmnD7GXDVqzFaemZ9n1CaeJbalxYxhOeefsXcwxkvdpJW/
-	Zh6tz6Bc5Kh6yqR6yqT6z2SNPZlR0yz2v/hVprr8Pm7lIEajmSfKEHUROXEJitjIWIVQoJDE
-	KhKkkYIIWWw9Mj98rW654Qo6b1gQdCKMhzrRS+bOqUu1A8iFkMqkHN/JPnXAmXOwPyr5KpGT
-	y8LkCTGcohP5m68xD3fZEiEz/yJpfJhQ7OMv9BMH+PgHiH35W+2D49IlDnSkJJ77guPiOPm/
-	fRjP1kWJvT7m7zWett+0zS2s1TdaLAmX8ju0IvEKb0kxnHrkfTjhEdBYEGwzFvLC58qXw3m9
-	mZSkP5Tu+XDQePwTvZuBVSr+zA5+7zN9xF6N4WD6eRgfF82l73FOSlE/2tRmu7m3tqrVveWV
-	mPYU92L7N+I9xlOnUqJ3vsjfu91QeP3tn9w2IrWGukB1yDMHZq+uh8xo8u0mpX1RDxeGFnlf
-	em0xnNQfvj7ptJJ2mNt6aOLA2lTSIb9z98q3nTzlGtrkPZ+0Xp24Vqm6/U7yphzhbVHAjn4M
-	iO2c3cF+m4Ijv7l6f4CTF9xnRnc5bP7o3LzuzeWCqqadxzOZwdd6shu64voWm0gPgk8ooiRC
-	T1yukPwF2ZBtso0EAAA=
-X-CMS-MailID: 20230929140239eucas1p100707358803bb5652bd2e506e93dfaf3
-X-Msg-Generator: CA
-X-RootMTR: 20230928152622eucas1p20ca3dd701247895e232e59fb84e33e1f
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230928152622eucas1p20ca3dd701247895e232e59fb84e33e1f
-References: <20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com>
-	<65157da8.050a0220.fb263.fdb1SMTPIN_ADDED_BROKEN@mx.google.com>
-	<CGME20230928152622eucas1p20ca3dd701247895e232e59fb84e33e1f@eucas1p2.samsung.com>
-	<ZRWbGDlXCS4t8tMf@liuwe-devbox-debian-v2>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
+ device
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, Jan Karcher <jaka@linux.ibm.com>,
+        dust.li@linux.alibaba.com, kgraul@linux.ibm.com, wenjia@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
+ <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
+ <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
+ <20230925151816.GC92403@linux.alibaba.com>
+ <3f71928e-157a-748e-42ee-4de3c80ed109@linux.ibm.com>
+ <e85fe903-a025-a693-906b-834ff2a2a812@linux.ibm.com>
+ <22858b56-dee0-e65f-a698-b0f2090a872d@linux.alibaba.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <22858b56-dee0-e65f-a698-b0f2090a872d@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: d0wyDnEd3MkOnUnhHQZueMsaQuLIsWiv
+X-Proofpoint-GUID: kzksUxrgw3u9VpXhQO98yQCRhj3cFm_1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-09-29_11,2023-09-28_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 phishscore=0 mlxlogscore=736 mlxscore=0 bulkscore=0
+ malwarescore=0 spamscore=0 clxscore=1015 impostorscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2309290120
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---pe36q5lo2npaavkw
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 28, 2023 at 03:26:16PM +0000, Wei Liu wrote:
-> Please change the prefix to "Drivers: hv:" in the subject line in the
-> two patches.
-I'll change the commit message for the 14/15 patch from "hyper-v/azure"
-to "Drivers: hv:". But I only see one patch that needs this. Which is
-the other one?
 
-best
->=20
-> On Thu, Sep 28, 2023 at 03:21:39PM +0200, Joel Granados via B4 Relay wrot=
-e:
-> > From: Joel Granados <j.granados@samsung.com>
-> >=20
-> > This commit comes at the tail end of a greater effort to remove the
-> > empty elements at the end of the ctl_table arrays (sentinels) which
-> > will reduce the overall build time size of the kernel and run time
-> > memory bloat by ~64 bytes per sentinel (further information Link :
-> > https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
-> >=20
-> > Remove sentinel from hv_ctl_table
-> >=20
-> > Signed-off-by: Joel Granados <j.granados@samsung.com>
-> > ---
-> >  drivers/hv/hv_common.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >=20
-> > diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
-> > index ccad7bca3fd3..bc7d678030aa 100644
-> > --- a/drivers/hv/hv_common.c
-> > +++ b/drivers/hv/hv_common.c
-> > @@ -147,8 +147,7 @@ static struct ctl_table hv_ctl_table[] =3D {
-> >  		.proc_handler	=3D proc_dointvec_minmax,
-> >  		.extra1		=3D SYSCTL_ZERO,
-> >  		.extra2		=3D SYSCTL_ONE
-> > -	},
-> > -	{}
-> > +	}
->=20
-> Please keep the comma at the end.
->=20
-> >  };
-> > =20
-> >  static int hv_die_panic_notify_crash(struct notifier_block *self,
-> >=20
-> > --=20
-> > 2.30.2
-> >=20
+On 28.09.23 20:35, Wen Gu wrote:
+> 
+> 
+> On 2023/9/28 11:16, Jan Karcher wrote:
+>>
+>>
+>> On 26/09/2023 09:24, Alexandra Winter wrote:
+>>>
+>>>
+>>> On 25.09.23 17:18, Dust Li wrote:
+>>>>> Hello Wen Gu,
+>>>>>
+>>>>> thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
+>>>>>
+>>>>> I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
+>>>>> may want to exploit smcd-loopback. Especially in native environements without containers.
+>>>>>
+>>>>> If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
+>>>>> If loopback is always created unconditionally, there is no way to opt-out.
+>>>> Hi Sandy,
+>>>>
+>>>> After talking to Wen Gu offline, I think the real issue here might be
+>>>> we don't have an abstract layer in SMC, something like net/core/dev.c
+>>>>
+>>>> Without this, we cannot do:
+>>>>
+>>>> 1. Enable/disable those devices dynamically
+>>>>     Currently, If we want to disable a SMC-R device to communicate with
+>>>>     others, we need to refer to 'ip link set dev xxx down' to disable the
+>>>>     netdevice, then Infiniband subsystem will notify SMC that the state of
+>>>>     the IB device has changed. We cannot explicitly choose not to use some
+>>>>     specific IB/RoCE devices without disable totally.
+>>>>     If the loopback device need to support enable/disable itself, I
+>>>>     think it might be better to enable this feature for all SMC devices.
+>>>>
+>>>> 2. Do statistics per device
+>>>>     Now, we have to relay on IB/RoCE devices' hardware statistics to see
+>>>>     how many packets/bytes we have sent through this device.
+>>>>
+>>>> Both the above issues get worse when the IB/RoCE device is shared by SMC
+>>>> and userspace RDMA applications. If SMC-R and userspace RDMA applications
+>>>> run at the same time, we can't enable the device to run userspace RDMA
+>>>> applications while block it from running SMC. For statistics, we cannot
+>>>> tell how many packets/bytes were sent by SMC and how many were sent by
+>>>> userspace RDMA applications.
+>>>>
+>>>> So I think those are better to support in the SMC layer.
+>>>>
+>>>> Best regards!
+>>>> Dust
+>>>
+>>> Thank you very much for your considerations. I also think a generic handling
+>>> of these requirements in the smc layer would be best. Especially, if we want
+>>> to add virtio-ism support soon. There we will face the same issues again.
+>>> Let's hear what others think about this.
+>>>
+>>>
+>>
+>> Thanks you Sandy for bringing it up and Dust Li & Wen Gu for your thoughts.
+>> I agree that such a runtime switch is needed and also that this generic handling would be good in the smc layer.
+> 
+> Right. runtime switch is necessary. I'm trying some ways to see which one is more suitable.
+> 
+> 
+> As for implementing a abstract layer that capable of handling 1) enable/disable SMC usage of
+> RDMA/ISM devices. 2) count packets/bytes of RDMA/ISM devices that generated/consumed by SMC,
+> I believe it would be helpful, and IMHO its architecture may be:
+> 
+> ----------------------------------------------
+>                   SMC protocol
+>     (af_smc.c / smc_core.c / smc_clc.c ...)
+> ----------------------------------------------
+>           Abstract layer of SMC device
+>       (define SMC device common operations)
+> ----------------------------------------------
+>   RDMA device |        (virt) ISM device
+>   (smc_ib.c)  |   (smc_ism.c / smc_loopback.c)
+> ----------------------------------------------
+> 
+> But I also believe this may require a lot of works and may be a long-term job.
+> 
 
---=20
+I like that concept a lot. If we can agree on a direction, we can define
+meaningful pieces and approach it piece by piece.
 
-Joel Granados
 
---pe36q5lo2npaavkw
-Content-Type: application/pgp-signature; name="signature.asc"
+> If only for the virtual ISM device, e.g.loopback-ism, I am considering adding it to the Linux
+> device tree (/sys/devices/virtual/) to make it more 'device-like', and controlling its
+> enable/disable and get the statistics through some files, such as
+> echo 1 > /sys/devices/virtual/loopback-ism/alive
+> or
+> cat /sys/devices/virtual/loopback-ism/statistics/{rx|tx}_{bytes|packets}
+> (similar to what tcp lo have in /sys/devices/virtual/net/lo)
+> 
+> What are your thoughts on it? Thanks.
+> 
 
------BEGIN PGP SIGNATURE-----
+Makes sense to me, but I don't have too much experience in that area.
+I have never seen an attribute called 'alive' before. 
+I think attributes like 'power', 'enable' or 'online' are used for other device types.
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmUW2UEACgkQupfNUreW
-QU+ZyQv9HSXCGinIOipdlVjAjwhhj6RTSXKmVOPKYpS5Rg7aN0U82HzUpe/YGUvE
-dEkLD50b0Mo5onU0fxk7PxAo7caRLYwpTki5RqjceH1a3DgPuH0jozn4rbxb10ym
-v0B/fxvdHH9rxasac48TToOUPvqcbelPpQ59h7PEj84QwcYkd7pV6Wt7elbOt2fI
-w8dfe8vvnNXGLquYe0hqGv7c6TGjOXwY06dTtga5LzmalTp0IMELfKNebRsWhhPQ
-gsL9i6erlZUN75ZmgZM+YMnhEcEQwRFxapO1r2nENKMoWHNKglPIZ8BHfkZnXy48
-HCo5Kt8JZ1E1XArWKL6N58dcSyWJx2U9aMXC7Ugl8WWKDGuW3W9+v/1uxuxE7Bsi
-wfooQe5Df/UjY3wvmdcooleqJ8NFjWgv7/pU0i/WXS2dxzUB9VF27Ghgj9sRNY7V
-IUGRM7apb2US7rjwyn1DuDn4A+iO4ZRBH1tZr3RtnIigP9fboAI8E3+sEIhdL0FX
-R517c3qf
-=7vL7
------END PGP SIGNATURE-----
+> 
+> -- 
+> A little off-topic, it's currently China's National Day holiday, which lasts for about a week,
+> so we are now on vacation. As a result, my responses might be a bit slower, but I will still
+> make time to check/reply the mail and prepare for my new version. Thank you all very much!
+> 
+> Regards,
+> Wen Gu
 
---pe36q5lo2npaavkw--
+Next week is Germany's national holiday, so many of us are out as well.
 
