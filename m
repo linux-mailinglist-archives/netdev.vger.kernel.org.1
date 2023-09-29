@@ -1,173 +1,165 @@
-Return-Path: <netdev+bounces-37125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E837B3B3E
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 22:30:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D65A7B3B5D
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 22:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7B4AF281EC2
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:30:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 52350B20A97
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3483C41E40;
-	Fri, 29 Sep 2023 20:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20B711C9C;
+	Fri, 29 Sep 2023 20:43:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9841566DFE
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 20:30:46 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B59101AA
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 13:30:44 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-5363227cc80so3471185a12.3
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 13:30:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696019443; x=1696624243; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t5p6ss+byANcIZ0xfw9ju2BJf5FjcNOKngvOcjk+MKk=;
-        b=M/LK/qdAjwM1/OO7kzotAOyomcBuXGLmG5VCuhYwJtX3S5b+F6Wi1TKP8nBzAxFKbz
-         pMVwM3de4cDF/ggU+xsi/CynRCzdmRCmTFfkeJ/Y/RTXNkyYvSwCsu1Gq06p06GWyJyc
-         PR8+zuFbn6EZOWkq2GB0irrg+oEPRE/3Ydn4w/IF1vXDkWNaB2u7gfmPch+XRo9hO1r8
-         hU2BWuMsBfe8gzQ4Ch2C+5Ai00vWpKN7knG0LZYKV5IvrRaScTP0xNS+JbMdZH9uAXSa
-         v8HJN/wpijoMLDvg6WOq2zuoeR4JcyHDWNCEQsXUnC8F+1O27xmFboY5Us/Sl8tOQJ4a
-         H68g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696019443; x=1696624243;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t5p6ss+byANcIZ0xfw9ju2BJf5FjcNOKngvOcjk+MKk=;
-        b=m3FOyBgtmzcMWTVQfcxmxV1Bra2zFGG8ERIXN+5Uds3b+Wv8zjWOdA3b2N2QlLP86t
-         cazPqWHX4o1gS6NqTZAuDhllKPUvpnm1THzYB/NIr70luEO1FeP/fCGxVnNjaXbLUwYJ
-         nrqjThlGSX5zojgTpjQ9iRDgHMTHksYP1ww4BhviJFgfd1rP4Hzx0aE67R1FabkmDt3W
-         4AycnE5xro30KUXnZk70ZW/BcCIrDo5UYmQ8Awdieu6nxQwC9uIy1XFvTyLYIflmj5yH
-         Wz4wDBDpfAlLSz3dDAobtU356nintEpmx+teS8y88H3/wR8+Wsop1FokbnjTfKmwMxrK
-         yKkA==
-X-Gm-Message-State: AOJu0Yx5MeolPNAF+hCabaIszJijGt839gXs3rbzX46cYgdXYMzp/rRI
-	3zsBSKH23Q60TjJDx/k107ZUy0310n6Z/J8bsek=
-X-Google-Smtp-Source: AGHT+IEkd4hZEk7BCZ6qQ5+u9PclDsHqpPT5QZwNwHnjx6fj04T8PxtNUdGinwqUc1o72B7Sm3LPT+IotDMzMfldHhE=
-X-Received: by 2002:aa7:d0d0:0:b0:530:c386:b277 with SMTP id
- u16-20020aa7d0d0000000b00530c386b277mr4935811edo.7.1696019442827; Fri, 29 Sep
- 2023 13:30:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136AF8F62;
+	Fri, 29 Sep 2023 20:43:17 +0000 (UTC)
+Received: from BN3PR00CU001.outbound.protection.outlook.com (mail-eastus2azon11020017.outbound.protection.outlook.com [52.101.56.17])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C4F1AA;
+	Fri, 29 Sep 2023 13:43:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ALJ+mWKhoXa4J4C4ng2WSfW/McOL3VSDN9mKgChRJsp/RUCQrzxbP9DlXhgoIGCAVzmAIhBPBP373iYTWX8EXXaK4T8l8IRIYr1ng+0f4NvJSs5AsKPkUkn8MAuEo953EFw4ARDkAAlT/oYRD4ej+S/2lIzj1xkt3H1yCyweIGlgzj17n+dEKw+r93eGLw9tkDtCL12Ihc94Mj1AAZFh5acx0WSbRtRS7iouzk8KHpg23tjf0ExX9JxIK6dJsqN6w91CA2kBkEOvggn6mUSg9CYK1V1n5FRSWog5X4CVeRfj66Ng4xWBDMNKmPmWJacjOIsoR1Znpx2Lf2r1Xry45A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dxT8qLiEFsyVUsdKnnu4mDC0v1cHYjdqSUmOxEJXQs8=;
+ b=CichUJnYcNuRUrM1an7WSeYUKyckXcqLQN9KzuTxF3xDBcWnqpbV4JWOccsbjCRQw6RJTH8C8++WLHgDJ5U9O2t2dPeIAZaa7hH+uOetEUs8vXwPGHjHPBPOvbrxa375A1st3MrI1eTkmKkEoeNXksdGKnskMJ/9powNUSdFz3O7u2AdNqse3GtR/bTf4XsEruWBICoha6WCa2I90t0CEcsJWHpxp7I/E3hdEttF+WK7f9/AKOoh/knNfehbyTohcBDleE0/Pq5x7ugQrc4Fa7KJS/WyE2kYK3aN+Zxdz1K37sHqp+2Q99bTkySRWLndGdsq9su7ow8StGlTPXpJeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dxT8qLiEFsyVUsdKnnu4mDC0v1cHYjdqSUmOxEJXQs8=;
+ b=DDXdn6M9lI5ZJTi4E76/SRtzkn3tksmVu7WR4bb5UXPu1i56MFMyU4eERXHb4o+OYpAiD7dbjUNSzkSH3/i/YuCLiJiCQdYHv5hjWiww6zFCyr8ZWZMvkNCIxTATkiMrOwHhwb3CI91dQ9tZa65324lybQNt6/jWCg06iVcEHFc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com (2603:10b6:a03:21f::18)
+ by MW4PR21MB1969.namprd21.prod.outlook.com (2603:10b6:303:7c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.8; Fri, 29 Sep
+ 2023 20:43:13 +0000
+Received: from BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::1d4f:5006:aed7:78aa]) by BY5PR21MB1443.namprd21.prod.outlook.com
+ ([fe80::1d4f:5006:aed7:78aa%6]) with mapi id 15.20.6863.016; Fri, 29 Sep 2023
+ 20:43:13 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: haiyangz@microsoft.com,
+	decui@microsoft.com,
+	stephen@networkplumber.org,
+	kys@microsoft.com,
+	paulros@microsoft.com,
+	olaf@aepfle.de,
+	vkuznets@redhat.com,
+	davem@davemloft.net,
+	wei.liu@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leon@kernel.org,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	linux-rdma@vger.kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org,
+	ast@kernel.org,
+	sharmaajay@microsoft.com,
+	hawk@kernel.org,
+	tglx@linutronix.de,
+	shradhagupta@linux.microsoft.com,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net,v2, 0/3] net: mana: Fix some TX processing bugs
+Date: Fri, 29 Sep 2023 13:42:24 -0700
+Message-Id: <1696020147-14989-1-git-send-email-haiyangz@microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+Content-Type: text/plain
+X-ClientProxiedBy: MW4PR03CA0209.namprd03.prod.outlook.com
+ (2603:10b6:303:b8::34) To BY5PR21MB1443.namprd21.prod.outlook.com
+ (2603:10b6:a03:21f::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.com>
-In-Reply-To: <74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.com>
-From: William Tu <u9012063@gmail.com>
-Date: Fri, 29 Sep 2023 13:30:05 -0700
-Message-ID: <CALDO+SZ_qmBv2AXD3xusEx1fb_PqSqTXVaBdhDTogpvDoKqRUw@mail.gmail.com>
-Subject: Re: Vmxnet3 v22 - bug
-To: Martin Zaharinov <micron10@gmail.com>
-Cc: Alexander Duyck <alexanderduyck@fb.com>, alexandr.lobakin@intel.com, 
-	netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+Sender: LKML haiyangz <lkmlhyz@microsoft.com>
+X-MS-Exchange-MessageSentRepresentingType: 2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BY5PR21MB1443:EE_|MW4PR21MB1969:EE_
+X-MS-Office365-Filtering-Correlation-Id: 762f0d67-afce-4c13-f28f-08dbc12cb2d4
+X-LD-Processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+ U9SfSOUEzu8ckqbodITsATG1ND+A4+AVWU65gWf/c2JDjBAi4+umnOmZSiO1HLxyThL6nwavTClFQh/ztw2DPqWbMFtl7Yzv8SXnkEMEUzh8V70prv5kdvnaLG5ON1tXNwVUEEddjhA49HW7oixSBEBfMIJYp37U+Alot+pEmHXbog/r4UaHja8EtFHlRov9ilBjyGnq9DDQ0LRzOeUVFuJUVps6sgM+gD6lyk7kpFSicGli6j9AP6iLzYazx/cc/Aufk4Gq2jXq1ia5khXhzebvO1F8/NWlxkpNFJihCb/jhawUYeaPB3qSHTat1r54gzwDkHw/nDJLAOU/40qWvl4IW51eBaUoesFdMXBJJT38/rFIr3zhTFHX6cvEAwZBpAzAO/BsOzUBc1xdKLoI/BFpqO9wccEyg0SKyx4qaNEgUkqjdeEH4wfuHTXv3Hpxc+J/SpjT/vZ2NxzU3o2o4BIJNuJih3vIxbd6nkvFqL/99OoKh6e28+jSryRBrar1NSDHtPPC/tv7ZyHSRrkmAkeLs9msEhc+IdHM29JVzO3VKIzMYOOnqXdC736cL3B/4op4Zf76rONiEcgdY3faaH11FdTUD7CUxIlT+iLymN+vGGqi1uQJvllQg6QGFiHm9w17nWukmsgMb79atXQaP1dRPhgiRbGitUglWjQwv7g=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR21MB1443.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(39860400002)(366004)(396003)(346002)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(7416002)(4744005)(6512007)(2906002)(82960400001)(82950400001)(5660300002)(52116002)(6506007)(6486002)(7846003)(2616005)(26005)(83380400001)(36756003)(6666004)(478600001)(41300700001)(38350700002)(38100700002)(8936002)(8676002)(316002)(4326008)(10290500003)(66946007)(66476007)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?MAdgxnYgJKQzrAq0Epfrh2vBKUiafZOuC6hH43ypCDT9nFRQsAva0uAArE1V?=
+ =?us-ascii?Q?xU/tnGrqP7C94LArsHayqpxXB6HmHPAoCyCMiShRxnWgBuVGVdRvvBZuE69u?=
+ =?us-ascii?Q?2LsaJSULrysWoPbrhTa+VyvngH47BS863wT0Al0n8dqyyF29E3PTokW7ls39?=
+ =?us-ascii?Q?u43J95efKnW2hKJD9+GCYHoG6ICIT6mcN8u5IYUauQJcD64ev2qGoh5LJmbo?=
+ =?us-ascii?Q?eT2gLXxdu2gTAwmeKZD4Gz5mxKxD2ioia9haBPyfIllVtbrea0SXp2cA4nWJ?=
+ =?us-ascii?Q?Kqp0zMLKCuaDh6Gm3Y3A7rbqfCCif/qw9ckDebPlblADY8iv5GH7luonltEJ?=
+ =?us-ascii?Q?Ak4tZ3MCpVwO6NGUIWdnIe9wbdOt2BEGCz057nCiAfnbutBkdOsXyoVB7247?=
+ =?us-ascii?Q?YALWGjVekHiL7j6MMWKBGGNjlIfPNe+GpiG1Aaba6AIKMMBSmeoIrlsWVJwj?=
+ =?us-ascii?Q?0pFM78s4/sdTvCujKweGsIbgbi0mUiz6RL/OgIZKEDTjbDxruB1DOxpv+gJn?=
+ =?us-ascii?Q?0apE+Jxnkm2GPYSWXAwK0j68k+b8zmgOdZUc6jts8K6BwfeALioHq7oZRCry?=
+ =?us-ascii?Q?IITx7un54Wa8Jl0UnczWvPdVCAL0yKcH0kHFqtnu7i2BxJigH1gJOascyR2V?=
+ =?us-ascii?Q?Hirpo2N5U0SI2rA1Q1dSj7KpzHDDOLgWi55ZlPSlmOg3Mr/yJOTnQTkW08Cg?=
+ =?us-ascii?Q?FGGb32AKRoQhOMtrk3YCvqa+EN7/sjMr0vQwpUGOZRikoCMl4N1T0fsig9AB?=
+ =?us-ascii?Q?GQIWmWCRMHPvbSlTcQUrGRplDkOQa679AoqxkCVxwSpAOP96tHSbco++YxJq?=
+ =?us-ascii?Q?qoP3xEoCWT4pzQ2SvMYbgZZEP1CJtK5knoCrbvF8tyksgjPUgL1pn9/HN9kb?=
+ =?us-ascii?Q?nII45v6GUfa1kcH3qgzJBZ3SrLbGukKNYRqqYDIZ5QcZA+TLqALvStV370g1?=
+ =?us-ascii?Q?UO8X/7Td8zQAwEjKVTev3IQB2T0qliylzsBSk4QgVd9ALhh8rLVFLq9zYOaV?=
+ =?us-ascii?Q?JUr+FQbCmeyC4Ww1GqMkVoO0W6mPLdviYhDZE/cdSy//W/fiF15Uf6IcZ05z?=
+ =?us-ascii?Q?x5VIgtBK2RvaX6SLKZn23tE8l0iIp0r8Yr5mH2Za2pl3u2NnPgCw2t9lx3xD?=
+ =?us-ascii?Q?uCB6UKaqoMN5/3BFL8FY2JcIfbVEzpwmvMGOCr4Y7047GMf6s2noHgiOcf4o?=
+ =?us-ascii?Q?FeBmCmJc2VxN/Mg+GG1jsMEtlNV/ED1SguBzATOWD6f8TaErZLXN5K82O6Lx?=
+ =?us-ascii?Q?c2anfBkFLr71m3p/oKvKo5puzBuvEpB1sLm9twEQ1awpawbDev9wUtdkDzjI?=
+ =?us-ascii?Q?IXGig4NjwzmeFxdkVpsPHT2k9RZUvObbQ/KThvfmya9cxVGAiK9mzeiPp8sN?=
+ =?us-ascii?Q?DCKH7jScYTWR57IDHkGcJE4a2V6HpATHlx4mzgrNJ2KoySxUxEF9pmWYrxLu?=
+ =?us-ascii?Q?y0mVs5l6QRAKbyPMgTdGZ0Hn3sF4U/gXyIR81ZP/k3JyTZrf++y6nf85TTpv?=
+ =?us-ascii?Q?VptC4UBQ4IyjEGc9UAU/8KW2mTI9UatD59eAZCv2Xnzq7EcFEEouDClzGuhQ?=
+ =?us-ascii?Q?c57vsiqCb19jS1mnHrHy3IG5Wwnn9d7BSHLNDirP?=
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 762f0d67-afce-4c13-f28f-08dbc12cb2d4
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR21MB1443.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2023 20:43:13.3011
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /DG4CUhcZ7n4NKEoU9k9BX09IP1qFP6rzhQefoUTNc5VqFdUAHmsBQdHde/T7lrL+G4kAiErSVlDSA1ooK+iWQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR21MB1969
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 4, 2023 at 9:24=E2=80=AFAM Martin Zaharinov <micron10@gmail.com=
-> wrote:
->
-> Hi William Tu
->
->
-> this is report of bug with latest version of vmxnet3 xdp support:
->
->
-> [   92.417855] ------------[ cut here ]------------
-> [   92.417855] XDP_WARN: xdp_update_frame_from_buff(line:278): Driver BUG=
-: missing reserved tailroom
-> [   92.417855] WARNING: CPU: 0 PID: 0 at net/core/xdp.c:586 xdp_warn+0xf/=
-0x20
-> [   92.417855] Modules linked in:  pppoe pppox ppp_generic slhc virtio_ne=
-t net_failover failover virtio_pci virtio_pci_legacy_dev virtio_pci_modern_=
-dev virtio virtio_ring vmxnet3
-> [   92.417855] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O      =
- 6.5.1 #1
-> [   92.417855] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS r=
-el-1.16.2-0-gea1b7a073390-prebuilt.qemu.org 04/01/2014
-> [   92.417855] RIP: 0010:xdp_warn+0xf/0x20
-> [   92.417855] Code: 00 00 c3 0f 1f 84 00 00 00 00 00 83 7f 0c 01 0f 94 c=
-0 c3 0f 1f 84 00 00 00 00 00 48 89 f9 48 c7 c7 3d b2 e4 91 e8 d1 00 8e ff <=
-0f> 0b c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 53 48 89 fb 8b
-> [   92.417855] RSP: 0018:ffffb30180003d40 EFLAGS: 00010286
-> [   92.417855] RAX: 0000000000000055 RBX: ffff99bcf7c22ee0 RCX: 00000000f=
-ffdffff
-> [   92.417855] RDX: 00000000fffdffff RSI: 0000000000000001 RDI: 00000000f=
-fffffea
-> [   92.417855] RBP: ffff99bb849c2000 R08: 0000000000000000 R09: 00000000f=
-ffdffff
-> [   92.417855] R10: ffff99bcf6a00000 R11: 0000000000000003 R12: ffff99bb8=
-3840000
-> [   92.417855] R13: ffff99bb83842780 R14: ffffb3018081d000 R15: ffff99bb8=
-49c2000
-> [   92.417855] FS:  0000000000000000(0000) GS:ffff99bcf7c00000(0000) knlG=
-S:0000000000000000
-> [   92.417855] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   92.417855] CR2: 00007f9bf822df88 CR3: 00000001a74de000 CR4: 000000000=
-03506f0
-> [   92.417855] Call Trace:
-> [   92.417855]  <IRQ>
-> [   92.417855]  ? __warn+0x6c/0x130
-> [   92.417855]  ? report_bug+0x1e4/0x260
-> [   92.417855]  ? handle_bug+0x36/0x70
-> [   92.417855]  ? exc_invalid_op+0x17/0x1a0
-> [   92.417855]  ? asm_exc_invalid_op+0x16/0x20
-> [   92.417855]  ? xdp_warn+0xf/0x20
-> [   92.417855]  xdp_do_redirect+0x15f/0x1c0
-> [   92.417855]  vmxnet3_run_xdp+0x17a/0x400 [vmxnet3]
-> [   92.417855]  vmxnet3_process_xdp+0xe4/0x760 [vmxnet3]
-> [   92.417855]  ? vmxnet3_tq_tx_complete.isra.0+0x21e/0x2c0 [vmxnet3]
-> [   92.417855]  vmxnet3_rq_rx_complete+0x7ad/0x1120 [vmxnet3]
-> [   92.417855]  vmxnet3_poll_rx_only+0x2d/0xa0 [vmxnet3]
-> [   92.417855]  __napi_poll+0x20/0x180
-> [   92.417855]  net_rx_action+0x177/0x390
-> [   92.417855]  __do_softirq+0xd0/0x202
-> [   92.417855]  irq_exit_rcu+0x82/0xa0
-> [   92.417855]  common_interrupt+0x7a/0xa0
-> [   92.417855]  </IRQ>
-> [   92.417855]  <TASK>
-> [   92.417855]  asm_common_interrupt+0x22/0x40
-> [   92.417855] RIP: 0010:default_idle+0xb/0x10
-> [   92.417855] Code: 07 76 e7 48 89 07 49 c7 c0 08 00 00 00 4d 29 c8 4c 0=
-1 c7 4c 29 c2 e9 72 ff ff ff cc cc cc cc eb 07 0f 00 2d 47 72 29 00 fb f4 <=
-fa> c3 0f 1f 00 65 48 8b 04 25 00 33 02 00 f0 80 48 02 20 48 8b 10
-> [   92.417855] RSP: 0018:ffffffff92003e88 EFLAGS: 00000206
-> [   92.417855] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000=
-0000001
-> [   92.417855] RDX: 4000000000000000 RSI: 0000000000000083 RDI: 000000000=
-00bfc34
-> [   92.417855] RBP: ffffffff92009dc0 R08: ffff99bcf7c1f160 R09: ffff99bcf=
-7c1f100
-> [   92.417855] R10: ffff99bcf7c1f100 R11: 0000000000000000 R12: 000000000=
-0000000
-> [   92.417855] R13: 0000000000000000 R14: ffffffff92009dc0 R15: 000000000=
-0000000
-> [   92.417855]  default_idle_call+0x1f/0x30
-> [   92.417855]  do_idle+0x1df/0x210
-> [   92.417855]  cpu_startup_entry+0x14/0x20
-> [   92.417855]  rest_init+0xc7/0xd0
-> [   92.417855]  arch_call_rest_init+0x5/0x20
-> [   92.417855]  start_kernel+0x3e9/0x5b0
-> [   92.417855]  x86_64_start_reservations+0x14/0x30
-> [   92.417855]  x86_64_start_kernel+0x71/0x80
-> [   92.417855]  secondary_startup_64_no_verify+0x167/0x16b
-> [   92.417855]  </TASK>
-> [   92.417855] ---[ end trace 0000000000000000 ]=E2=80=94
->
->
-Hi Martin,
+Fix TX processing bugs on error handling, tso_bytes calculation,
+and sge0 size.
 
-Thanks, I'll take a look.
-William
+Haiyang Zhang (3):
+  net: mana: Fix TX CQE error handling
+  net: mana: Fix the tso_bytes calculation
+  net: mana: Fix oversized sge0 for GSO packets
+
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 211 ++++++++++++------
+ include/net/mana/mana.h                       |   5 +-
+ 2 files changed, 149 insertions(+), 67 deletions(-)
+
+-- 
+2.25.1
+
 
