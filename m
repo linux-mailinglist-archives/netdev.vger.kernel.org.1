@@ -1,143 +1,205 @@
-Return-Path: <netdev+bounces-36991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670DA7B2D8D
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 10:10:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8317B2DC6
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 10:26:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 847411C2074D
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 08:10:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id CCF15282BA6
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 08:26:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E5FD312;
-	Fri, 29 Sep 2023 08:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5B7F9F1;
+	Fri, 29 Sep 2023 08:26:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5781C3F
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 08:10:18 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0B81A8
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:10:15 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-136-V-eKdlGtNjCLQJKswWmyoQ-1; Fri, 29 Sep 2023 09:10:02 +0100
-X-MC-Unique: V-eKdlGtNjCLQJKswWmyoQ-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 29 Sep
- 2023 09:10:00 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 29 Sep 2023 09:10:00 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: "'joao@overdrivepizza.com'" <joao@overdrivepizza.com>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"coreteam@netfilter.org" <coreteam@netfilter.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "kadlec@netfilter.org" <kadlec@netfilter.org>, "fw@strlen.de"
-	<fw@strlen.de>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"rkannoth@marvell.com" <rkannoth@marvell.com>, "wojciech.drewek@intel.com"
-	<wojciech.drewek@intel.com>, "steen.hegenlund@microhip.com"
-	<steen.hegenlund@microhip.com>, "keescook@chromium.org"
-	<keescook@chromium.org>, Joao Moreira <joao.moreira@intel.com>
-Subject: RE: [PATCH v2 2/2] Make num_actions unsigned
-Thread-Topic: [PATCH v2 2/2] Make num_actions unsigned
-Thread-Index: AQHZ8ObIeUWAs73e2U+3ivRy5uEH5bAxdYzQ
-Date: Fri, 29 Sep 2023 08:10:00 +0000
-Message-ID: <09695e42dfaf4dfe9457aa814fef297e@AcuMS.aculab.com>
-References: <20230927020221.85292-1-joao@overdrivepizza.com>
- <20230927020221.85292-3-joao@overdrivepizza.com>
-In-Reply-To: <20230927020221.85292-3-joao@overdrivepizza.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A900FC154
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 08:26:37 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB5C1A8
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:26:35 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-533d31a8523so14272890a12.1
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 01:26:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1695975994; x=1696580794; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=23yH0BNZzwfYBudqKllSnoXRGS73pAdr6tfQ7LisAW4=;
+        b=hTFcJHR2bEWT5we7Jqx420cRgwnT+hmnmdhF7wTKGTNGynDp+YoC98x189PN1EIg9S
+         6hKONmFrWLQB+oSoTBbTxgzzzr/SNYmynfP1ZB0hk0WMwuhn+q5APsomz8zXFVeMYMz+
+         zsCN7UziYG7WQeR/q3x9UZnpGb6y/3xA4tp7AyLhyuWyXSMcAWPHlM7c3EBvyf9w02JN
+         UjLXA5lsg1PPaqdiuC67uJQjz8ApKbnl1+UO1xIrTxSQlk4c7XYrMa6jLsL/gACabrcS
+         jFv7ZZ6BkQPm1UPYQJStFDkRIOhFAU+TYVaegpUjh43itYejcbJhWe2F6tcg9sTvp6Hk
+         SwpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695975994; x=1696580794;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=23yH0BNZzwfYBudqKllSnoXRGS73pAdr6tfQ7LisAW4=;
+        b=wk6IvymLAmIoNghSeLW5SkxT/12Bq+0b6bo1onos8rCGL2Pk/xcWEFmcCuhzlax+1o
+         9XHTaaz/Hhe5uUZCbzVobRe+qj72dslldiscQO3bCHUNojB2q5EAnuaYIKzmUPc9RW3z
+         qbYJF57Q1IyLLGamCjD3CX9wFqeBqAtF10P3shlA6VhgK+hlubBdBSX0LHJo2fJkCkVt
+         Fcggu2LN/Ff5FtGGJxNfs9hH5kGCbB/jhJmINVkaEHhZ5g0KIaKMAnpszW29uIAlLPnI
+         PU6Cim6f7vFKfFD7VPKYA/8jrmICaIkcnd/6Ti6903YEbkwxG15OlcSsSDTLAmwvr2+P
+         HrhQ==
+X-Gm-Message-State: AOJu0YxGfxzgCBapaz6q5kIjRzpkCICbDTy3AuI83Ezk5b7R03y63Igr
+	muqJq1X/xQ3oRTDJUUhivHtDwA==
+X-Google-Smtp-Source: AGHT+IG5c7ZLODhzgcjbTetb2Xpcq5dO0m5smUL0MHCHtHz/4AO0lfHplR/aNulH09soqJckpuP2xA==
+X-Received: by 2002:a17:907:75cc:b0:9ae:654d:510e with SMTP id jl12-20020a17090775cc00b009ae654d510emr3126251ejc.5.1695975993924;
+        Fri, 29 Sep 2023 01:26:33 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:a470:6c6:a6ee:941f? ([2a01:e0a:b41:c160:a470:6c6:a6ee:941f])
+        by smtp.gmail.com with ESMTPSA id o14-20020a05600c4fce00b004065d67c3c9sm831851wmq.8.2023.09.29.01.26.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Sep 2023 01:26:33 -0700 (PDT)
+Message-ID: <a68b135f-12ee-3c75-8b12-d039c9036d53@6wind.com>
+Date: Fri, 29 Sep 2023 10:26:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: Persisting mounts between 'ip netns' invocations
 Content-Language: en-US
+To: =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Christian Brauner <brauner@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ "Eric W. Biederman" <ebiederm@xmission.com>, David Ahern <dsahern@kernel.org>
+References: <87a5t68zvw.fsf@toke.dk>
+ <2aa087b5-cbcf-e736-00d4-d962a9deda75@6wind.com>
+ <20230928-geldbeschaffung-gekehrt-81ed7fba768d@brauner>
+ <87il7ucg5z.fsf@toke.dk>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <87il7ucg5z.fsf@toke.dk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: joao@overdrivepizza.com
-> Sent: 27 September 2023 03:02
->=20
-> From: Joao Moreira <joao.moreira@intel.com>
->=20
-> Currently, in nft_flow_rule_create function, num_actions is a signed
-> integer. Yet, it is processed within a loop which increments its
-> value. To prevent an overflow from occurring, make it unsigned and
-> also check if it reaches UINT_MAX when being incremented.
->=20
-> After checking with maintainers, it was mentioned that front-end will
-> cap the num_actions value and that it is not possible to reach such
-> condition for an overflow. Yet, for correctness, it is still better to
-> fix this.
->=20
-> This issue was observed by the commit author while reviewing a write-up
-> regarding a CVE within the same subsystem [1].
->=20
-> 1 - https://nickgregory.me/post/2022/03/12/cve-2022-25636/
->=20
-> Signed-off-by: Joao Moreira <joao.moreira@intel.com>
-> ---
->  net/netfilter/nf_tables_offload.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/net/netfilter/nf_tables_offload.c b/net/netfilter/nf_tables_=
-offload.c
-> index 12ab78fa5d84..d25088791a74 100644
-> --- a/net/netfilter/nf_tables_offload.c
-> +++ b/net/netfilter/nf_tables_offload.c
-> @@ -90,7 +90,8 @@ struct nft_flow_rule *nft_flow_rule_create(struct net *=
-net,
->  {
->  =09struct nft_offload_ctx *ctx;
->  =09struct nft_flow_rule *flow;
-> -=09int num_actions =3D 0, err;
-> +=09unsigned int num_actions =3D 0;
-> +=09int err;
->  =09struct nft_expr *expr;
->=20
->  =09expr =3D nft_expr_first(rule);
-> @@ -99,6 +100,9 @@ struct nft_flow_rule *nft_flow_rule_create(struct net =
-*net,
->  =09=09    expr->ops->offload_action(expr))
->  =09=09=09num_actions++;
->=20
-> +=09=09if (num_actions =3D=3D UINT_MAX)
-> +=09=09=09return ERR_PTR(-ENOMEM);
-> +
->  =09=09expr =3D nft_expr_next(expr);
+Le 28/09/2023 à 20:21, Toke Høiland-Jørgensen a écrit :
+> Christian Brauner <brauner@kernel.org> writes:
+> 
+>> On Thu, Sep 28, 2023 at 11:54:23AM +0200, Nicolas Dichtel wrote:
+>>> + Eric
+>>>
+>>> Le 28/09/2023 à 10:29, Toke Høiland-Jørgensen a écrit :
+>>>> Hi everyone
+>>>>
+>>>> I recently ran into this problem again, and so I figured I'd ask if
+>>>> anyone has any good idea how to solve it:
+>>>>
+>>>> When running a command through 'ip netns exec', iproute2 will
+>>>> "helpfully" create a new mount namespace and remount /sys inside it,
+>>>> AFAICT to make sure /sys/class/net/* refers to the right devices inside
+>>>> the namespace. This makes sense, but unfortunately it has the side
+>>>> effect that no mount commands executed inside the ns persist. In
+>>>> particular, this makes it difficult to work with bpffs; even when
+>>>> mounting a bpffs inside the ns, it will disappear along with the
+>>>> namespace as soon as the process exits.
+>>>>
+>>>> To illustrate:
+>>>>
+>>>> # ip netns exec <nsname> bpftool map pin id 2 /sys/fs/bpf/mymap
+>>>> # ip netns exec <nsname> ls /sys/fs/bpf
+>>>> <nothing>
+>>>>
+>>>> This happens because namespaces are cleaned up as soon as they have no
+>>>> processes, unless they are persisted by some other means. For the
+>>>> network namespace itself, iproute2 will bind mount /proc/self/ns/net to
+>>>> /var/run/netns/<nsname> (in the root mount namespace) to persist the
+>>>> namespace. I tried implementing something similar for the mount
+>>>> namespace, but that doesn't work; I can't manually bind mount the 'mnt'
+>>>> ns reference either:
+>>>>
+>>>> # mount -o bind /proc/104444/ns/mnt /var/run/netns/mnt/testns
+>>>> mount: /run/netns/mnt/testns: wrong fs type, bad option, bad superblock on /proc/104444/ns/mnt, missing codepage or helper program, or other error.
+>>>>        dmesg(1) may have more information after failed mount system call.
+>>>>
+>>>> When running strace on that mount command, it seems the move_mount()
+>>>> syscall returns EINVAL, which, AFAICT, is because the mount namespace
+>>>> file references itself as its namespace, which means it can't be
+>>>> bind-mounted into the containing mount namespace.
+>>>>
+>>>> So, my question is, how to overcome this limitation? I know it's
+>>>> possible to get a reference to the namespace of a running process, but
+>>>> there is no guarantee there is any processes running inside the
+>>>> namespace (hence the persisting bind mount for the netns). So is there
+>>>> some other way to persist the mount namespace reference, so we can pick
+>>>> it back up on the next 'ip netns' invocation?
+>>>>
+>>>> Hoping someone has a good idea :)
+>>> We ran into similar problems. The only solution we found was to use nsenter
+>>> instead of 'ip netns exec'.
+>>>
+>>> To be able to bind mount a mount namespace on a file, the directory of this file
+>>> should be private. For example:
+>>>
+>>> mkdir -p /run/foo
+>>> mount --make-rshared /
+>>> mount --bind /run/foo /run/foo
+>>> mount --make-private /run/foo
+>>> touch /run/foo/ns
+>>> unshare --mount --propagation=slave -- sh -c 'yes $$ 2>/dev/null' | {
+>>>         read -r pid &&
+>>>         mount --bind /proc/$pid/ns/mnt /run/foo/ns
+>>> }
+>>> nsenter --mount=/run/foo/ns ls /
+>>>
+>>> But this doesn't work under 'ip netns exec'.
+>>
+>> Afaiu, each ip netns exec invocation allocates a new mount namespace.
+>> If you run multiple concurrent ip netns exec command and leave them
+>> around then they all get a separate mount namespace. Not sure what the
+>> design behind that was. So even if you could persist the mount namespace
+>> of one there's still no way for ip netns exec to pick that up iiuc.
+>>
+>> So imho, the solution is to change ip netns exec to persist a mount
+>> namespace and netns namespace pair. unshare does this easily via:
+>>
+>> sudo mkdir /run/mntns
+>> sudo mount --bind /run/mntns /run/mntns
+>> sudo mount --make-slave /run/mntns
+>>
+>> sudo mkdir /run/netns
+>>
+>> sudo touch /run/mntns/mnt1
+>> sudo touch /run/netns/net1
+>>
+>> sudo unshare --mount=/run/mntns/mnt1 --net=/run/netns/net1 true
+I fear that creating a new mount ns for each net ns will introduce more problems.
 
-The code is going to 'crash and burn' well before the counter
-can possibly overflow.
+>>
+>> So I'd probably patch iproute2.
+> 
+> Patching iproute2 is what I'm trying to do - sorry if that wasn't clear :)
+> 
+> However, I couldn't get it to work. I think it's probably because I was
+> missing the bind-to-self/--make-slave dance on the containing folder, as
+> Nicolas pointed out. Will play around with that a bit more, thanks for
+> the pointers both of you!
 
-nft_expr_next() is ((void *)expr) + expr->ops->size;
+The fundamental problem is that the remount of /sys should not be propagated to
+the parent mount ns (and in fact the /etc remount also).
+You will have to choose between 'propagating the new mount points to the parent
+mount ns' and 'having the right view of /sys (ie the /sys corresponding to the
+current netns)'.
+Maybe this could be done via a new command, something like 'ip netns light-exec'
+(which will be equivalent to 'nsenter --net=/run/netns/foo').
 
-It is far more likely that has got setup wrong than the
-count is too big.=20
+FWIW, here is a nice doc about mount subtleties:
+https://www.kernel.org/doc/Documentation/filesystems/sharedsubtree.txt
 
-=09David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
-
+Regards,
+Nicolas
 
