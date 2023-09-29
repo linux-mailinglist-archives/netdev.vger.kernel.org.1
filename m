@@ -1,100 +1,102 @@
-Return-Path: <netdev+bounces-37109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8AE27B3AA7
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 21:25:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F317C7B3ABA
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 21:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 36C9728122B
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 19:25:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1C48C1C2074B
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 19:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B282B66DC9;
-	Fri, 29 Sep 2023 19:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B90566DD7;
+	Fri, 29 Sep 2023 19:37:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8286588D;
-	Fri, 29 Sep 2023 19:25:37 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDEBA1B2;
-	Fri, 29 Sep 2023 12:25:30 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4053c6f0db8so139950145e9.3;
-        Fri, 29 Sep 2023 12:25:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1673A66DD2
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 19:37:31 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB9D1B3
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 12:37:29 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-690d2441b95so796209b3a.1
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 12:37:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696015529; x=1696620329; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=chromium.org; s=google; t=1696016248; x=1696621048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aMHV2V/kqG9I3RQeTZYX0vMNO9LsbrSBVcGKEums0k4=;
-        b=VeF59lhY43MLZSLWpp2VIyT2OnY6BUg9XYKPHKh5W/+hsTFTzECJIRj+fAGgHB/c5g
-         kWTFGkRsMKXZjYH4X5fVijn1vC5f5a/tsfLs9Ft1N7GSeFKLb/PMK18p29pWCCHWpBuk
-         mMs2khECbb0RhGW9FmVaIyyzGRNBgkrTXih+AJHdrA1UcPbU9syzihTFk4pL7yGFYWEX
-         zYUsBKNauzEHBhHjptbI7lPIweQVA1WODXcbxNjs/FadJhWJBYtc+sUVwfF1oQ/sXwBM
-         0jJGLO7m5uYTl4we9O/a2jkNH+YTq2WXdNSX9SHJKRC/LgKW9Zw3y9Q7O9pUHUiwLDgd
-         z5dA==
+        bh=pz6XxrokHS8tD3oX5YP+XUhcoroypZl9efJWa+Ud3No=;
+        b=i5UNO6IicrDU38SjFqnx8ZSKG8LC+34CX3yvrdXgpLQ/GZkqJKAHlsWIqAJJMMAK2l
+         9LgOSriZcDVECFjg+6DSX14LWYALdrPyTwHCVM4Pgavlah6DsislwFVwPNboVJGsVCvI
+         GN9Ojr3nO8VtQ476zOqxJFNzVuavvmxegsRGA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696015529; x=1696620329;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1696016248; x=1696621048;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aMHV2V/kqG9I3RQeTZYX0vMNO9LsbrSBVcGKEums0k4=;
-        b=v6up3/2lmHa7ElvEytwcJwtUAEA7IkKhh5L220e3AUusIq06eudj3uvAWWk8p/mvX0
-         G53FX9ond7v8t98jOsOBV/1W2R7vvg4gLMKuOBGs8WIUvjx29p35gq7zpy7OgMGrqOzV
-         PtKbJiLy4HR5bxj2C+VWT5KQASqVyaAO0y8wIid/Xl7wG14EDnH7dQxytPEE+7NMJstp
-         l0MPRwhUwT5AZhPPS5i1qQ+4VAXDGsRFLk2jrWi9Z71oSqRWP1qZNFUrmth/sKmJ7fXJ
-         /ObxJxCCKOpeY78l3JbY5jl2C9I39kVKQ0MR1GelUILn/g6U1++B5lfOt0Wr9+QRFZax
-         bR1g==
-X-Gm-Message-State: AOJu0Ywk0EfvtmdXnnMa1o5LvIcI18JWlR23ozCbmMh1vcQUhi2s31ao
-	QYsV+DMwpnOLnz2Gy0A/bRoJ4iGYUX/c0l4tFZ8=
-X-Google-Smtp-Source: AGHT+IEmExtnQrtc5nPi7e3OT9GMrxtnLk0R/vdDkSkap5pcG0kWevBwEypEdBou0cqbwtOww8ZnmlXQrGRpnlk9GA0=
-X-Received: by 2002:adf:f102:0:b0:31f:651f:f84f with SMTP id
- r2-20020adff102000000b0031f651ff84fmr3951475wro.27.1696015529150; Fri, 29 Sep
- 2023 12:25:29 -0700 (PDT)
+        bh=pz6XxrokHS8tD3oX5YP+XUhcoroypZl9efJWa+Ud3No=;
+        b=BQ1iieSH+Ini4vQvxRW+xgZCd3ogDc/xDd90vfhlo5Vm9ExVGMPgmZEK4N6n1RiFWr
+         tb0nPZIGYjVS30Xyh+lUclqcmC09QqR8Ipunr75PJyt3t9vnjB8Mfs9DMV+yj8Q5oUAz
+         Zhsv9eVZ9w/vHrNvkq2EpSev9fxQvYgM22yupcShIkIrG2OY5X8WVR/KtXrGUp+DJ6UA
+         eFAO3eKU15gpETk2nA0gnxX7IgnFUF1ReRAIaFb0z14cgM9xWU4SKMJ/LTopTrLQ2jz4
+         XUlzsbpJaW9xW9WM6L4DrsdBVX2dULc0jUefUkPZF0zZwcYvwLdz+XrCAYw0d/YxQid6
+         soCg==
+X-Gm-Message-State: AOJu0Yz1gQ4VTP5vLpaRkRa6c+XUQssJ27s0dCX9wk2KkjX+mYYDiqWP
+	LI2g1Rp+P7vmjWW+6VLK+wMi0bpwxCUQtf0HxM0=
+X-Google-Smtp-Source: AGHT+IEnN6bxYqpGvl9ktJGtLQQ5mwKyJ3TeMFdfpa66gryjMY4jCfgv/JejeF1KEVIKsl05FW+Sew==
+X-Received: by 2002:a05:6a20:4420:b0:13e:debc:3657 with SMTP id ce32-20020a056a20442000b0013edebc3657mr7894820pzb.30.1696016248658;
+        Fri, 29 Sep 2023 12:37:28 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id i17-20020aa78b51000000b0066a4e561beesm15931376pfd.173.2023.09.29.12.37.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Sep 2023 12:37:28 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+To: Karsten Keil <isdn@linux-pingi.de>,
+	Justin Stitt <justinstitt@google.com>
+Cc: Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] isdn: kcapi: replace deprecated strncpy with strscpy_pad
+Date: Fri, 29 Sep 2023 12:37:25 -0700
+Message-Id: <169601624548.3016093.6534786691169747871.b4-ty@chromium.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230922-strncpy-drivers-isdn-capi-kcapi-c-v1-1-55fcf8b075fb@google.com>
+References: <20230922-strncpy-drivers-isdn-capi-kcapi-c-v1-1-55fcf8b075fb@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230926055913.9859-1-daniel@iogearbox.net> <20230926055913.9859-2-daniel@iogearbox.net>
- <877coa8xp2.fsf@toke.dk> <11c6240c-ab6b-fba3-d84a-824b3fa36ac9@iogearbox.net>
-In-Reply-To: <11c6240c-ab6b-fba3-d84a-824b3fa36ac9@iogearbox.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 29 Sep 2023 12:25:17 -0700
-Message-ID: <CAADnVQK82PRjGnw+wht4ZpxK3s3St2qWRoO6bJbuY3cARXXPxQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/8] meta, bpf: Add bpf programmable meta device
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 2:14=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
->
-> > I think we should just name the driver 'bpfnet'; it's not pretty, but
-> > it's obvious and descriptive. Optionally we could teach 'ip' to
-> > understand just 'bpf' as the device type, so you could go 'ip link add
-> > type bpf' and get one of these.
->
-> I'll think about it, the bpfnet sounds terrible as you also noticed. I
-> definitely don't like that. Perhaps meta_net as suggested by Andrii in
-> the other thread could be a compromise. Need to sleep over it, my pref
-> was actually to keep it shorter.
+On Fri, 22 Sep 2023 11:49:14 +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> `buf` is used in this context as a data buffer with 64 bytes of memory
+> to be occupied by capi_manufakturer.
+> 
+> [...]
 
-I don't like the meta name either standalone or as meta_net.
-Maybe "hollow" or "void" netdevice?
-Since this netdev doesn't have a substance when bpf prog is not attached.
-It's empty =3D=3D dummy =3D=3D hollow =3D=3D void netdevice.
+Applied to for-next/hardening, thanks!
+
+[1/1] isdn: kcapi: replace deprecated strncpy with strscpy_pad
+      https://git.kernel.org/kees/c/69cee158c9b0
+
+Take care,
+
+-- 
+Kees Cook
+
 
