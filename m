@@ -1,165 +1,106 @@
-Return-Path: <netdev+bounces-37025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77097B3362
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:19:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECE0A7B3378
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 15:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 930DF283433
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:19:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 156EB1C209D1
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 13:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1851A5A2;
-	Fri, 29 Sep 2023 13:19:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17411A5A3;
+	Fri, 29 Sep 2023 13:20:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503A51A58E;
-	Fri, 29 Sep 2023 13:19:33 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B74EE7;
-	Fri, 29 Sep 2023 06:19:31 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 38TABSom007571;
-	Fri, 29 Sep 2023 15:18:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:from:to:cc:references
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=KMM5HFfGi3/V+NX/zIj16MtndrNJ3wjO6VBqQEWwOzE=; b=ga
-	rM6WT7soC9Qg5lgEynlNIDEz19ICFxdBxx8K4WKaa81yBoo69ZoqQgPtPJrk+yqH
-	6Ke+T4tgb/wvQ7+D6b8/REeHXj+x3qhuVXstjmlbfDXVsD7fnq1otz0IBlMfWVfL
-	E4pait5J8DRp751sajaRVoUu+IBQuOKISwGGaDU+w8jkYTr9fXxKlpYDQovtoe8f
-	gElrQ2fdRogxsh24zwaguSO+d3txrH3Ag2t7373pPcvxthqul803q1iHU52Zkj5N
-	HDkK8wgJgLFXVxL19kvPUsq9yAyQ76DfuoiJhXjgKUsphyNPOIYM5JXL5gCdij8s
-	EmQ/SdD52jWC2koKfFGg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3ta9k0s0fb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 29 Sep 2023 15:18:50 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id AE29710002A;
-	Fri, 29 Sep 2023 15:18:48 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4AB3A2865FC;
-	Fri, 29 Sep 2023 15:18:48 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 29 Sep
- 2023 15:18:46 +0200
-Message-ID: <6e419e89-10f1-e448-10fe-64f1ea9ff862@foss.st.com>
-Date: Fri, 29 Sep 2023 15:18:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A031A5A6
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 13:20:15 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA036CC3
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 06:20:13 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-658-iSaAYYJJO06RazDCH-kyKA-1; Fri, 29 Sep 2023 09:20:10 -0400
+X-MC-Unique: iSaAYYJJO06RazDCH-kyKA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D45C78002B2;
+	Fri, 29 Sep 2023 13:20:09 +0000 (UTC)
+Received: from hog (unknown [10.45.225.122])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D4AB1005E29;
+	Fri, 29 Sep 2023 13:20:07 +0000 (UTC)
+Date: Fri, 29 Sep 2023 15:20:05 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux-Next Mailing List <linux-next@vger.kernel.org>,
+	Netdev <netdev@vger.kernel.org>, linux-snps-arc@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined
+ reference to `crypto_has_aead'
+Message-ID: <ZRbPBdu0ZJ86juff@hog>
+References: <CA+G9fYu2DKDxOEFTeJhH-r_JD8gR1gS8e4YsSrW3rfGegHR4Sg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [IGNORE][PATCH v4 01/11] dt-bindings: Document common device
- controller bindings
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <Oleksii_Moisieiev@epam.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230811100731.108145-1-gatien.chevallier@foss.st.com>
- <20230811100731.108145-2-gatien.chevallier@foss.st.com>
- <2023081117-sprout-cruncher-862c@gregkh>
- <4f0f9d6c-ce4d-73a2-60bf-801c1a1d6cc3@foss.st.com>
-Content-Language: en-US
-In-Reply-To: <4f0f9d6c-ce4d-73a2-60bf-801c1a1d6cc3@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-09-29_11,2023-09-28_03,2023-05-22_02
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CA+G9fYu2DKDxOEFTeJhH-r_JD8gR1gS8e4YsSrW3rfGegHR4Sg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+2023-09-29, 12:41:51 +0530, Naresh Kamboju wrote:
+> The arc defconfig builds failed on Linux next from Sept 22.
+>=20
+> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+>=20
+> Build log:
+> -----------
+> arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined reference
+> to `crypto_has_aead'
+> arc-elf32-ld: net/xfrm/xfrm_algo.o:(.rodata+0x24): undefined reference
+> to `crypto_has_aead'
+> make[3]: *** [/builds/linux/scripts/Makefile.vmlinux:36: vmlinux] Error 1
+> make[3]: Target '__default' not remade because of errors.
 
+Use of crypto_has_aead was added to net/xfrm/xfrm_algo.c in commit
+a1383e2ab102 ("ipsec: Stop using crypto_has_alg").
 
-On 8/11/23 14:00, Gatien CHEVALLIER wrote:
-> 
-> 
-> On 8/11/23 12:16, Greg KH wrote:
->> On Fri, Aug 11, 2023 at 12:07:21PM +0200, Gatien Chevallier wrote:
->>> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
->>>
->>> Introducing of the common device controller bindings for the controller
->>> provider and consumer devices. Those bindings are intended to allow
->>> divided system on chip into multiple domains, that can be used to
->>> configure hardware permissions.
->>>
->>> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->>> [Gatien: Fix typos and YAML error]
->>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>> ---
->>>
->>> Changes in V4:
->>>     Corrected typos and YAML errors
->>
->> Why are we supposed to ignore the first patch in this series, but pay
->> attention to the 10 after this that depend on it?
->>
->> totally confused,
->>
->> greg k-h
-> 
-> Hello Greg,
-> 
-> I'm sorry that this tag troubles your review. It was first suggested
-> in [1]. The "IGNORE" means ignore review on this thread, as it is still
-> under review in another thread (Link in the cover letter). It does not
-> mean that the content should be ignored for the series. I will change
-> this to something else as this is obviously confusing the review.
-> 
-> @Oleksii, can we imagine integrating this patch to this series or do
-> you prefer to keep it apart?
-> 
+I guess the problem is that CONFIG_XFRM_ALGO doesn't select
+CONFIG_CRYPTO_AEAD (or _AEAD2?), just CRYPTO_HASH and CRYPTO_SKCIPHER.
 
-Hi,
+Herbert, does that seem reasonable?
 
-after a discussion with Oleksii: I'll rename the binding to narrow
-down its scope and integrate the patch in my series. This way, I'll drop
-the [IGNORE] tag.
+-------- 8< --------
+diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
+index 3adf31a83a79..d7b16f2c23e9 100644
+--- a/net/xfrm/Kconfig
++++ b/net/xfrm/Kconfig
+@@ -15,6 +15,7 @@ config XFRM_ALGO
+ =09tristate
+ =09select XFRM
+ =09select CRYPTO
++=09select CRYPTO_AEAD
+ =09select CRYPTO_HASH
+ =09select CRYPTO_SKCIPHER
+=20
 
-=> I'll stick with the generic binding for V5 (Sorry for the misleading
-    information in the previous mail)
+--=20
+Sabrina
 
-Best regards,
-Gatien
-
-> Should I consider a resend with another tag if Oleksii prefers to keep
-> this patch apart?
-> 
-> [1] 
-> https://lore.kernel.org/all/1e498b93-d3bd-bd12-e991-e3f4bedf632d@linaro.org/
-> 
-> Best regards,
-> Gatien
 
