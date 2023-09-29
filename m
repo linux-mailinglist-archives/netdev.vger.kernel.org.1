@@ -1,161 +1,66 @@
-Return-Path: <netdev+bounces-37000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C88B7B2EF6
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 11:12:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEBC7B2F1F
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 11:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 490371C208F0
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 09:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 025E71C209D9
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 09:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25091172F;
-	Fri, 29 Sep 2023 09:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC7311CB3;
+	Fri, 29 Sep 2023 09:25:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCD611705
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 09:12:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59368180
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 02:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1695978752;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mWGhTxhB3dGkyUJd+ZvB0A+li+V3clasR5rFEOBuS5Q=;
-	b=Rj+am9QH0kTDDPsRpN3ibi3/BNWf476Du1ovdHQeSMq5oGPpGhRlMX0/1HE36bgl+793L/
-	uA8VreBUxn3kksoO7Is28SVvdyVlPgy3DPzlUjx7IyS9lo5RNm7PuYGpk0J+GiHaNs0HcH
-	Y2yZpBjkx0mNliLGhkWtMnOyI1bpqo8=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-464-zINCMx0OMu-lnzv0G8nixg-1; Fri, 29 Sep 2023 05:12:29 -0400
-X-MC-Unique: zINCMx0OMu-lnzv0G8nixg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BDC473C1ACEE;
-	Fri, 29 Sep 2023 09:12:28 +0000 (UTC)
-Received: from [10.39.208.41] (unknown [10.39.208.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E46AD14171B6;
-	Fri, 29 Sep 2023 09:12:26 +0000 (UTC)
-Message-ID: <db93d5aa-64c4-42a4-73dc-ae25e9e3833e@redhat.com>
-Date: Fri, 29 Sep 2023 11:12:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB1C9CA7A;
+	Fri, 29 Sep 2023 09:25:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F53C433C7;
+	Fri, 29 Sep 2023 09:25:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1695979527;
+	bh=Ti9DZZ19rV42Iow/MPF+Ri4zjNiXMprHHMErhBYkwlc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ejPj6AOZ2jJD1DemNlm8WoUKIi2339Pzn/gg9m9OaJ6I2H/KxRduboXEADa11WxQQ
+	 4WZvBY0W8WmKKqZtnE8c6FNRGiC+mX+XZAFU/3PXGPgMcejbVLlqiX6rLbVZj5yfh1
+	 iacVNH6u4Jsy7USh9h1fEASqdm4SvdM9po02Pr3+RmdzNEZpU9vAcRac2RbQ0CoYSD
+	 H8v9ZPDYtfelkxUcqUr3taH6Qc3RPdOZ2G/UHqxgi0kGBzqmiJuzXXadnF0lGZbBN2
+	 N1aqTUoZ5UHadq3hbOu//IHgQ+R6JFRrL/lvO+6gdVDRULd158fX7YwFgeqF2jDINi
+	 //RHRtHfS7WhA==
+Date: Fri, 29 Sep 2023 11:25:21 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	"Eric W. Biederman" <ebiederm@xmission.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: Persisting mounts between 'ip netns' invocations
+Message-ID: <20230929-paket-pechschwarz-a259da786431@brauner>
+References: <87a5t68zvw.fsf@toke.dk>
+ <2aa087b5-cbcf-e736-00d4-d962a9deda75@6wind.com>
+ <20230928-geldbeschaffung-gekehrt-81ed7fba768d@brauner>
+ <87il7ucg5z.fsf@toke.dk>
+ <a68b135f-12ee-3c75-8b12-d039c9036d53@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
-Content-Language: en-US
-To: Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>
-Cc: mst@redhat.com, xieyongji@bytedance.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, stable@vger.kernel.org
-References: <20230912030008.3599514-1-lulu@redhat.com>
- <20230912030008.3599514-4-lulu@redhat.com>
- <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-In-Reply-To: <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <a68b135f-12ee-3c75-8b12-d039c9036d53@6wind.com>
 
+> I fear that creating a new mount ns for each net ns will introduce more problems.
 
+Not sure if we're talking past each other but that is what's happening
+now. Each new ip netns exec invocation will allocate a _new_ mount
+namespace. In other words, if you have 300 ip netns exec commands
+running then there will be 300 individual mount namespaces active.
 
-On 9/12/23 09:39, Jason Wang wrote:
-> On Tue, Sep 12, 2023 at 11:00 AM Cindy Lu <lulu@redhat.com> wrote:
->>
->> In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
->> with reconnect info, After mapping the reconnect pages to userspace
->> The userspace App will update the reconnect_time in
->> struct vhost_reconnect_vring, If this is not 0 then it means this
->> vq is reconnected and will update the last_avail_idx
->>
->> Signed-off-by: Cindy Lu <lulu@redhat.com>
->> ---
->>   drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
->>   include/uapi/linux/vduse.h         |  6 ++++++
->>   2 files changed, 19 insertions(+)
->>
->> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
->> index 2c69f4004a6e..680b23dbdde2 100644
->> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
->> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
->> @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->>                  struct vduse_vq_info vq_info;
->>                  struct vduse_virtqueue *vq;
->>                  u32 index;
->> +               struct vdpa_reconnect_info *area;
->> +               struct vhost_reconnect_vring *vq_reconnect;
->>
->>                  ret = -EFAULT;
->>                  if (copy_from_user(&vq_info, argp, sizeof(vq_info)))
->> @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
->>
->>                  vq_info.ready = vq->ready;
->>
->> +               area = &vq->reconnect_info;
->> +
->> +               vq_reconnect = (struct vhost_reconnect_vring *)area->vaddr;
->> +               /*check if the vq is reconnect, if yes then update the last_avail_idx*/
->> +               if ((vq_reconnect->last_avail_idx !=
->> +                    vq_info.split.avail_index) &&
->> +                   (vq_reconnect->reconnect_time != 0)) {
->> +                       vq_info.split.avail_index =
->> +                               vq_reconnect->last_avail_idx;
->> +               }
->> +
->>                  ret = -EFAULT;
->>                  if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
->>                          break;
->> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
->> index 11bd48c72c6c..d585425803fd 100644
->> --- a/include/uapi/linux/vduse.h
->> +++ b/include/uapi/linux/vduse.h
->> @@ -350,4 +350,10 @@ struct vduse_dev_response {
->>          };
->>   };
->>
->> +struct vhost_reconnect_vring {
->> +       __u16 reconnect_time;
->> +       __u16 last_avail_idx;
->> +       _Bool avail_wrap_counter;
-> 
-> Please add a comment for each field.
-> 
-> And I never saw _Bool is used in uapi before, maybe it's better to
-> pack it with last_avail_idx into a __u32.
-
-Better as two distincts __u16 IMHO.
-
-Thanks,
-Maxime
-
-> 
-> Btw, do we need to track inflight descriptors as well?
-> 
-> Thanks
-> 
->> +};
->> +
->>   #endif /* _UAPI_VDUSE_H_ */
->> --
->> 2.34.3
->>
-> 
-
+What I tried to say is that ip netns exec could be changed to
+_optionally_ allocate a prepared mount namespace that is shared between
+ip netns exec commands. And yeah, that would need to be a new command
+line addition to ip netns exec.
 
