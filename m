@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-37091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B3197B39B0
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:07:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D37527B39AE
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 51B651C20B20
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:07:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 845872821C7
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2EF66688;
-	Fri, 29 Sep 2023 18:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1217C66688;
+	Fri, 29 Sep 2023 18:07:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CA766686
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 18:07:50 +0000 (UTC)
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A82F4D6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9360466680
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 18:07:49 +0000 (UTC)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090DE1B1
 	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:07:48 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bdf4752c3cso105987785ad.2
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:07:48 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c735473d1aso20913065ad.1
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:07:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696010868; x=1696615668; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ytcIulEB3Bd0Lgb6X1DnmKvq+hrlwdq4lTgiyfurQ14=;
-        b=cuVBAaBIyghBmO81lSaXEHPxf8OVa6KMq/GYIsVSGifxEQocRaOx42pF+eNKaSQ5P5
-         rOypC71o23d2fU/MJpbwX6Qc9lGsWIcsdmt+ZZnPdnm7Vpw9PM7kxTd0gz3CCTlMoQco
-         QALsoJnrQ/HR713Uw99Y31d4+mOClc1OrG8jE=
+        d=chromium.org; s=google; t=1696010867; x=1696615667; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3cXa0cO8yt2b6e+VGi8zgr6GOxIgX0GS3Nbuo7CXwec=;
+        b=C7zQjsY0bLpXxORG1txjs2Kg3j+zIgfX8oP8/R1uZrA/0JjeDf1q8nsLaVcDxcfGWZ
+         ONHsTIGhASybM9COXhKobV5iUzQ8bpjfI+N3/giEqq5Uo/TOzZUq/yM+IVsbxrB+z4IM
+         JSUyqdYzTOjo27v1yAwaxTL6m5dwb75cvIFhg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696010868; x=1696615668;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ytcIulEB3Bd0Lgb6X1DnmKvq+hrlwdq4lTgiyfurQ14=;
-        b=FqQgIG4A0lCpcdiEpgJoCUjbEGUUeeFa4CiuqCIFWMfzOFrFgUazGLL9zZdhYUG1+9
-         szo9PQs4kuEbNAs5ZQOz629WiNqvbjnKHsCq6WhoLZt6FVVKjEv+8qFkW8YFHro9W5Eo
-         32mrrkcazsXjlfl7o37beAtKGOrwFxpXTUjDEwWHE4XjfrhyjIJE2mWPX9Tkpr/OEjda
-         U4BgHa6ZQT8RRaKBLRzjae6qj/U1pWx1nVeIpoKAGdVlimGKfh3Gg5VhCAmszKNqEW5H
-         ZqUnCXZ1fQdaxY5YdJ3SMiOnyHuNZsmq/y6RGE2GugrAzNvghx9HLyqqnoqsBSwCcx1r
-         y1Gw==
-X-Gm-Message-State: AOJu0YzQRsOFp0rjNbV05Ww2A79rllTRBo4qapN1rkgx2dAiL4v8Ba8i
-	r3pq8ufjSbQ/z4/198Pw88ylpA==
-X-Google-Smtp-Source: AGHT+IGMFNLTCNCtA/FqnKOTA460hZC6guf310Jbrn09vBZrg4EKduZUZHOzzcMy8xMUvOVnVjCeYQ==
-X-Received: by 2002:a17:902:ea8d:b0:1bb:94ed:20a with SMTP id x13-20020a170902ea8d00b001bb94ed020amr4663075plb.24.1696010867805;
+        d=1e100.net; s=20230601; t=1696010867; x=1696615667;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3cXa0cO8yt2b6e+VGi8zgr6GOxIgX0GS3Nbuo7CXwec=;
+        b=OaBpmblm6w+VTwZ8O7aw0q1fV15+Cr8f2blOQyhMxui50yk5djhOmC2lD3l9Oc49bR
+         JOItaa6mcEsBju2NaQzfmZmlhs7s3w4+MB0WHmCOPySYowyqyPuR/g20AWTsLT3XQvtM
+         GWojvklI8gcwpV0IwUVHSM6EkDjTaTMkJ1NCzN3fk4lTFTmaps+lynG4JVWcHGbNiRys
+         f5Q0q8aimecCMSjPKy/CEwD4pf4AkwkMzyZ1eKsSJk0Kw1KeJcrv28fRt4tRBJo4T3zQ
+         2z+WxlmODmhdeu7i85Yed7hwE/ju3TAhQcHjsl+OWkGvEkfJiV29tQy4KHaLzDL8BMDO
+         ZBJA==
+X-Gm-Message-State: AOJu0YzvIuChaY/LlukJaAmCstFBsmAZO5TX7rLfr6cv4tEnSZx0WRNc
+	ZG5gDDOSxJW5h5z2L3fU4FhKLA==
+X-Google-Smtp-Source: AGHT+IFtu4c4ZFASN8YJ8+i8qsvc58IIkosaQq3qEI0WmbaBdN20jLQIPQZc62BpHb3+w0fTnXx5Tg==
+X-Received: by 2002:a17:903:24f:b0:1bd:bba1:be78 with SMTP id j15-20020a170903024f00b001bdbba1be78mr5817296plh.23.1696010867484;
         Fri, 29 Sep 2023 11:07:47 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id jw13-20020a170903278d00b001c74876f018sm1605993plb.18.2023.09.29.11.07.46
+        by smtp.gmail.com with ESMTPSA id p16-20020a170902e75000b001c446dea2c5sm17144513plf.143.2023.09.29.11.07.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 29 Sep 2023 11:07:46 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
@@ -58,73 +59,83 @@ Cc: Kees Cook <keescook@chromium.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Tom Rix <trix@redhat.com>,
 	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH 0/5] mlxsw: Annotate structs with __counted_by
-Date: Fri, 29 Sep 2023 11:07:39 -0700
-Message-Id: <20230929180611.work.870-kees@kernel.org>
+Subject: [PATCH 1/5] mlxsw: Annotate struct mlxsw_linecards with __counted_by
+Date: Fri, 29 Sep 2023 11:07:40 -0700
+Message-Id: <20230929180746.3005922-1-keescook@chromium.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230929180611.work.870-kees@kernel.org>
+References: <20230929180611.work.870-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1021; i=keescook@chromium.org;
- h=from:subject:message-id; bh=GMvcoJa22FgGaZ5PVgWxKg4zkvx6Wc5lsJ5JwJVw2fI=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlFxJvZx4KMD65V6zmNUdqeMe55R3rtiwTNYOc6
- EZZ9t3itwqJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRcSbwAKCRCJcvTf3G3A
- JilLD/9r7z+Y0akNEbzBq9UIK6u9F8wxjl2UhnrMWJV3dIfqBfLZuKWOV5DzIinJVsMdydRvZ7g
- LzeVXCUcQ9Y5xtrOmqzuO7qt1YrYJ2ivzNReGQNY37w5stJlTgoQECYYskZmbIzKLLHbd2PmXEK
- 5PVWAtEQ9fgKUA+34HyZ7QplTHvqrrEYeCLOmrKWHvPAW/l+gl0+fV+CF0uEgpKOCk8LCnFlODo
- iBQDBo0ty6OqTWAItcqrMvAzf3DnS/LoznwCjVUtt8Qe4Z16eBkFFrrN09ptZlIGnVEZAI+CBEo
- NiHxE5nHwqvZb4vVFLa37SLJC5Zn0V+W7engScEuW+vmsaIbzyEDWvueXrbFWXxC5L/BEVjt5jA
- RLuI9pH223rzBSA/Fva1nt3P1MHUlopmO9ge7/lAZmSp5h6tYcdxQKOFSqgCmWRjHJttAjzx4k5
- EjHejSkET+0kGXK4q1lm5OYkUUNT7RJBywxrTTVB0X+v1ZTIIYW3kS+jqMsfI3GL8pCXdKig8eW
- lAVjor5R8hTWY5x35fn6Bn0ofB60JmP5BmukdqqVwACrrQ3tb5O0r6Uh/1YObqO5d7wbmd76Sn2
- +NkqwfKsUKtD6BPbF0eEX7oywwTZaKrYh7KjFV3vlVlMy4Wpf6Pt0NkFeGDzTA2RXe0LVTQnGok
- 9cFR6xv keo3z+2g==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1509; i=keescook@chromium.org;
+ h=from:subject; bh=Ww0CdLXqXc4lNTAvPkI5tpHASRFsk/+Dd/7elsfsEVo=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlFxJvZ0ctS3Apt7u/ZPa2oHBqvLK7sDWQzgvto
+ ev8sStvUCOJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRcSbwAKCRCJcvTf3G3A
+ JtPID/9lzDk8uueD1NLYXfN5nJTT1N04aIYmTyDtXOx9Q2ze4G6KfG72FccvuQD7QCYudQIhMti
+ UN9kFRwzHB7UjP9+D3r86ENK4dpKPvnIeIFJpd+Hvg4vvG+DHtLDZGJIeTi4dnyw4z2ayv/4Lgy
+ OoSQKKswKBI5hkv1uMxbxIljvEhJDhbbWhEme2fxZvzV4c8mInhVzj90PhhsRET4a5lxGwe+Al3
+ JMx4CP859l1P2gwm9vaxIazkD1E3IKgESNenzlG9zjXyuFTkazOjQfdFDUBiEesU4WrkZCzJeKA
+ UuQZW27ZR8vwOh9N2cu1ONtfxOC3XRQPmnu0IDt0yyM0Vp3fEVJkAQn8Ti5J58VNHTGj9/INkms
+ 33nE+9B37Lpmr0v5oEhgLhVfUOzIeXEoOHjnvoed9Pmw0+QqjEMq636LMMuxTp/O45pqisaLrGM
+ nQcAqGkoQiYUXpyAzmKfzC4AGHALfiI8/0EZGSqr+5hPIGdiDEWxQiL61EQ4kgUuubp16GUcRdQ
+ MvmN1Nz1hHJzFP1lA9sBSTnAcyDLZDYUSFP555nDHRyjzoDPbiQtCWbMEaKn6rQYBA9t1LasSzS
+ RMn1fKyLWauhfAYUUXnimfKBeQDtWvFwT4nVKcDVN9mtuu7N0+VNU0r8/O+oSgsdzzpFTbA2Kqz XW74PgNoDQaokuQ==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+Prepare for the coming implementation by GCC and Clang of the __counted_by
+attribute. Flexible array members annotated with __counted_by can have
+their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+(for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+functions).
 
-This annotates several mlxsw structures with the coming __counted_by attribute
-for bounds checking of flexible arrays at run-time. For more details, see
-commit dd06e72e68bc ("Compiler Attributes: Add __counted_by macro").
+As found with Coccinelle[1], add __counted_by for struct mlxsw_linecards.
 
-Thanks!
+[1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
 
--Kees
+Cc: Ido Schimmel <idosch@nvidia.com>
+Cc: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/net/ethernet/mellanox/mlxsw/core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Kees Cook (5):
-  mlxsw: Annotate struct mlxsw_linecards with __counted_by
-  mlxsw: core: Annotate struct mlxsw_env with __counted_by
-  mlxsw: spectrum: Annotate struct mlxsw_sp_counter_pool with
-    __counted_by
-  mlxsw: spectrum_router: Annotate struct mlxsw_sp_nexthop_group_info
-    with __counted_by
-  mlxsw: spectrum_span: Annotate struct mlxsw_sp_span with __counted_by
-
- drivers/net/ethernet/mellanox/mlxsw/core.h            | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/core_env.c        | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/spectrum_cnt.c    | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c | 2 +-
- drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c   | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
-
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/core.h b/drivers/net/ethernet/mellanox/mlxsw/core.h
+index e5474d3e34db..c6bc5819ce43 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/core.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/core.h
+@@ -624,7 +624,7 @@ struct mlxsw_linecards {
+ 	struct mlxsw_linecard_types_info *types_info;
+ 	struct list_head event_ops_list;
+ 	struct mutex event_ops_list_lock; /* Locks accesses to event ops list */
+-	struct mlxsw_linecard linecards[];
++	struct mlxsw_linecard linecards[] __counted_by(count);
+ };
+ 
+ static inline struct mlxsw_linecard *
 -- 
 2.34.1
 
