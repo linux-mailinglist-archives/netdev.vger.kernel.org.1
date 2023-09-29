@@ -1,123 +1,177 @@
-Return-Path: <netdev+bounces-36981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-36982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B06B77B2CD8
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 09:07:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51F57B2CD9
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 09:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id ECEE4282F90
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 07:07:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id D80C11C20B07
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 07:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D44C133;
-	Fri, 29 Sep 2023 07:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32289C148;
+	Fri, 29 Sep 2023 07:07:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9DD3D78
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:07:02 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DDA1A8
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 00:07:00 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so11052a12.0
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 00:07:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9642BC131
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 07:07:03 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B871A7
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 00:07:01 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c3bd829b86so112313495ad.0
+        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 00:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1695971219; x=1696576019; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1695971221; x=1696576021; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8VDhsG3RvqxurmnHIUU3NyMw2Ckx5kzAqe1lOg3jvtw=;
-        b=yqOdf/Xe738+uS/bdp7sa/4PaONqHb7OVBN4HkvAdt2ijif6Y4+bm7V9iAD0igjNZs
-         cONxpOdz/qUyZ9mlxY5Ckj6fFtCsMEWx98jqa6FmwoOy/RwkPI+leXv9N3RiQ1H21cQU
-         l6Z9APHuPqwGsn4re+yEqh9525Iiz9yA49UrF1bebORvtZa4K/jPm7IzPFFniMpYT2Q5
-         YMdEUHpkSs33IR3lo97OyCLZheebi7H3a+BQV6zAqViYxonj5rJuo2KjeYunod79Cov9
-         zd6+I2CX8rK1nLLWvYMqmB+nmEW6yYxWIPT7qFfsTId4bjF3G+JvNtjY9HcCXWNW3epU
-         pGnw==
+        bh=3qPnruVOPtCURvIrKVgV1Gzpi9qZsBOOnAtjdNN6W7U=;
+        b=foNv2W8MBOqsX/gYUQ41DRPbIyhHinyjxnTg5lMGJMRtJPZknx7GaM+d6k0JVZR+Id
+         Pxl75y4ZwfCNp4te06NQkge1h0r7TyQ6yhQT+CvMZqM4TbaPfgvOTBjQslhgcsKsxITF
+         a/SPccvuWvhFQzx52dOKCTaYNnkk/zk+MblTi3cggxyHho6Yj7S8PECLBrVM6b/p40f1
+         YeE1PiUNUQTcx9N+3Q7NpPhi+C7Fiyup00u6Sc9kwD5dhECFX8C5ggu3/CrrWzo2Pu4n
+         TFDn+QFN9lRP5u155ES3Iu8ErY/q8xDazJZATBLhHfoBwPsHpXJJC5jtkcESWl5DTiSp
+         Janw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695971219; x=1696576019;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8VDhsG3RvqxurmnHIUU3NyMw2Ckx5kzAqe1lOg3jvtw=;
-        b=fVfAxt6qXeIEfGDhHHeoz5jfEEV3b5bi8tmFz7T3VaoXH5d+zwfV49/DqI59svPUIq
-         OQbZBkxJt8J0SDh7G0LuirKyrjgfXx+xsSDDw/bRokY5joWnA2T91VvLd619BaCsKEbQ
-         V6AdhqPsciZhOMXed6QCvQOqg9sX9hhb6kE4ZECfx1qTPF5HRNwoxpI/2rxvY1Bz/9Se
-         eiIzMUlQhyNRtD8VHeCv0IkqUfdE9U8Y18hJihDaWZz/iFGJCB3s6epPCfqX2T++EB/m
-         yYpcWJdMnYhOkpqGjinQY3A+7Xi5+YQyBaaSbVygXE/Hb2UuPTWt5kqCTfAiLKP1M786
-         dU1g==
-X-Gm-Message-State: AOJu0YxIzp8KtJ3nqL6k4tqgSeanFEZvOxFBtlvY6giV1boMb2x420R/
-	X4CvcafBz7s44g7KRBtOgaS4SbVD2KWwnUKs5M0d
-X-Google-Smtp-Source: AGHT+IFnfnJXkiewY/umtolhOz81iE67AbIHb6KpIZ6rJ1t3VwVdF7zYwbMSa8r53kwey8FGA0L57aj/oWvhXqVeODE=
-X-Received: by 2002:a50:aa93:0:b0:52e:f99a:b5f8 with SMTP id
- q19-20020a50aa93000000b0052ef99ab5f8mr493256edc.7.1695971219021; Fri, 29 Sep
- 2023 00:06:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695971221; x=1696576021;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3qPnruVOPtCURvIrKVgV1Gzpi9qZsBOOnAtjdNN6W7U=;
+        b=gCJXQ3udC4cUPFpg3LnAUtAvL5jhEQQLqnZkWnHXGSbFfBmJpQo2oBvO1jbPlyUs9m
+         VTqaoPzFJmmJy+kGOld4+TGe5iLj8PKQNn1FGW/ql3dm3IyO66Kqz1sR9rNxtORrdFN6
+         l1zX4M84AFRqBh81uyG/3NzqP85wE9nfMB8d19WWDKfyKmL8pKA2SzWIjQXpRGFJ/rDS
+         1tnJmmAbcz98Ql2dLIOkX/lYEVIZQHLYF1LzE6GAm9PBOw78u+3ekNo5Zz4iBSZ49ctO
+         cZOwJ4wbeSmqVUbqPNQUYy3HR2xtYvOzDx38vjJwhgnHuAqSDuSsrz5WXBpYi+O9IvJD
+         j65A==
+X-Gm-Message-State: AOJu0YxqLmoLRt+C/Jdeof/Jf4nkc+l52EwxvCubluqlEQUNSXwfXcdL
+	5XQHWtAUiVomTAzfiLlfpY4=
+X-Google-Smtp-Source: AGHT+IHQPJ7Vv4zgtrz0Z2FmrQUAlxeRl+P+3OrVG437HodLr+8+XPCSZrClqAqrA8smUNC+YR4Lvw==
+X-Received: by 2002:a17:902:c94d:b0:1c7:4a8a:32d1 with SMTP id i13-20020a170902c94d00b001c74a8a32d1mr266165pla.28.1695971221085;
+        Fri, 29 Sep 2023 00:07:01 -0700 (PDT)
+Received: from localhost (58-6-231-19.tpgi.com.au. [58.6.231.19])
+        by smtp.gmail.com with ESMTPSA id i17-20020a170902eb5100b001c611e9a5fdsm10247571pli.306.2023.09.29.00.06.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 29 Sep 2023 00:06:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230929023737.1610865-1-maheshb@google.com> <CANDhNCqb5JzEDOdAnocanR2KFbokrpMOL=iNwY3fTxcn_ftuZQ@mail.gmail.com>
- <CAF2d9jgeGLCzbFZhptGzpUnmMgLaRysyzBmpZ+dK4sxWdmR5ZQ@mail.gmail.com> <CANDhNCro+AQum3eSmKK5OTNik2E0cFxV_reCQg0+_uTubHaDsA@mail.gmail.com>
-In-Reply-To: <CANDhNCro+AQum3eSmKK5OTNik2E0cFxV_reCQg0+_uTubHaDsA@mail.gmail.com>
-From: John Stultz <jstultz@google.com>
-Date: Fri, 29 Sep 2023 00:06:46 -0700
-Message-ID: <CANDhNCryn8TjJZRdCvVUj88pakHSUvtyN53byjmAcyowKj5mcA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] time: add ktime_get_cycles64() api
-To: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>, 
-	Mahesh Bandewar <mahesh@bandewar.net>, Thomas Gleixner <tglx@linutronix.de>, 
-	Stephen Boyd <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 29 Sep 2023 17:06:53 +1000
+Message-Id: <CVV7MBT9C7JY.5PYBOXU9NUDR@wheely>
+Cc: <dev@openvswitch.org>
+Subject: Re: [ovs-dev] [RFC PATCH 0/7] net: openvswitch: Reduce stack usage
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Ilya Maximets" <i.maximets@ovn.org>, <netdev@vger.kernel.org>
+X-Mailer: aerc 0.15.2
+References: <20230927001308.749910-1-npiggin@gmail.com>
+ <a018e82f-5cce-fb81-b52c-901e106c16eb@ovn.org>
+In-Reply-To: <a018e82f-5cce-fb81-b52c-901e106c16eb@ovn.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 11:56=E2=80=AFPM John Stultz <jstultz@google.com> w=
-rote:
-> On Thu, Sep 28, 2023 at 11:35=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=A4=
-=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=
-=BE=E0=A4=B0)
-> <maheshb@google.com> wrote:
-> > On Thu, Sep 28, 2023 at 10:15=E2=80=AFPM John Stultz <jstultz@google.co=
-m> wrote:
-> > > 3) Nit: The interface is called ktime_get_cycles64 (timespec64
-> > > returning interfaces usually are postfixed with ts64).
-> > >
-> > Ah, thanks for the explanation. I can change to comply with the
-> > convention. Does ktime_get_cycles_ts64() make more sense?
+On Wed Sep 27, 2023 at 6:36 PM AEST, Ilya Maximets wrote:
+> On 9/27/23 02:13, Nicholas Piggin wrote:
+> > Hi,
+> >=20
+> > We've got a report of a stack overflow on ppc64le with a 16kB kernel
+> > stack. Openvswitch is just one of many things in the stack, but it
+> > does cause recursion and contributes to some usage.
+> >=20
+> > Here are a few patches for reducing stack overhead. I don't know the
+> > code well so consider them just ideas. GFP_ATOMIC allocations
+> > introduced in a couple of places might be controversial, but there
+> > is still some savings to be had if you skip those.
+> >=20
+> > Here is one place detected where the stack reaches >14kB before
+> > overflowing a little later. I massaged the output so it just shows
+> > the stack frame address on the left.
 >
-> Maybe a little (it at least looks consistent), but not really if
-> you're sticking raw cycles in the timespec :)
+> Hi, Nicholas.  Thanks for the patches!
+>
+> Though it looks like OVS is not really playing a huge role in the
+> stack trace below.  How much of the stack does the patch set save
+> in total?  How much patches 2-7 contribute (I posted a patch similar
+> to the first one last week, so we may not count it)?
+
+Stack usage was tested for the same path (this is backported to
+RHEL9 kernel), and saving was 2080 bytes for that. It's enough
+to get us out of trouble. But if it was a config that caused more
+recursions then it might still be a problem.
+
+>
+> Also, most of the changes introduced here has a real chance to
+> noticeably impact performance.  Did you run any performance tests
+> with this to assess the impact?
+
+Some numbers were posted by Aaron as you would see. 2-4% for that
+patch, but I suspect the rest should have much smaller impact.
+
+Maybe patch 2 if you were doing a lot of push_nsh operations, but
+that might be less important since it's out of the recursive path.
+
+>
+> One last thing is that at least some of the patches seem to change
+> non-inlined non-recursive functions.  Seems unnecessary.
+>
+> Best regards, Ilya Maximets.
 >
 
-Despite my concerns that it's a bad idea, If one was going to expose
-raw cycles from the timekeeping core, I'd suggest doing so directly as
-a u64 (`u64 ktime_get_cycles(void)`).
+One thing I do notice in the trace:
 
-That may mean widening (or maybe using a union in) your PTP ioctl data
-structure to have a explicit cycles field.
-Or introducing a separate ioctl that deals with cycles instead of timespec6=
-4s.
+> >=20
+> > [c00000037d480b40] __kmalloc+0x8c/0x5e0
+> > [c00000037d480bc0] virtqueue_add_outbuf+0x354/0xac0
+> > [c00000037d480cc0] xmit_skb+0x1dc/0x350 [virtio_net]
+> > [c00000037d480d50] start_xmit+0xd4/0x3b0 [virtio_net]
+> > [c00000037d480e00] dev_hard_start_xmit+0x11c/0x280
+> > [c00000037d480e80] sch_direct_xmit+0xec/0x330
+> > [c00000037d480f20] __dev_xmit_skb+0x41c/0xa80
+> > [c00000037d480f90] __dev_queue_xmit+0x414/0x950
+> > [c00000037d481070] ovs_vport_send+0xb4/0x210 [openvswitch]
+> > [c00000037d4810f0] do_output+0x7c/0x200 [openvswitch]
+> > [c00000037d481140] do_execute_actions+0xe48/0xeb0 [openvswitch]
+> > [c00000037d481300] ovs_execute_actions+0x78/0x1f0 [openvswitch]
+> > [c00000037d481380] ovs_dp_process_packet+0xb4/0x2e0 [openvswitch]
+> > [c00000037d481450] ovs_vport_receive+0x8c/0x130 [openvswitch]
+> > [c00000037d481660] internal_dev_xmit+0x40/0xd0 [openvswitch]
+> > [c00000037d481690] dev_hard_start_xmit+0x11c/0x280
+> > [c00000037d481710] __dev_queue_xmit+0x634/0x950
+> > [c00000037d4817f0] neigh_hh_output+0xd0/0x180
+> > [c00000037d481840] ip_finish_output2+0x31c/0x5c0
+> > [c00000037d4818e0] ip_local_out+0x64/0x90
+> > [c00000037d481920] iptunnel_xmit+0x194/0x290
+> > [c00000037d4819c0] udp_tunnel_xmit_skb+0x100/0x140 [udp_tunnel]
+> > [c00000037d481a80] geneve_xmit_skb+0x34c/0x610 [geneve]
+> > [c00000037d481bb0] geneve_xmit+0x94/0x1e8 [geneve]
+> > [c00000037d481c30] dev_hard_start_xmit+0x11c/0x280
+> > [c00000037d481cb0] __dev_queue_xmit+0x634/0x950
+> > [c00000037d481d90] ovs_vport_send+0xb4/0x210 [openvswitch]
+> > [c00000037d481e10] do_output+0x7c/0x200 [openvswitch]
+> > [c00000037d481e60] do_execute_actions+0xe48/0xeb0 [openvswitch]
+> > [c00000037d482020] ovs_execute_actions+0x78/0x1f0 [openvswitch]
+> > [c00000037d4820a0] ovs_dp_process_packet+0xb4/0x2e0 [openvswitch]
+> > [c00000037d482170] clone_execute+0x2c8/0x370 [openvswitch]
 
-Squeezing data into types that are canonically used for something else
-should always be avoided if possible (there are some cases where
-you're stuck with an existing interface, but that's not the case
-here).
+                       ^^^^^
 
-But I still think we should avoid exporting the raw cycle values
-unless there is some extremely strong argument for it (and if we can,
-they should be abstracted into some sort of cookie value to avoid
-userland using it as a raw clock).
+clone_execute is an action which can be deferred AFAIKS, but it is
+not deferred until several recursions deep.
 
-thanks
--john
+If we deferred always when possible, then might avoid such a big
+stack (at least for this config). Is it very costly to defer? Would
+it help here, or is it just going to process it right away and
+cause basically the same call chain?
+
+Thanks,
+Nick
 
