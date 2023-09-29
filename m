@@ -1,304 +1,185 @@
-Return-Path: <netdev+bounces-37104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77DEE7B3A2E
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:43:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6E67B3A3E
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 20:52:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2B942283601
-	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:43:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 740FBB20B64
+	for <lists+netdev@lfdr.de>; Fri, 29 Sep 2023 18:52:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AC741E4F;
-	Fri, 29 Sep 2023 18:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AAF42C0B;
+	Fri, 29 Sep 2023 18:51:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762F141E25
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 18:43:39 +0000 (UTC)
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FE91B5
-	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:43:36 -0700 (PDT)
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-6c4f69456aeso14526532a34.2
-        for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:43:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696013015; x=1696617815;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j+IO+qGNr7Q1OqQXnJ0K+7tfthwm5cgkTCtl9T9+EG4=;
-        b=ooAG64AokDU1yIVKVu/EhtBpscE8medE0ClBFNKd3lUHOHfMYlHWHkQyX0yycqUtRG
-         T3YESxbN463WNjcHFWwJ/6CjTP099bg5554oT3g+y4nz3VzP0KZpQPul3Rffc7cvKR5n
-         cugChMO4lTA9+5qnZy9k0bxP0B0dlZTWFjpE8GAXxfvlGM/fGUi+0OfznDFh4TfQ1sNx
-         xqvPaJJJsX1WmVhtg/sawzQWBRpVu+9q2BXxZuTlIl3xI+25Xk9lKAAgaj0CaNHzqJoL
-         Lbm2i9VbYZJvHxHZPcQBHESFJ+9L3JJripVrlkLaH3sC9FVEaA6y6iSyb/DxJFjYlqgS
-         g7uA==
-X-Gm-Message-State: AOJu0Yz07cI8fP5xtDmFw3tTPylmFYcNulSi9aOsCzBS240I9VUeAA91
-	QSYjxEs8D7cZDyXFLBIzvm57ZvfUkeIFLdZnoA4FA2DxOM6I
-X-Google-Smtp-Source: AGHT+IENU0Eyy7n9Fg2Q2n3JU9R3ZD/YvUXLjCV6xn3xAMAHjdfWFK9opv3w6z49kI+7cBA8nU4X/8Ox0FT5QEd8DT0mhIrULCpS
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A15E849C
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 18:51:53 +0000 (UTC)
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE032199
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 11:51:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5kGS2lI6FP00vz5q3k6trMEBNeRpc2K7yINUitCt/fs=; b=FJPd3P64bjn/5p2oD7m2uNawOX
+	OY12tuDE+6NuEFKV6wNCrNNE/7DKViJDMw6zGLPeBOj4toO9M5LeITz+FKKKUxMX+lKvt7p4ZDH6+
+	FhaTSA44wnsnOezep4RamEhy0L/PP7+yWf1IfXkxAVHWvDXc2/PqM2KKYJGyWLbIpSY8vqqy2JfbH
+	VAfEvath0iU9Ti/LSU72VVaGAe2rNRTD5jmbT538z7UZCRQg/84VTVq0XIHfLqKTVohY27h7IoEBl
+	qcbXAiYmTajCVkGIyD9r18E+spiWXjuUlAjFg4/eh875mSsAFALBB0ZxxEJpKNbLIeX2X04F1yErj
+	huYGwNVg==;
+Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qmIaY-00DSv9-2Q;
+	Fri, 29 Sep 2023 18:51:46 +0000
+Date: Fri, 29 Sep 2023 11:51:43 -0700
+From: Joel Becker <jlbec@evilplan.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: hch@lst.de, netdev@vger.kernel.org
+Subject: Re: configfs: Create config_item from netconsole
+Message-ID: <ZRccv2H3wK6PL5Rb@google.com>
+References: <ZRWRal5bW93px4km@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:1e82:b0:6bc:b75c:f32f with SMTP id
- n2-20020a0568301e8200b006bcb75cf32fmr1585441otr.2.1696013015689; Fri, 29 Sep
- 2023 11:43:35 -0700 (PDT)
-Date: Fri, 29 Sep 2023 11:43:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000055b35a060683cd56@google.com>
-Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in tls_encrypt_done
-From: syzbot <syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com>
-To: borisp@nvidia.com, bpf@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRWRal5bW93px4km@gmail.com>
+X-Burt-Line: Trees are cool.
+X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
+ come to perfection.
+Sender: Joel Becker <jlbec@ftp.linux.org.uk>
+X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Thu, Sep 28, 2023 at 07:44:58AM -0700, Breno Leitao wrote:
+> Right now there is a limitation in netconsole, where it is impossible to
+> disable or modify the target created from the command line parameter.
+> (netconsole=...).
+> 
+> "netconsole" cmdline parameter sets the remote IP, and if the remote IP
+> changes, the machine needs to be rebooted (with the new remote IP set in
+> the command line parameter).
+> 
+> I am planning to reuse the dynamic netconsole mechanism for
+> the 'command line' target, i.e., create a `cmdline` configfs_item for
+> the "command line" target, so, the user can modify the "command line"
+> target in configfs in runtime. Something as :
+> 
+> 	echo 0 > /sys/kernel/config/netconsole/cmdline/enabled
+> 	echo <new-IP> > /sys/kernel/config/netconsole/cmdline/remote_ip
+> 	echo 1 > /sys/kernel/config/netconsole/cmdline/enabled
 
-syzbot found the following issue on:
+Note that the `netconsole=` command line parameter can specify more than
+one network console, split by semicolons.  Anything you do here has to be
+responsive to this.  So you can't create a single `cmdline` entry.
 
-HEAD commit:    6465e260f487 Linux 6.6-rc3
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=114f1f96680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8d7d7928f78936aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=29c22ea2d6b2c5fd2eae
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c6888e680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=174c3996680000
+> I didn't find a configfs API to register a configfs_item into a
+> config_group. Basically the make_item() callbacks are called once the
+> inode is created by the user at mkdir(2) time, but now I need to create
+> it at the driver initialization.
+>
+> Should I create a configfs_register_item() to solve this problem?
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-6465e260.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/3560b94cfbc8/vmlinux-6465e260.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a098d6f44df3/bzImage-6465e260.xz
+It's an express philosophy of configfs that all lifetimes are controlled
+by userspace, which is why we don't have such a facility.  If hch wants
+to change this, I defer to his judgement.  But I don't think it is
+necessary.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
+What I would do instead is check whether a mkdir(2) call is
+trying to reference a command line entry.  If so, attach it to the
+existing entry rather than creating a new one.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in debug_spin_unlock kernel/locking/spinlock_debug.c:99 [inline]
-BUG: KASAN: slab-use-after-free in do_raw_spin_unlock+0x1f7/0x230 kernel/locking/spinlock_debug.c:140
-Read of size 4 at addr ffff88801f5a7d3c by task kworker/2:1/36
+Currently, `alloc_param_target()` initializes `netconsole_target.item`
+to zeros.  The item is never used by parameter-created targets.  Step
+one would be to give it a name.  So in `init_netconsole()`, right after
+`alloc_param_target()`, initialize `nt->item` just like we do in
+`make_netconsole_target()`.  So something like:
 
-CPU: 2 PID: 36 Comm: kworker/2:1 Not tainted 6.6.0-rc3-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: pencrypt_serial padata_serial_worker
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0xc4/0x620 mm/kasan/report.c:475
- kasan_report+0xda/0x110 mm/kasan/report.c:588
- debug_spin_unlock kernel/locking/spinlock_debug.c:99 [inline]
- do_raw_spin_unlock+0x1f7/0x230 kernel/locking/spinlock_debug.c:140
- __raw_spin_unlock_bh include/linux/spinlock_api_smp.h:166 [inline]
- _raw_spin_unlock_bh+0x1e/0x30 kernel/locking/spinlock.c:210
- spin_unlock_bh include/linux/spinlock.h:396 [inline]
- tls_encrypt_done+0x281/0x560 net/tls/tls_sw.c:488
- padata_serial_worker+0x246/0x490 kernel/padata.c:378
- process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
- process_scheduled_works kernel/workqueue.c:2703 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
- kthread+0x33c/0x440 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
- </TASK>
+```
++ #ifdef CONFIG_NETCONOLE_DYNAMIC
++       char target_name[16];
++       int target_count = 0;
++ #endif
+	while ((target_config = strsep(&input, ";"))) {
+			nt = alloc_param_target(target_config);
+			if (IS_ERR(nt)) {
+				err = PTR_ERR(nt);
+				goto fail;
+			}
++ #ifdef CONFIG_NETCONSOLE_DYNAMIC
++                       snprintf(target_name, 16, "cmdline", target_count);
++                       config_item_init_type_name(&nt->item, target_name,
++                                                  &netconsole_target_type);
++                       target_count++;
++ #endif
++
+			/* Dump existing printks when we register */
+			if (nt->extended) {
+				extended = true;
+```
 
-Allocated by task 19233:
- kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0xa3/0xb0 mm/kasan/common.c:383
- kmalloc include/linux/slab.h:599 [inline]
- kzalloc include/linux/slab.h:720 [inline]
- tls_set_sw_offload+0x12e0/0x1700 net/tls/tls_sw.c:2606
- do_tls_setsockopt_conf net/tls/tls_main.c:667 [inline]
- do_tls_setsockopt net/tls/tls_main.c:772 [inline]
- tls_setsockopt+0x108c/0x1340 net/tls/tls_main.c:800
- __sys_setsockopt+0x2cd/0x5b0 net/socket.c:2308
- __do_sys_setsockopt net/socket.c:2319 [inline]
- __se_sys_setsockopt net/socket.c:2316 [inline]
- __x64_sys_setsockopt+0xbd/0x150 net/socket.c:2316
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Then, later in `make_netconsole_target()`, rather than blindly inserting
+the new `netconsole_target` in the list, you can check if the name is
+already present and use that.  Here's some ugly pseudocode:
 
-Freed by task 19233:
- kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- kasan_save_free_info+0x28/0x40 mm/kasan/generic.c:522
- ____kasan_slab_free mm/kasan/common.c:236 [inline]
- ____kasan_slab_free+0x138/0x190 mm/kasan/common.c:200
- kasan_slab_free include/linux/kasan.h:164 [inline]
- __cache_free mm/slab.c:3370 [inline]
- __do_kmem_cache_free mm/slab.c:3557 [inline]
- __kmem_cache_free+0xcc/0x2d0 mm/slab.c:3564
- tls_sk_proto_close+0x4c3/0xb00 net/tls/tls_main.c:390
- inet_release+0x132/0x270 net/ipv4/af_inet.c:433
- inet6_release+0x4f/0x70 net/ipv6/af_inet6.c:484
- __sock_release+0xae/0x260 net/socket.c:659
- sock_close+0x1c/0x20 net/socket.c:1402
- __fput+0x3f7/0xa70 fs/file_table.c:384
- task_work_run+0x14d/0x240 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa92/0x2a20 kernel/exit.c:874
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
- __do_sys_exit_group kernel/exit.c:1035 [inline]
- __se_sys_exit_group kernel/exit.c:1033 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+```
+	spin_lock_irqsave(&target_list_lock, flags);
+	list_for_each_entry(tmp, &target_list, list) {
+		if (!strcmp(tmp->item.name, nt->item.name)) {
+			existing = tmp;
+			break;
+		}
+	}
+	if (existing) {
+		to_free = nt;
+		nt = existing;
+	} else {
+		list_add(&nt->list, &target_list);
+	}
+	spin_unlock_irqrestore(&target_list_lock, flags);
 
-Last potentially related work creation:
- kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
- __kasan_record_aux_stack+0x78/0x80 mm/kasan/generic.c:492
- kvfree_call_rcu+0x70/0xbe0 kernel/rcu/tree.c:3372
- tls_ctx_free net/tls/tls_main.c:333 [inline]
- tls_ctx_free+0x69/0x90 net/tls/tls_main.c:323
- tls_sk_proto_close+0x46b/0xb00 net/tls/tls_main.c:398
- inet_release+0x132/0x270 net/ipv4/af_inet.c:433
- inet6_release+0x4f/0x70 net/ipv6/af_inet6.c:484
- __sock_release+0xae/0x260 net/socket.c:659
- sock_close+0x1c/0x20 net/socket.c:1402
- __fput+0x3f7/0xa70 fs/file_table.c:384
- task_work_run+0x14d/0x240 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa92/0x2a20 kernel/exit.c:874
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
- __do_sys_exit_group kernel/exit.c:1035 [inline]
- __se_sys_exit_group kernel/exit.c:1033 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+	if (to_free)
+		kfree(to_free);
 
-Second to last potentially related work creation:
- kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
- __kasan_record_aux_stack+0x78/0x80 mm/kasan/generic.c:492
- kvfree_call_rcu+0x70/0xbe0 kernel/rcu/tree.c:3372
- tls_ctx_free net/tls/tls_main.c:333 [inline]
- tls_ctx_free+0x69/0x90 net/tls/tls_main.c:323
- tls_sk_proto_close+0x46b/0xb00 net/tls/tls_main.c:398
- inet_release+0x132/0x270 net/ipv4/af_inet.c:433
- inet6_release+0x4f/0x70 net/ipv6/af_inet6.c:484
- __sock_release+0xae/0x260 net/socket.c:659
- sock_close+0x1c/0x20 net/socket.c:1402
- __fput+0x3f7/0xa70 fs/file_table.c:384
- task_work_run+0x14d/0x240 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa92/0x2a20 kernel/exit.c:874
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
- __do_sys_exit_group kernel/exit.c:1035 [inline]
- __se_sys_exit_group kernel/exit.c:1033 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1033
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+	return &nt->item;
+}
+```
 
-The buggy address belongs to the object at ffff88801f5a7c00
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 316 bytes inside of
- freed 512-byte region [ffff88801f5a7c00, ffff88801f5a7e00)
+In this fashion, each console created on the command line will get a
+name of `cmdline0`, `cmdline1`, etc.  They will not be part of the
+configfs tree.  If the user comes along later and says `mkdir
+/sys/kernel/config/netconsole/cmdline1`, the existing `cmdline1` console
+will be attached to the configfs tree.  The user is then free to disable
+and reconfigure the device.
 
-The buggy address belongs to the physical page:
-page:ffffea00007d69c0 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1f5a7
-flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0x4()
-raw: 00fff00000000800 ffff888012c40600 ffffea000076b490 ffffea00006bae50
-raw: 0000000000000000 ffff88801f5a7000 0000000100000004 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x242020(__GFP_HIGH|__GFP_NOWARN|__GFP_COMP|__GFP_THISNODE), pid 6562, tgid 6562 (syz-executor469), ts 291264206650, free_ts 291263177339
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x2cf/0x340 mm/page_alloc.c:1536
- prep_new_page mm/page_alloc.c:1543 [inline]
- get_page_from_freelist+0xee0/0x2f20 mm/page_alloc.c:3170
- __alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4426
- __alloc_pages_node include/linux/gfp.h:237 [inline]
- kmem_getpages mm/slab.c:1356 [inline]
- cache_grow_begin+0x99/0x3a0 mm/slab.c:2550
- cache_alloc_refill+0x294/0x3a0 mm/slab.c:2923
- ____cache_alloc mm/slab.c:2999 [inline]
- ____cache_alloc mm/slab.c:2982 [inline]
- __do_cache_alloc mm/slab.c:3182 [inline]
- slab_alloc_node mm/slab.c:3230 [inline]
- __kmem_cache_alloc_node+0x3c5/0x470 mm/slab.c:3521
- kmalloc_trace+0x25/0xe0 mm/slab_common.c:1114
- kmalloc include/linux/slab.h:599 [inline]
- kzalloc include/linux/slab.h:720 [inline]
- tls_ctx_create+0x45/0x140 net/tls/tls_main.c:808
- tls_init net/tls/tls_main.c:951 [inline]
- tls_init+0x11e/0xbc0 net/tls/tls_main.c:928
- __tcp_set_ulp net/ipv4/tcp_ulp.c:146 [inline]
- tcp_set_ulp+0x31f/0x7e0 net/ipv4/tcp_ulp.c:167
- do_tcp_setsockopt+0x5cb/0x2830 net/ipv4/tcp.c:3429
- tcp_setsockopt+0xd4/0x100 net/ipv4/tcp.c:3679
- __sys_setsockopt+0x2cd/0x5b0 net/socket.c:2308
- __do_sys_setsockopt net/socket.c:2319 [inline]
- __se_sys_setsockopt net/socket.c:2316 [inline]
- __x64_sys_setsockopt+0xbd/0x150 net/socket.c:2316
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1136 [inline]
- free_unref_page_prepare+0x476/0xa40 mm/page_alloc.c:2312
- free_unref_page+0x33/0x3b0 mm/page_alloc.c:2405
- __folio_put_small mm/swap.c:106 [inline]
- __folio_put+0xc3/0x110 mm/swap.c:129
- folio_put include/linux/mm.h:1475 [inline]
- put_page include/linux/mm.h:1544 [inline]
- free_page_and_swap_cache+0x25a/0x2d0 mm/swap_state.c:303
- __tlb_remove_table arch/x86/include/asm/tlb.h:34 [inline]
- __tlb_remove_table_free mm/mmu_gather.c:154 [inline]
- tlb_remove_table_rcu+0x89/0xe0 mm/mmu_gather.c:209
- rcu_do_batch kernel/rcu/tree.c:2139 [inline]
- rcu_core+0x805/0x1bb0 kernel/rcu/tree.c:2403
- __do_softirq+0x218/0x965 kernel/softirq.c:553
+Note that this behavior cannot be triggered for netconsoles already
+created by configfs.  If I try to `mkdir
+/sys/kernel/config/netconsole/mydev` twice, the second command will get
+`-EEXISTS` in filesystem code long before it reaches the netconsole
+code.  Only when someone makes a config item that matches the console
+names can we traverse this code.  Thus, matching the name is safe.
 
-Memory state around the buggy address:
- ffff88801f5a7c00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88801f5a7c80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88801f5a7d00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                        ^
- ffff88801f5a7d80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88801f5a7e00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+There would, of course, be some other corner cases to handle.  Do we
+allow dynamic names that look like command-line names if no command-line
+parameter exists?  Does `rmdir /sys/kernel/config/netconsole/cmdline0`
+actually delete the command-line console entry, or does it return
+-EBUSY?  And so on.
 
+Thanks,
+Joel
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+"When ideas fail, words come in very handy." 
+         - Goethe
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+			http://www.jlbec.org/
+			jlbec@evilplan.org
 
