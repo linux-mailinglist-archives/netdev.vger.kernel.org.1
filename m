@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-37149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A66747B3EBD
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 09:06:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069C17B3EBF
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 09:10:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 026352821F2
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 07:06:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C25E01C20777
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 07:10:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BDD223D0;
-	Sat, 30 Sep 2023 07:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66E323D0;
+	Sat, 30 Sep 2023 07:10:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF4617EF
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 07:06:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A607C433C7;
-	Sat, 30 Sep 2023 07:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C382F17EF
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 07:10:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BB4C433C8;
+	Sat, 30 Sep 2023 07:10:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696057613;
-	bh=DSppv+puotLzLGa9P89I9XPs6L6xfrHSkKaipjzNnGQ=;
+	s=korg; t=1696057813;
+	bh=uvGD1csA5JWxarCHp9AYsOjN6Mf9w1sy7vN59u16vz0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pHUqL8TwN9w7SazoLtaCEqx9fopxIPS332QJ2cXRvzKbhE1Y+6HBQB9m3F5/fmgpP
-	 /9ELdRLGy84YrjfifmI7G4+kmtLvUcm2NAF60WeZ0xDWTK51WyEpzDNckE25aVRl9l
-	 uQABzr9h+gKVMkQMccQWZzQGFCT6LV/Bb2ux0uZ4=
-Date: Sat, 30 Sep 2023 09:06:51 +0200
+	b=UO+RYsCedPI73JzxykVPefAXh/+ASlxwiOA9qJ27HKndAAIOP1hfuMNm7lXMXrSNO
+	 X0+VdhabYsih7Wq6zJOmoRsag9sO+DkhnAP5Oz9S2Ricf6PBQBWN32oRUCVGWAgzGi
+	 didA5lSJoGzH8SKrt/U2Xmgrd/2+VPxi9GkcPFvA=
+Date: Sat, 30 Sep 2023 09:10:10 +0200
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Chris Leech <cleech@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>, Rasesh Mody <rmody@marvell.com>,
@@ -39,10 +39,10 @@ Cc: Christoph Hellwig <hch@lst.de>, Rasesh Mody <rmody@marvell.com>,
 	Mike Christie <michael.christie@oracle.com>,
 	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-Message-ID: <2023093055-gotten-astronomy-a98b@gregkh>
+Subject: Re: [PATCH 1/3] uio: introduce UIO_DMA_COHERENT type
+Message-ID: <2023093037-onion-backroom-b4ef@gregkh>
 References: <20230929170023.1020032-1-cleech@redhat.com>
- <20230929170023.1020032-4-cleech@redhat.com>
+ <20230929170023.1020032-2-cleech@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,17 +51,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230929170023.1020032-4-cleech@redhat.com>
+In-Reply-To: <20230929170023.1020032-2-cleech@redhat.com>
 
-On Fri, Sep 29, 2023 at 10:00:23AM -0700, Chris Leech wrote:
-> Make use of the new UIO_MEM_DMA_COHERENT type to properly handle mmap
-> for dma_alloc_coherent buffers.
+On Fri, Sep 29, 2023 at 10:00:21AM -0700, Chris Leech wrote:
+> Add a UIO memtype specificially for sharing dma_alloc_coherent
+> memory with userspace, backed by dma_mmap_coherent.
 
-Why are ethernet drivers messing around with UIO devices?  That's not
-what UIO is for, unless you are trying to do kernel bypass for these
-devices without anyone noticing?
+Are you sure that you can share this type of memory with userspace
+safely?  And you are saying what you are doing here, but not why you
+want to do it and who will use it.
 
-confused,
+What are the userspace implications for accessing this type of memory?
+
+> 
+> Signed-off-by: Chris Leech <cleech@redhat.com>
+> ---
+>  drivers/uio/uio.c          | 34 ++++++++++++++++++++++++++++++++++
+>  include/linux/uio_driver.h | 12 ++++++++++--
+>  2 files changed, 44 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/uio/uio.c b/drivers/uio/uio.c
+> index 62082d64ece0..f8f1f7ba6378 100644
+> --- a/drivers/uio/uio.c
+> +++ b/drivers/uio/uio.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/kobject.h>
+>  #include <linux/cdev.h>
+>  #include <linux/uio_driver.h>
+> +#include <linux/dma-mapping.h>
+>  
+>  #define UIO_MAX_DEVICES		(1U << MINORBITS)
+>  
+> @@ -759,6 +760,36 @@ static int uio_mmap_physical(struct vm_area_struct *vma)
+>  			       vma->vm_page_prot);
+>  }
+>  
+> +static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
+> +{
+> +	struct uio_device *idev = vma->vm_private_data;
+> +	int mi = uio_find_mem_index(vma);
+> +	struct uio_mem *mem;
+> +	int rc;
+> +
+> +	if (mi < 0)
+> +		return -EINVAL;
+> +	mem = idev->info->mem + mi;
+> +
+> +	if (mem->dma_addr & ~PAGE_MASK)
+> +		return -ENODEV;
+> +	if (vma->vm_end - vma->vm_start > mem->size)
+> +		return -EINVAL;
+> +
+> +	/*
+> +	 * UIO uses offset to index into the maps for a device.
+> +	 * We need to clear vm_pgoff for dma_mmap_coherent.
+> +	 */
+> +	vma->vm_pgoff = 0;
+> +	rc = dma_mmap_coherent(mem->dma_device,
+> +				vma,
+> +				mem->virtual_addr,
+> +				mem->dma_addr,
+> +				vma->vm_end - vma->vm_start);
+> +	vma->vm_pgoff = mi;
+> +	return rc;
+> +}
+> +
+>  static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
+>  {
+>  	struct uio_listener *listener = filep->private_data;
+> @@ -806,6 +837,9 @@ static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
+>  	case UIO_MEM_VIRTUAL:
+>  		ret = uio_mmap_logical(vma);
+>  		break;
+> +	case UIO_MEM_DMA_COHERENT:
+> +		ret = uio_mmap_dma_coherent(vma);
+> +		break;
+>  	default:
+>  		ret = -EINVAL;
+>  	}
+> diff --git a/include/linux/uio_driver.h b/include/linux/uio_driver.h
+> index 47c5962b876b..ede58e984658 100644
+> --- a/include/linux/uio_driver.h
+> +++ b/include/linux/uio_driver.h
+> @@ -36,11 +36,18 @@ struct uio_map;
+>   */
+>  struct uio_mem {
+>  	const char		*name;
+> -	phys_addr_t		addr;
+> +	union {
+> +		phys_addr_t	addr;
+> +		dma_addr_t	dma_addr;
+> +	};
+>  	unsigned long		offs;
+>  	resource_size_t		size;
+>  	int			memtype;
+> -	void __iomem		*internal_addr;
+> +	union {
+> +		void __iomem	*internal_addr;
+> +		void 		*virtual_addr;
+> +	};
+> +	struct device		*dma_device;
+
+Why are you adding a new struct device here?
+
+And why the unions?  How are you going to verify that they are being
+used correctly?  What space savings are you attempting to do here and
+why?
+
+thanks,
 
 greg k-h
 
