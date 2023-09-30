@@ -1,203 +1,453 @@
-Return-Path: <netdev+bounces-37155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE73C7B3FA1
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 11:11:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0F67B4006
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 12:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5BA7D281976
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 09:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 5B8AD1C20859
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 10:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82918F5E;
-	Sat, 30 Sep 2023 09:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FA88F62;
+	Sat, 30 Sep 2023 10:40:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D41A3C28
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 09:10:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F952BF
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 02:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696065055;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UPWXUz5xFoBIqUnArR4JRWxPC09psvlsazRlR/JX6bI=;
-	b=EH+94BbrYqPb6IQqthEkSn8ilcf9BpXQLw71ISvWgisz3V+1XhwcrCFV8PkZGvQs9W57Mb
-	p7L8vtPge6rXcjNJlUxLB1aJ4uQNhilYcT8DxEMOigiiOtjqqiuyu07EdBcTVAKmAAoLdj
-	0/iyYeF9LbGhwXQBFf9rQyX2tM7NHfU=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-LfxLwGfrOqmqg8oVPN52aA-1; Sat, 30 Sep 2023 05:10:53 -0400
-X-MC-Unique: LfxLwGfrOqmqg8oVPN52aA-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-77578227e4bso692325285a.2
-        for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 02:10:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B24A5E
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 10:40:15 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2182F193;
+	Sat, 30 Sep 2023 03:40:13 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-99c3c8adb27so2066759166b.1;
+        Sat, 30 Sep 2023 03:40:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696070411; x=1696675211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lrttq1jI1On2L9CIFIF2RfFGZYCC+g/ps27m2VIEb+M=;
+        b=AM3N6JdsUsmvVXbk5NvbVD039ic8FySJvoFMeELzEhz/7bqZetJmzEMW/E+Sal15OE
+         RRgXsUROiQ3oJhndWobtLKqoYV7IJ6M0h3iSvkwGPguN06miyLUXgYE2EL1mjcKBYiCH
+         asANOadNSpQP7/NeXtxsoWJwUcaY940Su8VTTT8wvpQ07AZs6yq0PAu8F6K07oVry56V
+         kgSsxJHzKJcqIxdHgwMlr4aeGwStR0jKHQQ5GwsbR1TVyHS8RQxxdmhxm58cjNtjuWar
+         Sq+pSFTsNXRlLw63VO9WUHEsiTouP1k+D+42J3fmOsIfcWLllLYd5ITsnNlEiEFa9zEZ
+         i7lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696065053; x=1696669853;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UPWXUz5xFoBIqUnArR4JRWxPC09psvlsazRlR/JX6bI=;
-        b=B/FJinPiCeIgBnm/ExjOpMPemmncyeLd0tlUA3Dk9XAgbPdKlcb9mESbxv/Of/GgoK
-         Dm4Y9zzoYmL0FR07vYJL58VZfxK2wYNgyQBSuOSDy17Kp0DeJzOa4IoIs1Q2ikFuwspQ
-         Fqjndq4PDlefq75CILIUkNWDRYcgSBw8v+NBYf8WDAykqik/hQm1Ffx+pGAlWzgdMFpK
-         VdQdrrO0jr6xnmsIXABO/Ni0MxedwqnXahRPttzLRekmvxMlSBuhiP+rbS1/20vnq3dO
-         hml5BV3a7lseO7gW/69xSraz8Qsezk37qVs+ZWoOIbV35t6LyOJyM/00j7bWQ669tsuj
-         CJoA==
-X-Gm-Message-State: AOJu0YxITe05/z7SaAsTur7W7Sd4FTMntmj6qsO6K+wY3VRxm4C5DWqn
-	bvdfO87CSdY7Er16KAJgWqlRwZGina0h1PzHdoGr1zlueC4ywC2YJgNWSy+amWqNPcLIyEX9EN5
-	7aPDGIO/iKhb/386G
-X-Received: by 2002:a0c:df08:0:b0:658:4008:e2ba with SMTP id g8-20020a0cdf08000000b006584008e2bamr5489065qvl.63.1696065052998;
-        Sat, 30 Sep 2023 02:10:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE56LNXHwXdZYQD+TSBlp5hcvvEHvpjv1FySU1EeuW4NIJz6A3QVslPfd2pXr6ysltdBKNDrg==
-X-Received: by 2002:a0c:df08:0:b0:658:4008:e2ba with SMTP id g8-20020a0cdf08000000b006584008e2bamr5489053qvl.63.1696065052586;
-        Sat, 30 Sep 2023 02:10:52 -0700 (PDT)
-Received: from localhost (ip98-179-76-75.ph.ph.cox.net. [98.179.76.75])
-        by smtp.gmail.com with ESMTPSA id o8-20020a0cf4c8000000b0065b260eafd9sm3658278qvm.87.2023.09.30.02.10.51
+        d=1e100.net; s=20230601; t=1696070411; x=1696675211;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lrttq1jI1On2L9CIFIF2RfFGZYCC+g/ps27m2VIEb+M=;
+        b=SqwwwK27B4SpgFmGJsx3dd8mtEU/cqi0sAsV9DBQ9W4nhCqLDMJ1zdjq14tM2QKCJz
+         MSsTQH1dgXNKN/Kx/tajwrnggaHNBfDll0+JWgExNhxaGDbRh4QEu7tOC4A0YZVZ25y/
+         tvPsgjyDCvdrWdxR8XT2ARVMQ5NK+tBVDZYMWLa1wiJufBzZEGebU2KpnAwQ+aob4YSp
+         beBM9afr00TXCjab4jY1I9YzHiXsk/3oZk1IKaK776Z0FqceNkvul04p36VXqMIFvyRt
+         04DL5XSi9m+P4j4NeT8RUVaO/ditXTyAoz7OqYdGFiLzinyo3Am+bLDq7akuhcTHyCeR
+         dBXw==
+X-Gm-Message-State: AOJu0YzwR5T5pgzOnFYvFC07dP9nqecKpjAkdPfx8yeD5A0rUcCqVf39
+	jSGXyTtmv713SYVB4FlQw2I=
+X-Google-Smtp-Source: AGHT+IGGr93WngBeLqRWPTfcYVRa2vhZmtKLZTX8W0y3BhiGxspKr11hCz562ZLqUU6qlut3Kp0F2A==
+X-Received: by 2002:a17:907:2722:b0:9a1:cdf1:ba3 with SMTP id d2-20020a170907272200b009a1cdf10ba3mr6248897ejl.27.1696070411285;
+        Sat, 30 Sep 2023 03:40:11 -0700 (PDT)
+Received: from fedora.. (dh207-96-216.xnet.hr. [88.207.96.216])
+        by smtp.googlemail.com with ESMTPSA id lt2-20020a170906fa8200b00992e265495csm13847532ejb.212.2023.09.30.03.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Sep 2023 02:10:51 -0700 (PDT)
-Date: Sat, 30 Sep 2023 02:10:50 -0700
-From: Jerry Snitselaar <jsnitsel@redhat.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Chris Leech <cleech@redhat.com>, Christoph Hellwig <hch@lst.de>, 
-	Rasesh Mody <rmody@marvell.com>, Ariel Elior <aelior@marvell.com>, 
-	Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, 
-	Nilesh Javali <njavali@marvell.com>, Manish Rangankar <mrangankar@marvell.com>, 
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>, 
-	Mike Christie <michael.christie@oracle.com>, Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org, 
+        Sat, 30 Sep 2023 03:40:10 -0700 (PDT)
+From: Robert Marko <robimarko@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-Message-ID: <yfws24bzfebts5mr7n7y4dekjlrhlbbk6afr6vgbducpx4j2wh@iiftl57eonc6>
-References: <20230929170023.1020032-1-cleech@redhat.com>
- <20230929170023.1020032-4-cleech@redhat.com>
- <2023093055-gotten-astronomy-a98b@gregkh>
+Cc: Robert Marko <robimarko@gmail.com>,
+	Christian Marangi <ansuelsmth@gmail.com>
+Subject: [RFC PATCH net-next] net: phy: aquantia: add firmware load support
+Date: Sat, 30 Sep 2023 12:39:44 +0200
+Message-ID: <20230930104008.234831-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2023093055-gotten-astronomy-a98b@gregkh>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 30, 2023 at 09:06:51AM +0200, Greg Kroah-Hartman wrote:
-> On Fri, Sep 29, 2023 at 10:00:23AM -0700, Chris Leech wrote:
-> > Make use of the new UIO_MEM_DMA_COHERENT type to properly handle mmap
-> > for dma_alloc_coherent buffers.
-> 
-> Why are ethernet drivers messing around with UIO devices?  That's not
-> what UIO is for, unless you are trying to do kernel bypass for these
-> devices without anyone noticing?
-> 
-> confused,
-> 
-> greg k-h
+Aquantia PHY-s require firmware to be loaded before they start operating.
+It can be automatically loaded in case when there is a SPI-NOR connected
+to Aquantia PHY-s or can be loaded from the host via MDIO.
 
-Hi Greg,
+This patch adds support for loading the firmware via MDIO as in most cases
+there is no SPI-NOR being used to save on cost.
+Firmware loading code itself is ported from mainline U-boot with cleanups.
 
-It is for iscsi offload [1], and apparently cnic has been handing off
-dma alloc'd memory to uio for this since 2009, but it has just been
-handing off the address from dma_alloc_coherent to uio, and giving the
-dma handle the bnx2x device. That managed to avoid being an issue
-until changes last year rightly cleaned up allowing __GFP_COMP to be
-passed to the dma_alloc* calls, which cnic was passing to
-dma_alloc_coherent. Now iscsiuio goes to mmap through the uio device
-and the result is a BUG and stack trace like below.
+The firmware has mixed values both in big and little endian.
+PHY core itself is big-endian but it expects values to be in little-endian.
+The firmware is little-endian but CRC-16 value for it is stored at the end
+of firmware in big-endian.
 
-It was my suggestion that it either needs to use dma_mmap_coherent to
-mmap the memory, which possibly is a mistaken understanding on my
-part but what dma_mmap_coherent says it is for, or possibly look to
-do something similar to what qed is doing for uio.
+It seems the PHY does the conversion internally from firmware that is
+little-endian to the PHY that is big-endian on using the mailbox
+but mailbox returns a big-endian CRC-16 to verify the written data
+integrity.
 
-Regards,
-Jerry
+Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+---
+ drivers/net/phy/Kconfig         |   1 +
+ drivers/net/phy/aquantia_main.c | 276 ++++++++++++++++++++++++++++++++
+ 2 files changed, 277 insertions(+)
 
-
-[  129.196731] page:ffffea0004cacb40 refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x132b2d
-[  129.207285] flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
-[  129.214650] page_type: 0xffffffff()
-[  129.218584] raw: 0017ffffc0000000 dead000000000100 dead000000000122 0000000000000000
-[  129.227264] raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
-[  129.235937] page dumped because: VM_BUG_ON_FOLIO(((unsigned int) folio_ref_count(folio) + 127u <= 127u))
-[  129.246632] ------------[ cut here ]------------
-[  129.251817] kernel BUG at include/linux/mm.h:1441!
-[  129.257209] invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-[  129.263440] CPU: 1 PID: 1930 Comm: iscsiuio Kdump: loaded Not tainted 6.6.0-0.rc3.26.eln130.x86_64+debug #1
-[  129.274323] Hardware name: Dell Inc. PowerEdge R320/08VT7V, BIOS 2.4.2 01/29/2015
-[  129.282682] RIP: 0010:uio_vma_fault+0x40e/0x520 [uio]
-[  129.288345] Code: 49 83 ee 01 e9 db fe ff ff be 01 00 00 00 4c 89 f7 e8 96 7f ae e9 e9 2b ff ff ff 48 c7 c6 00 08 52 c1 4c 89 f7 e8 12 1b 8e e9 <0f> 0b e8 cb 7b a3 e9 e9 f6 fd ff ff bb 02 00 00 00 e9 2b ff ff ff
-[  129.309311] RSP: 0018:ffffc900022878b0 EFLAGS: 00010246
-[  129.315156] RAX: 000000000000005c RBX: ffffea0004cacb40 RCX: 0000000000000000
-[  129.323130] RDX: 0000000000000000 RSI: ffffffffad380f00 RDI: 0000000000000001
-[  129.331102] RBP: ffff8881a65da528 R08: 0000000000000001 R09: fffff52000450eca
-[  129.339074] R10: ffffc90002287657 R11: 0000000000000001 R12: ffffea0004cacb74
-[  129.347044] R13: ffffc900022879f8 R14: ffffea0004cacb40 R15: ffff8881946a0400
-[  129.355015] FS:  00007fc6dcafe640(0000) GS:ffff8885cb800000(0000) knlGS:0000000000000000
-[  129.364054] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  129.370474] CR2: 000055b5c9f091a0 CR3: 0000000162292001 CR4: 00000000001706e0
-[  129.378446] Call Trace:
-[  129.381183]  <TASK>
-[  129.383532]  ? die+0x36/0x90
-[  129.386765]  ? do_trap+0x199/0x240
-[  129.390573]  ? uio_vma_fault+0x40e/0x520 [uio]
-[  129.395560]  ? uio_vma_fault+0x40e/0x520 [uio]
-[  129.400539]  ? do_error_trap+0xa3/0x170
-[  129.404830]  ? uio_vma_fault+0x40e/0x520 [uio]
-[  129.409815]  ? handle_invalid_op+0x2c/0x40
-[  129.414395]  ? uio_vma_fault+0x40e/0x520 [uio]
-[  129.419361]  ? exc_invalid_op+0x2d/0x40
-[  129.423657]  ? asm_exc_invalid_op+0x1a/0x20
-[  129.428332]  ? uio_vma_fault+0x40e/0x520 [uio]
-[  129.433301]  __do_fault+0xf2/0x5a0
-[  129.437103]  do_fault+0x68e/0xc30
-[  129.440804]  ? __pfx___pte_offset_map_lock+0x10/0x10
-[  129.446350]  __handle_mm_fault+0x8e0/0xeb0
-[  129.450939]  ? follow_page_pte+0x29a/0xda0
-[  129.455513]  ? __pfx___handle_mm_fault+0x10/0x10
-[  129.460668]  ? __pfx_follow_page_pte+0x10/0x10
-[  129.465626]  ? follow_pmd_mask.isra.0+0x1d4/0xab0
-[  129.470877]  ? count_memcg_event_mm.part.0+0xc7/0x1f0
-[  129.476515]  ? rcu_is_watching+0x15/0xb0
-[  129.480896]  handle_mm_fault+0x2f2/0x8d0
-[  129.485277]  ? check_vma_flags+0x1c2/0x420
-[  129.489852]  __get_user_pages+0x333/0xa20
-[  129.494331]  ? __pfx___get_user_pages+0x10/0x10
-[  129.499389]  ? __pfx_mt_find+0x10/0x10
-[  129.503568]  ? __mm_populate+0xe7/0x360
-[  129.507850]  ? rcu_is_watching+0x15/0xb0
-[  129.512231]  populate_vma_page_range+0x1e9/0x2d0
-[  129.517388]  ? __pfx_populate_vma_page_range+0x10/0x10
-[  129.523125]  ? __pfx_mmap_region+0x10/0x10
-[  129.527693]  __mm_populate+0x1ff/0x360
-[  129.531882]  ? __pfx___mm_populate+0x10/0x10
-[  129.536649]  ? do_mmap+0x61d/0xcd0
-[  129.540446]  ? __up_write+0x1a5/0x500
-[  129.544536]  vm_mmap_pgoff+0x276/0x360
-[  129.548722]  ? rcu_is_watching+0x15/0xb0
-[  129.553093]  ? __pfx_vm_mmap_pgoff+0x10/0x10
-[  129.557861]  ? rcu_is_watching+0x15/0xb0
-[  129.562239]  ? lock_release+0x25c/0x300
-[  129.566522]  ? __fget_files+0x1e0/0x380
-[  129.570807]  ksys_mmap_pgoff+0x2e4/0x430
-[  129.575189]  do_syscall_64+0x60/0x90
-[  129.579180]  ? do_syscall_64+0x6c/0x90
-[  129.583357]  ? lockdep_hardirqs_on+0x7d/0x100
-[  129.588235]  ? do_syscall_64+0x6c/0x90
-[  129.592420]  ? lockdep_hardirqs_on+0x7d/0x100
-[  129.597283]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-
-
-[1] https://github.com/open-iscsi/open-iscsi/blob/master/iscsiuio/README
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 107880d13d21..558fef3d9491 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -98,6 +98,7 @@ config ADIN1100_PHY
+ 
+ config AQUANTIA_PHY
+ 	tristate "Aquantia PHYs"
++	select CRC_CCITT
+ 	help
+ 	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+ 
+diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
+index 334a6904ca5a..d343df3d0e61 100644
+--- a/drivers/net/phy/aquantia_main.c
++++ b/drivers/net/phy/aquantia_main.c
+@@ -12,6 +12,10 @@
+ #include <linux/delay.h>
+ #include <linux/bitfield.h>
+ #include <linux/phy.h>
++#include <linux/of.h>
++#include <linux/firmware.h>
++#include <linux/crc-ccitt.h>
++#include <linux/nvmem-consumer.h>
+ 
+ #include "aquantia.h"
+ 
+@@ -92,10 +96,40 @@
+ #define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
+ 
+ /* Vendor specific 1, MDIO_MMD_VEND1 */
++#define VEND1_GLOBAL_SC				0x0
++#define VEND1_GLOBAL_SC_SOFT_RESET		BIT(15)
++#define VEND1_GLOBAL_SC_LOW_POWER		BIT(11)
++
+ #define VEND1_GLOBAL_FW_ID			0x0020
+ #define VEND1_GLOBAL_FW_ID_MAJOR		GENMASK(15, 8)
+ #define VEND1_GLOBAL_FW_ID_MINOR		GENMASK(7, 0)
+ 
++#define VEND1_GLOBAL_MAILBOX_INTERFACE1			0x0200
++#define VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE		BIT(15)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE		BIT(14)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET	BIT(12)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE1_BUSY		BIT(8)
++
++#define VEND1_GLOBAL_MAILBOX_INTERFACE2			0x0201
++#define VEND1_GLOBAL_MAILBOX_INTERFACE3			0x0202
++#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK	GENMASK(15, 0)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK, (u16)((x) >> 16))
++#define VEND1_GLOBAL_MAILBOX_INTERFACE4			0x0203
++#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK	GENMASK(15, 2)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK, (u16)(x))
++
++#define VEND1_GLOBAL_MAILBOX_INTERFACE5			0x0204
++#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK	GENMASK(15, 0)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK, (u16)((x) >> 16))
++#define VEND1_GLOBAL_MAILBOX_INTERFACE6			0x0205
++#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK	GENMASK(15, 0)
++#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK, (u16)(x))
++
++#define VEND1_GLOBAL_CONTROL2			0xc001
++#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_RST	BIT(15)
++#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
++#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
++
+ #define VEND1_GLOBAL_GEN_STAT2			0xc831
+ #define VEND1_GLOBAL_GEN_STAT2_OP_IN_PROG	BIT(15)
+ 
+@@ -152,6 +186,30 @@
+ #define AQR107_OP_IN_PROG_SLEEP		1000
+ #define AQR107_OP_IN_PROG_TIMEOUT	100000
+ 
++#define UP_RESET_SLEEP		100
++
++/* addresses of memory segments in the phy */
++#define DRAM_BASE_ADDR		0x3FFE0000
++#define IRAM_BASE_ADDR		0x40000000
++
++/* firmware image format constants */
++#define VERSION_STRING_SIZE		0x40
++#define VERSION_STRING_OFFSET		0x0200
++/* primary offset is written at an offset from the start of the fw blob */
++#define PRIMARY_OFFSET_OFFSET		0x8
++/* primary offset needs to be then added to a base offset */
++#define PRIMARY_OFFSET_SHIFT		12
++#define PRIMARY_OFFSET(x)		((x) << PRIMARY_OFFSET_SHIFT)
++#define HEADER_OFFSET			0x300
++
++struct aqr_fw_header {
++	u32 padding;
++	u8 iram_offset[3];
++	u8 iram_size[3];
++	u8 dram_offset[3];
++	u8 dram_size[3];
++} __packed;
++
+ struct aqr107_hw_stat {
+ 	const char *name;
+ 	int reg;
+@@ -677,6 +735,142 @@ static int aqr107_wait_processor_intensive_op(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++/* load data into the phy's memory */
++static int aquantia_load_memory(struct phy_device *phydev, u32 addr,
++				const u8 *data, size_t len)
++{
++	u16 crc = 0, up_crc;
++	size_t pos;
++
++	/* PHY expect addr in LE */
++	addr = cpu_to_le32(addr);
++
++	phy_write_mmd(phydev, MDIO_MMD_VEND1,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
++	phy_write_mmd(phydev, MDIO_MMD_VEND1,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE3,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(addr));
++	phy_write_mmd(phydev, MDIO_MMD_VEND1,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE4,
++		      VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(addr));
++
++	for (pos = 0; pos < len; pos += min(sizeof(u32), len - pos)) {
++		u32 word = 0;
++
++		memcpy(&word, data + pos, min(sizeof(u32), len - pos));
++
++		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE5,
++			      VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(word));
++		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE6,
++			      VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(word));
++
++		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE1,
++			      VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE |
++			      VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE);
++
++		/* calculate CRC as we load data to the mailbox.
++		 * We convert word to big-endiang as PHY is BE and ailbox will
++		 * return a BE crc.
++		 */
++		word = cpu_to_be32(word);
++		crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
++	}
++
++	up_crc = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE2);
++	if (crc != up_crc) {
++		phydev_err(phydev, "CRC mismatch: calculated 0x%04x PHY 0x%04x\n",
++			   crc, up_crc);
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size)
++{
++	const struct aqr_fw_header *header;
++	u32 iram_offset = 0, iram_size = 0;
++	u32 dram_offset = 0, dram_size = 0;
++	char version[VERSION_STRING_SIZE];
++	u16 calculated_crc, read_crc;
++	u32 primary_offset = 0;
++	int ret;
++
++	/* extract saved crc at the end of the fw */
++	memcpy(&read_crc, data + size - 2, sizeof(read_crc));
++	/* crc is saved in big-endian as PHY is BE */
++	read_crc = be16_to_cpu(read_crc);
++	calculated_crc = crc_ccitt_false(0, data, size - 2);
++	if (read_crc != calculated_crc) {
++		phydev_err(phydev, "bad firmware CRC: file 0x%04x calculated 0x%04x\n",
++			   read_crc, calculated_crc);
++		return -EINVAL;
++	}
++
++	/* Get the primary offset to extract DRAM and IRAM sections. */
++	memcpy(&primary_offset, data + PRIMARY_OFFSET_OFFSET, sizeof(u16));
++	primary_offset = PRIMARY_OFFSET(le32_to_cpu(primary_offset));
++
++	/* Find the DRAM and IRAM sections within the firmware file. */
++	header = (struct aqr_fw_header *)(data + primary_offset + HEADER_OFFSET);
++	memcpy(&iram_offset, &header->iram_offset, sizeof(u8) * 3);
++	memcpy(&iram_size, &header->iram_size, sizeof(u8) * 3);
++	memcpy(&dram_offset, &header->dram_offset, sizeof(u8) * 3);
++	memcpy(&dram_size, &header->dram_size, sizeof(u8) * 3);
++
++	/* offset are in LE and values needs to be converted to cpu endian */
++	iram_offset = le32_to_cpu(iram_offset);
++	iram_size = le32_to_cpu(iram_size);
++	dram_offset = le32_to_cpu(dram_offset);
++	dram_size = le32_to_cpu(dram_size);
++
++	/* Increment the offset with the primary offset. */
++	iram_offset += primary_offset;
++	dram_offset += primary_offset;
++
++	phydev_dbg(phydev, "primary %d IRAM offset=%d size=%d DRAM offset=%d size=%d\n",
++		   primary_offset, iram_offset, iram_size, dram_offset, dram_size);
++
++	strscpy(version, (char *)data + dram_offset + VERSION_STRING_OFFSET,
++		VERSION_STRING_SIZE);
++	phydev_info(phydev, "loading firmware version '%s'\n", version);
++
++	/* stall the microcprocessor */
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CONTROL2,
++		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL | VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD);
++
++	phydev_dbg(phydev, "loading DRAM 0x%08x from offset=%d size=%d\n",
++		   DRAM_BASE_ADDR, dram_offset, dram_size);
++	ret = aquantia_load_memory(phydev, DRAM_BASE_ADDR, data + dram_offset,
++				   dram_size);
++	if (ret)
++		return ret;
++
++	phydev_dbg(phydev, "loading IRAM 0x%08x from offset=%d size=%d\n",
++		   IRAM_BASE_ADDR, iram_offset, iram_size);
++	ret = aquantia_load_memory(phydev, IRAM_BASE_ADDR, data + iram_offset,
++				   iram_size);
++	if (ret)
++		return ret;
++
++	/* make sure soft reset and low power mode are clear */
++	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_SC,
++			   VEND1_GLOBAL_SC_SOFT_RESET | VEND1_GLOBAL_SC_LOW_POWER);
++
++	/* Release the microprocessor. UP_RESET must be held for 100 usec. */
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CONTROL2,
++		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL |
++		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD |
++		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_RST);
++	usleep_range(UP_RESET_SLEEP, UP_RESET_SLEEP * 2);
++
++	phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CONTROL2,
++		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD);
++
++	return 0;
++}
++
+ static int aqr107_get_rate_matching(struct phy_device *phydev,
+ 				    phy_interface_t iface)
+ {
+@@ -711,13 +905,95 @@ static int aqr107_resume(struct phy_device *phydev)
+ 	return aqr107_wait_processor_intensive_op(phydev);
+ }
+ 
++static int aqr_firmware_load_nvmem(struct phy_device *phydev)
++{
++	struct nvmem_cell *cell;
++	size_t size;
++	u8 *buf;
++	int ret;
++
++	cell = nvmem_cell_get(&phydev->mdio.dev, "firmware");
++	if (IS_ERR(cell))
++		return PTR_ERR(cell);
++
++	buf = nvmem_cell_read(cell, &size);
++	if (IS_ERR(buf)) {
++		ret = PTR_ERR(buf);
++		goto exit;
++	}
++
++	ret = aqr_fw_boot(phydev, buf, size);
++	if (ret)
++		phydev_err(phydev, "firmware loading failed: %d\n", ret);
++
++exit:
++	nvmem_cell_put(cell);
++
++	return ret;
++}
++
++static int aqr_firmware_load_sysfs(struct phy_device *phydev)
++{
++	struct device *dev = &phydev->mdio.dev;
++	const struct firmware *fw;
++	const char *fw_name;
++	int ret;
++
++	ret = of_property_read_string(dev->of_node, "firmware-name",
++				      &fw_name);
++	if (ret)
++		return ret;
++
++	ret = request_firmware(&fw, fw_name, dev);
++	if (ret) {
++		phydev_err(phydev, "failed to find FW file %s (%d)\n",
++			   fw_name, ret);
++		goto exit;
++	}
++
++	ret = aqr_fw_boot(phydev, fw->data, fw->size);
++	if (ret)
++		phydev_err(phydev, "firmware loading failed: %d\n", ret);
++
++exit:
++	release_firmware(fw);
++
++	return ret;
++}
++
++static int aqr_firmware_load(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_FW_ID);
++	if (ret > 0)
++		goto exit;
++
++	ret = aqr_firmware_load_nvmem(phydev);
++	if (!ret)
++		goto exit;
++
++	ret = aqr_firmware_load_sysfs(phydev);
++	if (ret)
++		return ret;
++
++exit:
++	return 0;
++}
++
+ static int aqr107_probe(struct phy_device *phydev)
+ {
++	int ret;
++
+ 	phydev->priv = devm_kzalloc(&phydev->mdio.dev,
+ 				    sizeof(struct aqr107_priv), GFP_KERNEL);
+ 	if (!phydev->priv)
+ 		return -ENOMEM;
+ 
++	ret = aqr_firmware_load(phydev);
++	if (ret)
++		return ret;
++
+ 	return aqr_hwmon_probe(phydev);
+ }
+ 
+-- 
+2.41.0
 
 
