@@ -1,68 +1,158 @@
-Return-Path: <netdev+bounces-37201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F1B7B4303
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 20:30:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E916A7B43C6
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 23:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2403B28201B
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 18:30:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1C9231C20BE2
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 21:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858D828EC;
-	Sat, 30 Sep 2023 18:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7FE1944A;
+	Sat, 30 Sep 2023 21:10:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74AFA168CA
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 18:30:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 110ACC433C7;
-	Sat, 30 Sep 2023 18:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696098602;
-	bh=Y4imC89W3KdMY2UPdzMV4XPUqHsU4iC+LIa8tI7NQ8g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1RyzUb0dql97BmSTWWXH4WElBuESRh1nfdjAYmTH6vuLq7CQYn81zMxLMOFAd/clX
-	 iF+kliizT2sMMAonxvxRvneMRkqHLihK8T/2wT2afNvjL8A1K1mlo4KXLJcHHMSGmr
-	 Y47tDVyqgVi4Hl20otmWlcRMF8i+XqmAWjqicUL0=
-Date: Sat, 30 Sep 2023 20:29:59 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Jerry Snitselaar <jsnitsel@redhat.com>
-Cc: Chris Leech <cleech@redhat.com>, Christoph Hellwig <hch@lst.de>,
-	Rasesh Mody <rmody@marvell.com>, Ariel Elior <aelior@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	Manish Rangankar <mrangankar@marvell.com>,
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-Message-ID: <2023093003-city-pursuant-956e@gregkh>
-References: <20230929170023.1020032-1-cleech@redhat.com>
- <20230929170023.1020032-4-cleech@redhat.com>
- <2023093055-gotten-astronomy-a98b@gregkh>
- <yfws24bzfebts5mr7n7y4dekjlrhlbbk6afr6vgbducpx4j2wh@iiftl57eonc6>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56BA19445
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 21:10:34 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FDF4E3;
+	Sat, 30 Sep 2023 14:10:31 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id DC8D8100003;
+	Sun,  1 Oct 2023 00:10:27 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru DC8D8100003
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1696108227;
+	bh=jMRqqJ1cS+t7jOx0bPvcOZRVJEpnD1obaP6bDeXm6Oc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=QGbIK0S5QfekicXxDqkwxLbxW/io0IKJYu0aJCVDvpgaMEK9rEFSnhLCkMAfreSsw
+	 hbmi6p8KjwQOgFkP94SGUmX8T+ZRYxyEWgFK1lBPJTmRMayFSxKYU+VbYtvHoP31gC
+	 uaHcyDYGnpNdHWvx7quVv9dqL4rmiPwwRXiuyAsC8e73GAl9aZNeDkM2QgbkmvNUKG
+	 LNLZP7kYg9M75/esBjbPWs88453dddEuyXyAd2jDmMWXjslS2Fv5Ln+z+bQqq8SpmK
+	 KpvuzBxCtyllnPYSQ/x4yP31fG4zjNCsQsaf5c00BOrbwQLyirFOAiXpIj9qvi+Sa/
+	 cjFbxBHFt9toA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Sun,  1 Oct 2023 00:10:26 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Sun, 1 Oct 2023 00:10:26 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [PATCH net-next v2 00/12] vsock/virtio: continue MSG_ZEROCOPY support
+Date: Sun, 1 Oct 2023 00:02:56 +0300
+Message-ID: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yfws24bzfebts5mr7n7y4dekjlrhlbbk6afr6vgbducpx4j2wh@iiftl57eonc6>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180254 [Sep 30 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, lore.kernel.org:7.1.1;git.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/09/30 20:08:00
+X-KSMG-LinksScanning: Clean, bases: 2023/09/30 20:07:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/09/30 19:49:00 #22015058
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Sat, Sep 30, 2023 at 02:10:50AM -0700, Jerry Snitselaar wrote:
-> [1] https://github.com/open-iscsi/open-iscsi/blob/master/iscsiuio/README
+Hello,
 
-That's IP offload, not what UIO is supposed to be for at all (yes, I
-know DPDK abuses this api as well, and I hate it.)  But this is on a
-network card, it shouldn't need UIO.  Why is iscsi somehow "special" for
-this?
+this patchset contains second and third parts of another big patchset
+for MSG_ZEROCOPY flag support:
+https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
 
-still confused,
+During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+suggested to split it for three parts to simplify review and merging:
 
-greg k-h
+1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
+   link below)
+2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+   tx completions) and update for Documentation/. <-- this patchset
+3) Updates for tests and utils. <-- this patchset
+
+Part 1) was merged:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=236f3873b517acfaf949c23bb2d5dec13bfd2da2
+
+Link to v1:
+https://lore.kernel.org/netdev/20230922052428.4005676-1-avkrasnov@salutedevices.com/
+
+Changelog:                                                              
+ v1 -> v2:                                                              
+ * Patchset rebased and tested on new HEAD of net-next (see hash above).
+ * See per-patch changelog after ---. 
+
+Arseniy Krasnov (12):
+  vsock: set EPOLLERR on non-empty error queue
+  vsock: read from socket's error queue
+  vsock: check for MSG_ZEROCOPY support on send
+  vsock: enable SOCK_SUPPORT_ZC bit
+  vhost/vsock: support MSG_ZEROCOPY for transport
+  vsock/virtio: support MSG_ZEROCOPY for transport
+  vsock/loopback: support MSG_ZEROCOPY for transport
+  vsock: enable setting SO_ZEROCOPY
+  docs: net: description of MSG_ZEROCOPY for AF_VSOCK
+  test/vsock: MSG_ZEROCOPY flag tests
+  test/vsock: MSG_ZEROCOPY support for vsock_perf
+  test/vsock: io_uring rx/tx tests
+
+ Documentation/networking/msg_zerocopy.rst |  13 +-
+ drivers/vhost/vsock.c                     |   7 +
+ include/linux/socket.h                    |   1 +
+ include/net/af_vsock.h                    |   7 +
+ include/uapi/linux/vm_sockets.h           |   4 +
+ net/vmw_vsock/af_vsock.c                  |  63 ++++-
+ net/vmw_vsock/virtio_transport.c          |   7 +
+ net/vmw_vsock/vsock_loopback.c            |   6 +
+ tools/testing/vsock/Makefile              |   9 +-
+ tools/testing/vsock/util.c                | 214 +++++++++++++++
+ tools/testing/vsock/util.h                |  27 ++
+ tools/testing/vsock/vsock_perf.c          | 143 +++++++++-
+ tools/testing/vsock/vsock_test.c          |  16 ++
+ tools/testing/vsock/vsock_test_zerocopy.c | 314 +++++++++++++++++++++
+ tools/testing/vsock/vsock_test_zerocopy.h |  15 +
+ tools/testing/vsock/vsock_uring_test.c    | 321 ++++++++++++++++++++++
+ 16 files changed, 1151 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+ create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+ create mode 100644 tools/testing/vsock/vsock_uring_test.c
+
+-- 
+2.25.1
+
 
