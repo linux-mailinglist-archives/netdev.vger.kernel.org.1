@@ -1,64 +1,50 @@
-Return-Path: <netdev+bounces-37199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339357B42F5
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 20:19:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAA717B4300
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 20:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D7AAC282F3C
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 18:19:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0E1851C20939
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 18:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640F018B1F;
-	Sat, 30 Sep 2023 18:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0A818C03;
+	Sat, 30 Sep 2023 18:28:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F57818B11;
-	Sat, 30 Sep 2023 18:19:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D97A7C433C7;
-	Sat, 30 Sep 2023 18:19:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696097993;
-	bh=VkV7TjXZJnym2EdSAsMapvwnoXQMIzv/8uo4dDQrWTg=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF42B678
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 18:28:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75395C433C8;
+	Sat, 30 Sep 2023 18:28:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696098513;
+	bh=Y9iCNcGGh4nfHDPA28tz0aK7pyM7yVYEhIxnYu0QfG8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vBOmrl8788GbnxHeP93j29wo1oJzATYxI9FNfCZ+5dQrB5Zfl32IFQxHVQs5Mezw4
-	 qg4RET03lYP+nNNp3ZdBfn1/I+8fe6faywJo5j1LwYGiD25oZBdcYV96BAuVW4pESV
-	 GDtUHZblaXnXYqGPF0Pslim6HYcSh6fffRQ68Pu7xz6OVXQyZBGoUcSu2nuRiaZzGc
-	 7Uca+FJvj0NT2Wsy+d5XaonAEHbaAVVuahl6HFm6KNFjvbcR0u4DoemNLVz5GL9tN6
-	 zaEfh4YeXokL6XoDUQxIW3dFzXWGDnJhyFZ2ljWi8VeWvXW0ApGHMrjgx2mhFcrFzz
-	 TsWCHsXKX6Q4A==
-Date: Sat, 30 Sep 2023 20:19:46 +0200
-From: Simon Horman <horms@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	Paul Rosswurm <paulros@microsoft.com>,
-	"olaf@aepfle.de" <olaf@aepfle.de>, vkuznets <vkuznets@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"leon@kernel.org" <leon@kernel.org>, Long Li <longli@microsoft.com>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"ast@kernel.org" <ast@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"shradhagupta@linux.microsoft.com" <shradhagupta@linux.microsoft.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net, 3/3] net: mana: Fix oversized sge0 for GSO packets
-Message-ID: <20230930181946.GG92317@kernel.org>
-References: <1695519107-24139-1-git-send-email-haiyangz@microsoft.com>
- <1695519107-24139-4-git-send-email-haiyangz@microsoft.com>
- <ZRaRSKQDyfkhxYmY@kernel.org>
- <PH7PR21MB311698B8C2107E66890F6C7ECAC0A@PH7PR21MB3116.namprd21.prod.outlook.com>
+	b=1k1HaUHuIORJNTGPd+sZFi8gkE0zdO5YIja2DkSsvLFPK3pYs55Mobkwz8fLs6rQa
+	 hwvyWiSwwBSQYASjE9dZKij+EUA2Fa34mmaJzW6xCgu77gCaDAUE04LiuQTjOpMCrI
+	 geP/D2iDqYhIqiZ1P5iV7vt3YGQxYQl12/7T17F4=
+Date: Sat, 30 Sep 2023 20:28:29 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Chris Leech <cleech@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Rasesh Mody <rmody@marvell.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	Manish Rangankar <mrangankar@marvell.com>,
+	Jerry Snitselaar <jsnitsel@redhat.com>,
+	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
+Message-ID: <2023093002-unlighted-ragged-c6e1@gregkh>
+References: <20230929170023.1020032-1-cleech@redhat.com>
+ <20230929170023.1020032-4-cleech@redhat.com>
+ <2023093055-gotten-astronomy-a98b@gregkh>
+ <ZRhmqBRNUB3AfLv/@rhel-developer-toolbox>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,97 +53,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH7PR21MB311698B8C2107E66890F6C7ECAC0A@PH7PR21MB3116.namprd21.prod.outlook.com>
+In-Reply-To: <ZRhmqBRNUB3AfLv/@rhel-developer-toolbox>
 
-On Fri, Sep 29, 2023 at 04:11:15PM +0000, Haiyang Zhang wrote:
-
-...
-
-> > > @@ -209,19 +281,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb,
-> > struct net_device *ndev)
-> > >  	pkg.wqe_req.client_data_unit = 0;
-> > >
-> > >  	pkg.wqe_req.num_sge = 1 + skb_shinfo(skb)->nr_frags;
-> > > -	WARN_ON_ONCE(pkg.wqe_req.num_sge >
-> > MAX_TX_WQE_SGL_ENTRIES);
-> > > -
-> > > -	if (pkg.wqe_req.num_sge <= ARRAY_SIZE(pkg.sgl_array)) {
-> > > -		pkg.wqe_req.sgl = pkg.sgl_array;
-> > > -	} else {
-> > > -		pkg.sgl_ptr = kmalloc_array(pkg.wqe_req.num_sge,
-> > > -					    sizeof(struct gdma_sge),
-> > > -					    GFP_ATOMIC);
-> > > -		if (!pkg.sgl_ptr)
-> > > -			goto tx_drop_count;
-> > > -
-> > > -		pkg.wqe_req.sgl = pkg.sgl_ptr;
-> > > -	}
+On Sat, Sep 30, 2023 at 11:19:20AM -0700, Chris Leech wrote:
+> On Sat, Sep 30, 2023 at 09:06:51AM +0200, Greg Kroah-Hartman wrote:
+> > On Fri, Sep 29, 2023 at 10:00:23AM -0700, Chris Leech wrote:
+> > > Make use of the new UIO_MEM_DMA_COHERENT type to properly handle mmap
+> > > for dma_alloc_coherent buffers.
 > > 
-> > It is unclear to me why this logic has moved from here to further
-> > down in this function. Is it to avoid some cases where
-> > alloation has to be unwond on error (when mana_fix_skb_head() fails) ?
-> > If so, this feels more like an optimisation than a fix.
-> mana_fix_skb_head() may add one more sge (success case) so the sgl 
-> allocation should be done later. Otherwise, we need to free / re-allocate 
-> the array later.
-
-Understood, thanks for the clarification.
-
-> > >  	if (skb->protocol == htons(ETH_P_IP))
-> > >  		ipv4 = true;
-> > > @@ -229,6 +288,23 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb,
-> > struct net_device *ndev)
-> > >  		ipv6 = true;
-> > >
-> > >  	if (skb_is_gso(skb)) {
-> > > +		gso_hs = mana_get_gso_hs(skb);
-> > > +
-> > > +		if (mana_fix_skb_head(ndev, skb, gso_hs,
-> > &pkg.wqe_req.num_sge))
-> > > +			goto tx_drop_count;
-> > > +
-> > > +		if (skb->encapsulation) {
-> > > +			u64_stats_update_begin(&tx_stats->syncp);
-> > > +			tx_stats->tso_inner_packets++;
-> > > +			tx_stats->tso_inner_bytes += skb->len - gso_hs;
-> > > +			u64_stats_update_end(&tx_stats->syncp);
-> > > +		} else {
-> > > +			u64_stats_update_begin(&tx_stats->syncp);
-> > > +			tx_stats->tso_packets++;
-> > > +			tx_stats->tso_bytes += skb->len - gso_hs;
-> > > +			u64_stats_update_end(&tx_stats->syncp);
-> > > +		}
+> > Why are ethernet drivers messing around with UIO devices?  That's not
+> > what UIO is for, unless you are trying to do kernel bypass for these
+> > devices without anyone noticing?
 > > 
-> > nit: I wonder if this could be slightly more succinctly written as:
-> > 
-> > 		u64_stats_update_begin(&tx_stats->syncp);
-> > 		if (skb->encapsulation) {
-> > 			tx_stats->tso_inner_packets++;
-> > 			tx_stats->tso_inner_bytes += skb->len - gso_hs;
-> > 		} else {
-> > 			tx_stats->tso_packets++;
-> > 			tx_stats->tso_bytes += skb->len - gso_hs;
-> > 		}
-> > 		u64_stats_update_end(&tx_stats->syncp);
-> > 
-> Yes it can be written this way:)
+> > confused,
 > 
-> > Also, it is unclear to me why the stats logic is moved here from
-> > futher down in the same block. It feels more like a clean-up than a fix
-> > (as, btw, is my suggestion immediately above).
-> Since we need to calculate the gso_hs and fix head earlier than the stats and 
-> some other work, I move it immediately after skb_is_gso(skb).
-> The gso_hs calculation was part of the tx_stats block, so the tx_stats is moved 
-> together to remain close to the gso_hs calculation to keep readability.
+> It's confusing. The bnx2 driver stack included a cnic (converged nic?)
+> module that sits between the ethernet drivers (bnx2, bnx2x) and protocol
+> offload drivers (iscsi, fcoe, rdma).
+> 
+> The iscsi module (bnx2i) uses a passthrough interface from cnic to
+> handle some network configuration that the device firmware doesn't do.
+> It uses a uio device and a userspace component called iscsiuio to do
+> that.
 
-I agree it is nice the way you have it.
-I was mainly thinking that the diffstat could be made smaller,
-which might be beneficial to a fix. But I have no strong feelings on that.
+That's horrible, and not what the UIO api is for at all.  Configure the
+device like any other normal kernel device, don't poke at raw memory
+values directly, that way lies madness.
 
-> > > +
-> > >  		pkg.tx_oob.s_oob.is_outer_ipv4 = ipv4;
-> > >  		pkg.tx_oob.s_oob.is_outer_ipv6 = ipv6;
-> > >
+Have a pointer to the userspace tool anywhere?  All I found looks like a
+full IP stack in userspace under that name, and surely that's not what
+this api is for...
 
-...
+thanks,
+
+greg k-h
 
