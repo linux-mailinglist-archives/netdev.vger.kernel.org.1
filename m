@@ -1,135 +1,127 @@
-Return-Path: <netdev+bounces-37146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1564F7B3E36
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 07:02:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 514C27B3EA8
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 08:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BDDD8281A26
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 05:02:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 25C8F281DDC
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 06:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B620317E9;
-	Sat, 30 Sep 2023 05:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ECC1FA8;
+	Sat, 30 Sep 2023 06:39:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E1217C8
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 05:02:41 +0000 (UTC)
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3622FCC5;
-	Fri, 29 Sep 2023 22:02:39 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c60f1a2652so10356825ad.0;
-        Fri, 29 Sep 2023 22:02:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696050158; x=1696654958; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xyxiBtLOD6vKA93NS3NnjiNRx4OZIF1tJqScqvYHIAA=;
-        b=VBSP56FsvsX2sAOKAc6rmt7Qy/p4D5Wl28D/GnHG+/RBJvMHK2GLTOMWAe2sbSCb5y
-         BDXmHlod7VCIlROoprvmj7/YsDPXlAcfp0CoipqLJKHLgK66xsLhbbD8/eJc3Y9R9w95
-         WQ9a5y6Q42b6DWiwbPslqHiTEcvnHCHjOcVIotM26cs5RhQDncVJjPKNfn7iaBU6p5TH
-         9N9VaAheViF9RGEwVj1LmTqLgl7KHJtsDTAEVhmNqD9vqjtAyxebjvm3otWWx3yBcOwz
-         ek8VBiD4xTr881N5M3ojNj+Jgq2MuD7+7HOVWZ6vgcbYcYtMuzVjFe7iI3xVza3fNDhd
-         L8Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696050158; x=1696654958;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xyxiBtLOD6vKA93NS3NnjiNRx4OZIF1tJqScqvYHIAA=;
-        b=s2laeMImirhJk319JbNgiWVBY4nXkXblqRhLYosrWqNFSaH5Mn7WBhNGC9Ql+7Xp+J
-         rNBqcq7O2OwQyO5r2DCArsd3ERh+MBBT1ZWhsJOZFdO5UPJkaJGngd0eJheyKE5sI+yq
-         AKdRfqEZpgnarmOXGtFHeCXB9SoG79TQJ3fO535QY0DbDEPIR8PrgCI9T+XOHOcuQbNe
-         2w/HUpEkCWDWUTl4fIqPL6jH20eUAKkXCyngSjn9Ufdsh2CUuMi3+kvLgh/ix0zTovk1
-         ddqDIKaQFNpGcNLY+qZkwAAyIYCW4AdixGPkfBUz/Ch8kAoEElqw3Qe2GU0Q08nwV+Kc
-         5MPQ==
-X-Gm-Message-State: AOJu0Yyi7tVWZAwGx6ZrTnqzu5/qya7I1huvtCds9VYqOdSDThiW6zYq
-	9jvpsfNzkJY4zkcKeqyun+g=
-X-Google-Smtp-Source: AGHT+IHeeeLjNU8syfWCBKCNd97N2hKxjyhO5OwBkFhe27PcOwAEtpXWD5JUYEpvqR1hQq8unpsqKQ==
-X-Received: by 2002:a17:902:e741:b0:1c4:1cd3:8068 with SMTP id p1-20020a170902e74100b001c41cd38068mr9737235plf.5.1696050158560;
-        Fri, 29 Sep 2023 22:02:38 -0700 (PDT)
-Received: from wedsonaf-dev.home.lan ([189.124.190.154])
-        by smtp.googlemail.com with ESMTPSA id y10-20020a17090322ca00b001c322a41188sm392136plg.117.2023.09.29.22.02.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Sep 2023 22:02:38 -0700 (PDT)
-From: Wedson Almeida Filho <wedsonaf@gmail.com>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Wedson Almeida Filho <walmeida@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 29/29] net: move sockfs_xattr_handlers to .rodata
-Date: Sat, 30 Sep 2023 02:00:33 -0300
-Message-Id: <20230930050033.41174-30-wedsonaf@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230930050033.41174-1-wedsonaf@gmail.com>
-References: <20230930050033.41174-1-wedsonaf@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D351385
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 06:39:49 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537E41AE
+	for <netdev@vger.kernel.org>; Fri, 29 Sep 2023 23:39:47 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id mTdfqzIAmNwJhmTdfqg9fR; Sat, 30 Sep 2023 08:39:45 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1696055985;
+	bh=PuFtE8Nzqce9GbOstUVaI0iC3LvA8WVVT5UfiC0x0N8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=B8ElbXXvOXWetZw3fI9NSyo1YhshaygFu+vth0MHhOvzg3ysKfsBlWRQpf0dzTSsv
+	 ON1DpCMkrAVP9pZsorOE7xJjN+WxBNnen29CakYPhf4cwjmCeVKS7ZFQhiGzexltvv
+	 5gLR5PM0fBWQBkP3ugRsFgsaq4arZftG6QWLwgrQOsnFEisWlYTzjODYjLAnvNGlAy
+	 MB3JZSgfIWkdOCS0HkBlRe/o7SpEyTrjxU/lUF5n1UwPYLdoA7tKJ4pWtfTPhEppd5
+	 kcFJHGZy8iV+eAhgOGlo7fS3LFD/foHBP2k2dpzZHvTkIBACjSu2mI4vcbrtcYW6Si
+	 ISnU8FR4vMGYw==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 30 Sep 2023 08:39:45 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <10341d7c-2903-9aba-9e33-c60bab32df5d@wanadoo.fr>
+Date: Sat, 30 Sep 2023 08:39:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH 1/5] chelsio/l2t: Annotate struct l2t_data with
+ __counted_by
+To: Kees Cook <keescook@chromium.org>, Raju Rangoju <rajur@chelsio.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
+References: <20230929181042.work.990-kees@kernel.org>
+ <20230929181149.3006432-1-keescook@chromium.org>
+Content-Language: fr, en-GB
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20230929181149.3006432-1-keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Wedson Almeida Filho <walmeida@microsoft.com>
+Le 29/09/2023 à 20:11, Kees Cook a écrit :
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUNDS
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+> 
+> As found with Coccinelle[1], add __counted_by for struct l2t_data.
+> 
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci
+> 
+> Cc: Raju Rangoju <rajur@chelsio.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>   drivers/net/ethernet/chelsio/cxgb3/l2t.h | 2 +-
+>   drivers/net/ethernet/chelsio/cxgb4/l2t.c | 2 +-
+>   2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/chelsio/cxgb3/l2t.h b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
+> index ea75f275023f..646ca0bc25bd 100644
+> --- a/drivers/net/ethernet/chelsio/cxgb3/l2t.h
+> +++ b/drivers/net/ethernet/chelsio/cxgb3/l2t.h
+> @@ -76,7 +76,7 @@ struct l2t_data {
+>   	atomic_t nfree;		/* number of free entries */
+>   	rwlock_t lock;
+>   	struct rcu_head rcu_head;	/* to handle rcu cleanup */
+> -	struct l2t_entry l2tab[];
+> +	struct l2t_entry l2tab[] __counted_by(nentries);
+>   };
+>   
+>   typedef void (*arp_failure_handler_func)(struct t3cdev * dev,
+> diff --git a/drivers/net/ethernet/chelsio/cxgb4/l2t.c b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
+> index a10a6862a9a4..1e5f5b1a22a6 100644
+> --- a/drivers/net/ethernet/chelsio/cxgb4/l2t.c
+> +++ b/drivers/net/ethernet/chelsio/cxgb4/l2t.c
+> @@ -59,7 +59,7 @@ struct l2t_data {
+>   	rwlock_t lock;
+>   	atomic_t nfree;             /* number of free entries */
+>   	struct l2t_entry *rover;    /* starting point for next allocation */
+> -	struct l2t_entry l2tab[];  /* MUST BE LAST */
+> +	struct l2t_entry l2tab[] __counted_by(l2t_size);  /* MUST BE LAST */
 
-This makes it harder for accidental or malicious changes to
-sockfs_xattr_handlers at runtime.
+Nit: the comment is maybe unneeded.
 
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org
-Signed-off-by: Wedson Almeida Filho <walmeida@microsoft.com>
----
- include/linux/pseudo_fs.h | 2 +-
- net/socket.c              | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/pseudo_fs.h b/include/linux/pseudo_fs.h
-index eceda1d1407a..730f77381d55 100644
---- a/include/linux/pseudo_fs.h
-+++ b/include/linux/pseudo_fs.h
-@@ -5,7 +5,7 @@
- 
- struct pseudo_fs_context {
- 	const struct super_operations *ops;
--	const struct xattr_handler **xattr;
-+	const struct xattr_handler * const *xattr;
- 	const struct dentry_operations *dops;
- 	unsigned long magic;
- };
-diff --git a/net/socket.c b/net/socket.c
-index 2b0e54b2405c..0a99fc22641e 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -400,7 +400,7 @@ static const struct xattr_handler sockfs_security_xattr_handler = {
- 	.set = sockfs_security_xattr_set,
- };
- 
--static const struct xattr_handler *sockfs_xattr_handlers[] = {
-+static const struct xattr_handler * const sockfs_xattr_handlers[] = {
- 	&sockfs_xattr_handler,
- 	&sockfs_security_xattr_handler,
- 	NULL
--- 
-2.34.1
+>   };
+>   
+>   static inline unsigned int vlan_prio(const struct l2t_entry *e)
 
 
