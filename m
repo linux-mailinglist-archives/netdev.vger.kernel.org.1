@@ -1,71 +1,73 @@
-Return-Path: <netdev+bounces-37224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C6477B447E
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 00:37:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DEF97B448B
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 01:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C8CB028205B
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 22:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 484091C2084E
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 23:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7C7D2F5;
-	Sat, 30 Sep 2023 22:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF5D156D8;
+	Sat, 30 Sep 2023 23:07:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3759BA28
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 22:37:43 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D555CD3
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 15:37:42 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-690fe1d9ba1so3400227b3a.0
-        for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 15:37:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFE679E0
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 23:07:34 +0000 (UTC)
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018AADD;
+	Sat, 30 Sep 2023 16:07:33 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id 98e67ed59e1d1-273e3d8b57aso3212886a91.0;
+        Sat, 30 Sep 2023 16:07:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696113462; x=1696718262; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696115252; x=1696720052; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R+NSL7+HoPU+jL0KLjnt6z9ImzpvykULcHhDch9aXPU=;
-        b=XN7UmTiWWkqfLehUaYT5QLoHWkKXd2G6ANV3y85I3p77QrtT4kQjHQtvUmaQUSih4U
-         QUHS0MdnJsJ7q7p4LY/lOVpLSTRM4QGRQv06oVECYlUZBglbm49pYAgllWYydVmoBrT4
-         4RzCCH6uMocj7vXDbfeXKMT8QtVe1nTfIGfqjXpRJsVX+y62AT4/qmktDwaWVAOG/lT5
-         5qt6J5f2uY+9qeSbCaxs5ldiq+gtJwFhK7KVjXzF6z4NIu3LmjAxtbMEL1mVZxNqUwPZ
-         2Zp/CxJoK2wMlX8nKqXd4Mj1aLUkgRvxqPg9eQ7BlZvAaE+UBTtNzHSqbrN2HkH0ZBzL
-         MVhA==
+        bh=lMD6lstC96bTqqIqisEMOIoG8c7LDdVFsbakUijz8rs=;
+        b=dMvLW3ODoq++er18qOLetnkoVxk3zBYEShtEqn4W/Fk+6mjnhgpUAwpERduHoVXLXc
+         h5OZI7wHlET4swtRGxXavjZ0gvwa3nTE+M82nX/EgnwsBttBkS9Qg5tr5U0HAWA1+BtP
+         X7X80RsBIDgULW3q/e5LEKaB9lAZ+ypF5hjfTklGbjNZgX86cn78P1UBiFzMFvC4yXWy
+         L6JC08waOfj6KE9JfYwueK+5wdZgrLKYeFdiNKdEE4wydoek4Uf6dsU+kqtxiOMP55X2
+         wmJBI+vmhEDLEXlTfdxHLNE1KCFxqN8Hi95mJz/hh47ZmVjyFLmyagFowmRmBCM2OzPg
+         87hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696113462; x=1696718262;
+        d=1e100.net; s=20230601; t=1696115252; x=1696720052;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R+NSL7+HoPU+jL0KLjnt6z9ImzpvykULcHhDch9aXPU=;
-        b=P3BIzjxchTJzX18vStIQ0iEGuPAmqw0cZiNgUjNv3YWOj7KoMYvxbWjU6kftBY7cj1
-         OQmwAh+wwQBEfIrV/IUxUH9Zw4nmXNJ4YXmj1l3XGxp5WVGw3UPykThDknTYHNC2yMnp
-         GxEnq+d09Imvys6aFNvr7jkPX22ND2mNikj991lGY/g6ZG/hAJnDZQVIuXEBitpC4krQ
-         O4S4RQ7z+EonxdvHxXx98+t9TdtjcZqWQgiTaiUkN3v2i9KYywp9/P0mIj5ucGUAxESl
-         uQLP8D7PXDYLBCdTzwxvytVDmD+ozo6DRmgu9k6PmqUIOuywnsf/gdOsLPXib1yFFTfz
-         4CEg==
-X-Gm-Message-State: AOJu0YzBkSdcjHByf67oZeDjc7O5oG220XpiNpVwTkJuPUaSz62VJXQz
-	SLEKfs7elqESlCLt2EGa5y0=
-X-Google-Smtp-Source: AGHT+IGGUuLXOuNtPo+NNAJUEJYm4ARE/gvWYZsp/9iqgdUbslcbdR9hNb5fY1nviVvaSiMzAOjG2g==
-X-Received: by 2002:a05:6a00:4682:b0:68f:c8b3:3077 with SMTP id de2-20020a056a00468200b0068fc8b33077mr7556860pfb.1.1696113462231;
-        Sat, 30 Sep 2023 15:37:42 -0700 (PDT)
+        bh=lMD6lstC96bTqqIqisEMOIoG8c7LDdVFsbakUijz8rs=;
+        b=mv98wxkVjxgCVreF3YaKx8gTyPkYaIEixf4R+ME3IKOndnPNl8fbELMZFap681RNvt
+         so6Ugiy43ZdArB+CLky74hBXhuhSgwBtdqjrL7MjYHMxKfWgpHSM5cm5Nv/cxNG4Y9x4
+         s4M77oY15oNV4IJxZ5CpG5lTKZdR1iCFPaibEYPPGBt13JGgiki4SS+cQUS+/AXjzaJw
+         ZmApUA5x/cFXurzDW/upftWEtYIbMZ1YbRU73YMwzCBE4c5azx5WoykNRqHHvzbipKWQ
+         WDki2O+BFI/eWnK4N/zC4QT/eRhHjUGQvqSOeCm/tswHAlw56W16xJSV8MTUlMukcIZE
+         Vueg==
+X-Gm-Message-State: AOJu0YyCiINFOVxM5oZtxPt2HXFDTCgj24EjhVC1HyQKi8KMepZfuOWw
+	FqkZcZTCcFybnLeuWRCq0QxcdVJ95NU=
+X-Google-Smtp-Source: AGHT+IGpFz0JOfUO/O4JRbkLberIGrg2EuksHTgXnSdegzPALcNbE5H7Jsntcb+sN3QJirtwT75DNw==
+X-Received: by 2002:a17:902:ea0c:b0:1c2:c60:8388 with SMTP id s12-20020a170902ea0c00b001c20c608388mr8645750plg.6.1696115252330;
+        Sat, 30 Sep 2023 16:07:32 -0700 (PDT)
 Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id r20-20020aa78b94000000b006933f85bc29sm5945822pfd.111.2023.09.30.15.37.40
+        by smtp.gmail.com with ESMTPSA id i9-20020a170902c94900b001b9c960ffeasm19186171pla.47.2023.09.30.16.07.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Sep 2023 15:37:41 -0700 (PDT)
-Date: Sat, 30 Sep 2023 15:37:39 -0700
+        Sat, 30 Sep 2023 16:07:31 -0700 (PDT)
+Date: Sat, 30 Sep 2023 16:07:29 -0700
 From: Richard Cochran <richardcochran@gmail.com>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org,
-	chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com,
-	ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
-	alex.maftei@amd.com, davem@davemloft.net, rrameshbabu@nvidia.com,
-	shuah@kernel.org
-Subject: Re: [PATCH net-next v3 3/3] ptp: support event queue reader channel
- masks
-Message-ID: <ZRijM9YfyCmrXG7m@hoboy.vegasvil.org>
-References: <20230928133544.3642650-1-reibax@gmail.com>
- <20230928133544.3642650-4-reibax@gmail.com>
+To: Mahesh Bandewar <maheshb@google.com>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>,
+	Yuliang Li <yuliangli@google.com>,
+	Mahesh Bandewar <mahesh@bandewar.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH 3/4] ptp: add ioctl interface for ptp_gettimex64any()
+Message-ID: <ZRiqMTwkqqXUYPPB@hoboy.vegasvil.org>
+References: <20230929023743.1611460-1-maheshb@google.com>
+ <ZRiSQ/fCa3pYZnXJ@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +76,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230928133544.3642650-4-reibax@gmail.com>
+In-Reply-To: <ZRiSQ/fCa3pYZnXJ@hoboy.vegasvil.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -82,39 +84,14 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 03:35:44PM +0200, Xabier Marquiegui wrote:
+On Sat, Sep 30, 2023 at 02:25:23PM -0700, Richard Cochran wrote:
+> But how about a new system call instead?
+> 
+>     clock_compare(clockid_t a, clockid_t b);
 
-> diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
-> index 05cc35fc94ac..6bbf11dc4a05 100644
-> --- a/include/uapi/linux/ptp_clock.h
-> +++ b/include/uapi/linux/ptp_clock.h
-> @@ -105,6 +105,15 @@ struct ptp_extts_request {
->  	unsigned int rsv[2]; /* Reserved for future use. */
->  };
->  
-> +struct ptp_tsfilter {
-> +	union {
-> +		unsigned int reader_rpid; /* PID of device user */
-> +		unsigned int ndevusers; /* Device user count */
-> +	};
-> +	int reader_oid; /* Object ID of the timestamp event queue */
-> +	unsigned int mask; /* Channel mask. LSB = channel 0 */
-> +};
-
-This is WAY too complicated.
-
-Just let the user pass a bit mask (say 32 x uint64_t = 2048 channels)
-of what they want to receive.
-
-OR:
-
-- ioctl to clear mask
-- ioctl to set one channel in mask
-
-After opening the character device, the default is that the user will
-receive events from all channels.  This is an established API, and you
-cannot change it.  If the user is only interested in specific
-channels, then they can set the mask after calling open().
+It could have a third argument, n_samples, that would only be used for
+"slow" clocks like PCIe MACs.  The system call would return the offset
+from the shortest measurement (which is really what user space needs).
 
 Thanks,
 Richard
