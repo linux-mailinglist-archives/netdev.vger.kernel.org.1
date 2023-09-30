@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-37221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F5747B43FB
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 23:57:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF347B445C
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 00:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 4AA74B209CA
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 21:57:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E1762281551
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 22:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C561946E;
-	Sat, 30 Sep 2023 21:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676C219471;
+	Sat, 30 Sep 2023 22:05:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47DBBA48
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 21:57:29 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC757CA
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 14:57:28 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2791d5f1a09so792878a91.1
-        for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 14:57:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CCD646
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 22:05:16 +0000 (UTC)
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0448BC6
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 15:05:16 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-27755cfa666so2236772a91.0
+        for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 15:05:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696111048; x=1696715848; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696111515; x=1696716315; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VI3LavMGZ6n/laTSAV7fEld2pH9NIz3R1LBssCn8kek=;
-        b=U39k2SZKFfEI1HTcYbOp5wn1IpWvbsvEkm1tqMBcCCzjBPhDwBBjF77nxX/0u5+UYO
-         t63FcTJIN8nNspv0aDjzdajM1T4YE31Kl4N3bs0jJFyur83lZKKyUnyo5iJNhWoNFWOO
-         9gFjV+4mgsPXTJh6Gux3wFCD81pKmxrlVlIk7fn6SwGBhRXHx4aY47DcvCe9C8XG0cvb
-         geRKZRAajZRuW96Ncmp1Nn1gSP1DZxj9kPHUyOylzSV8HNMtiaV8G4hXa7QkVDRTmCP8
-         a/s/4Wp/c2xeAsNOY2Y+QdntLiHuZ4qgQwgnK/Twk4bqDKr1tSpUigZkSvbWDeRRwyIr
-         E5MQ==
+        bh=RGMyjtr8QPPNDLjaRlPEnKY0/mtq80hq6tXIQhsL8oY=;
+        b=LxuhHTwERswBqvf0hSXsJG01sd5i/HbkAHhrHE5V9g7DeT0gJL+D92twr7bAStVt1h
+         lOkRow3Yc/JPcJWRlOODgs265j7k8rqI4g9xXa6zFZ5ND3gz9ZiH7i2dsBs9zZ2qslva
+         BdAEtvtXzUqVl/HBWKDQBtd5Y1LvBi/y+uwvZrWra7u0eK9RdR2h2vAnQBdT5u6hm95h
+         JNrUrPRt/UYFRsLMYXQR1syVsRVVfvhmfGp1de4GX2KgkDMHR/vU9PM0xbZ1tMX+/niu
+         4RsydfUqPFWorq6hcUYeKBV7FqjRULEb2FqOEQBaui4/72CQhkam8rR9VV8wfELOHxF/
+         Q8Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696111048; x=1696715848;
+        d=1e100.net; s=20230601; t=1696111515; x=1696716315;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VI3LavMGZ6n/laTSAV7fEld2pH9NIz3R1LBssCn8kek=;
-        b=QNO5uejEhqnae0muOpe2+FaABlHt65jqPFT6uCZsGZaQe3pp1snvfi+lTfkp9HvxJE
-         rbOx289SnaBNVTYv0Pn6oTD2Yo4OBveuXA0xbsYRK6wGihGcbO8oBBel8bNnQHzjqTNK
-         YDqf54DTlh4uxUwxk8L67S4RvHOr9LWYZZma8CFMSyZwQM7yyG9Jjjzv/xbF2IgUv0JT
-         wqPyc+7Wdq0Ta8q5qzMaGrZfCgcFihFRpsuhGhhbdAaHU3XVVRafsbZ9GLMIDIRkNrgk
-         3F+arwvzmzmREqoVd1Am0ZuE61kODc/+T4gfIEolD13gYmnYaR0bpm6COmP/RPpCzNcj
-         bc/w==
-X-Gm-Message-State: AOJu0Yzny+uC3iEHzJPOPGRz1+Jbhw7Qgt0i6LF9eX9nUAA2UF97o5/0
-	FU2fxFwUo9r0QF68WLsxpJo=
-X-Google-Smtp-Source: AGHT+IF26zkgroAYRQQwTfSG/3L6W2pAtUMoko6Dg09YzDVERGzwbU8SubBLVbEALbc9gQsQj1f49w==
-X-Received: by 2002:a17:902:dac8:b0:1bf:1a9e:85f7 with SMTP id q8-20020a170902dac800b001bf1a9e85f7mr8919793plx.1.1696111048078;
-        Sat, 30 Sep 2023 14:57:28 -0700 (PDT)
+        bh=RGMyjtr8QPPNDLjaRlPEnKY0/mtq80hq6tXIQhsL8oY=;
+        b=AvHw7ibZEWGMU7TkzbCIzd93ccJYL6MC/hqI+CugqVJFa+uhU6XWSqkauGFN3LdE9u
+         7S88p3Se5bRLbJEn/IqmoP4ga1uDVX49yqSx/SH4PfFtUTlWYNMygLy2ynn8M54EasPn
+         i0taFe8UlLCrJBhENG9PYi3TWKLeMYXZ4B+TEq/NYTKkLs3M2PsnZOrMx9Qw26TnkEbq
+         rhFJyiLlGxGgjMHuyRjkpwg5+tQcGFdCPTnAlaPDlg/toNWGbux1DJgQmyWAhEZ1KdRW
+         myU8m1Qv9c3jC3yF3BQuQ+oiOvBIUgff6TKp0kNzjrxhq/95N8xW0W+eCrilCiLZoVfK
+         MZbA==
+X-Gm-Message-State: AOJu0Yx9GJE7ODGy/HH2CPh/792MSrj3SnWPl1J4eXMPVDJiBJtdajY+
+	9QSHWXQqZcd07VUqKjhnV9E=
+X-Google-Smtp-Source: AGHT+IH9gMT00S4gWLvoQLzOZFFCVi7jv44xRs8ci3yr5NAb/0QrvZ2GkP7NKAVAyXBQ5HZd4OOlMg==
+X-Received: by 2002:a17:90a:9cc:b0:273:e4a7:ce72 with SMTP id 70-20020a17090a09cc00b00273e4a7ce72mr6940380pjo.3.1696111515368;
+        Sat, 30 Sep 2023 15:05:15 -0700 (PDT)
 Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id z5-20020a170902ee0500b001c727d3ea6bsm7437539plb.74.2023.09.30.14.57.26
+        by smtp.gmail.com with ESMTPSA id x15-20020a17090a530f00b0027654d389casm3527592pjh.54.2023.09.30.15.05.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Sep 2023 14:57:27 -0700 (PDT)
-Date: Sat, 30 Sep 2023 14:57:24 -0700
+        Sat, 30 Sep 2023 15:05:14 -0700 (PDT)
+Date: Sat, 30 Sep 2023 15:05:12 -0700
 From: Richard Cochran <richardcochran@gmail.com>
 To: Xabier Marquiegui <reibax@gmail.com>
 Cc: netdev@vger.kernel.org, horms@kernel.org,
@@ -63,7 +63,7 @@ Cc: netdev@vger.kernel.org, horms@kernel.org,
 	shuah@kernel.org
 Subject: Re: [PATCH net-next v3 2/3] ptp: support multiple timestamp event
  readers
-Message-ID: <ZRiZxH5TbkKS5py7@hoboy.vegasvil.org>
+Message-ID: <ZRibmLHEBGUWfOZM@hoboy.vegasvil.org>
 References: <20230928133544.3642650-1-reibax@gmail.com>
  <20230928133544.3642650-3-reibax@gmail.com>
 Precedence: bulk
@@ -84,66 +84,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 On Thu, Sep 28, 2023 at 03:35:43PM +0200, Xabier Marquiegui wrote:
 
-> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-> index 197edf1179f1..65e7acaa40a9 100644
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -101,14 +101,74 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
->  	return 0;
->  }
+>  include/linux/posix-clock.h |  24 ++++---
+>  kernel/time/posix-clock.c   |  43 +++++++++---
+
+This change deserves its own patch.  Please put that first in the
+series.  And be sure to CC tglx and John Stultz.
+
+> diff --git a/include/linux/posix-clock.h b/include/linux/posix-clock.h
+> index 468328b1e1dd..8f844ac28aa8 100644
+> --- a/include/linux/posix-clock.h
+> +++ b/include/linux/posix-clock.h
+> @@ -14,6 +14,7 @@
+>  #include <linux/rwsem.h>
 >  
-> -int ptp_open(struct posix_clock *pc, fmode_t fmode)
-> +int ptp_open(struct posix_clock_user *pcuser, fmode_t fmode)
->  {
-> +	struct ptp_clock *ptp =
-> +		container_of(pcuser->clk, struct ptp_clock, clock);
-> +	struct ida *ida = ptp_get_tsevq_ida(ptp);
+>  struct posix_clock;
+> +struct posix_clock_user;
 
-No need for IDA or ...
+No need for a forward declaration, since the struct is below.
+Just put it here.
 
-> +	struct timestamp_event_queue *queue;
-> +
-> +	if (!ida)
-> +		return -EINVAL;
-> +	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
-> +	if (!queue)
-> +		return -EINVAL;
-> +	queue->close_req = false;
-> +	queue->reader_pid = task_pid_nr(current);
-
-... PIDs.  Just allocate the queue and set:
-
-> +	pcuser->private_clkdata = queue;
-
-> +void ptp_flush_users(struct posix_clock *pc)
-
-I can't see any need for "flush users".
-
-open/release are per-user anyhow.
-
-> @@ -184,11 +216,11 @@ static void ptp_clock_release(struct device *dev)
+> @@ -90,6 +93,11 @@ struct posix_clock {
+>  	bool zombie;
+>  };
 >  
->  	ptp_cleanup_pin_groups(ptp);
->  	kfree(ptp->vclock_index);
-> -	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
->  	ptp_clean_queue_list(ptp);
+> +struct posix_clock_user {
 
-You don't need this ^^^
+The idea is fine, but how about calling this "posix_clock_context"
+instead?
 
-Keep it simple:
-
-- allocate queue on open()
-- free the queue on release()
-
-Hm?
-
->  	ida_free(&ptp_clocks_map, ptp->index);
-> +	mutex_destroy(&ptp->close_mux);
->  	kfree(ptp);
->  }
->  
+> +	struct posix_clock *clk;
+> +	void *private_clkdata;
+> +};
 
 Thanks,
 Richard
