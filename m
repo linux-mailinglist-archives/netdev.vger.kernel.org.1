@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-37187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0A67B41F1
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 18:04:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790067B4203
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 18:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 10082283498
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 16:04:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id A00811C20956
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 16:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D281774B;
-	Sat, 30 Sep 2023 16:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8725617996;
+	Sat, 30 Sep 2023 16:14:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B50C6EAEC
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 16:04:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 144A7C433C7;
-	Sat, 30 Sep 2023 16:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7653523D8
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 16:14:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F11C433C8;
+	Sat, 30 Sep 2023 16:14:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696089872;
-	bh=6RkJeO80Y6I9k6A93GTmjkGFgNpYWb9OU4GsW1LTuYc=;
+	s=k20201202; t=1696090478;
+	bh=MqO0aeyCzwGjYjLSV1SulI5oIkludvo2w2vvpfZBR5k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RcJAsXbE9a5DeIf+W8MB19aWP172gjnpP3lwAuggEBDqnEKXAJwmYCG6ImDppINAY
-	 f6/q/GRNZ2e5Ma8pmzb2B888SrguU8F5MoxwHIILuAUfIaCRxLOdV9UcROOdH/OyQx
-	 Cn+HPqALEhFGILZADjo60ed3ulIpl8eQQ1lRFkVZyN2ATRTSV7LBXZcKSNsUeXTuoU
-	 w9Dm0ulg+qEGA6vJUKNqAp6xTPkBY8sPtIslKW+d8xslsUr+zOM7suKtKcH5CTdL8S
-	 Rn4qi5uI6q0Y85znGNOjKYdYHYj+9D4+HoHittc7tGLxOdd+/mPl+GIw571L1DCt5t
-	 xQ5G1AnDmR7dA==
-Date: Sat, 30 Sep 2023 18:04:28 +0200
+	b=hHaXyUqb5u19NSeivZVuqsGLERwCFQVtvOSZ6WKeXWj8sZJ91a1IYj6qouew6kPjI
+	 xic8ZhHrlWpBTQRI75wHUDuR0HCvOcw+RALr8TcWA0b4NYJ7B9hJEaecUMVc0zUzBo
+	 xL9BwgWwTfzYsqBM7fiNNoFTpWIVmEpbD1ecY8PUIywsl6rYpabOdJjlCRxyHnDIMW
+	 obFboj9ouQBWtT6atC//ZwtkNCNWFzxJ3C4pgUuuxUW+ThIsRz6QCvtyjgPbLBHBJQ
+	 qXX1u3opw0VoTMXSqydg3hpaA9yRrVoLFDjMbbwPrOJe0G6RzF50c+G5k0PGSzb6YM
+	 Z1f6WflMt+f8A==
+Date: Sat, 30 Sep 2023 18:14:34 +0200
 From: Simon Horman <horms@kernel.org>
 To: Chengfeng Ye <dg573847474@gmail.com>
-Cc: 3chas3@gmail.com, davem@davemloft.net,
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
-Subject: Re: [PATCH] atm: solos-pci: Fix potential deadlock on
- &cli_queue_lock and &tx_queue_lock
-Message-ID: <20230930160428.GB92317@kernel.org>
-References: <20230926104442.8684-1-dg573847474@gmail.com>
+Cc: jreuter@yaina.de, ralf@linux-mips.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ax25: Fix potential deadlock on &ax25_list_lock
+Message-ID: <20230930161434.GC92317@kernel.org>
+References: <20230926105732.10864-1-dg573847474@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,105 +46,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230926104442.8684-1-dg573847474@gmail.com>
+In-Reply-To: <20230926105732.10864-1-dg573847474@gmail.com>
 
-+ David Woodhouse <dwmw2@infradead.org>
-
-On Tue, Sep 26, 2023 at 10:44:42AM +0000, Chengfeng Ye wrote:
-> As &card->cli_queue_lock and &card->tx_queue_lock are acquired under
-> softirq context along the following call chain from solos_bh(), other
-> acquisition of the same lock inside process context should disable
-> at least bh to avoid double lock.
+On Tue, Sep 26, 2023 at 10:57:32AM +0000, Chengfeng Ye wrote:
+> Timer interrupt ax25_ds_timeout() could introduce double locks on
+> &ax25_list_lock.
 > 
-> <deadlock #1>
-> console_show()
-> --> spin_lock(&card->cli_queue_lock)
-> <interrupt>
->    --> solos_bh()
->    --> spin_lock(&card->cli_queue_lock)
-> 
-> <deadlock #2>
-> pclose()
-> --> spin_lock(&card->tx_queue_lock)
-> <interrupt>
->    --> solos_bh()
->    --> fpga_tx()
->    --> spin_lock(&card->tx_queue_lock)
+> ax25_ioctl()
+> --> ax25_ctl_ioctl()
+> --> ax25_dama_off()
+> --> ax25_dev_dama_off()
+> --> ax25_check_dama_slave()
+> --> spin_lock(&ax25_list_lock)
+> <timer interrupt>
+>    --> ax25_ds_timeout()
+>    --> spin_lock(&ax25_list_lock)
 > 
 > This flaw was found by an experimental static analysis tool I am
 > developing for irq-related deadlock.
 > 
-> To prevent the potential deadlock, the patch uses spin_lock_irqsave()
-> on the two locks under process context code consistently to prevent
-> the possible deadlock scenario.
+> To prevent the potential deadlock, the patch use spin_lock_bh()
+> on &ax25_list_lock inside ax25_check_dama_slave().
+> 
+> Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
 
 Hi Chengfeng Ye,
 
 thanks for your patch.
 
-As this patch seems to fix two, albeit, similar problems,
-it should probably be split into two patches.
-
-As fixes for Networking code they should probably be targeted at the
+As a fix for Networking this should probably be targeted at the
 'net' tree. Which should be denoted in the subject.
 
-	Subject: [PATCH net] ...
+        Subject: [PATCH net] ...
 
-And as fixes the patch(es) should probably have Fixes tags.
-These ones seem appropriate to me, but I could be wrong.
+And as a fix this patch should probably have a Fixes tag.
+This ones seem appropriate to me, but I could be wrong.
 
-Fixes: 9c54004ea717 ("atm: Driver for Solos PCI ADSL2+ card.")
-Fixes: 213e85d38912 ("solos-pci: clean up pclose() function")
+Fixes: c070e51db5e2 ("ice: always add legacy 32byte RXDID in supported_rxdids")
 
-> Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+I don't think it is necessary to repost just to address these issues,
+but the Networking maintainers may think otherwise.
+
+The code change itself looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 > ---
->  drivers/atm/solos-pci.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
+>  net/ax25/ax25_ds_subr.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
-> index 94fbc3abe60e..247e9200e312 100644
-> --- a/drivers/atm/solos-pci.c
-> +++ b/drivers/atm/solos-pci.c
-> @@ -447,11 +447,12 @@ static ssize_t console_show(struct device *dev, struct device_attribute *attr,
->  	struct atm_dev *atmdev = container_of(dev, struct atm_dev, class_dev);
->  	struct solos_card *card = atmdev->dev_data;
->  	struct sk_buff *skb;
-> +	unsigned long flags;
->  	unsigned int len;
+> diff --git a/net/ax25/ax25_ds_subr.c b/net/ax25/ax25_ds_subr.c
+> index f00e27df3c76..010b11303d32 100644
+> --- a/net/ax25/ax25_ds_subr.c
+> +++ b/net/ax25/ax25_ds_subr.c
+> @@ -156,13 +156,13 @@ static int ax25_check_dama_slave(ax25_dev *ax25_dev)
+>  	ax25_cb *ax25;
+>  	int res = 0;
 >  
-> -	spin_lock(&card->cli_queue_lock);
-> +	spin_lock_irqsave(&card->cli_queue_lock, flags);
->  	skb = skb_dequeue(&card->cli_queue[SOLOS_CHAN(atmdev)]);
-> -	spin_unlock(&card->cli_queue_lock);
-> +	spin_unlock_irqrestore(&card->cli_queue_lock, flags);
->  	if(skb == NULL)
->  		return sprintf(buf, "No data.\n");
->  
-> @@ -954,16 +955,17 @@ static void pclose(struct atm_vcc *vcc)
->  	unsigned char port = SOLOS_CHAN(vcc->dev);
->  	struct sk_buff *skb, *tmpskb;
->  	struct pkt_hdr *header;
-> +	unsigned long flags;
->  
->  	/* Remove any yet-to-be-transmitted packets from the pending queue */
-> -	spin_lock(&card->tx_queue_lock);
-> +	spin_lock_irqsave(&card->tx_queue_lock, flags);
->  	skb_queue_walk_safe(&card->tx_queue[port], skb, tmpskb) {
->  		if (SKB_CB(skb)->vcc == vcc) {
->  			skb_unlink(skb, &card->tx_queue[port]);
->  			solos_pop(vcc, skb);
+> -	spin_lock(&ax25_list_lock);
+> +	spin_lock_bh(&ax25_list_lock);
+>  	ax25_for_each(ax25, &ax25_list)
+>  		if (ax25->ax25_dev == ax25_dev && (ax25->condition & AX25_COND_DAMA_MODE) && ax25->state > AX25_STATE_1) {
+>  			res = 1;
+>  			break;
 >  		}
->  	}
-> -	spin_unlock(&card->tx_queue_lock);
-> +	spin_unlock_irqrestore(&card->tx_queue_lock, flags);
+> -	spin_unlock(&ax25_list_lock);
+> +	spin_unlock_bh(&ax25_list_lock);
 >  
->  	skb = alloc_skb(sizeof(*header), GFP_KERNEL);
->  	if (!skb) {
+>  	return res;
+>  }
 > -- 
 > 2.17.1
 > 
 > 
-
--- 
-pw-bot: changes-requested
 
