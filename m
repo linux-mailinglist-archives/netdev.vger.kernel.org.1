@@ -1,48 +1,51 @@
-Return-Path: <netdev+bounces-37150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069C17B3EBF
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 09:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE1E7B3ED4
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 09:36:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C25E01C20777
-	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 07:10:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 868D0281FAB
+	for <lists+netdev@lfdr.de>; Sat, 30 Sep 2023 07:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66E323D0;
-	Sat, 30 Sep 2023 07:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094AE17EC;
+	Sat, 30 Sep 2023 07:36:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C382F17EF
-	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 07:10:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BB4C433C8;
-	Sat, 30 Sep 2023 07:10:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696057813;
-	bh=uvGD1csA5JWxarCHp9AYsOjN6Mf9w1sy7vN59u16vz0=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5CE17E9
+	for <netdev@vger.kernel.org>; Sat, 30 Sep 2023 07:36:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0279AC433C7;
+	Sat, 30 Sep 2023 07:36:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696059397;
+	bh=u+Q2YBbAuaGWTrcSYtmRkLm1uMagIDTTzw8E5LMr6DA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UO+RYsCedPI73JzxykVPefAXh/+ASlxwiOA9qJ27HKndAAIOP1hfuMNm7lXMXrSNO
-	 X0+VdhabYsih7Wq6zJOmoRsag9sO+DkhnAP5Oz9S2Ricf6PBQBWN32oRUCVGWAgzGi
-	 didA5lSJoGzH8SKrt/U2Xmgrd/2+VPxi9GkcPFvA=
-Date: Sat, 30 Sep 2023 09:10:10 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Chris Leech <cleech@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>, Rasesh Mody <rmody@marvell.com>,
-	Ariel Elior <aelior@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Nilesh Javali <njavali@marvell.com>,
-	Manish Rangankar <mrangankar@marvell.com>,
-	Jerry Snitselaar <jsnitsel@redhat.com>,
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/3] uio: introduce UIO_DMA_COHERENT type
-Message-ID: <2023093037-onion-backroom-b4ef@gregkh>
-References: <20230929170023.1020032-1-cleech@redhat.com>
- <20230929170023.1020032-2-cleech@redhat.com>
+	b=I/eB9Ij7lq/cTWTCAvkOVWa0S/19CAD++XnB9YNCmV0jmYiYJB9y+IweeBFa8hOs5
+	 cniVGLlJnSeTSM82T8xaLthgsjQNikQAkcfKT74c+ut06MZ03ZT9O6Ic11BchgzoQv
+	 A28kLMY7Oc6yhkL/RMA9NLG99+/+55fVouNtP2v6RwKTRVdXGFd3JIrv1iFmA5jx/M
+	 2l6Pk8pEo0bcDVn4NkTMX9s2qWYRzcuRN+CSCLfhHqjOeFydIvXRmGSma0+kjbfcCb
+	 H8/QcRJnz2m+5pQkCwaEond8SLbLL/QLVItHFNxwq15peUwzwNMICuenN2taFpjWrb
+	 cw32fmVbfos7Q==
+Date: Sat, 30 Sep 2023 10:36:33 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net/mlx5: fix calling mlx5_cmd_init() before DMA
+ mask is set
+Message-ID: <20230930073633.GC1296942@unreal>
+References: <20230929-mlx5_init_fix-v2-1-51ed2094c9d8@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,114 +54,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230929170023.1020032-2-cleech@redhat.com>
+In-Reply-To: <20230929-mlx5_init_fix-v2-1-51ed2094c9d8@linux.ibm.com>
 
-On Fri, Sep 29, 2023 at 10:00:21AM -0700, Chris Leech wrote:
-> Add a UIO memtype specificially for sharing dma_alloc_coherent
-> memory with userspace, backed by dma_mmap_coherent.
-
-Are you sure that you can share this type of memory with userspace
-safely?  And you are saying what you are doing here, but not why you
-want to do it and who will use it.
-
-What are the userspace implications for accessing this type of memory?
-
+On Fri, Sep 29, 2023 at 02:15:49PM +0200, Niklas Schnelle wrote:
+> Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
+> reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
+> called in probe_one() before mlx5_pci_init(). This is a problem because
+> mlx5_pci_init() is where the DMA and coherent mask is set but
+> mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+> allocation is done during probe before the correct mask is set. This
+> causes probe to fail initialization of the cmdif SW structs on s390x
+> after that is converted to the common dma-iommu code. This is because on
+> s390x DMA addresses below 4 GiB are reserved on current machines and
+> unlike the old s390x specific DMA API implementation common code
+> enforces DMA masks.
 > 
-> Signed-off-by: Chris Leech <cleech@redhat.com>
+> Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
+> probe_one() before mlx5_mdev_init(). To match the overall naming scheme
+> rename it to mlx5_dma_init().
+> 
+> Link: https://lore.kernel.org/linux-iommu/cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com/
+> Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
 > ---
->  drivers/uio/uio.c          | 34 ++++++++++++++++++++++++++++++++++
->  include/linux/uio_driver.h | 12 ++++++++++--
->  2 files changed, 44 insertions(+), 2 deletions(-)
+> Note: I ran into this while testing the linked series for converting
+> s390x to use dma-iommu. The existing s390x specific DMA API
+> implementation doesn't respect DMA masks and is thus not affected
+> despite of course also only supporting DMA addresses above 4 GiB.
+> ---
+> Changes in v2:
+> - Instead of moving the whole mlx5_pci_init() only move the
+>   set_dma_caps() call so as to keep pci_enable_device() after the FW
+>   command interface initialization (Leon)
+> - Link to v1: https://lore.kernel.org/r/20230928-mlx5_init_fix-v1-1-79749d45ce60@linux.ibm.com
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/main.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/drivers/uio/uio.c b/drivers/uio/uio.c
-> index 62082d64ece0..f8f1f7ba6378 100644
-> --- a/drivers/uio/uio.c
-> +++ b/drivers/uio/uio.c
-> @@ -24,6 +24,7 @@
->  #include <linux/kobject.h>
->  #include <linux/cdev.h>
->  #include <linux/uio_driver.h>
-> +#include <linux/dma-mapping.h>
->  
->  #define UIO_MAX_DEVICES		(1U << MINORBITS)
->  
-> @@ -759,6 +760,36 @@ static int uio_mmap_physical(struct vm_area_struct *vma)
->  			       vma->vm_page_prot);
->  }
->  
-> +static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
-> +{
-> +	struct uio_device *idev = vma->vm_private_data;
-> +	int mi = uio_find_mem_index(vma);
-> +	struct uio_mem *mem;
-> +	int rc;
-> +
-> +	if (mi < 0)
-> +		return -EINVAL;
-> +	mem = idev->info->mem + mi;
-> +
-> +	if (mem->dma_addr & ~PAGE_MASK)
-> +		return -ENODEV;
-> +	if (vma->vm_end - vma->vm_start > mem->size)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * UIO uses offset to index into the maps for a device.
-> +	 * We need to clear vm_pgoff for dma_mmap_coherent.
-> +	 */
-> +	vma->vm_pgoff = 0;
-> +	rc = dma_mmap_coherent(mem->dma_device,
-> +				vma,
-> +				mem->virtual_addr,
-> +				mem->dma_addr,
-> +				vma->vm_end - vma->vm_start);
-> +	vma->vm_pgoff = mi;
-> +	return rc;
-> +}
-> +
->  static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
->  {
->  	struct uio_listener *listener = filep->private_data;
-> @@ -806,6 +837,9 @@ static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
->  	case UIO_MEM_VIRTUAL:
->  		ret = uio_mmap_logical(vma);
->  		break;
-> +	case UIO_MEM_DMA_COHERENT:
-> +		ret = uio_mmap_dma_coherent(vma);
-> +		break;
->  	default:
->  		ret = -EINVAL;
->  	}
-> diff --git a/include/linux/uio_driver.h b/include/linux/uio_driver.h
-> index 47c5962b876b..ede58e984658 100644
-> --- a/include/linux/uio_driver.h
-> +++ b/include/linux/uio_driver.h
-> @@ -36,11 +36,18 @@ struct uio_map;
->   */
->  struct uio_mem {
->  	const char		*name;
-> -	phys_addr_t		addr;
-> +	union {
-> +		phys_addr_t	addr;
-> +		dma_addr_t	dma_addr;
-> +	};
->  	unsigned long		offs;
->  	resource_size_t		size;
->  	int			memtype;
-> -	void __iomem		*internal_addr;
-> +	union {
-> +		void __iomem	*internal_addr;
-> +		void 		*virtual_addr;
-> +	};
-> +	struct device		*dma_device;
 
-Why are you adding a new struct device here?
-
-And why the unions?  How are you going to verify that they are being
-used correctly?  What space savings are you attempting to do here and
-why?
-
-thanks,
-
-greg k-h
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
