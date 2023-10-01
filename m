@@ -1,83 +1,99 @@
-Return-Path: <netdev+bounces-37291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCA67B48CF
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 19:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A987B48EE
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 19:46:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 782CBB20998
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id E497D1C2074E
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EBE171D5;
-	Sun,  1 Oct 2023 17:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C1018B17;
+	Sun,  1 Oct 2023 17:46:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEFCBD290;
-	Sun,  1 Oct 2023 17:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D0EAC433C9;
-	Sun,  1 Oct 2023 17:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DCED2E1
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 17:46:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B0DC433C7;
+	Sun,  1 Oct 2023 17:46:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696180823;
-	bh=QYgny6PwNamG5NS8GHQ8VLOhaddeQzPUUx73boo7bBs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K/piiXxbampS+I1nE0kyK+HeWXLbcdtdnG/g/neTS/MFDlM/HPyr1hcO2lwtb63wa
-	 rt1sGW494KFWSPkqQ/it+E9Y5RlwaTNsHF4Wp4enzX/PnvP0vh7qTg2tSdsdfptrQs
-	 ijCkeKQ4rOLMlT+gtrso3TSxicJaFN6Y9oDoz/f1GXLRwXTqIoIdo1d5tLykpqodML
-	 kCBuKeQZmnCNMyXKqD8tmSsNZKUJxi2oiAleAGaksmx2vUFzz6hFnAcMlCxiNq3Mrk
-	 RHDHIdlWtsOLPAPcRhhgl7Yyk7kMnqerTtuDL2j+pB5vFGdLHiDEdlOHSpErEC/566
-	 kqTAGos+F/MOg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 019AAC64457;
-	Sun,  1 Oct 2023 17:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696182389;
+	bh=YiZtbJcNhba/FnrOoweiMtTxQ8gd/lsjKmXTBE+vY+k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s/tkNt2PigdOcZY9y6/dEg6esD8e+2u5pg/1Jhss6mXGSAFpZaHCTwf3AkFc7cXCT
+	 YzIM94Ut+K9YczwebYxrcIUQNWWR/xaVFtiw/nxJPphO9B3Vz8ru56uRhpRuJ76PTU
+	 kdZdge/r+V6WX7p3xIxPGz1xTbEm41NpIQMPqzJMmR+uWAeKfBc27z/V6zEq1rzpYq
+	 zBMneWhBVr8a8gA3hk4MEOyA5/XeS/UcRtcmxHmX6+geYf/YlCxrCSt8XvEnoG1QSv
+	 k8cQT6p/Hey7pYMih2bQdmUUUKa1Vvyilw/HfFunERZRw1abLtMW4c1QM/ldkeLQ9E
+	 uOZ1Ax/tYIaow==
+Date: Sun, 1 Oct 2023 19:46:25 +0200
+From: Simon Horman <horms@kernel.org>
+To: Chengfeng Ye <dg573847474@gmail.com>
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] tipc: fix a potential deadlock on &tx->lock
+Message-ID: <20231001174625.GR92317@kernel.org>
+References: <20230927181414.59928-1-dg573847474@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] ipv4,
- ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169618082300.17513.8154196586548656981.git-patchwork-notify@kernel.org>
-Date: Sun, 01 Oct 2023 17:20:23 +0000
-References: <730408.1695292879@warthog.procyon.org.uk>
-In-Reply-To: <730408.1695292879@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org,
- syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com, edumazet@google.com,
- willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, bpf@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230927181414.59928-1-dg573847474@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 21 Sep 2023 11:41:19 +0100 you wrote:
-> Including the transhdrlen in length is a problem when the packet is
-> partially filled (e.g. something like send(MSG_MORE) happened previously)
-> when appending to an IPv4 or IPv6 packet as we don't want to repeat the
-> transport header or account for it twice.  This can happen under some
-> circumstances, such as splicing into an L2TP socket.
+On Wed, Sep 27, 2023 at 06:14:14PM +0000, Chengfeng Ye wrote:
+> It seems that tipc_crypto_key_revoke() could be be invoked by
+> wokequeue tipc_crypto_work_rx() under process context and
+> timer/rx callback under softirq context, thus the lock acquisition
+> on &tx->lock seems better use spin_lock_bh() to prevent possible
+> deadlock.
 > 
-> The symptom observed is a warning in __ip6_append_data():
+> This flaw was found by an experimental static analysis tool I am
+> developing for irq-related deadlock.
 > 
-> [...]
+> tipc_crypto_work_rx() <workqueue>
+> --> tipc_crypto_key_distr()
+> --> tipc_bcast_xmit()
+> --> tipc_bcbase_xmit()
+> --> tipc_bearer_bc_xmit()
+> --> tipc_crypto_xmit()
+> --> tipc_ehdr_build()
+> --> tipc_crypto_key_revoke()
+> --> spin_lock(&tx->lock)
+> <timer interrupt>
+>    --> tipc_disc_timeout()
+>    --> tipc_bearer_xmit_skb()
+>    --> tipc_crypto_xmit()
+>    --> tipc_ehdr_build()
+>    --> tipc_crypto_key_revoke()
+>    --> spin_lock(&tx->lock) <deadlock here>
+> 
+> Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
 
-Here is the summary with links:
-  - [net,v3] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
-    https://git.kernel.org/netdev/net/c/9d4c75800f61
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Hi Chengfeng Ye,
 
+thanks for your patch.
 
+As a fix for Networking this should probably be targeted at the
+'net' tree. Which should be denoted in the subject.
+
+        Subject: [PATCH net] ...
+
+And as a fix this patch should probably have a Fixes tag.
+This ones seem appropriate to me, but I could be wrong.
+
+Fixes: fc1b6d6de220 ("tipc: introduce TIPC encryption & authentication")
+
+I don't think it is necessary to repost just to address these issues,
+but the Networking maintainers may think otherwise.
+
+The code change itself looks good to me.
 
