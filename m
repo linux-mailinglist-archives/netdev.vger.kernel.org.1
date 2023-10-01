@@ -1,226 +1,106 @@
-Return-Path: <netdev+bounces-37270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6888B7B4825
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:50:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57107B482D
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 819BE1C20444
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:50:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 31949B20A61
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA74AFBE5;
-	Sun,  1 Oct 2023 14:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B05FBFA;
+	Sun,  1 Oct 2023 14:51:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53BD2561
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:50:32 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267D3A9;
-	Sun,  1 Oct 2023 07:50:28 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 0F0B75C2C29;
-	Sun,  1 Oct 2023 10:50:25 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute5.internal (MEProxy); Sun, 01 Oct 2023 10:50:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1696171825; x=1696258225; bh=mEMutYlrVNpsS
-	g7pWqpRwU1aONJ27VWy6905pdrkIqI=; b=clRr215/arKhXy6mDtuOWYOvKNH/O
-	plIeU3G7c7h4aFie7RVwb33h4LHvbvXn8zJTz7R/3xSWD3WDLq/ute/eGezCWVzh
-	OYgi2D2hI+xO/W4R/g9Ehrv3uDTZGHYqKCHK5euZ7aUlZjbhaGJBu+ajulSSCfPT
-	6rHnYNeCj6Fqw46XpFYRxCPT2DY7Kuk5luqvn0oJ5z690YucYgeEPWot3FAYc+Kc
-	x0IeNhdqKgTDY5zJEHmMiQ+F2DkGXsrG/1N3LJ4d8XtaerOMjaZoX0zRq1a2LDwN
-	/y3a6pMLqHSv1uF6jRYtOmtOzxy0P0cwCJr2guHVHloRN5oQNH5JJ9/eA==
-X-ME-Sender: <xms:MIcZZWVbvahzZh2oj7kR-Z5QrhM-UuCJPJihvrvEO3e1K5l80bAFpg>
-    <xme:MIcZZSnEzheXxG1Mfk9Ir-1ZY4kW5uldSfpWkJ0MHLTd41dn9KVzybmAwjq6qinw4
-    9PO2oOQyFVvmLg>
-X-ME-Received: <xmr:MIcZZaazckKZ_FxHkRZBpZuZZpSD6Z2qISNbHdoQqDavIf3FsvlH8k_GX5Cy>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddugddulecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeetgeejteeivedvheekgeeiheehvedvveefgffgudekgfffheehgeeivdejgeei
-    udenucffohhmrghinhepshgvlhhfthgvshhtshdrnhgvthdpkhgvrhhnvghlqdhsvghlfh
-    htvghsthhsrdhnvghtpdhkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-    necurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:MIcZZdUNKS4M8JNImwQOwxYoBwMqWmu8WA4PTdT7n7Ke58TwVfuLiQ>
-    <xmx:MIcZZQkGiDxb77mbQN1auwagngkQ29-jAGAlk6McHypLQ-7zxObD6w>
-    <xmx:MIcZZSdEidrF1POPDZIShTlrCKpBQ5kxsqiYMvEc8vHv6RkCoI7Pqg>
-    <xmx:MYcZZRCyPV4ExQyo7dDtkRJyPBEQxCoW9RY803Ld7eIpPaeUeWolsA>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 1 Oct 2023 10:50:24 -0400 (EDT)
-Date: Sun, 1 Oct 2023 17:50:20 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>, oliver.sang@intel.com
-Cc: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
-	"lkp@intel.com" <lkp@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [linus:master] [selftests]  8ae9efb859:
- kernel-selftests.net.fib_tests.sh.fail
-Message-ID: <ZRmHLPbyTCBvoHWP@shredder>
-References: <202309191658.c00d8b8-oliver.sang@intel.com>
- <DBBP189MB1433CECC6CBECFD95352EA3595FCA@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD679CA61
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:51:08 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E4AD9
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 07:51:05 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a1d352a86dso175254277b3.0
+        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 07:51:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696171865; x=1696776665; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=lwp1oyRF3ChLSaRi+yID2JlXBWV6npwVkf3uYhTAXgk=;
+        b=ugT7fowZl64JQSM8ydVJXb3wST7q0KI/469ZyGXZWWmLSpUWPfG9e5SzLPi6Q296Md
+         VuWJhHegra8Q8RNGllxUwKFj1J2UH/sJRKz0lAKSQafeJgtwtJoUJQ5+Zpsfm8jRRv2g
+         hG8l1QZnQso78FcJo84MYMm6ZRXmuQG0gszKmDCUwYwzHv+Ovx4Bwa0u1LmKVnSpIH9R
+         60cG83JT23mGZQCD9GZjUUCFs0Grh0zd1Hv4uxXiYAcG56+SFO307SNMERxgHvNhHvWG
+         lm2XJ2lwoVx51tEXuDseXqj1XG8GSzL6LIkGX1e4DDL6gx+6qR9fN4TizQhaU3mEXZkY
+         +fug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696171865; x=1696776665;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lwp1oyRF3ChLSaRi+yID2JlXBWV6npwVkf3uYhTAXgk=;
+        b=jHS1usRc3kowEyGNUYU+jiMUVlTctQGksQ3CLbYSfKPl4uyR/cklU8v60efA/99Ayw
+         +6ko1tZis6zUfkRDqT2uxZ9xqJ5FsaGnenxY5Yd7it+v4RLBU427+1caTrK68t74+t+d
+         YjVfQ88UguNTSgcOykltagCEktsx/Fsn1ioRHBkqR/wTmrw8xVldJz8FCzsH+kMKtHpE
+         HxIchs1zOPdlaQbSoGv8ly8vXLQesXlMZRPffnwTDCLzkwL+x1gp/dJSe58ZhP2fFJsb
+         uSHLh5ShC3pe56IGu1d6I/og+LShB4ikwzPSgijpu4KBCyCLI94Nwfr6Yj1i24EVwTQD
+         hocw==
+X-Gm-Message-State: AOJu0YwFkpI6kbqXFCBjl7XyVw3+2PeIMRDRz6qZQx+fyFr6Yp4s0AgX
+	KSemhbmv22ksmZ0SQAn4WrwD50ZAHnmOvQ==
+X-Google-Smtp-Source: AGHT+IGQ91ncwXhvbSTxr5ubXGiYeZXicVNsWO1Qvt+WmzBvurN7Q66iVZjr4vr12a5ZoNgqpH2rZdPdpaSkdA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:e013:0:b0:d80:ff9:d19e with SMTP id
+ x19-20020a25e013000000b00d800ff9d19emr155779ybg.9.1696171864644; Sun, 01 Oct
+ 2023 07:51:04 -0700 (PDT)
+Date: Sun,  1 Oct 2023 14:50:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DBBP189MB1433CECC6CBECFD95352EA3595FCA@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
+Message-ID: <20231001145102.733450-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] net_sched: sch_fq: add WRR scheduling and 3 bands
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, Soheil Hassas Yeganeh <soheil@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Sep 25, 2023 at 06:18:34PM +0000, Sriram Yagnaraman wrote:
-> CC: Ido, who helped a lot with writing these tests.
-> 
-> > -----Original Message-----
-> > From: kernel test robot <oliver.sang@intel.com>
-> > Sent: Tuesday, 19 September 2023 10:32
-> > To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
-> > Cc: oe-lkp@lists.linux.dev; lkp@intel.com; linux-kernel@vger.kernel.org; David
-> > S. Miller <davem@davemloft.net>; netdev@vger.kernel.org;
-> > oliver.sang@intel.com
-> > Subject: [linus:master] [selftests] 8ae9efb859: kernel-
-> > selftests.net.fib_tests.sh.fail
-> > 
-> > 
-> > hi, Sriram Yagnaraman,
-> > 
-> > we noticed two new added tests failed in our test environment.
-> > want to consult with you what's the dependency and requirement to run
-> > them?
-> > Thanks a lot!
-> 
-> Sorry for the delayed response. I will look at this and get back.
-> I am not an expert with lkp-tests but will try to set it up on my local environment and reproduce the problem.
-> 
-> > 
-> > Hello,
-> > 
-> > kernel test robot noticed "kernel-selftests.net.fib_tests.sh.fail" on:
-> > 
-> > commit: 8ae9efb859c05a54ac92b3336c6ca0597c9c8cdb ("selftests: fib_tests:
-> > Add multipath list receive tests")
-> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> > 
-> > in testcase: kernel-selftests
-> > version: kernel-selftests-x86_64-60acb023-1_20230329
-> > with following parameters:
-> > 
-> > 	group: net
-> > 
-> > 
-> > 
-> > compiler: gcc-12
-> > test machine: 36 threads 1 sockets Intel(R) Core(TM) i9-10980XE CPU @
-> > 3.00GHz (Cascade Lake) with 32G memory
-> > 
-> > (please refer to attached dmesg/kmsg for entire log/backtrace)
-> > 
-> > 
-> > 
-> > 
-> > If you fix the issue in a separate patch/commit (i.e. not just a new version of the
-> > same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <oliver.sang@intel.com>
-> > | Closes:
-> > | https://lore.kernel.org/oe-lkp/202309191658.c00d8b8-oliver.sang@intel.
-> > | com
-> > 
-> > 
-> > 
-> > # timeout set to 1500
-> > # selftests: net: fib_tests.sh
-> > #
-> > # Single path route test
-> > #     Start point
-> > #     TEST: IPv4 fibmatch                                                 [ OK ]
-> > #     TEST: IPv6 fibmatch                                                 [ OK ]
-> > #     Nexthop device deleted
-> > #     TEST: IPv4 fibmatch - no route                                      [ OK ]
-> > #     TEST: IPv6 fibmatch - no route                                      [ OK ]
-> > 
-> > ...
-> > 
-> > #
-> > # Fib6 garbage collection test
-> > #     TEST: ipv6 route garbage collection                                 [ OK ]
-> > #
-> > # IPv4 multipath list receive tests
-> > #     TEST: Multipath route hit ratio (.06)                               [FAIL]
-> > #
-> > # IPv6 multipath list receive tests
-> > #     TEST: Multipath route hit ratio (.10)                               [FAIL]
+As discussed in Netconf 2023 in Paris last week, this series adds
+to FQ the possibility of replacing pfifo_fast for most setups.
 
-I found two possible problems. The first is that in the IPv4 case we
-might get more trace point hits than packets (ratio higher than 1)
-because of the additional FIB lookups for source validation. Fixed by
-disabling source validation:
+FQ provides fairness among flows, but malicious applications
+can cause problems by using thousands of sockets.
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index e7d2a530618a..66d0db7a2614 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -2437,6 +2437,9 @@ ipv4_mpath_list_test()
-        run_cmd "ip -n ns2 route add 203.0.113.0/24
-                nexthop via 172.16.201.2 nexthop via 172.16.202.2"
-        run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.fib_multipath_hash_policy=1"
-+       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.veth2.rp_filter=0"
-+       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.all.rp_filter=0"
-+       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.default.rp_filter=0"
-        set +e
- 
-        local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
+Having 3 bands like pfifo_fast can make sure that applications
+using high prio packets (eg AF4) can get guaranteed throughput
+even if thousands of low priority flows are competing.
 
-The second problem (which I believe is the one you encountered) is that
-we might miss certain trace point hits if they happen from the ksoftirqd
-task instead of the mausezahn task. Fixed by:
+Added complexity in FQ does not matter in many cases when/if
+fastpath added in the prior series is used.
 
-@@ -2449,7 +2452,7 @@ ipv4_mpath_list_test()
-        # words, the FIB lookup tracepoint needs to be triggered for every
-        # packet.
-        local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
--       run_cmd "perf stat -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-+       run_cmd "perf stat -a -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-        local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-        local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
-        list_rcv_eval $tmp_file $diff
-@@ -2494,7 +2497,7 @@ ipv6_mpath_list_test()
-        # words, the FIB lookup tracepoint needs to be triggered for every
-        # packet.
-        local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
--       run_cmd "perf stat -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-+       run_cmd "perf stat -a -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
-        local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
-        local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
-        list_rcv_eval $tmp_file $diff
+Eric Dumazet (4):
+  net_sched: sch_fq: remove q->ktime_cache
+  net_sched: export pfifo_fast prio2band[]
+  net_sched: sch_fq: add 3 bands and WRR scheduling
+  net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
 
-Ran both tests in a loop:
+ include/net/sch_generic.h      |   1 +
+ include/uapi/linux/pkt_sched.h |  14 +-
+ net/sched/sch_fq.c             | 263 ++++++++++++++++++++++++++-------
+ net/sched/sch_generic.c        |   9 +-
+ 4 files changed, 226 insertions(+), 61 deletions(-)
 
-# for i in $(seq 1 20); do ./fib_tests.sh -t ipv4_mpath_list; done
-# for i in $(seq 1 20); do ./fib_tests.sh -t ipv6_mpath_list; done
+-- 
+2.42.0.582.g8ccd20d70d-goog
 
-And verified that the results are stable. Also verified that the tests
-reliably fail when reverting both fixes:
-
-8423be8926aa ipv6: ignore dst hint for multipath routes
-6ac66cb03ae3 ipv4: ignore dst hint for multipath routes
-
-Can you please test with the proposed modifications?
-
-Thanks
 
