@@ -1,157 +1,245 @@
-Return-Path: <netdev+bounces-37278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042767B484A
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:06:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6837B484D
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A71E6282192
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 15:06:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 78D0B282192
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 15:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392E517992;
-	Sun,  1 Oct 2023 15:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478161799C;
+	Sun,  1 Oct 2023 15:07:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEB85247
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 15:06:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74742C433C8;
-	Sun,  1 Oct 2023 15:06:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696172780;
-	bh=9ycBs/E3VKS6FnpElHe45CjMEj/JLsMAiH7Cxekezfg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iGaVcmNlL1Th/q7bXrsSf7Af9cMxocqLPPL22Gm0cRR718UC9BwfNe8Fe8I6YteO1
-	 9DDKFhYWam+g/ldoVc/+KqrbgM+JMA7fXm8NvYvsa5pRf1gP2Th9dVC0woJtkdyfvX
-	 iEVcm61Knx1e0c+JIMY8g2gZUrCwSxIuj7ORR++yiAKXYlGbO6r3dbhWTdGPVlVhLu
-	 kt6iUbTgQbSsXYZ7cx4P3ArDejlP1Gv6yEg7zCnKq9O/tJffbnw1ngeeIE84DAHCxF
-	 l1c2hhYWRmk7lXygbVU34U313+VYtd17eTbrnhfMmFJC+oDw5duVCnkDH/49j6ZNXO
-	 SBtZHSq2YFezQ==
-Date: Sun, 1 Oct 2023 17:06:15 +0200
-From: Simon Horman <horms@kernel.org>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
-	chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com,
-	ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
-	alex.maftei@amd.com, davem@davemloft.net, rrameshbabu@nvidia.com,
-	shuah@kernel.org
-Subject: Re: [PATCH net-next v3 2/3] ptp: support multiple timestamp event
- readers
-Message-ID: <20231001150615.GP92317@kernel.org>
-References: <20230928133544.3642650-1-reibax@gmail.com>
- <20230928133544.3642650-3-reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF88715496
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 15:07:53 +0000 (UTC)
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93570D9;
+	Sun,  1 Oct 2023 08:07:51 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-4197bb0a0d9so16751441cf.3;
+        Sun, 01 Oct 2023 08:07:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696172870; x=1696777670; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uUcV+Z9d+ZbN189XwOZEn5wIKxAIgH34VNcGHPGRlFI=;
+        b=dx6pheS6I84feKP9kd9bGRi+MufB4OhUSmympxyi7CYNnG+zc+U/gfZtT/wPAbdPWi
+         Q9oNW6kp8qKsDftJIBRjZsP/av7LD8Ot7DFVpbT9L92sf2md4z6KDVPYYmIC98VFSpFW
+         vnkKZ5ijKHyEM3LaZrD0Vzk5p6zAnkla1YulEnEQupNYHzEVHzC1pJm6o8pYXau+3vKc
+         DGEyqXwbRc6eJ5ZxGEmMViGtv48+sEmr10Idh5TYmYs6ztNmFd2cHufnfP/p7ZaX2lZ7
+         P9bbwXqcSPkPOPsxEhEvROjQWuYunhfS3oHWvBkTF4T7fUU7ZhHqz+5nt9UCp7P/tLKw
+         N55A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696172870; x=1696777670;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uUcV+Z9d+ZbN189XwOZEn5wIKxAIgH34VNcGHPGRlFI=;
+        b=DclKkXwGmbXJIyWV2v4Ws+VKR7rdFiZ+0kMsmzAT8zmzoXALzJbTYfN6GqpGpjWW2w
+         K5c2eMtrb7H2L5Tp2IJ0SHkbfy/kXJJ5B0OynhkoSVIIBo41wk4Tsf/g4dH4AVStVdZy
+         SSwrcBjLLS/hFj62smrqLoIG5aLrsH4q1rLqOBgtUY1HLokCxVsYrHUh+OvPKUsL18Hn
+         +V3ehQymjzBHDAJ4iW8YR2BTboATwPoArktotABUWWosuaqNooK3EEl88/IKsm/3AU/x
+         Mn6ZtQoI4yI7V32GAaaVupvtQmyMlZfIkgwu8WkKRQuFAOu9Ig08l1NMgifs85KtdDLa
+         YGFQ==
+X-Gm-Message-State: AOJu0YxvgzE75BoDMQhniioYXnRgTWzLgYxK7hupflAR3mOU8Q479Y7D
+	km4J5pwwfz6P8oCggyqdvvke8mSh5hZX5A==
+X-Google-Smtp-Source: AGHT+IGuhEsxgWFjtArRcyX04Q3eCD+hFfxJv09vftqdRE+XjdoUqH4x+ybNbgVRF6zU/iK+MCU0Mw==
+X-Received: by 2002:a05:622a:1047:b0:417:9e48:44d7 with SMTP id f7-20020a05622a104700b004179e4844d7mr11351168qte.1.1696172870159;
+        Sun, 01 Oct 2023 08:07:50 -0700 (PDT)
+Received: from wsfd-netdev15.ntdv.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id jv24-20020a05622aa09800b00417d56d432asm8074938qtb.40.2023.10.01.08.07.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Oct 2023 08:07:49 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	netfilter-devel@vger.kernel.org,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH nf] netfilter: handle the connecting collision properly in nf_conntrack_proto_sctp
+Date: Sun,  1 Oct 2023 11:07:48 -0400
+Message-Id: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.39.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230928133544.3642650-3-reibax@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 03:35:43PM +0200, Xabier Marquiegui wrote:
-> Use linked lists to create one event queue per open file. This enables
-> simultaneous readers for timestamp event queues.
-> 
-> Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
-> Suggested-by: Richard Cochran <richardcochran@gmail.com>
+In Scenario A and B below, as the delayed INIT_ACK always changes the peer
+vtag, SCTP ct with the incorrect vtag may cause packet loss.
 
-Hi Xabier,
+Scenario A: INIT_ACK is delayed until the peer receives its own INIT_ACK
 
-some minor feedback from Smatch via myself follows.
+  192.168.1.2 > 192.168.1.1: [INIT] [init tag: 1328086772]
+    192.168.1.1 > 192.168.1.2: [INIT] [init tag: 1414468151]
+    192.168.1.2 > 192.168.1.1: [INIT ACK] [init tag: 1328086772]
+  192.168.1.1 > 192.168.1.2: [INIT ACK] [init tag: 1650211246] *
+  192.168.1.2 > 192.168.1.1: [COOKIE ECHO]
+    192.168.1.1 > 192.168.1.2: [COOKIE ECHO]
+    192.168.1.2 > 192.168.1.1: [COOKIE ACK]
 
-> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-> index 197edf1179f1..65e7acaa40a9 100644
-> --- a/drivers/ptp/ptp_chardev.c
-> +++ b/drivers/ptp/ptp_chardev.c
-> @@ -101,14 +101,74 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
->  	return 0;
->  }
->  
-> -int ptp_open(struct posix_clock *pc, fmode_t fmode)
-> +int ptp_open(struct posix_clock_user *pcuser, fmode_t fmode)
->  {
-> +	struct ptp_clock *ptp =
-> +		container_of(pcuser->clk, struct ptp_clock, clock);
-> +	struct ida *ida = ptp_get_tsevq_ida(ptp);
-> +	struct timestamp_event_queue *queue;
-> +
-> +	if (!ida)
-> +		return -EINVAL;
-> +	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
-> +	if (!queue)
-> +		return -EINVAL;
-> +	queue->close_req = false;
-> +	queue->reader_pid = task_pid_nr(current);
-> +	spin_lock_init(&queue->lock);
-> +	queue->ida = ida;
-> +	queue->oid = ida_alloc(ida, GFP_KERNEL);
-> +	if (queue->oid < 0) {
-> +		kfree(queue);
+Scenario B: INIT_ACK is delayed until the peer completes its own handshake
 
-queue is freed on the line above but dereferenced on the line below.
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+    192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+    192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 3922216408]
+    192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
+    192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
+  192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021] *
 
-As flagged by Smatch.
+This patch fixes it as below:
 
-> +		return queue->oid;
-> +	}
-> +	list_add_tail(&queue->qlist, &ptp->tsevqs);
-> +	pcuser->private_clkdata = queue;
-> +
->  	return 0;
->  }
+In SCTP_CID_INIT processing:
+- clear ct->proto.sctp.init[!dir] if ct->proto.sctp.init[dir] &&
+  ct->proto.sctp.init[!dir]. (Scenario E)
+- set ct->proto.sctp.init[dir].
 
-...
+In SCTP_CID_INIT_ACK processing:
+- drop it if !ct->proto.sctp.init[!dir] && ct->proto.sctp.vtag[!dir] &&
+  ct->proto.sctp.vtag[!dir] != ih->init_tag. (Scenario B, Scenario C)
+- drop it if ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir] &&
+  ct->proto.sctp.vtag[!dir] != ih->init_tag. (Scenario A)
 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+In SCTP_CID_COOKIE_ACK processing:
+- clear ct->proto.sctp.init[dir] and ct->proto.sctp.init[!dir]. (Scenario D)
 
-...
+Also, it's important to allow the ct state to move forward with cookie_echo
+and cookie_ack from the opposite dir for the collision scenarios.
 
-> @@ -243,15 +275,23 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	ptp->devid = MKDEV(major, index);
->  	ptp->index = index;
->  	INIT_LIST_HEAD(&ptp->tsevqs);
-> +	INIT_LIST_HEAD(&ptp->closed_tsevqs);
->  	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
->  	if (!queue)
->  		goto no_memory_queue;
-> +	queue->close_req = false;
-> +	queue->ida = kzalloc(sizeof(*queue->ida), GFP_KERNEL);
-> +	if (!queue->ida)
-> +		goto no_memory_queue;
+There are also other Scenarios where it should allow the packet through,
+addressed by the processing above:
 
-It's not clear to me that queue isn't leaked here.
+Scenario C: new CT is created by INIT_ACK.
 
-As flagged by Smatch.
+Scenario D: start INIT on the existing ESTABLISHED ct.
 
-> +	ida_init(queue->ida);
->  	spin_lock_init(&queue->lock);
->  	list_add_tail(&queue->qlist, &ptp->tsevqs);
-> -	/* TODO - Transform or delete this mutex */
-> -	mutex_init(&ptp->tsevq_mux);
-> +	queue->oid = ida_alloc(queue->ida, GFP_KERNEL);
-> +	if (queue->oid < 0)
-> +		goto ida_err;
->  	mutex_init(&ptp->pincfg_mux);
->  	mutex_init(&ptp->n_vclocks_mux);
-> +	mutex_init(&ptp->close_mux);
->  	init_waitqueue_head(&ptp->tsev_wq);
->  
->  	if (ptp->info->getcycles64 || ptp->info->getcyclesx64) {
-> @@ -350,9 +390,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  	if (ptp->kworker)
->  		kthread_destroy_worker(ptp->kworker);
->  kworker_err:
-> -	mutex_destroy(&ptp->tsevq_mux);
->  	mutex_destroy(&ptp->pincfg_mux);
->  	mutex_destroy(&ptp->n_vclocks_mux);
-> +	mutex_destroy(&ptp->close_mux);
-> +ida_err:
->  	ptp_clean_queue_list(ptp);
->  no_memory_queue:
->  	ida_free(&ptp_clocks_map, index);
+Scenario E: start INIT after the old collision on the existing ESTABLISHED ct.
 
-...
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+  192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+  (both side are stopped, then start new connection again in hours)
+  192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 242308742]
+
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ include/linux/netfilter/nf_conntrack_sctp.h |  1 +
+ net/netfilter/nf_conntrack_proto_sctp.c     | 41 ++++++++++++++++-----
+ 2 files changed, 33 insertions(+), 9 deletions(-)
+
+diff --git a/include/linux/netfilter/nf_conntrack_sctp.h b/include/linux/netfilter/nf_conntrack_sctp.h
+index 625f491b95de..fb31312825ae 100644
+--- a/include/linux/netfilter/nf_conntrack_sctp.h
++++ b/include/linux/netfilter/nf_conntrack_sctp.h
+@@ -9,6 +9,7 @@ struct ip_ct_sctp {
+ 	enum sctp_conntrack state;
+ 
+ 	__be32 vtag[IP_CT_DIR_MAX];
++	u8 init[IP_CT_DIR_MAX];
+ 	u8 last_dir;
+ 	u8 flags;
+ };
+diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
+index b6bcc8f2f46b..91aee286d503 100644
+--- a/net/netfilter/nf_conntrack_proto_sctp.c
++++ b/net/netfilter/nf_conntrack_proto_sctp.c
+@@ -112,7 +112,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] = {
+ /* shutdown_ack */ {sSA, sCL, sCW, sCE, sES, sSA, sSA, sSA, sSA},
+ /* error        */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},/* Can't have Stale cookie*/
+ /* cookie_echo  */ {sCL, sCL, sCE, sCE, sES, sSS, sSR, sSA, sCL},/* 5.2.4 - Big TODO */
+-/* cookie_ack   */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},/* Can't come in orig dir */
++/* cookie_ack   */ {sCL, sCL, sCW, sES, sES, sSS, sSR, sSA, sCL},/* Can't come in orig dir */
+ /* shutdown_comp*/ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sCL, sCL},
+ /* heartbeat    */ {sHS, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
+ /* heartbeat_ack*/ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
+@@ -126,7 +126,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] = {
+ /* shutdown     */ {sIV, sCL, sCW, sCE, sSR, sSS, sSR, sSA, sIV},
+ /* shutdown_ack */ {sIV, sCL, sCW, sCE, sES, sSA, sSA, sSA, sIV},
+ /* error        */ {sIV, sCL, sCW, sCL, sES, sSS, sSR, sSA, sIV},
+-/* cookie_echo  */ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sSA, sIV},/* Can't come in reply dir */
++/* cookie_echo  */ {sIV, sCL, sCE, sCE, sES, sSS, sSR, sSA, sIV},/* Can't come in reply dir */
+ /* cookie_ack   */ {sIV, sCL, sCW, sES, sES, sSS, sSR, sSA, sIV},
+ /* shutdown_comp*/ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sCL, sIV},
+ /* heartbeat    */ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
+@@ -412,6 +412,9 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
+ 			/* (D) vtag must be same as init_vtag as found in INIT_ACK */
+ 			if (sh->vtag != ct->proto.sctp.vtag[dir])
+ 				goto out_unlock;
++		} else if (sch->type == SCTP_CID_COOKIE_ACK) {
++			ct->proto.sctp.init[dir] = 0;
++			ct->proto.sctp.init[!dir] = 0;
+ 		} else if (sch->type == SCTP_CID_HEARTBEAT) {
+ 			if (ct->proto.sctp.vtag[dir] == 0) {
+ 				pr_debug("Setting %d vtag %x for dir %d\n", sch->type, sh->vtag, dir);
+@@ -461,16 +464,18 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
+ 		}
+ 
+ 		/* If it is an INIT or an INIT ACK note down the vtag */
+-		if (sch->type == SCTP_CID_INIT ||
+-		    sch->type == SCTP_CID_INIT_ACK) {
+-			struct sctp_inithdr _inithdr, *ih;
++		if (sch->type == SCTP_CID_INIT) {
++			struct sctp_inithdr _ih, *ih;
+ 
+-			ih = skb_header_pointer(skb, offset + sizeof(_sch),
+-						sizeof(_inithdr), &_inithdr);
++			ih = skb_header_pointer(skb, offset + sizeof(_sch), sizeof(*ih), &_ih);
+ 			if (ih == NULL)
+ 				goto out_unlock;
+-			pr_debug("Setting vtag %x for dir %d\n",
+-				 ih->init_tag, !dir);
++
++			if (ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir])
++				ct->proto.sctp.init[!dir] = 0;
++			ct->proto.sctp.init[dir] = 1;
++
++			pr_debug("Setting vtag %x for dir %d\n", ih->init_tag, !dir);
+ 			ct->proto.sctp.vtag[!dir] = ih->init_tag;
+ 
+ 			/* don't renew timeout on init retransmit so
+@@ -481,6 +486,24 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
+ 			    old_state == SCTP_CONNTRACK_CLOSED &&
+ 			    nf_ct_is_confirmed(ct))
+ 				ignore = true;
++		} else if (sch->type == SCTP_CID_INIT_ACK) {
++			struct sctp_inithdr _ih, *ih;
++			u32 vtag;
++
++			ih = skb_header_pointer(skb, offset + sizeof(_sch), sizeof(*ih), &_ih);
++			if (ih == NULL)
++				goto out_unlock;
++
++			vtag = ct->proto.sctp.vtag[!dir];
++			if (!ct->proto.sctp.init[!dir] && vtag && vtag != ih->init_tag)
++				goto out_unlock;
++			/* collision */
++			if (ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir] &&
++			    vtag != ih->init_tag)
++				goto out_unlock;
++
++			pr_debug("Setting vtag %x for dir %d\n", ih->init_tag, !dir);
++			ct->proto.sctp.vtag[!dir] = ih->init_tag;
+ 		}
+ 
+ 		ct->proto.sctp.state = new_state;
+-- 
+2.39.1
+
 
