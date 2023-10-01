@@ -1,85 +1,70 @@
-Return-Path: <netdev+bounces-37257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25DD7B474F
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:20:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 409047B4757
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 13F84B2096C
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 12:20:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id C127CB20978
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 12:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D8F17721;
-	Sun,  1 Oct 2023 12:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CE917728;
+	Sun,  1 Oct 2023 12:22:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671DE5666
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 12:20:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CC4ABC433C9;
-	Sun,  1 Oct 2023 12:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8470168B6
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 12:22:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87D5AC433C8;
+	Sun,  1 Oct 2023 12:22:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696162829;
-	bh=I38svwnmcb+sPcAQD1YVln6VjsiOXPPcFSO3nDIBelc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XFBEsrmLvXV/LRvwC2txQNUwtt5l54becjWRmhhvyWJ4JlxgTtYZJUefpkPRdK7jp
-	 TEfimQXSJ05yJ67uc6pb8YCAQWIunXbVa+ahQOvyLTfMdIrWQFEdqE4YL+fRbVIj4x
-	 edy7d1OL0ajYz1hoOqnVxMjLKEY3VEwpXUGzHjdXvT4m+n7lq/gzLAgNiybtH48kdK
-	 mvbpFv82a+7Eb5jYDYSj50g4dryxyKCry/sfmljhWPoZr9zpveth2xjd7plnCy3T1K
-	 9BiiZWyb/VzgQv3HVyhdJL2L9SWg1OYJAYHROaYNTqHOWxYBV3PFuh2f2WMh3mQwEM
-	 KoWDXH/HfAUxQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B33E7C691EF;
-	Sun,  1 Oct 2023 12:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696162934;
+	bh=KEKIGJ8YzKasW9ukSR/+yIY9EqVyIgke9DbyhZEYjFw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=H+UW6dFcaRdFOoLZ8eu0qf9uAYLsCIKFXs3SzihQe2dnCxUI83LjD5C+RUco/Za7q
+	 82Du5oMzjqHcCo8qicNOq5egrBuiM3iSpogdRxWffF55x+Ik2oMiVxZDw1Fpapex2m
+	 Rrc8VztWiNvU1pu0N79JYsyG2P8/627ZO9ce/CMoGqxfrZzq/WwvWJdAFCQDGE3hgP
+	 b9XxdBAdLthYn+xHRAkrl5xFRv8xAsql413u884WMrDUdpnzYFKmNPVAUo9+761Dfk
+	 ytTc3/A17/3FPpWoV6Lw6FQ2u0RBW1/c7l9wCs+IXswyrgQRzaWQFUiQ02ZOGKdATf
+	 O4nupdDbKHQEQ==
+Date: Sun, 1 Oct 2023 14:22:09 +0200
+From: Simon Horman <horms@kernel.org>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Julien Panis <jpanis@baylibre.com>,
+	Judith Mendez <jm@ti.com>
+Subject: Re: [PATCH v6 01/14] can: m_can: Start/Cancel polling timer together
+ with interrupts
+Message-ID: <20231001122209.GJ92317@kernel.org>
+References: <20230929141304.3934380-1-msp@baylibre.com>
+ <20230929141304.3934380-2-msp@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] tcp: add tcp_delack_max()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169616282972.12522.9918976877085029703.git-patchwork-notify@kernel.org>
-Date: Sun, 01 Oct 2023 12:20:29 +0000
-References: <20230920172943.4135513-1-edumazet@google.com>
-In-Reply-To: <20230920172943.4135513-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- soheil@google.com, ncardwell@google.com, ycheng@google.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230929141304.3934380-2-msp@baylibre.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 20 Sep 2023 17:29:40 +0000 you wrote:
-> First patches are adding const qualifiers to four existing helpers.
+On Fri, Sep 29, 2023 at 04:12:51PM +0200, Markus Schneider-Pargmann wrote:
+> Interrupts are enabled/disabled in more places than just m_can_start()
+> and m_can_stop(). Couple the polling timer with enabling/disabling of
+> all interrupts to achieve equivalent behavior.
 > 
-> Third patch adds a much needed companion feature to RTAX_RTO_MIN.
-> 
-> Eric Dumazet (3):
->   net: constify sk_dst_get() and __sk_dst_get() argument
->   tcp: constify tcp_rto_min() and tcp_rto_min_us() argument
->   tcp: derive delack_max from rto_min
-> 
-> [...]
+> Cc: Judith Mendez <jm@ti.com>
+> Fixes: b382380c0d2d ("can: m_can: Add hrtimer to generate software interrupt")
+> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 
-Here is the summary with links:
-  - [net-next,1/3] net: constify sk_dst_get() and __sk_dst_get() argument
-    https://git.kernel.org/netdev/net-next/c/5033f58d5fee
-  - [net-next,2/3] tcp: constify tcp_rto_min() and tcp_rto_min_us() argument
-    https://git.kernel.org/netdev/net-next/c/f68a181fcd3b
-  - [net-next,3/3] tcp: derive delack_max from rto_min
-    https://git.kernel.org/netdev/net-next/c/bbf80d713fe7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
