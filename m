@@ -1,110 +1,241 @@
-Return-Path: <netdev+bounces-37284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08F37B485F
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:19:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD027B4861
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 17:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4ADC828227A
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 15:19:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E1108282238
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 15:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30BE182B5;
-	Sun,  1 Oct 2023 15:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B482182DA;
+	Sun,  1 Oct 2023 15:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8608FFC06
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 15:19:29 +0000 (UTC)
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47704EE
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 08:19:28 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-49d39f07066so295620e0c.0
-        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 08:19:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696173567; x=1696778367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PdQzRFnPM+ymAydUo9XAgGZeIYCPjHlHL98l6eXo/Fs=;
-        b=zyRReANo/7oJRp6rQVMhH5D/stksydc+NONmpFhc3lOLFBmcWv0LCivPikyNeCFslx
-         iwKKzCN+G1rTeYhuOaESKSuxNEiFDvsIUS5U+JneL9+YB408QUNLwVA8nPxNckL9fnT1
-         BUnFI++wSsOLhu0S4c6E83UkZcvtigvJTwYIzs0G4+UMVStVx4e2PdGSSEHXneU49fe9
-         KUH+ShbBm9YGjrzKFV/mgXBQ4fi46svJoEW0MQ6QRSPakLctEegdyLmQmPy/ctJ1S2vz
-         xZX48Mjj+ouFPca7Nk5PFNGHj1rjqptBHgM1vr6chju1pNqj86oQhXvk+0QS8J4KGM79
-         rfmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696173567; x=1696778367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PdQzRFnPM+ymAydUo9XAgGZeIYCPjHlHL98l6eXo/Fs=;
-        b=fqVkhAhztelSS57G6Mww0y7zylnHuxdwD4+FFn1rgbDme2Ct+ETzuxZn5fGPl/Ll8a
-         iaraWnL2LWyIhgtKgEsmGYbF6rBsk0dUMfXSmYAiDgAmQ6YcMa9Sln6FUGIhs2v6biFg
-         9q5rKUN6L99YfzEhWtvHBSgl++67JfKiA2zQlLa0y4l4vvVAZEqomybFqNWIlL0EccI5
-         NN2zjvO9LOH1KbGY6BPiQvSaQljd47eaP9BVRNRUWhcTepRw7NncY26VJoAfN1BghSB8
-         M8VjmEObm4cdBvTQSmxl/sosmBVDaNKRZiA+rBW6tKqPFdYGGNan0HuwKaOPMKCE2NuK
-         ROFA==
-X-Gm-Message-State: AOJu0Yyv8D2N1RyR2pfi8kYCG2PlOxjPj03XiJgSxP2BerWBCf4LwFK3
-	l2Axr3k7Z37GZEGLTGBioTGpH72Ule/TVxAv0BfEyg==
-X-Google-Smtp-Source: AGHT+IGRrOujYqhzALfgMmregRD2vhyXqGo3rugpFsivQkfPgM4SDn0FQBSx9P6MaZHMEBR7Q47g+edw+eg62JJcP/k=
-X-Received: by 2002:a05:6122:4113:b0:49d:10ce:9a8b with SMTP id
- ce19-20020a056122411300b0049d10ce9a8bmr6846706vkb.15.1696173567162; Sun, 01
- Oct 2023 08:19:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5604FBE5
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 15:19:58 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2062.outbound.protection.outlook.com [40.107.243.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 282D3DA;
+	Sun,  1 Oct 2023 08:19:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mjUA+TRwDK345beSzl+7ZQLwdVEEwbWxmmeZwsZ18BezLdKhvyuN74ZKlNef1i7KZdwXJ9zl8gcnHksWCYSrzxjlN7OnqqJfGWFGB/2Hw9Z1agpK0gm3IG1moFWQp0EsslmIliO6bkmjkd531bgl+xqQGfId6bVQHH0DYr0/XMiZW4AzIuCnDCX37ltqnDFmtpdO5y4e3MwWLDW+Fjg/kb45d3VB5O/CH8BrixDvN6T5iyOsMMNpGJNGwkJI7NipAzXMo0wtlLjTHJFM3n4de2JxcTczM4KzjkTOJfA4h7ymIuVNc4OTf+XgqZtYFQj3p3TS3Cce+eB2ZkxcOd3l2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kdnT5UI22ExutNgKdPeO+6ijC6x0qBz2aPHjv1708sQ=;
+ b=QHnqZ2cHPBCMUJl2ny0IZD1XpGz0HWMoSzL5laknm3KfScN/nzJBfSYtMGXS1r0sJzBFPnwaXuBqbJ6hwh3/7amSC5o1vuJTzndKEaj4CVbpj5VrXxlAFGByeGc317lkuJqDq7/mXr9g3aD6ThoodaXEu3dIahA5Rb+/Xm+aWDBlX4ebZKxtEqzu2/1c+AjE4NH8MgajoaOl3wIULJqJxXeMESzfz9zGMPJknvLcGB/TFuYJq39CGNS8+BtoEvaZfbE4grxVPvF3sDonLhF8j0v7ENUJQWBWTTdytYIjWOGSMDo0M5c+CMNJQfiFFuPvCGCVF5H91zgeRT3eEMX1Kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kdnT5UI22ExutNgKdPeO+6ijC6x0qBz2aPHjv1708sQ=;
+ b=HBFwo8GHV7QbYGwShn2f1yJhE9vWB2BborticCytGK8YS9IZLNPFe2wqrKV3ZymKG70nfS0/INStzPrGV+1apxhiPTtak7VK0FMQHX/nz3Nbvvw1NAhbupDyjVYuZb7dHkcTPcA3YqkN+Fekfl0DL5kc4AuuKW20H3vMXOTnUCzDxh1hKxDsoVbuXdn6cnD38nhCQuW/oEBCpttuKPsFLV7sq9NoDIo/kbij+zBYPfMjsPw/zpIOaXObeMvNGalzeqa31XES3ehE65ViKItQ8igNfIt0cd1FtzB9cQjovAQSW+ipBneaYESVmXvIvbdSdd4F2Sw7cduRitfWh+4pgg==
+Received: from MW4PR04CA0085.namprd04.prod.outlook.com (2603:10b6:303:6b::30)
+ by BL1PR12MB5112.namprd12.prod.outlook.com (2603:10b6:208:316::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.28; Sun, 1 Oct
+ 2023 15:19:55 +0000
+Received: from CO1PEPF000044FC.namprd21.prod.outlook.com
+ (2603:10b6:303:6b:cafe::b8) by MW4PR04CA0085.outlook.office365.com
+ (2603:10b6:303:6b::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.30 via Frontend
+ Transport; Sun, 1 Oct 2023 15:19:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000044FC.mail.protection.outlook.com (10.167.241.202) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6863.9 via Frontend Transport; Sun, 1 Oct 2023 15:19:54 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 1 Oct 2023
+ 08:19:46 -0700
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Sun, 1 Oct 2023
+ 08:19:46 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.986.41 via Frontend Transport; Sun, 1 Oct
+ 2023 08:19:44 -0700
+From: Moshe Shemesh <moshe@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Jiri Pirko <jiri@nvidia.com>, <linux-kernel@vger.kernel.org>, "Moshe
+ Shemesh" <moshe@nvidia.com>
+Subject: [PATCH net] devlink: Hold devlink lock on health reporter dump get
+Date: Sun, 1 Oct 2023 18:19:40 +0300
+Message-ID: <1696173580-222744-1-git-send-email-moshe@nvidia.com>
+X-Mailer: git-send-email 1.8.4.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927151501.1549078-1-ncardwell.sw@gmail.com>
- <20230927151501.1549078-2-ncardwell.sw@gmail.com> <CAMaK5_gz=B5wJhaC5MtgwiQi9Tm8fkhLdiWQLz9DX+jf0S7P=Q@mail.gmail.com>
- <CADVnQymiStUHkzmrTrm_uzt1Cw-NgZ_4MuF5+BptArJfGRFQsA@mail.gmail.com> <CAMaK5_i-9dGgPtK9AErfjCaBVC72F=jzdQ968q9_TBLXoH3QBA@mail.gmail.com>
-In-Reply-To: <CAMaK5_i-9dGgPtK9AErfjCaBVC72F=jzdQ968q9_TBLXoH3QBA@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Sun, 1 Oct 2023 11:19:09 -0400
-Message-ID: <CADVnQymo2h4dYqeZQm9y5qqHoD1qrht9adLeuakFXzcKV5hyFQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] tcp: fix delayed ACKs for MSS boundary condition
-To: Xin Guo <guoxin0309@gmail.com>
-Cc: Neal Cardwell <ncardwell.sw@gmail.com>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Netdev <netdev@vger.kernel.org>, 
-	Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FC:EE_|BL1PR12MB5112:EE_
+X-MS-Office365-Filtering-Correlation-Id: 527eb304-41fe-4ec9-6d7a-08dbc291dd75
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	HiiYzhjhAaWrBXH7rOnYIG8I6WYjFIeLgWtm8oyP4hZ80HRBd26p+OCgPhoHZ+l4IXjRZdkvmZ+QbOWqgjAhEdVtWpfaRuF0D8Ve85eV7WgoZ0q/kcPamoGcOsv2zduazBGaNxxBDXHvTLpi/0CyPJCbNzbVIGVGpsiW/CuZsFZfJa6EnnEJx7tNr8w8+eLWWut3YW3gnpfNLjrhNe0qWKLan5Vwb0pRihhpf25gQCY+uGjOxWYJz9OI7RcoR3BMzqxaOEYzI/hYGBN7722x+d/R1b5TzNi8m/HXfrf8LucDT2zkCddveWUF9AijlpIz0rojOXV2wsjMYacTY5c6a3mz6uXAdo0Kftm5bh9qYEKlzMY4Qp11kI341Js2+Sb1y8TbjAiVxRmSnZVedJoC6XBDfHaGNhDjhiqLBKihO5HGmaVYZVyT2xbfoNHCVC7mhR957tOX0eFMZSlhg2D2aXJ0j1H/CUk+6KmPPKVf2s5lXJs4f9uDryI5K++I2ZFfzDKpM/7wiJDosrdWRf29hVwdQY9gYQ7xeHSBStYKfqYMw4Vef4zf729eNu50ASFK2G8YrTYEIltNeXZrWTqsuuL9g4gX9rf3B81FmV55bX05wtEYY2JaSRXvPCdaN/Yv+JQTdhnuu4sTRojbOLQBZs2ibGFQJAG0APCr+PdIbkTSH2k7gkmuk4d3AIJnVREO/nrMat6nxqBqxwIntXJSnhRNZF4za839xP/jCfOVlCLD6L8/tVtkgr0QR9X8nhkdVj8YeOY6j9vGvYkdOt4LZg==
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(136003)(396003)(376002)(39860400002)(230922051799003)(1800799009)(82310400011)(451199024)(186009)(64100799003)(36840700001)(40470700004)(46966006)(40460700003)(2906002)(316002)(41300700001)(8936002)(8676002)(4326008)(5660300002)(36756003)(40480700001)(54906003)(110136005)(70206006)(70586007)(478600001)(86362001)(6666004)(7696005)(2616005)(107886003)(82740400003)(336012)(426003)(356005)(26005)(7636003)(36860700001)(83380400001)(47076005)(309714004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2023 15:19:54.3001
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 527eb304-41fe-4ec9-6d7a-08dbc291dd75
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044FC.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5112
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Sep 28, 2023 at 11:56=E2=80=AFAM Xin Guo <guoxin0309@gmail.com> wro=
-te:
->
-> Neal,
-> thanks for your explanation,
-> 1)when I read the patch, i cannot understood "if an app reads  >1*MSS dat=
-a",
-> because in my view that "the app reads" mean that the copied data
-> length from sk_receive_queue to user-space buffer
-> in function tcp_recvmsg_locked(as example) when an app reads data from a =
-socket,
-> but for "tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||"
-> "tp->rcv_nxt - tp->rcv_wup" means that the received data length from
-> last ack in the kernel for the sk,
-> and not always the length of copied data to user-space buffer.
->
-> 2) when we received two small packets(<1*MSS) in the kernel for the
-> sk, the total length of the two packets may  > 1*MSS.
+Devlink health dump get callback should take devlink lock as any other
+devlink callback. Add devlink lock to the callback and to any call for
+devlink_health_do_dump().
 
-Thanks for clarifying. Those are good points; the commit message could
-and should be more precise when describing the existing logic in
-tcp_cleanup_rbuf(). I have posted a v2 series with a more precise
-commit message:
-  https://patchwork.kernel.org/project/netdevbpf/patch/20231001151239.18668=
-45-2-ncardwell.sw@gmail.com/
+As devlink lock is added to any callback of dump, the reporter dump_lock
+is now redundant and can be removed.
 
-best regards,
-neal
+Fixes: d3efc2a6a6d8 ("net: devlink: remove devlink_mutex")
+Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/devlink/health.c | 30 ++++++++++++++++--------------
+ 1 file changed, 16 insertions(+), 14 deletions(-)
+
+diff --git a/net/devlink/health.c b/net/devlink/health.c
+index 638cad8d5c65..51e6e81e31bb 100644
+--- a/net/devlink/health.c
++++ b/net/devlink/health.c
+@@ -58,7 +58,6 @@ struct devlink_health_reporter {
+ 	struct devlink *devlink;
+ 	struct devlink_port *devlink_port;
+ 	struct devlink_fmsg *dump_fmsg;
+-	struct mutex dump_lock; /* lock parallel read/write from dump buffers */
+ 	u64 graceful_period;
+ 	bool auto_recover;
+ 	bool auto_dump;
+@@ -125,7 +124,6 @@ __devlink_health_reporter_create(struct devlink *devlink,
+ 	reporter->graceful_period = graceful_period;
+ 	reporter->auto_recover = !!ops->recover;
+ 	reporter->auto_dump = !!ops->dump;
+-	mutex_init(&reporter->dump_lock);
+ 	return reporter;
+ }
+ 
+@@ -226,7 +224,6 @@ EXPORT_SYMBOL_GPL(devlink_health_reporter_create);
+ static void
+ devlink_health_reporter_free(struct devlink_health_reporter *reporter)
+ {
+-	mutex_destroy(&reporter->dump_lock);
+ 	if (reporter->dump_fmsg)
+ 		devlink_fmsg_free(reporter->dump_fmsg);
+ 	kfree(reporter);
+@@ -625,10 +622,10 @@ int devlink_health_report(struct devlink_health_reporter *reporter,
+ 	}
+ 
+ 	if (reporter->auto_dump) {
+-		mutex_lock(&reporter->dump_lock);
++		devl_lock(devlink);
+ 		/* store current dump of current error, for later analysis */
+ 		devlink_health_do_dump(reporter, priv_ctx, NULL);
+-		mutex_unlock(&reporter->dump_lock);
++		devl_unlock(devlink);
+ 	}
+ 
+ 	if (!reporter->auto_recover)
+@@ -1262,7 +1259,7 @@ int devlink_nl_cmd_health_reporter_diagnose_doit(struct sk_buff *skb,
+ }
+ 
+ static struct devlink_health_reporter *
+-devlink_health_reporter_get_from_cb(struct netlink_callback *cb)
++devlink_health_reporter_get_from_cb_lock(struct netlink_callback *cb)
+ {
+ 	const struct genl_info *info = genl_info_dump(cb);
+ 	struct devlink_health_reporter *reporter;
+@@ -1272,10 +1269,12 @@ devlink_health_reporter_get_from_cb(struct netlink_callback *cb)
+ 	devlink = devlink_get_from_attrs_lock(sock_net(cb->skb->sk), attrs);
+ 	if (IS_ERR(devlink))
+ 		return NULL;
+-	devl_unlock(devlink);
+ 
+ 	reporter = devlink_health_reporter_get_from_attrs(devlink, attrs);
+-	devlink_put(devlink);
++	if (!reporter) {
++		devl_unlock(devlink);
++		devlink_put(devlink);
++	}
+ 	return reporter;
+ }
+ 
+@@ -1284,16 +1283,20 @@ int devlink_nl_cmd_health_reporter_dump_get_dumpit(struct sk_buff *skb,
+ {
+ 	struct devlink_nl_dump_state *state = devlink_dump_state(cb);
+ 	struct devlink_health_reporter *reporter;
++	struct devlink *devlink;
+ 	int err;
+ 
+-	reporter = devlink_health_reporter_get_from_cb(cb);
++	reporter = devlink_health_reporter_get_from_cb_lock(cb);
+ 	if (!reporter)
+ 		return -EINVAL;
+ 
+-	if (!reporter->ops->dump)
++	devlink = reporter->devlink;
++	if (!reporter->ops->dump) {
++		devl_unlock(devlink);
++		devlink_put(devlink);
+ 		return -EOPNOTSUPP;
++	}
+ 
+-	mutex_lock(&reporter->dump_lock);
+ 	if (!state->idx) {
+ 		err = devlink_health_do_dump(reporter, NULL, cb->extack);
+ 		if (err)
+@@ -1309,7 +1312,8 @@ int devlink_nl_cmd_health_reporter_dump_get_dumpit(struct sk_buff *skb,
+ 	err = devlink_fmsg_dumpit(reporter->dump_fmsg, skb, cb,
+ 				  DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET);
+ unlock:
+-	mutex_unlock(&reporter->dump_lock);
++	devl_unlock(devlink);
++	devlink_put(devlink);
+ 	return err;
+ }
+ 
+@@ -1326,9 +1330,7 @@ int devlink_nl_cmd_health_reporter_dump_clear_doit(struct sk_buff *skb,
+ 	if (!reporter->ops->dump)
+ 		return -EOPNOTSUPP;
+ 
+-	mutex_lock(&reporter->dump_lock);
+ 	devlink_health_dump_clear(reporter);
+-	mutex_unlock(&reporter->dump_lock);
+ 	return 0;
+ }
+ 
+-- 
+2.27.0
+
 
