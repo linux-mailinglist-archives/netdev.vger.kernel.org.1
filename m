@@ -1,73 +1,88 @@
-Return-Path: <netdev+bounces-37263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA3787B4767
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:24:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED2907B476F
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7168B281B11
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 12:24:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 7F67CB2096D
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 12:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604CE17738;
-	Sun,  1 Oct 2023 12:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216B817754;
+	Sun,  1 Oct 2023 12:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517D717728
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 12:24:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D041C433C7;
-	Sun,  1 Oct 2023 12:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1305217753
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 12:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 78672C433C7;
+	Sun,  1 Oct 2023 12:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696163091;
-	bh=60Jvv/Pm2PQ/Yz/ve2h3Ch8pPQyPw2+hMP/ocOFmqxM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LU/VU39MeIZafsdLU1IGGQOSAP1F4b2/uUhGtdrafCRP27AbfZ+wYnWgjGressAuk
-	 ZxszmyylMKtxWOYoD82cfsq3hg7g/sO4eyBF+4DIiocOH0T2NpTf05++AA+Nll2K9g
-	 486xbmG81EFLJUFX4+6oL/1kUBwueeG3X9TvoiZZu424PX4ZsxaL/+USQflUXQ7bvM
-	 XY5o/qz+N9O/x8oONtzmVFi4OlYb1DcD+IubgWbGNn81uqbMv+Wf8V5BCBip8OT4As
-	 ESPUI6LZKh82yDPR8a002qHif70K023W846IggV/eKKqVWclFWTNMZf0S9iQX0olkB
-	 iamK58LXFAWFw==
-Date: Sun, 1 Oct 2023 14:24:47 +0200
-From: Simon Horman <horms@kernel.org>
-To: Markus Schneider-Pargmann <msp@baylibre.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Julien Panis <jpanis@baylibre.com>,
-	Judith Mendez <jm@ti.com>
-Subject: Re: [PATCH v6 07/14] can: m_can: Add tx coalescing ethtool support
-Message-ID: <20231001122447.GO92317@kernel.org>
-References: <20230929141304.3934380-1-msp@baylibre.com>
- <20230929141304.3934380-8-msp@baylibre.com>
+	s=k20201202; t=1696163425;
+	bh=p+ChMF0gZVCMqe4kBBzE+Zzu6Sm2U0JmlhHJQS+ZlN4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=PFTfboZkd38vCGGCYFDX228t77mSRJp4O20F9QHuX9Wijk9Clmk2rPcBUh06jAyxU
+	 s+5uU4W8ZP7POeS1x7Nw6szRaimgWK0BA9mQuNGkpWz/I2wsX8oNVpznJ3pDN/W0vO
+	 zAFdBgsQnOb6PzfurWwqT2GE/9Z4LhTj4SiMaXsh05i+AS7hm0i9Id4XmzoElFOUjZ
+	 qTunnTmfIjxLVDnrLa5ZqTUrLLI75W02zKYIX1K/xsA47sy7a2aesdzOrBzIP6Nylf
+	 RnUmN55yXC1z1ZzYCdR29U9nXCC82Qt2yzIiyMDOM/UT5UVn0RdKFwD8owA7fh+Y/8
+	 KUDkvouw2xZdA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 60684C691EF;
+	Sun,  1 Oct 2023 12:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230929141304.3934380-8-msp@baylibre.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next 0/5] net_sched: sch_fq: round of improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169616342538.16897.2555401624233593537.git-patchwork-notify@kernel.org>
+Date: Sun, 01 Oct 2023 12:30:25 +0000
+References: <20230920201715.418491-1-edumazet@google.com>
+In-Reply-To: <20230920201715.418491-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemb@google.com, soheil@google.com, ncardwell@google.com,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-On Fri, Sep 29, 2023 at 04:12:57PM +0200, Markus Schneider-Pargmann wrote:
-> Add TX support to get/set functions for ethtool coalescing.
-> tx-frames-irq and tx-usecs-irq can only be set/unset together.
-> tx-frames-irq needs to be less than TXE and TXB.
-> 
-> As rx and tx share the same timer, rx-usecs-irq and tx-usecs-irq can be
-> enabled/disabled individually but they need to have the same value if
-> enabled.
-> 
-> Polling is excluded from TX irq coalescing.
-> 
-> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+Hello:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 20 Sep 2023 20:17:10 +0000 you wrote:
+> For FQ tenth anniversary, it was time for making it faster.
+> 
+> The FQ part (as in Fair Queue) is rather expensive, because
+> we have to classify packets and store them in a per-flow structure,
+> and add this per-flow structure in a hash table. Then the RR lists
+> also add cache line misses.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net-next,1/5] net_sched: constify qdisc_priv()
+    https://git.kernel.org/netdev/net-next/c/1add90738cf5
+  - [v2,net-next,2/5] net_sched: sch_fq: struct sched_data reorg
+    https://git.kernel.org/netdev/net-next/c/54ff8ad69c6e
+  - [v2,net-next,3/5] net_sched: sch_fq: change how @inactive is tracked
+    https://git.kernel.org/netdev/net-next/c/ee9af4e14d16
+  - [v2,net-next,4/5] net_sched: sch_fq: add fast path for mostly idle qdisc
+    https://git.kernel.org/netdev/net-next/c/076433bd78d7
+  - [v2,net-next,5/5] net_sched: sch_fq: always garbage collect
+    https://git.kernel.org/netdev/net-next/c/8f6c4ff9e052
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
