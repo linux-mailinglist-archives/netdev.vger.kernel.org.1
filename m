@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-37226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD3E47B44D1
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 02:38:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BFB7B44D2
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 02:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id D5FE8B2098A
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 00:38:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 52608282073
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 00:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C82385;
-	Sun,  1 Oct 2023 00:38:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DC039F;
+	Sun,  1 Oct 2023 00:38:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F5737F
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 00:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A0F37D
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 00:38:48 +0000 (UTC)
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34760D3;
-	Sat, 30 Sep 2023 17:38:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5552CA;
+	Sat, 30 Sep 2023 17:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=MgPUZu5lJ2mnvysZdGu2Kc1b7RZofo72Va4okUfyrCQ=; b=Ob5YNP+BeMVGp1+WORUo6wyT3r
-	nXWuhetfvuluA+OOZ6++X9e1KBQVYrek64A1gAO8ppWpcGI7dDukk2oA59ATyRxvtlpkq76QdMpT6
-	y6CxcSGnp0duFCVe+k8aHrF5Hz4lV1YV1ECG0IS4w6sR0V1p4sL1x0ka98W2Qy4r2O4zAxg+rN7ix
-	G6xTRXVnOgwu06JxyMQBbzPce0kWEei6MdcS7zTjmUOPNDcpLAG+TFPsRoO/7p5nLtsdt0Ufwc/Iv
-	/uOqu5Ea0FfKG8iQv6mfFXf0rGLVYp0+IOWrsff7SAKDITOZpAJrEAHbx4SSD004YzR5GegLwvTcB
-	0jYTmRFg==;
+	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
+	:Reply-To:Content-Type:Content-ID:Content-Description;
+	bh=z88LOIZ7EHuBVYquetgM5Awx0oSZmDtFncHgndSEXL8=; b=c+v9RdPLbFnKnkqj77DOIeop5v
+	dJI/ZozCdVWv+B8NUgRZEtN/fRQ0N+vT5b3DpWRlldnPHOWW1EfTuZ9w58yXDegSeCFDft+nmzFIp
+	rzbkpEirDTyAEpt3tbVHW1aisXd3hy7CS6I7OvkAOolIMjhsle2k01q4vgrUBlyQcrKycbi/dj5Qh
+	yoXyxobqiBAIQ2Ay4VMq4zZNkDh0PZqLLDbsEm1v+vdHGusjHOQyIcalTEvQdtA+aqD2li/3AaXr4
+	0suSpZCMJ0Auca2HsEkYUCdKiZZK4exQoU2OI8b+f2v/PW7aNXBSMFk4dH3QVtMxQdVPy/lWu/o0d
+	uPmUggaA==;
 Received: from [50.53.46.231] (helo=bombadil.infradead.org)
 	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qmkTv-00AI3H-0l;
+	id 1qmkTv-00AI3H-1b;
 	Sun, 01 Oct 2023 00:38:47 +0000
 From: Randy Dunlap <rdunlap@infradead.org>
 To: linux-kernel@vger.kernel.org
 Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH] page_pool: fix documentation typos
-Date: Sat, 30 Sep 2023 17:38:45 -0700
-Message-ID: <20231001003846.29541-1-rdunlap@infradead.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: skbuff: fix kernel-doc typos
+Date: Sat, 30 Sep 2023 17:38:46 -0700
+Message-ID: <20231001003846.29541-2-rdunlap@infradead.org>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231001003846.29541-1-rdunlap@infradead.org>
+References: <20231001003846.29541-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,38 +60,37 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Correct grammar for better readability.
+Correct punctuation.
 
 Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
 ---
- include/net/page_pool/helpers.h |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/skbuff.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff -- a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -16,13 +16,13 @@
-  * page_pool_alloc_pages() call.  Drivers should use
-  * page_pool_dev_alloc_pages() replacing dev_alloc_pages().
+diff -- a/include/linux/skbuff.h b/include/linux/skbuff.h
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1309,7 +1309,7 @@ struct sk_buff_fclones {
   *
-- * API keeps track of in-flight pages, in order to let API user know
-+ * The API keeps track of in-flight pages, in order to let API users know
-  * when it is safe to free a page_pool object.  Thus, API users
-  * must call page_pool_put_page() to free the page, or attach
-- * the page to a page_pool-aware objects like skbs marked with
-+ * the page to a page_pool-aware object like skbs marked with
-  * skb_mark_for_recycle().
-  *
-- * API user must call page_pool_put_page() once on a page, as it
-+ * API users must call page_pool_put_page() once on a page, as it
-  * will either recycle the page, or in case of refcnt > 1, it will
-  * release the DMA mapping and in-flight state accounting.
+  * Returns true if skb is a fast clone, and its clone is not freed.
+  * Some drivers call skb_orphan() in their ndo_start_xmit(),
+- * so we also check that this didnt happen.
++ * so we also check that this didn't happen.
   */
+ static inline bool skb_fclone_busy(const struct sock *sk,
+ 				   const struct sk_buff *skb)
+@@ -2016,7 +2016,7 @@ static inline struct sk_buff *skb_share_
+  *	Copy shared buffers into a new sk_buff. We effectively do COW on
+  *	packets to handle cases where we have a local reader and forward
+  *	and a couple of other messy ones. The normal one is tcpdumping
+- *	a packet thats being forwarded.
++ *	a packet that's being forwarded.
+  */
+ 
+ /**
 
