@@ -1,83 +1,74 @@
-Return-Path: <netdev+bounces-37269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 728617B47FC
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:22:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6888B7B4825
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:50:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 90290281827
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:22:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 819BE1C20444
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE675179A1;
-	Sun,  1 Oct 2023 14:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA74AFBE5;
+	Sun,  1 Oct 2023 14:50:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273889CA43
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:22:44 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C27AB
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 07:22:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696170160;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pS/deKlBkZMul+LFIgWetgiJ2B6GYe7768vqbID1y4s=;
-	b=ApmnCe5IKGekC6uXJM31sdVgH21DubGubAOBwd/nRLlcORO175FBnDyV8RgrusIiV2rw8k
-	2dnyn6+2b/94A8mRcCJr9e/6ezg7bajLYt3veV+A+zormntOV8taXCoiigVE7O17cGxW+c
-	TtAha9r1XfavU1WXPBbWt9HN410WXXA=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-fAvuYCZZMPSNNDXoT6f8Pw-1; Sun, 01 Oct 2023 10:22:39 -0400
-X-MC-Unique: fAvuYCZZMPSNNDXoT6f8Pw-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-77405179afdso2591363285a.1
-        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 07:22:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696170158; x=1696774958;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pS/deKlBkZMul+LFIgWetgiJ2B6GYe7768vqbID1y4s=;
-        b=iZJvZWuOpy5fWMJQKCPdhI/m1CTqLHyh/QneKmQimSfIPcX+HGw+ekHprWroUjwvrT
-         U7isAFxB4l2W92410eh3yKLfC+ByljR7ucYKEoB907unfxFlTpVCYD2GKOJuQyvoDP4Q
-         r0NnqUNomL3ysBwQYXI2H1HbXA/zYvx4rZWvo+z1GHgd9q2jSYGIR6f5xOvITaH0vi+V
-         vkFqX2jCNJtu0C0HPA2Vq/jFXEXSk/7UyyhqQpA4Tx/5+YEiJqxTkkR3ABUSrIHVFhnr
-         wP0XQWjGGbmc33/i/Twa/k9sqPy4SziBrNX5lgylciPf/CN9u4UL+TxzC6qbVQcHrgc9
-         ikYA==
-X-Gm-Message-State: AOJu0YwqNKMdhT3+aYswWqwIMGSo4Pe1G4KyXFxaiyfih5taIK8OdYuK
-	XZpHK2jVIVBz3GTUX7e6L64wTRf4vB/siNulyrwNf6rVKJcweO1h4ueF+S9pHshWR5/J5/Y7MPV
-	HQr+pTXX2H2zysdIW
-X-Received: by 2002:a05:620a:2992:b0:773:d99a:49e9 with SMTP id r18-20020a05620a299200b00773d99a49e9mr12568592qkp.66.1696170158523;
-        Sun, 01 Oct 2023 07:22:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFoEB2QAvrRIoNJUdcES86FH6wLkRgYY8YbnsxzOnPpV1YyGPz5hvVFbl3TQJU9hwHYDcqubw==
-X-Received: by 2002:a05:620a:2992:b0:773:d99a:49e9 with SMTP id r18-20020a05620a299200b00773d99a49e9mr12568566qkp.66.1696170158173;
-        Sun, 01 Oct 2023 07:22:38 -0700 (PDT)
-Received: from localhost (ip98-179-76-75.ph.ph.cox.net. [98.179.76.75])
-        by smtp.gmail.com with ESMTPSA id f19-20020a05620a15b300b0076f1d8b1c2dsm8317668qkk.12.2023.10.01.07.22.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Oct 2023 07:22:37 -0700 (PDT)
-Date: Sun, 1 Oct 2023 07:22:36 -0700
-From: Jerry Snitselaar <jsnitsel@redhat.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Hannes Reinecke <hare@suse.de>, Chris Leech <cleech@redhat.com>, 
-	Christoph Hellwig <hch@lst.de>, Rasesh Mody <rmody@marvell.com>, 
-	Ariel Elior <aelior@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
-	Manish Chopra <manishc@marvell.com>, Nilesh Javali <njavali@marvell.com>, 
-	Manish Rangankar <mrangankar@marvell.com>, John Meneghini <jmeneghi@redhat.com>, 
-	Lee Duncan <lduncan@suse.com>, Mike Christie <michael.christie@oracle.com>, 
-	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-Message-ID: <7pq4ptas5wpcxd3v4p7iwvgoj7vrpta6aqfppqmuoccpk4mg5t@fwxm3apjkez3>
-References: <20230929170023.1020032-1-cleech@redhat.com>
- <20230929170023.1020032-4-cleech@redhat.com>
- <2023093055-gotten-astronomy-a98b@gregkh>
- <ZRhmqBRNUB3AfLv/@rhel-developer-toolbox>
- <2023093002-unlighted-ragged-c6e1@gregkh>
- <e0360d8f-6d36-4178-9069-d633d9b7031d@suse.de>
- <2023100114-flatware-mourner-3fed@gregkh>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53BD2561
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:50:32 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267D3A9;
+	Sun,  1 Oct 2023 07:50:28 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 0F0B75C2C29;
+	Sun,  1 Oct 2023 10:50:25 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Sun, 01 Oct 2023 10:50:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696171825; x=1696258225; bh=mEMutYlrVNpsS
+	g7pWqpRwU1aONJ27VWy6905pdrkIqI=; b=clRr215/arKhXy6mDtuOWYOvKNH/O
+	plIeU3G7c7h4aFie7RVwb33h4LHvbvXn8zJTz7R/3xSWD3WDLq/ute/eGezCWVzh
+	OYgi2D2hI+xO/W4R/g9Ehrv3uDTZGHYqKCHK5euZ7aUlZjbhaGJBu+ajulSSCfPT
+	6rHnYNeCj6Fqw46XpFYRxCPT2DY7Kuk5luqvn0oJ5z690YucYgeEPWot3FAYc+Kc
+	x0IeNhdqKgTDY5zJEHmMiQ+F2DkGXsrG/1N3LJ4d8XtaerOMjaZoX0zRq1a2LDwN
+	/y3a6pMLqHSv1uF6jRYtOmtOzxy0P0cwCJr2guHVHloRN5oQNH5JJ9/eA==
+X-ME-Sender: <xms:MIcZZWVbvahzZh2oj7kR-Z5QrhM-UuCJPJihvrvEO3e1K5l80bAFpg>
+    <xme:MIcZZSnEzheXxG1Mfk9Ir-1ZY4kW5uldSfpWkJ0MHLTd41dn9KVzybmAwjq6qinw4
+    9PO2oOQyFVvmLg>
+X-ME-Received: <xmr:MIcZZaazckKZ_FxHkRZBpZuZZpSD6Z2qISNbHdoQqDavIf3FsvlH8k_GX5Cy>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvddugddulecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefkughoucfu
+    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
+    gvrhhnpeetgeejteeivedvheekgeeiheehvedvveefgffgudekgfffheehgeeivdejgeei
+    udenucffohhmrghinhepshgvlhhfthgvshhtshdrnhgvthdpkhgvrhhnvghlqdhsvghlfh
+    htvghsthhsrdhnvghtpdhkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhg
+X-ME-Proxy: <xmx:MIcZZdUNKS4M8JNImwQOwxYoBwMqWmu8WA4PTdT7n7Ke58TwVfuLiQ>
+    <xmx:MIcZZQkGiDxb77mbQN1auwagngkQ29-jAGAlk6McHypLQ-7zxObD6w>
+    <xmx:MIcZZSdEidrF1POPDZIShTlrCKpBQ5kxsqiYMvEc8vHv6RkCoI7Pqg>
+    <xmx:MYcZZRCyPV4ExQyo7dDtkRJyPBEQxCoW9RY803Ld7eIpPaeUeWolsA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 1 Oct 2023 10:50:24 -0400 (EDT)
+Date: Sun, 1 Oct 2023 17:50:20 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>, oliver.sang@intel.com
+Cc: "oe-lkp@lists.linux.dev" <oe-lkp@lists.linux.dev>,
+	"lkp@intel.com" <lkp@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [linus:master] [selftests]  8ae9efb859:
+ kernel-selftests.net.fib_tests.sh.fail
+Message-ID: <ZRmHLPbyTCBvoHWP@shredder>
+References: <202309191658.c00d8b8-oliver.sang@intel.com>
+ <DBBP189MB1433CECC6CBECFD95352EA3595FCA@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,87 +77,150 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2023100114-flatware-mourner-3fed@gregkh>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+In-Reply-To: <DBBP189MB1433CECC6CBECFD95352EA3595FCA@DBBP189MB1433.EURP189.PROD.OUTLOOK.COM>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 01, 2023 at 01:57:25PM +0200, Greg Kroah-Hartman wrote:
-> On Sun, Oct 01, 2023 at 12:44:05PM +0200, Hannes Reinecke wrote:
-> > On 9/30/23 20:28, Greg Kroah-Hartman wrote:
-> > > On Sat, Sep 30, 2023 at 11:19:20AM -0700, Chris Leech wrote:
-> > > > On Sat, Sep 30, 2023 at 09:06:51AM +0200, Greg Kroah-Hartman wrote:
-> > > > > On Fri, Sep 29, 2023 at 10:00:23AM -0700, Chris Leech wrote:
-> > > > > > Make use of the new UIO_MEM_DMA_COHERENT type to properly handle mmap
-> > > > > > for dma_alloc_coherent buffers.
-> > > > > 
-> > > > > Why are ethernet drivers messing around with UIO devices?  That's not
-> > > > > what UIO is for, unless you are trying to do kernel bypass for these
-> > > > > devices without anyone noticing?
-> > > > > 
-> > > > > confused,
-> > > > 
-> > > > It's confusing. The bnx2 driver stack included a cnic (converged nic?)
-> > > > module that sits between the ethernet drivers (bnx2, bnx2x) and protocol
-> > > > offload drivers (iscsi, fcoe, rdma).
-> > > > 
-> > > > The iscsi module (bnx2i) uses a passthrough interface from cnic to
-> > > > handle some network configuration that the device firmware doesn't do.
-> > > > It uses a uio device and a userspace component called iscsiuio to do
-> > > > that.
-> > > 
-> > > That's horrible, and not what the UIO api is for at all.  Configure the
-> > > device like any other normal kernel device, don't poke at raw memory
-> > > values directly, that way lies madness.
-> > > 
-> > > Have a pointer to the userspace tool anywhere?  All I found looks like a
-> > > full IP stack in userspace under that name, and surely that's not what
-> > > this api is for...
-> > > 
-> > But that's how the interface is used, in particular for the bnx2i driver.
-> > Problem is that the bnx2i iSCSI offload is just that, an iSCSI offload. Not
-> > a TCP offload. So if the iSCSI interface is configured to
-> > acquire the IP address via DHCP, someone has to run the DHCP protocol.
-> > But the iSCSI offload can't, and the bnx2i PCI device is not a network
-> > device so that the normal network stack can't be used.
-> > And so the architects of the bnx2i card decided to use UIO to pass
-> > the network traffic to userspace, and used the userspace 'iscsiuio'
-> > application to run DHCP in userspace.
+On Mon, Sep 25, 2023 at 06:18:34PM +0000, Sriram Yagnaraman wrote:
+> CC: Ido, who helped a lot with writing these tests.
+> 
+> > -----Original Message-----
+> > From: kernel test robot <oliver.sang@intel.com>
+> > Sent: Tuesday, 19 September 2023 10:32
+> > To: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+> > Cc: oe-lkp@lists.linux.dev; lkp@intel.com; linux-kernel@vger.kernel.org; David
+> > S. Miller <davem@davemloft.net>; netdev@vger.kernel.org;
+> > oliver.sang@intel.com
+> > Subject: [linus:master] [selftests] 8ae9efb859: kernel-
+> > selftests.net.fib_tests.sh.fail
 > > 
-> > But's been that way for several years now; so long, in fact, that
-> > the card itself has been out of support from Marvell (since quite some
-> > years, too, IIRC). And even the successor of that card (the qedi driver)
-> > is nearing EOL. Mind you, the qedi driver is using the same interface (by
-> > using UIO to run DHCP in userspace), so singling out the bnx2i for bad
-> > design can be construed as being unfair :-)
+> > 
+> > hi, Sriram Yagnaraman,
+> > 
+> > we noticed two new added tests failed in our test environment.
+> > want to consult with you what's the dependency and requirement to run
+> > them?
+> > Thanks a lot!
 > 
-> Ok, let's say they are all horrible! :)
+> Sorry for the delayed response. I will look at this and get back.
+> I am not an expert with lkp-tests but will try to set it up on my local environment and reproduce the problem.
 > 
-> > I agree, though, that the design is a mess.
-> 
-> Ok, so why are we papering over it and continuing to allow it to exist?
->
-> What "broke" to suddenly require this UIO change?  If this has been
-> around for a very long time, what has caused this to now require the UIO
-> layer to change?
-> 
-> thanks,
-> 
-> greg k-h
+> > 
+> > Hello,
+> > 
+> > kernel test robot noticed "kernel-selftests.net.fib_tests.sh.fail" on:
+> > 
+> > commit: 8ae9efb859c05a54ac92b3336c6ca0597c9c8cdb ("selftests: fib_tests:
+> > Add multipath list receive tests")
+> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> > 
+> > in testcase: kernel-selftests
+> > version: kernel-selftests-x86_64-60acb023-1_20230329
+> > with following parameters:
+> > 
+> > 	group: net
+> > 
+> > 
+> > 
+> > compiler: gcc-12
+> > test machine: 36 threads 1 sockets Intel(R) Core(TM) i9-10980XE CPU @
+> > 3.00GHz (Cascade Lake) with 32G memory
+> > 
+> > (please refer to attached dmesg/kmsg for entire log/backtrace)
+> > 
+> > 
+> > 
+> > 
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of the
+> > same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <oliver.sang@intel.com>
+> > | Closes:
+> > | https://lore.kernel.org/oe-lkp/202309191658.c00d8b8-oliver.sang@intel.
+> > | com
+> > 
+> > 
+> > 
+> > # timeout set to 1500
+> > # selftests: net: fib_tests.sh
+> > #
+> > # Single path route test
+> > #     Start point
+> > #     TEST: IPv4 fibmatch                                                 [ OK ]
+> > #     TEST: IPv6 fibmatch                                                 [ OK ]
+> > #     Nexthop device deleted
+> > #     TEST: IPv4 fibmatch - no route                                      [ OK ]
+> > #     TEST: IPv6 fibmatch - no route                                      [ OK ]
+> > 
+> > ...
+> > 
+> > #
+> > # Fib6 garbage collection test
+> > #     TEST: ipv6 route garbage collection                                 [ OK ]
+> > #
+> > # IPv4 multipath list receive tests
+> > #     TEST: Multipath route hit ratio (.06)                               [FAIL]
+> > #
+> > # IPv6 multipath list receive tests
+> > #     TEST: Multipath route hit ratio (.10)                               [FAIL]
 
-Changes last year to the dma-mapping api to no longer allow __GFP_COMP,
-in particular these two (from the e529d3507a93 dma-mapping pull for
-6.2):
+I found two possible problems. The first is that in the IPv4 case we
+might get more trace point hits than packets (ratio higher than 1)
+because of the additional FIB lookups for source validation. Fixed by
+disabling source validation:
 
-ffcb75458460 dma-mapping: reject __GFP_COMP in dma_alloc_attrs | 2022-11-21 | (Christoph Hellwig)
-bb73955c0b1d cnic: don't pass bogus GFP_ flags to dma_alloc_coherent | 2022-11-21 | (Christoph Hellwig)
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index e7d2a530618a..66d0db7a2614 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -2437,6 +2437,9 @@ ipv4_mpath_list_test()
+        run_cmd "ip -n ns2 route add 203.0.113.0/24
+                nexthop via 172.16.201.2 nexthop via 172.16.202.2"
+        run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.fib_multipath_hash_policy=1"
++       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.veth2.rp_filter=0"
++       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.all.rp_filter=0"
++       run_cmd "ip netns exec ns2 sysctl -qw net.ipv4.conf.default.rp_filter=0"
+        set +e
+ 
+        local dmac=$(ip -n ns2 -j link show dev veth2 | jq -r '.[]["address"]')
 
+The second problem (which I believe is the one you encountered) is that
+we might miss certain trace point hits if they happen from the ksoftirqd
+task instead of the mausezahn task. Fixed by:
 
-Regards,
-Jerry
+@@ -2449,7 +2452,7 @@ ipv4_mpath_list_test()
+        # words, the FIB lookup tracepoint needs to be triggered for every
+        # packet.
+        local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
+-       run_cmd "perf stat -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
++       run_cmd "perf stat -a -e fib:fib_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
+        local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
+        local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
+        list_rcv_eval $tmp_file $diff
+@@ -2494,7 +2497,7 @@ ipv6_mpath_list_test()
+        # words, the FIB lookup tracepoint needs to be triggered for every
+        # packet.
+        local t0_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
+-       run_cmd "perf stat -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
++       run_cmd "perf stat -a -e fib6:fib6_table_lookup --filter 'err == 0' -j -o $tmp_file -- $cmd"
+        local t1_rx_pkts=$(link_stats_get ns2 veth2 rx packets)
+        local diff=$(echo $t1_rx_pkts - $t0_rx_pkts | bc -l)
+        list_rcv_eval $tmp_file $diff
 
+Ran both tests in a loop:
+
+# for i in $(seq 1 20); do ./fib_tests.sh -t ipv4_mpath_list; done
+# for i in $(seq 1 20); do ./fib_tests.sh -t ipv6_mpath_list; done
+
+And verified that the results are stable. Also verified that the tests
+reliably fail when reverting both fixes:
+
+8423be8926aa ipv6: ignore dst hint for multipath routes
+6ac66cb03ae3 ipv4: ignore dst hint for multipath routes
+
+Can you please test with the proposed modifications?
+
+Thanks
 
