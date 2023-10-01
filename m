@@ -1,138 +1,84 @@
-Return-Path: <netdev+bounces-37302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E23D7B4948
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 20:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA44B7B494B
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 20:54:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 7DEB41C2048A
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 18:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0D7CC1C203FF
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 18:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21971803F;
-	Sun,  1 Oct 2023 18:51:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E7A182C8;
+	Sun,  1 Oct 2023 18:54:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A30AEED3
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 18:51:13 +0000 (UTC)
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47893D3
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 11:51:11 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6bc57401cb9so2234504a34.0
-        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 11:51:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288A91803F
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 18:54:01 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C35EA94;
+	Sun,  1 Oct 2023 11:53:56 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-31f71b25a99so15717523f8f.2;
+        Sun, 01 Oct 2023 11:53:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696186270; x=1696791070; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jnC1cLUw1otPjc5iY/XpyFgQUai99uHbpR9mHNJU9pA=;
-        b=mL6EGCliN6s/jJi2hneFQtzzQ0Eu9/54zyBvrae552NJNsTuu9V20VrHpRdTIgZ9pA
-         AYudiSmdmz1ypi7ktHkxEGf+tkShocHYAjqZjTnSN8MYygkPi+R05m2RDOsBbhYtQx0W
-         J86WAVq0Dlv3H8OYJyKSuo5c4Exni8DAgzqt5udVl487WnBnXvMb8a2PNarqf9ybG8Ma
-         9n5mS688xavtyOvEEMCX238XcJB54L2pp+yEAnkXGPmlRkF/sIRQLt8MwIaAae3ErgLM
-         iJplrq9kWXdI3nurQx5HfyETVZTvzuIHmCpjra94r5aCpA9HXi18iaE7yYWUgqxPMgw2
-         K3bA==
+        d=gmail.com; s=20230601; t=1696186435; x=1696791235; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=3cD6+vLh9d0ZT/ELU9FRBDaG0MrX94eVa84jGJPRbYc=;
+        b=j5F4gqElpltv8i3nHLnLvXd5fIh0rJdVa/zUOkc0oqRK9417SLVQed9chMkB6iNgwz
+         0wt/pB7Y2DPl4iRdcH50bk3VCsFX50xKMgMoDSxykDLuEVUhzxT7k3Ne2/FviaWS5PpO
+         gc/AzPUwxjqq19uR1t0Yvar/ey3xhWT/ZxQcULp7CX7EPIOJuYEYBF+fwMB1AjjzMK3o
+         sLVBABzRthsXaIeEfc7nJVOJk6HpTfbmOOpsCBrWZplTUbLviGCq16yy8xpPYjoxZpEJ
+         hyjKignNY9PeY25rFuTddrGOKg7RGG98SrYaUo9QxH8KZ4/IeiRR8ZOEh5GotO1aJhSO
+         /tIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696186270; x=1696791070;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jnC1cLUw1otPjc5iY/XpyFgQUai99uHbpR9mHNJU9pA=;
-        b=Y+XczoFXm19Bf/B6WQQ82a7ZlM6xbmeY/vs7Jc+0l+gF6Rf0XcA0OOCc+us+be1+8E
-         Bj8hvJhA11G7fWRLgTp7luZ0WM6Ui4HEv2fW5IbWPqly62lwelvXLHOS/PoTz3v1H7H/
-         it1Tqr8N8yCyQQTSfxgf/9k1fbobJYmHphFO8R61MnqOMrHo+H0W3JPpKub0+IKgVrM6
-         yEeY3xT505ZwPCydO4xRB7/LPnzICHXddbWkir9EtJSgJ1r/TIi6GyYJnxAvGSB2g2aT
-         62HgZy1Zj6QWYsyTL2JdtekOLNk4CzAGGUwIVp4IacG5vSit8g6+92vmeq7ex6YWUqTx
-         f1KA==
-X-Gm-Message-State: AOJu0YxsuKkRDCfffZxFjXhcxhE3nLRB6vcjssp75LlgKdzHoKd/Sn3F
-	32HGrYWRyE33tlp2kJLHhTc=
-X-Google-Smtp-Source: AGHT+IH28uNoUYGbnkyWRhkDul5Pkzl7knxhvFKmqkbVLrJ3dUPUoWX60Ds6Pq3cehWt6BwjEKDSZQ==
-X-Received: by 2002:a05:6808:f92:b0:3ae:df5:6d0d with SMTP id o18-20020a0568080f9200b003ae0df56d0dmr10481660oiw.2.1696186270370;
-        Sun, 01 Oct 2023 11:51:10 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 23-20020a17090a031700b0025dc5749b4csm5338085pje.21.2023.10.01.11.51.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Oct 2023 11:51:09 -0700 (PDT)
-Date: Sun, 1 Oct 2023 11:51:07 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Xabier Marquiegui <reibax@gmail.com>, netdev@vger.kernel.org,
-	chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com,
-	ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
-	alex.maftei@amd.com, davem@davemloft.net, rrameshbabu@nvidia.com,
-	shuah@kernel.org
-Subject: Re: [PATCH net-next v3 3/3] ptp: support event queue reader channel
- masks
-Message-ID: <ZRm/myTwrv1MqHAn@hoboy.vegasvil.org>
-References: <20230928133544.3642650-1-reibax@gmail.com>
- <20230928133544.3642650-4-reibax@gmail.com>
- <20231001151202.GQ92317@kernel.org>
+        d=1e100.net; s=20230601; t=1696186435; x=1696791235;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3cD6+vLh9d0ZT/ELU9FRBDaG0MrX94eVa84jGJPRbYc=;
+        b=S0dv4MuKBJqfs0KrT9HBLs1DFMroOHOq+YmPuGDWPp7XNMUBpm52/8afaFir0NI/84
+         D6UNFfQsFvg9v5wpYzgVS6oegeI7EcouJkK7jF6aNPc9YWnGTyESIhd0iVg2PfC4C1Wc
+         vgHg+O0RN5hgNBZCpbAo28RDEe4K4IjtHBC793XhUXHNaku7sYyTP5CeWFnG4O9kY93j
+         mnrf1MuP/cj5rng3jhm1/65vtxkn7R3vQQopYTc2VuZrO9+bsE+VRntmPLMXk61xWTlV
+         QwKVP/E096QqlAU9AqMZSSRiC10ndTUFf6dP3e2OEKF2+hfp/uTbEsFEhiz1T6K9Q2Zc
+         OWsA==
+X-Gm-Message-State: AOJu0YzNHzjxfbn7KXapCQyFAR5nLNl5X2ILsrKFZ7wVvW8oerq9LFbX
+	I2gz2JgtrYT07MCV93LF8n/aMTBnsqTVi4byBck=
+X-Google-Smtp-Source: AGHT+IFlkqsvcgnhD+3Mg6qa7uqBTqo20BB11WgxJqDc6++w/YY2dF7AwWBvKnyzvQerqV40/qL/GvLz0C61N8ICmq4=
+X-Received: by 2002:adf:e583:0:b0:31f:f644:de09 with SMTP id
+ l3-20020adfe583000000b0031ff644de09mr8222483wrm.6.1696186434871; Sun, 01 Oct
+ 2023 11:53:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231001151202.GQ92317@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230926182625.72475-1-dg573847474@gmail.com> <CAM_iQpUbDR1S6hY6gPhjXrnWCQHGjQZ6JcB27zbauzdBhP76RA@mail.gmail.com>
+In-Reply-To: <CAM_iQpUbDR1S6hY6gPhjXrnWCQHGjQZ6JcB27zbauzdBhP76RA@mail.gmail.com>
+From: Chengfeng Ye <dg573847474@gmail.com>
+Date: Mon, 2 Oct 2023 02:53:43 +0800
+Message-ID: <CAAo+4rX0SVNnydubFLx2hfLJtuarnqFtSxGcUiy5O=HH-y_=Sw@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: use spin_lock_bh() on &gact->tcf_lock
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 01, 2023 at 05:12:02PM +0200, Simon Horman wrote:
+> Did you find this during code review or did you see a real
+> lockdep splat? If the latter, please include the full lockdep log.
 
-> > @@ -169,19 +170,28 @@ long ptp_ioctl(struct posix_clock_user *pcuser, unsigned int cmd,
-> >  {
-> >  	struct ptp_clock *ptp =
-> >  		container_of(pcuser->clk, struct ptp_clock, clock);
-> > +	struct ptp_tsfilter tsfilter_set, *tsfilter_get = NULL;
-> >  	struct ptp_sys_offset_extended *extoff = NULL;
-> >  	struct ptp_sys_offset_precise precise_offset;
-> >  	struct system_device_crosststamp xtstamp;
-> >  	struct ptp_clock_info *ops = ptp->info;
-> >  	struct ptp_sys_offset *sysoff = NULL;
-> > +	struct timestamp_event_queue *tsevq;
-> >  	struct ptp_system_timestamp sts;
-> >  	struct ptp_clock_request req;
-> >  	struct ptp_clock_caps caps;
-> >  	struct ptp_clock_time *pct;
-> > +	int lsize, enable, err = 0;
-> >  	unsigned int i, pin_index;
-> >  	struct ptp_pin_desc pd;
-> >  	struct timespec64 ts;
-> > -	int enable, err = 0;
-> > +
-> > +	tsevq = pcuser->private_clkdata;
-> > +
-> > +	if (tsevq->close_req) {
-> > +		err = -EPIPE;
-> > +		return err;
-> > +	}
-> 
-> Here tseqv is dereferenced unconditionally...
-
-Which is correct because the pointer is always set during open().
-
-> 
-> >  
-> >  	switch (cmd) {
-> >  
-> > @@ -481,6 +491,79 @@ long ptp_ioctl(struct posix_clock_user *pcuser, unsigned int cmd,
-> >  		mutex_unlock(&ptp->pincfg_mux);
-> >  		break;
-> >  
-> > +	case PTP_FILTERCOUNT_REQUEST:
-> > +		/* Calculate amount of device users */
-> > +		if (tsevq) {
-> 
-> ... but here it is assumed that tseqv might be NULL.
-
-Which is incorrect.  The test is pointless.
+No, it is found during static code review.
 
 Thanks,
-Richard
+Chengfeng
 
