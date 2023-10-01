@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-37275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB8D87B4830
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C28B97B482F
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 16:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 254C7282A18
-	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:51:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8FF552822B3
+	for <lists+netdev@lfdr.de>; Sun,  1 Oct 2023 14:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E0F171A8;
-	Sun,  1 Oct 2023 14:51:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D675FBFD;
+	Sun,  1 Oct 2023 14:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A251802E
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:51:14 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A3EF1
-	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 07:51:11 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d86dac81f8fso16846268276.1
-        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 07:51:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF48F1802B
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 14:51:13 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F178FA
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 07:51:12 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a20c7295bbso44738097b3.0
+        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 07:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696171870; x=1696776670; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696171872; x=1696776672; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7baOcN0NfRnsn3oW+qaGtTdUJTKl0ZG0sHS5gwfUCpo=;
-        b=WRI776ouBrattp077Hg/+L73sex/ufs8JTPKzfRlsipWT90y/nazZUA5quhaSmx6K/
-         2GIwOOOlGEc07SvCjPlrrqk33JlkwszKWYQKKZLwJ/Zg0lUOYdIsDKt5q6V/PBrbu6qo
-         jMLTQxKMorLsS8O3n7h2wh39jFYL2EagY844ve3QTsLGG+roT+G+76O3K3o5oesMDnEK
-         ox/0p6T1mhK+1IhayiiZsiWDL2TaYB8NwRuAaggmmznm+YgraycbpFmscWWnP/mgVpKx
-         k+bUK8IQdV9VvikOzmoKLP2oW/oAGaU7M2nnWb8Y9ZMTA3TsFT/ACQ7QP7ud0y0MkBB6
-         UUdA==
+        bh=B2AGvwXpb0WC95trVEwZsQK9/WLFvPeSaJf59DFRVl4=;
+        b=UdchtQt0J/GsPSpAhv4u+3JtRH5wK6F7UOMjcz+U2+NIzQ+m6GzFwhfu1fwqYGAT/P
+         1Ies0ra2o6lAilSTMqUoYjcRGBnrbVFwJmVYxY7lD0tkqh7m9wCGF+6FgvQSLhLG1dad
+         3BBJcjvM/zwXXsBD1c/sTYXe6bAeQDW2ONPNW/1y5+M2dpWfj0YS9XBY8JrbOv7/DKEO
+         4bb3556n9go69WeKUn5hlltjyOuy/MO6BzNAJpUEb3UQy09FI7A/RWn9zeckpmNvISd5
+         IecbNIngh2h3G4sQmp/OImj2Bv9Tj8ROy3Ia0n4PP7qISC75pg6lTieAuw/e6wzefyam
+         I+DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696171870; x=1696776670;
+        d=1e100.net; s=20230601; t=1696171872; x=1696776672;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7baOcN0NfRnsn3oW+qaGtTdUJTKl0ZG0sHS5gwfUCpo=;
-        b=hGndoDeMbP722PlyL6IjyIZBoM7lR0y+OvMUUKQBQ2iwxUwIWrDE6I56+zjaNhZ7yY
-         y1mpV66TFOpmpF8K9SEsVPelU5RAEbx0M58KsJB1ae+WBCv980FUr8Da3A5PLUlVnrzi
-         MLrVFdvwDUVVQjYIRrqhaVYL73uSXqOWeNAXzL/lrBpA5hUnwcCuJZJPGx5CJbNbNOKb
-         rRSEB2ANT0nGEgydlS52w9jWDZsnVQTEVxuAajKHA8YPaRTV2jlTWu05fUW1WW8cdr7Q
-         8TWKX8FrA9uwmuzrwVxYfR/RcAGgqkz/afZw3zbtC8dptFnBeJfa39Tzz7nH4u07JaCw
-         rzPw==
-X-Gm-Message-State: AOJu0YxUhdHlrOTOz8vJ7PiCRNMIknMKRgp4KQO9sPFDMSj+KuxRgDYj
-	kweH/7RtZp0P84pR50q/uuar9GdxmLmyrA==
-X-Google-Smtp-Source: AGHT+IERvf9rqKQo6KB2mshZMgD7ggZQxa6i+SSGi3HZNcJzZsWqN43JhEZF9UPcWh+h/a5TtmvD55QOR7YyqA==
+        bh=B2AGvwXpb0WC95trVEwZsQK9/WLFvPeSaJf59DFRVl4=;
+        b=uroT7AooRlx0zTVPq8ClhP7Phw+0amtHBqaMiqZDz5qxUx47Rp4beOh5WXOkl0clqe
+         s94gV65u9FBNYTD7Uo3tyZo2lIHQOVQXcneA+39fW/f1CSTIStwdJntI7RoZ7f8n7ln9
+         /NkMKRtQYWleUP/XK6CnfbDPtsfRiBdEzY4XaldkV7i205pBjiVmJfbp9DD51qNalD/x
+         lK0cCMQfuv006UwyrndP6NuHPclw6PKIgWEdNNt4ydJ3GO05a9ODEJlnxlduIv0cFO+t
+         h6UDzTWk/mhg9TXxJNihUmkELryHIFBh/Q45awuIKRaG+sllKp4qoW12vWnofwx0kSu7
+         Pt6g==
+X-Gm-Message-State: AOJu0YwfKJLxoGaD3Ay31cTdzgLfigVqWh13nSQhcXD78swsNg26Oeb3
+	HwpnB2sinn+jf6Nj+IBpdGgROkK3Jb3EWg==
+X-Google-Smtp-Source: AGHT+IE5Y+pt8hg+m7BeXP5McmYyD/GVvAnLvowqKPihfKgVrmPSpKobCjTtyw7fiZI5f4S4L11GGSbXrWcTYg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:ad50:0:b0:d0e:e780:81b3 with SMTP id
- l16-20020a25ad50000000b00d0ee78081b3mr132467ybe.2.1696171870117; Sun, 01 Oct
- 2023 07:51:10 -0700 (PDT)
-Date: Sun,  1 Oct 2023 14:51:01 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:ca13:0:b0:56c:e9fe:3cb4 with SMTP id
+ p19-20020a81ca13000000b0056ce9fe3cb4mr217492ywi.1.1696171871775; Sun, 01 Oct
+ 2023 07:51:11 -0700 (PDT)
+Date: Sun,  1 Oct 2023 14:51:02 +0000
 In-Reply-To: <20231001145102.733450-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231001145102.733450-1-edumazet@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231001145102.733450-4-edumazet@google.com>
-Subject: [PATCH net-next 3/4] net_sched: sch_fq: add 3 bands and WRR scheduling
+Message-ID: <20231001145102.733450-5-edumazet@google.com>
+Subject: [PATCH net-next 4/4] net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -71,523 +71,121 @@ Cc: Willem de Bruijn <willemb@google.com>, Soheil Hassas Yeganeh <soheil@google.
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Before Google adopted FQ for its production servers,
-we had to ensure AF4 packets would get a higher share
-than BE1 ones.
+This attribute can be used to tune the per band weight
+and report them in "tc qdisc show" output:
 
-As discussed this week in Netconf 2023 in Paris, it is time
-to upstream this for public use.
-
-After this patch FQ can replace pfifo_fast, with the following
-differences :
-
-- FQ uses WRR instead of strict prio, to avoid starvation of
-  low priority packets.
-
-- We make sure each band/prio tracks its own usage against sch->limit.
-  This was done to make sure flood of low priority packets would not
-  prevent AF4 packets to be queued. Contributed by Willem.
-
-- priomap can be changed, if needed (default value are the ones
-  coming from pfifo_fast).
-
-In this patch, we set default band weights so that :
-
-- high prio (band=0) packets get 90% of the bandwidth
-  if they compete with low prio (band=2) packets.
-
-- high prio packets get 75% of the bandwidth
-  if they compete with medium prio (band=1) packets.
-
-Following patch in this series adds the possibility to tune
-the per-band weights.
-
-As we added many fields in 'struct fq_sched_data', we had
-to make sure to have the first cache line read-mostly, and
-avoid wasting precious cache lines.
-
-More optimizations are possible but will be sent separately.
+qdisc fq 802f: parent 1:9 limit 100000p flow_limit 500p buckets 1024 orphan_mask 1023
+ quantum 8364b initial_quantum 41820b low_rate_threshold 550Kbit
+ refill_delay 40ms timer_slack 10us horizon 10s horizon_drop
+ bands 3 priomap 1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1 weights 589824 196608 65536
+ Sent 236460814 bytes 792991 pkt (dropped 0, overlimits 0 requeues 0)
+ rate 25816bit 10pps backlog 0b 0p requeues 0
+  flows 4 (inactive 4 throttled 0)
+  gc 0 throttled 19 latency 17.6us fastpath 773882
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/uapi/linux/pkt_sched.h |  11 +-
- net/sched/sch_fq.c             | 203 ++++++++++++++++++++++++++-------
- 2 files changed, 170 insertions(+), 44 deletions(-)
+ include/uapi/linux/pkt_sched.h |  3 +++
+ net/sched/sch_fq.c             | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
 diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
-index 579f641846b87da05e5d4b09c1072c90220ca601..ec5ab44d41a2493130670870dc9e68c71187740f 100644
+index ec5ab44d41a2493130670870dc9e68c71187740f..f762a10bfb78ed896d8a5b936045a956d97b3831 100644
 --- a/include/uapi/linux/pkt_sched.h
 +++ b/include/uapi/linux/pkt_sched.h
-@@ -941,15 +941,19 @@ enum {
+@@ -943,12 +943,15 @@ enum {
  
- 	TCA_FQ_HORIZON_DROP,	/* drop packets beyond horizon, or cap their EDT */
+ 	TCA_FQ_PRIOMAP,		/* prio2band */
  
-+	TCA_FQ_PRIOMAP,		/* prio2band */
++	TCA_FQ_WEIGHTS,		/* Weights for each band */
 +
  	__TCA_FQ_MAX
  };
  
  #define TCA_FQ_MAX	(__TCA_FQ_MAX - 1)
  
-+#define FQ_BANDS 3
-+
+ #define FQ_BANDS 3
++#define FQ_MIN_WEIGHT 16384
+ 
  struct tc_fq_qd_stats {
  	__u64	gc_flows;
--	__u64	highprio_packets;
--	__u64	tcp_retrans;
-+	__u64	highprio_packets;	/* obsolete */
-+	__u64	tcp_retrans;		/* obsolete */
- 	__u64	throttled;
- 	__u64	flows_plimit;
- 	__u64	pkts_too_long;
-@@ -963,6 +967,9 @@ struct tc_fq_qd_stats {
- 	__u64	horizon_drops;
- 	__u64	horizon_caps;
- 	__u64	fastpath_packets;
-+	__u64	band_drops[FQ_BANDS];
-+	__u32	band_pkt_count[FQ_BANDS];
-+	__u32	pad;
- };
- 
- /* Heavy-Hitter Filter */
 diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 91d71a538b71f9208f2507fd11443f784dffa966..1bae145750a66f769bd30f1db09203f725801249 100644
+index 1bae145750a66f769bd30f1db09203f725801249..1a411fe36c79a86635f319c230a045d653571700 100644
 --- a/net/sched/sch_fq.c
 +++ b/net/sched/sch_fq.c
-@@ -51,7 +51,8 @@
- #include <net/tcp.h>
- 
- struct fq_skb_cb {
--	u64	        time_to_send;
-+	u64	time_to_send;
-+	u8	band;
- };
- 
- static inline struct fq_skb_cb *fq_skb_cb(struct sk_buff *skb)
-@@ -84,32 +85,28 @@ struct fq_flow {
- 	u32		socket_hash;	/* sk_hash */
- 	int		qlen;		/* number of packets in flow queue */
- 
--/* Second cache line, used in fq_dequeue() */
-+/* Second cache line */
- 	int		credit;
--	/* 32bit hole on 64bit arches */
--
-+	int		band;
- 	struct fq_flow *next;		/* next pointer in RR lists */
- 
- 	struct rb_node  rate_node;	/* anchor in q->delayed tree */
- 	u64		time_next_packet;
--} ____cacheline_aligned_in_smp;
-+};
- 
- struct fq_flow_head {
- 	struct fq_flow *first;
- 	struct fq_flow *last;
- };
- 
--struct fq_sched_data {
-+struct fq_perband_flows {
- 	struct fq_flow_head new_flows;
--
- 	struct fq_flow_head old_flows;
-+	int		    credit;
-+	int		    quantum; /* based on band nr : 576KB, 192KB, 64KB */
-+};
- 
--	struct rb_root	delayed;	/* for rate limited flows */
--	u64		time_next_delayed_flow;
--	unsigned long	unthrottle_latency_ns;
--
--	struct fq_flow	internal;	/* for non classified or high prio packets */
--
-+struct fq_sched_data {
- /* Read mostly cache line */
- 
- 	u32		quantum;
-@@ -125,10 +122,21 @@ struct fq_sched_data {
- 	u8		rate_enable;
- 	u8		fq_trees_log;
- 	u8		horizon_drop;
-+	u8		prio2band[(TC_PRIO_MAX + 1) >> 2];
- 	u32		timer_slack; /* hrtimer slack in ns */
- 
- /* Read/Write fields. */
- 
-+	unsigned int band_nr; /* band being serviced in fq_dequeue() */
-+
-+	struct fq_perband_flows band_flows[FQ_BANDS];
-+
-+	struct fq_flow	internal;	/* fastpath queue. */
-+	struct rb_root	delayed;	/* for rate limited flows */
-+	u64		time_next_delayed_flow;
-+	unsigned long	unthrottle_latency_ns;
-+
-+	u32		band_pkt_count[FQ_BANDS];
- 	u32		flows;
- 	u32		inactive_flows; /* Flows with no packet to send. */
- 	u32		throttled_flows;
-@@ -139,7 +147,7 @@ struct fq_sched_data {
- 
- /* Seldom used fields. */
- 
--	u64		stat_internal_packets; /* aka highprio */
-+	u64		stat_band_drops[FQ_BANDS];
- 	u64		stat_ce_mark;
- 	u64		stat_horizon_drops;
- 	u64		stat_horizon_caps;
-@@ -148,6 +156,12 @@ struct fq_sched_data {
- 	u64		stat_allocation_errors;
- };
- 
-+/* return the i-th 2-bit value ("crumb") */
-+static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
-+{
-+	return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
-+}
-+
- /*
-  * f->tail and f->age share the same location.
-  * We can use the low order bit to differentiate if this location points
-@@ -172,8 +186,19 @@ static bool fq_flow_is_throttled(const struct fq_flow *f)
- 	return f->next == &throttled;
- }
- 
--static void fq_flow_add_tail(struct fq_flow_head *head, struct fq_flow *flow)
-+enum new_flow {
-+	NEW_FLOW,
-+	OLD_FLOW
-+};
-+
-+static void fq_flow_add_tail(struct fq_sched_data *q, struct fq_flow *flow,
-+			     enum new_flow list_sel)
- {
-+	struct fq_perband_flows *pband = &q->band_flows[flow->band];
-+	struct fq_flow_head *head = (list_sel == NEW_FLOW) ?
-+					&pband->new_flows :
-+					&pband->old_flows;
-+
- 	if (head->first)
- 		head->last->next = flow;
- 	else
-@@ -186,7 +211,7 @@ static void fq_flow_unset_throttled(struct fq_sched_data *q, struct fq_flow *f)
- {
- 	rb_erase(&f->rate_node, &q->delayed);
- 	q->throttled_flows--;
--	fq_flow_add_tail(&q->old_flows, f);
-+	fq_flow_add_tail(q, f, OLD_FLOW);
- }
- 
- static void fq_flow_set_throttled(struct fq_sched_data *q, struct fq_flow *f)
-@@ -326,11 +351,6 @@ static struct fq_flow *fq_classify(struct Qdisc *sch, struct sk_buff *skb,
- 	struct rb_root *root;
- 	struct fq_flow *f;
- 
--	/* warning: no starvation prevention... */
--	if (unlikely((skb->priority & TC_PRIO_MAX) == TC_PRIO_CONTROL)) {
--		q->stat_internal_packets++; /* highprio packet */
--		return &q->internal;
--	}
- 	/* SYNACK messages are attached to a TCP_NEW_SYN_RECV request socket
- 	 * or a listener (SYNCOOKIE mode)
- 	 * 1) request sockets are not full blown,
-@@ -509,9 +529,13 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	struct fq_sched_data *q = qdisc_priv(sch);
- 	struct fq_flow *f;
- 	u64 now;
-+	u8 band;
- 
--	if (unlikely(sch->q.qlen >= sch->limit))
-+	band = fq_prio2band(q->prio2band, skb->priority & TC_PRIO_MAX);
-+	if (unlikely(q->band_pkt_count[band] >= sch->limit)) {
-+		q->stat_band_drops[band]++;
- 		return qdisc_drop(skb, sch, to_free);
-+	}
- 
- 	now = ktime_get_ns();
- 	if (!skb->tstamp) {
-@@ -538,11 +562,14 @@ static int fq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 		}
- 
- 		if (fq_flow_is_detached(f)) {
--			fq_flow_add_tail(&q->new_flows, f);
-+			fq_flow_add_tail(q, f, NEW_FLOW);
- 			if (time_after(jiffies, f->age + q->flow_refill_delay))
- 				f->credit = max_t(u32, f->credit, q->quantum);
- 		}
- 
-+		f->band = band;
-+		q->band_pkt_count[band]++;
-+		fq_skb_cb(skb)->band = band;
- 		if (f->qlen == 0)
- 			q->inactive_flows--;
- 	}
-@@ -584,13 +611,26 @@ static void fq_check_throttled(struct fq_sched_data *q, u64 now)
- 	}
- }
- 
-+static struct fq_flow_head *fq_pband_head_select(struct fq_perband_flows *pband)
-+{
-+	if (pband->credit <= 0)
-+		return NULL;
-+
-+	if (pband->new_flows.first)
-+		return &pband->new_flows;
-+
-+	return pband->old_flows.first ? &pband->old_flows : NULL;
-+}
-+
- static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- {
- 	struct fq_sched_data *q = qdisc_priv(sch);
-+	struct fq_perband_flows *pband;
- 	struct fq_flow_head *head;
- 	struct sk_buff *skb;
- 	struct fq_flow *f;
- 	unsigned long rate;
-+	int retry;
- 	u32 plen;
- 	u64 now;
- 
-@@ -606,24 +646,31 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 
- 	now = ktime_get_ns();
- 	fq_check_throttled(q, now);
-+	retry = 0;
-+	pband = &q->band_flows[q->band_nr];
- begin:
--	head = &q->new_flows;
--	if (!head->first) {
--		head = &q->old_flows;
--		if (!head->first) {
--			if (q->time_next_delayed_flow != ~0ULL)
--				qdisc_watchdog_schedule_range_ns(&q->watchdog,
-+	head = fq_pband_head_select(pband);
-+	if (!head) {
-+		while (++retry < FQ_BANDS) {
-+			if (++q->band_nr == FQ_BANDS)
-+				q->band_nr = 0;
-+			pband = &q->band_flows[q->band_nr];
-+			pband->credit = min(pband->credit + pband->quantum,
-+					    pband->quantum);
-+			goto begin;
-+		}
-+		if (q->time_next_delayed_flow != ~0ULL)
-+			qdisc_watchdog_schedule_range_ns(&q->watchdog,
- 							q->time_next_delayed_flow,
- 							q->timer_slack);
--			return NULL;
--		}
-+		return NULL;
- 	}
- 	f = head->first;
--
-+	retry = 0;
- 	if (f->credit <= 0) {
- 		f->credit += q->quantum;
- 		head->first = f->next;
--		fq_flow_add_tail(&q->old_flows, f);
-+		fq_flow_add_tail(q, f, OLD_FLOW);
- 		goto begin;
- 	}
- 
-@@ -645,12 +692,13 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 		}
- 		if (--f->qlen == 0)
- 			q->inactive_flows++;
-+		q->band_pkt_count[fq_skb_cb(skb)->band]--;
- 		fq_dequeue_skb(sch, f, skb);
- 	} else {
- 		head->first = f->next;
- 		/* force a pass through old_flows to prevent starvation */
--		if ((head == &q->new_flows) && q->old_flows.first) {
--			fq_flow_add_tail(&q->old_flows, f);
-+		if (head == &pband->new_flows) {
-+			fq_flow_add_tail(q, f, OLD_FLOW);
- 		} else {
- 			fq_flow_set_detached(f);
- 		}
-@@ -658,6 +706,7 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 	}
- 	plen = qdisc_pkt_len(skb);
- 	f->credit -= plen;
-+	pband->credit -= plen;
- 
- 	if (!q->rate_enable)
- 		goto out;
-@@ -749,8 +798,10 @@ static void fq_reset(struct Qdisc *sch)
- 			kmem_cache_free(fq_flow_cachep, f);
- 		}
- 	}
--	q->new_flows.first	= NULL;
--	q->old_flows.first	= NULL;
-+	for (idx = 0; idx < FQ_BANDS; idx++) {
-+		q->band_flows[idx].new_flows.first = NULL;
-+		q->band_flows[idx].old_flows.first = NULL;
-+	}
- 	q->delayed		= RB_ROOT;
- 	q->flows		= 0;
- 	q->inactive_flows	= 0;
-@@ -864,8 +915,53 @@ static const struct nla_policy fq_policy[TCA_FQ_MAX + 1] = {
- 	[TCA_FQ_TIMER_SLACK]		= { .type = NLA_U32 },
- 	[TCA_FQ_HORIZON]		= { .type = NLA_U32 },
- 	[TCA_FQ_HORIZON_DROP]		= { .type = NLA_U8 },
-+	[TCA_FQ_PRIOMAP]		= {
+@@ -919,6 +919,10 @@ static const struct nla_policy fq_policy[TCA_FQ_MAX + 1] = {
+ 			.type = NLA_BINARY,
+ 			.len = sizeof(struct tc_prio_qopt),
+ 		},
++	[TCA_FQ_WEIGHTS]		= {
 +			.type = NLA_BINARY,
-+			.len = sizeof(struct tc_prio_qopt),
++			.len = FQ_BANDS * sizeof(s32),
 +		},
  };
  
-+/* compress a u8 array with all elems <= 3 to an array of 2-bit fields */
-+static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
-+{
-+	const int num_elems = TC_PRIO_MAX + 1;
-+	int i;
-+
-+	memset(out, 0, num_elems / 4);
-+	for (i = 0; i < num_elems; i++)
-+		out[i / 4] |= in[i] << (2 * (i & 0x3));
-+}
-+
-+static void fq_prio2band_decompress_crumb(const u8 *in, u8 *out)
-+{
-+	const int num_elems = TC_PRIO_MAX + 1;
-+	int i;
-+
-+	for (i = 0; i < num_elems; i++)
-+		out[i] = fq_prio2band(in, i);
-+}
-+
-+static int fq_load_priomap(struct fq_sched_data *q,
+ /* compress a u8 array with all elems <= 3 to an array of 2-bit fields */
+@@ -941,6 +945,24 @@ static void fq_prio2band_decompress_crumb(const u8 *in, u8 *out)
+ 		out[i] = fq_prio2band(in, i);
+ }
+ 
++static int fq_load_weights(struct fq_sched_data *q,
 +			   const struct nlattr *attr,
 +			   struct netlink_ext_ack *extack)
 +{
-+	const struct tc_prio_qopt *map = nla_data(attr);
++	s32 *weights = nla_data(attr);
 +	int i;
 +
-+	if (map->bands != FQ_BANDS) {
-+		NL_SET_ERR_MSG_MOD(extack, "FQ only supports 3 bands");
-+		return -EINVAL;
-+	}
-+	for (i = 0; i < TC_PRIO_MAX + 1; i++) {
-+		if (map->priomap[i] >= FQ_BANDS) {
-+			NL_SET_ERR_MSG_MOD(extack, "Incorrect field in FQ priomap");
++	for (i = 0; i < FQ_BANDS; i++) {
++		if (weights[i] < FQ_MIN_WEIGHT) {
++			NL_SET_ERR_MSG_MOD(extack, "Incorrect weight");
 +			return -EINVAL;
 +		}
 +	}
-+	fq_prio2band_compress_crumb(map->priomap, q->prio2band);
++	for (i = 0; i < FQ_BANDS; i++)
++		q->band_flows[i].quantum = weights[i];
 +	return 0;
 +}
 +
- static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 		     struct netlink_ext_ack *extack)
- {
-@@ -940,6 +1036,9 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 		q->flow_refill_delay = usecs_to_jiffies(usecs_delay);
- 	}
+ static int fq_load_priomap(struct fq_sched_data *q,
+ 			   const struct nlattr *attr,
+ 			   struct netlink_ext_ack *extack)
+@@ -1039,6 +1061,9 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
+ 	if (!err && tb[TCA_FQ_PRIOMAP])
+ 		err = fq_load_priomap(q, tb[TCA_FQ_PRIOMAP], extack);
  
-+	if (!err && tb[TCA_FQ_PRIOMAP])
-+		err = fq_load_priomap(q, tb[TCA_FQ_PRIOMAP], extack);
++	if (!err && tb[TCA_FQ_WEIGHTS])
++		err = fq_load_weights(q, tb[TCA_FQ_WEIGHTS], extack);
 +
  	if (tb[TCA_FQ_ORPHAN_MASK])
  		q->orphan_mask = nla_get_u32(tb[TCA_FQ_ORPHAN_MASK]);
  
-@@ -991,7 +1090,7 @@ static int fq_init(struct Qdisc *sch, struct nlattr *opt,
- 		   struct netlink_ext_ack *extack)
- {
- 	struct fq_sched_data *q = qdisc_priv(sch);
--	int err;
-+	int i, err;
- 
- 	sch->limit		= 10000;
- 	q->flow_plimit		= 100;
-@@ -1001,8 +1100,13 @@ static int fq_init(struct Qdisc *sch, struct nlattr *opt,
- 	q->flow_max_rate	= ~0UL;
- 	q->time_next_delayed_flow = ~0ULL;
- 	q->rate_enable		= 1;
--	q->new_flows.first	= NULL;
--	q->old_flows.first	= NULL;
-+	for (i = 0; i < FQ_BANDS; i++) {
-+		q->band_flows[i].new_flows.first = NULL;
-+		q->band_flows[i].old_flows.first = NULL;
-+	}
-+	q->band_flows[0].quantum = 9 << 16;
-+	q->band_flows[1].quantum = 3 << 16;
-+	q->band_flows[2].quantum = 1 << 16;
- 	q->delayed		= RB_ROOT;
- 	q->fq_root		= NULL;
- 	q->fq_trees_log		= ilog2(1024);
-@@ -1017,6 +1121,7 @@ static int fq_init(struct Qdisc *sch, struct nlattr *opt,
- 	/* Default ce_threshold of 4294 seconds */
- 	q->ce_threshold		= (u64)NSEC_PER_USEC * ~0U;
- 
-+	fq_prio2band_compress_crumb(sch_default_prio2band, q->prio2band);
- 	qdisc_watchdog_init_clockid(&q->watchdog, sch, CLOCK_MONOTONIC);
- 
- 	if (opt)
-@@ -1031,6 +1136,9 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- {
- 	struct fq_sched_data *q = qdisc_priv(sch);
- 	u64 ce_threshold = q->ce_threshold;
-+	struct tc_prio_qopt prio = {
-+		.bands = FQ_BANDS,
-+	};
+@@ -1141,6 +1166,7 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	};
  	u64 horizon = q->horizon;
  	struct nlattr *opts;
++	s32 weights[3];
  
-@@ -1062,6 +1170,10 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	    nla_put_u8(skb, TCA_FQ_HORIZON_DROP, q->horizon_drop))
+ 	opts = nla_nest_start_noflag(skb, TCA_OPTIONS);
+ 	if (opts == NULL)
+@@ -1174,6 +1200,12 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	if (nla_put(skb, TCA_FQ_PRIOMAP, sizeof(prio), &prio))
  		goto nla_put_failure;
  
-+	fq_prio2band_decompress_crumb(q->prio2band, prio.priomap);
-+	if (nla_put(skb, TCA_FQ_PRIOMAP, sizeof(prio), &prio))
++	weights[0] = q->band_flows[0].quantum;
++	weights[1] = q->band_flows[1].quantum;
++	weights[2] = q->band_flows[2].quantum;
++	if (nla_put(skb, TCA_FQ_WEIGHTS, sizeof(weights), &weights))
 +		goto nla_put_failure;
 +
  	return nla_nest_end(skb, opts);
  
  nla_put_failure:
-@@ -1072,11 +1184,14 @@ static int fq_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- {
- 	struct fq_sched_data *q = qdisc_priv(sch);
- 	struct tc_fq_qd_stats st;
-+	int i;
-+
-+	st.pad = 0;
- 
- 	sch_tree_lock(sch);
- 
- 	st.gc_flows		  = q->stat_gc_flows;
--	st.highprio_packets	  = q->stat_internal_packets;
-+	st.highprio_packets	  = 0;
- 	st.fastpath_packets	  = q->internal.stat_fastpath_packets;
- 	st.tcp_retrans		  = 0;
- 	st.throttled		  = q->stat_throttled;
-@@ -1093,6 +1208,10 @@ static int fq_dump_stats(struct Qdisc *sch, struct gnet_dump *d)
- 	st.ce_mark		  = q->stat_ce_mark;
- 	st.horizon_drops	  = q->stat_horizon_drops;
- 	st.horizon_caps		  = q->stat_horizon_caps;
-+	for (i = 0; i < FQ_BANDS; i++) {
-+		st.band_drops[i]  = q->stat_band_drops[i];
-+		st.band_pkt_count[i] = q->band_pkt_count[i];
-+	}
- 	sch_tree_unlock(sch);
- 
- 	return gnet_stats_copy_app(d, &st, sizeof(st));
-@@ -1120,7 +1239,7 @@ static int __init fq_module_init(void)
- 
- 	fq_flow_cachep = kmem_cache_create("fq_flow_cache",
- 					   sizeof(struct fq_flow),
--					   0, 0, NULL);
-+					   0, SLAB_HWCACHE_ALIGN, NULL);
- 	if (!fq_flow_cachep)
- 		return -ENOMEM;
- 
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
