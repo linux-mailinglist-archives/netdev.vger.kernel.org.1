@@ -1,152 +1,97 @@
-Return-Path: <netdev+bounces-37326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53CE7B4D5A
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 10:38:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 724287B4D7D
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 10:46:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 837EC1C204E8
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:38:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id EEF3028184D
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C9F1361;
-	Mon,  2 Oct 2023 08:38:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B831C2D;
+	Mon,  2 Oct 2023 08:46:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7600A20
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 08:38:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C461C433C8;
-	Mon,  2 Oct 2023 08:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696235922;
-	bh=QKQIHWTbgfLpyj+Ika035PQ5df3XDSAH9fgVzXKccQk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JPgX4GRrUTebAwufvkvpxXJeH4R2XA+mmWd4wcWmZCFqY1MniCoL+Qewm+pIuscUZ
-	 li5sl2E8Ebl5mrcaEzI6+e8syPHPdFmdvZGcJvX7F+fTeaNdJLDujKLtjT37IpxetY
-	 LJKk/QLvyeMmuWH4vTiogJo9B8MsGlYGQCqYaxQuSElNjByjdVZqN953VN9rQ/LUbQ
-	 Yda0uWWIWxJVf8tICq/toqFEUbThXtXib4hNsMcy4g111MzWkGZHllhZ41JPH0j5lg
-	 yKBtDQ/U0/MU09Z/jIgtxbpsp0GyogG37dyAU4HrfTrXJ+pvDrENeLTGF7RQEmYMe2
-	 N9u2qVranXAPw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: linux-rdma@vger.kernel.org,
-	Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org,
-	Patrisious Haddad <phaddad@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [GIT PULL] Please pull IPsec packet offload support in multiport RoCE devices
-Date: Mon,  2 Oct 2023 11:38:31 +0300
-Message-ID: <20231002083832.19746-1-leon@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B467F17F4
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 08:46:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98574C433C7;
+	Mon,  2 Oct 2023 08:46:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696236367;
+	bh=SFYczP14+YPquywIz+kLBBQBFxbQSUtX9DllX2+43Po=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZnAklcyfyFtMFaYI1giLt0UCh8h+FrWL8byoDNMu37IUBE9p1mlCYiZ/lcjBMHG+v
+	 IgL+RUFTzDEtSOiK8ciqQu3ur11ICwdlZc/pLilHmXsWFcl4LwHF5IdyyKHFaquAq3
+	 rsiddk+eVqb55CzS6iD1w/Mz2O/djrOr10+kJ520=
+Date: Mon, 2 Oct 2023 10:46:05 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jerry Snitselaar <jsnitsel@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>,
+	Chris Leech <cleech@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Nilesh Javali <njavali@marvell.com>,
+	Manish Rangankar <mrangankar@marvell.com>,
+	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
+Message-ID: <2023100233-salsa-joyous-6d8c@gregkh>
+References: <20230929170023.1020032-1-cleech@redhat.com>
+ <20230929170023.1020032-4-cleech@redhat.com>
+ <2023093055-gotten-astronomy-a98b@gregkh>
+ <ZRhmqBRNUB3AfLv/@rhel-developer-toolbox>
+ <2023093002-unlighted-ragged-c6e1@gregkh>
+ <e0360d8f-6d36-4178-9069-d633d9b7031d@suse.de>
+ <2023100114-flatware-mourner-3fed@gregkh>
+ <7pq4ptas5wpcxd3v4p7iwvgoj7vrpta6aqfppqmuoccpk4mg5t@fwxm3apjkez3>
+ <20231002060424.GA781@lst.de>
+ <tf2zu6gqaii2bjipbo2mn2hz64px2624rfcmyg36rkq4bskxiw@zgjzznig6e22>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tf2zu6gqaii2bjipbo2mn2hz64px2624rfcmyg36rkq4bskxiw@zgjzznig6e22>
 
-Hi,
+On Mon, Oct 02, 2023 at 12:50:21AM -0700, Jerry Snitselaar wrote:
+> On Mon, Oct 02, 2023 at 08:04:24AM +0200, Christoph Hellwig wrote:
+> > On Sun, Oct 01, 2023 at 07:22:36AM -0700, Jerry Snitselaar wrote:
+> > > Changes last year to the dma-mapping api to no longer allow __GFP_COMP,
+> > > in particular these two (from the e529d3507a93 dma-mapping pull for
+> > > 6.2):
+> > 
+> > That's complete BS.  The driver was broken since day 1 and always
+> > ignored the DMA API requirement to never try to grab the page from the
+> > dma coherent allocation because you generally speaking can't.  It just
+> > happened to accidentally work the trivial dma coherent allocator that
+> > is used on x86.
+> > 
+> 
+> re-sending since gmail decided to not send plain text:
+> 
+> Yes, I agree that it has been broken and misusing the API. Greg's
+> question was what changed though, and it was the clean up of
+> __GFP_COMP in dma-mapping that brought the problem in the driver to
+> light.
+> 
+> I already said the other day that cnic has been doing this for 14
+> years. I'm not blaming you or your __GFP_COMP cleanup commits, they
+> just uncovered that cnic was doing something wrong. My apologies if
+> you took it that way.
 
-This PR is collected from https://lore.kernel.org/all/cover.1695296682.git.leon@kernel.org
+As these devices aren't being made anymore, and this api is really not a
+good idea in the first place, why don't we just leave it broken and see
+if anyone notices?
 
-This series from Patrisious extends mlx5 to support IPsec packet offload
-in multiport devices (MPV, see [1] for more details).
+thanks,
 
-These devices have single flow steering logic and two netdev interfaces,
-which require extra logic to manage IPsec configurations as they performed
-on netdevs.
-
-Thanks
-
-[1] https://lore.kernel.org/linux-rdma/20180104152544.28919-1-leon@kernel.org/
-
-----------------------------------------------------------------
-Conflict notice:
-when merged into net-next, this series will cause a conflict in file:
-include/linux/mlx5/device.h
-
-diff --cc include/linux/mlx5/device.h
-index 8fbe22de16ef,26333d602a50..000000000000
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@@ -366,7 -366,8 +366,12 @@@ enum mlx5_driver_event
-        MLX5_DRIVER_EVENT_UPLINK_NETDEV,
-        MLX5_DRIVER_EVENT_MACSEC_SA_ADDED,
-        MLX5_DRIVER_EVENT_MACSEC_SA_DELETED,
-++<<<<<<< HEAD
- +      MLX5_DRIVER_EVENT_SF_PEER_DEVLINK,
-++=======
-+       MLX5_DRIVER_EVENT_AFFILIATION_DONE,
-+       MLX5_DRIVER_EVENT_AFFILIATION_REMOVED,
-++>>>>>>> mlx5-next
-  };
-
-as a resolution, please take both chunks:
-
-diff --cc include/linux/mlx5/device.h
-index 8fbe22de16ef,26333d602a50..000000000000
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@@ -366,7 -366,8 +366,12 @@@ enum mlx5_driver_event 
-        MLX5_DRIVER_EVENT_UPLINK_NETDEV,
-        MLX5_DRIVER_EVENT_MACSEC_SA_ADDED,
-        MLX5_DRIVER_EVENT_MACSEC_SA_DELETED,
- +      MLX5_DRIVER_EVENT_SF_PEER_DEVLINK,
-+       MLX5_DRIVER_EVENT_AFFILIATION_DONE,
-+       MLX5_DRIVER_EVENT_AFFILIATION_REMOVED,
-  };
-  
-Thanks
-
-----------------------------------------------------------------
-The following changes since commit 6581da706473073066e45b8fc4913f61c2bf6e05:
-
-  Merge branch 'mlx5-vfio' into mlx5-next (2023-09-28 21:43:11 +0300)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git mlx5-next
-
-for you to fetch changes up to 82f9378c443c206d3f9e45844306e5270e7e4109:
-
-  net/mlx5: Handle IPsec steering upon master unbind/bind (2023-10-02 11:22:22 +0300)
-
-----------------------------------------------------------------
-Patrisious Haddad (9):
-      RDMA/mlx5: Send events from IB driver about device affiliation state
-      net/mlx5: Register mlx5e priv to devcom in MPV mode
-      net/mlx5: Store devcom pointer inside IPsec RoCE
-      net/mlx5: Add alias flow table bits
-      net/mlx5: Implement alias object allow and create functions
-      net/mlx5: Add create alias flow table function to ipsec roce
-      net/mlx5: Configure IPsec steering for egress RoCEv2 MPV traffic
-      net/mlx5: Configure IPsec steering for ingress RoCEv2 MPV traffic
-      net/mlx5: Handle IPsec steering upon master unbind/bind
-
- drivers/infiniband/hw/mlx5/main.c                  |  17 +
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      |  70 +++
- drivers/net/ethernet/mellanox/mlx5/core/en.h       |   8 +
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |   3 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.h   |  25 +-
- .../mellanox/mlx5/core/en_accel/ipsec_fs.c         | 122 ++++-
- .../mellanox/mlx5/core/en_accel/ipsec_offload.c    |   3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  63 +++
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |  10 +-
- .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   1 +
- .../mellanox/mlx5/core/lib/ipsec_fs_roce.c         | 542 ++++++++++++++++++++-
- .../mellanox/mlx5/core/lib/ipsec_fs_roce.h         |  14 +-
- drivers/net/ethernet/mellanox/mlx5/core/main.c     |   6 +
- .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |  22 +
- include/linux/mlx5/device.h                        |   2 +
- include/linux/mlx5/driver.h                        |   2 +
- include/linux/mlx5/mlx5_ifc.h                      |  56 ++-
- 17 files changed, 925 insertions(+), 41 deletions(-)
+greg k-h
 
