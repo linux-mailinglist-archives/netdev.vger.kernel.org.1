@@ -1,75 +1,60 @@
-Return-Path: <netdev+bounces-37420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E7A57B545C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:54:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAB27B5461
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2C01F1C20754
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:54:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 755462827C6
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93CD199D7;
-	Mon,  2 Oct 2023 13:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53DD19BA7;
+	Mon,  2 Oct 2023 13:57:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9FA199D5
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:54:46 +0000 (UTC)
-Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4A5B0
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:54:45 -0700 (PDT)
-Received: by mail-qk1-x741.google.com with SMTP id af79cd13be357-77574c076e4so479585085a.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 06:54:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=hefring-com.20230601.gappssmtp.com; s=20230601; t=1696254885; x=1696859685; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=STxM7vkkmDyUmxUH+gQAbgTWzPPiXJaAVUcK/e9j1i4=;
-        b=p+RYV19piPjRHM9Mw2x+fMFRK2I+NmPpr1O9Q+lYe3ltFSAzJHE047s1Mc9RnZAqXo
-         C/3j9l1hyswjG7aXScr28pmn6xP9drhjD8Fo9MxlRCaZ597elhzK+cgOLYWLzvAg5ozy
-         LwkyozfzAfWlWIaP2QzZioPHnPc9pg345mr33Fv/voFV8h12oiSSKcxX9dq1Z22TqgLC
-         vRa+QYKkzeCFbR97RxPvKQzNASwUhQODtmUOtlF9OqSEgIH6Tcfz+3eRr3gN20GLOK3E
-         9dRTnOW+8u/G4fPO3O+kSolj5MPcgzOzCoezhgaxVYJcbn4vk90Yb8rvIzYUX8fDziek
-         zgvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696254885; x=1696859685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=STxM7vkkmDyUmxUH+gQAbgTWzPPiXJaAVUcK/e9j1i4=;
-        b=XoqcedYTHplyETqDKkZBuVq3HPLHNVGI3wv54xOw5WDcjYB9anYTpO06p9GK4akFZN
-         2gzZYcK0PtX4PPJ7hKu/GjfZVWXsDBMcbxjQ7axSiPAbrp0/0RlwppLbCh8ecgG8F7W/
-         Fp4Umf9UBVpLIXm+6TKIFG9VaCGtuuTXzHCutMZz5sYo9naFVpx7amnGxA8x4oF+VXtV
-         N7baCP7zJxF7BiidRnIcZJeRzZ1GkEpH5Qsyg1asyrSBFyUmR1CoFEpfXulKNl1NTIF/
-         L+MAssCwGzt70TIZrGi9qYEvo+zblcIpI46/fTgsKzTmo5pOlHlcFfvkv9iOdoUIlpAf
-         ZSXQ==
-X-Gm-Message-State: AOJu0Yxa/DDnvpEqoXEwmpfODlmJy/mWKJFlYL0rkeXkcicD/NDGTuaW
-	lt+BVxsuEGvxYIaw/RfR3nHC3A==
-X-Google-Smtp-Source: AGHT+IEs4NNprUgXOj7mVjG0S6MI/X0bgLI21KGJ4S6Xc/WbrCRFCrApaXSxBK8zWzz0pDpmlfRmAA==
-X-Received: by 2002:a05:620a:12f1:b0:774:13e:71cd with SMTP id f17-20020a05620a12f100b00774013e71cdmr10622494qkl.56.1696254884697;
-        Mon, 02 Oct 2023 06:54:44 -0700 (PDT)
-Received: from dell-precision-5540 ([50.212.55.89])
-        by smtp.gmail.com with ESMTPSA id h8-20020ae9ec08000000b0076e672f535asm8922296qkg.57.2023.10.02.06.54.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 06:54:44 -0700 (PDT)
-Date: Mon, 2 Oct 2023 09:54:34 -0400
-From: Ben Wolsieffer <ben.wolsieffer@hefring.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Christophe Roullier <christophe.roullier@st.com>
-Subject: Re: [PATCH net] net: stmmac: dwmac-stm32: fix resume on STM32 MCU
-Message-ID: <ZRrLmjxoIIx7pIcs@dell-precision-5540>
-References: <20230927175749.1419774-1-ben.wolsieffer@hefring.com>
- <681cc4ca-9fd7-9436-6c7d-d7da95026ce3@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA521944C;
+	Mon,  2 Oct 2023 13:57:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A407EE5;
+	Mon,  2 Oct 2023 06:57:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696255071; x=1727791071;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=t+G5ATAb6PDeUCMFiytt+qhbsV+Jl1Pjo9it2Deijho=;
+  b=HNr47t/jvHunFJLmyKm7+BdDwsepmJiS6W81UtWs57cjYnc+iQwzBOoi
+   zgb7UXkbjbvwOgawYAqgVYpYLjgbx1+AyCra65JLEqhve1NhGGpa5aaMP
+   uci2mjiXYbX6D4yiXUv7AN6o8sAbt8gl/bAhcWrASTVN8Ng927uFuQeYM
+   S+YAVb969yVgrxDK2y0x+6Wo19NU3uhrwOD5zAea52fAeUWahUCxpqMZZ
+   h9n6pHOebJOIyT2VjucWKQ8ENph/VIiCR/+747AI10eCEV11f6KQnXxcT
+   igbcuF4Gyrv52FvA+9WKjamm7+ZBHN94c2u5uxNzH92ifi+rJ1qvwqUYF
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="413557280"
+X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
+   d="scan'208";a="413557280"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 06:57:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
+   d="scan'208";a="1546437"
+Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 02 Oct 2023 06:57:51 -0700
+Received: from kbuild by c3b01524d57c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qnJQg-00066D-1U;
+	Mon, 02 Oct 2023 13:57:46 +0000
+Date: Mon, 2 Oct 2023 21:57:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Daan De Meyer <daan.j.demeyer@gmail.com>,
+	martin.lau@linux.dev, kernel-team@meta.com, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v7 2/9] bpf: Propagate modified uaddrlen from
+ cgroup sockaddr programs
+Message-ID: <202310022113.1H3kTKXX-lkp@intel.com>
+References: <20231002122756.323591-3-daan.j.demeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,65 +63,104 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <681cc4ca-9fd7-9436-6c7d-d7da95026ce3@intel.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20231002122756.323591-3-daan.j.demeyer@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jacob,
+Hi Daan,
 
-On Fri, Sep 29, 2023 at 10:48:47AM -0700, Jacob Keller wrote:
-> 
-> 
-> On 9/27/2023 10:57 AM, Ben Wolsieffer wrote:
-> > The STM32MP1 keeps clk_rx enabled during suspend, and therefore the
-> > driver does not enable the clock in stm32_dwmac_init() if the device was
-> > suspended. The problem is that this same code runs on STM32 MCUs, which
-> > do disable clk_rx during suspend, causing the clock to never be
-> > re-enabled on resume.
-> > 
-> > This patch adds a variant flag to indicate that clk_rx remains enabled
-> > during suspend, and uses this to decide whether to enable the clock in
-> > stm32_dwmac_init() if the device was suspended.
-> > 
-> 
-> Why not just keep clk_rx enabled unconditionally or unconditionally stop
-> it during suspend? I guess that might be part of a larger cleanup and
-> has more side effects?
+kernel test robot noticed the following build warnings:
 
-Ideally, you want to turn off as many clocks as possible in suspend to
-save power. I'm assuming there is some hardware reason the STM32MP1
-needs the RX clock on during suspend, but it was not explained in the
-original patch. Without more information, I'm trying to maintain the
-existing behavior.
+[auto build test WARNING on bpf-next/master]
 
-> 
-> > This approach fixes this specific bug with limited opportunity for
-> > unintended side-effects, but I have a follow up patch that will refactor
-> > the clock configuration and hopefully make it less error prone.
-> > 
-> 
-> I'd guess the follow-up refactor would target next?
-> 
-> > Fixes: 6528e02cc9ff ("net: ethernet: stmmac: add adaptation for stm32mp157c.")
-> > Signed-off-by: Ben Wolsieffer <ben.wolsieffer@hefring.com>
-> > ---
-> 
-> This seems pretty small and targeted so it does make sense to me as a
-> net fix, but it definitely feels like a workaround.
-> 
-> I look forward to reading the cleanup patch mentioned.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daan-De-Meyer/selftests-bpf-Add-missing-section-name-tests-for-getpeername-getsockname/20231002-203646
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231002122756.323591-3-daan.j.demeyer%40gmail.com
+patch subject: [PATCH bpf-next v7 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231002/202310022113.1H3kTKXX-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231002/202310022113.1H3kTKXX-lkp@intel.com/reproduce)
 
-Sorry, I should have linked this when I re-posted this patch for
-net, but I previously submitted this patch as part of a series with
-the cleanup but was asked to split them up for net and net-next.
-Personally, I would be fine with them going into net-next together (or
-squashed).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310022113.1H3kTKXX-lkp@intel.com/
 
-The original series can be found here:
-https://lore.kernel.org/linux-arm-kernel/20230919164535.128125-3-ben.wolsieffer@hefring.com/T/
+All warnings (new ones prefixed by >>):
 
-Thanks, Ben
+>> kernel/bpf/cgroup.c:1454: warning: bad line:               read-only for AF_INET[6] uaddr but can be modified for AF_UNIX
+>> kernel/bpf/cgroup.c:1455: warning: bad line:               uaddr.
+
+
+vim +1454 kernel/bpf/cgroup.c
+
+  1447	
+  1448	/**
+  1449	 * __cgroup_bpf_run_filter_sock_addr() - Run a program on a sock and
+  1450	 *                                       provided by user sockaddr
+  1451	 * @sk: sock struct that will use sockaddr
+  1452	 * @uaddr: sockaddr struct provided by user
+  1453	 * @uaddrlen: Pointer to the size of the sockaddr struct provided by user. It is
+> 1454		      read-only for AF_INET[6] uaddr but can be modified for AF_UNIX
+> 1455		      uaddr.
+  1456	 * @atype: The type of program to be executed
+  1457	 * @t_ctx: Pointer to attach type specific context
+  1458	 * @flags: Pointer to u32 which contains higher bits of BPF program
+  1459	 *         return value (OR'ed together).
+  1460	 *
+  1461	 * socket is expected to be of type INET or INET6.
+  1462	 *
+  1463	 * This function will return %-EPERM if an attached program is found and
+  1464	 * returned value != 1 during execution. In all other cases, 0 is returned.
+  1465	 */
+  1466	int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+  1467					      struct sockaddr *uaddr,
+  1468					      int *uaddrlen,
+  1469					      enum cgroup_bpf_attach_type atype,
+  1470					      void *t_ctx,
+  1471					      u32 *flags)
+  1472	{
+  1473		struct bpf_sock_addr_kern ctx = {
+  1474			.sk = sk,
+  1475			.uaddr = uaddr,
+  1476			.t_ctx = t_ctx,
+  1477		};
+  1478		struct sockaddr_storage unspec;
+  1479		struct cgroup *cgrp;
+  1480		int ret;
+  1481	
+  1482		/* Check socket family since not all sockets represent network
+  1483		 * endpoint (e.g. AF_UNIX).
+  1484		 */
+  1485		if (sk->sk_family != AF_INET && sk->sk_family != AF_INET6)
+  1486			return 0;
+  1487	
+  1488		if (!ctx.uaddr) {
+  1489			memset(&unspec, 0, sizeof(unspec));
+  1490			ctx.uaddr = (struct sockaddr *)&unspec;
+  1491			ctx.uaddrlen = 0;
+  1492		} else if (uaddrlen)
+  1493			ctx.uaddrlen = *uaddrlen;
+  1494		else
+  1495			return -EINVAL;
+  1496	
+  1497		cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+  1498		ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+  1499					    0, flags);
+  1500	
+  1501		if (!ret && uaddrlen)
+  1502			*uaddrlen = ctx.uaddrlen;
+  1503	
+  1504		return ret;
+  1505	}
+  1506	EXPORT_SYMBOL(__cgroup_bpf_run_filter_sock_addr);
+  1507	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
