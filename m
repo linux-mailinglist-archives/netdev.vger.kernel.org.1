@@ -1,207 +1,88 @@
-Return-Path: <netdev+bounces-37468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC2127B571A
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:09:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D792B7B5714
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id AEF521C20836
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:09:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id B1DFB1C2081F
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594FF1DA23;
-	Mon,  2 Oct 2023 16:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5009F1D6BC;
+	Mon,  2 Oct 2023 16:08:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44E41CF84
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:09:49 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2192F91;
-	Mon,  2 Oct 2023 09:09:47 -0700 (PDT)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 392FLAQB027199;
-	Mon, 2 Oct 2023 16:08:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=T9yCwFrS5AoooxlKBeLdSc8An+tppK1rapyiK3ru7OU=;
- b=HZ3pP6j7Ib+6fTbkOdd8Ly/OEv9HPqy0690lI4jtvxiW25clJXZp+846T/Uz3iu9qHoP
- N1VAVfU0wfzInuSNVCGo4UUw6GxXIsQpRW1Br5T77nJ4pVicOz/4wOSgjyg0y9yhYjj7
- c903k8sL3Sh5f9EAk1K34OoQ+tmVgUBBdsnVxoKAfLR0ArjoixzYgTSKSSbSBW8bE3dM
- kY8YXHvOVs5/sndPD7RsA5I+UMEdiJ0eXwxatpRgGGQjBOurxAC/Ay4jieUrOwwksSsl
- AeI+uNSauNz++7j96MzLdUc4YYmdQxK4ufjMq9HLzeKWvV4mceIbYHnjCinKHJ7eUDYa jQ== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tecygbyct-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 02 Oct 2023 16:08:20 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 392G8IMZ026834
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 2 Oct 2023 16:08:18 GMT
-Received: from [10.111.179.185] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 2 Oct
- 2023 09:08:16 -0700
-Message-ID: <9a65ff82-e6b0-4253-be86-a0962e673bc4@quicinc.com>
-Date: Mon, 2 Oct 2023 09:08:14 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD171D699;
+	Mon,  2 Oct 2023 16:08:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEAD3C433C7;
+	Mon,  2 Oct 2023 16:08:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696262924;
+	bh=A8RHgRJTdq1YDreXk6pMR2+4zGGe3daZlhUNpP+YvT0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uHpSZwV+lJDbbehLSb/Spt3d5nct5tqN+zguTdzkPGP78BtxJA5slWfkTHCE8nFQo
+	 5Yp3/oCpoJUvujCt8oxxEYnhBkzbbfdWcUXXSLMC2qKfBUPFd2AhM75roBWtzG12r+
+	 zyO3n4G2YX0Ps18ARR/RDgmN7gspcIylPGhayXOz1Z3HxoUpPcb7dfOrvn+RuO5jOI
+	 k2O/32V4DaM8k2gyvWyggG3PutfRoMw1ofZehwhbd+Ft3ixdNjLhr1VYMPu4nJnQko
+	 xeOCGFGk/lxGzbnX61GXQT0EuQIbzaoX+ArQPRhaz4CGLZCfceZXmw3nFUYhiiDYic
+	 5M3ipz/e+xiTA==
+Received: (nullmailer pid 1849866 invoked by uid 1000);
+	Mon, 02 Oct 2023 16:08:40 -0000
+Date: Mon, 2 Oct 2023 11:08:40 -0500
+From: Rob Herring <robh@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: linux-kernel@vger.kernel.org, Xiubo Li <Xiubo.Lee@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	alsa-devel@alsa-project.org, "David S. Miller" <davem@davemloft.net>,
+	Mark Brown <broonie@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>, devicetree@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Rob Herring <robh+dt@kernel.org>, Fabio Estevam <festevam@gmail.com>,
+	linuxppc-dev@lists.ozlabs.org, Qiang Zhao <qiang.zhao@nxp.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Li Yang <leoyang.li@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, linux-gpio@vg.smtp.subspace.kernel.org,
+	er.kernel.org@web.codeaurora.org, Takashi Iwai <tiwai@suse.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Nicolin Chen <nicoleotsuka@gmail.com>
+Subject: Re: [PATCH v7 25/30] dt-bindings: net: Add the Lantiq PEF2256
+ E1/T1/J1 framer
+Message-ID: <169626292036.1849826.7381200671829119399.robh@kernel.org>
+References: <20230928070652.330429-1-herve.codina@bootlin.com>
+ <20230928070652.330429-26-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 2/4] netdev: make napi_schedule return bool on
- NAPI successful schedule
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>,
-        Wolfgang Grandegger <wg@grandegger.com>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Chris Snook
-	<chris.snook@gmail.com>,
-        Raju Rangoju <rajur@chelsio.com>,
-        Jeroen de Borst
-	<jeroendb@google.com>,
-        Praveen Kaligineedi <pkaligineedi@google.com>,
-        Shailend Chand <shailend@google.com>,
-        Douglas Miller
-	<dougmill@linux.ibm.com>,
-        Nick Child <nnac123@linux.ibm.com>,
-        Michael
- Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Haren Myneni
-	<haren@linux.ibm.com>,
-        Rick Lindsley <ricklind@linux.ibm.com>,
-        Dany Madden
-	<danymadden@us.ibm.com>,
-        Thomas Falcon <tlfalcon@linux.ibm.com>,
-        Tariq Toukan
-	<tariqt@nvidia.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose
- Abreu <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
-        Gregory
- Greenman <gregory.greenman@intel.com>,
-        Chandrashekar Devegowda
-	<chandrashekar.devegowda@intel.com>,
-        Intel Corporation <linuxwwan@intel.com>,
-        Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-        Liu Haijun
-	<haijun.liu@mediatek.com>,
-        M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-        Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-        Loic Poulain
-	<loic.poulain@linaro.org>,
-        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-        Johannes
- Berg <johannes@sipsolutions.net>,
-        Yuanjun Gong <ruc_gongyuanjun@163.com>, Wei
- Fang <wei.fang@nxp.com>,
-        Alex Elder <elder@linaro.org>, Simon Horman
-	<horms@kernel.org>,
-        Rob Herring <robh@kernel.org>, Bailey Forrest
-	<bcf@google.com>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Junfeng Guo
-	<junfeng.guo@intel.com>,
-        Ziwei Xiao <ziweixiao@google.com>,
-        Thomas Gleixner
-	<tglx@linutronix.de>,
-        Rushil Gupta <rushilg@google.com>,
-        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Yuri
- Karpov <YKarpov@ispras.ru>,
-        Zhengchao Shao <shaozhengchao@huawei.com>,
-        Andrew
- Lunn <andrew@lunn.ch>, Zheng Zengkai <zhengzengkai@huawei.com>,
-        "Rafael J.
- Wysocki" <rafael.j.wysocki@intel.com>,
-        Lee Jones <lee@kernel.org>, Dawei Li
-	<set_pte_at@outlook.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Benjamin Berg
-	<benjamin.berg@intel.com>,
-        Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <ath10k@lists.infradead.org>,
-        <linux-wireless@vger.kernel.org>
-References: <20231002151023.4054-1-ansuelsmth@gmail.com>
- <20231002151023.4054-2-ansuelsmth@gmail.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20231002151023.4054-2-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.49.16.6]
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: OG9E9tRT0CgWmcphKGvEtpMdVBHFNb-n
-X-Proofpoint-ORIG-GUID: OG9E9tRT0CgWmcphKGvEtpMdVBHFNb-n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-02_10,2023-10-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 impostorscore=0
- mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2309180000 definitions=main-2310020123
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230928070652.330429-26-herve.codina@bootlin.com>
 
-On 10/2/2023 8:10 AM, Christian Marangi wrote:
-> Change napi_schedule to return a bool on NAPI successful schedule. This
-> might be useful for some driver to do additional step after a NAPI ahs
 
-nit:s/ahs/has/
-
-> been scheduled.
+On Thu, 28 Sep 2023 09:06:43 +0200, Herve Codina wrote:
+> The Lantiq PEF2256 is a framer and line interface component designed to
+> fulfill all required interfacing between an analog E1/T1/J1 line and the
+> digital PCM system highway/H.100 bus.
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 > ---
->   include/linux/netdevice.h | 11 +++++++++--
->   1 file changed, 9 insertions(+), 2 deletions(-)
+>  .../bindings/net/lantiq,pef2256.yaml          | 213 ++++++++++++++++++
+>  1 file changed, 213 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
 > 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 7e520c14eb8c..2bead8e2a14d 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -490,11 +490,18 @@ bool napi_schedule_prep(struct napi_struct *n);
->    *
->    * Schedule NAPI poll routine to be called if it is not already
->    * running.
-> + * Return true if we schedule a NAPI or false if not.
-> + * Refer to napi_schedule_prep() for additional reason on why
-> + * a NAPI might not be scheduled.
->    */
-> -static inline void napi_schedule(struct napi_struct *n)
-> +static inline bool napi_schedule(struct napi_struct *n)
->   {
-> -	if (napi_schedule_prep(n))
-> +	if (napi_schedule_prep(n)) {
->   		__napi_schedule(n);
-> +		return true;
-> +	}
-> +
-> +	return false;
->   }
->   
->   /**
+
+Reviewed-by: Rob Herring <robh@kernel.org>
 
 
