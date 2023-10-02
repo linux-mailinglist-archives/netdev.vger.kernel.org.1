@@ -1,82 +1,115 @@
-Return-Path: <netdev+bounces-37317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF89D7B4B76
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:30:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D6727B4BA7
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 948471C20756
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 06:30:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 5C6EB1C20757
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 06:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F00384;
-	Mon,  2 Oct 2023 06:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D0D9CA44;
+	Mon,  2 Oct 2023 06:49:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 052B7383
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:30:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 60E17C433C9;
-	Mon,  2 Oct 2023 06:30:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696228256;
-	bh=51D3jAWjqLEab76pPQmJ5kfBAfDmgnzB+pvMpo7r1BU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KEw3MegVxhjpNh+d+zdBD+D1t6g0QLdeyOllMocnFBwfeTLqinBZ2vsQIBIpKktn7
-	 PQnf2RfOEJZZKvBLmmHhYqWbezoM/qdZBFYSW5rjGyij3YnkdCc/wh2+5HjrYo+WKy
-	 TkisFNlIMHJJ8NVbDGzw7zw4/DryK0TEc9aw4vK1xQ6Sevnh08juHoaUcO+NjuP57X
-	 cII9F/Gq8as9GEqdm8I8s/gm2zbZ7l3Q6uJ47niZxVc7Q6Yqatar/5RWOAO8h4AN62
-	 C1C/93NY6q/Wo08Z1L9/UhCeaF2HU9xc3APpSkPJzSbId+hcdNPoB0C23K9F51bALV
-	 F6656xD1VAthQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43BC2E632D2;
-	Mon,  2 Oct 2023 06:30:56 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FE97FB
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:48:59 +0000 (UTC)
+Received: from mail-vs1-xe2e.google.com (mail-vs1-xe2e.google.com [IPv6:2607:f8b0:4864:20::e2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA7FAA4
+	for <netdev@vger.kernel.org>; Sun,  1 Oct 2023 23:48:57 -0700 (PDT)
+Received: by mail-vs1-xe2e.google.com with SMTP id ada2fe7eead31-4526b9404b0so1985527137.0
+        for <netdev@vger.kernel.org>; Sun, 01 Oct 2023 23:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696229337; x=1696834137; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wPk6iXEPIHTQeqzKN1mmWx6ZDZMpHOnXSJXF5+ry+v4=;
+        b=ZK9dP9bBRdcs7wiprItPCDHqYvzXC3ahcgpTffoCblS9lcMbNGqjrQYWXR7F5VTbky
+         KfZnUeYTJ9dBzMx35Y5EzebGhhq5g6rfbm0KvY+laOYpvLzFeKL1Rp83WV89+gQJQJ39
+         ZW1nxHPDv6KXEeGl2jSrYDBLq7tNXAsaHQbw/trE2IiR12CsaJ514w9lyotevcrplGn2
+         C3u7sH1w+bJeSqCU2ldATBSvgvu4hH3lUDfckropFh89cNCnmlpnzENYPGtvalR4+54e
+         yL+lcXXzevU2fimkveUEVZWOK0zo6u+QnrZbmbmRMgJ86sF7Ejt58fl0jk1CcB8EF/Ah
+         RgIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696229337; x=1696834137;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wPk6iXEPIHTQeqzKN1mmWx6ZDZMpHOnXSJXF5+ry+v4=;
+        b=USvMHLnHGcuWTCZ0i/o3BXuTRLiIdu7euHAT2GLtBKj1GWLgB6qFNQeES71tZ3bRq4
+         6DRoRFWQAwk57uyMqi5lzZaOfHRroXx/OHzGp/1xKy7/K/uQJHhnGrVN4eRsaJCsdU+J
+         MZjpeh4Zr0k+EDy53zbnZvIUqU+Mqgr8B1obp9ibjTfVqgQRrQcpIT/xL6mG0XAG06oR
+         Eu0gMCJnKPu/Oq0ZIRHpMTodsvT5zp8Kw+Gw2+f2foC/Ve1YDT2AsaVRbvltFo4R3Ymd
+         yse3VCRXNznmTI7/wrMlqZazHyq6vrLiUSo3Yy27bLjRZuw+t35WQ7eArPUKvsG1OR1c
+         jZbA==
+X-Gm-Message-State: AOJu0Yx38SgC3RKknOku+w3eRKuJu+D7lozVkff1JKlYServ7RItEqSi
+	rKCqCNvL0xjob+lWAoqDJg0sqY1QKVAkjdIV2iTChkekhxw=
+X-Google-Smtp-Source: AGHT+IF4XMhSLRhn05RxFeTLAFU+XUPW6OPhpruHYBuTwkUKyz08eSSwuJ2brzJBk1kNQNC56ZU5XuZM4swLrFXDYQs=
+X-Received: by 2002:a05:6102:440e:b0:452:79da:94a with SMTP id
+ df14-20020a056102440e00b0045279da094amr5208139vsb.4.1696229336826; Sun, 01
+ Oct 2023 23:48:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM
- is absent
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169622825626.32662.10323231031478671932.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Oct 2023 06:30:56 +0000
-References: <20230922124741.360103-1-festevam@gmail.com>
-In-Reply-To: <20230922124741.360103-1-festevam@gmail.com>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: kuba@kernel.org, andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- l00g33k@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- festevam@denx.de, florian.fainelli@broadcom.com
+References: <20231001145102.733450-1-edumazet@google.com>
+In-Reply-To: <20231001145102.733450-1-edumazet@google.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 2 Oct 2023 08:48:21 +0200
+Message-ID: <CAF=yD-JrggCg9NQ3MKDHx9rzKtJqhuoFD3kbSVsUH8n8553VKg@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/4] net_sched: sch_fq: add WRR scheduling and 3 bands
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Sun, Oct 1, 2023 at 4:51=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> As discussed in Netconf 2023 in Paris last week, this series adds
+> to FQ the possibility of replacing pfifo_fast for most setups.
+>
+> FQ provides fairness among flows, but malicious applications
+> can cause problems by using thousands of sockets.
+>
+> Having 3 bands like pfifo_fast can make sure that applications
+> using high prio packets (eg AF4) can get guaranteed throughput
+> even if thousands of low priority flows are competing.
+>
+> Added complexity in FQ does not matter in many cases when/if
+> fastpath added in the prior series is used.
+>
+> Eric Dumazet (4):
+>   net_sched: sch_fq: remove q->ktime_cache
+>   net_sched: export pfifo_fast prio2band[]
+>   net_sched: sch_fq: add 3 bands and WRR scheduling
+>   net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
+>
+>  include/net/sch_generic.h      |   1 +
+>  include/uapi/linux/pkt_sched.h |  14 +-
+>  net/sched/sch_fq.c             | 263 ++++++++++++++++++++++++++-------
+>  net/sched/sch_generic.c        |   9 +-
+>  4 files changed, 226 insertions(+), 61 deletions(-)
+>
+> --
+> 2.42.0.582.g8ccd20d70d-goog
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+For the series:
 
-On Fri, 22 Sep 2023 09:47:41 -0300 you wrote:
-> From: Fabio Estevam <festevam@denx.de>
-> 
-> Since commit 23d775f12dcd ("net: dsa: mv88e6xxx: Wait for EEPROM done
-> before HW reset") the following error is seen on a imx8mn board with
-> a 88E6320 switch:
-> 
-> mv88e6085 30be0000.ethernet-1:00: Timeout waiting for EEPROM done
-> 
-> [...]
-
-Here is the summary with links:
-  - [v3,net] net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent
-    https://git.kernel.org/netdev/net/c/6ccf50d4d474
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
