@@ -1,177 +1,125 @@
-Return-Path: <netdev+bounces-37496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 271417B5AE9
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:14:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE0407B5B0B
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:16:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3384E1C204F5
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:14:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8FEA8283289
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF3A1F199;
-	Mon,  2 Oct 2023 19:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241A11F60E;
+	Mon,  2 Oct 2023 19:16:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF581C688
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 19:14:06 +0000 (UTC)
-X-Greylist: delayed 449 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 02 Oct 2023 12:14:05 PDT
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B6BAC;
-	Mon,  2 Oct 2023 12:14:04 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 8E8BECC010C;
-	Mon,  2 Oct 2023 21:06:28 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
-Received: from smtp2.kfki.hu ([127.0.0.1])
-	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP; Mon,  2 Oct 2023 21:06:26 +0200 (CEST)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
-	by smtp2.kfki.hu (Postfix) with ESMTP id 3F575CC010A;
-	Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id E80B13431A9; Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id E6836343155;
-	Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
-Date: Mon, 2 Oct 2023 21:06:23 +0200 (CEST)
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
-To: Simon Horman <horms@kernel.org>
-cc: xiaolinkui <xiaolinkui@126.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-    Florian Westphal <fw@strlen.de>, David Miller <davem@davemloft.net>, 
-    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-    justinstitt@google.com, kuniyu@amazon.com, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, Linkui Xiao <xiaolinkui@kylinos.cn>
-Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
-In-Reply-To: <20231002160651.GX92317@kernel.org>
-Message-ID: <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
-References: <20230927130309.30891-1-xiaolinkui@126.com> <20231002160651.GX92317@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F2B1F5E1;
+	Mon,  2 Oct 2023 19:16:19 +0000 (UTC)
+Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4DDB3;
+	Mon,  2 Oct 2023 12:16:17 -0700 (PDT)
+Received: by mail-vs1-xe2a.google.com with SMTP id ada2fe7eead31-4527d65354bso88163137.0;
+        Mon, 02 Oct 2023 12:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696274176; x=1696878976; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7Tr1XYfZFQPwOIGZkao0xDKBVDpd/yFY9b0CTr+HCmI=;
+        b=fG8Lk0qhIQ9sgBk798MAYtZLMMNfcPDOVCC0CpCe7i3XpsRF7tEScj/ldnV79b91Rj
+         Ip41w2YhjKbY9PykpLqYXhDQzE1vOBiWpqyMQTOzhYL3apgFZW1zRoYokZKpG3oWC+E6
+         v24X0nLYLJkK6CsDBH/C/VBI/epdehsas0OrFS7uoSXpoRyiUPJt9rqt1iXOz/byznKm
+         6Kgj9PjFKAOguAINhI/d/6kkMEQg3jV/j3YrKVgSAFM6srkuPxUI8IRAvmk2bEdthyJo
+         qOTLFJE/6/jUAwyisNI9UCnwcbdFuRc9ru1qk4wz6TTNdBcVggNz26eKJiA+vhpvrucg
+         1/KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696274176; x=1696878976;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Tr1XYfZFQPwOIGZkao0xDKBVDpd/yFY9b0CTr+HCmI=;
+        b=tpzlZQbbKX5mC9ZKRMyJViyEGcxsLl2iEu+QmxOWtJjtyUktDjcukGskb4KDa/NLsp
+         sIDymMG0dox1SeNVoU43FQlBeVJpi9L/xnyFp4onRrd49a7FTyleSuVtZqMNdOmeP/6b
+         0Jk/9ukyfZ9veAzdPnZW8OiEm64avcO10e7Buu35DSsvS8AYLw4FH4ubE70+uFbOR7H5
+         Pxdxsv0+gBscC9azb6dQgMOd5bjP6a0/anVrU6lnznrm6zhuCsUSMES+hg0FvPipQN+f
+         vVBHnArTuH39F8AeoRDPa2MjNjtpXghoVi0m7zaoYzBOpq0+J1FZxuWDp3X9gmfmSwUM
+         kk/w==
+X-Gm-Message-State: AOJu0YyDpN1+/TDOtTAwAJbuzL8xonWvdm2JTpe0G8cA2gqHZnFAzNrg
+	+CF5LuuP7EvpbV1IfwzsgKU=
+X-Google-Smtp-Source: AGHT+IFv1LL4hAxRrpJUw0BnAkrSJG1KrOzUpd35rSgjuWaSyLrINoESA3s18Z8/hb4VtPYwVgEJ0g==
+X-Received: by 2002:a05:6102:1cb:b0:454:6ccc:ab79 with SMTP id s11-20020a05610201cb00b004546cccab79mr10882242vsq.11.1696274176341;
+        Mon, 02 Oct 2023 12:16:16 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id o20-20020a0cf4d4000000b00656329bb3b1sm7686722qvm.10.2023.10.02.12.16.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Oct 2023 12:16:15 -0700 (PDT)
+Message-ID: <4351a85a-ab53-acf8-9e80-e65b2ebfab66@gmail.com>
+Date: Mon, 2 Oct 2023 12:16:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [RFC PATCH v2 net-next 01/15] phy: introduce phy_get_status() and
+ use it to report CDR lock
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-phy@lists.infradead.org
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Madalin Bucur <madalin.bucur@nxp.com>, Ioana Ciornei
+ <ioana.ciornei@nxp.com>, Camelia Groza <camelia.groza@nxp.com>,
+ Li Yang <leoyang.li@nxp.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor@kernel.org>, Sean Anderson <sean.anderson@seco.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>
+References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-2-vladimir.oltean@nxp.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230923134904.3627402-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-On Mon, 2 Oct 2023, Simon Horman wrote:
-
-> On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
-> > From: Linkui Xiao <xiaolinkui@kylinos.cn>
-> > 
-> > If the ip_set is not locked during ip_set_test, the following situations
-> > may occur:
-> > 
-> > 	CPU0				CPU1
-> > 	ip_rcv->
-> > 	ip_rcv_finish->
-> > 	ip_local_deliver->
-> > 	nf_hook_slow->
-> > 	iptable_filter_hook->
-> > 	ipt_do_table->
-> > 	set_match_v4->
-> > 	ip_set_test->			list_set_destroy->
-> > 	hash_net4_kadt->		set->data = NULL
+On 9/23/23 06:48, Vladimir Oltean wrote:
+> Some modules, like the MTIP AN/LT block used as a copper backplane PHY
+> driver, need this extra information from the SerDes PHY as another
+> source of "link up" information.
 > 
-> I'm having a bit of trouble analysing this.
-> In particular, I'm concerned that in such a scenario set
-> itself will be also freed, which seems likely to lead to problems.
+> Namely, the 25GBase-R PCS does not have a MDIO_CTRL1_LPOWER bit
+> implemented in its MDIO_MMD_PCS:MDIO_CTRL1 register. That bit is
+> typically set from phy_suspend() or phylink_pcs_disable() implementations,
+> and that is supposed to cause a link drop event on the link partner.
+> But here it does not happen.
 > 
-> Can you provide a more complete call stack for CPU1 ?
-
-ip_set_test() runs intentionally without holding a spinlock, it uses RCU.
-
-But I don't understand the scenario at all:
-
-	CPU0:				CPU1:
-	hash_net4_kadt			list_set_destroy
-
-	so it's a hash:net type		which works on a list
-	of set				type of sets only
-
-The list type of set can freely be destroyed (when not referenced), the 
-destroy operation has no effect whatsoever on its possible hash:net type 
-of member set.
-
-Moreover, kernel side add/del/test can only be performed when the set in 
-question is referenced. Referenced sets cannot be deleted.
-
-So what is the scenario really in this case?
-
-Best regards,
-Jozsef
-
-> > 	h = set->data
-> > 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
-> > 
-> > The set->data is empty, continuing to access set->data will result in a
-> > kernel NULL pointer. The call trace is as follows:
-> > 
-> > [2350616.024418] Call trace:
-> > [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
-> > [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
-> > [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
-> > [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
-> > [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
-> > [2350616.026905]  nf_hook_slow+0x50/0x100
-> > [2350616.027256]  ip_local_deliver+0xd4/0xe8
-> > [2350616.027616]  ip_rcv_finish+0x90/0xb0
-> > [2350616.027961]  ip_rcv+0x50/0xb0
-> > [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
-> > [2350616.028716]  __netif_receive_skb+0x28/0x80
-> > [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
-> > [2350616.029533]  napi_gro_receive+0xf8/0x170
-> > [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
-> > [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
-> > [2350616.030761]  net_rx_action+0x158/0x3a0
-> > [2350616.031124]  __do_softirq+0x11c/0x33c
-> > [2350616.031470]  irq_exit+0x11c/0x128
-> > [2350616.031793]  __handle_domain_irq+0x6c/0xc0
-> > [2350616.032172]  gic_handle_irq+0x6c/0x170
-> > [2350616.032528]  el1_irq+0xb8/0x140
-> > [2350616.032835]  arch_cpu_idle+0x38/0x1c0
-> > [2350616.033183]  default_idle_call+0x24/0x58
-> > [2350616.033549]  do_idle+0x1a4/0x268
-> > [2350616.033859]  cpu_startup_entry+0x28/0x78
-> > [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
-> > 
-> > Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
-> > ---
-> >  net/netfilter/ipset/ip_set_core.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-> > index 35d2f9c9ada0..46f4f47e29e4 100644
-> > --- a/net/netfilter/ipset/ip_set_core.c
-> > +++ b/net/netfilter/ipset/ip_set_core.c
-> > @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
-> >  	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
-> >  		return 0;
-> >  
-> > +	ip_set_lock(set);
-> >  	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
-> > +	ip_set_unlock(set);
-> >  
-> >  	if (ret == -EAGAIN) {
-> >  		/* Type requests element to be completed */
-> > -- 
-> > 2.17.1
-> > 
-> > 
+> By implementing the networking phylink_pcs_disable() as phy_power_off(),
+> we are able to actually power down the lane in a way that is visible to
+> the remote end. Where it is visible is the CDR lock, so we introduce
+> PHY_STATUS_TYPE_CDR_LOCK as an extra link indication, we are able to
+> detect that condition and signal it to upper layers of the network
+> stack.
 > 
+> A more high-level and generic phy_get_status() operation was chosen
+> instead of the more specific phy_get_cdr_lock() alternative, because I
+> saw this as being more in the spirit of the generic PHY API.
+> Also, phy_get_status() is more extensible and reusable for other
+> purposes as well.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
--
-E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-Address : Wigner Research Centre for Physics
-          H-1525 Budapest 114, POB. 49, Hungary
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
+
 
