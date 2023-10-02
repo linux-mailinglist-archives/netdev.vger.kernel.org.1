@@ -1,167 +1,108 @@
-Return-Path: <netdev+bounces-37356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A89E7B4EC8
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:14:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C22A7B4EE3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 19A38282A1C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 09:14:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 7E9B5B20B35
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 09:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C948F7A;
-	Mon,  2 Oct 2023 09:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B1FC2E3;
+	Mon,  2 Oct 2023 09:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5816A63DF;
-	Mon,  2 Oct 2023 09:14:43 +0000 (UTC)
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774DC9D;
-	Mon,  2 Oct 2023 02:14:40 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.nyi.internal (Postfix) with ESMTP id 23D7A5C023A;
-	Mon,  2 Oct 2023 05:14:38 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Mon, 02 Oct 2023 05:14:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1696238078; x=1696324478; bh=Gi
-	67L2nf6jw6VX+/CjPRuyOklRqWd3cHNR+4mWcy4TQ=; b=PklC6y2/Uv3YeyWbWW
-	gLHl6SWf1vj2irTu2KZVK+Iv2qntqrls4scjNP2a3Mlh6Me2nVfdkQdxjPJaIOq6
-	XqrrdMqHC6OAwc4qy75LN4G9KbmiVoUD0IzkJuWH3zkegmUw66VQtIvf3yyyQLVv
-	X8v7T6rEo5y5qZwIgvpilZxNca5UOKuwyGLCCGtjySfZutSF3rlEVf6JixozE6yz
-	eTY4urTUyEI7Bm4brSeNQ0GibJ0n74Qp4kWBqUb/61WbzLfh6B+sXr6un116Qx1n
-	Kz6CHx0AY/XPjSgGP7dweepXrjP5UNTP6aCgDezkEOe9RCFxyCKpVq5oNenNZcxF
-	JiSg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1696238078; x=1696324478; bh=Gi67L2nf6jw6V
-	X+/CjPRuyOklRqWd3cHNR+4mWcy4TQ=; b=aOHgjYtf9RaA38+X9GwpL6H748EBd
-	Ovou/xCCu9FRpGrMItexL+F4ovlhXWYWyb01Oa2nyQFsAlFu8RsmkuTeOx1uQ/8H
-	r6+LMKYZwd1dVY7d24nI+D49SVT+FA8ejzSlWENQVyg/RUkveJ4znGovx5I1ssSW
-	kyItO//+Q5UDYCtgWPztGmt+Bmpbyojk+ZuhYYGNBf8ihQ2q34mGo4EecCXwjzs4
-	JlX4b+2dRbj3QxGLzXql6URJMtVwJapyO0XaL7r7+jq03dstJvU7nR9f7GogWzbm
-	Yg89LPHCkH3l9FrFUXPKKgvMX1po9jYtRRlDiS9jX/5lW0BUrCdmC3/8w==
-X-ME-Sender: <xms:_YkaZVjvl75UpEFGItU5kjx9DD0T15IgHFbuCg_pW-YOnJBpOmIlaQ>
-    <xme:_YkaZaAU0OTISNBNDx3UzI2nBlJ3nJApRJcKrKh4qSN_51gTakfDShzJtWUDCbl_L
-    u63Y0hotlqhMQ>
-X-ME-Received: <xmr:_YkaZVHgABpuoUUxh-qif-UokYMEoRDYjDd3ovG6ffDQe8xRsJxIM4mag_HgJO6q86YQMxO5-101s6fMaf7UvDjF9yhjqzIR7eB69dxOndc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrvdelgddufecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcu
-    mffjuceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeehgedvve
-    dvleejuefgtdduudfhkeeltdeihfevjeekjeeuhfdtueefhffgheekteenucevlhhushht
-    vghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehgrhgvgheskhhrohgrhh
-    drtghomh
-X-ME-Proxy: <xmx:_YkaZaS0dyk7rAdcbnrJbeM_TjfEb6rHx5Uf4FIKuxnC2Bur_4V7Gg>
-    <xmx:_YkaZSwGty8nKR5QChxmehhuc6vCmoXLsvu9YUQoIGHZLKrxXdYeeQ>
-    <xmx:_YkaZQ7F7xlyNlH6gqutbbxOyg3EqsobA4gFHcs6vPqql85_b6sWtQ>
-    <xmx:_okaZRl_XNgZZKYf87CQWww-OrHqTN-c_Ycu7TzA63vskmVRTA6k1g>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 2 Oct 2023 05:14:37 -0400 (EDT)
-Date: Mon, 2 Oct 2023 11:14:36 +0200
-From: Greg KH <greg@kroah.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v1 1/3] rust: core abstractions for network PHY drivers
-Message-ID: <2023100237-satirical-prance-bd57@gregkh>
-References: <20231002085302.2274260-1-fujita.tomonori@gmail.com>
- <20231002085302.2274260-2-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD168F40
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 09:20:21 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0325B99;
+	Mon,  2 Oct 2023 02:20:19 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qnF62-000861-Nl; Mon, 02 Oct 2023 11:20:10 +0200
+Date: Mon, 2 Oct 2023 11:20:10 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Henrik =?iso-8859-15?Q?Lindstr=F6m?= <lindstrom515@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: macvtap performs IP defragmentation, causing MTU problems for
+ virtual machines
+Message-ID: <20231002092010.GA30843@breakpoint.cc>
+References: <CAHkKap3sdN4wZm_euAZEyt3XB4bvr6cV-oAMGtrmrm5Z8biZ_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
-In-Reply-To: <20231002085302.2274260-2-fujita.tomonori@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHkKap3sdN4wZm_euAZEyt3XB4bvr6cV-oAMGtrmrm5Z8biZ_Q@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 05:53:00PM +0900, FUJITA Tomonori wrote:
-> +/// Corresponds to the kernel's `enum phy_state`.
-> +#[derive(PartialEq)]
-> +pub enum DeviceState {
-> +    /// PHY device and driver are not ready for anything.
-> +    Down,
-> +    /// PHY is ready to send and receive packets.
-> +    Ready,
-> +    /// PHY is up, but no polling or interrupts are done.
-> +    Halted,
-> +    /// PHY is up, but is in an error state.
-> +    Error,
-> +    /// PHY and attached device are ready to do work.
-> +    Up,
-> +    /// PHY is currently running.
-> +    Running,
-> +    /// PHY is up, but not currently plugged in.
-> +    NoLink,
-> +    /// PHY is performing a cable test.
-> +    CableTest,
-> +}
+Henrik Lindström <lindstrom515@gmail.com> wrote:
+> I found this old thread describing why macvlan does this:
+> https://lore.kernel.org/netdev/4E8C89EE.3090600@candelatech.com/
+> Interestingly, the problem described in that thread seems to be more
+> general than macvlans, and i can still reproduce it by simply having
+> multiple physical interfaces.
+> So it looks like macvlans are being special-cased right now, as a
+> workaround for a more general defragmentation problem?
 
-I still think these should come straight from the C code, and that
-moving them to an enum makes sense to make this possible, but hey, it's
-not my subsystem to maintain!  :)
+Looks like it, maybe Eric remembers details here.
 
-> +/// Wraps the kernel's `struct phy_device`.
-> +///
-> +/// # Invariants
-> +///
-> +/// `self.0` is always in a valid state.
-> +#[repr(transparent)]
-> +pub struct Device(Opaque<bindings::phy_device>);
-> +
-> +impl Device {
-> +    /// Creates a new [`Device`] instance from a raw pointer.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// For the duration of the lifetime 'a, the pointer must be valid for writing and nobody else
-> +    /// may read or write to the `phy_device` object.
-> +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
-> +        unsafe { &mut *ptr.cast() }
-> +    }
-> +
-> +    /// Gets the id of the PHY.
-> +    pub fn id(&mut self) -> u32 {
-> +        let phydev = self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        unsafe { (*phydev).phy_id }
-> +    }
+AFAIU however this issue isn't specific to macvlan, looks like some people
+insist that receiving a fragmented multicast packet on n devices means we
+should pass n defragmented packets up to the stack (we don't; ip defrag
+will discard "duplicates").
 
-Naming question, why are you making this "id" instead of "phy_id"
-like the C code has?  Same for many of these bindings.
+There is a vif identifier for l3mdev sake (that did not exist back then),
+we could use that as a discriminator for mcast case.
 
-> +    /// Returns true if the link is up.
-> +    pub fn get_link(&mut self) -> bool {
-> +        const LINK_IS_UP: u32 = 1;
-> +        let phydev = self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        unsafe { (*phydev).link() == LINK_IS_UP }
-> +    }
+Something like this (totally untested):
 
-"get_" normally means to grab a reference, if this isn't matching a C
-call, why not just call it link_is_up or to match your other state
-checks "is_link_up"?
+diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
+--- a/net/ipv4/ip_fragment.c
++++ b/net/ipv4/ip_fragment.c
+@@ -479,11 +479,29 @@ static int ip_frag_reasm(struct ipq *qp, struct sk_buff *skb,
+ 	return err;
+ }
+ 
++static int ip_defrag_vif(const struct sk_buff *skb, const struct net_device *dev)
++{
++	int vif = l3mdev_master_ifindex_rcu(dev);
++
++	if (vif)
++		return vif;
++
++	/* some folks insist that receiving a fragmented mcast dgram on n devices shall
++	 * result in n defragmented packets.
++	 */
++	if (skb->pkt_type == PACKET_BROADCAST || skb->pkt_type == PACKET_MULTICAST) {
++		if (dev)
++			vif = dev->ifindex;
++	}
++
++	return 0;
++}
++
+ /* Process an incoming IP datagram fragment. */
+ int ip_defrag(struct net *net, struct sk_buff *skb, u32 user)
+ {
+ 	struct net_device *dev = skb->dev ? : skb_dst(skb)->dev;
+-	int vif = l3mdev_master_ifindex_rcu(dev);
++	int vif = ip_defrag_vif(skb, dev);
+ 	struct ipq *qp;
+ 
+ 	__IP_INC_STATS(net, IPSTATS_MIB_REASMREQDS);
 
-but hey, I'm just bikeshedding at this point in time, if they maintainer
-likes these as-is, keep them :)
-
-thanks,
-
-greg k-h
+... which should allow to remove the macvlan defrag step.
 
