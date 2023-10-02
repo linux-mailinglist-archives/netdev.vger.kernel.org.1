@@ -1,171 +1,74 @@
-Return-Path: <netdev+bounces-37524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D5F7B5C50
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:57:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3907B5C5C
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 23:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 2965EB20A27
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:57:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 944852816D3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAE220320;
-	Mon,  2 Oct 2023 20:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E7320324;
+	Mon,  2 Oct 2023 21:07:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8FA200D2;
-	Mon,  2 Oct 2023 20:57:19 +0000 (UTC)
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDD0C6;
-	Mon,  2 Oct 2023 13:57:17 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9a9d82d73f9so24564766b.3;
-        Mon, 02 Oct 2023 13:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696280236; x=1696885036; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=exaza9diQenOrShvV6MMCLhRCzDC5rAMUMxRmEmm+Nk=;
-        b=Gxcho68KHbKoMwan6BwguY4++1u9kZeSQZYfPJE9St+uwmL6q/F/Fp9RQw6qXIGFzm
-         ZWfTzNvNqDImeScAdRJzORIiJpDgMc7ZqdWIxAzf2w4FWTkjF9cedmG+T1e461nbYDEK
-         mvHSqpsFQPjekuOFP17aDknwKR9BhqOs6Wh5yj/+19IkwB+MavUrN61zeOkLsNfTxSUP
-         eXAMi5WHEJwQVZW7MY+8vLRkHmpGSMkpW6DdQ5CmaS/UVLYr7kapNbkgk6/mTrcIvQXp
-         /cFOHzAx2qsPY9CJjmmFgQkFOG7AGIECQZAuyVB/60ASrxTMYvEDkhWK/mmBRrTRxWQE
-         h6hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696280236; x=1696885036;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=exaza9diQenOrShvV6MMCLhRCzDC5rAMUMxRmEmm+Nk=;
-        b=NmprBQ6olcyHoqDM5ZrIa6gjpEzbOfuQawoZi99IL0mFU5ww7GOtk9tzR4nmk7WL61
-         NRrDm5Bgoo22Uek+y1XB5l3ttmYirBtJZF4477rhlsG3ytY4mlF8X744ud46bz4ZCGk4
-         QwCJMJPOCW/wKstAqpi1WbIPy+optpZE6RK6xp7hikktIgBuPYpelf46SPSkQzRMeJqK
-         kz60B69eA2QOcRCcdvJFjUqFn3V/HLteLw+4oHvgBKEDV8gBL4s10mKM3zmxqNIo8tGJ
-         81De5QtPCFcNbBuEI8gdkUVML0PKd/thQ8bOVsHsx3DHCuat7qMBqVQT9EoUX9ALOXlK
-         Gvww==
-X-Gm-Message-State: AOJu0Yw8vz6DAXYo0izk9Zklo+CPUfw7w/miiw6uJ/XIds1G7cfLpOuT
-	FKdEH3PcepvIXDjI+nK4uHs2otPITKECNTChnqE=
-X-Google-Smtp-Source: AGHT+IHSo40cmKeex7UOmhM0j1X2NYVxhmeg7ikY6OaTtOg51K/sdDBDYr4eNc5xVjY2l02Ds0xihQJ4RONf8E/j4Mc=
-X-Received: by 2002:a17:906:ce:b0:9b2:be5e:7545 with SMTP id
- 14-20020a17090600ce00b009b2be5e7545mr10362457eji.36.1696280235907; Mon, 02
- Oct 2023 13:57:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8701C6FB8
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:07:36 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D88948E;
+	Mon,  2 Oct 2023 14:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cHdxPJkUffAe71uXd4ceymr9QjRVP6992Y6TUUtw5Jk=; b=VOLjccYRB8DDrJeZxkRDhrd9M6
+	BAI10X6BkVMCgCay8Q3Q/aMez4oITD685DE1zeK8PUNHxCZEcL94F657Z7+jH/bdNSKjik+R56PUe
+	5XF6DFiRwvZykTNg+UQ+yL8B5S3k960aDSS0N0+z9O4BnqwpL6Gn2Dcu66A3071gKz0k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qnQ8T-0083OV-Ly; Mon, 02 Oct 2023 23:07:25 +0200
+Date: Mon, 2 Oct 2023 23:07:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Robert Marko <robimarko@gmail.com>, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
+ support
+Message-ID: <9a84642e-b4fe-4e36-bcdc-d02c84bb1dc9@lunn.ch>
+References: <20230930104008.234831-1-robimarko@gmail.com>
+ <df89a28e-0886-4db0-9e68-5f9af5bec888@lunn.ch>
+ <651b26a5.050a0220.213bf.e11b@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231002122756.323591-1-daan.j.demeyer@gmail.com> <20231002122756.323591-6-daan.j.demeyer@gmail.com>
-In-Reply-To: <20231002122756.323591-6-daan.j.demeyer@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 2 Oct 2023 13:57:04 -0700
-Message-ID: <CAEf4BzbxF5RxX6vLiAAA4i+9V-pYeue55eTA7Zfk3FGFdQC8dA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 5/9] libbpf: Add support for cgroup unix
- socket address hooks
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <651b26a5.050a0220.213bf.e11b@mx.google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75
-	autolearn=no autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 2, 2023 at 5:28=E2=80=AFAM Daan De Meyer <daan.j.demeyer@gmail.=
-com> wrote:
->
-> Add the necessary plumbing to hook up the new cgroup unix sockaddr
-> hooks into libbpf.
->
-> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-> ---
->  tools/lib/bpf/libbpf.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index 31b8b252e614..dd3683b98679 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -82,17 +82,22 @@ static const char * const attach_type_name[] =3D {
->         [BPF_CGROUP_INET6_BIND]         =3D "cgroup_inet6_bind",
->         [BPF_CGROUP_INET4_CONNECT]      =3D "cgroup_inet4_connect",
->         [BPF_CGROUP_INET6_CONNECT]      =3D "cgroup_inet6_connect",
-> +       [BPF_CGROUP_UNIX_CONNECT]       =3D "cgroup_unix_connect",
->         [BPF_CGROUP_INET4_POST_BIND]    =3D "cgroup_inet4_post_bind",
->         [BPF_CGROUP_INET6_POST_BIND]    =3D "cgroup_inet6_post_bind",
->         [BPF_CGROUP_INET4_GETPEERNAME]  =3D "cgroup_inet4_getpeername",
->         [BPF_CGROUP_INET6_GETPEERNAME]  =3D "cgroup_inet6_getpeername",
-> +       [BPF_CGROUP_UNIX_GETPEERNAME]   =3D "cgroup_unix_getpeername",
->         [BPF_CGROUP_INET4_GETSOCKNAME]  =3D "cgroup_inet4_getsockname",
->         [BPF_CGROUP_INET6_GETSOCKNAME]  =3D "cgroup_inet6_getsockname",
-> +       [BPF_CGROUP_UNIX_GETSOCKNAME]   =3D "cgroup_unix_getsockname",
->         [BPF_CGROUP_UDP4_SENDMSG]       =3D "cgroup_udp4_sendmsg",
->         [BPF_CGROUP_UDP6_SENDMSG]       =3D "cgroup_udp6_sendmsg",
-> +       [BPF_CGROUP_UNIX_SENDMSG]       =3D "cgroup_unix_sendmsg",
->         [BPF_CGROUP_SYSCTL]             =3D "cgroup_sysctl",
->         [BPF_CGROUP_UDP4_RECVMSG]       =3D "cgroup_udp4_recvmsg",
->         [BPF_CGROUP_UDP6_RECVMSG]       =3D "cgroup_udp6_recvmsg",
-> +       [BPF_CGROUP_UNIX_RECVMSG]       =3D "cgroup_unix_recvmsg",
->         [BPF_CGROUP_GETSOCKOPT]         =3D "cgroup_getsockopt",
->         [BPF_CGROUP_SETSOCKOPT]         =3D "cgroup_setsockopt",
->         [BPF_SK_SKB_STREAM_PARSER]      =3D "sk_skb_stream_parser",
-> @@ -8960,14 +8965,19 @@ static const struct bpf_sec_def section_defs[] =
-=3D {
->         SEC_DEF("cgroup/bind6",         CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-6_BIND, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/connect4",      CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-4_CONNECT, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/connect6",      CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-6_CONNECT, SEC_ATTACHABLE),
-> +       SEC_DEF("cgroup/connectun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
-_CONNECT, SEC_ATTACHABLE),
+> This is problematic... Since this is a plain standard PHY and we don't
+> have a compatible (as it's matched with the PHY id) we don't have DT to
+> add this... Sooo how to add this? Should we update the generic-phy dt?
+> 
+> Should we create a dummy dt and add a compatible adding
+> ethernet-phy.ID... just for this properties?
+> 
+> This is why we were a bit confused about adding a DT commit to this.
 
-I don't have too strong feelings here, but is "un" suffix a clear
-enough designator that this is working with unix sockets? Nothing can
-beat "connect4" and "connect6" in succinctness, but
-`cgroup/connect_unix` is not too verbose, but is probably a bit easier
-to guess?
+Just do what other PHYs do. ti,dp83869.yaml, motorcomm,yt8xxx.yaml,
+nxp,tja11xx.yaml, etc.
 
-Again, if this was some sort of consensus, I don't care much, but I
-thought I'd bring this up anyways.
-
->         SEC_DEF("cgroup/sendmsg4",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP4=
-_SENDMSG, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/sendmsg6",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP6=
-_SENDMSG, SEC_ATTACHABLE),
-> +       SEC_DEF("cgroup/sendmsgun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
-_SENDMSG, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/recvmsg4",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP4=
-_RECVMSG, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/recvmsg6",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP6=
-_RECVMSG, SEC_ATTACHABLE),
-> +       SEC_DEF("cgroup/recvmsgun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
-_RECVMSG, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/getpeername4",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-4_GETPEERNAME, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/getpeername6",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-6_GETPEERNAME, SEC_ATTACHABLE),
-> +       SEC_DEF("cgroup/getpeernameun", CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
-_GETPEERNAME, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/getsockname4",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-4_GETSOCKNAME, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/getsockname6",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
-6_GETSOCKNAME, SEC_ATTACHABLE),
-> +       SEC_DEF("cgroup/getsocknameun", CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
-_GETSOCKNAME, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/sysctl",        CGROUP_SYSCTL, BPF_CGROUP_SYSCTL,=
- SEC_ATTACHABLE),
->         SEC_DEF("cgroup/getsockopt",    CGROUP_SOCKOPT, BPF_CGROUP_GETSOC=
-KOPT, SEC_ATTACHABLE),
->         SEC_DEF("cgroup/setsockopt",    CGROUP_SOCKOPT, BPF_CGROUP_SETSOC=
-KOPT, SEC_ATTACHABLE),
-> --
-> 2.41.0
->
->
+	Andrew
 
