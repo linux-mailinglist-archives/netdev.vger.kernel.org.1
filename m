@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-37423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372EF7B54C7
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:15:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F3E7B54CD
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BABF7280DCC
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:15:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2EA852829F5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD4919BB8;
-	Mon,  2 Oct 2023 14:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960CF19BCE;
+	Mon,  2 Oct 2023 14:17:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C0D419BAB
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 14:15:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89EAEC433C8;
-	Mon,  2 Oct 2023 14:15:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80202C2EB;
+	Mon,  2 Oct 2023 14:17:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53217C433C8;
+	Mon,  2 Oct 2023 14:17:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696256125;
-	bh=yBLggVfjJptc78Vjm7vipW9J6f/K+WIJSeZEXBiMFCI=;
+	s=k20201202; t=1696256258;
+	bh=vkYSu3CMdUku1DYMLSbi1CqSIx/Y+w371ZyBOHbOWQU=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WYHkK05bK8+f3PBgxgAZOWhYVMJ78oD7cpe+heni54N9r63Q4zK5wWzBJajT1l6yK
-	 COn05Jh8yqDhTY8zPDk+SHqOiOl8DVQU5eF2nsggzQxWJY+Q4p63QeWRz9SE3oPhAP
-	 Vo0mH4EgXC2z46wDeAIUxbhpgAU4Dg1/u5IvGq5GnaQXUoHaGbHiANLhDofh3ec7Bm
-	 6S0rlmO0VZn8OR/VcNNi9kLhP1KJMWVgCD/X+Tcp0EF0LDCvtOlIOd4SjshXU8pOns
-	 IA4LXBYFV4vHr4MRUJa+Ekdapyv9lXX9AeVYdQT4prGbJrE2fAm66K8ooyYom5zp3A
-	 PBOL3KUC3jwTg==
-Message-ID: <37a93031-b594-f27f-70f9-02762511d6b9@kernel.org>
-Date: Mon, 2 Oct 2023 08:15:24 -0600
+	b=exLEpilJBAgz5ZnsirATe9JxW+UqjlphdsbHWsfr4jfuvvcdvfFqCOOPADpHoegLG
+	 QT1ZRviNOCQSFKPR+2ncqqKUmVN5OgF6Y3H/MOzAcM/iVe2Rhws0drvVplI+2eIc8B
+	 vEtl9FK4HkZ3OOjR4RCkE9u+Gvi4K1kPyS1jOYkSvxJSQs2ZBIu74ouWye+qLIE93j
+	 akqIqYVLy6LU2/F78IRxLEwEfXTSJG6/bFwFcDmsl1IBSzB7eh4B9D9E143cSdty4X
+	 r2p6zx5xCX9grOdpP+GalyJ8YI4rJQvVL0i4iN5OQXuy6/X9d744gUtflnDsfOCo5Y
+	 8pia5lOvzI0rg==
+Message-ID: <e493d101-348a-949d-5160-3d633817adf2@kernel.org>
+Date: Mon, 2 Oct 2023 08:17:35 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -38,47 +38,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net] ipv4: Set offload_failed flag in fibmatch results
-To: Benjamin Poirier <bpoirier@nvidia.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Amit Cohen <amcohen@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>
-References: <20230926182730.231208-1-bpoirier@nvidia.com>
+Subject: Re: [PATCH v2 10/15] vrf: Remove the now superfluous sentinel element
+ from ctl_table array
 Content-Language: en-US
+To: j.granados@samsung.com, Luis Chamberlain <mcgrof@kernel.org>,
+ willy@infradead.org, josh@joshtriplett.org, Kees Cook
+ <keescook@chromium.org>, Phillip Potter <phil@philpotter.co.uk>,
+ Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Juergen Gross <jgross@suse.com>, Stefano Stabellini
+ <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Jiri Slaby <jirislaby@kernel.org>, "James E.J. Bottomley"
+ <jejb@linux.ibm.com>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Doug Gilbert <dgilbert@interlog.com>,
+ Sudip Mukherjee <sudipm.mukherjee@gmail.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Corey Minyard <minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Robin Holt <robinmholt@gmail.com>, Steve Wahl <steve.wahl@hpe.com>,
+ Russ Weight <russell.h.weight@intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Song Liu <song@kernel.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Jani Nikula <jani.nikula@linux.intel.com>,
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+ David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>
+Cc: linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+ openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-raid@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+References: <20231002-jag-sysctl_remove_empty_elem_drivers-v2-0-02dd0d46f71e@samsung.com>
+ <651a84ff.050a0220.51ca9.2e91SMTPIN_ADDED_BROKEN@mx.google.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230926182730.231208-1-bpoirier@nvidia.com>
+In-Reply-To: <651a84ff.050a0220.51ca9.2e91SMTPIN_ADDED_BROKEN@mx.google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/26/23 12:27 PM, Benjamin Poirier wrote:
-> Due to a small omission, the offload_failed flag is missing from ipv4
-> fibmatch results. Make sure it is set correctly.
+On 10/2/23 2:55 AM, Joel Granados via B4 Relay wrote:
+> From: Joel Granados <j.granados@samsung.com>
 > 
-> The issue can be witnessed using the following commands:
-> echo "1 1" > /sys/bus/netdevsim/new_device
-> ip link add dummy1 up type dummy
-> ip route add 192.0.2.0/24 dev dummy1
-> echo 1 > /sys/kernel/debug/netdevsim/netdevsim1/fib/fail_route_offload
-> ip route add 198.51.100.0/24 dev dummy1
-> ip route
-> 	# 192.168.15.0/24 has rt_trap
-> 	# 198.51.100.0/24 has rt_offload_failed
-> ip route get 192.168.15.1 fibmatch
-> 	# Result has rt_trap
-> ip route get 198.51.100.1 fibmatch
-> 	# Result differs from the route shown by `ip route`, it is missing
-> 	# rt_offload_failed
-> ip link del dev dummy1
-> echo 1 > /sys/bus/netdevsim/del_device
+> This commit comes at the tail end of a greater effort to remove the
+> empty elements at the end of the ctl_table arrays (sentinels) which
+> will reduce the overall build time size of the kernel and run time
+> memory bloat by ~64 bytes per sentinel (further information Link :
+> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
 > 
-> Fixes: 36c5100e859d ("IPv4: Add "offload failed" indication to routes")
-> Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Remove sentinel from vrf_table
+> 
+> Signed-off-by: Joel Granados <j.granados@samsung.com>
 > ---
->  net/ipv4/route.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/net/vrf.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
