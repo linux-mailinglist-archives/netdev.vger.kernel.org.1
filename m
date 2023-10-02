@@ -1,118 +1,142 @@
-Return-Path: <netdev+bounces-37418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A8F7B5459
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:53:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7A57B545C
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 19AC4282343
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:53:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2C01F1C20754
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EC5199D1;
-	Mon,  2 Oct 2023 13:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93CD199D7;
+	Mon,  2 Oct 2023 13:54:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520AA199CE
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:53:05 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DC8AD
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:53:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696254783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Mrj5d145WqbtENreBONn0seQxwuGWLqhegF/9hzJAQ=;
-	b=VrAfYBPRWF+8pJKWGXEBAl2v/A+ifABI/Gyi/Ps1JI+kbBLTIeTrB+Kfa92NSG/vrKXg7Z
-	bQ7hWqjAV+zIlxB3MrgAamgRfsNfv8ZqCd1xLRn36c1e5rIR9fHxQwi536dgB0OnD435FN
-	ue8I/BEBMaSTFyQnS638bzRTpYWOoaw=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-257-9FaUMBHkMjWGbgwB7cT4Xw-1; Mon, 02 Oct 2023 09:53:01 -0400
-X-MC-Unique: 9FaUMBHkMjWGbgwB7cT4Xw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9b2e030e4caso303555866b.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 06:53:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9FA199D5
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:54:46 +0000 (UTC)
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE4A5B0
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:54:45 -0700 (PDT)
+Received: by mail-qk1-x741.google.com with SMTP id af79cd13be357-77574c076e4so479585085a.1
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 06:54:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=hefring-com.20230601.gappssmtp.com; s=20230601; t=1696254885; x=1696859685; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=STxM7vkkmDyUmxUH+gQAbgTWzPPiXJaAVUcK/e9j1i4=;
+        b=p+RYV19piPjRHM9Mw2x+fMFRK2I+NmPpr1O9Q+lYe3ltFSAzJHE047s1Mc9RnZAqXo
+         C/3j9l1hyswjG7aXScr28pmn6xP9drhjD8Fo9MxlRCaZ597elhzK+cgOLYWLzvAg5ozy
+         LwkyozfzAfWlWIaP2QzZioPHnPc9pg345mr33Fv/voFV8h12oiSSKcxX9dq1Z22TqgLC
+         vRa+QYKkzeCFbR97RxPvKQzNASwUhQODtmUOtlF9OqSEgIH6Tcfz+3eRr3gN20GLOK3E
+         9dRTnOW+8u/G4fPO3O+kSolj5MPcgzOzCoezhgaxVYJcbn4vk90Yb8rvIzYUX8fDziek
+         zgvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696254781; x=1696859581;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+Mrj5d145WqbtENreBONn0seQxwuGWLqhegF/9hzJAQ=;
-        b=orgHEnsfKfG//CDR0PCHd6RTwdrbn8ZVe+Ayq9+BpWIlhAuJ/Bcw/FdbkUj7MuaDNN
-         zEKlF2vM+idX2R7bk7EXuTrKavoACGM0yglTM86JonoJ5HMBS1kQRyM9NTfaTekVG91c
-         mskeABvwXpCB6swGK/eI8KB1p6BjZoIVayQQQQ6Tn81iopBDuTGqxHZNzgUUflw4GdKD
-         8oksfQWP19OAQS0r/ALLwIPaa9qe+AUzLbZ3l/1k4iVRpRFIz01gxAlHK/88qMF7pa5T
-         6ZbaOCH7arZ7lVt38OD7z2jN4I4CFfoH0EFekuvNrTOmB7+h1iHvl2z3IEBJLRh9Z97p
-         56jA==
-X-Gm-Message-State: AOJu0YwphvLAxZ7Fa/kRlH9I+IAhc5LR/+SEBXZDV7j7z/UniP33K6yE
-	Ka8uDJQXgYLOXdC90ZFCMKvvEKb2ivnkCCgYcGZjIEBwcsHYImNSE4ZGdraJRMszlfxGuETcKsy
-	UOCrEgNkbHYLpSwe5
-X-Received: by 2002:a17:906:225c:b0:9a1:f1b2:9f2e with SMTP id 28-20020a170906225c00b009a1f1b29f2emr10683080ejr.2.1696254780889;
-        Mon, 02 Oct 2023 06:53:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvmg2L4GwygG+NnIWBQO9RWotyvFWD3eorxKExRmBbrcYT8Xt+oy99jHeQI7PckzsEqrFwrg==
-X-Received: by 2002:a17:906:225c:b0:9a1:f1b2:9f2e with SMTP id 28-20020a170906225c00b009a1f1b29f2emr10683060ejr.2.1696254780587;
-        Mon, 02 Oct 2023 06:53:00 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id i13-20020a170906090d00b0099cbfee34e3sm17047432ejd.196.2023.10.02.06.53.00
+        d=1e100.net; s=20230601; t=1696254885; x=1696859685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=STxM7vkkmDyUmxUH+gQAbgTWzPPiXJaAVUcK/e9j1i4=;
+        b=XoqcedYTHplyETqDKkZBuVq3HPLHNVGI3wv54xOw5WDcjYB9anYTpO06p9GK4akFZN
+         2gzZYcK0PtX4PPJ7hKu/GjfZVWXsDBMcbxjQ7axSiPAbrp0/0RlwppLbCh8ecgG8F7W/
+         Fp4Umf9UBVpLIXm+6TKIFG9VaCGtuuTXzHCutMZz5sYo9naFVpx7amnGxA8x4oF+VXtV
+         N7baCP7zJxF7BiidRnIcZJeRzZ1GkEpH5Qsyg1asyrSBFyUmR1CoFEpfXulKNl1NTIF/
+         L+MAssCwGzt70TIZrGi9qYEvo+zblcIpI46/fTgsKzTmo5pOlHlcFfvkv9iOdoUIlpAf
+         ZSXQ==
+X-Gm-Message-State: AOJu0Yxa/DDnvpEqoXEwmpfODlmJy/mWKJFlYL0rkeXkcicD/NDGTuaW
+	lt+BVxsuEGvxYIaw/RfR3nHC3A==
+X-Google-Smtp-Source: AGHT+IEs4NNprUgXOj7mVjG0S6MI/X0bgLI21KGJ4S6Xc/WbrCRFCrApaXSxBK8zWzz0pDpmlfRmAA==
+X-Received: by 2002:a05:620a:12f1:b0:774:13e:71cd with SMTP id f17-20020a05620a12f100b00774013e71cdmr10622494qkl.56.1696254884697;
+        Mon, 02 Oct 2023 06:54:44 -0700 (PDT)
+Received: from dell-precision-5540 ([50.212.55.89])
+        by smtp.gmail.com with ESMTPSA id h8-20020ae9ec08000000b0076e672f535asm8922296qkg.57.2023.10.02.06.54.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 06:53:00 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A0B94E573FD; Mon,  2 Oct 2023 15:52:59 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, Soheil Hassas Yeganeh
- <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, Jamal Hadi
- Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH v2 net-next 0/4] net_sched: sch_fq: add WRR scheduling
- and 3 bands
-In-Reply-To: <20231002131738.1868703-1-edumazet@google.com>
-References: <20231002131738.1868703-1-edumazet@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 02 Oct 2023 15:52:59 +0200
-Message-ID: <875y3pgmh0.fsf@toke.dk>
+        Mon, 02 Oct 2023 06:54:44 -0700 (PDT)
+Date: Mon, 2 Oct 2023 09:54:34 -0400
+From: Ben Wolsieffer <ben.wolsieffer@hefring.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Christophe Roullier <christophe.roullier@st.com>
+Subject: Re: [PATCH net] net: stmmac: dwmac-stm32: fix resume on STM32 MCU
+Message-ID: <ZRrLmjxoIIx7pIcs@dell-precision-5540>
+References: <20230927175749.1419774-1-ben.wolsieffer@hefring.com>
+ <681cc4ca-9fd7-9436-6c7d-d7da95026ce3@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <681cc4ca-9fd7-9436-6c7d-d7da95026ce3@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Eric Dumazet <edumazet@google.com> writes:
+Hi Jacob,
 
-> As discussed in Netconf 2023 in Paris last week, this series adds
-> to FQ the possibility of replacing pfifo_fast for most setups.
->
-> FQ provides fairness among flows, but malicious applications
-> can cause problems by using thousands of sockets.
->
-> Having 3 bands like pfifo_fast can make sure that applications
-> using high prio packets (eg AF4) can get guaranteed throughput
-> even if thousands of low priority flows are competing.
->
-> Added complexity in FQ does not matter in many cases when/if
-> fastpath added in the prior series is used.
->
-> v2: augmented two extack messages (Toke)
+On Fri, Sep 29, 2023 at 10:48:47AM -0700, Jacob Keller wrote:
+> 
+> 
+> On 9/27/2023 10:57 AM, Ben Wolsieffer wrote:
+> > The STM32MP1 keeps clk_rx enabled during suspend, and therefore the
+> > driver does not enable the clock in stm32_dwmac_init() if the device was
+> > suspended. The problem is that this same code runs on STM32 MCUs, which
+> > do disable clk_rx during suspend, causing the clock to never be
+> > re-enabled on resume.
+> > 
+> > This patch adds a variant flag to indicate that clk_rx remains enabled
+> > during suspend, and uses this to decide whether to enable the clock in
+> > stm32_dwmac_init() if the device was suspended.
+> > 
+> 
+> Why not just keep clk_rx enabled unconditionally or unconditionally stop
+> it during suspend? I guess that might be part of a larger cleanup and
+> has more side effects?
 
-Thanks!
-For the series:
+Ideally, you want to turn off as many clocks as possible in suspend to
+save power. I'm assuming there is some hardware reason the STM32MP1
+needs the RX clock on during suspend, but it was not explained in the
+original patch. Without more information, I'm trying to maintain the
+existing behavior.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> 
+> > This approach fixes this specific bug with limited opportunity for
+> > unintended side-effects, but I have a follow up patch that will refactor
+> > the clock configuration and hopefully make it less error prone.
+> > 
+> 
+> I'd guess the follow-up refactor would target next?
+> 
+> > Fixes: 6528e02cc9ff ("net: ethernet: stmmac: add adaptation for stm32mp157c.")
+> > Signed-off-by: Ben Wolsieffer <ben.wolsieffer@hefring.com>
+> > ---
+> 
+> This seems pretty small and targeted so it does make sense to me as a
+> net fix, but it definitely feels like a workaround.
+> 
+> I look forward to reading the cleanup patch mentioned.
 
+Sorry, I should have linked this when I re-posted this patch for
+net, but I previously submitted this patch as part of a series with
+the cleanup but was asked to split them up for net and net-next.
+Personally, I would be fine with them going into net-next together (or
+squashed).
+
+The original series can be found here:
+https://lore.kernel.org/linux-arm-kernel/20230919164535.128125-3-ben.wolsieffer@hefring.com/T/
+
+Thanks, Ben
 
