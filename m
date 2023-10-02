@@ -1,174 +1,109 @@
-Return-Path: <netdev+bounces-37410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29897B53AE
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:11:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89FBC7B53C9
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:17:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6B4162837D5
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:11:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id D6FC4B20A7E
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0CD18C0A;
-	Mon,  2 Oct 2023 13:11:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E0B18C24;
+	Mon,  2 Oct 2023 13:17:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0F6179BF;
-	Mon,  2 Oct 2023 13:11:22 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2083.outbound.protection.outlook.com [40.107.21.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B897EB0;
-	Mon,  2 Oct 2023 06:11:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y6K2IXUpNGg2j1r/iBl362B9zP212ecD0jgmoAlQWaya8mTg7Sww0xREtAERiAOszJRcU35w2I02i7TAYj1lyHTwJ48d0Sn5daDdPikkUGhPpJ9U0s108XWxtqQQPEDtBw1/qVxHojmrT7TYFDvLHkenYMpFOkDedeE5jGdm4OI8dpjHgksQRRLcDqWOzIVzEek+Eouyqh3USQoq6q8YP4XGJKEuv9jJkmjTuIl3s8LuoZBKQhG0S2M5XuoxJO1KwMAvA94Khe3toXVXtqDlCzefZI+5nBe2QO0kp0Ut0PNT+SIttOLIxzIWKe2wtJNSHuz1aalLdctwikw2CpBgww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3VrFUZhFXyPR4hIjgtY0cHd2Mcjy3483MCHW9uouLYk=;
- b=G5VydtPYlauh5RTykETXWsSpTZyptROecOhFlJZQj33XOXcXcc+97yRXYMn70qL/t+Z0y6pH7k4fNdriyWtOOd4i31T5Z/PQeXRBpVO79oWf6Atfl6pvDYYOoFskXNRRJPZSqJ8Z6sNHkageU460vuWhezXU97lIJ9d/qkwRRqP+zTu+Is6L4L8UPBEUddNiG51AERA3Ke8V1fZBXb54+0hYKZFBAYzCGaBXpUaCeqFAzgFlAin/hc2Ea+GIcCAnAxoYPfjpqEbQbIe6m5KqG2ZeHsNFqlPCMIRaaxwnMA67ZkBQLHFX6ArM5E0PSiy0yi0IC4fjw2Qc3CDnlqLJGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3VrFUZhFXyPR4hIjgtY0cHd2Mcjy3483MCHW9uouLYk=;
- b=fvbO47aXXH9ZRw9IIpx0S9SiJ9ATJIEfb+TlvX/JWnPiMLkIOPT/uFt7iPRYS16QHf/8rusvK6QXPapV6VcBCISrlM2XmOqKrt/e0JZ59X1fF7jxwOdd76qeIDvTMrPtd3M+MqeaLlf9rjh9SNXuGw2eg98uPCjZKpF6qW5dQjU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM8PR04MB7329.eurprd04.prod.outlook.com (2603:10a6:20b:1d0::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.37; Mon, 2 Oct
- 2023 13:11:14 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6838.024; Mon, 2 Oct 2023
- 13:11:14 +0000
-Date: Mon, 2 Oct 2023 16:11:10 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH v2 net-next 03/15] phy: ethernet: add configuration
- interface for copper backplane Ethernet PHYs
-Message-ID: <20231002131110.4kjkinc2xyxtdwbv@skbuf>
-References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
- <20230923134904.3627402-4-vladimir.oltean@nxp.com>
- <20230928190536.GO24230@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230928190536.GO24230@kernel.org>
-X-ClientProxiedBy: VI1PR04CA0131.eurprd04.prod.outlook.com
- (2603:10a6:803:f0::29) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F89168AC
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:17:46 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11F5B0
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:17:44 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a1eb48d346so146912637b3.3
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 06:17:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696252664; x=1696857464; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UviE7gNHoGTjeRL3UJ2ZMftog0mp3PTguSK9JSO5txs=;
+        b=cUCG3tgw6TKeIcqS9qTolRaxctCWKkVtyOGUwGKzKHxF5+Dvhs93pBB03mNjN6ldri
+         TvAj84Q5TrfEDEjLdm9mgH6hMZcwKuX0dl76IwwMVOqWgtBkCE7TxdQ1G3JhOBuhpmP6
+         633dkEBCpEn9/cqN/71KJGXG/WAAqOUJlN4MFC7nh/SrcfnAo1ChCHI+9KILfs80BI7L
+         8yxGDCxfpr9ViuQWSYnwQx7jd86406hd5oSKVEIozNWqwsAjo55LBhpXJCJZBT7xMsn0
+         XsTTnSFfiBLrfkja1WZNAGrRBt69fIbDwC+IfqlT1tJDQdVNopy/OVM3bxdLjWhvEv/9
+         jpPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696252664; x=1696857464;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UviE7gNHoGTjeRL3UJ2ZMftog0mp3PTguSK9JSO5txs=;
+        b=goKkYYWZikBCkEw9kpLV4Q6Xgi5Ztk78xnNyLMs2X1x8DDDnjK+VefWoefxWpypLjX
+         +mRtMXzO9d+9H+vuWI32/ICdrx22rRhiByumPifigfnmcrQYbj879XIiC0/yf3FPqVA8
+         kwMSL8IF5JPhklqDdtC5vF93fdsFYqeUFYbBVBYmLWm/OsnNwYZMHySuIdt6Wk3KTH/0
+         qPK0o3u7w8+g301/3EY9yiEHxSolKhjB/EMdCjUktetg/DZLbfsrEmqYLj7x1V2llBWn
+         JW/2QGYRR1onSHtr5FOrT6PMvpRI1IURuNVIO9CxjhMwvA2Q5iuYvfD48NYtWW9+yrYE
+         3SSA==
+X-Gm-Message-State: AOJu0YzWvBosW0b2UP1vMV8MiGLrSX1vDZZXa3PT0y0hl/rIu4a96xH1
+	19P/HukkDm2BFgUIaZokh/n2fy0XWSIk9Q==
+X-Google-Smtp-Source: AGHT+IH0jXgEFbqEdYfZDoeDMEnuQ5dFmYaFH5qVKUDoNQ9zWh+KdtzVczV6JLoor2NgGkZANC2nYWMMvWoNjw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:ce42:0:b0:d84:e73f:6f8c with SMTP id
+ x63-20020a25ce42000000b00d84e73f6f8cmr175940ybe.6.1696252664224; Mon, 02 Oct
+ 2023 06:17:44 -0700 (PDT)
+Date: Mon,  2 Oct 2023 13:17:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB7329:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5290f201-f662-4de1-ce34-08dbc3490e6a
-X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
- kL8LOMOxs4IdNIDSHHW5Mqm/LNMpfileZ7mkdj4vD0XKpPTRCRAsGENwEa4qdPit2cGdaSdUjBIJPUEDryeq1gVj4ZGwfXJg3DSpygYdrAr8tMICujBd7W71UIiBTdO2UglV+4UpaGZ0iqBwhOv17Rcsuz/jBU4+ogSGx9hBmst1DYjzzhgy9LGTMbWCUY+c9XkaY6ahe0ruD4NJ4vrfiVqjDT1Ep9CbpVFmPRolXCvD/R14+9t1wIA/d/ox92RrdV5OdwZ7OAJ3IT/cL+29OCprMeJ3A56hMTvpp5gWZeMGSkoKvcJpWqKl8MWP077yybDMbp9Li5E6nYLf5pr6ctLjroAYnVQ4RkXWyo3EtI7JpipAdJmmH6WK6IJq5SBPWuc4Pg3r1hiswUJAhb4Ro9Tgv6N/oYrzDUUDhPu9VRlSBikmtIvT5gCYnLsWBG63In5ksRec1ZG0BzkR1j/7z7Bf3D007r7boIwlIJyKW77HhI8BkiKAWFneeRD+WvQx4cXadxNR3EgPN7t/BzQjmJssFIHayG+JeWARlCbnZyDbDHzi4v9H+RWXrbwndOxn
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(366004)(396003)(136003)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6506007)(6512007)(478600001)(86362001)(26005)(8936002)(38100700002)(1076003)(2906002)(7416002)(6666004)(9686003)(83380400001)(6486002)(44832011)(8676002)(4326008)(41300700001)(33716001)(316002)(6916009)(66946007)(66476007)(5660300002)(54906003)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?us-ascii?Q?85CkgoUJl32dgQ4hDhxKg/X6UIjXYgDuopLYKekGLrKF6oR+POOEeexH+8Jh?=
- =?us-ascii?Q?w1nFyhfjlQiOpSzT8WmyePnp+SlHNfWOyMeh/km1TfE69gPlI0HEH1KCfLFT?=
- =?us-ascii?Q?/JDwvDBDJK0S1rPg+Hl4XuU+gnq492zODbJXBcpGVI94nwZkO7izxJ+r9Whq?=
- =?us-ascii?Q?L3c2SnXboMjH+AOPaXQPNLGyVBVDF/Q9pXhQk20ADjmQBVkDPngCl1lpVOlb?=
- =?us-ascii?Q?w/6+yyOU/iIhhwyKV/x83mzIqZ+HuYVbifc2D5LIPCH3Nwdqqb+2pfQ5pLMP?=
- =?us-ascii?Q?VkvKDwdD6v7JzTTgXwVEFB1FjYf7aaTfmTe3/A3YpovYWte76oJ3h1pBxqe5?=
- =?us-ascii?Q?12Jf/RZyAwRMD8tyMtbXXyRWTZbgtKTnCH27gUUUR0zG9cWScFEQBqP1JDO9?=
- =?us-ascii?Q?gq8pJQOHF1AKTb7zx40sjDwbYYGjsGov8J9B4UH86yy+lbTKlxoyixQS5p7G?=
- =?us-ascii?Q?ZoShlDCwKnaypba/aRg80TGCUAB2Go/SFRcmuJdWEr9UHETbtynDcPrgZAeI?=
- =?us-ascii?Q?Oo8kY1RqIT/67FrI4Sn8rDtuv+oXt3TieVxef+/PU/NHsX+Q+Hm0qr3iBc3A?=
- =?us-ascii?Q?+y4vRsT48MFcbZsvBmY1Rj7tx5qOxLKQB88a1BPQG6n+nuyGGEfpnGA/s/7T?=
- =?us-ascii?Q?5rvJgeY5UxpZlTDTnL6pHn6P6sDmauTo4F1UE/Hmm7EnYSpqY2xubodOPnAR?=
- =?us-ascii?Q?x9wM1HbPXtImBOfqKsTWeyIZKx4St46oR06A6CE2iGp5RIxPDfQHBYanGE0e?=
- =?us-ascii?Q?4Njf2wlukznsuXBDSi488FJCfTq5wFRlXw3DwZ9W/NTdA0/BHvqw3tHQEhXH?=
- =?us-ascii?Q?OKwKiFiKi9CJ21UdSWHvDS8xc3u7Gnw6eOkRVmHwN8hoDaYI8Ye3TRJBzCxG?=
- =?us-ascii?Q?7oAFME30ilxwKg6gc7Q1iGigL1eNFj3lR9as6ASwcqNlkIiBQD5jRPhLqTXs?=
- =?us-ascii?Q?ptPKt3A814QFPWGoC2WmtpO0mrwp52fTJx7GGEwbZOufUnvkT8HOAYjmDIjc?=
- =?us-ascii?Q?MG+7d9v3oPMOSJCRJdrxEwOM3OreA39+rj78kwytnHgV1xnbggs3SfHmi8Cw?=
- =?us-ascii?Q?LX+Fe+gEyONYthfQkxWQ2dVwcP8sN2gM4Auya9QuMb1ufTxXfom0YAFXAs5Q?=
- =?us-ascii?Q?qjk1DDKT5ihEa9rRhdrv2qOyofZem4vzm2nw5dxTL29DB6ctUh0NRGNka6Vf?=
- =?us-ascii?Q?8ytjtHJjE83ceMy3wJVuR3B/iWapT8n2Pb+ajEfKaFkYAmrlZ15ldJDR4SYt?=
- =?us-ascii?Q?injjuBhL/sv+6dSeCixEjCDNZ8M9euBYX1dnnELudlBTf0TN9dIwZW59cl8h?=
- =?us-ascii?Q?s7n9GTJz0cOHL4QbjyBGx/gsOgqR+6IOWveI75TecEjTcvmnLT/rHsa/uDr3?=
- =?us-ascii?Q?48+CrafbbtHDQLYtDW6eDMqbZPduR6y5kJDvLV0Ls0QNxvFI2N0V0TE5iZ3v?=
- =?us-ascii?Q?9yXIPiy5HZA9y/+rqQW7wMdyJ/MIBXwXJ0G6LSg6j/QxOG3gZmpLKZUDhE5O?=
- =?us-ascii?Q?UVsb+zodHl1WazxtpelB0fDpoX+TsleTKvUnRVjY9JWhoLaO50S8vKCI4QaJ?=
- =?us-ascii?Q?mHuQZi0xUIMyrqNWybtWxta5EpNA+YYzBen5U0Skjxae7xv29UeLBITY/Dmi?=
- =?us-ascii?Q?Zw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5290f201-f662-4de1-ce34-08dbc3490e6a
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 13:11:14.6376
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cVrGd9YchViSDDN36wGHWbkEMhACSUEcDw78aEqKgaHWUvBPKRt8Pk4TdZCAZFGCSXd7kD8YPXdjhC+Uws7OOw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7329
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
+Message-ID: <20231002131738.1868703-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 0/4] net_sched: sch_fq: add WRR scheduling and 3 bands
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, Soheil Hassas Yeganeh <soheil@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon,
+As discussed in Netconf 2023 in Paris last week, this series adds
+to FQ the possibility of replacing pfifo_fast for most setups.
 
-On Thu, Sep 28, 2023 at 09:05:36PM +0200, Simon Horman wrote:
-> On Sat, Sep 23, 2023 at 04:48:52PM +0300, Vladimir Oltean wrote:
-> 
-> ...
-> 
-> > +/**
-> > + * coef_update_opposite - return the opposite of one C72 coefficient update
-> > + *			  request
-> > + *
-> > + * @update:	original coefficient update
-> > + *
-> > + * Helper to transform the update request of one equalization tap into a
-> > + * request of the same tap in the opposite direction. May be used by C72
-> > + * phy remote TX link training algorithms.
-> > + */
-> > +static inline enum coef_update coef_update_opposite(enum coef_update update)
-> 
-> Hi Vladimir,
-> 
-> another nit from me.
-> 
-> Please put the inline keyword first.
-> Likewise elsewhere in this patch.
-> 
-> Tooling, including gcc-13 with W=1, complains about this.
+FQ provides fairness among flows, but malicious applications
+can cause problems by using thousands of sockets.
 
-Thanks for pointing this out. I guess you are talking about the c72_coef_update_print()
-function, whose prototype is mistakenly "static void inline" instead of
-"static inline void". I cannot find the problem with the quoted coef_update_opposite().
+Having 3 bands like pfifo_fast can make sure that applications
+using high prio packets (eg AF4) can get guaranteed throughput
+even if thousands of low priority flows are competing.
+
+Added complexity in FQ does not matter in many cases when/if
+fastpath added in the prior series is used.
+
+v2: augmented two extack messages (Toke)
+
+Eric Dumazet (4):
+  net_sched: sch_fq: remove q->ktime_cache
+  net_sched: export pfifo_fast prio2band[]
+  net_sched: sch_fq: add 3 bands and WRR scheduling
+  net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
+
+ include/net/sch_generic.h      |   1 +
+ include/uapi/linux/pkt_sched.h |  14 +-
+ net/sched/sch_fq.c             | 265 ++++++++++++++++++++++++++-------
+ net/sched/sch_generic.c        |   9 +-
+ 4 files changed, 228 insertions(+), 61 deletions(-)
+
+-- 
+2.42.0.582.g8ccd20d70d-goog
+
 
