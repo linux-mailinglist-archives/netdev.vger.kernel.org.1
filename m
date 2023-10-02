@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-37359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01EE17B4F51
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:44:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF87F7B4F58
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A959D282A01
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 09:44:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id AC335B20CE5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 09:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBC6CA68;
-	Mon,  2 Oct 2023 09:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7961CA69;
+	Mon,  2 Oct 2023 09:46:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826CC79DD
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 09:44:52 +0000 (UTC)
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960C79E
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 02:44:50 -0700 (PDT)
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-6c6204b2defso10689318a34.0
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 02:44:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED9DCA68
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 09:45:59 +0000 (UTC)
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9950BE1
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 02:45:57 -0700 (PDT)
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6c65a8aaa0dso1223759a34.2
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 02:45:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696239890; x=1696844690;
+        d=1e100.net; s=20230601; t=1696239957; x=1696844757;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=aZVwf6WiRiOj0OXOXdp+NwbIcumjFFUUSCI16ysNhaY=;
-        b=OmDrom0LAwIuSsjbH+UWn67BA4sVcKd1opOVNoqqrVE8MDcHuMNIOPD3u3f+NWeEbN
-         0PX8JQMJpj49CD4p1PoRBbuoRD/+ngFU1AruCkjqe7sNlyaKkbQnTfFogqIRmApkhk9G
-         RtJ/u5SUPgTN5a/Yf88jtZfdPx1yxYt3e8IZDD0TOCcE2tQXYJujtrv2PUq4d9tYixj5
-         ud/dCMCLKIeu7IQk9gFPsgEYNXREHqA3InKNIhmuCiv1Ft5tpOx7QouUElz2UO3riVMo
-         BzH/AJWUsxsZJ5fUy71Hwf1TPPfUkxwSBl5fQursX/4BeDQ5u5QGr713vFOCAJ//T+kl
-         dwBw==
-X-Gm-Message-State: AOJu0YyAXJBb8JCNHR0fvyFTaQzyfUoD5eP+P05qIGFvCYj7uZX33flA
-	l1anz0dHeF+3Yp19mS1jVm/DX+lINdbTvVMu37mTwgNmeqU2
-X-Google-Smtp-Source: AGHT+IGoOXhtRQRlr9dZLd6jo1k8tgYgp1b/Y6PWK9HqykysZZcKskz5Rg7o5F3MG32e87eBFwsr5UPAIsMNjA0a058LP4vpa2kf
+        bh=j+V/Kas7sPAGONSNF95omM6KA+Zl9oYVho8EqMT7rbM=;
+        b=bik4XdPQKhLnAS+TGJBQlHg0fAwuLqDerJEqrQM1TTacZNXx6owGaJQUsO/P5aDm4v
+         sQlqiYNPysjVQI0DY2L3A/ASLkk+2b9K2a0teMGDT0s4BUjdj7PdHpYpq8uNhwO972P1
+         1WwYc2/eEcYU6CQ3ow9zyBe8MKSfd+Z4M9B2+LXTzWHirsWe/dKmWJKU1Vd01VpBg2ZS
+         9xzmV9MxdPeVFquo33flLl9+D4wcBleFKI7BXP4Mwt2MWV6RCNGqVvhU83stYiYd5msM
+         sIzLpwj1ZbuG9Q6Fv7kyBcI1u6COTUj3Nq/cZQpyLeNeTrzVSNl70ABVRZyK2zhQrOwC
+         IooQ==
+X-Gm-Message-State: AOJu0Yxt7kNc2Hf+iLD5y7wSSX8cXJeq/hwatiW2It4LdaluNKYBUVEw
+	GwLIpPG7S4biEP1SzT/qdO5TTWqeT41T6lDXAoNrkFBAk1R2
+X-Google-Smtp-Source: AGHT+IElUT3xavaqCQKZ2cxGY8UTjgJeI6y9hTzx2P/TqT18EAuMs23S/kpRJXl8aA3EWRB2XmcfIHh+ZTLv+OHC+INg60lnz9ow
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6830:16c3:b0:6c4:aa6a:c4db with SMTP id
- l3-20020a05683016c300b006c4aa6ac4dbmr3726979otr.0.1696239889846; Mon, 02 Oct
- 2023 02:44:49 -0700 (PDT)
-Date: Mon, 02 Oct 2023 02:44:49 -0700
+X-Received: by 2002:a9d:7dcc:0:b0:6b9:a955:43bc with SMTP id
+ k12-20020a9d7dcc000000b006b9a95543bcmr3119771otn.3.1696239957023; Mon, 02 Oct
+ 2023 02:45:57 -0700 (PDT)
+Date: Mon, 02 Oct 2023 02:45:56 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001697760606b8a05e@google.com>
-Subject: [syzbot] Monthly hams report (Sep 2023)
-From: syzbot <syzbot+list96e394457c1cb35c32bc@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000017a4bd0606b8a48c@google.com>
+Subject: [syzbot] Monthly can report (Sep 2023)
+From: syzbot <syzbot+list80422fea79f8c83e326e@syzkaller.appspotmail.com>
+To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
@@ -60,24 +60,24 @@ X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello hams maintainers/developers,
+Hello can maintainers/developers,
 
-This is a 31-day syzbot report for the hams subsystem.
+This is a 31-day syzbot report for the can subsystem.
 All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+https://syzkaller.appspot.com/upstream/s/can
 
 During the period, 0 new issues were detected and 0 were fixed.
-In total, 3 issues are still open and 31 have been fixed so far.
+In total, 8 issues are still open and 47 have been fixed so far.
 
 Some of the still happening issues:
 
 Ref Crashes Repro Title
-<1> 92      Yes   memory leak in nr_rx_frame (2)
-                  https://syzkaller.appspot.com/bug?extid=0145ea560de205bc09f0
-<2> 20      No    general protection fault in rose_transmit_link (3)
-                  https://syzkaller.appspot.com/bug?extid=677921bcd8c3a67a3df3
-<3> 9       Yes   memory leak in nr_create (3)
-                  https://syzkaller.appspot.com/bug?extid=d327a1f3b12e1e206c16
+<1> 279     Yes   possible deadlock in j1939_sk_queue_drop_all
+                  https://syzkaller.appspot.com/bug?extid=3bd970a1887812621b4c
+<2> 60      Yes   possible deadlock in j1939_session_activate
+                  https://syzkaller.appspot.com/bug?extid=f32cbede7fd867ce0d56
+<3> 6       Yes   possible deadlock in j1939_sk_errqueue (2)
+                  https://syzkaller.appspot.com/bug?extid=1591462f226d9cbf0564
 
 ---
 This report is generated by a bot. It may contain errors.
