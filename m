@@ -1,149 +1,135 @@
-Return-Path: <netdev+bounces-37465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32077B570C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:02:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E09FF7B5710
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7453E281B81
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:02:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 28045B20B2F
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0BB1D699;
-	Mon,  2 Oct 2023 16:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71261D6A6;
+	Mon,  2 Oct 2023 16:06:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46E11D525
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:02:13 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCA3E5;
-	Mon,  2 Oct 2023 09:02:10 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 71297240004;
-	Mon,  2 Oct 2023 16:02:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1696262529;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VceR3KZ7j/tRvYYnO2ZWLO0nUF4+UHbP0i80WdJuN3s=;
-	b=GG7WmlMedaqR7tTwyF8niW1i9CBEBj8f9xTfUhkr5VmpSgNCSFds5MecI5Do43C6eh+1+R
-	4AxOUX/PR4z5S7TdSXep3QcIn65x4OdUN/4IieMjidzIoLhxqcZedu9PreEVub1HhDLJlJ
-	Iwm2HQN7uHnZtJDNGSZsJeqnQF1I02VM8A2d+LFYyl1CvL5Dfs/PG7Og0Zdji0LF+og27/
-	ZPVXGcI2aemCouo8ZAiTnNrKJVoJ9yh8jhBoS9wcUh8WmGLYPj/pMksmaFFBT/vQCgG/si
-	ZYt9Dy83BO2wA66j3E50/t02VT4cP8CVQCDKFU2vuMdCySYwL0btG3Om8v/inw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9mie=20Dautheribes?= <jeremie.dautheribes@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	sylvain.girard@se.com,
-	pascal.eberhard@se.com,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	stable@vger.kernel.org
-Subject: [PATCH v3] can: sja1000: Always restart the Tx queue after an overrun
-Date: Mon,  2 Oct 2023 18:02:06 +0200
-Message-Id: <20231002160206.190953-1-miquel.raynal@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77098488
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:06:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AF1C433C8;
+	Mon,  2 Oct 2023 16:06:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696262816;
+	bh=hjJsXyNAF1V7Na1B/S3lP6ETWWJSxW2eEAWFxd1xSuk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rDFT9Jte07g2Ec1nFQBlQricWs9bCv0EicI7uAjZMT9tEbZ8nIQ7Yl2Sk1V4xrjdL
+	 Q9yh1LOzF8wtvQEj4rhgV9aEks47N7m/MBvFKn3UHdk6mjupdMhwwiHkHMrEMCSGj2
+	 4OiS0urZS4d+GO6AkGTVOnhvbIgYa8FPDG4jmsntNfTGqa+7a+mq1kkSrcAUnpEDmp
+	 QhhnZRdudOlKTmclWJg5kqnmlny6wH1a4JwKoE92zVbOT+mrQTbiToHv68k/o5nnE2
+	 FGHcr83eXgUDNFsMjBxgb2adQqwqpAa9PXkpdDCvuNMo+Pi2nr7KIZKh38HdCugje1
+	 /kPlnY4nkNNEA==
+Date: Mon, 2 Oct 2023 18:06:51 +0200
+From: Simon Horman <horms@kernel.org>
+To: xiaolinkui <xiaolinkui@126.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, justinstitt@google.com, kuniyu@amazon.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Linkui Xiao <xiaolinkui@kylinos.cn>
+Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
+Message-ID: <20231002160651.GX92317@kernel.org>
+References: <20230927130309.30891-1-xiaolinkui@126.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230927130309.30891-1-xiaolinkui@126.com>
 
-Upstream commit 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with
-a soft reset on Renesas SoCs") fixes an issue with Renesas own SJA1000
-CAN controller reception: the Rx buffer is only 5 messages long, so when
-the bus loaded (eg. a message every 50us), overrun may easily
-happen. Upon an overrun situation, due to a possible internal crosstalk
-situation, the controller enters a frozen state which only can be
-unlocked with a soft reset (experimentally). The solution was to offload
-a call to sja1000_start() in a threaded handler. This needs to happen in
-process context as this operation requires to sleep. sja1000_start()
-basically enters "reset mode", performs a proper software reset and
-returns back into "normal mode".
+On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
+> From: Linkui Xiao <xiaolinkui@kylinos.cn>
+> 
+> If the ip_set is not locked during ip_set_test, the following situations
+> may occur:
+> 
+> 	CPU0				CPU1
+> 	ip_rcv->
+> 	ip_rcv_finish->
+> 	ip_local_deliver->
+> 	nf_hook_slow->
+> 	iptable_filter_hook->
+> 	ipt_do_table->
+> 	set_match_v4->
+> 	ip_set_test->			list_set_destroy->
+> 	hash_net4_kadt->		set->data = NULL
 
-Since this fix was introduced, we no longer observe any stalls in
-reception. However it was sporadically observed that the transmit path
-would now freeze. Further investigation blamed the fix mentioned above,
-and especially the reset operation. Reproducing the reset in a loop
-helped identifying what could possibly go wrong. The sja1000 is a single
-Tx queue device, which leverages the netdev helpers to process one Tx
-message at a time. The logic is: the queue is stopped, the message sent
-to the transceiver, once properly transmitted the controller sets a
-status bit which triggers an interrupt, in the interrupt handler the
-transmission status is checked and the queue woken up. Unfortunately, if
-an overrun happens, we might perform the soft reset precisely between
-the transmission of the buffer to the transceiver and the advent of the
-transmission status bit. We would then stop the transmission operation
-without re-enabling the queue, leading to all further transmissions to
-be ignored.
+Hi,
 
-The reset interrupt can only happen while the device is "open", and
-after a reset we anyway want to resume normal operations, no matter if a
-packet to transmit got dropped in the process, so we shall wake up the
-queue. Restarting the device and waking-up the queue is exactly what
-sja1000_set_mode(CAN_MODE_START) does. In order to be consistent about
-the queue state, we must acquire a lock both in the reset handler and in
-the transmit path to ensure serialization of both operations. It turns
-out, a lock is already held when entering the transmit path, so we can
-just acquire/release it as well with the regular net helpers inside the
-threaded interrupt handler and this way we should be safe. As the
-reset handler might still be called after the transmission of a frame to
-the transceiver but before it actually gets transmitted, we must ensure
-we don't leak the skb, so we free it (the behavior is consistent, no
-matter if there was an skb on the stack or not).
+I'm having a bit of trouble analysing this.
+In particular, I'm concerned that in such a scenario set
+itself will be also freed, which seems likely to lead to problems.
 
-Fixes: 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with a soft reset on Renesas SoCs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
----
+Can you provide a more complete call stack for CPU1 ?
 
-Changes in v3:
-* Fix new implementation by just acquiring the tx lock when required.
-
-Changes in v2:
-* As Marc sugested, use netif_tx_{,un}lock() instead of our own
-  spin_lock.
-
- drivers/net/can/sja1000/sja1000.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/can/sja1000/sja1000.c b/drivers/net/can/sja1000/sja1000.c
-index ae47fc72aa96..9531684d47cd 100644
---- a/drivers/net/can/sja1000/sja1000.c
-+++ b/drivers/net/can/sja1000/sja1000.c
-@@ -396,7 +396,13 @@ static irqreturn_t sja1000_reset_interrupt(int irq, void *dev_id)
- 	struct net_device *dev = (struct net_device *)dev_id;
- 
- 	netdev_dbg(dev, "performing a soft reset upon overrun\n");
--	sja1000_start(dev);
-+
-+	netif_tx_lock(dev);
-+
-+	can_free_echo_skb(dev, 0);
-+	sja1000_set_mode(dev, CAN_MODE_START);
-+
-+	netif_tx_unlock(dev);
- 
- 	return IRQ_HANDLED;
- }
--- 
-2.34.1
-
+> 	h = set->data
+> 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
+> 
+> The set->data is empty, continuing to access set->data will result in a
+> kernel NULL pointer. The call trace is as follows:
+> 
+> [2350616.024418] Call trace:
+> [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
+> [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
+> [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
+> [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
+> [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
+> [2350616.026905]  nf_hook_slow+0x50/0x100
+> [2350616.027256]  ip_local_deliver+0xd4/0xe8
+> [2350616.027616]  ip_rcv_finish+0x90/0xb0
+> [2350616.027961]  ip_rcv+0x50/0xb0
+> [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
+> [2350616.028716]  __netif_receive_skb+0x28/0x80
+> [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
+> [2350616.029533]  napi_gro_receive+0xf8/0x170
+> [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
+> [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
+> [2350616.030761]  net_rx_action+0x158/0x3a0
+> [2350616.031124]  __do_softirq+0x11c/0x33c
+> [2350616.031470]  irq_exit+0x11c/0x128
+> [2350616.031793]  __handle_domain_irq+0x6c/0xc0
+> [2350616.032172]  gic_handle_irq+0x6c/0x170
+> [2350616.032528]  el1_irq+0xb8/0x140
+> [2350616.032835]  arch_cpu_idle+0x38/0x1c0
+> [2350616.033183]  default_idle_call+0x24/0x58
+> [2350616.033549]  do_idle+0x1a4/0x268
+> [2350616.033859]  cpu_startup_entry+0x28/0x78
+> [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
+> 
+> Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+> ---
+>  net/netfilter/ipset/ip_set_core.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+> index 35d2f9c9ada0..46f4f47e29e4 100644
+> --- a/net/netfilter/ipset/ip_set_core.c
+> +++ b/net/netfilter/ipset/ip_set_core.c
+> @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
+>  	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
+>  		return 0;
+>  
+> +	ip_set_lock(set);
+>  	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
+> +	ip_set_unlock(set);
+>  
+>  	if (ret == -EAGAIN) {
+>  		/* Type requests element to be completed */
+> -- 
+> 2.17.1
+> 
+> 
 
