@@ -1,107 +1,154 @@
-Return-Path: <netdev+bounces-37493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3AD27B5A7D
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:54:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8F27B5A9A
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id E119D1C20491
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:54:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7A0A8281E80
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148051F172;
-	Mon,  2 Oct 2023 18:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48C1F175;
+	Mon,  2 Oct 2023 18:55:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C341E503
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 18:54:36 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01D95AC
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 11:54:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696272874;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dmM5ZNDegeZhf5s/Nz9vdWgDVovgTarUhb8l/wE2St4=;
-	b=eGSmRxGEY6t+7qV28wsJn+Y8bSJ7CRhqO2v74Iw1gGMf5m6wb5zTA011gJtDJqPskXku9S
-	gHiVvMKA3XPjHjMPHEVlfDaHKHegouvbffhqrPlsa5k+0RrDS/2XvT7HVzD2vUdUvXIyBb
-	EwyIERF1tk6RXAzVbTed6x5yapLamcE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-584-W4uLBja-N5WWgJ9pUCQOhA-1; Mon, 02 Oct 2023 14:54:22 -0400
-X-MC-Unique: W4uLBja-N5WWgJ9pUCQOhA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 24FD3101A59B;
-	Mon,  2 Oct 2023 18:54:22 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.67])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A0BD310EE402;
-	Mon,  2 Oct 2023 18:54:21 +0000 (UTC)
-Date: Mon, 2 Oct 2023 14:54:20 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-scsi: Spelling s/preceeding/preceding/g
-Message-ID: <20231002185420.GB1059748@fedora>
-References: <b57b882675809f1f9dacbf42cf6b920b2bea9cba.1695903476.git.geert+renesas@glider.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BE71E517
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 18:55:33 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D533CE
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 11:55:31 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 392ICIgS023156;
+	Mon, 2 Oct 2023 18:55:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=baQvOB9foh+svMTd+4dkDTzq8oWLjRmgXYBzVdD4eqM=;
+ b=XhlOdomf3mX1EOsPR5PQMGEKB1guF7Wn9yu/vRjy/AZGRVbF62y4vmYU6EBwI9Vwv9Ix
+ /XpHRuuaG/IIBEUi9BJdJ6y6ciGdVPJYWqT7GT2OIODXVQcH/ulQDsivbU3QJgDsStYC
+ AL+0rhahMV+nGPIhTZVGuYX1s/8bUhyNevttHIWtUMTI6U66cur0RCYuP8mSh5SdhhGc
+ 6chgZ/OxqCijLYISXrIp14axlQD35Jk+ReOL/eCElFzX5NUUcBLa4C2rFiTtLeSjX4Rz
+ oyK1JSnjRb0rDuJ0XUcUACIXiYr5AOwO1l3nLJ7TQevljcPndt6uqttRcyKQp24OoVqa uA== 
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tg2xb13hm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Oct 2023 18:55:28 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 392IHt7Y017637;
+	Mon, 2 Oct 2023 18:55:27 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tey0muntp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Oct 2023 18:55:27 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 392ItREM34800250
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 2 Oct 2023 18:55:27 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DE6F758058;
+	Mon,  2 Oct 2023 18:55:25 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B91F58057;
+	Mon,  2 Oct 2023 18:55:25 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  2 Oct 2023 18:55:25 +0000 (GMT)
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+To: netdev@vger.kernel.org
+Cc: siva.kallam@broadcom.com, prashant@broadcom.com, mchan@broadcom.com,
+        drc@linux.vnet.ibm.com, pavan.chebbi@broadcom.com,
+        Thinh Tran <thinhtr@linux.vnet.ibm.com>,
+        Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Subject: [PATCH] net/tg3: fix race condition in tg3_reset_task_cancel()
+Date: Mon,  2 Oct 2023 13:55:10 -0500
+Message-Id: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fuzmqqeB7+mI12HN"
-Content-Disposition: inline
-In-Reply-To: <b57b882675809f1f9dacbf42cf6b920b2bea9cba.1695903476.git.geert+renesas@glider.be>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: cHpS0ZEGWYLSvtrRPktxXuC0dYYZnb2k
+X-Proofpoint-GUID: cHpS0ZEGWYLSvtrRPktxXuC0dYYZnb2k
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-02_12,2023-10-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 clxscore=1011
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310020144
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+during the EEH error injection tests on the 4-port 1 GbE NetXtreme
+BCM5719 Gigabit Ethernet PCIe adapter, a race condition was observed in
+the process of resetting and setting the driver flag to
+TX_RECOVERY_PENDING between tg3_reset_task_cancel() and tg3_tx_recover().
+As a result, it occasionally leads to transmit timeouts and the
+subsequent disabling of all the driver's interfaces.
 
---fuzmqqeB7+mI12HN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[12046.886221] NETDEV WATCHDOG: eth16 (tg3): transmit queue 0 timed out
+[12046.886238] WARNING: CPU: 7 PID: 0 at ../net/sched/sch_generic.c:478
+   dev_watchdog+0x42c/0x440
+[12046.886247] Modules linked in: tg3 libphy nfsv3 nfs_acl .......
+ ..........
+[12046.886571] tg3 0021:01:00.0 eth16: transmit timed out, resetting
+...........
+[12046.966175] tg3 0021:01:00.1 eth15: transmit timed out, resetting
+...........
+[12046.981584] tg3 0021:01:00.2 eth14: transmit timed out, resetting
+...........
+[12047.056165] tg3 0021:01:00.3 eth13: transmit timed out, resetting
 
-On Thu, Sep 28, 2023 at 02:18:33PM +0200, Geert Uytterhoeven wrote:
-> Fix a misspelling of "preceding".
->=20
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  drivers/vhost/scsi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Fixing this issue by taking the spinlock when modifying the driver flag
 
---fuzmqqeB7+mI12HN
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Fixes: 6c4ca03bd890 ("net/tg3: resolve deadlock in tg3_reset_task() during EEH")
 
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmUbEdwACgkQnKSrs4Gr
-c8jm3wf3SybCVag7HhsRlbQBB2qCWSsI12mkvW0sXMAwLbLvfBANqEWmTzmywolz
-wzPqtLEJrTAScwq8jHk8r9R+V8Sq+thDzpNdI08PCGDVriCt8LBEgDIjvs0EvSNP
-rAhQxFxP5ciDKCRnnVq3cdXdzwPdkKNifj02HiaXQknBCE99vXD71LTwYLY4MBXI
-fIfva8/FlebeJYdBU91I9alORHAnlmgE7xZWh3j9QN8b+hT6TQKbcVKan2Z+/Zj+
-uEsjUWce8P3nTF8jd1AkjFDTegRXSmc9TKX2iqiglCBRZPUT8Ya2pSacmGdk2Lm/
-mNLVJfYcDmicuRAkTrTsok4iECvw
-=P1kz
------END PGP SIGNATURE-----
 
---fuzmqqeB7+mI12HN--
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+
+---
+ drivers/net/ethernet/broadcom/tg3.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 14b311196b8f..f4558762f9de 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6507,7 +6507,9 @@ static void tg3_tx_recover(struct tg3 *tp)
+ 		    "Please report the problem to the driver maintainer "
+ 		    "and include system chipset information.\n");
+ 
++	tg3_full_lock(tp, 0);
+ 	tg3_flag_set(tp, TX_RECOVERY_PENDING);
++	tg3_full_unlock(tp);
+ }
+ 
+ static inline u32 tg3_tx_avail(struct tg3_napi *tnapi)
+@@ -7210,7 +7212,10 @@ static inline void tg3_reset_task_cancel(struct tg3 *tp)
+ {
+ 	if (test_and_clear_bit(TG3_FLAG_RESET_TASK_PENDING, tp->tg3_flags))
+ 		cancel_work_sync(&tp->reset_task);
++
++	tg3_full_lock(tp, 0);
+ 	tg3_flag_clear(tp, TX_RECOVERY_PENDING);
++	tg3_full_unlock(tp);
+ }
+ 
+ static int tg3_poll_msix(struct napi_struct *napi, int budget)
+-- 
+2.25.1
 
 
