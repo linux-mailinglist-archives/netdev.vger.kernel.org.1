@@ -1,378 +1,189 @@
-Return-Path: <netdev+bounces-37439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35057B5590
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:59:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327A77B5595
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 17:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C90811C2048D
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:59:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 8BEBEB20CB5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B689F1A71E;
-	Mon,  2 Oct 2023 14:59:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F801A72D;
+	Mon,  2 Oct 2023 15:00:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24D71FC6
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 14:59:50 +0000 (UTC)
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E998BB7;
-	Mon,  2 Oct 2023 07:59:47 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-d8cc08fb47dso2423898276.3;
-        Mon, 02 Oct 2023 07:59:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4885F1A727
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 15:00:53 +0000 (UTC)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F9FBD
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 08:00:51 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-327b7e08456so1570712f8f.2
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 08:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696258787; x=1696863587; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q53XKUuDDMvCFBaS7mJ2d26tUdSLzM6Jemr2bfcRJx0=;
-        b=XOy/JGc3rG48KrIrb4aUyOQ2+csIdD5bWxu8bjDagsvqkWWX28syERCiYZ05dbiYwd
-         QXSsa+Ya0/BlaLSyI0bUyJDTzSHxp7yDuhtEs6s97j5/l4VhV3lSaPmE7tnmgHu4QzXY
-         Zq90FyNkD8xlEk5CaMb6B6ulyee0RxL6pY1DLsLEN/BmkBk4VHmmNzev/vftYLMh6D9I
-         8spTcZMg+4yPo5q4BuPuTKpTiOEIS65Hu5GJrh/+QHjVLlp+TLjY9zOn7zw6JQNjjBSQ
-         DQ3uRJPteClHSGh5wahVI7dy7phxebfr7TfA1UnSoSdnhTQ/JKwDHzz2DE0bKdphCzK1
-         JGPw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696258849; x=1696863649; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wkzGa2NxcO0pxnOMibbgAoclGRI+KHmZWNdvoqM0EiE=;
+        b=VnlwM89AGl2I4yeXst4XNsTpe5PxipuYZgDVih/dkXp6dWXu9M+1e7+n6ZTMsYZRQx
+         Ddg1GFMdw8OpGnJ2QmUwP3Gez/0eEbzKmajQcVxg1UOLdbtRqItLfN/VqGw9gO3ce07A
+         IcvkarhSxzA1b84nvFs1ZCWlzrkZHD6YN+xCX9rlN0YdmApCAGOAmP1QIwT/7QvW3Qjy
+         HXo4k9CtVyllSzqhqYWNE0xcBDFYRS4CNQzHeZdN3pb8YqCC7FtoAnAWgFdz8mIui8zx
+         9fIcfLr2Wk8/5lMjTpp0Vl4p7UgDyDB4fVEOyXWm1ixZCRTl1q6hLnxNLcuIUHVW+yTc
+         h80w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696258787; x=1696863587;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q53XKUuDDMvCFBaS7mJ2d26tUdSLzM6Jemr2bfcRJx0=;
-        b=FeyS1VW4IbD4Qc+PyHbKSWY7yHZTQne+3FO/4wd2zdTMuIGFQZxgg7EM9i9Yr7TIvS
-         5bTef1JPxDWVgX/KCVqJn3VfHXK88aZ/BwjvwPq9EgXZVtlUSJdd8k0n6R+YzApI5Vh0
-         +WYRtpx7g2lZAXNcOKGtqAGzL8wqoa+upB06Dp7xY+70+jU/eFpnm3tzxrW4sff5oVAj
-         nmMZWd4syNgumNrc05m+X9HqFWOpJlFYvOKIf///PmjYZ9pkd+mH5Y2HDE+KT/pCv7QL
-         uM+D5kcrC+NtnnMQweqamhGUEN+RA9hoin1pEOVPvdmLTdWEqfyiqip5JUL+/iim/c7E
-         MKaA==
-X-Gm-Message-State: AOJu0YxbBUFdiQ3e3KCxui5B867ycacCO708hfJivthyrX5fht9A1+an
-	+XFbR/dRauoer2uBYdxZzexPkVHRSZri8JRtEWTJW76EPgIRYg==
-X-Google-Smtp-Source: AGHT+IHgGs7/VN5rANVTx4wQVdDj+I8GbJVZ7NZsc9nJ6a3N87XY0RNVK8qznqZ8rWRlgQ9XNXH5fhANVOzadm2yD9k=
-X-Received: by 2002:a25:1983:0:b0:d81:6691:9f8d with SMTP id
- 125-20020a251983000000b00d8166919f8dmr10078553ybz.19.1696258786831; Mon, 02
- Oct 2023 07:59:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696258849; x=1696863649;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wkzGa2NxcO0pxnOMibbgAoclGRI+KHmZWNdvoqM0EiE=;
+        b=eHr/BM0ULi2txXjoVY+gDoQeffujfw+Zh9LEFS7MPgUHi64V++Gy+C3059pp++W6CG
+         wGtAB3hOLEucvGFy4GlJECR1RNE+Twyhx10EYiwdRGJG08abMAJHBE4lSdrAV3mFBUns
+         lmTjCTsc2JeJ3MjM4tmduVt6gTgrx9xFGmDkeSUwvt8wwhVZ7btoTkQpFvoxIpHX0wyK
+         ++uNKVD+Ncf7sduO2YpfAh+e2SWh5Xt7vqhK0D9kWZNxi4wFziQRpAuECD4/CqiTU1lc
+         +4VuK6lw0py/xq7iMb1s02/R2Mt0EKShYaNJq+Rjvy5r8p10gru5OHN6okBeMdjkhkFz
+         0zMg==
+X-Gm-Message-State: AOJu0YwSnG4cSTdBi0k8AiP+dyFeMp+VEkO8HjLo0ZjfeJMxY/Huh+o3
+	ju7Wmx6aKNo3ahopNP56ApYb6A==
+X-Google-Smtp-Source: AGHT+IHrmlnt9I95atsKI9gbnPrSdt+pQfKReIyEPo4bPCSEjPbgKCtgw/CbTF6jX9PR2dx50R4oNQ==
+X-Received: by 2002:a05:6000:1112:b0:31f:d3e3:a53d with SMTP id z18-20020a056000111200b0031fd3e3a53dmr10800356wrw.2.1696258849324;
+        Mon, 02 Oct 2023 08:00:49 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id kb23-20020a1709070f9700b009944e955e19sm17070887ejc.30.2023.10.02.08.00.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Oct 2023 08:00:48 -0700 (PDT)
+Date: Mon, 2 Oct 2023 17:00:47 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next 1/4] dpll: docs: add support for pin signal
+ phase offset/adjust
+Message-ID: <ZRrbH4gdfOg9TmV3@nanopsycho>
+References: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
+ <20230927092435.1565336-2-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
-In-Reply-To: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 2 Oct 2023 10:59:35 -0400
-Message-ID: <CADvbK_fE2KGLtqBxFUVikrCxkRjG_eodeHjRuMGWU=og_qk9_A@mail.gmail.com>
-Subject: Re: [PATCH nf] netfilter: handle the connecting collision properly in nf_conntrack_proto_sctp
-To: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org, 
-	linux-sctp@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: multipart/mixed; boundary="0000000000006fd14d0606bd064f"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230927092435.1565336-2-arkadiusz.kubalewski@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000006fd14d0606bd064f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Wed, Sep 27, 2023 at 11:24:32AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>Add dpll documentation on new pin's attributes:
+>- phase-offset - measured difference between phase of signals on pin
+>  and dpll
+>- phase-adjust - adjustable value of pin's signal phase
+>- phase-adjust-min / phase-adjust-max - values for determining limits
+>  for phase-adjust
+>
+>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>---
+> Documentation/driver-api/dpll.rst | 53 ++++++++++++++++++++++++++++++-
+> 1 file changed, 52 insertions(+), 1 deletion(-)
+>
+>diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
+>index bb52f1b8c0be..59634a3513bd 100644
+>--- a/Documentation/driver-api/dpll.rst
+>+++ b/Documentation/driver-api/dpll.rst
+>@@ -173,6 +173,47 @@ in order to configure active input of a MUX-type pin, the user needs to
+> request desired pin state of the child pin on the parent pin,
+> as described in the ``MUX-type pins`` chapter.
+> 
+>+Phase offset measurement and adjustment
+>+========================================
+>+
+>+Device may provide ability to measure a phase difference between signals
+>+on a pin and its parent dpll device. If pin-dpll phase offset measurement
+>+is supported, it shall be provided with ``DPLL_A_PIN_PHASE_OFFSET``
+>+attribute for each parent dpll device.
+>+
+>+Device may also provide ability to adjust a signal phase on a pin.
+>+If pin phase adjustment is supported, minimal and maximal values that pin
+>+handle shall be provide to the user on ``DPLL_CMD_PIN_GET`` respond
+>+with ``DPLL_A_PIN_PHASE_ADJUST_MIN`` and ``DPLL_A_PIN_PHASE_ADJUST_MAX``
+>+attributes. Configured phase adjust value is provided with
+>+``DPLL_A_PIN_PHASE_ADJUST`` attribute of a pin, and value change can be
+>+requested with the same attribute with ``DPLL_CMD_PIN_SET`` command.
+>+
+>+  =============================== ======================================
+>+  ``DPLL_A_PIN_ID``               configured pin id
+>+  ``DPLL_A_PIN_PHASE_ADJUST_MIN`` attr minimum value of phase adjustment
+>+  ``DPLL_A_PIN_PHASE_ADJUST_MAX`` attr maximum value of phase adjustment
+>+  ``DPLL_A_PIN_PHASE_ADJUST``     attr configured value of phase
+>+                                  adjustment on parent dpll device
+>+  ``DPLL_A_PIN_PARENT_DEVICE``    nested attribute for requesting
+>+                                  configuration on given parent dpll
+>+                                  device
+>+    ``DPLL_A_PIN_PARENT_ID``      parent dpll device id
+>+    ``DPLL_A_PIN_PHASE_OFFSET``   attr measured phase difference
+>+                                  between a pin and parent dpll device
+>+  =============================== ======================================
+>+
+>+All phase related values are provided in pico seconds, which represents
+>+time differnece between signals phase. The negative value means that
+>+phase of signal on pin is earlier in time than dpll's signal. Positive
+>+value means that phase of signal on pin is later in time than signal of
+>+a dpll.
+>+
+>+Phase adjust (also min and max) values are integers, but measured phase
+>+offset values are fractional with 3-digit decimal places and shell be
+>+divided with ``DPLL_PIN_PHASE_OFFSET_DIVIDER`` to get integer part and
+>+modulo divided to get fractional part.
+>+
+> Configuration commands group
+> ============================
+> 
+>@@ -263,6 +304,12 @@ according to attribute purpose.
+>                                        frequencies
+>       ``DPLL_A_PIN_ANY_FREQUENCY_MIN`` attr minimum value of frequency
+>       ``DPLL_A_PIN_ANY_FREQUENCY_MAX`` attr maximum value of frequency
+>+    ``DPLL_A_PIN_PHASE_ADJUST_MIN``    attr minimum value of phase
+>+                                       adjustment
+>+    ``DPLL_A_PIN_PHASE_ADJUST_MAX``    attr maximum value of phase
+>+                                       adjustment
+>+    ``DPLL_A_PIN_PHASE_ADJUST``        attr configured value of phase
+>+                                       adjustment on parent device
+>     ``DPLL_A_PIN_PARENT_DEVICE``       nested attr for each parent device
+>                                        the pin is connected with
+>       ``DPLL_A_PIN_PARENT_ID``         attr parent dpll device id
+>@@ -270,8 +317,10 @@ according to attribute purpose.
+>                                        dpll device
+>       ``DPLL_A_PIN_STATE``             attr state of pin on the parent
+>                                        dpll device
+>-     ``DPLL_A_PIN_DIRECTION``          attr direction of a pin on the
+>+      ``DPLL_A_PIN_DIRECTION``         attr direction of a pin on the
 
-On Sun, Oct 1, 2023 at 11:07=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
-> In Scenario A and B below, as the delayed INIT_ACK always changes the pee=
-r
-> vtag, SCTP ct with the incorrect vtag may cause packet loss.
->
-> Scenario A: INIT_ACK is delayed until the peer receives its own INIT_ACK
->
->   192.168.1.2 > 192.168.1.1: [INIT] [init tag: 1328086772]
->     192.168.1.1 > 192.168.1.2: [INIT] [init tag: 1414468151]
->     192.168.1.2 > 192.168.1.1: [INIT ACK] [init tag: 1328086772]
->   192.168.1.1 > 192.168.1.2: [INIT ACK] [init tag: 1650211246] *
->   192.168.1.2 > 192.168.1.1: [COOKIE ECHO]
->     192.168.1.1 > 192.168.1.2: [COOKIE ECHO]
->     192.168.1.2 > 192.168.1.1: [COOKIE ACK]
->
-> Scenario B: INIT_ACK is delayed until the peer completes its own handshak=
-e
->
->   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
->     192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
->     192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 3922216408]
->     192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
->     192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
->   192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021] *
->
-> This patch fixes it as below:
->
-> In SCTP_CID_INIT processing:
-> - clear ct->proto.sctp.init[!dir] if ct->proto.sctp.init[dir] &&
->   ct->proto.sctp.init[!dir]. (Scenario E)
-> - set ct->proto.sctp.init[dir].
->
-> In SCTP_CID_INIT_ACK processing:
-> - drop it if !ct->proto.sctp.init[!dir] && ct->proto.sctp.vtag[!dir] &&
->   ct->proto.sctp.vtag[!dir] !=3D ih->init_tag. (Scenario B, Scenario C)
-> - drop it if ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir] &&
->   ct->proto.sctp.vtag[!dir] !=3D ih->init_tag. (Scenario A)
->
-> In SCTP_CID_COOKIE_ACK processing:
-> - clear ct->proto.sctp.init[dir] and ct->proto.sctp.init[!dir]. (Scenario=
- D)
->
-> Also, it's important to allow the ct state to move forward with cookie_ec=
-ho
-> and cookie_ack from the opposite dir for the collision scenarios.
->
-> There are also other Scenarios where it should allow the packet through,
-> addressed by the processing above:
->
-> Scenario C: new CT is created by INIT_ACK.
->
-> Scenario D: start INIT on the existing ESTABLISHED ct.
->
-> Scenario E: start INIT after the old collision on the existing ESTABLISHE=
-D ct.
->
->   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
->   192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
->   (both side are stopped, then start new connection again in hours)
->   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 242308742]
->
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> ---
->  include/linux/netfilter/nf_conntrack_sctp.h |  1 +
->  net/netfilter/nf_conntrack_proto_sctp.c     | 41 ++++++++++++++++-----
->  2 files changed, 33 insertions(+), 9 deletions(-)
->
-> diff --git a/include/linux/netfilter/nf_conntrack_sctp.h b/include/linux/=
-netfilter/nf_conntrack_sctp.h
-> index 625f491b95de..fb31312825ae 100644
-> --- a/include/linux/netfilter/nf_conntrack_sctp.h
-> +++ b/include/linux/netfilter/nf_conntrack_sctp.h
-> @@ -9,6 +9,7 @@ struct ip_ct_sctp {
->         enum sctp_conntrack state;
->
->         __be32 vtag[IP_CT_DIR_MAX];
-> +       u8 init[IP_CT_DIR_MAX];
->         u8 last_dir;
->         u8 flags;
->  };
-> diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_c=
-onntrack_proto_sctp.c
-> index b6bcc8f2f46b..91aee286d503 100644
-> --- a/net/netfilter/nf_conntrack_proto_sctp.c
-> +++ b/net/netfilter/nf_conntrack_proto_sctp.c
-> @@ -112,7 +112,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK=
-_MAX] =3D {
->  /* shutdown_ack */ {sSA, sCL, sCW, sCE, sES, sSA, sSA, sSA, sSA},
->  /* error        */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},/* Can'=
-t have Stale cookie*/
->  /* cookie_echo  */ {sCL, sCL, sCE, sCE, sES, sSS, sSR, sSA, sCL},/* 5.2.=
-4 - Big TODO */
-> -/* cookie_ack   */ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sCL},/* Can'=
-t come in orig dir */
-> +/* cookie_ack   */ {sCL, sCL, sCW, sES, sES, sSS, sSR, sSA, sCL},/* Can'=
-t come in orig dir */
->  /* shutdown_comp*/ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sCL, sCL},
->  /* heartbeat    */ {sHS, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
->  /* heartbeat_ack*/ {sCL, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
-> @@ -126,7 +126,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK=
-_MAX] =3D {
->  /* shutdown     */ {sIV, sCL, sCW, sCE, sSR, sSS, sSR, sSA, sIV},
->  /* shutdown_ack */ {sIV, sCL, sCW, sCE, sES, sSA, sSA, sSA, sIV},
->  /* error        */ {sIV, sCL, sCW, sCL, sES, sSS, sSR, sSA, sIV},
-> -/* cookie_echo  */ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sSA, sIV},/* Can'=
-t come in reply dir */
-> +/* cookie_echo  */ {sIV, sCL, sCE, sCE, sES, sSS, sSR, sSA, sIV},/* Can'=
-t come in reply dir */
->  /* cookie_ack   */ {sIV, sCL, sCW, sES, sES, sSS, sSR, sSA, sIV},
->  /* shutdown_comp*/ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sCL, sIV},
->  /* heartbeat    */ {sIV, sCL, sCW, sCE, sES, sSS, sSR, sSA, sHS},
-> @@ -412,6 +412,9 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
->                         /* (D) vtag must be same as init_vtag as found in=
- INIT_ACK */
->                         if (sh->vtag !=3D ct->proto.sctp.vtag[dir])
->                                 goto out_unlock;
-> +               } else if (sch->type =3D=3D SCTP_CID_COOKIE_ACK) {
-> +                       ct->proto.sctp.init[dir] =3D 0;
-> +                       ct->proto.sctp.init[!dir] =3D 0;
->                 } else if (sch->type =3D=3D SCTP_CID_HEARTBEAT) {
->                         if (ct->proto.sctp.vtag[dir] =3D=3D 0) {
->                                 pr_debug("Setting %d vtag %x for dir %d\n=
-", sch->type, sh->vtag, dir);
-> @@ -461,16 +464,18 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
->                 }
->
->                 /* If it is an INIT or an INIT ACK note down the vtag */
-> -               if (sch->type =3D=3D SCTP_CID_INIT ||
-> -                   sch->type =3D=3D SCTP_CID_INIT_ACK) {
-> -                       struct sctp_inithdr _inithdr, *ih;
-> +               if (sch->type =3D=3D SCTP_CID_INIT) {
-> +                       struct sctp_inithdr _ih, *ih;
->
-> -                       ih =3D skb_header_pointer(skb, offset + sizeof(_s=
-ch),
-> -                                               sizeof(_inithdr), &_inith=
-dr);
-> +                       ih =3D skb_header_pointer(skb, offset + sizeof(_s=
-ch), sizeof(*ih), &_ih);
->                         if (ih =3D=3D NULL)
->                                 goto out_unlock;
-> -                       pr_debug("Setting vtag %x for dir %d\n",
-> -                                ih->init_tag, !dir);
-> +
-> +                       if (ct->proto.sctp.init[dir] && ct->proto.sctp.in=
-it[!dir])
-> +                               ct->proto.sctp.init[!dir] =3D 0;
-> +                       ct->proto.sctp.init[dir] =3D 1;
-> +
-> +                       pr_debug("Setting vtag %x for dir %d\n", ih->init=
-_tag, !dir);
->                         ct->proto.sctp.vtag[!dir] =3D ih->init_tag;
->
->                         /* don't renew timeout on init retransmit so
-> @@ -481,6 +486,24 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
->                             old_state =3D=3D SCTP_CONNTRACK_CLOSED &&
->                             nf_ct_is_confirmed(ct))
->                                 ignore =3D true;
-> +               } else if (sch->type =3D=3D SCTP_CID_INIT_ACK) {
-> +                       struct sctp_inithdr _ih, *ih;
-> +                       u32 vtag;
-> +
-> +                       ih =3D skb_header_pointer(skb, offset + sizeof(_s=
-ch), sizeof(*ih), &_ih);
-> +                       if (ih =3D=3D NULL)
-> +                               goto out_unlock;
-> +
-> +                       vtag =3D ct->proto.sctp.vtag[!dir];
-> +                       if (!ct->proto.sctp.init[!dir] && vtag && vtag !=
-=3D ih->init_tag)
-> +                               goto out_unlock;
-> +                       /* collision */
-> +                       if (ct->proto.sctp.init[dir] && ct->proto.sctp.in=
-it[!dir] &&
-> +                           vtag !=3D ih->init_tag)
-> +                               goto out_unlock;
-> +
-> +                       pr_debug("Setting vtag %x for dir %d\n", ih->init=
-_tag, !dir);
-> +                       ct->proto.sctp.vtag[!dir] =3D ih->init_tag;
->                 }
->
->                 ct->proto.sctp.state =3D new_state;
-> --
-> 2.39.1
->
-a reproducer is attached.
+Could be in a separate patch, it's not related to this one.
 
-Thanks.
 
---0000000000006fd14d0606bd064f
-Content-Type: text/x-sh; charset="US-ASCII"; name="sctp_collision.sh"
-Content-Disposition: attachment; filename="sctp_collision.sh"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ln90nps30>
-X-Attachment-Id: f_ln90nps30
-
-IyEvYmluL2Jhc2gKIyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMAojCiMgVGVzdGlu
-ZyBGb3IgU0NUUCBDT0xMSVNJT04gU0NFTkFSSU8gYXMgQmVsb3c6CiMKIyAgIDE0OjM1OjQ3LjY1
-NTI3OSBJUCAxOTguNTEuMjAwLjEuMTIzNCA+IDE5OC41MS4xMDAuMS4xMjM0OiBzY3RwICgxKSBb
-SU5JVF0gW2luaXQgdGFnOiAyMDE3ODM3MzU5XQojICAgMTQ6MzU6NDguMzUzMjUwIElQIDE5OC41
-MS4xMDAuMS4xMjM0ID4gMTk4LjUxLjIwMC4xLjEyMzQ6IHNjdHAgKDEpIFtJTklUXSBbaW5pdCB0
-YWc6IDExODcyMDYxODddCiMgICAxNDozNTo0OC4zNTMyNzUgSVAgMTk4LjUxLjIwMC4xLjEyMzQg
-PiAxOTguNTEuMTAwLjEuMTIzNDogc2N0cCAoMSkgW0lOSVQgQUNLXSBbaW5pdCB0YWc6IDIwMTc4
-MzczNTldCiMgICAxNDozNTo0OC4zNTMyODMgSVAgMTk4LjUxLjEwMC4xLjEyMzQgPiAxOTguNTEu
-MjAwLjEuMTIzNDogc2N0cCAoMSkgW0NPT0tJRSBFQ0hPXQojICAgMTQ6MzU6NDguMzUzOTc3IElQ
-IDE5OC41MS4yMDAuMS4xMjM0ID4gMTk4LjUxLjEwMC4xLjEyMzQ6IHNjdHAgKDEpIFtDT09LSUUg
-QUNLXQojICAgMTQ6MzU6NDguODU1MzM1IElQIDE5OC41MS4xMDAuMS4xMjM0ID4gMTk4LjUxLjIw
-MC4xLjEyMzQ6IHNjdHAgKDEpIFtJTklUIEFDS10gW2luaXQgdGFnOiAxNjQ1Nzk5NzBdCiMKIyBU
-T1BPOiBvYW1jbSAobGluazApPC0tLT4obGluazEpIEhPU1QvUk9VVEVSIChsaW5rMik8LS0tPihs
-aW5rMykgb2FtYmIKCiMgaW5jbHVkZSB0aGUgYyB0ZXN0IGZpbGUgaW4gdGhpcyBzY3JpcHQKY2F0
-ID4gLi9zY3RwX3Rlc3QuYyA8PCBFT0YKI2luY2x1ZGUgPHN0ZGlvLmg+CiNpbmNsdWRlIDxzdGRs
-aWIuaD4KI2luY2x1ZGUgPHN0cmluZy5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CiNpbmNsdWRlIDxh
-cnBhL2luZXQuaD4KCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCnsKCXN0cnVjdCBz
-b2NrYWRkcl9pbiBzYWRkciA9IHt9LCBkYWRkciA9IHt9OwoJaW50IHNkLCByZXQsIGxlbiA9IHNp
-emVvZihkYWRkcik7CglzdHJ1Y3QgdGltZXZhbCB0diA9IHsyNSwgMH07CgljaGFyIGJ1ZltdID0g
-ImhlbGxvIjsKCglpZiAoYXJnYyAhPSA2IHx8IChzdHJjbXAoYXJndlsxXSwgInNlcnZlciIpICYm
-IHN0cmNtcChhcmd2WzFdLCAiY2xpZW50IikpKSB7CgkJcHJpbnRmKCIlcyA8c2VydmVyfGNsaWVu
-dD4gPExPQ0FMX0lQPiA8TE9DQUxfUE9SVD4gPFJFTU9URV9JUD4gPFJFTU9URV9QT1JUPlxuIiwg
-YXJndlswXSk7CgkJcmV0dXJuIC0xOwoJfQoKCXNkID0gc29ja2V0KEFGX0lORVQsIFNPQ0tfU0VR
-UEFDS0VULCBJUFBST1RPX1NDVFApOwoJaWYgKHNkIDwgMCkgewoJCXByaW50ZigiRmFpbGVkIHRv
-IGNyZWF0ZSBzZFxuIik7CgkJcmV0dXJuIC0xOwoJfQoKCXNhZGRyLnNpbl9mYW1pbHkgPSBBRl9J
-TkVUOwoJc2FkZHIuc2luX2FkZHIuc19hZGRyID0gaW5ldF9hZGRyKGFyZ3ZbMl0pOwoJc2FkZHIu
-c2luX3BvcnQgPSBodG9ucyhhdG9pKGFyZ3ZbM10pKTsKCglyZXQgPSBiaW5kKHNkLCAoc3RydWN0
-IHNvY2thZGRyICopJnNhZGRyLCBzaXplb2Yoc2FkZHIpKTsKCWlmIChyZXQgPCAwKSB7CgkJcHJp
-bnRmKCJGYWlsZWQgdG8gYmluZCB0byBhZGRyZXNzXG4iKTsKCQlyZXR1cm4gLTE7Cgl9CgoJcmV0
-ID0gbGlzdGVuKHNkLCA1KTsKCWlmIChyZXQgPCAwKSB7CgkJcHJpbnRmKCJGYWlsZWQgdG8gbGlz
-dGVuIG9uIHBvcnRcbiIpOwoJCXJldHVybiAtMTsKCX0KCglkYWRkci5zaW5fZmFtaWx5ID0gQUZf
-SU5FVDsKCWRhZGRyLnNpbl9hZGRyLnNfYWRkciA9IGluZXRfYWRkcihhcmd2WzRdKTsKCWRhZGRy
-LnNpbl9wb3J0ID0gaHRvbnMoYXRvaShhcmd2WzVdKSk7CgoJLyogbWFrZSB0ZXN0IHNob3J0ZXIg
-dGhhbiAyNXMgKi8KCXJldCA9IHNldHNvY2tvcHQoc2QsIFNPTF9TT0NLRVQsIFNPX1JDVlRJTUVP
-LCAmdHYsIHNpemVvZih0dikpOwoJaWYgKHJldCA8IDApIHsKCQlwcmludGYoIkZhaWxlZCB0byBz
-ZXRzb2Nrb3B0IFNPX1JDVlRJTUVPXG4iKTsKCQlyZXR1cm4gLTE7Cgl9CgoJaWYgKCFzdHJjbXAo
-YXJndlsxXSwgInNlcnZlciIpKSB7CgkJc2xlZXAoMSk7IC8qIHdhaXQgYSBiaXQgZm9yIGNsaWVu
-dCdzIElOSVQgKi8KCQlyZXQgPSBjb25uZWN0KHNkLCAoc3RydWN0IHNvY2thZGRyICopJmRhZGRy
-LCBsZW4pOwoJCWlmIChyZXQgPCAwKSB7CgkJCXByaW50ZigiRmFpbGVkIHRvIGNvbm5lY3QgdG8g
-cGVlclxuIik7CgkJCXJldHVybiAtMTsKCQl9CgkJcmV0ID0gcmVjdmZyb20oc2QsIGJ1Ziwgc2l6
-ZW9mKGJ1ZiksIDAsIChzdHJ1Y3Qgc29ja2FkZHIgKikmZGFkZHIsICZsZW4pOwoJCWlmIChyZXQg
-PCAwKSB7CgkJCXByaW50ZigiRmFpbGVkIHRvIHJlY3YgbXNnICVkXG4iLCByZXQpOwoJCQlyZXR1
-cm4gLTE7CgkJfQoJCXJldCA9IHNlbmR0byhzZCwgYnVmLCBzdHJsZW4oYnVmKSArIDEsIDAsIChz
-dHJ1Y3Qgc29ja2FkZHIgKikmZGFkZHIsIGxlbik7CgkJaWYgKHJldCA8IDApIHsKCQkJcHJpbnRm
-KCJGYWlsZWQgdG8gc2VuZCBtc2cgJWRcbiIsIHJldCk7CgkJCXJldHVybiAtMTsKCQl9CgkJcHJp
-bnRmKCJTZXJ2ZXI6IHNlbnQhICVkXG4iLCByZXQpOwoJfQoKCWlmICghc3RyY21wKGFyZ3ZbMV0s
-ICJjbGllbnQiKSkgewoJCXVzbGVlcCgzMDAwMDApOyAvKiB3YWl0IGEgYml0IGZvciBzZXJ2ZXIn
-cyBsaXN0ZW5pbmcgKi8KCQlyZXQgPSBjb25uZWN0KHNkLCAoc3RydWN0IHNvY2thZGRyICopJmRh
-ZGRyLCBsZW4pOwoJCWlmIChyZXQgPCAwKSB7CgkJCXByaW50ZigiRmFpbGVkIHRvIGNvbm5lY3Qg
-dG8gcGVlclxuIik7CgkJCXJldHVybiAtMTsKCQl9CgkJc2xlZXAoMSk7IC8qIHdhaXQgYSBiaXQg
-Zm9yIHNlcnZlcidzIGRlbGF5ZWQgSU5JVF9BQ0sgdG8gcmVwcm9kdWNlIHRoZSBpc3N1ZSAqLwoJ
-CXJldCA9IHNlbmR0byhzZCwgYnVmLCBzdHJsZW4oYnVmKSArIDEsIDAsIChzdHJ1Y3Qgc29ja2Fk
-ZHIgKikmZGFkZHIsIGxlbik7CgkJaWYgKHJldCA8IDApIHsKCQkJcHJpbnRmKCJGYWlsZWQgdG8g
-c2VuZCBtc2cgJWRcbiIsIHJldCk7CgkJCXJldHVybiAtMTsKCQl9CgkJcmV0ID0gcmVjdmZyb20o
-c2QsIGJ1Ziwgc2l6ZW9mKGJ1ZiksIDAsIChzdHJ1Y3Qgc29ja2FkZHIgKikmZGFkZHIsICZsZW4p
-OwoJCWlmIChyZXQgPCAwKSB7CgkJCXByaW50ZigiRmFpbGVkIHRvIHJlY3YgbXNnICVkXG4iLCBy
-ZXQpOwoJCQlyZXR1cm4gLTE7CgkJfQoJCXByaW50ZigiQ2xpZW50OiByY3ZkISAlZFxuIiwgcmV0
-KTsKCX0KCgljbG9zZShzZCk7CglyZXR1cm4gMDsKfQpFT0YKCmlmICEgY29ubnRyYWNrIC1WOyB0
-aGVuCgllY2hvICJTS0lQOiBDb3VsZCBub3QgcnVuIHRlc3Qgd2l0aG91dCBjb25udHJhY2stdG9v
-bHMsIHRyeSAjIGRuZiBpbnN0YWxsIC15IGNvbm50cmFjay10b29scyIKCWV4aXQgNApmaQppZiAh
-IG1ha2Ugc2N0cF90ZXN0OyB0aGVuCgllY2hvICJTS0lQOiBGYWlsZWQgdG8gY29tcGlsZSBzY3Rw
-X3Rlc3QuYyIKCWV4aXQgNApmaQoKIyBjbGVhbiB1cAppcCBuZXRucyBkZWwgb2FtY20gPiAvZGV2
-L251bGwgMj4mMQppcCBuZXRucyBkZWwgb2FtYmIgPiAvZGV2L251bGwgMj4mMQppcCBsaW5rIGRl
-bCBsaW5rMSA+IC9kZXYvbnVsbCAyPiYxCmlwIGxpbmsgZGVsIGxpbmsyID4gL2Rldi9udWxsIDI+
-JjEKY29ubnRyYWNrIC1EIC1wIHNjdHAgPiAvZGV2L251bGwgMj4mMQppcHRhYmxlcyAtRgoKIyBz
-ZXR1cCB0aGUgdG9wbwppcCBuZXRucyBhZGQgb2FtY20KaXAgbmV0bnMgYWRkIG9hbWJiCmlwIGxp
-bmsgYWRkIGxpbmsxIHR5cGUgdmV0aCBwZWVyIG5hbWUgbGluazAgbmV0bnMgb2FtY20KaXAgbGlu
-ayBhZGQgbGluazIgdHlwZSB2ZXRoIHBlZXIgbmFtZSBsaW5rMyBuZXRucyBvYW1iYgoKaXAgLW4g
-b2FtY20gbGluayBzZXQgbGluazAgdXAKaXAgLW4gb2FtY20gYWRkciBhZGQgMTk4LjUxLjEwMC4x
-LzI0IGRldiBsaW5rMAppcCAtbiBvYW1jbSByb3V0ZSBhZGQgMTk4LjUxLjIwMC4xIGRldiBsaW5r
-MCB2aWEgMTk4LjUxLjEwMC4yCgppcCBsaW5rIHNldCBsaW5rMSB1cAppcCBsaW5rIHNldCBsaW5r
-MiB1cAppcCBhZGRyIGFkZCAxOTguNTEuMTAwLjIvMjQgZGV2IGxpbmsxCmlwIGFkZHIgYWRkIDE5
-OC41MS4yMDAuMi8yNCBkZXYgbGluazIKc3lzY3RsIC13cSBuZXQuaXB2NC5pcF9mb3J3YXJkPTEK
-CmlwIC1uIG9hbWJiIGxpbmsgc2V0IGxpbmszIHVwCmlwIC1uIG9hbWJiIGFkZHIgYWRkIDE5OC41
-MS4yMDAuMS8yNCBkZXYgbGluazMKaXAgLW4gb2FtYmIgcm91dGUgYWRkIDE5OC41MS4xMDAuMSBk
-ZXYgbGluazMgdmlhIDE5OC41MS4yMDAuMgoKIyBzaW11bGF0ZSB0aGUgZGVsYXkgb24gT1ZTIHVw
-Y2FsbCBieSBzZXR0aW5nIHVwIGEgZGVsYXkgZm9yIElOSVRfQUNLIHdpdGggdGMgb24gb2FtY20g
-c2lkZQp0YyAtbiBvYW1jbSBxZGlzYyBhZGQgZGV2IGxpbmswIHJvb3QgaGFuZGxlIDE6IGh0Ygp0
-YyAtbiBvYW1jbSBjbGFzcyBhZGQgZGV2IGxpbmswIHBhcmVudCAxOiBjbGFzc2lkIDE6MSBodGIg
-cmF0ZSAxMDBtYml0CnRjIC1uIG9hbWNtIGZpbHRlciBhZGQgZGV2IGxpbmswIHBhcmVudCAxOiBw
-cm90b2NvbCBpcCB1MzIgbWF0Y2ggaXAgcHJvdG9jb2wgMTMyIDB4ZmYgbWF0Y2ggdTggMiAweGZm
-IGF0IDMyIGZsb3dpZCAxOjEKdGMgLW4gb2FtY20gcWRpc2MgYWRkIGRldiBsaW5rMCBwYXJlbnQg
-MToxIGhhbmRsZSAxMDogbmV0ZW0gZGVsYXkgMTIwMG1zCgojIHNpbXVsYXRlIHRoZSBjdHN0YXRl
-IGNoZWNrIG9uIE9WUyBuZl9jb25udHJhY2sKaXB0YWJsZXMgLUEgRk9SV0FSRCAtbSBzdGF0ZSAt
-LXN0YXRlIElOVkFMSUQsVU5UUkFDS0VEIC1qIERST1AKaXB0YWJsZXMgLUEgSU5QVVQgLXAgc2N0
-cCAtaiBEUk9QCgojIHVzZSBhIHNtYWxsZXIgbnVtYmVyIGZvciBhc3NvYydzIG1heF9yZXRyYW5z
-IHRvIHJlcHJvZHVjZSB0aGUgaXNzdWUKbW9kcHJvYmUgc2N0cAppcCBuZXRucyBleGVjIG9hbWJi
-IHN5c2N0bCAtd3EgbmV0LnNjdHAuYXNzb2NpYXRpb25fbWF4X3JldHJhbnM9MwoKIyBOT1RFOiBv
-bmUgd2F5IHRvIHdvcmsgYXJvdW5kIHRoZSBpc3N1ZSBpcyBzZXQgYSBzbWFsbGVyIGhiX2ludGVy
-dmFsCiMgaXAgbmV0bnMgZXhlYyBvYW1iYiBzeXNjdGwgLXdxIG5ldC5zY3RwLmhiX2ludGVydmFs
-PTM1MDAKCiMgcnVuIHRoZSB0ZXN0IGNhc2UKZWNobyAiVGVzdCBTdGFydGVkICh3YWl0IHVwIHRv
-IDI1cyk6IgppcCBuZXQgZXhlYyBvYW1jbSAuL3NjdHBfdGVzdCBzZXJ2ZXIgMTk4LjUxLjEwMC4x
-IDEyMzQgMTk4LjUxLjIwMC4xIDEyMzQgJgppcCBuZXQgZXhlYyBvYW1iYiAuL3NjdHBfdGVzdCBj
-bGllbnQgMTk4LjUxLjIwMC4xIDEyMzQgMTk4LjUxLjEwMC4xIDEyMzQgJiYgZWNobyAiUEFTUyEi
-ICYmIGV4aXQgMAplY2hvICJGQUlMISIgJiYgZXhpdCAxCg==
---0000000000006fd14d0606bd064f--
+>                                        parent dpll device
+>+      ``DPLL_A_PIN_PHASE_OFFSET``      attr measured phase difference
+>+                                       between a pin and parent dpll
+>     ``DPLL_A_PIN_PARENT_PIN``          nested attr for each parent pin
+>                                        the pin is connected with
+>       ``DPLL_A_PIN_PARENT_ID``         attr parent pin id
+>@@ -284,6 +333,8 @@ according to attribute purpose.
+>   ``DPLL_CMD_PIN_SET``                 command to set pins configuration
+>     ``DPLL_A_PIN_ID``                  attr unique a pin ID
+>     ``DPLL_A_PIN_FREQUENCY``           attr requested frequency of a pin
+>+    ``DPLL_A_PIN_PHASE_ADJUST``        attr requested value of phase
+>+                                       adjustment on parent device
+>     ``DPLL_A_PIN_PARENT_DEVICE``       nested attr for each parent dpll
+>                                        device configuration request
+>       ``DPLL_A_PIN_PARENT_ID``         attr parent dpll device id
+>-- 
+>2.38.1
+>
 
