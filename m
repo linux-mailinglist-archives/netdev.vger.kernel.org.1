@@ -1,192 +1,213 @@
-Return-Path: <netdev+bounces-37484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018B67B58B9
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:26:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432727B58C3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 91480B20D70
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 17:26:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 619ED283D19
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 17:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651E11E500;
-	Mon,  2 Oct 2023 17:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7C01E514;
+	Mon,  2 Oct 2023 17:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BE01DA4A
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 17:26:17 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D74B3
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 10:26:15 -0700 (PDT)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-534694a9f26so645a12.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 10:26:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696267574; x=1696872374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+THaq8uFiTd4DrxZR5TG4ua1xeBVAbWIqdUZDzylDcQ=;
-        b=wHDvukclocxwTKJLnfJIqsfWcyjNC6lycZiJ9/MT2rIocLUrdAjmigXttjWCdPRqKB
-         3EVApsRrs74j4fQQawO3/6+v+9luDU5ATgjC5A9QXkkBEOC2IN5BkGz//eXqoS2FdAtB
-         f/rPRWkU9d/dzrkiazciRuZUypCxXmBYQOVXVogC71DQp5IYfLx9zWakg0qeaFYRVVfk
-         Aqahm1wGaBBQUcbEDg6Gyej40Rda2THrtaAoHWIz/mzKu1vrOcNrJHRoUDFiUsVXGz9Q
-         +7ZDIdTrU1N8Sw8ZP9d2vNZmbAJNvrfgKERWvknZy/WsNE+qckq2jTsq03WW2sub4VMN
-         LTog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696267574; x=1696872374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+THaq8uFiTd4DrxZR5TG4ua1xeBVAbWIqdUZDzylDcQ=;
-        b=wS5Lq7TnZjntXbtYYQHFZnJdQJmPkQTtJGtpldQRPQbgSAKXaw7uQQzeksSpMRcLMC
-         0ecATxiOGhOqqUUgZ1zORojuAwoERvhlxsrjv0t0knb2icAi1dYl8TwXI5rWYorToSn+
-         LIrHDCuOYh1QgOlR2cuh4kYHerTanDhSNfSSUEZhq6OuEru0HRa6/KsJV0+frlp9RMt5
-         O+80P8FD5KgH0mFspk2XeRRAChNF0HmHE9ILW29G7dNWvPpizihbaNiqaq9NFTWCWfGB
-         XQ+gSyVNWi+hJ14oJyHIwDT+NhDlLy+bxjKzbIyy/2fMHDSuZd8UAIHPq252PTQqhRbv
-         HzpQ==
-X-Gm-Message-State: AOJu0YwFZJzSLBoyjoTKFxOUyaoc+0lqUxRcWh5OckVLJx/PEYSeL51O
-	AdgBD7OJzYlXu7gPfmUAzcYjxla7d418rUro+xGoR14twp4XA8q+yEw=
-X-Google-Smtp-Source: AGHT+IFSJAaxaYGn/cTTZr9aRWqq0XkQILGjOJnA25hwlrkNvW0AEw69hcLSh6nqbLQ2P62X0ztV2KCnqJ0dT1fFIbA=
-X-Received: by 2002:a50:d602:0:b0:52f:5697:8dec with SMTP id
- x2-20020a50d602000000b0052f56978decmr9508edi.4.1696267573623; Mon, 02 Oct
- 2023 10:26:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB85199B2;
+	Mon,  2 Oct 2023 17:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19B79C433C7;
+	Mon,  2 Oct 2023 17:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696267825;
+	bh=OdlZ5THuUArLfRy0wPc5UG7mfiwyH1fEuvpKiBXwcrk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WLDvTlVrxZp+ubgMERGBLIgHk6VMW4gyrqvh6mAAY+mHvtfSK005LoanH0gVddMIF
+	 dv6MrJ8iXIX8S5kE74NfsNKvWsSgPX0bl4B/psz3ESsD5XzS7o4s96vlCPREA25czC
+	 tijyU5A+aReBkq0z80oyP9APXu6XkA7ib7irSiLHoPG9kzDlpUYeOMLna/gyLBZz8Q
+	 tcAgkYfXWtiFK93iad2cRXQY12s76l3zqk3dF2u2o8+S58OpoSymvEwH5IRF1I4g2t
+	 PUu/LV3ItEkvomp2fk/sFlrkgrkeKKqHFuyIkMgWKp3SENERPcMqNcLi2GvRCK8K2E
+	 q4ZQpq6SN+/+A==
+Received: (nullmailer pid 2046960 invoked by uid 1000);
+	Mon, 02 Oct 2023 17:30:19 -0000
+Date: Mon, 2 Oct 2023 12:30:19 -0500
+From: Rob Herring <robh@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
+	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
+	mchehab@kernel.org, fabrice.gasnier@foss.st.com,
+	andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
+	lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
+	arnd@kernel.org, richardcochran@gmail.com,
+	Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-p@web.codeaurora.org,
+	hy@lists.infradead.org, linux-serial@vger.kernel.org,
+	linux-spi@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v5 01/11] dt-bindings: document generic access controller
+Message-ID: <20231002173019.GA2037244-robh@kernel.org>
+References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
+ <20230929142852.578394-2-gatien.chevallier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
- <CANn89iKEs8_zdEXWbjxd8mC220MqhcRQp3AeHJMS6eD-a45rRA@mail.gmail.com> <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com>
-In-Reply-To: <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Oct 2023 19:26:00 +0200
-Message-ID: <CANn89i+Ef7zNz7t6U2_6VEHPDantgyR8d0w3ALOBVVwK0Fe=FQ@mail.gmail.com>
-Subject: Re: tcpdump and Big TCP
-To: Xin Long <lucien.xin@gmail.com>
-Cc: David Ahern <dsahern@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230929142852.578394-2-gatien.chevallier@foss.st.com>
 
-On Mon, Oct 2, 2023 at 7:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wrot=
-e:
->
-> On Mon, Oct 2, 2023 at 12:25=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Mon, Oct 2, 2023 at 6:20=E2=80=AFPM David Ahern <dsahern@kernel.org>=
- wrote:
-> > >
-> > > Eric:
-> > >
-> > > Looking at the tcpdump source code, it has a GUESS_TSO define that ca=
-n
-> > > be enabled to dump IPv4 packets with tot_len =3D 0:
-> > >
-> > >         if (len < hlen) {
-> > > #ifdef GUESS_TSO
-> > >             if (len) {
-> > >                 ND_PRINT("bad-len %u", len);
-> > >                 return;
-> > >             }
-> > >             else {
-> > >                 /* we guess that it is a TSO send */
-> > >                 len =3D length;
-> > >             }
-> > > #else
-> > >             ND_PRINT("bad-len %u", len);
-> > >             return;
-> > > #endif /* GUESS_TSO */
-> > >         }
-> > >
-> > >
-> > > The IPv6 version has a similar check but no compile change needed:
-> > >         /*
-> > >          * RFC 1883 says:
-> > >          *
-> > >          * The Payload Length field in the IPv6 header must be set to=
- zero
-> > >          * in every packet that carries the Jumbo Payload option.  If=
- a
-> > >          * packet is received with a valid Jumbo Payload option prese=
-nt and
-> > >          * a non-zero IPv6 Payload Length field, an ICMP Parameter Pr=
-oblem
-> > >          * message, Code 0, should be sent to the packet's source, po=
-inting
-> > >          * to the Option Type field of the Jumbo Payload option.
-> > >          *
-> > >          * Later versions of the IPv6 spec don't discuss the Jumbo Pa=
-yload
-> > >          * option.
-> > >          *
-> > >          * If the payload length is 0, we temporarily just set the to=
-tal
-> > >          * length to the remaining data in the packet (which, for Eth=
-ernet,
-> > >          * could include frame padding, but if it's a Jumbo Payload f=
-rame,
-> > >          * it shouldn't even be sendable over Ethernet, so we don't w=
-orry
-> > >          * about that), so we can process the extension headers in or=
-der
-> > >          * to *find* a Jumbo Payload hop-by-hop option and, when we'v=
-e
-> > >          * processed all the extension headers, check whether we foun=
-d
-> > >          * a Jumbo Payload option, and fail if we haven't.
-> > >          */
-> > >         if (payload_len !=3D 0) {
-> > >                 len =3D payload_len + sizeof(struct ip6_hdr);
-> > >                 if (length < len)
-> > >                         ND_PRINT("truncated-ip6 - %u bytes missing!",
-> > >                                 len - length);
-> > >         } else
-> > >                 len =3D length + sizeof(struct ip6_hdr);
-> > >
-> > >
-> > > Maybe I am missing something, but it appears that no code change to
-> > > tcpdump is needed for Linux Big TCP packets other than enabling that
-> > > macro when building. I did that in a local build and the large packet=
-s
-> > > were dumped just fine.
-> > >
-> Right, wireshark/tshark currently has no problem parsing BIG TCP IPv4 pac=
-kets.
-> I think it enables GUESS_TSO by default.
->
-> We also enabled GUESS_TSO in tcpdump for RHEL-9 when BIG TCP IPv4 was
-> backported in it.
+On Fri, Sep 29, 2023 at 04:28:42PM +0200, Gatien Chevallier wrote:
+> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+> 
+> Introducing of the generic access controller bindings for the
+> access controller provider and consumer devices. Those bindings are
+> intended to allow a better handling of accesses to resources in a
+> hardware architecture supporting several compartments.
+> 
+> This patch is based on [1]. It is integrated in this patchset as it
+> provides a use-case for it.
+> 
+> Diffs with [1]:
+> 	- Rename feature-domain* properties to access-control* to narrow
+> 	  down the scope of the binding
+> 	- YAML errors and typos corrected.
+> 	- Example updated
+> 	- Some rephrasing in the binding description
+> 
+> [1]: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b
+> 
+> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> 
+> ---
+> Changes in V5:
+> 	- Diffs with [1]
+> 	- Discarded the [IGNORE] tag as the patch is now part of the
+> 	  patchset
+> 
+>  .../access-controllers/access-controller.yaml | 90 +++++++++++++++++++
+>  1 file changed, 90 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/access-controllers/access-controller.yaml b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+> new file mode 100644
+> index 000000000000..9d305fccc333
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+> @@ -0,0 +1,90 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/access-controllers/access-controller.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Generic Domain Access Controller
+> +
+> +maintainers:
+> +  - Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+> +
+> +description: |+
+> +  Common access controllers properties
+> +
+> +  Access controllers are in charge of stating which of the hardware blocks under
+> +  their responsibility (their domain) can be accesssed by which compartment. A
+> +  compartment can be a cluster of CPUs (or coprocessors), a range of addresses
+> +  or a group of hardware blocks. An access controller's domain is the set of
+> +  resources covered by the access controller.
+> +
+> +  This device tree bindings can be used to bind devices to their access
+> +  controller provided by access-controller property. In this case, the device is
+> +  a consumer and the access controller is the provider.
+> +
+> +  An access controller can be represented by any node in the device tree and
+> +  can provide one or more configuration parameters, needed to control parameters
+> +  of the consumer device. A consumer node can refer to the provider by phandle
+> +  and a set of phandle arguments, specified by '#access-controller-cells'
+> +  property in the access controller node.
+> +
+> +  Access controllers are typically used to set/read the permissions of a
+> +  hardware block and grant access to it. Any of which depends on the access
+> +  controller. The capabilities of each access controller are defined by the
+> +  binding of the access controller device.
+> +
+> +  Each node can be a consumer for the several access controllers.
+> +
+> +# always select the core schema
+> +select: true
+> +
+> +properties:
+> +  "#access-controller-cells":
+> +    $ref: /schemas/types.yaml#/definitions/uint32
 
-Make sure to enable this in tcpdump source, so that other distros do
-not have to 'guess'.
+Drop. "#.*-cells" already defines the type.
 
->
-> >
-> > My point is that tcpdump should not guess, but look at TP_STATUS_GSO_TC=
-P
-> > (and TP_STATUS_CSUM_VALID would also be nice)
-> >
-> > Otherwise, why add TP_STATUS_GSO_TCP in the first place ?
-> That's for more reliable parsing in the future.
+> +    description:
+> +      Number of cells in a access-controller specifier;
+> +      Can be any value as specified by device tree binding documentation
+> +      of a particular provider.
+> +
+> +  access-control-provider:
+> +    description:
+> +      Indicates that the node is an access controller.
 
-We want this. I thought this was obvious.
+Drop. The presence of "#access-controller-cells" is enough to do that.
 
->
-> As currently in libpcap, it doesn't save meta_data(like
-> TP_STATUS_CSUM_VALID/GSO_TCP)
-> to 'pcap' files, and it requires libpcap APIs change and uses the
-> 'pcap-ng' file format.
-> I think it will take quite some time to implement in userspace.
+> +
+> +  access-controller-names:
+> +    $ref: /schemas/types.yaml#/definitions/string-array
+> +    description:
+> +      A list of access-controller names, sorted in the same order as
+> +      access-controller entries. Consumer drivers will use
+> +      access-controller-names to match with existing access-controller entries.
+> +
+> +  access-controller:
 
-Great. Until this is implemented as discussed last year, we will not remove
-IPv6 jumbo headers.
+For consistency with other provider bindings: access-controllers
+
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    description:
+> +      A list of access controller specifiers, as defined by the
+> +      bindings of the access-controller provider.
+> +
+> +additionalProperties: true
+> +
+> +examples:
+> +  - |
+> +    uart_controller: access-controller@50000 {
+> +        reg = <0x50000 0x10>;
+> +        access-control-provider;
+> +        #access-controller-cells = <2>;
+> +    };
+> +
+> +    bus_controller: bus@60000 {
+> +        reg = <0x60000 0x10000>;
+> +        #address-cells = <1>;
+> +        #size-cells = <1>;
+> +        ranges;
+> +        access-control-provider;
+> +        #access-controller-cells = <3>;
+> +
+> +        uart4: serial@60100 {
+> +            reg = <0x60100 0x400>;
+> +            access-controller = <&uart_controller 1 2>,
+> +                                <&bus_controller 1 3 5>;
+> +            access-controller-names = "controller", "bus-controller";
+
+Not great names. It should indicate what access is being controlled 
+locally. Perhaps "reg" for register access, "dma" or "bus" for bus 
+master access. (Not sure what your uart_controller is controlling access 
+to.)
+
+Rob
 
