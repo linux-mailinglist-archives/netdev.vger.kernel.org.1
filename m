@@ -1,103 +1,192 @@
-Return-Path: <netdev+bounces-37483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6127B58B1
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:20:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 018B67B58B9
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 79142282C02
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 17:20:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 91480B20D70
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 17:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01CBD1DDFB;
-	Mon,  2 Oct 2023 17:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651E11E500;
+	Mon,  2 Oct 2023 17:26:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06061A73C;
-	Mon,  2 Oct 2023 17:20:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21855C433C7;
-	Mon,  2 Oct 2023 17:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696267211;
-	bh=SLgvctAoGEpa0Dcyn2+NQ5w/1PZ3Zu/4iXSrOVqEPCI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TnDzPwntJSzRxoK+QbW0s2Oo3Mrul/EyxvpchFeubFgW8ihyytBxTiqRDMhntzNGX
-	 fvGN1EcFvonBwEORXT6RpZR3RoczTVwYmHEdLdmy0MNerqDxXZPHfseB/vjCAPmHJI
-	 Asg3y5/ftypnvJ80OB3drCP4pZe2XMkCz3017NuSCBxXUoXINvhhkJEDFfszc38qf0
-	 4xLja3cdx84i9zdaznQZsDBY5x+rnKmHokyEDfIrSydyzUPmx84oaLdBFjWNgxDJDB
-	 qJof9G0qAE/VJeegTs61SLsbQm5qUn2ZmgaYgzD3/5zxdWWAuJA+hyxYZxvAIaEo0H
-	 Es52BPm5mH/mQ==
-Date: Mon, 2 Oct 2023 19:20:05 +0200
-From: Simon Horman <horms@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor@kernel.org>,
-	Sean Anderson <sean.anderson@seco.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>
-Subject: Re: [RFC PATCH v2 net-next 03/15] phy: ethernet: add configuration
- interface for copper backplane Ethernet PHYs
-Message-ID: <20231002172005.GC92317@kernel.org>
-References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
- <20230923134904.3627402-4-vladimir.oltean@nxp.com>
- <20230928190536.GO24230@kernel.org>
- <20231002131110.4kjkinc2xyxtdwbv@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5BE01DA4A
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 17:26:17 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D74B3
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 10:26:15 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-534694a9f26so645a12.1
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 10:26:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696267574; x=1696872374; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+THaq8uFiTd4DrxZR5TG4ua1xeBVAbWIqdUZDzylDcQ=;
+        b=wHDvukclocxwTKJLnfJIqsfWcyjNC6lycZiJ9/MT2rIocLUrdAjmigXttjWCdPRqKB
+         3EVApsRrs74j4fQQawO3/6+v+9luDU5ATgjC5A9QXkkBEOC2IN5BkGz//eXqoS2FdAtB
+         f/rPRWkU9d/dzrkiazciRuZUypCxXmBYQOVXVogC71DQp5IYfLx9zWakg0qeaFYRVVfk
+         Aqahm1wGaBBQUcbEDg6Gyej40Rda2THrtaAoHWIz/mzKu1vrOcNrJHRoUDFiUsVXGz9Q
+         +7ZDIdTrU1N8Sw8ZP9d2vNZmbAJNvrfgKERWvknZy/WsNE+qckq2jTsq03WW2sub4VMN
+         LTog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696267574; x=1696872374;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+THaq8uFiTd4DrxZR5TG4ua1xeBVAbWIqdUZDzylDcQ=;
+        b=wS5Lq7TnZjntXbtYYQHFZnJdQJmPkQTtJGtpldQRPQbgSAKXaw7uQQzeksSpMRcLMC
+         0ecATxiOGhOqqUUgZ1zORojuAwoERvhlxsrjv0t0knb2icAi1dYl8TwXI5rWYorToSn+
+         LIrHDCuOYh1QgOlR2cuh4kYHerTanDhSNfSSUEZhq6OuEru0HRa6/KsJV0+frlp9RMt5
+         O+80P8FD5KgH0mFspk2XeRRAChNF0HmHE9ILW29G7dNWvPpizihbaNiqaq9NFTWCWfGB
+         XQ+gSyVNWi+hJ14oJyHIwDT+NhDlLy+bxjKzbIyy/2fMHDSuZd8UAIHPq252PTQqhRbv
+         HzpQ==
+X-Gm-Message-State: AOJu0YwFZJzSLBoyjoTKFxOUyaoc+0lqUxRcWh5OckVLJx/PEYSeL51O
+	AdgBD7OJzYlXu7gPfmUAzcYjxla7d418rUro+xGoR14twp4XA8q+yEw=
+X-Google-Smtp-Source: AGHT+IFSJAaxaYGn/cTTZr9aRWqq0XkQILGjOJnA25hwlrkNvW0AEw69hcLSh6nqbLQ2P62X0ztV2KCnqJ0dT1fFIbA=
+X-Received: by 2002:a50:d602:0:b0:52f:5697:8dec with SMTP id
+ x2-20020a50d602000000b0052f56978decmr9508edi.4.1696267573623; Mon, 02 Oct
+ 2023 10:26:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231002131110.4kjkinc2xyxtdwbv@skbuf>
+References: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
+ <CANn89iKEs8_zdEXWbjxd8mC220MqhcRQp3AeHJMS6eD-a45rRA@mail.gmail.com> <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com>
+In-Reply-To: <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Oct 2023 19:26:00 +0200
+Message-ID: <CANn89i+Ef7zNz7t6U2_6VEHPDantgyR8d0w3ALOBVVwK0Fe=FQ@mail.gmail.com>
+Subject: Re: tcpdump and Big TCP
+To: Xin Long <lucien.xin@gmail.com>
+Cc: David Ahern <dsahern@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 04:11:10PM +0300, Vladimir Oltean wrote:
-> Hi Simon,
-> 
-> On Thu, Sep 28, 2023 at 09:05:36PM +0200, Simon Horman wrote:
-> > On Sat, Sep 23, 2023 at 04:48:52PM +0300, Vladimir Oltean wrote:
-> > 
-> > ...
-> > 
-> > > +/**
-> > > + * coef_update_opposite - return the opposite of one C72 coefficient update
-> > > + *			  request
-> > > + *
-> > > + * @update:	original coefficient update
-> > > + *
-> > > + * Helper to transform the update request of one equalization tap into a
-> > > + * request of the same tap in the opposite direction. May be used by C72
-> > > + * phy remote TX link training algorithms.
-> > > + */
-> > > +static inline enum coef_update coef_update_opposite(enum coef_update update)
-> > 
-> > Hi Vladimir,
-> > 
-> > another nit from me.
-> > 
-> > Please put the inline keyword first.
-> > Likewise elsewhere in this patch.
-> > 
-> > Tooling, including gcc-13 with W=1, complains about this.
-> 
-> Thanks for pointing this out. I guess you are talking about the c72_coef_update_print()
-> function, whose prototype is mistakenly "static void inline" instead of
-> "static inline void". I cannot find the problem with the quoted coef_update_opposite().
+On Mon, Oct 2, 2023 at 7:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wrot=
+e:
+>
+> On Mon, Oct 2, 2023 at 12:25=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Oct 2, 2023 at 6:20=E2=80=AFPM David Ahern <dsahern@kernel.org>=
+ wrote:
+> > >
+> > > Eric:
+> > >
+> > > Looking at the tcpdump source code, it has a GUESS_TSO define that ca=
+n
+> > > be enabled to dump IPv4 packets with tot_len =3D 0:
+> > >
+> > >         if (len < hlen) {
+> > > #ifdef GUESS_TSO
+> > >             if (len) {
+> > >                 ND_PRINT("bad-len %u", len);
+> > >                 return;
+> > >             }
+> > >             else {
+> > >                 /* we guess that it is a TSO send */
+> > >                 len =3D length;
+> > >             }
+> > > #else
+> > >             ND_PRINT("bad-len %u", len);
+> > >             return;
+> > > #endif /* GUESS_TSO */
+> > >         }
+> > >
+> > >
+> > > The IPv6 version has a similar check but no compile change needed:
+> > >         /*
+> > >          * RFC 1883 says:
+> > >          *
+> > >          * The Payload Length field in the IPv6 header must be set to=
+ zero
+> > >          * in every packet that carries the Jumbo Payload option.  If=
+ a
+> > >          * packet is received with a valid Jumbo Payload option prese=
+nt and
+> > >          * a non-zero IPv6 Payload Length field, an ICMP Parameter Pr=
+oblem
+> > >          * message, Code 0, should be sent to the packet's source, po=
+inting
+> > >          * to the Option Type field of the Jumbo Payload option.
+> > >          *
+> > >          * Later versions of the IPv6 spec don't discuss the Jumbo Pa=
+yload
+> > >          * option.
+> > >          *
+> > >          * If the payload length is 0, we temporarily just set the to=
+tal
+> > >          * length to the remaining data in the packet (which, for Eth=
+ernet,
+> > >          * could include frame padding, but if it's a Jumbo Payload f=
+rame,
+> > >          * it shouldn't even be sendable over Ethernet, so we don't w=
+orry
+> > >          * about that), so we can process the extension headers in or=
+der
+> > >          * to *find* a Jumbo Payload hop-by-hop option and, when we'v=
+e
+> > >          * processed all the extension headers, check whether we foun=
+d
+> > >          * a Jumbo Payload option, and fail if we haven't.
+> > >          */
+> > >         if (payload_len !=3D 0) {
+> > >                 len =3D payload_len + sizeof(struct ip6_hdr);
+> > >                 if (length < len)
+> > >                         ND_PRINT("truncated-ip6 - %u bytes missing!",
+> > >                                 len - length);
+> > >         } else
+> > >                 len =3D length + sizeof(struct ip6_hdr);
+> > >
+> > >
+> > > Maybe I am missing something, but it appears that no code change to
+> > > tcpdump is needed for Linux Big TCP packets other than enabling that
+> > > macro when building. I did that in a local build and the large packet=
+s
+> > > were dumped just fine.
+> > >
+> Right, wireshark/tshark currently has no problem parsing BIG TCP IPv4 pac=
+kets.
+> I think it enables GUESS_TSO by default.
+>
+> We also enabled GUESS_TSO in tcpdump for RHEL-9 when BIG TCP IPv4 was
+> backported in it.
 
-Yes, you are right.
-Sorry for my error.
+Make sure to enable this in tcpdump source, so that other distros do
+not have to 'guess'.
 
+>
+> >
+> > My point is that tcpdump should not guess, but look at TP_STATUS_GSO_TC=
+P
+> > (and TP_STATUS_CSUM_VALID would also be nice)
+> >
+> > Otherwise, why add TP_STATUS_GSO_TCP in the first place ?
+> That's for more reliable parsing in the future.
+
+We want this. I thought this was obvious.
+
+>
+> As currently in libpcap, it doesn't save meta_data(like
+> TP_STATUS_CSUM_VALID/GSO_TCP)
+> to 'pcap' files, and it requires libpcap APIs change and uses the
+> 'pcap-ng' file format.
+> I think it will take quite some time to implement in userspace.
+
+Great. Until this is implemented as discussed last year, we will not remove
+IPv6 jumbo headers.
 
