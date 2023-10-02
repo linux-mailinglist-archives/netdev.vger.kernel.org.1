@@ -1,135 +1,207 @@
-Return-Path: <netdev+bounces-37466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09FF7B5710
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:07:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2127B571A
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 28045B20B2F
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:06:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id AEF521C20836
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71261D6A6;
-	Mon,  2 Oct 2023 16:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 594FF1DA23;
+	Mon,  2 Oct 2023 16:09:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77098488
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:06:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97AF1C433C8;
-	Mon,  2 Oct 2023 16:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696262816;
-	bh=hjJsXyNAF1V7Na1B/S3lP6ETWWJSxW2eEAWFxd1xSuk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rDFT9Jte07g2Ec1nFQBlQricWs9bCv0EicI7uAjZMT9tEbZ8nIQ7Yl2Sk1V4xrjdL
-	 Q9yh1LOzF8wtvQEj4rhgV9aEks47N7m/MBvFKn3UHdk6mjupdMhwwiHkHMrEMCSGj2
-	 4OiS0urZS4d+GO6AkGTVOnhvbIgYa8FPDG4jmsntNfTGqa+7a+mq1kkSrcAUnpEDmp
-	 QhhnZRdudOlKTmclWJg5kqnmlny6wH1a4JwKoE92zVbOT+mrQTbiToHv68k/o5nnE2
-	 FGHcr83eXgUDNFsMjBxgb2adQqwqpAa9PXkpdDCvuNMo+Pi2nr7KIZKh38HdCugje1
-	 /kPlnY4nkNNEA==
-Date: Mon, 2 Oct 2023 18:06:51 +0200
-From: Simon Horman <horms@kernel.org>
-To: xiaolinkui <xiaolinkui@126.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, justinstitt@google.com, kuniyu@amazon.com,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Linkui Xiao <xiaolinkui@kylinos.cn>
-Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
-Message-ID: <20231002160651.GX92317@kernel.org>
-References: <20230927130309.30891-1-xiaolinkui@126.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D44E41CF84
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:09:49 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2192F91;
+	Mon,  2 Oct 2023 09:09:47 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 392FLAQB027199;
+	Mon, 2 Oct 2023 16:08:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=T9yCwFrS5AoooxlKBeLdSc8An+tppK1rapyiK3ru7OU=;
+ b=HZ3pP6j7Ib+6fTbkOdd8Ly/OEv9HPqy0690lI4jtvxiW25clJXZp+846T/Uz3iu9qHoP
+ N1VAVfU0wfzInuSNVCGo4UUw6GxXIsQpRW1Br5T77nJ4pVicOz/4wOSgjyg0y9yhYjj7
+ c903k8sL3Sh5f9EAk1K34OoQ+tmVgUBBdsnVxoKAfLR0ArjoixzYgTSKSSbSBW8bE3dM
+ kY8YXHvOVs5/sndPD7RsA5I+UMEdiJ0eXwxatpRgGGQjBOurxAC/Ay4jieUrOwwksSsl
+ AeI+uNSauNz++7j96MzLdUc4YYmdQxK4ufjMq9HLzeKWvV4mceIbYHnjCinKHJ7eUDYa jQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tecygbyct-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Oct 2023 16:08:20 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 392G8IMZ026834
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 2 Oct 2023 16:08:18 GMT
+Received: from [10.111.179.185] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 2 Oct
+ 2023 09:08:16 -0700
+Message-ID: <9a65ff82-e6b0-4253-be86-a0962e673bc4@quicinc.com>
+Date: Mon, 2 Oct 2023 09:08:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927130309.30891-1-xiaolinkui@126.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 2/4] netdev: make napi_schedule return bool on
+ NAPI successful schedule
+Content-Language: en-US
+To: Christian Marangi <ansuelsmth@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        Wolfgang Grandegger <wg@grandegger.com>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Chris Snook
+	<chris.snook@gmail.com>,
+        Raju Rangoju <rajur@chelsio.com>,
+        Jeroen de Borst
+	<jeroendb@google.com>,
+        Praveen Kaligineedi <pkaligineedi@google.com>,
+        Shailend Chand <shailend@google.com>,
+        Douglas Miller
+	<dougmill@linux.ibm.com>,
+        Nick Child <nnac123@linux.ibm.com>,
+        Michael
+ Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Haren Myneni
+	<haren@linux.ibm.com>,
+        Rick Lindsley <ricklind@linux.ibm.com>,
+        Dany Madden
+	<danymadden@us.ibm.com>,
+        Thomas Falcon <tlfalcon@linux.ibm.com>,
+        Tariq Toukan
+	<tariqt@nvidia.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose
+ Abreu <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
+        Gregory
+ Greenman <gregory.greenman@intel.com>,
+        Chandrashekar Devegowda
+	<chandrashekar.devegowda@intel.com>,
+        Intel Corporation <linuxwwan@intel.com>,
+        Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+        Liu Haijun
+	<haijun.liu@mediatek.com>,
+        M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+        Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+        Loic Poulain
+	<loic.poulain@linaro.org>,
+        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+        Johannes
+ Berg <johannes@sipsolutions.net>,
+        Yuanjun Gong <ruc_gongyuanjun@163.com>, Wei
+ Fang <wei.fang@nxp.com>,
+        Alex Elder <elder@linaro.org>, Simon Horman
+	<horms@kernel.org>,
+        Rob Herring <robh@kernel.org>, Bailey Forrest
+	<bcf@google.com>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Junfeng Guo
+	<junfeng.guo@intel.com>,
+        Ziwei Xiao <ziweixiao@google.com>,
+        Thomas Gleixner
+	<tglx@linutronix.de>,
+        Rushil Gupta <rushilg@google.com>,
+        =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+        Yuri
+ Karpov <YKarpov@ispras.ru>,
+        Zhengchao Shao <shaozhengchao@huawei.com>,
+        Andrew
+ Lunn <andrew@lunn.ch>, Zheng Zengkai <zhengzengkai@huawei.com>,
+        "Rafael J.
+ Wysocki" <rafael.j.wysocki@intel.com>,
+        Lee Jones <lee@kernel.org>, Dawei Li
+	<set_pte_at@outlook.com>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Benjamin Berg
+	<benjamin.berg@intel.com>,
+        Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+        <linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <ath10k@lists.infradead.org>,
+        <linux-wireless@vger.kernel.org>
+References: <20231002151023.4054-1-ansuelsmth@gmail.com>
+ <20231002151023.4054-2-ansuelsmth@gmail.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20231002151023.4054-2-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.49.16.6]
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: OG9E9tRT0CgWmcphKGvEtpMdVBHFNb-n
+X-Proofpoint-ORIG-GUID: OG9E9tRT0CgWmcphKGvEtpMdVBHFNb-n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-02_10,2023-10-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ lowpriorityscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 malwarescore=0 bulkscore=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2310020123
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
-> From: Linkui Xiao <xiaolinkui@kylinos.cn>
-> 
-> If the ip_set is not locked during ip_set_test, the following situations
-> may occur:
-> 
-> 	CPU0				CPU1
-> 	ip_rcv->
-> 	ip_rcv_finish->
-> 	ip_local_deliver->
-> 	nf_hook_slow->
-> 	iptable_filter_hook->
-> 	ipt_do_table->
-> 	set_match_v4->
-> 	ip_set_test->			list_set_destroy->
-> 	hash_net4_kadt->		set->data = NULL
+On 10/2/2023 8:10 AM, Christian Marangi wrote:
+> Change napi_schedule to return a bool on NAPI successful schedule. This
+> might be useful for some driver to do additional step after a NAPI ahs
 
-Hi,
+nit:s/ahs/has/
 
-I'm having a bit of trouble analysing this.
-In particular, I'm concerned that in such a scenario set
-itself will be also freed, which seems likely to lead to problems.
-
-Can you provide a more complete call stack for CPU1 ?
-
-> 	h = set->data
-> 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
+> been scheduled.
 > 
-> The set->data is empty, continuing to access set->data will result in a
-> kernel NULL pointer. The call trace is as follows:
-> 
-> [2350616.024418] Call trace:
-> [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
-> [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
-> [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
-> [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
-> [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
-> [2350616.026905]  nf_hook_slow+0x50/0x100
-> [2350616.027256]  ip_local_deliver+0xd4/0xe8
-> [2350616.027616]  ip_rcv_finish+0x90/0xb0
-> [2350616.027961]  ip_rcv+0x50/0xb0
-> [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
-> [2350616.028716]  __netif_receive_skb+0x28/0x80
-> [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
-> [2350616.029533]  napi_gro_receive+0xf8/0x170
-> [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
-> [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
-> [2350616.030761]  net_rx_action+0x158/0x3a0
-> [2350616.031124]  __do_softirq+0x11c/0x33c
-> [2350616.031470]  irq_exit+0x11c/0x128
-> [2350616.031793]  __handle_domain_irq+0x6c/0xc0
-> [2350616.032172]  gic_handle_irq+0x6c/0x170
-> [2350616.032528]  el1_irq+0xb8/0x140
-> [2350616.032835]  arch_cpu_idle+0x38/0x1c0
-> [2350616.033183]  default_idle_call+0x24/0x58
-> [2350616.033549]  do_idle+0x1a4/0x268
-> [2350616.033859]  cpu_startup_entry+0x28/0x78
-> [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
-> 
-> Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 > ---
->  net/netfilter/ipset/ip_set_core.c | 2 ++
->  1 file changed, 2 insertions(+)
+>   include/linux/netdevice.h | 11 +++++++++--
+>   1 file changed, 9 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
-> index 35d2f9c9ada0..46f4f47e29e4 100644
-> --- a/net/netfilter/ipset/ip_set_core.c
-> +++ b/net/netfilter/ipset/ip_set_core.c
-> @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
->  	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
->  		return 0;
->  
-> +	ip_set_lock(set);
->  	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
-> +	ip_set_unlock(set);
->  
->  	if (ret == -EAGAIN) {
->  		/* Type requests element to be completed */
-> -- 
-> 2.17.1
-> 
-> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 7e520c14eb8c..2bead8e2a14d 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -490,11 +490,18 @@ bool napi_schedule_prep(struct napi_struct *n);
+>    *
+>    * Schedule NAPI poll routine to be called if it is not already
+>    * running.
+> + * Return true if we schedule a NAPI or false if not.
+> + * Refer to napi_schedule_prep() for additional reason on why
+> + * a NAPI might not be scheduled.
+>    */
+> -static inline void napi_schedule(struct napi_struct *n)
+> +static inline bool napi_schedule(struct napi_struct *n)
+>   {
+> -	if (napi_schedule_prep(n))
+> +	if (napi_schedule_prep(n)) {
+>   		__napi_schedule(n);
+> +		return true;
+> +	}
+> +
+> +	return false;
+>   }
+>   
+>   /**
+
 
