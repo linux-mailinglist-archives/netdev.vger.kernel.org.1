@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-37379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BA67B51C6
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:55:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AFDA7B51C7
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:55:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 76F03B209C6
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C903D283F5C
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 11:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDAC1548D;
-	Mon,  2 Oct 2023 11:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A299B1548A;
+	Mon,  2 Oct 2023 11:55:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA1C14F6B;
-	Mon,  2 Oct 2023 11:55:14 +0000 (UTC)
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8E7D3;
-	Mon,  2 Oct 2023 04:55:09 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7D7EAC0007;
-	Mon,  2 Oct 2023 11:54:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1696247707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZauemzlB2GLs7I7VeZeMr7YTRfLhZitHrMbmBgYpBFo=;
-	b=Y+TMpJzrSEayNtrQ1/UBUfMpH1c7s5l736WL9S3/lFbOXcx0BTUCPb/erG9k+osScJSt0y
-	2tbeBT7/SGnbvouwlGDLERC25y4ZcvayWFzdg/+PfokEDbKflSRhLVWeR40woW8xPlw8Ox
-	8YG1Fvh6sY+27HWsp2z15RKmQUl5kLV9dzDDPUB0zbgmVCPFeznmRQGhJQOZ2xTSYzAjGe
-	NoJzak3j4Py4dzMatBXdC8yNKY3MdQrC208MwQiapP6gCOc8Tx0NARPrBEWIeXgMu71pdE
-	KxUkEfL+NLoKzt+j+Ski75iX7InerKkxpp5uKvWbQdzBuBTRaaRAlf+3yYfmTA==
-Date: Mon, 2 Oct 2023 13:54:58 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: kernel test robot <lkp@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao
- <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
- <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
- <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
- oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Simon
- Horman <horms@kernel.org>
-Subject: Re: [PATCH v7 25/30] dt-bindings: net: Add the Lantiq PEF2256
- E1/T1/J1 framer
-Message-ID: <20231002135458.420f6ae4@bootlin.com>
-In-Reply-To: <202309291924.OBfdyhXb-lkp@intel.com>
-References: <20230928070652.330429-26-herve.codina@bootlin.com>
-	<202309291924.OBfdyhXb-lkp@intel.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EAE15E99
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 11:55:18 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D782A6
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 04:55:15 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 63BE724000B;
+	Mon,  2 Oct 2023 11:55:12 +0000 (UTC)
+Message-ID: <2c01d102-3c84-3edc-a92a-a0b9a889d70d@ovn.org>
+Date: Mon, 2 Oct 2023 13:56:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Cc: i.maximets@ovn.org, dev@openvswitch.org, Aaron Conole
+ <aconole@redhat.com>, Eelco Chaudron <echaudro@redhat.com>,
+ Simon Horman <horms@ovn.org>
+Content-Language: en-US
+To: Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org
+References: <20230927001308.749910-1-npiggin@gmail.com>
+ <a018e82f-5cce-fb81-b52c-901e106c16eb@ovn.org>
+ <CVV7MBT9C7JY.5PYBOXU9NUDR@wheely>
+From: Ilya Maximets <i.maximets@ovn.org>
+Subject: Re: [ovs-dev] [RFC PATCH 0/7] net: openvswitch: Reduce stack usage
+In-Reply-To: <CVV7MBT9C7JY.5PYBOXU9NUDR@wheely>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: i.maximets@ovn.org
+X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NEUTRAL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob, all,
-
-On Fri, 29 Sep 2023 20:04:44 +0800
-kernel test robot <lkp@intel.com> wrote:
-
-> Hi Herve,
+On 9/29/23 09:06, Nicholas Piggin wrote:
+> On Wed Sep 27, 2023 at 6:36 PM AEST, Ilya Maximets wrote:
+>> On 9/27/23 02:13, Nicholas Piggin wrote:
+>>> Hi,
+>>>
+>>> We've got a report of a stack overflow on ppc64le with a 16kB kernel
+>>> stack. Openvswitch is just one of many things in the stack, but it
+>>> does cause recursion and contributes to some usage.
+>>>
+>>> Here are a few patches for reducing stack overhead. I don't know the
+>>> code well so consider them just ideas. GFP_ATOMIC allocations
+>>> introduced in a couple of places might be controversial, but there
+>>> is still some savings to be had if you skip those.
+>>>
+>>> Here is one place detected where the stack reaches >14kB before
+>>> overflowing a little later. I massaged the output so it just shows
+>>> the stack frame address on the left.
+>>
+>> Hi, Nicholas.  Thanks for the patches!
+>>
+>> Though it looks like OVS is not really playing a huge role in the
+>> stack trace below.  How much of the stack does the patch set save
+>> in total?  How much patches 2-7 contribute (I posted a patch similar
+>> to the first one last week, so we may not count it)?
 > 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on linus/master]
-> [also build test WARNING on v6.6-rc3 next-20230929]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Herve-Codina/soc-fsl-cpm1-tsa-Fix-__iomem-addresses-declaration/20230928-151746
-> base:   linus/master
-> patch link:    https://lore.kernel.org/r/20230928070652.330429-26-herve.codina%40bootlin.com
-> patch subject: [PATCH v7 25/30] dt-bindings: net: Add the Lantiq PEF2256 E1/T1/J1 framer
-> compiler: loongarch64-linux-gcc (GCC) 13.2.0
-> reproduce: (https://download.01.org/0day-ci/archive/20230929/202309291924.OBfdyhXb-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202309291924.OBfdyhXb-lkp@intel.com/
-> 
-> dtcheck warnings: (new ones prefixed by >>)
-> >> Documentation/devicetree/bindings/net/lantiq,pef2256.yaml: properties:lantiq,data-rate-bps: 'oneOf' conditional failed, one must be fixed:  
->    	'type' is a required property
->    		hint: A vendor boolean property can use "type: boolean"
->    	Additional properties are not allowed ('default', 'enum' were unexpected)
->    		hint: A vendor boolean property can use "type: boolean"
->    	Additional properties are not allowed ('default' was unexpected)
->    		hint: A vendor string property with exact values has an implicit type
-> >> 	Documentation/devicetree/bindings/net/lantiq,pef2256.yaml: properties:lantiq,data-rate-bps: 'oneOf' conditional failed, one must be fixed:  
->    		'$ref' is a required property
->    		'allOf' is a required property
->    		hint: A vendor property needs a $ref to types.yaml
->    		from schema $id: http://devicetree.org/meta-schemas/vendor-props.yaml#
->    	2048000 is not of type 'string'
->    		hint: A vendor string property with exact values has an implicit type
->    	4096000 is not of type 'string'
->    		hint: A vendor string property with exact values has an implicit type
->    	8192000 is not of type 'string'
->    		hint: A vendor string property with exact values has an implicit type
-> 
+> Stack usage was tested for the same path (this is backported to
+> RHEL9 kernel), and saving was 2080 bytes for that. It's enough
+> to get us out of trouble. But if it was a config that caused more
+> recursions then it might still be a problem.
 
-This issue is related to '-bps' standard suffix not yet available in the
-dt-schema release.
-The commit adding '-pbs' suffix is
-  commit 033d0b1 ("Add '-bps' as a standard unit suffix for bits per second")
-present in https://github.com/devicetree-org/dt-schema/
+The 2K total value likely means that only patches 1 and 4 actually
+contribute much into the savings.  And I agree that running at
+85%+ stack utilization seems risky.  It can likely be overflowed
+by just a few more recirculations in OVS pipeline or traversing
+one more network namespace on a way out.  And it's possible that
+some of the traffic will take such a route in your system even if
+you didn't see it yet.
 
-This point was previously discussed with Rob [1] and mentioned in the cover
-letter of the series.
+>> Also, most of the changes introduced here has a real chance to
+>> noticeably impact performance.  Did you run any performance tests
+>> with this to assess the impact?
+> 
+> Some numbers were posted by Aaron as you would see. 2-4% for that
+> patch, but I suspect the rest should have much smaller impact.
 
-[1]: https://lore.kernel.org/linux-kernel/CAL_JsqJTruTExc=uHCPCp3q-fo+fB-wAJ-ggPpHpWcHSoGALdw@mail.gmail.com/
+They also seem to have a very small impact on the stack usage,
+so may be not worth touching at all, since performance evaluation
+for them will be necessary before they can be accepted.
 
-Best regards,
-Hervé
+> 
+> Maybe patch 2 if you were doing a lot of push_nsh operations, but
+> that might be less important since it's out of the recursive path.
 
+It's also unlikely that you have NHS pipeline configured in OVS.
+
+> 
+>>
+>> One last thing is that at least some of the patches seem to change
+>> non-inlined non-recursive functions.  Seems unnecessary.
+>>
+>> Best regards, Ilya Maximets.
+>>
+> 
+> One thing I do notice in the trace:
+> 
+> 
+> clone_execute is an action which can be deferred AFAIKS, but it is
+> not deferred until several recursions deep.
+> 
+> If we deferred always when possible, then might avoid such a big
+> stack (at least for this config). Is it very costly to defer? Would
+> it help here, or is it just going to process it right away and
+> cause basically the same call chain?
+
+It may save at most two stack frames maybe, because deferred actions
+will be called just one function above in ovs_execute_actions(), and
+it will not save us from packets exiting openvswitch module and
+re-entering from a different port, which is a case in the provided
+trace.
+
+Also, I'd vote against deferring, because then we'll start hitting
+the limit of deferred actions much faster causing packet drops, which
+is already a problem for some OVN deployments.  And deferring involves
+copying a lot of memory, which will hit performance once again.
+
+Best regards, Ilya Maximets.
 
