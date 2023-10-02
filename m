@@ -1,152 +1,211 @@
-Return-Path: <netdev+bounces-37471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2155D7B57E1
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:25:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509D47B57F4
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C3122284E81
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:25:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 3E411B20CA3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 16:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB551DA47;
-	Mon,  2 Oct 2023 16:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F9E1A5BE;
+	Mon,  2 Oct 2023 16:35:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B7E1CF83
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 16:25:34 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB8CA7
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 09:25:33 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-5032a508e74so6571e87.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 09:25:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696263931; x=1696868731; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6R5LBRkNvnXKP8QY/miZsRIggyAFIMaxHqv5LlPVVeY=;
-        b=sAcBv7wJNHfx+gSA1/IngB6sYiaJ3ZJpu7TVtarDYlzCsVz2pWcOvvoWc5IWrj2JFX
-         oqK44VtF9hnitBIthCb7HhxYGZdYryCfMuDUWRa4DP85QfD3PV2g9Ecsm1AsCPCK/UrL
-         DJOScT47DbGHxYiamVgVdPp4+R9jZQ2jqb8nM0ljaVxz+RXq2tTUIS76fX2l2A10EMWU
-         kMLhDPj430F43FlOoD2h8beeRZVlgwnqPuHeIYh6DgG2VtXrgtmoN7mAcUQjtRZWUCl6
-         vPeIK5x+2HJdGcnNT4TRIccMjA6Mhs5eUCGUF0Y2G+sSio13mNuSZQ/Xc0mLYlKMAm6L
-         zJBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696263931; x=1696868731;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6R5LBRkNvnXKP8QY/miZsRIggyAFIMaxHqv5LlPVVeY=;
-        b=ANZe9usmviaowxX88+O88uORvTpQ+SNEMBMZybMsC6AuLEmjo1ScVv8ieac9U3JgxC
-         8OqWc+GucmWmiToKtr0zs7iYkOnPMwnRS4rIDCcN3KwCsSpGp7VT2wX4gYFHjnzSN2uW
-         K3KOKXQrPGB5y6aB6pzKMmhpDrTMPC0zeBYz7esGZR0xKqkDewVfdttrHRVGXxCdeZS7
-         BR5GEhTFd+PWPM2a8rccG4lOuc5y9bbzzCwnldgwPjodabLdEErKbO1V813BlF2uWxmO
-         zcqjXwmDEqeei1t2tebjP1APdWclCcrT5dP9exdpZTHvGjB4AbiQJg9UgqgHcPAPd1Hp
-         RSPQ==
-X-Gm-Message-State: AOJu0YypD7ySAkGzNQcKeMn0qOBwDSxLtqCAWUPoWqJIY1l0tVzjkvTV
-	3RWBmiZ9i87ESrnl5y96SUOFj9yYH93cKnXXeT8bcdAU1XhOGWgBxNKnsg==
-X-Google-Smtp-Source: AGHT+IEF2GqmeikOd/ZpZIcFXNRTGwfF5n2trr+3c2irQWnFwcteE3ug+GSdA+thikc2k6N186cLZfL4WDuu38YG8rU=
-X-Received: by 2002:ac2:5462:0:b0:502:cdb6:f316 with SMTP id
- e2-20020ac25462000000b00502cdb6f316mr75829lfn.3.1696263930911; Mon, 02 Oct
- 2023 09:25:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36C3199B2;
+	Mon,  2 Oct 2023 16:35:45 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC7BD3;
+	Mon,  2 Oct 2023 09:35:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696264544; x=1727800544;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HtXXSaxIUxjHE1Wz5boFHGVVOcQNpMLjN6igcpPHakg=;
+  b=LctUeXF7rJMP8vVce4TKdDzuj069+/MrH7A/0VRLJH9S/3DqvVI5zzx+
+   +FYkJ08XYpXM1oiLGV4JxeI03OSBm+MtLEGf9ZygXgO5yILHKkxkkOgTY
+   Q+a2iQMw/y4XJyRkW3ZNoiroNdY6bDJxdgfRI5B1X6snNwObLHcKGyU05
+   UyNcH426c5CJ18N7YZEjUjdalOtXsnH3lyQ6BPDX09geulhMDCnzrhGaY
+   j6rAeVlv0vOvfRJtyFN7cU/k7u4O7XiYsjdRabLdsZ3NRQvOSLyHKVIDN
+   YQeo2dq46Vgv5nKoGy/MUwipElLTg34kChhKJR+fJ9em2k/Z5Jp2pfbcJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="4259637"
+X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
+   d="scan'208";a="4259637"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 09:35:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="754107462"
+X-IronPort-AV: E=Sophos;i="6.03,194,1694761200"; 
+   d="scan'208";a="754107462"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga007.fm.intel.com with ESMTP; 02 Oct 2023 09:35:10 -0700
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 559EC43C38;
+	Mon,  2 Oct 2023 17:35:07 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>,
+	xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next] selftests/bpf: add options and ZC mode to xdp_hw_metadata
+Date: Mon,  2 Oct 2023 18:26:50 +0200
+Message-ID: <20231002162653.297318-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
-In-Reply-To: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Oct 2023 18:25:19 +0200
-Message-ID: <CANn89iKEs8_zdEXWbjxd8mC220MqhcRQp3AeHJMS6eD-a45rRA@mail.gmail.com>
-Subject: Re: tcpdump and Big TCP
-To: David Ahern <dsahern@kernel.org>
-Cc: Xin Long <lucien.xin@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 2, 2023 at 6:20=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> Eric:
->
-> Looking at the tcpdump source code, it has a GUESS_TSO define that can
-> be enabled to dump IPv4 packets with tot_len =3D 0:
->
->         if (len < hlen) {
-> #ifdef GUESS_TSO
->             if (len) {
->                 ND_PRINT("bad-len %u", len);
->                 return;
->             }
->             else {
->                 /* we guess that it is a TSO send */
->                 len =3D length;
->             }
-> #else
->             ND_PRINT("bad-len %u", len);
->             return;
-> #endif /* GUESS_TSO */
->         }
->
->
-> The IPv6 version has a similar check but no compile change needed:
->         /*
->          * RFC 1883 says:
->          *
->          * The Payload Length field in the IPv6 header must be set to zer=
-o
->          * in every packet that carries the Jumbo Payload option.  If a
->          * packet is received with a valid Jumbo Payload option present a=
-nd
->          * a non-zero IPv6 Payload Length field, an ICMP Parameter Proble=
-m
->          * message, Code 0, should be sent to the packet's source, pointi=
-ng
->          * to the Option Type field of the Jumbo Payload option.
->          *
->          * Later versions of the IPv6 spec don't discuss the Jumbo Payloa=
-d
->          * option.
->          *
->          * If the payload length is 0, we temporarily just set the total
->          * length to the remaining data in the packet (which, for Etherne=
-t,
->          * could include frame padding, but if it's a Jumbo Payload frame=
-,
->          * it shouldn't even be sendable over Ethernet, so we don't worry
->          * about that), so we can process the extension headers in order
->          * to *find* a Jumbo Payload hop-by-hop option and, when we've
->          * processed all the extension headers, check whether we found
->          * a Jumbo Payload option, and fail if we haven't.
->          */
->         if (payload_len !=3D 0) {
->                 len =3D payload_len + sizeof(struct ip6_hdr);
->                 if (length < len)
->                         ND_PRINT("truncated-ip6 - %u bytes missing!",
->                                 len - length);
->         } else
->                 len =3D length + sizeof(struct ip6_hdr);
->
->
-> Maybe I am missing something, but it appears that no code change to
-> tcpdump is needed for Linux Big TCP packets other than enabling that
-> macro when building. I did that in a local build and the large packets
-> were dumped just fine.
->
+By default, xdp_hw_metadata runs in AF_XDP copy mode. However, hints are
+also supposed to be supported in ZC mode, which is usually implemented
+separately in driver, and so needs to be tested too.
 
-My point is that tcpdump should not guess, but look at TP_STATUS_GSO_TCP
-(and TP_STATUS_CSUM_VALID would also be nice)
+Add an option to run xdp_hw_metadata in ZC mode.
 
-Otherwise, why add TP_STATUS_GSO_TCP in the first place ?
+As for now, xdp_hw_metadata accepts no options, so add simple option
+parsing logic and a help message.
+
+For quick reference, also add an ingress packet generation command to the
+help message. The command comes from [0].
+
+[0] https://lore.kernel.org/all/20230119221536.3349901-18-sdf@google.com/
+
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+ tools/testing/selftests/bpf/xdp_hw_metadata.c | 59 ++++++++++++++++---
+ 1 file changed, 52 insertions(+), 7 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+index 613321eb84c1..c1d1b161a964 100644
+--- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
++++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+@@ -26,6 +26,7 @@
+ #include <linux/sockios.h>
+ #include <sys/mman.h>
+ #include <net/if.h>
++#include <ctype.h>
+ #include <poll.h>
+ #include <time.h>
+ 
+@@ -49,6 +50,7 @@ struct xsk {
+ struct xdp_hw_metadata *bpf_obj;
+ struct xsk *rx_xsk;
+ const char *ifname;
++bool zero_copy;
+ int ifindex;
+ int rxq;
+ 
+@@ -60,7 +62,7 @@ static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id)
+ 	const struct xsk_socket_config socket_config = {
+ 		.rx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
+ 		.tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
+-		.bind_flags = XDP_COPY,
++		.bind_flags = zero_copy ? XDP_ZEROCOPY : XDP_COPY,
+ 	};
+ 	const struct xsk_umem_config umem_config = {
+ 		.fill_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
+@@ -404,6 +406,54 @@ static void timestamping_enable(int fd, int val)
+ 		error(1, errno, "setsockopt(SO_TIMESTAMPING)");
+ }
+ 
++static void print_usage(void)
++{
++	const char *usage =
++		"  Usage: xdp_hw_metadata [OPTIONS] [IFNAME]\n"
++		"  Options:\n"
++		"  -z            Run AF_XDP in ZC mode (copy mode is used by default)\n"
++		"  -h            Display this help and exit\n\n"
++		"  Generate test packets on other machine with:\n"
++		"    echo -n xdp | nc -u -q1 <dst_ip> 9091\n";
++
++	printf("%s", usage);
++}
++
++static void read_args(int argc, char *argv[])
++{
++	char opt;
++
++	while ((opt = getopt(argc, argv, "zh")) != -1) {
++		switch (opt) {
++		case 'z':
++			zero_copy = true;
++			break;
++		case 'h':
++			print_usage();
++			exit(0);
++		case '?':
++			if (isprint(optopt))
++				fprintf(stderr, "Unknown option: -%c\n", optopt);
++			fallthrough;
++		default:
++			print_usage();
++			error(-1, opterr, "Command line options error");
++		}
++	}
++
++	if (optind >= argc) {
++		fprintf(stderr, "No device name provided\n");
++		print_usage();
++		exit(-1);
++	}
++
++	ifname = argv[optind];
++	ifindex = if_nametoindex(ifname);
++
++	if (!ifname)
++		error(-1, errno, "Invalid interface name");
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	clockid_t clock_id = CLOCK_TAI;
+@@ -413,13 +463,8 @@ int main(int argc, char *argv[])
+ 
+ 	struct bpf_program *prog;
+ 
+-	if (argc != 2) {
+-		fprintf(stderr, "pass device name\n");
+-		return -1;
+-	}
++	read_args(argc, argv);
+ 
+-	ifname = argv[1];
+-	ifindex = if_nametoindex(ifname);
+ 	rxq = rxq_num(ifname);
+ 
+ 	printf("rxq: %d\n", rxq);
+-- 
+2.41.0
+
 
