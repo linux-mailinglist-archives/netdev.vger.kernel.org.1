@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-37381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09867B520F
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:03:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E977B52C4
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6D01A283E1E
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:03:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 89F8CB20A82
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8784C15E9A;
-	Mon,  2 Oct 2023 12:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2090315EBC;
+	Mon,  2 Oct 2023 12:13:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A98A6AD6
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:03:33 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 915761B6
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:03:16 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-405524e6768so143145415e9.2
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:03:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948DC10A0E
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:13:28 +0000 (UTC)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ECA2712
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:11:49 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3215f19a13aso16366402f8f.3
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696248195; x=1696852995; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696248707; x=1696853507; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:subject:cc:to:from:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=LkGgdFr05agRR4B9/n54lNLBLooPlkq4SUAidYLhpYI=;
-        b=Wolcri6kgU5Qc8NbDttLdOi+YJVP8IAyL7xZzhV42/Xmg+ATKdedZ6+0SMaqPXXiXh
-         fKsJD+TPDBXAkmyid0Er6lDrwprOS2SXvaLvI9P1ox40RNdUPVAfUCekehZTgW7vkMty
-         Sn2oFLYu9M5GtAmWjUx7EHfrC1WXWLFBU+6Cf0DDSm+Z4cXDbaVDRQpkuVOyHkStPPev
-         MLhkmIP9FXdZqt4zUm4K2MBhazMPAP28/xdVRo029Nks28xad44NiAYnjMLvkKzLL0TQ
-         24S10Fcr1vGCnPwZq5B8Tw3WTfO9/LOT8XqT/0QgSTDNtcF2j8YoBcH2rmek5fiN0gSq
-         4WeA==
+        bh=L5LdkWS0biIIZvELj2EpRuPnpaaDaxnemHE3/PgKWBM=;
+        b=fnhfXZF3Cx357hbaIwJ48dOaZr8STuFEBTvTJGNL7bQ2alqkGRd7fN+ABc4G1xMltc
+         QkLTrUYuTkJ9dnPYdtul99+8HGb5VAzNwQUej0d3cwgYSyR/CK7qCNkb8FBBVVj0mC1V
+         EshkfH3045usvitGQDGU/dzhluYNBFEcMy/WTeRI4XAqPBRkyvCAP3w0NeqtQ6zQMX9t
+         JkfKMWyq8nKExSJYwAfQCYnYCaEILdDBj839fROUwhH65EKhK7ZWkIE1CZ4nNaguutiN
+         AeRpwSm8Aitc9ZR3MBgmkHRyCUdfbOaVD5MsMC9ZODSFgV/530SF6hJQ6GbrpS021EiS
+         BSCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696248195; x=1696852995;
+        d=1e100.net; s=20230601; t=1696248707; x=1696853507;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:subject:cc:to:from:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkGgdFr05agRR4B9/n54lNLBLooPlkq4SUAidYLhpYI=;
-        b=XI4KzVr/QYWisvB2/Q5ZlzGykns224/RnQ4M0ldI4ekAqTFVBa7oC4hE+T7lQioTRS
-         XsCtvXKE8CERM0P4yZv1TNOeNOpw59RH2ZkVCsI/HCyZENRIqPXBKXddWV2tjO6SiL0F
-         JumubAxQRY3eNmbPHS7mpEQdsRczQqlayIaC4U8ZWRpH/9GgqzuWv3+LboS+yGuXoelr
-         JnbcbDN2q/DazbF2gQXVeEAke56PTjHT74h75iyd9ZvmIdeBlH/UnqIX9Mc1UwLDlTqQ
-         IfzG3yj3UvLKyuzxMHc1yg8tMIbfXToDsE4zNUXhCF7nwT6hdbFmrPW1Q16EJKDUqbqe
-         BR4w==
-X-Gm-Message-State: AOJu0Yzs+kqypjAXcBwZcdIH9W0/XJrQtkpEPgRm4hR3HFSJnTY9JkzF
-	7MzqYAeJwN39HJk/2KeQUi3N6o1CIto=
-X-Google-Smtp-Source: AGHT+IE9FUHMrtoZKhffiztFw5bKBWLPl7dm7AS4yyhSOQ3I88JaFMk5F7pcCTNkKZFzO1JAv4w0pg==
-X-Received: by 2002:a05:600c:254:b0:401:b504:b6a0 with SMTP id 20-20020a05600c025400b00401b504b6a0mr10437124wmj.3.1696248194245;
-        Mon, 02 Oct 2023 05:03:14 -0700 (PDT)
+        bh=L5LdkWS0biIIZvELj2EpRuPnpaaDaxnemHE3/PgKWBM=;
+        b=k/ZLjnv2XiXpqPq46Yx8EjjSVxoYxfx+NEJ9FcC1B7F957jpYmzIgWWKdzvTJs1Owy
+         NUECE8NjJIPuOwKhrys9fdZtmdNkm3zBtf+0Y+Bce0lXAd+74z+1q0oEng3twgCb/iPw
+         30nvGeKVkpqK+iga2oARPGTuiHnyqIyx70yofGM+Jx4TpLRF1rwKZTVm4+Tw+4a8+eIP
+         g9Fo2gvpAWqsPA5rC2GRvdF3PohUdl6kADaBe4+HUZlgTrC0vpsXpn0dC0z2BLzbGCz/
+         Q9XFcpkTu3TZgAb+E0KMYZKsEwmgimIxkK9zxYdEzyz1QdJAPd6c4W5qwYKmnzbsto1H
+         8VHA==
+X-Gm-Message-State: AOJu0YyEaO4qBf/Rjgg/m99cbCxlZImqSHo0BbmIxVUkFRdXzYSAxAmt
+	yx3QtySKyHOG62zLAmcpBcl8k//QTqY=
+X-Google-Smtp-Source: AGHT+IGQy10hgw71Q836S7WNS1QP33zHBDM3xe5wiZDGRMiVp5zkUrtMTZ40MJ47576tW4lOysEcCQ==
+X-Received: by 2002:a5d:6401:0:b0:320:938:300e with SMTP id z1-20020a5d6401000000b003200938300emr9204405wru.4.1696248707216;
+        Mon, 02 Oct 2023 05:11:47 -0700 (PDT)
 Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id 12-20020a05600c024c00b004051f8d6207sm7098834wmj.6.2023.10.02.05.03.13
+        by smtp.gmail.com with ESMTPSA id g16-20020adfa490000000b003232380ffd5sm20035808wrb.106.2023.10.02.05.11.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 05:03:13 -0700 (PDT)
-Message-ID: <651ab181.050a0220.ad81c.9536@mx.google.com>
-X-Google-Original-Message-ID: <ZRqxfjc7w7nPKhOa@Ansuel-xps.>
-Date: Mon, 2 Oct 2023 14:03:10 +0200
+        Mon, 02 Oct 2023 05:11:46 -0700 (PDT)
+Message-ID: <651ab382.df0a0220.e74df.fc51@mx.google.com>
+X-Google-Original-Message-ID: <ZRqzf3VVMjq1ZFAG@Ansuel-xps.>
+Date: Mon, 2 Oct 2023 14:11:43 +0200
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: dsa: qca8k: fix regmap bulk read/write
- methods on big endian systems
+Subject: Re: [PATCH net 2/2] net: dsa: qca8k: fix potential MDIO bus conflict
+ when accessing internal PHYs via management frames
 References: <20231002104612.21898-1-kabel@kernel.org>
- <20231002104612.21898-2-kabel@kernel.org>
+ <20231002104612.21898-3-kabel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231002104612.21898-2-kabel@kernel.org>
+In-Reply-To: <20231002104612.21898-3-kabel@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -82,32 +82,131 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 12:46:11PM +0200, Marek Behún wrote:
-> Commit c766e077d927 ("net: dsa: qca8k: convert to regmap read/write
-> API") introduced bulk read/write methods to qca8k's regmap.
+On Mon, Oct 02, 2023 at 12:46:12PM +0200, Marek Behún wrote:
+> Besides the QCA8337 switch the Turris 1.x device has on it's MDIO bus
+> also Micron ethernet PHY (dedicated to the WAN port).
 > 
-> The regmap bulk read/write methods get the register address in a buffer
-> passed as a void pointer parameter (the same buffer contains also the
-> read/written values). The register address occupies only as many bytes
-> as it requires at the beginning of this buffer. For example if the
-> .reg_bits member in regmap_config is 16 (as is the case for this
-> driver), the register address occupies only the first 2 bytes in this
-> buffer, so it can be cast to u16.
+> We've been experiencing a strange behavior of the WAN ethernet
+> interface, wherein the WAN PHY started timing out the MDIO accesses, for
+> example when the interface was brought down and then back up.
 > 
-> But the original commit implementing these bulk read/write methods cast
-> the buffer to u32:
->   u32 reg = *(u32 *)reg_buf & U16_MAX;
-> taking the first 4 bytes. This works on little endian systems where the
-> first 2 bytes of the buffer correnspond to the low 16-bits, but it
-> obviously cannot work on big endian systems.
+> Bisecting led to commit 2cd548566384 ("net: dsa: qca8k: add support for
+> phy read/write with mgmt Ethernet"), which added support to access the
+> QCA8337 switch's internal PHYs via management ethernet frames.
 > 
-> Fix this by casting the beginning of the buffer to u16 as
->    u32 reg = *(u16 *)reg_buf;
+> Connecting the MDIO bus pins onto an oscilloscope, I was able to see
+> that the MDIO bus was active whenever a request to read/write an
+> internal PHY register was done via an management ethernet frame.
 > 
-> Fixes: c766e077d927 ("net: dsa: qca8k: convert to regmap read/write API")
+> My theory is that when the switch core always communicates with the
+> internal PHYs via the MDIO bus, even when externally we request the
+> access via ethernet. This MDIO bus is the same one via which the switch
+> and internal PHYs are accessible to the board, and the board may have
+> other devices connected on this bus. An ASCII illustration may give more
+> insight:
+> 
+>            +---------+
+>       +----|         |
+>       |    | WAN PHY |
+>       | +--|         |
+>       | |  +---------+
+>       | |
+>       | |  +----------------------------------+
+>       | |  | QCA8337                          |
+> MDC   | |  |                        +-------+ |
+> ------o-+--|--------o------------o--|       | |
+> MDIO    |  |        |            |  | PHY 1 |-|--to RJ45
+> --------o--|---o----+---------o--+--|       | |
+>            |   |    |         |  |  +-------+ |
+> 	   | +-------------+  |  o--|       | |
+> 	   | | MDIO MDC    |  |  |  | PHY 2 |-|--to RJ45
+> eth1	   | |             |  o--+--|       | |
+> -----------|-|port0        |  |  |  +-------+ |
+>            | |             |  |  o--|       | |
+> 	   | | switch core |  |  |  | PHY 3 |-|--to RJ45
+>            | +-------------+  o--+--|       | |
+> 	   |                  |  |  +-------+ |
+> 	   |                  |  o--|  ...  | |
+> 	   +----------------------------------+
+> 
+> When we send a request to read an internal PHY register via an ethernet
+> management frame via eth1, the switch core receives the ethernet frame
+> on port 0 and then communicates with the internal PHY via MDIO. At this
+> time, other potential devices, such as the WAN PHY on Turris 1.x, cannot
+> use the MDIO bus, since it may cause a bus conflict.
+> 
+> Fix this issue by locking the MDIO bus even when we are accessing the
+> PHY registers via ethernet management frames.
+> 
+> Fixes: 2cd548566384 ("net: dsa: qca8k: add support for phy read/write with mgmt Ethernet")
 > Signed-off-by: Marek Behún <kabel@kernel.org>
 
-Reviewed-by: Christian Marangi <ansuelsmth@gmail.com>
+Just some comments (micro-optimization) and one question.
+
+Wonder if the extra lock would result in a bit of overhead for simple
+implementation where the switch is the only thing connected to the MDIO.
+
+It's just an idea and probably not even something to consider (since
+probably the overhead is so little that it's not worth it)
+
+But we might consider to add some logic in the MDIO setup function to
+check if the MDIO have other PHY connected and enable this lock (and
+make this optional with an if and a bool like require_mdio_locking)
+
+If we don't account for this, yes the lock should have been there from
+the start and this is correct. (we can make it optional only in the case
+where only the switch is connected as it would be the only user and
+everything is already locked by the eth_mgmt lock)
+
+> ---
+>  drivers/net/dsa/qca/qca8k-8xxx.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> index d2df30640269..4ce68e655a63 100644
+> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> @@ -666,6 +666,15 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
+>  		goto err_read_skb;
+>  	}
+>  
+> +	/* It seems that accessing the switch's internal PHYs via management
+> +	 * packets still uses the MDIO bus within the switch internally, and
+> +	 * these accesses can conflict with external MDIO accesses to other
+> +	 * devices on the MDIO bus.
+> +	 * We therefore need to lock the MDIO bus onto which the switch is
+> +	 * connected.
+> +	 */
+> +	mutex_lock(&priv->bus->mdio_lock);
+> +
+
+Please move this down before the first dev_queue_xmit. (we can save a
+few cycle where locking is not needed)
+
+Also should we use mutex_lock_nested?
+
+>  	/* Actually start the request:
+>  	 * 1. Send mdio master packet
+>  	 * 2. Busy Wait for mdio master command
+> @@ -678,6 +687,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
+>  	mgmt_master = priv->mgmt_master;
+>  	if (!mgmt_master) {
+>  		mutex_unlock(&mgmt_eth_data->mutex);
+> +		mutex_unlock(&priv->bus->mdio_lock);
+>  		ret = -EINVAL;
+>  		goto err_mgmt_master;
+>  	}
+> @@ -765,6 +775,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
+>  				    QCA8K_ETHERNET_TIMEOUT);
+>  
+>  	mutex_unlock(&mgmt_eth_data->mutex);
+> +	mutex_unlock(&priv->bus->mdio_lock);
+>  
+>  	return ret;
+>  
+> -- 
+> 2.41.0
+> 
 
 -- 
 	Ansuel
