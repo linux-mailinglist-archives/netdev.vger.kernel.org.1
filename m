@@ -1,106 +1,83 @@
-Return-Path: <netdev+bounces-37522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E3FE7B5C4A
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:55:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A89F17B5C4B
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 9F9D1B20B03
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:55:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id CFFAF1C208E3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD2F2032D;
-	Mon,  2 Oct 2023 20:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45125200DB;
+	Mon,  2 Oct 2023 20:55:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B6F20329;
-	Mon,  2 Oct 2023 20:55:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3243BC43395;
-	Mon,  2 Oct 2023 20:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016920309;
+	Mon,  2 Oct 2023 20:55:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E7B0C433C8;
+	Mon,  2 Oct 2023 20:55:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696280149;
-	bh=Y2Lt8qx7KyiKOUPa2We5gWo6fuqgHoG5oG5OZdYy0+M=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=BMcitU6QE707Nv7g6gJ1R/jLsUitQvIalA9QIwaiVjMwAnU8Ia41eo+QMD8akWEAl
-	 /rQliFgY6/UxLd/8l33gzkvrrq8rVoed5MdIoFQmtQJYMIuunpjR91i0cDP842C+QE
-	 jNgE77xRgP4hH6UetsxuZZ8Dqc1wLhUR/tDIgyCn1rVpJOQYudBa+nboicw1ROVuse
-	 8w11v4zCWxtI1xSVl20iV/FBtlRmdodUFTw+0iqrVaRy1xbIsPAPNbIBDo53OLAqM1
-	 dou8zuehhoay/uNea7dGF3y/Fz+oGusWpD0uEcsoWkYhkzhZIXzMS79PH8wTN2ucxX
-	 xgWSZPIE14E0A==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 02 Oct 2023 13:55:21 -0700
-Subject: [PATCH 2/2] mlx5: Fix type of mode parameter in
- mlx5_dpll_device_mode_get()
+	s=k20201202; t=1696280157;
+	bh=3SUjHS1R/+k33+41I8df1OAaO4gb+JCavb+GatMXfr8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ts6e8OPAXbwJSqbHZh7OB/J5bL/OHFILZtb1yBVm7HXPB1PZk/XGQ7AuIW4n29dj+
+	 ecoBTO+7hrPW8Q6xuPPASkVTEUpIET4SQ0Jsvd2gVlk1zyw1YTaRy14t4smDjHCbYx
+	 Ip/BJuo0W6EjA2rvCbaan0iEIW+cj78pq0AqAEptDJPl392/1LNQKv84du3Y6mEcD5
+	 kLx5VdsMxdIHgNASSD2ZmOJqOflab/gjsH9hwidf2wGhMgu6x7m8pUtG4MO1ahLvP5
+	 y4L8a3M2ByHooguBVfjxXHjB0K4VvDBx4MXBRBHPNchRHELaiLL3HcPvunO0YVRUT/
+	 sMrIc2mpMLNtQ==
+Date: Mon, 2 Oct 2023 13:55:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Rohan G Thomas <rohan.g.thomas@intel.com>, "David S . Miller"
+ <davem@davemloft.net>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH net-next 1/1] net: stmmac: xgmac: EST interrupts
+ handling
+Message-ID: <20231002135551.020f180c@kernel.org>
+In-Reply-To: <xwcwjtyy5yx6pruoa3vmssnjzkbeahmfyym4e5lrq2efcwwiym@2upf4ko4mah5>
+References: <20230923031031.21434-1-rohan.g.thomas@intel.com>
+	<xwcwjtyy5yx6pruoa3vmssnjzkbeahmfyym4e5lrq2efcwwiym@2upf4ko4mah5>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231002-net-wifpts-dpll_mode_get-v1-2-a356a16413cf@kernel.org>
-References: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
-In-Reply-To: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
- pabeni@redhat.com, vadfed@fb.com
-Cc: arkadiusz.kubalewski@intel.com, jiri@resnulli.us, 
- netdev@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>, saeedm@nvidia.com, leon@kernel.org, 
- linux-rdma@vger.kernel.org
-X-Mailer: b4 0.13-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2119; i=nathan@kernel.org;
- h=from:subject:message-id; bh=Y2Lt8qx7KyiKOUPa2We5gWo6fuqgHoG5oG5OZdYy0+M=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDKnSesEfzOqbj2kfeNXzsH5q96utkjcLLAMNrU23Pf0++
- fiG0E/fOkpZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEZDMZ/set3+G6yeio7AwL
- m1uCJx+pLzxe/KRJ+/dVSfbY/cxuxwoZ/tkfelJ1K+/oz/9zFlaqLF/VU3vpT25Pic2rvmcv4xr
- OcXIAAA==
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-When building with -Wincompatible-function-pointer-types-strict, a
-warning designed to catch potential kCFI failures at build time rather
-than run time due to incorrect function pointer types, there is a
-warning due to a mismatch between the type of the mode parameter in
-mlx5_dpll_device_mode_get() vs. what the function pointer prototype for
-->mode_get() in 'struct dpll_device_ops' expects.
+On Tue, 26 Sep 2023 14:25:56 +0300 Serge Semin wrote:
+> On Sat, Sep 23, 2023 at 11:10:31AM +0800, Rohan G Thomas wrote:
+> > Enabled the following EST related interrupts:
+> >   1) Constant Gate Control Error (CGCE)
+> >   2) Head-of-Line Blocking due to Scheduling (HLBS)
+> >   3) Head-of-Line Blocking due to Frame Size (HLBF)
+> >   4) Base Time Register error (BTRE)
+> >   5) Switch to S/W owned list Complete (SWLC)
+> > Also, add EST errors into the ethtool statistic.
+> > 
+> > The commit e49aa315cb01 ("net: stmmac: EST interrupts handling and
+> > error reporting") and commit 9f298959191b ("net: stmmac: Add EST
+> > errors into ethtool statistic") add EST interrupts handling and error
+> > reporting support to DWMAC4 core. This patch enables the same support
+> > for XGMAC.  
+> 
+> So, this is basically a copy of what was done for the DW QoS Eth
+> IP-core (DW GMAC v4.x/v5.x). IMO it would be better to factor it out
+> into a separate module together with the rest of the setup methods
+> like it's done for TC or PTP. But since it implies some much more work
+> I guess we can leave it as is for now...
 
-  drivers/net/ethernet/mellanox/mlx5/core/dpll.c:141:14: error: incompatible function pointer types initializing 'int (*)(const struct dpll_device *, void *, enum dpll_mode *, struct netlink_ext_ack *)' with an expression of type 'int (const struct dpll_device *, void *, u32 *, struct netlink_ext_ack *)' (aka 'int (const struct dpll_device *, void *, unsigned int *, struct netlink_ext_ack *)') [-Werror,-Wincompatible-function-pointer-types-strict]
-    141 |         .mode_get = mlx5_dpll_device_mode_get,
-        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~
-  1 error generated.
-
-Change the type of the mode parameter in mlx5_dpll_device_mode_get() to
-clear up the warning and avoid kCFI failures at run time.
-
-Fixes: 496fd0a26bbf ("mlx5: Implement SyncE support using DPLL infrastructure")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-To: saeedm@nvidia.com
-To: leon@kernel.org
-Cc: linux-rdma@vger.kernel.org
----
- drivers/net/ethernet/mellanox/mlx5/core/dpll.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-index 74f0c7867120..2cd81bb32c66 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
-@@ -121,8 +121,8 @@ static int mlx5_dpll_device_lock_status_get(const struct dpll_device *dpll,
- }
- 
- static int mlx5_dpll_device_mode_get(const struct dpll_device *dpll,
--				     void *priv,
--				     u32 *mode, struct netlink_ext_ack *extack)
-+				     void *priv, enum dpll_mode *mode,
-+				     struct netlink_ext_ack *extack)
- {
- 	*mode = DPLL_MODE_MANUAL;
- 	return 0;
-
--- 
-2.42.0
-
+I think we can push back a little harder. At the very least we should
+get a clear explanation why this copy'n'paste is needed, i.e. what are
+the major differences. No?
 
