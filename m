@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-37502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0407B5B0B
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:16:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6587B5B23
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:20:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8FEA8283289
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:16:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7EA1B28237E
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241A11F60E;
-	Mon,  2 Oct 2023 19:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C1E41F92A;
+	Mon,  2 Oct 2023 19:20:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F2B1F5E1;
-	Mon,  2 Oct 2023 19:16:19 +0000 (UTC)
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4DDB3;
-	Mon,  2 Oct 2023 12:16:17 -0700 (PDT)
-Received: by mail-vs1-xe2a.google.com with SMTP id ada2fe7eead31-4527d65354bso88163137.0;
-        Mon, 02 Oct 2023 12:16:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF69F1F174;
+	Mon,  2 Oct 2023 19:20:04 +0000 (UTC)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64976B0;
+	Mon,  2 Oct 2023 12:20:02 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-4195fddd6d7so694721cf.0;
+        Mon, 02 Oct 2023 12:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696274176; x=1696878976; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696274401; x=1696879201; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=7Tr1XYfZFQPwOIGZkao0xDKBVDpd/yFY9b0CTr+HCmI=;
-        b=fG8Lk0qhIQ9sgBk798MAYtZLMMNfcPDOVCC0CpCe7i3XpsRF7tEScj/ldnV79b91Rj
-         Ip41w2YhjKbY9PykpLqYXhDQzE1vOBiWpqyMQTOzhYL3apgFZW1zRoYokZKpG3oWC+E6
-         v24X0nLYLJkK6CsDBH/C/VBI/epdehsas0OrFS7uoSXpoRyiUPJt9rqt1iXOz/byznKm
-         6Kgj9PjFKAOguAINhI/d/6kkMEQg3jV/j3YrKVgSAFM6srkuPxUI8IRAvmk2bEdthyJo
-         qOTLFJE/6/jUAwyisNI9UCnwcbdFuRc9ru1qk4wz6TTNdBcVggNz26eKJiA+vhpvrucg
-         1/KA==
+        bh=ds6VTt0w8PY6LpzSqGG11xF1/RVNxL0JohTRt+pMTII=;
+        b=Y/S8TP0yFclFtprmwqcasgOyr+2egpR8ch8IvWTyFtFcDOfsFYQ9JCoWABuJG+QQL4
+         UZneCKLoFyf0ORS2hIayCCNFjMUdYRj8tGFzb4v1SOv1aj+2RpxN4fMKro/LpeFkMxkG
+         GlwNUAdb9gAIPyOENjqvOly/7Sq/+QNrVo0LsZsbZckcar5MKWC9afZqhpdhXdeBDugc
+         DrDQ9W9hW/V511LYgHWTB/NdtGHHvgh3O87JakkZtfTVK5OD5jKEt0/zWSspFXQFX0Tw
+         zt29YItP1sl6OUCZGqYE9gD7+olDEwTm7LTt7rZOyGdVlHWxlhXnsbd5r3ZhDL9Y6kAi
+         FXHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696274176; x=1696878976;
+        d=1e100.net; s=20230601; t=1696274401; x=1696879201;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7Tr1XYfZFQPwOIGZkao0xDKBVDpd/yFY9b0CTr+HCmI=;
-        b=tpzlZQbbKX5mC9ZKRMyJViyEGcxsLl2iEu+QmxOWtJjtyUktDjcukGskb4KDa/NLsp
-         sIDymMG0dox1SeNVoU43FQlBeVJpi9L/xnyFp4onRrd49a7FTyleSuVtZqMNdOmeP/6b
-         0Jk/9ukyfZ9veAzdPnZW8OiEm64avcO10e7Buu35DSsvS8AYLw4FH4ubE70+uFbOR7H5
-         Pxdxsv0+gBscC9azb6dQgMOd5bjP6a0/anVrU6lnznrm6zhuCsUSMES+hg0FvPipQN+f
-         vVBHnArTuH39F8AeoRDPa2MjNjtpXghoVi0m7zaoYzBOpq0+J1FZxuWDp3X9gmfmSwUM
-         kk/w==
-X-Gm-Message-State: AOJu0YyDpN1+/TDOtTAwAJbuzL8xonWvdm2JTpe0G8cA2gqHZnFAzNrg
-	+CF5LuuP7EvpbV1IfwzsgKU=
-X-Google-Smtp-Source: AGHT+IFv1LL4hAxRrpJUw0BnAkrSJG1KrOzUpd35rSgjuWaSyLrINoESA3s18Z8/hb4VtPYwVgEJ0g==
-X-Received: by 2002:a05:6102:1cb:b0:454:6ccc:ab79 with SMTP id s11-20020a05610201cb00b004546cccab79mr10882242vsq.11.1696274176341;
-        Mon, 02 Oct 2023 12:16:16 -0700 (PDT)
+        bh=ds6VTt0w8PY6LpzSqGG11xF1/RVNxL0JohTRt+pMTII=;
+        b=evsoAlUTQtPz+QhtwIXBf8/jq60Q+6EbGCCwo1Uuem5EInUEUIj3UwKHyMVZobagt1
+         r16Mts45jaw1rV++QLpMGkqVWWa+dFSsTeNWMwjEHlUeSm7s7WPNkbH3rDOxPm2JC2dl
+         s9I2kjH1DV+H6Xne6dUOMuCuvRtZSkd9/ZwUgv/Z4lCeKIyUszm8GlGS8FRjqXbgUovV
+         gI75UT9iOUJcV2nuTX2NQslr3Kg4G4bOeZdk0Qf22xyAClimtt4VKqDwmikDLSLIwxFs
+         MKkMs09R9qIuTIHJ95C2zSabOmYYIlDom3B9+6iXTUF4K2JNWyZA8+IZigvq8z3QHzLg
+         TP/A==
+X-Gm-Message-State: AOJu0Yx/wrqIJe8KKmc7kXhbAenpz8XVfNDMVxKc82Q0FKbe+eA3g2WB
+	4RTol+RBwjadgwWIDtoGUY8=
+X-Google-Smtp-Source: AGHT+IGo6yeaGgco1DFJeiDGQXKNDcXfNT0WDByiIGMzDo4ZxvNVsqXi0hPLiGLZWFxsvV17yl+ifg==
+X-Received: by 2002:ac8:588f:0:b0:408:392e:2aa5 with SMTP id t15-20020ac8588f000000b00408392e2aa5mr546193qta.20.1696274401317;
+        Mon, 02 Oct 2023 12:20:01 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id o20-20020a0cf4d4000000b00656329bb3b1sm7686722qvm.10.2023.10.02.12.16.13
+        by smtp.googlemail.com with ESMTPSA id b10-20020ac86bca000000b004198ac8be74sm1728335qtt.65.2023.10.02.12.19.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 12:16:15 -0700 (PDT)
-Message-ID: <4351a85a-ab53-acf8-9e80-e65b2ebfab66@gmail.com>
-Date: Mon, 2 Oct 2023 12:16:12 -0700
+        Mon, 02 Oct 2023 12:20:00 -0700 (PDT)
+Message-ID: <5293ccd0-cb88-a196-fa26-aa6fe1e3a52a@gmail.com>
+Date: Mon, 2 Oct 2023 12:19:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,8 +64,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
-Subject: Re: [RFC PATCH v2 net-next 01/15] phy: introduce phy_get_status() and
- use it to report CDR lock
+Subject: Re: [RFC PATCH v2 net-next 02/15] phy: introduce the PHY_MODE_ETHTOOL
+ mode for phy_set_mode_ext()
 Content-Language: en-US
 To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -80,9 +80,9 @@ Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Maxime Chevallier <maxime.chevallier@bootlin.com>,
  Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>
 References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
- <20230923134904.3627402-2-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-3-vladimir.oltean@nxp.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20230923134904.3627402-2-vladimir.oltean@nxp.com>
+In-Reply-To: <20230923134904.3627402-3-vladimir.oltean@nxp.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -93,32 +93,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 9/23/23 06:48, Vladimir Oltean wrote:
-> Some modules, like the MTIP AN/LT block used as a copper backplane PHY
-> driver, need this extra information from the SerDes PHY as another
-> source of "link up" information.
+> In networking, we have 2 distinct data types:
 > 
-> Namely, the 25GBase-R PCS does not have a MDIO_CTRL1_LPOWER bit
-> implemented in its MDIO_MMD_PCS:MDIO_CTRL1 register. That bit is
-> typically set from phy_suspend() or phylink_pcs_disable() implementations,
-> and that is supposed to cause a link drop event on the link partner.
-> But here it does not happen.
+> - phy_interface_t describes the link between a MAC (or MAC-side PCS) and
+>    an attached PHY or SFP cage
 > 
-> By implementing the networking phylink_pcs_disable() as phy_power_off(),
-> we are able to actually power down the lane in a way that is visible to
-> the remote end. Where it is visible is the CDR lock, so we introduce
-> PHY_STATUS_TYPE_CDR_LOCK as an extra link indication, we are able to
-> detect that condition and signal it to upper layers of the network
-> stack.
+> - enum ethtool_link_mode_bit_indices describes the link between a local
+>    PHY and a remote PHY (for example, gigabit RJ45 twisted copper pairs)
 > 
-> A more high-level and generic phy_get_status() operation was chosen
-> instead of the more specific phy_get_cdr_lock() alternative, because I
-> saw this as being more in the spirit of the generic PHY API.
-> Also, phy_get_status() is more extensible and reusable for other
-> purposes as well.
+> Currently, phy_set_mode_ext(PHY_MODE_ETHERNET) takes arguments of the
+> phy_interface_t type, and there is no way to pass an argument of the
+> enum ethtool_link_mode_bit_indices type. The new PHY_MODE_ETHTOOL
+> intends to address that.
+> 
+> It is true that there is currently some overlap between these data
+> types, namely:
+> 
+>   phy_interface_t                enum ethtool_link_mode_bit_indices
+>   -----------------------------------------------------------------
+>   PHY_INTERFACE_MODE_10GKR       ETHTOOL_LINK_MODE_10000baseKR_Full_BIT
+>   PHY_INTERFACE_MODE_1000BASEKX  ETHTOOL_LINK_MODE_1000baseKX_Full_BIT
+> 
+> but those overlaps were deemed to be mistakes, and PHY-to-PHY link modes
+> should only be added to ethtool_link_mode_bit_indices going forward.
+> Thus, I believe that the distinction is necessary, rather than hacking
+> more improper PHY modes. Some of the PHY-to-PHY link modes which may be
+> added in the future (to ethtool_link_mode_bit_indices and not to
+> phy_interface_t) are:
+> 
+> 	ETHTOOL_LINK_MODE_100000baseKP4_Full_BIT
+> 	ETHTOOL_LINK_MODE_100000baseCR10_Full_BIT
+> 	ETHTOOL_LINK_MODE_25000baseKR_S_Full_BIT
+> 	ETHTOOL_LINK_MODE_25000baseCR_S_Full_BIT
+> 
+> One user of PHY_MODE_ETHTOOL will be the MTIP backplane AN/LT + Lynx
+> SerDes PHY combo, where the backplane autoneg protocol (IEEE 802.3
+> clause 73) selects the operating PHY-to-PHY link mode.
+> 
+> There are electrical differences between the PHY-to-PHY backplane link
+> modes (like ETHTOOL_LINK_MODE_10000baseKR_Full_BIT) and their
+> non-backplane counterparts (like PHY_INTERFACE_MODE_10GBASER), namely
+> the number of TX signal equalization taps and their configurability.
+> This further justifies distinguishing between them in the generic PHY
+> API.
 > 
 > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+> v1->v2: rename PHY_MODE_ETHERNET_PHY to PHY_MODE_ETHTOOL at Russell's
+> suggestion
+> 
+>   include/linux/phy/phy.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/phy/phy.h b/include/linux/phy/phy.h
+> index 6be348f1fa0e..72ef4afcda81 100644
+> --- a/include/linux/phy/phy.h
+> +++ b/include/linux/phy/phy.h
+> @@ -39,6 +39,7 @@ enum phy_mode {
+>   	PHY_MODE_UFS_HS_B,
+>   	PHY_MODE_PCIE,
+>   	PHY_MODE_ETHERNET,
+> +	PHY_MODE_ETHTOOL,
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Not feeling very comfortable with using ETHTOOL here because that is a 
+Linux sub-subsystem name as opposed to the other enumeration values 
+which are electrical modes of operation and/or industry standards names.
+
+How about PHY_MODE_ETHERNET_EXPLICIT or PHY_MODE_ETHERNET_LINKMODE?
 -- 
 Florian
 
