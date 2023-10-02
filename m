@@ -1,80 +1,91 @@
-Return-Path: <netdev+bounces-37382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E977B52C4
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:13:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 949D07B52C5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 89F8CB20A82
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:13:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 38AA62840B0
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2090315EBC;
-	Mon,  2 Oct 2023 12:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCBF171B5;
+	Mon,  2 Oct 2023 12:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948DC10A0E
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:13:28 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29ECA2712
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:11:49 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3215f19a13aso16366402f8f.3
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:11:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0397171C6
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:13:31 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D7A170E
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:13:15 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4064876e8b8so63871235e9.0
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696248707; x=1696853507; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L5LdkWS0biIIZvELj2EpRuPnpaaDaxnemHE3/PgKWBM=;
-        b=fnhfXZF3Cx357hbaIwJ48dOaZr8STuFEBTvTJGNL7bQ2alqkGRd7fN+ABc4G1xMltc
-         QkLTrUYuTkJ9dnPYdtul99+8HGb5VAzNwQUej0d3cwgYSyR/CK7qCNkb8FBBVVj0mC1V
-         EshkfH3045usvitGQDGU/dzhluYNBFEcMy/WTeRI4XAqPBRkyvCAP3w0NeqtQ6zQMX9t
-         JkfKMWyq8nKExSJYwAfQCYnYCaEILdDBj839fROUwhH65EKhK7ZWkIE1CZ4nNaguutiN
-         AeRpwSm8Aitc9ZR3MBgmkHRyCUdfbOaVD5MsMC9ZODSFgV/530SF6hJQ6GbrpS021EiS
-         BSCg==
+        d=gmail.com; s=20230601; t=1696248793; x=1696853593; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2E6zLEbuF7yCYO5lVzEIKhDg6ftS0hm22ODHgX+gy94=;
+        b=HwpCEUyF9/f8ED4gEG36XbpvSEp7nrsgnsIk5E5noDJkbQUUgPIMnMoTEcyx1gEyLj
+         lvfX0Q7kVE+nRiJC1a+NdxO2W//G9AAUfd7w4wcLGRsfwiWpVOTQXfxBz2nkkaF/m9Az
+         dKiNb0Anvb2PZtJ/gkB9ii6MvDCIxA2hLFPSbHwuGIqlmcfJdpVOoMi8EzGWZYGrpshr
+         DuZm5qGLmba2Tv5UMfbn2tELhD+zW2XZbEu4Nt66EC2H9FA+4V16ZlEEsIlBxEI2gEG6
+         WB8g8vANmFYs9hcEVMEVUtserGDMSmYQV7wjEanf+fhbi/ZVlfMzAr0skCpWW3fZn5nH
+         qPxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696248707; x=1696853507;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
+        d=1e100.net; s=20230601; t=1696248793; x=1696853593;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L5LdkWS0biIIZvELj2EpRuPnpaaDaxnemHE3/PgKWBM=;
-        b=k/ZLjnv2XiXpqPq46Yx8EjjSVxoYxfx+NEJ9FcC1B7F957jpYmzIgWWKdzvTJs1Owy
-         NUECE8NjJIPuOwKhrys9fdZtmdNkm3zBtf+0Y+Bce0lXAd+74z+1q0oEng3twgCb/iPw
-         30nvGeKVkpqK+iga2oARPGTuiHnyqIyx70yofGM+Jx4TpLRF1rwKZTVm4+Tw+4a8+eIP
-         g9Fo2gvpAWqsPA5rC2GRvdF3PohUdl6kADaBe4+HUZlgTrC0vpsXpn0dC0z2BLzbGCz/
-         Q9XFcpkTu3TZgAb+E0KMYZKsEwmgimIxkK9zxYdEzyz1QdJAPd6c4W5qwYKmnzbsto1H
-         8VHA==
-X-Gm-Message-State: AOJu0YyEaO4qBf/Rjgg/m99cbCxlZImqSHo0BbmIxVUkFRdXzYSAxAmt
-	yx3QtySKyHOG62zLAmcpBcl8k//QTqY=
-X-Google-Smtp-Source: AGHT+IGQy10hgw71Q836S7WNS1QP33zHBDM3xe5wiZDGRMiVp5zkUrtMTZ40MJ47576tW4lOysEcCQ==
-X-Received: by 2002:a5d:6401:0:b0:320:938:300e with SMTP id z1-20020a5d6401000000b003200938300emr9204405wru.4.1696248707216;
-        Mon, 02 Oct 2023 05:11:47 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id g16-20020adfa490000000b003232380ffd5sm20035808wrb.106.2023.10.02.05.11.46
+        bh=2E6zLEbuF7yCYO5lVzEIKhDg6ftS0hm22ODHgX+gy94=;
+        b=EIpPycdLQEunbl3P8ad0b0QZ3ONcVaAB+qivGnptiqPqcpuALIxm099kuBx3yHR+FF
+         dV6DblpkX8LgtDH5sBYM/FGMP80mM7BXX2x/J63YDiS9BMMnr7/HQsfOILS+Dk/obTm/
+         oxxYkOjbUON8KPKcc58fFaFZ2NB6wsgQMvU79c2fZHt5DJYIWWEa3CeY4nB5LGEGBarH
+         I6MwH4PRsgbjmb/pLcnJxoQPTyTBN5NICO1Ccm2kaDR3rLOsLne5zCT7c1oRTiBLLqu0
+         36V22KpO8Z8tM+x7iE1n77nZ6tE1e6BHdbeNvQRqGZnEzSN6yqnqlExjMvWb+OHdWS6Y
+         l0XA==
+X-Gm-Message-State: AOJu0Ywm4G1tuqln4wyv3XZge1AZ4gDw4qSnRimq/OVuzjfngecql39O
+	hcT1dF34NC8yd62U7XJeOCMmWzKAY2s=
+X-Google-Smtp-Source: AGHT+IFp1Xc9/Fbjdtm4E3BmNvGZScZxOXiOhKPiPeTONM4tOtoU1f33SYztuOWZqoZLSsQ+J8SOvg==
+X-Received: by 2002:a05:600c:2284:b0:403:e21:1355 with SMTP id 4-20020a05600c228400b004030e211355mr9436757wmf.36.1696248792966;
+        Mon, 02 Oct 2023 05:13:12 -0700 (PDT)
+Received: from localhost ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id o14-20020a05600c4fce00b00405d9a950a2sm6827308wmq.28.2023.10.02.05.13.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 05:11:46 -0700 (PDT)
-Message-ID: <651ab382.df0a0220.e74df.fc51@mx.google.com>
-X-Google-Original-Message-ID: <ZRqzf3VVMjq1ZFAG@Ansuel-xps.>
-Date: Mon, 2 Oct 2023 14:11:43 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: dsa: qca8k: fix potential MDIO bus conflict
- when accessing internal PHYs via management frames
-References: <20231002104612.21898-1-kabel@kernel.org>
- <20231002104612.21898-3-kabel@kernel.org>
+        Mon, 02 Oct 2023 05:13:12 -0700 (PDT)
+Date: Mon, 2 Oct 2023 13:13:10 +0100
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
+	sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
+	mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+	saeedm@nvidia.com, leon@kernel.org
+Subject: Re: [PATCH v4 net-next 5/7] net: ethtool: add an extack parameter to
+ new rxfh_context APIs
+Message-ID: <20231002121310.GE21694@gmail.com>
+Mail-Followup-To: edward.cree@amd.com, linux-net-drivers@amd.com,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, Edward Cree <ecree.xilinx@gmail.com>,
+	netdev@vger.kernel.org, sudheer.mogilappagari@intel.com,
+	jdamato@fastly.com, andrew@lunn.ch, mw@semihalf.com,
+	linux@armlinux.org.uk, sgoutham@marvell.com, gakula@marvell.com,
+	sbhatta@marvell.com, hkelam@marvell.com, saeedm@nvidia.com,
+	leon@kernel.org
+References: <cover.1695838185.git.ecree.xilinx@gmail.com>
+ <63183b19786e2a97dfe55ed31313ede1a50427fc.1695838185.git.ecree.xilinx@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231002104612.21898-3-kabel@kernel.org>
+In-Reply-To: <63183b19786e2a97dfe55ed31313ede1a50427fc.1695838185.git.ecree.xilinx@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -82,132 +93,84 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 12:46:12PM +0200, Marek Behún wrote:
-> Besides the QCA8337 switch the Turris 1.x device has on it's MDIO bus
-> also Micron ethernet PHY (dedicated to the WAN port).
+On Wed, Sep 27, 2023 at 07:13:36PM +0100, edward.cree@amd.com wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
 > 
-> We've been experiencing a strange behavior of the WAN ethernet
-> interface, wherein the WAN PHY started timing out the MDIO accesses, for
-> example when the interface was brought down and then back up.
+> Currently passed as NULL, but will allow drivers to report back errors
+>  when ethnl support for these ops is added.
 > 
-> Bisecting led to commit 2cd548566384 ("net: dsa: qca8k: add support for
-> phy read/write with mgmt Ethernet"), which added support to access the
-> QCA8337 switch's internal PHYs via management ethernet frames.
-> 
-> Connecting the MDIO bus pins onto an oscilloscope, I was able to see
-> that the MDIO bus was active whenever a request to read/write an
-> internal PHY register was done via an management ethernet frame.
-> 
-> My theory is that when the switch core always communicates with the
-> internal PHYs via the MDIO bus, even when externally we request the
-> access via ethernet. This MDIO bus is the same one via which the switch
-> and internal PHYs are accessible to the board, and the board may have
-> other devices connected on this bus. An ASCII illustration may give more
-> insight:
-> 
->            +---------+
->       +----|         |
->       |    | WAN PHY |
->       | +--|         |
->       | |  +---------+
->       | |
->       | |  +----------------------------------+
->       | |  | QCA8337                          |
-> MDC   | |  |                        +-------+ |
-> ------o-+--|--------o------------o--|       | |
-> MDIO    |  |        |            |  | PHY 1 |-|--to RJ45
-> --------o--|---o----+---------o--+--|       | |
->            |   |    |         |  |  +-------+ |
-> 	   | +-------------+  |  o--|       | |
-> 	   | | MDIO MDC    |  |  |  | PHY 2 |-|--to RJ45
-> eth1	   | |             |  o--+--|       | |
-> -----------|-|port0        |  |  |  +-------+ |
->            | |             |  |  o--|       | |
-> 	   | | switch core |  |  |  | PHY 3 |-|--to RJ45
->            | +-------------+  o--+--|       | |
-> 	   |                  |  |  +-------+ |
-> 	   |                  |  o--|  ...  | |
-> 	   +----------------------------------+
-> 
-> When we send a request to read an internal PHY register via an ethernet
-> management frame via eth1, the switch core receives the ethernet frame
-> on port 0 and then communicates with the internal PHY via MDIO. At this
-> time, other potential devices, such as the WAN PHY on Turris 1.x, cannot
-> use the MDIO bus, since it may cause a bus conflict.
-> 
-> Fix this issue by locking the MDIO bus even when we are accessing the
-> PHY registers via ethernet management frames.
-> 
-> Fixes: 2cd548566384 ("net: dsa: qca8k: add support for phy read/write with mgmt Ethernet")
-> Signed-off-by: Marek Behún <kabel@kernel.org>
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 
-Just some comments (micro-optimization) and one question.
-
-Wonder if the extra lock would result in a bit of overhead for simple
-implementation where the switch is the only thing connected to the MDIO.
-
-It's just an idea and probably not even something to consider (since
-probably the overhead is so little that it's not worth it)
-
-But we might consider to add some logic in the MDIO setup function to
-check if the MDIO have other PHY connected and enable this lock (and
-make this optional with an if and a bool like require_mdio_locking)
-
-If we don't account for this, yes the lock should have been there from
-the start and this is correct. (we can make it optional only in the case
-where only the switch is connected as it would be the only user and
-everything is already locked by the eth_mgmt lock)
+Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 
 > ---
->  drivers/net/dsa/qca/qca8k-8xxx.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
+>  include/linux/ethtool.h | 9 ++++++---
+>  net/core/dev.c          | 3 ++-
+>  net/ethtool/ioctl.c     | 9 ++++++---
+>  3 files changed, 14 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index d2df30640269..4ce68e655a63 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -666,6 +666,15 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
->  		goto err_read_skb;
->  	}
->  
-> +	/* It seems that accessing the switch's internal PHYs via management
-> +	 * packets still uses the MDIO bus within the switch internally, and
-> +	 * these accesses can conflict with external MDIO accesses to other
-> +	 * devices on the MDIO bus.
-> +	 * We therefore need to lock the MDIO bus onto which the switch is
-> +	 * connected.
-> +	 */
-> +	mutex_lock(&priv->bus->mdio_lock);
-> +
-
-Please move this down before the first dev_queue_xmit. (we can save a
-few cycle where locking is not needed)
-
-Also should we use mutex_lock_nested?
-
->  	/* Actually start the request:
->  	 * 1. Send mdio master packet
->  	 * 2. Busy Wait for mdio master command
-> @@ -678,6 +687,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
->  	mgmt_master = priv->mgmt_master;
->  	if (!mgmt_master) {
->  		mutex_unlock(&mgmt_eth_data->mutex);
-> +		mutex_unlock(&priv->bus->mdio_lock);
->  		ret = -EINVAL;
->  		goto err_mgmt_master;
->  	}
-> @@ -765,6 +775,7 @@ qca8k_phy_eth_command(struct qca8k_priv *priv, bool read, int phy,
->  				    QCA8K_ETHERNET_TIMEOUT);
->  
->  	mutex_unlock(&mgmt_eth_data->mutex);
-> +	mutex_unlock(&priv->bus->mdio_lock);
->  
->  	return ret;
->  
-> -- 
-> 2.41.0
-> 
-
--- 
-	Ansuel
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 975fda7218f8..c8963bde9289 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -927,14 +927,17 @@ struct ethtool_ops {
+>  	int	(*create_rxfh_context)(struct net_device *,
+>  				       struct ethtool_rxfh_context *ctx,
+>  				       const u32 *indir, const u8 *key,
+> -				       const u8 hfunc, u32 rss_context);
+> +				       const u8 hfunc, u32 rss_context,
+> +				       struct netlink_ext_ack *extack);
+>  	int	(*modify_rxfh_context)(struct net_device *,
+>  				       struct ethtool_rxfh_context *ctx,
+>  				       const u32 *indir, const u8 *key,
+> -				       const u8 hfunc, u32 rss_context);
+> +				       const u8 hfunc, u32 rss_context,
+> +				       struct netlink_ext_ack *extack);
+>  	int	(*remove_rxfh_context)(struct net_device *,
+>  				       struct ethtool_rxfh_context *ctx,
+> -				       u32 rss_context);
+> +				       u32 rss_context,
+> +				       struct netlink_ext_ack *extack);
+>  	int	(*set_rxfh_context)(struct net_device *, const u32 *indir,
+>  				    const u8 *key, const u8 hfunc,
+>  				    u32 *rss_context, bool delete);
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 637218adca22..69579d9cd7ba 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10892,7 +10892,8 @@ static void netdev_rss_contexts_free(struct net_device *dev)
+>  			xa_erase(&dev->ethtool->rss_ctx, context);
+>  			if (dev->ethtool_ops->create_rxfh_context)
+>  				dev->ethtool_ops->remove_rxfh_context(dev, ctx,
+> -								      context);
+> +								      context,
+> +								      NULL);
+>  			else
+>  				dev->ethtool_ops->set_rxfh_context(dev, indir,
+>  								   key,
+> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+> index c23d2bd3cd2a..3920ddee3ee2 100644
+> --- a/net/ethtool/ioctl.c
+> +++ b/net/ethtool/ioctl.c
+> @@ -1381,14 +1381,17 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+>  			if (create)
+>  				ret = ops->create_rxfh_context(dev, ctx, indir,
+>  							       hkey, rxfh.hfunc,
+> -							       rxfh.rss_context);
+> +							       rxfh.rss_context,
+> +							       NULL);
+>  			else if (delete)
+>  				ret = ops->remove_rxfh_context(dev, ctx,
+> -							       rxfh.rss_context);
+> +							       rxfh.rss_context,
+> +							       NULL);
+>  			else
+>  				ret = ops->modify_rxfh_context(dev, ctx, indir,
+>  							       hkey, rxfh.hfunc,
+> -							       rxfh.rss_context);
+> +							       rxfh.rss_context,
+> +							       NULL);
+>  		} else {
+>  			ret = ops->set_rxfh_context(dev, indir, hkey,
+>  						    rxfh.hfunc,
 
