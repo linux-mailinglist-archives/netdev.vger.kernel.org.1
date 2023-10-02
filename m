@@ -1,202 +1,250 @@
-Return-Path: <netdev+bounces-37384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52D4E7B52CA
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:17:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 330817B52D3
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:20:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BEF3A282490
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:17:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D216D282966
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3BB3171A5;
-	Mon,  2 Oct 2023 12:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AE3171C9;
+	Mon,  2 Oct 2023 12:20:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D455216419
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:16:57 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C9094
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:16:54 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-40651a726acso41918975e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:16:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696249013; x=1696853813; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XVIYb8iR+IY1Vy1V/SixchvXPhBPU7v4GTxW9ZyB4CY=;
-        b=PGVxXK1sOCkjz/tl/aDYwhertyJ3QHBEX8ZeJe4gggvUmc8oFFO/k7N3zyvNROh0k0
-         O4oLj+jn7sBoKB1/9+FnQd/tkTyTSai77d1Uxw8afWUiIT+UXY5TTQqCahfeQzHmQw0Y
-         406vvCKNvpaVurKT1+8KAvhT0yJkOkGJqwbHUrnO6WyEzfD/wcLumgYD0rcguWw110ml
-         9VPFk1srHnE4981MqpdYhTDrUwnV3+0TrElxbpZSaO0Vr5GytbhO8UbWCwaL4HhIKWR0
-         mdHZlPSgz6jBd1q9nxunAXHcId0KZM3lZvufTPoitWGUmX8vjZNXEVxD34kihi0OvWCV
-         3H4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696249013; x=1696853813;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XVIYb8iR+IY1Vy1V/SixchvXPhBPU7v4GTxW9ZyB4CY=;
-        b=HJgXJqqqBhkovZAjcKxmJ0FJgtKGADagJw55Lkm4lA1AEoYueACskGkq3g9zLP/cZp
-         MLd1w/HUa8i3klaLQ1hEOS+j+Wcjiy7kMjESoDwa/pfha/UV4A0b7F8OnjifrfUlLj9o
-         LZReAldeV7oQF92WN4WM66ivvJlrWeJylqaUNslhCkPft+AS0n44F7nuFk3HM0ku3yBQ
-         ZXHy0gK6PTaoKV9IEVEloRXcQh9N0EKFIiiH8M0Kag3KTRstHBGHn5IZia4+K8sZTO9c
-         va5bmWSAzfNtdvEgCUsJWq5u23eqDWNNfkzIC7hpqXkDm6Q0FtJMl5gpAJ7P3QG9xCfG
-         +/5A==
-X-Gm-Message-State: AOJu0YykQ1i2Vy/EOdvg0Q6b5k7fwJX5jhNB2Ohd5oBFFc/60M8l8Q2J
-	YF7avlX4iqVTROULNJS0ZuU=
-X-Google-Smtp-Source: AGHT+IH+RXHNieBq5ENXvLGDVRBtmggyvpGCnvDeQNj4DBb19BHnniOaShNIY2AwO+guHV55ICDdHw==
-X-Received: by 2002:a05:600c:2318:b0:401:be77:9a50 with SMTP id 24-20020a05600c231800b00401be779a50mr9373938wmo.8.1696249012415;
-        Mon, 02 Oct 2023 05:16:52 -0700 (PDT)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id d4-20020a05600c34c400b003feea62440bsm7232984wmq.43.2023.10.02.05.16.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 05:16:51 -0700 (PDT)
-Date: Mon, 2 Oct 2023 13:16:50 +0100
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
-	sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
-	mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
-	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-	saeedm@nvidia.com, leon@kernel.org
-Subject: Re: [PATCH v4 net-next 6/7] net: ethtool: add a mutex protecting RSS
- contexts
-Message-ID: <20231002121650.GF21694@gmail.com>
-Mail-Followup-To: edward.cree@amd.com, linux-net-drivers@amd.com,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, Edward Cree <ecree.xilinx@gmail.com>,
-	netdev@vger.kernel.org, sudheer.mogilappagari@intel.com,
-	jdamato@fastly.com, andrew@lunn.ch, mw@semihalf.com,
-	linux@armlinux.org.uk, sgoutham@marvell.com, gakula@marvell.com,
-	sbhatta@marvell.com, hkelam@marvell.com, saeedm@nvidia.com,
-	leon@kernel.org
-References: <cover.1695838185.git.ecree.xilinx@gmail.com>
- <b5d7b8e243178d63643c8efc1f1c48b3b2468dc7.1695838185.git.ecree.xilinx@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7E914013;
+	Mon,  2 Oct 2023 12:20:07 +0000 (UTC)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2041.outbound.protection.outlook.com [40.107.247.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C381A6;
+	Mon,  2 Oct 2023 05:20:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MZ5WKLGWSRBXS81TfAUVuXl/zFabk5FkamKkWLoJu39HyImNTEvvxu/ELLEkFfFqd4fRvYj/RMXMnh1WWMb7jYTAHnAAn9amX3gq/6e+UqeNXNV2VQIkTCSVq/1cgnNW49uq6cnKhgkfzyXj0wy3iXQNTkBLq/8x5L8gVyOsZPXlWSVSMFifFUoPu3t4sQ24P5ULPK9dV38waruIJlPx3jaOa1YbHAU0EUldIC0uzD1Jl6S9bPKIb5jgRtSx/0XTpDYU+VZvknUjlM4hlmn1nQatGyIrDIXuGNYM6b+sFvWD3erz61hcVEnxwOlE35B2MMhIU+aim3DxWGzSVgElkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tm/E32g4VeGrCiJUg+ljpLYx/zJ8JRqy+HCXMQvavMM=;
+ b=KAOqDSDVQTz0J6oK5wWM3fB12P2wkiGgoWbfs6PX83JnGKUxgsgPfT5OgRMt1FKq1PDV6bOc/Awo/2q+q0MxmUxRTI2tEW/sBSvOM41FW5NGGF8AI/2Zb8B2PQCS1mUCle1dixHC3ZXo0w+rHM8ZNzK5fbnKEqlR/CxPJ2YyXyPBpfs07NkrknUk9UCdDtE/ua+M5SXw23qKe8UKXzsKbOxvm/2nhUjvdKH20spu8HhpjFIy9Q72g1Tk5wot3ScT0njSEruOWPseLifK5Pekn9RHGmv88z2t1VTYFLzzU233YGLZLwTkAnmkf5E16JxqRCQicE64kOzqCwQmdzvcmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tm/E32g4VeGrCiJUg+ljpLYx/zJ8JRqy+HCXMQvavMM=;
+ b=k1+8gbVELyed1CCyO4LMQilbc2DAKEO64ZsfaJDuMA2pdJ3pm42M2WCF3sus2derGWr9Dl/MmL+wrUyPTDszOqeqMxD/d0bGZ/Dkfdx0O0TLXMlH26v2S0mbP8tGE+5b0OM1BAqlb6IJnty6LIf9kwvPpkv2vYxG6fv5wy9zdw4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by VI1PR04MB7101.eurprd04.prod.outlook.com (2603:10a6:800:12e::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.31; Mon, 2 Oct
+ 2023 12:20:02 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6838.024; Mon, 2 Oct 2023
+ 12:20:02 +0000
+Date: Mon, 2 Oct 2023 15:19:58 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH v2 net-next 13/15] dt-bindings: lynx-pcs: add
+ properties for backplane mode
+Message-ID: <20231002121958.xybzovgjzldfiae2@skbuf>
+References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-14-vladimir.oltean@nxp.com>
+ <c31577ee-9d81-212b-42a6-e72a648f9276@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c31577ee-9d81-212b-42a6-e72a648f9276@linaro.org>
+X-ClientProxiedBy: VI1P191CA0002.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:800:1ba::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b5d7b8e243178d63643c8efc1f1c48b3b2468dc7.1695838185.git.ecree.xilinx@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB7101:EE_
+X-MS-Office365-Filtering-Correlation-Id: ccd1c36e-81dd-415b-11d8-08dbc341e750
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+ Hp/eCWED2lva4GhMfHH9RkoO2ckKRu5YY7CApPO3x2qBlbvn2Ad2RXjH+0UlwYmbRrIa9PdPaj0W3e9TRn087fpW8CRekApC9XuYI61xHfsxKpivVpwAkGXQxdQUjgdADs/6okX0n9cXaDQoeUbZlPH36mGqZQMfdaXq6aKUPQmmrd7A6/c/Pt7DDT9yDIsU3ArNwPVfTXIH0yY7yBaZuxAFeVwuAPcRjW7BgN/bqHXUp4vfai2Qtr+pzbKOu3gaxVMqLMZQwZuU2jnONbaWdwZWOmlCsabVCmcBS3UGnrMTnHC1QCuLTQ6NBNi3eJHHSEHkp2PC8MM5GN/Uyff3uQ2RdlZJXsT4FZJCAJ8eOb4XAFruVOfcKdjyNpmrUFrCiEYryPwFymGtLM4nKUsI7s5IOfs27rPQpahl4CxlXFajrm88TfLUzjQESvEsfmshkr3Xs0Nv4EcacwKN7LFj0I1UJPx/TLi/RwyC/ZwqIS68DQn/D6P2gC7iENlafEHLZ0HjtBkgyEJN7Zh2iHnE34tdmd0PE3ttZ06PPBYF7j70qpwEYkCAqfCaPn+rndTF
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(346002)(396003)(366004)(376002)(39860400002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(66476007)(66556008)(6916009)(54906003)(316002)(66946007)(2906002)(478600001)(5660300002)(6486002)(6506007)(6512007)(44832011)(4326008)(26005)(1076003)(53546011)(6666004)(8676002)(8936002)(7416002)(83380400001)(9686003)(41300700001)(38100700002)(86362001)(33716001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?uMOmhOswINyfEkemyJIlM3Vu8e5/8vwDHbB1bQt5v919fHGJE+01krCG6XCw?=
+ =?us-ascii?Q?L95aNmaq8ivYO1Rs59S94/abVcoYuI2444AHvpxBk014+zCOsydBpw1bT0tz?=
+ =?us-ascii?Q?7gw5bBIL7alu3ktgNaTlITPXbCLRgO17C3crjqJPAIufJzIu2Bp/GczkE94C?=
+ =?us-ascii?Q?2Oot7X8GLTnhedwSKWRKY/11wzRXBfLpMgnMQntplThjP1wf3PzlxUOkPRJH?=
+ =?us-ascii?Q?ykxrvclyaPBz3FHH/OZqwAvWmpp3LWo/nJi7T++HDveZusV5qq4Pg8/AKCmp?=
+ =?us-ascii?Q?cY1YCR6p1IvdZIc/o5dFkCRX2iPauYGa9Ngs4ffdKht1LmdweAxt70vILfKs?=
+ =?us-ascii?Q?U7psew9Z0eOVu16b1VhUbq2ZFhanfgUVAHrQIez8RvDXGPNx3Zdm9ajGLevo?=
+ =?us-ascii?Q?iWjcNbMoNCMxRckI9JhNu1JDT/lCqn4LG4fJzUMtdRcYu7WvfB2EWiCgrd0k?=
+ =?us-ascii?Q?y6Oi3b8z9ioXNX+RKuHHopmYW3VE04wcwdtiKRaeM6TrHnivtbUuByb4mxtT?=
+ =?us-ascii?Q?HZ54uaQiy63eZmg8R0JBquLSbpZgbsdmruDdw0e3NuxA7rdAK0INomImVBfJ?=
+ =?us-ascii?Q?XkbJtjLbqngBg95A8a+7szWhhytRQpB4s5+CtrTagUx1015hTvhyzzHMRCSg?=
+ =?us-ascii?Q?pQVmAPDn/iw9emuHfCUMNcp0AcZgBLEIObfCg3SDZZYPerlWGrBmlw17vTA+?=
+ =?us-ascii?Q?oGQjXiSH2qE6mnadFt0FmZ2sWDvhPSo3VxfRnLquEVJ/fWWmNrITH03wkIfi?=
+ =?us-ascii?Q?hb/4eX3eGS4uSd1Ay+5jRCin7QvZQgUjULhBGhIYeaU82zx7loxd+V0sEORl?=
+ =?us-ascii?Q?YcUwUmVG4tmxUB9vAo4F7pBpA0hbPmoaHBT5aUx5QobQGUNmMIRabet6hWM5?=
+ =?us-ascii?Q?G6tUAj4VMaesrFRluWrZ2sy28R+G19ErQKVgow6bOx+2bTY/pB47dWxNQGWi?=
+ =?us-ascii?Q?Si7X7ScIXm4sdCPT0u+GlOfXYwmwPzWcGCtIwKYVzeU9KUxFwfrADejaYSTy?=
+ =?us-ascii?Q?xlIhh9BeE2GwUZ/GTaQ9n97N8D5RhyTRa+ixENLph1psiSP6F4cN8Pcy6hfp?=
+ =?us-ascii?Q?MkcubsBr8NxWAsxbZqjutXKY9xQLt40t1CHfuixSsmkTzJGwmaTUJkpNjOs+?=
+ =?us-ascii?Q?y/vmbsR0kanIVvsQxdIjWg9Ed3d+pzrtfnf8wGqqDpYwfkSNbrQpi6Gw+nZH?=
+ =?us-ascii?Q?hZ5BL2z0cyck21lVlSmDYv8UMEI1VYB9kj2mfyXKmHyJC3bm7ysJvvhwr/YY?=
+ =?us-ascii?Q?ps4TfBp1G3uDVni8+Uo9Q/tXTnAkUNRlZX+YDZ46PXBU18K7Kh+l4PVOygt4?=
+ =?us-ascii?Q?2IYLa8XGxBllD1YICSPfytjiUbaTzMNjWDvIk9LupjlnnsD4lhucl/P39KOc?=
+ =?us-ascii?Q?8nyGC1QEWLtR5QglASrJoWXFwONKRNMeWg+Z1cInqT5EJJAvBk9SarBYFqyH?=
+ =?us-ascii?Q?5EyTb+NvjRKX0v60/uvK9DNKEnsCNT82Ow3vpfhigpMgpcBaT3CKAbqUY6Z8?=
+ =?us-ascii?Q?VGn4ucL61mzH0KBEE3ZlmQjbwqWNIMyEerS9oCSo+dI3uWVMeBba8LhQt3gT?=
+ =?us-ascii?Q?Ux+VRIheeEj+a+z+rElIxya1TGqXv32xig8GLpO6prb5mb7CLbWGolb/QKt9?=
+ =?us-ascii?Q?Ig=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ccd1c36e-81dd-415b-11d8-08dbc341e750
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 12:20:02.6112
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XsMwtm+fyOwgxFxVT7rxnt3MiP1Q8bTEYVYZn1ItLFO6E45xH6LMaFV/ejl9R0dBIglniwIFdEsgwx1NapI+1g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7101
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 07:13:37PM +0100, edward.cree@amd.com wrote:
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> While this is not needed to serialise the ethtool entry points (which
->  are all under RTNL), drivers may have cause to asynchronously access
->  dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
->  do this safely without needing to take the RTNL.
-> 
-> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+Hi Krzysztof,
 
-Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
-
-> ---
->  include/linux/ethtool.h | 3 +++
->  net/core/dev.c          | 5 +++++
->  net/ethtool/ioctl.c     | 7 +++++++
->  3 files changed, 15 insertions(+)
+On Sun, Sep 24, 2023 at 01:49:24PM +0200, Krzysztof Kozlowski wrote:
+> On 23/09/2023 15:49, Vladimir Oltean wrote:
+> > When the Lynx PCS is deployed on a copper backplane link, it must be
+> > prepared to handle clause 73 autoneg and clause 72 link training, which
+> > it can do using a dedicated AN/LT block. The latter doesn't need to be
+> > described in the device tree, because it is discoverable from the SerDes
+> > lanes.
+> > 
+> > The media type that is deployed on the link is not discoverable though,
+> > so the introduction of a fsl,backplane-mode boolean property appears
+> > necessary to determine whether the AN/LT block should be employed, or
+> > left bypassed.
+> > 
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > ---
+> > v1->v2: patch is new
+> > 
+> >  .../devicetree/bindings/net/pcs/fsl,lynx-pcs.yaml | 15 ++++++++++++++-
+> >  1 file changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/pcs/fsl,lynx-pcs.yaml b/Documentation/devicetree/bindings/net/pcs/fsl,lynx-pcs.yaml
+> > index fbedf696c555..40fbcd80ee2a 100644
+> > --- a/Documentation/devicetree/bindings/net/pcs/fsl,lynx-pcs.yaml
+> > +++ b/Documentation/devicetree/bindings/net/pcs/fsl,lynx-pcs.yaml
+> > @@ -16,11 +16,24 @@ description: |
+> >  
+> >  properties:
+> >    compatible:
+> > -    const: fsl,lynx-pcs
+> > +    enum:
+> > +      - fsl,lx2160a-lynx-pcs
+> > +      - fsl,lynx-pcs
+> >  
+> >    reg:
+> >      maxItems: 1
+> >  
+> > +  phys:
+> > +    maxItems: 4
+> > +    description:
+> > +      phandle for the SerDes lanes that act as PMA/PMD layer when the PCS is
+> > +      part of a copper backplane PHY.
+> > +
+> > +  fsl,backplane-mode:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      Indicates that the PCS is deployed over a copper backplane link.
+> > +
 > 
-> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> index c8963bde9289..d15a21bd6f12 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -1026,11 +1026,14 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
->  /**
->   * struct ethtool_netdev_state - per-netdevice state for ethtool features
->   * @rss_ctx:		XArray of custom RSS contexts
-> + * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
-> + *			within RTNL.
->   * @rss_ctx_max_id:	maximum (exclusive) supported RSS context ID
->   * @wol_enabled:	Wake-on-LAN is enabled
->   */
->  struct ethtool_netdev_state {
->  	struct xarray		rss_ctx;
-> +	struct mutex		rss_lock;
->  	u32			rss_ctx_max_id;
->  	u32			wol_enabled:1;
->  };
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 69579d9cd7ba..c57456ed4be8 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -10074,6 +10074,7 @@ int register_netdevice(struct net_device *dev)
->  
->  	/* rss ctx ID 0 is reserved for the default context, start from 1 */
->  	xa_init_flags(&dev->ethtool->rss_ctx, XA_FLAGS_ALLOC1);
-> +	mutex_init(&dev->ethtool->rss_lock);
->  
->  	spin_lock_init(&dev->addr_list_lock);
->  	netdev_set_addr_lockdep_class(dev);
-> @@ -10882,6 +10883,7 @@ static void netdev_rss_contexts_free(struct net_device *dev)
->  	struct ethtool_rxfh_context *ctx;
->  	unsigned long context;
->  
-> +	mutex_lock(&dev->ethtool->rss_lock);
->  	if (dev->ethtool_ops->create_rxfh_context ||
->  	    dev->ethtool_ops->set_rxfh_context)
->  		xa_for_each(&dev->ethtool->rss_ctx, context, ctx) {
-> @@ -10903,6 +10905,7 @@ static void netdev_rss_contexts_free(struct net_device *dev)
->  			kfree(ctx);
->  		}
->  	xa_destroy(&dev->ethtool->rss_ctx);
-> +	mutex_unlock(&dev->ethtool->rss_lock);
->  }
->  
->  /**
-> @@ -11016,6 +11019,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
->  		if (dev->netdev_ops->ndo_uninit)
->  			dev->netdev_ops->ndo_uninit(dev);
->  
-> +		mutex_destroy(&dev->ethtool->rss_lock);
-> +
->  		if (skb)
->  			rtmsg_ifinfo_send(skb, dev, GFP_KERNEL, portid, nlh);
->  
-> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-> index 3920ddee3ee2..d21bbc92e6fc 100644
-> --- a/net/ethtool/ioctl.c
-> +++ b/net/ethtool/ioctl.c
-> @@ -1258,6 +1258,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  	u8 *rss_config;
->  	u32 rss_cfg_offset = offsetof(struct ethtool_rxfh, rss_config[0]);
->  	bool create = false, delete = false;
-> +	bool locked = false; /* dev->ethtool->rss_lock taken */
->  
->  	if (!ops->get_rxnfc || !ops->set_rxfh)
->  		return -EOPNOTSUPP;
-> @@ -1335,6 +1336,10 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  		}
->  	}
->  
-> +	if (rxfh.rss_context) {
-> +		mutex_lock(&dev->ethtool->rss_lock);
-> +		locked = true;
-> +	}
->  	if (create) {
->  		if (delete) {
->  			ret = -EINVAL;
-> @@ -1455,6 +1460,8 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
->  	}
->  
->  out:
-> +	if (locked)
-> +		mutex_unlock(&dev->ethtool->rss_lock);
->  	kfree(rss_config);
->  	return ret;
->  }
+> Please extend also existing example.
+
+Ok. Snippet for attention (a dtsi I was working with - applies over fsl-lx2160a-qds.dts):
+
+&dpmac2 {
+	phy-connection-type = "internal";
+	managed = "in-band-status";
+	/delete-property/ phys;
+};
+
+&pcs_mdio2 {
+	status = "okay";
+};
+
+&pcs2 {
+	fsl,backplane-mode;
+	phys = <&serdes_1 3>, /* lane D */
+	       <&serdes_1 2>, /* lane C */
+	       <&serdes_1 1>, /* lane B */
+	       <&serdes_1 0>; /* lane A */
+};
+
+The thing is that the RFC v2 bindings are still very much WIP. For v3,
+I will try to remove the "phys" property from the pcs node, and process
+the ones from the MAC node (client of PCS).
+
+For example, arch/arm64/boot/dts/freescale/fsl-lx2160a-clearfog-itx.dtsi
+has "phys" under &dpmac7:
+
+&dpmac7 {
+	sfp = <&sfp0>;
+	managed = "in-band-status";
+	phys = <&serdes_1 3>;
+};
+
+but &dpmac7 also has pcs-handle = <&pcs7>; in fsl-lx2160a.dtsi.
+Thus, if I'm able to pass the "phys" phandle from &dpmac7 to &pcs7
+through code (argument to lynx_pcs_create_fwnode()), then the location
+of the "phys" property could be the same regardless of use case
+(backplane or not), and the dt-bindings of the lynx pcs would be simpler.
+
+The only dilemma that has stopped me from doing it is that the dpmac node
+may have other "phys" in the signal path (for example external redrivers/
+retimers). With up to 4 SerDes lanes per MAC and with optional retimer
+phys on each lane, it becomes a question of how can we distinguish the
+SerDes phys from the other phys (the PCS wants the SerDes PHY)? Would it
+be okay to add a phy-names property, and parse it for "serdes-%d" to
+indicate a SerDes PHY, and anything else can be named in any other way
+("retimer-%d")?
+
+> If these do not apply to lynx-pcs, then they should be disallowed in
+> allOf:if:then.
+
+They do: the "fsl,lynx-pcs" compatible string + the bool "fsl,backplane-mode"
+is supposed to instantiate a MTIP_MODEL_AUTODETECT backplane AN/LT block
+(as opposed to LX2160A where it isn't autodetectable). It's just that I
+didn't get to implement support for the other models yet.
 
