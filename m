@@ -1,74 +1,125 @@
-Return-Path: <netdev+bounces-37525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB3907B5C5C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 23:07:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E5667B5C62
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 23:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 944852816D3
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:07:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BC4412818CD
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:08:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E7320324;
-	Mon,  2 Oct 2023 21:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7D020326;
+	Mon,  2 Oct 2023 21:08:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8701C6FB8
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:07:36 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D88948E;
-	Mon,  2 Oct 2023 14:07:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cHdxPJkUffAe71uXd4ceymr9QjRVP6992Y6TUUtw5Jk=; b=VOLjccYRB8DDrJeZxkRDhrd9M6
-	BAI10X6BkVMCgCay8Q3Q/aMez4oITD685DE1zeK8PUNHxCZEcL94F657Z7+jH/bdNSKjik+R56PUe
-	5XF6DFiRwvZykTNg+UQ+yL8B5S3k960aDSS0N0+z9O4BnqwpL6Gn2Dcu66A3071gKz0k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qnQ8T-0083OV-Ly; Mon, 02 Oct 2023 23:07:25 +0200
-Date: Mon, 2 Oct 2023 23:07:25 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Robert Marko <robimarko@gmail.com>, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA97520304
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:08:44 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3368CC
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 14:08:43 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-390-81ZDJZC5NGOH4LIxnAQpBQ-1; Mon, 02 Oct 2023 17:08:21 -0400
+X-MC-Unique: 81ZDJZC5NGOH4LIxnAQpBQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 776A3811621;
+	Mon,  2 Oct 2023 21:08:20 +0000 (UTC)
+Received: from hog (unknown [10.45.224.57])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 521022156A27;
+	Mon,  2 Oct 2023 21:08:16 +0000 (UTC)
+Date: Mon, 2 Oct 2023 23:08:14 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, borisp@nvidia.com,
+	saeedm@nvidia.com, leon@kernel.org, andrew@lunn.ch,
+	hkallweit1@gmail.com, linux@armlinux.org.uk,
+	richardcochran@gmail.com, sebastian.tobuschat@oss.nxp.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v6 08/10] net: phy: nxp-c45-tja11xx: add MACsec
  support
-Message-ID: <9a84642e-b4fe-4e36-bcdc-d02c84bb1dc9@lunn.ch>
-References: <20230930104008.234831-1-robimarko@gmail.com>
- <df89a28e-0886-4db0-9e68-5f9af5bec888@lunn.ch>
- <651b26a5.050a0220.213bf.e11b@mx.google.com>
+Message-ID: <ZRsxPvGXJAbgkzYL@hog>
+References: <20230928084430.1882670-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230928084430.1882670-9-radu-nicolae.pirea@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <651b26a5.050a0220.213bf.e11b@mx.google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230928084430.1882670-9-radu-nicolae.pirea@oss.nxp.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> This is problematic... Since this is a plain standard PHY and we don't
-> have a compatible (as it's matched with the PHY id) we don't have DT to
-> add this... Sooo how to add this? Should we update the generic-phy dt?
-> 
-> Should we create a dummy dt and add a compatible adding
-> ethernet-phy.ID... just for this properties?
-> 
-> This is why we were a bit confused about adding a DT commit to this.
+2023-09-28, 11:44:28 +0300, Radu Pirea (NXP OSS) wrote:
+> +static int nxp_c45_mdo_upd_secy(struct macsec_context *ctx)
+> +{
+> +	u8 encoding_sa = ctx->secy->tx_sc.encoding_sa;
+> +	struct phy_device *phydev = ctx->phydev;
+> +	struct nxp_c45_phy *priv = phydev->priv;
+> +	struct nxp_c45_secy *phy_secy;
+> +	struct nxp_c45_sa next_sa;
+> +	bool can_rx_sc0_impl;
+> +
+> +	phydev_dbg(phydev, "update SecY SCI %016llx\n",
+> +		   sci_to_cpu(ctx->secy->sci));
+> +
+> +	phy_secy = nxp_c45_find_secy(&priv->macsec->secy_list, ctx->secy->sci);
+> +	if (IS_ERR(phy_secy))
+> +		return PTR_ERR(phy_secy);
+> +
+> +	if (!nxp_c45_mac_addr_free(ctx))
+> +		return -EBUSY;
 
-Just do what other PHYs do. ti,dp83869.yaml, motorcomm,yt8xxx.yaml,
-nxp,tja11xx.yaml, etc.
+mdo_upd_secy gets called from macsec_set_mac_address, but the error is ignored:
 
-	Andrew
+	static int macsec_set_mac_address(struct net_device *dev, void *p)
+	{
+	[...]
+		/* If h/w offloading is available, propagate to the device */
+		if (macsec_is_offloaded(macsec)) {
+			const struct macsec_ops *ops;
+			struct macsec_context ctx;
+	
+			ops = macsec_get_ops(macsec, &ctx);
+			if (ops) {
+				ctx.secy = &macsec->secy;
+				macsec_offload(ops->mdo_upd_secy, &ctx);
+			}
+		}
+	
+		return 0;
+	}
+
+
+Should macsec_set_mac_address try to roll back the change when
+mdo_upd_secy fails? Otherwise I guess your device doesn't work.
+
+
+> +static int nxp_c45_mdo_add_txsa(struct macsec_context *ctx)
+> +{
+...
+> +	nxp_c45_select_secy(phydev, phy_secy->secy_id);
+> +	nxp_c45_sa_set_pn(phydev, sa, tx_sa->next_pn, 0);
+> +	nxp_c45_sa_set_key(ctx, sa->regs, tx_sa->key.salt.bytes, tx_sa->ssci);
+> +	if (ctx->secy->tx_sc.encoding_sa  == sa->an)
+
+nit: double ' ' before '==' (also in nxp_c45_mdo_del_txsa)
+
+-- 
+Sabrina
+
 
