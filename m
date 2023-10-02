@@ -1,83 +1,171 @@
-Return-Path: <netdev+bounces-37523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A89F17B5C4B
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:56:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9D5F7B5C50
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id CFFAF1C208E3
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:55:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 2965EB20A27
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45125200DB;
-	Mon,  2 Oct 2023 20:55:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAE220320;
+	Mon,  2 Oct 2023 20:57:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3016920309;
-	Mon,  2 Oct 2023 20:55:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E7B0C433C8;
-	Mon,  2 Oct 2023 20:55:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696280157;
-	bh=3SUjHS1R/+k33+41I8df1OAaO4gb+JCavb+GatMXfr8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ts6e8OPAXbwJSqbHZh7OB/J5bL/OHFILZtb1yBVm7HXPB1PZk/XGQ7AuIW4n29dj+
-	 ecoBTO+7hrPW8Q6xuPPASkVTEUpIET4SQ0Jsvd2gVlk1zyw1YTaRy14t4smDjHCbYx
-	 Ip/BJuo0W6EjA2rvCbaan0iEIW+cj78pq0AqAEptDJPl392/1LNQKv84du3Y6mEcD5
-	 kLx5VdsMxdIHgNASSD2ZmOJqOflab/gjsH9hwidf2wGhMgu6x7m8pUtG4MO1ahLvP5
-	 y4L8a3M2ByHooguBVfjxXHjB0K4VvDBx4MXBRBHPNchRHELaiLL3HcPvunO0YVRUT/
-	 sMrIc2mpMLNtQ==
-Date: Mon, 2 Oct 2023 13:55:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Rohan G Thomas <rohan.g.thomas@intel.com>, "David S . Miller"
- <davem@davemloft.net>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH net-next 1/1] net: stmmac: xgmac: EST interrupts
- handling
-Message-ID: <20231002135551.020f180c@kernel.org>
-In-Reply-To: <xwcwjtyy5yx6pruoa3vmssnjzkbeahmfyym4e5lrq2efcwwiym@2upf4ko4mah5>
-References: <20230923031031.21434-1-rohan.g.thomas@intel.com>
-	<xwcwjtyy5yx6pruoa3vmssnjzkbeahmfyym4e5lrq2efcwwiym@2upf4ko4mah5>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8FA200D2;
+	Mon,  2 Oct 2023 20:57:19 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDD0C6;
+	Mon,  2 Oct 2023 13:57:17 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9a9d82d73f9so24564766b.3;
+        Mon, 02 Oct 2023 13:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696280236; x=1696885036; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=exaza9diQenOrShvV6MMCLhRCzDC5rAMUMxRmEmm+Nk=;
+        b=Gxcho68KHbKoMwan6BwguY4++1u9kZeSQZYfPJE9St+uwmL6q/F/Fp9RQw6qXIGFzm
+         ZWfTzNvNqDImeScAdRJzORIiJpDgMc7ZqdWIxAzf2w4FWTkjF9cedmG+T1e461nbYDEK
+         mvHSqpsFQPjekuOFP17aDknwKR9BhqOs6Wh5yj/+19IkwB+MavUrN61zeOkLsNfTxSUP
+         eXAMi5WHEJwQVZW7MY+8vLRkHmpGSMkpW6DdQ5CmaS/UVLYr7kapNbkgk6/mTrcIvQXp
+         /cFOHzAx2qsPY9CJjmmFgQkFOG7AGIECQZAuyVB/60ASrxTMYvEDkhWK/mmBRrTRxWQE
+         h6hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696280236; x=1696885036;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=exaza9diQenOrShvV6MMCLhRCzDC5rAMUMxRmEmm+Nk=;
+        b=NmprBQ6olcyHoqDM5ZrIa6gjpEzbOfuQawoZi99IL0mFU5ww7GOtk9tzR4nmk7WL61
+         NRrDm5Bgoo22Uek+y1XB5l3ttmYirBtJZF4477rhlsG3ytY4mlF8X744ud46bz4ZCGk4
+         QwCJMJPOCW/wKstAqpi1WbIPy+optpZE6RK6xp7hikktIgBuPYpelf46SPSkQzRMeJqK
+         kz60B69eA2QOcRCcdvJFjUqFn3V/HLteLw+4oHvgBKEDV8gBL4s10mKM3zmxqNIo8tGJ
+         81De5QtPCFcNbBuEI8gdkUVML0PKd/thQ8bOVsHsx3DHCuat7qMBqVQT9EoUX9ALOXlK
+         Gvww==
+X-Gm-Message-State: AOJu0Yw8vz6DAXYo0izk9Zklo+CPUfw7w/miiw6uJ/XIds1G7cfLpOuT
+	FKdEH3PcepvIXDjI+nK4uHs2otPITKECNTChnqE=
+X-Google-Smtp-Source: AGHT+IHSo40cmKeex7UOmhM0j1X2NYVxhmeg7ikY6OaTtOg51K/sdDBDYr4eNc5xVjY2l02Ds0xihQJ4RONf8E/j4Mc=
+X-Received: by 2002:a17:906:ce:b0:9b2:be5e:7545 with SMTP id
+ 14-20020a17090600ce00b009b2be5e7545mr10362457eji.36.1696280235907; Mon, 02
+ Oct 2023 13:57:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231002122756.323591-1-daan.j.demeyer@gmail.com> <20231002122756.323591-6-daan.j.demeyer@gmail.com>
+In-Reply-To: <20231002122756.323591-6-daan.j.demeyer@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 2 Oct 2023 13:57:04 -0700
+Message-ID: <CAEf4BzbxF5RxX6vLiAAA4i+9V-pYeue55eTA7Zfk3FGFdQC8dA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v7 5/9] libbpf: Add support for cgroup unix
+ socket address hooks
+To: Daan De Meyer <daan.j.demeyer@gmail.com>
+Cc: bpf@vger.kernel.org, martin.lau@linux.dev, kernel-team@meta.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 26 Sep 2023 14:25:56 +0300 Serge Semin wrote:
-> On Sat, Sep 23, 2023 at 11:10:31AM +0800, Rohan G Thomas wrote:
-> > Enabled the following EST related interrupts:
-> >   1) Constant Gate Control Error (CGCE)
-> >   2) Head-of-Line Blocking due to Scheduling (HLBS)
-> >   3) Head-of-Line Blocking due to Frame Size (HLBF)
-> >   4) Base Time Register error (BTRE)
-> >   5) Switch to S/W owned list Complete (SWLC)
-> > Also, add EST errors into the ethtool statistic.
-> > 
-> > The commit e49aa315cb01 ("net: stmmac: EST interrupts handling and
-> > error reporting") and commit 9f298959191b ("net: stmmac: Add EST
-> > errors into ethtool statistic") add EST interrupts handling and error
-> > reporting support to DWMAC4 core. This patch enables the same support
-> > for XGMAC.  
-> 
-> So, this is basically a copy of what was done for the DW QoS Eth
-> IP-core (DW GMAC v4.x/v5.x). IMO it would be better to factor it out
-> into a separate module together with the rest of the setup methods
-> like it's done for TC or PTP. But since it implies some much more work
-> I guess we can leave it as is for now...
+On Mon, Oct 2, 2023 at 5:28=E2=80=AFAM Daan De Meyer <daan.j.demeyer@gmail.=
+com> wrote:
+>
+> Add the necessary plumbing to hook up the new cgroup unix sockaddr
+> hooks into libbpf.
+>
+> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+> ---
+>  tools/lib/bpf/libbpf.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 31b8b252e614..dd3683b98679 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -82,17 +82,22 @@ static const char * const attach_type_name[] =3D {
+>         [BPF_CGROUP_INET6_BIND]         =3D "cgroup_inet6_bind",
+>         [BPF_CGROUP_INET4_CONNECT]      =3D "cgroup_inet4_connect",
+>         [BPF_CGROUP_INET6_CONNECT]      =3D "cgroup_inet6_connect",
+> +       [BPF_CGROUP_UNIX_CONNECT]       =3D "cgroup_unix_connect",
+>         [BPF_CGROUP_INET4_POST_BIND]    =3D "cgroup_inet4_post_bind",
+>         [BPF_CGROUP_INET6_POST_BIND]    =3D "cgroup_inet6_post_bind",
+>         [BPF_CGROUP_INET4_GETPEERNAME]  =3D "cgroup_inet4_getpeername",
+>         [BPF_CGROUP_INET6_GETPEERNAME]  =3D "cgroup_inet6_getpeername",
+> +       [BPF_CGROUP_UNIX_GETPEERNAME]   =3D "cgroup_unix_getpeername",
+>         [BPF_CGROUP_INET4_GETSOCKNAME]  =3D "cgroup_inet4_getsockname",
+>         [BPF_CGROUP_INET6_GETSOCKNAME]  =3D "cgroup_inet6_getsockname",
+> +       [BPF_CGROUP_UNIX_GETSOCKNAME]   =3D "cgroup_unix_getsockname",
+>         [BPF_CGROUP_UDP4_SENDMSG]       =3D "cgroup_udp4_sendmsg",
+>         [BPF_CGROUP_UDP6_SENDMSG]       =3D "cgroup_udp6_sendmsg",
+> +       [BPF_CGROUP_UNIX_SENDMSG]       =3D "cgroup_unix_sendmsg",
+>         [BPF_CGROUP_SYSCTL]             =3D "cgroup_sysctl",
+>         [BPF_CGROUP_UDP4_RECVMSG]       =3D "cgroup_udp4_recvmsg",
+>         [BPF_CGROUP_UDP6_RECVMSG]       =3D "cgroup_udp6_recvmsg",
+> +       [BPF_CGROUP_UNIX_RECVMSG]       =3D "cgroup_unix_recvmsg",
+>         [BPF_CGROUP_GETSOCKOPT]         =3D "cgroup_getsockopt",
+>         [BPF_CGROUP_SETSOCKOPT]         =3D "cgroup_setsockopt",
+>         [BPF_SK_SKB_STREAM_PARSER]      =3D "sk_skb_stream_parser",
+> @@ -8960,14 +8965,19 @@ static const struct bpf_sec_def section_defs[] =
+=3D {
+>         SEC_DEF("cgroup/bind6",         CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+6_BIND, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/connect4",      CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+4_CONNECT, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/connect6",      CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+6_CONNECT, SEC_ATTACHABLE),
+> +       SEC_DEF("cgroup/connectun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
+_CONNECT, SEC_ATTACHABLE),
 
-I think we can push back a little harder. At the very least we should
-get a clear explanation why this copy'n'paste is needed, i.e. what are
-the major differences. No?
+I don't have too strong feelings here, but is "un" suffix a clear
+enough designator that this is working with unix sockets? Nothing can
+beat "connect4" and "connect6" in succinctness, but
+`cgroup/connect_unix` is not too verbose, but is probably a bit easier
+to guess?
+
+Again, if this was some sort of consensus, I don't care much, but I
+thought I'd bring this up anyways.
+
+>         SEC_DEF("cgroup/sendmsg4",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP4=
+_SENDMSG, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/sendmsg6",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP6=
+_SENDMSG, SEC_ATTACHABLE),
+> +       SEC_DEF("cgroup/sendmsgun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
+_SENDMSG, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/recvmsg4",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP4=
+_RECVMSG, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/recvmsg6",      CGROUP_SOCK_ADDR, BPF_CGROUP_UDP6=
+_RECVMSG, SEC_ATTACHABLE),
+> +       SEC_DEF("cgroup/recvmsgun",     CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
+_RECVMSG, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/getpeername4",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+4_GETPEERNAME, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/getpeername6",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+6_GETPEERNAME, SEC_ATTACHABLE),
+> +       SEC_DEF("cgroup/getpeernameun", CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
+_GETPEERNAME, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/getsockname4",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+4_GETSOCKNAME, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/getsockname6",  CGROUP_SOCK_ADDR, BPF_CGROUP_INET=
+6_GETSOCKNAME, SEC_ATTACHABLE),
+> +       SEC_DEF("cgroup/getsocknameun", CGROUP_SOCK_ADDR, BPF_CGROUP_UNIX=
+_GETSOCKNAME, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/sysctl",        CGROUP_SYSCTL, BPF_CGROUP_SYSCTL,=
+ SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/getsockopt",    CGROUP_SOCKOPT, BPF_CGROUP_GETSOC=
+KOPT, SEC_ATTACHABLE),
+>         SEC_DEF("cgroup/setsockopt",    CGROUP_SOCKOPT, BPF_CGROUP_SETSOC=
+KOPT, SEC_ATTACHABLE),
+> --
+> 2.41.0
+>
+>
 
