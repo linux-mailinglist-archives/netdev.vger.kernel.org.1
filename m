@@ -1,93 +1,174 @@
-Return-Path: <netdev+bounces-37409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF937B53AB
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:10:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C29897B53AE
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 89566281142
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6B4162837D5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25DD418AEE;
-	Mon,  2 Oct 2023 13:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0CD18C0A;
+	Mon,  2 Oct 2023 13:11:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0EC613E
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:10:45 +0000 (UTC)
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF08B0
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:10:43 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40572aeb73cso135438085e9.3
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 06:10:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1696252242; x=1696857042; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=trOs+bS9qjB1tKtP7PdcIjgdydsrIJlX1JkiYwfzkv4=;
-        b=ANm7Gu+jAIT2yO2ljlw0AhUOYhjiR3d4HS1w6yx4dsOHo64sGNeyMrVj/yzdgtk+v7
-         7StyrLi9ElL4Qi70OJGBKcb/N21Y1jLdgZynFjfFHYlYAA7rESzoQQ5LqGb0jE5zYtB0
-         01m6nyEWioEjL3H2/J72c5i/nBEl8mS63nJwTvTg8M3jP8GaZ+d+PkDtxYI0ivXAjHHq
-         D28jfmQ7XiLN/lGKOSuVhHkPEyxsKdzMliVjdtvW4DIVPznx4Qp0WAc7q17GAkLPc8VK
-         NMvOQqfFZnU87W5ZnlTmKTnUsWt+Nt43iRSCqiJpMEyPTBER+xemmEyxLiFLpFEgtsuf
-         nCAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696252242; x=1696857042;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=trOs+bS9qjB1tKtP7PdcIjgdydsrIJlX1JkiYwfzkv4=;
-        b=lxxya6uOJBnMQrcBKuho4Wov/m2CXEPRR+sL97XJHjYRFBONmYAZXckT4/xUtOUR2v
-         oDRP6bpsQsBi08OGuYIBqM+nU0BnMcPOXIjY8dURLHmQ0uISu4/L5Od2BI5xvRmCfBlN
-         4Pq8Jtpg8t0FzAHpnSeQYcQIF/XxDyY6sL0lDS926luX3Rrsnnu2f3/tlQSpVBuwDTkN
-         2L4aJvtpmjks0EXDcpH6qjamQLL3uo8B+md0aRLERO2FbC3K16B3T/wI5nJEeYWf1WRX
-         3Hm+j5FiZOI2jmgUKm40xpwvCzJjpytDqyoa5dBKvlj59/MZtsBP3GOBHekF2vvoZxH5
-         17Ng==
-X-Gm-Message-State: AOJu0YwT2IDWju/lUrqRJbHxUazirzw6wf1gKwvgc4ovKRUQ8UWWrIe/
-	6QYAgHLVb4+x2C417RYyFqNjdw==
-X-Google-Smtp-Source: AGHT+IGgu8vs4o57DqfZX7XEqKXt7wI9oDp7v3YzpIyV4RsnX8UJ8LaX59vKyxY1HHLzvWlcHrbAKQ==
-X-Received: by 2002:a7b:cb95:0:b0:3fb:e189:3532 with SMTP id m21-20020a7bcb95000000b003fbe1893532mr10530379wmi.20.1696252241941;
-        Mon, 02 Oct 2023 06:10:41 -0700 (PDT)
-Received: from ?IPV6:2a02:8011:e80c:0:236f:623a:5782:3a49? ([2a02:8011:e80c:0:236f:623a:5782:3a49])
-        by smtp.gmail.com with ESMTPSA id f11-20020a7bcd0b000000b004053e9276easm7271249wmj.32.2023.10.02.06.10.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Oct 2023 06:10:41 -0700 (PDT)
-Message-ID: <73591a73-c478-4e6e-8899-a05c4996b60e@isovalent.com>
-Date: Mon, 2 Oct 2023 14:10:40 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0F6179BF;
+	Mon,  2 Oct 2023 13:11:22 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2083.outbound.protection.outlook.com [40.107.21.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B897EB0;
+	Mon,  2 Oct 2023 06:11:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y6K2IXUpNGg2j1r/iBl362B9zP212ecD0jgmoAlQWaya8mTg7Sww0xREtAERiAOszJRcU35w2I02i7TAYj1lyHTwJ48d0Sn5daDdPikkUGhPpJ9U0s108XWxtqQQPEDtBw1/qVxHojmrT7TYFDvLHkenYMpFOkDedeE5jGdm4OI8dpjHgksQRRLcDqWOzIVzEek+Eouyqh3USQoq6q8YP4XGJKEuv9jJkmjTuIl3s8LuoZBKQhG0S2M5XuoxJO1KwMAvA94Khe3toXVXtqDlCzefZI+5nBe2QO0kp0Ut0PNT+SIttOLIxzIWKe2wtJNSHuz1aalLdctwikw2CpBgww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3VrFUZhFXyPR4hIjgtY0cHd2Mcjy3483MCHW9uouLYk=;
+ b=G5VydtPYlauh5RTykETXWsSpTZyptROecOhFlJZQj33XOXcXcc+97yRXYMn70qL/t+Z0y6pH7k4fNdriyWtOOd4i31T5Z/PQeXRBpVO79oWf6Atfl6pvDYYOoFskXNRRJPZSqJ8Z6sNHkageU460vuWhezXU97lIJ9d/qkwRRqP+zTu+Is6L4L8UPBEUddNiG51AERA3Ke8V1fZBXb54+0hYKZFBAYzCGaBXpUaCeqFAzgFlAin/hc2Ea+GIcCAnAxoYPfjpqEbQbIe6m5KqG2ZeHsNFqlPCMIRaaxwnMA67ZkBQLHFX6ArM5E0PSiy0yi0IC4fjw2Qc3CDnlqLJGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3VrFUZhFXyPR4hIjgtY0cHd2Mcjy3483MCHW9uouLYk=;
+ b=fvbO47aXXH9ZRw9IIpx0S9SiJ9ATJIEfb+TlvX/JWnPiMLkIOPT/uFt7iPRYS16QHf/8rusvK6QXPapV6VcBCISrlM2XmOqKrt/e0JZ59X1fF7jxwOdd76qeIDvTMrPtd3M+MqeaLlf9rjh9SNXuGw2eg98uPCjZKpF6qW5dQjU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM8PR04MB7329.eurprd04.prod.outlook.com (2603:10a6:20b:1d0::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.37; Mon, 2 Oct
+ 2023 13:11:14 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6838.024; Mon, 2 Oct 2023
+ 13:11:14 +0000
+Date: Mon, 2 Oct 2023 16:11:10 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH v2 net-next 03/15] phy: ethernet: add configuration
+ interface for copper backplane Ethernet PHYs
+Message-ID: <20231002131110.4kjkinc2xyxtdwbv@skbuf>
+References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-4-vladimir.oltean@nxp.com>
+ <20230928190536.GO24230@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230928190536.GO24230@kernel.org>
+X-ClientProxiedBy: VI1PR04CA0131.eurprd04.prod.outlook.com
+ (2603:10a6:803:f0::29) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v7 6/9] bpftool: Add support for cgroup unix
- socket address hooks
-Content-Language: en-GB
-To: Daan De Meyer <daan.j.demeyer@gmail.com>, bpf@vger.kernel.org
-Cc: martin.lau@linux.dev, kernel-team@meta.com, netdev@vger.kernel.org
-References: <20231002122756.323591-1-daan.j.demeyer@gmail.com>
- <20231002122756.323591-7-daan.j.demeyer@gmail.com>
-From: Quentin Monnet <quentin@isovalent.com>
-In-Reply-To: <20231002122756.323591-7-daan.j.demeyer@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB7329:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5290f201-f662-4de1-ce34-08dbc3490e6a
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+ kL8LOMOxs4IdNIDSHHW5Mqm/LNMpfileZ7mkdj4vD0XKpPTRCRAsGENwEa4qdPit2cGdaSdUjBIJPUEDryeq1gVj4ZGwfXJg3DSpygYdrAr8tMICujBd7W71UIiBTdO2UglV+4UpaGZ0iqBwhOv17Rcsuz/jBU4+ogSGx9hBmst1DYjzzhgy9LGTMbWCUY+c9XkaY6ahe0ruD4NJ4vrfiVqjDT1Ep9CbpVFmPRolXCvD/R14+9t1wIA/d/ox92RrdV5OdwZ7OAJ3IT/cL+29OCprMeJ3A56hMTvpp5gWZeMGSkoKvcJpWqKl8MWP077yybDMbp9Li5E6nYLf5pr6ctLjroAYnVQ4RkXWyo3EtI7JpipAdJmmH6WK6IJq5SBPWuc4Pg3r1hiswUJAhb4Ro9Tgv6N/oYrzDUUDhPu9VRlSBikmtIvT5gCYnLsWBG63In5ksRec1ZG0BzkR1j/7z7Bf3D007r7boIwlIJyKW77HhI8BkiKAWFneeRD+WvQx4cXadxNR3EgPN7t/BzQjmJssFIHayG+JeWARlCbnZyDbDHzi4v9H+RWXrbwndOxn
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(366004)(396003)(136003)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6506007)(6512007)(478600001)(86362001)(26005)(8936002)(38100700002)(1076003)(2906002)(7416002)(6666004)(9686003)(83380400001)(6486002)(44832011)(8676002)(4326008)(41300700001)(33716001)(316002)(6916009)(66946007)(66476007)(5660300002)(54906003)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?85CkgoUJl32dgQ4hDhxKg/X6UIjXYgDuopLYKekGLrKF6oR+POOEeexH+8Jh?=
+ =?us-ascii?Q?w1nFyhfjlQiOpSzT8WmyePnp+SlHNfWOyMeh/km1TfE69gPlI0HEH1KCfLFT?=
+ =?us-ascii?Q?/JDwvDBDJK0S1rPg+Hl4XuU+gnq492zODbJXBcpGVI94nwZkO7izxJ+r9Whq?=
+ =?us-ascii?Q?L3c2SnXboMjH+AOPaXQPNLGyVBVDF/Q9pXhQk20ADjmQBVkDPngCl1lpVOlb?=
+ =?us-ascii?Q?w/6+yyOU/iIhhwyKV/x83mzIqZ+HuYVbifc2D5LIPCH3Nwdqqb+2pfQ5pLMP?=
+ =?us-ascii?Q?VkvKDwdD6v7JzTTgXwVEFB1FjYf7aaTfmTe3/A3YpovYWte76oJ3h1pBxqe5?=
+ =?us-ascii?Q?12Jf/RZyAwRMD8tyMtbXXyRWTZbgtKTnCH27gUUUR0zG9cWScFEQBqP1JDO9?=
+ =?us-ascii?Q?gq8pJQOHF1AKTb7zx40sjDwbYYGjsGov8J9B4UH86yy+lbTKlxoyixQS5p7G?=
+ =?us-ascii?Q?ZoShlDCwKnaypba/aRg80TGCUAB2Go/SFRcmuJdWEr9UHETbtynDcPrgZAeI?=
+ =?us-ascii?Q?Oo8kY1RqIT/67FrI4Sn8rDtuv+oXt3TieVxef+/PU/NHsX+Q+Hm0qr3iBc3A?=
+ =?us-ascii?Q?+y4vRsT48MFcbZsvBmY1Rj7tx5qOxLKQB88a1BPQG6n+nuyGGEfpnGA/s/7T?=
+ =?us-ascii?Q?5rvJgeY5UxpZlTDTnL6pHn6P6sDmauTo4F1UE/Hmm7EnYSpqY2xubodOPnAR?=
+ =?us-ascii?Q?x9wM1HbPXtImBOfqKsTWeyIZKx4St46oR06A6CE2iGp5RIxPDfQHBYanGE0e?=
+ =?us-ascii?Q?4Njf2wlukznsuXBDSi488FJCfTq5wFRlXw3DwZ9W/NTdA0/BHvqw3tHQEhXH?=
+ =?us-ascii?Q?OKwKiFiKi9CJ21UdSWHvDS8xc3u7Gnw6eOkRVmHwN8hoDaYI8Ye3TRJBzCxG?=
+ =?us-ascii?Q?7oAFME30ilxwKg6gc7Q1iGigL1eNFj3lR9as6ASwcqNlkIiBQD5jRPhLqTXs?=
+ =?us-ascii?Q?ptPKt3A814QFPWGoC2WmtpO0mrwp52fTJx7GGEwbZOufUnvkT8HOAYjmDIjc?=
+ =?us-ascii?Q?MG+7d9v3oPMOSJCRJdrxEwOM3OreA39+rj78kwytnHgV1xnbggs3SfHmi8Cw?=
+ =?us-ascii?Q?LX+Fe+gEyONYthfQkxWQ2dVwcP8sN2gM4Auya9QuMb1ufTxXfom0YAFXAs5Q?=
+ =?us-ascii?Q?qjk1DDKT5ihEa9rRhdrv2qOyofZem4vzm2nw5dxTL29DB6ctUh0NRGNka6Vf?=
+ =?us-ascii?Q?8ytjtHJjE83ceMy3wJVuR3B/iWapT8n2Pb+ajEfKaFkYAmrlZ15ldJDR4SYt?=
+ =?us-ascii?Q?injjuBhL/sv+6dSeCixEjCDNZ8M9euBYX1dnnELudlBTf0TN9dIwZW59cl8h?=
+ =?us-ascii?Q?s7n9GTJz0cOHL4QbjyBGx/gsOgqR+6IOWveI75TecEjTcvmnLT/rHsa/uDr3?=
+ =?us-ascii?Q?48+CrafbbtHDQLYtDW6eDMqbZPduR6y5kJDvLV0Ls0QNxvFI2N0V0TE5iZ3v?=
+ =?us-ascii?Q?9yXIPiy5HZA9y/+rqQW7wMdyJ/MIBXwXJ0G6LSg6j/QxOG3gZmpLKZUDhE5O?=
+ =?us-ascii?Q?UVsb+zodHl1WazxtpelB0fDpoX+TsleTKvUnRVjY9JWhoLaO50S8vKCI4QaJ?=
+ =?us-ascii?Q?mHuQZi0xUIMyrqNWybtWxta5EpNA+YYzBen5U0Skjxae7xv29UeLBITY/Dmi?=
+ =?us-ascii?Q?Zw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5290f201-f662-4de1-ce34-08dbc3490e6a
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2023 13:11:14.6376
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cVrGd9YchViSDDN36wGHWbkEMhACSUEcDw78aEqKgaHWUvBPKRt8Pk4TdZCAZFGCSXd7kD8YPXdjhC+Uws7OOw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7329
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 02/10/2023 13:27, Daan De Meyer wrote:
-> Add the necessary plumbing to hook up the new cgroup unix sockaddr
-> hooks into bpftool.
+Hi Simon,
+
+On Thu, Sep 28, 2023 at 09:05:36PM +0200, Simon Horman wrote:
+> On Sat, Sep 23, 2023 at 04:48:52PM +0300, Vladimir Oltean wrote:
 > 
-> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+> ...
+> 
+> > +/**
+> > + * coef_update_opposite - return the opposite of one C72 coefficient update
+> > + *			  request
+> > + *
+> > + * @update:	original coefficient update
+> > + *
+> > + * Helper to transform the update request of one equalization tap into a
+> > + * request of the same tap in the opposite direction. May be used by C72
+> > + * phy remote TX link training algorithms.
+> > + */
+> > +static inline enum coef_update coef_update_opposite(enum coef_update update)
+> 
+> Hi Vladimir,
+> 
+> another nit from me.
+> 
+> Please put the inline keyword first.
+> Likewise elsewhere in this patch.
+> 
+> Tooling, including gcc-13 with W=1, complains about this.
 
-Acked-by: Quentin Monnet <quentin@isovalent.com>
-
-Please keep the tag if the patch has minor changes or no changes at all
-between versions of your series.
+Thanks for pointing this out. I guess you are talking about the c72_coef_update_print()
+function, whose prototype is mistakenly "static void inline" instead of
+"static inline void". I cannot find the problem with the quoted coef_update_opposite().
 
