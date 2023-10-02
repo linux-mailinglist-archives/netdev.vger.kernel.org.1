@@ -1,206 +1,177 @@
-Return-Path: <netdev+bounces-37495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF2E7B5AA0
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:59:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 271417B5AE9
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 4B2B1B20C51
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 18:59:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3384E1C204F5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 19:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2571F17E;
-	Mon,  2 Oct 2023 18:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF3A1F199;
+	Mon,  2 Oct 2023 19:14:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAF11DA28
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 18:59:25 +0000 (UTC)
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C468EA
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 11:59:23 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-d84f18e908aso93045276.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 11:59:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696273162; x=1696877962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dblyvw157+4QXxx4Gx4OQP1HlWyJULPim5OEmQHOZSQ=;
-        b=mtM1jLwl9m+Tr+MMddwNSR+bOzWfGN2QX320rgEv5mojh3gssbuCpQnDR5TbYQbZif
-         IGDDEMHehhSs+o+4rcOgTTGJ/dL9vUQxeqaWSG8w+3aaIg6JSGhtocAfnWULh7BzzlXZ
-         FNm+JtdtLroD2ZpTCpEOHH21PJV2QiB9g/sxsjDi6mm6nHQ8XbOGamC1zufCo5pGyCrC
-         C2U2dmS2Q0OGN1QjvUvng0E0VGbAAiBOgEFYrPRVIcNM0SyZoAfwtSMReHefgeJjX+Kb
-         uAILc48gOU+AYSUqFDBOKILb0BprrkQH7ZXHSYivYifj8dBF629ge/bEkb7m/8/p50e7
-         y27Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696273162; x=1696877962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dblyvw157+4QXxx4Gx4OQP1HlWyJULPim5OEmQHOZSQ=;
-        b=JL6b9jn0bwFMEBu7u6VCgAjCdvF/zm/8odJ9bF51jSpbJmjdYprAw2zxvXnLosDBmb
-         XmAE5iIhsw1op/cWrONHa1nF2dKqlvU7cn6iuKKeCkwpShLZiLMBVCXZPHst7DBm/bbV
-         1HAgBdJOTmn2/ojIQ//bWomdBuuAOvgdGuvwxYI3FXorNN9JXIAvRAuvq07Q1yfMHCUH
-         yZzJRzCtxe5bF5vqoen9t4yxUjt35Lf569MeOmMK74Sr6haDF6aRuk/FFtUH8avLYth+
-         ImoBhvr1J0mSXX5nXwKF2wlUh7k55qAWBsfBhsZlOn2lKIERjzs2v3j8GBrPvjZ6FfX9
-         rGIw==
-X-Gm-Message-State: AOJu0Yw7OAZVHslSl+mTraxwHDwzLMERt7rQ2n41cFfJzXNQsCHHU+An
-	hqA5OrkHQcv9CDTU7Y9KmFToTwmTN/zQEf7sY7Q=
-X-Google-Smtp-Source: AGHT+IHjlKeeTKMnj34VtwFwKmSw9RTVshDK7x3XCWkjewdNUQK6JoZNW6N8F0tDmu8ZGY7VdOLeg1NZx/RcfPzZGUY=
-X-Received: by 2002:a25:a1a5:0:b0:d85:e03b:6ac4 with SMTP id
- a34-20020a25a1a5000000b00d85e03b6ac4mr10665761ybi.47.1696273162328; Mon, 02
- Oct 2023 11:59:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF581C688
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 19:14:06 +0000 (UTC)
+X-Greylist: delayed 449 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 02 Oct 2023 12:14:05 PDT
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B6BAC;
+	Mon,  2 Oct 2023 12:14:04 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 8E8BECC010C;
+	Mon,  2 Oct 2023 21:06:28 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Mon,  2 Oct 2023 21:06:26 +0200 (CEST)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 3F575CC010A;
+	Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id E80B13431A9; Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id E6836343155;
+	Mon,  2 Oct 2023 21:06:23 +0200 (CEST)
+Date: Mon, 2 Oct 2023 21:06:23 +0200 (CEST)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: Simon Horman <horms@kernel.org>
+cc: xiaolinkui <xiaolinkui@126.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+    Florian Westphal <fw@strlen.de>, David Miller <davem@davemloft.net>, 
+    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+    justinstitt@google.com, kuniyu@amazon.com, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, Linkui Xiao <xiaolinkui@kylinos.cn>
+Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
+In-Reply-To: <20231002160651.GX92317@kernel.org>
+Message-ID: <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
+References: <20230927130309.30891-1-xiaolinkui@126.com> <20231002160651.GX92317@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
- <CANn89iKEs8_zdEXWbjxd8mC220MqhcRQp3AeHJMS6eD-a45rRA@mail.gmail.com>
- <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com> <CANn89i+Ef7zNz7t6U2_6VEHPDantgyR8d0w3ALOBVVwK0Fe=FQ@mail.gmail.com>
-In-Reply-To: <CANn89i+Ef7zNz7t6U2_6VEHPDantgyR8d0w3ALOBVVwK0Fe=FQ@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 2 Oct 2023 14:59:11 -0400
-Message-ID: <CADvbK_epdT+s-peW9v1oKGrTfttrVFCgSLkdwLLBAT2N+ZDdMQ@mail.gmail.com>
-Subject: Re: tcpdump and Big TCP
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 2, 2023 at 1:26=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Mon, Oct 2, 2023 at 7:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wr=
-ote:
-> >
-> > On Mon, Oct 2, 2023 at 12:25=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Mon, Oct 2, 2023 at 6:20=E2=80=AFPM David Ahern <dsahern@kernel.or=
-g> wrote:
-> > > >
-> > > > Eric:
-> > > >
-> > > > Looking at the tcpdump source code, it has a GUESS_TSO define that =
-can
-> > > > be enabled to dump IPv4 packets with tot_len =3D 0:
-> > > >
-> > > >         if (len < hlen) {
-> > > > #ifdef GUESS_TSO
-> > > >             if (len) {
-> > > >                 ND_PRINT("bad-len %u", len);
-> > > >                 return;
-> > > >             }
-> > > >             else {
-> > > >                 /* we guess that it is a TSO send */
-> > > >                 len =3D length;
-> > > >             }
-> > > > #else
-> > > >             ND_PRINT("bad-len %u", len);
-> > > >             return;
-> > > > #endif /* GUESS_TSO */
-> > > >         }
-> > > >
-> > > >
-> > > > The IPv6 version has a similar check but no compile change needed:
-> > > >         /*
-> > > >          * RFC 1883 says:
-> > > >          *
-> > > >          * The Payload Length field in the IPv6 header must be set =
-to zero
-> > > >          * in every packet that carries the Jumbo Payload option.  =
-If a
-> > > >          * packet is received with a valid Jumbo Payload option pre=
-sent and
-> > > >          * a non-zero IPv6 Payload Length field, an ICMP Parameter =
-Problem
-> > > >          * message, Code 0, should be sent to the packet's source, =
-pointing
-> > > >          * to the Option Type field of the Jumbo Payload option.
-> > > >          *
-> > > >          * Later versions of the IPv6 spec don't discuss the Jumbo =
-Payload
-> > > >          * option.
-> > > >          *
-> > > >          * If the payload length is 0, we temporarily just set the =
-total
-> > > >          * length to the remaining data in the packet (which, for E=
-thernet,
-> > > >          * could include frame padding, but if it's a Jumbo Payload=
- frame,
-> > > >          * it shouldn't even be sendable over Ethernet, so we don't=
- worry
-> > > >          * about that), so we can process the extension headers in =
-order
-> > > >          * to *find* a Jumbo Payload hop-by-hop option and, when we=
-'ve
-> > > >          * processed all the extension headers, check whether we fo=
-und
-> > > >          * a Jumbo Payload option, and fail if we haven't.
-> > > >          */
-> > > >         if (payload_len !=3D 0) {
-> > > >                 len =3D payload_len + sizeof(struct ip6_hdr);
-> > > >                 if (length < len)
-> > > >                         ND_PRINT("truncated-ip6 - %u bytes missing!=
-",
-> > > >                                 len - length);
-> > > >         } else
-> > > >                 len =3D length + sizeof(struct ip6_hdr);
-> > > >
-> > > >
-> > > > Maybe I am missing something, but it appears that no code change to
-> > > > tcpdump is needed for Linux Big TCP packets other than enabling tha=
-t
-> > > > macro when building. I did that in a local build and the large pack=
-ets
-> > > > were dumped just fine.
-> > > >
-> > Right, wireshark/tshark currently has no problem parsing BIG TCP IPv4 p=
-ackets.
-> > I think it enables GUESS_TSO by default.
-> >
-> > We also enabled GUESS_TSO in tcpdump for RHEL-9 when BIG TCP IPv4 was
-> > backported in it.
->
-> Make sure to enable this in tcpdump source, so that other distros do
-> not have to 'guess'.
-Looks the tcpdump maintainer has posted one:
+Hi,
 
-https://github.com/the-tcpdump-group/tcpdump/pull/1085
+On Mon, 2 Oct 2023, Simon Horman wrote:
 
->
-> >
-> > >
-> > > My point is that tcpdump should not guess, but look at TP_STATUS_GSO_=
-TCP
-> > > (and TP_STATUS_CSUM_VALID would also be nice)
-> > >
-> > > Otherwise, why add TP_STATUS_GSO_TCP in the first place ?
-> > That's for more reliable parsing in the future.
->
-> We want this. I thought this was obvious.
->
-> >
-> > As currently in libpcap, it doesn't save meta_data(like
-> > TP_STATUS_CSUM_VALID/GSO_TCP)
-> > to 'pcap' files, and it requires libpcap APIs change and uses the
-> > 'pcap-ng' file format.
-> > I think it will take quite some time to implement in userspace.
->
-> Great. Until this is implemented as discussed last year, we will not remo=
-ve
-> IPv6 jumbo headers.
-I will get back to this libpcap APIs and pcap-ng things, and let you
-know when it's done.
+> On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
+> > From: Linkui Xiao <xiaolinkui@kylinos.cn>
+> > 
+> > If the ip_set is not locked during ip_set_test, the following situations
+> > may occur:
+> > 
+> > 	CPU0				CPU1
+> > 	ip_rcv->
+> > 	ip_rcv_finish->
+> > 	ip_local_deliver->
+> > 	nf_hook_slow->
+> > 	iptable_filter_hook->
+> > 	ipt_do_table->
+> > 	set_match_v4->
+> > 	ip_set_test->			list_set_destroy->
+> > 	hash_net4_kadt->		set->data = NULL
+> 
+> I'm having a bit of trouble analysing this.
+> In particular, I'm concerned that in such a scenario set
+> itself will be also freed, which seems likely to lead to problems.
+> 
+> Can you provide a more complete call stack for CPU1 ?
 
-Thanks.
+ip_set_test() runs intentionally without holding a spinlock, it uses RCU.
+
+But I don't understand the scenario at all:
+
+	CPU0:				CPU1:
+	hash_net4_kadt			list_set_destroy
+
+	so it's a hash:net type		which works on a list
+	of set				type of sets only
+
+The list type of set can freely be destroyed (when not referenced), the 
+destroy operation has no effect whatsoever on its possible hash:net type 
+of member set.
+
+Moreover, kernel side add/del/test can only be performed when the set in 
+question is referenced. Referenced sets cannot be deleted.
+
+So what is the scenario really in this case?
+
+Best regards,
+Jozsef
+
+> > 	h = set->data
+> > 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
+> > 
+> > The set->data is empty, continuing to access set->data will result in a
+> > kernel NULL pointer. The call trace is as follows:
+> > 
+> > [2350616.024418] Call trace:
+> > [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
+> > [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
+> > [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
+> > [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
+> > [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
+> > [2350616.026905]  nf_hook_slow+0x50/0x100
+> > [2350616.027256]  ip_local_deliver+0xd4/0xe8
+> > [2350616.027616]  ip_rcv_finish+0x90/0xb0
+> > [2350616.027961]  ip_rcv+0x50/0xb0
+> > [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
+> > [2350616.028716]  __netif_receive_skb+0x28/0x80
+> > [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
+> > [2350616.029533]  napi_gro_receive+0xf8/0x170
+> > [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
+> > [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
+> > [2350616.030761]  net_rx_action+0x158/0x3a0
+> > [2350616.031124]  __do_softirq+0x11c/0x33c
+> > [2350616.031470]  irq_exit+0x11c/0x128
+> > [2350616.031793]  __handle_domain_irq+0x6c/0xc0
+> > [2350616.032172]  gic_handle_irq+0x6c/0x170
+> > [2350616.032528]  el1_irq+0xb8/0x140
+> > [2350616.032835]  arch_cpu_idle+0x38/0x1c0
+> > [2350616.033183]  default_idle_call+0x24/0x58
+> > [2350616.033549]  do_idle+0x1a4/0x268
+> > [2350616.033859]  cpu_startup_entry+0x28/0x78
+> > [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
+> > 
+> > Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+> > ---
+> >  net/netfilter/ipset/ip_set_core.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+> > index 35d2f9c9ada0..46f4f47e29e4 100644
+> > --- a/net/netfilter/ipset/ip_set_core.c
+> > +++ b/net/netfilter/ipset/ip_set_core.c
+> > @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
+> >  	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
+> >  		return 0;
+> >  
+> > +	ip_set_lock(set);
+> >  	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
+> > +	ip_set_unlock(set);
+> >  
+> >  	if (ret == -EAGAIN) {
+> >  		/* Type requests element to be completed */
+> > -- 
+> > 2.17.1
+> > 
+> > 
+> 
+
+-
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
 
