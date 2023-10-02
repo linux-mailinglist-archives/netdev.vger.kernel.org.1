@@ -1,186 +1,190 @@
-Return-Path: <netdev+bounces-37403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA9BE7B537C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:55:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 686007B537E
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 14:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id CEC8D1C202D5
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:55:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1904E2836BB
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 12:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D7715499;
-	Mon,  2 Oct 2023 12:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDCF15EB0;
+	Mon,  2 Oct 2023 12:56:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1569CA47
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:55:04 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFA1B0;
-	Mon,  2 Oct 2023 05:55:01 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40566f8a093so134037205e9.3;
-        Mon, 02 Oct 2023 05:55:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CF3EAC5
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 12:56:40 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79C9AB3
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 05:56:37 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50348c54439so5008e87.1
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 05:56:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696251300; x=1696856100; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=28IiggInfhdX5TRLSL71Si3g5qgj6uye3wMvj7LWpPw=;
-        b=PJCtaiDbE641MoPV3Wx+U8rr/NazQtELrzEoeVG2lTd4O5kbQakKE9YdOqppaeQiXU
-         MjByNpdi8Skb0OZquUvEH+90Q8uveMXu55gTaMS6QqjLjo4h66ejOZQ83vbFs2bkJdwp
-         nPo8+Qm35g1VdnfoHM971Nil4rYYtUH+rjzwANfEMSl57iZm3CZfDGNijJCqxRn00WM0
-         Lbhqv86t4Ouof8I/85OoxzxUnTzMNdNdbpBMsGq2XabmVf22kB3yxqvX/+Cepga+7dGr
-         R6GRNfFs8TCyFoECbNhuKuPp/cHCG5WaK4vXEiGJjH4RnQE+OEEXauXD8aj4mwLmisAl
-         Iqtg==
+        d=google.com; s=20230601; t=1696251396; x=1696856196; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vhnS1jID/E/HPZQRwttboOmGY8j/6QNBSIOKDXt9Rx0=;
+        b=I5Z6P+M0ZQuBH9Gw4ld/bNeK6wb05j3yDpFTIcF7WMFacyW4b63iwq64h0ZAm4s7O3
+         3m+UxOiBM/hFixTGMHmzZnn+IyRxcx88hmwwVZHSKLIxF0CIuM5WnoARIZ/RrqsGfVZu
+         2Oc6+9hrzGYJ2XPtzWZUhOYoyDUpkymg2oTr80E2MRHyQErqLGY8MgG9nA1MHWvDGU7s
+         o8tb4JObI7Tz1/8rX3+5p0yG7gyOv+sharKrtD3/hSQOJzSpg7Xyqi+lZuyrfcGQQX+L
+         QpWdZoeZqhpzAS7A6pcHUdcv9fV70CRFxGCYlIszBjiPAMwaKFfAyKUExCcjvKpyqcl9
+         9IYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696251300; x=1696856100;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=28IiggInfhdX5TRLSL71Si3g5qgj6uye3wMvj7LWpPw=;
-        b=aWUG1PZtwlBxsOXDChiEDrTx4F98AH6d40/Mcr3dYkWWNI0glSbpZ2l/E+XTvztSfE
-         uxy3xgiaNhJfH9yCdjWe/P6mzcMYaKCgCznPE8asZZ/yJDpcoyxKFj5iypGSrb0mUUWS
-         hEBy4XRgi3eDX6nGVhshnw9ACDDPO5e1ekwMY2zN7ejRl4i91s4+Ve+sBQTt1rWVIf7Q
-         PMUU1MiHrOepd2YKPftLJUpiJ+FoqfEF0Uz4dvKJOe1upFP1R/wusIzBPLndGaO4Fi0G
-         NCbLXk2jEAovHR8DNGilW+oZZa+TS+HWVFWfTZUZIQEKV/qspqcssy0CA/qxhpBqzVWI
-         c2AA==
-X-Gm-Message-State: AOJu0YwUH920YwTMIaWUZ9ShubAmG/SF3juGisC+RbfIbMoFWqNWmK7W
-	qBIhhrUHI4RXsCemFUNeUYE=
-X-Google-Smtp-Source: AGHT+IGMOsBeJ1M30+rfvuzbSeaPC6dZyf97ZswVAua76P7jZFwmyAiqKyvI8+Y2NbdOgX4Bsybsag==
-X-Received: by 2002:a1c:4b18:0:b0:404:7659:ba39 with SMTP id y24-20020a1c4b18000000b004047659ba39mr10368110wma.16.1696251299806;
-        Mon, 02 Oct 2023 05:54:59 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id p10-20020adff20a000000b0032763287473sm4987101wro.75.2023.10.02.05.54.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 05:54:59 -0700 (PDT)
-Message-ID: <651abda3.df0a0220.a04f0.12df@mx.google.com>
-X-Google-Original-Message-ID: <ZRq9n/VYcTZOZmJ7@Ansuel-xps.>
-Date: Mon, 2 Oct 2023 14:54:55 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Vincent Whitchurch <vincent.whitchurch@axis.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Ping-Ke Shih <pkshih@realtek.com>, Kalle Valo <kvalo@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH 1/3] net: introduce napi_is_scheduled helper
-References: <20230922111247.497-1-ansuelsmth@gmail.com>
- <CANn89iJtrpVQZbeAezd7S4p_yCRSFzcsBMgW+y9YhxOrCv463A@mail.gmail.com>
- <65181064.050a0220.7887c.c7ee@mx.google.com>
- <CANn89iJqkpRu8rd_M7HCzaZQV5P_XTCzbKe5DOwnJkTRDZWEWw@mail.gmail.com>
- <651ab7b8.050a0220.e15ed.9d6a@mx.google.com>
- <CANn89iJqFC-Z3NZwT+CXEG7R9rc9g4LRwNm6Zm=nZKpD3Mon7Q@mail.gmail.com>
- <651abb07.050a0220.5435c.9eae@mx.google.com>
- <CANn89iLHMOh9Axt3xquzPjx0Dfn6obmSZJFSpzH51TKAN_nPqQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1696251396; x=1696856196;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vhnS1jID/E/HPZQRwttboOmGY8j/6QNBSIOKDXt9Rx0=;
+        b=EF7qUzUekRBOqUGLqPIZAkmvhEkm1HZrOLmCl8x19+rpnZN1hLhrJsZ8ajhDPot8cp
+         7X0kIdGmryfPf0jk7lJilKBBP07xhLQ3FPN+q9xXcyzizWhsUHyvkBK8hTxAq7P2/AAK
+         g6lx+QdapSFcKfcnHwdvvGZyCrVfOIszpcJ11pl86VwmJqoss7ktdyrK7ZyTwgFLzJC0
+         fUTpS/yGLdr0YFWecV8D9GMrwugNq9uHdsJlBm8QZoiUw8cvQY6sHAPXGRiD72G8k+Nk
+         d9NkEBiszstKU3gVxZ+hvHi6YUwIgic8mTg6gfG8fHx1/x8Gq/DSl5Mo27ZJPd/3NpfS
+         vI6g==
+X-Gm-Message-State: AOJu0Yz2JWsa0lvMHmdQMZGlD5+yFBKP/CxPakcLh5jWFayd93ShchqL
+	dIE9BQNKZwNIHieBP6Xrckksu0739t1Pu3EreQkTDw==
+X-Google-Smtp-Source: AGHT+IH2BpKCB5EMiwqckAjJ6wIMKO3DV/EsUH2KYkYKWp0emjrHOycC6QBqa5b6EXDe3hYKjUZFW0cUS4ODnBk/VRc=
+X-Received: by 2002:ac2:544b:0:b0:502:c615:99b0 with SMTP id
+ d11-20020ac2544b000000b00502c61599b0mr68351lfn.4.1696251395319; Mon, 02 Oct
+ 2023 05:56:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLHMOh9Axt3xquzPjx0Dfn6obmSZJFSpzH51TKAN_nPqQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230922111247.497-1-ansuelsmth@gmail.com> <CANn89iJtrpVQZbeAezd7S4p_yCRSFzcsBMgW+y9YhxOrCv463A@mail.gmail.com>
+ <65181064.050a0220.7887c.c7ee@mx.google.com> <CANn89iJqkpRu8rd_M7HCzaZQV5P_XTCzbKe5DOwnJkTRDZWEWw@mail.gmail.com>
+ <651ab7b8.050a0220.e15ed.9d6a@mx.google.com> <CANn89iJqFC-Z3NZwT+CXEG7R9rc9g4LRwNm6Zm=nZKpD3Mon7Q@mail.gmail.com>
+ <651abb07.050a0220.5435c.9eae@mx.google.com> <CANn89iLHMOh9Axt3xquzPjx0Dfn6obmSZJFSpzH51TKAN_nPqQ@mail.gmail.com>
+ <651abda3.df0a0220.a04f0.12df@mx.google.com>
+In-Reply-To: <651abda3.df0a0220.a04f0.12df@mx.google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 2 Oct 2023 14:56:24 +0200
+Message-ID: <CANn89iLKBqsV6=jP1viSNMpA1W8r5mJEitjH3+RU5gEOQFYEtg@mail.gmail.com>
+Subject: Re: [net-next PATCH 1/3] net: introduce napi_is_scheduled helper
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Vincent Whitchurch <vincent.whitchurch@axis.com>, Raju Rangoju <rajur@chelsio.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Ping-Ke Shih <pkshih@realtek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-wireless@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 02:49:11PM +0200, Eric Dumazet wrote:
-> On Mon, Oct 2, 2023 at 2:43 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
-> >
-> > On Mon, Oct 02, 2023 at 02:35:22PM +0200, Eric Dumazet wrote:
-> > > On Mon, Oct 2, 2023 at 2:29 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
+On Mon, Oct 2, 2023 at 2:55=E2=80=AFPM Christian Marangi <ansuelsmth@gmail.=
+com> wrote:
+>
+> On Mon, Oct 02, 2023 at 02:49:11PM +0200, Eric Dumazet wrote:
+> > On Mon, Oct 2, 2023 at 2:43=E2=80=AFPM Christian Marangi <ansuelsmth@gm=
+ail.com> wrote:
 > > >
-> > > > Ehhh the idea here was to reduce code duplication since the very same
-> > > > test will be done in stmmac. So I guess this code cleanup is a NACK and
-> > > > I have to duplicate the test in the stmmac driver.
+> > > On Mon, Oct 02, 2023 at 02:35:22PM +0200, Eric Dumazet wrote:
+> > > > On Mon, Oct 2, 2023 at 2:29=E2=80=AFPM Christian Marangi <ansuelsmt=
+h@gmail.com> wrote:
+> > > >
+> > > > > Ehhh the idea here was to reduce code duplication since the very =
+same
+> > > > > test will be done in stmmac. So I guess this code cleanup is a NA=
+CK and
+> > > > > I have to duplicate the test in the stmmac driver.
+> > > >
+> > > > I simply wanted to add a comment in front of this function/helper,
+> > > > advising not using it unless absolutely needed.
+> > > >
+> > > > Thus my question "In which context is it safe to call this helper ?=
+"
+> > > >
+> > > > As long as it was private with a driver, I did not mind.
+> > > >
+> > > > But if made public in include/linux/netdevice.h, I would rather not
+> > > > have to explain
+> > > > to future users why it can be problematic.
 > > >
-> > > I simply wanted to add a comment in front of this function/helper,
-> > > advising not using it unless absolutely needed.
+> > > Oh ok!
 > > >
-> > > Thus my question "In which context is it safe to call this helper ?"
+> > > We have plenty of case similar to this. (example some clock API very
+> > > internal that should not be used normally or regmap related)
 > > >
-> > > As long as it was private with a driver, I did not mind.
+> > > I will include some comments warning that this should not be used in
+> > > normal circumstances and other warnings. If you have suggestion on wh=
+at
+> > > to add feel free to write them.
 > > >
-> > > But if made public in include/linux/netdevice.h, I would rather not
-> > > have to explain
-> > > to future users why it can be problematic.
+> > > Any clue on how to proceed with the sge driver?
+> > >
 > >
-> > Oh ok!
+> > I would remove use of this helper for something with no race ?
 > >
-> > We have plenty of case similar to this. (example some clock API very
-> > internal that should not be used normally or regmap related)
+> > Feel free to submit this :
 > >
-> > I will include some comments warning that this should not be used in
-> > normal circumstances and other warnings. If you have suggestion on what
-> > to add feel free to write them.
+> > (Alternative would be to change napi_schedule() to return a boolean)
 > >
-> > Any clue on how to proceed with the sge driver?
-> >
-> 
-> I would remove use of this helper for something with no race ?
-> 
-> Feel free to submit this :
-> 
-> (Alternative would be to change napi_schedule() to return a boolean)
+>
+> Think mod napi_schedule() to return a bool would result in massive
+> warning (actually error with werror) with return value not handled.
 >
 
-Think mod napi_schedule() to return a bool would result in massive
-warning (actually error with werror) with return value not handled.
+It should not, unless we added a __must_check
 
-I will submit with your Suggested-by. Ok for you?
+> I will submit with your Suggested-by. Ok for you?
 
-> diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c
-> b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-> index 2e9a74fe0970df333226b80af8716f30865c01b7..09d0e6aa4db982e3488e0c28bed33e83453801d0
-> 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
-> @@ -2501,14 +2501,6 @@ static int napi_rx_handler(struct napi_struct
-> *napi, int budget)
->         return work_done;
->  }
-> 
-> -/*
-> - * Returns true if the device is already scheduled for polling.
-> - */
-> -static inline int napi_is_scheduled(struct napi_struct *napi)
-> -{
-> -       return test_bit(NAPI_STATE_SCHED, &napi->state);
-> -}
-> -
->  /**
->   *     process_pure_responses - process pure responses from a response queue
->   *     @adap: the adapter
-> @@ -2674,9 +2666,9 @@ static int rspq_check_napi(struct sge_qset *qs)
->  {
->         struct sge_rspq *q = &qs->rspq;
-> 
-> -       if (!napi_is_scheduled(&qs->napi) &&
-> -           is_new_response(&q->desc[q->cidx], q)) {
-> -               napi_schedule(&qs->napi);
-> +       if (is_new_response(&q->desc[q->cidx], q) &&
-> +           napi_schedule_prep(&qs->napi)) {
-> +               __napi_schedule(&qs->napi);
->                 return 1;
->         }
->         return 0;
+Absolutely, thanks.
 
--- 
-	Ansuel
+>
+> > diff --git a/drivers/net/ethernet/chelsio/cxgb3/sge.c
+> > b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+> > index 2e9a74fe0970df333226b80af8716f30865c01b7..09d0e6aa4db982e3488e0c2=
+8bed33e83453801d0
+> > 100644
+> > --- a/drivers/net/ethernet/chelsio/cxgb3/sge.c
+> > +++ b/drivers/net/ethernet/chelsio/cxgb3/sge.c
+> > @@ -2501,14 +2501,6 @@ static int napi_rx_handler(struct napi_struct
+> > *napi, int budget)
+> >         return work_done;
+> >  }
+> >
+> > -/*
+> > - * Returns true if the device is already scheduled for polling.
+> > - */
+> > -static inline int napi_is_scheduled(struct napi_struct *napi)
+> > -{
+> > -       return test_bit(NAPI_STATE_SCHED, &napi->state);
+> > -}
+> > -
+> >  /**
+> >   *     process_pure_responses - process pure responses from a response=
+ queue
+> >   *     @adap: the adapter
+> > @@ -2674,9 +2666,9 @@ static int rspq_check_napi(struct sge_qset *qs)
+> >  {
+> >         struct sge_rspq *q =3D &qs->rspq;
+> >
+> > -       if (!napi_is_scheduled(&qs->napi) &&
+> > -           is_new_response(&q->desc[q->cidx], q)) {
+> > -               napi_schedule(&qs->napi);
+> > +       if (is_new_response(&q->desc[q->cidx], q) &&
+> > +           napi_schedule_prep(&qs->napi)) {
+> > +               __napi_schedule(&qs->napi);
+> >                 return 1;
+> >         }
+> >         return 0;
+>
+> --
+>         Ansuel
 
