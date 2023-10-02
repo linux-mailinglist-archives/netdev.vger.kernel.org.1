@@ -1,172 +1,134 @@
-Return-Path: <netdev+bounces-37530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DE7A7B5C9D
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 23:45:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 702C07B5CFB
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 00:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 42421281C3C
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 21:45:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2BC6B281741
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4954F2033D;
-	Mon,  2 Oct 2023 21:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FF5208A6;
+	Mon,  2 Oct 2023 22:03:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15731F934
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:45:34 +0000 (UTC)
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8320C9
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 14:45:31 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-406609df1a6so2486005e9.3
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 14:45:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5840220326;
+	Mon,  2 Oct 2023 22:03:43 +0000 (UTC)
+Received: from mail-lf1-x141.google.com (mail-lf1-x141.google.com [IPv6:2a00:1450:4864:20::141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 431CFB0;
+	Mon,  2 Oct 2023 15:03:41 -0700 (PDT)
+Received: by mail-lf1-x141.google.com with SMTP id 2adb3069b0e04-50481a0eee7so4458956e87.0;
+        Mon, 02 Oct 2023 15:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20230601.gappssmtp.com; s=20230601; t=1696283130; x=1696887930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3dA79LkNYU7asBXwt/uQxW8bheOGwedQNE5Z+nFIVT0=;
-        b=jC4WA2n5N6fh0h+8A80v34J674kTNb/dkqkkQ4wr6AQU33VVyNhBrLJ5fIDHvQkiRC
-         YGLtDdF8yOE+UQ1F9TDhWiCE0v6E1PqR6ceCh6wN4S6/wW6QSdK3FhOoyU/zI1HpFs0O
-         +F8KfczwTGXQlzUVF4ka2LhahMo5RG2sNqhG8NaTCIin4KK5EYb9i1itvP4TT4QtItrG
-         6l81HyN+/AWlJTwrcZBsVzzV6zShJd0lbmT0bslRid9k+F5TLRs7b1Nah9+yNFpY15j8
-         CilWH5jhV7Apb9r2YfgO6KBYqg0XMY4yHLusxDU82pYXfBi6WeD9aJ2bVZr42E3kPHhV
-         fbbw==
+        d=gmail.com; s=20230601; t=1696284219; x=1696889019; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GcfuhtzVzjDNtRj4QA4ePrsnxqf+lMTsaZP4TTaHfSU=;
+        b=MFEDMVdNc7YtftIMAShxWK9aeBcfDO8gO8Kjr7+MIK6L5FN8bIafBXUA3FBAGaC03q
+         APElRAvzAv05jIiJNk58lWPQQ97no06OT9R7yhCFlmVLykrOGim6uT2PjP/xVbL0roY/
+         R4VszKp4/6uRTEGcIWNscsXqnvYqMEcAVBwuHxaGrM4VgpmF+A175leB2j04UXYzkiLp
+         z6GgkdellbB+ckI/aCcToFtXI2Cs5mFmgWaK5HzP8uAy4RHFyLm2INN3FVqP93EZqe0l
+         0SHzgtFg/zh1qAjb+w7zZpCG8D7yryEU/55Li5Q15iITZ6SMdl0oBa/Au7TAAgZBI93/
+         i5/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696283130; x=1696887930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3dA79LkNYU7asBXwt/uQxW8bheOGwedQNE5Z+nFIVT0=;
-        b=NdhY71SweN1O72kSo1dN89lJKJ0UazjLZkYF+a7yrECR07PJwuVi8ElESCl17yaUCv
-         mpyk1+Eo43YurLkNRJbp5Zb1x1A06NSk8x/4mb6SM2N1teFq2s+Ksn8i9XWezuF2XEUq
-         Ybjv+kdsm5D4YHNQBuPuLRcuKVrpbS9HaqhQBuwlk8twnDlvZiF43t/PrFjrGa6rC9l+
-         D1NkmcDz5spIcbPFCYMCFmjk3uSRrKnWzglKjizeYzYWoq0pSOY+K9FqBQWjWm1iSKj8
-         GX3S3mBVq9B5CstW5WswGXyayAwoUZpNcuBCeO0xW02xgHv8teQdAG3R4djoFS42CYll
-         Yr/w==
-X-Gm-Message-State: AOJu0YwA1OYQXI/pSAhlffvoTq1k0rfWRxoTf4QCbGqnxViBErZO/iAr
-	gMZLzduO9KZj7qpF/Ivhaeodfw==
-X-Google-Smtp-Source: AGHT+IFQqDHrxS5nLVVcz3uYz3zBoh8PRAUblObfkXMiu+127hGE3d4cKV4jcsCeAwYclm/ssvuz7g==
-X-Received: by 2002:a1c:6a05:0:b0:404:757e:c5ba with SMTP id f5-20020a1c6a05000000b00404757ec5bamr10282866wmc.26.1696283130281;
-        Mon, 02 Oct 2023 14:45:30 -0700 (PDT)
-Received: from localhost.localdomain (3.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.6.1.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:df16::3])
-        by smtp.gmail.com with ESMTPSA id a11-20020a05600c2d4b00b004065daba6casm7974630wmg.46.2023.10.02.14.45.28
+        d=1e100.net; s=20230601; t=1696284219; x=1696889019;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GcfuhtzVzjDNtRj4QA4ePrsnxqf+lMTsaZP4TTaHfSU=;
+        b=HBiH51ysoC4N/oO5c/Sx4XolAUBr7UNBBlur80ByoIHKMCC77JTC1EpVyEC5TOcSgE
+         9nwDmgWMU41Id1iHa4r2fYV8J+Hw+CDX7pThvef3+IUevToXSyEDhVKmq5HGqaDfMyTu
+         Nq92H6kWx6NaQYTwc/3Zd/5/9YpjgUa1edwI3gqGV524OVAmKds0bs/z7f7/vRBj5POK
+         9NiOaDGts064qhI8q3YBrs5/QDMDgVcSHNKW6gbPg+w23mpnBll5vQGq6+D8WbijqUIp
+         RNPuOuO9LXRrNBHmMNAog745qUJzx/9fJVxSkBUWBulrio3LPw+8J9qPuDH6x5vSZTN9
+         FlJw==
+X-Gm-Message-State: AOJu0Yx6n923aT1f6q3sQXln0Di2bZn7SZyvJ0/rdz3h4Nkn3+by+7a+
+	1zVB2Kmyyi/R9Ug4b8CjR2E=
+X-Google-Smtp-Source: AGHT+IEAgHJlYSsgmnfK4UkrJFaksI3FPfgxhdP0pFjvKUKbN9WNfKQ7eecVA+Ftm1fOyG812fGfGA==
+X-Received: by 2002:ac2:4577:0:b0:4fe:4896:b6ab with SMTP id k23-20020ac24577000000b004fe4896b6abmr708500lfm.15.1696284219160;
+        Mon, 02 Oct 2023 15:03:39 -0700 (PDT)
+Received: from akanner-r14. ([77.222.24.78])
+        by smtp.gmail.com with ESMTPSA id w9-20020ac25989000000b005057781cee2sm1212429lfn.264.2023.10.02.15.03.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 14:45:29 -0700 (PDT)
-From: Phillip Potter <phil@philpotter.co.uk>
-To: devnull+j.granados.samsung.com@kernel.org
-Cc: Jason@zx2c4.com,
-	airlied@gmail.com,
-	arnd@arndb.de,
-	clemens@ladisch.de,
-	daniel@ffwll.ch,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	dgilbert@interlog.com,
-	dri-devel@lists.freedesktop.org,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	haiyangz@microsoft.com,
-	intel-gfx@lists.freedesktop.org,
-	j.granados@samsung.com,
-	jani.nikula@linux.intel.com,
-	jejb@linux.ibm.com,
-	jgg@ziepe.ca,
-	jgross@suse.com,
-	jirislaby@kernel.org,
-	joonas.lahtinen@linux.intel.com,
-	josh@joshtriplett.org,
-	keescook@chromium.org,
-	kuba@kernel.org,
-	kys@microsoft.com,
-	leon@kernel.org,
-	linux-hyperv@vger.kernel.org,
+        Mon, 02 Oct 2023 15:03:38 -0700 (PDT)
+Message-ID: <651b3e3a.c20a0220.a0ffe.58a3@mx.google.com>
+X-Google-Original-Message-ID: <ZRs+NzP9sL5jbhad@akanner-r14.>
+Date: Tue, 3 Oct 2023 01:03:35 +0300
+From: Andrew Kanner <andrew.kanner@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-raid@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	martin.petersen@oracle.com,
-	mcgrof@kernel.org,
-	minyard@acm.org,
-	netdev@vger.kernel.org,
-	oleksandr_tyshchenko@epam.com,
-	openipmi-developer@lists.sourceforge.net,
-	pabeni@redhat.com,
-	phil@philpotter.co.uk,
-	rafael@kernel.org,
-	robinmholt@gmail.com,
-	rodrigo.vivi@intel.com,
-	russell.h.weight@intel.com,
-	song@kernel.org,
-	sstabellini@kernel.org,
-	steve.wahl@hpe.com,
-	sudipm.mukherjee@gmail.com,
-	tvrtko.ursulin@linux.intel.com,
-	tytso@mit.edu,
-	wei.liu@kernel.org,
-	willy@infradead.org,
-	xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v2 01/15] cdrom: Remove now superfluous sentinel element from ctl_table array
-Date: Mon,  2 Oct 2023 22:45:28 +0100
-Message-ID: <20231002214528.15529-1-phil@philpotter.co.uk>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231002-jag-sysctl_remove_empty_elem_drivers-v2-1-02dd0d46f71e@samsung.com>
-References: <20231002-jag-sysctl_remove_empty_elem_drivers-v2-1-02dd0d46f71e@samsung.com>
+	syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next v1] net/xdp: fix zero-size allocation warning in
+ xskq_create()
+References: <000000000000c84b4705fb31741e@google.com>
+ <20230928204440.543-1-andrew.kanner@gmail.com>
+ <2165e4a3-a717-f715-f7c3-e520d45ec21c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2165e4a3-a717-f715-f7c3-e520d45ec21c@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> From: Joel Granados <j.granados@samsung.com>
->
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which
-> will reduce the overall build time size of the kernel and run time
-> memory bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
->
-> Remove sentinel element from cdrom_table
->
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
-> ---
->  drivers/cdrom/cdrom.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-> index cc2839805983..a5e07270e0d4 100644
-> --- a/drivers/cdrom/cdrom.c
-> +++ b/drivers/cdrom/cdrom.c
-> @@ -3655,7 +3655,6 @@ static struct ctl_table cdrom_table[] = {
->  		.mode		= 0644,
->  		.proc_handler	= cdrom_sysctl_handler
->  	},
-> -	{ }
->  };
->  static struct ctl_table_header *cdrom_sysctl_header;
->
->
-> -- 
-> 2.30.2
+On Mon, Oct 02, 2023 at 03:52:44PM +0200, Alexander Lobakin wrote:
+> From: Andrew Kanner <andrew.kanner@gmail.com>
+> Date: Thu, 28 Sep 2023 23:44:40 +0300
+> 
+> > Syzkaller reported the following issue:
+> 
+> [...]
+> 
+> > PS: the initial number of entries is 0x20000000 in syzkaller repro:
+> > syscall(__NR_setsockopt, (intptr_t)r[0], 0x11b, 3, 0x20000040, 0x20);
+> > 
+> > Link: https://syzkaller.appspot.com/text?tag=ReproC&x=10910f18280000
+> > 
+> >  net/xdp/xsk_queue.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
+> > index f8905400ee07..1bc7fb1f14ae 100644
+> > --- a/net/xdp/xsk_queue.c
+> > +++ b/net/xdp/xsk_queue.c
+> > @@ -34,6 +34,9 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
+> >  	q->ring_mask = nentries - 1;
+> >  
+> >  	size = xskq_get_ring_size(q, umem_queue);
+> > +	if (size == SIZE_MAX)
+> 
+> unlikely().
+> 
+> > +		return NULL;
+> > +
+> >  	size = PAGE_ALIGN(size);
+> >  
+> >  	q->ring = vmalloc_user(size);
+> 
+> Thanks,
+> Olek
 
+Thanks, Olek.
+That is a reasonable optimization, I'll add it in v2.
 
-Hi Joel,
+--
+pw-bot: cr
 
-Looks good to me, many thanks. I'll send on for inclusion.
-
-Reviewed-by: Phillip Potter <phil@philpotter.co.uk>
-
-Regards,
-Phil
+Andrew Kanner
 
