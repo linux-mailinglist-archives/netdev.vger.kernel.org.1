@@ -1,274 +1,189 @@
-Return-Path: <netdev+bounces-37416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF0E7B53F3
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:25:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7AAD7B5458
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 15:53:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E461C280FA3
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:25:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 95C032821F8
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 13:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E2718E28;
-	Mon,  2 Oct 2023 13:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C55199CE;
+	Mon,  2 Oct 2023 13:53:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30F5613E
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:25:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEC6BC433C8;
-	Mon,  2 Oct 2023 13:25:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696253150;
-	bh=rC5LeS/E4y7Ju4SRFC7Yoq5dzRfnMvaFKthqPf/GKKw=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=OHnPp5R+SinZuqXQNR2a9IPhKIQlMPRPsI8/i7JFqRC836Lby+OGZ/EA8R2YRJCGc
-	 VQxCTtIupC991CghzoCNgzVUvxG0LXtAJupj6hzo+21II4fEGPl8juIDcabeU7qmfZ
-	 onONKkiLflxyTPHrp/o5MbsjzcCYhq5GoJpDd+RcILupZbW/G8JQT1hf8YfCbNHI6h
-	 +QCmYxBJgB2dKcAiSve96QrejGMh0xff2193DNkRya+WpDbrlJcxjIr8D5Eeowg3tE
-	 8iJiGeT/f6H8E2oZ7/otWu/La6dWIiXILTMN5YFYSMEJuv8KggiuiAU0290x4F+1D7
-	 pbcvfatywn+0Q==
-Message-ID: <a1ab72d41a502906ea31b983f147ae75f6b0e3a2.camel@kernel.org>
-Subject: Re: [PATCH v3] NFSD: convert write_threads, write_maxblksize and
- write_maxconn to netlink commands
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, NeilBrown <neilb@suse.de>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org, 
-	lorenzo.bianconi@redhat.com, netdev@vger.kernel.org
-Date: Mon, 02 Oct 2023 09:25:48 -0400
-In-Reply-To: <ZRbUp0gsLv9PqriL@tissot.1015granger.net>
-References: 
-	<27646a34a3ddac3e0b0ad9b49aaf66b3cee5844f.1695766257.git.lorenzo@kernel.org>
-	 <169576951041.19404.9298873670065778737@noble.neil.brown.name>
-	 <ZRbUp0gsLv9PqriL@tissot.1015granger.net>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FFBEAC5
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 13:53:01 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E5D8AD
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 06:52:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696254778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vpLoGghBwfAF/DR0ZHV2Bh2/WPx4zdRILR3KFZtAXWE=;
+	b=RMKvgxMVfqXNL8Yhl8EPr/gE8uzwG/i6WBDSh8gpzUMX1zHCqsj1MMtfe+b4Nw6/TBO3n1
+	PktNWcbXhNUzDA7COGZ+o2s7X4VaMDMSzmJXpqv/vcfc0fFUvHhZa9eMGGQWkECrznquZA
+	2Hcx1rpQ1xlyYeN3sPGgDdSJ7cRK7aI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-607-p2jhS79bNEmnpPnmm7HB3g-1; Mon, 02 Oct 2023 09:52:48 -0400
+X-MC-Unique: p2jhS79bNEmnpPnmm7HB3g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F52B3C176E8;
+	Mon,  2 Oct 2023 13:52:47 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.43.17.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 494FB40C6EBF;
+	Mon,  2 Oct 2023 13:52:45 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-rt-users@vger.kernel.org,
+	Jiri Olsa <jolsa@kernel.org>,
+	Artem Savkov <asavkov@redhat.com>
+Subject: [RFC PATCH] tracing: change syscall number type in struct syscall_trace_*
+Date: Mon,  2 Oct 2023 15:52:42 +0200
+Message-ID: <20231002135242.247536-1-asavkov@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_SBL_CSS,SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: *
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 2023-09-29 at 09:44 -0400, Chuck Lever wrote:
-> On Wed, Sep 27, 2023 at 09:05:10AM +1000, NeilBrown wrote:
-> > > diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-> > > index b71744e355a8..07e7a09e28e3 100644
-> > > --- a/fs/nfsd/nfsctl.c
-> > > +++ b/fs/nfsd/nfsctl.c
-> > > @@ -1694,6 +1694,147 @@ int nfsd_nl_rpc_status_get_done(struct netlin=
-k_callback *cb)
-> > >  	return 0;
-> > >  }
-> > > =20
-> > > +/**
-> > > + * nfsd_nl_threads_set_doit - set the number of running threads
-> > > + * @skb: reply buffer
-> > > + * @info: netlink metadata and command arguments
-> > > + *
-> > > + * Return 0 on success or a negative errno.
-> > > + */
-> > > +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *=
-info)
-> > > +{
-> > > +	u32 nthreads;
-> > > +	int ret;
-> > > +
-> > > +	if (!info->attrs[NFSD_A_CONTROL_PLANE_THREADS])
-> > > +		return -EINVAL;
-> > > +
-> > > +	nthreads =3D nla_get_u32(info->attrs[NFSD_A_CONTROL_PLANE_THREADS])=
-;
-> > > +
-> > > +	ret =3D nfsd_svc(nthreads, genl_info_net(info), get_current_cred())=
-;
-> > > +	return ret =3D=3D nthreads ? 0 : ret;
-> > > +}
-> > > +
-> > > +static int nfsd_nl_get_dump(struct sk_buff *skb, struct netlink_call=
-back *cb,
-> > > +			    int cmd, int attr, u32 val)
-> > > +{
-> > > +	void *hdr;
-> > > +
-> > > +	if (cb->args[0]) /* already consumed */
-> > > +		return 0;
-> > > +
-> > > +	hdr =3D genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg=
-_seq,
-> > > +			  &nfsd_nl_family, NLM_F_MULTI, cmd);
-> > > +	if (!hdr)
-> > > +		return -ENOBUFS;
-> > > +
-> > > +	if (nla_put_u32(skb, attr, val))
-> > > +		return -ENOBUFS;
-> > > +
-> > > +	genlmsg_end(skb, hdr);
-> > > +	cb->args[0] =3D 1;
-> > > +
-> > > +	return skb->len;
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_threads_get_dumpit - dump the number of running threads
-> > > + * @skb: reply buffer
-> > > + * @cb: netlink metadata and command arguments
-> > > + *
-> > > + * Returns the size of the reply or a negative errno.
-> > > + */
-> > > +int nfsd_nl_threads_get_dumpit(struct sk_buff *skb, struct netlink_c=
-allback *cb)
-> > > +{
-> > > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_THREADS_GET,
-> > > +				NFSD_A_CONTROL_PLANE_THREADS,
-> > > +				nfsd_nrthreads(sock_net(skb->sk)));
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_max_blksize_set_doit - set the nfs block size
-> > > + * @skb: reply buffer
-> > > + * @info: netlink metadata and command arguments
-> > > + *
-> > > + * Return 0 on success or a negative errno.
-> > > + */
-> > > +int nfsd_nl_max_blksize_set_doit(struct sk_buff *skb, struct genl_in=
-fo *info)
-> > > +{
-> > > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_i=
-d);
-> > > +	struct nlattr *attr =3D info->attrs[NFSD_A_CONTROL_PLANE_MAX_BLKSIZ=
-E];
-> > > +	int ret =3D 0;
-> > > +
-> > > +	if (!attr)
-> > > +		return -EINVAL;
-> > > +
-> > > +	mutex_lock(&nfsd_mutex);
-> > > +	if (nn->nfsd_serv) {
-> > > +		ret =3D -EBUSY;
-> > > +		goto out;
-> > > +	}
-> >=20
-> > This code is wrong... but then the original in write_maxblksize is wron=
-g
-> > to, so you can't be blamed.
-> > nfsd_max_blksize applies to nfsd in ALL network namespaces.  So if we
-> > need to check there are no active services in one namespace, we need to
-> > check the same for *all* namespaces.
->=20
-> Yes, the original code does look strange and is probably incorrect
-> with regard to its handling of the mutex. Shall we explore and fix
-> that issue in the nfsctl code first so that it can be backported to
-> stable kernels?
->=20
->=20
-> > I think we should make nfsd_max_blksize a per-namespace value.
->=20
-> That is a different conversation.
->=20
-> First, the current name of this tunable is incongruent with its
-> actual function, which is to specify the maximum network buffer size
-> that is allocated when the NFSD service pool is created. We should
-> find a more descriptive and specific name for this element in the
-> netlink protocol.
->=20
-> Second, it does seem like a candidate for becoming namespace-
-> specific, but TBH I'm not familiar enough with its current user
-> space consumers to know if that change would be welcome or fraught.
->=20
-> Since more discussion, research, and possibly a fix are needed, we
-> might drop max_blksize from this round and look for one or two
-> other tunables to convert for the first round.
->=20
->=20
+linux-rt-devel tree contains a patch that adds an extra member to struct
+trace_entry. This causes the offset of args field in struct
+trace_event_raw_sys_enter be different from the one in struct
+syscall_trace_enter:
 
-I think we need to step back a bit further even, and consider what we
-want this to look like for users. How do we expect users to interact
-with these new interfaces in the future?
+struct trace_event_raw_sys_enter {
+        struct trace_entry         ent;                  /*     0    12 */
 
-Most of these settings are things that are "set and forget" and things
-that we'd want to set up before we ever start any nfsd threads. I think
-as an initial goal here, we ought to aim to replace the guts of
-rpc.nfsd(8). Make it (preferentially) use the netlink interfaces for
-setting everything instead of writing to files under /proc/fs/nfsd.
+        /* XXX last struct has 3 bytes of padding */
+        /* XXX 4 bytes hole, try to pack */
 
-That gives us a clear set of interfaces that need to be replaced as a
-first step, and gives us a start on integrating this change into nfs-
-utils.
+        long int                   id;                   /*    16     8 */
+        long unsigned int          args[6];              /*    24    48 */
+        /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
+        char                       __data[];             /*    72     0 */
 
-> > > +
-> > > +	nfsd_max_blksize =3D nla_get_u32(attr);
-> > > +	nfsd_max_blksize =3D max_t(int, nfsd_max_blksize, 1024);
-> > > +	nfsd_max_blksize =3D min_t(int, nfsd_max_blksize, NFSSVC_MAXBLKSIZE=
-);
-> > > +	nfsd_max_blksize &=3D ~1023;
-> > > +out:
-> > > +	mutex_unlock(&nfsd_mutex);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_max_blksize_get_dumpit - dump the nfs block size
-> > > + * @skb: reply buffer
-> > > + * @cb: netlink metadata and command arguments
-> > > + *
-> > > + * Returns the size of the reply or a negative errno.
-> > > + */
-> > > +int nfsd_nl_max_blksize_get_dumpit(struct sk_buff *skb,
-> > > +				   struct netlink_callback *cb)
-> > > +{
-> > > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_BLKSIZE_GET,
-> > > +				NFSD_A_CONTROL_PLANE_MAX_BLKSIZE,
-> > > +				nfsd_max_blksize);
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_max_conn_set_doit - set the max number of connections
-> > > + * @skb: reply buffer
-> > > + * @info: netlink metadata and command arguments
-> > > + *
-> > > + * Return 0 on success or a negative errno.
-> > > + */
-> > > +int nfsd_nl_max_conn_set_doit(struct sk_buff *skb, struct genl_info =
-*info)
-> > > +{
-> > > +	struct nfsd_net *nn =3D net_generic(genl_info_net(info), nfsd_net_i=
-d);
-> > > +	struct nlattr *attr =3D info->attrs[NFSD_A_CONTROL_PLANE_MAX_CONN];
-> > > +
-> > > +	if (!attr)
-> > > +		return -EINVAL;
-> > > +
-> > > +	nn->max_connections =3D nla_get_u32(attr);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +/**
-> > > + * nfsd_nl_max_conn_get_dumpit - dump the max number of connections
-> > > + * @skb: reply buffer
-> > > + * @cb: netlink metadata and command arguments
-> > > + *
-> > > + * Returns the size of the reply or a negative errno.
-> > > + */
-> > > +int nfsd_nl_max_conn_get_dumpit(struct sk_buff *skb,
-> > > +				struct netlink_callback *cb)
-> > > +{
-> > > +	struct nfsd_net *nn =3D net_generic(sock_net(cb->skb->sk), nfsd_net=
-_id);
-> > > +
-> > > +	return nfsd_nl_get_dump(skb, cb, NFSD_CMD_MAX_CONN_GET,
-> > > +				NFSD_A_CONTROL_PLANE_MAX_CONN,
-> > > +				nn->max_connections);
-> > > +}
-> > > +
-> > >  /**
-> > >   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespa=
-ce
-> > >   * @net: a freshly-created network namespace
+        /* size: 72, cachelines: 2, members: 4 */
+        /* sum members: 68, holes: 1, sum holes: 4 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 8 bytes */
+};
 
---=20
-Jeff Layton <jlayton@kernel.org>
+struct syscall_trace_enter {
+        struct trace_entry         ent;                  /*     0    12 */
+
+        /* XXX last struct has 3 bytes of padding */
+
+        int                        nr;                   /*    12     4 */
+        long unsigned int          args[];               /*    16     0 */
+
+        /* size: 16, cachelines: 1, members: 3 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 16 bytes */
+};
+
+This, in turn, causes perf_event_set_bpf_prog() fail while running bpf
+test_profiler testcase because max_ctx_offset is calculated based on the
+former struct, while off on the latter:
+
+  10488         if (is_tracepoint || is_syscall_tp) {
+  10489                 int off = trace_event_get_offsets(event->tp_event);
+  10490
+  10491                 if (prog->aux->max_ctx_offset > off)
+  10492                         return -EACCES;
+  10493         }
+
+This patch changes the type of nr member in syscall_trace_* structs to
+be long so that "args" offset is equal to that in struct
+trace_event_raw_sys_enter.
+
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
+---
+ kernel/trace/trace.h          | 4 ++--
+ kernel/trace/trace_syscalls.c | 7 ++++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
+index 77debe53f07cf..cd1d24df85364 100644
+--- a/kernel/trace/trace.h
++++ b/kernel/trace/trace.h
+@@ -135,13 +135,13 @@ enum trace_type {
+  */
+ struct syscall_trace_enter {
+ 	struct trace_entry	ent;
+-	int			nr;
++	long			nr;
+ 	unsigned long		args[];
+ };
+ 
+ struct syscall_trace_exit {
+ 	struct trace_entry	ent;
+-	int			nr;
++	long			nr;
+ 	long			ret;
+ };
+ 
+diff --git a/kernel/trace/trace_syscalls.c b/kernel/trace/trace_syscalls.c
+index de753403cdafb..c26939119f2e4 100644
+--- a/kernel/trace/trace_syscalls.c
++++ b/kernel/trace/trace_syscalls.c
+@@ -101,7 +101,7 @@ find_syscall_meta(unsigned long syscall)
+ 	return NULL;
+ }
+ 
+-static struct syscall_metadata *syscall_nr_to_meta(int nr)
++static struct syscall_metadata *syscall_nr_to_meta(long nr)
+ {
+ 	if (IS_ENABLED(CONFIG_HAVE_SPARSE_SYSCALL_NR))
+ 		return xa_load(&syscalls_metadata_sparse, (unsigned long)nr);
+@@ -132,7 +132,8 @@ print_syscall_enter(struct trace_iterator *iter, int flags,
+ 	struct trace_entry *ent = iter->ent;
+ 	struct syscall_trace_enter *trace;
+ 	struct syscall_metadata *entry;
+-	int i, syscall;
++	int i;
++	long syscall;
+ 
+ 	trace = (typeof(trace))ent;
+ 	syscall = trace->nr;
+@@ -177,7 +178,7 @@ print_syscall_exit(struct trace_iterator *iter, int flags,
+ 	struct trace_seq *s = &iter->seq;
+ 	struct trace_entry *ent = iter->ent;
+ 	struct syscall_trace_exit *trace;
+-	int syscall;
++	long syscall;
+ 	struct syscall_metadata *entry;
+ 
+ 	trace = (typeof(trace))ent;
+-- 
+2.41.0
+
 
