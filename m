@@ -1,116 +1,199 @@
-Return-Path: <netdev+bounces-37511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F8417B5BC8
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:07:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3667B5BE5
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 22:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C65A3281D84
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0F908281D34
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 20:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F92200C8;
-	Mon,  2 Oct 2023 20:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E865200DA;
+	Mon,  2 Oct 2023 20:18:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A5B1D53B
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 20:07:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02719C433C8;
-	Mon,  2 Oct 2023 20:07:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696277251;
-	bh=FZvCKPJ01tn0EEdrhF9GhUHZ+BYZhZIJfSC7xN7B4xk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UN2ox1IpZxb+A+46gmvudWroavUCQ0Vm23sdt96h414S1MBugFJVbZ+G0EzOGFi07
-	 L5l9i4RbGNnWUom9XnxsCdgw07Ksib88dPM8/+ll+/wMJH1p4xD0dSiZs55WmSqNPG
-	 RNig/Z4PXMUWkG0uCY4RTSCz6Fbq+H41LnBxx0XcKTO29eYyf2t9+Gbee1xMQmVZBx
-	 nUpcnfyIvTsnD1Th/I9/f71jPrbtl+VaQmQivNuMtl882lPrC7N2CEKmnbUqcQGdSQ
-	 vRnu40RBiRKxve7E/3waj5Ptm54HpPHkQ4xpZbZfx43QKrEzMveApRpuq8K8B8ahhs
-	 WsY6ELnvxeLGw==
-Message-ID: <57df308d-a97f-f20e-c2f4-90dca6171c6f@kernel.org>
-Date: Mon, 2 Oct 2023 14:07:30 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946DE1F939
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 20:18:24 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594A2B7;
+	Mon,  2 Oct 2023 13:18:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xn3+HJeASNLi6Bxxpih08r0KtwhwbXCe716RaBhG288=; b=HcBw+VQyOqeJxrqsHPEF14fWR7
+	H3mS1uwbV36Xo6KpGGDeSfPCbJQJoJvsohNSO80ZHrOy+t595RRK9G+qUT0JNYZnotzTcyDBqFm1Z
+	PaDsSn4gmNm7bEs09koDJ1o8c4YxrVDud2vK/HKeoqw9zNydkEUSqsl44MseDvEvwlvQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qnPMj-0083Dd-H5; Mon, 02 Oct 2023 22:18:05 +0200
+Date: Mon, 2 Oct 2023 22:18:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Robert Marko <robimarko@gmail.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
+ support
+Message-ID: <df89a28e-0886-4db0-9e68-5f9af5bec888@lunn.ch>
+References: <20230930104008.234831-1-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCHv4 net] ipv4/fib: send notify when delete source address
- routes
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Ido Schimmel <idosch@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>,
- Thomas Haller <thaller@redhat.com>,
- Stephen Hemminger <stephen@networkplumber.org>,
- Eric Dumazet <edumazet@google.com>,
- Nicolas Dichtel <nicolas.dichtel@6wind.com>
-References: <20230922075508.848925-1-liuhangbin@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230922075508.848925-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230930104008.234831-1-robimarko@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 9/22/23 1:55 AM, Hangbin Liu wrote:
-> After deleting an interface address in fib_del_ifaddr(), the function
-> scans the fib_info list for stray entries and calls fib_flush() and
-> fib_table_flush(). Then the stray entries will be deleted silently and no
-> RTM_DELROUTE notification will be sent.
-> 
-> This lack of notification can make routing daemons, or monitor like
-> `ip monitor route` miss the routing changes. e.g.
-> 
-> + ip link add dummy1 type dummy
-> + ip link add dummy2 type dummy
-> + ip link set dummy1 up
-> + ip link set dummy2 up
-> + ip addr add 192.168.5.5/24 dev dummy1
-> + ip route add 7.7.7.0/24 dev dummy2 src 192.168.5.5
-> + ip -4 route
-> 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
-> 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-> + ip monitor route
-> + ip addr del 192.168.5.5/24 dev dummy1
-> Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-> Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
-> Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
-> 
-> As Ido reminded, fib_table_flush() isn't only called when an address is
-> deleted, but also when an interface is deleted or put down. The lack of
-> notification in these cases is deliberate. And commit 7c6bb7d2faaf
-> ("net/ipv6: Add knob to skip DELROUTE message on device down") introduced
-> a sysctl to make IPv6 behave like IPv4 in this regard. So we can't send
-> the route delete notify blindly in fib_table_flush().
-> 
-> To fix this issue, let's add a new flag in "struct fib_info" to track the
-> deleted prefer source address routes, and only send notify for them.
-> 
-> After update:
-> + ip monitor route
-> + ip addr del 192.168.5.5/24 dev dummy1
-> Deleted 192.168.5.0/24 dev dummy1 proto kernel scope link src 192.168.5.5
-> Deleted broadcast 192.168.5.255 dev dummy1 table local proto kernel scope link src 192.168.5.5
-> Deleted local 192.168.5.5 dev dummy1 table local proto kernel scope host src 192.168.5.5
-> Deleted 7.7.7.0/24 dev dummy2 scope link src 192.168.5.5
-> 
-> Suggested-by: Thomas Haller <thaller@redhat.com>
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
-> v4: As David Ahern said, do not use bitfield as it has higher overhead.
-> v3: update patch description
-> v2: Add a bit in fib_info to mark the deleted src route.
-> ---
->  include/net/ip_fib.h     | 1 +
->  net/ipv4/fib_semantics.c | 1 +
->  net/ipv4/fib_trie.c      | 4 ++++
->  3 files changed, 6 insertions(+)
-> 
+> +/* load data into the phy's memory */
+> +static int aquantia_load_memory(struct phy_device *phydev, u32 addr,
+> +				const u8 *data, size_t len)
+> +{
+> +	u16 crc = 0, up_crc;
+> +	size_t pos;
+> +
+> +	/* PHY expect addr in LE */
+> +	addr = cpu_to_le32(addr);
+> +
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE3,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(addr));
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE4,
+> +		      VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(addr));
+> +
+> +	for (pos = 0; pos < len; pos += min(sizeof(u32), len - pos)) {
+> +		u32 word = 0;
+> +
+> +		memcpy(&word, data + pos, min(sizeof(u32), len - pos));
+> +
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE5,
+> +			      VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(word));
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE6,
+> +			      VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(word));
+> +
+> +		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE1,
+> +			      VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE |
+> +			      VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE);
+> +
+> +		/* calculate CRC as we load data to the mailbox.
+> +		 * We convert word to big-endiang as PHY is BE and ailbox will
+> +		 * return a BE crc.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+_m_ailbox.
 
+And i would consistently uses CRC in comments.
 
+> +static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size)
+> +{
+> +	const struct aqr_fw_header *header;
+> +	u32 iram_offset = 0, iram_size = 0;
+> +	u32 dram_offset = 0, dram_size = 0;
+> +	char version[VERSION_STRING_SIZE];
+> +	u16 calculated_crc, read_crc;
+> +	u32 primary_offset = 0;
+> +	int ret;
+> +
+> +	/* extract saved crc at the end of the fw */
+> +	memcpy(&read_crc, data + size - 2, sizeof(read_crc));
+> +	/* crc is saved in big-endian as PHY is BE */
+> +	read_crc = be16_to_cpu(read_crc);
+> +	calculated_crc = crc_ccitt_false(0, data, size - 2);
+> +	if (read_crc != calculated_crc) {
+> +		phydev_err(phydev, "bad firmware CRC: file 0x%04x calculated 0x%04x\n",
+> +			   read_crc, calculated_crc);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Get the primary offset to extract DRAM and IRAM sections. */
+> +	memcpy(&primary_offset, data + PRIMARY_OFFSET_OFFSET, sizeof(u16));
+
+Please add some sanity checks. We should not fully trust the
+firmware. Is PRIMARY_OFFSET_OFFSET + sizeof(u16) actually inside the
+firmware blob?
+
+> +	primary_offset = PRIMARY_OFFSET(le32_to_cpu(primary_offset));
+> +
+> +	/* Find the DRAM and IRAM sections within the firmware file. */
+> +	header = (struct aqr_fw_header *)(data + primary_offset + HEADER_OFFSET);
+
+Is header actually inside the firmware blob?
+
+> +	memcpy(&iram_offset, &header->iram_offset, sizeof(u8) * 3);
+> +	memcpy(&iram_size, &header->iram_size, sizeof(u8) * 3);
+> +	memcpy(&dram_offset, &header->dram_offset, sizeof(u8) * 3);
+> +	memcpy(&dram_size, &header->dram_size, sizeof(u8) * 3);
+> +
+> +	/* offset are in LE and values needs to be converted to cpu endian */
+> +	iram_offset = le32_to_cpu(iram_offset);
+> +	iram_size = le32_to_cpu(iram_size);
+> +	dram_offset = le32_to_cpu(dram_offset);
+> +	dram_size = le32_to_cpu(dram_size);
+> +
+> +	/* Increment the offset with the primary offset. */
+> +	iram_offset += primary_offset;
+> +	dram_offset += primary_offset;
+> +
+> +	phydev_dbg(phydev, "primary %d IRAM offset=%d size=%d DRAM offset=%d size=%d\n",
+> +		   primary_offset, iram_offset, iram_size, dram_offset, dram_size);
+> +
+> +	strscpy(version, (char *)data + dram_offset + VERSION_STRING_OFFSET,
+> +		VERSION_STRING_SIZE);
+
+Is version inside the blob....
+
+> +static int aqr_firmware_load_nvmem(struct phy_device *phydev)
+> +{
+> +	struct nvmem_cell *cell;
+> +	size_t size;
+> +	u8 *buf;
+> +	int ret;
+> +
+> +	cell = nvmem_cell_get(&phydev->mdio.dev, "firmware");
+
+Does this need properties in device tree? Please update the binding.
+
+> +
+> +static int aqr_firmware_load_sysfs(struct phy_device *phydev)
+
+_sysfs seems a bit odd here. Does request_firmware still use the user
+mode helper? I _thought_ it just went direct to the filesystem?
+
+> +{
+> +	struct device *dev = &phydev->mdio.dev;
+> +	const struct firmware *fw;
+> +	const char *fw_name;
+> +	int ret;
+> +
+> +	ret = of_property_read_string(dev->of_node, "firmware-name",
+> +				      &fw_name);
+
+Please update the device tree binding.
+
+> +static int aqr_firmware_load(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_FW_ID);
+> +	if (ret > 0)
+> +		goto exit;
+
+I assume this means a value of 0 indicates there is no firmware
+running? Maybe a comment or a #define for 0?
+
+	 Andrew
 
