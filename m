@@ -1,277 +1,374 @@
-Return-Path: <netdev+bounces-37349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB247B4E14
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 10:53:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC017B4DAC
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 10:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 25F201C209DE
-	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:53:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id CABCBB20B6E
+	for <lists+netdev@lfdr.de>; Mon,  2 Oct 2023 08:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C6E8C0D;
-	Mon,  2 Oct 2023 08:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749CF53B6;
+	Mon,  2 Oct 2023 08:53:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CE610A04;
-	Mon,  2 Oct 2023 08:53:26 +0000 (UTC)
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D24291;
-	Mon,  2 Oct 2023 01:53:23 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-2791d5f1a09so1136345a91.1;
-        Mon, 02 Oct 2023 01:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696236802; x=1696841602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tQTTlYYsnz8FL8Zy6c22htG1c4iCQ1YYL+g38bjpDds=;
-        b=EXRIcuqJH2v4ZS8c24TXXjmh5EcDrLOlYRfPx4Ktzg9z6tCzAIOf0SW0CmOHKdSq60
-         PsCvJxpGB7vfNKoGSCSPklGcASm0dQoQE7pU7zMbw3+fIdy30n79uMK5LHxkB6HZQrjB
-         ywbduuWSXNLDZowF/t6nWSYBQDNmvMLLHen2AS7kCYrZqr/a1KzuM9LJHRULaIgGDGUx
-         U5zCgb4W78TJv3KeIhzdadiYWtN4Qeqger18NTQjeSSeMG+DFXnOGvtxLd+gLn7a/8y6
-         SPpxr2vE4NvvdqI15QDFL65fpaIbtyFRS3FX35yMKHayt6TKDL8P+ouL51VCB0VUqUqR
-         GIWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696236802; x=1696841602;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tQTTlYYsnz8FL8Zy6c22htG1c4iCQ1YYL+g38bjpDds=;
-        b=mgSA2TRBGcj0nONWkIZBgmoon0/vIQML1yJElKDqmLSozYrtQeZIhuB9tQRF/wcNXZ
-         OzhHexGhCkRCxrRKV2ZFpYEgq5RBlBiVYhTDickP4kLzYxqtw/9PhtuOe09pIMsRtQEO
-         Zgrdm+qYvAx+NYV55OaCVdVdJqf3TbxkSn8tqwjdwROkjRXkEPjjBLv5z68xUXM0R6Uz
-         yFHBM8WFWzHz27/fZSD4aZuLmVMIHsWAMGQLSufLCUEuTXvf92GTRnfglPx4w1z7bjjJ
-         KVSVz3D5kPiY5OSk2Ia+jUU9eT76F16hfoJ4E9/ibIfr8Jf1AhPTqaFB/PicMWEzDvnM
-         GtYQ==
-X-Gm-Message-State: AOJu0YwdG7Uyhh+w8Yqt9Uo4nWwlsSl91DmMcII6X46ouRPpP8Pe22sr
-	RTGmQjGmxT3TX/v6NTOfowIYvuj8OoMm9jn7
-X-Google-Smtp-Source: AGHT+IHyTMOGN2GTNNfSDTDCH5V1Hc2AjsJ2L3440jarxOdyY6j5cZKRgeAWW2I3JEprHC5aIq9NGg==
-X-Received: by 2002:a17:90a:657:b0:277:653b:3fef with SMTP id q23-20020a17090a065700b00277653b3fefmr9269449pje.3.1696236802491;
-        Mon, 02 Oct 2023 01:53:22 -0700 (PDT)
-Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id g4-20020a17090ace8400b00274c541ac9esm5656270pju.48.2023.10.02.01.53.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 01:53:22 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com
-Subject: [PATCH v1 3/3] net: phy: add Rust Asix PHY driver
-Date: Mon,  2 Oct 2023 17:53:02 +0900
-Message-Id: <20231002085302.2274260-4-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231002085302.2274260-1-fujita.tomonori@gmail.com>
-References: <20231002085302.2274260-1-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F02F23B1
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 08:53:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E0548C433C9;
+	Mon,  2 Oct 2023 08:53:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696236794;
+	bh=IZog35uNq8vGRsNKIfEniN68FE7olg9OC5FvS2SzfCc=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=hufwGK8eMTwpAZzY5tjjCcSrUlENx2R+GHGSL/MRXkOFuLxlRDrpxb7L8+UmzAAMY
+	 3kyrLlmdif7UJUhx8unTHOW05aoTQTW9PQR/22MMlDEvRzoawpbBHEOwCPKVSGi9hX
+	 0wD8UynDxT9GxWBuVaKGJb1hefuvPbZhQSQ6hYcimLZgnX/osYq003o8rF1prmfvhi
+	 LtYeFa0hAvwXxBPpAp66rx2duVRL7Q2j6tUSgp66GHPQLnypVAF+y5Z1tfYpYJ5k6j
+	 /t6wPv+O/vLovGDIQr1Jl99KdgEs2bk9jJSQfzwBDj1gwVb8p3QcZWt/rbklVbQMGh
+	 6tqQLbbnXv/NQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B437FE784A5;
+	Mon,  2 Oct 2023 08:53:14 +0000 (UTC)
+From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
+Subject: [PATCH v2 00/15] sysctl: Remove sentinel elements from drivers
+Date: Mon, 02 Oct 2023 10:55:17 +0200
+Message-Id:
+ <20231002-jag-sysctl_remove_empty_elem_drivers-v2-0-02dd0d46f71e@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHWFGmUC/43NSw6DIBSF4a0YxqVB7EM66j4aQwhe9DYihmtJj
+ XHvpSadd/ifwflWRhARiN2KlUVISBjGHPJQMNubsQOObW4mhayEklf+NB2nhew86Ag+JNDgp3n
+ RMIDXbcQEkbgT1UldpBFtbVm+miI4fO/Mo8ndI80hLruayu/6A+r/gFRyweGsSimcNcqpOxlPr
+ 7E72uBZs23bB7xaV5/aAAAA
+To: Luis Chamberlain <mcgrof@kernel.org>, willy@infradead.org, 
+ josh@joshtriplett.org, Kees Cook <keescook@chromium.org>, 
+ Phillip Potter <phil@philpotter.co.uk>, 
+ Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Juergen Gross <jgross@suse.com>, 
+ Stefano Stabellini <sstabellini@kernel.org>, 
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>, 
+ Jiri Slaby <jirislaby@kernel.org>, 
+ "James E.J. Bottomley" <jejb@linux.ibm.com>, 
+ "Martin K. Petersen" <martin.petersen@oracle.com>, 
+ Doug Gilbert <dgilbert@interlog.com>, 
+ Sudip Mukherjee <sudipm.mukherjee@gmail.com>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+ Corey Minyard <minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>, 
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, David Ahern <dsahern@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Robin Holt <robinmholt@gmail.com>, Steve Wahl <steve.wahl@hpe.com>, 
+ Russ Weight <russell.h.weight@intel.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Song Liu <song@kernel.org>, 
+ "K. Y. Srinivasan" <kys@microsoft.com>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Jani Nikula <jani.nikula@linux.intel.com>, 
+ Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+ Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+ Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>, 
+ David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>
+Cc: Joel Granados <j.granados@samsung.com>, linux-kernel@vger.kernel.org, 
+ xen-devel@lists.xenproject.org, linux-serial@vger.kernel.org, 
+ linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+ linux-rdma@vger.kernel.org, openipmi-developer@lists.sourceforge.net, 
+ netdev@vger.kernel.org, linux-raid@vger.kernel.org, 
+ linux-hyperv@vger.kernel.org, intel-gfx@lists.freedesktop.org, 
+ dri-devel@lists.freedesktop.org
+X-Mailer: b4 0.13-dev-86aa5
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12365;
+ i=j.granados@samsung.com; h=from:subject:message-id;
+ bh=odYjDIhyzOtO5Q0U203ntyluw37NErA2/ZkJretAk7g=;
+ b=owEB7QES/pANAwAKAbqXzVK3lkFPAcsmYgBlGoV7hvNwCIGX3CH1hN+xorNhoD5xKwuTuTXzC
+ Hr03QRHgz2JAbMEAAEKAB0WIQSuRwlXJeYxJc7LJ5C6l81St5ZBTwUCZRqFewAKCRC6l81St5ZB
+ T9oDC/wKVdRDpAFA8LsfwGfmauawotop1selvIUUiWvIA6Ydbya0ucL7Chq71gwhtiD6XFgnEAm
+ MYfELkOZ3OHpp+ERmRTsKo2NcA+1/OHMfAADX3brGP5OWKzGXVhkR9GYDAYD1XPo6ShiUZIT+Cu
+ fIFO+s/Wg5tgnVjs4yE44jXRFPsbH3pwnqxFGbAbX26GI+GTPo+jjtUL0a+WcbJy9Mpxpu2+bDO
+ TZHVixlLPOqq3YBxSBPOYQ+IYTra4MO9MYTdEdvQhfSGZgVBw+fdrG0/5caISy38c3S91WaLLFV
+ pXyRzsol2P/FUrSXxdgKSkD6vBheUaywFVgt6cstLp4+/yStMgYYYcknx5Mlf4LOwuebaFLKAau
+ pP1GDHZXYoR6xKI2UghYY1DX7mGloY0U16rrWh7f2hSAvTBsMHyzN1GS5nrtecfUmMpDNvqcDx6
+ WIPfHqbSx6RcqFTDisa1KnzCA91No7YAHYQrpOwTMzCuakkbopEGnu34ba88MRprtuL3M=
+X-Developer-Key: i=j.granados@samsung.com; a=openpgp;
+ fpr=F1F8E46D30F0F6C4A45FF4465895FAAC338C6E77
+X-Endpoint-Received:
+ by B4 Relay for j.granados@samsung.com/default with auth_id=70
+X-Original-From: Joel Granados <j.granados@samsung.com>
+Reply-To: <j.granados@samsung.com>
 
-This is the Rust implementation of drivers/net/phy/ax88796b.c.  The
-features are equivalent. You can choose C or Rust versionon kernel
-configuration.
+From: Joel Granados <j.granados@samsung.com>
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+What?
+These commits remove the sentinel element (last empty element) from the
+sysctl arrays of all the files under the "drivers/" directory that use a
+sysctl array for registration. The merging of the preparation patches
+(in https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+to mainline allows us to just remove sentinel elements without changing
+behavior (more info here [1]).
+
+These commits are part of a bigger set (here
+https://github.com/Joelgranados/linux/tree/tag/sysctl_remove_empty_elem_V4)
+that remove the ctl_table sentinel. Make the review process easier by
+chunking the commits into manageable pieces. Each chunk can be reviewed
+separately without noise from parallel sets.
+
+Now that the architecture chunk has been mostly reviewed [6], we send
+the "drivers/" directory. Once this one is done, it will be follwed by
+"fs/*", "kernel/*", "net/*" and miscellaneous. The final set will remove
+the unneeded check for ->procname == NULL.
+
+Why?
+By removing the sysctl sentinel elements we avoid kernel bloat as
+ctl_table arrays get moved out of kernel/sysctl.c into their own
+respective subsystems. This move was started long ago to avoid merge
+conflicts; the sentinel removal bit came after Mathew Wilcox suggested
+it to avoid bloating the kernel by one element as arrays moved out. This
+patchset will reduce the overall build time size of the kernel and run
+time memory bloat by about ~64 bytes per declared ctl_table array. I
+have consolidated some links that shed light on the history of this
+effort [2].
+
+Testing:
+* Ran sysctl selftests (./tools/testing/selftests/sysctl/sysctl.sh)
+* Ran this through 0-day with no errors or warnings
+
+Size saving after removing all sentinels:
+  These are the bytes that we save after removing all the sentinels
+  (this plus all the other chunks). I included them to get an idea of
+  how much memory we are talking about.
+    * bloat-o-meter:
+        - The "yesall" configuration results save 9158 bytes
+          https://lore.kernel.org/all/20230621091000.424843-1-j.granados@samsung.com/
+        - The "tiny" config + CONFIG_SYSCTL save 1215 bytes
+          https://lore.kernel.org/all/20230809105006.1198165-1-j.granados@samsung.com/
+    * memory usage:
+        In memory savings are measured to be 7296 bytes. (here is how to
+        measure [3])
+
+Size saving after this patchset:
+    * bloat-o-meter
+        - The "yesall" config saves 2432 bytes [4]
+        - The "tiny" config saves 64 bytes [5]
+    * memory usage:
+        In this case there were no bytes saved because I do not have any
+        of the drivers in the patch. To measure it comment the printk in
+        `new_dir` and uncomment the if conditional in `new_links` [3].
+
 ---
- drivers/net/phy/Kconfig          |   7 ++
- drivers/net/phy/Makefile         |   6 +-
- drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
- rust/uapi/uapi_helper.h          |   1 +
- 4 files changed, 142 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/phy/ax88796b_rust.rs
+Changes in v2:
+- Left the dangling comma in the ctl_table arrays.
+- Link to v1: https://lore.kernel.org/r/20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 107880d13d21..e4d941f0ebe4 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -107,6 +107,13 @@ config AX88796B_PHY
- 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
- 	  AX88796B package.
- 
-+config AX88796B_RUST_PHY
-+	bool "Rust reference driver"
-+	depends on RUST && AX88796B_PHY
-+	default n
-+	help
-+	  Uses the Rust version driver for Asix PHYs.
-+
- config BROADCOM_PHY
- 	tristate "Broadcom 54XX PHYs"
- 	select BCM_NET_PHYLIB
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index c945ed9bd14b..58d7dfb095ab 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
- endif
- obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
- obj-$(CONFIG_AT803X_PHY)	+= at803x.o
--obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+ifdef CONFIG_AX88796B_RUST_PHY
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-+else
-+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-+endif
- obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
- obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
- obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-new file mode 100644
-index 000000000000..d11c82a9e847
---- /dev/null
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -0,0 +1,129 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Rust Asix PHYs driver
-+use kernel::c_str;
-+use kernel::net::phy::{self, DeviceId, Driver};
-+use kernel::prelude::*;
-+use kernel::uapi;
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyAX88772A>(),
-+        DeviceId::new_with_driver::<PhyAX88772C>(),
-+        DeviceId::new_with_driver::<PhyAX88796B>()
-+    ],
-+    type: RustAsixPhy,
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+struct RustAsixPhy;
-+
-+// Performs a software PHY reset using the standard
-+// BMCR_RESET bit and poll for the reset bit to be cleared.
-+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
-+// such as used on the Individual Computers' X-Surf 100 Zorro card.
-+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
-+    dev.write(uapi::MII_BMCR as u16, 0)?;
-+    dev.genphy_soft_reset()
-+}
-+
-+struct PhyAX88772A;
-+
-+#[vtable]
-+impl phy::Driver for PhyAX88772A {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
-+
-+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-+    // after autoneg is done and the link status is reported as active, the MII_LPA
-+    // register is 0. This issue is not reproducible on AX88772C.
-+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-+        dev.genphy_update_link()?;
-+        if !dev.get_link() {
-+            return Ok(0);
-+        }
-+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-+        // linkmode so use MII_BMCR as default values.
-+        let ret = dev.read(uapi::MII_BMCR as u16)?;
-+
-+        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-+            dev.set_speed(100);
-+        } else {
-+            dev.set_speed(10);
-+        }
-+
-+        let duplex = if ret as u32 & uapi::BMCR_FULLDPLX != 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
-+
-+        dev.genphy_read_lpa()?;
-+
-+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
-+            dev.resolve_aneg_linkmode();
-+        }
-+
-+        Ok(0)
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+        // Reset PHY, otherwise MII_LPA will provide outdated information.
-+        // This issue is reproducible only with some link partner PHYs.
-+        if dev.state() == phy::DeviceState::NoLink {
-+            let _ = dev.init_hw();
-+            let _ = dev.start_aneg();
-+        }
-+    }
-+}
-+
-+struct PhyAX88772C;
-+
-+#[vtable]
-+impl Driver for PhyAX88772C {
-+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1881);
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        dev.genphy_resume()
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-+
-+struct PhyAX88796B;
-+
-+#[vtable]
-+impl Driver for PhyAX88796B {
-+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_model_mask(0x003b1841);
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        asix_soft_reset(dev)
-+    }
-+}
-diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
-index 301f5207f023..d92abe9064c2 100644
---- a/rust/uapi/uapi_helper.h
-+++ b/rust/uapi/uapi_helper.h
-@@ -7,3 +7,4 @@
-  */
- 
- #include <uapi/asm-generic/ioctl.h>
-+#include <uapi/linux/mii.h>
+Comments/feedback greatly appreciated
+
+Best
+
+Joel
+
+[1]
+We are able to remove a sentinel table without behavioral change by
+introducing a table_size argument in the same place where procname is
+checked for NULL. The idea is for it to keep stopping when it hits
+->procname == NULL, while the sentinel is still present. And when the
+sentinel is removed, it will stop on the table_size. You can go to 
+(https://lore.kernel.org/all/20230809105006.1198165-1-j.granados@samsung.com/)
+for more information.
+
+[2]
+Links Related to the ctl_table sentinel removal:
+* Good summary from Luis sent with the "pull request" for the
+  preparation patches.
+  https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/
+* Another very good summary from Luis.
+  https://lore.kernel.org/all/ZMFizKFkVxUFtSqa@bombadil.infradead.org/
+* This is a patch set that replaces register_sysctl_table with register_sysctl
+  https://lore.kernel.org/all/20230302204612.782387-1-mcgrof@kernel.org/
+* Patch set to deprecate register_sysctl_paths()
+  https://lore.kernel.org/all/20230302202826.776286-1-mcgrof@kernel.org/
+* Here there is an explicit expectation for the removal of the sentinel element.
+  https://lore.kernel.org/all/20230321130908.6972-1-frank.li@vivo.com
+* The "ARRAY_SIZE" approach was mentioned (proposed?) in this thread
+  https://lore.kernel.org/all/20220220060626.15885-1-tangmeng@uniontech.com
+
+[3]
+To measure the in memory savings apply this on top of this patchset.
+
+"
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index c88854df0b62..e0073a627bac 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -976,6 +976,8 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
+        table[0].procname = new_name;
+        table[0].mode = S_IFDIR|S_IRUGO|S_IXUGO;
+        init_header(&new->header, set->dir.header.root, set, node, table, 1);
++       // Counts additional sentinel used for each new dir.
++       printk("%ld sysctl saved mem kzalloc \n", sizeof(struct ctl_table));
+
+        return new;
+ }
+@@ -1199,6 +1201,9 @@ static struct ctl_table_header *new_links(struct ctl_dir *dir, struct ctl_table_
+                link_name += len;
+                link++;
+        }
++       // Counts additional sentinel used for each new registration
++       //if ((head->ctl_table + head->ctl_table_size)->procname)
++               printk("%ld sysctl saved mem kzalloc \n", sizeof(struct ctl_table));
+        init_header(links, dir->header.root, dir->header.set, node, link_table,
+                    head->ctl_table_size);
+        links->nreg = nr_entries;
+"
+and then run the following bash script in the kernel:
+
+accum=0
+for n in $(dmesg | grep kzalloc | awk '{print $3}') ; do
+    echo $n
+    accum=$(calc "$accum + $n")
+done
+echo $accum
+
+[4]
+add/remove: 0/0 grow/shrink: 0/21 up/down: 0/-2432 (-2432)
+Function                                     old     new   delta
+xpc_sys_xpc_hb                               192     128     -64
+xpc_sys_xpc                                  128      64     -64
+vrf_table                                    128      64     -64
+ucma_ctl_table                               128      64     -64
+tty_table                                    192     128     -64
+sg_sysctls                                   128      64     -64
+scsi_table                                   128      64     -64
+random_table                                 448     384     -64
+raid_table                                   192     128     -64
+oa_table                                     192     128     -64
+mac_hid_files                                256     192     -64
+iwcm_ctl_table                               128      64     -64
+ipmi_table                                   128      64     -64
+hv_ctl_table                                 128      64     -64
+hpet_table                                   128      64     -64
+firmware_config_table                        192     128     -64
+cdrom_table                                  448     384     -64
+balloon_table                                128      64     -64
+parport_sysctl_template                      912     720    -192
+parport_default_sysctl_table                 584     136    -448
+parport_device_sysctl_template               776     136    -640
+Total: Before=429940038, After=429937606, chg -0.00%
+
+[5]
+add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-64 (-64)
+Function                                     old     new   delta
+random_table                                 448     384     -64
+Total: Before=1885527, After=1885463, chg -0.00%
+
+[6] https://lore.kernel.org/all/20230913-jag-sysctl_remove_empty_elem_arch-v2-0-d1bd13a29bae@samsung.com/
+
+Signed-off-by: Joel Granados <j.granados@samsung.com>
+
+To: Luis Chamberlain <mcgrof@kernel.org>
+To: willy@infradead.org
+To: josh@joshtriplett.org
+To: Kees Cook <keescook@chromium.org>
+To: Phillip Potter <phil@philpotter.co.uk>
+To: Clemens Ladisch <clemens@ladisch.de>
+To: Arnd Bergmann <arnd@arndb.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Juergen Gross <jgross@suse.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+To: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+To: Jiri Slaby <jirislaby@kernel.org>
+To: "James E.J. Bottomley" <jejb@linux.ibm.com>
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Doug Gilbert <dgilbert@interlog.com>
+To: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+To: Leon Romanovsky <leon@kernel.org>
+To: Corey Minyard <minyard@acm.org>
+To: Theodore Ts'o <tytso@mit.edu>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: David Ahern <dsahern@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Robin Holt <robinmholt@gmail.com>
+To: Steve Wahl <steve.wahl@hpe.com>
+To: Russ Weight <russell.h.weight@intel.com>
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+To: Song Liu <song@kernel.org>
+To: "K. Y. Srinivasan" <kys@microsoft.com>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+To: Wei Liu <wei.liu@kernel.org>
+To: Dexuan Cui <decui@microsoft.com>
+To: Jani Nikula <jani.nikula@linux.intel.com>
+To: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+To: Rodrigo Vivi <rodrigo.vivi@intel.com>
+To: Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>
+To: David Airlie <airlied@gmail.com>
+To: Daniel Vetter <daniel@ffwll.ch>
+Cc: linux-kernel@vger.kernel.org
+Cc: xen-devel@lists.xenproject.org
+Cc: linux-serial@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-rdma@vger.kernel.org
+Cc: openipmi-developer@lists.sourceforge.net
+Cc: netdev@vger.kernel.org
+Cc: linux-raid@vger.kernel.org
+Cc: linux-hyperv@vger.kernel.org
+Cc: intel-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
+
+---
+
+---
+Joel Granados (15):
+      cdrom: Remove now superfluous sentinel element from ctl_table array
+      hpet: Remove now superfluous sentinel element from ctl_table array
+      xen: Remove now superfluous sentinel element from ctl_table array
+      tty: Remove now superfluous sentinel element from ctl_table array
+      scsi: Remove now superfluous sentinel element from ctl_table array
+      parport: Remove the now superfluous sentinel element from ctl_table array
+      macintosh: Remove the now superfluous sentinel element from ctl_table array
+      infiniband: Remove the now superfluous sentinel element from ctl_table array
+      char-misc: Remove the now superfluous sentinel element from ctl_table array
+      vrf: Remove the now superfluous sentinel element from ctl_table array
+      sgi-xp: Remove the now superfluous sentinel element from ctl_table array
+      fw loader: Remove the now superfluous sentinel element from ctl_table array
+      raid: Remove now superfluous sentinel element from ctl_table array
+      Drivers: hv: Remove now superfluous sentinel element from ctl_table array
+      intel drm: Remove now superfluous sentinel element from ctl_table array
+
+ drivers/base/firmware_loader/fallback_table.c |  1 -
+ drivers/cdrom/cdrom.c                         |  1 -
+ drivers/char/hpet.c                           |  1 -
+ drivers/char/ipmi/ipmi_poweroff.c             |  1 -
+ drivers/char/random.c                         |  1 -
+ drivers/gpu/drm/i915/i915_perf.c              |  1 -
+ drivers/hv/hv_common.c                        |  1 -
+ drivers/infiniband/core/iwcm.c                |  1 -
+ drivers/infiniband/core/ucma.c                |  1 -
+ drivers/macintosh/mac_hid.c                   |  1 -
+ drivers/md/md.c                               |  1 -
+ drivers/misc/sgi-xp/xpc_main.c                |  2 --
+ drivers/net/vrf.c                             |  1 -
+ drivers/parport/procfs.c                      | 28 +++++++++++----------------
+ drivers/scsi/scsi_sysctl.c                    |  1 -
+ drivers/scsi/sg.c                             |  1 -
+ drivers/tty/tty_io.c                          |  1 -
+ drivers/xen/balloon.c                         |  1 -
+ 18 files changed, 11 insertions(+), 35 deletions(-)
+---
+base-commit: 0e945134b680040b8613e962f586d91b6d40292d
+change-id: 20230927-jag-sysctl_remove_empty_elem_drivers-f034962a0d8c
+
+Best regards,
 -- 
-2.34.1
+Joel Granados <j.granados@samsung.com>
 
 
