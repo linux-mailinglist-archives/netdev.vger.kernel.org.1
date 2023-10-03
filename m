@@ -1,59 +1,37 @@
-Return-Path: <netdev+bounces-37596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AF87B63E1
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:17:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F24B57B641B
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:30:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 160FE1C20473
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 08:17:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2087D2816F4
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 08:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD02BD533;
-	Tue,  3 Oct 2023 08:17:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61C54C6E;
+	Tue,  3 Oct 2023 08:30:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2188D6119
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 08:16:59 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35CD9CD6
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 01:16:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696321018; x=1727857018;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=UIqxt/Mlo7Zqs2pefZMZO2wJ2/bqH75N5KsuWpd4zGs=;
-  b=kovVwTTDBmRLqICXhxLX/+BqgRNQTdYbqxUInqKWw+FJt6UlnrXc1XqG
-   58B4dr2LvUFAzzbK/Mq5Rd1SumtHNE+kTlZI7JIjCP2ZS1gZDk/CAcdb4
-   UvTjyUUIEr4T1Q5S3I3v/W8Z5zKc8NCeBtTBrCxrh+mnNo80o/j3LHUXP
-   qtOJbHDbXNNdeUu3lAhTE4NoZrUO6r086+bqoHM83EgZg2tSrOURwgVfW
-   3y0eVmIYJls1zdXUCYfJGyoqO1us4H+EIDYx5RLPOPwLYACk2fus+vWV3
-   2GwJUHX94WRfa+FGWejG6M1r8mQoFMMj6bGZ0V7FF4OYzuuzRhxDU99G+
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="4385008"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="4385008"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 01:16:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="700621518"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="700621518"
-Received: from unknown (HELO fedora.iind.intel.com) ([10.138.157.125])
-  by orsmga003.jf.intel.com with ESMTP; 03 Oct 2023 01:16:55 -0700
-From: Aniruddha Paul <aniruddha.paul@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: marcin.szycik@intel.com,
-	netdev@vger.kernel.org,
-	Aniruddha Paul <aniruddha.paul@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-net,v2] ice: Fix VF-VF filter rules in switchdev mode
-Date: Tue,  3 Oct 2023 13:46:39 +0530
-Message-Id: <20231003081639.1915967-1-aniruddha.paul@intel.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC706DDA9;
+	Tue,  3 Oct 2023 08:30:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C54BC433C9;
+	Tue,  3 Oct 2023 08:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696321825;
+	bh=DqRTB6arV11tq5ZIytFbJxUjjbeix/wfn7i4t+l11Cg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p7IUAPU2YHbAMKR0K3Vf1aCaHUY9pde7eYsnNi5S5FlqxF8YnylAuw+7a2VKIg4pJ
+	 XllXNGTvvGmP636faPxUKd96GfuMvhYZmFdttYuiCBQqlU8wP+bbvgaMsj+5IZtYAn
+	 QbJfDtq/z8qnYgkISTqB4SWVJw5gQG8sqcUKa3choBF5Y2h9xmWRrgWuXs7djL9sp0
+	 lqbvPvM9TQouOKZhecCV6O/6OegexeXhWLE/WP2u34aMS0nXQt9ByqpdSVDIA7y63Y
+	 iTr3mEvgkxLxrvc8vEo/P5bkajFx3FSPqH4LMwRabmiBm4moDXp1rDmUltSg+wTGWm
+	 y5V8oHOJEWI/A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3F6FE632D8;
+	Tue,  3 Oct 2023 08:30:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,199 +39,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH] net: usb: smsc75xx: Fix uninit-value access in
+ __smsc75xx_read_reg
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169632182499.2138.3290447743580809288.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Oct 2023 08:30:24 +0000
+References: <20230923173549.3284502-1-syoshida@redhat.com>
+In-Reply-To: <20230923173549.3284502-1-syoshida@redhat.com>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: steve.glendinning@shawell.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+6966546b78d050bb0b5d@syzkaller.appspotmail.com
 
-Any packet leaving VSI i.e VF's VSI is considered as
-egress traffic by HW, thus failing to match the added
-rule.
+Hello:
 
-Mark the direction for redirect rules as below:
-1. VF-VF - Egress
-2. Uplink-VF - Ingress
-3. VF-Uplink - Egress
-4. Link_Partner-Uplink - Ingress
-5. Link_Partner-VF - Ingress
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 0960a27bd479 ("ice: Add direction metadata")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Aniruddha Paul <aniruddha.paul@intel.com>
----
-Change Log:
-v2:
--Fix rebase compilation error
--Change targeted to iwl-net
+On Sun, 24 Sep 2023 02:35:49 +0900 you wrote:
+> syzbot reported the following uninit-value access issue:
+> 
+> =====================================================
+> BUG: KMSAN: uninit-value in smsc75xx_wait_ready drivers/net/usb/smsc75xx.c:975 [inline]
+> BUG: KMSAN: uninit-value in smsc75xx_bind+0x5c9/0x11e0 drivers/net/usb/smsc75xx.c:1482
+> CPU: 0 PID: 8696 Comm: kworker/0:3 Not tainted 5.8.0-rc5-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> Workqueue: usb_hub_wq hub_event
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x21c/0x280 lib/dump_stack.c:118
+>  kmsan_report+0xf7/0x1e0 mm/kmsan/kmsan_report.c:121
+>  __msan_warning+0x58/0xa0 mm/kmsan/kmsan_instr.c:215
+>  smsc75xx_wait_ready drivers/net/usb/smsc75xx.c:975 [inline]
+>  smsc75xx_bind+0x5c9/0x11e0 drivers/net/usb/smsc75xx.c:1482
+>  usbnet_probe+0x1152/0x3f90 drivers/net/usb/usbnet.c:1737
+>  usb_probe_interface+0xece/0x1550 drivers/usb/core/driver.c:374
+>  really_probe+0xf20/0x20b0 drivers/base/dd.c:529
+>  driver_probe_device+0x293/0x390 drivers/base/dd.c:701
+>  __device_attach_driver+0x63f/0x830 drivers/base/dd.c:807
+>  bus_for_each_drv+0x2ca/0x3f0 drivers/base/bus.c:431
+>  __device_attach+0x4e2/0x7f0 drivers/base/dd.c:873
+>  device_initial_probe+0x4a/0x60 drivers/base/dd.c:920
+>  bus_probe_device+0x177/0x3d0 drivers/base/bus.c:491
+>  device_add+0x3b0e/0x40d0 drivers/base/core.c:2680
+>  usb_set_configuration+0x380f/0x3f10 drivers/usb/core/message.c:2032
+>  usb_generic_driver_probe+0x138/0x300 drivers/usb/core/generic.c:241
+>  usb_probe_device+0x311/0x490 drivers/usb/core/driver.c:272
+>  really_probe+0xf20/0x20b0 drivers/base/dd.c:529
+>  driver_probe_device+0x293/0x390 drivers/base/dd.c:701
+>  __device_attach_driver+0x63f/0x830 drivers/base/dd.c:807
+>  bus_for_each_drv+0x2ca/0x3f0 drivers/base/bus.c:431
+>  __device_attach+0x4e2/0x7f0 drivers/base/dd.c:873
+>  device_initial_probe+0x4a/0x60 drivers/base/dd.c:920
+>  bus_probe_device+0x177/0x3d0 drivers/base/bus.c:491
+>  device_add+0x3b0e/0x40d0 drivers/base/core.c:2680
+>  usb_new_device+0x1bd4/0x2a30 drivers/usb/core/hub.c:2554
+>  hub_port_connect drivers/usb/core/hub.c:5208 [inline]
+>  hub_port_connect_change drivers/usb/core/hub.c:5348 [inline]
+>  port_event drivers/usb/core/hub.c:5494 [inline]
+>  hub_event+0x5e7b/0x8a70 drivers/usb/core/hub.c:5576
+>  process_one_work+0x1688/0x2140 kernel/workqueue.c:2269
+>  worker_thread+0x10bc/0x2730 kernel/workqueue.c:2415
+>  kthread+0x551/0x590 kernel/kthread.c:292
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:293
+> 
+> [...]
 
-Links:
-v1:
--https://lore.kernel.org/netdev/20230927104253.1729049-1-aniruddha.paul@intel.com/
----
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 91 ++++++++++++++-------
- 1 file changed, 63 insertions(+), 28 deletions(-)
+Here is the summary with links:
+  - net: usb: smsc75xx: Fix uninit-value access in __smsc75xx_read_reg
+    https://git.kernel.org/netdev/net/c/e9c65989920f
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index db34df1890f7..de50dc831ea5 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -630,32 +630,62 @@ bool ice_is_tunnel_supported(struct net_device *dev)
- 	return ice_tc_tun_get_type(dev) != TNL_LAST;
- }
- 
--static int
--ice_eswitch_tc_parse_action(struct ice_tc_flower_fltr *fltr,
--			    struct flow_action_entry *act)
-+static bool ice_tc_is_dev_uplink(struct net_device *dev)
-+{
-+	return netif_is_ice(dev) || ice_is_tunnel_supported(dev);
-+}
-+
-+static int ice_tc_setup_redirect_action(struct net_device *filter_dev,
-+					struct ice_tc_flower_fltr *fltr,
-+					struct net_device *target_dev)
- {
- 	struct ice_repr *repr;
- 
-+	fltr->action.fltr_act = ICE_FWD_TO_VSI;
-+
-+	if (ice_is_port_repr_netdev(filter_dev) &&
-+	    ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_is_port_repr_netdev(filter_dev) &&
-+		   ice_tc_is_dev_uplink(target_dev)) {
-+		repr = ice_netdev_to_repr(filter_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi->back->switchdev.uplink_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
-+	} else if (ice_tc_is_dev_uplink(filter_dev) &&
-+		   ice_is_port_repr_netdev(target_dev)) {
-+		repr = ice_netdev_to_repr(target_dev);
-+
-+		fltr->dest_vsi = repr->src_vsi;
-+		fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
-+	} else {
-+		NL_SET_ERR_MSG_MOD(fltr->extack,
-+				   "Unsupported netdevice in switchdev mode");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ice_eswitch_tc_parse_action(struct net_device *filter_dev,
-+				       struct ice_tc_flower_fltr *fltr,
-+				       struct flow_action_entry *act)
-+{
-+	int err;
-+	struct ice_repr *repr;
-+
- 	switch (act->id) {
- 	case FLOW_ACTION_DROP:
- 		fltr->action.fltr_act = ICE_DROP_PACKET;
- 		break;
- 
- 	case FLOW_ACTION_REDIRECT:
--		fltr->action.fltr_act = ICE_FWD_TO_VSI;
--
--		if (ice_is_port_repr_netdev(act->dev)) {
--			repr = ice_netdev_to_repr(act->dev);
--
--			fltr->dest_vsi = repr->src_vsi;
--			fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
--		} else if (netif_is_ice(act->dev) ||
--			   ice_is_tunnel_supported(act->dev)) {
--			fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
--		} else {
--			NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported netdevice in switchdev mode");
--			return -EINVAL;
--		}
-+		err = ice_tc_setup_redirect_action(filter_dev, fltr, act->dev);
-+		if (err)
-+			return err;
- 
- 		break;
- 
-@@ -709,10 +739,6 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 		goto exit;
- 	}
- 
--	/* egress traffic is always redirect to uplink */
--	if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS)
--		fltr->dest_vsi = vsi->back->switchdev.uplink_vsi;
--
- 	rule_info.sw_act.fltr_act = fltr->action.fltr_act;
- 	if (fltr->action.fltr_act != ICE_DROP_PACKET)
- 		rule_info.sw_act.vsi_handle = fltr->dest_vsi->idx;
-@@ -726,13 +752,21 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 	rule_info.flags_info.act_valid = true;
- 
- 	if (fltr->direction == ICE_ESWITCH_FLTR_INGRESS) {
-+		/* Uplink to VF */
- 		rule_info.sw_act.flag |= ICE_FLTR_RX;
- 		rule_info.sw_act.src = hw->pf_id;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
--	} else {
-+	} else if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
-+		   fltr->dest_vsi == vsi->back->switchdev.uplink_vsi) {
-+		/* VF to Uplink */
- 		rule_info.sw_act.flag |= ICE_FLTR_TX;
- 		rule_info.sw_act.src = vsi->idx;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LAN_ENABLE;
-+	} else {
-+		/* VF to VF */
-+		rule_info.sw_act.flag |= ICE_FLTR_TX;
-+		rule_info.sw_act.src = vsi->idx;
-+		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
- 	}
- 
- 	/* specify the cookie as filter_rule_id */
-@@ -1758,16 +1792,17 @@ ice_tc_parse_action(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr,
- 
- /**
-  * ice_parse_tc_flower_actions - Parse the actions for a TC filter
-+ * @filter_dev: Pointer to device on which filter is being added
-  * @vsi: Pointer to VSI
-  * @cls_flower: Pointer to TC flower offload structure
-  * @fltr: Pointer to TC flower filter structure
-  *
-  * Parse the actions for a TC filter
-  */
--static int
--ice_parse_tc_flower_actions(struct ice_vsi *vsi,
--			    struct flow_cls_offload *cls_flower,
--			    struct ice_tc_flower_fltr *fltr)
-+static int ice_parse_tc_flower_actions(struct net_device *filter_dev,
-+				       struct ice_vsi *vsi,
-+				       struct flow_cls_offload *cls_flower,
-+				       struct ice_tc_flower_fltr *fltr)
- {
- 	struct flow_rule *rule = flow_cls_offload_flow_rule(cls_flower);
- 	struct flow_action *flow_action = &rule->action;
-@@ -1782,7 +1817,7 @@ ice_parse_tc_flower_actions(struct ice_vsi *vsi,
- 
- 	flow_action_for_each(i, act, flow_action) {
- 		if (ice_is_eswitch_mode_switchdev(vsi->back))
--			err = ice_eswitch_tc_parse_action(fltr, act);
-+			err = ice_eswitch_tc_parse_action(filter_dev, fltr, act);
- 		else
- 			err = ice_tc_parse_action(vsi, fltr, act);
- 		if (err)
-@@ -1869,7 +1904,7 @@ ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
- 	if (err < 0)
- 		goto err;
- 
--	err = ice_parse_tc_flower_actions(vsi, f, fltr);
-+	err = ice_parse_tc_flower_actions(netdev, vsi, f, fltr);
- 	if (err < 0)
- 		goto err;
- 
+You are awesome, thank you!
 -- 
-2.40.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
