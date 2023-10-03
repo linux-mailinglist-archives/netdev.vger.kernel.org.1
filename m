@@ -1,114 +1,182 @@
-Return-Path: <netdev+bounces-37868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B8C7B76E4
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 05:32:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFFBA7B771B
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 06:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2D41528147C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 03:32:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id B2B57B20841
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 04:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AB41108;
-	Wed,  4 Oct 2023 03:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A69139A;
+	Wed,  4 Oct 2023 04:25:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B1B10EC
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 03:32:46 +0000 (UTC)
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160C8B7
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:32:44 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-69101022969so1272062b3a.3
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 20:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1696390363; x=1696995163; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u5OaR8DthMsUyWl9mFY7CUG1t46HFxwH/NtoS9Paoao=;
-        b=CWSjTOLfUidj+/k6i1A3DoOdhE5OhuTRB+68BrImmMhE8U4NkhujiJVYce/8cc9y1O
-         QEeS9VfCd4oYzEZRK1CS1ScVMZgqfbQ73ZM7YZ62N7xSe0P4A3sawCZ7ZkNkayOyjnsR
-         gqpQSSgeT9NQvaTFIjH/I5set4oM63NUeJzpHa4BTsc0wuadWYBb1Ga99RP/TBrOa5Ae
-         nC8KDQ8azkmPl4Uztua02iQIV9WypRSgcpZVbh8/pTeCaKRXCeZDM3HhrnI9Si+AuNIV
-         g8cNtrr7HRYpXYh3eqrHA10W619fwbwN1hzpP2+cqd2IrnFk58fNFkHGD905gFbQgB52
-         1bRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696390363; x=1696995163;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u5OaR8DthMsUyWl9mFY7CUG1t46HFxwH/NtoS9Paoao=;
-        b=NHwhcYVv0z+pqihzV/yJuk1WMUUn5GwLA0H+6OjSGFeiU3DtFmctq1L51dNfs5wUOM
-         JP8GS5wxfwqz2NJektktnCnQUMD+FDPZ/JiEFlb+ltG4xuhqC46WX/Y1OjE8cfSYJizt
-         JS/Tv4JMtKnslq2lFw3yhQhzRxg6nFOfko8/fZIzDm8Y3lcdwhtk1aVVF/FPAGjRC14Z
-         ppa2Qbrip71ts3jsg+vmT0Da2AZ6gSnvI6dcqNqSjsrLPxPvIWr2j8IhCuDF483VXK8J
-         Ed4wzJOOhRnnKUdItCclX6AfPgSfcn/JjLFUWSbkc5ItR/ASbMhts9k9uoFsevkwqHCj
-         PfXQ==
-X-Gm-Message-State: AOJu0YwN4TPRzFuCOaoRkwIRKHTVJYWmb+r+Qw0eqI/dbfve3sn2yKm5
-	9kpvlUMPxlScq8Ik3+F+uu8UMw==
-X-Google-Smtp-Source: AGHT+IGGpsEw0e3LTyT8M7WzDJclFEVAubYuk5fb/YO6bOu6xRTDtMULAYA3M1rgQmLE3v3tCyXsrA==
-X-Received: by 2002:a05:6a00:a18:b0:690:fe13:1d28 with SMTP id p24-20020a056a000a1800b00690fe131d28mr1249286pfh.33.1696390363246;
-        Tue, 03 Oct 2023 20:32:43 -0700 (PDT)
-Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
-        by smtp.gmail.com with ESMTPSA id m16-20020aa79010000000b0069346777241sm2185428pfo.97.2023.10.03.20.32.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 20:32:43 -0700 (PDT)
-Date: Tue, 3 Oct 2023 20:32:40 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
- <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH] netem: Annotate struct disttable with __counted_by
-Message-ID: <20231003203240.45705fde@hermes.local>
-In-Reply-To: <20231003231823.work.684-kees@kernel.org>
-References: <20231003231823.work.684-kees@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B32615AC;
+	Wed,  4 Oct 2023 04:25:50 +0000 (UTC)
+Received: from omta036.useast.a.cloudfilter.net (omta036.useast.a.cloudfilter.net [44.202.169.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22869B0;
+	Tue,  3 Oct 2023 21:25:48 -0700 (PDT)
+Received: from eig-obgw-5007a.ext.cloudfilter.net ([10.0.29.141])
+	by cmsmtp with ESMTP
+	id npJ5qY89pNWIentSFqI6D2; Wed, 04 Oct 2023 04:25:47 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id ntSEqzup5oD58ntSEqBvRH; Wed, 04 Oct 2023 04:25:46 +0000
+X-Authority-Analysis: v=2.4 cv=Ou1cdgzt c=1 sm=1 tr=0 ts=651ce94a
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=Dx1Zrv+1i3YEdDUMOX3koA==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=bhdUkHdE2iEA:10 a=wYkD_t78qR0A:10 a=J1Y8HTJGAAAA:8
+ a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=QyXUC8HyAAAA:8
+ a=NEAV23lmAAAA:8 a=cm27Pg_UAAAA:8 a=6UV5UrL1aO4bJEFlmkAA:9 a=QEXdDO2ut3YA:10
+ a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22 a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=TU8/ezpal9LOvD+9AttLo3gv3h/2NvMSc+fbzalOHb8=; b=oTmyHfiLcBC6VNqAJx6CyuQABV
+	rugq7xC3fPI7m8f0YojTPDoi4XLaoq5khTHaDlNEYUBps3utjtlZuPGrLpMwbRJsnQtN1j4nClzfQ
+	FieKfvyDtjWJehDN7doPbrDABltgOcY0wl+JHnSCEJFiWQffm53ovBo0e3vlPyOnnNUsfjNULT34f
+	KFZjikxHuIFfBYR2bbStKXsZyNDWB14497EryYKgfrqj3KFsYzGbxI8nsxkWTgo9JIS3QPR9zb+4t
+	vY7S8mwNF/tJTUeqJofT3nwz/VX+XdZYRP0w1ru3JCwE12h50dy9cUE6P54NwwsEtfe7R+uURpv80
+	KX4aSuSw==;
+Received: from 94-238-9-39.abo.bbox.fr ([94.238.9.39]:58492 helo=[192.168.1.98])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1qnp0U-001VLP-16;
+	Tue, 03 Oct 2023 18:40:50 -0500
+Message-ID: <6a3fb58c-440a-31f7-72f8-36e07383d603@embeddedor.com>
+Date: Wed, 4 Oct 2023 01:40:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] netlink: Annotate struct netlink_policy_dump_state with
+ __counted_by
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Johannes Berg <johannes.berg@intel.com>,
+ netdev@vger.kernel.org, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
+References: <20231003232102.work.430-kees@kernel.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20231003232102.work.430-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 94.238.9.39
+X-Source-L: No
+X-Exim-ID: 1qnp0U-001VLP-16
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 94-238-9-39.abo.bbox.fr ([192.168.1.98]) [94.238.9.39]:58492
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 0
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfBz1xlqOVW54GL5Uqo56BhUhUmPmikw2AaVwCv2hLVFeONavyYiHjanBxmf07DFgOC+2tHnspu5qptIGaHSynXbxZFwkOtJEvA+Px1k8nSRTCaZL+ZiY
+ vVywd7I2CHDBHI4T8Yud6f/UxXod5cAkIHYrpFyBN9RrqhXtn69iuSDs7GeQb+uetLN963KX8slCe0u7gxFECMpD2DowwN8bXSh96/P0vyK8y50AMQ5MGNAO
+ 9jOCQOcF5lzi/tkLeZmOwnuHSOHZwurJ2h7dbTOL3+7Oco8O9+jeU1Js+EoIHm0R
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue,  3 Oct 2023 16:18:23 -0700
-Kees Cook <keescook@chromium.org> wrote:
 
+
+On 10/4/23 01:21, Kees Cook wrote:
 > Prepare for the coming implementation by GCC and Clang of the __counted_by
 > attribute. Flexible array members annotated with __counted_by can have
 > their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
 > array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 > functions).
 > 
-> As found with Coccinelle[1], add __counted_by for struct disttable.
+> As found with Coccinelle[1], add __counted_by for struct netlink_policy_dump_state.
 > 
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
+> Additionally update the size of the usage array length before accessing
+> it. This requires remembering the old size for the memset() and later
+> assignments.
+> 
 > Cc: "David S. Miller" <davem@davemloft.net>
 > Cc: Eric Dumazet <edumazet@google.com>
 > Cc: Jakub Kicinski <kuba@kernel.org>
 > Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Johannes Berg <johannes.berg@intel.com>
 > Cc: netdev@vger.kernel.org
 > Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
-> Signed-off-by: Kees Cook <keescook@chromium.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Reviewed-by: Stephen Hemminger <stephen@networkplumber.org>
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-PS: size is intended wrong in original code but that is not important.
-Should have lined up with table[].
+Thanks
+--
+Gustavo
+
+> ---
+>   net/netlink/policy.c | 15 ++++++++-------
+>   1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/netlink/policy.c b/net/netlink/policy.c
+> index 87e3de0fde89..e2f111edf66c 100644
+> --- a/net/netlink/policy.c
+> +++ b/net/netlink/policy.c
+> @@ -21,7 +21,7 @@ struct netlink_policy_dump_state {
+>   	struct {
+>   		const struct nla_policy *policy;
+>   		unsigned int maxtype;
+> -	} policies[];
+> +	} policies[] __counted_by(n_alloc);
+>   };
+>   
+>   static int add_policy(struct netlink_policy_dump_state **statep,
+> @@ -29,7 +29,7 @@ static int add_policy(struct netlink_policy_dump_state **statep,
+>   		      unsigned int maxtype)
+>   {
+>   	struct netlink_policy_dump_state *state = *statep;
+> -	unsigned int n_alloc, i;
+> +	unsigned int old_n_alloc, n_alloc, i;
+>   
+>   	if (!policy || !maxtype)
+>   		return 0;
+> @@ -52,12 +52,13 @@ static int add_policy(struct netlink_policy_dump_state **statep,
+>   	if (!state)
+>   		return -ENOMEM;
+>   
+> -	memset(&state->policies[state->n_alloc], 0,
+> -	       flex_array_size(state, policies, n_alloc - state->n_alloc));
+> -
+> -	state->policies[state->n_alloc].policy = policy;
+> -	state->policies[state->n_alloc].maxtype = maxtype;
+> +	old_n_alloc = state->n_alloc;
+>   	state->n_alloc = n_alloc;
+> +	memset(&state->policies[old_n_alloc], 0,
+> +	       flex_array_size(state, policies, n_alloc - old_n_alloc));
+> +
+> +	state->policies[old_n_alloc].policy = policy;
+> +	state->policies[old_n_alloc].maxtype = maxtype;
+>   	*statep = state;
+>   
+>   	return 0;
 
