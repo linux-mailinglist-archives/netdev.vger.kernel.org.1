@@ -1,314 +1,263 @@
-Return-Path: <netdev+bounces-37586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 275B17B62AA
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:44:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE5CD7B62C1
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 851CE28131A
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:44:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A037C281775
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE48D29D;
-	Tue,  3 Oct 2023 07:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD50FD300;
+	Tue,  3 Oct 2023 07:46:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787686AB4
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 07:43:56 +0000 (UTC)
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88631A9
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:43:52 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9ae75ece209so94127266b.3
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 00:43:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696319031; x=1696923831; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jWS09yPlmT/nxTJiXs7+fTMrLXImEC8p6wRCenFi3s=;
-        b=Pcck7986B9rIOPzARRdbeiTyFiDiSc7lzZ+QNMagnMlhrFutGhq8HnYjtUMOIzsM5+
-         pp4FHsbqkgYVuYlwDk++wb+wQK6x1ppmCrpTzzpt7rKgGigH4b2a893UHsGhTLET+X8f
-         ZR8DUbIL0dqpr0VfCBf12Bb91/o5jP31Kg4+ptP9KzeCSJj22SUiqv80214QC5ITxnJu
-         KZXtQxJR5oeMVWrYSBf/DdUGpuJdH6W8djrd1b2tSCvFMS3RG7qwFucRh0rYVPj3WV+J
-         mSRFWXP82zZhZjtBQ9YTJ3PYit5XpUskvcVGjmwh9ZS03DP5nLcByJwgKrjhZJQYHNhY
-         I8rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696319031; x=1696923831;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6jWS09yPlmT/nxTJiXs7+fTMrLXImEC8p6wRCenFi3s=;
-        b=NyHnf6sNJJSmQz9ZozQRCg4n7HGL9GI/V5fYo1trnNPvD2aetVYyMZLdBwq9p3HYnn
-         D3zM4TSpkeKsECj9PqNPL2s+ZsPHhZIc0QjdS6E1ar+Q2PaAa3hyFDgKmwZwZYrqAy+x
-         IP5mbs/rQ5fHpLrtOpF2MpcOzAFUPSVc6VZ/7arIaZnPuh2mzX/S86R6RQhKBwndBLVn
-         Jvjq0B/TMxO1EEnawjtacLoFTCUQTm1DRrbPdNo/10l4/hx1eTBJwqGaQyHUIniYrAs7
-         Gr+NsGs64hplbDt15fQ5ovN/eChORFUftzzjaDAALJ5Xq+6yUMASnsSoCNGF3K8V7DNw
-         Z5uQ==
-X-Gm-Message-State: AOJu0Yx3Cry/D0XbRX5MoMBwbttp4+9sMoX1owMNnx70ZpWGLfQssVBe
-	GcHG+XZA/1IRkEPnD4VMCQY05blc2P9t5HVXwWM=
-X-Google-Smtp-Source: AGHT+IGmgs1Xo8p0meTQV2USFmUoO2+WUqOiHJmQ72/t7YVNv26ah696b6E8XDDOWMRcI5w0qdTQzw==
-X-Received: by 2002:a17:906:10ce:b0:9ae:4843:66ee with SMTP id v14-20020a17090610ce00b009ae484366eemr13191087ejv.36.1696319030772;
-        Tue, 03 Oct 2023 00:43:50 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id op13-20020a170906bced00b0098921e1b064sm584921ejb.181.2023.10.03.00.43.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 00:43:50 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gal@nvidia.com
-Subject: [patch net-next] devlink: don't take instance lock for nested handle put
-Date: Tue,  3 Oct 2023 09:43:49 +0200
-Message-ID: <20231003074349.1435667-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E536AB4;
+	Tue,  3 Oct 2023 07:46:35 +0000 (UTC)
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7289F90;
+	Tue,  3 Oct 2023 00:46:32 -0700 (PDT)
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39353va3021962;
+	Tue, 3 Oct 2023 09:45:56 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=x3zvFTP/cLetsfZPkK+gIr/Q1D7D0ztqpwYaPZYqEI8=; b=uO
+	k9aJK7R1840fb0b3pBnvZI/Q+sO/3kzxpReIyl8a2WtjvEs45JT6XTDrlHMrsGPn
+	Io4kdlT3zs4GfXE3bNHXaM0035fkGjMAqp2uMreLcEPQiYepILPOa+cc7NCAPguM
+	XG/+aAp+4tKUhiooqE+RCJHYp2y7MjmaJGdf1IMZoAa94a14CtlOeJUBnEw8dsgw
+	u6oWujro9NzuU9qeHL/ppQLDYgxAEDr6y873+ikT+KJq7Fg4e8TZp7c+qkB+QmPp
+	mFyCfe1vyeHFUsZQmgUNkpuoVew6YGy6z2Wppfm2ptuSn7pxaIHLo+x4mVReKTrQ
+	5oexx004P/dDF0l4T6kQ==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3texmj0c3h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Oct 2023 09:45:56 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 787F8100057;
+	Tue,  3 Oct 2023 09:45:54 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1D361229A9D;
+	Tue,  3 Oct 2023 09:45:54 +0200 (CEST)
+Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 3 Oct
+ 2023 09:45:52 +0200
+Message-ID: <1a48fce4-0faf-5e26-c57a-064307573c69@foss.st.com>
+Date: Tue, 3 Oct 2023 09:45:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v5 01/11] dt-bindings: document generic access controller
+To: Rob Herring <robh@kernel.org>
+CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
+        <peng.fan@oss.nxp.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-p.hy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
+ <20230929142852.578394-2-gatien.chevallier@foss.st.com>
+ <20231002173019.GA2037244-robh@kernel.org>
+Content-Language: en-US
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20231002173019.GA2037244-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.20.32]
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-03_04,2023-10-02_01,2023-05-22_02
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi Rob,
 
-Lockdep reports following issue:
+On 10/2/23 19:30, Rob Herring wrote:
+> On Fri, Sep 29, 2023 at 04:28:42PM +0200, Gatien Chevallier wrote:
+>> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+>>
+>> Introducing of the generic access controller bindings for the
+>> access controller provider and consumer devices. Those bindings are
+>> intended to allow a better handling of accesses to resources in a
+>> hardware architecture supporting several compartments.
+>>
+>> This patch is based on [1]. It is integrated in this patchset as it
+>> provides a use-case for it.
+>>
+>> Diffs with [1]:
+>> 	- Rename feature-domain* properties to access-control* to narrow
+>> 	  down the scope of the binding
+>> 	- YAML errors and typos corrected.
+>> 	- Example updated
+>> 	- Some rephrasing in the binding description
+>>
+>> [1]: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b
+>>
+>> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>>
+>> ---
+>> Changes in V5:
+>> 	- Diffs with [1]
+>> 	- Discarded the [IGNORE] tag as the patch is now part of the
+>> 	  patchset
+>>
+>>   .../access-controllers/access-controller.yaml | 90 +++++++++++++++++++
+>>   1 file changed, 90 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/access-controllers/access-controller.yaml b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+>> new file mode 100644
+>> index 000000000000..9d305fccc333
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
+>> @@ -0,0 +1,90 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/access-controllers/access-controller.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Generic Domain Access Controller
+>> +
+>> +maintainers:
+>> +  - Oleksii Moisieiev <oleksii_moisieiev@epam.com>
+>> +
+>> +description: |+
+>> +  Common access controllers properties
+>> +
+>> +  Access controllers are in charge of stating which of the hardware blocks under
+>> +  their responsibility (their domain) can be accesssed by which compartment. A
+>> +  compartment can be a cluster of CPUs (or coprocessors), a range of addresses
+>> +  or a group of hardware blocks. An access controller's domain is the set of
+>> +  resources covered by the access controller.
+>> +
+>> +  This device tree bindings can be used to bind devices to their access
+>> +  controller provided by access-controller property. In this case, the device is
+>> +  a consumer and the access controller is the provider.
+>> +
+>> +  An access controller can be represented by any node in the device tree and
+>> +  can provide one or more configuration parameters, needed to control parameters
+>> +  of the consumer device. A consumer node can refer to the provider by phandle
+>> +  and a set of phandle arguments, specified by '#access-controller-cells'
+>> +  property in the access controller node.
+>> +
+>> +  Access controllers are typically used to set/read the permissions of a
+>> +  hardware block and grant access to it. Any of which depends on the access
+>> +  controller. The capabilities of each access controller are defined by the
+>> +  binding of the access controller device.
+>> +
+>> +  Each node can be a consumer for the several access controllers.
+>> +
+>> +# always select the core schema
+>> +select: true
+>> +
+>> +properties:
+>> +  "#access-controller-cells":
+>> +    $ref: /schemas/types.yaml#/definitions/uint32
+> 
+> Drop. "#.*-cells" already defines the type.
+> 
 
-WARNING: possible circular locking dependency detected
-------------------------------------------------------
-devlink/8191 is trying to acquire lock:
-ffff88813f32c250 (&devlink->lock_key#14){+.+.}-{3:3}, at: devlink_rel_devlink_handle_put+0x11e/0x2d0
+Ok, I will drop it for V6
 
-                           but task is already holding lock:
-ffffffff8511eca8 (rtnl_mutex){+.+.}-{3:3}, at: unregister_netdev+0xe/0x20
+>> +    description:
+>> +      Number of cells in a access-controller specifier;
+>> +      Can be any value as specified by device tree binding documentation
+>> +      of a particular provider.
+>> +
+>> +  access-control-provider:
+>> +    description:
+>> +      Indicates that the node is an access controller.
+> 
+> Drop. The presence of "#access-controller-cells" is enough to do that.
+> 
 
-                           which lock already depends on the new lock.
+Ok, I wasn't sure. I'll will drop it for V6
 
-                           the existing dependency chain (in reverse order) is:
+>> +
+>> +  access-controller-names:
+>> +    $ref: /schemas/types.yaml#/definitions/string-array
+>> +    description:
+>> +      A list of access-controller names, sorted in the same order as
+>> +      access-controller entries. Consumer drivers will use
+>> +      access-controller-names to match with existing access-controller entries.
+>> +
+>> +  access-controller:
+> 
+> For consistency with other provider bindings: access-controllers
+> 
 
-                           -> #3 (rtnl_mutex){+.+.}-{3:3}:
-       lock_acquire+0x1c3/0x500
-       __mutex_lock+0x14c/0x1b20
-       register_netdevice_notifier_net+0x13/0x30
-       mlx5_lag_add_mdev+0x51c/0xa00 [mlx5_core]
-       mlx5_load+0x222/0xc70 [mlx5_core]
-       mlx5_init_one_devl_locked+0x4a0/0x1310 [mlx5_core]
-       mlx5_init_one+0x3b/0x60 [mlx5_core]
-       probe_one+0x786/0xd00 [mlx5_core]
-       local_pci_probe+0xd7/0x180
-       pci_device_probe+0x231/0x720
-       really_probe+0x1e4/0xb60
-       __driver_probe_device+0x261/0x470
-       driver_probe_device+0x49/0x130
-       __driver_attach+0x215/0x4c0
-       bus_for_each_dev+0xf0/0x170
-       bus_add_driver+0x21d/0x590
-       driver_register+0x133/0x460
-       vdpa_match_remove+0x89/0xc0 [vdpa]
-       do_one_initcall+0xc4/0x360
-       do_init_module+0x22d/0x760
-       load_module+0x51d7/0x6750
-       init_module_from_file+0xd2/0x130
-       idempotent_init_module+0x326/0x5a0
-       __x64_sys_finit_module+0xc1/0x130
-       do_syscall_64+0x3d/0x90
-       entry_SYSCALL_64_after_hwframe+0x46/0xb0
+Ack
 
-                           -> #2 (mlx5_intf_mutex){+.+.}-{3:3}:
-       lock_acquire+0x1c3/0x500
-       __mutex_lock+0x14c/0x1b20
-       mlx5_register_device+0x3e/0xd0 [mlx5_core]
-       mlx5_init_one_devl_locked+0x8fa/0x1310 [mlx5_core]
-       mlx5_devlink_reload_up+0x147/0x170 [mlx5_core]
-       devlink_reload+0x203/0x380
-       devlink_nl_cmd_reload+0xb84/0x10e0
-       genl_family_rcv_msg_doit+0x1cc/0x2a0
-       genl_rcv_msg+0x3c9/0x670
-       netlink_rcv_skb+0x12c/0x360
-       genl_rcv+0x24/0x40
-       netlink_unicast+0x435/0x6f0
-       netlink_sendmsg+0x7a0/0xc70
-       sock_sendmsg+0xc5/0x190
-       __sys_sendto+0x1c8/0x290
-       __x64_sys_sendto+0xdc/0x1b0
-       do_syscall_64+0x3d/0x90
-       entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+>> +    description:
+>> +      A list of access controller specifiers, as defined by the
+>> +      bindings of the access-controller provider.
+>> +
+>> +additionalProperties: true
+>> +
+>> +examples:
+>> +  - |
+>> +    uart_controller: access-controller@50000 {
+>> +        reg = <0x50000 0x10>;
+>> +        access-control-provider;
+>> +        #access-controller-cells = <2>;
+>> +    };
+>> +
+>> +    bus_controller: bus@60000 {
+>> +        reg = <0x60000 0x10000>;
+>> +        #address-cells = <1>;
+>> +        #size-cells = <1>;
+>> +        ranges;
+>> +        access-control-provider;
+>> +        #access-controller-cells = <3>;
+>> +
+>> +        uart4: serial@60100 {
+>> +            reg = <0x60100 0x400>;
+>> +            access-controller = <&uart_controller 1 2>,
+>> +                                <&bus_controller 1 3 5>;
+>> +            access-controller-names = "controller", "bus-controller";
+> 
+> Not great names. It should indicate what access is being controlled
+> locally. Perhaps "reg" for register access, "dma" or "bus" for bus
+> master access. (Not sure what your uart_controller is controlling access
+> to.)
+> 
+> Rob
 
-                           -> #1 (&dev->lock_key#8){+.+.}-{3:3}:
-       lock_acquire+0x1c3/0x500
-       __mutex_lock+0x14c/0x1b20
-       mlx5_init_one_devl_locked+0x45/0x1310 [mlx5_core]
-       mlx5_devlink_reload_up+0x147/0x170 [mlx5_core]
-       devlink_reload+0x203/0x380
-       devlink_nl_cmd_reload+0xb84/0x10e0
-       genl_family_rcv_msg_doit+0x1cc/0x2a0
-       genl_rcv_msg+0x3c9/0x670
-       netlink_rcv_skb+0x12c/0x360
-       genl_rcv+0x24/0x40
-       netlink_unicast+0x435/0x6f0
-       netlink_sendmsg+0x7a0/0xc70
-       sock_sendmsg+0xc5/0x190
-       __sys_sendto+0x1c8/0x290
-       __x64_sys_sendto+0xdc/0x1b0
-       do_syscall_64+0x3d/0x90
-       entry_SYSCALL_64_after_hwframe+0x46/0xb0
+Yes, I agree it's poor naming. I'll come up with something more
+adequate. Thank you for the input.
 
-                           -> #0 (&devlink->lock_key#14){+.+.}-{3:3}:
-       check_prev_add+0x1af/0x2300
-       __lock_acquire+0x31d7/0x4eb0
-       lock_acquire+0x1c3/0x500
-       __mutex_lock+0x14c/0x1b20
-       devlink_rel_devlink_handle_put+0x11e/0x2d0
-       devlink_nl_port_fill+0xddf/0x1b00
-       devlink_port_notify+0xb5/0x220
-       __devlink_port_type_set+0x151/0x510
-       devlink_port_netdevice_event+0x17c/0x220
-       notifier_call_chain+0x97/0x240
-       unregister_netdevice_many_notify+0x876/0x1790
-       unregister_netdevice_queue+0x274/0x350
-       unregister_netdev+0x18/0x20
-       mlx5e_vport_rep_unload+0xc5/0x1c0 [mlx5_core]
-       __esw_offloads_unload_rep+0xd8/0x130 [mlx5_core]
-       mlx5_esw_offloads_rep_unload+0x52/0x70 [mlx5_core]
-       mlx5_esw_offloads_unload_rep+0x85/0xc0 [mlx5_core]
-       mlx5_eswitch_unload_sf_vport+0x41/0x90 [mlx5_core]
-       mlx5_devlink_sf_port_del+0x120/0x280 [mlx5_core]
-       genl_family_rcv_msg_doit+0x1cc/0x2a0
-       genl_rcv_msg+0x3c9/0x670
-       netlink_rcv_skb+0x12c/0x360
-       genl_rcv+0x24/0x40
-       netlink_unicast+0x435/0x6f0
-       netlink_sendmsg+0x7a0/0xc70
-       sock_sendmsg+0xc5/0x190
-       __sys_sendto+0x1c8/0x290
-       __x64_sys_sendto+0xdc/0x1b0
-       do_syscall_64+0x3d/0x90
-       entry_SYSCALL_64_after_hwframe+0x46/0xb0
-
-                           other info that might help us debug this:
-
-Chain exists of:
-                             &devlink->lock_key#14 --> mlx5_intf_mutex --> rtnl_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(rtnl_mutex);
-                               lock(mlx5_intf_mutex);
-                               lock(rtnl_mutex);
-  lock(&devlink->lock_key#14);
-
-Problem is taking the devlink instance lock of nested instance when RTNL
-is already held.
-
-To fix this, don't take the devlink instance lock when putting nested
-handle. Instead, rely on devlink reference to access relevant pointers
-within devlink structure. Also, make sure that the device does
-not disappear by taking a reference in devlink_alloc_ns().
-
-Fixes: c137743bce02 ("devlink: introduce object and nested devlink relationship infra")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/core.c    | 20 +++++---------------
- net/devlink/netlink.c |  6 +++---
- 2 files changed, 8 insertions(+), 18 deletions(-)
-
-diff --git a/net/devlink/core.c b/net/devlink/core.c
-index bcbbb952569f..655903ddbdfd 100644
---- a/net/devlink/core.c
-+++ b/net/devlink/core.c
-@@ -183,9 +183,8 @@ static struct devlink_rel *devlink_rel_find(unsigned long rel_index)
- 		       DEVLINK_REL_IN_USE);
- }
- 
--static struct devlink *devlink_rel_devlink_get_lock(u32 rel_index)
-+static struct devlink *devlink_rel_devlink_get(u32 rel_index)
- {
--	struct devlink *devlink;
- 	struct devlink_rel *rel;
- 	u32 devlink_index;
- 
-@@ -198,16 +197,7 @@ static struct devlink *devlink_rel_devlink_get_lock(u32 rel_index)
- 	xa_unlock(&devlink_rels);
- 	if (!rel)
- 		return NULL;
--	devlink = devlinks_xa_get(devlink_index);
--	if (!devlink)
--		return NULL;
--	devl_lock(devlink);
--	if (!devl_is_registered(devlink)) {
--		devl_unlock(devlink);
--		devlink_put(devlink);
--		return NULL;
--	}
--	return devlink;
-+	return devlinks_xa_get(devlink_index);
- }
- 
- int devlink_rel_devlink_handle_put(struct sk_buff *msg, struct devlink *devlink,
-@@ -218,11 +208,10 @@ int devlink_rel_devlink_handle_put(struct sk_buff *msg, struct devlink *devlink,
- 	struct devlink *rel_devlink;
- 	int err;
- 
--	rel_devlink = devlink_rel_devlink_get_lock(rel_index);
-+	rel_devlink = devlink_rel_devlink_get(rel_index);
- 	if (!rel_devlink)
- 		return 0;
- 	err = devlink_nl_put_nested_handle(msg, net, rel_devlink, attrtype);
--	devl_unlock(rel_devlink);
- 	devlink_put(rel_devlink);
- 	if (!err && msg_updated)
- 		*msg_updated = true;
-@@ -310,6 +299,7 @@ static void devlink_release(struct work_struct *work)
- 
- 	mutex_destroy(&devlink->lock);
- 	lockdep_unregister_key(&devlink->lock_key);
-+	put_device(devlink->dev);
- 	kfree(devlink);
- }
- 
-@@ -425,7 +415,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
- 	if (ret < 0)
- 		goto err_xa_alloc;
- 
--	devlink->dev = dev;
-+	devlink->dev = get_device(dev);
- 	devlink->ops = ops;
- 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
- 	xa_init_flags(&devlink->params, XA_FLAGS_ALLOC);
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 499304d9de49..2685c8fcf124 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -85,6 +85,7 @@ static const struct nla_policy devlink_nl_policy[DEVLINK_ATTR_MAX + 1] = {
- int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
- 				 struct devlink *devlink, int attrtype)
- {
-+	struct net *devl_net = devlink_net(devlink);
- 	struct nlattr *nested_attr;
- 
- 	nested_attr = nla_nest_start(msg, attrtype);
-@@ -92,9 +93,8 @@ int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
- 		return -EMSGSIZE;
- 	if (devlink_nl_put_handle(msg, devlink))
- 		goto nla_put_failure;
--	if (!net_eq(net, devlink_net(devlink))) {
--		int id = peernet2id_alloc(net, devlink_net(devlink),
--					  GFP_KERNEL);
-+	if (!net_eq(net, devl_net)) {
-+		int id = peernet2id_alloc(net, devl_net, GFP_KERNEL);
- 
- 		if (nla_put_s32(msg, DEVLINK_ATTR_NETNS_ID, id))
- 			return -EMSGSIZE;
--- 
-2.41.0
-
+Best regards,
+Gatien
 
