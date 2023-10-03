@@ -1,276 +1,179 @@
-Return-Path: <netdev+bounces-37591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF2A7B62F9
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:58:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A157B62FE
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id B30EF1C2090B
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4DB7D1C20847
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:58:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5231ED512;
-	Tue,  3 Oct 2023 07:58:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E35D511;
+	Tue,  3 Oct 2023 07:58:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6662D27B;
-	Tue,  3 Oct 2023 07:58:08 +0000 (UTC)
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF7890;
-	Tue,  3 Oct 2023 00:58:06 -0700 (PDT)
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39354RYX021850;
-	Tue, 3 Oct 2023 09:57:28 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=2y5VWljP34AhFxfwuXFEGUJY8eirMnibqQLHOoorPbE=; b=fa
-	R320QQYh6hKcFinrg870rQe7h0GoXbzAPslv70ug5D/eA+R8ih3Xs94oiISEkK6B
-	+lVN0Nk0RWDanLNzOlVYVNXoVC3ylH/TR6SkGucS1gcPw7FozvY41TLJnEVq1maw
-	Jl6Eziv6CXtKt7MA3JP2LjxAGGwZhycpeAquJPFY02PW+RyneA8UuzdwjLuc2TLb
-	C9VlpRVVgHLOWIyRNtcpjQgKBqCrRy6rnZcMMhIH05RrLAiA3z+B1mGpbD7TMDLg
-	lm/a6IQSsoxIMoQfUPRokZlwPSqQ1ylCSIFMXzh4BEOWLA7H9P1siSHgVyaetmgZ
-	OCu6sQeMWTJ6KW6XuqMg==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3texmj0e7j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Oct 2023 09:57:28 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 9D9B9100057;
-	Tue,  3 Oct 2023 09:57:27 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 88D7222D164;
-	Tue,  3 Oct 2023 09:57:27 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 3 Oct
- 2023 09:57:25 +0200
-Message-ID: <1d33a7ee-3966-5c2e-5a6c-08a6e56d0f75@foss.st.com>
-Date: Tue, 3 Oct 2023 09:57:24 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182566AB4
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 07:58:43 +0000 (UTC)
+Received: from phobos.denx.de (phobos.denx.de [IPv6:2a01:238:438b:c500:173d:9f52:ddab:ee01])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0CBA1;
+	Tue,  3 Oct 2023 00:58:42 -0700 (PDT)
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id ED0D6871DB;
+	Tue,  3 Oct 2023 09:58:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1696319919;
+	bh=PZREtQJWDxL5bttOJQAbnHZ654a8M4MmoIbQ/xDy3Iw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TE3s7z5FRKu4FUbxpsm1s8vb6rKxK9y8vfwGQPgX/uA+cVT/6Xt113kO/vpEIEjVE
+	 2vPph5YAbc46WaoYKMq31URqQxITQn/LHmRJEFSJRpQb9sKzC+EeXCE6lTNPoEBd+5
+	 flfOyJMf2tL2YzlgoKQXnfPKkl2ddk1PGyPrHQrtB//7j5z9/loTfQNalM2gOd3x7y
+	 MV5gJ03hymWbBe71fYvDbJHQMtRU0lRIrHV+6FjM1evy+dWRs+hg/IxbUeGPZmfa8A
+	 gQsOzsx7JWSn3lNXsRKfOssA5WcrnwytspBo0meiXsSG9uJdQPY9Z4/ynljmUr0LCE
+	 evV9nbXCYf+Hg==
+Date: Tue, 3 Oct 2023 09:58:32 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Woojung Huh <woojung.huh@microchip.com>
+Cc: Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+ davem@davemloft.net, Oleksij Rempel <o.rempel@pengutronix.de>, Florian
+ Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
+ for KSZ9477
+Message-ID: <20231003095832.4bec4c72@wsk>
+In-Reply-To: <20230928124127.379115e6@wsk>
+References: <20230922133108.2090612-1-lukma@denx.de>
+	<20230926225401.bganxwmtrgkiz2di@skbuf>
+	<20230928124127.379115e6@wsk>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v5 03/11] dt-bindings: bus: document RIFSC
-Content-Language: en-US
-To: Rob Herring <robh@kernel.org>
-CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-p.hy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-4-gatien.chevallier@foss.st.com>
- <20231002183041.GA2062984-robh@kernel.org>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231002183041.GA2062984-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-03_05,2023-10-02_01,2023-05-22_02
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+Content-Type: multipart/signed; boundary="Sig_/tWJgJkDKh999.Df3ro_hA.w";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+--Sig_/tWJgJkDKh999.Df3ro_hA.w
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+Hi Vladimir, Andrew, Woojung,
 
-On 10/2/23 20:30, Rob Herring wrote:
-> On Fri, Sep 29, 2023 at 04:28:44PM +0200, Gatien Chevallier wrote:
->> Document RIFSC (RIF security controller). RIFSC is a firewall controller
->> composed of different kinds of hardware resources.
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>
->> Changes in V5:
->> 	- Renamed feature-domain* to access-control*
->>
->> Changes in V2:
->> 	- Corrected errors highlighted by Rob's robot
->> 	- No longer define the maxItems for the "feature-domains"
->> 	  property
->> 	- Fix example (node name, status)
->> 	- Declare "feature-domain-names" as an optional
->> 	  property for child nodes
->> 	- Fix description of "feature-domains" property
->>
->>   .../bindings/bus/st,stm32mp25-rifsc.yaml      | 105 ++++++++++++++++++
->>   1 file changed, 105 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> new file mode 100644
->> index 000000000000..c28fceff3036
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/bus/st,stm32mp25-rifsc.yaml
->> @@ -0,0 +1,105 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/bus/st,stm32mp25-rifsc.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: STM32 Resource isolation framework security controller
->> +
->> +maintainers:
->> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
->> +
->> +description: |
->> +  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
->> +  designed to enforce and manage isolation of STM32 hardware resources like
->> +  memory and peripherals.
->> +
->> +  The RIFSC (RIF security controller) is composed of three sets of registers,
->> +  each managing a specific set of hardware resources:
->> +    - RISC registers associated with RISUP logic (resource isolation device unit
->> +      for peripherals), assign all non-RIF aware peripherals to zero, one or
->> +      any security domains (secure, privilege, compartment).
->> +    - RIMC registers: associated with RIMU logic (resource isolation master
->> +      unit), assign all non RIF-aware bus master to one security domain by
->> +      setting secure, privileged and compartment information on the system bus.
->> +      Alternatively, the RISUP logic controlling the device port access to a
->> +      peripheral can assign target bus attributes to this peripheral master port
->> +      (supported attribute: CID).
->> +    - RISC registers associated with RISAL logic (resource isolation device unit
->> +      for address space - Lite version), assign address space subregions to one
->> +      security domains (secure, privilege, compartment).
->> +
->> +properties:
->> +  compatible:
->> +    contains:
->> +      const: st,stm32mp25-rifsc
->> +
->> +  reg:
->> +    maxItems: 1
->> +
->> +  "#address-cells":
->> +    const: 1
->> +
->> +  "#size-cells":
->> +    const: 1
->> +
->> +  ranges: true
->> +
->> +  "#access-controller-cells":
->> +    const: 1
-> 
-> You should define what the cells contain here.
-> 
+> Hi Vladimir,
+>=20
+> > On Fri, Sep 22, 2023 at 03:31:03PM +0200, Lukasz Majewski wrote: =20
+> > > This patch series provides support for HSR HW offloading in
+> > > KSZ9477 switch IC.
+> > >=20
+> > > To test this feature:
+> > > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision
+> > > 45 version 1 ip link set dev lan1 up
+> > > ip link set dev lan2 up
+> > > ip a add 192.168.0.1/24 dev hsr0
+> > > ip link set dev hsr0 up
+> > >=20
+> > > To remove HSR network device:
+> > > ip link del hsr0
+> > >=20
+> > > To test if one can adjust MAC address:
+> > > ip link set lan2 address 00:01:02:AA:BB:CC
+> > >=20
+> > > It is also possible to create another HSR interface, but it will
+> > > only support HSR is software - e.g.
+> > > ip link add name hsr1 type hsr slave1 lan3 slave2 lan4 supervision
+> > > 45 version 1
+> > >=20
+> > > Test HW:
+> > > Two KSZ9477-EVB boards with HSR ports set to "Port1" and "Port2".
+> > >=20
+> > > Performance SW used:
+> > > nuttcp -S --nofork
+> > > nuttcp -vv -T 60 -r 192.168.0.2
+> > > nuttcp -vv -T 60 -t 192.168.0.2
+> > >=20
+> > > Code: v6.6.0-rc2+ Linux net-next repository
+> > > SHA1: 5a1b322cb0b7d0d33a2d13462294dc0f46911172
+> > >=20
+> > > Tested HSR v0 and v1
+> > > Results:
+> > > With KSZ9477 offloading support added: RX: 100 Mbps TX: 98 Mbps
+> > > With no offloading 		       RX: 63 Mbps  TX: 63
+> > > Mbps   =20
+> >=20
+> > Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> >=20
+> > Thanks! =20
+>=20
+> I hope, that it will find its way to net-next soon :-).
+>=20
 
-Ok, I'll do this as well for the ETZPC binding
+I'm a bit puzzled with this patch series - will it be pulled directly
+to net-next [1] or is there any other (KSZ maintainer's?) tree to which
+it will be first pulled and then PR will be send to net-next?
 
->> +
->> +  access-control-provider: true
->> +
+Thanks in advance for the clarification.
 
-Will be dropped, ditto for ETZPC.
+> Thanks for your help and patience.
+>=20
 
->> +patternProperties:
->> +  "^.*@[0-9a-f]+$":
->> +    description: Peripherals
->> +    type: object
-> 
->         additionalProperties: true
-> 
->> +    properties:
->> +      access-controller:
->> +        minItems: 1
->> +        description:
->> +          The phandle of the firewall controller of the peripheral and the
->> +          platform-specific firewall ID of the peripheral.
->> +
->> +      access-controller-names:
->> +        minItems: 1
-> 
-> Drop all this. You have to define these in the specific device schemas
-> anyways.
-> 
+Links:
 
-I guess that:
+[1] -
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
 
-patternProperties:
-   "^.*@[0-9a-f]+$":
-     description: Peripherals
-     type: object
-
-     required:
-       - access-controller
-
-is sufficient if I describe what the content of the cells will be in the
-"#access-controller-cells" above. It avoids redundant information. I'll
-make the change for V6, thank you.
+>=20
+> Best regards,
+>=20
+> Lukasz Majewski
+>=20
+> --
+>=20
+> DENX Software Engineering GmbH,      Managing Director: Erika Unter
+> HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+> Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email:
+> lukma@denx.de
 
 Best regards,
-Gatien
 
->> +
->> +    required:
->> +      - access-controller
->> +
->> +required:
->> +  - compatible
->> +  - reg
->> +  - "#address-cells"
->> +  - "#size-cells"
->> +  - access-control-provider
->> +  - "#access-controller-cells"
->> +  - ranges
->> +
->> +additionalProperties: false
->> +
->> +examples:
->> +  - |
->> +    // In this example, the usart2 device refers to rifsc as its domain
->> +    // controller.
->> +    // Access rights are verified before creating devices.
->> +
->> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
->> +
->> +    rifsc: bus@42080000 {
->> +        compatible = "st,stm32mp25-rifsc";
->> +        reg = <0x42080000 0x1000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <1>;
->> +        access-control-provider;
->> +        #access-controller-cells = <1>;
->> +        ranges;
->> +
->> +        usart2: serial@400e0000 {
->> +              compatible = "st,stm32h7-uart";
->> +              reg = <0x400e0000 0x400>;
->> +              interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
->> +              clocks = <&ck_flexgen_08>;
->> +              access-controller = <&rifsc 32>;
->> +        };
->> +    };
->> -- 
->> 2.25.1
->>
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/tWJgJkDKh999.Df3ro_hA.w
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUbyagACgkQAR8vZIA0
+zr3ZkAgAoj7z6JUowZLbgaiPp3oIGHbaN5ds9j3iAGlC40XKhf5Yr5C4dZGMY0FU
++M2kZMiEae7rvawT6zZNukX1MNA7pFHUqi659ljTDXQQAEqALI/gY7xhga+22DHQ
+SdZ9ZsjhugCYjetCNEW0GTfemkE3ETXk8bl0zmf6mM3+z18IKuAgsTAzyOyIEjIx
+czeG7kLQ5QcmleSZmHsxuUIMnVx24ede+kGPPmNqoyRODR3PejzMBYDsDc9ctkKY
+GT2ILpd2CL75gs4YD8sNpcH+yNiQwfG45aiISn+bjVVpjgrjHyaqeUhhQIXg8bw/
+vsJty81gHhL98oly76Ms1X6Jj9YGTA==
+=W6Hy
+-----END PGP SIGNATURE-----
+
+--Sig_/tWJgJkDKh999.Df3ro_hA.w--
 
