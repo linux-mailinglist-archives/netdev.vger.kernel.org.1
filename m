@@ -1,284 +1,153 @@
-Return-Path: <netdev+bounces-37552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7A17B5F38
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:05:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6B07B5F70
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1B17E281671
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 03:05:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id B00471C20756
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 03:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6F6815;
-	Tue,  3 Oct 2023 03:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626017F4;
+	Tue,  3 Oct 2023 03:43:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F04F364
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:05:31 +0000 (UTC)
-Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56A2FBF;
-	Mon,  2 Oct 2023 20:05:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
-	Content-Type; bh=j5U+KH7L61eD/YR+rpoWGe4zYfEE19aFtlBhfDC1WRw=;
-	b=JTDlxMKJ14hBqiUvEmwUW8CZZpzGCu4pcGJCXUY2fbyFOaJeugvegPMtJYTlcl
-	wR7pvlTx/kUYFwRUxhca+B9EZF170gnzwAvbhzc3d60NhwqaJ2Jmgo1vErZDdDF2
-	l88QSwhWRS06Z/OcXMtJtO6RMWaAX+tYmL1UZ7Fn0LKFY=
-Received: from [172.20.125.11] (unknown [111.48.58.12])
-	by zwqz-smtp-mta-g5-1 (Coremail) with SMTP id _____wC3n0ZDhBtlPMxWBA--.40871S2;
-	Tue, 03 Oct 2023 11:02:28 +0800 (CST)
-Message-ID: <7ce7ae25-7f1d-7eaa-3084-f3c5f417167a@126.com>
-Date: Tue, 3 Oct 2023 11:02:27 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD164EA3;
+	Tue,  3 Oct 2023 03:43:14 +0000 (UTC)
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5049D;
+	Mon,  2 Oct 2023 20:43:13 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-27909dabf1cso106279a91.1;
+        Mon, 02 Oct 2023 20:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696304592; x=1696909392; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aNwOC9N4ruq7sxgNc7Qo8qd72bZpAOd5wtjGETdiya4=;
+        b=O1FpdidjRmDDr2dKcBcKpUx7GoAmpUytaNhrGGXeSBAS7LklCrXpA0KdXzZWugeQh3
+         /ztDPxFPquOuTPrieB2oyaFOXMApwIi7w6p8RfJCJaabv0fLPd/cf1ZJjM4Tn8yeCl/g
+         /hTi4dX7cpnvlnepmz/Loc2W8YrpGOxvysgrBd7IqYn3CVPUrcYk5lNH7xtlnCrrYUpY
+         ahSmiPx3F0KafFzwwB1PG/jg2Q7J1oge6Oyvk9ZYPm4Ap3bmZSdRsY3Gpy6A19giyU2I
+         LEQdfhQqmOJbQv7gWv1Wv90bS3WHuZZBJkB319wJu4mF2e1AO2Is0+aywHOadnk0qyZL
+         ExSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696304592; x=1696909392;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aNwOC9N4ruq7sxgNc7Qo8qd72bZpAOd5wtjGETdiya4=;
+        b=lz1k0Q8rpHm2aN2R0LTOvAwFVAp1CFvC8mBbKraIiDCcx2Ur8+TPxMZd7HD5bs8Vfa
+         7QWoP2Epxj5in5rGtqnFHbsRHDqK23dHhmPpmchyd6ZxWzP8z7jKQgO9lUfZU6xxtRMO
+         HbGdCH7wFt6vI9mswI4Dm/qG30aK/ezq4yXSY5zQEAH+28XinxsUjB2WTtOHA7KyPoDL
+         GQFV0hdCbaGwScK2SFz/bgTGFYYYKeQXI0nX/gwS9YhMd54rGdbPFFWKL9dOk3Hfj07/
+         6DqojCaPrcVpAmLvdiTEPvLQYdUL9bYkcO5dw+2T+fyG5q0O01BOGN1Dqssd9lpgiBYu
+         D6Vw==
+X-Gm-Message-State: AOJu0YzyZtNarSTusVX9e2CGAA08ctdd072it4VnWLSD1Mh0U9CZWbRr
+	TmHH2hQLQmjv5ivREy8Mpv2+l6JwUXYbOHPC
+X-Google-Smtp-Source: AGHT+IH9418wYSuNA6gPH8dq1Z5qkhsrKrLVs2G8TtQFhW11Q0P616j2AHtA5QZGketa7exvGIkFtQ==
+X-Received: by 2002:a17:90b:3144:b0:279:9611:1020 with SMTP id ip4-20020a17090b314400b0027996111020mr857251pjb.1.1696304592558;
+        Mon, 02 Oct 2023 20:43:12 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id i15-20020a63b30f000000b00563826c66eesm216426pgf.61.2023.10.02.20.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Oct 2023 20:43:12 -0700 (PDT)
+Date: Tue, 03 Oct 2023 12:43:11 +0900 (JST)
+Message-Id: <20231003.124311.1007471622916115559.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] rust: core abstractions for network PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <9efcbc51-f91d-4468-b7f3-9ded93786edb@lunn.ch>
+References: <ec65611a-d52a-459a-af60-6a0b441b0999@lunn.ch>
+	<20231003.093338.913889246531201639.fujita.tomonori@gmail.com>
+	<9efcbc51-f91d-4468-b7f3-9ded93786edb@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
-Content-Language: en-US
-To: Jozsef Kadlecsik <kadlec@netfilter.org>, Simon Horman <horms@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
- David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, justinstitt@google.com, kuniyu@amazon.com,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Linkui Xiao <xiaolinkui@kylinos.cn>
-References: <20230927130309.30891-1-xiaolinkui@126.com>
- <20231002160651.GX92317@kernel.org>
- <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
-From: xiaolinkui <xiaolinkui@126.com>
-In-Reply-To: <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wC3n0ZDhBtlPMxWBA--.40871S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxuFWUXFWfJr1xAry7Gw4fGrg_yoW3urWkpa
-	4YgF1qg3ykZrnrAw4jyF48KF1jqanIyF1UGr95Gr1fuwnrGwnrJF48KFW3Wr47XrWruFy2
-	yw1jv3y0qr1UGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jP_-PUUUUU=
-X-Originating-IP: [111.48.58.12]
-X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbibQX91lpEFAQ3OwABsA
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Tue, 3 Oct 2023 03:40:50 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On 10/3/23 03:06, Jozsef Kadlecsik wrote:
-> Hi,
->
-> On Mon, 2 Oct 2023, Simon Horman wrote:
->
->> On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
->>> From: Linkui Xiao <xiaolinkui@kylinos.cn>
->>>
->>> If the ip_set is not locked during ip_set_test, the following situations
->>> may occur:
->>>
->>> 	CPU0				CPU1
->>> 	ip_rcv->
->>> 	ip_rcv_finish->
->>> 	ip_local_deliver->
->>> 	nf_hook_slow->
->>> 	iptable_filter_hook->
->>> 	ipt_do_table->
->>> 	set_match_v4->
->>> 	ip_set_test->			list_set_destroy->
->>> 	hash_net4_kadt->		set->data = NULL
->> I'm having a bit of trouble analysing this.
->> In particular, I'm concerned that in such a scenario set
->> itself will be also freed, which seems likely to lead to problems.
->>
->> Can you provide a more complete call stack for CPU1 ?
-> ip_set_test() runs intentionally without holding a spinlock, it uses RCU.
->
-> But I don't understand the scenario at all:
->
-> 	CPU0:				CPU1:
-> 	hash_net4_kadt			list_set_destroy
->
-> 	so it's a hash:net type		which works on a list
-> 	of set				type of sets only
->
-> The list type of set can freely be destroyed (when not referenced), the
-> destroy operation has no effect whatsoever on its possible hash:net type
-> of member set.
->
-> Moreover, kernel side add/del/test can only be performed when the set in
-> question is referenced. Referenced sets cannot be deleted.
->
-> So what is the scenario really in this case?
-The case I want to express should be like this:
+> On Tue, Oct 03, 2023 at 09:33:38AM +0900, FUJITA Tomonori wrote:
+>> On Mon, 2 Oct 2023 16:52:45 +0200
+>> Andrew Lunn <andrew@lunn.ch> wrote:
+>> 
+>> >> +//! Networking.
+>> >> +
+>> >> +#[cfg(CONFIG_PHYLIB)]
+>> > 
+>> > I brought this up on the rust for linux list, but did not get a answer
+>> > which convinced me.
+>> 
+>> Sorry, I overlooked that discussion.
+>> 
+>> 
+>> > Have you tried building this with PHYLIB as a kernel module? 
+>> 
+>> I've just tried and failed to build due to linker errors.
+>> 
+>> 
+>> > My understanding is that at the moment, this binding code is always
+>> > built in. So you somehow need to force phylib core to also be builtin.
+>> 
+>> Right. It means if you add Rust bindings for a subsystem, the
+>> subsystem must be builtin, cannot be a module. I'm not sure if it's
+>> acceptable.
+>  
+> You just need Kconfig in the Rust code to indicate it depends on
+> PHYLIB. Kconfig should then remove the option to build the phylib core
+> as a module. And that is acceptable.  
 
-                         CPU0         CPU1
+The following works. If you set the phylib as a module, the rust
+option isn't available.
 
-                 ip_set_test
-
-                             |   (1)  iptables -D -> set->ref --
-
-                             |   (2) ipset destroy -> set->data=NULL
-
-                             |
-
-                 hash_net4_kadt
-
-                             |
-
-                 hash_net4_test
-
-For the convenience of description, the definition is as follows:
-
-cmd(1): iptables -D
-
-cmd(2):  ipset destroy
-
-When the ip_set test has already started in CPU0, but before it ends.
-
-For example, when CPU0 runs between  ip_set_test  and hash_net4_kadt,
-CPU1 executes cmd (1) and cmd (2).
-
-In addition, if CPU 0 runs between hash_net4_kadt and hash_net4_test,
-
-CPU1 executes cmd (1) and cmd (2). The following call trace will be 
-triggered:
-
-crash> bt
-PID: 0      TASK: ffff8003a1cd2680  CPU: 7   COMMAND: "swapper/7"
-  #0 [ffff8003fff3f460] crash_kexec at ffff0000081af828
-  #1 [ffff8003fff3f490] die at ffff00000808f754
-  #2 [ffff8003fff3f4d0] die_kernel_fault at ffff0000080aa9ac
-  #3 [ffff8003fff3f500] __do_kernel_fault at ffff0000080aa67c
-  #4 [ffff8003fff3f530] do_page_fault at ffff000008bfa66c
-  #5 [ffff8003fff3f620] do_translation_fault at ffff000008bfab64
-  #6 [ffff8003fff3f650] do_mem_abort at ffff000008081284
-  #7 [ffff8003fff3f830] el1_ia at ffff00000808310c
-      PC: ffff00000342225c  [hash_net4_test+68]
-      LR: ffff000003420200  [hash_net4_kadt+208]
-      SP: ffff8003fff3f840  PSTATE: 60400005
-     X29: ffff8003fff3f840  X28: ffff8003a78ca600  X27: ffff8003fff3f908
-     X26: 0000000000000000  X25: ffff000000c70600  X24: ffff8003b8232400
-     X23: ffff000002f90fcc  X22: 0000000000000000  X21: ffff8003fff3f9d0
-     X20: ffff8003fff3f910  X19: ffff8003fff3f9c8  X18: 0000000000000000
-     X17: 0000000000000000  X16: 0000000000000000  X15: 0000000000000000
-     X14: 970000002d494600  X13: 0000000000000000  X12: a40d15d8df825036
-     X11: ffff000000c70600  X10: ffff8003b2deb000   X9: 0000000000000001
-      X8: 0000000000000000   X7: 00000000637c7464   X6: ffff000003422218
-      X5: 00000000637c7464   X4: 0000000000000000   X3: ffff8003fff3f9d0
-      X2: ffff8003fff3f910   X1: ffff8003fff3f908   X0: 0000000000000020
-  #8 [ffff8003fff3f840] hash_net4_test at ffff000003422258 
-[ip_set_hash_net]
-  #9 [ffff8003fff3f8d0] hash_net4_kadt at ffff0000034201fc 
-[ip_set_hash_net]
-#10 [ffff8003fff3f940] ip_set_test at ffff000002c011b8 [ip_set]
-#11 [ffff8003fff3f990] set_match_v4 at ffff000002f90fc8 [xt_set]
-#12 [ffff8003fff3fa20] ipt_do_table at ffff000000c504e0 [ip_tables]
-#13 [ffff8003fff3fb60] iptable_filter_hook at ffff0000026e006c 
-[iptable_filter]
-#14 [ffff8003fff3fb80] nf_hook_slow at ffff000008ac7a84
-#15 [ffff8003fff3fbc0] ip_local_deliver at ffff000008ad5d88
-#16 [ffff8003fff3fc10] ip_rcv_finish at ffff000008ad59b4
-#17 [ffff8003fff3fc40] ip_rcv at ffff000008ad5dec
-#18 [ffff8003fff3fca0] __netif_receive_skb_one_core at ffff000008a6c344
-#19 [ffff8003fff3fce0] __netif_receive_skb at ffff000008a6c3ac
-#20 [ffff8003fff3fd00] netif_receive_skb_internal at ffff000008a6c440
-#21 [ffff8003fff3fd30] napi_gro_receive at ffff000008a6d3ec
-#22 [ffff8003fff3fd60] receive_buf at ffff000001c734d8 [virtio_net]
-#23 [ffff8003fff3fe20] virtnet_poll at ffff000001c753e8 [virtio_net]
-#24 [ffff8003fff3fec0] net_rx_action at ffff000008a6c9ec
-#25 [ffff8003fff3ff60] __softirqentry_text_start at ffff0000080819f0
-#26 [ffff8003fff3fff0] irq_exit at ffff0000080f1228
-#27 [ffff8003fff40010] __handle_domain_irq at ffff000008162a10
-
-Of course, the ip_set_test execution cycle is very short. During this 
-period,
-another CPU needs to complete the cmd1 and cmd2 operations on the 
-ip_set, the
-probability of triggering this problem will be very low.
-
-This problem has also occurred in Red Hat:
-
-https://access.redhat.com/solutions/6839381
-
-But I think the solution mentioned in the link is not applicable.
-
-Commit c120959387ef(netfilter: fix a use-after-free in mtype_destroy()) 
-applies
-to ip_set_bitmap instead of ip_set_hash.
-
-Best regards,
-
-Linkui
->
-> Best regards,
-> Jozsef
->
->>> 	h = set->data
->>> 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
->>>
->>> The set->data is empty, continuing to access set->data will result in a
->>> kernel NULL pointer. The call trace is as follows:
->>>
->>> [2350616.024418] Call trace:
->>> [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
->>> [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
->>> [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
->>> [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
->>> [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
->>> [2350616.026905]  nf_hook_slow+0x50/0x100
->>> [2350616.027256]  ip_local_deliver+0xd4/0xe8
->>> [2350616.027616]  ip_rcv_finish+0x90/0xb0
->>> [2350616.027961]  ip_rcv+0x50/0xb0
->>> [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
->>> [2350616.028716]  __netif_receive_skb+0x28/0x80
->>> [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
->>> [2350616.029533]  napi_gro_receive+0xf8/0x170
->>> [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
->>> [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
->>> [2350616.030761]  net_rx_action+0x158/0x3a0
->>> [2350616.031124]  __do_softirq+0x11c/0x33c
->>> [2350616.031470]  irq_exit+0x11c/0x128
->>> [2350616.031793]  __handle_domain_irq+0x6c/0xc0
->>> [2350616.032172]  gic_handle_irq+0x6c/0x170
->>> [2350616.032528]  el1_irq+0xb8/0x140
->>> [2350616.032835]  arch_cpu_idle+0x38/0x1c0
->>> [2350616.033183]  default_idle_call+0x24/0x58
->>> [2350616.033549]  do_idle+0x1a4/0x268
->>> [2350616.033859]  cpu_startup_entry+0x28/0x78
->>> [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
->>>
->>> Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
->>> ---
->>>   net/netfilter/ipset/ip_set_core.c | 2 ++
->>>   1 file changed, 2 insertions(+)
->>>
->>> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
->>> index 35d2f9c9ada0..46f4f47e29e4 100644
->>> --- a/net/netfilter/ipset/ip_set_core.c
->>> +++ b/net/netfilter/ipset/ip_set_core.c
->>> @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
->>>   	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
->>>   		return 0;
->>>   
->>> +	ip_set_lock(set);
->>>   	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
->>> +	ip_set_unlock(set);
->>>   
->>>   	if (ret == -EAGAIN) {
->>>   		/* Type requests element to be completed */
->>> -- 
->>> 2.17.1
->>>
->>>
-> -
-> E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-> PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
-> Address : Wigner Research Centre for Physics
->            H-1525 Budapest 114, POB. 49, Hungary
-
+diff --git a/init/Kconfig b/init/Kconfig
+index 6d35728b94b2..4b4e3df1658d 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1889,6 +1889,7 @@ config RUST
+ 	depends on !GCC_PLUGINS
+ 	depends on !RANDSTRUCT
+ 	depends on !DEBUG_INFO_BTF || PAHOLE_HAS_LANG_EXCLUDE
++	depends on PHYLIB=y
+ 	select CONSTRUCTORS
+ 	help
+ 	  Enables Rust support in the kernel.
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 0588422e273c..f9883bde4459 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -37,7 +37,6 @@
+ pub mod ioctl;
+ #[cfg(CONFIG_KUNIT)]
+ pub mod kunit;
+-#[cfg(CONFIG_NET)]
+ pub mod net;
+ pub mod prelude;
+ pub mod print;
+diff --git a/rust/kernel/net.rs b/rust/kernel/net.rs
+index b49b052969e5..fbb6d9683012 100644
+--- a/rust/kernel/net.rs
++++ b/rust/kernel/net.rs
+@@ -2,5 +2,4 @@
+ 
+ //! Networking.
+ 
+-#[cfg(CONFIG_PHYLIB)]
+ pub mod phy;
 
