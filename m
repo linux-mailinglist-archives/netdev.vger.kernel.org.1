@@ -1,148 +1,92 @@
-Return-Path: <netdev+bounces-37677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A21D7B696E
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:51:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4D87B6972
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3CCFE2815DC
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:51:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 9570DB20924
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C308923758;
-	Tue,  3 Oct 2023 12:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065F62375D;
+	Tue,  3 Oct 2023 12:51:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC01F2915
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:51:19 +0000 (UTC)
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED6D91;
-	Tue,  3 Oct 2023 05:51:15 -0700 (PDT)
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 1C85687102;
-	Tue,  3 Oct 2023 14:51:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1696337473;
-	bh=aaprkLAz8M28X4vHEFfK4xuZcsmFV8/uA9susaQBpHI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gUy6gV7Jf2LmC+75CGPiHiNeLdQZqdbjOXHDGCWy2IVIny+rTbN0fjqN1FO5z4Mgh
-	 AnuxgZrU5yy8FI4edE5i46BvziysCcF3FhxL3BqaSe4Q0ggW2GHUDbFmY6zKMJh3ja
-	 juiXSzXboZewVRIKjTZKxkRwjcDGyoTTTewijkPqkzbyIV6rrjafLgeiQvncpjTuti
-	 a5fCeLJJvMocllC96iDPP9A6oITP10g/Chr6b4YrJrvf0ozPoHVOSuSzGJS0J5t0U1
-	 ayAYjXGp0k4svj0ufq53k5UxWinq4/Ed8mX8C4PXGzubg4uYkV3AXxKAqG+j/nKOlH
-	 cpc789T6qLz2Q==
-Date: Tue, 3 Oct 2023 14:51:06 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
- Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, Oleksij Rempel <o.rempel@pengutronix.de>, Florian
- Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
- for KSZ9477
-Message-ID: <20231003145106.3cd5a19f@wsk>
-In-Reply-To: <20231003104410.dhngn3vvdfdcurga@skbuf>
-References: <20230922133108.2090612-1-lukma@denx.de>
-	<20230926225401.bganxwmtrgkiz2di@skbuf>
-	<20230928124127.379115e6@wsk>
-	<20231003095832.4bec4c72@wsk>
-	<20231003104410.dhngn3vvdfdcurga@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFD82915
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:51:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1895BC433C8;
+	Tue,  3 Oct 2023 12:51:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696337500;
+	bh=giCCL/NQzyaXSepsEpVlfuBXyhXS1M2eW5ebS85qKZo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Rz4WfdlKsXh1tFMotFawMYFAsYy2FjqKasOSSRBu5y6Yk6xxZUt7oaPH/+FfMAXll
+	 xw207CQd/qaXVdVNBPqnp+u3U/jhAMUB+31upo1GUynANt3cOzOX4VlJpjunymCOiA
+	 bgWi+0exsrfd1Wh6EDX3xJzXxZ+B4PU5vblYXaG94i7URiI9Smqex+9+YTqXAEULI+
+	 i5G9QD10CdKbMjRN22No7aBUoZEaTWNgHB0NkkeYRbSB3NNo6b+HilmgzhUJYVCGfz
+	 oOQPKxmyfTZhHJMRJmr8Lh4tw0m7FCcVxPMe7A9c5qZAMLqY/boJFiGnDAbDVcc4e+
+	 zVWQGxcBPSdaw==
+Date: Tue, 3 Oct 2023 14:51:35 +0200
+From: Simon Horman <horms@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org,
+	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: Re: [PATCH nf] netfilter: handle the connecting collision properly
+ in nf_conntrack_proto_sctp
+Message-ID: <ZRwOVyKQR8MBjpBh@kernel.org>
+References: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/DeKx4JaPtFZ3VK4fxaRFAgh";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
 
---Sig_/DeKx4JaPtFZ3VK4fxaRFAgh
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Sun, Oct 01, 2023 at 11:07:48AM -0400, Xin Long wrote:
 
-Hi Vladimir,
+...
 
-> On Tue, Oct 03, 2023 at 09:58:32AM +0200, Lukasz Majewski wrote:
-> > I'm a bit puzzled with this patch series - will it be pulled
-> > directly to net-next [1] or is there any other (KSZ maintainer's?)
-> > tree to which it will be first pulled and then PR will be send to
-> > net-next?
-> >=20
-> > Thanks in advance for the clarification.
-> >=20
-> > Links:
-> >=20
-> > [1] -
-> > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
-> > =20
->=20
-> No, there's no other tree than net-next. I see your patch was marked
-> as "Changes requested", let me see if I can transition it back to
-> "Under review" so that it gains the netdev maintainers' attention
-> again:
->=20
-> https://patchwork.kernel.org/project/netdevbpf/cover/20230922133108.20906=
-12-1-lukma@denx.de/
->=20
-> pw-bot: under-review
+> @@ -481,6 +486,24 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
+>  			    old_state == SCTP_CONNTRACK_CLOSED &&
+>  			    nf_ct_is_confirmed(ct))
+>  				ignore = true;
+> +		} else if (sch->type == SCTP_CID_INIT_ACK) {
+> +			struct sctp_inithdr _ih, *ih;
+> +			u32 vtag;
+> +
+> +			ih = skb_header_pointer(skb, offset + sizeof(_sch), sizeof(*ih), &_ih);
+> +			if (ih == NULL)
+> +				goto out_unlock;
+> +
+> +			vtag = ct->proto.sctp.vtag[!dir];
+> +			if (!ct->proto.sctp.init[!dir] && vtag && vtag != ih->init_tag)
+> +				goto out_unlock;
+> +			/* collision */
+> +			if (ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir] &&
+> +			    vtag != ih->init_tag)
 
-Thanks!
+The type of vtag is u32. But the type of ct->proto.sctp.vtag[!dir] and init_tag
+is __be32. This doesn't seem right (and makes Sparse unhappy).
 
-I've just noticed that there is a WARNING:
-https://patchwork.kernel.org/project/netdevbpf/patch/20230922133108.2090612=
--6-lukma@denx.de/
-
-but then on the newest kernel checkpatch.pl is silent:
-./scripts/checkpatch.pl
-0005-net-dsa-microchip-Enable-HSR-offloading-for-KSZ9477.patch total: 0
-errors, 0 warnings, 0 checks, 277 lines checked
-
-0005-net-dsa-microchip-Enable-HSR-offloading-for-KSZ9477.patch has no
-obvious style problems and is ready for submission.
-
-Does the checkpatch for patchwork differs in any way from mainline?
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/DeKx4JaPtFZ3VK4fxaRFAgh
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmUcDjoACgkQAR8vZIA0
-zr383Qf/UDs6iZwqUh3JPM8lRrI19Hze1fJ2qEnCAinjhHYz5KFN2kpzFsOJvYN9
-ESkNWN2mYJe55GyWs/BiV7vwGmtDR5PjcBvXSu/h8MkOnaJndK7ArvhscyssqyWv
-M4jFjLRAA7UKAS83gkm4ANa9aIs0MM3Q8dqg0akJq/QZFNYko7WyDLvZYBTe9psE
-+jsmzqTvRkqDFr4YwY0yflCdRO8ykYCdXsfgJaPz8uEQ5B271OpVhJMYNuJjpjh6
-dL+8baMb1sqDF6OvkWq/pUl5DhY3c0SICRMPJGOoZBqf6HUO/6753e3rhq4U7dC7
-9C2tMT/sYG31cCwhTLWXG06n3IERDw==
-=E0iA
------END PGP SIGNATURE-----
-
---Sig_/DeKx4JaPtFZ3VK4fxaRFAgh--
+> +				goto out_unlock;
+> +
+> +			pr_debug("Setting vtag %x for dir %d\n", ih->init_tag, !dir);
+> +			ct->proto.sctp.vtag[!dir] = ih->init_tag;
+>  		}
+>  
+>  		ct->proto.sctp.state = new_state;
+> -- 
+> 2.39.1
+> 
+> 
 
