@@ -1,250 +1,190 @@
-Return-Path: <netdev+bounces-37559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C147B5FBC
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:17:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7387B5FDB
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 7B1051C20991
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:17:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 48E0DB2098D
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36288ED8;
-	Tue,  3 Oct 2023 04:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73DC210FE;
+	Tue,  3 Oct 2023 04:27:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F7D1398
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:17:12 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994BBCC
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:17:10 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d86dac81f8fso708218276.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 21:17:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FD07F5;
+	Tue,  3 Oct 2023 04:27:26 +0000 (UTC)
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6E9A4;
+	Mon,  2 Oct 2023 21:27:25 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-5809d5fe7f7so269391a12.3;
+        Mon, 02 Oct 2023 21:27:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696306630; x=1696911430; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xVHKEQiikdMgbU+y27225hg2LnDyDOWoRLfGIfsc16c=;
-        b=0U/Z3kCJttS7atNniTMaDYdXA8Yw8ZGiE2tZ/+72SyS/+HugQMWMxTeV9I+mWhHPhO
-         EW0BhySSwZ/I3gct/YSiHnPkdi6UWMQBsiA2MqZDPA4eYWxdwCfQmNhaBbsCnmt+Fy4y
-         gXMgQdMl9e1ZPN9yK7WbJ+F4SWOCEOb4o53stY6LF5DnyB4lNKvqZY2wzpKgDhR/Y/90
-         OSAtZE20HEfrbwsIB86FzoX1QufryaHkP9+/bM04dvg4C5dIJG1bYW2afdUjvBCoWHlP
-         Vid14Gv58kq6EAgSa3CoaZK9VsW7/y7VW+GZPNyfii54fCqklACp8MhsybrF6U1tlIt8
-         tz2Q==
+        d=gmail.com; s=20230601; t=1696307244; x=1696912044; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0i2+2bzLaAw4UfvDPBpBDW2+pEt9VCrTIzNCf4JObI=;
+        b=WQ92RfzjATeE7mdBj4ATf9ea/c52OMYmYZ1Zq8tddkLoe42sjq8OZJqCOmPcdoi99+
+         Ml4ZK2SI9rAwl98Sxz9OsQUaKSLjmp8W2LAyOCa2kKnSfuTuH1XdytfNY2xF0KuIvDeO
+         JAnlRNWdVkQod3aAULT212/bl2okhzK1bjhcA1rrLsgtTTCa66bLRR2arpm7YGr6jo6i
+         l6G0tCtX8z10oe1pLxqNrrSJt8gS6HRamzPU3RcugjpEV+mnd4TBTaA0sWeJPI/UKhSe
+         Tv7crlivsFPt8DcvspnSgeqp6j1tSwxwxUr6rFrHWlvbCf5zJ5KtCaVVEbtdsyP3qeZh
+         igkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696306630; x=1696911430;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xVHKEQiikdMgbU+y27225hg2LnDyDOWoRLfGIfsc16c=;
-        b=NNoU+Sa9qmtAIWPOc0Z2FgDWfhlgyetbz7OY89nUitS76yW6Ar03ar4D8hIuF8+/3T
-         2NOGZ+blgKDkEeo2Q9CNGKMfWfOcWzxUNE7uFt+sh8rHr8CX0tTzdfRWeiAB8FHvjN8d
-         tZ3eeVMIJlha6wyb7WFObX7A9xo6tZGKZo/i9SJ/R56AmzHg05Qhb/7EuH57i6nLUiqX
-         CgFfinbRjM0QbOYHFcF9oy9GUc+CDOoiZy9FDO28Z9G58zl2WbLG9/HJTQVZ+sqw4kz4
-         VS51YzhqXoRiDxjRXAw/3WmOOVJaKjZgm2c+YTbmEaDo121DoQUUZMYb7wzJnk8Xsti7
-         DHeQ==
-X-Gm-Message-State: AOJu0YyxWimv43FoaNDFgGzMsLvYUYyktduXRSsVKe7xEE6H8W3xgs6M
-	0JyiHO3TtalhVJ8gjY3maSgHT4kCx/O55+gWb0Kmu4zoeF3WbgB8lcsj6VyLuzvDZccqsBFjgqm
-	Y/reobDzTXfV7Z/hWF3uFtQbe5sDOMhpcwqMsPPW/MQ3D5dAZzMynvNsOWlaVGru4
-X-Google-Smtp-Source: AGHT+IFqdsv7HPhJyVpjFa70cd8lqSqqjzyGMmf+x/TfZsWhqaKDgORtG52OMlda2Z5v7xXb0p2XiHtPY4bs
-X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2b7a])
- (user=maheshb job=sendgmr) by 2002:a25:abaf:0:b0:d7b:9830:c172 with SMTP id
- v44-20020a25abaf000000b00d7b9830c172mr211752ybi.0.1696306629637; Mon, 02 Oct
- 2023 21:17:09 -0700 (PDT)
-Date: Mon,  2 Oct 2023 21:17:06 -0700
+        d=1e100.net; s=20230601; t=1696307244; x=1696912044;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=y0i2+2bzLaAw4UfvDPBpBDW2+pEt9VCrTIzNCf4JObI=;
+        b=kCx18+8mjknGqnh/JPdMHaaEcXcVepyVLeizb5vuR0b23qT3bNQ9iw9X9PMuhiQwkt
+         KELML6dGCFliE/SUqfB5WlqU6TUbmFKZ97ABH9ftn8HAnWtagoVsRUI8yfkjwsAGRXfj
+         HXPFQGioG5a4XWn63J1OdY/JSh9X2Dfm6g0Fv7s67B4IBeaK2gEPI96q7N7hFZBvKn3w
+         kP+w5kNi/xobXSPXtAjPfwx32C8wGZJkVgZsecy5kHodttXsORZpnVCoJxulexW4xGuj
+         PGms1G+vSH74ptEHd/8sR8bqwK8TiCz8nXtsj3BiT+IjUmezidTH/CUdbk2/JKwOwOdU
+         ZhpQ==
+X-Gm-Message-State: AOJu0YxtIExiWdyURGfUp4pa9XaQT/35AL4FgC3C63e2f9qfJStCEp4N
+	9Vn0HKuCKqa9cXXMMrDlvTI=
+X-Google-Smtp-Source: AGHT+IEzNjy+rb1mjbi6bqioDSUpBIVdZ0de8tTc4kjeIH5Yv2jt+r8Cgtk/ug3bzfqzUsqCoigkSg==
+X-Received: by 2002:a05:6a20:3206:b0:154:9943:7320 with SMTP id hl6-20020a056a20320600b0015499437320mr10413897pzc.28.1696307244397;
+        Mon, 02 Oct 2023 21:27:24 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba00:2a00:5720:bdb8:2705])
+        by smtp.gmail.com with ESMTPSA id u5-20020a17090282c500b001c446dea2c5sm317952plz.143.2023.10.02.21.27.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Oct 2023 21:27:23 -0700 (PDT)
+Date: Mon, 02 Oct 2023 21:27:22 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Liu Jian <liujian56@huawei.com>, 
+ john.fastabend@gmail.com, 
+ jakub@cloudflare.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ kpsingh@kernel.org, 
+ sdf@google.com, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ liujian56@huawei.com
+Message-ID: <651b982a1b22a_4fa3f20854@john.notmuch>
+In-Reply-To: <20230927093013.1951659-2-liujian56@huawei.com>
+References: <20230927093013.1951659-1-liujian56@huawei.com>
+ <20230927093013.1951659-2-liujian56@huawei.com>
+Subject: RE: [PATCH bpf-next v5 1/7] bpf, sockmap: add BPF_F_PERMANENT flag
+ for skmsg redirect
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231003041706.1746634-1-maheshb@google.com>
-Subject: [PATCHv2 next 3/3] selftes/ptp: extend test to include ptp_gettimex64any()
-From: Mahesh Bandewar <maheshb@google.com>
-To: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, Don Hatchett <hatch@google.com>, 
-	Yuliang Li <yuliangli@google.com>, Mahesh Bandewar <mahesh@bandewar.net>, 
-	Mahesh Bandewar <maheshb@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-add -y/-Y options to support PTP_SYS_OFFSET_ANY2 op. where -y represents
-samples to collect while -Y is to choose the timebase from available
-options of cycles, real, mono, or raw.
+Liu Jian wrote:
+> If the sockmap msg redirection function is used only to forward packets
+> and no other operation, the execution result of the BPF_SK_MSG_VERDICT
+> program is the same each time. In this case, the BPF program only needs to
+> be run once. Add BPF_F_PERMANENT flag to bpf_msg_redirect_map() and
+> bpf_msg_redirect_hash() to implement this ability.
+> 
+> Then we can enable this function in the bpf program as follows:
+> bpf_msg_redirect_hash(xx, xx, xx, BPF_F_INGRESS | BPF_F_PERMANENT);
+> 
+> Test results using netperf  TCP_STREAM mode:
+> for i in 1 64 128 512 1k 2k 32k 64k 100k 500k 1m;then
+> netperf -T 1,2 -t TCP_STREAM -H 127.0.0.1 -l 20 -- -m $i -s 100m,100m -S 100m,100m
+> done
+> 
+> before:
+> 3.84 246.52 496.89 1885.03 3415.29 6375.03 40749.09 48764.40 51611.34 55678.26 55992.78
+> after:
+> 4.43 279.20 555.82 2080.79 3870.70 7105.44 41836.41 49709.75 51861.56 55211.00 54566.85
+> 
+> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> ---
 
-Signed-off-by: Mahesh Bandewar <maheshb@google.com>
-CC: Shuah Khan <shuah@kernel.org>
-CC: Richard Cochran <richardcochran@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: linux-kselftest@vger.kernel.org
-CC: netdev@vger.kernel.org
----
- tools/testing/selftests/Makefile      |  1 +
- tools/testing/selftests/ptp/testptp.c | 76 ++++++++++++++++++++++++++-
- 2 files changed, 75 insertions(+), 2 deletions(-)
+First sorry for the delay I was thinking about this a bit. I decided it likely makes
+a lot of sense if you want to build an l7 load balancer where you just read some
+keys off an initial msg and then pin the rest of the connection to a specific
+backend or proxy socket, etc.
 
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index 42806add0114..c5e59cfc9830 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -66,6 +66,7 @@ TARGETS += powerpc
- TARGETS += prctl
- TARGETS += proc
- TARGETS += pstore
-+TARGETS += ptp
- TARGETS += ptrace
- TARGETS += openat2
- TARGETS += resctrl
-diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
-index c9f6cca4feb4..549f0861e897 100644
---- a/tools/testing/selftests/ptp/testptp.c
-+++ b/tools/testing/selftests/ptp/testptp.c
-@@ -37,6 +37,12 @@
- 
- #define NSEC_PER_SEC 1000000000LL
- 
-+static char *time_base_arr[PTP_TS_MAX] = {
-+	"system time",
-+	"monotonic time",
-+	"raw-monotonic time",
-+};
-+
- /* clock_adjtime is not available in GLIBC < 2.14 */
- #if !__GLIBC_PREREQ(2, 14)
- #include <sys/syscall.h>
-@@ -145,8 +151,10 @@ static void usage(char *progname)
- 		" -T val     set the ptp clock time to 'val' seconds\n"
- 		" -x val     get an extended ptp clock time with the desired number of samples (up to %d)\n"
- 		" -X         get a ptp clock cross timestamp\n"
-+		" -y val     get an extended-any ptp clock time with the desired number of samples (up to %d) with given time-base for sandwich (with -Y opt)\n"
-+		" -Y val     sandwich timebase to use {real|mono|raw}\n"
- 		" -z         test combinations of rising/falling external time stamp flags\n",
--		progname, PTP_MAX_SAMPLES);
-+		progname, PTP_MAX_SAMPLES, PTP_MAX_SAMPLES);
- }
- 
- int main(int argc, char *argv[])
-@@ -162,6 +170,7 @@ int main(int argc, char *argv[])
- 	struct ptp_sys_offset *sysoff;
- 	struct ptp_sys_offset_extended *soe;
- 	struct ptp_sys_offset_precise *xts;
-+	struct ptp_sys_offset_any *ats;
- 
- 	char *progname;
- 	unsigned int i;
-@@ -182,6 +191,8 @@ int main(int argc, char *argv[])
- 	int pct_offset = 0;
- 	int getextended = 0;
- 	int getcross = 0;
-+	int get_ext_any = 0;
-+	int ext_any_type = -1;
- 	int n_samples = 0;
- 	int pin_index = -1, pin_func;
- 	int pps = -1;
-@@ -196,7 +207,7 @@ int main(int argc, char *argv[])
- 
- 	progname = strrchr(argv[0], '/');
- 	progname = progname ? 1+progname : argv[0];
--	while (EOF != (c = getopt(argc, argv, "cd:e:f:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xz"))) {
-+	while (EOF != (c = getopt(argc, argv, "cd:e:f:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xy:Y:z"))) {
- 		switch (c) {
- 		case 'c':
- 			capabilities = 1;
-@@ -273,6 +284,29 @@ int main(int argc, char *argv[])
- 		case 'X':
- 			getcross = 1;
- 			break;
-+		case 'y':
-+			get_ext_any = atoi(optarg);
-+			if (get_ext_any < 1 || get_ext_any > PTP_MAX_SAMPLES) {
-+				fprintf(stderr,
-+					"number of extended-any timestamp samples must be between 1 and %d; was asked for %d\n",
-+					PTP_MAX_SAMPLES, get_ext_any);
-+				return -1;
-+			}
-+			break;
-+		case 'Y':
-+			if (!strcasecmp(optarg, "real"))
-+				ext_any_type = PTP_TS_REAL;
-+			else if (!strcasecmp(optarg, "mono"))
-+				ext_any_type = PTP_TS_MONO;
-+			else if (!strcasecmp(optarg, "raw"))
-+				ext_any_type = PTP_TS_RAW;
-+			else {
-+				fprintf(stderr,
-+					"type needs to be one of real,mono,raw only; was given %s\n",
-+					optarg);
-+				return -1;
-+			}
-+			break;
- 		case 'z':
- 			flagtest = 1;
- 			break;
-@@ -286,6 +320,14 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
-+	/* For ptp_sys_offset_any both options 'y' and 'Y' must be given */
-+	if (get_ext_any > 0 && ext_any_type == -1) {
-+		fprintf(stderr,
-+			"For extended-any TS both options -y, and -Y are required.\n");
-+		usage(progname);
-+		return -1;
-+	}
-+
- 	fd = open(device, O_RDWR);
- 	if (fd < 0) {
- 		fprintf(stderr, "opening %s: %s\n", device, strerror(errno));
-@@ -604,6 +646,36 @@ int main(int argc, char *argv[])
- 		free(xts);
- 	}
- 
-+	if (get_ext_any) {
-+		ats = calloc(1, sizeof(*ats));
-+		if (!ats) {
-+			perror("calloc");
-+			return -1;
-+		}
-+
-+		ats->n_samples = get_ext_any;
-+		ats->ts_type = ext_any_type;
-+
-+		if (ioctl(fd, PTP_SYS_OFFSET_ANY2, ats)) {
-+			perror("PTP_SYS_OFFSET_ANY2");
-+		} else {
-+			printf("extended-any timestamp request returned %d samples\n",
-+			       get_ext_any);
-+
-+			for (i = 0; i < get_ext_any; i++) {
-+				printf("sample #%2d: %s before: %lld.%09u\n",
-+				       i, time_base_arr[ext_any_type],
-+				       ats->ts[i][0].sec, ats->ts[i][0].nsec);
-+				printf("            phc time: %lld.%09u\n",
-+				       ats->ts[i][1].sec, ats->ts[i][1].nsec);
-+				printf("            %s after: %lld.%09u\n",
-+				       time_base_arr[ext_any_type],
-+				       ats->ts[i][2].sec, ats->ts[i][2].nsec);
-+			}
-+		}
-+
-+		free(ats);
-+	}
- 	close(fd);
- 	return 0;
- }
--- 
-2.42.0.582.g8ccd20d70d-goog
+>  include/linux/skmsg.h          |  1 +
+>  include/uapi/linux/bpf.h       | 45 ++++++++++++++++++++++++++--------
+>  net/core/skmsg.c               |  6 ++++-
+>  net/core/sock_map.c            |  4 +--
+>  net/ipv4/tcp_bpf.c             | 12 +++++----
+>  tools/include/uapi/linux/bpf.h | 45 ++++++++++++++++++++++++++--------
+>  6 files changed, 85 insertions(+), 28 deletions(-)
+> 
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index c1637515a8a4..acd7de85608b 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -83,6 +83,7 @@ struct sk_psock {
+>  	u32				cork_bytes;
+>  	u32				eval;
+>  	bool				redir_ingress; /* undefined if sk_redir is null */
+> +	bool				redir_permanent;
+>  	struct sk_msg			*cork;
+>  	struct sk_psock_progs		progs;
+>  #if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 70bfa997e896..cec6c34f4486 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -3029,11 +3029,23 @@ union bpf_attr {
+>   * 		socket level. If the message *msg* is allowed to pass (i.e. if
+>   * 		the verdict eBPF program returns **SK_PASS**), redirect it to
+>   * 		the socket referenced by *map* (of type
+> - * 		**BPF_MAP_TYPE_SOCKMAP**) at index *key*. Both ingress and
+> - * 		egress interfaces can be used for redirection. The
+> - * 		**BPF_F_INGRESS** value in *flags* is used to make the
+> - * 		distinction (ingress path is selected if the flag is present,
+> - * 		egress path otherwise). This is the only flag supported for now.
+> + * 		**BPF_MAP_TYPE_SOCKMAP**) at index *key*.
+> + *
+> + *		The following *flags* are supported:
+> + *
+> + *		**BPF_F_INGRESS**
+> + *		        Both ingress and egress interfaces can be used for redirection.
+> + *		        The **BPF_F_INGRESS** value in *flags* is used to make the
+> + *		        distinction. Ingress path is selected if the flag is present,
+> + *		        egress path otherwise.
+> + *		**BPF_F_PERMANENT**
+> + *		        Indicates that redirect verdict and the target socket should be
+> + *		        remembered. The verdict program will not be run for subsequent
+> + *		        packets, unless an error occurs when forwarding packets.
 
+Why clear it on error? The error is almost always because either the socket is
+being torn down or there is a memory ENOMEM error that is going to be kicked
+back to user.
+
+Is the idea that you can try anopther backend possibly by picking another socket
+out of the table? But, I'm not sure how that might work because you probably
+don't know that this is even the beginning of a msg block.
+
+I'm wondering if I missed some other reason or if its just simpler to pass the
+error up the stack and keep the same sk_redir.
+
+Thanks,
+John
 
