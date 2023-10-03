@@ -1,37 +1,60 @@
-Return-Path: <netdev+bounces-37645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84BC7B66F7
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:00:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A8E7B672D
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:05:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 107231C20756
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:00:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 690452816C2
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:05:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D513120B18;
-	Tue,  3 Oct 2023 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92DD210F6;
+	Tue,  3 Oct 2023 11:05:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D0D1548D
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 41886C433C9;
-	Tue,  3 Oct 2023 11:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696330824;
-	bh=dIPlgC9gvoPIUme9b8IduCTPIX8de21NRrrzF7KCkwM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=apy7cArLeTPoV/Joj3xtri9A5FiocXGzCRCI9fQQGIi0wnV4MTVGx0QzeVDedqWjm
-	 /EyvXRbU700A0owDYI1ehOgA0Ox1vNC2I+02PLukQbP5NET/bm3plOth+G7HkLe/lO
-	 m88TqZas38VZt0Hr7TE3lTagC9NczFRfdzmRv4RqRGSY7zp+N2Kgc5gqCVALRz81sg
-	 mL5S0uUc3m9VW5gxbo4526+1knL/o95UXtO0E0tK+/2lF8+S0uL2ByNglNUBwG0B51
-	 wJCxJGQfeE5qGs9o1DjCoqlzBugxv4n40pvMcczYsjSD8CAHdqUujIN/pwU1Rw1F5C
-	 kxV+/+MmIKtCQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27760E632D2;
-	Tue,  3 Oct 2023 11:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6215FF4EE
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:05:27 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4401AF;
+	Tue,  3 Oct 2023 04:05:23 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3931jZsg028259;
+	Tue, 3 Oct 2023 04:05:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=tET2+AIxtn68+0uz+/GiUayRVrjGD1YQA48ihtjez8Y=;
+ b=IiRY5Ecz/3kTxlgTZW1T//pgFz8Z+JV0y2GQoIiIrMFDD/t8H+M5k0pfu3HjqkNlpEgJ
+ NcjLeKn9fxnsG7i9Edkt4FkxYNct7A41Xm+JBLE0QRYeD2h6xyhD4xJtohINCQYJ7nOS
+ cHvl/oVcVhgC7zjTdCvxKCYiFqEQHLTp/LfovAUxNVsUDzP4r8PExx4KfuCT0OfxX4ZK
+ gcGEkPTjHSrx9O6WnTWw5td+R/Jc/6YFHZPUlVbZNQyD49fad81Ucyv9m/UkZ2bIfbMm
+ Db6cRVQLrczQiS2wmdIuOaOpsrdIffq+iOi9HdluPoVgDMNuoSGRyfPctjQbDHL+nvaT Cg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tek6myxnc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 03 Oct 2023 04:05:14 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 3 Oct
+ 2023 04:05:12 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 3 Oct 2023 04:05:12 -0700
+Received: from hyd1425.marvell.com (unknown [10.29.37.83])
+	by maili.marvell.com (Postfix) with ESMTP id 63C983F7082;
+	Tue,  3 Oct 2023 04:05:06 -0700 (PDT)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <richardcochran@gmail.com>,
+        <lcherian@marvell.com>, <jerinj@marvell.com>, <hkelam@marvell.com>,
+        <sbhatta@marvell.com>
+CC: Sai Krishna <saikrishnag@marvell.com>
+Subject: [net PATCH v2] octeontx2-af: Fix hardware timestamping for VFs
+Date: Tue, 3 Oct 2023 16:35:04 +0530
+Message-ID: <20231003110504.913980-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,40 +62,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V1] net: sfp: add quirk for FS's 2.5G copper SFP
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169633082415.2756.5864136564250245678.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Oct 2023 11:00:24 +0000
-References: <20230925080059.266240-1-Raju.Lakkaraju@microchip.com>
-In-Reply-To: <20230925080059.266240-1-Raju.Lakkaraju@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, Jose.Abreu@synopsys.com,
- linux@armlinux.org.uk, hkallweit1@gmail.com, UNGLinuxDriver@microchip.com
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: G54itKdXw0XzXu-6Ik06kNscxhMG4PO8
+X-Proofpoint-GUID: G54itKdXw0XzXu-6Ik06kNscxhMG4PO8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-03_08,2023-10-02_01,2023-05-22_02
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+From: Subbaraya Sundeep <sbhatta@marvell.com>
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Currently for VFs, mailbox returns ENODEV error when hardware timestamping
+enable is requested. This patch fixes this issue. Modified this patch to
+return EPERM error for the PF/VFs which are not attached to CGX/RPM.
 
-On Mon, 25 Sep 2023 13:30:59 +0530 you wrote:
-> Add a quirk for a copper SFP that identifies itself as "FS" "SFP-2.5G-T".
-> This module's PHY is inaccessible, and can only run at 2500base-X with the
-> host without negotiation. Add a quirk to enable the 2500base-X interface mode
-> with 2500base-T support and disable auto negotiation.
-> 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> 
-> [...]
+Fixes: 421572175ba5 ("octeontx2-af: Support to enable/disable HW timestamping")
+Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Here is the summary with links:
-  - [net-next,V1] net: sfp: add quirk for FS's 2.5G copper SFP
-    https://git.kernel.org/netdev/net-next/c/e27aca3760c0
-
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index f2b1edf1bb43..f464640e188b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -756,12 +756,11 @@ static int rvu_cgx_ptp_rx_cfg(struct rvu *rvu, u16 pcifunc, bool enable)
+ 	if (!is_mac_feature_supported(rvu, pf, RVU_LMAC_FEAT_PTP))
+ 		return 0;
+ 
+-	/* This msg is expected only from PFs that are mapped to CGX LMACs,
++	/* This msg is expected only from PF/VFs that are mapped to CGX/RPM LMACs,
+ 	 * if received from other PF/VF simply ACK, nothing to do.
+ 	 */
+-	if ((pcifunc & RVU_PFVF_FUNC_MASK) ||
+-	    !is_pf_cgxmapped(rvu, pf))
+-		return -ENODEV;
++	if (!is_pf_cgxmapped(rvu, rvu_get_pf(pcifunc)))
++		return -EPERM;
+ 
+ 	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_id, &lmac_id);
+ 	cgxd = rvu_cgx_pdata(cgx_id, rvu);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
