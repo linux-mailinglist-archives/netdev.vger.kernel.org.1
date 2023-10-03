@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-37832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B07E7B74A7
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:19:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 490FF7B74A8
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 01079B208FB
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:19:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id EB88A281AB9
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9C03F4D6;
-	Tue,  3 Oct 2023 23:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34873F4DB;
+	Tue,  3 Oct 2023 23:19:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D213F4D9
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 23:18:57 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39D4100
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 16:18:47 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1c7373cff01so2636055ad.1
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 16:18:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6653F4D1
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 23:19:02 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0D7121
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 16:18:54 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-690d8fb3b7eso1163582b3a.1
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 16:18:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696375127; x=1696979927; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1696375133; x=1696979933; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BfDQBScYxSUnSyfi4Uo6dvpGeAqp/VpjWLErGf4V/4Y=;
-        b=c39GCY13A683WQCyXS91Ah+kckgiae7d4dciHzklFjcoQIB+TDGXGlWWf4PLFilZX8
-         +1E8A99I6S3jAWXv5wkfYCAKs/b1ukQNYCj43Q+2nO2oLcLFnrZYft0BjxUWbj6kvu/u
-         ulzUIJCN3AfQrOHaGQePEgSjrvC5/4Jp2U6aA=
+        bh=mWNIdeN2XwgWHo5X2YYBIvg85yUsaTggFd2yH1rpeNo=;
+        b=FUNXClypEDIPztwRcBTngVP9vRWTx93FHRHaondl5dE8i10zMxU7OUsF1NznK1ZMZD
+         mWVFInGRdpMUqq49AJjcmIRsziaNWsjioN44l5SSk2JHOBtC+0+3M8/aAwpJNF8kPtqk
+         fmC9Nm/jMRK8ylLmVzTiWfN/4aU3qld/roQGc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696375127; x=1696979927;
+        d=1e100.net; s=20230601; t=1696375133; x=1696979933;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BfDQBScYxSUnSyfi4Uo6dvpGeAqp/VpjWLErGf4V/4Y=;
-        b=q7GwHmarpcb1qMRo6oDrxdt740Se4P2bphrAai262Wxh1LExXxc7nohH4YkUKA5qLN
-         Jkb7y5aLINAIjvjLqfRdFsA3HAp983wmC+AbDrQNRTENECCqFKy/cq1gvGQscyBgGl1w
-         3+6dZoZRb65TxoqGCQFt70/n2kE5l9GApilX+bBN35I6e6UHHchMu1SgAiH1aV2Uqv5n
-         cFnnU0RCbE/sfn0p7gp7RSAp4kGOvBWP/2S8XN6OcVgJpoh4hMHhQra8yThhRqSdbSTu
-         tNLOVQ3i1SAvbQS900w+GAcQ+kBl1jsXpg9FarmHt9KhEl17bOP7bKhMRnv5vGeEnyZw
-         Pdug==
-X-Gm-Message-State: AOJu0Yy+Y0EQIlC7XDMRa4zDrw5ZEm2h+C3Mkfml3erAySHEcGP/ABhD
-	tN/n9GqVBv7UdKS6BDwxHTqwgA==
-X-Google-Smtp-Source: AGHT+IEQQoskUukjcV6UR3tDbZMEU82tUa1GjjWkAWraorZYJdgm/37PjJsSVWQuLq54fcBY2UxXAw==
-X-Received: by 2002:a17:902:d4cb:b0:1c5:d8a3:8783 with SMTP id o11-20020a170902d4cb00b001c5d8a38783mr1089962plg.11.1696375126989;
-        Tue, 03 Oct 2023 16:18:46 -0700 (PDT)
+        bh=mWNIdeN2XwgWHo5X2YYBIvg85yUsaTggFd2yH1rpeNo=;
+        b=llzzUu847kLjzYBa9yqot1eIoYK7/zeq4D5rxdhtwhJC/MhX7vFzaibYjfi1jlfEbJ
+         BpmWpskiqztNMWwioe+agG13zFTz9e7fmICCgmzWdttlHXnUXPKtLUpcwdPWa2F1Rr6t
+         MD/NUSlkhuB6SM37i6zTf9V4oxQIlAigur9oAlLwb0Dd0sJ1r1Myvpy+PHzp6BrVdgVH
+         nOqU/EsnUyf/g9gPZvIK78iUWIQ5jMiLQZORTCMzMGz2r612gkEPGlx1VWEDR25Azm00
+         lIf0aQfWutbhd+tyeXuqDqAdTojk2WisOG+I79HfpxFEaq101uWokTTiprMDqPijbFRx
+         /AJg==
+X-Gm-Message-State: AOJu0Yzgu97rz//Fg7NFbnAXg2z4H0RTs6Gn/Y+c1lsfCbcdOrY9Yp+N
+	wBK3hQWiUQnsJZEsXufEo70hXA==
+X-Google-Smtp-Source: AGHT+IE2ezD7VkJBj90UTSYYCyLaSdWwrTpUvpxo1uGqb0HyKbaxHn5PneqQ/44FkdSbOE1AfbArPQ==
+X-Received: by 2002:a05:6a00:1511:b0:690:cb8f:3320 with SMTP id q17-20020a056a00151100b00690cb8f3320mr1061401pfu.24.1696375133553;
+        Tue, 03 Oct 2023 16:18:53 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id g2-20020a170902868200b001bde65894c8sm2155966plo.268.2023.10.03.16.18.46
+        by smtp.gmail.com with ESMTPSA id f30-20020a63755e000000b005777a50c14csm1948843pgn.0.2023.10.03.16.18.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 16:18:46 -0700 (PDT)
+        Tue, 03 Oct 2023 16:18:53 -0700 (PDT)
 From: Kees Cook <keescook@chromium.org>
 To: Simon Horman <horms@kernel.org>
 Cc: Kees Cook <keescook@chromium.org>,
@@ -58,6 +58,10 @@ Cc: Kees Cook <keescook@chromium.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Yinjun Zhang <yinjun.zhang@corigine.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Yu Xiao <yu.xiao@corigine.com>,
+	Sixiang Chen <sixiang.chen@corigine.com>,
 	oss-drivers@corigine.com,
 	netdev@vger.kernel.org,
 	Louis Peens <louis.peens@corigine.com>,
@@ -68,9 +72,9 @@ Cc: Kees Cook <keescook@chromium.org>,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org,
 	llvm@lists.linux.dev
-Subject: [PATCH] nfp: Annotate struct nfp_reprs with __counted_by
-Date: Tue,  3 Oct 2023 16:18:43 -0700
-Message-Id: <20231003231843.work.811-kees@kernel.org>
+Subject: [PATCH] nfp: nsp: Annotate struct nfp_eth_table with __counted_by
+Date: Tue,  3 Oct 2023 16:18:51 -0700
+Message-Id: <20231003231850.work.335-kees@kernel.org>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -78,20 +82,20 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1385; i=keescook@chromium.org;
- h=from:subject:message-id; bh=GBdZ/bN+5XfvUCtrP1SCYpOVG1FCyQF4BGZ+0KiNObU=;
- b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlHKFT3XcaVjq8M5JxizadLIhdl5wOFCRk4jHmt
- IqwNVjEepmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRyhUwAKCRCJcvTf3G3A
- JjtdD/9D9R+8v9dgd3XY2WHug3rJjyK4+8aPw1mMYmILmQAYJrviLmccxjiM3F8I8PdZetcj6SX
- RbH4C+nQWdw5ItnpPFkHGDihNWS9JWqOKv+oGkwUa3Whsf7iRHBvZf7uB/OgbdEO293mVpH28xd
- KbDCTzrjImpUo55jjiQpypeXtqmMx9ETglaTTFwQcsy0AFJijWbvSS8agYnozYrZRQ/PImZqVtX
- SFpz7g3JLBAoGdtYE9fQ7jjJ03qrd+ZQrvXLw9SIaO9HFyflrYGihTFC1VCzd7kPAwollvn4m97
- HH7yUiaKoVQDlXMiCxjF1SJJJ5QIFF+rmU+yQNBLg/yzGofvOSNIHLJHsBoI1WCt1cuuf0mnJaC
- +99noNzwMdxYbz2ty0nd3nkKAgq9GWcgxUmxwAnh6DyTzhCdCyXTQFbQdFIwQPWMkk3XZzW/MBM
- oi4Nl8a1A7APm4f2ShQWBNUF+X5+K4WiwWDDm02GDNhGbhd8g4SqOBl0/u8VfysAI6ItMlF6Bmr
- hypptMkfiJr5Kgaw9lCUFKeoF4buVYEhf6KaQp/5D+vPYIEYbR/LYJZQC4OIlgi8AOgnMELTjFx
- ToEkiMcod9orNCiC8N2Sp0fIEREqeIVvOYH/MV1ScmN7S/nb6gSwPSSvo5KhnEOicTn5xHj2QxY
- Xabvqd3 WXqLy3lg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1591; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=kyIpUckdxhoPI7wg/1i7aDtbMCbDJmvf94yOHZ/LMos=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlHKFaqeDk2zRE3th7z8cYZ1dn2zrPeWsHfJfCM
+ Cuy93rmm6WJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZRyhWgAKCRCJcvTf3G3A
+ JtivD/921uPevWfkg8Iip9YGwRkTHQCT/UJ598wTfO+mlFZfgD8SEx3AvBWVtFAqDbrflleiDp7
+ R58oBrQcmRqVIpJKsm718xxHUhMOtY3JGgUQYiv6bAN4lISc2z5Ju2QzD1IrXquWHev+ayiwS7n
+ 7KZVM+Gd+Sr/EQvetaHmNqzDWdIBpT5mdQLxQmX4+hCsrGzMAXlei3f84qoOw9V2e9u+n43W93H
+ Z7rbuFzJIXu4IKLlngEXXY/RFZVr88AIIkpwz8/OLLEnYTJ7SkChFnM3/yMejx9Xsp9zCyfF/5w
+ b+riLsgZTZzyAUN4l7+Pgl9Kqq1+xXc6+mV5O0MJ8pdzoA3aiUcTiMZqhJds8Ti0POEk+7pauBr
+ d/n6Dnx+fZtx58xQUgpRvrVLtZkQ8pFgcNr3b3KNXXy3c2zxAv15kOKKK5jHD4/FpOINsE3FVfx
+ SUZS2QHF0QVAWCxGH9+5QJn5SOVWKlzi0AFHyV6bRb0yyRkkp8+8Gj9xDDJMarG0yDVlaW6lPTT
+ oYsKlppQ44FxNQ9UEDX3nZpTULabRuehfovG2KPpb4amory077swEoE6JUbBUf8rm9K09YA8FDk
+ wyXGduO9eqahqe3FfT3xbGGSFV+k4JvfrMZrTP0+Eu5N659fq3paOBy8VsG3ts4pnnXNddDgEGP
+ okULyFU CI3chMuA==
 X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -107,34 +111,38 @@ their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
 array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 functions).
 
-As found with Coccinelle[1], add __counted_by for struct nfp_reprs.
+As found with Coccinelle[1], add __counted_by for struct nfp_eth_table.
 
 Cc: Simon Horman <simon.horman@corigine.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Eric Dumazet <edumazet@google.com>
 Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Yinjun Zhang <yinjun.zhang@corigine.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Yu Xiao <yu.xiao@corigine.com>
+Cc: Sixiang Chen <sixiang.chen@corigine.com>
 Cc: oss-drivers@corigine.com
 Cc: netdev@vger.kernel.org
 Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- drivers/net/ethernet/netronome/nfp/nfp_net_repr.h | 2 +-
+ drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_repr.h b/drivers/net/ethernet/netronome/nfp/nfp_net_repr.h
-index 48a74accbbd3..77bf4198dbde 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_repr.h
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_repr.h
-@@ -18,7 +18,7 @@ struct nfp_port;
-  */
- struct nfp_reprs {
- 	unsigned int num_reprs;
--	struct net_device __rcu *reprs[];
-+	struct net_device __rcu *reprs[] __counted_by(num_reprs);
+diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
+index 6e044ac04917..00264af13b49 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
++++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
+@@ -241,7 +241,7 @@ struct nfp_eth_table {
+ 
+ 		u64 link_modes_supp[2];
+ 		u64 link_modes_ad[2];
+-	} ports[];
++	} ports[] __counted_by(count);
  };
  
- /**
+ struct nfp_eth_table *nfp_eth_read_ports(struct nfp_cpp *cpp);
 -- 
 2.34.1
 
