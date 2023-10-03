@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-37558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846637B5FBD
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:17:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1C147B5FBC
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D3F39281D02
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:17:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 7B1051C20991
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57844EC8;
-	Tue,  3 Oct 2023 04:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36288ED8;
+	Tue,  3 Oct 2023 04:17:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AA210E8
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:17:08 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B526BBF
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:17:07 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a22f833405so8509597b3.0
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 21:17:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F7D1398
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:17:12 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994BBCC
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:17:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d86dac81f8fso708218276.1
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 21:17:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696306626; x=1696911426; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696306630; x=1696911430; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=yYq0uo4Y2Gfz3+tHCOAtr3XBow0LxI3rKbo8nyoJx34=;
-        b=CF0TrnO8ODXXQxMLO0w0W8vDQlGw8ZPRStKeLzEqdnP5FM9GLXOs1lOAC4VZFJoI1M
-         7ULmb4edrRabkakzGDHptpU2KUFPmy2WgAt026+jTDr+c4qI18AHkdqcw5PBaHXDBFfu
-         Erw1k/qW4NJgMvw6neszxKga5cL/Azvc1Ww/sSqUsq09VcKn0d8TNE4qNcvwg8V7t7af
-         Doc2IuNcziJPPnPRMDF0xS2NyWumX3Mv6KLgMk2zxBAmvjOo22ijb/4Z62KD+ZNJtueV
-         9NsRQVIMqJ2JdtcCTzJoSenR++CDsTNPTc+MWAW9gegp9A+kAJNngAJtOUdur/PEgA7D
-         3dqA==
+        bh=xVHKEQiikdMgbU+y27225hg2LnDyDOWoRLfGIfsc16c=;
+        b=0U/Z3kCJttS7atNniTMaDYdXA8Yw8ZGiE2tZ/+72SyS/+HugQMWMxTeV9I+mWhHPhO
+         EW0BhySSwZ/I3gct/YSiHnPkdi6UWMQBsiA2MqZDPA4eYWxdwCfQmNhaBbsCnmt+Fy4y
+         gXMgQdMl9e1ZPN9yK7WbJ+F4SWOCEOb4o53stY6LF5DnyB4lNKvqZY2wzpKgDhR/Y/90
+         OSAtZE20HEfrbwsIB86FzoX1QufryaHkP9+/bM04dvg4C5dIJG1bYW2afdUjvBCoWHlP
+         Vid14Gv58kq6EAgSa3CoaZK9VsW7/y7VW+GZPNyfii54fCqklACp8MhsybrF6U1tlIt8
+         tz2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696306626; x=1696911426;
+        d=1e100.net; s=20230601; t=1696306630; x=1696911430;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=yYq0uo4Y2Gfz3+tHCOAtr3XBow0LxI3rKbo8nyoJx34=;
-        b=cUgxb8gRPesgZfVbqQzh7o1m6PJLYH7DEIKUWOB7oOvZpT/rs+hk4RUC1gVHzbtkvh
-         Qer8Bss/8BXaVOunvyRagmSvUT8U5FlFREaWuc3RYLDriEDAjzAxHagEzIBeAXYd71J9
-         fNqKzH8vjGOMR7wUWleNYq0ccgWZojnU7DOwqHHdQIseg86fuD/aPaxZSHHXmb0fiviq
-         fLZQ4hFhXKzluf+LjwUyT8LH2UGi9LnG80fxB615UwqO7znXJQrYi26zxwZzOKPNgaDI
-         tR314E0G56E0l9RlmBLh0n4TfRQ9Kg7wLGPeG0GUN9R5PvPGF58cKLSPg46J3Pm3z8Zq
-         dYEQ==
-X-Gm-Message-State: AOJu0Yyxrr1+vtGsJK96HYjFwNtyVt3w1/kFj8CMQNApEYI4gsfqXZSQ
-	yWqFJRMYglMkB2geYbo9GRmciVAJ6k48gdwOR0wjMw7DlMc6H3oPk3Zsn6PvTI9qqE3Se+onpW6
-	vjI8uN/87hEx9/8sk9OjhRMoZqX/H7LMfVI/8IauM5NRs2RIDk3V5+ipM2AEy9f/i
-X-Google-Smtp-Source: AGHT+IGC0X7QovnW4gsRVEbo+jsI2T4w9x2kNqBi7zQkcFcnlkyZ8/QUK9c25Bvx/HsSn8VAHB3e5NWoSPgA
+        bh=xVHKEQiikdMgbU+y27225hg2LnDyDOWoRLfGIfsc16c=;
+        b=NNoU+Sa9qmtAIWPOc0Z2FgDWfhlgyetbz7OY89nUitS76yW6Ar03ar4D8hIuF8+/3T
+         2NOGZ+blgKDkEeo2Q9CNGKMfWfOcWzxUNE7uFt+sh8rHr8CX0tTzdfRWeiAB8FHvjN8d
+         tZ3eeVMIJlha6wyb7WFObX7A9xo6tZGKZo/i9SJ/R56AmzHg05Qhb/7EuH57i6nLUiqX
+         CgFfinbRjM0QbOYHFcF9oy9GUc+CDOoiZy9FDO28Z9G58zl2WbLG9/HJTQVZ+sqw4kz4
+         VS51YzhqXoRiDxjRXAw/3WmOOVJaKjZgm2c+YTbmEaDo121DoQUUZMYb7wzJnk8Xsti7
+         DHeQ==
+X-Gm-Message-State: AOJu0YyxWimv43FoaNDFgGzMsLvYUYyktduXRSsVKe7xEE6H8W3xgs6M
+	0JyiHO3TtalhVJ8gjY3maSgHT4kCx/O55+gWb0Kmu4zoeF3WbgB8lcsj6VyLuzvDZccqsBFjgqm
+	Y/reobDzTXfV7Z/hWF3uFtQbe5sDOMhpcwqMsPPW/MQ3D5dAZzMynvNsOWlaVGru4
+X-Google-Smtp-Source: AGHT+IFqdsv7HPhJyVpjFa70cd8lqSqqjzyGMmf+x/TfZsWhqaKDgORtG52OMlda2Z5v7xXb0p2XiHtPY4bs
 X-Received: from coldfire.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2b7a])
- (user=maheshb job=sendgmr) by 2002:a81:7611:0:b0:59b:eace:d465 with SMTP id
- r17-20020a817611000000b0059beaced465mr225387ywc.2.1696306626466; Mon, 02 Oct
- 2023 21:17:06 -0700 (PDT)
-Date: Mon,  2 Oct 2023 21:17:04 -0700
+ (user=maheshb job=sendgmr) by 2002:a25:abaf:0:b0:d7b:9830:c172 with SMTP id
+ v44-20020a25abaf000000b00d7b9830c172mr211752ybi.0.1696306629637; Mon, 02 Oct
+ 2023 21:17:09 -0700 (PDT)
+Date: Mon,  2 Oct 2023 21:17:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,120 +59,191 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231003041704.1746303-1-maheshb@google.com>
-Subject: [PATCHv2 next 2/3] ptp: add ioctl interface for ptp_gettimex64any()
+Message-ID: <20231003041706.1746634-1-maheshb@google.com>
+Subject: [PATCHv2 next 3/3] selftes/ptp: extend test to include ptp_gettimex64any()
 From: Mahesh Bandewar <maheshb@google.com>
 To: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
 	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
 Cc: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, Don Hatchett <hatch@google.com>, 
 	Yuliang Li <yuliangli@google.com>, Mahesh Bandewar <mahesh@bandewar.net>, 
-	Mahesh Bandewar <maheshb@google.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+	Mahesh Bandewar <maheshb@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-add an ioctl op PTP_SYS_OFFSET_ANY2 to support ptp_gettimex64any() method
+add -y/-Y options to support PTP_SYS_OFFSET_ANY2 op. where -y represents
+samples to collect while -Y is to choose the timebase from available
+options of cycles, real, mono, or raw.
 
 Signed-off-by: Mahesh Bandewar <maheshb@google.com>
+CC: Shuah Khan <shuah@kernel.org>
 CC: Richard Cochran <richardcochran@gmail.com>
-CC: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 CC: "David S. Miller" <davem@davemloft.net>
+CC: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: linux-kselftest@vger.kernel.org
 CC: netdev@vger.kernel.org
 ---
- drivers/ptp/ptp_chardev.c      | 34 ++++++++++++++++++++++++++++++++++
- include/uapi/linux/ptp_clock.h | 14 ++++++++++++++
- 2 files changed, 48 insertions(+)
+ tools/testing/selftests/Makefile      |  1 +
+ tools/testing/selftests/ptp/testptp.c | 76 ++++++++++++++++++++++++++-
+ 2 files changed, 75 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 362bf756e6b7..fef1c7e7e6e6 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -110,6 +110,7 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
- {
- 	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
- 	struct ptp_sys_offset_extended *extoff = NULL;
-+	struct ptp_sys_offset_any *anyoff = NULL;
- 	struct ptp_sys_offset_precise precise_offset;
- 	struct system_device_crosststamp xtstamp;
- 	struct ptp_clock_info *ops = ptp->info;
-@@ -324,6 +325,39 @@ long ptp_ioctl(struct posix_clock *pc, unsigned int cmd, unsigned long arg)
- 			err = -EFAULT;
- 		break;
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 42806add0114..c5e59cfc9830 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -66,6 +66,7 @@ TARGETS += powerpc
+ TARGETS += prctl
+ TARGETS += proc
+ TARGETS += pstore
++TARGETS += ptp
+ TARGETS += ptrace
+ TARGETS += openat2
+ TARGETS += resctrl
+diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
+index c9f6cca4feb4..549f0861e897 100644
+--- a/tools/testing/selftests/ptp/testptp.c
++++ b/tools/testing/selftests/ptp/testptp.c
+@@ -37,6 +37,12 @@
  
-+	case PTP_SYS_OFFSET_ANY2:
-+		if (!ptp->info->gettimex64any) {
-+			err = -EOPNOTSUPP;
-+			break;
-+		}
-+		anyoff = memdup_user((void __user *)arg, sizeof(*anyoff));
-+		if (IS_ERR(anyoff)) {
-+			err = PTR_ERR(anyoff);
-+			anyoff = NULL;
-+			break;
-+		}
-+		if (anyoff->n_samples > PTP_MAX_SAMPLES
-+		    || anyoff->ts_type >= PTP_TS_MAX
-+		    || anyoff->rsv[0] || anyoff->rsv[1]) {
-+			err = -EINVAL;
-+			break;
-+		}
-+		for (i = 0; i < anyoff->n_samples; i++) {
-+			err = ptp->info->gettimex64any(ptp->info, &ts, &sts,
-+						       anyoff->ts_type);
-+			if (err)
-+				goto out;
-+			anyoff->ts[i][0].sec = sts.pre_ts.tv_sec;
-+			anyoff->ts[i][0].nsec = sts.pre_ts.tv_nsec;
-+			anyoff->ts[i][1].sec = ts.tv_sec;
-+			anyoff->ts[i][1].nsec = ts.tv_nsec;
-+			anyoff->ts[i][2].sec = sts.post_ts.tv_sec;
-+			anyoff->ts[i][2].nsec = sts.post_ts.tv_nsec;
-+		}
-+		if (copy_to_user((void __user *)arg, anyoff, sizeof(*anyoff)))
-+			err = -EFAULT;
-+		break;
-+
- 	case PTP_SYS_OFFSET:
- 	case PTP_SYS_OFFSET2:
- 		sysoff = memdup_user((void __user *)arg, sizeof(*sysoff));
-diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
-index dc44e34f8146..b4e71e754b35 100644
---- a/include/uapi/linux/ptp_clock.h
-+++ b/include/uapi/linux/ptp_clock.h
-@@ -165,6 +165,18 @@ struct ptp_sys_offset_extended {
- 	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
- };
+ #define NSEC_PER_SEC 1000000000LL
  
-+struct ptp_sys_offset_any {
-+	unsigned int n_samples;		/* Desired number of measurements. */
-+	enum ptp_ts_types ts_type;	/* One of the TS types */
-+	unsigned int rsv[2];		/* Reserved for future use. */
-+	/*
-+	 * Array of [TS, phc, TS] time stamps. The kernel will provide
-+	 * 3*n_samples time stamps.
-+	 * TS is any of the ts_type requested.
-+	 */
-+	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
++static char *time_base_arr[PTP_TS_MAX] = {
++	"system time",
++	"monotonic time",
++	"raw-monotonic time",
 +};
 +
- struct ptp_sys_offset_precise {
- 	struct ptp_clock_time device;
- 	struct ptp_clock_time sys_realtime;
-@@ -231,6 +243,8 @@ struct ptp_pin_desc {
- 	_IOWR(PTP_CLK_MAGIC, 17, struct ptp_sys_offset_precise)
- #define PTP_SYS_OFFSET_EXTENDED2 \
- 	_IOWR(PTP_CLK_MAGIC, 18, struct ptp_sys_offset_extended)
-+#define PTP_SYS_OFFSET_ANY2 \
-+	_IOWR(PTP_CLK_MAGIC, 19, struct ptp_sys_offset_any)
+ /* clock_adjtime is not available in GLIBC < 2.14 */
+ #if !__GLIBC_PREREQ(2, 14)
+ #include <sys/syscall.h>
+@@ -145,8 +151,10 @@ static void usage(char *progname)
+ 		" -T val     set the ptp clock time to 'val' seconds\n"
+ 		" -x val     get an extended ptp clock time with the desired number of samples (up to %d)\n"
+ 		" -X         get a ptp clock cross timestamp\n"
++		" -y val     get an extended-any ptp clock time with the desired number of samples (up to %d) with given time-base for sandwich (with -Y opt)\n"
++		" -Y val     sandwich timebase to use {real|mono|raw}\n"
+ 		" -z         test combinations of rising/falling external time stamp flags\n",
+-		progname, PTP_MAX_SAMPLES);
++		progname, PTP_MAX_SAMPLES, PTP_MAX_SAMPLES);
+ }
  
- struct ptp_extts_event {
- 	struct ptp_clock_time t; /* Time event occured. */
+ int main(int argc, char *argv[])
+@@ -162,6 +170,7 @@ int main(int argc, char *argv[])
+ 	struct ptp_sys_offset *sysoff;
+ 	struct ptp_sys_offset_extended *soe;
+ 	struct ptp_sys_offset_precise *xts;
++	struct ptp_sys_offset_any *ats;
+ 
+ 	char *progname;
+ 	unsigned int i;
+@@ -182,6 +191,8 @@ int main(int argc, char *argv[])
+ 	int pct_offset = 0;
+ 	int getextended = 0;
+ 	int getcross = 0;
++	int get_ext_any = 0;
++	int ext_any_type = -1;
+ 	int n_samples = 0;
+ 	int pin_index = -1, pin_func;
+ 	int pps = -1;
+@@ -196,7 +207,7 @@ int main(int argc, char *argv[])
+ 
+ 	progname = strrchr(argv[0], '/');
+ 	progname = progname ? 1+progname : argv[0];
+-	while (EOF != (c = getopt(argc, argv, "cd:e:f:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xz"))) {
++	while (EOF != (c = getopt(argc, argv, "cd:e:f:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xy:Y:z"))) {
+ 		switch (c) {
+ 		case 'c':
+ 			capabilities = 1;
+@@ -273,6 +284,29 @@ int main(int argc, char *argv[])
+ 		case 'X':
+ 			getcross = 1;
+ 			break;
++		case 'y':
++			get_ext_any = atoi(optarg);
++			if (get_ext_any < 1 || get_ext_any > PTP_MAX_SAMPLES) {
++				fprintf(stderr,
++					"number of extended-any timestamp samples must be between 1 and %d; was asked for %d\n",
++					PTP_MAX_SAMPLES, get_ext_any);
++				return -1;
++			}
++			break;
++		case 'Y':
++			if (!strcasecmp(optarg, "real"))
++				ext_any_type = PTP_TS_REAL;
++			else if (!strcasecmp(optarg, "mono"))
++				ext_any_type = PTP_TS_MONO;
++			else if (!strcasecmp(optarg, "raw"))
++				ext_any_type = PTP_TS_RAW;
++			else {
++				fprintf(stderr,
++					"type needs to be one of real,mono,raw only; was given %s\n",
++					optarg);
++				return -1;
++			}
++			break;
+ 		case 'z':
+ 			flagtest = 1;
+ 			break;
+@@ -286,6 +320,14 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
++	/* For ptp_sys_offset_any both options 'y' and 'Y' must be given */
++	if (get_ext_any > 0 && ext_any_type == -1) {
++		fprintf(stderr,
++			"For extended-any TS both options -y, and -Y are required.\n");
++		usage(progname);
++		return -1;
++	}
++
+ 	fd = open(device, O_RDWR);
+ 	if (fd < 0) {
+ 		fprintf(stderr, "opening %s: %s\n", device, strerror(errno));
+@@ -604,6 +646,36 @@ int main(int argc, char *argv[])
+ 		free(xts);
+ 	}
+ 
++	if (get_ext_any) {
++		ats = calloc(1, sizeof(*ats));
++		if (!ats) {
++			perror("calloc");
++			return -1;
++		}
++
++		ats->n_samples = get_ext_any;
++		ats->ts_type = ext_any_type;
++
++		if (ioctl(fd, PTP_SYS_OFFSET_ANY2, ats)) {
++			perror("PTP_SYS_OFFSET_ANY2");
++		} else {
++			printf("extended-any timestamp request returned %d samples\n",
++			       get_ext_any);
++
++			for (i = 0; i < get_ext_any; i++) {
++				printf("sample #%2d: %s before: %lld.%09u\n",
++				       i, time_base_arr[ext_any_type],
++				       ats->ts[i][0].sec, ats->ts[i][0].nsec);
++				printf("            phc time: %lld.%09u\n",
++				       ats->ts[i][1].sec, ats->ts[i][1].nsec);
++				printf("            %s after: %lld.%09u\n",
++				       time_base_arr[ext_any_type],
++				       ats->ts[i][2].sec, ats->ts[i][2].nsec);
++			}
++		}
++
++		free(ats);
++	}
+ 	close(fd);
+ 	return 0;
+ }
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
