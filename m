@@ -1,82 +1,138 @@
-Return-Path: <netdev+bounces-37630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF877B6643
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:21:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7B7B7B6658
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:26:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 061531C20400
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:21:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C15AB1C2033F
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFDE1DA21;
-	Tue,  3 Oct 2023 10:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F541EA73;
+	Tue,  3 Oct 2023 10:26:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF79D302
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:21:31 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F43A3;
-	Tue,  3 Oct 2023 03:21:30 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32329d935d4so763442f8f.2;
-        Tue, 03 Oct 2023 03:21:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6009D302
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:25:58 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4705E93;
+	Tue,  3 Oct 2023 03:25:53 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4056ce55e7eso7003175e9.2;
+        Tue, 03 Oct 2023 03:25:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696328488; x=1696933288; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wyk1y8XC/A7otYhdDr88eU8AxtqyBbvI9qOM1Ivdglo=;
-        b=UFovOfJH+qEMPSXwCYfuPLowKy8V2JSdSE48yuGCyOks1EAMFKbRNo7BkZYO/yIFIw
-         k9q2dF9FHSVVQ1T4fC1j9D2plNxaBRBQtpGCxAzPLeupP5kgcQONZbcNN9ZkC9fh5qP4
-         AwfGJXauMXc6aXBGNe596E1jtr4WOUZyWQGeSMUg70Pr8hY1yH7S2Xdpg04zAHPSu/1J
-         TsXMvZK4HEuYms0enhKgi+Mmr22p8Nass560ld9pQmInjLHTKg5Y+oBcnUurGL9t8HzL
-         dOoJxAtNpG71GANS96rT7xMoz8zj12gyj8jtYWbI2j138el1oBZR528YfcubszKP9iPc
-         STpg==
+        d=gmail.com; s=20230601; t=1696328752; x=1696933552; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UJbPLQ2sJq+JdJneKcIjpXN6+YXEeaAlp1ihUjhH9nY=;
+        b=A7F3bBFdpPsQz7EQyx3/2fObKls0vOph42CX8RNLRUQBTmVcw+tlF/q3XV30rO2I4C
+         qstUjIoqORbGcH+JnU7HoaAAlESmt+9t0/hXG5BWACFv7A0yUTHJNtuE+7vxJHkATLmA
+         6o2heFj0DWure4XXSPqVy7YFhze1Zeb4HaBj/31JzF3BsW4YxH12tawI52YtHNhJcLhd
+         TMxecwej8EpO1cqsm41nTeU8bQk4AmiN+uewWyFG016DsGEI4tGtg66g+d9ikEluF9Eq
+         /rb3QRt3vH9T3yb9Nqtlvx7G5cBXvTVb7M6rMPyLCr9cVTL5GjNWw0aIW8n4s1hsopzF
+         kAXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696328488; x=1696933288;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wyk1y8XC/A7otYhdDr88eU8AxtqyBbvI9qOM1Ivdglo=;
-        b=tG1ox+MWlbEYcLs+JGok7fhilgYjQGED/0Cukwr8SRi4HG7CNg7jkzSlGFGZgnoeUs
-         czY7XcAEPsfSLbkaCME4Z+8Z8tANckmHdME2VAGGh8QIz0j1DqU3ANZ2TY+J+98sphuJ
-         R/ahxC8poYfybWIVu6rwb3vIMJTftBo8Xa++y2Yyb4IZzuTyyJUfB07RTtQRcM6OfnEh
-         t1X2Abi5c/usV6EIKilih5iqCw1jUmvqkWgtpLJj5SCuHos1RLYHXisdtjSeGFgtcoR4
-         uTiBRnSHApTl8lL2NZOnYglZMMhrkB21XE7wN43z1BuD7JrJh+nSF9fE6R0ryp3r44UF
-         kU9g==
-X-Gm-Message-State: AOJu0YyC+myPH/AP9I7klxQ1rjKvEKrWeAVAOndLNOvZezQ1/faw/lvg
-	3JQ9nOtgwWrrH6mzRu6LKQU=
-X-Google-Smtp-Source: AGHT+IFoGSxPH67dI0pSqB17FrRseCZNLJ1HnkigQOoUBOBngTInpQ+0b6carltMEWxkHkGJaPnRMQ==
-X-Received: by 2002:adf:e592:0:b0:31f:f9de:6a4e with SMTP id l18-20020adfe592000000b0031ff9de6a4emr13329765wrm.69.1696328488077;
-        Tue, 03 Oct 2023 03:21:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696328752; x=1696933552;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UJbPLQ2sJq+JdJneKcIjpXN6+YXEeaAlp1ihUjhH9nY=;
+        b=XeyftuBb66/Sn3YhC13i9f+DgS3l97EqZs5cNCVbFRMCLtn81kY/8FHS9yUCNKcy9T
+         I6pjcwUOJHFMItGxG0fYn5NQ/4OLCUjs9PRPMBZdmmlbiHs7Z2+UQiHpwHMognTuP2SL
+         tkgs9W2FAnACVE3gSC6HD7sZVP2qsg/NPtlThAbIkwFPKYQo3ayVLSPd0a+6+jgZz7mE
+         NT5lBV1h+xPGQd3t74cxwkxdaez/UCH2x2l15Q/HbTmS3Gp0jFHAxXoCnzflDlMyYokC
+         jKp/l/THKIlzGDtOEdovrVTKjnKfAGN91yRVjhggZAsE47UtgdpuWwkiA6lkFHNAgGD3
+         Z6Jg==
+X-Gm-Message-State: AOJu0YwFzrLWKiYk/5rsONKK0kiHW59T5VYVrz3CqPYowPyagqa5NGeJ
+	1521Tmn3jKUcEcIPAAuV1w0=
+X-Google-Smtp-Source: AGHT+IH4PtfHldj0VvMZI/On+6s7VpV7CIQtUMLRVRfnUnG2AW04zeibvBdNxyG/QoznL6yrZAPK7w==
+X-Received: by 2002:a1c:7c0b:0:b0:405:3885:490a with SMTP id x11-20020a1c7c0b000000b004053885490amr12474883wmc.0.1696328751231;
+        Tue, 03 Oct 2023 03:25:51 -0700 (PDT)
 Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id f7-20020a7bcc07000000b004053a2138bfsm9119977wmh.12.2023.10.03.03.21.27
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c021100b004063cced50bsm945150wmi.23.2023.10.03.03.25.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 03:21:27 -0700 (PDT)
-Message-ID: <651beb27.7b0a0220.fe7ca.2796@mx.google.com>
-X-Google-Original-Message-ID: <ZRvrJnPG6hTpyO1h@Ansuel-xps.>
-Date: Tue, 3 Oct 2023 12:21:26 +0200
+        Tue, 03 Oct 2023 03:25:50 -0700 (PDT)
+Message-ID: <651bec2e.050a0220.f5ddb.3810@mx.google.com>
+X-Google-Original-Message-ID: <ZRvsKwrdSOI43YWZ@Ansuel-xps.>
+Date: Tue, 3 Oct 2023 12:25:47 +0200
 From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Robert Marko <robimarko@gmail.com>, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
- support
-References: <20230930104008.234831-1-robimarko@gmail.com>
- <df89a28e-0886-4db0-9e68-5f9af5bec888@lunn.ch>
- <651b26a5.050a0220.213bf.e11b@mx.google.com>
- <9a84642e-b4fe-4e36-bcdc-d02c84bb1dc9@lunn.ch>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Raju Rangoju <rajur@chelsio.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Douglas Miller <dougmill@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Dany Madden <danymadden@us.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Intel Corporation <linuxwwan@intel.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Yuanjun Gong <ruc_gongyuanjun@163.com>, Wei Fang <wei.fang@nxp.com>,
+	Alex Elder <elder@linaro.org>, Simon Horman <horms@kernel.org>,
+	Rob Herring <robh@kernel.org>, Bailey Forrest <bcf@google.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Junfeng Guo <junfeng.guo@intel.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Rushil Gupta <rushilg@google.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Yuri Karpov <YKarpov@ispras.ru>,
+	Zhengchao Shao <shaozhengchao@huawei.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Zheng Zengkai <zhengzengkai@huawei.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Lee Jones <lee@kernel.org>, Dawei Li <set_pte_at@outlook.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [net-next PATCH 2/4] netdev: make napi_schedule return bool on
+ NAPI successful schedule
+References: <20231002151023.4054-1-ansuelsmth@gmail.com>
+ <20231002151023.4054-2-ansuelsmth@gmail.com>
+ <CANn89i+eSWYuE=wE1TPJFtAS1OCfFYytC_nAjDWkizxmR9e6JQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9a84642e-b4fe-4e36-bcdc-d02c84bb1dc9@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+eSWYuE=wE1TPJFtAS1OCfFYytC_nAjDWkizxmR9e6JQ@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -84,21 +140,26 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 11:07:25PM +0200, Andrew Lunn wrote:
-> > This is problematic... Since this is a plain standard PHY and we don't
-> > have a compatible (as it's matched with the PHY id) we don't have DT to
-> > add this... Sooo how to add this? Should we update the generic-phy dt?
-> > 
-> > Should we create a dummy dt and add a compatible adding
-> > ethernet-phy.ID... just for this properties?
-> > 
-> > This is why we were a bit confused about adding a DT commit to this.
+On Tue, Oct 03, 2023 at 07:21:46AM +0200, Eric Dumazet wrote:
+> On Mon, Oct 2, 2023 at 5:10 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
+> >
+> > Change napi_schedule to return a bool on NAPI successful schedule. This
+> > might be useful for some driver to do additional step after a NAPI ahs
 > 
-> Just do what other PHYs do. ti,dp83869.yaml, motorcomm,yt8xxx.yaml,
-> nxp,tja11xx.yaml, etc.
+> This might be useful for some drivers to do additional steps after a
+> NAPI has been scheduled.
 > 
+> > been scheduled.
+> >
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> 
+> Yeah, I guess you forgot to mention I suggested this patch ...
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Thanks I prepared a DT hoping it will be good in v2.
+Yes sorry, totally forgot to add this here. I already have the patch for the
+other driver (but it's dependant on this so I'm waiting) and I forgot to
+add the tag also for this piece.
 
 -- 
 	Ansuel
