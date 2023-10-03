@@ -1,112 +1,117 @@
-Return-Path: <netdev+bounces-37725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACAC17B6CF8
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:22:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A99F7B6D27
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5E70228132C
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:22:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2A065281355
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E434CF0;
-	Tue,  3 Oct 2023 15:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1848E3588F;
+	Tue,  3 Oct 2023 15:30:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A375DDC7
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 15:22:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA801C433C7;
-	Tue,  3 Oct 2023 15:22:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696346546;
-	bh=GATpp7gLk+9vH4S+ZsqxKEXorMVjpzl17S6e9IMF6Ug=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pF3Rw9+BWoA4AVvAYwySQBDtgOoPjaC3ODX2YvtSeXexKph9UTnOh67F/rOXiNKcu
-	 Rr8O8rOryG+loxf9SkMsrQn9UZd6kcOjzxNt+JhL4NMJpZbMbzcH/SOuyObrYEtbfP
-	 hhfhk2m/dVqjAqUpGBGndaFQQrFDO9q/2gEQmKga67JXPYRjartMQ3GW8a5DcF+9Ga
-	 J1fwawlMj+ePJPr8lw4fb0uOVnJ0c4zE2NmDrspjjz3nHUr01PivBztSIZBBcXwkc3
-	 kOWtyJHG7cnFS40UvaGEUJ9NUbraApDPg7ipkcl/5eYdLpKKsEn2ebTq2JcOdZJVpt
-	 SdRiS2dqR01ig==
-Date: Tue, 3 Oct 2023 17:22:22 +0200
-From: Simon Horman <horms@kernel.org>
-To: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: dsa: qca8k: fix regmap bulk read/write
- methods on big endian systems
-Message-ID: <ZRwxrixyhOT29C47@kernel.org>
-References: <20231002104612.21898-1-kabel@kernel.org>
- <20231002104612.21898-2-kabel@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E557E347A2
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 15:30:00 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C616BB
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 08:29:57 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-5041bb9ce51so1253713e87.1
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 08:29:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696346995; x=1696951795; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=amro8Gq6QWRGZvPI8kQ8K9MaGGmsh2qAsN2cjlX45YQ=;
+        b=C4vwP/YRS+PaN1DO/5xZBx/3P8upUxPw87HBcOcnh+QWDLvmv4pLsi1bQButNXigkz
+         rrVKBZz6xfmJldDWDyt4LJb5NmxFXarIqprw8jf4Y84Msittsjgp2w1tiLpLlsacsK/l
+         N1/c62Zyq8jI2jc+DCpwXZ7mQtlMJSjoGk0QbG41NQSnV5x913mgYLdXS6RVFjNFzoRT
+         k8yQP1f7vNkNbIMk7F4NAfer3//gM2LDxLyYjo5NGhCum7UKMSn0tEtEKCIrLlmUmqZK
+         sZaWGmlmZGB3MmzrtxZaiIICpgNcyi4kXuJnc1gPKESTJMRRxdcaJ+58oak5+8a/Fgpg
+         2ZRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696346995; x=1696951795;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=amro8Gq6QWRGZvPI8kQ8K9MaGGmsh2qAsN2cjlX45YQ=;
+        b=UPVSxD/L2sYFvNtp39ys2PSdijQnOo47teA2TNG+V1xwD7NWUlrOK2f8GuYbJPAFdM
+         UFRXJUTj1kt/ybkb6UsEUaxukdZis8U3Enjv+29ZW20+B0fATOrNpkaQ3fquoUvGiXiJ
+         jVfsQiXKj25epbQyMFf6VWcRGqg/dujzDCtlgx6wsWNKQrSKonoYgji9kVe0ZwMjXYUE
+         HQyLekagSSHpnn358QEIXQJOeVm13mVV9qGb8nFxDcPU1Iro6+V5FoKki4lM/85YE4pH
+         zl910yuhZ+pe0+9Le2AVnSKzQEpyAJ9ZU1tcVtrjOpz/APkucCs+m5ev8D26Jy27Y3gR
+         rQ4w==
+X-Gm-Message-State: AOJu0YxQT+Imb8XRspzrzNjb3PZ4gqmYEHqwoZD4zWWDYDiR1VdTCxeZ
+	EHAc9apVajUgXGYr7iH3A9n9Y/BEHHnjlLS1jdF5xdQXCakOF8tw7ma5Gw==
+X-Google-Smtp-Source: AGHT+IGx0FgrW2Ah4ADgj45zfcrPkZEtVTpoj4C20Ji+ONiK6KoICzW/yWQ22hIx9FDK7G+rLghZBNV93m9mJQ5IaUo=
+X-Received: by 2002:a05:6512:1246:b0:502:cc8d:f1fc with SMTP id
+ fb6-20020a056512124600b00502cc8df1fcmr16458163lfb.37.1696346995109; Tue, 03
+ Oct 2023 08:29:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231002104612.21898-2-kabel@kernel.org>
+References: <20231001003846.29541-1-rdunlap@infradead.org>
+In-Reply-To: <20231001003846.29541-1-rdunlap@infradead.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Tue, 3 Oct 2023 18:29:18 +0300
+Message-ID: <CAC_iWj+rqx1v1s6p3c92iv_nyzNOA7bRX=vLZPsHOSryXrmycw@mail.gmail.com>
+Subject: Re: [PATCH] page_pool: fix documentation typos
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 12:46:11PM +0200, Marek Behún wrote:
-> Commit c766e077d927 ("net: dsa: qca8k: convert to regmap read/write
-> API") introduced bulk read/write methods to qca8k's regmap.
-> 
-> The regmap bulk read/write methods get the register address in a buffer
-> passed as a void pointer parameter (the same buffer contains also the
-> read/written values). The register address occupies only as many bytes
-> as it requires at the beginning of this buffer. For example if the
-> .reg_bits member in regmap_config is 16 (as is the case for this
-> driver), the register address occupies only the first 2 bytes in this
-> buffer, so it can be cast to u16.
-> 
-> But the original commit implementing these bulk read/write methods cast
-> the buffer to u32:
->   u32 reg = *(u32 *)reg_buf & U16_MAX;
-> taking the first 4 bytes. This works on little endian systems where the
-> first 2 bytes of the buffer correnspond to the low 16-bits, but it
+Thanks Randy!
 
-nit: correspond
-
-> obviously cannot work on big endian systems.
-> 
-> Fix this by casting the beginning of the buffer to u16 as
->    u32 reg = *(u16 *)reg_buf;
-> 
-> Fixes: c766e077d927 ("net: dsa: qca8k: convert to regmap read/write API")
-> Signed-off-by: Marek Behún <kabel@kernel.org>
+On Sun, 1 Oct 2023 at 03:38, Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> Correct grammar for better readability.
+>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Cc: netdev@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
 > ---
->  drivers/net/dsa/qca/qca8k-8xxx.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index de1dc22cf683..d2df30640269 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -505,8 +505,8 @@ qca8k_bulk_read(void *ctx, const void *reg_buf, size_t reg_len,
->  		void *val_buf, size_t val_len)
->  {
->  	int i, count = val_len / sizeof(u32), ret;
-> -	u32 reg = *(u32 *)reg_buf & U16_MAX;
->  	struct qca8k_priv *priv = ctx;
-> +	u32 reg = *(u16 *)reg_buf;
->  
->  	if (priv->mgmt_master &&
->  	    !qca8k_read_eth(priv, reg, val_buf, val_len))
-> @@ -527,8 +527,8 @@ qca8k_bulk_gather_write(void *ctx, const void *reg_buf, size_t reg_len,
->  			const void *val_buf, size_t val_len)
->  {
->  	int i, count = val_len / sizeof(u32), ret;
-> -	u32 reg = *(u32 *)reg_buf & U16_MAX;
->  	struct qca8k_priv *priv = ctx;
-> +	u32 reg = *(u16 *)reg_buf;
->  	u32 *val = (u32 *)val_buf;
->  
->  	if (priv->mgmt_master &&
-> -- 
-> 2.41.0
-> 
-> 
+>  include/net/page_pool/helpers.h |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff -- a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -16,13 +16,13 @@
+>   * page_pool_alloc_pages() call.  Drivers should use
+>   * page_pool_dev_alloc_pages() replacing dev_alloc_pages().
+>   *
+> - * API keeps track of in-flight pages, in order to let API user know
+> + * The API keeps track of in-flight pages, in order to let API users know
+>   * when it is safe to free a page_pool object.  Thus, API users
+>   * must call page_pool_put_page() to free the page, or attach
+> - * the page to a page_pool-aware objects like skbs marked with
+> + * the page to a page_pool-aware object like skbs marked with
+>   * skb_mark_for_recycle().
+>   *
+> - * API user must call page_pool_put_page() once on a page, as it
+> + * API users must call page_pool_put_page() once on a page, as it
+>   * will either recycle the page, or in case of refcnt > 1, it will
+>   * release the DMA mapping and in-flight state accounting.
+>   */
+
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
