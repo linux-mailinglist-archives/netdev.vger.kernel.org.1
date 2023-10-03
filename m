@@ -1,124 +1,417 @@
-Return-Path: <netdev+bounces-37735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472CC7B6E1B
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 18:10:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CCC67B6E34
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 18:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id C03C71F20F7B
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:10:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0D3FA2810FC
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2800738BD5;
-	Tue,  3 Oct 2023 16:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D16E38DE0;
+	Tue,  3 Oct 2023 16:17:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A1038DC5
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 16:09:58 +0000 (UTC)
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC64B4
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 09:09:57 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-5856082f92dso734665a12.2
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 09:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696349397; x=1696954197; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fMNd5cy+iJOW1gFpgN/QZ1aYRGnrlEzRG0+fZIEWVq4=;
-        b=G+7ALQXeNDDhSmSk4qnatL+1DHUKLIVEZjHYOfhF7FK6GKQ8STfpH9opF8MZ5I9TzK
-         529hw8Qb887/fijJoQI/1ovOd3pIy8oR/LTU+mc089lpEhnDkruw9zyK1uw8uD13wGgi
-         EFqsuNHRMDMIUFFWTmyoDkd5Br8XxiM4tsmXfikhucPOnBPMk1arPS3WF2etL/zswQBA
-         qC/FpXGy/CAWErIHmwSo5VyvzdULgpVaUE4d/EvvZYmCR5dqQ6XUbnFaPzB98P7arL+H
-         AIUu0ts03fYqQY0xhwa3dPbD3wGH5CwX9D0lQui60/dnU22aPzGyFexWhENbTrS9FNyU
-         ZNFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696349397; x=1696954197;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fMNd5cy+iJOW1gFpgN/QZ1aYRGnrlEzRG0+fZIEWVq4=;
-        b=De62ITUZryoXHtMs3X3o+ELs0i3/zRxd+cMSHIx8nk+UNSFW9tmpoD6QW5MPzr6XEv
-         jtqG9zMyXP0QtNMBNxhnmLnX4rp+GD+5Zoc4nnCORYzOgGZiYaA/YhhBQH7VnFPlvgYX
-         Mzux//RxeSRSZr7d0D+u3B95PC4cT0vOIj5lGeK93oX36Q6gPXWK4tV0tdhtFTVmVSo8
-         zVrSw8glScjYvoRln6uD6PWYKAChLb+j9eEEyfDa/qpduqAlvJfIkoI6ShqQGS/zyljF
-         u6H6wnlAnA0vW4jV93XIrCVQ4L8eiW0D5lBtVdaV9HiQ2Ns8CFcQjpNZ5TVbstzYjmkL
-         WOCg==
-X-Gm-Message-State: AOJu0YxYJl1duvYtNt2172nH/q+qlxMkPZxNtac2ZLaZtRwIkpM6pZGb
-	oHRDDzeaCMo69khaZOLHigP9k+E=
-X-Google-Smtp-Source: AGHT+IFUI/zSRouM2YNJLSf/d4E6lhAcKza+USPolB7JhkwY/YXDC9+n+f30QlKeQNyx/U9ERtAAlk4=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:294a:0:b0:57a:32e7:3240 with SMTP id
- bu10-20020a63294a000000b0057a32e73240mr224124pgb.5.1696349397201; Tue, 03 Oct
- 2023 09:09:57 -0700 (PDT)
-Date: Tue, 3 Oct 2023 09:09:55 -0700
-In-Reply-To: <ZRu4OJMAOApPsoVx@lincoln>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D034D31A82
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 16:17:51 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A984AF;
+	Tue,  3 Oct 2023 09:17:46 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.226])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S0NGw0PMnz6K5tf;
+	Wed,  4 Oct 2023 00:16:08 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 3 Oct
+ 2023 17:17:43 +0100
+Date: Tue, 3 Oct 2023 17:17:42 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Konstantin Aladyshev <aladyshev22@gmail.com>
+CC: <minyard@acm.org>, <joel@jms.id.au>, <andrew@aj.id.au>,
+	<avifishman70@gmail.com>, <tmaimon77@gmail.com>, <tali.perry1@gmail.com>,
+	<venture@google.com>, <yuenn@google.com>, <benjaminfair@google.com>,
+	<jk@codeconstruct.com.au>, <matt@codeconstruct.com.au>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <openipmi-developer@lists.sourceforge.net>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <openbmc@lists.ozlabs.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH 3/3] mctp: Add MCTP-over-KCS transport binding
+Message-ID: <20231003171742.00004a14@Huawei.com>
+In-Reply-To: <CACSj6VUS+cjsvjzY=wggMXXO1DEH0=9aHi1ADp0F-O8AKL5cCg@mail.gmail.com>
+References: <20230928123009.2913-1-aladyshev22@gmail.com>
+	<20230928123009.2913-4-aladyshev22@gmail.com>
+	<20230929120835.0000108e@Huawei.com>
+	<CACSj6VUS+cjsvjzY=wggMXXO1DEH0=9aHi1ADp0F-O8AKL5cCg@mail.gmail.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231002162653.297318-1-larysa.zaremba@intel.com>
- <CAKH8qBtGBOw7j01s-ZO4tZmU9kQf-jQi1xUP9UmZ0ebN+W0whw@mail.gmail.com> <ZRu4OJMAOApPsoVx@lincoln>
-Message-ID: <ZRw804r4JM3vTCDH@google.com>
-Subject: Re: [PATCH bpf-next] selftests/bpf: add options and ZC mode to xdp_hw_metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/03, Larysa Zaremba wrote:
-> On Mon, Oct 02, 2023 at 09:46:08AM -0700, Stanislav Fomichev wrote:
-> > On Mon, Oct 2, 2023 at 9:35=E2=80=AFAM Larysa Zaremba <larysa.zaremba@i=
-ntel.com> wrote:
-> > >
-> > > By default, xdp_hw_metadata runs in AF_XDP copy mode. However, hints =
-are
-> > > also supposed to be supported in ZC mode, which is usually implemente=
-d
-> > > separately in driver, and so needs to be tested too.
-> > >
-> > > Add an option to run xdp_hw_metadata in ZC mode.
-> > >
-> > > As for now, xdp_hw_metadata accepts no options, so add simple option
-> > > parsing logic and a help message.
-> > >
-> > > For quick reference, also add an ingress packet generation command to=
- the
-> > > help message. The command comes from [0].
-> > >
-> > > [0] https://lore.kernel.org/all/20230119221536.3349901-18-sdf@google.=
-com/
-> >=20
-> > I did similar changes in my pending [0], but I made the zerocopy, not
-> > the copy mode, the default.
-> > If you want to get this in faster (my series will probably need
-> > another iteration), let's maybe do the same here?
-> > ZC as a default feels better.
-> >=20
-> > 0: https://lore.kernel.org/bpf/20230914210452.2588884-9-sdf@google.com/
->=20
-> I do not need those changes in tree ASAP, that is just something I had lo=
-cally=20
-> for some time and decided to send. So I think I can wait for your series.=
- This=20
-> way it is less work for both of us.
+On Mon, 2 Oct 2023 17:41:42 +0300
+Konstantin Aladyshev <aladyshev22@gmail.com> wrote:
 
-SGTM, thanks!
+> Thanks for the review!
+> I've corrected many things from your comments and have sent the V2 patch.
+> I'm not sure about the LIST thing and all the devres management. I've
+> written the KCS handling the same way it is done in the standard IPMI
+> KCS driver (https://github.com/torvalds/linux/blob/master/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c)
+> Not sure if we need to do any different here.
+> Please see detailed response below:
+> 
+> > > +#include <linux/module.h>
+> > > +#include <linux/mutex.h>  
+> > Check these.  There aren't any mutex's in here that I noticed...
+> >  
+> 
+> Currently there are no mutex's in the driver. Where do you think they
+> are needed?
+> For example there no mutex's in the 'mctp-serial.c' driver
+> (https://github.com/torvalds/linux/blob/master/drivers/net/mctp/mctp-serial.c)
+
+I don't think you need a mutex.  Hence don't include the header either! :)
+> 
+> > > +#include <linux/netdevice.h>
+
+...
+
+> > > +
+> > > +static DEFINE_SPINLOCK(kcs_bmc_mctp_instances_lock);
+> > > +static LIST_HEAD(kcs_bmc_mctp_instances);  
+> > As mentioned below, this seems to be only used to find some data again
+> > in remove. Lots of cleaner ways to do that than a list in the driver.
+> > I'd explore the alternatives.
+> >  
+> 
+> This was copied from the other KCS drivers. For example please see
+> 'kcs_bmc_cdev_ipmi.c':
+> https://github.com/torvalds/linux/blob/8a749fd1a8720d4619c91c8b6e7528c0a355c0aa/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c#L469
+
+Sure, I spotted it was copied but doesn't mean I like that code either :)
+
+
+> 
+> > > +
+> > > +static int kcs_bmc_mctp_add_device(struct kcs_bmc_device *kcs_bmc)
+> > > +{
+> > > +     struct mctp_kcs *mkcs;
+> > > +     struct net_device *ndev;
+> > > +     char name[32];
+> > > +     int rc;
+> > > +
+> > > +     snprintf(name, sizeof(name), "mctpkcs%d", kcs_bmc->channel);
+> > > +
+> > > +     ndev = alloc_netdev(sizeof(*mkcs), name, NET_NAME_ENUM, mctp_kcs_setup);  
+> > Interesting that there is an explicit devm_register_netdev() but not one for
+> > this simple allocation case (there is one for the ethernet specific version).
+> > Never mind, we have devm_add_action_or_reset() for that.  Just create a
+> > small wrapper for free_netdev() (which will look like devm_free_netdev()
+> > in net/devres.c but that's local to that file) and add
+> >
+> >         rc = devm_add_action_or_reset(&kcs_bmc->dev,
+> >                                       wrapper_for_free_netdev(), ndev);
+> >         if (rc)
+> >                 return rc;
+> >  
+> 
+> 
+> Did you mean something like this?
+> ```
+> static void devm_free_netdev(struct device *dev, void *this)
+> {
+> struct net_device_devres *res = this;
+> 
+> free_netdev(res->ndev);
+> }
+
+No. That would be unwind for a devm_alloc_netdev() which doesn't
+exist for the case where you want to override the manual version.
+
+Here would be
+static void kcs_bmc_mctp_free_netdev(void *priv)
+{
+	free_netdev(priv);
+}
+
+
+> 
+> 
+> ...
+> 
+> static int kcs_bmc_mctp_add_device(struct kcs_bmc_device *kcs_bmc)
+> {
+> 
+> // Instead of:
+> //ndev = alloc_netdev
+> //rc = register_netdev(ndev);
+> 
+> // Use
+> ...
+> if (!devm_register_netdev(kcs_bmc->dev, ndev)) {
+> dev_err_probe(kcs_bmc->dev,
+>         "alloc_netdev failed for KCS channel %d\n",
+>         kcs_bmc->channel);
+> return -ENOMEM;
+> }
+> 
+> rc = devm_add_action_or_reset(&kcs_bmc->dev,
+>                               devm_free_netdev(),
+>                               ndev);
+> if (rc)
+> return rc;
+> ...
+> }
+> ```
+> What calls do I need to perform in `kcs_bmc_mctp_remove_device` in this case?
+> Do I still have to perform `unregister_netdev` and `free_netdev` for example?
+
+Ideally none at all once everthing has moved over to device managed (devm) based
+handling.  The purpose of devm is to automatically call all the release functions
+in reverse order of the setup calls (gets more complex but in this case it will
+simply be reverse order).  That will occur on an error in probe() or after
+remove() callback is called. Happens without the remove() callback as well which
+is what we want here.
+> 
+> Anyway I don't see anything similar in the current mctp-i2c/mctp-serial drivers.
+
+True - lots of examples elsewhere though :)
+
+> 
+> 
+> > > +     if (!ndev) {
+> > > +             dev_err(kcs_bmc->dev,
+> > > +                     "alloc_netdev failed for KCS channel %d\n",
+> > > +                     kcs_bmc->channel);  
+> > No idea if the kcs subsystem handles deferred probing right, but in general
+> > anything called just in 'probe' routines can use dev_err_probe() to pretty
+> > print errors and also register any deferred cases with the logging stuff that
+> > lets you find out why they were deferred.
+> >  
+> 
+> Done
+> 
+> > > +             rc = -ENOMEM;
+> > > +             goto err;  
+> > In general I find it easier to follow code that only uses a goto if there
+> > is shared cleanup to do.
+> >                 return -ENOMEM; and for this path I don't need to read further.  
+> 
+> Done
+> 
+> > > +     }
+> > > +
+> > > +     mkcs = netdev_priv(ndev);
+> > > +     mkcs->netdev = ndev;
+> > > +     mkcs->client.dev = kcs_bmc;
+> > > +     mkcs->client.ops = &kcs_bmc_mctp_client_ops;
+> > > +     mkcs->data_in = devm_kmalloc(kcs_bmc->dev, KCS_MSG_BUFSIZ, GFP_KERNEL);
+> > > +     mkcs->data_out = devm_kmalloc(kcs_bmc->dev, KCS_MSG_BUFSIZ, GFP_KERNEL);  
+> >
+> > You should not be mixing device manged cleanup and manual cleanup.  Rule of thumb
+> > is don't call any devm_ functions in a 'probe / add' type routine after you pass
+> > the first element that requires manual cleanup. Otherwise you get horrible
+> > race conditions or if not that, just code that is hard to check for them.
+> >  
+> 
+> Not sure how to fix
+
+Some simple rules of thumb.
+
+1. The first call in probe() that you make that does not have automated cleanup
+   (so non devm_ * or you haven't manually added a cleanup callback via
+    devm_add_action_or_reset()) ends devm usage in probe.
+2. In remove() and in error paths in probe() don't do anything at all to cleanup
+   stuff that was registered with devm_ calls as they will be automatically
+   cleaned up for you.
+
+In a simple driver it's often possible to move everything over to devm_ 
+calls so there is no manual cleanup to do at all. If that's the case
+don't provide a remove() callback.  However the subsystem may insist
+on one in which case either fix that (they should be optional) or
+provide an empty one.
+
+
+
+> > > +
+> > > +static int kcs_bmc_mctp_remove_device(struct kcs_bmc_device *kcs_bmc)
+> > > +{
+> > > +     struct mctp_kcs *mkcs = NULL, *pos;
+> > > +
+> > > +     dev_info(kcs_bmc->dev, "Remove MCTP client for the KCS channel %d",
+> > > +              kcs_bmc->channel);
+> > > +     spin_lock_irq(&kcs_bmc_mctp_instances_lock);
+> > > +     list_for_each_entry(pos, &kcs_bmc_mctp_instances, entry) {
+> > > +             if (pos->client.dev == kcs_bmc) {
+> > > +                     mkcs = pos;
+> > > +                     list_del(&pos->entry);
+> > > +                     break;  
+> > I don't know the kcs stuff at all but these seems 'unusual'.
+> > Can't you stash  device_set_drvdata(kcs_bmc->dev) or does it
+> > just match the structure containing the client pointed to
+> > by kcs_bmc_device? If so use something like
+> > container_of(kcs_bmc->client, struct mctp_kcs, client);
+> > Ah. You already have a function for that.  Why not use that here?
+> >
+> > There isn't normally a reason for a driver to maintain an
+> > additional list like this.
+> >  
+> 
+> Once again this logic was copied from the KCS IPMI driver:
+> https://github.com/torvalds/linux/blob/8a749fd1a8720d4619c91c8b6e7528c0a355c0aa/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c#L520
+
+Understood - should be able to do better than that though ;)
+
+> 
+> > > +             }
+> > > +     }
+> > > +     spin_unlock_irq(&kcs_bmc_mctp_instances_lock);
+> > > +
+> > > +     if (!mkcs)
+> > > +             return -ENODEV;
+> > > +
+> > > +     unregister_netdev(mkcs->netdev);
+> > > +     free_netdev(mkcs->netdev);  
+> >
+> > This stuff should be opposite order of add above, or leave it to devm to clean up.  
+> 
+> Which things are exact things that are currently in the incorrect order?
+
+Allocations occur in probe just before register_netdev, so they should be
+before free_netdev() for example.
+
+> 
+> >  
+> > > +     kcs_bmc_disable_device(mkcs->client.dev, &mkcs->client);  
+> >
+> > This doesn't match with stuff in add - so I'd like a comment to explain
+> > why it is here.  Also needs a comment on the ordering.  Perhaps this
+> > is why you can't use devm for all the above, in which case I'd use it
+> > nowhere in this driver.
+> > I'm also confused on relationship between mks->client.dev and kcs_bmc
+> > (I'm fairly sure they are the same, so just use kcs_bmc here).
+> >  
+> 
+> I've changed the variable. Not sure about `kcs_bmc_disable_device`.
+> I've added it since it is also present in the IPMI KCS driver.
+> https://github.com/torvalds/linux/blob/8a749fd1a8720d4619c91c8b6e7528c0a355c0aa/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c#L533
+
+Understood. Would need some experimenting to figure
+out a path where it does something rather than it already
+being disabled.
+
+> 
+> >  
+> > > +     devm_kfree(kcs_bmc->dev, mkcs->data_in);
+> > > +     devm_kfree(kcs_bmc->dev, mkcs->data_out);  
+> >
+> > Alarm bells occur whenever an explicit devm_kfree turns up in
+> > except in complex corner cases. Please look at how devm based
+> > resource management works. These should not be here.
+> >
+> > Also, remove_device should either do things in the opposite order
+> > to add_device, or it should have comments saying why not!
+> >
+> >  
+> 
+> https://github.com/torvalds/linux/blob/8a749fd1a8720d4619c91c8b6e7528c0a355c0aa/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c#L534C2-L534C2
+
+Yeah. That's bad :(  Seems devm being relied on for error paths, but not
+remove() 
+
+
+> 
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static const struct kcs_bmc_driver_ops kcs_bmc_mctp_driver_ops = {
+> > > +     .add_device = kcs_bmc_mctp_add_device,
+> > > +     .remove_device = kcs_bmc_mctp_remove_device,
+> > > +};
+> > > +
+> > > +static struct kcs_bmc_driver kcs_bmc_mctp_driver = {
+> > > +     .ops = &kcs_bmc_mctp_driver_ops,
+> > > +};
+> > > +
+> > > +static int __init mctp_kcs_init(void)
+> > > +{
+> > > +     kcs_bmc_register_driver(&kcs_bmc_mctp_driver);
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static void __exit mctp_kcs_exit(void)
+> > > +{
+> > > +     kcs_bmc_unregister_driver(&kcs_bmc_mctp_driver);
+> > > +}  
+> >
+> > Hmm. So kcs is a very small subsystem hence no one has done the usual
+> > module_kcs_driver() wrapper (see something like module_i2c_driver)
+> > for an example.  You can just use the underlying macro directly
+> > though to get rid of most of this boilerplate.
+> >
+> >
+> > module_driver(kcs_bmc_mctp_driver, kcs_bmc_register_driver,
+> >               kcs_bmc_uregister_driver);
+> >  
+> 
+> Not possible. If I understand error message correctly it is from the
+> fact that 'kcs_bmc_register_driver' returns void:
+
+That's annoying..  Could fix it by making it return an int so it
+could report the failure it handles to the caller module instead
+of always returning success...  That smells like a bug to me though
+I haven't checked if the module_init() return value gets used
+for anything much.
+
+
+> ```
+> | drivers/net/mctp/mctp-kcs.c: In function 'kcs_bmc_mctp_driver_init':
+> | drivers/net/mctp/mctp-kcs.c:576:36: error: void value not ignored as
+> it ought to be
+> |   576 | module_driver(kcs_bmc_mctp_driver, kcs_bmc_register_driver,
+> kcs_bmc_unregister_driver);
+> | include/linux/device/driver.h:265:16: note: in definition of macro
+> 'module_driver'
+> |   265 |         return __register(&(__driver) , ##__VA_ARGS__); \
+> |       |                ^~~~~~~~~~
+> | include/linux/device/driver.h:266:1: error: control reaches end of
+> non-void function [-Werror=return-type]
+> |   266 | } \
+> |       | ^
+> | drivers/net/mctp/mctp-kcs.c:576:1: note: in expansion of macro 'module_driver'
+> |   576 | module_driver(kcs_bmc_mctp_driver, kcs_bmc_register_driver,
+> kcs_bmc_unregister_driver);
+> |       | ^~~~~~~~~~~~~
+> | cc1: some warnings being treated as errors
+> ```
+> 
+> > > +
+> > > +module_init(mctp_kcs_init);
+> > > +module_exit(mctp_kcs_exit);
+> > > +
+> > > +MODULE_LICENSE("GPL");
+> > > +MODULE_AUTHOR("Konstantin Aladyshev <aladyshev22@gmail.com>");
+> > > +MODULE_DESCRIPTION("MCTP KCS transport");  
+> >  
+> 
+> Best regards,
+> Konstantin Aladyshev
+> 
+
 
