@@ -1,76 +1,136 @@
-Return-Path: <netdev+bounces-37670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7BB7B6917
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:35:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8AC7B6934
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id EA6FA281614
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:35:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id CA46D1C203B8
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86451125A9;
-	Tue,  3 Oct 2023 12:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED77A1F934;
+	Tue,  3 Oct 2023 12:41:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B572DDBE;
-	Tue,  3 Oct 2023 12:35:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90C2FC433C8;
-	Tue,  3 Oct 2023 12:35:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696336528;
-	bh=KkLfUgocu5F7KXQSvfrqaGnYcZzRw7HrYorKPZvmsys=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bH0Pig52T8oRLymG0RJ4ZctqFLc/nxKMDQmTHKn/nBAsNqWPISeavAJ5YAaVilzLU
-	 PJ3e9QZU1xMBFKoA8+ql/toVTTKh+ODqQUmxnTCr4goGcjiSASfkwigJAybBki1AoS
-	 QPuLw3HVZXN8wBe2WZ7qHgmzAHTgZ5GQ/+64MKT8MoJnZajInQgsKKZuy/GuwnUVYn
-	 lLv5KHivK8B2u2tPuJbfcn52HE2DTKGPWRHXb5EOVtBxd8DQ0yQwcKOLRHMNlZKbxx
-	 Zq05vH9sZhN4vE8z524HuCH85ZrB+KgNi0BkSoiSBTJV7qTSuyq9OY/6QSGPDy5vJ+
-	 E66T5RD7HUwrQ==
-Date: Tue, 3 Oct 2023 05:35:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
- Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer
- <brouer@redhat.com>, Anatoly Burakov <anatoly.burakov@intel.com>, Alexander
- Lobakin <alexandr.lobakin@intel.com>, Magnus Karlsson
- <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>,
- xdp-hints@xdp-project.net, netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
- <alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
- Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: Re: [RFC bpf-next v2 09/24] xdp: Add VLAN tag hint
-Message-ID: <20231003053519.74ae8938@kernel.org>
-In-Reply-To: <20230927075124.23941-10-larysa.zaremba@intel.com>
-References: <20230927075124.23941-1-larysa.zaremba@intel.com>
-	<20230927075124.23941-10-larysa.zaremba@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27972915
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:41:01 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77ADB0;
+	Tue,  3 Oct 2023 05:40:58 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 393CeLGW11998446, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 393CeLGW11998446
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Oct 2023 20:40:23 +0800
+Received: from RTEXDAG02.realtek.com.tw (172.21.6.101) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Tue, 3 Oct 2023 20:40:22 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG02.realtek.com.tw (172.21.6.101) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Tue, 3 Oct 2023 20:40:21 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Tue, 3 Oct 2023 20:40:21 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v9 02/13] net:ethernet:realtek:rtase: Implement the .ndo_open function
+Thread-Topic: [PATCH net-next v9 02/13] net:ethernet:realtek:rtase: Implement
+ the .ndo_open function
+Thread-Index: AQHZ8fl23iE5gfcWPUefA6LhXZT8grAvrIqAgAhbNIA=
+Date: Tue, 3 Oct 2023 12:40:20 +0000
+Message-ID: <f3ff51ce080b441cbfe9309e286fc039@realtek.com>
+References: <20230928104920.113511-1-justinlai0215@realtek.com>
+ <20230928104920.113511-3-justinlai0215@realtek.com>
+ <714dbb7d-3fb8-481e-aba1-01a1be992950@lunn.ch>
+In-Reply-To: <714dbb7d-3fb8-481e-aba1-01a1be992950@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXDAG02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 27 Sep 2023 09:51:09 +0200 Larysa Zaremba wrote:
-> Implement functionality that enables drivers to expose VLAN tag
-> to XDP code.
-> 
-> VLAN tag is represented by 2 variables:
-> - protocol ID, which is passed to bpf code in BE
-> - VLAN TCI, in host byte order
+> > diff --git a/drivers/net/ethernet/realtek/rtase/rtase.h
+> > b/drivers/net/ethernet/realtek/rtase/rtase.h
+> > index bae04cfea060..5314fceb72a2 100644
+> > --- a/drivers/net/ethernet/realtek/rtase/rtase.h
+> > +++ b/drivers/net/ethernet/realtek/rtase/rtase.h
+> > @@ -51,8 +51,6 @@
+> >
+> >  #define RX_BUF_SIZE (1522 + 1)
+> >
+> > -#define IVEC_NAME_SIZE IFNAMSIZ + 10
+> > -
+> >
+> >
+> /***************************************************************
+> ******
+> > ********/
+> >  enum rtase_registers {
+> >       RTASE_MAC0   =3D 0x0000,
+> > @@ -261,6 +259,8 @@ union rx_desc {
+> >  #define RTASE_IDLESLOPE_INT_SHIFT 25
+> >  #define RTASE_IDLESLOPE_INT_MASK  GENMASK(31, 25)
+> >
+> > +#define IVEC_NAME_SIZE IFNAMSIZ + 10
+> > +
+>=20
+> Please try to avoid moving things around which you just added in the prev=
+ious
+> patch.
+>=20
+> > +static int rtase_open(struct net_device *dev) {
+> > +     struct rtase_private *tp =3D netdev_priv(dev);
+> > +     struct rtase_int_vector *ivec =3D &tp->int_vector[0];
+> > +     const struct pci_dev *pdev =3D tp->pdev;
+> > +     int ret;
+> > +     u16 i;
+> > +
+>=20
+> > +     netif_carrier_on(dev);
+> > +     netif_wake_queue(dev);
+> > +     netdev_info(dev, "link up\n");
+>=20
+> No need to spam the log with this. Given the hardware architecture, the l=
+ink is
+> always going to be up.
+>=20
+>     Andrew
 
-Sorry for a random chime-in but was there any discussion about 
-the validity of VLAN stripping as an offload?
-
-I always thought this is a legacy "Windows" thing which allowed
-Windows drivers to operate on VLAN-tagged networks even before
-the OS itself understood VLANs...  Do people actually care about
-having it enabled?
+Hi, Andrew
+Thank you for your reply, I will modify what you mentioned.
 
