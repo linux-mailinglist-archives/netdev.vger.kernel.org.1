@@ -1,263 +1,173 @@
-Return-Path: <netdev+bounces-37588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5CD7B62C1
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:46:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5E317B62B5
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id A037C281775
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:46:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id DFD661C20840
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD50FD300;
-	Tue,  3 Oct 2023 07:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533CDD2EB;
+	Tue,  3 Oct 2023 07:46:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E536AB4;
-	Tue,  3 Oct 2023 07:46:35 +0000 (UTC)
-Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7289F90;
-	Tue,  3 Oct 2023 00:46:32 -0700 (PDT)
-Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39353va3021962;
-	Tue, 3 Oct 2023 09:45:56 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=x3zvFTP/cLetsfZPkK+gIr/Q1D7D0ztqpwYaPZYqEI8=; b=uO
-	k9aJK7R1840fb0b3pBnvZI/Q+sO/3kzxpReIyl8a2WtjvEs45JT6XTDrlHMrsGPn
-	Io4kdlT3zs4GfXE3bNHXaM0035fkGjMAqp2uMreLcEPQiYepILPOa+cc7NCAPguM
-	XG/+aAp+4tKUhiooqE+RCJHYp2y7MjmaJGdf1IMZoAa94a14CtlOeJUBnEw8dsgw
-	u6oWujro9NzuU9qeHL/ppQLDYgxAEDr6y873+ikT+KJq7Fg4e8TZp7c+qkB+QmPp
-	mFyCfe1vyeHFUsZQmgUNkpuoVew6YGy6z2Wppfm2ptuSn7pxaIHLo+x4mVReKTrQ
-	5oexx004P/dDF0l4T6kQ==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3texmj0c3h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Oct 2023 09:45:56 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 787F8100057;
-	Tue,  3 Oct 2023 09:45:54 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 1D361229A9D;
-	Tue,  3 Oct 2023 09:45:54 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 3 Oct
- 2023 09:45:52 +0200
-Message-ID: <1a48fce4-0faf-5e26-c57a-064307573c69@foss.st.com>
-Date: Tue, 3 Oct 2023 09:45:36 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060AECA7B
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 07:46:06 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3459090
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:46:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696319162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=badhJh7j9vTt4lYRj3w4dzKDnX5l9fCk+488RmtlxLs=;
+	b=i3BPWSR0EZVzk69Xi2Qt7MwyNY7AGGPZvevn2TWiLcMpggFGxo8jDjowDQoXnxmGYdNxzJ
+	yOrwSSVAfF89TqoNObiZ7TsElEOtmqHcTX4leJEnmVtcpw2JHRbHMep1oWLE2wrY8aJXZt
+	vC+pRYGIXmIObXtAx7bXoI1fUlPqMco=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-d0LyL8VDO2-guzPVkD0NYw-1; Tue, 03 Oct 2023 03:46:01 -0400
+X-MC-Unique: d0LyL8VDO2-guzPVkD0NYw-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9adcb9ecc16so10492566b.0
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 00:46:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696319160; x=1696923960;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=badhJh7j9vTt4lYRj3w4dzKDnX5l9fCk+488RmtlxLs=;
+        b=t3gCGlb6D6o7D58J2jY54eA3FRItqTFTlPKziHUQB8K2BCtenskca/QFFnSNRrUZkn
+         dEdCQs7i2xaEOZLLh/iQuaveQiCbCpu9yNn3vC3pyHn1xFirY/t37QqeWs5aDn6sNAMb
+         9Q0gzgQoGyJw/jvQLbZZ2cYBbEqj+eUlBW7oJwBZvjDpL4gTCkvDuBFE8EkJmeayaXDL
+         JRw5Aul6tdIOrbJPoBdVHCiSM2IQAb7tiqOgUvd9TlJzYwd691FyGdAaNEDR9Cavv07j
+         dxFrH0X5195Qa2q7wYmW+sqjUXtpkHE6U2phxDyaJFPvRu9P2v8XeaWkhuApWKjzLM4P
+         MmlQ==
+X-Gm-Message-State: AOJu0YzxuzloJc9roaT0zbUx/CKL8akK5iVnl8HPBRXEn98xxPY+XdZ8
+	cnj+sybX7kl0zjhc5e/E5oZjA/J6a9/Ui6N/2FGTPZ54V0zGqT9I/d08p6cj7r9NqB+ljWqsJTr
+	bkMN4gOIAWQusFNXW
+X-Received: by 2002:a17:906:19b:b0:9ae:6da8:181c with SMTP id 27-20020a170906019b00b009ae6da8181cmr12064771ejb.7.1696319159814;
+        Tue, 03 Oct 2023 00:45:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFWzeUW1QUpPdAL7ev6RQA1+N2TB0hOVem0AAU3/MPZFHW0EnnDEy+RK9wC9vjYR/dvQPeDRw==
+X-Received: by 2002:a17:906:19b:b0:9ae:6da8:181c with SMTP id 27-20020a170906019b00b009ae6da8181cmr12064749ejb.7.1696319159406;
+        Tue, 03 Oct 2023 00:45:59 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-232-193.dyn.eolo.it. [146.241.232.193])
+        by smtp.gmail.com with ESMTPSA id k19-20020a1709067ad300b009a193a5acffsm592740ejo.121.2023.10.03.00.45.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 00:45:58 -0700 (PDT)
+Message-ID: <b70b44bec789b60a99c18e43f6270f9c48e3d704.camel@redhat.com>
+Subject: Re: [PATCH net-next v10 1/6] page_pool: fragment API support for
+ 32-bit arch with 64-bit DMA
+From: Paolo Abeni <pabeni@redhat.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lorenzo Bianconi
+ <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
+ Chen <liangchen.linux@gmail.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>,  Guillaume Tucker
+ <guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>,
+ Linux-MM <linux-mm@kvack.org>,  Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
+ <edumazet@google.com>
+Date: Tue, 03 Oct 2023 09:45:56 +0200
+In-Reply-To: <20230922091138.18014-2-linyunsheng@huawei.com>
+References: <20230922091138.18014-1-linyunsheng@huawei.com>
+	 <20230922091138.18014-2-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v5 01/11] dt-bindings: document generic access controller
-To: Rob Herring <robh@kernel.org>
-CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-p.hy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230929142852.578394-1-gatien.chevallier@foss.st.com>
- <20230929142852.578394-2-gatien.chevallier@foss.st.com>
- <20231002173019.GA2037244-robh@kernel.org>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231002173019.GA2037244-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-03_04,2023-10-02_01,2023-05-22_02
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob,
+On Fri, 2023-09-22 at 17:11 +0800, Yunsheng Lin wrote:
+> Currently page_pool_alloc_frag() is not supported in 32-bit
+> arch with 64-bit DMA because of the overlap issue between
+> pp_frag_count and dma_addr_upper in 'struct page' for those
+> arches, which seems to be quite common, see [1], which means
+> driver may need to handle it when using fragment API.
+>=20
+> It is assumed that the combination of the above arch with an
+> address space >16TB does not exist, as all those arches have
+> 64b equivalent, it seems logical to use the 64b version for a
+> system with a large address space. It is also assumed that dma
+> address is page aligned when we are dma mapping a page aligned
+> buffer, see [2].
+>=20
+> That means we're storing 12 bits of 0 at the lower end for a
+> dma address, we can reuse those bits for the above arches to
+> support 32b+12b, which is 16TB of memory.
+>=20
+> If we make a wrong assumption, a warning is emitted so that
+> user can report to us.
+>=20
+> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.=
+com/
+> 2. https://lore.kernel.org/all/20230818145145.4b357c89@kernel.org/
+>=20
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> CC: Lorenzo Bianconi <lorenzo@kernel.org>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Liang Chen <liangchen.linux@gmail.com>
+> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> CC: Guillaume Tucker <guillaume.tucker@collabora.com>
+> CC: Matthew Wilcox <willy@infradead.org>
+> CC: Linux-MM <linux-mm@kvack.org>
+> ---
+>  include/linux/mm_types.h        | 13 +------------
+>  include/net/page_pool/helpers.h | 20 ++++++++++++++------
+>  net/core/page_pool.c            | 14 +++++++++-----
+>  3 files changed, 24 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 36c5b43999e6..74b49c4c7a52 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -125,18 +125,7 @@ struct page {
+>  			struct page_pool *pp;
+>  			unsigned long _pp_mapping_pad;
+>  			unsigned long dma_addr;
+> -			union {
+> -				/**
+> -				 * dma_addr_upper: might require a 64-bit
+> -				 * value on 32-bit architectures.
+> -				 */
+> -				unsigned long dma_addr_upper;
+> -				/**
+> -				 * For frag page support, not supported in
+> -				 * 32-bit architectures with 64-bit DMA.
+> -				 */
+> -				atomic_long_t pp_frag_count;
+> -			};
+> +			atomic_long_t pp_frag_count;
+>  		};
+>  		struct {	/* Tail pages of compound page */
+>  			unsigned long compound_head;	/* Bit zero is set */
 
-On 10/2/23 19:30, Rob Herring wrote:
-> On Fri, Sep 29, 2023 at 04:28:42PM +0200, Gatien Chevallier wrote:
->> From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
->>
->> Introducing of the generic access controller bindings for the
->> access controller provider and consumer devices. Those bindings are
->> intended to allow a better handling of accesses to resources in a
->> hardware architecture supporting several compartments.
->>
->> This patch is based on [1]. It is integrated in this patchset as it
->> provides a use-case for it.
->>
->> Diffs with [1]:
->> 	- Rename feature-domain* properties to access-control* to narrow
->> 	  down the scope of the binding
->> 	- YAML errors and typos corrected.
->> 	- Example updated
->> 	- Some rephrasing in the binding description
->>
->> [1]: https://lore.kernel.org/lkml/0c0a82bb-18ae-d057-562b
->>
->> Signed-off-by: Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>
->> ---
->> Changes in V5:
->> 	- Diffs with [1]
->> 	- Discarded the [IGNORE] tag as the patch is now part of the
->> 	  patchset
->>
->>   .../access-controllers/access-controller.yaml | 90 +++++++++++++++++++
->>   1 file changed, 90 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/access-controllers/access-controller.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/access-controllers/access-controller.yaml b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
->> new file mode 100644
->> index 000000000000..9d305fccc333
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/access-controllers/access-controller.yaml
->> @@ -0,0 +1,90 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/access-controllers/access-controller.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Generic Domain Access Controller
->> +
->> +maintainers:
->> +  - Oleksii Moisieiev <oleksii_moisieiev@epam.com>
->> +
->> +description: |+
->> +  Common access controllers properties
->> +
->> +  Access controllers are in charge of stating which of the hardware blocks under
->> +  their responsibility (their domain) can be accesssed by which compartment. A
->> +  compartment can be a cluster of CPUs (or coprocessors), a range of addresses
->> +  or a group of hardware blocks. An access controller's domain is the set of
->> +  resources covered by the access controller.
->> +
->> +  This device tree bindings can be used to bind devices to their access
->> +  controller provided by access-controller property. In this case, the device is
->> +  a consumer and the access controller is the provider.
->> +
->> +  An access controller can be represented by any node in the device tree and
->> +  can provide one or more configuration parameters, needed to control parameters
->> +  of the consumer device. A consumer node can refer to the provider by phandle
->> +  and a set of phandle arguments, specified by '#access-controller-cells'
->> +  property in the access controller node.
->> +
->> +  Access controllers are typically used to set/read the permissions of a
->> +  hardware block and grant access to it. Any of which depends on the access
->> +  controller. The capabilities of each access controller are defined by the
->> +  binding of the access controller device.
->> +
->> +  Each node can be a consumer for the several access controllers.
->> +
->> +# always select the core schema
->> +select: true
->> +
->> +properties:
->> +  "#access-controller-cells":
->> +    $ref: /schemas/types.yaml#/definitions/uint32
-> 
-> Drop. "#.*-cells" already defines the type.
-> 
+As noted by Jesper, since this is touching the super-critcal struct
+page, an explicit ack from the mm people is required.
 
-Ok, I will drop it for V6
+@Matthew: could you please have a look?
 
->> +    description:
->> +      Number of cells in a access-controller specifier;
->> +      Can be any value as specified by device tree binding documentation
->> +      of a particular provider.
->> +
->> +  access-control-provider:
->> +    description:
->> +      Indicates that the node is an access controller.
-> 
-> Drop. The presence of "#access-controller-cells" is enough to do that.
-> 
+I think it would be nice also an explicit ack from Jesper and/or Ilias.
 
-Ok, I wasn't sure. I'll will drop it for V6
+Cheers,
 
->> +
->> +  access-controller-names:
->> +    $ref: /schemas/types.yaml#/definitions/string-array
->> +    description:
->> +      A list of access-controller names, sorted in the same order as
->> +      access-controller entries. Consumer drivers will use
->> +      access-controller-names to match with existing access-controller entries.
->> +
->> +  access-controller:
-> 
-> For consistency with other provider bindings: access-controllers
-> 
+Paolo
 
-Ack
-
->> +    $ref: /schemas/types.yaml#/definitions/phandle-array
->> +    description:
->> +      A list of access controller specifiers, as defined by the
->> +      bindings of the access-controller provider.
->> +
->> +additionalProperties: true
->> +
->> +examples:
->> +  - |
->> +    uart_controller: access-controller@50000 {
->> +        reg = <0x50000 0x10>;
->> +        access-control-provider;
->> +        #access-controller-cells = <2>;
->> +    };
->> +
->> +    bus_controller: bus@60000 {
->> +        reg = <0x60000 0x10000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <1>;
->> +        ranges;
->> +        access-control-provider;
->> +        #access-controller-cells = <3>;
->> +
->> +        uart4: serial@60100 {
->> +            reg = <0x60100 0x400>;
->> +            access-controller = <&uart_controller 1 2>,
->> +                                <&bus_controller 1 3 5>;
->> +            access-controller-names = "controller", "bus-controller";
-> 
-> Not great names. It should indicate what access is being controlled
-> locally. Perhaps "reg" for register access, "dma" or "bus" for bus
-> master access. (Not sure what your uart_controller is controlling access
-> to.)
-> 
-> Rob
-
-Yes, I agree it's poor naming. I'll come up with something more
-adequate. Thank you for the input.
-
-Best regards,
-Gatien
 
