@@ -1,282 +1,167 @@
-Return-Path: <netdev+bounces-37675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F4607B6951
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:47:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94527B6967
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:49:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3FB192815DF
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:47:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 22D34B20959
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52A122F09;
-	Tue,  3 Oct 2023 12:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF2222F19;
+	Tue,  3 Oct 2023 12:49:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD01B22EE6
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:46:59 +0000 (UTC)
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAFE091
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 05:46:57 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d8164e661abso908137276.1
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 05:46:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CC52915
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:49:18 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EE5B0
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 05:49:16 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6910ea9cca1so622224b3a.1
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 05:49:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696337217; x=1696942017; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9eY1hbA70WFNs6+o8zolvBU8UQiRaI/f1anzJ9//I6Q=;
-        b=C5lWeUlrAKHlU+95H/BRSCAECvPNzzYqKoqSHTrn5C5h6oao48//5RTVElhJvzxNdH
-         VbioJJbi0tob1cgpHfMUqW+ByNwX26q0Dqs1vDspCLJAby8zGNEeJIXOv4uJkT1xTXQr
-         yBgDnteAxq1Np+hqdnK2R8U1GwUkYwVD6L09KWI1px81b+ShHOS+SDB/6PkbpziKHEes
-         JNzR/GkLRqLs89sBZbCwe2K7u+0O4fGkOiNXOQlusxF23eHfjY/ed0Co7wFld5fEOyTd
-         RH7CaWmKt1egNlDBu4iem3SNyWak2kkBJVkg+vJe6HLvHIGUI5glxJVDKGQHDwpofILF
-         zTeA==
+        d=bytedance.com; s=google; t=1696337356; x=1696942156; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SN3E964ODCJjpz85I+WSpRkPsUEBZcxQzYCTWvMspok=;
+        b=FSR/D/BGssyVjkBE3jLTpQOdL2tRItJq+u4rAEFew31UK4bf0BrQBKM6WqxGR1GRii
+         H82vTH2wciOLlkDT+IoUnIfkV15RZb96WZM0IzOjgLjwaaojyoJQtdOEPVPeCib7Cw4K
+         Gl3IZn74Gs7M6vJ/2VOdXdztWfnTjdPdf7Zz6pV4nEUQ7E0k/HjYUnC7erwf7Le/LArJ
+         yhGwl1WY9lzMo76UHHLEUYDfAKbtK6MrqegPQXMi9M22tqHJ03TKjtxs2Tty6UBCewHq
+         faL6HxefbQfOdo5pqVxEFXZsD4iIAup04vkVaS0Xo5VLjnCVxhvOP8Fj/abRu9+xgU2N
+         akxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696337217; x=1696942017;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9eY1hbA70WFNs6+o8zolvBU8UQiRaI/f1anzJ9//I6Q=;
-        b=hcbIdBh3TUri2rnXoUegLTXW09wRCBj+rI0wg7lzDhjfPJ25MHgxrClflbMfGZ3Dw5
-         A3bkL5iFzZz4aFyRnSAa2fy6P0fI0XvY5s9+kWS3TkY9EnlzuqQ6ITp0c0JCANsyML+O
-         2WuHngkKeSBKIb+1nMdHHbdMYb6cYtZ2QAFJ4suorTbk65bR7I7kCLPPPYXswEVzdKL9
-         04IcYfVerM9OVO+YluoJFQ5KsrPl5ZvovmvHPY7OikfKT9wmiY3+eGFaOQ2k3oXGOhV4
-         KbtNTrLB5nM0LBqn7Gz/HXgDkqenzeZWGhxI/oRN79b6M9AOZZojaaGMvXjKXqJ02T2Z
-         FyuA==
-X-Gm-Message-State: AOJu0Yx1UzBWKtZhehHTk418SrejK4VyHA8GVok1aKScdl57TmHz1eJX
-	We3S1SguNY7DBliXsG76w9vdw+cWFfSaQtoZh0i/Ng==
-X-Google-Smtp-Source: AGHT+IEZTmgDJtaVBhzBgpAuedmZqgvE7lZWHuajb5WvOK52B03Ro2zUkuyILosG5Z6CfMWPDcpl6Vpg9r5w6uJ0y1k=
-X-Received: by 2002:a25:e806:0:b0:d4d:b6de:69bd with SMTP id
- k6-20020a25e806000000b00d4db6de69bdmr12512235ybd.23.1696337216854; Tue, 03
- Oct 2023 05:46:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696337356; x=1696942156;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SN3E964ODCJjpz85I+WSpRkPsUEBZcxQzYCTWvMspok=;
+        b=sZQScc8xHvXfTwQzoouhk9XcdaAPSl8y6kBWkZGKlYjV7xHTXHyKjqBX9iXsvYfRg3
+         cbj4wOPCYO9GSopaCGNRAgAxbePMe3mS3dK/aVIg4GEKjbVEpKkn33rY9sxxd9j0qEGa
+         rbrThBivQjzFCzbDwP0GAxUS0KGXcpwm3wk5PWq9aD4ugczd7qf2dfVywHBpyuRyHh+b
+         XnMiZQEcwGC2Em4NYi2S9FgUufi+LrE/8I/ncGPsXaQZVTIToUay1MdMp1PQrhDAATO6
+         GBD0AbETWIX4jVHQNy3TOPy5nm2FF4geKN9QcJvgR7UxS1DGIAcr4F2UuRQBpl0HK9R3
+         AURA==
+X-Gm-Message-State: AOJu0Yypt4Lbl6PKxIHyfJdoS1Fd71CfXpkMO08jmOrFKkWaqX9y76SB
+	6eJOGyVZKVFVvqdQEOIlnTucvg==
+X-Google-Smtp-Source: AGHT+IGmzT37smXXRQ4PsSss9CA8pDZ6W57Ijm1sqNx8jWDBtXv6OD9Mq/KH3oO/wvqAbx4zHux8dg==
+X-Received: by 2002:a05:6a00:1254:b0:691:2d4:238e with SMTP id u20-20020a056a00125400b0069102d4238emr12585943pfi.6.1696337356110;
+        Tue, 03 Oct 2023 05:49:16 -0700 (PDT)
+Received: from [10.254.175.124] ([139.177.225.240])
+        by smtp.gmail.com with ESMTPSA id q17-20020a62e111000000b0068ff6d21563sm1311489pfh.148.2023.10.03.05.49.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Oct 2023 05:49:15 -0700 (PDT)
+Message-ID: <7551924f-a9b6-4bb8-bfe9-e3efcf0da438@bytedance.com>
+Date: Tue, 3 Oct 2023 20:49:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230919145951.352548-1-victor@mojatatu.com> <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
- <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
- <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net> <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
- <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net> <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
- <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
-In-Reply-To: <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 3 Oct 2023 08:46:45 -0400
-Message-ID: <CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return code
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	paulb@nvidia.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
-	martin.lau@linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: [PATCH net-next 2/2] sock: Fix improper heuristic on raising
+ memory
+Content-Language: en-US
+To: Shakeel Butt <shakeelb@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Breno Leitao <leitao@debian.org>,
+ Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+ David Howells <dhowells@redhat.com>, Jason Xing <kernelxing@tencent.com>,
+ Xin Long <lucien.xin@gmail.com>,
+ KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujtsu.com>,
+ "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20230920132545.56834-1-wuyun.abel@bytedance.com>
+ <20230920132545.56834-2-wuyun.abel@bytedance.com>
+ <20230921190156.s4oygohw4hud42tx@google.com>
+ <82c0a442-c7d7-d0f1-54de-7a5e7e6a31d5@bytedance.com>
+ <71ac08d3-9f36-e0de-870e-3e252abcb66a@bytedance.com>
+ <20230924072816.6ywgoe7ab2max672@google.com>
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20230924072816.6ywgoe7ab2max672@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 3, 2023 at 5:00=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
-t> wrote:
->
-> On 10/2/23 9:54 PM, Jamal Hadi Salim wrote:
-> > On Fri, Sep 29, 2023 at 11:48=E2=80=AFAM Daniel Borkmann <daniel@iogear=
-box.net> wrote:
-> >> On 9/26/23 1:01 AM, Jamal Hadi Salim wrote:
-> >>> On Fri, Sep 22, 2023 at 4:12=E2=80=AFAM Daniel Borkmann <daniel@iogea=
-rbox.net> wrote:
-> >>>> On 9/20/23 1:20 AM, Jamal Hadi Salim wrote:
-> >>>>> On Tue, Sep 19, 2023 at 6:15=E2=80=AFPM Daniel Borkmann <daniel@iog=
-earbox.net> wrote:
-> >>>>>> On 9/19/23 4:59 PM, Victor Nogueira wrote:
-> >> [...]
-> >>>>
-> >>>> In the above case we don't have 'internal' errors which you want to =
-trace, so I would
-> >>>> also love to avoid the cost of zeroing struct tcf_result res which s=
-hould be 3x 8b for
-> >>>> every packet.
-> >>>
-> >>> We can move the zeroing inside tc_run() but we declare it in the same
-> >>> spot as we do right now. You will still need to set res.verdict as
-> >>> above.
-> >>> Would that work for you?
-> >>
-> >> What I'm not following is that with the below you can avoid the unnece=
-ssary
-> >> fast path cost (which is only for corner case which is almost never hi=
-t) and
-> >> get even better visibility. Are you saying it doesn't work?
-> >
-> > I am probably missing something:
-> > -1/UNSPEC is a legit errno. And the main motivation here for this
-> > patch is to disambiguate if it was -EPERM vs UNSPEC
-> > Maybe that is what you are calling a "corner case"?
->
-> Yes, but what is the use-case to ever return a -EPERM from the fast-path?=
- This can
-> be audited for the code in the tree and therefore avoided so that you nev=
-er run into
-> this problem.
+On 9/24/23 3:28 PM, Shakeel Butt wrote:
+> On Fri, Sep 22, 2023 at 06:10:06PM +0800, Abel Wu wrote:
+> [...]
+>>
+>> After a second thought, it is still vague to me about the position
+>> the memcg pressure should be in socket memory allocation. It lacks
+>> convincing design. I think the above hunk helps, but not much.
+>>
+>> I wonder if we should take option (3) first. Thoughts?
+>>
+> 
+> Let's take a step further. Let's decouple the memcg accounting and
+> global skmem accounting. __sk_mem_raise_allocated is already very hard
+> to reason. There are couple of heuristics in it which may or may not
+> apply to both accounting infrastructures.
+> 
+> Let's explicitly document what heurisitics allows to forcefully succeed
+> the allocations i.e. irrespective of pressure or over limit for both
+> accounting infras. I think decoupling them would make the flow of the
+> code very clear.
 
-I am sorry but i am not in favor of this approach.
-You are suggesting audits are the way to go forward when in fact lack
-of said audits is what got us in this trouble with syzkaller to begin
-with. We cant rely on tribal knowledge to be able to spot these
-discrepancies. The elder of the tribe may move to a different mountain
-at some point and TheLinuxWay(tm) is cutnpaste, so i dont see this as
-long term good for maintainance. We have a clear distinction between
-an error vs verdict - lets use that.
-We really dont want to make this a special case just for eBPF and how
-to make it a happy world for eBPF at the cost of everyone else. I made
-a suggestion of leaving tcx alone, you can do your own thing there;
-but for tc_run my view is we should keep it generic.
+I can't agree more.
 
-cheers,
-jamal
+> 
+> There are three heuristics:
 
-> > There are two options in my mind right now (since you are guaranteed
-> > in tcx_run you will never return anything below UNSPEC):
-> > 1) we just have the switch statement invocation inside an inline
-> > function and you can pass it sch_ret (for tcx case) and we'll pass it
-> > res.verdit for tc_run() case.
-> > 2) is something is we leave tcx_run alone and we have something along
-> > the lines of:
-> >
-> > --------------
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 1450f4741d9b..93613bce647c 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -3985,7 +3985,7 @@ sch_handle_ingress(struct sk_buff *skb, struct
-> > packet_type **pt_prev, int *ret,
-> >                     struct net_device *orig_dev, bool *another)
-> >   {
-> >          struct bpf_mprog_entry *entry =3D
-> > rcu_dereference_bh(skb->dev->tcx_ingress);
-> > -       struct tcf_result res =3D {0};
-> > +       struct tcf_result res;
-> >          int sch_ret;
-> >
-> >          if (!entry)
-> > @@ -4003,14 +4003,16 @@ sch_handle_ingress(struct sk_buff *skb, struct
-> > packet_type **pt_prev, int *ret,
-> >                  if (sch_ret !=3D TC_ACT_UNSPEC)
-> >                          goto ingress_verdict;
-> >          }
-> > +
-> > +       res.verdict =3D 0;
-> >          sch_ret =3D tc_run(tcx_entry(entry), skb, &res);
-> >          if (sch_ret < 0) {
-> >                  kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS_ERROR=
-);
-> >                  *ret =3D NET_RX_DROP;
-> >                  return NULL;
-> >          }
-> > +       sch_ret =3D res.verdict;
-> >   ingress_verdict:
-> > -       switch (res.verdict) {
-> > +       switch (sch_ret) {
-> >          case TC_ACT_REDIRECT:
-> >                  /* skb_mac_header check was done by BPF, so we can
-> > safely
-> >                   * push the L2 header back before redirecting to anoth=
-er
-> > -----------
-> >
-> > on the drop reason - our thinking is to support drop_watch alongside
-> > tracepoint given kfree_skb_reason exists already; if i am not mistaken
-> > what you suggested would require us to create a new tracepoint?
->
-> So if the only thing you really care about is the different drop reason f=
-or
-> kfree_skb_reason, then I still don't follow why you need to drag this int=
-o
-> struct tcf_result. This can be done in a much simpler and more efficient =
-way
-> like the following:
->
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
-h
-> index a587e83fc169..b1c069c8e7f2 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -80,6 +80,8 @@
->         FN(IPV6_NDISC_BAD_OPTIONS)      \
->         FN(IPV6_NDISC_NS_OTHERHOST)     \
->         FN(QUEUE_PURGE)                 \
-> +       FN(TC_EGRESS_ERROR)             \
-> +       FN(TC_INGRESS_ERROR)            \
->         FNe(MAX)
->
->   /**
-> @@ -345,6 +347,10 @@ enum skb_drop_reason {
->         SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
->         /** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
->         SKB_DROP_REASON_QUEUE_PURGE,
-> +       /** @SKB_DROP_REASON_TC_EGRESS_ERROR: dropped in TC egress HOOK d=
-ue to error */
-> +       SKB_DROP_REASON_TC_EGRESS_ERROR,
-> +       /** @SKB_DROP_REASON_TC_INGRESS_ERROR: dropped in TC ingress HOOK=
- due to error */
-> +       SKB_DROP_REASON_TC_INGRESS_ERROR,
->         /**
->          * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->          * shouldn't be used as a real 'reason' - only for tracing code g=
-en
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index f308e8268651..cd2444dd3745 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -10,6 +10,7 @@
->
->   /* TC action not accessible from user space */
->   #define TC_ACT_CONSUMED               (TC_ACT_VALUE_MAX + 1)
-> +#define TC_ACT_ABORT           (TC_ACT_VALUE_MAX + 2)
->
->   /* Basic packet classifier frontend definitions. */
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 85df22f05c38..3abb4d71c170 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4011,7 +4011,10 @@ sch_handle_ingress(struct sk_buff *skb, struct pac=
-ket_type **pt_prev, int *ret,
->                 *ret =3D NET_RX_SUCCESS;
->                 return NULL;
->         case TC_ACT_SHOT:
-> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS);
-> +       case TC_ACT_ABORT:
-> +               kfree_skb_reason(skb, likely(sch_ret =3D=3D TC_ACT_SHOT) =
-?
-> +                                SKB_DROP_REASON_TC_INGRESS :
-> +                                SKB_DROP_REASON_TC_INGRESS_ERROR);
->                 *ret =3D NET_RX_DROP;
->                 return NULL;
->         /* used by tc_run */
-> @@ -4054,7 +4057,10 @@ sch_handle_egress(struct sk_buff *skb, int *ret, s=
-truct net_device *dev)
->                 *ret =3D NET_XMIT_SUCCESS;
->                 return NULL;
->         case TC_ACT_SHOT:
-> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_EGRESS);
-> +       case TC_ACT_ABORT:
-> +               kfree_skb_reason(skb, likely(sch_ret =3D=3D TC_ACT_SHOT) =
-?
-> +                                SKB_DROP_REASON_TC_EGRESS :
-> +                                SKB_DROP_REASON_TC_EGRESS_ERROR);
->                 *ret =3D NET_XMIT_DROP;
->                 return NULL;
->         /* used by tc_run */
->
-> Then you just return the internal TC_ACT_ABORT code for internal 'excepti=
-ons',
-> and you'll get the same result to make it observable for dropwatch.
->
-> Thanks,
-> Daniel
+I found all of them were first introduced in linux-2.4.0-test7pre1 for
+TCP only, and then migrated to socket core in linux-2.6.8-rc1 without
+functional change.
+
+> 
+> 1. minimum buffer size even under pressure.
+
+This is required by RFC 7323 (TCP Extensions for High Performance) to
+make features like Window Scale option work as expected, and should be
+succeeded under global pressure by tcp_{r,w}mem's definition. And IMHO
+for same reason, it should also be succeeded under memcg pressure, or
+else workloads might suffer performance drop due to bottleneck on
+network.
+
+The allocation must not be succeeded either exceed global or memcg's
+hard limit, or else a DoS attack can be taken place by spawning lots
+of sockets that are under minimum buffer size.
+
+> 
+> 2. allow allocation for a socket whose usage is below average of the
+> system.
+
+Since 'average' is within the scope of global accounting, this one
+only makes sense under global memory pressure. Actually this exists
+before cgroup was born, hence doesn't take memcg into consideration.
+
+While OTOH the intention of throttling under memcg pressure is to
+relief the memcg from heavy reclaim pressure, this heuristic does no
+help. And there also seems to be no reason to succeed the allocation
+when global or memcg's hard limit is exceeded.
+
+> 
+> 3. socket is over its sndbuf.
+
+TBH I don't get its point..
+
+> 
+> Let's discuss which heuristic applies to which accounting infra and
+> under which state (under pressure or over limit).
+
+I will follow your suggestion to post a patch to explicitly document
+the behaviors once things are cleared.
+
+Thanks,
+	Abel
 
