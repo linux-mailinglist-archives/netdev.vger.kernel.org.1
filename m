@@ -1,116 +1,101 @@
-Return-Path: <netdev+bounces-37762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEACC7B70A7
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:19:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 513EC7B70C6
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C849A1C2032D
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 18:19:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id DD68D1F2114D
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 18:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E815D3C68D;
-	Tue,  3 Oct 2023 18:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75833C697;
+	Tue,  3 Oct 2023 18:26:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5CE36B18
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 18:19:24 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2442290
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:19:23 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d8191a1d5acso1419204276.1
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 11:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696357162; x=1696961962; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0kRX0mHyjN+ltUV2mI07fVi115pYU+W9FTrXUUL/GJw=;
-        b=h3CPIMJGVrUkb948WgcuLyD/KkxLCY8PCHeUfnbOku/E5JGYVihGU4qMeR/acM4kHw
-         TZE7+UOLotlcPrxRsVaW0arIWS/oXPOHtgh8R9g+jrB9eZSyVCMClzEPTb+iQlWaSjPS
-         BE7r1+W73Dz5jXgieDyiSwSI4kY2RWLJaiUf/U7LWjzkkl/XSWsv+mRW63S8Qj9O7iNh
-         089YYlj2ooVPQXdP7+07GxnOu0gXqSFOuoJSbEFeUgj/5N3OAaMsyThSnMlJ0FFx5lgr
-         qUldDVUzf5lKpcF/MleNfS4kvEBg7nRY+fBnXQdIWgAVmx/ES9QaAcs2Gns+poBKSL9W
-         ZZ7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696357162; x=1696961962;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0kRX0mHyjN+ltUV2mI07fVi115pYU+W9FTrXUUL/GJw=;
-        b=n+3+BVLhKbbQQZgXfEtnGVfqZXMVJ/m9LcAETJiIVvsuP18I0+3yMUEVnB0Mi14WF1
-         iBhhq3B59+KDV8B8yr0CB4ULSoeVIXvJiowUMRlzjmdBzehFuI1O9m0py6OnVghHjlBt
-         D0KVguawR4sM9wDRHydPlQarJ+ykebXevtuli7epnb9Z+nzWw7Uy3/kjKPxOyGZ+BM3P
-         8pkxVV7jzaeT/EQzmguTOwEjuIQih5DEOfiZMOfvRZKAn01olRUyleltTIRUCJ3ByxLs
-         SGpc5B7TEQx+IgH20ZfghA/oKRG/CGVy2K+B3u11uLp4dCZeyNqaivMzdHaFXA1rfFSO
-         jbjQ==
-X-Gm-Message-State: AOJu0Yw48hOhDxloEgxRBh29MEd7/WGj1Rxo9sOWqluGWvBaRIoFKYbp
-	zyEkHwgqzRJ6CEjqwu3NU31asmZwQJH4Yg==
-X-Google-Smtp-Source: AGHT+IEmXtB+PD3QqdVUWU9nRZ/s6THlKgvqKFJihDFvLjjtiVuIYZb+cMqzpgIA0amQwjrfuiiP/S144gVE4g==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:c057:0:b0:d77:f4f5:9e4 with SMTP id
- c84-20020a25c057000000b00d77f4f509e4mr630ybf.2.1696357162366; Tue, 03 Oct
- 2023 11:19:22 -0700 (PDT)
-Date: Tue,  3 Oct 2023 18:19:20 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08AED2EB
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 18:26:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EBD983;
+	Tue,  3 Oct 2023 11:26:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8kSMH9mFqlEMXMzJocJNXqDhfdneaQ4QxIN0eEXIpF4=; b=iWYRx9ujoGpS1M3bid/rdR2a74
+	laVYS2fLJAupCJS4QXe4dPW/AVtfuKeAb/V3sgOeD5MwYWAK1HVGT1v6oNhIt6dwz07zZ7ARAZcMy
+	ul60nlEbBP3OODvmQgr2HeM3hJVBax6iAt/vF/k7ycEiZ+R71wVNaR6knoFXd2QRgbA0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qnk5p-00899E-74; Tue, 03 Oct 2023 20:26:01 +0200
+Date: Tue, 3 Oct 2023 20:26:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	thomas.petazzoni@bootlin.com,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: Re: [RFC PATCH net-next 6/7] net: ethtool: add a netlink command to
+ get PHY information
+Message-ID: <ffc6ff4a-d1af-4643-a538-fd13e6be9e06@lunn.ch>
+References: <20230907092407.647139-1-maxime.chevallier@bootlin.com>
+ <20230907092407.647139-7-maxime.chevallier@bootlin.com>
+ <20230908084606.5707e1b1@kernel.org>
+ <20230914113613.54fe125c@fedora>
+ <20231003065535.34a3a4e0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231003181920.3280453-1-edumazet@google.com>
-Subject: [PATCH net-next] net: skb_queue_purge_reason() optimizations
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003065535.34a3a4e0@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-1) Exit early if the list is empty.
+On Tue, Oct 03, 2023 at 06:55:35AM -0700, Jakub Kicinski wrote:
+> On Thu, 14 Sep 2023 11:36:13 +0200 Maxime Chevallier wrote:
+> > I'm currently implementing this, and I was wondering if it could be
+> > worth it to include a pointer to struct phy_device directly in
+> > ethnl_req_info.
+> > 
+> > This would share the logic for all netlink commands that target a
+> > phy_device :
+> > 
+> >  - plca
+> >  - pse-pd
+> >  - cabletest
+> >  - other future commands
+> > 
+> > Do you see this as acceptable ? we would grab the phy_device that
+> > matches the passed phy_index in the request, and if none is specified,
+> > we default to dev->phydev.
+> 
+> You may need to be careful with that. It could work in practice but 
+> the req_info is parsed without holding any locks, IIRC. And there
+> may also be some interplay between PHY state and ethnl_ops_begin().
 
-2) splice the list into a local list,
-   so that we block hard irqs only once.
+We also need to ensure it is totally optional. There are MAC drivers
+which reinvent the wheel in firmware. They can have multiple PHYs, or
+PHY and SFP in parallel etc. All the typologies which you are
+considering for phylink. Ideally we want the uAPI to work for
+everybody, not just phylink. Its not our problem how said firmware
+actually works, and what additional wheels they need to re-implement,
+but we should try not to block them.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/skbuff.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 87f5372b197fff4ffef5df34ef126eb1e297ae4c..0401f40973a584ba4a89509b02510c8352bd6fb5 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -3722,10 +3722,19 @@ EXPORT_SYMBOL(skb_dequeue_tail);
- void skb_queue_purge_reason(struct sk_buff_head *list,
- 			    enum skb_drop_reason reason)
- {
--	struct sk_buff *skb;
-+	struct sk_buff_head tmp;
-+	unsigned long flags;
-+
-+	if (skb_queue_empty_lockless(list))
-+		return;
-+
-+	__skb_queue_head_init(&tmp);
-+
-+	spin_lock_irqsave(&list->lock, flags);
-+	skb_queue_splice_init(list, &tmp);
-+	spin_unlock_irqrestore(&list->lock, flags);
- 
--	while ((skb = skb_dequeue(list)) != NULL)
--		kfree_skb_reason(skb, reason);
-+	__skb_queue_purge_reason(&tmp, reason);
- }
- EXPORT_SYMBOL(skb_queue_purge_reason);
- 
--- 
-2.42.0.582.g8ccd20d70d-goog
-
+    Andrew
 
