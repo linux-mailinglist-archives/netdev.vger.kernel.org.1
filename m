@@ -1,80 +1,177 @@
-Return-Path: <netdev+bounces-37698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9EF7B6AC5
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:42:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B3F57B6ADF
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:48:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DBA6228166E
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:42:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C1A201C20818
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754542940E;
-	Tue,  3 Oct 2023 13:42:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3D929436;
+	Tue,  3 Oct 2023 13:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A9B266AD
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:42:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68F7AC433C7;
-	Tue,  3 Oct 2023 13:42:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696340539;
-	bh=HvH1Q1z92W9hdqkCNnVvSV1dvkn66o/wVbN4IpbbyWo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=grYxISXlNYov8M8r0twN1gillga5LQqMIC24ujlJP/o8k/u0/3PpkWscYWy4n4AEK
-	 PsK3V+Cd46gw2XaSa9kOWFdHRop1w9xqBpaSBSQ5V1aZ8BGeX//N48ROpmy4mm7ic5
-	 0qM0lbJoGLqG5je2PqIQRNaXeuUOd36yALjX5obugnCRK+U3xU9DwZA1StdtEtC3US
-	 SegqiqX/LaBsRtxX68KlsDlKrRkSRKFhBwOvTI5oqDCYLe/ISNZrzrmMJxbp9k+94F
-	 jVwurMYMNfLAzBAjr6bD8nGpsYiUj9RAkSs/LuDIF7mZAHwwqMfwAENFh0D3lEESpj
-	 lQ5IY7xOndrOA==
-Date: Tue, 3 Oct 2023 06:42:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Woojung Huh <woojung.huh@microchip.com>, Tristram.Ha@microchip.com, Eric
- Dumazet <edumazet@google.com>, davem@davemloft.net, Oleksij Rempel
- <o.rempel@pengutronix.de>, Florian Fainelli <f.fainelli@gmail.com>, Paolo
- Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
- for KSZ9477
-Message-ID: <20231003064213.4886626f@kernel.org>
-In-Reply-To: <20231003145106.3cd5a19f@wsk>
-References: <20230922133108.2090612-1-lukma@denx.de>
-	<20230926225401.bganxwmtrgkiz2di@skbuf>
-	<20230928124127.379115e6@wsk>
-	<20231003095832.4bec4c72@wsk>
-	<20231003104410.dhngn3vvdfdcurga@skbuf>
-	<20231003145106.3cd5a19f@wsk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7A629431
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:48:34 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE989CE;
+	Tue,  3 Oct 2023 06:48:32 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1c3bd829b86so7269635ad.0;
+        Tue, 03 Oct 2023 06:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696340912; x=1696945712; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AXx12Xh5OdYtcd2fycn71joB20ZrxlQW7gPZtnETXlo=;
+        b=mKLq2HCLhhDbAHq8pgijmTb4r8AecHT82AFn8KNdFz1t0P78zthCotoMDghTSVLqmz
+         uSBOGDYpxCKtr+AQ5XoqFFYZWpAsa3NtH30Z8WJtAEe/lnStogNVYyZTdClwf1iwkebA
+         /Dsv/vkBHiA3J/A5J/SjJcBaGV8SFtlyYz5gjv9rRSNUUkx3BMxBK8I2rVmHQAg25NLw
+         g5Hsfn2oD2nmlhSonFvRZKZcueAL3RZFoC8/KzjTNGvLoUwSNG/sh3+22+en/nCvrpEF
+         9i04W0Nmp7W1nnraYkd/WZmr6PRBiPIauDzSq+MiVHixrmkbzdT28jL5Z61h3j7otMZK
+         neYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696340912; x=1696945712;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AXx12Xh5OdYtcd2fycn71joB20ZrxlQW7gPZtnETXlo=;
+        b=Q5DF+QGbcFeBQMDDFyRJ+P1gP4KqjFgoh3dKJHtKpHcj40pt9W/hCKtZN+wEgHRFpo
+         KiDYEc1uKRyH4iFaEludd/9d6UmSFzhQ5AkFeg7TLtEE4Sbrxm42N3XmS8u+l2qPyzOU
+         JRLTVI5c0SLYTYyf/yEXVbyF/uhueDI4E2t4drCOmrsV+6smuF+OCnViU1N7ZcsrSTev
+         pRGAG7pVK6Vi+Dw5j9kL82l6cbkCM2AoJLllepJh9D/RXWf/Pz8UcKzq/P02bzT+95Vl
+         EyINWXok5GL6IDW0Sk2zL8fRDp4MtOsgWzeMxG18YmwYtu0iZyndS/X47wQgMYx86mSl
+         on0Q==
+X-Gm-Message-State: AOJu0YyZN2wtLTuBOBSw7Q1lsgfB/Wp2j+Qxx5QaBF3mmDT1O0Fz+p/y
+	1G5gu1T+uWTMSlnZDISdWXA=
+X-Google-Smtp-Source: AGHT+IGtPt1XVtqOzSLe+Y3WiKfioYBDClQ2Vrf/pQc1OE1nxhWQT7+sKkPapeNUz5KRMqBCjwFElA==
+X-Received: by 2002:a17:903:22c7:b0:1bf:3c10:1d70 with SMTP id y7-20020a17090322c700b001bf3c101d70mr14808390plg.6.1696340912142;
+        Tue, 03 Oct 2023 06:48:32 -0700 (PDT)
+Received: from localhost ([216.228.127.131])
+        by smtp.gmail.com with ESMTPSA id v7-20020a170902b7c700b001c627413e87sm1543164plz.290.2023.10.03.06.48.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 06:48:31 -0700 (PDT)
+Date: Tue, 3 Oct 2023 06:46:17 -0700
+From: Yury Norov <yury.norov@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, Tariq Toukan <ttoukan.linux@gmail.com>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Maher Sanalla <msanalla@nvidia.com>, Ingo Molnar <mingo@kernel.org>,
+	Mel Gorman <mgorman@suse.de>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Ben Segall <bsegall@google.com>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Yury Norov <ynorov@nvidia.com>
+Subject: Re: [PATCH 1/4] net: mellanox: drop mlx5_cpumask_default_spread()
+Message-ID: <ZRwbKRnnKY/tDqCF@yury-ThinkPad>
+References: <20230925020528.777578-1-yury.norov@gmail.com>
+ <20230925020528.777578-2-yury.norov@gmail.com>
+ <2fd12c42d3dd60b2e9b56e9f7dd37d5f994fd9ac.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2fd12c42d3dd60b2e9b56e9f7dd37d5f994fd9ac.camel@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 3 Oct 2023 14:51:06 +0200 Lukasz Majewski wrote:
-> I've just noticed that there is a WARNING:
-> https://patchwork.kernel.org/project/netdevbpf/patch/20230922133108.2090612-6-lukma@denx.de/
+On Tue, Oct 03, 2023 at 12:04:01PM +0200, Paolo Abeni wrote:
+> On Sun, 2023-09-24 at 19:05 -0700, Yury Norov wrote:
+> > The function duplicates existing cpumask_local_spread(), and it's O(N),
+> > while cpumask_local_spread() implementation is based on bsearch, and
+> > thus is O(log n), so drop mlx5_cpumask_default_spread() and use generic
+> > cpumask_local_spread().
+> > 
+> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> > Signed-off-by: Yury Norov <ynorov@nvidia.com>
+> > ---
+> >  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 28 ++------------------
+> >  1 file changed, 2 insertions(+), 26 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > index ea0405e0a43f..bd9f857cc52d 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > @@ -828,30 +828,6 @@ static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
+> >  	mlx5_irq_release_vector(irq);
+> >  }
+> >  
+> > -static int mlx5_cpumask_default_spread(int numa_node, int index)
+> > -{
+> > -	const struct cpumask *prev = cpu_none_mask;
+> > -	const struct cpumask *mask;
+> > -	int found_cpu = 0;
+> > -	int i = 0;
+> > -	int cpu;
+> > -
+> > -	rcu_read_lock();
+> > -	for_each_numa_hop_mask(mask, numa_node) {
+> > -		for_each_cpu_andnot(cpu, mask, prev) {
+> > -			if (i++ == index) {
+> > -				found_cpu = cpu;
+> > -				goto spread_done;
+> > -			}
+> > -		}
+> > -		prev = mask;
+> > -	}
+> > -
+> > -spread_done:
+> > -	rcu_read_unlock();
+> > -	return found_cpu;
+> > -}
+> > -
+> >  static struct cpu_rmap *mlx5_eq_table_get_pci_rmap(struct mlx5_core_dev *dev)
+> >  {
+> >  #ifdef CONFIG_RFS_ACCEL
+> > @@ -873,7 +849,7 @@ static int comp_irq_request_pci(struct mlx5_core_dev *dev, u16 vecidx)
+> >  	int cpu;
+> >  
+> >  	rmap = mlx5_eq_table_get_pci_rmap(dev);
+> > -	cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vecidx);
+> > +	cpu = cpumask_local_spread(vecidx, dev->priv.numa_node);
+> >  	irq = mlx5_irq_request_vector(dev, cpu, vecidx, &rmap);
+> >  	if (IS_ERR(irq))
+> >  		return PTR_ERR(irq);
+> > @@ -1125,7 +1101,7 @@ int mlx5_comp_vector_get_cpu(struct mlx5_core_dev *dev, int vector)
+> >  	if (mask)
+> >  		cpu = cpumask_first(mask);
+> >  	else
+> > -		cpu = mlx5_cpumask_default_spread(dev->priv.numa_node, vector);
+> > +		cpu = cpumask_local_spread(vector, dev->priv.numa_node);
+> >  
+> >  	return cpu;
+> >  }
 > 
-> but then on the newest kernel checkpatch.pl is silent:
-> ./scripts/checkpatch.pl
-> 0005-net-dsa-microchip-Enable-HSR-offloading-for-KSZ9477.patch total: 0
-> errors, 0 warnings, 0 checks, 277 lines checked
-> 
-> 0005-net-dsa-microchip-Enable-HSR-offloading-for-KSZ9477.patch has no
-> obvious style problems and is ready for submission.
-> 
-> Does the checkpatch for patchwork differs in any way from mainline?
+> It looks like this series is going to cause some later conflicts
+> regardless of the target tree. I think the whole series could go via
+> the net-next tree, am I missing any relevant point?
 
-We run:
+Hi Paolo,
 
-checkpatch with --strict --max-line-length=80
+Can you elaborate on the conflicts you see? For me it applies cleanly
+on current master, and with some 3-way merging on latest -next...
 
-https://github.com/kuba-moo/nipa/blob/master/tests/patch/checkpatch/checkpatch.sh
-
-The "multiple new lines" warning on patch 2 looks legit, no?
+Thanks,
+Yury
 
