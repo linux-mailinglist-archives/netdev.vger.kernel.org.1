@@ -1,153 +1,144 @@
-Return-Path: <netdev+bounces-37553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A6B07B5F70
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:43:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3841B7B5FB1
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id B00471C20756
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 03:43:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B8D86281631
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626017F4;
-	Tue,  3 Oct 2023 03:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806F3ED2;
+	Tue,  3 Oct 2023 04:12:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD164EA3;
-	Tue,  3 Oct 2023 03:43:14 +0000 (UTC)
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5049D;
-	Mon,  2 Oct 2023 20:43:13 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-27909dabf1cso106279a91.1;
-        Mon, 02 Oct 2023 20:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696304592; x=1696909392; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aNwOC9N4ruq7sxgNc7Qo8qd72bZpAOd5wtjGETdiya4=;
-        b=O1FpdidjRmDDr2dKcBcKpUx7GoAmpUytaNhrGGXeSBAS7LklCrXpA0KdXzZWugeQh3
-         /ztDPxFPquOuTPrieB2oyaFOXMApwIi7w6p8RfJCJaabv0fLPd/cf1ZJjM4Tn8yeCl/g
-         /hTi4dX7cpnvlnepmz/Loc2W8YrpGOxvysgrBd7IqYn3CVPUrcYk5lNH7xtlnCrrYUpY
-         ahSmiPx3F0KafFzwwB1PG/jg2Q7J1oge6Oyvk9ZYPm4Ap3bmZSdRsY3Gpy6A19giyU2I
-         LEQdfhQqmOJbQv7gWv1Wv90bS3WHuZZBJkB319wJu4mF2e1AO2Is0+aywHOadnk0qyZL
-         ExSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696304592; x=1696909392;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=aNwOC9N4ruq7sxgNc7Qo8qd72bZpAOd5wtjGETdiya4=;
-        b=lz1k0Q8rpHm2aN2R0LTOvAwFVAp1CFvC8mBbKraIiDCcx2Ur8+TPxMZd7HD5bs8Vfa
-         7QWoP2Epxj5in5rGtqnFHbsRHDqK23dHhmPpmchyd6ZxWzP8z7jKQgO9lUfZU6xxtRMO
-         HbGdCH7wFt6vI9mswI4Dm/qG30aK/ezq4yXSY5zQEAH+28XinxsUjB2WTtOHA7KyPoDL
-         GQFV0hdCbaGwScK2SFz/bgTGFYYYKeQXI0nX/gwS9YhMd54rGdbPFFWKL9dOk3Hfj07/
-         6DqojCaPrcVpAmLvdiTEPvLQYdUL9bYkcO5dw+2T+fyG5q0O01BOGN1Dqssd9lpgiBYu
-         D6Vw==
-X-Gm-Message-State: AOJu0YzyZtNarSTusVX9e2CGAA08ctdd072it4VnWLSD1Mh0U9CZWbRr
-	TmHH2hQLQmjv5ivREy8Mpv2+l6JwUXYbOHPC
-X-Google-Smtp-Source: AGHT+IH9418wYSuNA6gPH8dq1Z5qkhsrKrLVs2G8TtQFhW11Q0P616j2AHtA5QZGketa7exvGIkFtQ==
-X-Received: by 2002:a17:90b:3144:b0:279:9611:1020 with SMTP id ip4-20020a17090b314400b0027996111020mr857251pjb.1.1696304592558;
-        Mon, 02 Oct 2023 20:43:12 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id i15-20020a63b30f000000b00563826c66eesm216426pgf.61.2023.10.02.20.43.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Oct 2023 20:43:12 -0700 (PDT)
-Date: Tue, 03 Oct 2023 12:43:11 +0900 (JST)
-Message-Id: <20231003.124311.1007471622916115559.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v1 1/3] rust: core abstractions for network PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <9efcbc51-f91d-4468-b7f3-9ded93786edb@lunn.ch>
-References: <ec65611a-d52a-459a-af60-6a0b441b0999@lunn.ch>
-	<20231003.093338.913889246531201639.fujita.tomonori@gmail.com>
-	<9efcbc51-f91d-4468-b7f3-9ded93786edb@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03443EC8
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:12:33 +0000 (UTC)
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2126.outbound.protection.outlook.com [40.107.247.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1003BA1
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 21:12:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IZAaPq5cr1DTgouDracH6Xl5xIV1CCaF2RwTR90s19Ltua+WYq+dCtO9Sz6IzlC7kdwdFwenC8sDt2Zypdnauko6gDUiVZ6G2fCXZxkvVX0N6K9DlYDGv+4Ei3CzV5vuLJmsvaYwfVPApWSodDnS0XVQsTTKlyTJOHnWvt7S/pAp4Yg7G5VfoqXPt4liZ+z7zPqPb+rkUZ3wU03lV2oMO/u6MQ/B5FrppGkDinP0L2dgjm3X53nyOcmplqRtwVtns4gXvTXG1UkMlQGpSMGXN8+/FA1zyVT5YmTiijs/vcX2aTPvIN60yaX6g68FtAZUAQq10RUKDFczH4h0czbxjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hc5H8kxBGYV5FyYWciDSyq6MEocC9u6MOWC4Pm2oNZc=;
+ b=n+NkdaudO0l5B4u3y+3LvK9+dMccmq/4hFq5IXXPRReccu0vZxkUUd8VS5fzMpPGON1AkSWuhDlsoTpwkpSJRqA4hx/KhkkKx2vK1TzrvGGOxAg6CpYrC9q+/oh3sWyX+04/v1KfC0dMm7kT3FwBpkKpJM63EOxXvvbmEVrZcEdCcn7rtOZOAN3w/IKicRYMBCdDD8rd2M66iTz2IBIoxGTF0eI6dQy8Ym1eKjujHZlTIphsqPxR+yxdA7MN2G/YAPg9NoNyxw08ALce4ww1F1Nqo7ZFsYEmnsZTPg5O2xibfgJVV2IVVYbmeoaSAeOz6Hbf2ZaV3TmK3R5VF+NczA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hc5H8kxBGYV5FyYWciDSyq6MEocC9u6MOWC4Pm2oNZc=;
+ b=kwfwKu5qmAkREuhDZu+fj2ZPOdAGG+EeUpZVSBhSTGoWzTsWk0P9FecUYTNSKhFOQnij5prxvpseilGvRjaX2UqKTwbEQv3e1xHMSjcKYZ+wftiI3lk0YMFPC10kfGRr+0FTImt/EUOP3v7Ryyf7v4mSPDWbgvNHbthzVXKX0l0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=voleatech.de;
+Received: from AM9PR05MB8857.eurprd05.prod.outlook.com (2603:10a6:20b:438::20)
+ by PAWPR05MB10164.eurprd05.prod.outlook.com (2603:10a6:102:2f3::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.30; Tue, 3 Oct
+ 2023 04:12:29 +0000
+Received: from AM9PR05MB8857.eurprd05.prod.outlook.com
+ ([fe80::fd04:c41c:d9cf:21b1]) by AM9PR05MB8857.eurprd05.prod.outlook.com
+ ([fe80::fd04:c41c:d9cf:21b1%6]) with mapi id 15.20.6838.024; Tue, 3 Oct 2023
+ 04:12:29 +0000
+Date: Tue, 3 Oct 2023 06:12:25 +0200
+From: Sven Auhagen <sven.auhagen@voleatech.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, hawk@kernel.org, 
+	lorenzo@kernel.org, Paulo.DaSilva@kyberna.com, ilias.apalodimas@linaro.org, 
+	mcroce@linux.microsoft.com
+Subject: Re: [PATCH v2 1/2] net: page_pool: check page pool ethtool stats
+Message-ID: <wt6tkw6g5ouhjcs3mqdibzoveczfqmnolpdzxaiapfbs7buoom@lvfwkxjk6bj7>
+References: <abr3xq5eankrmzvyhjd5za6itfm5s7wpqwfy7lp3iuwsv33oi3@dx5eg6wmb2so>
+ <20231002124650.7f01e1e6@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231002124650.7f01e1e6@kernel.org>
+X-ClientProxiedBy: FR0P281CA0178.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b4::6) To AM9PR05MB8857.eurprd05.prod.outlook.com
+ (2603:10a6:20b:438::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR05MB8857:EE_|PAWPR05MB10164:EE_
+X-MS-Office365-Filtering-Correlation-Id: 33a67926-5865-4452-061b-08dbc3c6f5a7
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	0AvGnwOOpujzfiNoNEWW0P1ACl+zCRDd8FgpprnS4cs+vW+MW2omAW+EdVqJVifOe/+MXY7a45YKtoXaxm1qx++bJS0nDjuASN3Z1qcXBB3tKV0ut8xgNfq7qJVOFxmSGgsLei13HMop3W/ba8zW4fhqgR1tsfIel8RpYQPIfSjQS96E6ZV9DIT+az5IcoceSu9TJfds6M8xxDvt3ipDJ+H89J60N1GJgPGgzushBeOiHS0/LL29FDYEgqm1r/8GtxmnU3EqbPMQq91osbTBNhcZHocZwUjU50B6jxjCNfrYh6bAZtsTGFGByySSLhb8ftkUHGDP+0RSmc8JTZLowL8N3njdaliU8iBuU+bDOUDN8bgVw0B50DlU1qB04TVE+d36vGBcg2jYUof/jk7v2ZiR4E8Cg9azrS1yGiokk4TAo/RZ351uRNtqiVj2z6Sr8ZvBwKt0XtH1vKpKWrtF9PAn0X2PHwEGCISv8IMsFx+HCU4r6El1zcVw5DLOvFA0lZI9i9fBYog6MypPXCQuxxYgdHRHHV8y371iVn9hBSYxtTe/qsuTQb9+zaiV5LzA
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR05MB8857.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(376002)(39830400003)(346002)(396003)(366004)(64100799003)(1800799009)(451199024)(186009)(26005)(6512007)(9686003)(86362001)(33716001)(38100700002)(66476007)(66556008)(478600001)(316002)(6916009)(5660300002)(66946007)(44832011)(6486002)(8936002)(4326008)(6506007)(41300700001)(6666004)(4744005)(8676002)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?vICrpFM8iFTWpTzYt/YH48kxcHSrz/VyKMbbs91aXpThkKA0kmfKQLald6s5?=
+ =?us-ascii?Q?yoaqI6Ppt90dmL5EndLf73DmkuC3K4ktZLYvaqOsRQXSRKveXWm1dqx6DAZu?=
+ =?us-ascii?Q?DLJ7nfPTGWCBhLFveueQykD4BkH0NLNRqN4Zxp0iBgs670PfKmNU9Ve6Nyry?=
+ =?us-ascii?Q?kNJTMS43tI9FaMcK56ScZx1rOSX+ORvQDVBbHWqybBGzQP08j8YWqhT1M7rR?=
+ =?us-ascii?Q?SjtyiurINpTUXkVsvYYIM2fXew9mv+nNHoIv67Qsrs09RE1wTBTQRcpBA6pU?=
+ =?us-ascii?Q?8Jw5A2JShCwPNwxkTjM2EL85yHbw4lqqeQw1ibuFDt+XpB5wTfRVxT35YOcC?=
+ =?us-ascii?Q?j7vWALNNa6l1C0p2FbvWjHSXtWKeZ7UKcu6It/4gZsS7emPeKl+5WEolzAga?=
+ =?us-ascii?Q?+yLVCqrB8N0WpDPfsV9TCNbR+AEXqUpg+MDECAqIQDlntrChlyq77PTryMbi?=
+ =?us-ascii?Q?ON2IoUuPARCHb9hSFyHkHGuqhZBzHJCJvkkm+XwJXfstRov/45ZkNtbqx+fp?=
+ =?us-ascii?Q?trJSh3VCZW5oEDcsx0npb10qqSFZN+gqQwOR+IBQOfhIY15n8vYAw7C4FSD7?=
+ =?us-ascii?Q?tI/2Fn3Nj2UsOQFqNPZ2P55NmkIaWJvV8E6fb1Ln/9+sFPDk/oQG185Ob5GO?=
+ =?us-ascii?Q?qU2uF4RIaB24k8rZoy0paA3Sgod1LahDYqN32fPjscASSm4CUEZOly5wF7zD?=
+ =?us-ascii?Q?IzDoB33OvqnBrYNFL27JHCfEpcNoTY/zH+tOQBb9m/MXb6yr3meEMbaMsE9o?=
+ =?us-ascii?Q?TLG88R1DNqBk2RzF1r6NxLD6jk//XJjvJuLlK7QTyiZcjwSn6726qD6ByEpn?=
+ =?us-ascii?Q?s84nCSevGrKGEe3S+nHWaNlf9NvdAmmByQL72KDy2ozGWX4m2zafdiElvhQd?=
+ =?us-ascii?Q?LG21y0W9ak05LGO/y2erTWkRMWlbK7gLvL/uLO5shv0ByhJPaFwibArwD1Ve?=
+ =?us-ascii?Q?tnscWTkFeK1Zj/p/M8HV3pfbn+p1N9w9x5XLErt5zyq6FOA40M6w+JQouzE4?=
+ =?us-ascii?Q?HFDySCpM0ajetgBwexHI2TBWTMlwQtV2LEI3cX8IrXdnxuziIx52AdCbq5XA?=
+ =?us-ascii?Q?iEhWJFV6bQdxZBiLuquMoQlZ1cal66/HMUZQrvOHvlR/oRUTDeRFNzjG3gil?=
+ =?us-ascii?Q?8ylXwSjdLdxKhm7/Bal7PJU3JfyUROdLNqkzzx/T+x6nU6vyg/SktG3mOsCU?=
+ =?us-ascii?Q?U3PwvKv3XkUkHvcYp1197u7w8/5eFTSiga8uD7lvnbdkiky8Svt62hnclWFC?=
+ =?us-ascii?Q?A4wnyxXrNL00sd6OnEb1E9Vvs97zWIxbvLQ4YiffUcd0XWqCytKOXPtxbyoI?=
+ =?us-ascii?Q?ChvYxuckkPwlJUqfmHxdrZw004btzigJd0tI8tUDYKjOryHRIVg30orujghB?=
+ =?us-ascii?Q?pNwNObyjfQIsNYZv7BYt5qcH9pmMg2IPUjK2kec8yohSjtz81AWlHqRUOih/?=
+ =?us-ascii?Q?coyW0ZfDx0l8CbDDWyO/fpWx4WJvZ1O9MgtIV7VMOCz2BikMPB5iiT5cE6/j?=
+ =?us-ascii?Q?AiV+oI+HgWOVCv4zUhHcfCzmYhjJ5izJilZ8dwKAKOoLGV+oillBg7UDHa6R?=
+ =?us-ascii?Q?YFVJZc2wpkxokZCEzLexPIoJXUR6PlfpbLwJPImdg3IPBAefiZEvRf/CKd1+?=
+ =?us-ascii?Q?Mg=3D=3D?=
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33a67926-5865-4452-061b-08dbc3c6f5a7
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR05MB8857.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 04:12:29.6956
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ylwx+rr1FlYlYZVjuGtNclwnqclpMlJJSBtJWjNfHsMBAS301VD5q8MEVcD0AiFtu3u9ybOWVDPus30xdw8dBU8U9eeHnR/v5naPSckUpWk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR05MB10164
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 3 Oct 2023 03:40:50 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Mon, Oct 02, 2023 at 12:46:50PM -0700, Jakub Kicinski wrote:
+> On Sun, 1 Oct 2023 13:41:15 +0200 Sven Auhagen wrote:
+> > If the page_pool variable is null while passing it to
+> > the page_pool_get_stats function we receive a kernel error.
+> > 
+> > Check if the page_pool variable is at least valid.
+> 
+> IMHO this seems insufficient, the driver still has to check if PP 
+> was instantiated when the strings are queried. My weak preference
+> would be to stick to v1 and have the driver check all the conditions.
+> But if nobody else feels this way, it's fine :)
 
-> On Tue, Oct 03, 2023 at 09:33:38AM +0900, FUJITA Tomonori wrote:
->> On Mon, 2 Oct 2023 16:52:45 +0200
->> Andrew Lunn <andrew@lunn.ch> wrote:
->> 
->> >> +//! Networking.
->> >> +
->> >> +#[cfg(CONFIG_PHYLIB)]
->> > 
->> > I brought this up on the rust for linux list, but did not get a answer
->> > which convinced me.
->> 
->> Sorry, I overlooked that discussion.
->> 
->> 
->> > Have you tried building this with PHYLIB as a kernel module? 
->> 
->> I've just tried and failed to build due to linker errors.
->> 
->> 
->> > My understanding is that at the moment, this binding code is always
->> > built in. So you somehow need to force phylib core to also be builtin.
->> 
->> Right. It means if you add Rust bindings for a subsystem, the
->> subsystem must be builtin, cannot be a module. I'm not sure if it's
->> acceptable.
->  
-> You just need Kconfig in the Rust code to indicate it depends on
-> PHYLIB. Kconfig should then remove the option to build the phylib core
-> as a module. And that is acceptable.  
+:) let me know which variant is preferred so I can send a new
+v3.
 
-The following works. If you set the phylib as a module, the rust
-option isn't available.
-
-diff --git a/init/Kconfig b/init/Kconfig
-index 6d35728b94b2..4b4e3df1658d 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1889,6 +1889,7 @@ config RUST
- 	depends on !GCC_PLUGINS
- 	depends on !RANDSTRUCT
- 	depends on !DEBUG_INFO_BTF || PAHOLE_HAS_LANG_EXCLUDE
-+	depends on PHYLIB=y
- 	select CONSTRUCTORS
- 	help
- 	  Enables Rust support in the kernel.
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index 0588422e273c..f9883bde4459 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -37,7 +37,6 @@
- pub mod ioctl;
- #[cfg(CONFIG_KUNIT)]
- pub mod kunit;
--#[cfg(CONFIG_NET)]
- pub mod net;
- pub mod prelude;
- pub mod print;
-diff --git a/rust/kernel/net.rs b/rust/kernel/net.rs
-index b49b052969e5..fbb6d9683012 100644
---- a/rust/kernel/net.rs
-+++ b/rust/kernel/net.rs
-@@ -2,5 +2,4 @@
- 
- //! Networking.
- 
--#[cfg(CONFIG_PHYLIB)]
- pub mod phy;
 
