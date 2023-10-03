@@ -1,94 +1,117 @@
-Return-Path: <netdev+bounces-37791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D23FC7B7310
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:10:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4444E7B7323
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B573A2812F4
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 21:10:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id A047D1F2142A
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 21:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1F43D964;
-	Tue,  3 Oct 2023 21:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4C53D965;
+	Tue,  3 Oct 2023 21:14:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB429D2EB;
-	Tue,  3 Oct 2023 21:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46A15C433C8;
-	Tue,  3 Oct 2023 21:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696367426;
-	bh=a2OQUcE+ISQtj09ENLHvNyZpLnb2mGbhv6CIImC0Y1o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EWUGiwUg1CL/Zl4/IfF+fn0PrMvK6Q/i6OxqLQd937mJN7vNibUdpXWmmkrDaWkyP
-	 EVM0Ke/cKhjfTzrCLBJTFKzhJ7cGnjl/w5M1ADgK71MxjUQDoMaH0WqxtEdhCpJYl6
-	 jxRCLyK7+r8EE2NL0sAANqCtlXCr6Tfaq7YQY9lIJe3SIuzSpDv6I1cSoSTxWukRnD
-	 Dbuc9hhgVrutDG0VC7rlLT+PfGmXvw3yQK9vWeZSqEwZd/8ahPFf+amatJh42G46jZ
-	 h/grImG00zjg3Nn0pXJkJh6djfHV3JKt9MLgES8W4gOfXpoyg0c5tnWCgSPVVRFO2p
-	 9cNjhSUQwPh9A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 276F6C595D2;
-	Tue,  3 Oct 2023 21:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F2FD2EB
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 21:14:14 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0E83B0;
+	Tue,  3 Oct 2023 14:14:13 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9b281a2aa94so253145766b.2;
+        Tue, 03 Oct 2023 14:14:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696367652; x=1696972452; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IPz2uBJ8rBwKPCCgJ+fxTjcXA7wMdv/YCDeLnT8vXMw=;
+        b=AXWTTjBSRvE+J5xC8dsra/msJQEOR1gcBV29O7LnBzO+LjKskvtoJZdimOoHcwIv6B
+         nOZ+yMYq7Nd66aBIbfmlg3UPWYbCtUQNCK05Ps2/0MZgVB6tjDnnJKIneYcmvY2KBlQx
+         8LcV2x0oTQtgssfzjL5SXksRAhY7yPObD9WolD7GEFTqCXS+sDp/30mRDeGnn6eeBn1B
+         VwcMStS++z2+/9spq0Vh6w/bPjpYnGE7Ft675mBw/3MHO3kDi9Lrw8DaWMAcayJBLgZg
+         KxwkoAdC8PtViObIYMwvoP+dl/oDen4et0wfO8RhBkxt1u7U/d6jNOpx6TVWBV5tTIfo
+         NRJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696367652; x=1696972452;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IPz2uBJ8rBwKPCCgJ+fxTjcXA7wMdv/YCDeLnT8vXMw=;
+        b=UsmT6S6JlyHGv3lXjpsTg49NQUwOyAFCfcFiHdWRRYDgPmzhcsseSMCWGghYY9BTi+
+         QVDwJdckJ/W9WfX8FRuqZkLM8rEpwLa1FGiWKGaDQUxE3RRuQ8HX75tKfB+O9esfIFr7
+         dHwEnITkpdK69LlsQ1UXHzBx3HRb1he1fW4yt7XcI9xOqS0L8BHa7WCLfBHwPRKJgPeM
+         YrPLOPYqz88OdmKjjXaJcOvPDs086hsLyrezieHb7F/J/2z1eqzUjPVMh5UlLK/pe7eS
+         hyzAcaWdoPecX9tjhMg7X5gwx+N1OEok6+GoUNyNcs20twYfvjm7K0w16rilU1deFAhi
+         61xg==
+X-Gm-Message-State: AOJu0Yz6KmyMyFkPUp/9dmBddumA0Bil0Lf5zJMgaoSrzFSi0IWTjvBy
+	BIFt0e8eAQGx6u4+Qb0QdzI=
+X-Google-Smtp-Source: AGHT+IEE/gVZj1T0rl7ECmIVbM44xWznSNAh06ICBbGgLsWWBJZaMTGMvm2YA5g67fa3uYZnJwC6Qg==
+X-Received: by 2002:a17:906:76cf:b0:9b2:a7e5:c47 with SMTP id q15-20020a17090676cf00b009b2a7e50c47mr343017ejn.9.1696367651907;
+        Tue, 03 Oct 2023 14:14:11 -0700 (PDT)
+Received: from skbuf ([188.25.255.218])
+        by smtp.gmail.com with ESMTPSA id kt13-20020a170906aacd00b009adce1c97ccsm1637590ejb.53.2023.10.03.14.14.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 14:14:11 -0700 (PDT)
+Date: Wed, 4 Oct 2023 00:14:09 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: =?utf-8?B?UGF3ZcWC?= Dembicki <paweldembicki@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/8] net: dsa: vsc73xx: convert to PHYLINK
+Message-ID: <20231003211409.4enff3ee3bb762ai@skbuf>
+References: <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-3-paweldembicki@gmail.com>
+ <ZQCWoIjvAJZ1Qyii@shell.armlinux.org.uk>
+ <20230926230346.xgdsifdnka2iawiz@skbuf>
+ <CAJN1KkwktmT_aV5s8+7i=6CW08R48V4Ru9D+QzwpiON+XF8N_g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/7] introduce DEFINE_FLEX() macro
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169636742615.22161.7688987075875689506.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Oct 2023 21:10:26 +0000
-References: <20230912115937.1645707-1-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20230912115937.1645707-1-przemyslaw.kitszel@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, keescook@chromium.org,
- jacob.e.keller@intel.com, intel-wired-lan@lists.osuosl.org,
- aleksander.lobakin@intel.com, linux-hardening@vger.kernel.org,
- steven.zou@intel.com, anthony.l.nguyen@intel.com, David.Laight@ACULAB.COM
+In-Reply-To: <CAJN1KkwktmT_aV5s8+7i=6CW08R48V4Ru9D+QzwpiON+XF8N_g@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Paweł,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+On Tue, Oct 03, 2023 at 10:45:45PM +0200, Paweł Dembicki wrote:
+> I plan to make rgmii delays configurable from the device tree. Should I?
+> a. switch to phy_interface_is_rgmii in the current patch?
+> b. add another patch in this series?
+> c. wait with change to phy_interface_is_rgmii for patch with rgmii
+> delays configuration?
 
-On Tue, 12 Sep 2023 07:59:30 -0400 you wrote:
-> Add DEFINE_FLEX() macro, that helps on-stack allocation of structures
-> with trailing flex array member.
-> Expose __struct_size() macro which reads size of data allocated
-> by DEFINE_FLEX().
-> 
-> Accompany new macros introduction with actual usage,
-> in the ice driver - hence targeting for netdev tree.
-> 
-> [...]
+If you want to configure the RGMII delays in the vsc73xx MAC, you should
+look at the "rx-internal-delay-ps" and "tx-internal-delay-ps" properties
+in the MAC OF node, rather than at the phy-mode. The phy-mode is for the
+internal delays from the PHY.
 
-Here is the summary with links:
-  - [net-next,v5,1/7] overflow: add DEFINE_FLEX() for on-stack allocs
-    https://git.kernel.org/netdev/net-next/c/26dd68d293fd
-  - [net-next,v5,2/7] ice: ice_sched_remove_elems: replace 1 elem array param by u32
-    https://git.kernel.org/netdev/net-next/c/ece285af77d0
-  - [net-next,v5,3/7] ice: drop two params of ice_aq_move_sched_elems()
-    https://git.kernel.org/netdev/net-next/c/a034fcdbeaf7
-  - [net-next,v5,4/7] ice: make use of DEFINE_FLEX() in ice_ddp.c
-    https://git.kernel.org/netdev/net-next/c/230064baa43d
-  - [net-next,v5,5/7] ice: make use of DEFINE_FLEX() for struct ice_aqc_add_tx_qgrp
-    https://git.kernel.org/netdev/net-next/c/43bba3b1664d
-  - [net-next,v5,6/7] ice: make use of DEFINE_FLEX() for struct ice_aqc_dis_txq_item
-    https://git.kernel.org/netdev/net-next/c/11dee3d611dd
-  - [net-next,v5,7/7] ice: make use of DEFINE_FLEX() in ice_switch.c
-    https://git.kernel.org/netdev/net-next/c/e268b9722705
+In any case, you should accept any phy_interface_is_rgmii() regardless
+of whether internal delays are configurable in the MAC. And yes, parsing
+those MAC OF properties should be a separate change.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+If the series exceeds 15 patches, I would consider splitting it per
+topic and submitting separate series (link management would be one,
+tag_8021q/bridging/VLAN would be another). If they don't conflict and
+can be applied independently, you could also send the 2 series
+simultaneously.
 
