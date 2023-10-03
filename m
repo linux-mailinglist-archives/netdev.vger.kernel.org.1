@@ -1,68 +1,87 @@
-Return-Path: <netdev+bounces-37815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6827B7440
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 00:49:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4607B745E
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 00:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 63BDEB207E9
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:49:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id EEB891C203AB
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23BC83E494;
-	Tue,  3 Oct 2023 22:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8873E498;
+	Tue,  3 Oct 2023 22:57:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A643E47B;
-	Tue,  3 Oct 2023 22:49:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E17B3C433C8;
-	Tue,  3 Oct 2023 22:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0743E496
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 22:57:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 324A7C433C8;
+	Tue,  3 Oct 2023 22:57:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696373361;
-	bh=sNFNOsCAUTdTCrCK/6t3DnsdjrJJ3nc6KvG8sLL1Yl8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a+hBKprQstjNXjWdk7v4Z4U7Gi9y5UGDciA1+azE8+yL2BKigIB6Ph2YHWjyqaXKs
-	 Dff+TgjX3AD2R/HKHPdwXJuH08d3bs9hMjoXW0nS5YKhM2IYl5psS6vcdYpkghKKN1
-	 0zHJfZ1Z/fHhYE6IBAi3mgOydP3rXj67jqbnHIq/gjFsQ1C743ncosU9mUSDK4vUCf
-	 EvWyJTPPUVNz8gCjJJ60wPsrna/a/OcKvHychg+Zz5mXfIDzY5zeHEudM2QCdNGUl2
-	 JYotAMM5oG27SnQdVopUK4Uh79oy6ZmrbDYQuFaa2UGMbeFiz44e2Kxx4cpXIKQjY/
-	 zglCWJaSUgt6g==
-Date: Tue, 3 Oct 2023 15:49:20 -0700
+	s=k20201202; t=1696373858;
+	bh=0Zqd4MB3GLO7Pi3VXPABkWFdqbFcpxf0VqNzVfzZlRo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ai5t+0TbWRNmOzjj0WQMCMQTc45vrT0pcTCMxLFigeStxY04Tf8SpwElWDayEJZuw
+	 MKYKY62t8J8CAcFap4BRYR5HQKyEXGCl43HK+JwmHYM/CoCXpssukJ+UiJBUMZpnC3
+	 fCy5gsQIuxQ8S9ZVwLaYGz8FMB8hv92uXeMwIbPRlEYVkuai4EVgqeEo1+inEu0xVb
+	 SwykywV9wfQ+pPD41Dij5Ea2bDnfTJyyHaPEhDfKprXpZLZ/9yeKMcog25w8c1rinm
+	 YIWCT+vueLENDVz3KbaU2Oa2VcVwPdXfWgYTzR8RQZx3R8sk6YyrYQUBZIk1G9KJqo
+	 rk4YYFotUHfnA==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, Kamil Maziarz <kamil.maziarz@intel.com>,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- bpf@vger.kernel.org, Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: Re: [PATCH net] ice: don't stop netdev tx queues when setting up
- XSK socket
-Message-ID: <20231003154920.6ae3801f@kernel.org>
-In-Reply-To: <20230925171957.3448944-1-anthony.l.nguyen@intel.com>
-References: <20230925171957.3448944-1-anthony.l.nguyen@intel.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>
+Subject: [PATCH net-next] tools: ynl-gen: use uapi header name for the header guard
+Date: Tue,  3 Oct 2023 15:57:35 -0700
+Message-ID: <20231003225735.2659459-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 25 Sep 2023 10:19:57 -0700 Tony Nguyen wrote:
-> Avoid stopping netdev tx queues during XSK setup by removing
-> netif_tx_stop_queue() and netif_tx_start_queue().
-> These changes prevent unnecessary stopping and starting of netdev
-> transmit queues during the setup of XDP socket. Without this change,
-> after stopping the XDP traffic flow tracker and then stopping
-> the XDP prog - NETDEV WATCHDOG transmit queue timed out appears.
+Chuck points out that we should use the uapi-header property
+when generating the guard. Otherwise we may generate the same
+guard as another file in the tree.
 
-I think we need more info about what happens here.
+Tested-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/net/ynl/ynl-gen-c.py | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Maybe ice_qp_ena() fails before it gets to the start?
-If we don't understand what happens, exactly, we may be papering
-over other bugs.
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 897af958cee8..168fe612b029 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -805,6 +805,10 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+             self.uapi_header = self.yaml['uapi-header']
+         else:
+             self.uapi_header = f"linux/{self.name}.h"
++        if self.uapi_header.startswith("linux/") and self.uapi_header.endswith('.h'):
++            self.uapi_header_name = self.uapi_header[6:-2]
++        else:
++            self.uapi_header_name = self.name
+ 
+     def resolve(self):
+         self.resolve_up(super())
+@@ -2124,7 +2128,7 @@ _C_KW = {
+ 
+ 
+ def render_uapi(family, cw):
+-    hdr_prot = f"_UAPI_LINUX_{family.name.upper()}_H"
++    hdr_prot = f"_UAPI_LINUX_{c_upper(family.uapi_header_name)}_H"
+     cw.p('#ifndef ' + hdr_prot)
+     cw.p('#define ' + hdr_prot)
+     cw.nl()
 -- 
-pw-bot: cr
+2.41.0
+
 
