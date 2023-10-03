@@ -1,107 +1,93 @@
-Return-Path: <netdev+bounces-37566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12F8C7B606B
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:32:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2037B6078
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 5B0A8B20986
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:32:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id D2DF82816F5
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20801375;
-	Tue,  3 Oct 2023 05:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1963FC2;
+	Tue,  3 Oct 2023 05:44:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A34E10FD
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 05:32:02 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4383B3;
-	Mon,  2 Oct 2023 22:32:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696311122; x=1727847122;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nFMy4xx+Sj2GKtLX3a/Sf+EbgsqvUQF1nDj0BB8WZTA=;
-  b=bBrfpu3bPM9R03EYig3/RSz2CzlPi7wPZzNCnh4jEUFcNbO1jtJjW6/K
-   hiUQruuOZKJWwWUOAWFV+YWCdb2/FOkdmmhS/cCoDhhNW9M3UAWkLi7PI
-   +HIMtxVSmmsr24q9ycX8OtT1ZC0ebrznhKwmRGRVsucXKq9rDnprs0SmC
-   khhak0NWTKpxpX0K9nkAch+CUeSiPv0wqYs5xOrdIx6znHJI4kc2gRi07
-   NHudRUAJW5L169UkyrNjgF6RC5RWcna5RjlLJxXVZnIWHEf2AAFsjdDRI
-   jx/s40QGiwWnsP02/DCMiIvYjqkJCcvDNVPR2056kLX8f3mZIRpkuJ15G
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1385306"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="1385306"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 22:32:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081881159"
-X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
-   d="scan'208";a="1081881159"
-Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2023 22:32:00 -0700
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	stable@vger.kernel.org
-Subject: [PATCH iwl-net v1] ice: fix over-shifted variable
-Date: Mon,  2 Oct 2023 22:31:10 -0700
-Message-Id: <20231003053110.3872424-1-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B900A62D;
+	Tue,  3 Oct 2023 05:44:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29246C433C7;
+	Tue,  3 Oct 2023 05:44:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696311890;
+	bh=TaZguEXQKjSyHnAA74xfdT5k4Fyw6T4I2L535UsMZOQ=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=Oh8mIWoYdcBvLrHp+irD9zsUljjwD3BOI5QjL/ZqAV6DWIHPKSRsG0CWXO3492MrJ
+	 WwR5pZBA5YgtC/KfkEF8sIqz1I3K0IUlEyLmVNaf40Y8DrhCrbDEFG4oaXgdic4DGg
+	 dxPK83/RQWn5CrN+/HVyKDpXQH7tkXaK3LoCOzm2A20eENtKr+6SaWMirT1wRXpw5+
+	 whladzHvzb4Qb+eaE+YzLiBLCzg7gDV8UdMbg7Dxc0Vq1M/ku8id4II+QEKo9WPOvS
+	 dL0yg7YJ4Do9t/MBPiV+IJEIrrWRTGU9ooSmKIYCVzqTVPVx+VR2J4n0OiQkBa9rpy
+	 p1F7oVYVdttdg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: enc0der <enc0der@gmail.com>,  Linux Regressions
+ <regressions@lists.linux.dev>,  Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>,  Linux Wireless
+ <linux-wireless@vger.kernel.org>,  Linux Networking
+ <netdev@vger.kernel.org>,  Linux USB <linux-usb@vger.kernel.org>,  Linux
+ RCU <rcu@vger.kernel.org>,  Stanislaw Gruszka <stf_xl@wp.pl>,  Helmut
+ Schaa <helmut.schaa@googlemail.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Hayes Wang
+ <hayeswang@realtek.com>,  Simon Horman <horms@kernel.org>,  Andre Przywara
+ <andre.przywara@arm.com>,  Andrew Gaul <gaul@gaul.org>,  =?utf-8?Q?Bj?=
+ =?utf-8?Q?=C3=B8rn?= Mork
+ <bjorn@mork.no>,  "Paul E. McKenney" <paulmck@kernel.org>,  Frederic
+ Weisbecker <frederic@kernel.org>,  Neeraj Upadhyay
+ <quic_neeraju@quicinc.com>,  Joel Fernandes <joel@joelfernandes.org>,
+  Josh Triplett <josh@joshtriplett.org>,  Boqun Feng
+ <boqun.feng@gmail.com>,  Steven Rostedt <rostedt@goodmis.org>,  Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>,  Lai Jiangshan
+ <jiangshanlai@gmail.com>,  Zqiang <qiang.zhang1211@gmail.com>
+Subject: Re: rt8000usb driver issue (maybe interaction with other drivers)
+References: <CAEXpi5Rd6Y4umKOWRsCjX0kit=W5ZrVhn=MuRkyvJPwmjjDVnA@mail.gmail.com>
+	<ZRj_ovMi-Xbb8i-D@debian.me>
+	<CAEXpi5RiLbma5cb-ctEvvb7LGRn78VTOh5HDmreC2hYgtBEQog@mail.gmail.com>
+	<3d246a72-2755-484f-8274-0c61fc185592@gmail.com>
+Date: Tue, 03 Oct 2023 08:47:00 +0300
+In-Reply-To: <3d246a72-2755-484f-8274-0c61fc185592@gmail.com> (Bagas Sanjaya's
+	message of "Sun, 1 Oct 2023 12:53:22 +0700")
+Message-ID: <878r8ki7fv.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain
 
-Since the introduction of the ice driver the code has been
-double-shifting the RSS enabling field, because the define already has
-shifts in it and can't have the regular pattern of "a << shiftval &
-mask" applied.
+Bagas Sanjaya <bagasdotme@gmail.com> writes:
 
-Most places in the code got it right, but one line was still wrong. Fix
-this one location for easy backports to stable. An in-progress patch
-fixes the defines to "standard" and will be applied as part of the
-regular -next process sometime after this one.
+>> These are the drivers being loaded:
+>> 
+>> rt2800usb              36864  0
+>> rt2x00usb              24576  1 rt2800usb
+>> rt2800lib             122880  1 rt2800usb
+>> rt2x00lib              77824  3 rt2800usb,rt2x00usb,rt2800lib
+>> mac80211              811008  3 rt2x00lib,rt2x00usb,rt2800lib
+>> cfg80211              724992  2 rt2x00lib,mac80211
+>> 
+>
+> I don't see rt2800usb module in the mainline kernel. Is it out-of-tree?
+> (no wonder why it taints your kernel)
 
-Fixes: d76a60ba7afb ("ice: Add support for VLANs and offloads")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: stable@vger.kernel.org
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_lib.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I'm guessing it's this driver:
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 201570cd2e0b..0aac519cc298 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1201,8 +1201,7 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
- 
- 	ctxt->info.q_opt_rss = ((lut_type << ICE_AQ_VSI_Q_OPT_RSS_LUT_S) &
- 				ICE_AQ_VSI_Q_OPT_RSS_LUT_M) |
--				((hash_type << ICE_AQ_VSI_Q_OPT_RSS_HASH_S) &
--				 ICE_AQ_VSI_Q_OPT_RSS_HASH_M);
-+				(hash_type & ICE_AQ_VSI_Q_OPT_RSS_HASH_M);
- }
- 
- static void
+drivers/net/wireless/ralink/rt2x00/Makefile:obj-$(CONFIG_RT2800USB)                     += rt2800usb.o
 
-base-commit: 6a70e5cbedaf8ad10528ac9ac114f3ec20f422df
 -- 
-2.39.3
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
