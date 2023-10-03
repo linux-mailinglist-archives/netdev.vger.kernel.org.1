@@ -1,550 +1,192 @@
-Return-Path: <netdev+bounces-37667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDBF7B6881
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:07:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923F57B68DC
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:20:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 544CB2815CF
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:07:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id A24611C203DE
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F0422EF7;
-	Tue,  3 Oct 2023 12:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E6222F0A;
+	Tue,  3 Oct 2023 12:20:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE76021373
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:07:21 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36964A6;
-	Tue,  3 Oct 2023 05:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696334839; x=1727870839;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=U3EOJfwn2qZGpnaKKwcOGLnNMPKWTNMH26Wnxf9XbeQ=;
-  b=a5YWEgITqTuMbOzO2A/RkwjlFyPCgdQAfPYeH4q1dPCG7mLrGdR74lvb
-   57fFfiy6K//6L38kcsSVEWaFw1edFrFrKcqDewdZVQwslRH3W3rLKERCb
-   hpsp5NjsK/9fzJjP3peFhKnpmG11mD6sM/5Q7lo3PFy1UxgdhGBWhP9dj
-   6VkEZ6U0+DDNCBMfL/vLxPnP/avdv/tNkUbiDurmHEhjrjFIarOfARpbW
-   4pXmUw1/L6yBgMI6U5P45PR/mp9vAee0KB4CU4fhSrA4gKKPVT3gbbXU9
-   8KoWk3ZfpJvdx6i1ht0NTcwkT8bwk378we+CBtHEa3Ji0n6gYUYh0TXvR
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="449347316"
-X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="449347316"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 05:07:18 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="1081989157"
-X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="1081989157"
-Received: from unknown (HELO localhost.localdomain) ([10.226.216.116])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Oct 2023 05:07:15 -0700
-From: niravkumar.l.rabara@intel.com
-To: Dinh Nguyen <dinguyen@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Niravkumar L Rabara <niravkumar.l.rabara@intel.com>,
-	Teh Wen Ping <wen.ping.teh@intel.com>
-Subject: [PATCH v3] clk: socfpga: agilex: add support for the Intel Agilex5
-Date: Tue,  3 Oct 2023 20:04:02 +0800
-Message-Id: <20231003120402.4186270-1-niravkumar.l.rabara@intel.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A4F21A0F
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:20:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F04EC433C8;
+	Tue,  3 Oct 2023 12:20:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696335640;
+	bh=2/EQPHqoeRCb33z8dC4Q13xkMmAn+fpq36Al/bM6Fg8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qFR1r4HZNX+bbs2I4rWgnV/lnFuHk1VZy/30BGPYy9KccefNarh9Rtu8vbOoRmGlP
+	 mEqQUfmDPpOb+K8UBQpLlXGZWTh/i+7+f9X8kEPdGK96hj8G/p3wCXKxpqiVAjOY/K
+	 WfQzW6py6HBcTZK0Ms//Py+SXqZif++sX1GQ8qgTwTM5rGjoi5oNGLfZKR83gqwKtM
+	 2doH0MZz7BQNKotgDNJWITmI/LeoAjEpV/AqeDNz2oZL9xguC/M9U6fMJDuEqr9TRM
+	 wtqCCNueqXlEJnv4w8VjNct0Z3uX3hIg6vBuDqp3sFJ4YkglLPPGVtBw9LFOTJK/Kh
+	 O6qtTHDVKCmtA==
+Date: Tue, 3 Oct 2023 14:20:35 +0200
+From: Simon Horman <horms@kernel.org>
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
+	habetsm.xilinx@gmail.com, pieter.jansen-van-vuuren@amd.com
+Subject: Re: [PATCH net-next 1/4] sfc: support TC left-hand-side rules on
+ foreign netdevs
+Message-ID: <ZRwHE0WiPCYle20r@kernel.org>
+References: <cover.1696261222.git.ecree.xilinx@gmail.com>
+ <890f07cf815ae31e7cd5b37cafb72801791f1c75.1696261222.git.ecree.xilinx@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <890f07cf815ae31e7cd5b37cafb72801791f1c75.1696261222.git.ecree.xilinx@gmail.com>
 
-From: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
+On Mon, Oct 02, 2023 at 04:44:41PM +0100, edward.cree@amd.com wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
+> 
+> Allow a tunnel netdevice (such as a vxlan) to offload conntrack lookups,
+>  in much the same way as efx netdevs.
+> To ensure this rule does not overlap with other tunnel rules on the same
+>  sip,dip,dport tuple, register a pseudo encap match of a new type
+>  (EFX_TC_EM_PSEUDO_OR), which unlike PSEUDO_MASK may only be referenced
+>  once (because an actual Outer Rule in hardware exists, although its
+>  fw_id is not recorded in the encap match entry).
+> 
+> Reviewed-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 
-Add support for Intel's SoCFPGA Agilex5 platform. The clock manager
-driver for the Agilex5 is very similar to the Agilex platform, so
-it is reusing most of the Agilex clock driver code.
+...
 
-Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
-Reviewed-by: Dinh Nguyen <dinguyen@kernel.org>
-Signed-off-by: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>
----
+> @@ -1354,6 +1450,119 @@ static int efx_tc_incomplete_mangle(struct efx_tc_mangler_state *mung,
+>  	return 0;
+>  }
+>  
+> +static int efx_tc_flower_replace_foreign_lhs(struct efx_nic *efx,
+> +					     struct flow_cls_offload *tc,
+> +					     struct flow_rule *fr,
+> +					     struct efx_tc_match *match,
+> +					     struct net_device *net_dev)
+> +{
+> +	struct netlink_ext_ack *extack = tc->common.extack;
+> +	struct efx_tc_lhs_rule *rule, *old;
+> +	enum efx_encap_type type;
+> +	int rc;
+> +
+> +	if (tc->common.chain_index) {
+> +		NL_SET_ERR_MSG_MOD(extack, "LHS rule only allowed in chain 0");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (!efx_tc_match_is_encap(&match->mask)) {
+> +		/* This is not a tunnel decap rule, ignore it */
+> +		netif_dbg(efx, drv, efx->net_dev, "Ignoring foreign LHS filter without encap match\n");
 
-Changes in v3:
-- Used different name for stratix10_clock_data pointer.
-- Used a single function call, devm_platform_ioremap_resource().
-- Used only .name in clk_parent_data.
+Hi Edward,
 
-Stephen suggested to use .fw_name or .index, But since the changes are on top
-of existing driver and current driver code is not using clk_hw and removing
-.name and using .fw_name and/or .index resulting in parent clock_rate &
-recalc_rate to 0.
+is NL_SET_ERR_MSG_MOD() appropriate here?
 
-In order to use .index, I would need to refactor the common code that is shared
-by a few Intel SoCFPGA platforms (S10, Agilex and N5x). So, if using .name for
-this patch is acceptable then I will upgrade clk-agilex.c in future submission.
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	if (efx_tc_flower_flhs_needs_ar(match)) {
+> +		NL_SET_ERR_MSG_MOD(extack, "Match keys not available in Outer Rule");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	type = efx_tc_indr_netdev_type(net_dev);
+> +	if (type == EFX_ENCAP_TYPE_NONE) {
+> +		NL_SET_ERR_MSG_MOD(extack, "Egress encap match on unsupported tunnel device\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	rc = efx_mae_check_encap_type_supported(efx, type);
+> +	if (rc) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack,
+> +				       "Firmware reports no support for %s encap match",
+> +				       efx_tc_encap_type_name(type));
+> +		return rc;
+> +	}
+> +	/* Reserve the outer tuple with a pseudo Encap Match */
+> +	rc = efx_tc_flower_record_encap_match(efx, match, type,
+> +					      EFX_TC_EM_PSEUDO_OR, 0, 0,
+> +					      extack);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (match->mask.ct_state_trk && match->value.ct_state_trk) {
+> +		NL_SET_ERR_MSG_MOD(extack, "LHS rule can never match +trk");
+> +		rc = -EOPNOTSUPP;
+> +		goto release_encap_match;
+> +	}
+> +	/* LHS rules are always -trk, so we don't need to match on that */
+> +	match->mask.ct_state_trk = 0;
+> +	match->value.ct_state_trk = 0;
+> +
+> +	rc = efx_tc_flower_translate_flhs_match(match);
+> +	if (rc) {
+> +		NL_SET_ERR_MSG_MOD(extack, "LHS rule cannot match on inner fields");
+> +		goto release_encap_match;
+> +	}
+> +
+> +	rc = efx_mae_match_check_caps_lhs(efx, &match->mask, extack);
+> +	if (rc)
+> +		goto release_encap_match;
+> +
+> +	rule = kzalloc(sizeof(*rule), GFP_USER);
+> +	if (!rule) {
+> +		rc = -ENOMEM;
+> +		goto release_encap_match;
+> +	}
+> +	rule->cookie = tc->cookie;
+> +	old = rhashtable_lookup_get_insert_fast(&efx->tc->lhs_rule_ht,
+> +						&rule->linkage,
+> +						efx_tc_lhs_rule_ht_params);
+> +	if (old) {
+> +		netif_dbg(efx, drv, efx->net_dev,
+> +			  "Already offloaded rule (cookie %lx)\n", tc->cookie);
+> +		rc = -EEXIST;
+> +		NL_SET_ERR_MSG_MOD(extack, "Rule already offloaded");
+> +		goto release;
+> +	}
+> +
+> +	/* Parse actions */
+> +	rc = efx_tc_flower_handle_lhs_actions(efx, tc, fr, net_dev, rule);
+> +	if (rc)
+> +		goto release;
+> +
+> +	rule->match = *match;
+> +	rule->lhs_act.tun_type = type;
+> +
+> +	rc = efx_mae_insert_lhs_rule(efx, rule, EFX_TC_PRIO_TC);
+> +	if (rc) {
+> +		NL_SET_ERR_MSG_MOD(extack, "Failed to insert rule in hw");
+> +		goto release;
+> +	}
+> +	netif_dbg(efx, drv, efx->net_dev,
+> +		  "Successfully parsed lhs rule (cookie %lx)\n",
+> +		  tc->cookie);
+> +	return 0;
+> +
+> +release:
+> +	efx_tc_flower_release_lhs_actions(efx, &rule->lhs_act);
+> +	if (!old)
+> +		rhashtable_remove_fast(&efx->tc->lhs_rule_ht, &rule->linkage,
+> +				       efx_tc_lhs_rule_ht_params);
+> +	kfree(rule);
+> +release_encap_match:
+> +	if (match->encap)
+> +		efx_tc_flower_release_encap_match(efx, match->encap);
+> +	return rc;
+> +}
 
-Changes in v2:
-- Instead of creating separate clock manager driver, re-use agilex clock
-  manager driver and modified it for agilex5 changes to avoid code
-  duplicate.
-
- drivers/clk/socfpga/clk-agilex.c | 355 ++++++++++++++++++++++++++++++-
- 1 file changed, 353 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/clk/socfpga/clk-agilex.c b/drivers/clk/socfpga/clk-agilex.c
-index 6b65a74aefa6..38ea7e7f600b 100644
---- a/drivers/clk/socfpga/clk-agilex.c
-+++ b/drivers/clk/socfpga/clk-agilex.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- /*
-- * Copyright (C) 2019, Intel Corporation
-+ * Copyright (C) 2019-2023, Intel Corporation
-  */
- #include <linux/slab.h>
- #include <linux/clk-provider.h>
-@@ -8,6 +8,7 @@
- #include <linux/platform_device.h>
- 
- #include <dt-bindings/clock/agilex-clock.h>
-+#include <dt-bindings/clock/intel,agilex5-clkmgr.h>
- 
- #include "stratix10-clk.h"
- 
-@@ -40,6 +41,44 @@ static const struct clk_parent_data mpu_free_mux[] = {
- 	  .name = "f2s-free-clk", },
- };
- 
-+static const struct clk_parent_data core0_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c0" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data core1_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c0" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data core2_free_mux[] = {
-+	{ .name = "main_pll_c0" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data core3_free_mux[] = {
-+	{ .name = "main_pll_c0" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data dsu_free_mux[] = {
-+	{ .name = "main_pll_c2" },
-+	{ .name = "peri_pll_c0" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
- static const struct clk_parent_data noc_free_mux[] = {
- 	{ .fw_name = "main_pll_c1",
- 	  .name = "main_pll_c1", },
-@@ -52,7 +91,6 @@ static const struct clk_parent_data noc_free_mux[] = {
- 	{ .fw_name = "f2s-free-clk",
- 	  .name = "f2s-free-clk", },
- };
--
- static const struct clk_parent_data emaca_free_mux[] = {
- 	{ .fw_name = "main_pll_c2",
- 	  .name = "main_pll_c2", },
-@@ -157,6 +195,70 @@ static const struct clk_parent_data s2f_usr1_free_mux[] = {
- 	  .name = "f2s-free-clk", },
- };
- 
-+static const struct clk_parent_data agilex5_emaca_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_emacb_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_emac_ptp_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_gpio_db_free_mux[] = {
-+	{ .name = "main_pll_c3" },
-+	{ .name = "peri_pll_c1" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_psi_ref_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_usb31_free_mux[] = {
-+	{ .name = "main_pll_c3" },
-+	{ .name = "peri_pll_c2" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_s2f_usr0_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
-+static const struct clk_parent_data agilex5_s2f_usr1_free_mux[] = {
-+	{ .name = "main_pll_c1" },
-+	{ .name = "peri_pll_c3" },
-+	{ .name = "osc1" },
-+	{ .name = "cb-intosc-hs-div2-clk" },
-+	{ .name = "f2s-free-clk" },
-+};
-+
- static const struct clk_parent_data mpu_mux[] = {
- 	{ .fw_name = "mpu_free_clk",
- 	  .name = "mpu_free_clk", },
-@@ -164,6 +266,31 @@ static const struct clk_parent_data mpu_mux[] = {
- 	  .name = "boot_clk", },
- };
- 
-+static const struct clk_parent_data core0_mux[] = {
-+	{ .name = "core0_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
-+static const struct clk_parent_data core1_mux[] = {
-+	{ .name = "core1_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
-+static const struct clk_parent_data core2_mux[] = {
-+	{ .name = "core2_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
-+static const struct clk_parent_data core3_mux[] = {
-+	{ .name = "core3_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
-+static const struct clk_parent_data dsu_mux[] = {
-+	{ .name = "dsu_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
- static const struct clk_parent_data emac_mux[] = {
- 	{ .fw_name = "emaca_free_clk",
- 	  .name = "emaca_free_clk", },
-@@ -222,6 +349,11 @@ static const struct clk_parent_data emac_ptp_mux[] = {
- 	  .name = "boot_clk", },
- };
- 
-+static const struct clk_parent_data usb31_mux[] = {
-+	{ .name = "usb31_free_clk" },
-+	{ .name = "boot_clk" },
-+};
-+
- /* clocks in AO (always on) controller */
- static const struct stratix10_pll_clock agilex_pll_clks[] = {
- 	{ AGILEX_BOOT_CLK, "boot_clk", boot_mux, ARRAY_SIZE(boot_mux), 0,
-@@ -254,6 +386,25 @@ static const struct stratix10_perip_c_clock agilex_main_perip_c_clks[] = {
- 	{ AGILEX_PERIPH_PLL_C3_CLK, "peri_pll_c3", "periph_pll", NULL, 1, 0, 0xBC},
- };
- 
-+static const struct stratix10_perip_c_clock agilex5_main_perip_c_clks[] = {
-+	{ AGILEX5_MAIN_PLL_C0_CLK, "main_pll_c0", "main_pll", NULL, 1, 0,
-+	  0x5C },
-+	{ AGILEX5_MAIN_PLL_C1_CLK, "main_pll_c1", "main_pll", NULL, 1, 0,
-+	  0x60 },
-+	{ AGILEX5_MAIN_PLL_C2_CLK, "main_pll_c2", "main_pll", NULL, 1, 0,
-+	  0x64 },
-+	{ AGILEX5_MAIN_PLL_C3_CLK, "main_pll_c3", "main_pll", NULL, 1, 0,
-+	  0x68 },
-+	{ AGILEX5_PERIPH_PLL_C0_CLK, "peri_pll_c0", "periph_pll", NULL, 1, 0,
-+	  0xB0 },
-+	{ AGILEX5_PERIPH_PLL_C1_CLK, "peri_pll_c1", "periph_pll", NULL, 1, 0,
-+	  0xB4 },
-+	{ AGILEX5_PERIPH_PLL_C2_CLK, "peri_pll_c2", "periph_pll", NULL, 1, 0,
-+	  0xB8 },
-+	{ AGILEX5_PERIPH_PLL_C3_CLK, "peri_pll_c3", "periph_pll", NULL, 1, 0,
-+	  0xBC },
-+};
-+
- static const struct stratix10_perip_cnt_clock agilex_main_perip_cnt_clks[] = {
- 	{ AGILEX_MPU_FREE_CLK, "mpu_free_clk", NULL, mpu_free_mux, ARRAY_SIZE(mpu_free_mux),
- 	   0, 0x3C, 0, 0, 0},
-@@ -279,6 +430,46 @@ static const struct stratix10_perip_cnt_clock agilex_main_perip_cnt_clks[] = {
- 	  ARRAY_SIZE(psi_ref_free_mux), 0, 0xF0, 0, 0x88, 6},
- };
- 
-+/* Non-SW clock-gated enabled clocks */
-+static const struct stratix10_perip_cnt_clock agilex5_main_perip_cnt_clks[] = {
-+	{ AGILEX5_CORE0_FREE_CLK, "core0_free_clk", NULL, core0_free_mux,
-+	  ARRAY_SIZE(core0_free_mux), 0, 0x0104, 0, 0, 0 },
-+	{ AGILEX5_CORE1_FREE_CLK, "core1_free_clk", NULL, core1_free_mux,
-+	  ARRAY_SIZE(core1_free_mux), 0, 0x0104, 0, 0, 0 },
-+	{ AGILEX5_CORE2_FREE_CLK, "core2_free_clk", NULL, core2_free_mux,
-+	  ARRAY_SIZE(core2_free_mux), 0, 0x010C, 0, 0, 0 },
-+	{ AGILEX5_CORE3_FREE_CLK, "core3_free_clk", NULL, core3_free_mux,
-+	  ARRAY_SIZE(core3_free_mux), 0, 0x0110, 0, 0, 0 },
-+	{ AGILEX5_DSU_FREE_CLK, "dsu_free_clk", NULL, dsu_free_mux,
-+	  ARRAY_SIZE(dsu_free_mux), 0, 0x0100, 0, 0, 0 },
-+	{ AGILEX5_NOC_FREE_CLK, "noc_free_clk", NULL, noc_free_mux,
-+	  ARRAY_SIZE(noc_free_mux), 0, 0x40, 0, 0, 0 },
-+	{ AGILEX5_EMAC_A_FREE_CLK, "emaca_free_clk", NULL,
-+	  agilex5_emaca_free_mux, ARRAY_SIZE(agilex5_emaca_free_mux), 0, 0xD4,
-+	  0, 0x88, 0 },
-+	{ AGILEX5_EMAC_B_FREE_CLK, "emacb_free_clk", NULL,
-+	  agilex5_emacb_free_mux, ARRAY_SIZE(agilex5_emacb_free_mux), 0, 0xD8,
-+	  0, 0x88, 1 },
-+	{ AGILEX5_EMAC_PTP_FREE_CLK, "emac_ptp_free_clk", NULL,
-+	  agilex5_emac_ptp_free_mux, ARRAY_SIZE(agilex5_emac_ptp_free_mux), 0,
-+	  0xDC, 0, 0x88, 2 },
-+	{ AGILEX5_GPIO_DB_FREE_CLK, "gpio_db_free_clk", NULL,
-+	  agilex5_gpio_db_free_mux, ARRAY_SIZE(agilex5_gpio_db_free_mux), 0,
-+	  0xE0, 0, 0x88, 3 },
-+	{ AGILEX5_S2F_USER0_FREE_CLK, "s2f_user0_free_clk", NULL,
-+	  agilex5_s2f_usr0_free_mux, ARRAY_SIZE(agilex5_s2f_usr0_free_mux), 0,
-+	  0xE8, 0, 0x30, 2 },
-+	{ AGILEX5_S2F_USER1_FREE_CLK, "s2f_user1_free_clk", NULL,
-+	  agilex5_s2f_usr1_free_mux, ARRAY_SIZE(agilex5_s2f_usr1_free_mux), 0,
-+	  0xEC, 0, 0x88, 5 },
-+	{ AGILEX5_PSI_REF_FREE_CLK, "psi_ref_free_clk", NULL,
-+	  agilex5_psi_ref_free_mux, ARRAY_SIZE(agilex5_psi_ref_free_mux), 0,
-+	  0xF0, 0, 0x88, 6 },
-+	{ AGILEX5_USB31_FREE_CLK, "usb31_free_clk", NULL,
-+	  agilex5_usb31_free_mux, ARRAY_SIZE(agilex5_usb31_free_mux), 0, 0xF8,
-+	  0, 0x88, 7 },
-+};
-+
- static const struct stratix10_gate_clock agilex_gate_clks[] = {
- 	{ AGILEX_MPU_CLK, "mpu_clk", NULL, mpu_mux, ARRAY_SIZE(mpu_mux), 0, 0x24,
- 	  0, 0, 0, 0, 0x30, 0, 0},
-@@ -334,6 +525,122 @@ static const struct stratix10_gate_clock agilex_gate_clks[] = {
- 	  10, 0, 0, 0, 0, 0, 4},
- };
- 
-+/* SW Clock gate enabled clocks */
-+static const struct stratix10_gate_clock agilex5_gate_clks[] = {
-+	/* Main PLL0 Begin */
-+	/* MPU clocks */
-+	{ AGILEX5_CORE0_CLK, "core0_clk", NULL, core0_mux,
-+	  ARRAY_SIZE(core0_mux), 0, 0x24, 8, 0, 0, 0, 0x30, 5, 0 },
-+	{ AGILEX5_CORE1_CLK, "core1_clk", NULL, core1_mux,
-+	  ARRAY_SIZE(core1_mux), 0, 0x24, 9, 0, 0, 0, 0x30, 5, 0 },
-+	{ AGILEX5_CORE2_CLK, "core2_clk", NULL, core2_mux,
-+	  ARRAY_SIZE(core2_mux), 0, 0x24, 10, 0, 0, 0, 0x30, 6, 0 },
-+	{ AGILEX5_CORE3_CLK, "core3_clk", NULL, core3_mux,
-+	  ARRAY_SIZE(core3_mux), 0, 0x24, 11, 0, 0, 0, 0x30, 7, 0 },
-+	{ AGILEX5_MPU_CLK, "dsu_clk", NULL, dsu_mux, ARRAY_SIZE(dsu_mux), 0, 0,
-+	  0, 0, 0, 0, 0x34, 4, 0 },
-+	{ AGILEX5_MPU_PERIPH_CLK, "mpu_periph_clk", NULL, dsu_mux,
-+	  ARRAY_SIZE(dsu_mux), 0, 0, 0, 0x44, 20, 2, 0x34, 4, 0 },
-+	{ AGILEX5_MPU_CCU_CLK, "mpu_ccu_clk", NULL, dsu_mux,
-+	  ARRAY_SIZE(dsu_mux), 0, 0, 0, 0x44, 18, 2, 0x34, 4, 0 },
-+	{ AGILEX5_L4_MAIN_CLK, "l4_main_clk", NULL, noc_mux,
-+	  ARRAY_SIZE(noc_mux), 0, 0x24, 1, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_L4_MP_CLK, "l4_mp_clk", NULL, noc_mux, ARRAY_SIZE(noc_mux), 0,
-+	  0x24, 2, 0x44, 4, 2, 0x30, 1, 0 },
-+	{ AGILEX5_L4_SYS_FREE_CLK, "l4_sys_free_clk", NULL, noc_mux,
-+	  ARRAY_SIZE(noc_mux), 0, 0, 0, 0x44, 2, 2, 0x30, 1, 0 },
-+	{ AGILEX5_L4_SP_CLK, "l4_sp_clk", NULL, noc_mux, ARRAY_SIZE(noc_mux),
-+	  CLK_IS_CRITICAL, 0x24, 3, 0x44, 6, 2, 0x30, 1, 0 },
-+
-+	/* Core sight clocks*/
-+	{ AGILEX5_CS_AT_CLK, "cs_at_clk", NULL, noc_mux, ARRAY_SIZE(noc_mux), 0,
-+	  0x24, 4, 0x44, 24, 2, 0x30, 1, 0 },
-+	{ AGILEX5_CS_TRACE_CLK, "cs_trace_clk", NULL, noc_mux,
-+	  ARRAY_SIZE(noc_mux), 0, 0x24, 4, 0x44, 26, 2, 0x30, 1, 0 },
-+	{ AGILEX5_CS_PDBG_CLK, "cs_pdbg_clk", "cs_at_clk", NULL, 1, 0, 0x24, 4,
-+	  0x44, 28, 1, 0, 0, 0 },
-+	/* Main PLL0 End */
-+
-+	/* Main Peripheral PLL1 Begin */
-+	{ AGILEX5_EMAC0_CLK, "emac0_clk", NULL, emac_mux, ARRAY_SIZE(emac_mux),
-+	  0, 0x7C, 0, 0, 0, 0, 0x94, 26, 0 },
-+	{ AGILEX5_EMAC1_CLK, "emac1_clk", NULL, emac_mux, ARRAY_SIZE(emac_mux),
-+	  0, 0x7C, 1, 0, 0, 0, 0x94, 27, 0 },
-+	{ AGILEX5_EMAC2_CLK, "emac2_clk", NULL, emac_mux, ARRAY_SIZE(emac_mux),
-+	  0, 0x7C, 2, 0, 0, 0, 0x94, 28, 0 },
-+	{ AGILEX5_EMAC_PTP_CLK, "emac_ptp_clk", NULL, emac_ptp_mux,
-+	  ARRAY_SIZE(emac_ptp_mux), 0, 0x7C, 3, 0, 0, 0, 0x88, 2, 0 },
-+	{ AGILEX5_GPIO_DB_CLK, "gpio_db_clk", NULL, gpio_db_mux,
-+	  ARRAY_SIZE(gpio_db_mux), 0, 0x7C, 4, 0x98, 0, 16, 0x88, 3, 1 },
-+	  /* Main Peripheral PLL1 End */
-+
-+	  /* Peripheral clocks  */
-+	{ AGILEX5_S2F_USER0_CLK, "s2f_user0_clk", NULL, s2f_user0_mux,
-+	  ARRAY_SIZE(s2f_user0_mux), 0, 0x24, 6, 0, 0, 0, 0x30, 2, 0 },
-+	{ AGILEX5_S2F_USER1_CLK, "s2f_user1_clk", NULL, s2f_user1_mux,
-+	  ARRAY_SIZE(s2f_user1_mux), 0, 0x7C, 6, 0, 0, 0, 0x88, 5, 0 },
-+	{ AGILEX5_PSI_REF_CLK, "psi_ref_clk", NULL, psi_mux,
-+	  ARRAY_SIZE(psi_mux), 0, 0x7C, 7, 0, 0, 0, 0x88, 6, 0 },
-+	{ AGILEX5_USB31_SUSPEND_CLK, "usb31_suspend_clk", NULL, usb31_mux,
-+	  ARRAY_SIZE(usb31_mux), 0, 0x7C, 25, 0, 0, 0, 0x88, 7, 0 },
-+	{ AGILEX5_USB31_BUS_CLK_EARLY, "usb31_bus_clk_early", "l4_main_clk",
-+	  NULL, 1, 0, 0x7C, 25, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_USB2OTG_HCLK, "usb2otg_hclk", "l4_mp_clk", NULL, 1, 0, 0x7C,
-+	  8, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPIM_0_CLK, "spim_0_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 9,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPIM_1_CLK, "spim_1_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 11,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPIS_0_CLK, "spis_0_clk", "l4_sp_clk", NULL, 1, 0, 0x7C, 12,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPIS_1_CLK, "spis_1_clk", "l4_sp_clk", NULL, 1, 0, 0x7C, 13,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_DMA_CORE_CLK, "dma_core_clk", "l4_mp_clk", NULL, 1, 0, 0x7C,
-+	  14, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_DMA_HS_CLK, "dma_hs_clk", "l4_mp_clk", NULL, 1, 0, 0x7C, 14,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I3C_0_CORE_CLK, "i3c_0_core_clk", "l4_mp_clk", NULL, 1, 0,
-+	  0x7C, 18, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I3C_1_CORE_CLK, "i3c_1_core_clk", "l4_mp_clk", NULL, 1, 0,
-+	  0x7C, 19, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I2C_0_PCLK, "i2c_0_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 15,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I2C_1_PCLK, "i2c_1_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 16,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I2C_EMAC0_PCLK, "i2c_emac0_pclk", "l4_sp_clk", NULL, 1, 0,
-+	  0x7C, 17, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I2C_EMAC1_PCLK, "i2c_emac1_pclk", "l4_sp_clk", NULL, 1, 0,
-+	  0x7C, 22, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_I2C_EMAC2_PCLK, "i2c_emac2_pclk", "l4_sp_clk", NULL, 1, 0,
-+	  0x7C, 27, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_UART_0_PCLK, "uart_0_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 20,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_UART_1_PCLK, "uart_1_pclk", "l4_sp_clk", NULL, 1, 0, 0x7C, 21,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPTIMER_0_PCLK, "sptimer_0_pclk", "l4_sp_clk", NULL, 1, 0,
-+	  0x7C, 23, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SPTIMER_1_PCLK, "sptimer_1_pclk", "l4_sp_clk", NULL, 1, 0,
-+	  0x7C, 24, 0, 0, 0, 0, 0, 0 },
-+
-+	/* NAND, SD/MMC and SoftPHY overall clocking */
-+	{ AGILEX5_DFI_CLK, "dfi_clk", "l4_mp_clk", NULL, 1, 0, 0, 0, 0x44, 16,
-+	  2, 0, 0, 0 },
-+	{ AGILEX5_NAND_NF_CLK, "nand_nf_clk", "dfi_clk", NULL, 1, 0, 0x7C, 10,
-+	  0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_NAND_BCH_CLK, "nand_bch_clk", "l4_mp_clk", NULL, 1, 0, 0x7C,
-+	  10, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SDMMC_SDPHY_REG_CLK, "sdmmc_sdphy_reg_clk", "l4_mp_clk", NULL,
-+	  1, 0, 0x7C, 5, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SDMCLK, "sdmclk", "dfi_clk", NULL, 1, 0, 0x7C, 5, 0, 0, 0, 0,
-+	  0, 0 },
-+	{ AGILEX5_SOFTPHY_REG_PCLK, "softphy_reg_pclk", "l4_mp_clk", NULL, 1, 0,
-+	  0x7C, 26, 0, 0, 0, 0, 0, 0 },
-+	{ AGILEX5_SOFTPHY_PHY_CLK, "softphy_phy_clk", "l4_mp_clk", NULL, 1, 0,
-+	  0x7C, 26, 0x44, 16, 2, 0, 0, 0 },
-+	{ AGILEX5_SOFTPHY_CTRL_CLK, "softphy_ctrl_clk", "dfi_clk", NULL, 1, 0,
-+	  0x7C, 26, 0, 0, 0, 0, 0, 0 },
-+};
-+
- static int n5x_clk_register_c_perip(const struct n5x_perip_c_clock *clks,
- 				       int nums, struct stratix10_clock_data *data)
- {
-@@ -532,6 +839,48 @@ static int n5x_clkmgr_init(struct platform_device *pdev)
- 	return 0;
- }
- 
-+static int agilex5_clkmgr_init(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct stratix10_clock_data *stratix_data;
-+	void __iomem *base;
-+	int i, num_clks;
-+
-+	base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(base))
-+		return PTR_ERR(base);
-+
-+	num_clks = AGILEX5_NUM_CLKS;
-+
-+	stratix_data = devm_kzalloc(dev, struct_size(stratix_data, clk_data.hws
-+						 , num_clks), GFP_KERNEL);
-+	if (!stratix_data)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < num_clks; i++)
-+		stratix_data->clk_data.hws[i] = ERR_PTR(-ENOENT);
-+
-+	stratix_data->base = base;
-+	stratix_data->clk_data.num = num_clks;
-+
-+	agilex_clk_register_pll(agilex_pll_clks, ARRAY_SIZE(agilex_pll_clks),
-+				stratix_data);
-+
-+	agilex_clk_register_c_perip(agilex5_main_perip_c_clks,
-+				    ARRAY_SIZE(agilex5_main_perip_c_clks),
-+				    stratix_data);
-+
-+	agilex_clk_register_cnt_perip(agilex5_main_perip_cnt_clks,
-+				      ARRAY_SIZE(agilex5_main_perip_cnt_clks),
-+				      stratix_data);
-+
-+	agilex_clk_register_gate(agilex5_gate_clks,
-+				 ARRAY_SIZE(agilex5_gate_clks), stratix_data);
-+
-+	return devm_of_clk_add_hw_provider(dev, of_clk_hw_onecell_get,
-+					   &stratix_data->clk_data);
-+}
-+
- static int agilex_clkmgr_probe(struct platform_device *pdev)
- {
- 	int (*probe_func)(struct platform_device *init_func);
-@@ -547,6 +896,8 @@ static const struct of_device_id agilex_clkmgr_match_table[] = {
- 	  .data = agilex_clkmgr_init },
- 	{ .compatible = "intel,easic-n5x-clkmgr",
- 	  .data = n5x_clkmgr_init },
-+	{ .compatible = "intel,agilex5-clkmgr",
-+	  .data = agilex5_clkmgr_init },
- 	{ }
- };
- 
--- 
-2.25.1
-
+...
 
