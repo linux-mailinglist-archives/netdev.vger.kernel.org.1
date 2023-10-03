@@ -1,81 +1,91 @@
-Return-Path: <netdev+bounces-37570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EADCF7B60C8
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 08:30:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3FB7B60CC
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 08:31:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E31792816E4
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:30:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7918E2817EC
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 06:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E404A2C;
-	Tue,  3 Oct 2023 06:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E183D9E;
+	Tue,  3 Oct 2023 06:31:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBBA10FD
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 06:29:58 +0000 (UTC)
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6732BD8;
-	Mon,  2 Oct 2023 23:29:56 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-327b7e08456so588544f8f.2;
-        Mon, 02 Oct 2023 23:29:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696314595; x=1696919395; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=c477/OLls9kiskA+Ywm7NX/i0eASEk7X2ymM3GHIjjY=;
-        b=XIP8VzzPj+irx14q073CHB8HdAhLTD/AHLzQVtw0bfb3ZrtFC7xfGhIEf57V5eADhl
-         4Pt//VOJ8DjOW7CUCSnNVsRkJZsK5VQry/QoF61ZldwqkhZ8miaN8z/9ck0eM0ohUXHF
-         5mTJmuWUfFAYx/5FVhYbVJvh5ygKyE8Yf6gdzdzZbMp+8jtuqSlInWslIZI8qPnJwUB0
-         T+3KNOSfpEbHwK8NNJVXIbR3DURT/0wfX0KwBM5z3i8zbIuRuUX9OUmymdtbZjLsCI/r
-         5DT8gRtQydLWaesUT5yg38xSHf0VR1SJTvcf1gk9AhuaQkCWBAgyA04oWLN8G2jpyKMH
-         +Rpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696314595; x=1696919395;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c477/OLls9kiskA+Ywm7NX/i0eASEk7X2ymM3GHIjjY=;
-        b=SSTiml9TrYy5q5LpohqYv9f5rNVrekRSf91NZpEIwsSWmJszXtIsFSGKG4i66IlB/4
-         36ujpZbTNu7rRm3YQp1Mmj3Zui1vHNSngtst8+BSpEzUaBPa8nJ/VraDQ9W0zJMlvvIt
-         oXCtfpfmli7k71JcThPUDFXdQrNhIlbwOGD2BWS5p4yHm4kXtYHClkGqqN6wyuHZrYvU
-         fwuuvHmBvMwk2o2a7Wy5gz4X6V+ZoDwhlZN2K+FbLrtcVJ8S8SB+wofJet5uh1Abdgvf
-         TTcq/kw83HyCVzkKfJiXF6pVVg/AKh7g+zV2dpDdT5+jt7eZz6AOlFsYx/TolQInxYWk
-         nqJg==
-X-Gm-Message-State: AOJu0YwopFE30UFC7rtrei3TzaIuuk/ll9JWSx6A+bQBqsXQanTvfBA8
-	BvHhrN112NxRt7OW0+Noa50Ib8z61SaploV8SQU=
-X-Google-Smtp-Source: AGHT+IGI1PZ8b9EpIBue+7qAEGK/FunsTjxd8K8lxBg7iJFrfeQMmKHVyoH2Azk+O5KGu/yOpz71q/xI3PVqS9i1Ci8=
-X-Received: by 2002:a5d:4533:0:b0:31f:97e2:a933 with SMTP id
- j19-20020a5d4533000000b0031f97e2a933mr12283598wra.56.1696314594362; Mon, 02
- Oct 2023 23:29:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0296628E2;
+	Tue,  3 Oct 2023 06:31:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03CB2C433C8;
+	Tue,  3 Oct 2023 06:31:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696314701;
+	bh=adS6IEqFZxln5xGsqrx2IJIePi71pek0Pzz0aUk+75A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cWFupqZlV6gND8KRIbruuNXdjpWSjCIodNbodja1hh1VmJb8dOwm3Ghd4aW2TB2HG
+	 sV9N1BqaZW8oMhkS1MRZQBi1z3au/rlz2trv2cZEIgm41d1rGKEWiYUISNgZRNbxud
+	 w/B6f45Owz6LJxS9QH5vDlqylmrbLjNdWn2QtElw=
+Date: Tue, 3 Oct 2023 08:31:38 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v1 1/3] rust: core abstractions for network PHY drivers
+Message-ID: <2023100317-glory-unbounded-af5c@gregkh>
+References: <ec65611a-d52a-459a-af60-6a0b441b0999@lunn.ch>
+ <20231003.093338.913889246531201639.fujita.tomonori@gmail.com>
+ <9efcbc51-f91d-4468-b7f3-9ded93786edb@lunn.ch>
+ <20231003.124311.1007471622916115559.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927181414.59928-1-dg573847474@gmail.com> <a2a43d5a-678d-129b-d258-d559df42431f@redhat.com>
-In-Reply-To: <a2a43d5a-678d-129b-d258-d559df42431f@redhat.com>
-From: Chengfeng Ye <dg573847474@gmail.com>
-Date: Tue, 3 Oct 2023 14:29:41 +0800
-Message-ID: <CAAo+4rVyszEhD1wujd_8_tgrUuJDEgLES4YWoOu36s9UL4YFAQ@mail.gmail.com>
-Subject: Re: [PATCH] tipc: fix a potential deadlock on &tx->lock
-To: Jon Maloy <jmaloy@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: ying.xue@windriver.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003.124311.1007471622916115559.fujita.tomonori@gmail.com>
 
-Thanks much for your review.
+On Tue, Oct 03, 2023 at 12:43:11PM +0900, FUJITA Tomonori wrote:
+> On Tue, 3 Oct 2023 03:40:50 +0200
+> Andrew Lunn <andrew@lunn.ch> wrote:
+> 
+> > On Tue, Oct 03, 2023 at 09:33:38AM +0900, FUJITA Tomonori wrote:
+> >> On Mon, 2 Oct 2023 16:52:45 +0200
+> >> Andrew Lunn <andrew@lunn.ch> wrote:
+> >> 
+> >> >> +//! Networking.
+> >> >> +
+> >> >> +#[cfg(CONFIG_PHYLIB)]
+> >> > 
+> >> > I brought this up on the rust for linux list, but did not get a answer
+> >> > which convinced me.
+> >> 
+> >> Sorry, I overlooked that discussion.
+> >> 
+> >> 
+> >> > Have you tried building this with PHYLIB as a kernel module? 
+> >> 
+> >> I've just tried and failed to build due to linker errors.
+> >> 
+> >> 
+> >> > My understanding is that at the moment, this binding code is always
+> >> > built in. So you somehow need to force phylib core to also be builtin.
+> >> 
+> >> Right. It means if you add Rust bindings for a subsystem, the
+> >> subsystem must be builtin, cannot be a module. I'm not sure if it's
+> >> acceptable.
+> >  
+> > You just need Kconfig in the Rust code to indicate it depends on
+> > PHYLIB. Kconfig should then remove the option to build the phylib core
+> > as a module. And that is acceptable.  
+> 
+> The following works. If you set the phylib as a module, the rust
+> option isn't available.
 
-Regards,
-Chengfeng
+That does not seem wise.  Why not make the binding a module as well?
+
+thanks,
+
+greg k-h
 
