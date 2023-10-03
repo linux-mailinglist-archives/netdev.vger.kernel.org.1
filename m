@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-37655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579EE7B67CF
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:26:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF497B67D0
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id DAEBF1C209DA
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:26:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 24DB0281F77
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C61219FB;
-	Tue,  3 Oct 2023 11:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784882135A;
+	Tue,  3 Oct 2023 11:26:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7A521352
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:26:08 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2043.outbound.protection.outlook.com [40.107.223.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B012AAC
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:26:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755E021379
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:26:10 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2073.outbound.protection.outlook.com [40.107.243.73])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402C18E
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:26:09 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ABST8MEbH02MHLLcY8MSkswic30Vdax53Zay1PWf7/DgPy9LLqTyaOpqeA5TOOpnQ+tE+EQ7LwUnidnLaE6RrwLSjr7gfgFaOytGx96bUfdLkW5A9HE/qg+dJf1Bl+1Ks4S85afIDSfKtyrBLrWTbGGpV9dai7xvotnqgDMqhsSBZSfjQS/DB/C1hojIi1epLUtQhtLkmf95NnBg0LOtRPenxXuDNpeyIGX5fx4wtfFNT98dbD4r8mf7s8OA3GHfsZrGxXoS8yPv5Af41pvC+PWG4uajrvv/M9TXpCz/lgsFLIbZkD18dJ+R+i3LdZOWWxGehbNQLCnz66wesE358A==
+ b=eSZfkA3vmBfGL55mZJx+fBZ2Via4FrjmLhwW6fplgBEaOqkqiT9SNxx6qRFVRowwB+WXTub4HtHWTSvYyIp7arQ5Phmh2TUazCmirhHp1AxtO9QBd3v8LzD9wJ8FkTLm294LADaDZEe3PESFQmHExsXTySjyPRcejhHkTk5d6h/V8tANyaDR70IveX2k5srq9wuU1stVFfnacqWPQQ437P8Js56QiFuOwpYWCYMhtnisgU/EgN/AHMZYbboQWziVgLahL3Ct08zPcDkLYy69GSpSiz6cE19w6DAN0i1bGq+u/4E31q4kaYx8cDVnMnfRHWgOVWYNj4RZVD8Swgjx2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nwkxeg5lmz3PowmoapNWdScvBdop7AcSWOXm4UXsLdU=;
- b=IpGh6UsHz4dMcdvK8ei2w30TlnhDCYOseOkY3jAZmjfBRLV1FLlJGky1f+ICfghkZOEyz0XhJorT6+kCT6gYwtmU86c4DXfEjLA56O4BnC2CoA6HxkS2CA8sqsm8KTrrQ4WxYPS6sNDYldqRZBneuyTAVBacf9qhztSFpsC7plqyvbmjwa5Q12xYh8+Bi/H6PhUGhzoNYnyGvbuU6g96qNWTmctkoNx5yLf2P9jblO36rq3WtfQ2QN1nCCzLXTwvCwVbWBu9NBRqzABBI5R/CoVRm6Dnmj6vLMrnimjg8arEgkq9IJI7kTihbsGIWeuPQCBJ8uOPadQc3PgePsIrYg==
+ bh=9M4ox8m9jR5VIDBXrBS96hjWZK2rX2hJQPvfkLeafLU=;
+ b=UNE7LlFR9UuHLR6YvCNN9JDoDJ1m+WgXIivrQFBH3i2z1eGJsaw0WfpN7RwQFek8sXv2mzYuJ+pBm7yupPVk2HtGgkBg2h0WD9arahLtLQgPhuuf83l91M+7BYbLOWTha6WOBWPi066m4iz09LVvkjZWmYjiGG5t8Ab0Nsbsbf91Vi9ziy63Ckd/ZuuMdr4QEtPE1ZOp2N91hFI5k5ukS83rP2LsSuaHAwpPJhHzOyvYscnWBKfMf/nRKlJegOXtDEa4ObLmJJnSUsqweH75cswS/MCx7IT6Z15rBjR3ko4wEaIowGJRXu3Uj3ODDKZ1oYkMH9j2jomeAzuzddW0oA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -33,18 +33,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nwkxeg5lmz3PowmoapNWdScvBdop7AcSWOXm4UXsLdU=;
- b=seg5aGsa/M0l2NSCMmxjapWWfM/auCAgcCGyDGUyG/L0GGreVQF9ZU8TgcmYjp/poCpEfiDkCydX0HU3HQ3rlTBAlQQVHuOjytznhMlp/Vr8DzJTYaBZ13x1RZEaqY4zkvbsJaeBZre2wq6Tl/47pUzMD4A6QRiVAlcGuBTzlj1HBPYXi/KuxhJEVDEZKgBQEJdOyqnhMUE0vz351yOeS8sgUuAXIyxSXQrTyIRPB18ER3RxQzHPyoPoeHdg05bZjmSBBEwY8CSG1O6aRBZ0enlRL3N5NeZTFS4XEGYxhedKDLfQ6quHowAgf1Hi+E+dGSW+vP5akJWofS0VyiRwJw==
-Received: from SN6PR08CA0023.namprd08.prod.outlook.com (2603:10b6:805:66::36)
- by MW6PR12MB8951.namprd12.prod.outlook.com (2603:10b6:303:244::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.32; Tue, 3 Oct
- 2023 11:26:05 +0000
-Received: from SA2PEPF00001505.namprd04.prod.outlook.com
- (2603:10b6:805:66:cafe::49) by SN6PR08CA0023.outlook.office365.com
- (2603:10b6:805:66::36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.31 via Frontend
- Transport; Tue, 3 Oct 2023 11:26:04 +0000
+ bh=9M4ox8m9jR5VIDBXrBS96hjWZK2rX2hJQPvfkLeafLU=;
+ b=izjCi8emp1atFZNqjxLp+ByALU8ZLDDRYdZ4cMBaH6Fmc/bj2QcguylqcEp7JHMggnxbmppszPCZlTi5gvn92Ic/b2d0Qr6Wpk+ADE//yEFUKGWjnmFNNrHss3ILeUKljVUH48tKb80q5weTTICKx3d7jN0CU6V4Y26SIXBsZkfl/rVj0h2RkX12Mz4sUrZQI8q7IXqw1QmtuzmX0dYNW8QDBqmGdL5pNkvWW3ELzz030Rx2W+0dcYRbccLNFkqhl7j6VNZGUnK+n2aS5KN/EqqjL+0yVGIob4DZ3TzwxZYppoZgpOgg/NWoVjw3WFQDOeZ4asC4mtribdNmC0MbYg==
+Received: from SN4PR0501CA0013.namprd05.prod.outlook.com
+ (2603:10b6:803:40::26) by SA3PR12MB9089.namprd12.prod.outlook.com
+ (2603:10b6:806:39f::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.30; Tue, 3 Oct
+ 2023 11:26:07 +0000
+Received: from SA2PEPF00001508.namprd04.prod.outlook.com
+ (2603:10b6:803:40:cafe::83) by SN4PR0501CA0013.outlook.office365.com
+ (2603:10b6:803:40::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.24 via Frontend
+ Transport; Tue, 3 Oct 2023 11:26:07 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -52,26 +52,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF00001505.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SA2PEPF00001508.mail.protection.outlook.com (10.167.242.40) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.14 via Frontend Transport; Tue, 3 Oct 2023 11:26:04 +0000
+ 15.20.6838.14 via Frontend Transport; Tue, 3 Oct 2023 11:26:07 +0000
 Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 3 Oct 2023
- 04:25:51 -0700
+ 04:25:54 -0700
 Received: from yaviefel.vdiclient.nvidia.com (10.126.231.35) by
  rnnvmail202.nvidia.com (10.129.68.7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Tue, 3 Oct 2023 04:25:49 -0700
+ 15.2.986.41; Tue, 3 Oct 2023 04:25:51 -0700
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
  Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 2/5] mlxsw: core_acl_flex_keys: Add a bitmap to save which blocks are chosen
-Date: Tue, 3 Oct 2023 13:25:27 +0200
-Message-ID: <8f118572e0f2fe4f800303977bcc4c6606c78642.1696330098.git.petrm@nvidia.com>
+Subject: [PATCH net-next 3/5] mlxsw: core_acl_flex_keys: Save chosen elements per block
+Date: Tue, 3 Oct 2023 13:25:28 +0200
+Message-ID: <d95ffeef080791802e618563957836cff59aa666.1696330098.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1696330098.git.petrm@nvidia.com>
 References: <cover.1696330098.git.petrm@nvidia.com>
@@ -88,26 +88,26 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail202.nvidia.com (10.129.68.7)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00001505:EE_|MW6PR12MB8951:EE_
-X-MS-Office365-Filtering-Correlation-Id: ec72f841-1442-4d95-8a54-08dbc403879d
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001508:EE_|SA3PR12MB9089:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2a3849d-9623-4e1c-a651-08dbc403896a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	pF8UjiX2jBc6KkzjUtIs7sHZ3f+MTGF6grsQZy22u0ZGRL0R7XtaiGnUu/Iau4gLp9ywFhtTYXMfSxxt1fqARkWXtjPbXngZXiyfU/pZP3w1I1F/YZCI7cP4tILQhGVio9gu4nwvFkCcv21csRVw9+DsPrJZaRLF6H3WAvgCmeptwyHxToRTrySRksz2y3FtxkEtcLjlDnMWl7eGNb1VLaqbSewqA/GeU7tp6o2tYezlxdbQjydPw9U8Fh7g7kKrcx6pjvBOH+0JmiHBkp67b0ltf52ZWp11jWGj943hoTmSjMZwRP80GCBimO8a67xRt9mObeInVWaAB62lfRw6jZN27mOR889BxX2lsxacr3L6aai4QV7ljjn1WMFZ63Vo6WtqAgbA33cuzGZMUc9hy1uf1x0BJIASOPla0wHxBvkSyJVzspwZW2Flmb7toDg/dalvxi32YO+kI54afBr2sSlRJAQUBwEFh0IgXFw4gQByT5vDCynJQnh15etDfcw1vD0LeU0r9yOxClkf0HMaE1vUZ/twfUU65OpfbmAAOfUrPkyrgpXoWUy1eo2ArNievFq6AzuVIoI1rAZsdd2XiZzV5Q0Ptafl/VZS0Jxt5MgqnFT/4HIFUZnJUTfymc2yMUu2e6ZcppUz/6ubbq836BDPhwC8dfzinX0nGxAmzVOw0iWVacN7zu5jVQle8iZSuNuk4fCqthn1RcPEWqWL3nNQ2mH5kWhyDSkXAlM49qHg4NDkQ2yY6CdSBGcph+3L
+	Ydg4n8in3DOBFxhbuFbfavSGf2OmobGXYocK9gqdi4LkeySY5qMzoS1bdEodVKGHS/80WmaeBJO8HKxF0GWiveZ2d6H4S3mjVlQ4uvrMy08syJBEs/jbCurkQBXoaBcUQfJUA4P16KUiu6/v+yYoHRD0XpxAC5DQ5du7Pj1g172oF1AzWZp6ZALZ1SqmLcAKjdnmlUPFYl3TNYHHM4slnronmPF6i1EXtV3oWsCw2Fxwl5UedpOMr17XZmLQZ7+C8Hv9Xrr/vttPw9SgEbbHPOLaSNt24/I+DpDvA3UIFbNbECaFxbhXPp7vJWLtHMyLpDiF4atmo2/3vL6q24fRiFjXs4bLENUE74TAniaVlUPo8AUTTerVwSqrrujaYcjDjSyf3PsacRLX4Zxhd5Ay4VGGGPyzINFZ1QRWIIZckvPeS1ANuK8yP1nKraovzGg2ayKNeXD3bR5LHgPoZ8fuZgefFz2D5qnVCmpcvw8QcXAhK0ADGIKgE12oZP7E0BM4SEFpEtA0d5GnUWFin/sGnOxHQn0iVRiSGDZ9RsHKXcLvNIXUzoEilhewja2j0FF+G4D539ca3sigPIKavwkwQPXmm860t5fju7wSgSnk6ENZZ4AuYiMiiq2L5hV7zC/uAr5YFaOTTcRiEhj7wm2S/UeUWr48LTni9FpCq3+7thUmr5vqenzNuo5v8ZsndYBknkbbgpCMaO3MvCv0SLTt0iKaQ4bmTAaWnAx4a9wDA2o98IplzJVN4PBhzZxzFNvyvl1IXC/CSdWY7rLCPsDv/g==
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(39860400002)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(82310400011)(40470700004)(36840700001)(46966006)(40460700003)(40480700001)(7696005)(478600001)(6666004)(107886003)(7636003)(47076005)(356005)(86362001)(82740400003)(41300700001)(426003)(16526019)(336012)(83380400001)(110136005)(2616005)(26005)(36860700001)(36756003)(2906002)(70206006)(54906003)(70586007)(5660300002)(8676002)(316002)(4326008)(8936002);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(346002)(376002)(39860400002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(82310400011)(46966006)(36840700001)(40470700004)(7696005)(2616005)(107886003)(40480700001)(40460700003)(82740400003)(36756003)(356005)(86362001)(7636003)(36860700001)(16526019)(6666004)(2906002)(47076005)(5660300002)(26005)(83380400001)(8936002)(316002)(41300700001)(426003)(478600001)(336012)(70206006)(70586007)(54906003)(8676002)(4326008)(110136005)(60793003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 11:26:04.0845
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 11:26:07.1063
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec72f841-1442-4d95-8a54-08dbc403879d
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2a3849d-9623-4e1c-a651-08dbc403896a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00001505.namprd04.prod.outlook.com
+	SA2PEPF00001508.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8951
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9089
 X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -124,64 +124,54 @@ the count of hits. This should be changed as we want to be able to choose
 which blocks will be placed in blocks 0 to 5.
 
 To separate between choosing blocks and filling blocks, several pre-changes
-are required. The indexes of the chosen blocks should be saved, so then
-the relevant blocks will be filled at the end of search.
-
-Allocate a bitmap for chosen blocks, when a block is found with most
-hits, set the relevant bit in the bitmap. This bitmap will be used in a
-following patch.
+are required. During the search, the structure 'mlxsw_afk_picker' is
+used per block, it contains how many elements from the required list appear
+in the block. When a block is chosen and filled, this bitmap of elements is
+cleaned. To be able to fill the blocks at the end, add a bitmap called
+'chosen_element' as part of picker. When a block is chosen, copy the
+'element' bitmap to it. Use the new bitmap as part of
+mlxsw_afk_picker_key_info_add(). So later, when filling the block will
+be done at the end of the searching, we will use the copied bitmap that
+contains the elements that should be used in the block.
 
 Signed-off-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
-index 745438d8ae10..e0b4834700dd 100644
+index e0b4834700dd..7679df860a74 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c
-@@ -225,6 +225,7 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
- 			    struct mlxsw_afk_element_usage *elusage)
- {
- 	struct mlxsw_afk_picker *picker;
-+	unsigned long *chosen_blocks_bm;
- 	enum mlxsw_afk_element element;
- 	int err;
+@@ -138,6 +138,7 @@ mlxsw_afk_key_info_find(struct mlxsw_afk *mlxsw_afk,
  
-@@ -232,6 +233,12 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
- 	if (!picker)
- 		return -ENOMEM;
+ struct mlxsw_afk_picker {
+ 	DECLARE_BITMAP(element, MLXSW_AFK_ELEMENT_MAX);
++	DECLARE_BITMAP(chosen_element, MLXSW_AFK_ELEMENT_MAX);
+ 	unsigned int total;
+ };
  
-+	chosen_blocks_bm = bitmap_zalloc(mlxsw_afk->blocks_count, GFP_KERNEL);
-+	if (!chosen_blocks_bm) {
-+		err = -ENOMEM;
-+		goto err_bitmap_alloc;
-+	}
-+
- 	/* Since the same elements could be present in multiple blocks,
- 	 * we must find out optimal block list in order to make the
- 	 * block count as low as possible.
-@@ -256,6 +263,9 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
- 			err = block_index;
- 			goto out;
- 		}
-+
-+		__set_bit(block_index, chosen_blocks_bm);
+@@ -208,7 +209,7 @@ static int mlxsw_afk_picker_key_info_add(struct mlxsw_afk *mlxsw_afk,
+ 	if (key_info->blocks_count == mlxsw_afk->max_blocks)
+ 		return -EINVAL;
+ 
+-	for_each_set_bit(element, picker[block_index].element,
++	for_each_set_bit(element, picker[block_index].chosen_element,
+ 			 MLXSW_AFK_ELEMENT_MAX) {
+ 		key_info->element_to_block[element] = key_info->blocks_count;
+ 		mlxsw_afk_element_usage_add(&key_info->elusage, element);
+@@ -266,6 +267,9 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
+ 
+ 		__set_bit(block_index, chosen_blocks_bm);
+ 
++		bitmap_copy(picker[block_index].chosen_element,
++			    picker[block_index].element, MLXSW_AFK_ELEMENT_MAX);
 +
  		err = mlxsw_afk_picker_key_info_add(mlxsw_afk, picker,
  						    block_index, key_info);
  		if (err)
-@@ -265,6 +275,8 @@ static int mlxsw_afk_picker(struct mlxsw_afk *mlxsw_afk,
- 
- 	err = 0;
- out:
-+	bitmap_free(chosen_blocks_bm);
-+err_bitmap_alloc:
- 	kfree(picker);
- 	return err;
- }
 -- 
 2.41.0
 
