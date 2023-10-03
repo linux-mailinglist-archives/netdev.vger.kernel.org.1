@@ -1,126 +1,85 @@
-Return-Path: <netdev+bounces-37695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B887B6A97
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:34:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6310A7B6AAE
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9795828160C
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:34:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 18FBD2816D2
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E7928DA6;
-	Tue,  3 Oct 2023 13:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 076F32940E;
+	Tue,  3 Oct 2023 13:37:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19559262AB
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:34:35 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E62CA6
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 06:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oqxMI3/bfDr/nVm0ypkWZiZ5Ylt26SnPTBr1Bh1iElk=; b=zVoO2MrQDWej1cq1caPmhr//15
-	ihdG2p/Bnh01QQzJS8GlQZaYLl44Ju6llBLtUVkvIhK2ALVRJZuEoLfanMDF6LqLceYGneBcghf4L
-	F0qgqupwL6oVzdiChQ4y799+1MhnDk7+MbCtbehd91pmM3NTqe6Bav7yv/qOAUA1kzXUV+M4tvXcC
-	ODT4NEJQHMK4QSN8BK2vT0/oyM5xHw5K1XUnDjuTBccHW/OmNxdiotM3geK5jWlYFb2uy2pNh8m+N
-	OZF8zGcEAhb7qSJzzRhFtWAUPQD1S47xYduj0cD4t6QKLtomFFMgIBf9QREPEExlOYX2KN5DFrpRY
-	4GRhdAiA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37884 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qnfXg-0001nL-12;
-	Tue, 03 Oct 2023 14:34:28 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qnfXh-008UDe-F9; Tue, 03 Oct 2023 14:34:29 +0100
-In-Reply-To: <ZRwYJXRizvkhm83M@shell.armlinux.org.uk>
-References: <ZRwYJXRizvkhm83M@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 2/2] net: sfp: improve Nokia GPON sfp fixup
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1154F505;
+	Tue,  3 Oct 2023 13:37:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E0AEC433C7;
+	Tue,  3 Oct 2023 13:37:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696340262;
+	bh=wlhdhZn1xBJ8gxC+v/rGLHxhYUc11yTLxM1h+HBXGhw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AqvDHUQzpsHAxcB/bWiLH51eHg2YS+4rOc2oXQbpYMRgbl3wZREE0e0B1VxuMf81e
+	 KYvDqa2pHJu1w24fvLwg/PzcXeLT1GsYZVNDV64DNnh3DVcpo2nq8cdDQ7ZwwxLmUC
+	 i+l4eOYymaNe67EceomwyqkFJrlG5+zGBYVFJJdLJaLFxNZY6+2vT/RKc7tgIUtumR
+	 cY9JWvLun6qR5jFKgyyzP53jl2v9Dv3Lwt32q4IFpI48iTZwmDMpr1ZOZ9Oy3i3XLv
+	 lVVTM060WcFPXnYI1AkKFcKJFB+2pHU6YRDpAdmZM/7+zcGfDEPmb7WiAZadB8HU6j
+	 CBfo9dYsctKwA==
+Date: Tue, 3 Oct 2023 15:37:37 +0200
+From: Simon Horman <horms@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vadfed@fb.com, arkadiusz.kubalewski@intel.com,
+	jiri@resnulli.us, netdev@vger.kernel.org, llvm@lists.linux.dev,
+	patches@lists.linux.dev, richardcochran@gmail.com,
+	jonathan.lemon@gmail.com, saeedm@nvidia.com, leon@kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH 0/2] Fix a couple recent instances of
+ -Wincompatible-function-pointer-types-strict from ->mode_get()
+ implementations
+Message-ID: <ZRwZIXaVS4yxGSQF@kernel.org>
+References: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qnfXh-008UDe-F9@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 03 Oct 2023 14:34:29 +0100
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
 
-Improve the Nokia GPON fixup - we need to ignore not only the hardware
-LOS signal, but also the software implementation as well. Do this by
-using the new state_ignore_mask to indicate that we should ignore not
-only the hardware RX_LOS signal, and also clear the LOS bits in the
-option field.
+On Mon, Oct 02, 2023 at 01:55:19PM -0700, Nathan Chancellor wrote:
+> Hi all,
+> 
+> This series fixes a couple of instances of
+> -Wincompatible-function-pointer-types-strict that were introduced by a
+> recent series that added a new type of ops, struct dpll_device_ops,
+> along with implementations of the callback ->mode_get() that had a
+> mismatched mode type.
+> 
+> This warning is not currently enabled for any build but I am planning on
+> submitting a patch to add it to W=1 to prevent new instances of the
+> warning from popping up while we try and fix the existing instances in
+> other drivers.
+> 
+> This series is based on current net-next but if they need to go into
+> individual maintainer trees, please feel free to take the patches
+> individually.
+> 
+> Cheers,
+> Nathan
+> 
+> ---
+> Nathan Chancellor (2):
+>       ptp: Fix type of mode parameter in ptp_ocp_dpll_mode_get()
+>       mlx5: Fix type of mode parameter in mlx5_dpll_device_mode_get()
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/sfp.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+For series,
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 1f32e936d3ab..1016a953226b 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -345,11 +345,26 @@ static void sfp_fixup_long_startup(struct sfp *sfp)
- 	sfp->module_t_start_up = T_START_UP_BAD_GPON;
- }
- 
-+static void sfp_fixup_ignore_los(struct sfp *sfp)
-+{
-+	/* This forces LOS to zero, so we ignore transitions */
-+	sfp->state_ignore_mask |= SFP_F_LOS;
-+	/* Make sure that LOS options are clear */
-+	sfp->id.ext.options &= ~cpu_to_be16(SFP_OPTIONS_LOS_INVERTED |
-+					    SFP_OPTIONS_LOS_NORMAL);
-+}
-+
- static void sfp_fixup_ignore_tx_fault(struct sfp *sfp)
- {
- 	sfp->state_ignore_mask |= SFP_F_TX_FAULT;
- }
- 
-+static void sfp_fixup_nokia(struct sfp *sfp)
-+{
-+	sfp_fixup_long_startup(sfp);
-+	sfp_fixup_ignore_los(sfp);
-+}
-+
- // For 10GBASE-T short-reach modules
- static void sfp_fixup_10gbaset_30m(struct sfp *sfp)
- {
-@@ -446,7 +461,7 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	// Alcatel Lucent G-010S-A can operate at 2500base-X, but report 3.2GBd
- 	// NRZ in their EEPROM
- 	SFP_QUIRK("ALCATELLUCENT", "3FE46541AA", sfp_quirk_2500basex,
--		  sfp_fixup_long_startup),
-+		  sfp_fixup_nokia),
- 
- 	// Fiberstore SFP-10G-T doesn't identify as copper, and uses the
- 	// Rollball protocol to talk to the PHY.
--- 
-2.30.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
