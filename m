@@ -1,92 +1,155 @@
-Return-Path: <netdev+bounces-37587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E317B62B5
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:46:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22F087B62CB
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:49:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id DFD661C20840
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:46:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 1FF0AB209F9
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 07:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533CDD2EB;
-	Tue,  3 Oct 2023 07:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404F4D301;
+	Tue,  3 Oct 2023 07:49:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060AECA7B
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 07:46:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3459090
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696319162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=badhJh7j9vTt4lYRj3w4dzKDnX5l9fCk+488RmtlxLs=;
-	b=i3BPWSR0EZVzk69Xi2Qt7MwyNY7AGGPZvevn2TWiLcMpggFGxo8jDjowDQoXnxmGYdNxzJ
-	yOrwSSVAfF89TqoNObiZ7TsElEOtmqHcTX4leJEnmVtcpw2JHRbHMep1oWLE2wrY8aJXZt
-	vC+pRYGIXmIObXtAx7bXoI1fUlPqMco=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-d0LyL8VDO2-guzPVkD0NYw-1; Tue, 03 Oct 2023 03:46:01 -0400
-X-MC-Unique: d0LyL8VDO2-guzPVkD0NYw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9adcb9ecc16so10492566b.0
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 00:46:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696319160; x=1696923960;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=badhJh7j9vTt4lYRj3w4dzKDnX5l9fCk+488RmtlxLs=;
-        b=t3gCGlb6D6o7D58J2jY54eA3FRItqTFTlPKziHUQB8K2BCtenskca/QFFnSNRrUZkn
-         dEdCQs7i2xaEOZLLh/iQuaveQiCbCpu9yNn3vC3pyHn1xFirY/t37QqeWs5aDn6sNAMb
-         9Q0gzgQoGyJw/jvQLbZZ2cYBbEqj+eUlBW7oJwBZvjDpL4gTCkvDuBFE8EkJmeayaXDL
-         JRw5Aul6tdIOrbJPoBdVHCiSM2IQAb7tiqOgUvd9TlJzYwd691FyGdAaNEDR9Cavv07j
-         dxFrH0X5195Qa2q7wYmW+sqjUXtpkHE6U2phxDyaJFPvRu9P2v8XeaWkhuApWKjzLM4P
-         MmlQ==
-X-Gm-Message-State: AOJu0YzxuzloJc9roaT0zbUx/CKL8akK5iVnl8HPBRXEn98xxPY+XdZ8
-	cnj+sybX7kl0zjhc5e/E5oZjA/J6a9/Ui6N/2FGTPZ54V0zGqT9I/d08p6cj7r9NqB+ljWqsJTr
-	bkMN4gOIAWQusFNXW
-X-Received: by 2002:a17:906:19b:b0:9ae:6da8:181c with SMTP id 27-20020a170906019b00b009ae6da8181cmr12064771ejb.7.1696319159814;
-        Tue, 03 Oct 2023 00:45:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFWzeUW1QUpPdAL7ev6RQA1+N2TB0hOVem0AAU3/MPZFHW0EnnDEy+RK9wC9vjYR/dvQPeDRw==
-X-Received: by 2002:a17:906:19b:b0:9ae:6da8:181c with SMTP id 27-20020a170906019b00b009ae6da8181cmr12064749ejb.7.1696319159406;
-        Tue, 03 Oct 2023 00:45:59 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-232-193.dyn.eolo.it. [146.241.232.193])
-        by smtp.gmail.com with ESMTPSA id k19-20020a1709067ad300b009a193a5acffsm592740ejo.121.2023.10.03.00.45.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 00:45:58 -0700 (PDT)
-Message-ID: <b70b44bec789b60a99c18e43f6270f9c48e3d704.camel@redhat.com>
-Subject: Re: [PATCH net-next v10 1/6] page_pool: fragment API support for
- 32-bit arch with 64-bit DMA
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lorenzo Bianconi
- <lorenzo@kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>, Liang
- Chen <liangchen.linux@gmail.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>,  Guillaume Tucker
- <guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>,
- Linux-MM <linux-mm@kvack.org>,  Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
- <edumazet@google.com>
-Date: Tue, 03 Oct 2023 09:45:56 +0200
-In-Reply-To: <20230922091138.18014-2-linyunsheng@huawei.com>
-References: <20230922091138.18014-1-linyunsheng@huawei.com>
-	 <20230922091138.18014-2-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF24E6126
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 07:49:21 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D6DA9
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:49:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696319359; x=1727855359;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=8Nebhyvx4SXh9TU0DxKGqbF6MYOxCLoOxXbecx562eA=;
+  b=KfY2fJEGI+r8VS6AyAaTMaTMOGAXAxK2B/7G5Sv1PohBpBbg5grzqfps
+   lApjJO3dy6RQgbJxf6nI31qKKtnuurFyz65j8c7BV4AKwEkStfK9TS084
+   YwLtRXKnQrdowkUoNnKHv+le0t/wX7TDxALA1PpDzymsTlRCBhJ1JkS7l
+   pfwBBBisYwEQUZqql1+wf5vyk8zX7TbU33+hpLmwqcBO0BoVaoUxhbbyo
+   O+Q2EVGNsN2A+zp22ylefkb9GE4XRxW5zYvh68m+3qh1AeDhbel9w9J/5
+   H718Q+3IAqAYFZmbakme+pGXJKxPotW8L1Pnsm+eZK6lZHTdMCb1TNBR9
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="385638866"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="385638866"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 00:49:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="754321555"
+X-IronPort-AV: E=Sophos;i="6.03,196,1694761200"; 
+   d="scan'208";a="754321555"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Oct 2023 00:49:17 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 3 Oct 2023 00:49:17 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 3 Oct 2023 00:49:17 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 3 Oct 2023 00:49:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=THQezQTWeh1DdsYAqgNmxfvTJuJe7vQWPjzbOoFFf8S6TiN26e+qdtVi4orRwSC64x/ZtiYNHJthlvneKjB9opWUBXygxZimkv1t5/O/YLhKJsWJCxn4sdWJzbqdGbN/XlnaLbLSx4ajpprdVO8RIozpdMzsTiNoOFZI257L26GCgc2c479/e5ubsNBTLQFRdvLWjeQu4iLjFor1lb1s/NETTAgHNLITZ5xvFUYZo2C8grOeYcXXmGa5PATCqx+wClfLxWdRv25DnZDgPWx+nLhAAgmbt+rSXowX6BCIthTChsrwUcwbcsWP++32Xflo0YcP4Dt/7IwtzPc1Xb/A3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pEwcY7N/l45WkonVqAd7iualhhhKe1GZX52tnn5eN3U=;
+ b=OCHUWhlh+onAHAzp8UYe831Rnyaemu8bdgOUqC77bt6h6eU+8k4QilDVliVk4j/Cn31M3VcQ7Dtvh+ByIwzbvflNqgsqVX9RK6Is5HagSHzzCS72SWS8Acxk8ZcQNzHou17ZadzBUgaNbnsn8xD0hormC0wTEFJX2LEdgUHxEOBdy5bAmMXJLstDIR5h4KfiywVfHp9gbV7C/eCQ/K+Y0f/Wtbof2EAPRljQErUvhbTN4pm9oONbrSKcRZHaEPqr3nONewcivpwtT/GZSguZiZ6RKIFLu84HDCsoaqcnCvk+IFdauwa2qxXpgNvI4iBY5unTlZB17v2bIyMl5t3avg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by CO6PR11MB5572.namprd11.prod.outlook.com (2603:10b6:303:13c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.30; Tue, 3 Oct
+ 2023 07:49:15 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::88e9:812b:618b:1fd3]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::88e9:812b:618b:1fd3%6]) with mapi id 15.20.6813.017; Tue, 3 Oct 2023
+ 07:49:15 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: "Staikov, Andrii" <andrii.staikov@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Staikov, Andrii"
+	<andrii.staikov@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for packet
+ mirroring using hardware in switchdev mode
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for
+ packet mirroring using hardware in switchdev mode
+Thread-Index: AQHZ5VvV+eiAnx4HMUe6qOCTkKSYXrA30CMQ
+Date: Tue, 3 Oct 2023 07:49:15 +0000
+Message-ID: <PH0PR11MB50139A29C11FDB21EF7795C596C4A@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20230912092952.2814966-1-andrii.staikov@intel.com>
+In-Reply-To: <20230912092952.2814966-1-andrii.staikov@intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|CO6PR11MB5572:EE_
+x-ms-office365-filtering-correlation-id: b89584e6-23ef-4ddb-75cf-08dbc3e53dcd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: wEAqPImnnHaXMoHGHJwVJejbsaNUas5DpAaza9rB6IeLgammW4uYmWkropWvMQ5PfaJGPhX+E78neKpVRpKoPIz1MtSAp/rq3Dzriqh9xm92z9hKEStVT8FEU+RFzNmaO55bE7o6jG2qjap93brHOv5baFpi6KoKQLcerscmMQ5n4AwW+4yEnLwh555OC/ZPsMYw8IzxER8HuPGjQ222wjQHFEFvWfYDrOT4y3kb2qdIHcexh7pTj1MH5xpwaT38uHGx0jyBn7PUNCZPhZNX2XmLVgcRBL+vKfyWpK7rkLJh01qdAjr4OBzquX52baOw9wYoDw86KdFvDnm7nqKkPBACeFOV55dVahGcxpfi4p4fpLk3AJ55m09LQXpZJvfdBBPmaz8DTPi79ZNFDIxhUET7L75eieqci1zNc8wDtI/oB9URx8ebLjf/g8rD/MO/d16cQH8IY+rSOm2ygDHjcCPiU6qjbUjv4wWg0GcQO2TXQrzY6wTV5HqpVriWB6xOjKENV5aBdEmB0eq1t3RDBf7rzGsLJXviGI5MqKz/nkilWM1SaZSQK9C83u4sjFttq3uuHJ1uXcgg3reZnlCIUnEGr38SGFHQHiUx2LnNPoJMkw3QqDfObzUui6S+dRkI
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(136003)(376002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(54906003)(66946007)(5660300002)(316002)(64756008)(52536014)(76116006)(66476007)(66446008)(478600001)(66556008)(6506007)(53546011)(2906002)(71200400001)(7696005)(110136005)(8676002)(8936002)(4326008)(41300700001)(107886003)(26005)(9686003)(55016003)(38100700002)(83380400001)(38070700005)(122000001)(86362001)(33656002)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?QAfBQ+lEyO1/OnmZncslogUSUbwK6ZBBe7Y/nTeH1YKqzO6i4Is4bCk/Dmcz?=
+ =?us-ascii?Q?GspNZpyBVc3Pju9/dX+RPcds2bCEx4qvBKUFGOR3mwse1DadP05pAe6s1zsc?=
+ =?us-ascii?Q?EgZ5HVZgbIlPVDT7Foa8Y9QoKifNcCUWDUPOcJ/mi79PXWJmU/Dnr0lavy0N?=
+ =?us-ascii?Q?0viGPBi3lH0r8MsrWfywWJST9jCXbTWfiPamG+9bARAwug2ex4VFDw7wsgyk?=
+ =?us-ascii?Q?LKvlCWFd1JX3o83kCpad5YGYuaEldlXlsTUtWSCS+sKlHGnaaxpGMCT3rEvF?=
+ =?us-ascii?Q?vZqdzNNL1ywoVEJyRv0tDJT7gzuDpvjxadNSaqCRKyEjGJGIv67krFzNw6t3?=
+ =?us-ascii?Q?usX+/nJ5wbQg3Tb8aAMRjG4kHk3Bf7hMqfjzHIjAtf1PnWLahm5La6OvE0iv?=
+ =?us-ascii?Q?Yl48DBbyZ5R3jsor6j+P5ZU8tg4Ujbh8WfWzMwhb0/L87gPIdASwNoFdyyC+?=
+ =?us-ascii?Q?2edV3jPjHfgDYa0hAyaVssHDu4xCElJwX2UITusTz0dS66uQ9SlWIbV2KP7G?=
+ =?us-ascii?Q?jlRuSIY71L1D0H3164surcvDfzmLc+RA0zAlQpdhu4faH6McmL0E3vF9csKR?=
+ =?us-ascii?Q?1S4hy7h6F90Dw2WjUuULL152f+hVUUTaR7MdG8/Xb4/Gb5RI4DiIkydWONPP?=
+ =?us-ascii?Q?GtKw8Gej3P2uKgLJNO+JHr2RBsq2puxi1pgBZRc+O39eFbg3LdULLVOctoYn?=
+ =?us-ascii?Q?irGdDqYZHL/i+S9Pvl1kHaIAeZxhvX3AAJFZpvIk2ne0DscCukui90uMR/RD?=
+ =?us-ascii?Q?IJJhdOQOg8EW2oRFF41+ankIEx+/GKUjhqdynnjhkKCqTLfkb7SAZVCZCPKo?=
+ =?us-ascii?Q?VmzyCqSrPogqIi+Lz++Ud+PKcLmisK1yXOcL45KsRV9AOvhMmSQOz8Rc1PSu?=
+ =?us-ascii?Q?+5AG5dM8es/KvqfLNnB41oxCBJ41SBE3edR1NtNJw+TV0sMfZupoqnGEBz4y?=
+ =?us-ascii?Q?N6NnCuY6MVt4+eK72XS5D3w6Yvr02Ux7AXWMUX1rVPo3cLh2lrvLL1j9mmtt?=
+ =?us-ascii?Q?qtj5HJcoWObov7JNjJfmW1Ewyjwc0RelOyRmn9Elc0J42BLkNugWS7yEl45l?=
+ =?us-ascii?Q?FC5cXKWVawLlyP6TBPaLSwkAzNHUtF3Ekk9Guvd/yqQqeJnYTzu9Y4iCW2kw?=
+ =?us-ascii?Q?a0Bw195BcHThTScLgFxl/lB13EQ1DoRBVr47UvrHkzYd2iPIYql1WzhphHpk?=
+ =?us-ascii?Q?SfnD0gL0sEsUL86+FA1PAc2w3WIlqnFE1rX6/7hUvlzxs13DI5wl7FaWjc+H?=
+ =?us-ascii?Q?2IWTuNidG7Oj8OhIWsuT0nG4adaudIwqesn++AMBfJh8QM8TYlvYPhTkts4z?=
+ =?us-ascii?Q?wM6xhhVMVzOahvkxwTMkV+KsvFCZL/TFfAhyjUFyqkiFfSoXtCTBOn7r66RF?=
+ =?us-ascii?Q?c4/UV+7D6+7rtk2EqIeIKV7h3AtHh/6mtvtG+Pcs2MwbZClJ2YTrSWp1Ssbw?=
+ =?us-ascii?Q?S99pToKOLd2epxhN1c2XNXlH7lI4Crz6A1fEiz3VxPBWgx5KmYQMaN/vS0J5?=
+ =?us-ascii?Q?lplcq3J3ZvYvRh/FxOxFPiaFsVu2pq0gWHj83nOYeHjYPvys/E8ncMiX1+ys?=
+ =?us-ascii?Q?dv8g9PuOusbA2flB7CCA9JY0wrFxfvOcCIDCfrFXz7Okr5bbZotITb96PaNM?=
+ =?us-ascii?Q?EA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b89584e6-23ef-4ddb-75cf-08dbc3e53dcd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2023 07:49:15.4303
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XWHRVeKcAcbbTSsTe3KWj+/6tmGqihJc2QUCT37WGZ/k5354DVqrPyOT1dNwaZyQmh1qUOjQFeSqkVtqCwebODCK8JLtaeDQGtTZXJOxZ8g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR11MB5572
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
@@ -94,80 +157,57 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-09-22 at 17:11 +0800, Yunsheng Lin wrote:
-> Currently page_pool_alloc_frag() is not supported in 32-bit
-> arch with 64-bit DMA because of the overlap issue between
-> pp_frag_count and dma_addr_upper in 'struct page' for those
-> arches, which seems to be quite common, see [1], which means
-> driver may need to handle it when using fragment API.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Andrii Staikov
+> Sent: Tuesday, September 12, 2023 3:00 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Staikov, Andrii <andrii.staikov@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2] ice: Add support for packe=
+t
+> mirroring using hardware in switchdev mode
 >=20
-> It is assumed that the combination of the above arch with an
-> address space >16TB does not exist, as all those arches have
-> 64b equivalent, it seems logical to use the 64b version for a
-> system with a large address space. It is also assumed that dma
-> address is page aligned when we are dma mapping a page aligned
-> buffer, see [2].
+> Switchdev mode allows to add mirroring rules to mirror incoming and
+> outgoing packets to the interface's port representor. Previously, this wa=
+s
+> available only using software functionality. Add possibility to offload t=
+his
+> functionality to the NIC hardware.
 >=20
-> That means we're storing 12 bits of 0 at the lower end for a
-> dma address, we can reuse those bits for the above arches to
-> support 32b+12b, which is 16TB of memory.
+> Introduce ICE_MIRROR_PACKET filter action to the ice_sw_fwd_act_type
+> enum to identify the desired action and pass it to the hardware as well a=
+s the
+> VSI to mirror.
 >=20
-> If we make a wrong assumption, a warning is emitted so that
-> user can report to us.
+> Example of tc mirror command using hardware:
+> tc filter add dev ens1f0np0 ingress protocol ip prio 1 flower src_mac
+> b4:96:91:a5:c7:a7 skip_sw action mirred egress mirror dev eth1
 >=20
-> 1. https://lore.kernel.org/all/20211117075652.58299-1-linyunsheng@huawei.=
-com/
-> 2. https://lore.kernel.org/all/20230818145145.4b357c89@kernel.org/
+> ens1f0np0 - PF
+> b4:96:91:a5:c7:a7 - source MAC address
+> eth1 - PR of a VF to mirror to
 >=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Lorenzo Bianconi <lorenzo@kernel.org>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Liang Chen <liangchen.linux@gmail.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
-> CC: Guillaume Tucker <guillaume.tucker@collabora.com>
-> CC: Matthew Wilcox <willy@infradead.org>
-> CC: Linux-MM <linux-mm@kvack.org>
+> Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
 > ---
->  include/linux/mm_types.h        | 13 +------------
->  include/net/page_pool/helpers.h | 20 ++++++++++++++------
->  net/core/page_pool.c            | 14 +++++++++-----
->  3 files changed, 24 insertions(+), 23 deletions(-)
+> v1 -> v2: no need for changes in ice_add_tc_flower_adv_fltr()
+> ---
+>  drivers/net/ethernet/intel/ice/ice_switch.c | 25 +++++++++++++++------
+> drivers/net/ethernet/intel/ice/ice_tc_lib.c | 13 +++++++++++
+>  drivers/net/ethernet/intel/ice/ice_type.h   |  1 +
+>  3 files changed, 32 insertions(+), 7 deletions(-)
 >=20
-> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
-> index 36c5b43999e6..74b49c4c7a52 100644
-> --- a/include/linux/mm_types.h
-> +++ b/include/linux/mm_types.h
-> @@ -125,18 +125,7 @@ struct page {
->  			struct page_pool *pp;
->  			unsigned long _pp_mapping_pad;
->  			unsigned long dma_addr;
-> -			union {
-> -				/**
-> -				 * dma_addr_upper: might require a 64-bit
-> -				 * value on 32-bit architectures.
-> -				 */
-> -				unsigned long dma_addr_upper;
-> -				/**
-> -				 * For frag page support, not supported in
-> -				 * 32-bit architectures with 64-bit DMA.
-> -				 */
-> -				atomic_long_t pp_frag_count;
-> -			};
-> +			atomic_long_t pp_frag_count;
->  		};
->  		struct {	/* Tail pages of compound page */
->  			unsigned long compound_head;	/* Bit zero is set */
 
-As noted by Jesper, since this is touching the super-critcal struct
-page, an explicit ack from the mm people is required.
+Tested this patch with HW offload enabled on both PF and VF. Packet mirrori=
+ng is working on the PF but it fails on the packets originating from VF.
 
-@Matthew: could you please have a look?
+Configured below mirror rules for mirroring the packets from both PF1 and V=
+F1 to VF2.
 
-I think it would be nice also an explicit ack from Jesper and/or Ilias.
+tc filter add dev $PF1 ingress protocol ip prio 1 flower src_mac b4:96:91:9=
+f:64:08 skip_sw action mirred egress mirror dev $VF2_PR
+tc filter add dev $VF1_PR ingress protocol ip prio 1 flower src_mac 52:54:0=
+0:00:16:01 skip_sw action mirred egress mirror dev $VF2_PR
 
-Cheers,
-
-Paolo
-
+With the above mirror rules, the packets from PF got mirrored to VF2. But p=
+ackets originating from VF1 are not seen in VF2.
 
