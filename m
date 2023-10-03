@@ -1,228 +1,146 @@
-Return-Path: <netdev+bounces-37818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1617B7466
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:01:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DED57B7480
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:06:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1440828134C
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:01:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 65BA328145A
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 667413E49E;
-	Tue,  3 Oct 2023 23:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A284F3F4A5;
+	Tue,  3 Oct 2023 23:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1FA43E48B
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 23:01:41 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66092AF;
-	Tue,  3 Oct 2023 16:01:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696374100; x=1727910100;
-  h=message-id:date:to:cc:references:from:subject:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=QmbboXM+X5pqD7JOsFIPvWMhplJs7MTEt6yFQyT9H3c=;
-  b=jAcPy3w11AMPCEChrcp4XdiCc3Ro0T84Lm+O+HMak83OdGWj3ba7mldM
-   1U/C8nYPI4Ph0ObOK35CTRriQLkb/SfU+pW8s7Taohkrw+WxslMVs17x6
-   ASFZ+0zoIekOuNCkwymRDlH+cvyDfZQtlQqdNJQrxGqka9qXdUXotyzrY
-   iWo2hVNErbBV7I507762lcB9BSjYw/ac7WMfvvbx8JFW1Z8Rmf6UUS5pK
-   jMH0j+YfFtUXN2dqBRQwLih4Lk3KKlhY2ywDDo764GYOVPqnJriZu+uFd
-   j42o5Sqj7s9xaAmTHbF8UYiTDa73rID6rjExNmo5py9jM2g8c8uYTGVWk
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="363268817"
-X-IronPort-AV: E=Sophos;i="6.03,198,1694761200"; 
-   d="scan'208";a="363268817"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 16:01:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="700891992"
-X-IronPort-AV: E=Sophos;i="6.03,198,1694761200"; 
-   d="scan'208";a="700891992"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Oct 2023 16:01:25 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 3 Oct 2023 16:01:24 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 3 Oct 2023 16:01:23 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 3 Oct 2023 16:01:23 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 3 Oct 2023 16:01:22 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C2lgbR9FfJ8NVlH01aox4rOFzMLN41q+aUW7uDqPqDEs+YSzdcaui60TGeK+DXac/j6d2E7L/UmCqPyowPVxM3K7JOLJLmXak9R2oAFhSSIyEKg2gqUgW7Cm893D9aAjgmvcFKzOyBZctGDepLR1ZbKBniJZGEa+or/ZF0WyEMpdhkEeUgF74Ldt/uSklOs/mHVBxL40+CnzSXXFmf4gQ207pelG9xH6eC4d8d8KrqVyBQ4oXJVeG/JiVpsrvUu1UxQjmk5uyIbTKrs5AvVPmQDDyu0EthOo2WFp5jBSLp61BiZLGPEVqlBXT2UmJwDC3CItNNFDPdofOrM4NpTjHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vrWyL1FbmU4cR5wtjjwbV22IgWUDjH1dhDa/2D8GqFM=;
- b=SIzc6yuSk2ZwcF4vBrlgOyU1Teeuwg93N5T9dJ6dsVHb21xYbP0w78E6SE33d1IjDobHACfkfyIMMyjg3tbTRQKjxjvdIaRFmq/eYPqYENVVqlhqPPXE4AqMxEn6xAIV9PyQjkWd3jw2Xu3f0nWYgvKvuOhxm2xuZTNFPk95c6JER6k+6McPBL9BigX9HXMuxTVaNhf7QDVnmpOqhCdE7AuTeZFoLef/yShV/2tJWwBTL+2rQtTq3w5bbkq0faGkiklvcwYSh7JvSD2Q2vFk3W6u/LcQGijvYliSaaEubI7dkQ9eLQ5n+sn0S2rFhsmX69MVorC2FTL80yOBOTqsbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
- by SJ0PR11MB7156.namprd11.prod.outlook.com (2603:10b6:a03:48d::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.27; Tue, 3 Oct
- 2023 23:01:21 +0000
-Received: from CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::9c1c:5c49:de36:1cda]) by CO1PR11MB4914.namprd11.prod.outlook.com
- ([fe80::9c1c:5c49:de36:1cda%3]) with mapi id 15.20.6813.027; Tue, 3 Oct 2023
- 23:01:20 +0000
-Message-ID: <ecc05528-ba59-922b-7384-4bedd46cf89b@intel.com>
-Date: Tue, 3 Oct 2023 16:01:18 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
- <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
- <abf8d279-b579-4a03-9ae9-053cf5efec3d@wanadoo.fr>
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [PATCH net-next] iavf: Avoid a memory allocation in
- iavf_print_link_message()
-In-Reply-To: <abf8d279-b579-4a03-9ae9-053cf5efec3d@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR04CA0323.namprd04.prod.outlook.com
- (2603:10b6:303:82::28) To CO1PR11MB4914.namprd11.prod.outlook.com
- (2603:10b6:303:90::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FC43F4A1
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 23:06:44 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEDAAF
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 16:06:42 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-99c136ee106so268182366b.1
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 16:06:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696374401; x=1696979201; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BED3t2aRrxtx0D0q4ZEBs+ApkSmWh8HJDsZNXZO2H1E=;
+        b=TJhdldhY/lq5NAoTeyNdXfSWa2OwK0PBlKYQII4OhYv7/eTz26t8J7BnCKJSEH40JC
+         +BpPvq7HOxdk3r3JFa17jtKJPJ1ZfLa+FWbBrO6pHWiH4UsLrP/KH6t5xbzPEQtgVHTR
+         Tj2nxh+2AtYbqzcAlpUM6LJBBDFwet6JXVB1WfrQ9N0rO6oUPIPqsIllni53MFANCRMq
+         FfU7UKZfAs4EWCv5uOISuUtguyUISA/C9JPm5SnKjkbFGUmYYAHESoxyhhZCxjl/ZwDz
+         cVAGW7c4uS9XDYb4NsdexcnD1lxc6r8BYsVQNhMr4aBsAYoBGAJXKrgNATKVcZGfflbu
+         HcmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696374401; x=1696979201;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BED3t2aRrxtx0D0q4ZEBs+ApkSmWh8HJDsZNXZO2H1E=;
+        b=ORTJN72gsYbUbXvHGsmq6vO+L6xgENfkvTfX65E7RAsZLIUhALNGzkHYZMmLmwUkJA
+         kdnhcOKX4xGDzdvn7uM4/ynH2r/Ar7wNGpYYMqPGf35X5uWPtOe52X3hdnQClR/qMcDe
+         36Ug8EyrK+Tp5yWb6HHHfRYPM/Vav3eRPPFpoPSKAdtKqYCNaMIXhyPvZ0UcbkVhU6mn
+         0F0VjsL9dh6ew0ldIKm+yKZc7R78RUVDctZfSYbaFjeBRrHNx5Y5DAhckwBIcoli1kWG
+         pAhxOCqk/+eAcXmKr9CFYA6+lmCedt/jNFhAmmP3ppT7Q/bycZ5HnzJwOzwuV17mmuBC
+         26sQ==
+X-Gm-Message-State: AOJu0Yx7eHRH4m66wm3HPwiB+qm6fg+4wAfJjjjyG9fx20gbevy53Q4L
+	YW0d8K6uOF2bBcXRLdTL72bw8iMFxqOnpRD2Kzv0CQ==
+X-Google-Smtp-Source: AGHT+IHB2pzA3bg1Fesj416efcT1N1xTYVtbEVVGRJW14+RdrX8v8VDBTH1EuOSCUOzjyMf3H2XQMrs2+N3Lkip4XW8=
+X-Received: by 2002:a17:906:74cc:b0:99b:ead0:2733 with SMTP id
+ z12-20020a17090674cc00b0099bead02733mr593265ejl.72.1696374400964; Tue, 03 Oct
+ 2023 16:06:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|SJ0PR11MB7156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 47c008cc-4768-4077-17d2-08dbc464a869
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gB2+3PRyBxP2KW+oMfHP33hgoezPW0F8eoh64eIHvgkqIUOJ+W162aIB93ELMBlPIaFwSt4aAcD9Rha+pLr/zNJdHzMXmCgULbSdR8Gq2imLaPRq0Lw6NdYIm+xmoGD11X5EMwIcBF+jiwcBN6MhrohREhh8SlP0SFmq6Eus5H+p5t29G8/R8ppehKAg5z3Q3Tg1DC9buUty0f3ce8lMZlxQv7WQoGl2ziArDCVLHf/qGbOpi6a80eSJVU1wNkJeqYxMGpPiaRwewQA3sRMPibmAdC9wpcixxnu3OSlfIXNJZCFlr89QE3M1gljeTFJbibNfmvOGNIh+A9YMF6hA7cF5N0mOROXT5eVj35lU8UGMBielYvUPjCZg5rgndZM6sdvM2PzfPtrVuI1qQB+yXUJ7bUlsEYAkxUg4y8DJwKzETUuX9VpbZdH1RnKhGJdR6GyK900dD2cur1omBs+rxEhnVRV+5p9VvPRnbjReIy0g6SVDsgwRfV1CrraIxWe8KnQvzU1wXefmZ2klDtfNdKCfSzUOqptTy3Cm1ALbaV2tfAJtGVsYvFZujMXMxbqBG/748OuFCzVh6UsZyb/eUQcZDWrG4g9Cgy3pZAEGJWZONZ4MHY1WP2cOHYmCbqzVMdPm3cN89sigFZK8r/dorA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(39860400002)(396003)(346002)(376002)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(6512007)(316002)(66946007)(66476007)(66556008)(26005)(4326008)(8676002)(41300700001)(36756003)(478600001)(53546011)(83380400001)(82960400001)(6506007)(31696002)(38100700002)(86362001)(2616005)(8936002)(110136005)(6486002)(31686004)(2906002)(44832011)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dTZGRFc1ZlRGWHJobXhscGllRlBBd2lMRWNDQUYvWk40UzFYMlZJYTlML1FI?=
- =?utf-8?B?eDRkQzRPVEcvTnJRUHNGU05aSWlYMlRXTUlqa2xKb3JlZkRxaUp6RmluSlRJ?=
- =?utf-8?B?UkhpenJUbHk3L1VIc3R2R3k2QjR6ZEZZMGdKenN3WXN3VzdFSmpHNVZUNTRr?=
- =?utf-8?B?aUExNm1tNUZyMlJuMklyTTk2RWExY2tUa243K0M5QXVOdXRoK2ZOL0M0NFhV?=
- =?utf-8?B?dExCaTdLb01DKytHMzBDK3VtYXpNVmFodkZac2QyTEZETlFuaVNyazlRMkF6?=
- =?utf-8?B?YjdzamtTY01WT1RoR3hIcEFhWm1oZU41bmZMVXBzTlh2a2VSVHVJMmpoZnpi?=
- =?utf-8?B?dEJDcnlGZ29YangzK1FoZldWczJNNzZtN0RTcjJlRUNNRFBZSlFCRzRFeU0y?=
- =?utf-8?B?dkEwYVJkT1FOdUQzSGdVdDFrczA0emh1em5aWE5iWnNtR1NwWEN4b25peVdu?=
- =?utf-8?B?VFFkQnltMVhzTmxEbTRUU05vako0djhNakN5NGkwcllFd2toVExQV0N1Rnlh?=
- =?utf-8?B?eFFlb1F2NjBYc2FBTWN5QjdQTVBneUpobXNKbUsxNUZiOGNUNzc5KzMwa0R2?=
- =?utf-8?B?WEw2WFZWbkZNNXJxbFAyL09NNWxTMUpQdW81MUxxVHlUK25hMkExL2lpMXNz?=
- =?utf-8?B?REJRbGFvd0wzQytxeUNFemFCZjNsK0lPQ0xiSGxBSzZPRndMcUpuMEdHOU5L?=
- =?utf-8?B?ZktoNGpJSzdJY2wxd0lXazZrY1l4TEdZdWdnS282MWFDZGpmaHhmUHl3Si8y?=
- =?utf-8?B?cnlzRjVJNEpEeVlXbHd2djVsdXZzemdubHZ1eFliZ29GbDV3OVNDUm1Bbjhx?=
- =?utf-8?B?OU43c0YraWdxdHY1U1g1QjVjTitBaHZIUDFvdlI5U2VwQWlvejJkblJVTWY4?=
- =?utf-8?B?SjRwdlkvZWhSNnZIZEovcTJrQ0tQNHlzcXE2UitFcmtWR1lOTGdLVmFLMFNO?=
- =?utf-8?B?b2srWGRtV2NDUFVlL3BndThIbXJ6U1FqTkIwUDdBTGhEb1hPQ2MreGgvRFhX?=
- =?utf-8?B?TzI3SU04V2grWVU4SGRuV1lZREtsd3gzK0Y0UFhEcWNrZ0E0dnZpc0hEU2tB?=
- =?utf-8?B?LzRFT1IvUm5pZ2RIZ2JycmN6N3I1T2NXcUY4eURsamUza3VhUnh6MjBuKzha?=
- =?utf-8?B?OFFPL09QdWNFeXpmZUx3LzZLQ1JncGYybkZiVlZhY0J1eEdDd1VIbENPSnNM?=
- =?utf-8?B?SW5ISFMxUHlmU1lHTnZuQ04vN3lUc01ha1JWdzR4cG1JV0xGblpQY0hXL3Zt?=
- =?utf-8?B?Y2JMK2RrNnlqUEU0cXRibStNdmJxUTU0REErbCt1K01mRHhSRVZuL1ZzVWVt?=
- =?utf-8?B?Q3ExS0lKRm9BTzZDS2NlUGc3ek5WekY1TzF1cUJYeXhzN1RPbVVQbG5TUTd4?=
- =?utf-8?B?VFl5ZEZYQXd2aWZBa2hORTlwTW1yYmJ1enZTSmptTnB3SGUrSXlyb3JhYjdt?=
- =?utf-8?B?MEFhaU10dWI5UWd4MThCVGo4VFVvL3VVL0JWRzN0RTlBQSs2ZnRjN05oM0JJ?=
- =?utf-8?B?OGphVDZyVlZKc09BREl6NngzRy9kS3RRSFBwOW13cVRXR1lhN3dleFBYV0VX?=
- =?utf-8?B?TFlJUzR2Q1BkcE00enJaRkswVmg0NzZrVkU4VnFtUElWa09td2dYRnhMNm1p?=
- =?utf-8?B?VXRDc25hMiszcFZGWmd1N3BTT3lXYjUvWUVJZmozS0JhaGFoSW93ZnpMZzQv?=
- =?utf-8?B?QlY2cURrL0o0dVBYT2FJRGFiRWpiTXJMR2lsMVk4L0tWa3hXRXRQUGV3dU9Z?=
- =?utf-8?B?VlJXM0U1cFJ4bHVyZ21qZjZqdTNiT3Q1bXRsZ1ZseGdraCttZHI3SytYVXIv?=
- =?utf-8?B?amV3ak1ieE5rdWZoQlN5U0paZ0k4QTJia0pCYXhCd2t3b29HZS8wTzhxV2k0?=
- =?utf-8?B?Mld4YzRJQS9TcXdBWTV6eUNUMEhRdXhLcGhtNTlsV2hQOVozcjZ4dCtneE1W?=
- =?utf-8?B?WVNBL1JlODlWeVlrSFU5S0wvWmhXL3BUSVpwaTZLNnM4MVp0TXF2Nm1Xa1Yx?=
- =?utf-8?B?S1Zvc0lONjQyRzArb2J5ZmNpZFVyN2ZmYVVocFk3KzZXMFhKOW9ZM0NpSHVY?=
- =?utf-8?B?Y2RkOXhqL2c2WS8zSWJZS2RUMHJncy9GelZxbzF0VC9kQXVJSXFsYXhKdUhL?=
- =?utf-8?B?TFNpTHYwTDRNajcwaG9CcEw2cGlldmF2eGFCWnNXTlcvVDhRUThod0NWbVEw?=
- =?utf-8?B?UGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47c008cc-4768-4077-17d2-08dbc464a869
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 23:01:20.8219
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SUl+RMG4qScUfvpduHJ91HXfRWkHcjHLFbW5zM3lsIas3y3q8pG2iJSKQZa+AUI98A7tzf1STpTkFt+wykDOeBG6NJGR/niOM0OCy7JjQpA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB7156
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230929180611.work.870-kees@kernel.org> <20230929180746.3005922-5-keescook@chromium.org>
+In-Reply-To: <20230929180746.3005922-5-keescook@chromium.org>
+From: Justin Stitt <justinstitt@google.com>
+Date: Tue, 3 Oct 2023 16:06:28 -0700
+Message-ID: <CAFhGd8pCJa=qevxwhtQDvXMwdhF-33fV87m90GGaUFkOa6eRuA@mail.gmail.com>
+Subject: Re: [PATCH 5/5] mlxsw: spectrum_span: Annotate struct mlxsw_sp_span
+ with __counted_by
+To: Kees Cook <keescook@chromium.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/3/2023 1:33 PM, Christophe JAILLET wrote:
-> kasprintf() is much better.
+On Fri, Sep 29, 2023 at 11:08=E2=80=AFAM Kees Cook <keescook@chromium.org> =
+wrote:
+>
+> Prepare for the coming implementation by GCC and Clang of the __counted_b=
+y
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time checking via CONFIG_UBSAN_BOUND=
+S
+> (for array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
+>
+> As found with Coccinelle[1], add __counted_by for struct mlxsw_sp_span.
+>
+> [1] https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/c=
+ounted_by.cocci
+>
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> Cc: Petr Machata <petrm@nvidia.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
 
-cool! I just sent the patches and cc'd you earlier today.
+Great patch!
 
->>
->> your patch still shows these errors
-> 
-> I built-tested the patch before sending, so this is strange.
-> 
-> However, I got a similar feedback from Greg KH and the "kernel test 
-> robot" for another similar patch.
-> 
-> What version of gcc do you use?
-> I use 12.3.0, and I suspect that the value range algorithm or how the 
-> diagnostic is done has been improved in recent gcc.
+Crucially, span->entries_count is assigned before any flexible array
+accesses.
 
-Fedora gcc 12.3.1, with W=1 flag
-
-gcc version 12.3.1 20230508 (Red Hat 12.3.1-1) (GCC)
-
-[linux]$ make W=1 M=drivers/net/ethernet/intel/iavf
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_main.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_ethtool.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_virtchnl.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_fdir.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_adv_rss.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_txrx.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_common.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_adminq.o
-   CC [M]  drivers/net/ethernet/intel/iavf/iavf_client.o
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c: In function 
-‘iavf_virtchnl_completion’:
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:60: warning: ‘%s’ 
-directive output may be truncated writing 4 bytes into a region of size 
-between 1 and 11 [-Wformat-truncation=]
-  1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
-       |                                                            ^~
-  1447 |                          link_speed_mbps, "Mbps");
-       |                                           ~~~~~~
-In function ‘iavf_print_link_message’,
-     inlined from ‘iavf_virtchnl_completion’ at 
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1965:4:
-drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:17: note: 
-‘snprintf’ output between 7 and 17 bytes into a destination of size 13
-  1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
-       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  1447 |                          link_speed_mbps, "Mbps");
-       |                          ~~~~~~~~~~~~~~~~~~~~~~~~
+        span->entries_count =3D entries_count;
+        ...
+        for (i =3D 0; i < mlxsw_sp->span->entries_count; i++)
+                mlxsw_sp->span->entries[i].id =3D i;
 
 
+Reviewed-by: Justin Stitt <justinstitt@google.com>
 
+>  drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c b/driver=
+s/net/ethernet/mellanox/mlxsw/spectrum_span.c
+> index b3472fb94617..af50ff9e5f26 100644
+> --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
+> +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_span.c
+> @@ -31,7 +31,7 @@ struct mlxsw_sp_span {
+>         refcount_t policer_id_base_ref_count;
+>         atomic_t active_entries_count;
+>         int entries_count;
+> -       struct mlxsw_sp_span_entry entries[];
+> +       struct mlxsw_sp_span_entry entries[] __counted_by(entries_count);
+>  };
+>
+>  struct mlxsw_sp_span_analyzed_port {
+> --
+> 2.34.1
+>
+>
+Thanks
+Justin
 
