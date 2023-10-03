@@ -1,218 +1,140 @@
-Return-Path: <netdev+bounces-37788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7997F7B7293
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:34:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D017B72A7
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id BFECFB207CF
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B0A6C280C0F
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B8730FA6;
-	Tue,  3 Oct 2023 20:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A603CCF5;
+	Tue,  3 Oct 2023 20:46:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341CBF517
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:33:55 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-13.smtpout.orange.fr [80.12.242.13])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9347AAC
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:33:52 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id nm5UqMLsanmFYnm5UqMmLO; Tue, 03 Oct 2023 22:33:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1696365230;
-	bh=4szZBF58NVDMkJwPCQGcaCq/8DXhNFlNUXK9ISU4JTg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=jMM5hJEqTl55wNmQJ4+r0YBYKX0Tt7hC93DBUR4UNEOanbF1mI9FB5vNtzYC2Pde+
-	 C8uatHITU/+hpj/uqY+xb1UDRcQNixIQ0QRqZB5BX1rnOdJR+PV2qgNjdXxQfoBT/q
-	 5mH067tDe9dQK9bITKkPOVeZS3Grb0t7xas5Um2HHzjy8eawGUpSaPkrxJLOAQWaOt
-	 FqiQqCllcVli5oAHKFhBhF+Ushb8praKuB+JIwc9S2J7+rEW+RJVDPL9+x0xTaAAu+
-	 QNHIBIeTTl8ZTcGMnXT6+6FXDCqrD5IzyWDMvBx3LZVqP+/1kvhJ4MrlpwYFc7VkWz
-	 CuKV7HsUbuTVQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 03 Oct 2023 22:33:50 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <abf8d279-b579-4a03-9ae9-053cf5efec3d@wanadoo.fr>
-Date: Tue, 3 Oct 2023 22:33:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D26E3B2BF
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:45:59 +0000 (UTC)
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E1FAB;
+	Tue,  3 Oct 2023 13:45:57 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-452863742f3so731853137.1;
+        Tue, 03 Oct 2023 13:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696365957; x=1696970757; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a4JUA//MmEG4tfOe5BmsGEUrypRftrVNp99sibsB0mE=;
+        b=kM0JnhD7U0cIpLpJbDWlcyWoXY8d3/2evEFB1su6fz9MVZZGHCPrA+CLdM8lSBxwKI
+         pUFXqV/fmeOf/lBQu60iJWxdI8G3Q+gEpz4so23IVqMOGVY2ZCYFSbWKu0cuppUVBTOX
+         aDI/D75WUGqVoCWtBVCkCOq0Y19QZEiTPx2SgA1j1umGSrLHE1dYAdRQwulUgRIj7X1h
+         iJsDM8cDYojuPCn2lU1lwSEDqEE8jnVzjJknN26jV6h37W7YLu3/VGZiDqfbujdUK+Pg
+         p8cjqjLcl3kIp3sviw9wagSH7yfVi8ORL0NOFZrNWtKssfUhRIbk9bNuhKC4/z0qYvl6
+         c3sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696365957; x=1696970757;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a4JUA//MmEG4tfOe5BmsGEUrypRftrVNp99sibsB0mE=;
+        b=pF8olKgZy+R3wW/1YAs8Vks8K74qr5HPwBji8NoF4bQzA7PoAow/uRomj5qXNYFMep
+         aaNnhHr303CeVs+Qujxq9trkWufhqMLbn8FUGU6Efd57P9cv2e+B3ZOTFMhNSSlZybSb
+         gIKXr6KHGpfUrAiFmKQOO95gvvBBvXw+XQJhdO3A4vr163L5rLd4jIDQ7G0+ApcyhFop
+         3aSoT22CYvaRnGVjinZ932ew2VqbWtjmKbSSghoYit/i0TUWIM/MJcJ9pNWTwHEnoAH9
+         eArN+kaWXs3IBBiReuFAs9kvhY1WLIc1EDHgif0FmaWaIg7sgOku4A2hYy4lfiUSnhCm
+         YqHw==
+X-Gm-Message-State: AOJu0YzZylDSA3BxNulygc2IaZFJaY9zKRhUfhmWWpg2iou/Ch+8Poio
+	dJJRyJXEaVqy/C5hOjCMSwzoK18p3HXJ0lXOM7Y=
+X-Google-Smtp-Source: AGHT+IE1Hg6kxbaAnD2mOWBe2+9BPvUW66QqBJkk3o9xu75Lnp9EQwC/+6bK3nwa4mr0BawN2aSGw96VZ1ePvIc578E=
+X-Received: by 2002:a67:f918:0:b0:452:8e07:db61 with SMTP id
+ t24-20020a67f918000000b004528e07db61mr456504vsq.6.1696365956627; Tue, 03 Oct
+ 2023 13:45:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] iavf: Avoid a memory allocation in
- iavf_print_link_message()
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
- <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
-Content-Language: fr
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20230912122201.3752918-1-paweldembicki@gmail.com>
+ <20230912122201.3752918-3-paweldembicki@gmail.com> <ZQCWoIjvAJZ1Qyii@shell.armlinux.org.uk>
+ <20230926230346.xgdsifdnka2iawiz@skbuf>
+In-Reply-To: <20230926230346.xgdsifdnka2iawiz@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Tue, 3 Oct 2023 22:45:45 +0200
+Message-ID: <CAJN1KkwktmT_aV5s8+7i=6CW08R48V4Ru9D+QzwpiON+XF8N_g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/8] net: dsa: vsc73xx: convert to PHYLINK
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <simon.horman@corigine.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 03/10/2023 à 19:14, Jesse Brandeburg a écrit :
-> On 9/23/2023 5:17 AM, Christophe JAILLET wrote:
->> IAVF_MAX_SPEED_STRLEN is only 13 and 'speed' is allocated and freed within
->> iavf_print_link_message().
->>
->> 'speed' is only used with some snprintf() and netdev_info() calls.
->>
->> So there is no real use to kzalloc()/free() it. Use the stack instead.
->> This saves a memory allocation.
->>
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->>   drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 7 +------
->>   1 file changed, 1 insertion(+), 6 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> index 8ce6389b5815..980dc69d7fbe 100644
->> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> @@ -1389,18 +1389,14 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
->>   static void iavf_print_link_message(struct iavf_adapter *adapter)
->>   {
->>   	struct net_device *netdev = adapter->netdev;
->> +	char speed[IAVF_MAX_SPEED_STRLEN];
->>   	int link_speed_mbps;
->> -	char *speed;
->>   
->>   	if (!adapter->link_up) {
->>   		netdev_info(netdev, "NIC Link is Down\n");
->>   		return;
->>   	}
->>   
->> -	speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
->> -	if (!speed)
->> -		return;
->> -
->>   	if (ADV_LINK_SUPPORT(adapter)) {
->>   		link_speed_mbps = adapter->link_speed_mbps;
->>   		goto print_link_msg;
->> @@ -1452,7 +1448,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
->>   	}
->>   
->>   	netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
->> -	kfree(speed);
->>   }
->>   
->>   /**
-> 
-> Hi Christophe!
-> 
-> I had a slightly different proposal that gets rid of all the -Wformat=2
-> warnings in this code by using kasprintf to handle the varying string
-> lengths.
-> 
-> any thoughts about this instead and drop yours? I'm less worried about
-> the "extra allocation" here in this function since it's slow path, and
-> the same comment applies to your patch as well.
+=C5=9Br., 27 wrz 2023 o 01:03 Vladimir Oltean <olteanv@gmail.com> napisa=C5=
+=82(a):
+>
+> On Tue, Sep 12, 2023 at 05:49:36PM +0100, Russell King (Oracle) wrote:
+> > On Tue, Sep 12, 2023 at 02:21:56PM +0200, Pawel Dembicki wrote:
+> > > +static void vsc73xx_phylink_mac_link_up(struct dsa_switch *ds, int p=
+ort,
+> > > +                                   unsigned int mode,
+> > > +                                   phy_interface_t interface,
+> > > +                                   struct phy_device *phydev,
+> > > +                                   int speed, int duplex,
+> > > +                                   bool tx_pause, bool rx_pause)
+> > > +{
+> > > +   struct vsc73xx *vsc =3D ds->priv;
+> > > +   u32 val;
+> > > +
+> > > +   if (speed =3D=3D SPEED_1000)
+> > > +           val =3D VSC73XX_MAC_CFG_GIGA_MODE | VSC73XX_MAC_CFG_TX_IP=
+G_1000M;
+> > > +   else
+> > > +           val =3D VSC73XX_MAC_CFG_TX_IPG_100_10M;
+> > > +
+> > > +   if (interface =3D=3D PHY_INTERFACE_MODE_RGMII)
+> > > +           val |=3D VSC73XX_MAC_CFG_CLK_SEL_1000M;
+> > > +   else
+> > > +           val |=3D VSC73XX_MAC_CFG_CLK_SEL_EXT;
+> >
+> > I know the original code tested against PHY_INTERFACE_MODE_RGMII, but
+> > is this correct, or should it be:
+> >
+> >       if (phy_interface_is_rgmii(interface))
+> >
+> > since the various RGMII* modes are used to determine the delay on the
+> > PHY side.
+> >
+> > Even so, I don't think that is a matter for this patch, but a future
+> > (or maybe a preceeding patch) to address.
+> >
+> > Other than that, I think it looks okay.
+> >
+> > Thanks.
+> >
+> > --
+> > RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> > FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>
+> I also agree with adding one more patch to this which converts to
+> phy_interface_is_rgmii(). Pawe=C5=82: there was a recent discussion about
+> the (ir)relevance of the specific rgmii phy-mode in fixed-link here.
+> https://lore.kernel.org/netdev/ZNpEaMJjmDqhK1dW@shell.armlinux.org.uk/
 
-kasprintf() is much better.
-
-> 
-> your patch still shows these errors
-
-I built-tested the patch before sending, so this is strange.
-
-However, I got a similar feedback from Greg KH and the "kernel test 
-robot" for another similar patch.
-
-What version of gcc do you use?
-I use 12.3.0, and I suspect that the value range algorithm or how the 
-diagnostic is done has been improved in recent gcc.
-
-The other report was from 11.3.0.
-
-CJ
-
->> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c: In function ‘iavf_virtchnl_completion’:
->> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:60: warning: ‘%s’ directive output may be truncated writing 4 bytes into a region of size between 1 and 11 [-Wformat-truncation=]
->>   1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
->>        |                                                            ^~
->>   1447 |                          link_speed_mbps, "Mbps");
->>        |                                           ~~~~~~
->> In function ‘iavf_print_link_message’,
->>      inlined from ‘iavf_virtchnl_completion’ at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1965:4:
->> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:17: note: ‘snprintf’ output between 7 and 17 bytes into a destination of size 13
->>   1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
->>        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->>   1447 |                          link_speed_mbps, "Mbps");
->>        |                          ~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> 
-> <my iavf patch pasted as a quote so my mail client won't wrap the lines...>
-> 
-> 
->> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> index 8ce6389b5815..82b84a93bcc8 100644
->> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
->> @@ -1378,8 +1378,6 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
->>                                    VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2);
->>   }
->>
->> -#define IAVF_MAX_SPEED_STRLEN  13
->> -
->>   /**
->>    * iavf_print_link_message - print link up or down
->>    * @adapter: adapter structure
->> @@ -1397,10 +1395,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
->>                  return;
->>          }
->>
->> -       speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
->> -       if (!speed)
->> -               return;
->> -
->>          if (ADV_LINK_SUPPORT(adapter)) {
->>                  link_speed_mbps = adapter->link_speed_mbps;
->>                  goto print_link_msg;
->> @@ -1438,17 +1432,17 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
->>
->>   print_link_msg:
->>          if (link_speed_mbps > SPEED_1000) {
->> -               if (link_speed_mbps == SPEED_2500)
->> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "2.5 Gbps");
->> -               else
->> +               if (link_speed_mbps == SPEED_2500) {
->> +                       speed = kasprintf(GFP_KERNEL, "%s", "2.5 Gbps");
->> +               } else {
->>                          /* convert to Gbps inline */
->> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
->> -                                link_speed_mbps / 1000, "Gbps");
->> +                       speed = kasprintf(GFP_KERNEL, "%d Gbps",
->> +                                         link_speed_mbps / 1000);
->> +               }
->>          } else if (link_speed_mbps == SPEED_UNKNOWN) {
->> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%s", "Unknown Mbps");
->> +               speed = kasprintf(GFP_KERNEL, "%s", "Unknown Mbps");
->>          } else {
->> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
->> -                        link_speed_mbps, "Mbps");
->> +               speed = kasprintf(GFP_KERNEL, "%d Mbps", link_speed_mbps);
->>          }
->>
->>          netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
-> 
-> 
-> 
-
+I plan to make rgmii delays configurable from the device tree. Should I?
+a. switch to phy_interface_is_rgmii in the current patch?
+b. add another patch in this series?
+c. wait with change to phy_interface_is_rgmii for patch with rgmii
+delays configuration?
 
