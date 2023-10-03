@@ -1,48 +1,51 @@
-Return-Path: <netdev+bounces-37774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DA87B7177
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 21:03:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F44F7B71BB
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 21:28:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id D31D11F2126D
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:03:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5059F2812C9
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D94E3CCED;
-	Tue,  3 Oct 2023 19:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70AA3CD00;
+	Tue,  3 Oct 2023 19:28:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD8D3C688
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 19:03:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59B56C433C7;
-	Tue,  3 Oct 2023 19:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47943CCF9
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 19:28:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C0FC433C8;
+	Tue,  3 Oct 2023 19:28:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696359780;
-	bh=suZXgFxQ4zV1QYIU40dPflLZY9Mx9HOz24DVnFy6DRc=;
+	s=k20201202; t=1696361323;
+	bh=F1gwlPMep2jVFplQsk4/rGDk2KWelsDBRqVu/4PVoV4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=U1jHvBUY9yOEnlptDs42Z3K9NHB0aPr83aH4+gx+5K1pXzP7/+o6Xo4P2osWReDjJ
-	 Fk9ghuW7MemB3U0NphT0aUa4inxB8Rzu8R6rP7r6MHApF2w9pyrfJfSnbjZZoTClKc
-	 mC2IaxmoFPmUNQZGPTDDhTDuxj9jWxeLgLbzJ7hXXL3Ub6+jjAQLqaSUtCakDnG009
-	 XQKOWv6m06boHpwTgyUHQj+4T0OJwhKbJwZDwELwYPwuB5/UQhRLERfCK0jrVQwB03
-	 3EFpnGmdciEwTITQMDRYM9QGXX05dDlzTdZGOdGnnr7p8gIgK2GeC5HPK+/0TK0N9B
-	 /3bVeGhH7jR5w==
-Date: Tue, 3 Oct 2023 12:02:59 -0700
+	b=Hw3nKo7mnYqc28JgqukwZBUTFavxVpHQ67YOOJlkQ6FdQy2aFb1GFt8/Z5IorU9gY
+	 CQY48gksmUqO6gSBgXlFmFI+2EDwRhT5wU4uEh7toMHwHqzCGXqaSqAxSW3Vu0DcqG
+	 0mnyMQ+IUftnn/mI1la59KBvxFnVIcBHs6hsJDIOMf90MQfZRFioW4rjm7bETmAIO6
+	 NvI4XrGoGLxBKSzfs6TSyoB8yNeI5TxWFGhmF25ZohlFDA0Wu3CO9XcJvVbeewHpW3
+	 +qFFKKl43vcIYXnM+A0VEqFT42czqLC5YJhYRZhaK//DzT0R8rkvRyGBSYa1NQxW53
+	 T4/R118rD9sbg==
+Date: Tue, 3 Oct 2023 12:28:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Chuck Lever III <chuck.lever@oracle.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Linux NFS Mailing List
- <linux-nfs@vger.kernel.org>, Lorenzo Bianconi
- <lorenzo.bianconi@redhat.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
- <neilb@suse.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v8 1/3] Documentation: netlink: add a YAML spec for
- nfsd_server
-Message-ID: <20231003120259.39c6609a@kernel.org>
-In-Reply-To: <F39762FD-DFE3-4F17-9947-48A0EF67B07F@oracle.com>
-References: <cover.1694436263.git.lorenzo@kernel.org>
-	<47c144cfa1859ab089527e67c8540eb920427c64.1694436263.git.lorenzo@kernel.org>
-	<20231003105540.75a3e652@kernel.org>
-	<F39762FD-DFE3-4F17-9947-48A0EF67B07F@oracle.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "shenjian (K)" <shenjian15@huawei.com>, <davem@davemloft.net>,
+ <ecree.xilinx@gmail.com>, <andrew@lunn.ch>, <hkallweit1@gmail.com>,
+ <saeed@kernel.org>, <leon@kernel.org>, <netdev@vger.kernel.org>,
+ <linuxarm@huawei.com>, "Sabrina Dubroca" <sd@queasysnail.net>
+Subject: Re: [RFCv8 PATCH net-next 00/55] net: extend the type of
+ netdev_features_t to bitmap
+Message-ID: <20231003122841.28e0c647@kernel.org>
+In-Reply-To: <79b08cc9-fac0-ca87-2ea5-a86d9b28aa12@intel.com>
+References: <20220918094336.28958-1-shenjian15@huawei.com>
+	<20221125154421.82829-1-alexandr.lobakin@intel.com>
+	<724a884e-d5ca-8192-b3be-bf68711be515@huawei.com>
+	<20221128155127.2101925-1-alexandr.lobakin@intel.com>
+	<d250f3b2-a63e-f0c5-fb48-52210922a846@intel.com>
+	<0352cd0e-9721-514d-0683-0eed91f711d7@huawei.com>
+	<79b08cc9-fac0-ca87-2ea5-a86d9b28aa12@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,13 +55,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 3 Oct 2023 18:40:29 +0000 Chuck Lever III wrote:
-> I've made similar modifications to Lorenzo's original
-> contribution. The current updated version of this spec
-> is here:
+On Mon, 18 Sep 2023 16:25:14 +0200 Alexander Lobakin wrote:
+> > Would you like to continue the work ? I thought I could finish this work
+> > as soon as possible, but in fact, there is a serious time conflict.  
 > 
-> https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git/commit/?h=nfsd-next&id=55f55c77f624066895470306898190f090e00cda
+> Oh well, I'm kinda overloaded as well (as always) and at the same time
+> won't work with the code during the next month due to conferences and
+> a vacation :z :D
+> Would I take this project over, I'd start working on it no sooner than
+> January 2024, so I don't think that would be a good idea.
+> 
+> Anyone else? +Cc Sabrina, there's "netdev_features_t extension"
+> mentioned next to her name in one interesting spreadsheet :D
 
-Great! I noticed too late :)
-Just the attr listing is missing in the spec, then.
+FTR Olek brought this topic up at netconf and the conclusion/Eric's
+guidance was to deprioritize this work. Instead focus on cleaning up
+things which are currently in features but do no need to be accessed 
+in generic fast paths.
 
