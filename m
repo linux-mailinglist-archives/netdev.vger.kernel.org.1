@@ -1,74 +1,119 @@
-Return-Path: <netdev+bounces-37672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4C997B6937
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:42:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 026247B6944
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 75F8F28164F
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:42:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A83C528158E
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08E3208BF;
-	Tue,  3 Oct 2023 12:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C92821361;
+	Tue,  3 Oct 2023 12:44:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D46FA2915;
-	Tue,  3 Oct 2023 12:42:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B168EC433C7;
-	Tue,  3 Oct 2023 12:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2C61F934
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:44:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7789CC433C7;
+	Tue,  3 Oct 2023 12:44:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696336923;
-	bh=n/gvnyDmLNOIdHGyVUG1n2iNubomaubRw/p9BmDO7/g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HKJXrHdnzKRXkdfldlO23qFPVJN7Re1Fi3VXGg+AcwxekTWjIMN+/vlLSNv+xslCe
-	 p/4ifCyC1XWBVV7u5zwV0TnihImgXntCOfJRs2fm8cT4rplPfaETqqxh0FKq4iT4oC
-	 UYytDe7RArUIiChhg2BEGm9HxS1k07uwedvH7Q41LJd2Gf2fIj3UMTmKGwJx2UzbVT
-	 ZoWKnU6D876pl+vuKAOaqK6ZvO4eqk6LRG31JAQ+8znk65tc3/2Fuj/7quQ5x+jfIJ
-	 NPFOhWFtWGu1zJyQFuoreV2ptq30ZiR9eaPJmcO5vtl0EFTQNdZyIX7H/EJR/YuV5m
-	 WzSFfzb4nfttg==
-Date: Tue, 3 Oct 2023 05:41:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, bpf <bpf@vger.kernel.org>,
- Networking <netdev@vger.kernel.org>, "davidhwei@meta.com"
- <davidhwei@meta.com>
-Subject: Re: Sockmap's parser/verdict programs and epoll notifications
-Message-ID: <20231003054156.52816535@kernel.org>
-In-Reply-To: <651ba39d55792_53e4920861@john.notmuch>
-References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
-	<64b4c5891096b_2b67208f@john.notmuch>
-	<CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
-	<64ff278e16f06_2e8f2083a@john.notmuch>
-	<CAEf4Bzb1fMy5beHKxCjvoeCqaYmQFvnjnMi9bgWoML0v27n3SQ@mail.gmail.com>
-	<651ba0f13cb51_4fa3f20824@john.notmuch>
-	<651ba39d55792_53e4920861@john.notmuch>
+	s=k20201202; t=1696337092;
+	bh=yxVFqdrVypVYPhUgP12T4SsGPkXaA4vzqa7NeiFSR9w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=M0i4klhBXUIXUlg47tK0NRlTedyhHHdA8YYeevRcp1em7QNl37cFoRiT09JUuHAUL
+	 2+M+SNVyeHFBJB83Kdwe+NgXCXeznXXPiWUkH/4O3GbcpW2iUNYxvhTI5CSYlvGggr
+	 TBJHhRq53IcM0BHSRxI880efmAs/RoabBsEgEA3IKd5GR4uaFSSwLI3j1ivaRhwSyc
+	 2DK/S0gqAmq3REMhlNcBFn100K10pcBjNF8+8van2GMGRq1ZdF+dAZroOeIEiYcnzD
+	 JOiVbo0QITiuBTMCjCpAtLrOkTJiB6w0dNtxsUbO5ukafcpcFRRAV2vOF/5nXKDAa3
+	 epvChKHD2eRrQ==
+Date: Tue, 3 Oct 2023 14:44:48 +0200
+From: Simon Horman <horms@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org,
+	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: Re: [PATCH nf] netfilter: handle the connecting collision properly
+ in nf_conntrack_proto_sctp
+Message-ID: <ZRwMwFgCCM3nMeBG@kernel.org>
+References: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
 
-On Mon, 02 Oct 2023 22:16:13 -0700 John Fastabend wrote:
-> > This with the other piece we want from our side to allow running
-> > verdict and sk_msg programs on sockets without having them in a
-> > sockmap/sockhash it would seem like a better system to me. The
-> > idea to drop the sockmap/sockhash is because we never remove progs
-> > once they are added and we add them from sockops side. The filter
-> > to socketes is almost always the port + metadata related to the
-> > process or environment. This simplifies having to manage the
-> > sockmap/sockhash and guess what size it should be. Sometimes we
-> > overrun these maps and have to kill connections until we can
-> > get more space.
+On Sun, Oct 01, 2023 at 11:07:48AM -0400, Xin Long wrote:
+> In Scenario A and B below, as the delayed INIT_ACK always changes the peer
+> vtag, SCTP ct with the incorrect vtag may cause packet loss.
+> 
+> Scenario A: INIT_ACK is delayed until the peer receives its own INIT_ACK
+> 
+>   192.168.1.2 > 192.168.1.1: [INIT] [init tag: 1328086772]
+>     192.168.1.1 > 192.168.1.2: [INIT] [init tag: 1414468151]
+>     192.168.1.2 > 192.168.1.1: [INIT ACK] [init tag: 1328086772]
+>   192.168.1.1 > 192.168.1.2: [INIT ACK] [init tag: 1650211246] *
+>   192.168.1.2 > 192.168.1.1: [COOKIE ECHO]
+>     192.168.1.1 > 192.168.1.2: [COOKIE ECHO]
+>     192.168.1.2 > 192.168.1.1: [COOKIE ACK]
+> 
+> Scenario B: INIT_ACK is delayed until the peer completes its own handshake
+> 
+>   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+>     192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+>     192.168.1.2 > 192.168.1.1: sctp (1) [INIT ACK] [init tag: 3922216408]
+>     192.168.1.1 > 192.168.1.2: sctp (1) [COOKIE ECHO]
+>     192.168.1.2 > 192.168.1.1: sctp (1) [COOKIE ACK]
+>   192.168.1.1 > 192.168.1.2: sctp (1) [INIT ACK] [init tag: 3914796021] *
+> 
+> This patch fixes it as below:
+> 
+> In SCTP_CID_INIT processing:
+> - clear ct->proto.sctp.init[!dir] if ct->proto.sctp.init[dir] &&
+>   ct->proto.sctp.init[!dir]. (Scenario E)
+> - set ct->proto.sctp.init[dir].
+> 
+> In SCTP_CID_INIT_ACK processing:
+> - drop it if !ct->proto.sctp.init[!dir] && ct->proto.sctp.vtag[!dir] &&
+>   ct->proto.sctp.vtag[!dir] != ih->init_tag. (Scenario B, Scenario C)
+> - drop it if ct->proto.sctp.init[dir] && ct->proto.sctp.init[!dir] &&
+>   ct->proto.sctp.vtag[!dir] != ih->init_tag. (Scenario A)
+> 
+> In SCTP_CID_COOKIE_ACK processing:
+> - clear ct->proto.sctp.init[dir] and ct->proto.sctp.init[!dir]. (Scenario D)
+> 
+> Also, it's important to allow the ct state to move forward with cookie_echo
+> and cookie_ack from the opposite dir for the collision scenarios.
+> 
+> There are also other Scenarios where it should allow the packet through,
+> addressed by the processing above:
+> 
+> Scenario C: new CT is created by INIT_ACK.
+> 
+> Scenario D: start INIT on the existing ESTABLISHED ct.
+> 
+> Scenario E: start INIT after the old collision on the existing ESTABLISHED ct.
+> 
+>   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 3922216408]
+>   192.168.1.1 > 192.168.1.2: sctp (1) [INIT] [init tag: 144230885]
+>   (both side are stopped, then start new connection again in hours)
+>   192.168.1.2 > 192.168.1.1: sctp (1) [INIT] [init tag: 242308742]
+> 
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
 
-That's a step in the right direction for sure, but I still think that
-Google's auto-lowat is the best approach. We just need a hook that
-looks at incoming data and sets rcvlowat appropriately. That's it.
-TCP looks at rcvlowat in a number of places to make protocol decisions,
-not just the wake-up. Plus Google will no longer have to carry their
-OOT patch..
+Hi,
+
+as a fix I wonder if this warrants a Fixes tag.
+Perhaps our old friend:
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
