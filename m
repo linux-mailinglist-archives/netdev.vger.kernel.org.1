@@ -1,247 +1,311 @@
-Return-Path: <netdev+bounces-37772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E75EC7B7132
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:40:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239B07B716C
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 21:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id C6B201C20429
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 18:40:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E22E6281353
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB3C3C6B3;
-	Tue,  3 Oct 2023 18:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E663CCEF;
+	Tue,  3 Oct 2023 19:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C183B797
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 18:40:46 +0000 (UTC)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48B7090;
-	Tue,  3 Oct 2023 11:40:40 -0700 (PDT)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 393I4A2S025017;
-	Tue, 3 Oct 2023 18:40:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=aDImBqT3y2BuYwZjckboYeATr6G+ZBw/VunCBaoFSX0=;
- b=WtDSUeU5c83bmr17AOHfIzqHB6yXd3pR54mNRVTDsM1F2SWIIMTX5nMG25HlQJe3nkm+
- 81xV85AfHubKNcHJWh8VC7d7Ftj9zn5XH5sv+VseHKTTjhMYYsEv3W0A5edx4jMLF1E+
- x1uC+IiB7WDckt+iNV1h7r0blk9k65cCYGcYF5IKL86IQPIMMMQ/WwtzD7H15NlBy+Eg
- U7chQJG+++X1MFHPfoaC7tV+C5XO4IhEBDHdhLyfhsfo+WA1CvUixe4qAElvfKt2vUnM
- JN3aXUECC47RAy3WO6FLyL404f/hciHq+Lw77JDD8hKm/CVxMMPgqduvRJAU/mh6rGqE Hg== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tebqdwfa6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 03 Oct 2023 18:40:32 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 393IA9MO002942;
-	Tue, 3 Oct 2023 18:40:31 GMT
-Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2175.outbound.protection.outlook.com [104.47.73.175])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3tea46en7d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 03 Oct 2023 18:40:31 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C20D2EB;
+	Tue,  3 Oct 2023 19:00:20 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2052.outbound.protection.outlook.com [40.107.7.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA91DAC;
+	Tue,  3 Oct 2023 12:00:18 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mPmovMcs3QmRqZQSmssk4FYwLpHg3W0O39Xr+TAlEANKLFbARAlWUxdAgKTnfwe0WSFNpLemb3B0tyYLHPd7LiV2JjRR9VdQMX55bRLshiahwlwB8bbMTaTi+OmlusdEkqsCj6WigsOxTKQSuyXI2ZqLKVpp/63XLPpoZhxLx/cmPGwAUq2CraW0qGYyjadgFkomCfenH6h8Yentrjapk/tl9z3k+8POmgla8KuoB0LlkjmXM1AgojtBDnObhNDbpc66VymVQ3i8LWIK51U8xOIvM+ohZEzXbpSIQ7Qq9GADRzju/mxl0ZJuaCU+dekMdjEgv4eiCvICG3jy7Hm0rA==
+ b=JTNmfuU73dGdaUTEQMDSPlS8wvUcmtlR7GLnaEVPgDJhEKff9Xt6LjSg+GCGxDqafu8EcdlFp3dKu9wuy3JsBOO04+41n/aHNH0VjP6HqIVM6HBo5JN79mJqHABK50u0JmZn5c3VoVK3ufZY4y1PXvyqSdXXPUYNbD3SgKipopdcdjXYY4sf7dFNvY/MU7m0VLkkmoUVLM4HZXEFpQhcY8H1cYmCbPbhqUdpcXDoan1oDNAx4MHrSWLvXWgYZ//qThxd1/Xn7i0uc/Pcgux2HaRHCBemIVeeTJpjerEOZXo9pBzepTz2puPCLzTQzeBsk7fnVbTqGaFLkgnuItRinQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aDImBqT3y2BuYwZjckboYeATr6G+ZBw/VunCBaoFSX0=;
- b=lI9t21jKbNU+0ddVdWbkbzTbszb9auMlIwq7oxEu3Wst5/L68inQ6IrK/fpejicCf7jYkcrKzsf/cEJ5IHRzIDVsd6LnepNyX9klTygb1vxvfSPKO1zWq/mUe1GyeNmJ6dOYtKym2SwLBrwAc7hownTtGW0sYPG8l+9bI6MVkrda+trvTluwT9r+5AQdScfB3cG8BE8YSdFchhpPXYz8B4n4NOg1dqLl7IXhQJd4g6QL4SxCcJ9p5X8KR+zNmD6MkDnWIdEM33C6giWuVJylpsf4TG3ZAWXJrZqR8N3yfm9O56HNO4fYPrXjRlR5vG77QIEVdb0xIaJ0nYn2b0+WVw==
+ bh=1K1YIBXLpiGiaPbBgTppXChGoM10jt0oyFscOiQ7AeM=;
+ b=YgsCia3fZl5Wodt2Ll4wPKwemyBV9on3u29BkmVNTm585Bdw7rN0qjPYmm1BWLaFjakX0dKaNWyvcRIf8JpYRrdGAa3VJKyhBeCp9mAKaI8cbktc8jNPBYrbMTHuNQzBelyYQMdDI/0CVx+g0en6Rx4kZ5W/Vju5uZKmsIq2lqRSzMBlXhUkUtjCqhsA5zOn9TMMHkPx9uxBuXLpm+FReKmmwRiEClA+zoVR7k93IJKJCjTJg8ULGN9oW6iWvzvRb0bUyNkTpSZRGh0CrRrrG+gDl2t+qgfHoX8qHnuy7z37NyWR5jDTi8sCpmkT0px63TkO+hfvE6pfNMqbSffBgw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aDImBqT3y2BuYwZjckboYeATr6G+ZBw/VunCBaoFSX0=;
- b=bxKzorG5BqeRI+b4X+Cuh02v8W+2V4bMNsZZZs/zbfWqu85nDfRnK4AiWsoAfJzum932zPPR5UJh30xBAXwsFR+gGhudKmp0+/DKkwYDAcWhLnlUiYHNh7BIxPlIADMrYh1x0qBls28D1GW5hY6Jp8SDrO6lqVkpSweMp3PfbN8=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DS0PR10MB6149.namprd10.prod.outlook.com (2603:10b6:8:c7::21) with
+ bh=1K1YIBXLpiGiaPbBgTppXChGoM10jt0oyFscOiQ7AeM=;
+ b=MOpeM6UYof0XeaQxFpbMB9thCjK0Us2kkDVIrrqcLp927p+MaSwvfWPFYFRqSD6y0zOY1mhIdLkb/6wp8MI7UJ+d5jl9SX/5TKlGU1JxjSXEeqhPCNzF+cNhZutSfze/JisLnAWSq/q7nw/oS+LPZxLLUM6L6iALv1OgV6nw5iE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM8PR04MB8036.eurprd04.prod.outlook.com (2603:10a6:20b:242::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.21; Tue, 3 Oct
- 2023 18:40:29 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::bffc:4f39:2aa8:6144]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::bffc:4f39:2aa8:6144%5]) with mapi id 15.20.6813.027; Tue, 3 Oct 2023
- 18:40:29 +0000
-From: Chuck Lever III <chuck.lever@oracle.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>,
-        Linux NFS Mailing List
-	<linux-nfs@vger.kernel.org>,
-        Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-        Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH v8 1/3] Documentation: netlink: add a YAML spec for
- nfsd_server
-Thread-Topic: [PATCH v8 1/3] Documentation: netlink: add a YAML spec for
- nfsd_server
-Thread-Index: AQHZ5K6VS5KBJ72dikWpg4qvkMdvd7A4fEcAgAAMeAA=
-Date: Tue, 3 Oct 2023 18:40:29 +0000
-Message-ID: <F39762FD-DFE3-4F17-9947-48A0EF67B07F@oracle.com>
-References: <cover.1694436263.git.lorenzo@kernel.org>
- <47c144cfa1859ab089527e67c8540eb920427c64.1694436263.git.lorenzo@kernel.org>
- <20231003105540.75a3e652@kernel.org>
-In-Reply-To: <20231003105540.75a3e652@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3731.700.6)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|DS0PR10MB6149:EE_
-x-ms-office365-filtering-correlation-id: badbe99e-3b8f-49e7-b884-08dbc440377f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- pwrRM8rIKC60R+JApC07uCMOoZiPULYnrDMxiCopIuXmDDDgWNd/MyL2dW/P29So7nWcqCA9orLJztv/9VLWkKTNDb4lVuOcsg7bhF/GZU0cCSZsfuYYQ7HucNIxVYGj6g2zgPyVw3J+huXyy2BzmMKMw7lX+qgNn9OkRXmgrcwZt1/8y3t3ZxsNh+kTo1COMXLRi4AygE+ulSHD06Kq5jKS0+do5PbusblqWvzh0Zxk3h16PMnas3/LJbwc8+1BzCVeIL/UCUB6OdaJo27GY8uBNaK6fU0w27aFZU7XZss+Zj1Zu5d/a4x8YbdNzsTYciptW8HBIDRl68FPrcxDGO9+oAMzIaWswxifyeq8XwxPUecbIq6odPO6H3cQtRdRllWhrFp5w2PwY9dhzIHkHwOegCKDRLpCztBVdSaABNlH8EeGzW7KaQMI8Ff0BDBQkHk6W0wLrtFbWymgzcEMNt6bYEfxmb5uJp8SJi7s/v5wunMcfkoukwipGPW58ka5bW88O8eYdpHLbsGDjaQ2e+SPUOeuFZOe8k+m60DcF/i1NFd2bQNyKKEBq4rZzBB/4l7vSEKuyza9zdjJMsd1G+PJgVcj3AwqU45SrX/CbjVnFBkBuPqMM+INHypbEVVXAzfBV6NjH/YTQBdNRntlBA==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(136003)(396003)(346002)(376002)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(64756008)(33656002)(36756003)(86362001)(2906002)(38070700005)(38100700002)(478600001)(6486002)(6512007)(8936002)(53546011)(2616005)(26005)(71200400001)(6506007)(54906003)(66946007)(66556008)(41300700001)(4326008)(8676002)(76116006)(66446008)(66476007)(122000001)(83380400001)(316002)(5660300002)(6916009)(966005)(91956017)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?TJ+1Wxu60blucDxXxC6kPttNxr/7P06vzhmCABW84hFPa8RR8hWU4Bau9lrE?=
- =?us-ascii?Q?iRWEiL0O09inbmsGPN084grVXyWdn7dNWFNYTqG6yRsW2H5TvzB2RSRk+f4c?=
- =?us-ascii?Q?QjDtIhJ95oYH8rTavdky+l/417fGmW4uz6BUFZKbPwbd3IpcWFirDc7s2AuQ?=
- =?us-ascii?Q?7OSKqddRZliVYQnGCkAEE9RdOIEted4epcSKEG/MJ0v6YxyYKWSzkckgy+eM?=
- =?us-ascii?Q?ly10AND7c76SozUFU9Cb9VrR3jQWngQ1PIgQnGtYdMUgdwxB4kBkZVwN8uLZ?=
- =?us-ascii?Q?4auepgw4AqhCLFiLNAM3yzQdbyOIAf2kQmrh5RJyCSqG+Fl1mtTR4buburXo?=
- =?us-ascii?Q?mUM33M/eThOOp45SMd1W46Sos/T1kx99+1iR4bx9ZNrYNRR/Bpx8XHABxbIs?=
- =?us-ascii?Q?U5CgSrGCG0m6zZvs+B23bL7Vjp/Y8aulrOMia76YB9iZFQTavGnwlXxQjjjF?=
- =?us-ascii?Q?ZxZTEmr2rMfG9eVccZsMCe+VFORVxHmhRChtlkfhRrFEJB3A7vnsUxAy0Jyw?=
- =?us-ascii?Q?GNDN4V1wy8dfD+AqL+Ju93ru8/aKrIf0rJLD2seyGSR3SEPzAyw9HhZYKkik?=
- =?us-ascii?Q?QZHe2NNQcVN3K7eMpEmpA8A8qPca51fIv6EvQvq6lekHzxdi0L1XAPoTp9/B?=
- =?us-ascii?Q?kMHxXbVA/EpU/cVz4MHREGuBMHvux7/uHE4czdtKXWLgTQ9LaoZ5nuaKTFJg?=
- =?us-ascii?Q?DeZRxQXW7BA0dmIUO/Y15hUPBdlEGj+E/5mFLM5c7nMqPEys3tO+nf2XzIwk?=
- =?us-ascii?Q?04PBZpqdL4i0lnhjhb756CYG31RkvTR4E45rT3j7uqHq4KIPwgO69kmEsTlb?=
- =?us-ascii?Q?TFDxaBkfemNPwiTtYAKr7KvsqKxgbfOW9Vp/2akezXG0yKV+rpJWZgUcaLGY?=
- =?us-ascii?Q?pRNs2ADMP9icaBns+FMRHQZmJWH5JV0u4t+itjI6eYUkhP/935I7wrHZIuZL?=
- =?us-ascii?Q?OyeGCY8VSB6F3A8qORy456dHDMvwPbRlQdj7awAZvGOqaHZgELPo4z69ZCXg?=
- =?us-ascii?Q?EYmW0iiNSDVNiKQcvB4zvdFgvVUMnySSoEMrClr03OOXQhLusyZ3nz06ZP+0?=
- =?us-ascii?Q?s+CP4DuxnXKWlcDo9UGX8+jLV9iT6vXqNLizZc0SAgjhprsSqNi3Qg1G/DQK?=
- =?us-ascii?Q?IuY7uKzfXbM5Ow4bQWTwbfQjguVEHGkX64pp1pCO/rzdFiGtJiioDVzxR3Eh?=
- =?us-ascii?Q?Wdbtt/qgW1OPkYcxeJAzx/WpgJ3qYsvmvb3eAN45Q+Si7XgJgnUq9GXZsPgO?=
- =?us-ascii?Q?oEnJybX/8FRgQGgHBKOj/fZxice3PZXlcknRwVeJ4KK7Ht3Pimcr+pZlki9M?=
- =?us-ascii?Q?EZAcsPhAIfQRKgQO/bda1YdAzhoHON7YYq66o6dZl41owdCSBIWWKk38xPfw?=
- =?us-ascii?Q?Iea0TGrNqrewRxDRGx0sdG6FRD0mOZD8Dg5S/WqZIIfRp6i0mOoN+3Tpd1jX?=
- =?us-ascii?Q?zv6NScANUQM14aikl8eNDWxLe6lNYMxY3NogKvcebbw2F5CLg2l9Mqq1mg01?=
- =?us-ascii?Q?/tbT6U+1psAqYQ65xzmzu5ldMqo37yFcjk1UfviVqui5Z9YlzkFRRu1iuq7k?=
- =?us-ascii?Q?rfwFd0xDCB4n2n5ff22Ds2/+134FR/bB0MLHo5/EC6swVExn6ToHpLcM4jQJ?=
- =?us-ascii?Q?0w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <FDCD5BCFFF6D5B4E9895436177B412BC@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Tue, 3 Oct
+ 2023 19:00:16 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::568a:57ee:35b5:e454%3]) with mapi id 15.20.6838.024; Tue, 3 Oct 2023
+ 19:00:15 +0000
+Date: Tue, 3 Oct 2023 22:00:11 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH v2 net-next 15/15] net: pcs: lynx: use MTIP AN/LT
+ block for copper backplanes
+Message-ID: <20231003190011.jcpahazy3uqlz7q4@skbuf>
+References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-16-vladimir.oltean@nxp.com>
+ <ZRwTwd18xWczDnur@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZRwTwd18xWczDnur@shell.armlinux.org.uk>
+X-ClientProxiedBy: FR3P281CA0136.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:95::9) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	uzi6UQmdOoDR5PyifJFR2fnjnl4vogGf2evrFJntk9F1qObO2rCQGz9a74Na1jnCi3tPz3SET+ylDpw7cuWmitoAbkONGFQEKV3eo01gC3UhR9khfgOXlrH+Vo6wPmBc0hJGTAJu0rov/N1kLHplFBcRZyvv5T1si0BIY/9GqS2NqBIaSKni2VDAb2KDkZyeK9AlOjq74lxZ9wN8+/kqQLT1dWYyAhg0+tgvKOrYN9FHj2tzwE4mYZHLJLhNKYdvq7QGO7P8u6q6ed3wYqWGg2at00lPUc1IMXLL47rcVmsq/bfjFvT69lotiXO8nnEPDl3A5RDZQ24R6QnEWsaduSr2QBJrHxPLjvJ/V/Pqt5S5MOgA4anRj517GrrsIxoHMGzEMF512fYvsOXrnSloSZ4QaI95fs58ZYF/raVL37UyvuNv0EhtK7l1aKGHn4oXntKDpkDRKOp6sXfyCqTh9PzjrMngaKAE+1RX3k1MXwyhMFD0FZqpPOaKLLP6t7w/5OgbyXthiUSD2i2nzaZDY/fdY1wzdolQXYnsZRDr1SGM12KcN2m4/9uq8vSC5IdNbnUTeUMlwm7dy5AKeFpUfDJasdf74S1nkG4f1BvzFv+G1kbdWk+7qe5L5OOaUW0LTEv+w5TxGBdkS0KX4FW+VIE/ruVUYp0S7AavhdMP84A+10rHDrgO3uGuo7P4kmCk5+L+jqKP2DMZnQhL2cCXDUImUAd2SslCJpGAYbHzn3c/Jcq/InRgnF126b4INTBE1BtiCSZ0sBUndX44cuZXapXdOPLlZzN85DwB34Wbrdgf49itcBE9LA1JRK/MgdG9p7FfMdhu+m8WwmDwXuA9NA==
-X-OriginatorOrg: oracle.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB8036:EE_
+X-MS-Office365-Filtering-Correlation-Id: e3499f29-f438-4a39-da89-08dbc442faab
+X-LD-Processed: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+ RN9XBr2tNe3yJaJp24cYEBWkPxzWQOEl2mp+kFFODJ/gyh7tgsK1zGGhN+Zm0GlCsgSP8O4XubpSQP2HgOdfjGa2tmYDhFzlJSc+C7UdpM4ZOL2TXBL6fQn6DT05T+ofQ3f6vvU5ojgLEQhoPIhwpJ0W7zyEGvyIq3YQpKcrnTs+6OQqReAsXX9b3V2kzBjJ+ObCocxl3x0dlbmw8j9YYFvQOSSMRoQ5Ew/kMe6q10sWG7EXsjYf4qBcrKvv1SWnWCiakvRNPJi7B6f5JgOhK1G87yindvh2h0Ipvjbs1VFoB62FWF87FZF2xqeZClSBrY8PzSpz2XxF22YOB4jBRrIdJYEPAxMwLDgMxQjQ+3umv4dgHjHUae4v6697BG+1pMvKuF3qXqvRndY8JqJletkHrpHfnO8MEgDstpXC0eefC1T76eUDGWo5cIMNJdru9VRnXgSwF7xSwPDRLW5IBi5Pg8ffGtFLH9lPBf+nZwDfcHeZDjD5OiKdkVtT1TV3McbYjHJaHQNuZtFqdnTRra8nJEStsXjowONBcpYeRFE=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(376002)(136003)(366004)(39860400002)(396003)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(7416002)(44832011)(83380400001)(5660300002)(38100700002)(33716001)(86362001)(2906002)(6506007)(41300700001)(66946007)(9686003)(54906003)(66476007)(6666004)(6512007)(6916009)(66556008)(316002)(8676002)(4326008)(8936002)(966005)(6486002)(1076003)(478600001)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?us-ascii?Q?NDfwsjU2b22Xbf1U4SIjfswJObCxXcVyWwW/6eKKYjLrxxho9qIIHf0JwMHb?=
+ =?us-ascii?Q?4PcCqxue5jh4EnI2tCvdGOKmqWkHgPeZweBpktZD9pb1P9hM40kpdgteGGnP?=
+ =?us-ascii?Q?srHIpukvDp9Psmzc8lV8lgl/pNCW3DuTKLy8rb/OYvBIKQEerQAIHSQ6ixsC?=
+ =?us-ascii?Q?3kQMAP5V/QiYzYUpzcsRukhibJMSZ/E+RMvscXJ1LsjlLm2bvcyhGHDPdal6?=
+ =?us-ascii?Q?qmjen5R5nR3LJ/iZJ1t5bBq/5twMkr+UH4i6fccEaC9eTm6eScLieVc7WvfU?=
+ =?us-ascii?Q?jG/nkHvxQ9uxzgAwT7OWz9edENNBarUVVBqpIJyCrZTytaHisVpUDTe0pcIK?=
+ =?us-ascii?Q?HisTgMIXvUrrj2mOwGQ3jKK9RajO5lrJfU4UhG++oy/s90eVO7JghfMVP125?=
+ =?us-ascii?Q?wBuosbsD/VTM8OP1rJ/VDdG65JLgU0jC6JreIkz1zbkveSQ54HmOtMB3U9KV?=
+ =?us-ascii?Q?Exwfu+7PcgmWYcwj3kLpOqYxxPc1l5Hepjbk5dW62jzMXPEqpxfgs0dJY/Ll?=
+ =?us-ascii?Q?oramdCwb3gVQOCUPCNoLIs6cWfb+wIIRYg/ysvDYLx3wxVSaTzLHQ+oa8byd?=
+ =?us-ascii?Q?e/JYHUvmh1Pl+kPzrwtCg8AriK8IZXCnN0pwmlIuQuJCPouUHTmYXflQOjoO?=
+ =?us-ascii?Q?ELeFxOAUCN/+QT0u1F/YwUW3cP/1sfmXgdpJTLraQWObaFUiQqzG+/hUxVNs?=
+ =?us-ascii?Q?bo1UPv1TQTfG6Zvt41sLGK/Ym5MqPdg+DXvgDOiJn8U0kLIjR/AwSAMJh9PY?=
+ =?us-ascii?Q?GpCaWRCruspULvr/tC8hxKHLaACYnSc1fDjutd+UTLK5X90diG6aiqyryKUw?=
+ =?us-ascii?Q?gwFJIgKGOgR+o/bmPJchG0+BjzKYYti9udftopCpi0/fZR3TwwgtD/swsDNH?=
+ =?us-ascii?Q?gR0j3aMD8+JjrQu1tR7CdT4rkVWIbobUAnfcL56eJmgKN3LYHM8w5Hu0uemY?=
+ =?us-ascii?Q?7WdkLcF8fEOie19k2p8lOh/Yu2WVk2eP3a7j4mt51Vod0f4ZU6dzE9DztWk1?=
+ =?us-ascii?Q?vtOR3PUR5N2aQlxwD9+ZbJOGydAODkexFmUhGpc+nNakxkkbjcfc2XMz/YLJ?=
+ =?us-ascii?Q?tO/MuLl63tWJScwQdqBMxLkCGTDuymGJGjNS4dgMhmjHLTmyXACsl3qkD8Ti?=
+ =?us-ascii?Q?E+xnpeE74cn09wpn4i/rkWnkIvfU89jBYOA6TWaVim7qv/X1Dol8KEnbRvok?=
+ =?us-ascii?Q?BUTdpEOwt1t7wTpbaKu+mLoeorMXpjGhUFAHZb7W7MZO+OtO7DBYD+B8yhDt?=
+ =?us-ascii?Q?b25h4VjXbtCxAi5hhCRzUiKW92LWW1uawGNur9dZ7g7qGHAWLo3kt9YDEwY7?=
+ =?us-ascii?Q?AH+V2urtJlRAaEmyxHmlFSTHc2ewy7fHBJEOY73VA29wsAO6mbaidjovH2JF?=
+ =?us-ascii?Q?PVVQsdDbjHZWolueTrC88kAuZOtejzfCCirioRThzdZ3IfpfvNpO2cJC4g1J?=
+ =?us-ascii?Q?eKXEh/FGe1sLvCcHTf1DGRE+JgGoKy8QaLPcUDUO/zRzkmsctVKjGD/CJ0vj?=
+ =?us-ascii?Q?kuEzpKH7aZoX/TTe87Xij0ttvV7dOx6WvXpyvD+9igu8+HqiHCM+29mtWa7y?=
+ =?us-ascii?Q?Zxa2HJiga/v7EwaA3zaFHZZYR9/S5YeOZWUdwDbVE7qcQ/jc2X9GOIpYWM9T?=
+ =?us-ascii?Q?0w=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3499f29-f438-4a39-da89-08dbc442faab
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: badbe99e-3b8f-49e7-b884-08dbc440377f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2023 18:40:29.0573
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 19:00:15.7536
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4q57yh0p2b8h06DtHJ4f2kuU6SNH8s2CcOGxevYCZQGpECLFRBwrBbqgh39euCcsZeT1qUrIdRBapsD0sp22Cg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB6149
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-03_15,2023-10-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310030140
-X-Proofpoint-GUID: R_lMzFHgwbG0hl-kLUkDSD-_LHpEu67W
-X-Proofpoint-ORIG-GUID: R_lMzFHgwbG0hl-kLUkDSD-_LHpEu67W
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dVAs5QEhdbocHkD3lvV4RWjut7gw8ydI5IVJPpJEzgOHgVSeKzgTtD4QZE77e1GcSjz6ZPGBzsPwRUYfiVdWQg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB8036
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub-
+Hi Russell,
 
-> On Oct 3, 2023, at 1:55 PM, Jakub Kicinski <kuba@kernel.org> wrote:
->=20
-> On Mon, 11 Sep 2023 14:49:44 +0200 Lorenzo Bianconi wrote:
->> Introduce nfsd_server.yaml specs to generate uAPI and netlink
->> code for nfsd server.
->> Add rpc-status specs to define message reported by the nfsd server
->> dumping the pending RPC requests.
->=20
-> Sorry for the delay, some minor "take it or leave it" nits below.
->=20
->> +doc:
->> +  nfsd server configuration over generic netlink.
->> +
->> +attribute-sets:
->> +  -
->> +    name: rpc-status-comp-op-attr
->> +    enum-name: nfsd-rpc-status-comp-attr
->> +    name-prefix: nfsd-attr-rpc-status-comp-
->> +    attributes:
->> +      -
->> +        name: unspec
->> +        type: unused
->> +        value: 0
->=20
-> the unused attrs can usually be skipped, the specs now start with value
-> of 1 by default. Same for the unused command.
->=20
->> +      -
->> +        name: dport
->> +        type: u16
->> +        byte-order: big-endian
->> +      -
->> +        name: compond-op
->> +        type: array-nest
->=20
-> Avoid array-nests if you can, they are legacy (does this spec pass JSON
-> schema validation?).
->=20
-> There's only one attribute in the nest, can you use
->=20
-> -=20
-> name: op
-> type: u32
-> multi-attr: true
->=20
-> ?
+On Tue, Oct 03, 2023 at 02:14:41PM +0100, Russell King (Oracle) wrote:
+> On Sat, Sep 23, 2023 at 04:49:04PM +0300, Vladimir Oltean wrote:
+> > +static int lynx_pcs_parse_fwnode(struct lynx_pcs *lynx)
+> > +{
+> > +	struct fwnode_handle *node = lynx->mdio->dev.fwnode;
+> > +	enum mtip_model model = MTIP_MODEL_AUTODETECT;
+> > +	struct device_node *np = to_of_node(node);
+> > +	struct mdio_device *mdio = lynx->mdio;
+> > +	struct device *dev = &mdio->dev;
+> > +	struct phy *phy;
+> > +	int i, err;
+> > +
+> > +	if (!node)
+> > +		return 0;
+> > +
+> > +	lynx->backplane_mode = fwnode_property_present(node, "fsl,backplane-mode");
+> > +	if (!lynx->backplane_mode)
+> > +		return 0;
+> > +
+> > +	if (fwnode_device_is_compatible(node, "fsl,lx2160a-lynx-pcs"))
+> > +		model = MTIP_MODEL_LX2160A;
+> > +
+> > +	lynx->num_lanes = of_count_phandle_with_args(np, "phys", "#phy-cells");
+> > +	if (lynx->num_lanes < 0)
+> > +		return lynx->num_lanes;
+> 
+> Is it possible for ->num_lanes to be zero at this point? If that is
+> possible, then ->anlt[PRIMARY_LANE] will be NULL but ->backplane_mode
+> will be set, so won't that cause the mtip_* calls above to pass a
+> NULL pointer into those functions? Is that safe? Should we trap that
+> case here?
 
-I've made similar modifications to Lorenzo's original
-contribution. The current updated version of this spec
-is here:
+Assuming the dt-bindings as proposed here, that case would be an invalid
+device tree ("fsl,backplane-mode" present but "phys" isn't present),
+which I indeed failed to catch.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/cel/linux.git/commit/?h=3Dn=
-fsd-next&id=3D55f55c77f624066895470306898190f090e00cda
+But in my reply to Krzysztof here:
+https://lore.kernel.org/netdev/20231002121958.xybzovgjzldfiae2@skbuf/
 
+I said that for v3, I'm looking to move the "phys" property from the PCS
+to the MAC (it's already in the MAC for the non-backplane use cases).
 
->> +        nested-attributes: rpc-status-comp-op-attr
->=20
->> +    -
->> +      name: rpc-status-get
->> +      doc: dump pending nfsd rpc
->> +      attribute-set: rpc-status-attr
->> +      dump:
->> +        pre: nfsd-server-nl-rpc-status-get-start
->> +        post: nfsd-server-nl-rpc-status-get-done
->=20
-> No attributes listed? User space C codegen will need those to make
-> sense of the commands.
+On LS1028A (ENETC, Felix), the lynx-pcs is not OF-based (we use
+lynx_pcs_create_mdiodev()), but it would be good to support the
+1000Base-KX link mode there also. As I'm starting to look beyond
+LX2160A, I'm starting to see why adding extra dt-bindings to the
+lynx-pcs (both "phys" and "fsl,backplane-mode") will be problematic
+if there is no OF node to speak of.
 
+I will leave a separate comment with some new ideas.
 
---
-Chuck Lever
+> If that's correct, then I don't see any point in storing
+> ->backplane_mode, since we can then use ->num_lanes > PRIMARY_LANE
+> or similar instead.
 
+Well, in v3, my plan is for the caller of lynx_pcs_create() (aka the MAC)
+to always pass an array of phys (the ones from its own OF node). In that
+case, we would indeed need the "fsl,backplane-mode" property in the PCS,
+because otherwise, with your proposal, the PCS would instantiate the
+AN/LT block even when it's not expected.
 
+> > +
+> > +	if (WARN_ON(lynx->num_lanes > MAX_NUM_LANES))
+> > +		return -EINVAL;
+> 
+> Do we need to use WARN_ON() here, or would it be better to print a short
+> error-level message?
+
+Admittedly I may not have the best intuition here, but I didn't want to
+over-complicate the code with error messages that can only be triggered
+with invalid device trees.
+
+> > +
+> > +	for (i = 0; i < lynx->num_lanes; i++) {
+> > +		phy = devm_of_phy_get_by_index(dev, np, i);
+> > +		if (IS_ERR(phy))
+> > +			return dev_err_probe(dev, PTR_ERR(phy),
+> > +					     "Failed to get SerDes PHY %d\n", i);
+> > +
+> > +		lynx->anlt[i] = mtip_backplane_create(mdio, phy, model);
+> > +		if (IS_ERR(lynx->anlt[i])) {
+> > +			err = PTR_ERR(lynx->anlt[i]);
+> > +
+> > +			while (i-- > 0)
+> > +				mtip_backplane_destroy(lynx->anlt[i]);
+> > +
+> > +			return err;
+> > +		}
+> > +	}
+> > +
+> > +	for (i = 1; i < lynx->num_lanes; i++) {
+> > +		err = mtip_backplane_add_subordinate(lynx->anlt[PRIMARY_LANE],
+> > +						     lynx->anlt[i]);
+> > +		if (WARN_ON(err)) {
+> 
+> Again, does this need to be a backtrace-producing WARN_ON()?
+
+mtip_backplane_add_subordinate() will only return -ERANGE if called too
+many times (more than MTIP_MAX_NUM_SUBORDINATES times, aka more than
+"MAX_NUM_LANES - 1" times).
+
+Given the way that the code is constructed, it is technically impossible
+for that to happen, but only because MTIP_MAX_NUM_SUBORDINATES is
+hand-crafted to be 3 and MAX_NUM_LANES to be 4. I think that if I define
+MTIP_MAX_NUM_SUBORDINATES in terms of MAX_NUM_LANES - 1, I can simply
+make mtip_backplane_add_subordinate() return void.
+
+What I want to avoid is to add error handling for errors which cannot
+take place. Which is where the WARN_ON() came from.
+
+> > +			/* Too many SerDes lanes in the device tree? */
+> > +			for (i = 0; i < lynx->num_lanes; i++)
+> > +				mtip_backplane_destroy(lynx->anlt[i]);
+> > +			return err;
+> > +		}
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
+> >  {
+> >  	struct lynx_pcs *lynx;
+> > +	int err;
+> >  
+> >  	lynx = kzalloc(sizeof(*lynx), GFP_KERNEL);
+> >  	if (!lynx)
+> > @@ -327,6 +451,12 @@ static struct phylink_pcs *lynx_pcs_create(struct mdio_device *mdio)
+> >  	lynx->pcs.neg_mode = true;
+> >  	lynx->pcs.poll = true;
+> >  
+> > +	err = lynx_pcs_parse_fwnode(lynx);
+> > +	if (err) {
+> > +		kfree(lynx);
+> > +		return ERR_PTR(err);
+> > +	}
+> > +
+> >  	return lynx_to_phylink_pcs(lynx);
+> >  }
+> >  
+> > @@ -392,6 +522,11 @@ EXPORT_SYMBOL_GPL(lynx_pcs_create_fwnode);
+> >  void lynx_pcs_destroy(struct phylink_pcs *pcs)
+> >  {
+> >  	struct lynx_pcs *lynx = phylink_pcs_to_lynx(pcs);
+> > +	int i;
+> > +
+> > +	if (lynx->backplane_mode)
+> > +		for (i = 0; i < lynx->num_lanes; i++)
+> > +			mtip_backplane_destroy(lynx->anlt[i]);
+> 
+> Won't ->num_lanes only be non-zero when ->backplane_mode is set, so
+> isn't the test for ->backplane_mode redundant here?
+
+I think it won't be redundant anymore once the series reaches a less
+"WIP" state.
+
+> >  
+> >  	mdio_device_put(lynx->mdio);
+> >  	kfree(lynx);
+> > -- 
+> > 2.34.1
+> > 
+> > 
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
