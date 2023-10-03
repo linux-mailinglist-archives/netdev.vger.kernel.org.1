@@ -1,174 +1,157 @@
-Return-Path: <netdev+bounces-37849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872F77B7573
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:46:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0492E7B7668
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 03:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 091BB281741
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 23:46:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id EE1FA1C20441
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 01:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3191D41205;
-	Tue,  3 Oct 2023 23:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB71A28;
+	Wed,  4 Oct 2023 01:51:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44177405FF;
-	Tue,  3 Oct 2023 23:46:49 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C280CCE;
-	Tue,  3 Oct 2023 16:46:46 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-2739c8862d2so336722a91.1;
-        Tue, 03 Oct 2023 16:46:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696376806; x=1696981606; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XcUqE9dhnpdkwEWc5/UR4jpA7Ne7zxjZBrKq9/qJDLI=;
-        b=l4DFQ55mWBJuFItyOL3/4rnU8X+wyqno+pBD7UeHNhrluU6/l0mmakdRk/eq5vAvh1
-         Upyl3H6uZAwftiNyDwgROvB4aY6p5wIhHcbfRDNCGJ6AtZjBVkBkLQULKeNU/b5vISo1
-         YxQQYE+ObhEiEcSXxA2STh3e6ja+/EyIMr/AtLaJbhZF+8L9FEzG6NgepAcoXB3HK1gi
-         xoOy84t1NSt/5UMzxdO4V1Nhf7k9cQdd4YVUZIdNBeH7p9wgZ6aBONOOAn5qVvDInac+
-         Ra+XcI9YcNK5Z0yQJz7WxvXWNtS52qzDsWWuysqu3V979nIwRduA/BKV24LXgpdOZUDz
-         ckgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696376806; x=1696981606;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XcUqE9dhnpdkwEWc5/UR4jpA7Ne7zxjZBrKq9/qJDLI=;
-        b=FLVdM/Hky0PzcClyImJic8mFDYD7Ng93yo9wB1vBZOp1AL4opHdgoNFgTt/XjAsKmJ
-         3S+iSEDsOPjSGUyThloS1C0dVpDJNTOLhakjMcKbqCoqKargtcK//rN0So8loYkNDU+B
-         ko99ZHLZ04KV27Rk7c0usj8b7sVJ8ktF/BEbxLkGzqbQBBW+kPSHPR3LMxO+Gf1icvb0
-         /vdHjQMOvFgKZvPS10bm7qHwwbLmeLNgrJ6UeDQqJLpRY+i+Hf1hMsOCeBWzolbXEK7q
-         kV34a02e1Df91ULTCvYC2hXyaAh6GzUeXG8gYNdKmMJ0UNqXDWkD4CCU/6x5sExc6zpK
-         4Gcg==
-X-Gm-Message-State: AOJu0Yxg3k6Rzq5Kxqfq1T5vNY9iFlaCks75M/bk4/uragwc4AKhpQq/
-	3k0bzOcQYQ1Oo7abmBQALz4=
-X-Google-Smtp-Source: AGHT+IGrLTvuZgp8KW9UzovnRWv62G03DvpZRnl+aeBq4Yn+OVUnaPIzMaC/717ZyRsq+wRJZOepHw==
-X-Received: by 2002:a05:6a00:3916:b0:68e:2fd4:288a with SMTP id fh22-20020a056a00391600b0068e2fd4288amr1023151pfb.3.1696376805803;
-        Tue, 03 Oct 2023 16:46:45 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id j9-20020aa78d09000000b00690c2cd7e0esm1932954pfe.49.2023.10.03.16.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 16:46:45 -0700 (PDT)
-Date: Wed, 04 Oct 2023 08:46:44 +0900 (JST)
-Message-Id: <20231004.084644.50784533959398755.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v1 1/3] rust: core abstractions for network PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <c0c00289-3bb3-4091-be78-8616e2ba90ee@lunn.ch>
-References: <20231002085302.2274260-1-fujita.tomonori@gmail.com>
-	<20231002085302.2274260-2-fujita.tomonori@gmail.com>
-	<c0c00289-3bb3-4091-be78-8616e2ba90ee@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4F981C;
+	Wed,  4 Oct 2023 01:51:51 +0000 (UTC)
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E747A1;
+	Tue,  3 Oct 2023 18:51:49 -0700 (PDT)
+Received: from eig-obgw-5007a.ext.cloudfilter.net ([10.0.29.141])
+	by cmsmtp with ESMTP
+	id npJ5q0DBfaLCxnr3EqMOM4; Wed, 04 Oct 2023 01:51:48 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id nr3DqxFyKoD58nr3Eq9rAr; Wed, 04 Oct 2023 01:51:48 +0000
+X-Authority-Analysis: v=2.4 cv=Ou1cdgzt c=1 sm=1 tr=0 ts=651cc534
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=Dx1Zrv+1i3YEdDUMOX3koA==:17
+ a=OWjo9vPv0XrRhIrVQ50Ab3nP57M=:19 a=dLZJa+xiwSxG16/P+YVxDGlgEgI=:19
+ a=IkcTkHD0fZMA:10 a=bhdUkHdE2iEA:10 a=wYkD_t78qR0A:10 a=7ZN4cI0QAAAA:8
+ a=FNyBlpCuAAAA:8 a=J1Y8HTJGAAAA:8 a=VwQbUJbxAAAA:8 a=NEAV23lmAAAA:8
+ a=cm27Pg_UAAAA:8 a=cZbiYKqXTMG0Wr-ZeUwA:9 a=QEXdDO2ut3YA:10
+ a=Dl0WHwQvj8hGZljrFLtM:22 a=RlW-AWeGUCXs_Nkyno-6:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+ a=AjGcO6oz07-iQ99wixmX:22 a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ggHCHkGU+2wCnzyFW6haFKxRKI3yRdbYc3yFtrU2eIA=; b=tTeN4mvJkuNKZc/5rouT9pns/Z
+	3cj2Axtd2GRqcmFamUMG7bR/flgJsr33ZbRlsjfZ4NF8P1WNmJ7AxNRT0B6VPxJXkl8GMvZ3S+dqZ
+	/Bh4Xio+87sTDSEQITowCpk+ovAD3b8Uxu9N6m8iz7WJSMR0Jp1Ghe7GsGX0edxBKl4HBeeACMbhY
+	om2Uqs7CuUAKA2m7DE7enV/S6TQnou42HMdF+ttxzgCuql6QUlQ2UAFXhHn/99caQQGFWV/GeWZtF
+	JXF6wX6j/VvN6Kl1ils9iw7DVbjDQCFiiaCbTEQODoJ4g79vEB29on3v+O9eEmRJb1tRNs6XGXC6c
+	KBfFF0sQ==;
+Received: from 94-238-9-39.abo.bbox.fr ([94.238.9.39]:50436 helo=[192.168.1.98])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1qnoyd-001TCG-1l;
+	Tue, 03 Oct 2023 18:38:55 -0500
+Message-ID: <37d2d198-d9e7-3427-af4f-05ac42c38ede@embeddedor.com>
+Date: Wed, 4 Oct 2023 01:38:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] xfrm: Annotate struct xfrm_sec_ctx with __counted_by
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>,
+ Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Tom Rix <trix@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
+References: <20231003231828.work.527-kees@kernel.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20231003231828.work.527-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 94.238.9.39
+X-Source-L: No
+X-Exim-ID: 1qnoyd-001TCG-1l
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 94-238-9-39.abo.bbox.fr ([192.168.1.98]) [94.238.9.39]:50436
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 0
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfKHY7ZSGoi8l/b5c92Q78wOnWZw3iIyT+RB53iNp7tMGmPZF2xXBcWhbGRqlNEHdKn2D/7D6+GiASZ/w2J7Nl8Lc4+m2r5h4R3DeRWBvOrCMN449Ukt2
+ 19vtn9YGoemLssaA7WVl3LgTrWXyBjUZiGpHx1h2V28gROscngnQTPaCgSpeD4DEXVx/sp65ERuZqPucGg0NgMSNH3+leqATQF8okm7nCMTbIC4jIrO7+BzV
+ Ahdv0FhentkhuZhiRf9dKwNbokc/0XLXf8YiC8Uh/t/rDNyDP+lP9urNgb2VW/tm
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2 Oct 2023 17:24:17 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
 
->> +    /// Gets the id of the PHY.
->> +    pub fn id(&mut self) -> u32 {
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        unsafe { (*phydev).phy_id }
->> +    }
+
+On 10/4/23 01:18, Kees Cook wrote:
+> Prepare for the coming implementation by GCC and Clang of the __counted_by
+> attribute. Flexible array members annotated with __counted_by can have
+> their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
+> array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> functions).
 > 
-> I somewhat agree with GregKH here. It will be easier to review and
-> maintain if the naming of well known things stay the same in the C and
-> Rust world. So phy_id. However....
-
-phy_id() is fine by me.
-
-The complete type name is `net::phy::Device` so I guess that the
-method names usually don't start with `phy`. But we maintain both C
-and Rust so I think that we need a balance between them.
-
-
->> +    /// Gets the state of the PHY.
->> +    pub fn state(&mut self) -> DeviceState {
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        let state = unsafe { (*phydev).state };
->> +        match state {
->> +            bindings::phy_state::PHY_DOWN => DeviceState::Down,
->> +            bindings::phy_state::PHY_READY => DeviceState::Ready,
->> +            bindings::phy_state::PHY_HALTED => DeviceState::Halted,
->> +            bindings::phy_state::PHY_ERROR => DeviceState::Error,
->> +            bindings::phy_state::PHY_UP => DeviceState::Up,
->> +            bindings::phy_state::PHY_RUNNING => DeviceState::Running,
->> +            bindings::phy_state::PHY_NOLINK => DeviceState::NoLink,
->> +            bindings::phy_state::PHY_CABLETEST => DeviceState::CableTest,
->> +        }
->> +    }
->> +
->> +    /// Returns true if the link is up.
->> +    pub fn get_link(&mut self) -> bool {
->> +        const LINK_IS_UP: u32 = 1;
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        unsafe { (*phydev).link() == LINK_IS_UP }
->> +    }
+> As found with Coccinelle[1], add __counted_by for struct xfrm_sec_ctx.
 > 
-> Naming is hard.
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: netdev@vger.kernel.org
+> Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks
+--
+Gustavo
+
+> ---
+>   include/uapi/linux/xfrm.h | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> This one is trickier and shows a difference between C and Rust. C just
-> does phydev->link and treats it as a boolean, setter/getters are not
-> needed. But Rust does seem to need setter/getters, and it is a lot
-> less clear what link() does. get_link() is a bit more
-> obvious. has_link() would also work. But as GregKH said, get_foo() and
-> put_foo() are often used to represent getting a reference on an object
-> and releasing it. I am however of the opinion that many driver writers
-> don't understand locking, so it is best to hide all the locking in the
-> core. I would not actually expect to see a PHY driver need to take a
-> reference on anything.
-> 
-> Since we forced into a world of getter/setter, the previous one
-> probably should be get_phy_id() and we want consistent set_ and get_
-> prefixes for plain accesses to members without further interpretation.
-
-get/set_something names aren't commonly used in Rust, I guess. Some examples
-follows in the standard library.
-
-https://doc.rust-lang.org/stable/std/net/struct.TcpStream.html
-
-there are set_linger(), set_nodelay(), set_read_timeout(),
-set_write_timeout(). correspondingly, linger(), nodelay(),
-read_timeout(), write_timeout() are provided.
-
-https://doc.rust-lang.org/stable/std/io/struct.Cursor.html
-
-There are set_position() and position().
-
-As I wrote above, I don't think that we need to follow Rust naming
-practices strictly, as long as there are patterns in Rust bindings.
-
-
->> +    /// Returns true if auto-negotiation is enabled.
->> +    pub fn is_autoneg_enabled(&mut self) -> bool {
->> +        let phydev = self.0.get();
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
->> +        unsafe { (*phydev).autoneg() == bindings::AUTONEG_ENABLE }
->> +    }
-> 
-> Should this maybe be get_autoneg_enabled()? I don't know.
-
-I think that we can leave this name alone since tis_something() names
-are used for OS related functions in Rust.
+> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> index 23543c33fee8..6a77328be114 100644
+> --- a/include/uapi/linux/xfrm.h
+> +++ b/include/uapi/linux/xfrm.h
+> @@ -4,6 +4,7 @@
+>   
+>   #include <linux/in6.h>
+>   #include <linux/types.h>
+> +#include <linux/stddef.h>
+>   
+>   /* All of the structures in this file may not change size as they are
+>    * passed into the kernel from userspace via netlink sockets.
+> @@ -33,7 +34,7 @@ struct xfrm_sec_ctx {
+>   	__u8	ctx_alg;
+>   	__u16	ctx_len;
+>   	__u32	ctx_sid;
+> -	char	ctx_str[];
+> +	char	ctx_str[] __counted_by(ctx_len);
+>   };
+>   
+>   /* Security Context Domains of Interpretation */
 
