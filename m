@@ -1,187 +1,235 @@
-Return-Path: <netdev+bounces-37624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E3767B65FA
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:01:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE3B7B659D
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:37:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8515E2815E0
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:01:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A6A2A2814B8
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C6A11CB0;
-	Tue,  3 Oct 2023 10:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29614FC15;
+	Tue,  3 Oct 2023 09:37:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542A3EEDF
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:01:01 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 087F691
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:01:00 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RHBqFmgOnS6weSW8LTY8exhwkpzZgAiUX/iGd+DXzPKRjfYf1PhCpKjJDzh7+CLyd1aKrqbqp1B/zqlplftmODbveWkJQmjYcsQwlF5eJqhjJdUdrR4M+PhQMPh8+TzrcHpvV/uEfLq1HArX2o5sqWVOjDOgdPZHbS975ERzQSeXWVL4nhOy5c2sHdFmMS2uFPrLOm+X1I/MsqWCSYjdlw9ABaP+D/pdttnQSQFSMwy1BQsFCT2WS6i3R8T28dImq/GWp9syWPzo28A/qBxy2ObSRHAsw1FpWn76FSOmfRvn3pNyH3xrERXcw723V8Nlj14fjAp8WD+6pjo0u6PZPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GjUsgPn6JxN06jNqrsv+qYHz+FJtlsX9ovZeL3s77T4=;
- b=JnbQiN59kSeaN8CGJNIoBM8IA9XvCnSLfod0ZikEvnim2oK4TMgrtUI05N37v6W4P/2cfliX4cT4XUhsn3Uq13stzN76857El0ZUTkMZnW98g0SGoToXFh55bmJ5uu3xu5JWfccg5T0+XfYI2zXgHc3WjV9ibq6nfIE5TmqpGbWfskXe2q65tbApqoOdWdUAVqAQbA+/aHIVLEpQodL/26lu/WfvGYRKF0o8pvzH32qNrmJe0xXAL2AHg5b2GoEcPYKdN6BgIN/RwycaFapKyzHAW1VGkhZMpI24YSWplb9bFp1tGhRYAk//rhnkKYKYtTXBFRNpzwfbIGhRWSug4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GjUsgPn6JxN06jNqrsv+qYHz+FJtlsX9ovZeL3s77T4=;
- b=UyUV4CeJf2uxYKr+85uXDQ1h0GHxfkg4OfsKLE4/eqSluzvq9ajAxE9tT27+7VQ2EXEgQc31m2S6aq+73jil8yQLcVGWgWF5W2tgT3QWofC9Ze3GQaskywSJiLfLtAYmK7h4U7mMy+9Y59oVq6PsXrkVixT7UjCC71dL21RyJWdl45YPDAS2N8neNef71N7D5eQ9EDPjglG1qixVNs1mZRrcEfV+jNAaJR/eTHwOO26XLpOMdkX9AIe7snsqNiFgrJQHzbABW6ZSw8bFxvD3L8WjyhIAaxeb2KeyCNDTh1pPy/NDopMzij9cuDzuPMA/ufNrizuywM5oZesO3SgGnA==
-Received: from MN2PR08CA0028.namprd08.prod.outlook.com (2603:10b6:208:239::33)
- by DS0PR12MB9276.namprd12.prod.outlook.com (2603:10b6:8:1a0::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.35; Tue, 3 Oct
- 2023 10:00:58 +0000
-Received: from BL02EPF0001A103.namprd05.prod.outlook.com
- (2603:10b6:208:239:cafe::3) by MN2PR08CA0028.outlook.office365.com
- (2603:10b6:208:239::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.25 via Frontend
- Transport; Tue, 3 Oct 2023 10:00:57 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BL02EPF0001A103.mail.protection.outlook.com (10.167.241.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.14 via Frontend Transport; Tue, 3 Oct 2023 10:00:57 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 3 Oct 2023
- 03:00:40 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 3 Oct 2023
- 03:00:38 -0700
-References: <20231002144014.40c33922@hermes.local>
-User-agent: mu4e 1.8.11; emacs 28.2
-From: Petr Machata <petrm@nvidia.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-CC: <netdev@vger.kernel.org>
-Subject: Re: [RFC] iproute2: ipila warning
-Date: Tue, 3 Oct 2023 11:35:47 +0200
-In-Reply-To: <20231002144014.40c33922@hermes.local>
-Message-ID: <87o7hgqb3w.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C9CD278
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 09:37:53 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B277B90
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 02:37:51 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5334f9a56f6so1075001a12.3
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 02:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1696325870; x=1696930670; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=e0MWy+RHoNgCgnYWcdDPuYDz2s3ffizCcPyJ0qqU4Ug=;
+        b=AXWC48sRLPUr6AxrV6nbi0XxEZKJbwwGKNLOBaigknEJzv2FL74S1Fw1Ve7TsDH7Zu
+         3gNAuu+gIlSGj4OT5ztoiPwNJQ2ER61mh2vKzi9L9KC/X7DPSwXyqstdF2QX3xkoBR/h
+         +ALtINCu4dnIWuUA564gbR27/kgXVSnw2ymPw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696325870; x=1696930670;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e0MWy+RHoNgCgnYWcdDPuYDz2s3ffizCcPyJ0qqU4Ug=;
+        b=IbGIQSQ1V+re4lRt56qe5iHX1FpThZysodn7jNuMD3TeFIfK36Ljkq1OqyCErf1ICc
+         q53RTjoUSfEkpfrOkzkJoFOn6clQJfEm8d59oE7dibBnKNY6FT0nxKNvpdhf5XMaXs+S
+         bQZxuQQMVvU2OTl2qb+NMHo5nmn6ZbhGfvjxbAYRnH4cxi6KZmoGYMjZGRpPbdZfF2hM
+         vTB8aBb14qAD99Lc2W5QOIkYwpRIgOeysbkGCVt0eOwbASOviuXWRDSYm3PkzqpqNi0e
+         +w+ew40hXbgL9yfl4iuanD5KMaOzMAovuHEsMV1IM2LQ4Tw5GZSr45GUKLxNPezU+ZnG
+         eLow==
+X-Gm-Message-State: AOJu0YwocQ59M2K7c0JCAwLw+7IuuVrW+ylHFRoOGoXkAChLm9RLgQOy
+	qejcTpIOMgvS5q6hHG4d8vfqqwoC65HBEEd21psZ5JInZOf3qK3U
+X-Google-Smtp-Source: AGHT+IF/qyy13tV3PUUOfUU4kk+geuzLl9siCXhFz+UX9e4DDK1Whd6SNmtFlcDjK00Zm87Sd1VPBFeAWq/rNom8AQc=
+X-Received: by 2002:a05:6402:2486:b0:538:3cf4:e880 with SMTP id
+ q6-20020a056402248600b005383cf4e880mr6836608eda.29.1696325869975; Tue, 03 Oct
+ 2023 02:37:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail202.nvidia.com (10.129.68.7)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A103:EE_|DS0PR12MB9276:EE_
-X-MS-Office365-Filtering-Correlation-Id: d72572f4-b56e-40bd-34d0-08dbc3f7a3ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	zb6yhR44cbgxmPEqE1dDtRLQJ/zOlYE3Wr/6h5jH6mP0jV6L9zr65oOMlty5wK6sHNT5qm9a6iuRkB+DTbhEm6J73dRwyEV7Ln3cqNI87altIlFYvclU09ZwoQaQ+4NQEmK0Yj/9Fjke7V+2TJGYZnY9uUU2OMn+iLI4w5kY3gUOpGaeCXlkdcuuyjkOdOh04AFcrpvnDhKNK+lFv3t4O1AblzPN/aPt2a+tOsxV+RtDk/cfmea9KpJDd0StJZtbJSFJ5PA8odvLYRLutrps+WCgJaKb9ehFPiLvhjSKKTCP84uiY+1vTDKWJVTPqaGUrhKhjiLVaq4RJCswftas2+xcGH4Fui0cH1jjID+oT77zIjsPCiNDXcDXFNakPRIQvyaRPdLWMHhlZ9MDt1keUMSlh6Mzj7X45i/86us1MXSMzqydKgZal+FWXP5qmjn3xuspO1lqIYdubiiRSZST4v1BXwHBVBTdSHbMBlH0JViliIrvOMax8yQbGZg3jdRW9ia0UWO25xd6B8bypVCv2RAWoh9cr2A8lOBWq3q/rq2nBrdy2agGAnMvaKjBaQi0EEbacYCfZf+kpHxJgIfP43s1RgO75yqo1Wm5vZKVfaSs8q6TWf5hAt+yeUistEzm2mVszAfCICFpnL6glTD8kf97ySECQsrEfYhhhGHaKUpUafeYgs3FgGHWkIVBJcZaZCk1Mdw17a/qwEt6pBOHbPDl0eAgKrnk3kfvZLzV8+6TSVKV56fIaqugXhOE8Qtc
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(396003)(39860400002)(346002)(230922051799003)(451199024)(64100799003)(82310400011)(186009)(1800799009)(46966006)(40470700004)(36840700001)(2616005)(40460700003)(40480700001)(86362001)(36756003)(7636003)(356005)(82740400003)(36860700001)(426003)(336012)(16526019)(26005)(47076005)(2906002)(478600001)(83380400001)(6666004)(4326008)(316002)(8936002)(8676002)(41300700001)(5660300002)(70206006)(6916009)(70586007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 10:00:57.5883
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d72572f4-b56e-40bd-34d0-08dbc3f7a3ef
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A103.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9276
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
+In-Reply-To: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 3 Oct 2023 02:37:37 -0700
+Message-ID: <CACKFLinpJgLvYAg+nALVb6RpddXXzXSoXbRAq+nddZvwf5+f3Q@mail.gmail.com>
+Subject: Re: [PATCH] net/tg3: fix race condition in tg3_reset_task_cancel()
+To: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com, 
+	mchan@broadcom.com, drc@linux.vnet.ibm.com, pavan.chebbi@broadcom.com, 
+	Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000ef21910606cca4bc"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+--000000000000ef21910606cca4bc
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Stephen Hemminger <stephen@networkplumber.org> writes:
+On Mon, Oct 2, 2023 at 11:55=E2=80=AFAM Thinh Tran <thinhtr@linux.vnet.ibm.=
+com> wrote:
+>
+> during the EEH error injection tests on the 4-port 1 GbE NetXtreme
+> BCM5719 Gigabit Ethernet PCIe adapter, a race condition was observed in
+> the process of resetting and setting the driver flag to
+> TX_RECOVERY_PENDING between tg3_reset_task_cancel() and tg3_tx_recover().
+> As a result, it occasionally leads to transmit timeouts and the
+> subsequent disabling of all the driver's interfaces.
+>
+> [12046.886221] NETDEV WATCHDOG: eth16 (tg3): transmit queue 0 timed out
+> [12046.886238] WARNING: CPU: 7 PID: 0 at ../net/sched/sch_generic.c:478
+>    dev_watchdog+0x42c/0x440
+> [12046.886247] Modules linked in: tg3 libphy nfsv3 nfs_acl .......
+>  ..........
+> [12046.886571] tg3 0021:01:00.0 eth16: transmit timed out, resetting
+> ...........
+> [12046.966175] tg3 0021:01:00.1 eth15: transmit timed out, resetting
+> ...........
+> [12046.981584] tg3 0021:01:00.2 eth14: transmit timed out, resetting
+> ...........
+> [12047.056165] tg3 0021:01:00.3 eth13: transmit timed out, resetting
+>
+>
+> Fixing this issue by taking the spinlock when modifying the driver flag
+>
+>
+> Fixes: 6c4ca03bd890 ("net/tg3: resolve deadlock in tg3_reset_task() durin=
+g EEH")
+>
+>
+> Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+> Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/b=
+roadcom/tg3.c
+> index 14b311196b8f..f4558762f9de 100644
+> --- a/drivers/net/ethernet/broadcom/tg3.c
+> +++ b/drivers/net/ethernet/broadcom/tg3.c
+> @@ -6507,7 +6507,9 @@ static void tg3_tx_recover(struct tg3 *tp)
+>                     "Please report the problem to the driver maintainer "
+>                     "and include system chipset information.\n");
+>
+> +       tg3_full_lock(tp, 0);
+>         tg3_flag_set(tp, TX_RECOVERY_PENDING);
+> +       tg3_full_unlock(tp);
 
-> Building current code with Debian stable Gcc 12.2.0 see this warning.
+tg3_flag_set() calls set_bit() which is atomic.  The same is true for
+tg3_flag_clear().  Maybe we just need some smp_mb__after_atomic() or
+similar memory barriers.
+
+>  }
 >
->     CC       ipila.o
-> ipila.c: In function =E2=80=98print_ila_locid=E2=80=99:
-> ipila.c:57:32: warning: =E2=80=98addr=E2=80=99 may be used uninitialized =
-[-Wmaybe-uninitialized]
->    57 |                 v =3D ntohs(words[i]);
->       |                                ^
-> ipila.c:69:13: note: =E2=80=98addr=E2=80=99 declared here
->    69 | static void print_ila_locid(const char *tag, int attr, struct rta=
-ttr *tb[])
->       |             ^~~~~~~~~~~~~~~
->
-> Looks like a Gcc aliasing bug.
-> Relevant snippets.
->
-> static void print_addr64(__u64 addr, char *buff, size_t len)
-> {
-> 	__u16 *words =3D (__u16 *)&addr;
-> 	__u16 v;
-> 	int i, ret;
-> 	size_t written =3D 0;
-> 	char *sep =3D ":";
->
-> 	for (i =3D 0; i < 4; i++) {
-> 		v =3D ntohs(words[i]);
-> ...
->
->
-> static void print_ila_locid(const char *tag, int attr, struct rtattr *tb[=
-])
-> {
-> 	char abuf[256];
->
-> 	if (tb[attr])
-> 		print_addr64(rta_getattr_u64(tb[attr]),
-> 			     abuf, sizeof(abuf));
->
-> One solution would be to use a union.
-> Other would be to use some variation of no-strict aliasing.
->
-> --- a/ip/ipila.c
-> +++ b/ip/ipila.c
-> @@ -47,14 +47,17 @@ static int genl_family =3D -1;
->=20=20
->  static void print_addr64(__u64 addr, char *buff, size_t len)
+>  static inline u32 tg3_tx_avail(struct tg3_napi *tnapi)
+> @@ -7210,7 +7212,10 @@ static inline void tg3_reset_task_cancel(struct tg=
+3 *tp)
 >  {
-> -       __u16 *words =3D (__u16 *)&addr;
-> +       union {
-> +               __u64 w64;
-> +               __u16 words[4];
-> +       } id =3D { .w64 =3D addr };
+>         if (test_and_clear_bit(TG3_FLAG_RESET_TASK_PENDING, tp->tg3_flags=
+))
+>                 cancel_work_sync(&tp->reset_task);
+> +
+> +       tg3_full_lock(tp, 0);
+>         tg3_flag_clear(tp, TX_RECOVERY_PENDING);
+> +       tg3_full_unlock(tp);
+>  }
+>
+>  static int tg3_poll_msix(struct napi_struct *napi, int budget)
+> --
+> 2.25.1
+>
 
-This looks OK to me FWIW. Unions are commonly used to legalize aliasing,
-so anybody looking at this will understand what's going on.
+--000000000000ef21910606cca4bc
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
->         __u16 v;
->         int i, ret;
->         size_t written =3D 0;
->         char *sep =3D ":";
->=20=20
->         for (i =3D 0; i < 4; i++) {
-> -               v =3D ntohs(words[i]);
-> +               v =3D ntohs(id.words[i]);
->=20=20
->                 if (i =3D=3D 3)
->                         sep =3D "";
-> ..
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPAopgfL6+BZwoJaBNEZjt3MT7KPdL8v
+3WzmGwVRSWY3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTAw
+MzA5Mzc1MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBplM9yUb0MkAa3j4JByIz1fntUoS9DUU/71gyk6+wtpWgvdaef
+2WYkWUCW7KpnVNbu2tVoHY1dbyzkuHzA0S3bzW5i+IatEU4pyeK6PcxhEG2WAG7rvUCfUBaqMGAM
+ZR9N55GqKl3NWCQH6kf8r/+RiGY+WT0StLmJq5sG1MR50an1wugwVc+1DQ3R5X0xeRIw0vFo5tD5
+ZtJM9UdcTWaSUYK+SQU3kSnX2532YcVl2J3aYFkWIeO9bYzPVX/Xuxz1/Yn4K+ZYQzqZWwFHYjdn
+/x+uB+MkoF95N5NvqYZt84P4G9MRV66SZLnJSB48zqJOzNwMH3k6Yged6+0ZV1hR
+--000000000000ef21910606cca4bc--
 
