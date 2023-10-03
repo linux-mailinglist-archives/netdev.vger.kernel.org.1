@@ -1,141 +1,188 @@
-Return-Path: <netdev+bounces-37666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5067B685C
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:54:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E87167B689B
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:09:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 61E1B2815E0
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:54:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 1B5801C20473
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1899722EEB;
-	Tue,  3 Oct 2023 11:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1033622EFA;
+	Tue,  3 Oct 2023 12:09:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33E621373
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:54:22 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35C93A6
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 04:54:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696334061; x=1727870061;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=YuUBS98GIeSeyEiT0rDr6RqvPbt3U21tkUiVvYVC4iM=;
-  b=Yof+La8ZWn9ta0jAWmT4eRxb3V79C8UTFoB2zg1YlNAwuCWUFsjQ1WH/
-   lZnbMBdn3Do8D91/cvSUkG+Z8ayWTTkJxd+QF35cCNMgcMepmmRwStSKi
-   N/VH7ooKdbdHIK0IeM0iLvMYeUIueBGZ34DJZp5ldxkbyaNS7b58AcFr5
-   MI5gkQ2Nz8HTwHHQeqUA8/SGtSh4RQ1ifpXghfnkBHu880pbGTnhEuvE6
-   TrRlvT98AOonu0fymu28oY6j9t7ReEuvuQKwzPVM3H/w0u53fR3dtCgBh
-   KIYbIcvqP4al99qydHfCyHtROgjF9LnNtjdERfFeV3N0WkqoTF0O1SmPa
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="382764328"
-X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="382764328"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 04:54:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10851"; a="841324637"
-X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
-   d="scan'208";a="841324637"
-Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 03 Oct 2023 04:54:18 -0700
-Received: from kbuild by c3b01524d57c with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qndyi-00075s-2M;
-	Tue, 03 Oct 2023 11:54:16 +0000
-Date: Tue, 3 Oct 2023 19:54:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Aniruddha Paul <aniruddha.paul@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, marcin.szycik@intel.com,
-	netdev@vger.kernel.org, Aniruddha Paul <aniruddha.paul@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH iwl-net,v2] ice: Fix VF-VF filter rules in switchdev mode
-Message-ID: <202310031925.uHjPXxCu-lkp@intel.com>
-References: <20231003081639.1915967-1-aniruddha.paul@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BAB21373
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 12:09:12 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22EB4AC
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 05:09:11 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qneCg-0007eJ-Ik; Tue, 03 Oct 2023 14:08:42 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qneCb-00Al6F-SV; Tue, 03 Oct 2023 14:08:37 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D0B6422CC33;
+	Tue,  3 Oct 2023 11:26:49 +0000 (UTC)
+Date: Tue, 3 Oct 2023 13:26:49 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Raju Rangoju <rajur@chelsio.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Douglas Miller <dougmill@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Dany Madden <danymadden@us.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Intel Corporation <linuxwwan@intel.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Yuanjun Gong <ruc_gongyuanjun@163.com>, Wei Fang <wei.fang@nxp.com>,
+	Alex Elder <elder@linaro.org>, Simon Horman <horms@kernel.org>,
+	Rob Herring <robh@kernel.org>, Bailey Forrest <bcf@google.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Junfeng Guo <junfeng.guo@intel.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Rushil Gupta <rushilg@google.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Yuri Karpov <YKarpov@ispras.ru>,
+	Zhengchao Shao <shaozhengchao@huawei.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Zheng Zengkai <zhengzengkai@huawei.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Lee Jones <lee@kernel.org>, Dawei Li <set_pte_at@outlook.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: [net-next PATCH 3/4] netdev: replace napi_reschedule with
+ napi_schedule
+Message-ID: <20231003-struggle-lung-3d7c89eab00b-mkl@pengutronix.de>
+References: <20231002151023.4054-1-ansuelsmth@gmail.com>
+ <20231002151023.4054-3-ansuelsmth@gmail.com>
+ <20231003-living-seltzer-172ea6aec629-mkl@pengutronix.de>
+ <651bf88c.050a0220.3a982.31fc@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="zbzdaj4jqyp54e52"
 Content-Disposition: inline
-In-Reply-To: <20231003081639.1915967-1-aniruddha.paul@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <651bf88c.050a0220.3a982.31fc@mx.google.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Aniruddha,
 
-kernel test robot noticed the following build warnings:
+--zbzdaj4jqyp54e52
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.6-rc4 next-20231003]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On 03.10.2023 13:18:33, Christian Marangi wrote:
+> On Tue, Oct 03, 2023 at 09:16:33AM +0200, Marc Kleine-Budde wrote:
+> > On 02.10.2023 17:10:22, Christian Marangi wrote:
+> > > Now that napi_schedule return a bool, we can drop napi_reschedule that
+> > > does the same exact function. The function comes from a very old comm=
+it
+> > > bfe13f54f502 ("ibm_emac: Convert to use napi_struct independent of st=
+ruct
+> > > net_device") and the purpose is actually deprecated in favour of
+> > > different logic.
+> > >=20
+> > > Convert every user of napi_reschedule to napi_schedule.
+> > >=20
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > > ---
+> > >  drivers/infiniband/ulp/ipoib/ipoib_ib.c                |  4 ++--
+> > >  drivers/net/can/dev/rx-offload.c                       |  2 +-
+> >=20
+> > Acked-by: Marc Kleine-Budde # for can/dev/rx-offload.c
+>=20
+> Just to make sure can I use the correct tag: (you didn't include the
+> mail)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Aniruddha-Paul/ice-Fix-VF-VF-filter-rules-in-switchdev-mode/20231003-161801
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231003081639.1915967-1-aniruddha.paul%40intel.com
-patch subject: [PATCH iwl-net,v2] ice: Fix VF-VF filter rules in switchdev mode
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231003/202310031925.uHjPXxCu-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231003/202310031925.uHjPXxCu-lkp@intel.com/reproduce)
+Doh! Sure.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310031925.uHjPXxCu-lkp@intel.com/
+> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for can/dev/rx-offload=
+=2Ec
 
-All warnings (new ones prefixed by >>):
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for can/dev/rx-offload.c
 
-   drivers/net/ethernet/intel/ice/ice_tc_lib.c: In function 'ice_eswitch_tc_parse_action':
->> drivers/net/ethernet/intel/ice/ice_tc_lib.c:678:26: warning: unused variable 'repr' [-Wunused-variable]
-     678 |         struct ice_repr *repr;
-         |                          ^~~~
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-vim +/repr +678 drivers/net/ethernet/intel/ice/ice_tc_lib.c
+--zbzdaj4jqyp54e52
+Content-Type: application/pgp-signature; name="signature.asc"
 
-   672	
-   673	static int ice_eswitch_tc_parse_action(struct net_device *filter_dev,
-   674					       struct ice_tc_flower_fltr *fltr,
-   675					       struct flow_action_entry *act)
-   676	{
-   677		int err;
- > 678		struct ice_repr *repr;
-   679	
-   680		switch (act->id) {
-   681		case FLOW_ACTION_DROP:
-   682			fltr->action.fltr_act = ICE_DROP_PACKET;
-   683			break;
-   684	
-   685		case FLOW_ACTION_REDIRECT:
-   686			err = ice_tc_setup_redirect_action(filter_dev, fltr, act->dev);
-   687			if (err)
-   688				return err;
-   689	
-   690			break;
-   691	
-   692		default:
-   693			NL_SET_ERR_MSG_MOD(fltr->extack, "Unsupported action in switchdev mode");
-   694			return -EINVAL;
-   695		}
-   696	
-   697		return 0;
-   698	}
-   699	
+-----BEGIN PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUb+nYACgkQvlAcSiqK
+BOgAwwf9HSZX1sxRgnOHWLXSBACCTpqNm26rDzNrIqPlybJQVie8rNauFCEQbSz+
+cKDZD68pDokwEv+8WajpOBW0d/Zc27B2d7EZtYhlopNFjo0XIPYoYfA6QTXfZ6Qs
+vi22lC87vHoyEwEi37X3yTPapJVY2GDgyGSD+8FsdOliNE679gautzYvZSWLPiRF
+stXo71bRBm15AbVKwCuOqymieHGxKbooQ09lRIYUXdK6oF671CJLKUia6m9Qg42f
+6Itf4TBPlF4XdxS0vqKrvTsg78XduHN1FmuI+RJIPdzULMx9CoUlr8BOSfGomsN3
+eoH9v4s8IDrkLGQifa7oRIgxg9EkFw==
+=72hV
+-----END PGP SIGNATURE-----
+
+--zbzdaj4jqyp54e52--
 
