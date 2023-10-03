@@ -1,119 +1,259 @@
-Return-Path: <netdev+bounces-37700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3ED7B6AD7
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:47:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 351C87B6AE5
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 15:49:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B041A28163A
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:47:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 68A04B20987
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA60029423;
-	Tue,  3 Oct 2023 13:47:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343CE2943F;
+	Tue,  3 Oct 2023 13:49:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A842770F
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:47:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A980DC433C7;
-	Tue,  3 Oct 2023 13:47:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696340827;
-	bh=/PqT9j9WUjZ4jMGoDwz8ZdnLpQ5yWa37gzGGi155Hr8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s0omkTjgj358YbIGBAeaANArP0enwO0cPAm7Qh5j79aiYhwZUUanxoTtE//QafR3C
-	 UzALxk1kFtKe5kI1d+WCjNM0Rwimbgvso9Amc9lcEcUrFaVy08Js2UDR9WNJQSuTNt
-	 KgJ8ydVwa8JwVq3HNoKWgX+N31D2hVRdyQM0I1pcEQPR25h0qv4/F9ehzSxLoIQJXY
-	 mxpvJ1gitJ8mHfbHxed+vT6mM3C+qhk3CnxrEzDM8R/Kq7OnmQDfhmrV2AxMeJNG/L
-	 70NMlg/XgMGRxcx/ZFdNGkwo5bbWhsMiBUmWtSgJismy6XbJtG4YPFo3szhNR4FsRh
-	 voH5LF/aC9YiQ==
-Date: Tue, 3 Oct 2023 15:47:02 +0200
-From: Simon Horman <horms@kernel.org>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	arkadiusz.kubalewski@intel.com, michal.michalik@intel.com,
-	richardcochran@gmail.com, vadim.fedorenko@linux.dev,
-	jiri@resnulli.us, kernel test robot <lkp@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net-next] ice: fix linking when CONFIG_PTP_1588_CLOCK=n
-Message-ID: <ZRwbVoUgcXBhuRqW@kernel.org>
-References: <20231002185132.1575271-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3224B262AB;
+	Tue,  3 Oct 2023 13:49:45 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C7AA6;
+	Tue,  3 Oct 2023 06:49:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=+2cqDHZK4i8nYrVx8MswcoAhgLdhpiLcDyG/gnz2ZF0=; b=axD5PcaYum44fQxbYi/wkEGn8H
+	HlQcfNpFNm0Up16fG0Lw6uA/0r4X5kE5e+4eZ7Gv1L5DjLOfNYev+3kjNs0URBSd/TZFwXvl+9zqL
+	16scpGmTIfJn4QrhVVilEUfonEAfRq9XzOKn3cMVYCdFFRRx85NJJMns+ClTTRaSPQaHHuYy8QhAi
+	qLTMBDv+6ZmD1ISLNyqaYcAkfiGUefYd/+1WeuUaEI3PNYAf68YfzTxNUTglPhdOVrLmwot+7ybeP
+	EeFJytpLq753kd//mhZSlH3RSkA1rE/KNKFXdhzKNZ6rGJPqQJgUsiryrIhqGoFYIqHnr5/Z0V9ec
+	osTUfOhA==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qnfmB-0002j2-8f; Tue, 03 Oct 2023 15:49:27 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qnfmA-000Bar-NI; Tue, 03 Oct 2023 15:49:26 +0200
+Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return
+ code
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, paulb@nvidia.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com, martin.lau@linux.dev, bpf@vger.kernel.org
+References: <20230919145951.352548-1-victor@mojatatu.com>
+ <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
+ <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
+ <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
+ <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
+ <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net>
+ <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
+ <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
+ <CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <96532f62-6927-326c-8470-daa1c4ab9699@iogearbox.net>
+Date: Tue, 3 Oct 2023 15:49:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231002185132.1575271-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27050/Tue Oct  3 09:39:20 2023)
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 11:51:32AM -0700, Tony Nguyen wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
+On 10/3/23 2:46 PM, Jamal Hadi Salim wrote:
+> On Tue, Oct 3, 2023 at 5:00 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 10/2/23 9:54 PM, Jamal Hadi Salim wrote:
+>>> On Fri, Sep 29, 2023 at 11:48 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>> On 9/26/23 1:01 AM, Jamal Hadi Salim wrote:
+>>>>> On Fri, Sep 22, 2023 at 4:12 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>>>> On 9/20/23 1:20 AM, Jamal Hadi Salim wrote:
+>>>>>>> On Tue, Sep 19, 2023 at 6:15 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>>>>>> On 9/19/23 4:59 PM, Victor Nogueira wrote:
+>>>> [...]
+>>>>>>
+>>>>>> In the above case we don't have 'internal' errors which you want to trace, so I would
+>>>>>> also love to avoid the cost of zeroing struct tcf_result res which should be 3x 8b for
+>>>>>> every packet.
+>>>>>
+>>>>> We can move the zeroing inside tc_run() but we declare it in the same
+>>>>> spot as we do right now. You will still need to set res.verdict as
+>>>>> above.
+>>>>> Would that work for you?
+>>>>
+>>>> What I'm not following is that with the below you can avoid the unnecessary
+>>>> fast path cost (which is only for corner case which is almost never hit) and
+>>>> get even better visibility. Are you saying it doesn't work?
+>>>
+>>> I am probably missing something:
+>>> -1/UNSPEC is a legit errno. And the main motivation here for this
+>>> patch is to disambiguate if it was -EPERM vs UNSPEC
+>>> Maybe that is what you are calling a "corner case"?
+>>
+>> Yes, but what is the use-case to ever return a -EPERM from the fast-path? This can
+>> be audited for the code in the tree and therefore avoided so that you never run into
+>> this problem.
 > 
-> The recent support for DPLL introduced by commit 8a3a565ff210 ("ice: add
-> admin commands to access cgu configuration") and commit d7999f5ea64b ("ice:
-> implement dpll interface to control cgu") broke linking the ice driver if
-> CONFIG_PTP_1588_CLOCK=n:
-> 
-> ld: vmlinux.o: in function `ice_init_feature_support':
-> (.text+0x8702b8): undefined reference to `ice_is_phy_rclk_present'
-> ld: (.text+0x8702cd): undefined reference to `ice_is_cgu_present'
-> ld: (.text+0x8702d9): undefined reference to `ice_is_clock_mux_present_e810t'
-> ld: vmlinux.o: in function `ice_dpll_init_info_direct_pins':
-> ice_dpll.c:(.text+0x894167): undefined reference to `ice_cgu_get_pin_freq_supp'
-> ld: ice_dpll.c:(.text+0x894197): undefined reference to `ice_cgu_get_pin_name'
-> ld: ice_dpll.c:(.text+0x8941a8): undefined reference to `ice_cgu_get_pin_type'
-> ld: vmlinux.o: in function `ice_dpll_update_state':
-> ice_dpll.c:(.text+0x894494): undefined reference to `ice_get_cgu_state'
-> ld: vmlinux.o: in function `ice_dpll_init':
-> (.text+0x8953d5): undefined reference to `ice_get_cgu_rclk_pin_info'
-> 
-> The first commit broke things by calling functions in
-> ice_init_feature_support that are compiled as part of ice_ptp_hw.o,
-> including:
-> 
-> * ice_is_phy_rclk_present
-> * ice_is_clock_mux_present_e810t
-> * ice_is_cgU_present
-> 
-> The second commit continued the break by calling several CGU functions
-> defined in ice_ptp_hw.c in the DPLL code.
-> Because the ice_dpll.c file is compiled unconditionally, it will not
-> link when CONFIG_PTP_1588_CLOCK=n.
-> 
-> It might be possible to break this dependency and expose those functions
-> without CONFIG_PTP_1588_CLOCK, but that is not clear to me.
-> 
-> For the DPLL case, simply compile ice_dpll.o only when we have
-> CONFIG_PTP_1588_CLOCK. Add stub no-op implementation of ice_dpll_init() and
-> ice_dpll_uninit() when CONFIG_PTP_1588_CLOCK=n into ice_dpll.h
-> 
-> The other functions are part of checking the netlist to see if hardware
-> features are enabled. These checks don't really belong in ice_ptp_hw.c, and
-> make more sense as part of the ice_common.c file. We already have
-> ice_is_gps_in_netlist() in ice_common.c which is doing a similar check.
-> 
-> Move the functions into ice_common.c and rename them to have the similar
-> postfix of "in_netlist()" to be more expressive of what they are actually
-> checking.
-> 
-> This also makes the ice_find_netlist_node only called from within
-> ice_common.c, so its safe to mark it static and stop declaring it in the
-> ice_common.h header as well.
-> 
-> Fixes: 8a3a565ff210 ("ice: add admin commands to access cgu configuration")
-> Fixes: d7999f5ea64b ("ice: implement dpll interface to control cgu")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202309191214.TaYEct4H-lkp@intel.com
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> I am sorry but i am not in favor of this approach.
+> You are suggesting audits are the way to go forward when in fact lack
+> of said audits is what got us in this trouble with syzkaller to begin
+> with. We cant rely on tribal knowledge to be able to spot these
+> discrepancies. The elder of the tribe may move to a different mountain
+> at some point and TheLinuxWay(tm) is cutnpaste, so i dont see this as
+> long term good for maintainance. We have a clear distinction between
+> an error vs verdict - lets use that.
+> We really dont want to make this a special case just for eBPF and how
+> to make it a happy world for eBPF at the cost of everyone else. I made
+> a suggestion of leaving tcx alone, you can do your own thing there;
+> but for tc_run my view is we should keep it generic.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
+Jamal, before you come to early conclusions, it would be great if you also
+read until the end of the email, because what I suggested below *is* generic
+and with less churn throughout the code base.
+
+>>> There are two options in my mind right now (since you are guaranteed
+>>> in tcx_run you will never return anything below UNSPEC):
+>>> 1) we just have the switch statement invocation inside an inline
+>>> function and you can pass it sch_ret (for tcx case) and we'll pass it
+>>> res.verdit for tc_run() case.
+>>> 2) is something is we leave tcx_run alone and we have something along
+>>> the lines of:
+>>>
+>>> --------------
+>>> diff --git a/net/core/dev.c b/net/core/dev.c
+>>> index 1450f4741d9b..93613bce647c 100644
+>>> --- a/net/core/dev.c
+>>> +++ b/net/core/dev.c
+>>> @@ -3985,7 +3985,7 @@ sch_handle_ingress(struct sk_buff *skb, struct
+>>> packet_type **pt_prev, int *ret,
+>>>                      struct net_device *orig_dev, bool *another)
+>>>    {
+>>>           struct bpf_mprog_entry *entry =
+>>> rcu_dereference_bh(skb->dev->tcx_ingress);
+>>> -       struct tcf_result res = {0};
+>>> +       struct tcf_result res;
+>>>           int sch_ret;
+>>>
+>>>           if (!entry)
+>>> @@ -4003,14 +4003,16 @@ sch_handle_ingress(struct sk_buff *skb, struct
+>>> packet_type **pt_prev, int *ret,
+>>>                   if (sch_ret != TC_ACT_UNSPEC)
+>>>                           goto ingress_verdict;
+>>>           }
+>>> +
+>>> +       res.verdict = 0;
+>>>           sch_ret = tc_run(tcx_entry(entry), skb, &res);
+>>>           if (sch_ret < 0) {
+>>>                   kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS_ERROR);
+>>>                   *ret = NET_RX_DROP;
+>>>                   return NULL;
+>>>           }
+>>> +       sch_ret = res.verdict;
+>>>    ingress_verdict:
+>>> -       switch (res.verdict) {
+>>> +       switch (sch_ret) {
+>>>           case TC_ACT_REDIRECT:
+>>>                   /* skb_mac_header check was done by BPF, so we can
+>>> safely
+>>>                    * push the L2 header back before redirecting to another
+>>> -----------
+>>>
+>>> on the drop reason - our thinking is to support drop_watch alongside
+>>> tracepoint given kfree_skb_reason exists already; if i am not mistaken
+>>> what you suggested would require us to create a new tracepoint?
+>>
+>> So if the only thing you really care about is the different drop reason for
+>> kfree_skb_reason, then I still don't follow why you need to drag this into
+>> struct tcf_result. This can be done in a much simpler and more efficient way
+>> like the following:
+>>
+>> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+>> index a587e83fc169..b1c069c8e7f2 100644
+>> --- a/include/net/dropreason-core.h
+>> +++ b/include/net/dropreason-core.h
+>> @@ -80,6 +80,8 @@
+>>          FN(IPV6_NDISC_BAD_OPTIONS)      \
+>>          FN(IPV6_NDISC_NS_OTHERHOST)     \
+>>          FN(QUEUE_PURGE)                 \
+>> +       FN(TC_EGRESS_ERROR)             \
+>> +       FN(TC_INGRESS_ERROR)            \
+>>          FNe(MAX)
+>>
+>>    /**
+>> @@ -345,6 +347,10 @@ enum skb_drop_reason {
+>>          SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
+>>          /** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
+>>          SKB_DROP_REASON_QUEUE_PURGE,
+>> +       /** @SKB_DROP_REASON_TC_EGRESS_ERROR: dropped in TC egress HOOK due to error */
+>> +       SKB_DROP_REASON_TC_EGRESS_ERROR,
+>> +       /** @SKB_DROP_REASON_TC_INGRESS_ERROR: dropped in TC ingress HOOK due to error */
+>> +       SKB_DROP_REASON_TC_INGRESS_ERROR,
+>>          /**
+>>           * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>>           * shouldn't be used as a real 'reason' - only for tracing code gen
+>> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+>> index f308e8268651..cd2444dd3745 100644
+>> --- a/include/net/pkt_cls.h
+>> +++ b/include/net/pkt_cls.h
+>> @@ -10,6 +10,7 @@
+>>
+>>    /* TC action not accessible from user space */
+>>    #define TC_ACT_CONSUMED               (TC_ACT_VALUE_MAX + 1)
+>> +#define TC_ACT_ABORT           (TC_ACT_VALUE_MAX + 2)
+>>
+>>    /* Basic packet classifier frontend definitions. */
+>>
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index 85df22f05c38..3abb4d71c170 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -4011,7 +4011,10 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
+>>                  *ret = NET_RX_SUCCESS;
+>>                  return NULL;
+>>          case TC_ACT_SHOT:
+>> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS);
+>> +       case TC_ACT_ABORT:
+>> +               kfree_skb_reason(skb, likely(sch_ret == TC_ACT_SHOT) ?
+>> +                                SKB_DROP_REASON_TC_INGRESS :
+>> +                                SKB_DROP_REASON_TC_INGRESS_ERROR);
+>>                  *ret = NET_RX_DROP;
+>>                  return NULL;
+>>          /* used by tc_run */
+>> @@ -4054,7 +4057,10 @@ sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
+>>                  *ret = NET_XMIT_SUCCESS;
+>>                  return NULL;
+>>          case TC_ACT_SHOT:
+>> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_EGRESS);
+>> +       case TC_ACT_ABORT:
+>> +               kfree_skb_reason(skb, likely(sch_ret == TC_ACT_SHOT) ?
+>> +                                SKB_DROP_REASON_TC_EGRESS :
+>> +                                SKB_DROP_REASON_TC_EGRESS_ERROR);
+>>                  *ret = NET_XMIT_DROP;
+>>                  return NULL;
+>>          /* used by tc_run */
+>>
+>> Then you just return the internal TC_ACT_ABORT code for internal 'exceptions',
+>> and you'll get the same result to make it observable for dropwatch.
+>>
+>> Thanks,
+>> Daniel
 
 
