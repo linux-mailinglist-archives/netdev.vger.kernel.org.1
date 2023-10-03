@@ -1,127 +1,68 @@
-Return-Path: <netdev+bounces-37651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEC17B67B7
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:18:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA637B67BF
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 13:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 040FA2816AB
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:18:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B254A2816F6
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C87B2134A;
-	Tue,  3 Oct 2023 11:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1404B21357;
+	Tue,  3 Oct 2023 11:19:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F093CE56A
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 11:18:48 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CB9BB;
-	Tue,  3 Oct 2023 04:18:39 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40566f8a093so7475905e9.3;
-        Tue, 03 Oct 2023 04:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696331917; x=1696936717; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dRmt6j5dxjz0MCUrCJcyD2cXKQxyJFJdm8ATGNw+KGc=;
-        b=XzeQcODl+S0VoX5SHWpA+1Vy+J0EfHQgYFF4wHCFJseWYhVH6qEK29CY9KFGrEzPjN
-         MGKiSrLdgE7kLC97WI3EGNbeHUw6kVmIZ9X38gZuiN6j4MaJzA2Emm2Fzeo33ngodS1N
-         WNr8jbRY2cXpqsZa/pUyFN7dBClcN1c7Y9SeAMMTz8ozcbryByWVH1LwcuCxN97ri5uQ
-         B5zY48CmpkJ5S4Vf9zLqc8vO76Ock9kcn0jqfU4lx17h/eCaOMjRozu70uXcMMhNrwWP
-         /ZeqtOvmBFrwt2Ulg8lBsMQa1tOQcgkWP9jmpgKtRcztp9xnpE8zCsrmfug31HAhU6BL
-         J8MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696331917; x=1696936717;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dRmt6j5dxjz0MCUrCJcyD2cXKQxyJFJdm8ATGNw+KGc=;
-        b=a9Ls4+Rmk6QWdPBo1Zbm3RxZ1Dvny43CmZSJvHpi8zmVfd7iA2Oa93EpmjS5eQaeNV
-         VJyg5Ps3O1lASUce82bfJM0EluQa/DQG7axyEUvEt19CehAYdK8PomsiNSNlEdI6zu7W
-         15iNR0R29gFcJkc7k8NeP7x6COaEWxaFpHl+jXwf0uOt3PoM5YT+WSS2JN4cmOWhVFQF
-         8W4rccLOedregl31F1bvqH9DV/MneqxSRA7J6ByR0sebzkmf4W8OS7rNtJpxk+tPznCH
-         vwTYZp+KNdD9Ws4sHm6TJgPYY/moJ8bCyDr4wZDYVmJSjTREkrT4HMwJuodccOsrxg1I
-         ppWw==
-X-Gm-Message-State: AOJu0Yz6GZwRoawJH/fa8LBS3FLZCnulP0bCZlb7o2yv3Y1wJw93f2tk
-	CAdIADeZUryISqxojprQMB0=
-X-Google-Smtp-Source: AGHT+IFLbiLzMIjYq17N9d6C9xhiAG+ijgYatVYbYzZACplv9aboPtXUhqao5fQwPpvl9QyVVVJ1HA==
-X-Received: by 2002:a7b:ce89:0:b0:402:f07c:4b48 with SMTP id q9-20020a7bce89000000b00402f07c4b48mr11269565wmj.28.1696331917146;
-        Tue, 03 Oct 2023 04:18:37 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id y24-20020a05600c365800b0040652e8ca13sm9195716wmq.43.2023.10.03.04.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 04:18:36 -0700 (PDT)
-Message-ID: <651bf88c.050a0220.3a982.31fc@mx.google.com>
-X-Google-Original-Message-ID: <ZRv4iZmOuLubYSiN@Ansuel-xps.>
-Date: Tue, 3 Oct 2023 13:18:33 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Douglas Miller <dougmill@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Dany Madden <danymadden@us.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Intel Corporation <linuxwwan@intel.com>,
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>, Wei Fang <wei.fang@nxp.com>,
-	Alex Elder <elder@linaro.org>, Simon Horman <horms@kernel.org>,
-	Rob Herring <robh@kernel.org>, Bailey Forrest <bcf@google.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Rushil Gupta <rushilg@google.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Yuri Karpov <YKarpov@ispras.ru>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D230421111;
+	Tue,  3 Oct 2023 11:19:55 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7955DA7;
+	Tue,  3 Oct 2023 04:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=3WQtsnIMGU3EZC75/U7lh4It7npmOBkHEQvs4xM/XDs=; b=aavn7HoNfrpw9SVa81FqPKDf4a
+	rkJiu/tRdgeUXh/cuL2QtIkZcKvjWiTqq6en38DvV2HNkpAykI5bBM0o2MrVZg2wlYpofS28FmgFO
+	MxVyVfaulb+pQ/XkcZwVzIBHI7sWOr+S885g77Cxh/MOzpB+lEDpPqmX/YiUyh8FcMJddBxgR83cB
+	jFKMebHrdXPTpyhZT7C+36PB3yMyeM9zL424iBQNgW2PtEkfOdGL42Q3WlHXKSMZWauNr/EQtqkd0
+	p27nqbQEV3fORj6PVCRrtAlbayUFDamfgr9F2RtFvthe1dzG6Sxq5DmxuxShJQrCvW3kQs3G2bUfa
+	TAdgqKSg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47706)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qndRO-0001ak-2X;
+	Tue, 03 Oct 2023 12:19:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qndRP-0007px-9b; Tue, 03 Oct 2023 12:19:51 +0100
+Date: Tue, 3 Oct 2023 12:19:51 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-phy@lists.infradead.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Andrew Lunn <andrew@lunn.ch>,
-	Zheng Zengkai <zhengzengkai@huawei.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Lee Jones <lee@kernel.org>, Dawei Li <set_pte_at@outlook.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH 3/4] netdev: replace napi_reschedule with
- napi_schedule
-References: <20231002151023.4054-1-ansuelsmth@gmail.com>
- <20231002151023.4054-3-ansuelsmth@gmail.com>
- <20231003-living-seltzer-172ea6aec629-mkl@pengutronix.de>
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Camelia Groza <camelia.groza@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor@kernel.org>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>
+Subject: Re: [RFC PATCH v2 net-next 05/15] net: add 25GBase-KR-S and
+ 25GBase-CR-S to ethtool link mode UAPI
+Message-ID: <ZRv4162uJ9pUVpR6@shell.armlinux.org.uk>
+References: <20230923134904.3627402-1-vladimir.oltean@nxp.com>
+ <20230923134904.3627402-6-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -130,38 +71,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003-living-seltzer-172ea6aec629-mkl@pengutronix.de>
+In-Reply-To: <20230923134904.3627402-6-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 03, 2023 at 09:16:33AM +0200, Marc Kleine-Budde wrote:
-> On 02.10.2023 17:10:22, Christian Marangi wrote:
-> > Now that napi_schedule return a bool, we can drop napi_reschedule that
-> > does the same exact function. The function comes from a very old commit
-> > bfe13f54f502 ("ibm_emac: Convert to use napi_struct independent of struct
-> > net_device") and the purpose is actually deprecated in favour of
-> > different logic.
-> > 
-> > Convert every user of napi_reschedule to napi_schedule.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  drivers/infiniband/ulp/ipoib/ipoib_ib.c                |  4 ++--
-> >  drivers/net/can/dev/rx-offload.c                       |  2 +-
-> 
-> Acked-by: Marc Kleine-Budde # for can/dev/rx-offload.c
+On Sat, Sep 23, 2023 at 04:48:54PM +0300, Vladimir Oltean wrote:
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index f7fba0dc87e5..421eb57fb6e9 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -1787,6 +1787,8 @@ enum ethtool_link_mode_bit_indices {
+>  	ETHTOOL_LINK_MODE_10baseT1S_Full_BIT		 = 99,
+>  	ETHTOOL_LINK_MODE_10baseT1S_Half_BIT		 = 100,
+>  	ETHTOOL_LINK_MODE_10baseT1S_P2MP_Half_BIT	 = 101,
+> +	ETHTOOL_LINK_MODE_25000baseCR_S_Full_BIT	 = 102,
+> +	ETHTOOL_LINK_MODE_25000baseKR_S_Full_BIT	 = 103,
 
-Just to make sure can I use the correct tag: (you didn't include the
-mail)
-
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for can/dev/rx-offload.c
-
-?
+Should these also be add to phylink_caps_to_linkmodes()'s MAC_25000FD
+conditional block?
 
 -- 
-	Ansuel
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
