@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-37782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468767B723B
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:05:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293DA7B723C
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BA867281465
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:05:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 8BED31F2126A
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:05:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9183D978;
-	Tue,  3 Oct 2023 20:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E37C3D97E;
+	Tue,  3 Oct 2023 20:05:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEF83CD1D
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:05:36 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE9AA1
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:05:35 -0700 (PDT)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1c746bccbdcso12581825ad.2
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 13:05:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582053D965
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:05:38 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36DDCB8
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:05:37 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-59b5a586da6so1620317b3.1
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 13:05:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696363534; x=1696968334; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696363536; x=1696968336; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mkYrfMEROl+nnKl4VmaP3DUpmKO4TmiY5HQ7B/WMMw4=;
-        b=a+Oz7dh3Iqxm5AkpcdQ95FoP/VVBYtSAY6Pspzh/czj1ElmMgpqRo0WBcET8ayWoi8
-         w7+PoRi7sVzNz73OXeacOCbe0F0KwuAjILs7eFzEyRziRVccd3tenE1V/FwUC8nNVsjz
-         4h5ocVDdjSl/ovno5C1nC+EOOfohVN6hekbgqWnEsFmTY48StP/VahBTIN8KYjtUUL8s
-         9hhLKQyxz9u27b/4aqATwZWYQlHfCWprZOv2dLaPUAi2umkpn3J/Cfz2tII63VXQ26im
-         5oZow/CH/cXu5sn1604CmtZlTv3S5SloCJ0tTkA21RW+M6YGA/HyFJiBoONeMw5Cuawn
-         9UqA==
+        bh=jLfu6nduRDM3dWzYzq/o3BySxKJwELyZOaZ+Zwhe/8w=;
+        b=rVru0ZV8kPByctmywulLQXCAmbmE/SqP8H4hixYi+jB2A2PF3M8f5PIUEHyW3MBhj8
+         2Yi2jK/UIR9xt62Rw55GtsmzSzZ0uYQBCql3crRULVe4AHSwFrLimv9xWu7Hx2GxL/he
+         WJZi4XkyJbhzYrD02xkcWnc3rWeS8MK1C5i/P8VTBxzAuXAeYP0exCL60+e7UgbVeiJD
+         W7uNUF15zF/3jHCy+UkUiywV4iIsyijM1ncbdSnbrYJW9eXvV/EP2PupnGlDWdMtdMMg
+         TcQG9TFhDyvCcpr1joxCXGDMCEZgSniZZpcK5DpG4z47gahLHfOsDiQ33YdlqBRE8YJi
+         /89Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696363534; x=1696968334;
+        d=1e100.net; s=20230601; t=1696363536; x=1696968336;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mkYrfMEROl+nnKl4VmaP3DUpmKO4TmiY5HQ7B/WMMw4=;
-        b=ihOCG/onlrluiZxq4fLH32dihaGo/Gc/zGbBDSdVApXH65d3Ik9w5k+EnP9IZwH+Kk
-         7bVGH7j57bO8pqKOiIw7sKSHz6TJJPDQ/uFIgFSQylrrx/o7k/vYlMzpeJ5WujSW/SHP
-         Apw6eqH7IYW+ngAuBhBw78RsSkrf0iUKs2ldVaD4omj6e+kaa9qt6b+YqUXyZRQu2ZvJ
-         PwivMcucoaPM7M0OtLUsdxLG24tuwxinywlPH8vbKyFV2wtCPNSGTvTIbYwh5SvhXH7r
-         KOH8mVA2xvHKhzcAPzw0eCQ9btHW3w6SjEw/vq+j7dFAP5GxKyUSsqzuVqpIAdsLI4VZ
-         jWRQ==
-X-Gm-Message-State: AOJu0Yzb0y+dYUj1ICntDLWBpNmUcgZWEDmR2Y9n4aR0d2QvXUTj+rEN
-	fG+mzL586uINebuuQ1fQb1MoUF8=
-X-Google-Smtp-Source: AGHT+IE3V09XJvSx/etSdyrMzjtPZenYBzBBURkff+I6OS9q5ablh3krJeZx98BpAhypkLreVbj4lYc=
+        bh=jLfu6nduRDM3dWzYzq/o3BySxKJwELyZOaZ+Zwhe/8w=;
+        b=XGJ7xAJR8mArTYdMcGjcB4NhTkNNv9AMefeB3ZXTiIzRiQDjnHGGB3XBrQjSs7MBKU
+         zUadRm15MK0o77JE9odl2x1zDi4zgrPufr5LTHd+jcmnwTAUfBqU4/er4c7GfzDMaCL6
+         n736ZME9hsNL8D5v40TtDO6ebWNPEaeiNzNP7SpupQSHQjZnQ9qNMbL9mJ70Xsx/5rdu
+         2TfiEf8We2+11T1W3Z9qM5irxuvp9Dul6AF1Li/17DDtRnsiB8ObaZ0amuLPExBnmojn
+         32B6rhtv6dlshO8BR6qiWSH9FPmi5DB67ecmqyueFDwbMdFmFT8tM7aw6rcTqxxikK8J
+         kyOw==
+X-Gm-Message-State: AOJu0YxsTYJ+NjA+9+GwdEwOSkjpgASQFpbp1BW3gxcPAU7e8UgBNOr0
+	F9+4O1zhKtZlt18I6gTKr3WZmKE=
+X-Google-Smtp-Source: AGHT+IG37FwY35BBpwUYvJZ3mMfpjvK56aS3ASvcODwAOF5iSPKj2kPihjeBEH1K+MuEKBkDJWFT/dM=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:d2cb:b0:1c7:55ff:858d with SMTP id
- n11-20020a170902d2cb00b001c755ff858dmr8340plc.8.1696363534449; Tue, 03 Oct
- 2023 13:05:34 -0700 (PDT)
-Date: Tue,  3 Oct 2023 13:05:17 -0700
+ (user=sdf job=sendgmr) by 2002:a81:4043:0:b0:59b:eb4b:2cad with SMTP id
+ m3-20020a814043000000b0059beb4b2cadmr5069ywn.5.1696363536465; Tue, 03 Oct
+ 2023 13:05:36 -0700 (PDT)
+Date: Tue,  3 Oct 2023 13:05:18 -0700
 In-Reply-To: <20231003200522.1914523-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,8 +60,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231003200522.1914523-1-sdf@google.com>
 X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231003200522.1914523-6-sdf@google.com>
-Subject: [PATCH bpf-next v3 05/10] net: stmmac: Add Tx HWTS support to XDP ZC
+Message-ID: <20231003200522.1914523-7-sdf@google.com>
+Subject: [PATCH bpf-next v3 06/10] selftests/xsk: Support tx_metadata_len
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -73,219 +73,60 @@ Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
 	xdp-hints@xdp-project.net
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Song Yoong Siang <yoong.siang.song@intel.com>
+Add new config field and propagate to umem registration setsockopt.
 
-This patch enables transmit hardware timestamp support to XDP zero copy
-via XDP Tx metadata framework.
-
-This patchset is tested with tools/testing/selftests/bpf/xdp_hw_metadata
-on Intel Tiger Lake platform. Below are the test steps and results.
-
-Command on DUT:
-  sudo ./xdp_hw_metadata <interface name>
-  sudo hwstamp_ctl -i <interface name> -t 1 -r 1
-
-Command on Link Partner:
-  echo -n xdp | nc -u -q1 <destination IPv4 addr> 9091
-
-Result:
-  xsk_ring_cons__peek: 1
-  0x562e3313b6d0: rx_desc[3]->addr=8e100 addr=8e100 comp_addr=8e100
-  No rx_hash err=-95
-  rx_timestamp:  1677763849292380229 (sec:1677763849.2924)
-  XDP RX-time:   1677763849292641940 (sec:1677763849.2926)
-                 delta sec:0.0003 (261.711 usec)
-  AF_XDP time:   1677763849292666175 (sec:1677763849.2927)
-                 delta sec:0.0000 (24.235 usec)
-  0x562e3313b6d0: ping-pong with csum=561c (want 08af)
-                  csum_start=34 csum_offset=6
-  0x562e3313b6d0: complete tx idx=3 addr=3008
-  0x562e3313b6d0: tx_timestamp:  1677763849295700005 (sec:1677763849.2957)
-  0x562e3313b6d0: complete rx idx=131 addr=8e100
-
-Additionally, to double confirm the rx_timestamp and tx_timestamp are taken
-from PTP Hardware Clock (PHC), we set the value of PHC to a specific value
-using tools/testing/selftests/ptp/testptp. Below are the test steps and
-results.
-
-Command to set PHC to a specific value:
-  sudo ./testptp -d /dev/ptp2 -T 123000000
-
-Result:
-  xsk_ring_cons__peek: 1
-  0x562e3313b6d0: rx_desc[7]->addr=9e100 addr=9e100 comp_addr=9e100
-  No rx_hash err=-95
-  rx_timestamp:  123000002731730589 (sec:123000002.7317)
-  XDP RX-time:   1677763869396644361 (sec:1677763869.3966)
-                 delta sec:1554763866.6649 (1554763866664913.750 usec)
-  AF_XDP time:   1677763869396671376 (sec:1677763869.3967)
-                 delta sec:0.0000 (27.015 usec)
-  0x562e3313b6d0: ping-pong with csum=561c (want d1bf)
-                  csum_start=34 csum_offset=6
-  0x562e3313b6d0: complete tx idx=7 addr=7008
-  0x562e3313b6d0: tx_timestamp:  123000002735048790 (sec:123000002.7350)
-  0x562e3313b6d0: complete rx idx=135 addr=9e100
-
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  | 12 ++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 63 ++++++++++++++++++-
- 2 files changed, 74 insertions(+), 1 deletion(-)
+ tools/testing/selftests/bpf/xsk.c | 3 +++
+ tools/testing/selftests/bpf/xsk.h | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-index cd7a9768de5f..686c94c2e8a7 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-@@ -51,6 +51,7 @@ struct stmmac_tx_info {
- 	bool last_segment;
- 	bool is_jumbo;
- 	enum stmmac_txbuf_type buf_type;
-+	struct xsk_tx_metadata_compl xsk_meta;
- };
- 
- #define STMMAC_TBS_AVAIL	BIT(0)
-@@ -100,6 +101,17 @@ struct stmmac_xdp_buff {
- 	struct dma_desc *ndesc;
- };
- 
-+struct stmmac_metadata_request {
-+	struct stmmac_priv *priv;
-+	struct dma_desc *tx_desc;
-+	bool *set_ic;
-+};
-+
-+struct stmmac_xsk_tx_complete {
-+	struct stmmac_priv *priv;
-+	struct dma_desc *desc;
-+};
-+
- struct stmmac_rx_queue {
- 	u32 rx_count_frames;
- 	u32 queue_index;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 81b6f3ecdf92..697712dd4024 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2422,6 +2422,46 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
+diff --git a/tools/testing/selftests/bpf/xsk.c b/tools/testing/selftests/bpf/xsk.c
+index d9fb2b730a2c..24f5313dbfde 100644
+--- a/tools/testing/selftests/bpf/xsk.c
++++ b/tools/testing/selftests/bpf/xsk.c
+@@ -115,6 +115,7 @@ static void xsk_set_umem_config(struct xsk_umem_config *cfg,
+ 		cfg->frame_size = XSK_UMEM__DEFAULT_FRAME_SIZE;
+ 		cfg->frame_headroom = XSK_UMEM__DEFAULT_FRAME_HEADROOM;
+ 		cfg->flags = XSK_UMEM__DEFAULT_FLAGS;
++		cfg->tx_metadata_len = 0;
+ 		return;
  	}
+ 
+@@ -123,6 +124,7 @@ static void xsk_set_umem_config(struct xsk_umem_config *cfg,
+ 	cfg->frame_size = usr_cfg->frame_size;
+ 	cfg->frame_headroom = usr_cfg->frame_headroom;
+ 	cfg->flags = usr_cfg->flags;
++	cfg->tx_metadata_len = usr_cfg->tx_metadata_len;
  }
  
-+static void stmmac_xsk_request_timestamp(void *_priv)
-+{
-+	struct stmmac_metadata_request *meta_req = _priv;
-+
-+	stmmac_enable_tx_timestamp(meta_req->priv, meta_req->tx_desc);
-+	*meta_req->set_ic = true;
-+}
-+
-+static u64 stmmac_xsk_fill_timestamp(void *_priv)
-+{
-+	struct stmmac_xsk_tx_complete *tx_compl = _priv;
-+	struct stmmac_priv *priv = tx_compl->priv;
-+	struct dma_desc *desc = tx_compl->desc;
-+	bool found = false;
-+	u64 ns = 0;
-+
-+	if (!priv->hwts_tx_en)
-+		return 0;
-+
-+	/* check tx tstamp status */
-+	if (stmmac_get_tx_timestamp_status(priv, desc)) {
-+		stmmac_get_timestamp(priv, desc, priv->adv_ts, &ns);
-+		found = true;
-+	} else if (!stmmac_get_mac_tx_timestamp(priv, priv->hw, &ns)) {
-+		found = true;
-+	}
-+
-+	if (found) {
-+		ns -= priv->plat->cdc_error_adj;
-+		return ns_to_ktime(ns);
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct xsk_tx_metadata_ops stmmac_xsk_tx_metadata_ops = {
-+	.tmo_request_timestamp		= stmmac_xsk_request_timestamp,
-+	.tmo_fill_timestamp		= stmmac_xsk_fill_timestamp,
-+};
-+
- static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- {
- 	struct netdev_queue *nq = netdev_get_tx_queue(priv->dev, queue);
-@@ -2441,6 +2481,8 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 	budget = min(budget, stmmac_tx_avail(priv, queue));
+ static int xsk_set_xdp_socket_config(struct xsk_socket_config *cfg,
+@@ -252,6 +254,7 @@ int xsk_umem__create(struct xsk_umem **umem_ptr, void *umem_area,
+ 	mr.chunk_size = umem->config.frame_size;
+ 	mr.headroom = umem->config.frame_headroom;
+ 	mr.flags = umem->config.flags;
++	mr.tx_metadata_len = umem->config.tx_metadata_len;
  
- 	while (budget-- > 0) {
-+		struct stmmac_metadata_request meta_req;
-+		struct xsk_tx_metadata *meta = NULL;
- 		dma_addr_t dma_addr;
- 		bool set_ic;
+ 	err = setsockopt(umem->fd, SOL_XDP, XDP_UMEM_REG, &mr, sizeof(mr));
+ 	if (err) {
+diff --git a/tools/testing/selftests/bpf/xsk.h b/tools/testing/selftests/bpf/xsk.h
+index d93200fdaa8d..bff8e50d7532 100644
+--- a/tools/testing/selftests/bpf/xsk.h
++++ b/tools/testing/selftests/bpf/xsk.h
+@@ -200,6 +200,7 @@ struct xsk_umem_config {
+ 	__u32 frame_size;
+ 	__u32 frame_headroom;
+ 	__u32 flags;
++	__u32 tx_metadata_len;
+ };
  
-@@ -2464,6 +2506,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 			tx_desc = tx_q->dma_tx + entry;
- 
- 		dma_addr = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
-+		meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
- 		xsk_buff_raw_dma_sync_for_device(pool, dma_addr, xdp_desc.len);
- 
- 		tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_XSK_TX;
-@@ -2491,6 +2534,11 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 		else
- 			set_ic = false;
- 
-+		meta_req.priv = priv;
-+		meta_req.tx_desc = tx_desc;
-+		meta_req.set_ic = &set_ic;
-+		xsk_tx_metadata_request(meta, &stmmac_xsk_tx_metadata_ops, &meta_req);
-+
- 		if (set_ic) {
- 			tx_q->tx_count_frames = 0;
- 			stmmac_set_tx_ic(priv, tx_desc);
-@@ -2503,6 +2551,8 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
- 
- 		stmmac_enable_dma_transmission(priv, priv->ioaddr);
- 
-+		xsk_tx_metadata_to_compl(meta, &tx_q->tx_skbuff_dma[entry].xsk_meta);
-+
- 		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
- 		entry = tx_q->cur_tx;
- 	}
-@@ -2608,8 +2658,18 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue)
- 			} else {
- 				tx_packets++;
- 			}
--			if (skb)
-+			if (skb) {
- 				stmmac_get_tx_hwtstamp(priv, p, skb);
-+			} else {
-+				struct stmmac_xsk_tx_complete tx_compl = {
-+					.priv = priv,
-+					.desc = p,
-+				};
-+
-+				xsk_tx_metadata_complete(&tx_q->tx_skbuff_dma[entry].xsk_meta,
-+							 &stmmac_xsk_tx_metadata_ops,
-+							 &tx_compl);
-+			}
- 		}
- 
- 		if (likely(tx_q->tx_skbuff_dma[entry].buf &&
-@@ -7444,6 +7504,7 @@ int stmmac_dvr_probe(struct device *device,
- 	ndev->netdev_ops = &stmmac_netdev_ops;
- 
- 	ndev->xdp_metadata_ops = &stmmac_xdp_metadata_ops;
-+	ndev->xsk_tx_metadata_ops = &stmmac_xsk_tx_metadata_ops;
- 
- 	ndev->hw_features = NETIF_F_SG | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM |
- 			    NETIF_F_RXCSUM;
+ int xsk_attach_xdp_program(struct bpf_program *prog, int ifindex, u32 xdp_flags);
 -- 
 2.42.0.582.g8ccd20d70d-goog
 
