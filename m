@@ -1,71 +1,132 @@
-Return-Path: <netdev+bounces-37709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12FA7B6B2C
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:17:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A75E7B6B37
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:17:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 39768B208DA
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 587651C20860
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BAB30FAC;
-	Tue,  3 Oct 2023 14:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B307F30FB4;
+	Tue,  3 Oct 2023 14:17:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CE12AB3A
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 14:17:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56B9AC433C9;
-	Tue,  3 Oct 2023 14:17:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696342627;
-	bh=kSy8cr3ZOx+YW40kNqWscNITU4mfjvRvlwOvHDKsVWY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i1tOg/O43eTvAqg0eVtYLHBWNOqYX1o7L1YKzcJsH/8CpSxp1CgEPzBE4f7z18OLb
-	 lWI6cqx4YRAgQD5daubhzYtVTzKOmWOH+w2mB2Lh41c3TgU0yELsZhPAGyXluNc1cE
-	 4GMl5NA6bDvBAQCZ4K5drcFhZj79BdLk6ZgdVKx+gjd1XrydOsnRmecOJw0yCKfQdT
-	 XAvLJOBfAoXprKoNIVOE8SUkjDOw6z9onIkG1nVXBnDZMeVZo55tP4IW/3pR6iGAAr
-	 vkPlyCmA42Bh8ZvDayF4Y4NV5DVHeu9v9wFGf4z60LEYYKGmMgvjG+N4VEtAGbnR8s
-	 pESlf/uRjCI3Q==
-Date: Tue, 3 Oct 2023 16:17:04 +0200
-From: Simon Horman <horms@kernel.org>
-To: Michael Pratt <mcpratt@protonmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rafal Milecki <zajec5@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH v1 0/2] mac_pton: support more MAC address formats
-Message-ID: <ZRwiYOH8wsNqPmED@kernel.org>
-References: <20231002233946.16703-1-mcpratt@protonmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C662940B
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 14:17:47 +0000 (UTC)
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A509CAB;
+	Tue,  3 Oct 2023 07:17:45 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-d8168d08bebso1042170276.0;
+        Tue, 03 Oct 2023 07:17:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696342665; x=1696947465; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0lqefmjYJWK3tGZa7hTGKrUkp1vISerRSIwtUB6OaaU=;
+        b=Au4Odsnc8Nw/MYqfLkLRoTfdYhtPzG3oZe86goBhJbUTAtxy7XbQFz8Dk+rBsEvE1b
+         E9AFIhg9DdFabtEe09+Q2ljyP6kLdkgTca5qjMJDU1XhCrycKw4DXp+QTP1VhFNYg7MR
+         xEY0mMlvKMcIyy04v1VkrR7cYzT+7+EdqSOzeE565Ubg8F5oRUnoJGO/DAE6wgJS02XH
+         b1Yrin2PiRFyWVWuj5eMoDRHcKeCvXB0hLTodmEk5ybfL2SlLYDZYjYQZIRXPmTNCPDX
+         62HCnA1gmJv4WyYPYNfL5i7sRBUGzbZhvNf3Afaq/IHMFlyPVCEQM3n2dcdF/bk45ztw
+         Khag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696342665; x=1696947465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0lqefmjYJWK3tGZa7hTGKrUkp1vISerRSIwtUB6OaaU=;
+        b=pBt2J4CmrNWZyjIBU82z3aglhaxst0FSH/xh2QzXwTjmY94ciho3LlmNJcwuIWUeS2
+         RCe7lGqChzOcAu4lHklhYkx0RqFCp9bq2uULvdAtDNXa3CO3DJKDFUMEqXsM0fvNXJJe
+         hAkKYIciPdZN3RSdVmfrZGWXJgLKKthv4e1fS4LC0YSnoNBizFOZ/hCkOLMhOJ6O1bHT
+         m0TJ8YBFLQpN6oOS/7cdj2RU5A13V5pDXyv3ivuaUWO8+7j4L5zbBC+P3gweLBtIBnI2
+         mZ7jDxDtmcoxHf1/NFW1zJyVTdv7p+bElpjbcDa3nmUDNsTQKxlfiA5HbciinCLRjzqT
+         USrQ==
+X-Gm-Message-State: AOJu0YxwrLbgWkPdFjPjbHEsjv+1dH9EXLQEzye4lm7eZ6q2T6TsZIDv
+	KJ9KzGzlc+i9BqYJgX7eQ3UNEmgq13cuPhT0ebI=
+X-Google-Smtp-Source: AGHT+IFSQH5Yz8SjE9LGYpd/qJZBqdtYmj/8cvdNUPqmSP90OX2ANnWog9fmCvrR0G/GxkgcTfT6AM/X4/UHiAcj9Dk=
+X-Received: by 2002:a25:a2c6:0:b0:d78:132a:2254 with SMTP id
+ c6-20020a25a2c6000000b00d78132a2254mr13214932ybn.37.1696342664703; Tue, 03
+ Oct 2023 07:17:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231002233946.16703-1-mcpratt@protonmail.com>
+References: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
+ <ZRwOVyKQR8MBjpBh@kernel.org>
+In-Reply-To: <ZRwOVyKQR8MBjpBh@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 3 Oct 2023 10:17:33 -0400
+Message-ID: <CADvbK_fK03UO3R=70J+VoGVm_LJuzZbh+_=0doceS8DCPJYBVA@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: handle the connecting collision properly in nf_conntrack_proto_sctp
+To: Simon Horman <horms@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	Florian Westphal <fw@strlen.de>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Oct 02, 2023 at 11:39:55PM +0000, Michael Pratt wrote:
-> Currently, mac_pton() strictly requires the standard ASCII MAC address format
-> with colons as the delimiter, however,
-> some hardware vendors don't store the address like that.
-> 
-> If there is no delimiter, one could use strtoul()
-> but that would leave out important checks to make sure
-> that each character in the string is hexadecimal.
-> 
-> This series adds support for other delimiters
-> and lack of any delimiter to the mac_pton() function.
-> 
-> Tested with Openwrt on a MIPS system (ar9344).
+On Tue, Oct 3, 2023 at 8:51=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> On Sun, Oct 01, 2023 at 11:07:48AM -0400, Xin Long wrote:
+>
+> ...
+>
+> > @@ -481,6 +486,24 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
+> >                           old_state =3D=3D SCTP_CONNTRACK_CLOSED &&
+> >                           nf_ct_is_confirmed(ct))
+> >                               ignore =3D true;
+> > +             } else if (sch->type =3D=3D SCTP_CID_INIT_ACK) {
+> > +                     struct sctp_inithdr _ih, *ih;
+> > +                     u32 vtag;
+> > +
+> > +                     ih =3D skb_header_pointer(skb, offset + sizeof(_s=
+ch), sizeof(*ih), &_ih);
+> > +                     if (ih =3D=3D NULL)
+> > +                             goto out_unlock;
+> > +
+> > +                     vtag =3D ct->proto.sctp.vtag[!dir];
+> > +                     if (!ct->proto.sctp.init[!dir] && vtag && vtag !=
+=3D ih->init_tag)
+> > +                             goto out_unlock;
+> > +                     /* collision */
+> > +                     if (ct->proto.sctp.init[dir] && ct->proto.sctp.in=
+it[!dir] &&
+> > +                         vtag !=3D ih->init_tag)
+>
+> The type of vtag is u32. But the type of ct->proto.sctp.vtag[!dir] and in=
+it_tag
+> is __be32. This doesn't seem right (and makes Sparse unhappy).
+You're right, I will fix it and re-post with tag:
 
-Hi Michael,
+Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
 
-I am wondering if you considered a different approach where,
-via parameters and/or new helpers, callers can specify the
-delimiter, or absence thereof.
+Thanks.
+>
+> > +                             goto out_unlock;
+> > +
+> > +                     pr_debug("Setting vtag %x for dir %d\n", ih->init=
+_tag, !dir);
+> > +                     ct->proto.sctp.vtag[!dir] =3D ih->init_tag;
+> >               }
+> >
+> >               ct->proto.sctp.state =3D new_state;
+> > --
+> > 2.39.1
+> >
+> >
 
