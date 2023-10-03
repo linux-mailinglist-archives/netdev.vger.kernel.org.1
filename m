@@ -1,140 +1,284 @@
-Return-Path: <netdev+bounces-37551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF947B5F0F
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 04:32:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E7A17B5F38
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 05:05:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 971C0281666
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 02:32:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1B17E281671
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 03:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5F4862B;
-	Tue,  3 Oct 2023 02:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6F6815;
+	Tue,  3 Oct 2023 03:05:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71683364
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 02:32:25 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84579BB
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 19:32:23 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4053f24c900so27075e9.1
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 19:32:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696300342; x=1696905142; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=al5wsxcEEaN9EiW9Q10StMwifcs508QOq5CB2e+zVuE=;
-        b=JEder+CwoTzfgoSh5q3l6XLAlAXUPid8zXnLr896D5cV4xUPqnlkb+6KUVZbPdtGFR
-         CwKs8MPlCfslQVtbqWEiSVgTx+qMFIlFxlLHf/3AixlJ+Tdke1/AftgVhbc1xs1zc5Mi
-         AikMxYQUmjvjpTQWyEkxM4UNl1C7HfCsBmtKoTPJJbI3p7EwUJO4La10oonv9uQvvShV
-         yk3f9b8NP2wACjQ4YS4700hwkZ3TskMtZ8LwzAUuoHBNEZzt/pJAELnUj0/14UxNtkHJ
-         8VPviB1m4H3Et4eu9ch9qB+ugAgLhm17IiGCuT3zMvgs+A7SYO32N3evGfZFLMbMRZCJ
-         /H+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696300342; x=1696905142;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=al5wsxcEEaN9EiW9Q10StMwifcs508QOq5CB2e+zVuE=;
-        b=TyIWayNau40cY+3029thTdAncRa/gQzQTfINaeabkeXKCMsFbNyxN/rvNiXzvZxE2J
-         GMNcmofpR0FjSmdZeerxMyU4BtaZxq8odTANUYAFBz5vAEwUNF0CjPHmwrDVLd3RrhcQ
-         jLs2epP3rRNNUSMJP1QqL9/AFdbR1DzPvfZTZ1aR6IjVYsrHnXiYafoM/PPojj1YsCPl
-         ek0S7RcVoWM8cnmicUgQwi5465JYMTqx2EqK+FWuoOftXkmWh4/JoQl8xa9lWZkaz/hu
-         ZEkWhxxfKiNSTwjbWrsQqvpnSCuFjtzR4KC9oj2jGE1SqQOVKk59Nf+YracOpp4hdVN6
-         ptiw==
-X-Gm-Message-State: AOJu0YxHQ/RJ03/WkeYZSlipt6N1KzT147bJQmUk5gYiJauuOQoRnKYw
-	KuMOpgDUQ7hwYnwzkHoU/40Zaw6eh84Mgqt0tIrG
-X-Google-Smtp-Source: AGHT+IHawGS/nKRDttCxOnrm1x8BXzTA2XAn8KgNoxMYw1zp7u1qR9XjUrId+1wAC3oM/0hcr3zcIpekfA405SgCO1s=
-X-Received: by 2002:a05:600c:3b82:b0:400:c6de:6a20 with SMTP id
- n2-20020a05600c3b8200b00400c6de6a20mr38797wms.3.1696300341777; Mon, 02 Oct
- 2023 19:32:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F04F364
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:05:31 +0000 (UTC)
+Received: from m126.mail.126.com (m126.mail.126.com [220.181.12.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56A2FBF;
+	Mon,  2 Oct 2023 20:05:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=j5U+KH7L61eD/YR+rpoWGe4zYfEE19aFtlBhfDC1WRw=;
+	b=JTDlxMKJ14hBqiUvEmwUW8CZZpzGCu4pcGJCXUY2fbyFOaJeugvegPMtJYTlcl
+	wR7pvlTx/kUYFwRUxhca+B9EZF170gnzwAvbhzc3d60NhwqaJ2Jmgo1vErZDdDF2
+	l88QSwhWRS06Z/OcXMtJtO6RMWaAX+tYmL1UZ7Fn0LKFY=
+Received: from [172.20.125.11] (unknown [111.48.58.12])
+	by zwqz-smtp-mta-g5-1 (Coremail) with SMTP id _____wC3n0ZDhBtlPMxWBA--.40871S2;
+	Tue, 03 Oct 2023 11:02:28 +0800 (CST)
+Message-ID: <7ce7ae25-7f1d-7eaa-3084-f3c5f417167a@126.com>
+Date: Tue, 3 Oct 2023 11:02:27 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230929023737.1610865-1-maheshb@google.com> <CANDhNCqb5JzEDOdAnocanR2KFbokrpMOL=iNwY3fTxcn_ftuZQ@mail.gmail.com>
- <CAF2d9jgeGLCzbFZhptGzpUnmMgLaRysyzBmpZ+dK4sxWdmR5ZQ@mail.gmail.com>
- <CANDhNCro+AQum3eSmKK5OTNik2E0cFxV_reCQg0+_uTubHaDsA@mail.gmail.com>
- <CANDhNCryn8TjJZRdCvVUj88pakHSUvtyN53byjmAcyowKj5mcA@mail.gmail.com> <CAF2d9jg4Oxm3NwDuh21eeKC5-m7umZM3XLuxUKcFkchFjTgTtQ@mail.gmail.com>
-In-Reply-To: <CAF2d9jg4Oxm3NwDuh21eeKC5-m7umZM3XLuxUKcFkchFjTgTtQ@mail.gmail.com>
-From: John Stultz <jstultz@google.com>
-Date: Mon, 2 Oct 2023 19:32:10 -0700
-Message-ID: <CANDhNCp_BvN5GMGjLnZTKQBXwVAn72CuMkCwK9LhhjNGTmujzQ@mail.gmail.com>
-Subject: Re: [PATCH 1/4] time: add ktime_get_cycles64() api
-To: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>, 
-	Mahesh Bandewar <mahesh@bandewar.net>, Thomas Gleixner <tglx@linutronix.de>, 
-	Stephen Boyd <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] netfilter: ipset: add ip_set lock to ip_set_test
+Content-Language: en-US
+To: Jozsef Kadlecsik <kadlec@netfilter.org>, Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, justinstitt@google.com, kuniyu@amazon.com,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Linkui Xiao <xiaolinkui@kylinos.cn>
+References: <20230927130309.30891-1-xiaolinkui@126.com>
+ <20231002160651.GX92317@kernel.org>
+ <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
+From: xiaolinkui <xiaolinkui@126.com>
+In-Reply-To: <bf23f26-6cf0-b6e-f720-adcd8658a29b@netfilter.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wC3n0ZDhBtlPMxWBA--.40871S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxuFWUXFWfJr1xAry7Gw4fGrg_yoW3urWkpa
+	4YgF1qg3ykZrnrAw4jyF48KF1jqanIyF1UGr95Gr1fuwnrGwnrJF48KFW3Wr47XrWruFy2
+	yw1jv3y0qr1UGw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jP_-PUUUUU=
+X-Originating-IP: [111.48.58.12]
+X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbibQX91lpEFAQ3OwABsA
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 2, 2023 at 5:13=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=
-=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=
-=E0=A4=B0)
-<maheshb@google.com> wrote:
+Hi,
+
+On 10/3/23 03:06, Jozsef Kadlecsik wrote:
+> Hi,
 >
-> On Fri, Sep 29, 2023 at 12:07=E2=80=AFAM John Stultz <jstultz@google.com>=
- wrote:
-> >
-> > On Thu, Sep 28, 2023 at 11:56=E2=80=AFPM John Stultz <jstultz@google.co=
-m> wrote:
-> > > On Thu, Sep 28, 2023 at 11:35=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=
-=E0=A4=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=
-=E0=A4=BE=E0=A4=B0)
-> > > <maheshb@google.com> wrote:
-> > > > On Thu, Sep 28, 2023 at 10:15=E2=80=AFPM John Stultz <jstultz@googl=
-e.com> wrote:
-> > > > > 3) Nit: The interface is called ktime_get_cycles64 (timespec64
-> > > > > returning interfaces usually are postfixed with ts64).
-> > > > >
-> > > > Ah, thanks for the explanation. I can change to comply with the
-> > > > convention. Does ktime_get_cycles_ts64() make more sense?
-> > >
-> > > Maybe a little (it at least looks consistent), but not really if
-> > > you're sticking raw cycles in the timespec :)
-> > >
-> >
-> > Despite my concerns that it's a bad idea, If one was going to expose
-> > raw cycles from the timekeeping core, I'd suggest doing so directly as
-> > a u64 (`u64 ktime_get_cycles(void)`).
-> >
-> > That may mean widening (or maybe using a union in) your PTP ioctl data
-> > structure to have a explicit cycles field.
-> > Or introducing a separate ioctl that deals with cycles instead of times=
-pec64s.
-> >
-> > Squeezing data into types that are canonically used for something else
-> > should always be avoided if possible (there are some cases where
-> > you're stuck with an existing interface, but that's not the case
-> > here).
-> >
-> > But I still think we should avoid exporting the raw cycle values
-> > unless there is some extremely strong argument for it (and if we can,
-> > they should be abstracted into some sort of cookie value to avoid
-> > userland using it as a raw clock).
-> >
-> Thanks for the input John. This change is basically to address the API
-> gap and allow it to give a user-given timebase for the sandwich time.
-> I will remove this RAW-CYCLES option for now. If it's deemed
-> necessary, we can always add it later into the same API.
+> On Mon, 2 Oct 2023, Simon Horman wrote:
+>
+>> On Wed, Sep 27, 2023 at 09:03:09PM +0800, xiaolinkui wrote:
+>>> From: Linkui Xiao <xiaolinkui@kylinos.cn>
+>>>
+>>> If the ip_set is not locked during ip_set_test, the following situations
+>>> may occur:
+>>>
+>>> 	CPU0				CPU1
+>>> 	ip_rcv->
+>>> 	ip_rcv_finish->
+>>> 	ip_local_deliver->
+>>> 	nf_hook_slow->
+>>> 	iptable_filter_hook->
+>>> 	ipt_do_table->
+>>> 	set_match_v4->
+>>> 	ip_set_test->			list_set_destroy->
+>>> 	hash_net4_kadt->		set->data = NULL
+>> I'm having a bit of trouble analysing this.
+>> In particular, I'm concerned that in such a scenario set
+>> itself will be also freed, which seems likely to lead to problems.
+>>
+>> Can you provide a more complete call stack for CPU1 ?
+> ip_set_test() runs intentionally without holding a spinlock, it uses RCU.
+>
+> But I don't understand the scenario at all:
+>
+> 	CPU0:				CPU1:
+> 	hash_net4_kadt			list_set_destroy
+>
+> 	so it's a hash:net type		which works on a list
+> 	of set				type of sets only
+>
+> The list type of set can freely be destroyed (when not referenced), the
+> destroy operation has no effect whatsoever on its possible hash:net type
+> of member set.
+>
+> Moreover, kernel side add/del/test can only be performed when the set in
+> question is referenced. Referenced sets cannot be deleted.
+>
+> So what is the scenario really in this case?
+The case I want to express should be like this:
 
-Sounds reasonable to me.
+                         CPU0         CPU1
 
-thanks
--john
+                 ip_set_test
+
+                             |   (1)  iptables -D -> set->ref --
+
+                             |   (2) ipset destroy -> set->data=NULL
+
+                             |
+
+                 hash_net4_kadt
+
+                             |
+
+                 hash_net4_test
+
+For the convenience of description, the definition is as follows:
+
+cmd(1): iptables -D
+
+cmd(2):  ipset destroy
+
+When the ip_set test has already started in CPU0, but before it ends.
+
+For example, when CPU0 runs between  ip_set_test  and hash_net4_kadt,
+CPU1 executes cmd (1) and cmd (2).
+
+In addition, if CPU 0 runs between hash_net4_kadt and hash_net4_test,
+
+CPU1 executes cmd (1) and cmd (2). The following call trace will be 
+triggered:
+
+crash> bt
+PID: 0      TASK: ffff8003a1cd2680  CPU: 7   COMMAND: "swapper/7"
+  #0 [ffff8003fff3f460] crash_kexec at ffff0000081af828
+  #1 [ffff8003fff3f490] die at ffff00000808f754
+  #2 [ffff8003fff3f4d0] die_kernel_fault at ffff0000080aa9ac
+  #3 [ffff8003fff3f500] __do_kernel_fault at ffff0000080aa67c
+  #4 [ffff8003fff3f530] do_page_fault at ffff000008bfa66c
+  #5 [ffff8003fff3f620] do_translation_fault at ffff000008bfab64
+  #6 [ffff8003fff3f650] do_mem_abort at ffff000008081284
+  #7 [ffff8003fff3f830] el1_ia at ffff00000808310c
+      PC: ffff00000342225c  [hash_net4_test+68]
+      LR: ffff000003420200  [hash_net4_kadt+208]
+      SP: ffff8003fff3f840  PSTATE: 60400005
+     X29: ffff8003fff3f840  X28: ffff8003a78ca600  X27: ffff8003fff3f908
+     X26: 0000000000000000  X25: ffff000000c70600  X24: ffff8003b8232400
+     X23: ffff000002f90fcc  X22: 0000000000000000  X21: ffff8003fff3f9d0
+     X20: ffff8003fff3f910  X19: ffff8003fff3f9c8  X18: 0000000000000000
+     X17: 0000000000000000  X16: 0000000000000000  X15: 0000000000000000
+     X14: 970000002d494600  X13: 0000000000000000  X12: a40d15d8df825036
+     X11: ffff000000c70600  X10: ffff8003b2deb000   X9: 0000000000000001
+      X8: 0000000000000000   X7: 00000000637c7464   X6: ffff000003422218
+      X5: 00000000637c7464   X4: 0000000000000000   X3: ffff8003fff3f9d0
+      X2: ffff8003fff3f910   X1: ffff8003fff3f908   X0: 0000000000000020
+  #8 [ffff8003fff3f840] hash_net4_test at ffff000003422258 
+[ip_set_hash_net]
+  #9 [ffff8003fff3f8d0] hash_net4_kadt at ffff0000034201fc 
+[ip_set_hash_net]
+#10 [ffff8003fff3f940] ip_set_test at ffff000002c011b8 [ip_set]
+#11 [ffff8003fff3f990] set_match_v4 at ffff000002f90fc8 [xt_set]
+#12 [ffff8003fff3fa20] ipt_do_table at ffff000000c504e0 [ip_tables]
+#13 [ffff8003fff3fb60] iptable_filter_hook at ffff0000026e006c 
+[iptable_filter]
+#14 [ffff8003fff3fb80] nf_hook_slow at ffff000008ac7a84
+#15 [ffff8003fff3fbc0] ip_local_deliver at ffff000008ad5d88
+#16 [ffff8003fff3fc10] ip_rcv_finish at ffff000008ad59b4
+#17 [ffff8003fff3fc40] ip_rcv at ffff000008ad5dec
+#18 [ffff8003fff3fca0] __netif_receive_skb_one_core at ffff000008a6c344
+#19 [ffff8003fff3fce0] __netif_receive_skb at ffff000008a6c3ac
+#20 [ffff8003fff3fd00] netif_receive_skb_internal at ffff000008a6c440
+#21 [ffff8003fff3fd30] napi_gro_receive at ffff000008a6d3ec
+#22 [ffff8003fff3fd60] receive_buf at ffff000001c734d8 [virtio_net]
+#23 [ffff8003fff3fe20] virtnet_poll at ffff000001c753e8 [virtio_net]
+#24 [ffff8003fff3fec0] net_rx_action at ffff000008a6c9ec
+#25 [ffff8003fff3ff60] __softirqentry_text_start at ffff0000080819f0
+#26 [ffff8003fff3fff0] irq_exit at ffff0000080f1228
+#27 [ffff8003fff40010] __handle_domain_irq at ffff000008162a10
+
+Of course, the ip_set_test execution cycle is very short. During this 
+period,
+another CPU needs to complete the cmd1 and cmd2 operations on the 
+ip_set, the
+probability of triggering this problem will be very low.
+
+This problem has also occurred in Red Hat:
+
+https://access.redhat.com/solutions/6839381
+
+But I think the solution mentioned in the link is not applicable.
+
+Commit c120959387ef(netfilter: fix a use-after-free in mtype_destroy()) 
+applies
+to ip_set_bitmap instead of ip_set_hash.
+
+Best regards,
+
+Linkui
+>
+> Best regards,
+> Jozsef
+>
+>>> 	h = set->data
+>>> 	.cidr = INIT_CIDR(h->nets[0].cidr[0], HOST_MASK)
+>>>
+>>> The set->data is empty, continuing to access set->data will result in a
+>>> kernel NULL pointer. The call trace is as follows:
+>>>
+>>> [2350616.024418] Call trace:
+>>> [2350616.024670]  hash_net4_kadt+0x38/0x148 [ip_set_hash_net]
+>>> [2350616.025147]  ip_set_test+0xbc/0x230 [ip_set]
+>>> [2350616.025549]  set_match_v4+0xac/0xd0 [xt_set]
+>>> [2350616.025951]  ipt_do_table+0x32c/0x678 [ip_tables]
+>>> [2350616.026391]  iptable_filter_hook+0x30/0x40 [iptable_filter]
+>>> [2350616.026905]  nf_hook_slow+0x50/0x100
+>>> [2350616.027256]  ip_local_deliver+0xd4/0xe8
+>>> [2350616.027616]  ip_rcv_finish+0x90/0xb0
+>>> [2350616.027961]  ip_rcv+0x50/0xb0
+>>> [2350616.028261]  __netif_receive_skb_one_core+0x58/0x68
+>>> [2350616.028716]  __netif_receive_skb+0x28/0x80
+>>> [2350616.029098]  netif_receive_skb_internal+0x3c/0xa8
+>>> [2350616.029533]  napi_gro_receive+0xf8/0x170
+>>> [2350616.029898]  receive_buf+0xec/0xa08 [virtio_net]
+>>> [2350616.030323]  virtnet_poll+0x144/0x310 [virtio_net]
+>>> [2350616.030761]  net_rx_action+0x158/0x3a0
+>>> [2350616.031124]  __do_softirq+0x11c/0x33c
+>>> [2350616.031470]  irq_exit+0x11c/0x128
+>>> [2350616.031793]  __handle_domain_irq+0x6c/0xc0
+>>> [2350616.032172]  gic_handle_irq+0x6c/0x170
+>>> [2350616.032528]  el1_irq+0xb8/0x140
+>>> [2350616.032835]  arch_cpu_idle+0x38/0x1c0
+>>> [2350616.033183]  default_idle_call+0x24/0x58
+>>> [2350616.033549]  do_idle+0x1a4/0x268
+>>> [2350616.033859]  cpu_startup_entry+0x28/0x78
+>>> [2350616.034234]  secondary_start_kernel+0x17c/0x1c8
+>>>
+>>> Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+>>> ---
+>>>   net/netfilter/ipset/ip_set_core.c | 2 ++
+>>>   1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+>>> index 35d2f9c9ada0..46f4f47e29e4 100644
+>>> --- a/net/netfilter/ipset/ip_set_core.c
+>>> +++ b/net/netfilter/ipset/ip_set_core.c
+>>> @@ -747,7 +747,9 @@ ip_set_test(ip_set_id_t index, const struct sk_buff *skb,
+>>>   	    !(opt->family == set->family || set->family == NFPROTO_UNSPEC))
+>>>   		return 0;
+>>>   
+>>> +	ip_set_lock(set);
+>>>   	ret = set->variant->kadt(set, skb, par, IPSET_TEST, opt);
+>>> +	ip_set_unlock(set);
+>>>   
+>>>   	if (ret == -EAGAIN) {
+>>>   		/* Type requests element to be completed */
+>>> -- 
+>>> 2.17.1
+>>>
+>>>
+> -
+> E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+> PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+> Address : Wigner Research Centre for Physics
+>            H-1525 Budapest 114, POB. 49, Hungary
+
 
