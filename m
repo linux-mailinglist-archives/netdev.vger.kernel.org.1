@@ -1,180 +1,302 @@
-Return-Path: <netdev+bounces-37749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E5327B6F54
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F7A7B6F5A
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B97E02812F8
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:13:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B2244281300
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0C73AC1F;
-	Tue,  3 Oct 2023 17:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34B13AC3A;
+	Tue,  3 Oct 2023 17:14:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4744230CF2;
-	Tue,  3 Oct 2023 17:13:00 +0000 (UTC)
-Received: from BN3PR00CU001.outbound.protection.outlook.com (mail-eastus2azon11020026.outbound.protection.outlook.com [52.101.56.26])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE7895;
-	Tue,  3 Oct 2023 10:12:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0A730CF2
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 17:14:15 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 377519B;
+	Tue,  3 Oct 2023 10:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696353254; x=1727889254;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=hHAqYhqSwROKZJWbkSMqAKxJjmE0SImGGYt1jCmqaTQ=;
+  b=LadnwuXIyudEkDnZKPONCQHmVXTg9ubdfkFHaLTYBRNgnZIPZk73ti2T
+   GfLNN1ymSCxrR1TMyGUvUokxz5awJeRUt1tT1XPge1YXuNLU44sNZ68Ld
+   dJj9coItN4gTIFsCZeiWTmtANghMmHrGq165FY4Mfy/QJAiVwV6BJIY9B
+   1Q3ARwKfketje2SkaXx5GFEzqavGTPTvn5RvpiJ9FwMNRxEWO4EuMedsI
+   3s7ehQkVlUAdwESABZqcI6CuTnhD/hHv4faMXd4iaX0HgT67z1oT1qy/Z
+   yN414h/YzV3yPg0QOe3WwQ1eADeEzGbWuR+oBSHvCGZE5J4e8rDCZSN3q
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="469211512"
+X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
+   d="scan'208";a="469211512"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2023 10:14:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="821336460"
+X-IronPort-AV: E=Sophos;i="6.03,197,1694761200"; 
+   d="scan'208";a="821336460"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Oct 2023 10:14:10 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 3 Oct 2023 10:14:11 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 3 Oct 2023 10:14:11 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 3 Oct 2023 10:14:11 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.42) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 3 Oct 2023 10:14:09 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PfqJGHYqyPIpH4yHiqs3jWmo9k0D1tWnqrHOg9d8J32VwciBcV8NhBxv+o1dLRSedhsWzlIhCQJn16Yo/fnLeUyhR0kBx+zDa1QCQUCWO/AwUZFxE8OoYvxE9DOEhaipACCv1pnrnd/uscbbtcGzgrFUQvpRRQ7jDyWoQHBvERKeoXAnVBZgx4z52xrEglLRSptMgAR0XCSR2bMZqo28G9HQ6EmP6puq8MofllArJDrhXQY9shD1MjZ2IyODXZ6Hjv0pDnFlamuRGtUrOTRgBH18bo31ZizB+7y9jjBczu1uKV1Bw7QnUkzNiRAycIIVJYCAznT02kAWFxn6mZI62g==
+ b=TkY/3+DAUu7PY1YyHAnfoUiLVcCEpQo2NpQicLZdrze0i9idFm7Fm5flQM3r3MbSw/ifyug2x3vlHYE2cl2+jkVpzf/g8S8w2wVFZ+3ZWANLBSkNcO1DfvS9PNs7ArGv7FmNj1JrazGm8z6LmjFUsyMGYajGCi0cSbw3bu12BESBSu2Mw4HO7vGpds43Rn8LpJparMnesSjQ+UyISwI1Fr+7AWnRuFLu0fu0og9E5zgu1DAKG1n9A++zzdMzsZP2AgRzOYQdEtY56L/gEb3iS7L/e4TTVPRAGzdWNYcYkieMWP84rjFWRj3wga7I+lf7eLxpNaDq5rK70MHxprTHlQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NzjXU3rhk8ME6MBY85ODBNeQRd5AKN1c9cafTsjAnw4=;
- b=OdP4P6HWfzdN/tnq93/HmR8vJNgR7JBmjmuJbFlInN3YGV+Fd4zF49vvGF3mYqzk2KUpcXTfJkGIWxlfLOyYU8ezw6qnVa+Grw7IA1QICBcfDVMscGiSek2eM/Otxpftx9HuOg0hau2yIAoYLKvwakNxNCXwgQ/f0+Ej797Ex4ugwwNGMlmU0W1NW5gej8rrMjb74jzBdrIGJmfb6I7kjDre352CroDVmTRqbmHOJdVzQnaZsUBIAu4B9CXJ5Am7Y8U0cdrpBRrfTSbiqJboQ3G3gSx8px70rRgNx7XogiE+xPRPF6hiCx8wqdVZIim9D4r0EoFAB8G4VU34UBX2qg==
+ bh=x48F0pPxAfc3kxWKEPqgvR3IXKYYfXMKaQa5xLgqk/U=;
+ b=LJ733oQOYEmhPBZUfdm2k+DdrIKZXwMi2K4gh2ST4GFZDLwKlMyBXOcmD/W6u9B0eOA2WxHvWgSUIFTiIjTw9goX2ZqTK0Hw4Xz53Q+hae1GasdAdxULDnsICEnKvLV2sOd/5bU2pI9gm1/b+4ficS0x/557wczroP6AuKumw6e8qCdxaQeNP4SHi26G7yetTV2pMIzRcF3yJb8vYmi2C677QegOjc8GYEt+6zlmt3LeqkoYCTtUzHpU0hkSPjcGopFIp7GjerjlJXGi8B/cRKoXV4zjKBwGkDvR9fTgnMW9xsh9rDYyi/zGkBkXdQwhhQDG7WwohEvxpvzkO8yeYA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NzjXU3rhk8ME6MBY85ODBNeQRd5AKN1c9cafTsjAnw4=;
- b=GaJFfNiSHQw8e/aXughG21jQNnDzrgT3oODGoGNbYDh/eoCPvWsiAfFXhdnejYeaMez5DAMiy/VhFi+7suCL7vZtATz7iVR3B6uFTuZAexo65iaJduc2VgkeeqqxABcNl2FJBgkfX5FsOc8inxA7jBGXdXZAkXELcpictvGhJ7Y=
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com (2603:10b6:a02:bf::26)
- by SJ1PR21MB3761.namprd21.prod.outlook.com (2603:10b6:a03:452::15) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by BL3PR11MB6412.namprd11.prod.outlook.com (2603:10b6:208:3bb::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.6; Tue, 3 Oct
- 2023 17:12:55 +0000
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::ef:cf62:9355:5884]) by BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::ef:cf62:9355:5884%3]) with mapi id 15.20.6886.004; Tue, 3 Oct 2023
- 17:12:55 +0000
-From: "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To: Randy Dunlap <rdunlap@infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: Haiyang Zhang <haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH] hyperv: rndis_filter needs to select NLS
-Thread-Topic: [PATCH] hyperv: rndis_filter needs to select NLS
-Thread-Index: AQHZ80ZpAIkCZ3Di40aHJavjr+vJHrA4UmgQ
-Date: Tue, 3 Oct 2023 17:12:55 +0000
-Message-ID:
- <BYAPR21MB1688523940DAA4DA6E61265DD7C4A@BYAPR21MB1688.namprd21.prod.outlook.com>
-References: <20230930023234.1903-1-rdunlap@infradead.org>
-In-Reply-To: <20230930023234.1903-1-rdunlap@infradead.org>
-Accept-Language: en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.28; Tue, 3 Oct
+ 2023 17:14:08 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda%3]) with mapi id 15.20.6813.027; Tue, 3 Oct 2023
+ 17:14:07 +0000
+Message-ID: <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
+Date: Tue, 3 Oct 2023 10:14:05 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.15.1
+Subject: Re: [PATCH net-next] iavf: Avoid a memory allocation in
+ iavf_print_link_message()
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=4b419781-6994-44e0-a6ea-540fbba3d282;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-10-03T17:10:16Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR21MB1688:EE_|SJ1PR21MB3761:EE_
-x-ms-office365-filtering-correlation-id: 32435b65-f5f5-4ffd-0485-08dbc433fc09
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- niMpW7gfXXennZbYtgekhlZ+5peZhn00czeAwnYgW4DXpAtXdtBbWIx7APQ5pVFUtChOG4UU8cUS5DQ2D6OGweN1Dv9PzggoN3PZoxTN9HPOJDGGjg75ha0lXO51gCh3NVquT+Oh8R8X/ycQbfG3gMMYwUFmyWXmrCWGOGSDX3qhNJ4anzc8gbjG1nZdKikcGnH/YcYTOilytI13GlJOBrBYbbU8yLSzzGJmtZh2z7xFRgBnSaIeFgEqcNVuP+doAUQ1h6bLaVX1Fwvc44fU7E0QeFFTD8DFBXZeiH6PDashV75gMBBTWH2/obhM0paabEWJg7Fu4PJ2/Rn5lxTb/BBrVSvI+zeHdzUOHpOff/DbL0LGYXXh6lTe4TwCF4kFVKULaYkP7VJbOrQJgZ2n98lTduU7zlYEySwPE0/Sncc/V4tlcYr1Z05RgAN6fMGs88rmFtN1kAFJ1z08cANJuhMmvsWRByA64xWeUdaXRY5FUGUGuyOqpXmsmA6cr34XSMFO/8/4tdXgrIFt3gQIyM42r8MQcIhndjx1+ueJjEzpctQEmjDE2cd6LwJYvNtMJ3mamjfSWKcYEfU9tdpqh+3lgrRJX6DYjcO7n4+2w9bw4DSi5wO8MkKrK0O+3CXNd9YyJoMEfjHeMqot97FUOA9PUL6eV4vqofWN6117PMk=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR21MB1688.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(376002)(366004)(396003)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(86362001)(55016003)(33656002)(122000001)(316002)(64756008)(66946007)(66556008)(110136005)(82960400001)(41300700001)(38100700002)(38070700005)(54906003)(4326008)(82950400001)(8676002)(66476007)(8990500004)(26005)(66446008)(9686003)(71200400001)(6506007)(8936002)(2906002)(478600001)(7696005)(10290500003)(5660300002)(76116006)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?PSEmZv9VxoY+Aagn4WYCkcgXSJ0omPzT8UUyZsv168PP4GPY+cncgCwlYfzZ?=
- =?us-ascii?Q?G/6WeB1LMyf7Cz8fvmQ4+X3xZ1x2DlqjCBRfde5sAzIUaL6iAWMqkaQHQuLY?=
- =?us-ascii?Q?U+graJiQ5Du1OWadT6V6vt5rA6xDsAvBcONqHZmZLl8r6274/pRANSdXMnLB?=
- =?us-ascii?Q?NHDNfyowWe9mlc4CvnLlWSJWUfO8I6NIRE8TIBsL7Upf/AkwEP8QPr5RTwv/?=
- =?us-ascii?Q?8eGdVSlgbPU/bVPsx5KmnbzR3sILj4Fr5cO8mC4GVX8hmaVVsR596e7gxj/c?=
- =?us-ascii?Q?KgcpHiSgZbKg27qqKWQkB0Ecpab/Ft8fU7P2XQTpX3o5DInzu6aKKB6aRzml?=
- =?us-ascii?Q?kD/X7hrtNEOlpb6n199iLSv3uPBh6Y55C7WoxcimJPqT0OA8JuHSDk9tkVAA?=
- =?us-ascii?Q?JavhWoPBOItyxWcbJZXYpsfLhYPrKXnSAvm3t2N0MLAzBvcKKa+I4kO5fhZc?=
- =?us-ascii?Q?FvVeqeCAqFkToChYN8O0Mf++YKlXf4sdM4WDxre/kwd45OULrwJQxOk7XEKi?=
- =?us-ascii?Q?csi+w0m1lnLCNm4N8RBZTjeq0Yt87tKP+nGQq3ZTzQ0wbuDqhbR+Uvs7OgT8?=
- =?us-ascii?Q?slFGGCHaTBta19l8X3wmFq7lH3gl2AkzRu08jue5fJNywCK/18GwGPLya5bc?=
- =?us-ascii?Q?HaYj+0jDDeBRFhQCpvGO7rkvvmvqSfD8aDxYV8D3E21jj2b77ttONxMoIPKc?=
- =?us-ascii?Q?FKi0n0nRtV50nfKfWRsmbI5m2BXLOI1SHcn6kfAOL1SY81AglfCs63HMzifl?=
- =?us-ascii?Q?+a/dHt9RN6+s/YbJ4c+gv5eDnA82eHyIg5UFJ6B1zMhmMfhAdeyFu/qMVBOg?=
- =?us-ascii?Q?38bLo1Ao3KKd49PhrGx1ufx2Tei1RWTjh/t+WtN+FkXAJvSWHIaxU+vIFanX?=
- =?us-ascii?Q?EQzInDvkahG0O7uTSczO9u6v2vpgJk62h6YesNr/LHDfACEbNCXjjfqIOgqa?=
- =?us-ascii?Q?orjXFpIlxI1RACY99FeGxOqDyPGSCVxEHDueZvzcaDWTh4ai+JtnG6d2cEOV?=
- =?us-ascii?Q?MuvXD5veIYISIZCh7FE1kxLi9bGKl7r/OrV8uJa5VZg9Y6dDp2ajJ3sLgADb?=
- =?us-ascii?Q?4H5C2ahj2Pf4725Ja9hzSPOubDXWuo78ML+DzMl4EUMWUrF5BqUUjmHnXv3n?=
- =?us-ascii?Q?bTtZBS1abLRh/YjUvPnazuBVAWbqj8jvgKtHVrQFt0HrnaCN2e2rElQBI3Gn?=
- =?us-ascii?Q?HVFKsu+7oMJPxwpegytP8lFVcLKP2ULUDvyHT9MNI6LvTHKi9AuNyQwvSwqy?=
- =?us-ascii?Q?HGfXo2LfyWkBuZmiPH/lIchTLo8lCQeVjFz+p1YB0FJU1pVbnjfKvPEU3XEc?=
- =?us-ascii?Q?smzSZYkcHmy/L1k3vyAF+EowHWrFNoL12DJwAgOL8zX9zdVDHaL02sj9ZQvk?=
- =?us-ascii?Q?MZRj3Y3ev1enMbGsH02FHuKr4WZPHfepEElzq2LpURsgN3XEX3gb+BX0zEZB?=
- =?us-ascii?Q?9x60UP7JN/WugdmxrMM7TK8JhYocSIL85kPILTpK1pmBWnHX0HtEyYCW4XH6?=
- =?us-ascii?Q?xSYrrFNLqxlDS+s+dxGemJNLr7r0dUJ8pZ3jlwC++gt10pRb/VKUscTbIosJ?=
- =?us-ascii?Q?b8UYzZCdQSWIEMLBNm1nNz/Me51n5iVqLWUtqv1B8suZuDS345miZ4r41fh5?=
- =?us-ascii?Q?Gg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+References: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+In-Reply-To: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4PR04CA0117.namprd04.prod.outlook.com
+ (2603:10b6:303:83::32) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|BL3PR11MB6412:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13810e88-554a-42a4-f99c-08dbc434271f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JMAYD3ZSHM76wZjFmzenHKlu4qeXI3eMMr0ZvsC5RHmdaT+3DiAT1mHQBG6TXfHCIZuRZ6fdtOYJ8d6kzW6ZnHRD1iN9+5FLIGzK4OSbePodIYYwa1TubTWdFZRA6uSOGgGuslhNy1pIjJ9vPEyVSGSPXdA/tx0vBveBLnjjt3VV84FltfSuqMBA9dof//bcsB7x0eQO9S3S4+ngyIGFpmIvLuev0d7gAjOhT2XFJ6TXKkPa/bZAwVZxKfBUDh1Vlmq/JV06zEc8VEDthpH3vqmUO3Jo7tGABAys3izHpbXZw32i/yT5BKB/Q3ALTegw5LsrsvCZq8cgVCfm7ZdP8ZFUknifrV6LM8OtQKw5qu2P5M9Yl0KIz0ZFypuJBakHlLj/tFLlZ/TOqNJNI6hYqedD3Z9miwFuZGVnjXaWHCpDVyOyI+ABoJ6yxJHfEaSkRxt6s3LPCKl7JVHQRP7PlY4Da04DnHTP3J2KxsVowLScjCl6nE1+/9bruiGwJaSdFKafUm5gDjYWCTlbD5P/RLH2Ad3P0b/EAjQv8SvE3j8bCIVBzvWDblEglrcuJUD1KvLbdHF9jFHMWxs7zMzndgVHoG1SNguTud3+J6bGxxOT5+unTsFCzhTAIm5d8DMH/VG/7b/QzaRZYhlU5p1XzQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(478600001)(316002)(66556008)(66476007)(41300700001)(66946007)(110136005)(83380400001)(31686004)(82960400001)(6506007)(8676002)(4326008)(8936002)(38100700002)(26005)(86362001)(2616005)(5660300002)(31696002)(6512007)(6486002)(53546011)(44832011)(36756003)(2906002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cGl0NkM2MlNrOEVBQnMyZEFMOWxSUUY0RitFTWg4ZUE1ZXBmeVJDMmdlSVpq?=
+ =?utf-8?B?eldJb3ZyMElCMW03UnlIUVBpT0U2ckFxQXBuVzY2cGd3UVltZkdOZTJFR25t?=
+ =?utf-8?B?M0ZYZlphWUQ0UE9CV2dYWHh2UlN6Vm8yMVdXT2ZnZEkrN1pHQlNRZllvZk5Z?=
+ =?utf-8?B?bThOOVhkcFlMOW9TUjNLZ2JTNHloRzlkZTBhTnV2a0RJbUVvTDU0bHcrOSts?=
+ =?utf-8?B?TkVGeldOdjB4cE55U2VaY29VVGMyZHVIbkpxWUdZRUd3ZFFGbTNhc2x3cTk0?=
+ =?utf-8?B?V2lKa1dLZjQ5Uk9mL2tSVGN1dzRQRnVsQzN3Q2pTUStGYU9OcVNiTFBRVkpm?=
+ =?utf-8?B?eEdrUXBycGdYZGlkajE4KzRYbjM2UjFRMzVZbkVJWmtaVXluZHJUdTd5d2c2?=
+ =?utf-8?B?dTJ4MHBMZS8wUFI2Skk1aXBzRldOZmh6OEZSdkdOK3ZNSk8zNXlxbXFmSVFR?=
+ =?utf-8?B?ZHRyVzdINkVXdU5LdlZnQkM0MlZmb1ZkU3k4T28yQkhEOUI4TThQSUQ4VnVx?=
+ =?utf-8?B?SzBZT3J0a0lhU1ZXVFEva0FZRm4zaFE5b01VdG11M3FjQitGakhKdjlLVGgz?=
+ =?utf-8?B?eUNFZHRHRGJ6eEFEN0doUDBVa21PZXIvV25TKzBBUjhFYWpEWklidUh5bzVa?=
+ =?utf-8?B?bVN6QnNUMDU3b25uZ3BzQ2FtRWwzTVRNeXJqV0x4OWR0ZklNVi8zYi9lTnky?=
+ =?utf-8?B?clNLS1pOQzJrTytvdFFvTFVQSEJ0YnhHeVNRYXk3Q0VmcW1aZTR2UE9zSXN0?=
+ =?utf-8?B?b1JNQXBvMGd4MUxXdWVrVDR3L2ltSWgxUWJ2NXhtNitpVmtZeVJMMU0wTjJm?=
+ =?utf-8?B?UlQ4SG9qOUk2NnZ5TStzRmFKRmNMUGJYWFZHQkQ4aUFPUzJ0SmhWV0FPZ2cr?=
+ =?utf-8?B?QlpkWEZPM2FsSVVjc0lvYVF6dXFNdk9qalR5RjA1eWdJYVQwZjNGMFNVcmht?=
+ =?utf-8?B?NUp2QXhVN25vUHA5VkgxaVJvWkI2clpSSVlYYVA0YU50UjdJYWMyTDZDam1S?=
+ =?utf-8?B?QXBaVkM2MXVGUDh5UlltT3FWV0JVTzRjRW9iWnhDSFdwZnVWTnZ0MmVlRXpv?=
+ =?utf-8?B?MFdTU3o5V3pPTlJmemlxZHZtbUJQeHBtUlViMVM4WlBHY3lyMUU1cm1WSkFw?=
+ =?utf-8?B?V3pDektFanY5dnFxVysrNnp0bWVlRGhyamlEOHlaR3QwRnhZQ3gydlBWZUVa?=
+ =?utf-8?B?bERRRCtZaDRPdStWWlh1VHVCQ1ZQczJHbjZJd1dlVGF5NWFWV2U4OGVqcFRw?=
+ =?utf-8?B?VU1Cd1hQcWJXTm0vVW5zbVFYL01QMXYvblM0MEpXalFSdjNxRElJc09Ec0FV?=
+ =?utf-8?B?NjZxeE00YllsUGVWbVQ3a2hCekVUeVJJWWx6bE5Vd1BRTlVRMHVLZVEybEVT?=
+ =?utf-8?B?T1UvRElxdXRkWnF0VHo0d0wvZlUreE51bHE0QjZCMmhiZjNHL2c2VFdsM01X?=
+ =?utf-8?B?RlpaejRnbnJTVlRhMTFqSEJBTTdIWS9kU1lqQXVXWDg5TXpWOHF1aWphT2xo?=
+ =?utf-8?B?MSthY0NzRk9NNWZqSDFCYURMZzFEaHI2cFNCK3BEaTBNSHBxaWk3aWhkbSs5?=
+ =?utf-8?B?aklKNUtCQ1I5TlkxbVFNbk52WVpicHNCOUJmUmNTY0MvSVdYZEUvMFF6S0Z0?=
+ =?utf-8?B?VFdja1NsR29GRFU1YkphZXpOTVhzNXhmQ0hLOVZVR1pMOVF3ZGc1NnFGK1g2?=
+ =?utf-8?B?MW9QV1VldzR5c2ZKSFAxS1JBNm9wQy9XNkx0cjJxamp6d0NMRlExWEtIbWlq?=
+ =?utf-8?B?QUNmTWZkeHFoTFFOcDFFQnduOFdvQXUrcGwrK2p3NGRKMDVTY3N5eVQ3UzNZ?=
+ =?utf-8?B?d2Vsam1GRmFiZ3RuYit1c3R6a3BDb0F6K21TUS9uVEJmVWJVS0hyQUgyNDJp?=
+ =?utf-8?B?ZGFsN1Uva3VBRE9ZdHorTWI3QWUvOVNYMW44dDZEMVc3dXZrQktIb255bzRT?=
+ =?utf-8?B?RkJXSjNZU0dYME9aSFNNbHRNdmx5dmNWUHhoSGRkWlg1bkJUVkxKT3JnRDJn?=
+ =?utf-8?B?dVM1UmpVTlliRWg4RHlmZ2xzK2tYTHFmYnExaXZkVmNzcWtxMUQ3WHZFVWEv?=
+ =?utf-8?B?amU3THJVSi84dktLc2c3akZ6WDhBdVdTSWdUTGNaSFpVaGJPdmtFU3NZSTlt?=
+ =?utf-8?B?YlNOQVEwbStxSjVUL2lhZjF4eTFiYzVrZUU1REtWcU1pT09IeWs5ZC9FMmVW?=
+ =?utf-8?B?WHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13810e88-554a-42a4-f99c-08dbc434271f
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR21MB1688.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32435b65-f5f5-4ffd-0485-08dbc433fc09
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Oct 2023 17:12:55.3422
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2023 17:14:07.8669
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iS4VSQ3OcumW9ViywwCBUEWdBq7o/MOmpPywUnRWBaHbaEILQPOl9V+i12s5T7nmZXd+7aGrfq+/YuS2a7kYykqSIrM6BKxCpzqjqNK8C7Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR21MB3761
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3z+bYrcJGdaAl7gNv6dxY2sv4ttJvwnAocekxcBq7TFx/K2PeVewoZaAzoDuJk75q7+ko3gxmZ9Vc/bVwckDkvW2I/SElQn1zs5HyCLW/hg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6412
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Randy Dunlap <rdunlap@infradead.org> Sent: Friday, September 29, 2023=
- 7:33 PM
->=20
-
-Patches for this driver usually use the subject prefix "hv_netvsc: ", not "=
-hyperv".
-Other than that minor tweak,
-
-Reviewed-by: Michael Kelley <mikelley@microsoft.com>
-
-> rndis_filter uses utf8s_to_utf16s() which is provided by setting
-> NLS, so select NLS to fix the build error:
->=20
-> ERROR: modpost: "utf8s_to_utf16s" [drivers/net/hyperv/hv_netvsc.ko] undef=
-ined!
->=20
-> Fixes: 1ce09e899d28 ("hyperv: Add support for setting MAC from within gue=
-sts")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: K. Y. Srinivasan <kys@microsoft.com>
-> Cc: Wei Liu <wei.liu@kernel.org>
-> Cc: Dexuan Cui <decui@microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
+On 9/23/2023 5:17 AM, Christophe JAILLET wrote:
+> IAVF_MAX_SPEED_STRLEN is only 13 and 'speed' is allocated and freed within
+> iavf_print_link_message().
+> 
+> 'speed' is only used with some snprintf() and netdev_info() calls.
+> 
+> So there is no real use to kzalloc()/free() it. Use the stack instead.
+> This saves a memory allocation.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 > ---
->  drivers/net/hyperv/Kconfig |    1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff -- a/drivers/net/hyperv/Kconfig b/drivers/net/hyperv/Kconfig
-> --- a/drivers/net/hyperv/Kconfig
-> +++ b/drivers/net/hyperv/Kconfig
-> @@ -3,5 +3,6 @@ config HYPERV_NET
->  	tristate "Microsoft Hyper-V virtual network driver"
->  	depends on HYPERV
->  	select UCS2_STRING
-> +	select NLS
->  	help
->  	  Select this option to enable the Hyper-V virtual network driver.
+>  drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> index 8ce6389b5815..980dc69d7fbe 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> @@ -1389,18 +1389,14 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
+>  static void iavf_print_link_message(struct iavf_adapter *adapter)
+>  {
+>  	struct net_device *netdev = adapter->netdev;
+> +	char speed[IAVF_MAX_SPEED_STRLEN];
+>  	int link_speed_mbps;
+> -	char *speed;
+>  
+>  	if (!adapter->link_up) {
+>  		netdev_info(netdev, "NIC Link is Down\n");
+>  		return;
+>  	}
+>  
+> -	speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
+> -	if (!speed)
+> -		return;
+> -
+>  	if (ADV_LINK_SUPPORT(adapter)) {
+>  		link_speed_mbps = adapter->link_speed_mbps;
+>  		goto print_link_msg;
+> @@ -1452,7 +1448,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+>  	}
+>  
+>  	netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
+> -	kfree(speed);
+>  }
+>  
+>  /**
+
+Hi Christophe!
+
+I had a slightly different proposal that gets rid of all the -Wformat=2
+warnings in this code by using kasprintf to handle the varying string
+lengths.
+
+any thoughts about this instead and drop yours? I'm less worried about
+the "extra allocation" here in this function since it's slow path, and
+the same comment applies to your patch as well.
+
+your patch still shows these errors
+> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c: In function ‘iavf_virtchnl_completion’:
+> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:60: warning: ‘%s’ directive output may be truncated writing 4 bytes into a region of size between 1 and 11 [-Wformat-truncation=]
+>  1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>       |                                                            ^~
+>  1447 |                          link_speed_mbps, "Mbps");
+>       |                                           ~~~~~~
+> In function ‘iavf_print_link_message’,
+>     inlined from ‘iavf_virtchnl_completion’ at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1965:4:
+> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:17: note: ‘snprintf’ output between 7 and 17 bytes into a destination of size 13
+>  1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>  1447 |                          link_speed_mbps, "Mbps");
+>       |                          ~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+<my iavf patch pasted as a quote so my mail client won't wrap the lines...>
+
+
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> index 8ce6389b5815..82b84a93bcc8 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+> @@ -1378,8 +1378,6 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
+>                                   VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2);
+>  }
+> 
+> -#define IAVF_MAX_SPEED_STRLEN  13
+> -
+>  /**
+>   * iavf_print_link_message - print link up or down
+>   * @adapter: adapter structure
+> @@ -1397,10 +1395,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+>                 return;
+>         }
+> 
+> -       speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
+> -       if (!speed)
+> -               return;
+> -
+>         if (ADV_LINK_SUPPORT(adapter)) {
+>                 link_speed_mbps = adapter->link_speed_mbps;
+>                 goto print_link_msg;
+> @@ -1438,17 +1432,17 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+> 
+>  print_link_msg:
+>         if (link_speed_mbps > SPEED_1000) {
+> -               if (link_speed_mbps == SPEED_2500)
+> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "2.5 Gbps");
+> -               else
+> +               if (link_speed_mbps == SPEED_2500) {
+> +                       speed = kasprintf(GFP_KERNEL, "%s", "2.5 Gbps");
+> +               } else {
+>                         /* convert to Gbps inline */
+> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+> -                                link_speed_mbps / 1000, "Gbps");
+> +                       speed = kasprintf(GFP_KERNEL, "%d Gbps",
+> +                                         link_speed_mbps / 1000);
+> +               }
+>         } else if (link_speed_mbps == SPEED_UNKNOWN) {
+> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%s", "Unknown Mbps");
+> +               speed = kasprintf(GFP_KERNEL, "%s", "Unknown Mbps");
+>         } else {
+> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+> -                        link_speed_mbps, "Mbps");
+> +               speed = kasprintf(GFP_KERNEL, "%d Mbps", link_speed_mbps);
+>         }
+> 
+>         netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
+
+
 
