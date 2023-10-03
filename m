@@ -1,83 +1,82 @@
-Return-Path: <netdev+bounces-37755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 079007B6F82
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:19:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABE87B6F8F
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 19:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 77E261F21128
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 67462281317
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 17:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E1E3B298;
-	Tue,  3 Oct 2023 17:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5723B29B;
+	Tue,  3 Oct 2023 17:19:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6A03AC3F
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 17:19:01 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB8461A6
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:18:58 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5335725cf84so1946110a12.2
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 10:18:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8644730D1B
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 17:19:51 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDF7A6
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:19:47 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9b27bc8b65eso204037166b.0
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 10:19:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696353537; x=1696958337; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696353586; x=1696958386; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5EnlzNRFWMQ7thQWMg/qT9DCbeAiLijmJLaD1WjKhQ4=;
-        b=PbsgRErK8SIzG8DK8L4BqFECdeegvxIauEJ06yxII0kvwI0N5370QnUGF5Df09DdxL
-         VSVivSqr3ba7iapJP+9ZCqO6tk5fAic0GzvfYHInhwieJXbwJm++jvVWZ4EsPrxwZ+9f
-         8ABWCC7HsYk4wfK0++yDBNAAM/musscuWsWmuUnOhEqK3mwYcBOKMmN27HhQHewnqmO+
-         IVx1JbV+gp8en+KNfSCpzCzuMLUg4qLBEO2y9O/9JlCF+0B2weusFaSorWPrZDpXduVU
-         Dq1IYnbbs5UL4o10vCS9Rz4KJsIFbrbB+nLVkswGUgg24gUwuQiGVhxIllRB0w2BVk7a
-         soEw==
+        bh=Nm1Co97Gzfh8Vq750T8kSdQUCIb/1ye+ULTOO7iQfz8=;
+        b=ued1PvZbWv6go1LR6GNnc6Z3VS61EDk90pB/EPX4suyO7yAkQPtScfBfWBYiLI8aRh
+         kTCpeotPh7bLcsBFt/N5LIoNfah8pHusKX77N5ZI3KbgXb2UC6BL3amDUGUAdjljKXEj
+         tvxB29tXO77CFIct1qk6vrEaAkD3cv/FYEzGnM7SruC2GnQehFJIazF5AIJvLcOjKOmo
+         SBS8QprVA+ez37SgPRmK3VpOoAjFXLTU9JNSTpzefJIA/iROIBrreSr6BmoREKslLONZ
+         OiipTiLnLLFiTKUeFiIBUhzhX/kFkPaztILpJRDFeh25H6oIXCjQOI17iGFo2+yf96X4
+         CEQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696353537; x=1696958337;
+        d=1e100.net; s=20230601; t=1696353586; x=1696958386;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5EnlzNRFWMQ7thQWMg/qT9DCbeAiLijmJLaD1WjKhQ4=;
-        b=lZWqlAmsErQEF5V9bCQOzu4Hja+gaEKRFi/hEUmMy3ag3IyLj/jn9lfwBeWZOhaMvz
-         R3gKeDMjBi77Wbgaveb1peO4x2zG7e21XHbfZoWLg2gPTaJgA0tkK4bJG0j6mekrNU5+
-         62J7oqJtDim5cGAERGAABcd8mvyGtRn4Cov1c90NLcymGajbU3J1auAUk+bU9PX21WQZ
-         CXCn1IiJ8+5hqzCl4mzJyf3bRXVI6dwsBc7ednyzA8lwdoqm5P5WpKmBYMQGpSzWahCN
-         HfPRXw5JW+nQ4xV/rDzu7Q6rTEMHsSJlkJ23JAKO/qqyBMB6Bul0fz7dYjlR6KFF0iZI
-         H4CA==
-X-Gm-Message-State: AOJu0Yyn9OE3DLVwDYTjrtz/kFuvo9KKpaEKPGUGTPc1MLa0S7X+3ZU0
-	zqzOmV5kUzB8C1QXQxUIK6MfIw==
-X-Google-Smtp-Source: AGHT+IFZlMvMFeZ+OIrO7SCq93L8uRpsoOdhD5LXSPfy8mVx/wszOcWdFS9c324GMhaor8MVEZFISg==
-X-Received: by 2002:a17:906:3cb2:b0:9ad:df85:97ae with SMTP id b18-20020a1709063cb200b009addf8597aemr13771395ejh.66.1696353537104;
-        Tue, 03 Oct 2023 10:18:57 -0700 (PDT)
+        bh=Nm1Co97Gzfh8Vq750T8kSdQUCIb/1ye+ULTOO7iQfz8=;
+        b=kWGI/eUYXLHfgWx+4C2RkyUdd8X3PNC3kCiihtaWiQBCpOfx9oS6pHvEQwfP5GLTqF
+         kpCHb5kI27oP6ujb/6mBzL4JHElywfGAfD4AkFmQoUTaCk3Wfq8OPaID1UJ8iePHYtQr
+         drK0FdUwthOzlpJlrUF9Pxg/+XOwEW/lYmv+kJmYBiKpKM9vNmAUJZGmxkdGcJdKRuoT
+         jL9TbVLPibdJEjnb2NQe/KV11CQcMlEnA3KdOxnD459z00FaylSVll/aFDr0v4viQNUO
+         WEtsSyu+0CPYg0m8umbzJmmckd+JyGy57Kg8UfpMPodG6tbFlNMD+M8TsjFXyQ0VDxzb
+         Q2Kg==
+X-Gm-Message-State: AOJu0Yyih6X+xHt9A32aHogNTqtx61EZz2OeJFgqzAwZ3KL0AZnlnee2
+	N4sd4CeUcXM5zdd2PBelgN73tg==
+X-Google-Smtp-Source: AGHT+IFL89GFPQftGrDAdWk1LB4hpVU3dne0w1ogcBIfCpwhJPO4BRAxt67OuAblcJV4cPFvVxZBvw==
+X-Received: by 2002:a17:906:1350:b0:9ae:3d17:d5d0 with SMTP id x16-20020a170906135000b009ae3d17d5d0mr13562375ejb.31.1696353586218;
+        Tue, 03 Oct 2023 10:19:46 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id jw21-20020a17090776b500b009786c8249d6sm1389944ejc.175.2023.10.03.10.18.56
+        by smtp.gmail.com with ESMTPSA id ss26-20020a170907039a00b009a5f1d15644sm1325283ejb.119.2023.10.03.10.19.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 10:18:56 -0700 (PDT)
-Date: Tue, 3 Oct 2023 19:18:55 +0200
+        Tue, 03 Oct 2023 10:19:45 -0700 (PDT)
+Date: Tue, 3 Oct 2023 19:19:44 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"corbet@lwn.net" <corbet@lwn.net>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
 	"kuba@kernel.org" <kuba@kernel.org>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 3/4] dpll: netlink/core: add
- support for pin-dpll signal phase offset/adjust
-Message-ID: <ZRxM/+njiiu78b9p@nanopsycho>
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Subject: Re: [PATCH net-next 3/4] dpll: netlink/core: add support for
+ pin-dpll signal phase offset/adjust
+Message-ID: <ZRxNML855TG7L5To@nanopsycho>
 References: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
  <20230927092435.1565336-4-arkadiusz.kubalewski@intel.com>
  <4018c0b0-b288-ff60-09be-7ded382f4a82@linux.dev>
  <DM6PR11MB4657AA79C0C44F868499A3129BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
  <ZRrb87drG7aVrxsT@nanopsycho>
- <eb019ccf-c50b-e9d7-e4e6-f6574f805b49@linux.dev>
- <DM6PR11MB4657DB3C9BC3E1EFE6A2F3389BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZRu0OlwKWSmXFOcV@nanopsycho>
- <DM6PR11MB46573DF9081298B816A215329BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <DM6PR11MB4657C61104280788DF49F0E59BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZRu1cG2uglhmCdlI@nanopsycho>
+ <DM6PR11MB4657B52BD09700F49799ED8C9BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,187 +85,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46573DF9081298B816A215329BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
+In-Reply-To: <DM6PR11MB4657B52BD09700F49799ED8C9BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Oct 03, 2023 at 04:29:13PM CEST, arkadiusz.kubalewski@intel.com wrote:
+Tue, Oct 03, 2023 at 04:29:43PM CEST, arkadiusz.kubalewski@intel.com wrote:
 >>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Tuesday, October 3, 2023 8:27 AM
->>To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
+>>Sent: Tuesday, October 3, 2023 8:32 AM
 >>
->>Tue, Oct 03, 2023 at 01:10:39AM CEST, arkadiusz.kubalewski@intel.com wrote:
->>>>From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->>>>Vadim Fedorenko
->>>>Sent: Monday, October 2, 2023 5:09 PM
+>>Tue, Oct 03, 2023 at 01:03:00AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>Sent: Monday, October 2, 2023 5:04 PM
 >>>>
->>>>On 02/10/2023 16:04, Jiri Pirko wrote:
->>>>> Mon, Oct 02, 2023 at 04:32:30PM CEST, arkadiusz.kubalewski@intel.com
->>>>> wrote:
->>>>>>> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>>>>> Sent: Wednesday, September 27, 2023 8:09 PM
->>>>>>>
->>>>>>> On 27/09/2023 10:24, Arkadiusz Kubalewski wrote:
->>>>>>>> Add callback op (get) for pin-dpll phase-offset measurment.
->>>>>>>> Add callback ops (get/set) for pin signal phase adjustment.
->>>>>>>> Add min and max phase adjustment values to pin proprties.
->>>>>>>> Invoke get callbacks when filling up the pin details to provide user
->>>>>>>> with phase related attribute values.
->>>>>>>> Invoke phase-adjust set callback when phase-adjust value is provided
->>>>>>>> for
->>>>>>>> pin-set request.
->>>>>>>>
->>>>>>>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>>>>>
->>>>>>> [...]
->>>>>>>
->>>>>>>> +static int
->>>>>>>> +dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr
->>>>>>>> *phase_adj_attr,
->>>>>>>> +		       struct netlink_ext_ack *extack)
->>>>>>>> +{
->>>>>>>> +	struct dpll_pin_ref *ref;
->>>>>>>> +	unsigned long i;
->>>>>>>> +	s32 phase_adj;
->>>>>>>> +	int ret;
->>>>>>>> +
->>>>>>>> +	phase_adj = nla_get_s32(phase_adj_attr);
->>>>>>>> +	if (phase_adj > pin->prop->phase_range.max ||
->>>>>>>> +	    phase_adj < pin->prop->phase_range.min) {
->>>>>>>> +		NL_SET_ERR_MSG(extack, "phase adjust value not
->>>>>>>> supported");
->>>>>>>> +		return -EINVAL;
->>>>>>>> +	}
->>>>>>>> +	xa_for_each(&pin->dpll_refs, i, ref) {
->>>>>>>> +		const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
->>>>>>>> +		struct dpll_device *dpll = ref->dpll;
->>>>>>>> +
->>>>>>>> +		if (!ops->phase_adjust_set)
->>>>>>>> +			return -EOPNOTSUPP;
->>>>>>>
->>>>>>> I'm thinking about this part. We can potentially have dpll devices
->>>>>>> with
->>>>>>> different expectations on phase adjustments, right? And if one of
->>>>>>> them
->>>>>>> won't be able to adjust phase (or will fail in the next line), then
->>>>>>> netlink will return EOPNOTSUPP while _some_ of the devices will be
->>>>>>> adjusted. Doesn't look great. Can we think about different way to
->>>>>>> apply
->>>>>>> the change?
->>>>>>>
+>>>>Mon, Oct 02, 2023 at 04:32:30PM CEST, arkadiusz.kubalewski@intel.com
+>>>>wrote:
+>>>>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>>>>Sent: Wednesday, September 27, 2023 8:09 PM
 >>>>>>
->>>>>> Well makes sense to me.
+>>>>>>On 27/09/2023 10:24, Arkadiusz Kubalewski wrote:
+>>>>>>> Add callback op (get) for pin-dpll phase-offset measurment.
+>>>>>>> Add callback ops (get/set) for pin signal phase adjustment.
+>>>>>>> Add min and max phase adjustment values to pin proprties.
+>>>>>>> Invoke get callbacks when filling up the pin details to provide user
+>>>>>>> with phase related attribute values.
+>>>>>>> Invoke phase-adjust set callback when phase-adjust value is provided
+>>>>>>> for
+>>>>>>> pin-set request.
+>>>>>>>
+>>>>>>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 >>>>>>
->>>>>> Does following makes sense as a fix?
->>>>>> We would call op for all devices which has been provided with the op.
->>>>>> If device has no op -> add extack error, continue
+>>>>>>[...]
+>>>>>>
+>>>>>>> +static int
+>>>>>>> +dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr
+>>>>>>> *phase_adj_attr,
+>>>>>>> +		       struct netlink_ext_ack *extack)
+>>>>>>> +{
+>>>>>>> +	struct dpll_pin_ref *ref;
+>>>>>>> +	unsigned long i;
+>>>>>>> +	s32 phase_adj;
+>>>>>>> +	int ret;
+>>>>>>> +
+>>>>>>> +	phase_adj = nla_get_s32(phase_adj_attr);
+>>>>>>> +	if (phase_adj > pin->prop->phase_range.max ||
+>>>>>>> +	    phase_adj < pin->prop->phase_range.min) {
+>>>>>>> +		NL_SET_ERR_MSG(extack, "phase adjust value not
+>>>>>>> supported");
+>>>>>>> +		return -EINVAL;
+>>>>>>> +	}
+>>>>>>> +	xa_for_each(&pin->dpll_refs, i, ref) {
+>>>>>>> +		const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
+>>>>>>> +		struct dpll_device *dpll = ref->dpll;
+>>>>>>> +
+>>>>>>> +		if (!ops->phase_adjust_set)
+>>>>>>> +			return -EOPNOTSUPP;
+>>>>>>
+>>>>>>I'm thinking about this part. We can potentially have dpll devices with
+>>>>>>different expectations on phase adjustments, right? And if one of them
+>>>>>>won't be able to adjust phase (or will fail in the next line), then
+>>>>>>netlink will return EOPNOTSUPP while _some_ of the devices will be
+>>>>>>adjusted. Doesn't look great. Can we think about different way to apply
+>>>>>>the change?
+>>>>>>
 >>>>>
->>>>> Is it real to expect some of the device support this and others don't?
->>>>> Is it true for ice?
->>>>> If not, I would got for all-or-nothing here.
+>>>>>Well makes sense to me.
 >>>>>
+>>>>>Does following makes sense as a fix?
+>>>>>We would call op for all devices which has been provided with the op.
+>>>>>If device has no op -> add extack error, continue
 >>>>
->>>>But nothing blocks vendors to provide such configuration. Should we
->>>>rollback the configuration? Otherwise we can easily make it
->>>>inconsistent.
->>>
->>>Good point, in such case rollback might be required.
->>>
->>>>
->>>>I'm more thinking of checking if all the devices returned error (or
->>>>absence of operation callback) and then return error instead of 0 with
->>>>extack filled in.
+>>>>Is it real to expect some of the device support this and others don't?
+>>>>Is it true for ice?
+>>>>If not, I would got for all-or-nothing here.
 >>>>
 >>>
->>>Well, what if different devices would return different errors?
->>>In general we would have to keep track of the error values returned in
->>>such case.. Assuming one is different than the other - still need to error
->>>extack them out? I guess it would be easier to return common error if
->>there
+>>>Let's step back a bit.
+>>>The op itself is introduced as per pin-dpll tuple.. did this
+>>>intentionally,
+>>>to inform each dpll that the offset has been changed - in case dplls are
+>>>controlled by separated driver/firmware instances but still sharing the
+>>>pin.
+>>>Same way a pin frequency is being set, from user perspective on a pin, but
+>>>callback is called for each dpll the pin was registered with.
+>>>Whatever we do here, it shall be probably done for frequency_set()
+>>>callback as
+>>>well.
+>>>
+>>>The answers:
+>>>So far I don't know the device that might do it this way, it rather
+>>>supports
+>>>phase_adjust or not. In theory we allow such behavior to be implemented,
+>>>i.e.
+>>>pin is registered with 2 dplls, one has the callback, second not.
 >>
->>In this case, it is common to return the first error hit and bail out,
->>not trying the rest.
+>>If there is only theoretical device like that now, implement
+>>all-or-nothing. If such theoretical device appears in real, this could
+>>be changed. The UAPI would not change, no problem.
 >>
 >
->OK, so now I see it like this:
->-> check if all device implement callback, if not return EOPNOTSUPP;
->-> get old phase_adjust
->-> if new == old, return EINVAL
+>I can live with it :)
+>
+>>
+>>>Current hardware of ice sets phase offset for a pin no matter on which
+>>>dpll
+>>>device callback was invoked.
+>>>"all-or-nothing" - do you mean to check all callback returns and then
+>>>decide
+>>>if it was successful?
+>>
+>>Check if all dplls have ops and only perform the action in such case. In
+>>case one of the dplls does not have the op filled, return -EOPNOTSUPP.
+>>
+>>
+>>Regarding the successful/failed op, I think you can just return. In
+>>these cases, when user performs multiaction cmd, he should be prepared
+>>to deal with consequences if part of this cmd fails. We don't have
+>>rollback for any other multiaction cmd in dpll, I don't see why this
+>>should be treated differently.
+>>
+>
+>We don't have it because no one have spotted it on review,
+>as mentioned the frequency_set behaves the same way,
+>we need one approach for all of those cases.
+>I am opting for having the rollback as suggested on the other thread.
 
-0 would be better, no? User has what he desired.
+Okay, but let's do that consistently.
 
-
->-> for each device: call phase_adjust_set, if fails, rollback all previous
->   successful attempts and return the failure code
-
-That would work.
-
-
->?
 >
 >Thank you!
 >Arkadiusz
 >
 >>
->>>were only failures and let the driver fill the errors on extack, smt like:
->>>
->>>	int miss_cb_num = 0, dev_num = 0, err_num;
->>>
->>>	xa_for_each(&pin->dpll_refs, i, ref) {
->>>		const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
->>>		struct dpll_device *dpll = ref->dpll;
->>>
->>>		dev_num++;
->>>		if (!ops->phase_adjust_set) {
->>>			miss_cb_num++;
->>>			continue;
->>>		}
->>>		ret = ops->phase_adjust_set(pin,
->>>					dpll_pin_on_dpll_priv(dpll, pin),
->>>					dpll, dpll_priv(dpll), phase_adj,
->>>					extack);
->>>		if (ret)
->>>			err_num++;
->>>	}
->>>	if (dev_num == miss_cb_num)
->>>		return -EOPNOTSUPP;
->>>	if (dev_num == err_num)
->>>		return -EINVAL;
->>>	__dpll_pin_change_ntf(pin);
->>>	return 0;
->>>
->>>??
 >>>
 >>>Thank you!
 >>>Arkadiusz
 >>>
->>>>>
->>>>>> If device fails to set -> add extack error, continue
->>>>>> Function always returns 0.
->>>>>>
->>>>>> Thank you!
->>>>>> Arkadiusz
->>>>>>
->>>>>>>
->>>>>>>> +		ret = ops->phase_adjust_set(pin,
->>>>>>>> +					    dpll_pin_on_dpll_priv(dpll, pin),
->>>>>>>> +					    dpll, dpll_priv(dpll), phase_adj,
->>>>>>>> +					    extack);
->>>>>>>> +		if (ret)
->>>>>>>> +			return ret;
->>>>>>>> +	}
->>>>>>>> +	__dpll_pin_change_ntf(pin);
->>>>>>>> +
->>>>>>>> +	return 0;
->>>>>>>> +}
->>>>>>>> +
 >>>>
->>>>_______________________________________________
->>>>Intel-wired-lan mailing list
->>>>Intel-wired-lan@osuosl.org
->>>>https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
->
+>>>>>If device fails to set -> add extack error, continue
+>>>>>Function always returns 0.
+>>>>>
+>>>>>Thank you!
+>>>>>Arkadiusz
+>>>>>
+>>>>>>
+>>>>>>> +		ret = ops->phase_adjust_set(pin,
+>>>>>>> +					    dpll_pin_on_dpll_priv(dpll, pin),
+>>>>>>> +					    dpll, dpll_priv(dpll), phase_adj,
+>>>>>>> +					    extack);
+>>>>>>> +		if (ret)
+>>>>>>> +			return ret;
+>>>>>>> +	}
+>>>>>>> +	__dpll_pin_change_ntf(pin);
+>>>>>>> +
+>>>>>>> +	return 0;
+>>>>>>> +}
+>>>>>>> +
+>>>
 
