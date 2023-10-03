@@ -1,118 +1,108 @@
-Return-Path: <netdev+bounces-37636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69A787B6693
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:41:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 297D97B66A3
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:44:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1CC31281630
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:41:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 6CA34B20953
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DAEDDDD;
-	Tue,  3 Oct 2023 10:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4835B12B7C;
+	Tue,  3 Oct 2023 10:44:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC623DDAC
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:41:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E6FB7
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:41:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696329690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xEM5s9LjMr/YRPee+FNwgiSqc+ylSynZdt7LNsU3DA8=;
-	b=DSLIzrKjcWZypmbh1z5xtD0OfVGSU0vrcSXfbrfUQ94MJnRfDv3lkeDdAgfFAbP7/ZN049
-	2PQ4uEyQnJJwK8JvkW7HZui81i+ZlSGuGs/pxSkMsNwCvf6zsuuneXmC6WNtS21gDHDpb2
-	lhoV/P2CoXwD5t/aXijmM2LBIJrpevA=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-66-3rvotzW1MZitUZdGxEG9ZQ-1; Tue, 03 Oct 2023 06:41:29 -0400
-X-MC-Unique: 3rvotzW1MZitUZdGxEG9ZQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9ae6afce33fso17928566b.0
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 03:41:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEFD7ED
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:44:17 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E72B4;
+	Tue,  3 Oct 2023 03:44:15 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-98377c5d53eso128625266b.0;
+        Tue, 03 Oct 2023 03:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696329854; x=1696934654; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmEctcMUVbCclk9m0goiD7O58kPkk9ozB1JI3JI/hPI=;
+        b=K1/kJY9K8EJ7fSrU72OqYrJhm2cJSz0s1997Vjw6C5j9evTc2EgmDcuklFCeQHV9xF
+         imQQyAIEmf4xVeYFvJRMWKZzDaTqwaykb0fXY/vSEZCURwwRykkPimic2SogGh4dM30E
+         1FoYt1yx60ot7ikxzE9rNXfmQExVSFreDLqzciiKGn6PqXXzaWTrxyc8GK9jqVtKJNgU
+         op10bFM96uKVYJy1WK1+jqgs4BQqTzdwR7govo9UjYQMCfRyHSBYfcBzXXMBgRXVRk1X
+         Ur5V+PGDCz2dmEEz39McVXZ9/HzADNTQ2Vx6HhOzePtLXQqpihWPCwS4w0rrKgsTPeA5
+         y7kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696329688; x=1696934488;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xEM5s9LjMr/YRPee+FNwgiSqc+ylSynZdt7LNsU3DA8=;
-        b=TERvpID2kVIiawYCFgAv3xI06Hcsf1/SZkhXChmXurFkjAsJwbUiVk6wjZp4P2v8sR
-         0RtySOCpVKSwrRoi3+RlW8G8kzfo0uBwyXgx+HcJ3lj07P/JaghQOvzciRfLgjfp8wEt
-         8wedf4gyhQJMyStHl6DHsW7O8FyJHLmrR4KLMAU3qqQJBqxZPpn8VMHB4VXJMAnFsbyp
-         33wc2ytQaSR835lfmPZ6MpB3qMeypIX35b1v7hNnX4in7k+L4sq7J4Or32aOdX8VFQur
-         lTsFbnfG7rzrcCezRSo9e7jUjdMksf0wAvqDah4ZHZuUbPmh91XzVvxxdyBMe6OVN42f
-         d5tQ==
-X-Gm-Message-State: AOJu0YyDRX28LZPQTX029CoEBMseGckYdAnTbUvX/qxFBSfFT7v8URF2
-	HWnHCC9fYPeeb9fNIGv9bXUjkIhZ24mrSs87Dc4nC5VhMAVRvIkJaYzOzmY2RQf2FIMfo3Zpeyq
-	ri9vOvN2/aP0revZX
-X-Received: by 2002:a17:906:25d:b0:9b2:bf2d:6b65 with SMTP id 29-20020a170906025d00b009b2bf2d6b65mr13123552ejl.4.1696329688212;
-        Tue, 03 Oct 2023 03:41:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTp4Yzu/cOAedVnFfUtha2zEKWPPeZzfa3qsmsNMKsBJ+r6YYEbp9xiJ3pmDMPdNIMRLIP9g==
-X-Received: by 2002:a17:906:25d:b0:9b2:bf2d:6b65 with SMTP id 29-20020a170906025d00b009b2bf2d6b65mr13123529ejl.4.1696329687871;
-        Tue, 03 Oct 2023 03:41:27 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-232-193.dyn.eolo.it. [146.241.232.193])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170906118a00b009a19701e7b5sm832863eja.96.2023.10.03.03.41.26
+        d=1e100.net; s=20230601; t=1696329854; x=1696934654;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TmEctcMUVbCclk9m0goiD7O58kPkk9ozB1JI3JI/hPI=;
+        b=YykS7G26Lmmb5+KbHJsnjc4arL1O3JUJRlKaVFoxPy2jLe8J0N7nHWnDjBoWsd803+
+         C8xPyT4D80nffI32/CslYZMd2dCr/Iy/qDRkJmfKche+tiGOtgjL3NS1PWo8m4d1xyOD
+         j6GdPM8EfxMT0yr5z46ZGqJh0uYm8ymF2X9MzWyxQ072LXCzYMffOjjFsOXNF+ZzUykh
+         WYI9WyJK4zlHLXLiguku9wuqoCVXjGerx5V85f3YOxnY0Ll6yzxlmPkr4aMy4gHOtJNS
+         5eDWMZDa7rg5mqPSEsZsrzArN6437A+kItsKUGI1qEIdQas17d6byjBA+mBB6Ccajt9Q
+         PTfw==
+X-Gm-Message-State: AOJu0Yx6YDwm+Asf92A7mJVMYtkW676yXLb6lSWU0IgnsRQgSBi7VX2s
+	vGqqwC1T5eQzzZtbKY8Pr4gdMMrQ1AQ=
+X-Google-Smtp-Source: AGHT+IGeoM+GI4kBmhQElhTrw5bnp/MJFivmYswqf/ln69nM1n6ZfvZtRodCaIcEDAax2e51jphWYw==
+X-Received: by 2002:a17:907:75c6:b0:9b6:d9ae:402c with SMTP id jl6-20020a17090775c600b009b6d9ae402cmr919777ejc.61.1696329853452;
+        Tue, 03 Oct 2023 03:44:13 -0700 (PDT)
+Received: from skbuf ([188.25.255.218])
+        by smtp.gmail.com with ESMTPSA id c20-20020a170906529400b0098d2d219649sm850616ejm.174.2023.10.03.03.44.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 03:41:27 -0700 (PDT)
-Message-ID: <6e5fb3e148ae1fb4a29561fe9d04235d8be6ab1f.camel@redhat.com>
-Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
- containers.
-From: Paolo Abeni <pabeni@redhat.com>
-To: dust.li@linux.alibaba.com, Albert Huang <huangjie.albert@bytedance.com>,
-  Karsten Graul <kgraul@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu
- <tonylu@linux.alibaba.com>,  Wen Gu <guwen@linux.alibaba.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 03 Oct 2023 12:41:25 +0200
-In-Reply-To: <20230927034209.GE92403@linux.alibaba.com>
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
-	 <20230927034209.GE92403@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 03 Oct 2023 03:44:13 -0700 (PDT)
+Date: Tue, 3 Oct 2023 13:44:10 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Woojung Huh <woojung.huh@microchip.com>,
+	Tristram.Ha@microchip.com, Eric Dumazet <edumazet@google.com>,
+	davem@davemloft.net, Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 net-next 0/5] net: dsa: hsr: Enable HSR HW offloading
+ for KSZ9477
+Message-ID: <20231003104410.dhngn3vvdfdcurga@skbuf>
+References: <20230922133108.2090612-1-lukma@denx.de>
+ <20230926225401.bganxwmtrgkiz2di@skbuf>
+ <20230928124127.379115e6@wsk>
+ <20231003095832.4bec4c72@wsk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003095832.4bec4c72@wsk>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-09-27 at 11:42 +0800, Dust Li wrote:
-> On Mon, Sep 25, 2023 at 10:35:45AM +0800, Albert Huang wrote:
-> > If the netdevice is within a container and communicates externally
-> > through network technologies like VXLAN, we won't be able to find
-> > routing information in the init_net namespace. To address this issue,
->=20
-> Thanks for your founding !
->=20
-> I think this is a more generic problem, but not just related to VXLAN ?
-> If we use SMC-R v2 and the netdevice is in a net namespace which is not
-> init_net, we should always fail, right ? If so, I'd prefer this to be a b=
-ugfix.
+On Tue, Oct 03, 2023 at 09:58:32AM +0200, Lukasz Majewski wrote:
+> I'm a bit puzzled with this patch series - will it be pulled directly
+> to net-next [1] or is there any other (KSZ maintainer's?) tree to which
+> it will be first pulled and then PR will be send to net-next?
+> 
+> Thanks in advance for the clarification.
+> 
+> Links:
+> 
+> [1] -
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/log/
 
-Re-stating the above to be on the same page: the patch should be re-
-posted targeting the net tree, and including a suitable fixes tag.
+No, there's no other tree than net-next. I see your patch was marked as
+"Changes requested", let me see if I can transition it back to "Under review"
+so that it gains the netdev maintainers' attention again:
 
-@Dust Li: please correct me if I misread you.
+https://patchwork.kernel.org/project/netdevbpf/cover/20230922133108.2090612-1-lukma@denx.de/
 
-Thanks,
-
-Paolo
-
+pw-bot: under-review
 
