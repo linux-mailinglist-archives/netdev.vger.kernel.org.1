@@ -1,191 +1,218 @@
-Return-Path: <netdev+bounces-37787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 457147B7245
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:06:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7997F7B7293
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 22:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E8DEF281F96
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:06:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id BFECFB207CF
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 20:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7566B3E47F;
-	Tue,  3 Oct 2023 20:05:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B8730FA6;
+	Tue,  3 Oct 2023 20:33:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9CA3D39A
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:05:46 +0000 (UTC)
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0C3A9
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:05:44 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-58530660c1bso926302a12.1
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 13:05:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696363544; x=1696968344; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ddjKpJ/j1G+ZcWV9ZUKV5M/PQS+TN4o9oLf/XIDMvT0=;
-        b=jm6QY22WzV5GqngOTX8Kzy7yOZmyQ2/l+GtVqoX7m0doae2nlBUIvR7m/YP4Sx8CRU
-         a8d85lfYu66GhvC0YH3i/4hMTUln62QGRjZn4f7vQ407TKm1T64nSUcs//TzRxAnwZZZ
-         bR7/WRqzK/lJpNTuYc4pJhQdNBpFO3aOduYntEuIkYIyygugk59hLNDiZmgIIl3nleru
-         Jb61Mh+sx89gSwqV+vZHB13ogDi7wO/kBqBYNi8lkz2xzyO+0P/2CyYiauZjLpEb629L
-         t5lM6b4J4pJfFKSZ05tHVSY1NZNejzLU4L8j/iZXVmCpy6LhxahHAPXaI7wH8b93QXbA
-         YbZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696363544; x=1696968344;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ddjKpJ/j1G+ZcWV9ZUKV5M/PQS+TN4o9oLf/XIDMvT0=;
-        b=IaC5QGVKwT9+0VZu+uVPavTnklAdFz2YhO9kGFvtNObX6zm2YzQUnjlZe03OgjPf37
-         Q1aIC9LcmJ9R3iYW+30s3XvEkqYn8wDS2roHPFI/3f0GqG1DEoAAE+8zl2TyEZ1RA/mO
-         W7OHU5m8M3P3ei/jrXYRzOglF5s3z86o7Dq52XMEREzZ50OYOlEraAT+NTJv8NLSAlqj
-         B4NOh56dShXMDt8v/xBOnZKl48WugEBiuV3A0Oi5j2OiRea5UJdDf6JVFcLrrSj4aD+S
-         L0Hl+yoSD3lxzK1Ej/3mYZRQFWf8RWOa0HTMZB2GM5qii9p944ZyGHcFo2OTCOryfooB
-         KGvQ==
-X-Gm-Message-State: AOJu0YzBMP9nWy1JarhAqOOo6cwIVYGGkzzL9f6f7jbaESeuCkFkreiw
-	DxvVpMrzqyTEMJVW8lfqYywkX8g=
-X-Google-Smtp-Source: AGHT+IHXFrX38JHtyz5X3PE83Rd8dAQVVm4RG96h1vPXKxzvU3mGdy870f7x45uhm+p3usn+E2TiKR4=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:6d86:0:b0:566:1c6:139b with SMTP id
- i128-20020a636d86000000b0056601c6139bmr2233pgc.8.1696363543796; Tue, 03 Oct
- 2023 13:05:43 -0700 (PDT)
-Date: Tue,  3 Oct 2023 13:05:22 -0700
-In-Reply-To: <20231003200522.1914523-1-sdf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341CBF517
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 20:33:55 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-13.smtpout.orange.fr [80.12.242.13])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9347AAC
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 13:33:52 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id nm5UqMLsanmFYnm5UqMmLO; Tue, 03 Oct 2023 22:33:50 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1696365230;
+	bh=4szZBF58NVDMkJwPCQGcaCq/8DXhNFlNUXK9ISU4JTg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=jMM5hJEqTl55wNmQJ4+r0YBYKX0Tt7hC93DBUR4UNEOanbF1mI9FB5vNtzYC2Pde+
+	 C8uatHITU/+hpj/uqY+xb1UDRcQNixIQ0QRqZB5BX1rnOdJR+PV2qgNjdXxQfoBT/q
+	 5mH067tDe9dQK9bITKkPOVeZS3Grb0t7xas5Um2HHzjy8eawGUpSaPkrxJLOAQWaOt
+	 FqiQqCllcVli5oAHKFhBhF+Ushb8praKuB+JIwc9S2J7+rEW+RJVDPL9+x0xTaAAu+
+	 QNHIBIeTTl8ZTcGMnXT6+6FXDCqrD5IzyWDMvBx3LZVqP+/1kvhJ4MrlpwYFc7VkWz
+	 CuKV7HsUbuTVQ==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 03 Oct 2023 22:33:50 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <abf8d279-b579-4a03-9ae9-053cf5efec3d@wanadoo.fr>
+Date: Tue, 3 Oct 2023 22:33:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231003200522.1914523-1-sdf@google.com>
-X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
-Message-ID: <20231003200522.1914523-11-sdf@google.com>
-Subject: [PATCH bpf-next v3 10/10] xsk: document tx_metadata_len layout
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
-	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
-	hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] iavf: Avoid a memory allocation in
+ iavf_print_link_message()
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
+ <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
+Content-Language: fr
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-- how to use
-- how to query features
-- pointers to the examples
+Le 03/10/2023 à 19:14, Jesse Brandeburg a écrit :
+> On 9/23/2023 5:17 AM, Christophe JAILLET wrote:
+>> IAVF_MAX_SPEED_STRLEN is only 13 and 'speed' is allocated and freed within
+>> iavf_print_link_message().
+>>
+>> 'speed' is only used with some snprintf() and netdev_info() calls.
+>>
+>> So there is no real use to kzalloc()/free() it. Use the stack instead.
+>> This saves a memory allocation.
+>>
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>>   drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 7 +------
+>>   1 file changed, 1 insertion(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> index 8ce6389b5815..980dc69d7fbe 100644
+>> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> @@ -1389,18 +1389,14 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
+>>   static void iavf_print_link_message(struct iavf_adapter *adapter)
+>>   {
+>>   	struct net_device *netdev = adapter->netdev;
+>> +	char speed[IAVF_MAX_SPEED_STRLEN];
+>>   	int link_speed_mbps;
+>> -	char *speed;
+>>   
+>>   	if (!adapter->link_up) {
+>>   		netdev_info(netdev, "NIC Link is Down\n");
+>>   		return;
+>>   	}
+>>   
+>> -	speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
+>> -	if (!speed)
+>> -		return;
+>> -
+>>   	if (ADV_LINK_SUPPORT(adapter)) {
+>>   		link_speed_mbps = adapter->link_speed_mbps;
+>>   		goto print_link_msg;
+>> @@ -1452,7 +1448,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+>>   	}
+>>   
+>>   	netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
+>> -	kfree(speed);
+>>   }
+>>   
+>>   /**
+> 
+> Hi Christophe!
+> 
+> I had a slightly different proposal that gets rid of all the -Wformat=2
+> warnings in this code by using kasprintf to handle the varying string
+> lengths.
+> 
+> any thoughts about this instead and drop yours? I'm less worried about
+> the "extra allocation" here in this function since it's slow path, and
+> the same comment applies to your patch as well.
 
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- Documentation/networking/index.rst           |  1 +
- Documentation/networking/xsk-tx-metadata.rst | 77 ++++++++++++++++++++
- 2 files changed, 78 insertions(+)
- create mode 100644 Documentation/networking/xsk-tx-metadata.rst
+kasprintf() is much better.
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 5b75c3f7a137..9b2accb48df7 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -123,6 +123,7 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
-    xfrm_sync
-    xfrm_sysctl
-    xdp-rx-metadata
-+   xsk-tx-metadata
- 
- .. only::  subproject and html
- 
-diff --git a/Documentation/networking/xsk-tx-metadata.rst b/Documentation/networking/xsk-tx-metadata.rst
-new file mode 100644
-index 000000000000..b7289f06745c
---- /dev/null
-+++ b/Documentation/networking/xsk-tx-metadata.rst
-@@ -0,0 +1,77 @@
-+==================
-+AF_XDP TX Metadata
-+==================
-+
-+This document describes how to enable offloads when transmitting packets
-+via :doc:`af_xdp`. Refer to :doc:`xdp-rx-metadata` on how to access similar
-+metadata on the receive side.
-+
-+General Design
-+==============
-+
-+The headroom for the metadata is reserved via ``tx_metadata_len`` in
-+``struct xdp_umem_reg``. The metadata length is therefore the same for
-+every socket that shares the same umem. The metadata layout is a fixed UAPI,
-+refer to ``union xsk_tx_metadata`` in ``include/uapi/linux/if_xdp.h``.
-+Thus, generally, the ``tx_metadata_len`` field above should contain
-+``sizeof(union xsk_tx_metadata)``.
-+
-+The headroom and the metadata itself should be located right before
-+``xdp_desc->addr`` in the umem frame. Within a frame, the metadata
-+layout is as follows::
-+
-+           tx_metadata_len
-+     /                         \
-+    +-----------------+---------+----------------------------+
-+    | xsk_tx_metadata | padding |          payload           |
-+    +-----------------+---------+----------------------------+
-+                                ^
-+                                |
-+                          xdp_desc->addr
-+
-+An AF_XDP application can request headrooms larger than ``sizeof(struct
-+xsk_tx_metadata)``. The kernel will ignore the padding (and will still
-+use ``xdp_desc->addr - tx_metadata_len`` to locate
-+the ``xsk_tx_metadata``). For the frames that shouldn't carry
-+any metadata (i.e., the ones that don't have ``XDP_TX_METADATA`` option),
-+the metadata area is ignored by the kernel as well.
-+
-+The flags field enables the particular offload:
-+
-+- ``XDP_TX_METADATA_TIMESTAMP``: requests the device to put transmission
-+  timestamp into ``tx_timestamp`` field of ``union xsk_tx_metadata``.
-+- ``XDP_TX_METADATA_CHECKSUM``: requests the device to calculate L4
-+  checksum. ``csum_start`` specifies byte offset of there the checksumming
-+  should start and ``csum_offset`` specifies byte offset where the
-+  device should store the computed checksum.
-+- ``XDP_TX_METADATA_CHECKSUM_SW``: requests checksum calculation to
-+  be done in software; this mode works only in ``XSK_COPY`` mode and
-+  is mostly intended for testing. Do not enable this option, it
-+  will negatively affect performance.
-+
-+Besides the flags above, in order to trigger the offloads, the first
-+packet's ``struct xdp_desc`` descriptor should set ``XDP_TX_METADATA``
-+bit in the ``options`` field. Also not that in a multi-buffer packet
-+only the first chunk should carry the metadata.
-+
-+Querying Device Capabilities
-+============================
-+
-+Every devices exports its offloads capabilities via netlink netdev family.
-+Refer to ``xsk-flags`` features bitmask in
-+``Documentation/netlink/specs/netdev.yaml``.
-+
-+- ``tx-timestamp``: device supports ``XDP_TX_METADATA_TIMESTAMP``
-+- ``tx-checksum``: device supports ``XDP_TX_METADATA_CHECKSUM``
-+
-+Note that every devices supports ``XDP_TX_METADATA_CHECKSUM_SW`` when
-+running in ``XSK_COPY`` mode.
-+
-+See ``tools/net/ynl/samples/netdev.c`` on how to query this information.
-+
-+Example
-+=======
-+
-+See ``tools/testing/selftests/bpf/xdp_hw_metadata.c`` for an example
-+program that handles TX metadata. Also see https://github.com/fomichev/xskgen
-+for a more bare-bones example.
--- 
-2.42.0.582.g8ccd20d70d-goog
+> 
+> your patch still shows these errors
+
+I built-tested the patch before sending, so this is strange.
+
+However, I got a similar feedback from Greg KH and the "kernel test 
+robot" for another similar patch.
+
+What version of gcc do you use?
+I use 12.3.0, and I suspect that the value range algorithm or how the 
+diagnostic is done has been improved in recent gcc.
+
+The other report was from 11.3.0.
+
+CJ
+
+>> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c: In function ‘iavf_virtchnl_completion’:
+>> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:60: warning: ‘%s’ directive output may be truncated writing 4 bytes into a region of size between 1 and 11 [-Wformat-truncation=]
+>>   1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>>        |                                                            ^~
+>>   1447 |                          link_speed_mbps, "Mbps");
+>>        |                                           ~~~~~~
+>> In function ‘iavf_print_link_message’,
+>>      inlined from ‘iavf_virtchnl_completion’ at drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1965:4:
+>> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:17: note: ‘snprintf’ output between 7 and 17 bytes into a destination of size 13
+>>   1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>>        |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>   1447 |                          link_speed_mbps, "Mbps");
+>>        |                          ~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> 
+> <my iavf patch pasted as a quote so my mail client won't wrap the lines...>
+> 
+> 
+>> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> index 8ce6389b5815..82b84a93bcc8 100644
+>> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>> @@ -1378,8 +1378,6 @@ void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid)
+>>                                    VIRTCHNL_OP_DISABLE_VLAN_INSERTION_V2);
+>>   }
+>>
+>> -#define IAVF_MAX_SPEED_STRLEN  13
+>> -
+>>   /**
+>>    * iavf_print_link_message - print link up or down
+>>    * @adapter: adapter structure
+>> @@ -1397,10 +1395,6 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+>>                  return;
+>>          }
+>>
+>> -       speed = kzalloc(IAVF_MAX_SPEED_STRLEN, GFP_KERNEL);
+>> -       if (!speed)
+>> -               return;
+>> -
+>>          if (ADV_LINK_SUPPORT(adapter)) {
+>>                  link_speed_mbps = adapter->link_speed_mbps;
+>>                  goto print_link_msg;
+>> @@ -1438,17 +1432,17 @@ static void iavf_print_link_message(struct iavf_adapter *adapter)
+>>
+>>   print_link_msg:
+>>          if (link_speed_mbps > SPEED_1000) {
+>> -               if (link_speed_mbps == SPEED_2500)
+>> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "2.5 Gbps");
+>> -               else
+>> +               if (link_speed_mbps == SPEED_2500) {
+>> +                       speed = kasprintf(GFP_KERNEL, "%s", "2.5 Gbps");
+>> +               } else {
+>>                          /* convert to Gbps inline */
+>> -                       snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>> -                                link_speed_mbps / 1000, "Gbps");
+>> +                       speed = kasprintf(GFP_KERNEL, "%d Gbps",
+>> +                                         link_speed_mbps / 1000);
+>> +               }
+>>          } else if (link_speed_mbps == SPEED_UNKNOWN) {
+>> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%s", "Unknown Mbps");
+>> +               speed = kasprintf(GFP_KERNEL, "%s", "Unknown Mbps");
+>>          } else {
+>> -               snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
+>> -                        link_speed_mbps, "Mbps");
+>> +               speed = kasprintf(GFP_KERNEL, "%d Mbps", link_speed_mbps);
+>>          }
+>>
+>>          netdev_info(netdev, "NIC Link is Up Speed is %s Full Duplex\n", speed);
+> 
+> 
+> 
 
 
