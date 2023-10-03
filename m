@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-37546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047E57B5E2D
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 02:25:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2705A7B5E39
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 02:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 55BA9B20957
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 00:25:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8479628164D
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 00:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE8719E;
-	Tue,  3 Oct 2023 00:25:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6545362;
+	Tue,  3 Oct 2023 00:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E02E182
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:25:11 +0000 (UTC)
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF3CC9
-	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 17:25:10 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-65af75a0209so2122916d6.3
-        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 17:25:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68771632
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 00:30:28 +0000 (UTC)
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D64AA9
+	for <netdev@vger.kernel.org>; Mon,  2 Oct 2023 17:30:27 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-65d066995aeso2335066d6.2
+        for <netdev@vger.kernel.org>; Mon, 02 Oct 2023 17:30:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696292709; x=1696897509; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696293026; x=1696897826; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rh/oxoD92H1kiVOKUBO0S5GEjMsZkflJV2yuTcOo5N8=;
-        b=Z21ctcqcbn7indUeHN4PBnci7y/5Fk/pua7VJBc1LmcgPIfdwncQyKN7gKsgOwrQsh
-         NEfsHdQcc9mSemNdhXySQUyZQF9j2H17jxJ/TFenJK37PykbvzGKU/JgNq1vJKvrx1ib
-         1lJoDtaBHYB529rZN9836rVpv+r7/b/yBJ3aQG13rd9Kkaeg3xC3o/A/dbHWC5Yz74fP
-         xIpThMXuExHv2GKUC9WvpIx67emjL9+VKNARktcsmj4h8gSetLNvX5CvrM1db283UdGJ
-         cIK3aaGLzS3mDXQ1mraNKlmesgLtvsNb6Q+FMqYHCdGnUWVVdmaDTmZSenfHrqib7RUu
-         2RDw==
+        bh=Gm95BT66K1A2Zf/YgTxpWCUle5PuInPRhEHdoEUKoQE=;
+        b=F3SOZI5Affm7XwvYCNy1kYbY2urL72mIe19Vo+2y0mYD9/U5GK+mcgSSCcZ/frjKRK
+         4NigmqhHFASsvkPbf9Wr3pdyJzr6uM3cyvZRdu91Z1GrqVKW34A84djwqe6vLE2E9pmd
+         Co00+HztcfTv6rBDwoQVlUWALKZLpLytnNulhsbLXQtYfi2Fm6zbdoBJ3+YINB8wLVVf
+         IQl5QhFXq7VvNWYQgZkxXh/+9Oncga4EMQ+4ApkM9Sa4he5mtsmqfX5TDqF0niPydF7o
+         hSeYBwUe8d51xmX7AkhhJWeoZCpfr3XoQDgZpgoRf8o9/uBDIlHOI0BPKW8qERrirvqq
+         M/Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696292709; x=1696897509;
+        d=1e100.net; s=20230601; t=1696293026; x=1696897826;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rh/oxoD92H1kiVOKUBO0S5GEjMsZkflJV2yuTcOo5N8=;
-        b=MPOw/fmfXfDRlDlgfKrEEUR+8BQ0h440W6aFnwR/lOSlYWJirn/P24o0w59J1Y+mx1
-         8m8tt95M2BKUotJesVxSru5J/kkemIjuiuZMv6WEkc66flkfhu/6JvRs/A79oH9GorIM
-         SBjHP/ZP3LlsZfAPgB5u6VSp9sqwgige8bxMdgT1PlT/s6IhcgmakjIoE5F+L3hr7u+E
-         X3kCkV5fwjLAnyN+T/Q+pXF0pb1Xd8OS5YA7/tRakInSqa2F0cTaVadLythizM4XrGAC
-         sr2sXgjCXg+l/rvM16IJMft13/kHVYiuumIRAZneZlG8N3E+RpO52+o+hxGjLZ7V3Eqh
-         FQnw==
-X-Gm-Message-State: AOJu0YzAJH0V0OZm78LZoXNhVHRKyksOheLgvgyW3okqWyw1VUL0UHVv
-	aJOJIcjUl7mFdGv3hd+sDAsTUIFCIDaHGK/0xdhr6Q==
-X-Google-Smtp-Source: AGHT+IHb1/dimsEF/amBatrEHtKMQJThYkcDNmFcwv+eDoLhBq5FmQ86t7uGcpK84si2gXDwiQxCjrgiZwt9P4z1hQM=
-X-Received: by 2002:a0c:e1d2:0:b0:65b:1594:264e with SMTP id
- v18-20020a0ce1d2000000b0065b1594264emr10894257qvl.51.1696292709241; Mon, 02
- Oct 2023 17:25:09 -0700 (PDT)
+        bh=Gm95BT66K1A2Zf/YgTxpWCUle5PuInPRhEHdoEUKoQE=;
+        b=C/lQyQYY2HaL/hISo4/cvy2ujBh7P5Mu2+A5qn6VCcthJOZn5wSwERZkW3PFDNuLS3
+         cOmzye16lNIftU5YbY6b3uZTYU1xe3S6hCt0O7MCbfWhAHeisucZ6bEevnbQ3UhhXy97
+         9XaNTLflAws87eESMBy1YnS5HBH6rYJmH1GCRIqLYZZFlpYTyEOPGf284QbidEcNePS5
+         5ICAzn/IbT7iod+/3rI9O1us1Ze/iRB5su0j49rzYwYm6GMM65kc3/69W8yI++mPWwkQ
+         0aFn3LO0CEo2oYJOXGgxAt6sQAxEH3lqB+N+wRq+K+o/plRW7XRj0Dc71Mlr2kRvCDhv
+         qkHQ==
+X-Gm-Message-State: AOJu0YyQ3ykSdzTKbXqVgrJodjV+zGfyohQwF4ql6Ed0wWIn3OxlICnV
+	7poSk7PsmkQ6ZKK4x5uMtyJKj58hJkLq0a/+30lscg==
+X-Google-Smtp-Source: AGHT+IEpb7Cfo0yp4UqChQuah8UnSbiBBCbiC5lnkF9DzW3+QZ+WfjSNxRJF6F4+aUbfmcOC/wgFcIB74fjZr1vko4s=
+X-Received: by 2002:a0c:e383:0:b0:65d:4840:6eb4 with SMTP id
+ a3-20020a0ce383000000b0065d48406eb4mr13854778qvl.6.1696293026067; Mon, 02 Oct
+ 2023 17:30:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230929023740.1611161-1-maheshb@google.com> <ZRiQqLYpzJGbiqYX@hoboy.vegasvil.org>
-In-Reply-To: <ZRiQqLYpzJGbiqYX@hoboy.vegasvil.org>
+References: <20230929023743.1611460-1-maheshb@google.com> <ZRiSQ/fCa3pYZnXJ@hoboy.vegasvil.org>
+In-Reply-To: <ZRiSQ/fCa3pYZnXJ@hoboy.vegasvil.org>
 From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Date: Mon, 2 Oct 2023 17:24:43 -0700
-Message-ID: <CAF2d9jj4m4i278PN3F91VVudEG4nLFU8PJqk9Dnkqf=QOXTX0A@mail.gmail.com>
-Subject: Re: [PATCH 2/4] ptp: add ptp_gettimex64any() support
+Date: Mon, 2 Oct 2023 17:29:58 -0700
+Message-ID: <CAF2d9jgWpwNye89qrANfngG2+NQPDhpZQjXMKBDG6x7e32_cOw@mail.gmail.com>
+Subject: Re: [PATCH 3/4] ptp: add ioctl interface for ptp_gettimex64any()
 To: Richard Cochran <richardcochran@gmail.com>
 Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
 	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
 	Jonathan Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>, 
-	Mahesh Bandewar <mahesh@bandewar.net>
+	Mahesh Bandewar <mahesh@bandewar.net>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -79,36 +79,28 @@ X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 30, 2023 at 2:18=E2=80=AFPM Richard Cochran
+On Sat, Sep 30, 2023 at 2:25=E2=80=AFPM Richard Cochran
 <richardcochran@gmail.com> wrote:
 >
-> On Thu, Sep 28, 2023 at 07:37:40PM -0700, Mahesh Bandewar wrote:
+> On Thu, Sep 28, 2023 at 07:37:43PM -0700, Mahesh Bandewar wrote:
+> > add an ioctl op PTP_SYS_OFFSET_ANY2 to support ptp_gettimex64any() meth=
+od
 >
-> > diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_cl=
-ock.h
-> > index 05cc35fc94ac..1f1e98966cff 100644
-> > --- a/include/uapi/linux/ptp_clock.h
-> > +++ b/include/uapi/linux/ptp_clock.h
-> > @@ -69,6 +69,14 @@
-> >   */
-> >  #define PTP_PEROUT_V1_VALID_FLAGS    (0)
-> >
-> > +enum ptp_ts_types {
-> > +     PTP_TS_CYCLES =3D 0,
-> > +     PTP_TS_REAL,
-> > +     PTP_TS_MONO,
-> > +     PTP_TS_RAW,
-> > +     PTP_TS_MAX,
-> > +};
+> This is a useful idea.
 >
-> There is no need for a new set of enumerated values.  Why not use the
-> existing clockid_t ?
+> But how about a new system call instead?
 >
-I'm not sure which one you are referring to. These defs need to be
-UAPI and the one defined in time.h are not all relevant in this case
-(we just need only a few of those) hence the definition. However, if I
-missed something, please point me to it.
+>     clock_compare(clockid_t a, clockid_t b);
+>
+The purpose of this API is not to compare clocks but to get the width
+of reading the MTS value (offered by NICs) in terms of the timebase
+that is selected to essentially improve the accuracy.
 
+> It would accept any two clock IDs.
+>
+> I've been wanting this for a long time, but never found time to
+> implement it.
+>
 > Thanks,
 > Richard
 
