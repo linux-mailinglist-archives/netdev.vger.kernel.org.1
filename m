@@ -1,178 +1,238 @@
-Return-Path: <netdev+bounces-37602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2487B64DB
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:59:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B14517B64E3
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 11:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 6EF89281607
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 08:59:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3B1F528166A
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 09:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DDDDDD0;
-	Tue,  3 Oct 2023 08:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D5BDDD3;
+	Tue,  3 Oct 2023 09:00:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED97DDAA
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 08:59:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 925B8BF
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 01:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696323541;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v3nmu3krFFKLD3v68LyglQg7qgblXckqiH4dxOfI2bk=;
-	b=M9pdHa5QZ5W4r5+cxFAB2aTIYasxYJ4qNOnZmhel/RbsxZWXDUYPxWbGhF0DQo9RZIen5I
-	hZJ+JMGLmu6btFKdGZF30YJ8Ze6Od5xDuh7IcPQsNObZ927F/yi3y4XRqvduaiSdk1c4Va
-	eJV5y8ilLfrL84vzLbH/PujobE32KsY=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-575-MMY9naXGPHK_3KU8VlDxGg-1; Tue, 03 Oct 2023 04:58:58 -0400
-X-MC-Unique: MMY9naXGPHK_3KU8VlDxGg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9ae56805c41so17130766b.0
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 01:58:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696323537; x=1696928337;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v3nmu3krFFKLD3v68LyglQg7qgblXckqiH4dxOfI2bk=;
-        b=Z3q6rBrLuqG+MulNF8ntquL9MP2ZnxOBjG7xr5AyVkLncmkJthdZnMXrDXTLgX82Pz
-         oSGJ71SqBBIt8OfoPyUkq/R/50wvNkgiMev7wqR+rJYf8qf/DUa7CuQtBbohNRCZI4vN
-         5+73gZKyq/g870Q62HGmddm08hQCvFi8gYz/XI9E90/zbYCnHq9kNFPoZyafDZ4OSreC
-         7PKHVD0aNhLDJ1WHLqqkgco6bqVa7zmD6NQeSlFVTAb2Iy+VAOAf9acMcUsEn2bArsTV
-         XI7CZUKaqSVbJeUzJ5lZzz0THNNlirpEWihsmI2ML0KDxRB/SFsoP0c0Mxic8YhgGdZ3
-         mfpw==
-X-Gm-Message-State: AOJu0Yyh1t1gNeIugheMU+NtFJnZ9+ISIgBpebxw7IH0qShXtqo/1te0
-	zyUWxVZUmlPY+qeVzi69+5Zi0BzKY9/FMfFGP9qfPcsukxfVJMC2XypQB5WpR/Ua/sGkbBfheDt
-	xpldMWafO8g7/ds1a
-X-Received: by 2002:a17:906:104e:b0:9b2:bf2d:6b66 with SMTP id j14-20020a170906104e00b009b2bf2d6b66mr11343757ejj.7.1696323537107;
-        Tue, 03 Oct 2023 01:58:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOGHxezddx/k9c/xd7a1xIrTtNSX3Kw69ebXCBRbveikheH+aXxzB2h+sVJviiUN7DHVvROw==
-X-Received: by 2002:a17:906:104e:b0:9b2:bf2d:6b66 with SMTP id j14-20020a170906104e00b009b2bf2d6b66mr11343741ejj.7.1696323536738;
-        Tue, 03 Oct 2023 01:58:56 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-232-193.dyn.eolo.it. [146.241.232.193])
-        by smtp.gmail.com with ESMTPSA id si13-20020a170906cecd00b009ad850d4760sm690402ejb.219.2023.10.03.01.58.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 01:58:56 -0700 (PDT)
-Message-ID: <3666c3b4628d6d82ccff593d051706db3896e5af.camel@redhat.com>
-Subject: Re: [PATCH] tipc: Fix uninit-value access in
- tipc_nl_node_reset_link_stats()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Shigeru Yoshida <syoshida@redhat.com>, jmaloy@redhat.com, 
-	ying.xue@windriver.com
-Cc: netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
-Date: Tue, 03 Oct 2023 10:58:54 +0200
-In-Reply-To: <20230924060325.3779150-1-syoshida@redhat.com>
-References: <20230924060325.3779150-1-syoshida@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1689FDDAA;
+	Tue,  3 Oct 2023 09:00:47 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9D2AB;
+	Tue,  3 Oct 2023 02:00:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=n6LwwRSc60JjT2wGOKry5g3FrtE4NwWeJc6LbGQnXio=; b=DMo2nf6QwifwnDzNwzNa0/qzFd
+	Sqjcfq6IlxI5Vr5c1d3zTqwLg+Zl4BvpjRkDcqxonD4zLg6K2nmbykYrLZuEhRzW+tL+xk8XxM1ZA
+	c0HSZIuPLL4AtxOa8fZvB2AGSmarSnB6d6Q/lqZHqn3XiKwUR7I+lfL4RFsRi9SFY3+nxFp5fpFIL
+	vA6SnELJkYWocnO8oYtSeYNnISkLbyWQoDJvKsNW26pkPfaThTjP1ttqSfQfyUgww/mwy9vaaN4/A
+	tE7DVQ6PvR5tGEZA/hMEf4J0R6D2bB293kwke+bc8wI/La4TZtRH42YJVcPLOkxON0Fy1J5V9DjZx
+	dU09V36Q==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qnbGZ-000D9z-IA; Tue, 03 Oct 2023 11:00:31 +0200
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qnbGZ-000Uk7-4N; Tue, 03 Oct 2023 11:00:31 +0200
+Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return
+ code
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, paulb@nvidia.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com, martin.lau@linux.dev, bpf@vger.kernel.org
+References: <20230919145951.352548-1-victor@mojatatu.com>
+ <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
+ <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
+ <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
+ <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
+ <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net>
+ <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
+Date: Tue, 3 Oct 2023 11:00:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+In-Reply-To: <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27050/Tue Oct  3 09:39:20 2023)
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, 2023-09-24 at 15:03 +0900, Shigeru Yoshida wrote:
-> syzbot reported the following uninit-value access issue:
->=20
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
-> BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
->  strlen lib/string.c:418 [inline]
->  strstr+0xb8/0x2f0 lib/string.c:756
->  tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
->  genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
->  netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
->  genl_rcv+0x40/0x60 net/netlink/genetlink.c:1075
->  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->  netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
->  netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  sock_sendmsg net/socket.c:753 [inline]
->  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
->  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
->  __sys_sendmsg net/socket.c:2624 [inline]
->  __do_sys_sendmsg net/socket.c:2633 [inline]
->  __se_sys_sendmsg net/socket.c:2631 [inline]
->  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->=20
-> Uninit was created at:
->  slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
->  slab_alloc_node mm/slub.c:3478 [inline]
->  kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
->  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
->  __alloc_skb+0x318/0x740 net/core/skbuff.c:650
->  alloc_skb include/linux/skbuff.h:1286 [inline]
->  netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
->  netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  sock_sendmsg net/socket.c:753 [inline]
->  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
->  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
->  __sys_sendmsg net/socket.c:2624 [inline]
->  __do_sys_sendmsg net/socket.c:2633 [inline]
->  __se_sys_sendmsg net/socket.c:2631 [inline]
->  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->=20
-> Link names must be null-terminated strings. If a link name which is not
-> null-terminated is passed through netlink, strstr() and similar functions
-> can cause buffer overrun. This causes the above issue.
->=20
-> This patch fixes this issue by returning -EINVAL if a non-null-terminated
-> link name is passed.
->=20
-> Fixes: ae36342b50a9 ("tipc: add link stat reset to new netlink api")
-> Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail=
-.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D5138ca807af9d2b42574
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> ---
->  net/tipc/node.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/net/tipc/node.c b/net/tipc/node.c
-> index 3105abe97bb9..f167bdafc034 100644
-> --- a/net/tipc/node.c
-> +++ b/net/tipc/node.c
-> @@ -2586,6 +2586,10 @@ int tipc_nl_node_reset_link_stats(struct sk_buff *=
-skb, struct genl_info *info)
-> =20
->  	link_name =3D nla_data(attrs[TIPC_NLA_LINK_NAME]);
-> =20
-> +	if (link_name[strnlen(link_name,
-> +			      nla_len(attrs[TIPC_NLA_LINK_NAME]))] !=3D '\0')
-> +		return -EINVAL;
+On 10/2/23 9:54 PM, Jamal Hadi Salim wrote:
+> On Fri, Sep 29, 2023 at 11:48 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>> On 9/26/23 1:01 AM, Jamal Hadi Salim wrote:
+>>> On Fri, Sep 22, 2023 at 4:12 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>> On 9/20/23 1:20 AM, Jamal Hadi Salim wrote:
+>>>>> On Tue, Sep 19, 2023 at 6:15 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>>>> On 9/19/23 4:59 PM, Victor Nogueira wrote:
+>> [...]
+>>>>
+>>>> In the above case we don't have 'internal' errors which you want to trace, so I would
+>>>> also love to avoid the cost of zeroing struct tcf_result res which should be 3x 8b for
+>>>> every packet.
+>>>
+>>> We can move the zeroing inside tc_run() but we declare it in the same
+>>> spot as we do right now. You will still need to set res.verdict as
+>>> above.
+>>> Would that work for you?
+>>
+>> What I'm not following is that with the below you can avoid the unnecessary
+>> fast path cost (which is only for corner case which is almost never hit) and
+>> get even better visibility. Are you saying it doesn't work?
+> 
+> I am probably missing something:
+> -1/UNSPEC is a legit errno. And the main motivation here for this
+> patch is to disambiguate if it was -EPERM vs UNSPEC
+> Maybe that is what you are calling a "corner case"?
 
-I have the same comment as for the other tipc patch, please use
-nla_strscpy instead, thanks!
+Yes, but what is the use-case to ever return a -EPERM from the fast-path? This can
+be audited for the code in the tree and therefore avoided so that you never run into
+this problem.
 
-Paolo
+> There are two options in my mind right now (since you are guaranteed
+> in tcx_run you will never return anything below UNSPEC):
+> 1) we just have the switch statement invocation inside an inline
+> function and you can pass it sch_ret (for tcx case) and we'll pass it
+> res.verdit for tc_run() case.
+> 2) is something is we leave tcx_run alone and we have something along
+> the lines of:
+> 
+> --------------
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1450f4741d9b..93613bce647c 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3985,7 +3985,7 @@ sch_handle_ingress(struct sk_buff *skb, struct
+> packet_type **pt_prev, int *ret,
+>                     struct net_device *orig_dev, bool *another)
+>   {
+>          struct bpf_mprog_entry *entry =
+> rcu_dereference_bh(skb->dev->tcx_ingress);
+> -       struct tcf_result res = {0};
+> +       struct tcf_result res;
+>          int sch_ret;
+> 
+>          if (!entry)
+> @@ -4003,14 +4003,16 @@ sch_handle_ingress(struct sk_buff *skb, struct
+> packet_type **pt_prev, int *ret,
+>                  if (sch_ret != TC_ACT_UNSPEC)
+>                          goto ingress_verdict;
+>          }
+> +
+> +       res.verdict = 0;
+>          sch_ret = tc_run(tcx_entry(entry), skb, &res);
+>          if (sch_ret < 0) {
+>                  kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS_ERROR);
+>                  *ret = NET_RX_DROP;
+>                  return NULL;
+>          }
+> +       sch_ret = res.verdict;
+>   ingress_verdict:
+> -       switch (res.verdict) {
+> +       switch (sch_ret) {
+>          case TC_ACT_REDIRECT:
+>                  /* skb_mac_header check was done by BPF, so we can
+> safely
+>                   * push the L2 header back before redirecting to another
+> -----------
+> 
+> on the drop reason - our thinking is to support drop_watch alongside
+> tracepoint given kfree_skb_reason exists already; if i am not mistaken
+> what you suggested would require us to create a new tracepoint?
 
+So if the only thing you really care about is the different drop reason for
+kfree_skb_reason, then I still don't follow why you need to drag this into
+struct tcf_result. This can be done in a much simpler and more efficient way
+like the following:
+
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index a587e83fc169..b1c069c8e7f2 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -80,6 +80,8 @@
+  	FN(IPV6_NDISC_BAD_OPTIONS)	\
+  	FN(IPV6_NDISC_NS_OTHERHOST)	\
+  	FN(QUEUE_PURGE)			\
++	FN(TC_EGRESS_ERROR)		\
++	FN(TC_INGRESS_ERROR)		\
+  	FNe(MAX)
+
+  /**
+@@ -345,6 +347,10 @@ enum skb_drop_reason {
+  	SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
+  	/** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
+  	SKB_DROP_REASON_QUEUE_PURGE,
++	/** @SKB_DROP_REASON_TC_EGRESS_ERROR: dropped in TC egress HOOK due to error */
++	SKB_DROP_REASON_TC_EGRESS_ERROR,
++	/** @SKB_DROP_REASON_TC_INGRESS_ERROR: dropped in TC ingress HOOK due to error */
++	SKB_DROP_REASON_TC_INGRESS_ERROR,
+  	/**
+  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index f308e8268651..cd2444dd3745 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -10,6 +10,7 @@
+
+  /* TC action not accessible from user space */
+  #define TC_ACT_CONSUMED		(TC_ACT_VALUE_MAX + 1)
++#define TC_ACT_ABORT		(TC_ACT_VALUE_MAX + 2)
+
+  /* Basic packet classifier frontend definitions. */
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 85df22f05c38..3abb4d71c170 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4011,7 +4011,10 @@ sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
+  		*ret = NET_RX_SUCCESS;
+  		return NULL;
+  	case TC_ACT_SHOT:
+-		kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS);
++	case TC_ACT_ABORT:
++		kfree_skb_reason(skb, likely(sch_ret == TC_ACT_SHOT) ?
++				 SKB_DROP_REASON_TC_INGRESS :
++				 SKB_DROP_REASON_TC_INGRESS_ERROR);
+  		*ret = NET_RX_DROP;
+  		return NULL;
+  	/* used by tc_run */
+@@ -4054,7 +4057,10 @@ sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
+  		*ret = NET_XMIT_SUCCESS;
+  		return NULL;
+  	case TC_ACT_SHOT:
+-		kfree_skb_reason(skb, SKB_DROP_REASON_TC_EGRESS);
++	case TC_ACT_ABORT:
++		kfree_skb_reason(skb, likely(sch_ret == TC_ACT_SHOT) ?
++				 SKB_DROP_REASON_TC_EGRESS :
++				 SKB_DROP_REASON_TC_EGRESS_ERROR);
+  		*ret = NET_XMIT_DROP;
+  		return NULL;
+  	/* used by tc_run */
+
+Then you just return the internal TC_ACT_ABORT code for internal 'exceptions',
+and you'll get the same result to make it observable for dropwatch.
+
+Thanks,
+Daniel
 
