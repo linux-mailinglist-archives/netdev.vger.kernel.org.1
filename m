@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-37635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F211B7B668F
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:41:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69A787B6693
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 12:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8C048281651
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:41:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1CC31281630
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 10:41:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD488D314;
-	Tue,  3 Oct 2023 10:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DAEDDDD;
+	Tue,  3 Oct 2023 10:41:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6FA7ED
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:41:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DA07B8
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:41:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC623DDAC
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 10:41:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93E6FB7
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 03:41:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696329668;
+	s=mimecast20190719; t=1696329690;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uRRAGV+UU6/gJ85E/oblYOeeKk1zoIISwkILmJK6qUg=;
-	b=a0zbZTnHdttZ8EZx57yFUKbn0BENdEDTOAQph6fqifo+8RtR6S33vr9JY+Latle89CaL5J
-	4Ej1Rt/QWtv4IL125pf8AlRjwE9ZKMmBMKWLhsnJOdBBTkQZKt5f6JOjXvqU3FWqENAi/h
-	g+9SA2ZvLVpK4/gv4DelCx8ORC6/O10=
+	bh=xEM5s9LjMr/YRPee+FNwgiSqc+ylSynZdt7LNsU3DA8=;
+	b=DSLIzrKjcWZypmbh1z5xtD0OfVGSU0vrcSXfbrfUQ94MJnRfDv3lkeDdAgfFAbP7/ZN049
+	2PQ4uEyQnJJwK8JvkW7HZui81i+ZlSGuGs/pxSkMsNwCvf6zsuuneXmC6WNtS21gDHDpb2
+	lhoV/P2CoXwD5t/aXijmM2LBIJrpevA=
 Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
  [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-213-bpbByNTGMWawN6-nnCQMTA-1; Tue, 03 Oct 2023 06:41:07 -0400
-X-MC-Unique: bpbByNTGMWawN6-nnCQMTA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9ae5101b152so13883566b.1
-        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 03:41:06 -0700 (PDT)
+ us-mta-66-3rvotzW1MZitUZdGxEG9ZQ-1; Tue, 03 Oct 2023 06:41:29 -0400
+X-MC-Unique: 3rvotzW1MZitUZdGxEG9ZQ-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9ae6afce33fso17928566b.0
+        for <netdev@vger.kernel.org>; Tue, 03 Oct 2023 03:41:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696329666; x=1696934466;
+        d=1e100.net; s=20230601; t=1696329688; x=1696934488;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=uRRAGV+UU6/gJ85E/oblYOeeKk1zoIISwkILmJK6qUg=;
-        b=b6WV+1tdwTeQQiJW0/hK36ZLoievZE2NAAJvEPrdqUcn5Y1NdpqhwqAX9HcBVwLc8V
-         NaUykGK0nKHYH4kuEZxnAZui2YvSRPJCrlO2fCSH69K9KRfJVkyNoJm3Y51XWto9FtVc
-         xshQqUdHM0qlrKfLpv/YqYOH7fN/wSr6gWOrPWM30cBpjZeDHjjeyNYmUk8Nc3wHG8ti
-         swhWfVJ0QzxjKj8n89s96s+HJVRncJoziH5tLdJmFNIgWLGyiUCSDIB9j5a96Dc2lX4w
-         HwrN3Qm/0xPlkUgtFwsgBMB8k5vbve8pXO/4s8eH3OlMKNNYPCYzqwkF4L+lg0VqggXb
-         SX6w==
-X-Gm-Message-State: AOJu0YwmkAdIZryCiyXsrzsJSN6M24rCfGagT23l/29Oqq/ssU0uwqmq
-	8v/ICyiIeG6OsELkKaL0VlFxFWBASvW71885L2FPYzPmVf2Z7ejdHr5JqsqvVugDhOrHuTio4uL
-	/La8DFT7jogQ1Ccvx
-X-Received: by 2002:a17:906:101a:b0:9b2:93f0:70b9 with SMTP id 26-20020a170906101a00b009b293f070b9mr10916200ejm.3.1696329665904;
-        Tue, 03 Oct 2023 03:41:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0l8fLdJoHjuboygQtpHYXVPvRXsg/ustHtzTXzFiIkT9xq4pzDhV2oPN1PGx5cfXslOhQmg==
-X-Received: by 2002:a17:906:101a:b0:9b2:93f0:70b9 with SMTP id 26-20020a170906101a00b009b293f070b9mr10916180ejm.3.1696329665504;
-        Tue, 03 Oct 2023 03:41:05 -0700 (PDT)
+        bh=xEM5s9LjMr/YRPee+FNwgiSqc+ylSynZdt7LNsU3DA8=;
+        b=TERvpID2kVIiawYCFgAv3xI06Hcsf1/SZkhXChmXurFkjAsJwbUiVk6wjZp4P2v8sR
+         0RtySOCpVKSwrRoi3+RlW8G8kzfo0uBwyXgx+HcJ3lj07P/JaghQOvzciRfLgjfp8wEt
+         8wedf4gyhQJMyStHl6DHsW7O8FyJHLmrR4KLMAU3qqQJBqxZPpn8VMHB4VXJMAnFsbyp
+         33wc2ytQaSR835lfmPZ6MpB3qMeypIX35b1v7hNnX4in7k+L4sq7J4Or32aOdX8VFQur
+         lTsFbnfG7rzrcCezRSo9e7jUjdMksf0wAvqDah4ZHZuUbPmh91XzVvxxdyBMe6OVN42f
+         d5tQ==
+X-Gm-Message-State: AOJu0YyDRX28LZPQTX029CoEBMseGckYdAnTbUvX/qxFBSfFT7v8URF2
+	HWnHCC9fYPeeb9fNIGv9bXUjkIhZ24mrSs87Dc4nC5VhMAVRvIkJaYzOzmY2RQf2FIMfo3Zpeyq
+	ri9vOvN2/aP0revZX
+X-Received: by 2002:a17:906:25d:b0:9b2:bf2d:6b65 with SMTP id 29-20020a170906025d00b009b2bf2d6b65mr13123552ejl.4.1696329688212;
+        Tue, 03 Oct 2023 03:41:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFTp4Yzu/cOAedVnFfUtha2zEKWPPeZzfa3qsmsNMKsBJ+r6YYEbp9xiJ3pmDMPdNIMRLIP9g==
+X-Received: by 2002:a17:906:25d:b0:9b2:bf2d:6b65 with SMTP id 29-20020a170906025d00b009b2bf2d6b65mr13123529ejl.4.1696329687871;
+        Tue, 03 Oct 2023 03:41:27 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-232-193.dyn.eolo.it. [146.241.232.193])
-        by smtp.gmail.com with ESMTPSA id o13-20020a170906358d00b0099bc8db97bcsm839267ejb.131.2023.10.03.03.41.04
+        by smtp.gmail.com with ESMTPSA id n10-20020a170906118a00b009a19701e7b5sm832863eja.96.2023.10.03.03.41.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Oct 2023 03:41:05 -0700 (PDT)
-Message-ID: <960e16021a529bc9df217b3c2546e0dc7532ce7b.camel@redhat.com>
-Subject: Re: [PATCH net v2 5/6] virtio-net: fix the vq coalescing setting
- for vq resize
+        Tue, 03 Oct 2023 03:41:27 -0700 (PDT)
+Message-ID: <6e5fb3e148ae1fb4a29561fe9d04235d8be6ab1f.camel@redhat.com>
+Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
+ containers.
 From: Paolo Abeni <pabeni@redhat.com>
-To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin"
- <mst@redhat.com>,  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Xuan
- Zhuo <xuanzhuo@linux.alibaba.com>, Gavin Li <gavinl@nvidia.com>
-Date: Tue, 03 Oct 2023 12:41:03 +0200
-In-Reply-To: <1b4f480bed95951b6f4805d6c4e72dd1a315acab.1695627660.git.hengqi@linux.alibaba.com>
-References: <cover.1695627660.git.hengqi@linux.alibaba.com>
-	 <1b4f480bed95951b6f4805d6c4e72dd1a315acab.1695627660.git.hengqi@linux.alibaba.com>
+To: dust.li@linux.alibaba.com, Albert Huang <huangjie.albert@bytedance.com>,
+  Karsten Graul <kgraul@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Jan Karcher <jaka@linux.ibm.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu
+ <tonylu@linux.alibaba.com>,  Wen Gu <guwen@linux.alibaba.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 03 Oct 2023 12:41:25 +0200
+In-Reply-To: <20230927034209.GE92403@linux.alibaba.com>
+References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
+	 <20230927034209.GE92403@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
@@ -87,83 +87,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-09-25 at 15:53 +0800, Heng Qi wrote:
-> According to the definition of virtqueue coalescing spec[1]:
+On Wed, 2023-09-27 at 11:42 +0800, Dust Li wrote:
+> On Mon, Sep 25, 2023 at 10:35:45AM +0800, Albert Huang wrote:
+> > If the netdevice is within a container and communicates externally
+> > through network technologies like VXLAN, we won't be able to find
+> > routing information in the init_net namespace. To address this issue,
 >=20
->   Upon disabling and re-enabling a transmit virtqueue, the device MUST se=
-t
->   the coalescing parameters of the virtqueue to those configured through =
-the
->   VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the driver did not set
->   any TX coalescing parameters, to 0.
+> Thanks for your founding !
 >=20
->   Upon disabling and re-enabling a receive virtqueue, the device MUST set
->   the coalescing parameters of the virtqueue to those configured through =
-the
->   VIRTIO_NET_CTRL_NOTF_COAL_RX_SET command, or, if the driver did not set
->   any RX coalescing parameters, to 0.
->=20
-> We need to add this setting for vq resize (ethtool -G) where vq_reset hap=
-pens.
->=20
-> [1] https://lists.oasis-open.org/archives/virtio-dev/202303/msg00415.html
->=20
-> Fixes: 394bd87764b6 ("virtio_net: support per queue interrupt coalesce co=
-mmand")
-> Cc: Gavin Li <gavinl@nvidia.com>
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> I think this is a more generic problem, but not just related to VXLAN ?
+> If we use SMC-R v2 and the netdevice is in a net namespace which is not
+> init_net, we should always fail, right ? If so, I'd prefer this to be a b=
+ugfix.
 
-@Jason, since you commented on v1, waiting for your ack.
+Re-stating the above to be on the same page: the patch should be re-
+posted targeting the net tree, and including a suitable fixes tag.
 
-> ---
->  drivers/net/virtio_net.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->=20
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 12ec3ae19b60..cb19b224419b 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2855,6 +2855,9 @@ static void virtnet_get_ringparam(struct net_device=
- *dev,
->  	ring->tx_pending =3D virtqueue_get_vring_size(vi->sq[0].vq);
->  }
-> =20
-> +static int virtnet_send_ctrl_coal_vq_cmd(struct virtnet_info *vi,
-> +					 u16 vqn, u32 max_usecs, u32 max_packets);
-> +
->  static int virtnet_set_ringparam(struct net_device *dev,
->  				 struct ethtool_ringparam *ring,
->  				 struct kernel_ethtool_ringparam *kernel_ring,
-> @@ -2890,12 +2893,36 @@ static int virtnet_set_ringparam(struct net_devic=
-e *dev,
->  			err =3D virtnet_tx_resize(vi, sq, ring->tx_pending);
->  			if (err)
->  				return err;
-> +
-> +			/* Upon disabling and re-enabling a transmit virtqueue, the device mu=
-st
-> +			 * set the coalescing parameters of the virtqueue to those configured
-> +			 * through the VIRTIO_NET_CTRL_NOTF_COAL_TX_SET command, or, if the d=
-river
-> +			 * did not set any TX coalescing parameters, to 0.
-> +			 */
-> +			err =3D virtnet_send_ctrl_coal_vq_cmd(vi, txq2vq(i),
-> +							    vi->intr_coal_tx.max_usecs,
-> +							    vi->intr_coal_tx.max_packets);
-> +			if (err)
-> +				return err;
-> +			/* Save parameters */
+@Dust Li: please correct me if I misread you.
 
-As a very minor nit, I guess the comment could be dropped here (similar
-to patch 4/6). @Heng Qi: please don't repost just for this, let's wait
-for Jason' comments.
-
-Cheers,
+Thanks,
 
 Paolo
 
