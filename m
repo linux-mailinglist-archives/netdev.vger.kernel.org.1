@@ -1,83 +1,106 @@
-Return-Path: <netdev+bounces-37718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E66227B6BCE
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:36:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5937B6BD4
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 16:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9E63D280F67
-	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:36:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C1F9F1C20846
+	for <lists+netdev@lfdr.de>; Tue,  3 Oct 2023 14:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D562C2AB2F;
-	Tue,  3 Oct 2023 14:36:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8029E30FA8;
+	Tue,  3 Oct 2023 14:37:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54066FD2
-	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 14:36:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F67BC433C8;
-	Tue,  3 Oct 2023 14:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696343764;
-	bh=fb8a79U9B7XiFGw1+vbay0NRlK6p/9nWvlZtpmw7MlY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NdDeyY7BHO+mEUNz0GYNIU8Rto9yROJTyEKxUw0h75/nUs5a5iOBxzyJ5hzDnYZLU
-	 WY53IslJKvCOWQdiPUNmJ2hitDpgTMoBqZTUwseuWBD2rSC03CNcLGQig/omx8VWoQ
-	 X+3Vqdxs5/evYrep6M6lG8gICprTEXUwLX/+IdaNLXdw/Wks758YVeRcXVArqVIY9K
-	 9IwZGsbqWVfOujtu0QVJ5OFGbcr9G42OiUKYn1PMdoAHe5EKMEXy7IJtC0Cnx1oEqG
-	 pgHjWBq+rX/QNFOx+AQbRhRn89Adnkck0Pri+Iv0ZC9FAyV+Q5uRLlHRv8Nk0PvW0n
-	 XBcAs6OikO7kA==
-Message-ID: <0f91b58c-84bc-902c-0141-53fb8914590f@kernel.org>
-Date: Tue, 3 Oct 2023 08:36:02 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F4F219FB
+	for <netdev@vger.kernel.org>; Tue,  3 Oct 2023 14:37:16 +0000 (UTC)
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60DA3AB;
+	Tue,  3 Oct 2023 07:37:14 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-d90da64499cso1056806276.0;
+        Tue, 03 Oct 2023 07:37:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696343833; x=1696948633; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kDSrbor6d5vrsa4WUXcUYUUsBIxTGmw3LfKQuRqMfxg=;
+        b=AUE67MRPiRoTLOgVdDB+5QdYtsEM47K9N4jCJCbZoAbSPGLI0B2/fNu9JhyWGqqwaj
+         1dyiLmgFQrOok+OHF2RkLNyS7NhUXV+9QPt8pfouhHv2GRvW028G7u2L3Y4NX5UDvgE/
+         6iTOS1d0fs4mK9Aik456o/UckMqVKQTfn3KoU0xXFdJGjACAh61UxP22Y3DsB3eRjh63
+         8KIC3KRsvP21+eOFx3G4FC1Epnh2G8on/0HIzscXvvHg6OKeM1LjNnKquaffOkZWJ/Nd
+         M8OvH5dR/emUOtqTIx64VkCGd9g14ZTLavhPWaoEKwhMio9HmGvdCd3nNMDtpWvmHefv
+         m+SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696343833; x=1696948633;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kDSrbor6d5vrsa4WUXcUYUUsBIxTGmw3LfKQuRqMfxg=;
+        b=MgCwcXwc9ysGgJn+Lbpqtqcs7ckA/VGp2WlARJSjm2zlc+g+hbE4eH+0bryYgUZe3L
+         HbVmBTZ7ud2lXRbXwN8iEhCe1kRW9+hfcU9epFYi05QYU4OK8QTgueO0Mqq1x4VxquA+
+         tq+PQnJhdWCf0RzdLydCZjAdrfBj/qpbxwwuJkMKu3w0+xhO7rAvXm+3izJegAyqJu76
+         +kA2j/CuE4p3pYtb4v8g1CtISNTG0xCzhp0XLOHwdMTgjUMnp2fr9jMuND7JqvKJqYms
+         VHkgpA9fUivG9xCDk3Zfyy8B9QfA+EipKom/R6AKjCPlhw48ZcAqza8KU/StBKVL3D22
+         7b/g==
+X-Gm-Message-State: AOJu0YytEkS/RMr4xF+/sHdPIecN+2S+kA8jrvHcprstFUFcFhAAunpm
+	Io4g1ochpDLu9EcVDxuhl5dwF0c3Ucj9MR6I/ys7Ywxk
+X-Google-Smtp-Source: AGHT+IFZxGTJOgKxVQG5wsIyVvQRptQFng65OIT7UDDJjnn2dGSTzmZIsyhQJdinmjW/Mf9HMf+iU2VXM9tLzzv5t7c=
+X-Received: by 2002:a25:df91:0:b0:d86:2156:c314 with SMTP id
+ w139-20020a25df91000000b00d862156c314mr14930517ybg.28.1696343833061; Tue, 03
+ Oct 2023 07:37:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v4] net: add sysctl to disable rfc4862 5.5.3e
- lifetime handling
-Content-Language: en-US
-To: Patrick Rohr <prohr@google.com>, "David S. Miller" <davem@davemloft.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>,
- =?UTF-8?Q?Maciej_=c5=bbenczykowski?= <maze@google.com>,
- Lorenzo Colitti <lorenzo@google.com>, Jen Linkova <furry@google.com>,
- Jiri Pirko <jiri@resnulli.us>
-References: <20230925214711.959704-1-prohr@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20230925214711.959704-1-prohr@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <6ee630f777cada3259b29e732e7ea9321a99197b.1696172868.git.lucien.xin@gmail.com>
+ <ZRwOVyKQR8MBjpBh@kernel.org> <CADvbK_fK03UO3R=70J+VoGVm_LJuzZbh+_=0doceS8DCPJYBVA@mail.gmail.com>
+ <20231003142343.GA8405@breakpoint.cc>
+In-Reply-To: <20231003142343.GA8405@breakpoint.cc>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 3 Oct 2023 10:37:01 -0400
+Message-ID: <CADvbK_cHfsGaLG5NyWo6rXBpuPvqS4yWUCEhK3TcC65gixkPTQ@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: handle the connecting collision properly in nf_conntrack_proto_sctp
+To: Florian Westphal <fw@strlen.de>
+Cc: Simon Horman <horms@kernel.org>, network dev <netdev@vger.kernel.org>, 
+	netfilter-devel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 9/25/23 3:47 PM, Patrick Rohr wrote:
-> This change adds a sysctl to opt-out of RFC4862 section 5.5.3e's valid
-> lifetime derivation mechanism.
-> 
-> RFC4862 section 5.5.3e prescribes that the valid lifetime in a Router
-> Advertisement PIO shall be ignored if it less than 2 hours and to reset
-> the lifetime of the corresponding address to 2 hours. An in-progress
-> 6man draft (see draft-ietf-6man-slaac-renum-07 section 4.2) is currently
-> looking to remove this mechanism. While this draft has not been moving
-> particularly quickly for other reasons, there is widespread consensus on
-> section 4.2 which updates RFC4862 section 5.5.3e.
-> 
-> Cc: Maciej Żenczykowski <maze@google.com>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Cc: Jen Linkova <furry@google.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
-> Cc: David Ahern <dsahern@kernel.org>
-> Signed-off-by: Patrick Rohr <prohr@google.com>
-> ---
->  Documentation/networking/ip-sysctl.rst | 11 ++++++++
->  include/linux/ipv6.h                   |  1 +
->  net/ipv6/addrconf.c                    | 38 +++++++++++++++++---------
->  3 files changed, 37 insertions(+), 13 deletions(-)
-> 
+On Tue, Oct 3, 2023 at 10:23=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Xin Long <lucien.xin@gmail.com> wrote:
+> > > The type of vtag is u32. But the type of ct->proto.sctp.vtag[!dir] an=
+d init_tag
+> > > is __be32. This doesn't seem right (and makes Sparse unhappy).
+> > You're right, I will fix it and re-post with tag:
+> >
+> > Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+>
+> I'm fine with this, the bug is likely inherited from
+> ipt_conntrack_sctp.c, but that doesn't exist anymore.
+ah, I see.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+>
+> Would you also fix up the __be32/u32 confusion?
+>
+> Better to not add more sparse warnings...
+>
+yes, I will fix the __be32 one too.
 
-
+Thanks.
 
