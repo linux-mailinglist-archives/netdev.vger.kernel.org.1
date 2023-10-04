@@ -1,344 +1,145 @@
-Return-Path: <netdev+bounces-37904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2129F7B7B52
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:11:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8C87B7B72
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:13:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id C74132814DF
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7580C281831
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38AC10954;
-	Wed,  4 Oct 2023 09:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3541096A;
+	Wed,  4 Oct 2023 09:13:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFEC10949
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:11:18 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3904CB4;
-	Wed,  4 Oct 2023 02:11:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696410675; x=1727946675;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Eedc6uwunzox8Y6P05KAg6ccWk2F5YyI+s3GHWO3vas=;
-  b=ZQ/PI70+0BzaoWejnJ/Z+yyYtYWHu81yI9tLDn/ioS3HaVt+2f67eG1I
-   ArGou0x6Q5RbggY4w12QfK+x5eUzQ7A8BDd98Kla0tAJOQ4LD1rUB5Uqk
-   iWtv4sHVZdB64nSZ0Wye0JWvyZAbtfhqXCdQKOz+ITftsIWYrSaTAY2h/
-   aw+OyHp1Jkn8Y4yItRkEVt4/AcngsF3Q0NPCxihMlvxkpw3y9scuD3oRt
-   0Li9mwCZbhyw3CL5q+l2+pdKlWIGaKayB0K5RwvqSHMRSvH2FCJ+AoOKA
-   s9y054phoM0TzTFVRGar/W3szW9V/YcchK/uMHpKhewdSg9dSMD+1aBov
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="449604586"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="449604586"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 02:11:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="925025219"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="925025219"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Oct 2023 02:11:13 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Wed, 4 Oct 2023 02:11:13 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Wed, 4 Oct 2023 02:11:13 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Wed, 4 Oct 2023 02:11:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VvvPrsI2hc22CeFDM3FZf5UjiZAo4NccGxL6IbrdRCEEE01kZTf9lZWNsBcP5+U6z8liuO7pH6m+yItW4riHo/VySSCr2eAbDwnTBu9nbuCOTwH7g3VYPvaK8pWzn4niZ6eli20CDS2Rgn/xvRL9IWVXCv0gfGYIMWwsLKeOORV79B2r/CQ9HT/P0nrVNmZSnRuns8KCXPiugTIpI5mruDt/4LrngGeiCQohjhF3/lTqSQf1D6EvXgoVHGys5W8KgEefOxK0jVH/cdhMLw61yTyi8dlWc8jEk9f8qyRqoCD4bNSbnHRIPkVl/8AUwb5rmoHAsbfjHI58xlls11J32Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZkIyYmnqcw30jV/o1HRMaQLim3O2uskyFvwAqCO+f5k=;
- b=BfQS7kiE3ovUM7EbKIjD7o8eLSElcdepwJVAbHe4G364wnFE7+6mtscSCfBanpBfcfDmxrXhRIxt9Rs01T+Dhkattv89ubYAM6sjFZYnzSHjIEhcxtSQNPd0KbGsf4ItaJlUKSApqqGqQFQw8DF3O90qdGRD3fabrpGgsxsxuDp0bz/GdZZSFFBcFxE2dBv4TjNQVL+y1oYtEVR5MjLtffZt2br7zp//co9wXUxLeMk93+DyHwLWkkl5/luoHUCcWnNoxpcoDXsJ7FSsb7Sn7lkx847cY9I2E4NXvbhNu7C8c7PJqrj8NOknJ2tWfgEw8irJxJerPouzVBp+lRaqhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- SJ1PR11MB6082.namprd11.prod.outlook.com (2603:10b6:a03:48b::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.31; Wed, 4 Oct 2023 09:11:11 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::4c69:ab61:fea5:5a7f]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::4c69:ab61:fea5:5a7f%3]) with mapi id 15.20.6813.035; Wed, 4 Oct 2023
- 09:11:11 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Brandeburg,
- Jesse" <jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-Subject: RE: [PATCH net-next 3/4] dpll: netlink/core: add support for pin-dpll
- signal phase offset/adjust
-Thread-Topic: [PATCH net-next 3/4] dpll: netlink/core: add support for
- pin-dpll signal phase offset/adjust
-Thread-Index: AQHZ8STYBdXle/Bxd0eyxPCX/7DD6LAu+R+AgAebAaCAAA0FgIAAWKYAgACqnwCAAIO7gIAAMSsAgAEJTNA=
-Date: Wed, 4 Oct 2023 09:11:11 +0000
-Message-ID: <DM6PR11MB465796999DA139FB1E2BEF4B9BCBA@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
- <20230927092435.1565336-4-arkadiusz.kubalewski@intel.com>
- <4018c0b0-b288-ff60-09be-7ded382f4a82@linux.dev>
- <DM6PR11MB4657AA79C0C44F868499A3129BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZRrb87drG7aVrxsT@nanopsycho>
- <DM6PR11MB4657C61104280788DF49F0E59BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZRu1cG2uglhmCdlI@nanopsycho>
- <DM6PR11MB4657B52BD09700F49799ED8C9BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZRxNML855TG7L5To@nanopsycho>
-In-Reply-To: <ZRxNML855TG7L5To@nanopsycho>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|SJ1PR11MB6082:EE_
-x-ms-office365-filtering-correlation-id: 9cc7220b-0605-4403-8e1b-08dbc4b9da74
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: grUr/0EvDdBUQUWwr4i4Bo07t5bOFJ1KEUjcM4a57OBtyW5EFqKFY65Ib5tPJY/Seb6tFgXCCpTlVALco/GcyrGy0rsU8cmyOPwtY1QfQGSghgqUWuS9ZuoVNoZlS9ZhwBUjzt5J/QC5xQ9Wdls2O22EV4z43BBFxXLN6AlGS9ciEnpU6dq7v5sKyEalg1wYJbhpyGIOpPLY3SwMDRCIyzaWHsKzSNtHu3ifGTD5/XzK03YrFYbm0UW91S+Rku9u72M15SmqVKUnpDYtE4GvS9MlLkDTIfCTmCLxtw42i9qKfySrKFcYzltZB6rHXPfdNOraQoWTZkXeClCBiThtpm71CG0jiFVAT0qOAhsxzqQt368nQMC40YRRrXuCoiyI0EsIvuRx4a5XqRjdZ+pBW938tnS2P+5NbzlU7t2WA2tJv9a+IQbWOp+hazJkWUlucUd/ErzHb08p970qXWs2vx+c8KAqvU49maBmXom8/61qN6Xha4oJEPdAeiHtOIxciqsIA7AEXF5Ykn+fPhe9NNIJG6IXtFWh/hL2pLgioUzD4rBhpvih05Iu0rYJryrTSIlrsv0u2op6J9Bg63wJMlxPDQADQk5MJ53DljjOSUOOZMBL7GyLT+4Zctn2noex
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(396003)(136003)(366004)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(66899024)(38070700005)(82960400001)(33656002)(86362001)(26005)(9686003)(83380400001)(6506007)(7696005)(122000001)(38100700002)(478600001)(71200400001)(2906002)(8936002)(52536014)(8676002)(5660300002)(4326008)(6916009)(41300700001)(54906003)(76116006)(316002)(66476007)(66556008)(66946007)(55016003)(64756008)(66446008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1AY38sq7rs1f7NqLOiJnbadvIV3w39cTsjnADgXYlfRdfAxIpPRTG1nzPMkN?=
- =?us-ascii?Q?d1DWbwx65E0O5kItTJ1r6l3ePLrCzrUb+XhItDMStVAWPYY+tefb3BSB7IlN?=
- =?us-ascii?Q?owbjVpOlg3YY8V1TPxuFJBpEueiODijpbHVoUlkyhqGxBxDvww5iSBBbuOpE?=
- =?us-ascii?Q?ukZ9K7wAqn6O5oHVpcBjagS+y6ooFh99D0SpgXljomzLexSzf3aesmNz2ykw?=
- =?us-ascii?Q?uOFeVw34qMmaVqjOHLatuiueVTZyOMvyhg38ratz416Q/uZsbYv/qQqC96TB?=
- =?us-ascii?Q?dG1QuKmO901LHANEQDobrtJ+/KGQw8SuAo9GjFzOujB+ypwhckd+AWIxuAx5?=
- =?us-ascii?Q?Czd5l2ULFYFwV7d2xe7stuUxnKyQcU6D9Jy1iV7J72xvek4Knno2tF3PxbvP?=
- =?us-ascii?Q?BwXejvdEdCD1tTdu/s2+LhuX4HKdG025SN47bfYx+u4T2CGkwPk5YU/NUyRf?=
- =?us-ascii?Q?bS1LmvVXd/tZiZTu2Gq5KaYw50fi1PBTkXPEZE0XqrnkavBAjMoCyqrLmTbv?=
- =?us-ascii?Q?OugcuS9yNL8qkJ3XN0O8taSntMlZhj7WgaAQkgd62Dj5x8C8xd1SaIBJ5v7W?=
- =?us-ascii?Q?wWP2waqdMA5Zun0A4x2ABf9gyXNgcxFUAYacTNEcA2ndZ7r87F9yhYK/1fIu?=
- =?us-ascii?Q?jeuotn9w2A5LsOKKalufFYpCEeISxltwOxD6MrMjn6elK6CAiIqbpWd5LMcy?=
- =?us-ascii?Q?RPzVQZVDv7WJsQO/ELfYyUHUrQtioiWmTmZfw4yncj0XqgBYl776SU25xiA2?=
- =?us-ascii?Q?XzuIpJaQZ5EKtQvz6qUwRRlGSsOpv1ImopppEaij+AXJQRa5Xzr7HjMU2CYA?=
- =?us-ascii?Q?UtRPcHKiEVYKMhRJTohldSHA4EbjQx8sMj4jzN9nIN1NhB4Mrx4C4aWC/K4G?=
- =?us-ascii?Q?SvJ0owbWjmCR6p/BoRdDMorou09hITKKbHwFje6a1E8Xq8FGqVuytHpmM4i7?=
- =?us-ascii?Q?FUt7foxFsk2iOJnBPApRszXSSJccb3YqC6xhFj30c/hJoKhuXU7SGFAyGI36?=
- =?us-ascii?Q?VYaV3yGN0MoPMA20Y0/bBX+ydHh0YfTehQvEDtDPR7dMpsRTCEDyggs+hVZO?=
- =?us-ascii?Q?6M6QrjdKO8CALg+jFyd34o/j30Wz5cCQOtJC3j5YtPlT+/uBzSbPBqCGF/ca?=
- =?us-ascii?Q?A4VwYFqRLS+suKfU21PJ2YKruLWdlHtLuetvbuBQvNUsEqyzj780gMU6Np+K?=
- =?us-ascii?Q?6qc0b7lUUFMTK610gI8XAsd6rsIjG6Sl2u3ZmyrvYLvCtxEN2yMDX1onXNc6?=
- =?us-ascii?Q?qNvRen5dkybqos9bdIykH5C+LOaFgurqzZhOVsYHUkZxIaZzYp18FdWBF+mv?=
- =?us-ascii?Q?0UPdvsYdeZL4Wp4Fv5RhH/XqNvsnzKK53WJ0eskICxCtONm1HsDS3z2mGQHk?=
- =?us-ascii?Q?9qlmBL4wtQMJB/3rChviYJVLYXusKJ3x3s3CwNk/8s5PGEsG4HZMKA7RDKFe?=
- =?us-ascii?Q?8SGgf/sh0R5k8PxbAm46SIAgpfjo1aGikq6HdQyJV66znAeTY71QiKzAt5rh?=
- =?us-ascii?Q?Zac5sF1rF8j6nhuadzh2cqE3r25LRzRsCMSutiz+IYR+/zGNKT6xaZkGsAK/?=
- =?us-ascii?Q?j6OGW9gAke4ByuqTeuK/NHTaqYx22ntqjHW5qg+Go8dYIgr+r2meSBW1LcZd?=
- =?us-ascii?Q?bg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FDB10951
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:13:09 +0000 (UTC)
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D02F98;
+	Wed,  4 Oct 2023 02:13:06 -0700 (PDT)
+X-IronPort-AV: E=Sophos;i="6.03,199,1694703600"; 
+   d="scan'208";a="181890598"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 04 Oct 2023 18:13:05 +0900
+Received: from localhost.localdomain (unknown [10.166.15.32])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id B9EA641BB248;
+	Wed,  4 Oct 2023 18:13:05 +0900 (JST)
+From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Subject: [PATCH net 0/2] ravb: Fix use-after-free issues
+Date: Wed,  4 Oct 2023 18:12:51 +0900
+Message-Id: <20231004091253.4194205-1-yoshihiro.shimoda.uh@renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9cc7220b-0605-4403-8e1b-08dbc4b9da74
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2023 09:11:11.5691
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Jyfqzq7l9shJ+LWlMHEw0MxL3TLfX5xP+gIopcgthDshQMnM0VOrMPGs9n8S/qpT8BAkKpg7T7pYjUVjEajRUe7dORS2kF/TaRih7O9t0ec=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6082
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-0.9 required=5.0 tests=AC_FROM_MANY_DOTS,BAYES_00,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->From: Jiri Pirko <jiri@resnulli.us>
->Sent: Tuesday, October 3, 2023 7:20 PM
->To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
->
->Tue, Oct 03, 2023 at 04:29:43PM CEST, arkadiusz.kubalewski@intel.com wrote=
-:
->>>From: Jiri Pirko <jiri@resnulli.us>
->>>Sent: Tuesday, October 3, 2023 8:32 AM
->>>
->>>Tue, Oct 03, 2023 at 01:03:00AM CEST, arkadiusz.kubalewski@intel.com
->>>wrote:
->>>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>>Sent: Monday, October 2, 2023 5:04 PM
->>>>>
->>>>>Mon, Oct 02, 2023 at 04:32:30PM CEST, arkadiusz.kubalewski@intel.com
->>>>>wrote:
->>>>>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>>>>>Sent: Wednesday, September 27, 2023 8:09 PM
->>>>>>>
->>>>>>>On 27/09/2023 10:24, Arkadiusz Kubalewski wrote:
->>>>>>>> Add callback op (get) for pin-dpll phase-offset measurment.
->>>>>>>> Add callback ops (get/set) for pin signal phase adjustment.
->>>>>>>> Add min and max phase adjustment values to pin proprties.
->>>>>>>> Invoke get callbacks when filling up the pin details to provide
->>>>>>>> user
->>>>>>>> with phase related attribute values.
->>>>>>>> Invoke phase-adjust set callback when phase-adjust value is
->>>>>>>> provided
->>>>>>>> for
->>>>>>>> pin-set request.
->>>>>>>>
->>>>>>>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.co=
-m>
->>>>>>>
->>>>>>>[...]
->>>>>>>
->>>>>>>> +static int
->>>>>>>> +dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr
->>>>>>>> *phase_adj_attr,
->>>>>>>> +		       struct netlink_ext_ack *extack)
->>>>>>>> +{
->>>>>>>> +	struct dpll_pin_ref *ref;
->>>>>>>> +	unsigned long i;
->>>>>>>> +	s32 phase_adj;
->>>>>>>> +	int ret;
->>>>>>>> +
->>>>>>>> +	phase_adj =3D nla_get_s32(phase_adj_attr);
->>>>>>>> +	if (phase_adj > pin->prop->phase_range.max ||
->>>>>>>> +	    phase_adj < pin->prop->phase_range.min) {
->>>>>>>> +		NL_SET_ERR_MSG(extack, "phase adjust value not
->>>>>>>> supported");
->>>>>>>> +		return -EINVAL;
->>>>>>>> +	}
->>>>>>>> +	xa_for_each(&pin->dpll_refs, i, ref) {
->>>>>>>> +		const struct dpll_pin_ops *ops =3D dpll_pin_ops(ref);
->>>>>>>> +		struct dpll_device *dpll =3D ref->dpll;
->>>>>>>> +
->>>>>>>> +		if (!ops->phase_adjust_set)
->>>>>>>> +			return -EOPNOTSUPP;
->>>>>>>
->>>>>>>I'm thinking about this part. We can potentially have dpll devices
->>>>>>>with
->>>>>>>different expectations on phase adjustments, right? And if one of
->>>>>>>them
->>>>>>>won't be able to adjust phase (or will fail in the next line), then
->>>>>>>netlink will return EOPNOTSUPP while _some_ of the devices will be
->>>>>>>adjusted. Doesn't look great. Can we think about different way to
->>>>>>>apply
->>>>>>>the change?
->>>>>>>
->>>>>>
->>>>>>Well makes sense to me.
->>>>>>
->>>>>>Does following makes sense as a fix?
->>>>>>We would call op for all devices which has been provided with the op.
->>>>>>If device has no op -> add extack error, continue
->>>>>
->>>>>Is it real to expect some of the device support this and others don't?
->>>>>Is it true for ice?
->>>>>If not, I would got for all-or-nothing here.
->>>>>
->>>>
->>>>Let's step back a bit.
->>>>The op itself is introduced as per pin-dpll tuple.. did this
->>>>intentionally,
->>>>to inform each dpll that the offset has been changed - in case dplls ar=
-e
->>>>controlled by separated driver/firmware instances but still sharing the
->>>>pin.
->>>>Same way a pin frequency is being set, from user perspective on a pin, =
-but
->>>>callback is called for each dpll the pin was registered with.
->>>>Whatever we do here, it shall be probably done for frequency_set()
->>>>callback as
->>>>well.
->>>>
->>>>The answers:
->>>>So far I don't know the device that might do it this way, it rather
->>>>supports
->>>>phase_adjust or not. In theory we allow such behavior to be implemented=
-,
->>>>i.e.
->>>>pin is registered with 2 dplls, one has the callback, second not.
->>>
->>>If there is only theoretical device like that now, implement
->>>all-or-nothing. If such theoretical device appears in real, this could
->>>be changed. The UAPI would not change, no problem.
->>>
->>
->>I can live with it :)
->>
->>>
->>>>Current hardware of ice sets phase offset for a pin no matter on which
->>>>dpll
->>>>device callback was invoked.
->>>>"all-or-nothing" - do you mean to check all callback returns and then
->>>>decide
->>>>if it was successful?
->>>
->>>Check if all dplls have ops and only perform the action in such case. In
->>>case one of the dplls does not have the op filled, return -EOPNOTSUPP.
->>>
->>>
->>>Regarding the successful/failed op, I think you can just return. In
->>>these cases, when user performs multiaction cmd, he should be prepared
->>>to deal with consequences if part of this cmd fails. We don't have
->>>rollback for any other multiaction cmd in dpll, I don't see why this
->>>should be treated differently.
->>>
->>
->>We don't have it because no one have spotted it on review,
->>as mentioned the frequency_set behaves the same way,
->>we need one approach for all of those cases.
->>I am opting for having the rollback as suggested on the other thread.
->
->Okay, but let's do that consistently.
->
+This patch series fixes use-after-free issues in ravb_remove().
+The original patch is made by Zheng Wang [1]. And, I made the patch
+1/2 which I found other issue in the ravb_remove().
 
-Sure, fixed in v2.
-Thanks!
-Arkadiusz
+The issue is difficult to be reproduced. So, I checked this with a fault
+injection code which I made like below:
+---
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -1874,6 +1874,7 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+ 	struct net_device *ndev = priv->ndev;
+ 	int error;
+ 
++	netdev_info(ndev, "%s: enter\n", __func__);
+ 	netif_tx_stop_all_queues(ndev);
+ 
+ 	/* Stop PTP Clock driver */
+@@ -1911,12 +1912,15 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+ 	}
+ 	ravb_emac_init(ndev);
+ 
++	msleep(100);
++
+ out:
+ 	/* Initialise PTP Clock driver */
+ 	if (info->gptp)
+ 		ravb_ptp_init(ndev, priv->pdev);
+ 
+ 	netif_tx_start_all_queues(ndev);
++	netdev_info(ndev, "%s: exit\n", __func__);
+ }
+ 
+ /* Packet transmit function for Ethernet AVB */
+@@ -2886,6 +2890,7 @@ static int ravb_remove(struct platform_device *pdev)
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
+ 
++	netdev_info(ndev, "%s: enter\n", __func__);
+ 	/* Stop PTP Clock driver */
+ 	if (info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
+@@ -2895,6 +2900,11 @@ static int ravb_remove(struct platform_device *pdev)
+ 
+ 	/* Set reset mode */
+ 	ravb_write(ndev, CCC_OPC_RESET, CCC);
++
++	/* fault injection for tx timeout */
++	if (netif_running(ndev))
++		schedule_work(&priv->work);
++
+ 	unregister_netdev(ndev);
+ 	if (info->nc_queues)
+ 		netif_napi_del(&priv->napi[RAVB_NC]);
+@@ -2907,6 +2917,7 @@ static int ravb_remove(struct platform_device *pdev)
+ 	reset_control_assert(priv->rstc);
+ 	free_netdev(ndev);
+ 	platform_set_drvdata(pdev, NULL);
++	netdev_info(ndev, "%s: exit\n", __func__);
+ 
+ 	return 0;
+ }
+---
 
->>
->>Thank you!
->>Arkadiusz
->>
->>>
->>>>
->>>>Thank you!
->>>>Arkadiusz
->>>>
->>>>>
->>>>>>If device fails to set -> add extack error, continue
->>>>>>Function always returns 0.
->>>>>>
->>>>>>Thank you!
->>>>>>Arkadiusz
->>>>>>
->>>>>>>
->>>>>>>> +		ret =3D ops->phase_adjust_set(pin,
->>>>>>>> +					    dpll_pin_on_dpll_priv(dpll, pin),
->>>>>>>> +					    dpll, dpll_priv(dpll), phase_adj,
->>>>>>>> +					    extack);
->>>>>>>> +		if (ret)
->>>>>>>> +			return ret;
->>>>>>>> +	}
->>>>>>>> +	__dpll_pin_change_ntf(pin);
->>>>>>>> +
->>>>>>>> +	return 0;
->>>>>>>> +}
->>>>>>>> +
->>>>
+Before the patches are applied, the following message output if unbind:
+# echo e6800000.ethernet > unbind
+ravb e6800000.ethernet eth0: ravb_remove: enter
+ravb e6800000.ethernet eth0: ravb_tx_timeout_work: enter
+ravb e6800000.ethernet eth0: Link is Down
+ravb e6800000.ethernet eth0 (released): ravb_remove: exit
+platform e6800000.ethernet eth0 (released): ravb_tx_timeout_work: exit
+
+After the patches were appliedy, "released" ravb_tx_timeout_work disappeared:
+ravb e6800000.ethernet eth0: ravb_remove: enter
+ravb e6800000.ethernet eth0: ravb_tx_timeout_work: enter
+ravb e6800000.ethernet eth0: Link is Down
+ravb e6800000.ethernet eth0: ravb_tx_timeout_work: exit
+ravb e6800000.ethernet eth0 (released): ravb_remove: exit
+
+[1]
+https://lore.kernel.org/netdev/20230725030026.1664873-1-zyytlz.wz@163.com/
+
+Yoshihiro Shimoda (2):
+  ravb: Fix dma_free_coherent() of desc_bat timing in ravb_remove()
+  ravb: Fix use-after-free issue in ravb_remove and ravb_tx_timeout_work
+
+ drivers/net/ethernet/renesas/ravb_main.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+-- 
+2.25.1
+
 
