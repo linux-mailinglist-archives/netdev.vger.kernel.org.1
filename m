@@ -1,41 +1,52 @@
-Return-Path: <netdev+bounces-38094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2F97B969A
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:42:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CC37B96B9
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 53789281847
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 21:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 31539281813
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 21:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC745241F7;
-	Wed,  4 Oct 2023 21:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A433924206;
+	Wed,  4 Oct 2023 21:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IQXXKp3m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC13F23750;
-	Wed,  4 Oct 2023 21:42:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B9F1C433C8;
-	Wed,  4 Oct 2023 21:42:13 +0000 (UTC)
-Date: Wed, 4 Oct 2023 17:43:21 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Alan Maguire <alan.maguire@oracle.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org
-Subject: Re: [PATCH 0/4] tracing: improve symbolic printing
-Message-ID: <20231004174321.5afa2fb6@gandalf.local.home>
-In-Reply-To: <2f749ade-7821-00fa-ba34-e2d25cbad441@oracle.com>
-References: <20230921085129.261556-5-johannes@sipsolutions.net>
-	<20231004092205.02c8eb0b@kernel.org>
-	<20231004123524.27feeae7@gandalf.local.home>
-	<20231004095431.1dd234e6@kernel.org>
-	<20231004132955.0fb3893d@gandalf.local.home>
-	<2f749ade-7821-00fa-ba34-e2d25cbad441@oracle.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B30219F2;
+	Wed,  4 Oct 2023 21:59:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ACD8C433C8;
+	Wed,  4 Oct 2023 21:59:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696456792;
+	bh=h1wuJu7EQsw0ISUx0TDepOY/LS54P4l5en5rkpEd2fY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IQXXKp3mHSs7C3RpBvqk6NjjA3omclpdvfBr+th98AGd/jJHwr+SNYt3DrQA/tTC6
+	 CGVXbkPAeLNP+ogRrvru18i0GSibBl+w7HXMap5DQDuOrYmLdw+Tx1W6/MbCpIrsYq
+	 uQ3amhujSUY0KGp2MM38dxsXREQ33YXtIE15pnkYiOSaXPIiIUmxtBEpzyfZ9vgDDo
+	 bI7OyMePLY5CWCjr27kEoifclTlu1G2sjnuJ22oAvnoWRy9zz4MvD4Uf4V77e1j84o
+	 PZj8x033qUbHukwEnp7u6/RJOHhxm8BSYTwVY5olkQb+SrKjjXJGu8bwuLwx25JHMi
+	 kQ8hdjMEwCLSQ==
+Date: Wed, 4 Oct 2023 14:59:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam
+ <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, imx@lists.linux.dev, Mario
+ Castaneda <mario.ignacio.castaneda.lopez@nxp.com>
+Subject: Re: [PATCH net] net: stmmac: dwmac-imx: request high frequency mode
+Message-ID: <20231004145951.570a8ce4@kernel.org>
+In-Reply-To: <20231004195442.414766-1-shenwei.wang@nxp.com>
+References: <20231004195442.414766-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,31 +56,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 4 Oct 2023 22:35:07 +0100
-Alan Maguire <alan.maguire@oracle.com> wrote:
+On Wed,  4 Oct 2023 14:54:42 -0500 Shenwei Wang wrote:
+> Some i.MX SoCs like the i.mx8mq support adjusting the frequency of the
+> DDR, AHB, and AXI buses based on system loading. If the dwmac interface
+> in the driver does not request a HIGH frequency, it can significantly
+> degrade performance when the system switches to a lower frequency to
+> conserve power.
+> 
+> For example, on an i.MX8MQ EVK board, the throughput dropped to around
+> 100Mbit/s on a 1Gbit connection:
+> 
+>     [ ID] Interval           Transfer     Bitrate
+>     [  5]   0.00-10.00  sec   117 MBytes  97.9 Mbits/sec
+> 
+> However, throughput can return to expected levels after its driver requests
+> the high frequency mode. Requesting high frequency in the dwmac driver is
+> essential to maintain full throughput when the i.MX SoC adjusts bus speeds
+> for power savings.
 
-> One thing we've heard from some embedded folks [1] is that having
-> kernel BTF loadable as a separate module (rather than embedded in
-> vmlinux) would help, as there are size limits on vmlinux that they can
-> workaround by having modules on a different partition. We're hoping
-> to get that working soon. I was wondering if you see other issues around
-> BTF adoption for embedded systems that we could put on the to-do list?
-> Not necessarily for this particular use-case (since there are
-> complications with trace data as you describe), but just trying to make
-> sure we can remove barriers to BTF adoption where possible.
+Oh, another one in one day :S Although this one feels much more like
+a bug that escaped testing because testing didn't use power saving?
+In any case, do you happen to have a user report you can mention here?
+Quoting stable rules:
 
-I wonder how easy is it to create subsets of BTF. For one thing, in the
-future we want to be able to trace the arguments of all functions. That is,
-tracing all functions at the same time (function tracer) and getting the
-arguments within the trace.
+| Serious issues as reported by a user of a distribution kernel may also
+| be considered if they fix a notable performance or interactivity
+| issue. As these fixes are not as obvious and have a higher risk of a
+| subtle regression they should only be submitted by a distribution
+| kernel maintainer and include an addendum linking to a bugzilla entry
+| if it exists and additional information on the user-visible impact.
 
-This would only require information about functions and their arguments,
-which would be very useful. Is BTF easy to break apart? That is, just
-generate the information needed for function arguments?
-
-Note, pretty much all functions do not pass structures by values, and this
-would not need to know the contents of a pointer to a structure. This would
-mean that structure layout information is not needed.
-
--- Steve
+And a Fixes tag would be good, please add.
+-- 
+pw-bot: cr
 
