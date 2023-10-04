@@ -1,91 +1,149 @@
-Return-Path: <netdev+bounces-38129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 380F57B9864
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 00:50:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18C437B9873
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 00:56:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E2311281DDD
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:50:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BE8FC2818B0
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1F2262AE;
-	Wed,  4 Oct 2023 22:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8B5262B5;
+	Wed,  4 Oct 2023 22:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LEmpmqIl"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="tHHuP8Qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3244B1BDEE;
-	Wed,  4 Oct 2023 22:50:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 96C0CC433C8;
-	Wed,  4 Oct 2023 22:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696459829;
-	bh=29qFIdltgl6F0PKskAEDQDppIMvIB/Uobyguual+LQg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LEmpmqIlpgtWsaiXKVqzHc4G0I3TbO96VrUbSHaL0oeWWqWihAN0y2vaYQLoL/5pc
-	 FqNWOByLj+tTstlBaAf7AJIdyl0kUY3fsr884/RytG+u+Z76Zdfg31ZAcqDy31ROMY
-	 /fQxpefVfwO1lB/rxR8torCl0v5e/h643xIYz3B6X6huf67kwEpC2j2MN0nVwWxMdi
-	 lRvVtl7X67gGmOnKFhhGiyLSm6Tngrq8Ax2K253XVVSZoy11zewSd/qMDUKQS86/e8
-	 mM4Uu77Ng8b30wBFUDDDpC9XREAzQ+7ms7bRJHCyBz/3/MrHdpC+I0RGs/Ropu1LR/
-	 S5P2QKs+M6hFQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78DADE632D6;
-	Wed,  4 Oct 2023 22:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DF814AA5
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 22:56:10 +0000 (UTC)
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3693895;
+	Wed,  4 Oct 2023 15:56:07 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id C0D9577D;
+	Wed,  4 Oct 2023 22:56:05 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net C0D9577D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1696460165; bh=VGEewOivVVXxRe4yeWdnj6hs2luNc7hkwYEag1NXZWw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=tHHuP8QvrNgyqfwD29DAEB9Fyz/9m9K3y2sKAXSae3a3KPAXs4o196eUbjmVhXmc+
+	 DFmYoUWRH1ppihNXVcglkKTJuit12m9ESk/aU1Om5Lp0AQk8cJ3q+rViPWi3AYQY+j
+	 3CIp4qdj1gFMP/4l1vD8w/kRkCY4dZ/EGBNAgF5WsyUVACADAy6C6gLwEH4AlucGgM
+	 xRF578ij0imQW2Lmj/PbcEPj+4ozg47EDmULcRtc9XY73lXNfPaVNAeFvadkpSoxNv
+	 ts9OrI59d5JMZUAT2Kpm/2CHT8wjZZo8BlbD1AEiOdcejef62leajHNZhaiOK4Kvcg
+	 Mjq/XOV+Pay6w==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Dmitry Safonov <dima@arista.com>, David Ahern <dsahern@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, Dmitry Safonov <dima@arista.com>, Andy
+ Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>, Bob
+ Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>, David
+ Laight <David.Laight@aculab.com>, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Donald Cassidy <dcassidy@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+ "Eric W. Biederman" <ebiederm@xmission.com>, Francesco Ruggeri
+ <fruggeri05@gmail.com>, "Gaillardetz, Dominik" <dgaillar@ciena.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Hideaki YOSHIFUJI
+ <yoshfuji@linux-ipv6.org>, Ivan Delalande <colona@arista.com>, Leonard
+ Crestez <cdleonard@gmail.com>, "Nassiri, Mohammad" <mnassiri@ciena.com>,
+ Salam Noureddine <noureddine@arista.com>, Simon Horman
+ <simon.horman@corigine.com>, "Tetreault, Francois" <ftetreau@ciena.com>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v13 net-next 23/23] Documentation/tcp: Add TCP-AO
+ documentation
+In-Reply-To: <20231004223629.166300-24-dima@arista.com>
+References: <20231004223629.166300-1-dima@arista.com>
+ <20231004223629.166300-24-dima@arista.com>
+Date: Wed, 04 Oct 2023 16:56:05 -0600
+Message-ID: <87jzs2yp2y.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/5] chelsio: Annotate structs with __counted_by
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169645982948.18987.9169162380776342631.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 22:50:29 +0000
-References: <20230929181042.work.990-kees@kernel.org>
-In-Reply-To: <20230929181042.work.990-kees@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: rajur@chelsio.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, gustavoars@kernel.org, nathan@kernel.org,
- ndesaulniers@google.com, trix@redhat.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-hardening@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Dmitry Safonov <dima@arista.com> writes:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> It has Frequently Asked Questions (FAQ) on RFC 5925 - I found it very
+> useful answering those before writing the actual code. It provides answers
+> to common questions that arise on a quick read of the RFC, as well as how
+> they were answered. There's also comparison to TCP-MD5 option,
+> evaluation of per-socket vs in-kernel-DB approaches and description of
+> uAPI provided.
+>
+> Hopefully, it will be as useful for reviewing the code as it was for writing.
 
-On Fri, 29 Sep 2023 11:11:44 -0700 you wrote:
-> Hi,
-> 
-> This annotates several chelsio structures with the coming __counted_by
-> attribute for bounds checking of flexible arrays at run-time. For more details,
-> see commit dd06e72e68bc ("Compiler Attributes: Add __counted_by macro").
-> 
-> Thanks!
-> 
-> [...]
+It looks like useful information; I just have one request...
 
-Here is the summary with links:
-  - [1/5] chelsio/l2t: Annotate struct l2t_data with __counted_by
-    https://git.kernel.org/netdev/net-next/c/3bbae5f1c651
-  - [2/5] cxgb4: Annotate struct clip_tbl with __counted_by
-    https://git.kernel.org/netdev/net-next/c/c3db467b0822
-  - [3/5] cxgb4: Annotate struct cxgb4_tc_u32_table with __counted_by
-    https://git.kernel.org/netdev/net-next/c/157c56a4fede
-  - [4/5] cxgb4: Annotate struct sched_table with __counted_by
-    https://git.kernel.org/netdev/net-next/c/ceba9725fb45
-  - [5/5] cxgb4: Annotate struct smt_data with __counted_by
-    https://git.kernel.org/netdev/net-next/c/1508cb7e0752
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: linux-doc@vger.kernel.org
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> Acked-by: David Ahern <dsahern@kernel.org>
+> ---
+>  Documentation/networking/index.rst  |   1 +
+>  Documentation/networking/tcp_ao.rst | 434 ++++++++++++++++++++++++++++
+>  2 files changed, 435 insertions(+)
+>  create mode 100644 Documentation/networking/tcp_ao.rst
+>
+> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+> index 5b75c3f7a137..69c1e53ef88b 100644
+> --- a/Documentation/networking/index.rst
+> +++ b/Documentation/networking/index.rst
+> @@ -107,6 +107,7 @@ Contents:
+>     sysfs-tagging
+>     tc-actions-env-rules
+>     tc-queue-filters
+> +   tcp_ao
+>     tcp-thin
+>     team
+>     timestamping
+> diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
+> new file mode 100644
+> index 000000000000..cfa13a0748a2
+> --- /dev/null
+> +++ b/Documentation/networking/tcp_ao.rst
+> @@ -0,0 +1,434 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +
+> +========================================================
+> +TCP Authentication Option Linux implementation (RFC5925)
+> +========================================================
+> +
+> +TCP Authentication Option (TCP-AO) provides a TCP extension aimed at verifying
+> +segments between trusted peers. It adds a new TCP header option with
+> +a Message Authentication Code (MAC). MACs are produced from the content
+> +of a TCP segment using a hashing function with a password known to both peers.
+> +The intent of TCP-AO is to deprecate TCP-MD5 providing better security,
+> +key rotation and support for variety of hashing algorithms.
+> +
+> +1. Introduction
+> +===============
+> +
+> +.. list-table:: Short and Limited Comparison of TCP-AO and TCP-MD5
+> +
+> +   * -
+> +     - TCP-MD5
+> +     - TCP-AO
+> +   * - Supported hashing algorithms
+> +     - MD5 (cryptographically weak).
+> +     - Must support HMAC-SHA1 (chosen-prefix attacks) and CMAC-AES-128
+> +       (only side-channel attacks). May support any hashing algorithm.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+...can you please avoid using list-table if possible?  It makes the
+plain-text version nearly impossible to read.
 
+Thanks,
 
+jon
 
