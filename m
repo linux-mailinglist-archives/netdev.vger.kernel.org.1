@@ -1,48 +1,45 @@
-Return-Path: <netdev+bounces-38138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68577B98B0
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:28:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE3C7B98B6
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:33:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 79F1F281959
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:28:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 1ACF3B208CB
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF4130FAF;
-	Wed,  4 Oct 2023 23:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A583F30F89;
+	Wed,  4 Oct 2023 23:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L8EfGQ55"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EY0hNbwS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434C7266A1;
-	Wed,  4 Oct 2023 23:28:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A5F1C433C7;
-	Wed,  4 Oct 2023 23:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EA5266A0
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 23:32:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A06C433C7;
+	Wed,  4 Oct 2023 23:32:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696462112;
-	bh=qbZU7R3Zsw96CbqqTm9vDJi7eGwTuFjG+uwNT9ctvJY=;
+	s=k20201202; t=1696462375;
+	bh=0n38R5SC8S/5l5Ik34Obsa7hdR5k+fdYnhAGPoGD3SM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L8EfGQ55WKi2LtRA9Xq3ybLy4Wo7O+1h42hkjCU7fXyLjgOwfulSK88we8iNeXqMg
-	 4WNGn9C+lCAzRAU/+j7fLKqOXpcNguoZXELO17m/GIBD1XQpBLMUKAwPizMkYrLY9M
-	 8aoFnvoq7EuL3yA+tS6n85VijY+Fq3YDH7dVhSSNkClHBSEOzqZgt42/RksJXBJoQP
-	 J4OAuBhXO9SaGtypP7nm3WuD6IkXmrkny8BcMfMHO5dyI9MhHLWVzWUmOeBIcc1n/i
-	 hptqd23VLm5iLw1D6CUkZ5fXAZ25kcnj4I8jY00293ZWz60lkhNyMA7wnrp/kdNje7
-	 Dar0izIYT0FnQ==
-Date: Wed, 4 Oct 2023 16:28:31 -0700
+	b=EY0hNbwSshrQ0wJhWIxXGp4Zx3fXINLWpxdr260Nspolc1OZoibzu1nz55tbPdcYU
+	 M9ct9tVmzf7Hbjf/vBSABY2gEWbabUp3EETl4sTvorpbvWVIyKeHZ0ZRS2NmYKtENm
+	 OaJS+3q345AUphxpUX93tAZ4LC+GaGdABxBWmg9h3rSJorMXSCvOi7F3kstS0sUQl/
+	 tVc4b/TJXv8zDrpMMlr2yIRw41lYcHJVip3cAZN93Ou4OS8IR3o9gG0UKuS/7vNPNK
+	 71/lj3U64E5ew6e9CDFX68Gm+g5Ugh1l0gFQKwBLumQkGOEwPbcymiVuWcsHib7TFT
+	 SuwBUA1pyyNdg==
+Date: Wed, 4 Oct 2023 16:32:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Robert Marko <robimarko@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Christian Marangi
- <ansuelsmth@gmail.com>, Luis Chamberlain <mcgrof@kernel.org>,
- devicetree@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
- support
-Message-ID: <20231004162831.0cf1f6a8@kernel.org>
-In-Reply-To: <20230930104008.234831-1-robimarko@gmail.com>
-References: <20230930104008.234831-1-robimarko@gmail.com>
+To: David Morley <morleyd.kernel@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, David Morley <morleyd@google.com>
+Subject: Re: [PATCH net-next v2 0/2] tcp: save flowlabel and use for
+ receiver repathing
+Message-ID: <20231004163253.75584412@kernel.org>
+In-Reply-To: <20230929210352.3411495-1-morleyd.kernel@gmail.com>
+References: <20230929210352.3411495-1-morleyd.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,14 +49,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 30 Sep 2023 12:39:44 +0200 Robert Marko wrote:
-> +	ret = of_property_read_string(dev->of_node, "firmware-name",
-> +				      &fw_name);
+On Fri, 29 Sep 2023 21:03:50 +0000 David Morley wrote:
+> This patch series stores the last received ipv6 flowlabel. This last
+> received flowlabel is then used to help decide whether a packet is
+> likely an RTO retransmit or the result of a TLP. This new information
+> is used to better inform the flowlabel change decision for data
+> receivers.
 
-Perhaps a well established weirdness of the embedded world but why read
-the fw name from OF?! You can identify what PHY it is and decide the
-file name based on that. And also put that fw name in MODULE_FIRMWARE()
-so that initramfs can be built with appropriate file in place :S
-
-> +	ret = request_firmware(&fw, fw_name, dev);
+Minor conflict with Eric's changes to derive delack_max from rto_min.
+This no longer builds, please rebase & resend, thanks!
+-- 
+pw-bot: cr
 
