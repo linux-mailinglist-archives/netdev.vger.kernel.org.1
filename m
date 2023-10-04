@@ -1,73 +1,142 @@
-Return-Path: <netdev+bounces-37984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 967E67B830C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:58:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908B77B8359
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 17:15:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id E9282B20841
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:58:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 413B62812A3
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 15:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C1418E04;
-	Wed,  4 Oct 2023 14:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D50F18E1E;
+	Wed,  4 Oct 2023 15:15:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C8A6128
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 14:58:45 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7939CAB;
-	Wed,  4 Oct 2023 07:58:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=ItaLEz8yYofv11YCURyJNHQx1l8I20bDLTqN6Rxdd18=;
-	t=1696431523; x=1697641123; b=V8UOdtE6xNiCDdn57mg2rZW1wknmRZhcWWKzURhlpGXn0xL
-	AP+N0SPBViYfmIxwNOBfLsMIrBRI/ripJk1Yc1mUSP5CZr71arfZ/xOC4zA4u0U+1ibnGg7zlZQVJ
-	AW19LyyeftKStRpcvyC0aTjt705Z76vNyGTJT05u0OZz67X4ljGOJqZZXSPvnTEobvAv6Unwbp9N2
-	PnpCvbNDUJNphgHzz5dmekHS94tqQ0djiZ4HhA6cLXornbbYq5HFgw/9BJbF3rYXb1OxqwU7RuRxg
-	Plhh3Y+3Tuz6QTMDXJbCY7FIymIV1KxF11LxiaVKfJo5lJqjR/TaiypI50rfXsAg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.96)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qo3KV-0040mn-30;
-	Wed, 04 Oct 2023 16:58:28 +0200
-Message-ID: <3ba8e3902ade7483a82bd305a35a236744ffba25.camel@sipsolutions.net>
-Subject: Re: [lvc-project] [PATCH] wifi: mac80211: fix buffer overflow in
- ieee80211_rx_get_bigtk()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Igor Artemiev <Igor.A.Artemiev@mcst.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>,  linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-Date: Wed, 04 Oct 2023 16:58:26 +0200
-In-Reply-To: <20231004143740.40933-1-Igor.A.Artemiev@mcst.ru>
-References: <20231004143740.40933-1-Igor.A.Artemiev@mcst.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0536A18E13
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 15:15:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA326D7
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 08:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696432535;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q44NhlxH9QmpX+3kZY7RksgmAEsVHT6ZLia8SwlZRg0=;
+	b=B5FgSPW78aW3cf1uRRQvo3BCmCUnvK8oU630UcjFCpxQfOjhMFfKaKsZ7OnunNAqa/7MDk
+	+GcT1EFGKRqUMwlNqCpWGmZKGPKHVY3SBwItg2g4RLsJx5zDm7S0zk/biKORA6ueYFihd3
+	fu5BGbDF7I7bhnyKa5wLlkRhY12sQv4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-125-DniWRud-NLa77hJ7FCrBCA-1; Wed, 04 Oct 2023 11:15:32 -0400
+X-MC-Unique: DniWRud-NLa77hJ7FCrBCA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2FF7A811E7E;
+	Wed,  4 Oct 2023 15:15:32 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.10.68])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id D5948400F0F;
+	Wed,  4 Oct 2023 15:15:31 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: "Nicholas Piggin" <npiggin@gmail.com>
+Cc: "Eelco Chaudron" <echaudro@redhat.com>,  <netdev@vger.kernel.org>,
+  <dev@openvswitch.org>,  "Ilya Maximets" <imaximet@redhat.com>,  "Flavio
+ Leitner" <fbl@redhat.com>
+Subject: Re: [ovs-dev] [RFC PATCH 4/7] net: openvswitch: ovs_vport_receive
+ reduce stack usage
+References: <20230927001308.749910-1-npiggin@gmail.com>
+	<20230927001308.749910-5-npiggin@gmail.com>
+	<f7tfs2ymi8y.fsf@redhat.com> <CVV7HCQYCVOP.2JVVJCKU57CAW@wheely>
+	<34747C51-2F94-4B64-959B-BA4B0AA4224B@redhat.com>
+	<CVZGUWQGYWQX.1W7BH28XB6WKM@wheely>
+Date: Wed, 04 Oct 2023 11:15:31 -0400
+In-Reply-To: <CVZGUWQGYWQX.1W7BH28XB6WKM@wheely> (Nicholas Piggin's message of
+	"Wed, 04 Oct 2023 17:11:56 +1000")
+Message-ID: <f7tv8bmfmgc.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-10-04 at 17:37 +0300, Igor Artemiev wrote:
-> If 'idx' is 0
+"Nicholas Piggin" <npiggin@gmail.com> writes:
 
-And ... how exactly do you propose that is going to happen?
+> On Fri Sep 29, 2023 at 6:38 PM AEST, Eelco Chaudron wrote:
+>>
+>>
+>> On 29 Sep 2023, at 9:00, Nicholas Piggin wrote:
+>>
+>> > On Fri Sep 29, 2023 at 1:26 AM AEST, Aaron Conole wrote:
+>> >> Nicholas Piggin <npiggin@gmail.com> writes:
+>> >>
+>> >>> Dynamically allocating the sw_flow_key reduces stack usage of
+>> >>> ovs_vport_receive from 544 bytes to 64 bytes at the cost of
+>> >>> another GFP_ATOMIC allocation in the receive path.
+>> >>>
+>> >>> XXX: is this a problem with memory reserves if ovs is in a
+>> >>> memory reclaim path, or since we have a skb allocated, is it
+>> >>> okay to use some GFP_ATOMIC reserves?
+>> >>>
+>> >>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> >>> ---
+>> >>
+>> >> This represents a fairly large performance hit.  Just my own quick
+>> >> testing on a system using two netns, iperf3, and simple forwarding rules
+>> >> shows between 2.5% and 4% performance reduction on x86-64.  Note that it
+>> >> is a simple case, and doesn't involve a more involved scenario like
+>> >> multiple bridges, tunnels, and internal ports.  I suspect such cases
+>> >> will see even bigger hit.
+>> >>
+>> >> I don't know the impact of the other changes, but just an FYI that the
+>> >> performance impact of this change is extremely noticeable on x86
+>> >> platform.
+>> >
+>> > Thanks for the numbers. This patch is probably the biggest perf cost,
+>> > but unfortunately it's also about the biggest saving. I might have an
+>> > idea to improve it.
+>>
+>> Also, were you able to figure out why we do not see this problem on
+>> x86 and arm64? Is the stack usage so much larger, or is there some
+>> other root cause?
+>
+> Haven't pinpointed it exactly. ppc64le interrupt entry frame is nearly
+> 3x larger than x86-64, about 200 bytes. So there's 400 if a hard
+> interrupt (not seen in the backtrace) is what overflowed it. Stack
+> alignment I think is 32 bytes vs 16 for x86-64. And different amount of
+> spilling and non-volatile register use and inlining choices by the
+> compiler could nudge things one way or another. There is little to no
+> ppc64le specific data structures on the stack in any of this call chain
+> which should cause much more bloat though, AFAIKS.
+>
+> So other archs should not be far away from overflowing 16kB I think.
+>
+>> Is there a simple replicator, as this might help you
+>> profile the differences between the architectures?
+>
+> Unfortunately not, it's some kubernetes contraption I don't know how
+> to reproduce myself.
 
-johannes
+If we can get the flow dump and configuration, we can probably make sure
+to reproduce it with ovs-dpctl.py (add any missing features, etc).  I
+guess it should be simple to get (ovs-vsctl show, ovs-appctl
+dpctl/dump-flows) and we can try to replicate it.
+
+> Thanks,
+> Nick
+
 
