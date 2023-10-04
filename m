@@ -1,222 +1,95 @@
-Return-Path: <netdev+bounces-37979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63CC7B81F6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:14:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7A67B82AE
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D879F281B04
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:14:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id DF121281190
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE1C1805C;
-	Wed,  4 Oct 2023 14:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55441428A;
+	Wed,  4 Oct 2023 14:50:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7726318E04
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 14:14:39 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8751FAD;
-	Wed,  4 Oct 2023 07:14:37 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qo2e1-0002NP-Lz; Wed, 04 Oct 2023 16:14:33 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2A871095F
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 14:50:53 +0000 (UTC)
+Received: from mailo.com (msg-4.mailo.com [213.182.54.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5230DB8;
+	Wed,  4 Oct 2023 07:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=triplefau.lt; s=mailo;
+	t=1696429806; bh=TedzwPwzm/uvapENYRqWPjouS2zTRkOVHGvUyrv0Vbg=;
+	h=X-EA-Auth:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To;
+	b=rpv5KxdgDOusiTO9ZZC61winbmtp7SfZHExdR2ZIYw9LCALQbncIIkuHmpH/5sg/I
+	 1TnE238b7YHEyy1YvC/GqBrZmOaafysjte8Cu1hVsWgSgB/VOkJotvsfjx2zOUjdIe
+	 NstFlxLnKmF3GoJGXXUCeXN9lTgX50Au+YqODEo4=
+Received: by b221-2.in.mailobj.net [192.168.90.22] with ESMTP
+	via ip-20.mailobj.net [213.182.54.20]
+	Wed,  4 Oct 2023 16:30:05 +0200 (CEST)
+X-EA-Auth: FZCFa3GRQPbutha7o0M0ykDKPqM2F0qO6GzRNQf8jrVWg2fNZYwzAaVwjbw+R+Ys40IIDryL2fxYpvG/N0MKlGn1EYhErdyE2yIID/PZCJM=
+Date: Wed, 4 Oct 2023 16:29:06 +0200
+From: Remi Pommarel <repk@triplefau.lt>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	<netfilter-devel@vger.kernel.org>
-Subject: [PATCH net 6/6] netfilter: nf_tables: nft_set_rbtree: fix spurious insertion failure
-Date: Wed,  4 Oct 2023 16:13:50 +0200
-Message-ID: <20231004141405.28749-7-fw@strlen.de>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231004141405.28749-1-fw@strlen.de>
-References: <20231004141405.28749-1-fw@strlen.de>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: stmmac: remove unneeded
+ stmmac_poll_controller
+Message-ID: <ZR12sux0vN5YXIYk@pilgrim>
+References: <20230906091330.6817-1-repk@triplefau.lt>
+ <626de62327fa25706ab1aaab32d7ba3a93ab26e4.camel@redhat.com>
+ <ZRKozLps8dmDmQgc@pilgrim>
+ <20231002133759.133d8a97@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231002133759.133d8a97@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-nft_rbtree_gc_elem() walks back and removes the end interval element that
-comes before the expired element.
+On Mon, Oct 02, 2023 at 01:37:59PM -0700, Jakub Kicinski wrote:
+> On Tue, 26 Sep 2023 11:47:56 +0200 Remi Pommarel wrote:
+> > > I'm sorry for the incremental feedback, but we also need a suitable
+> > > Fixes tag, thanks!  
+> > 
+> > I didn't include Fixes tag because it would go back up to the initial
+> > driver support commit [0]. I can't be sure that this commit includes
+> > necessary NAPI implementation to be able to get rid of
+> > .ndo_poll_controller callback back then. And I am not able to test it on
+> > older version than 5.15.x hence I only included the 5.15.x Cc tag
+> > version prerequisite.
+> > 
+> > But I surely can add a Fixed tag if it is ok for it to be [0].
+> > 
+> > Also sorry for the long replying delay.
+> > 
+> > [0] commit 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers")
+> 
+> AFAIU the Fixes tag only indicates where the bug was present,
+> no guarantees on whether the fix can be backported as far back.
+> IOW I think [0] as Fixes tag will be perfectly correct, please
+> repost with it included?
 
-There is a small chance that we've cached this element as 'rbe_ge'.
-If this happens, we hold and test a pointer that has been queued for
-freeing.
+Ok that makes sense, thanks. Will resend with Fixes tag.
 
-It also causes spurious insertion failures:
-
-$ cat test-testcases-sets-0044interval_overlap_0.1/testout.log
-Error: Could not process rule: File exists
-add element t s {  0 -  2 }
-                   ^^^^^^
-Failed to insert  0 -  2 given:
-table ip t {
-        set s {
-                type inet_service
-                flags interval,timeout
-                timeout 2s
-                gc-interval 2s
-        }
-}
-
-The set (rbtree) is empty. The 'failure' doesn't happen on next attempt.
-
-Reason is that when we try to insert, the tree may hold an expired
-element that collides with the range we're adding.
-While we do evict/erase this element, we can trip over this check:
-
-if (rbe_ge && nft_rbtree_interval_end(rbe_ge) && nft_rbtree_interval_end(new))
-      return -ENOTEMPTY;
-
-rbe_ge was erased by the synchronous gc, we should not have done this
-check.  Next attempt won't find it, so retry results in successful
-insertion.
-
-Restart in-kernel to avoid such spurious errors.
-
-Such restart are rare, unless userspace intentionally adds very large
-numbers of elements with very short timeouts while setting a huge
-gc interval.
-
-Even in this case, this cannot loop forever, on each retry an existing
-element has been removed.
-
-As the caller is holding the transaction mutex, its impossible
-for a second entity to add more expiring elements to the tree.
-
-After this it also becomes feasible to remove the async gc worker
-and perform all garbage collection from the commit path.
-
-Fixes: c9e6978e2725 ("netfilter: nft_set_rbtree: Switch to node list walk for overlap detection")
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- net/netfilter/nft_set_rbtree.c | 46 +++++++++++++++++++++-------------
- 1 file changed, 29 insertions(+), 17 deletions(-)
-
-diff --git a/net/netfilter/nft_set_rbtree.c b/net/netfilter/nft_set_rbtree.c
-index 487572dcd614..2660ceab3759 100644
---- a/net/netfilter/nft_set_rbtree.c
-+++ b/net/netfilter/nft_set_rbtree.c
-@@ -233,10 +233,9 @@ static void nft_rbtree_gc_remove(struct net *net, struct nft_set *set,
- 	rb_erase(&rbe->node, &priv->root);
- }
- 
--static int nft_rbtree_gc_elem(const struct nft_set *__set,
--			      struct nft_rbtree *priv,
--			      struct nft_rbtree_elem *rbe,
--			      u8 genmask)
-+static const struct nft_rbtree_elem *
-+nft_rbtree_gc_elem(const struct nft_set *__set, struct nft_rbtree *priv,
-+		   struct nft_rbtree_elem *rbe, u8 genmask)
- {
- 	struct nft_set *set = (struct nft_set *)__set;
- 	struct rb_node *prev = rb_prev(&rbe->node);
-@@ -246,7 +245,7 @@ static int nft_rbtree_gc_elem(const struct nft_set *__set,
- 
- 	gc = nft_trans_gc_alloc(set, 0, GFP_ATOMIC);
- 	if (!gc)
--		return -ENOMEM;
-+		return ERR_PTR(-ENOMEM);
- 
- 	/* search for end interval coming before this element.
- 	 * end intervals don't carry a timeout extension, they
-@@ -261,6 +260,7 @@ static int nft_rbtree_gc_elem(const struct nft_set *__set,
- 		prev = rb_prev(prev);
- 	}
- 
-+	rbe_prev = NULL;
- 	if (prev) {
- 		rbe_prev = rb_entry(prev, struct nft_rbtree_elem, node);
- 		nft_rbtree_gc_remove(net, set, priv, rbe_prev);
-@@ -272,7 +272,7 @@ static int nft_rbtree_gc_elem(const struct nft_set *__set,
- 		 */
- 		gc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);
- 		if (WARN_ON_ONCE(!gc))
--			return -ENOMEM;
-+			return ERR_PTR(-ENOMEM);
- 
- 		nft_trans_gc_elem_add(gc, rbe_prev);
- 	}
-@@ -280,13 +280,13 @@ static int nft_rbtree_gc_elem(const struct nft_set *__set,
- 	nft_rbtree_gc_remove(net, set, priv, rbe);
- 	gc = nft_trans_gc_queue_sync(gc, GFP_ATOMIC);
- 	if (WARN_ON_ONCE(!gc))
--		return -ENOMEM;
-+		return ERR_PTR(-ENOMEM);
- 
- 	nft_trans_gc_elem_add(gc, rbe);
- 
- 	nft_trans_gc_queue_sync_done(gc);
- 
--	return 0;
-+	return rbe_prev;
- }
- 
- static bool nft_rbtree_update_first(const struct nft_set *set,
-@@ -314,7 +314,7 @@ static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
- 	struct nft_rbtree *priv = nft_set_priv(set);
- 	u8 cur_genmask = nft_genmask_cur(net);
- 	u8 genmask = nft_genmask_next(net);
--	int d, err;
-+	int d;
- 
- 	/* Descend the tree to search for an existing element greater than the
- 	 * key value to insert that is greater than the new element. This is the
-@@ -363,9 +363,14 @@ static int __nft_rbtree_insert(const struct net *net, const struct nft_set *set,
- 		 */
- 		if (nft_set_elem_expired(&rbe->ext) &&
- 		    nft_set_elem_active(&rbe->ext, cur_genmask)) {
--			err = nft_rbtree_gc_elem(set, priv, rbe, genmask);
--			if (err < 0)
--				return err;
-+			const struct nft_rbtree_elem *removed_end;
-+
-+			removed_end = nft_rbtree_gc_elem(set, priv, rbe, genmask);
-+			if (IS_ERR(removed_end))
-+				return PTR_ERR(removed_end);
-+
-+			if (removed_end == rbe_le || removed_end == rbe_ge)
-+				return -EAGAIN;
- 
- 			continue;
- 		}
-@@ -486,11 +491,18 @@ static int nft_rbtree_insert(const struct net *net, const struct nft_set *set,
- 	struct nft_rbtree_elem *rbe = elem->priv;
- 	int err;
- 
--	write_lock_bh(&priv->lock);
--	write_seqcount_begin(&priv->count);
--	err = __nft_rbtree_insert(net, set, rbe, ext);
--	write_seqcount_end(&priv->count);
--	write_unlock_bh(&priv->lock);
-+	do {
-+		if (fatal_signal_pending(current))
-+			return -EINTR;
-+
-+		cond_resched();
-+
-+		write_lock_bh(&priv->lock);
-+		write_seqcount_begin(&priv->count);
-+		err = __nft_rbtree_insert(net, set, rbe, ext);
-+		write_seqcount_end(&priv->count);
-+		write_unlock_bh(&priv->lock);
-+	} while (err == -EAGAIN);
- 
- 	return err;
- }
 -- 
-2.41.0
+Remi
+
 
 
