@@ -1,188 +1,344 @@
-Return-Path: <netdev+bounces-37897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DFAD7B7B17
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:06:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2129F7B7B52
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:11:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 6A0021C2037C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C74132814DF
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948A910941;
-	Wed,  4 Oct 2023 09:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38AC10954;
+	Wed,  4 Oct 2023 09:11:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423DC107A8
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:06:25 +0000 (UTC)
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072DF1732;
-	Wed,  4 Oct 2023 02:06:06 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VtMf2lx_1696410362;
-Received: from 30.13.48.40(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VtMf2lx_1696410362)
-          by smtp.aliyun-inc.com;
-          Wed, 04 Oct 2023 17:06:03 +0800
-Message-ID: <e3819550-7b10-4f9c-7347-dcf1f97b8e6b@linux.alibaba.com>
-Date: Wed, 4 Oct 2023 17:05:57 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFEC10949
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:11:18 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3904CB4;
+	Wed,  4 Oct 2023 02:11:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696410675; x=1727946675;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Eedc6uwunzox8Y6P05KAg6ccWk2F5YyI+s3GHWO3vas=;
+  b=ZQ/PI70+0BzaoWejnJ/Z+yyYtYWHu81yI9tLDn/ioS3HaVt+2f67eG1I
+   ArGou0x6Q5RbggY4w12QfK+x5eUzQ7A8BDd98Kla0tAJOQ4LD1rUB5Uqk
+   iWtv4sHVZdB64nSZ0Wye0JWvyZAbtfhqXCdQKOz+ITftsIWYrSaTAY2h/
+   aw+OyHp1Jkn8Y4yItRkEVt4/AcngsF3Q0NPCxihMlvxkpw3y9scuD3oRt
+   0Li9mwCZbhyw3CL5q+l2+pdKlWIGaKayB0K5RwvqSHMRSvH2FCJ+AoOKA
+   s9y054phoM0TzTFVRGar/W3szW9V/YcchK/uMHpKhewdSg9dSMD+1aBov
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="449604586"
+X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
+   d="scan'208";a="449604586"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 02:11:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="925025219"
+X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
+   d="scan'208";a="925025219"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Oct 2023 02:11:13 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 4 Oct 2023 02:11:13 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 4 Oct 2023 02:11:13 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 4 Oct 2023 02:11:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VvvPrsI2hc22CeFDM3FZf5UjiZAo4NccGxL6IbrdRCEEE01kZTf9lZWNsBcP5+U6z8liuO7pH6m+yItW4riHo/VySSCr2eAbDwnTBu9nbuCOTwH7g3VYPvaK8pWzn4niZ6eli20CDS2Rgn/xvRL9IWVXCv0gfGYIMWwsLKeOORV79B2r/CQ9HT/P0nrVNmZSnRuns8KCXPiugTIpI5mruDt/4LrngGeiCQohjhF3/lTqSQf1D6EvXgoVHGys5W8KgEefOxK0jVH/cdhMLw61yTyi8dlWc8jEk9f8qyRqoCD4bNSbnHRIPkVl/8AUwb5rmoHAsbfjHI58xlls11J32Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZkIyYmnqcw30jV/o1HRMaQLim3O2uskyFvwAqCO+f5k=;
+ b=BfQS7kiE3ovUM7EbKIjD7o8eLSElcdepwJVAbHe4G364wnFE7+6mtscSCfBanpBfcfDmxrXhRIxt9Rs01T+Dhkattv89ubYAM6sjFZYnzSHjIEhcxtSQNPd0KbGsf4ItaJlUKSApqqGqQFQw8DF3O90qdGRD3fabrpGgsxsxuDp0bz/GdZZSFFBcFxE2dBv4TjNQVL+y1oYtEVR5MjLtffZt2br7zp//co9wXUxLeMk93+DyHwLWkkl5/luoHUCcWnNoxpcoDXsJ7FSsb7Sn7lkx847cY9I2E4NXvbhNu7C8c7PJqrj8NOknJ2tWfgEw8irJxJerPouzVBp+lRaqhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ SJ1PR11MB6082.namprd11.prod.outlook.com (2603:10b6:a03:48b::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6838.31; Wed, 4 Oct 2023 09:11:11 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::4c69:ab61:fea5:5a7f]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::4c69:ab61:fea5:5a7f%3]) with mapi id 15.20.6813.035; Wed, 4 Oct 2023
+ 09:11:11 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Brandeburg,
+ Jesse" <jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+Subject: RE: [PATCH net-next 3/4] dpll: netlink/core: add support for pin-dpll
+ signal phase offset/adjust
+Thread-Topic: [PATCH net-next 3/4] dpll: netlink/core: add support for
+ pin-dpll signal phase offset/adjust
+Thread-Index: AQHZ8STYBdXle/Bxd0eyxPCX/7DD6LAu+R+AgAebAaCAAA0FgIAAWKYAgACqnwCAAIO7gIAAMSsAgAEJTNA=
+Date: Wed, 4 Oct 2023 09:11:11 +0000
+Message-ID: <DM6PR11MB465796999DA139FB1E2BEF4B9BCBA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230927092435.1565336-1-arkadiusz.kubalewski@intel.com>
+ <20230927092435.1565336-4-arkadiusz.kubalewski@intel.com>
+ <4018c0b0-b288-ff60-09be-7ded382f4a82@linux.dev>
+ <DM6PR11MB4657AA79C0C44F868499A3129BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZRrb87drG7aVrxsT@nanopsycho>
+ <DM6PR11MB4657C61104280788DF49F0E59BC5A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZRu1cG2uglhmCdlI@nanopsycho>
+ <DM6PR11MB4657B52BD09700F49799ED8C9BC4A@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZRxNML855TG7L5To@nanopsycho>
+In-Reply-To: <ZRxNML855TG7L5To@nanopsycho>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|SJ1PR11MB6082:EE_
+x-ms-office365-filtering-correlation-id: 9cc7220b-0605-4403-8e1b-08dbc4b9da74
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: grUr/0EvDdBUQUWwr4i4Bo07t5bOFJ1KEUjcM4a57OBtyW5EFqKFY65Ib5tPJY/Seb6tFgXCCpTlVALco/GcyrGy0rsU8cmyOPwtY1QfQGSghgqUWuS9ZuoVNoZlS9ZhwBUjzt5J/QC5xQ9Wdls2O22EV4z43BBFxXLN6AlGS9ciEnpU6dq7v5sKyEalg1wYJbhpyGIOpPLY3SwMDRCIyzaWHsKzSNtHu3ifGTD5/XzK03YrFYbm0UW91S+Rku9u72M15SmqVKUnpDYtE4GvS9MlLkDTIfCTmCLxtw42i9qKfySrKFcYzltZB6rHXPfdNOraQoWTZkXeClCBiThtpm71CG0jiFVAT0qOAhsxzqQt368nQMC40YRRrXuCoiyI0EsIvuRx4a5XqRjdZ+pBW938tnS2P+5NbzlU7t2WA2tJv9a+IQbWOp+hazJkWUlucUd/ErzHb08p970qXWs2vx+c8KAqvU49maBmXom8/61qN6Xha4oJEPdAeiHtOIxciqsIA7AEXF5Ykn+fPhe9NNIJG6IXtFWh/hL2pLgioUzD4rBhpvih05Iu0rYJryrTSIlrsv0u2op6J9Bg63wJMlxPDQADQk5MJ53DljjOSUOOZMBL7GyLT+4Zctn2noex
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(396003)(136003)(366004)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(66899024)(38070700005)(82960400001)(33656002)(86362001)(26005)(9686003)(83380400001)(6506007)(7696005)(122000001)(38100700002)(478600001)(71200400001)(2906002)(8936002)(52536014)(8676002)(5660300002)(4326008)(6916009)(41300700001)(54906003)(76116006)(316002)(66476007)(66556008)(66946007)(55016003)(64756008)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?1AY38sq7rs1f7NqLOiJnbadvIV3w39cTsjnADgXYlfRdfAxIpPRTG1nzPMkN?=
+ =?us-ascii?Q?d1DWbwx65E0O5kItTJ1r6l3ePLrCzrUb+XhItDMStVAWPYY+tefb3BSB7IlN?=
+ =?us-ascii?Q?owbjVpOlg3YY8V1TPxuFJBpEueiODijpbHVoUlkyhqGxBxDvww5iSBBbuOpE?=
+ =?us-ascii?Q?ukZ9K7wAqn6O5oHVpcBjagS+y6ooFh99D0SpgXljomzLexSzf3aesmNz2ykw?=
+ =?us-ascii?Q?uOFeVw34qMmaVqjOHLatuiueVTZyOMvyhg38ratz416Q/uZsbYv/qQqC96TB?=
+ =?us-ascii?Q?dG1QuKmO901LHANEQDobrtJ+/KGQw8SuAo9GjFzOujB+ypwhckd+AWIxuAx5?=
+ =?us-ascii?Q?Czd5l2ULFYFwV7d2xe7stuUxnKyQcU6D9Jy1iV7J72xvek4Knno2tF3PxbvP?=
+ =?us-ascii?Q?BwXejvdEdCD1tTdu/s2+LhuX4HKdG025SN47bfYx+u4T2CGkwPk5YU/NUyRf?=
+ =?us-ascii?Q?bS1LmvVXd/tZiZTu2Gq5KaYw50fi1PBTkXPEZE0XqrnkavBAjMoCyqrLmTbv?=
+ =?us-ascii?Q?OugcuS9yNL8qkJ3XN0O8taSntMlZhj7WgaAQkgd62Dj5x8C8xd1SaIBJ5v7W?=
+ =?us-ascii?Q?wWP2waqdMA5Zun0A4x2ABf9gyXNgcxFUAYacTNEcA2ndZ7r87F9yhYK/1fIu?=
+ =?us-ascii?Q?jeuotn9w2A5LsOKKalufFYpCEeISxltwOxD6MrMjn6elK6CAiIqbpWd5LMcy?=
+ =?us-ascii?Q?RPzVQZVDv7WJsQO/ELfYyUHUrQtioiWmTmZfw4yncj0XqgBYl776SU25xiA2?=
+ =?us-ascii?Q?XzuIpJaQZ5EKtQvz6qUwRRlGSsOpv1ImopppEaij+AXJQRa5Xzr7HjMU2CYA?=
+ =?us-ascii?Q?UtRPcHKiEVYKMhRJTohldSHA4EbjQx8sMj4jzN9nIN1NhB4Mrx4C4aWC/K4G?=
+ =?us-ascii?Q?SvJ0owbWjmCR6p/BoRdDMorou09hITKKbHwFje6a1E8Xq8FGqVuytHpmM4i7?=
+ =?us-ascii?Q?FUt7foxFsk2iOJnBPApRszXSSJccb3YqC6xhFj30c/hJoKhuXU7SGFAyGI36?=
+ =?us-ascii?Q?VYaV3yGN0MoPMA20Y0/bBX+ydHh0YfTehQvEDtDPR7dMpsRTCEDyggs+hVZO?=
+ =?us-ascii?Q?6M6QrjdKO8CALg+jFyd34o/j30Wz5cCQOtJC3j5YtPlT+/uBzSbPBqCGF/ca?=
+ =?us-ascii?Q?A4VwYFqRLS+suKfU21PJ2YKruLWdlHtLuetvbuBQvNUsEqyzj780gMU6Np+K?=
+ =?us-ascii?Q?6qc0b7lUUFMTK610gI8XAsd6rsIjG6Sl2u3ZmyrvYLvCtxEN2yMDX1onXNc6?=
+ =?us-ascii?Q?qNvRen5dkybqos9bdIykH5C+LOaFgurqzZhOVsYHUkZxIaZzYp18FdWBF+mv?=
+ =?us-ascii?Q?0UPdvsYdeZL4Wp4Fv5RhH/XqNvsnzKK53WJ0eskICxCtONm1HsDS3z2mGQHk?=
+ =?us-ascii?Q?9qlmBL4wtQMJB/3rChviYJVLYXusKJ3x3s3CwNk/8s5PGEsG4HZMKA7RDKFe?=
+ =?us-ascii?Q?8SGgf/sh0R5k8PxbAm46SIAgpfjo1aGikq6HdQyJV66znAeTY71QiKzAt5rh?=
+ =?us-ascii?Q?Zac5sF1rF8j6nhuadzh2cqE3r25LRzRsCMSutiz+IYR+/zGNKT6xaZkGsAK/?=
+ =?us-ascii?Q?j6OGW9gAke4ByuqTeuK/NHTaqYx22ntqjHW5qg+Go8dYIgr+r2meSBW1LcZd?=
+ =?us-ascii?Q?bg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net-next v4 09/18] net/smc: introduce SMC-D loopback
- device
-To: Alexandra Winter <wintera@linux.ibm.com>, Jan Karcher
- <jaka@linux.ibm.com>, dust.li@linux.alibaba.com, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: schnelle@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
- <1695568613-125057-10-git-send-email-guwen@linux.alibaba.com>
- <3febdf3e-e213-7acf-7dd4-75d177676c3e@linux.ibm.com>
- <20230925151816.GC92403@linux.alibaba.com>
- <3f71928e-157a-748e-42ee-4de3c80ed109@linux.ibm.com>
- <e85fe903-a025-a693-906b-834ff2a2a812@linux.ibm.com>
- <22858b56-dee0-e65f-a698-b0f2090a872d@linux.alibaba.com>
- <c2117ecb-466c-cc45-04c5-f12adedec217@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <c2117ecb-466c-cc45-04c5-f12adedec217@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.4 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9cc7220b-0605-4403-8e1b-08dbc4b9da74
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2023 09:11:11.5691
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Jyfqzq7l9shJ+LWlMHEw0MxL3TLfX5xP+gIopcgthDshQMnM0VOrMPGs9n8S/qpT8BAkKpg7T7pYjUVjEajRUe7dORS2kF/TaRih7O9t0ec=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6082
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-On 2023/9/29 22:08, Alexandra Winter wrote:
-> 
-> 
-> On 28.09.23 20:35, Wen Gu wrote:
+>From: Jiri Pirko <jiri@resnulli.us>
+>Sent: Tuesday, October 3, 2023 7:20 PM
+>To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>
+>
+>Tue, Oct 03, 2023 at 04:29:43PM CEST, arkadiusz.kubalewski@intel.com wrote=
+:
+>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>Sent: Tuesday, October 3, 2023 8:32 AM
+>>>
+>>>Tue, Oct 03, 2023 at 01:03:00AM CEST, arkadiusz.kubalewski@intel.com
+>>>wrote:
+>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>Sent: Monday, October 2, 2023 5:04 PM
+>>>>>
+>>>>>Mon, Oct 02, 2023 at 04:32:30PM CEST, arkadiusz.kubalewski@intel.com
+>>>>>wrote:
+>>>>>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>>>>>Sent: Wednesday, September 27, 2023 8:09 PM
+>>>>>>>
+>>>>>>>On 27/09/2023 10:24, Arkadiusz Kubalewski wrote:
+>>>>>>>> Add callback op (get) for pin-dpll phase-offset measurment.
+>>>>>>>> Add callback ops (get/set) for pin signal phase adjustment.
+>>>>>>>> Add min and max phase adjustment values to pin proprties.
+>>>>>>>> Invoke get callbacks when filling up the pin details to provide
+>>>>>>>> user
+>>>>>>>> with phase related attribute values.
+>>>>>>>> Invoke phase-adjust set callback when phase-adjust value is
+>>>>>>>> provided
+>>>>>>>> for
+>>>>>>>> pin-set request.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.co=
+m>
+>>>>>>>
+>>>>>>>[...]
+>>>>>>>
+>>>>>>>> +static int
+>>>>>>>> +dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr
+>>>>>>>> *phase_adj_attr,
+>>>>>>>> +		       struct netlink_ext_ack *extack)
+>>>>>>>> +{
+>>>>>>>> +	struct dpll_pin_ref *ref;
+>>>>>>>> +	unsigned long i;
+>>>>>>>> +	s32 phase_adj;
+>>>>>>>> +	int ret;
+>>>>>>>> +
+>>>>>>>> +	phase_adj =3D nla_get_s32(phase_adj_attr);
+>>>>>>>> +	if (phase_adj > pin->prop->phase_range.max ||
+>>>>>>>> +	    phase_adj < pin->prop->phase_range.min) {
+>>>>>>>> +		NL_SET_ERR_MSG(extack, "phase adjust value not
+>>>>>>>> supported");
+>>>>>>>> +		return -EINVAL;
+>>>>>>>> +	}
+>>>>>>>> +	xa_for_each(&pin->dpll_refs, i, ref) {
+>>>>>>>> +		const struct dpll_pin_ops *ops =3D dpll_pin_ops(ref);
+>>>>>>>> +		struct dpll_device *dpll =3D ref->dpll;
+>>>>>>>> +
+>>>>>>>> +		if (!ops->phase_adjust_set)
+>>>>>>>> +			return -EOPNOTSUPP;
+>>>>>>>
+>>>>>>>I'm thinking about this part. We can potentially have dpll devices
+>>>>>>>with
+>>>>>>>different expectations on phase adjustments, right? And if one of
+>>>>>>>them
+>>>>>>>won't be able to adjust phase (or will fail in the next line), then
+>>>>>>>netlink will return EOPNOTSUPP while _some_ of the devices will be
+>>>>>>>adjusted. Doesn't look great. Can we think about different way to
+>>>>>>>apply
+>>>>>>>the change?
+>>>>>>>
+>>>>>>
+>>>>>>Well makes sense to me.
+>>>>>>
+>>>>>>Does following makes sense as a fix?
+>>>>>>We would call op for all devices which has been provided with the op.
+>>>>>>If device has no op -> add extack error, continue
+>>>>>
+>>>>>Is it real to expect some of the device support this and others don't?
+>>>>>Is it true for ice?
+>>>>>If not, I would got for all-or-nothing here.
+>>>>>
+>>>>
+>>>>Let's step back a bit.
+>>>>The op itself is introduced as per pin-dpll tuple.. did this
+>>>>intentionally,
+>>>>to inform each dpll that the offset has been changed - in case dplls ar=
+e
+>>>>controlled by separated driver/firmware instances but still sharing the
+>>>>pin.
+>>>>Same way a pin frequency is being set, from user perspective on a pin, =
+but
+>>>>callback is called for each dpll the pin was registered with.
+>>>>Whatever we do here, it shall be probably done for frequency_set()
+>>>>callback as
+>>>>well.
+>>>>
+>>>>The answers:
+>>>>So far I don't know the device that might do it this way, it rather
+>>>>supports
+>>>>phase_adjust or not. In theory we allow such behavior to be implemented=
+,
+>>>>i.e.
+>>>>pin is registered with 2 dplls, one has the callback, second not.
+>>>
+>>>If there is only theoretical device like that now, implement
+>>>all-or-nothing. If such theoretical device appears in real, this could
+>>>be changed. The UAPI would not change, no problem.
+>>>
 >>
+>>I can live with it :)
 >>
->> On 2023/9/28 11:16, Jan Karcher wrote:
+>>>
+>>>>Current hardware of ice sets phase offset for a pin no matter on which
+>>>>dpll
+>>>>device callback was invoked.
+>>>>"all-or-nothing" - do you mean to check all callback returns and then
+>>>>decide
+>>>>if it was successful?
+>>>
+>>>Check if all dplls have ops and only perform the action in such case. In
+>>>case one of the dplls does not have the op filled, return -EOPNOTSUPP.
 >>>
 >>>
->>> On 26/09/2023 09:24, Alexandra Winter wrote:
->>>>
->>>>
->>>> On 25.09.23 17:18, Dust Li wrote:
->>>>>> Hello Wen Gu,
->>>>>>
->>>>>> thank you for adding the Kconfig, so the distributions can decide when to offer this feature.
->>>>>>
->>>>>> I propose you add some kind of runtime switch as well. Not every user who loads the SMC module
->>>>>> may want to exploit smcd-loopback. Especially in native environements without containers.
->>>>>>
->>>>>> If no RoCE interfaces or no ISM interfaces exist, the respective handling is skipped in SMC.
->>>>>> If loopback is always created unconditionally, there is no way to opt-out.
->>>>> Hi Sandy,
->>>>>
->>>>> After talking to Wen Gu offline, I think the real issue here might be
->>>>> we don't have an abstract layer in SMC, something like net/core/dev.c
->>>>>
->>>>> Without this, we cannot do:
->>>>>
->>>>> 1. Enable/disable those devices dynamically
->>>>>      Currently, If we want to disable a SMC-R device to communicate with
->>>>>      others, we need to refer to 'ip link set dev xxx down' to disable the
->>>>>      netdevice, then Infiniband subsystem will notify SMC that the state of
->>>>>      the IB device has changed. We cannot explicitly choose not to use some
->>>>>      specific IB/RoCE devices without disable totally.
->>>>>      If the loopback device need to support enable/disable itself, I
->>>>>      think it might be better to enable this feature for all SMC devices.
->>>>>
->>>>> 2. Do statistics per device
->>>>>      Now, we have to relay on IB/RoCE devices' hardware statistics to see
->>>>>      how many packets/bytes we have sent through this device.
->>>>>
->>>>> Both the above issues get worse when the IB/RoCE device is shared by SMC
->>>>> and userspace RDMA applications. If SMC-R and userspace RDMA applications
->>>>> run at the same time, we can't enable the device to run userspace RDMA
->>>>> applications while block it from running SMC. For statistics, we cannot
->>>>> tell how many packets/bytes were sent by SMC and how many were sent by
->>>>> userspace RDMA applications.
->>>>>
->>>>> So I think those are better to support in the SMC layer.
->>>>>
->>>>> Best regards!
->>>>> Dust
->>>>
->>>> Thank you very much for your considerations. I also think a generic handling
->>>> of these requirements in the smc layer would be best. Especially, if we want
->>>> to add virtio-ism support soon. There we will face the same issues again.
->>>> Let's hear what others think about this.
->>>>
->>>>
+>>>Regarding the successful/failed op, I think you can just return. In
+>>>these cases, when user performs multiaction cmd, he should be prepared
+>>>to deal with consequences if part of this cmd fails. We don't have
+>>>rollback for any other multiaction cmd in dpll, I don't see why this
+>>>should be treated differently.
 >>>
->>> Thanks you Sandy for bringing it up and Dust Li & Wen Gu for your thoughts.
->>> I agree that such a runtime switch is needed and also that this generic handling would be good in the smc layer.
 >>
->> Right. runtime switch is necessary. I'm trying some ways to see which one is more suitable.
->>
->>
->> As for implementing a abstract layer that capable of handling 1) enable/disable SMC usage of
->> RDMA/ISM devices. 2) count packets/bytes of RDMA/ISM devices that generated/consumed by SMC,
->> I believe it would be helpful, and IMHO its architecture may be:
->>
->> ----------------------------------------------
->>                    SMC protocol
->>      (af_smc.c / smc_core.c / smc_clc.c ...)
->> ----------------------------------------------
->>            Abstract layer of SMC device
->>        (define SMC device common operations)
->> ----------------------------------------------
->>    RDMA device |        (virt) ISM device
->>    (smc_ib.c)  |   (smc_ism.c / smc_loopback.c)
->> ----------------------------------------------
->>
->> But I also believe this may require a lot of works and may be a long-term job.
->>
-> 
-> I like that concept a lot. If we can agree on a direction, we can define
-> meaningful pieces and approach it piece by piece.
-> 
+>>We don't have it because no one have spotted it on review,
+>>as mentioned the frequency_set behaves the same way,
+>>we need one approach for all of those cases.
+>>I am opting for having the rollback as suggested on the other thread.
+>
+>Okay, but let's do that consistently.
+>
 
-Yes. It can be added to our interlock's backup list.
-
-> 
->> If only for the virtual ISM device, e.g.loopback-ism, I am considering adding it to the Linux
->> device tree (/sys/devices/virtual/) to make it more 'device-like', and controlling its
->> enable/disable and get the statistics through some files, such as
->> echo 1 > /sys/devices/virtual/loopback-ism/alive
->> or
->> cat /sys/devices/virtual/loopback-ism/statistics/{rx|tx}_{bytes|packets}
->> (similar to what tcp lo have in /sys/devices/virtual/net/lo)
->>
->> What are your thoughts on it? Thanks.
->>
-> 
-> Makes sense to me, but I don't have too much experience in that area.
-> I have never seen an attribute called 'alive' before.
-> I think attributes like 'power', 'enable' or 'online' are used for other device types.
-> 
-
-Thanks. I will refer to existing devices for reference.
+Sure, fixed in v2.
+Thanks!
+Arkadiusz
 
 >>
->> -- 
->> A little off-topic, it's currently China's National Day holiday, which lasts for about a week,
->> so we are now on vacation. As a result, my responses might be a bit slower, but I will still
->> make time to check/reply the mail and prepare for my new version. Thank you all very much!
+>>Thank you!
+>>Arkadiusz
 >>
->> Regards,
->> Wen Gu
-> 
-> Next week is Germany's national holiday, so many of us are out as well.
-
-Have a nice holiday! :)
+>>>
+>>>>
+>>>>Thank you!
+>>>>Arkadiusz
+>>>>
+>>>>>
+>>>>>>If device fails to set -> add extack error, continue
+>>>>>>Function always returns 0.
+>>>>>>
+>>>>>>Thank you!
+>>>>>>Arkadiusz
+>>>>>>
+>>>>>>>
+>>>>>>>> +		ret =3D ops->phase_adjust_set(pin,
+>>>>>>>> +					    dpll_pin_on_dpll_priv(dpll, pin),
+>>>>>>>> +					    dpll, dpll_priv(dpll), phase_adj,
+>>>>>>>> +					    extack);
+>>>>>>>> +		if (ret)
+>>>>>>>> +			return ret;
+>>>>>>>> +	}
+>>>>>>>> +	__dpll_pin_change_ntf(pin);
+>>>>>>>> +
+>>>>>>>> +	return 0;
+>>>>>>>> +}
+>>>>>>>> +
+>>>>
 
