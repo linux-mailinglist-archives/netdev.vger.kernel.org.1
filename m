@@ -1,94 +1,120 @@
-Return-Path: <netdev+bounces-38039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960867B8B44
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:50:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 947C77B8B49
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 3D1F61F22CF6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 474442816AC
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E43D1F61F;
-	Wed,  4 Oct 2023 18:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9A81F5F9;
+	Wed,  4 Oct 2023 18:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSPreQFq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQhpZsK6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326B01B27F
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:50:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9682CC433C9;
-	Wed,  4 Oct 2023 18:50:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF57A1D6A9
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:51:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F0EC433C8;
+	Wed,  4 Oct 2023 18:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696445425;
-	bh=rhH3BM3l5U/8ZimBx6sUN349z/3o89boKoRJJhgmjRc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QSPreQFq7IsrWZOLfAxefSThxr0tGvRqdC+jfcIUIHXrAL8bi0UdeWzv0d8ZNYfx4
-	 uyLAWn6GCJPBoTX5rb8DogE/vkBcIiw3eDV0sgytYOba6vc1ZyiF4rkTXvmuTKZRCC
-	 I05uWT5A0J49VKoyfo6nyjFSCX3tPSs4EMy0LJaNQr9HdZhkrE70G1PA4saHPfMbBP
-	 dANsdXIOVdfGdvWFROzjw3kPlZn/h0W/VCN6iD10LfHhln+4T6CTwuVTGFkR+fO6cS
-	 LIfZMutt0t5K7vSvJgKyyQ74JFyMsF+CHM6kA9dBI9Ov1ZV8u6eHjSe5i6wUQrqynt
-	 neXkNuX52nGyQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7BC04C395EC;
-	Wed,  4 Oct 2023 18:50:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696445491;
+	bh=0T+eb7tm4aVFcyKtRjbpTFX3g8MsS2qHFYW8zwU9ucs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UQhpZsK6hBj1e7Yft08HWJGHu5zKZXm1CkdGXn4CRW9uWLyt4hJ+7c4Nd5uIzr4+c
+	 sX6o7rxpQ3zNQAZ5ya5Hfp+urWyvg42+U0jPfuBmYp137ewWzRYRb4kNMMizWD+0Ts
+	 8pUUa6eYHmdLDFhNSUEMQSgLGfvrjiwhYtbyN9mGCpNhRXMoIQ/6PsAFqbh0/40r9I
+	 lzYhPcc7Ut+793oi2vEO02RRb5M/WGpPnTr0nKsX8u6N/G9BwCutOj4EragAK70AYS
+	 Yt5/qJAfiop5C4WJ4+r3elS0Jt9enLorA7hR+C9g4epblyM4oY6jbs3A006Oo/9aGZ
+	 RiuNzFc5fR80Q==
+Date: Wed, 4 Oct 2023 21:51:27 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Joerg Roedel <joro@8bytes.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net/mlx5: fix calling mlx5_cmd_init() before DMA
+ mask is set
+Message-ID: <20231004185127.GH51282@unreal>
+References: <20230929-mlx5_init_fix-v2-1-51ed2094c9d8@linux.ibm.com>
+ <20230930073633.GC1296942@unreal>
+ <1acfaaf12d1d24aa255a4da80882f8e0e98d2046.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv4: Set offload_failed flag in fibmatch results
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169644542550.13943.9248162999887305594.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 18:50:25 +0000
-References: <20230926182730.231208-1-bpoirier@nvidia.com>
-In-Reply-To: <20230926182730.231208-1-bpoirier@nvidia.com>
-To: Benjamin Poirier <bpoirier@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, amcohen@nvidia.com,
- idosch@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1acfaaf12d1d24aa255a4da80882f8e0e98d2046.camel@linux.ibm.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 26 Sep 2023 14:27:30 -0400 you wrote:
-> Due to a small omission, the offload_failed flag is missing from ipv4
-> fibmatch results. Make sure it is set correctly.
+On Wed, Oct 04, 2023 at 02:40:49PM +0200, Niklas Schnelle wrote:
+> On Sat, 2023-09-30 at 10:36 +0300, Leon Romanovsky wrote:
+> > On Fri, Sep 29, 2023 at 02:15:49PM +0200, Niklas Schnelle wrote:
+> > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
+> > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
+> > > called in probe_one() before mlx5_pci_init(). This is a problem because
+> > > mlx5_pci_init() is where the DMA and coherent mask is set but
+> > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+> > > allocation is done during probe before the correct mask is set. This
+> > > causes probe to fail initialization of the cmdif SW structs on s390x
+> > > after that is converted to the common dma-iommu code. This is because on
+> > > s390x DMA addresses below 4 GiB are reserved on current machines and
+> > > unlike the old s390x specific DMA API implementation common code
+> > > enforces DMA masks.
+> > > 
+> > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
+> > > probe_one() before mlx5_mdev_init(). To match the overall naming scheme
+> > > rename it to mlx5_dma_init().
+> > > 
+> > > Link: https://lore.kernel.org/linux-iommu/cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com/
+> > > Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+> > > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > > ---
+> > > Note: I ran into this while testing the linked series for converting
+> > > s390x to use dma-iommu. The existing s390x specific DMA API
+> > > implementation doesn't respect DMA masks and is thus not affected
+> > > despite of course also only supporting DMA addresses above 4 GiB.
+> > > ---
+> > > Changes in v2:
+> > > - Instead of moving the whole mlx5_pci_init() only move the
+> > >   set_dma_caps() call so as to keep pci_enable_device() after the FW
+> > >   command interface initialization (Leon)
+> > > - Link to v1: https://lore.kernel.org/r/20230928-mlx5_init_fix-v1-1-79749d45ce60@linux.ibm.com
+> > > ---
+> > >  drivers/net/ethernet/mellanox/mlx5/core/main.c | 18 +++++++++---------
+> > >  1 file changed, 9 insertions(+), 9 deletions(-)
+> > > 
+> > 
+> > Thanks,
+> > Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 > 
-> The issue can be witnessed using the following commands:
-> echo "1 1" > /sys/bus/netdevsim/new_device
-> ip link add dummy1 up type dummy
-> ip route add 192.0.2.0/24 dev dummy1
-> echo 1 > /sys/kernel/debug/netdevsim/netdevsim1/fib/fail_route_offload
-> ip route add 198.51.100.0/24 dev dummy1
-> ip route
-> 	# 192.168.15.0/24 has rt_trap
-> 	# 198.51.100.0/24 has rt_offload_failed
-> ip route get 192.168.15.1 fibmatch
-> 	# Result has rt_trap
-> ip route get 198.51.100.1 fibmatch
-> 	# Result differs from the route shown by `ip route`, it is missing
-> 	# rt_offload_failed
-> ip link del dev dummy1
-> echo 1 > /sys/bus/netdevsim/del_device
+> Thank you for the review. Assuming the mlx5 tree is included in linux-
+> next I think it would be easiest if this goes via that tree thereby
+> unbreaking linux-next for s390. Or do you prefer Joerg to take this via
+> the IOMMU tree or even some other tree?
+
+Strictly speaking this is net patch, netdev maintainers should pick it.
+We use mlx5 tree [1] for *-next material.
+
+Thanks
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/
+
 > 
-> [...]
-
-Here is the summary with links:
-  - [net] ipv4: Set offload_failed flag in fibmatch results
-    https://git.kernel.org/netdev/net/c/0add5c597f32
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Thanks,
+> Niklas
 
