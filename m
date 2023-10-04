@@ -1,45 +1,59 @@
-Return-Path: <netdev+bounces-38026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA887B871A
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:00:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA2EA7B87C2
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:08:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 086B5281CBA
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:00:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id B188C1C208E4
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D302C1D546;
-	Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C1E1D555;
+	Wed,  4 Oct 2023 18:08:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE24F1D68D
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31EC1C433C8;
-	Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448D71D523;
+	Wed,  4 Oct 2023 18:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65CE1C433C9;
+	Wed,  4 Oct 2023 18:08:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696442432;
-	bh=Kl3qkuDXwVsPtemGj5YLfWsZgo/fk06VDeK+hdq5JiU=;
+	s=k20201202; t=1696442932;
+	bh=7KinbA8DNblA+Km2f8glGeQw5rEldbniDtB58mio/Fw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j0kwz0zqiLuwTdWFK4Xp5H0+qrsMOkaOOoLenoaD7ZiM72mZsYQNoWYF0eLPbKcB+
-	 nWoyQvPBeaxY0d/KoZj6wCeNVdSlC/vqzojUGHojMwWtuVO4QU67NXI+0dMiMNzuaf
-	 9RK68AGbS1L71+qzsQuILJXwK5U1D4+PYrLsCfbW334BZwjvBDttkvmoFoO7oUpZ3m
-	 P7rUkpU0d0aXnQOUKqjzDvZPMS9Zb59mtI45fBXyFXrDlD9eksA555ibq4Pg7XagAz
-	 fRtaj5ixqSNW+4F7sqVaQh81rJcDD/SDxtdFQn+Y6UfhkpFvQ3sCEZXg4dittX7ShG
-	 yue9UaFDGxiVg==
-Date: Wed, 4 Oct 2023 11:00:31 -0700
+	b=rHzpZAiVZd7ZFkiW/MGVBek96RFTIJjcohB0e/YOf0qtsOfUMAWU2MGGzR58wiowk
+	 D/P/URX2DhFNOVR9vJ/iYgXQQu+nnZ5LcLPjq6DjmC5SGUzxYiaHXdCc5gSw1Ymo4S
+	 usX+ofMOub/zY945XGGYVRJBlqabJwqtchOEsNd+6vjIXbgMUhT/H/VTfV29ZP1zYn
+	 7t3V1E3MqfJZe+cr64wLZXz+p5xjo/GJfotavtLabkH2PDWZF3sC02RK5Qfd6RcDrF
+	 eo0r5avug/98hGKx9/kkETVhBcDLVQZFFIQdQ3mIL7Q0qfasJBbkh90UaCgQI+7fwV
+	 RlRsShJqz9k3w==
+Date: Wed, 4 Oct 2023 11:08:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
-Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <bryan.whitehead@microchip.com>, <unglinuxdriver@microchip.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next] net: microchip: lan743x: improve throughput
- with rx timestamp config
-Message-ID: <20231004110031.7e9c32e8@kernel.org>
-In-Reply-To: <20230926155658.159184-1-vishvambarpanth.s@microchip.com>
-References: <20230926155658.159184-1-vishvambarpanth.s@microchip.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>, <bpf@vger.kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
+ <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+ <john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+ <haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+ Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer
+ <brouer@redhat.com>, Anatoly Burakov <anatoly.burakov@intel.com>,
+ "Alexander Lobakin" <alexandr.lobakin@intel.com>, Magnus Karlsson
+ <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>,
+ <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+ Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [RFC bpf-next v2 09/24] xdp: Add VLAN tag hint
+Message-ID: <20231004110850.5501cd52@kernel.org>
+In-Reply-To: <8e9d830b-556b-b8e6-45df-0bf7971b4237@intel.com>
+References: <20230927075124.23941-1-larysa.zaremba@intel.com>
+	<20230927075124.23941-10-larysa.zaremba@intel.com>
+	<20231003053519.74ae8938@kernel.org>
+	<8e9d830b-556b-b8e6-45df-0bf7971b4237@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,15 +63,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Sep 2023 21:26:58 +0530 Vishvambar Panth S wrote:
-> +			netif_warn(adapter, drv, adapter->netdev,
-> +				   "rx timestamp = %d is not supported\n",
-> +				   rx_filter);
+On Tue, 3 Oct 2023 15:09:39 +0200 Alexander Lobakin wrote:
+> > Sorry for a random chime-in but was there any discussion about 
+> > the validity of VLAN stripping as an offload?
+> > 
+> > I always thought this is a legacy "Windows" thing which allowed
+> > Windows drivers to operate on VLAN-tagged networks even before
+> > the OS itself understood VLANs...  Do people actually care about
+> > having it enabled?  
+> 
+> On MIPS routers, I actually have some perf gains from having it enabled.
+> So they do, I'd say. Mediatek even has DSA tag stripping. Both save you
+> some skb->data push-pulls, csum corrections when CHECKSUM_COMPLETE, skb
+> unsharing in some cases, reduce L3/L4 headers cacheline spanning etc.
 
-I addition to Jake's comments please also drop this warning.
-
-> +			return -EINVAL;
-
-And make sure this is the correct return code.
-I thought -ERANGE was more appropriate here, but I could be wrong.
+No unsharing - you can still strip it in the driver.
+Do you really think that for XDP kfunc call will be cheaper?
 
