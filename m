@@ -1,144 +1,114 @@
-Return-Path: <netdev+bounces-38015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2317B860C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 19:02:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D617B860F
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 19:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 24E2F1C20282
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 17:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id CBC491F22B63
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 17:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BE51C69A;
-	Wed,  4 Oct 2023 17:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EC01C6A0;
+	Wed,  4 Oct 2023 17:03:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8101C68D
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 17:02:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB3B7AD;
-	Wed,  4 Oct 2023 10:02:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696438939; x=1727974939;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=88we1DSu8Bs6O8JdeNsZBSGueiNIhCurw3oB1CXvjPA=;
-  b=X/Tt+JH0i9W5exi3UiF/0XgNUubfABjhsNG9199Ry685otuL7QmSYQj3
-   xpycX+N+G37MNy7DOtPUngal0OQcKFrImzT5x3uN5U97+Kb4ucn0zYfLd
-   slwbGWAAZLuDSStwH4LtNMT8wt3yWZIWqF6PYHq/GgckrKSJv4+cz+Bgz
-   QGaPTjc4gsejq149fweXtGFML2PAOUQuZGB1ZHWLuyqg5hbra9V69qtbn
-   nR/Y5dN5wxOpQaDn+GrYplVBiViUd441Jxb1KvRScpFcDtRRQvvA0bGsK
-   LnFPWfq2AJdUTK5quyiM8gG/tnVyPSfMFiv31pZdWqAC0Eer39zymvgvw
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="362589465"
-X-IronPort-AV: E=Sophos;i="6.03,200,1694761200"; 
-   d="scan'208";a="362589465"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 10:02:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="821765087"
-X-IronPort-AV: E=Sophos;i="6.03,200,1694761200"; 
-   d="scan'208";a="821765087"
-Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 10:02:17 -0700
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	linux-pci@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	netdev@vger.kernel.org,
-	jkc@redhat.com,
-	jay.vosburgh@canonical.com,
-	Vishal Agrawal <vagrawal@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v3] ice: reset first in crash dump kernels
-Date: Wed,  4 Oct 2023 10:02:14 -0700
-Message-Id: <20231004170214.474792-1-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D7E1C68D
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 17:03:11 +0000 (UTC)
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA69895
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 10:03:09 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-27777174297so1638938a91.3
+        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 10:03:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1696438989; x=1697043789; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjKe52uxoEWYByCO7w/+hku1MO8es+pHrQpVHj97Wg0=;
+        b=btDwhkfwARzaBkTua/K4I23EE6fbIMxSg9BeXXiMYrJe9kmHdB/b0fzt+3kH7dqVZm
+         YaC82mr/gQJ7PsDOm50abbA+rRsA+5njkQO7iMSxAQqZ58XBKgHeaT1SJ8JdxxbO4FUo
+         SW/LJMCSViFeOzMBJfwJJEV9xoIgX3MEV4cm/IdLr2Q6rXmjod7n+mCHbKp6vRg/Lij3
+         xrN8XTmrcn9Vf6PU9dy4VMUEYLoS9gQXNrqBU8wEX5JXq3rtwJzbK74fjKDCwCT3uVz7
+         48M0UICCHf9OIT+1KhIu6SvFu9Vvombqc1K4GnduPF0Vx2yEMHLqXxwPBmwSLL0ju0qH
+         Ai4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696438989; x=1697043789;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XjKe52uxoEWYByCO7w/+hku1MO8es+pHrQpVHj97Wg0=;
+        b=wl9GMgsccvhmX7qwC9X8ibvFBS3MYcXbdfPwVr2jbjQNFSFgC8dhfb06GMFVyI5jcX
+         KHmPuzXtP5gwMxkkCuslRHYOfxWFsfQd442o0vzTuFEpGUpUv+g2tFfjhuP6uqR8aDL+
+         yCiLAdTtPV8XOit2Sfl04FZnQ+uU5tmQD5kfu0YRN3w/SM4+Y4GCVv15JYz1B/vepfLV
+         dXjO4SLAd6BjbJ7aKIEdH1ajoQGPaoO1kBjKsVE1w05DZuEPvQg1vDZbH2ntWZ/nx8fX
+         KkVprx/B+vEO4CprTL60cNpwfz3x2GcedX2r8j+zHdmMMqeOAl/q16uhEfAtCWyNgptt
+         JOBQ==
+X-Gm-Message-State: AOJu0YyHbo/N/0cM/OrtGuGKtKYM7EhZyfJZx9KgxBZxdS1Xze21fji+
+	SsMv9I//o4IaxVvFQ9qkDxVnOxCPOEEzAjg3Bpc=
+X-Google-Smtp-Source: AGHT+IF/yVO1B4A7pVumqaFuqeUirFvCAN2K3INB753u764HBXMclVpD5qSScXvEw8xQujxzu1buZA==
+X-Received: by 2002:a17:90b:1a8c:b0:274:bf7a:60ed with SMTP id ng12-20020a17090b1a8c00b00274bf7a60edmr2833596pjb.12.1696438988696;
+        Wed, 04 Oct 2023 10:03:08 -0700 (PDT)
+Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
+        by smtp.gmail.com with ESMTPSA id o12-20020a170902778c00b001bdc8a5e96csm3965382pll.169.2023.10.04.10.03.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 10:03:08 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] ila: fix array overflow warning
+Date: Wed,  4 Oct 2023 10:02:58 -0700
+Message-Id: <20231004170258.25575-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When the system boots into the crash dump kernel after a panic, the ice
-networking device may still have pending transactions that can cause errors
-or machine checks when the device is re-enabled. This can prevent the crash
-dump kernel from loading the driver or collecting the crash data.
+Aliasing a 64 bit value seems to confuse Gcc 12.2.
+ipila.c:57:32: warning: ‘addr’ may be used uninitialized [-Wmaybe-uninitialized]
 
-To avoid this issue, perform a function level reset (FLR) on the ice device
-via PCIe config space before enabling it on the crash kernel. This will
-clear any outstanding transactions and stop all queues and interrupts.
-Restore the config space after the FLR, otherwise it was found in testing
-that the driver wouldn't load successfully.
+Use a union instead.
 
-The following sequence causes the original issue:
-- Load the ice driver with modprobe ice
-- Enable SR-IOV with 2 VFs: echo 2 > /sys/class/net/eth0/device/sriov_num_vfs
-- Trigger a crash with echo c > /proc/sysrq-trigger
-- Load the ice driver again (or let it load automatically) with modprobe ice
-- The system crashes again during pcim_enable_device()
-
-Fixes: 837f08fdecbe ("ice: Add basic driver framework for Intel(R) E800 Series")
-
-Reported-by: Vishal Agrawal <vagrawal@redhat.com>
-Reviewed-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
-v3: add Fixes tag as approximate, added Jay's RB tag
-v2: respond to list comments and update commit message
-v1: initial version
----
- drivers/net/ethernet/intel/ice/ice_main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ ip/ipila.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c8286adae946..6550c46e4e36 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -6,6 +6,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+diff --git a/ip/ipila.c b/ip/ipila.c
+index 23b19a108862..f4387e039f97 100644
+--- a/ip/ipila.c
++++ b/ip/ipila.c
+@@ -47,14 +47,17 @@ static int genl_family = -1;
  
- #include <generated/utsrelease.h>
-+#include <linux/crash_dump.h>
- #include "ice.h"
- #include "ice_base.h"
- #include "ice_lib.h"
-@@ -5014,6 +5015,20 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 		return -EINVAL;
- 	}
+ static void print_addr64(__u64 addr, char *buff, size_t len)
+ {
+-	__u16 *words = (__u16 *)&addr;
++	union {
++		__u64 id64;
++		__u16 words[4];
++	} id = { .id64 = addr };
+ 	__u16 v;
+ 	int i, ret;
+ 	size_t written = 0;
+ 	char *sep = ":";
  
-+	/* when under a kdump kernel initiate a reset before enabling the
-+	 * device in order to clear out any pending DMA transactions. These
-+	 * transactions can cause some systems to machine check when doing
-+	 * the pcim_enable_device() below.
-+	 */
-+	if (is_kdump_kernel()) {
-+		pci_save_state(pdev);
-+		pci_clear_master(pdev);
-+		err = pcie_flr(pdev);
-+		if (err)
-+			return err;
-+		pci_restore_state(pdev);
-+	}
-+
- 	/* this driver uses devres, see
- 	 * Documentation/driver-api/driver-model/devres.rst
- 	 */
-
-base-commit: 6a70e5cbedaf8ad10528ac9ac114f3ec20f422df
+ 	for (i = 0; i < 4; i++) {
+-		v = ntohs(words[i]);
++		v = ntohs(id.words[i]);
+ 
+ 		if (i == 3)
+ 			sep = "";
 -- 
-2.39.3
+2.39.2
 
 
