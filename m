@@ -1,53 +1,51 @@
-Return-Path: <netdev+bounces-37921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 070447B7D0F
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:24:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B91B17B7D17
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:26:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B6B8E281470
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 35DAE28145E
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD7C1119F;
-	Wed,  4 Oct 2023 10:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5C3111A2;
+	Wed,  4 Oct 2023 10:26:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF2211181
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 10:24:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8933311181
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 10:26:17 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2407AF
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 03:23:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E32AF
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 03:26:12 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qnz2g-00075J-Tj; Wed, 04 Oct 2023 12:23:46 +0200
+	id 1qnz4n-0007NJ-8z; Wed, 04 Oct 2023 12:25:57 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qnz2g-00B0Xh-2u; Wed, 04 Oct 2023 12:23:46 +0200
+	id 1qnz4m-00B0Xz-M8; Wed, 04 Oct 2023 12:25:56 +0200
 Received: from pengutronix.de (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id C502222ED16;
-	Wed,  4 Oct 2023 10:23:45 +0000 (UTC)
-Date: Wed, 4 Oct 2023 12:23:45 +0200
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 4E5AE22ED1E;
+	Wed,  4 Oct 2023 10:25:56 +0000 (UTC)
+Date: Wed, 4 Oct 2023 12:25:55 +0200
 From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: John Watts <contact@jookia.org>
-Cc: linux-can@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc: socketcan@hartkopp.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH] can: sun4i_can: Only show Kconfig if ARCH_SUNXI is set
-Message-ID: <20231004-icky-contempt-b46d6bb68918-mkl@pengutronix.de>
-References: <20230905231342.2042759-2-contact@jookia.org>
+	Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] can: raw: Remove NULL check before dev_{put, hold}
+Message-ID: <20231004-shield-accurate-6b875651801b-mkl@pengutronix.de>
+References: <20230825064656.87751-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,9 +53,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z3zhqjwthn6wlylc"
+	protocol="application/pgp-signature"; boundary="7n5eokfyo5pa3sfp"
 Content-Disposition: inline
-In-Reply-To: <20230905231342.2042759-2-contact@jookia.org>
+In-Reply-To: <20230825064656.87751-1-jiapeng.chong@linux.alibaba.com>
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
@@ -69,23 +67,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
---z3zhqjwthn6wlylc
+--7n5eokfyo5pa3sfp
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 06.09.2023 09:13:43, John Watts wrote:
-> When adding the RISCV option I didn't gate it behind ARCH_SUNXI.
-> As a result this option shows up with Allwinner support isn't enabled.
-> Fix that by requiring ARCH_SUNXI to be set if RISCV is set.
+On 25.08.2023 14:46:56, Jiapeng Chong wrote:
+> The call netdev_{put, hold} of dev_{put, hold} will check NULL, so there
+> is no need to check before using dev_{put, hold}, remove it to silence
+> the warning:
 >=20
-> Fixes: 8abb95250ae6 ("can: sun4i_can: Add support for the Allwinner D1")
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Closes: https://lore.kernel.org/linux-sunxi/CAMuHMdV2m54UAH0X2dG7stEg=3Dg=
-rFihrdsz4+o7=3D_DpBMhjTbkw@mail.gmail.com/
-> Signed-off-by: John Watts <contact@jookia.org>
+> ./net/can/raw.c:497:2-9: WARNING: NULL check before dev_{put, hold} funct=
+ions is not needed.
+>=20
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=3D6231
+> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 
-Applied to linux-can/testing.
+Applied to linux-can-next/testing.
 
 regards,
 Marc
@@ -96,20 +95,20 @@ Embedded Linux                   | https://www.pengutronix.de |
 Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
 Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
---z3zhqjwthn6wlylc
+--7n5eokfyo5pa3sfp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUdPS4ACgkQvlAcSiqK
-BOhU5wf/dWWTRwtQpRT5Pz70QGC+v3K6sLXPZfBgh7btGZOF7Icwh3w4GGbx4RTA
-k1lx2Brcq6tPO3MsdqJRgp4CSpOrDlvuwIG51mA/UfFjRSbBYfpbdVkYjBJ7UdiK
-VUBUiHfv9W7IUon50lb0SFUREQ/wnaCgfoorQ+tPC0lhPhOAsR14/pk3xu5snmcH
-VUgJZobxei+Dvs6OfWcVt34+OeBwD28v60NNhVKR7lcVVB8pGsOs7zNM4R/d6N7f
-rXPxbs2SJi2hiT0+87c9p5AvwxslNDOq5SMhXUGtFfNDBByOnvfLBeLo5xC5Rs3k
-60tmdWRPZRMQ9uBkCvFItxgM2c4YcA==
-=HeNY
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUdPbEACgkQvlAcSiqK
+BOhaJAf8CJS4q8gjgzgbvGEY1oFdsFx5AOdvsIgFL4F3pg+7AjMNRXIX+CyDnGlf
+8tmSvh/3670c5pL8EN5ptuvlUVlJDVOhiH4/28FCC+7zkoWRtEOu4U6v4Uz2onGB
+d2FSb0cx7ifFIjrr6IOsBa67lPO5GD2AXXED8uyiE42K6cWYnpVqS6t48YDle5j2
+u76Q97bvL2TGI1sh3FWKtrsSpgYKcRiKDW9BxodrQrboRqeUMyqfq5OMnn76bc0r
+EyPe0zGVVE2peGfAWhdN1IC/5u7kuhPoB8WdymLnM99pSGeMVrPcvZ+vufB/hM3K
+UnMXGbHpmSlZ18a4oJZuyYTQJaSQnQ==
+=nayZ
 -----END PGP SIGNATURE-----
 
---z3zhqjwthn6wlylc--
+--7n5eokfyo5pa3sfp--
 
