@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-38007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A477B856E
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:37:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73EFF7B8576
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:39:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 1F8831F22A58
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 024F5281634
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD68319BDC;
-	Wed,  4 Oct 2023 16:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EC21BDEA;
+	Wed,  4 Oct 2023 16:39:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292651400F
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 16:37:00 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5232DAB
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:36:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4619BDC
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 16:39:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 829EDBF
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:39:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696437418;
+	s=mimecast20190719; t=1696437556;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zGlBt7bTvhe8OpNdjk0WVt8Ei5icwRybJL1TWWQ+z30=;
-	b=b1HQdYh//4U1dnoBiD7apCpuzP1lYNm5T55YK/bxZXcoFNhgyu3JNlpd+wWlSdS2m4zKHV
-	ZUHbZZbOKitoXFz6E2pMgNi7TI4a8boZ8UIbb6PoamFHfGNxkYhRapAYq3BWVZehGnAiKP
-	NMnF9GsGpnqMGa3yms1kZz/Nb5apEJk=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=9YIAoi2N6jKSNdTGNnxQ4r70nxai8Q1Dqlauk6QORHI=;
+	b=V9OL9scPYJ79anzGnVwTpzCe2OXzU9gV/sB903N8tZ4la5MHjILraBpiMM99QbxrGpGNbe
+	TjlnFxN4NWVnw8fg2qq2dMh/k6Qf+LaK5z40khDD+mabURv1iMVij0HL6tYBuyNehJR5HM
+	VstSsoK9Rp7HAOEnXeYothWcu4hFJBI=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-646-nngoZQhqPYemFbbdL2chLA-1; Wed, 04 Oct 2023 12:36:42 -0400
-X-MC-Unique: nngoZQhqPYemFbbdL2chLA-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1c729a25537so19522595ad.0
-        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 09:36:42 -0700 (PDT)
+ us-mta-155-WYI1f80kPKmNLbiksWOz_g-1; Wed, 04 Oct 2023 12:39:15 -0400
+X-MC-Unique: WYI1f80kPKmNLbiksWOz_g-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3512c238f25so62385ab.3
+        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 09:39:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696437401; x=1697042201;
+        d=1e100.net; s=20230601; t=1696437553; x=1697042353;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=zGlBt7bTvhe8OpNdjk0WVt8Ei5icwRybJL1TWWQ+z30=;
-        b=k1XtDoOwmddeXGlMPFak7IaV4P11cxx5METaBahG+65tNlWA+AiJeRKiqYTN8mF1Tq
-         E86mCTaT504/BK8pSLs66eqCf1C9H5NbdbkWvVjXjtz1ZYBiR9d4ASAj7DUYztRs7fck
-         sWdeJO8R8SqOjFxUykR5lGUxAttAnoYJrAngsg6mZ52qpB5WchY7b6sxoYJHgG4k/5RQ
-         cJlgBYcEhtK+NLYaXW3D4aqxkHDRdfkBKCQ+vD1fYfNfXbK2M05yQ2KoBNiXlOu2NPWN
-         n9KC3HZose21dVX4zSEBPhm3Qu83cCq04x4etVPI6FWGi5zLpk7LFqeCT5DeWGweJBVW
-         7XKA==
-X-Gm-Message-State: AOJu0YzSQoJBX7u2zDpvzbPnz1yon4iuzKUYfeYjsnKe52o49PikyHIn
-	Bs7iu2mnBUEW8rDqyaVOYlJu5EW0U3q3Z9dUxYN/gY9d6sBLcSjAX9sTsW1X5h626ZIJNPU5tQT
-	2a/KIU0FmjslcaxkxmRZLS6MDehE=
-X-Received: by 2002:a17:902:e743:b0:1c3:2ee6:380d with SMTP id p3-20020a170902e74300b001c32ee6380dmr3423736plf.48.1696437401280;
-        Wed, 04 Oct 2023 09:36:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG5vIPSizNEYIKnPH3bApRyiDFAirVaLfj9Nlk7YIPtPnWKD44MJI1eKF5ILc8nEfm6A9Kovg==
-X-Received: by 2002:a17:902:e743:b0:1c3:2ee6:380d with SMTP id p3-20020a170902e74300b001c32ee6380dmr3423710plf.48.1696437400983;
-        Wed, 04 Oct 2023 09:36:40 -0700 (PDT)
+        bh=9YIAoi2N6jKSNdTGNnxQ4r70nxai8Q1Dqlauk6QORHI=;
+        b=tW5pmELpy7p03GXLsd6OmMMTnB1IKkwMoehY7M+hEnRnXbAA4f8KzyDFraDOmAMflU
+         07Hei9funHvvmsjv5hY5VhWufd3drjA6jInWKzfW4xmVW0F1stzY8grFm+o4P5VJcsUz
+         dVrfkkbEHklm58jP6h6P4+oeuiVpIgxvC0hpu0CocmXR6Z5r5PU8XG015jQsaChtVlYO
+         vEJ5jwFAv6N+IuBwCOOte/zCvyyDySNy/tcLiheaN1cp1vFvhZvHLzHa1uZSwcYgHgcV
+         0YabShdBdkzhw8PplQCpF9eGUjspUEchdYk4VbuuEi1eR0NLZ1I0n2m4FEH0Q5hjeshW
+         Mlmg==
+X-Gm-Message-State: AOJu0YyJpK26jANc50as7ksslv3SOwxm0O2j3dy8H5Rj8o0COkUQ+2lk
+	+C6zMWccovQvFukT0nJVX4pnF64U9aT7CGhtR4+N8iQhBCASHa8pz33XXXjx6/Qt6C48oqjHEnd
+	96AKjK1vxQJdU2vK9
+X-Received: by 2002:a05:6e02:164f:b0:351:57d5:51bb with SMTP id v15-20020a056e02164f00b0035157d551bbmr3716952ilu.16.1696437553517;
+        Wed, 04 Oct 2023 09:39:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFytBl337LJl7fnH1tEMNvTVvdRyzepj/SY9LKBkr/2JIKcfKvUBQL/k9u0YI41kDHAabFHUw==
+X-Received: by 2002:a05:6e02:164f:b0:351:57d5:51bb with SMTP id v15-20020a056e02164f00b0035157d551bbmr3716932ilu.16.1696437553292;
+        Wed, 04 Oct 2023 09:39:13 -0700 (PDT)
 Received: from localhost ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id y11-20020a17090322cb00b001c407fac227sm3935842plg.41.2023.10.04.09.36.39
+        by smtp.gmail.com with ESMTPSA id m19-20020a638c13000000b0057411f9a516sm3584673pgd.7.2023.10.04.09.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Oct 2023 09:36:40 -0700 (PDT)
-Date: Thu, 05 Oct 2023 01:36:36 +0900 (JST)
-Message-Id: <20231005.013636.556295594018360621.syoshida@redhat.com>
-To: pabeni@redhat.com
-Cc: jmaloy@redhat.com, ying.xue@windriver.com, netdev@vger.kernel.org,
+        Wed, 04 Oct 2023 09:39:12 -0700 (PDT)
+Date: Thu, 05 Oct 2023 01:39:09 +0900 (JST)
+Message-Id: <20231005.013909.1713937955475096940.syoshida@redhat.com>
+To: jmaloy@redhat.com, pabeni@redhat.com
+Cc: ying.xue@windriver.com, netdev@vger.kernel.org,
  tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
- syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
+ syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
 Subject: Re: [PATCH] tipc: Fix uninit-value access in
- __tipc_nl_bearer_enable()
+ tipc_nl_node_reset_link_stats()
 From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <6d5e295b2c22743a44f268363ec28293052e0d2b.camel@redhat.com>
-References: <20230926125120.152133-1-syoshida@redhat.com>
-	<6d5e295b2c22743a44f268363ec28293052e0d2b.camel@redhat.com>
+In-Reply-To: <3666c3b4628d6d82ccff593d051706db3896e5af.camel@redhat.com>
+References: <20230924060325.3779150-1-syoshida@redhat.com>
+	<3666c3b4628d6d82ccff593d051706db3896e5af.camel@redhat.com>
 X-Mailer: Mew version 6.9 on Emacs 28.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,22 +83,21 @@ Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 03 Oct 2023 10:52:50 +0200, Paolo Abeni wrote:
-> On Tue, 2023-09-26 at 21:51 +0900, Shigeru Yoshida wrote:
+On Tue, 03 Oct 2023 10:58:54 +0200, Paolo Abeni wrote:
+> On Sun, 2023-09-24 at 15:03 +0900, Shigeru Yoshida wrote:
 >> syzbot reported the following uninit-value access issue:
 >> 
 >> =====================================================
->> BUG: KMSAN: uninit-value in strscpy+0xc4/0x160
->>  strscpy+0xc4/0x160
->>  bearer_name_validate net/tipc/bearer.c:147 [inline]
->>  tipc_enable_bearer net/tipc/bearer.c:259 [inline]
->>  __tipc_nl_bearer_enable+0x634/0x2220 net/tipc/bearer.c:1043
->>  tipc_nl_bearer_enable+0x3c/0x70 net/tipc/bearer.c:1052
+>> BUG: KMSAN: uninit-value in strlen lib/string.c:418 [inline]
+>> BUG: KMSAN: uninit-value in strstr+0xb8/0x2f0 lib/string.c:756
+>>  strlen lib/string.c:418 [inline]
+>>  strstr+0xb8/0x2f0 lib/string.c:756
+>>  tipc_nl_node_reset_link_stats+0x3ea/0xb50 net/tipc/node.c:2595
 >>  genl_family_rcv_msg_doit net/netlink/genetlink.c:971 [inline]
 >>  genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
 >>  genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1066
@@ -109,12 +108,12 @@ On Tue, 03 Oct 2023 10:52:50 +0200, Paolo Abeni wrote:
 >>  netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
 >>  sock_sendmsg_nosec net/socket.c:730 [inline]
 >>  sock_sendmsg net/socket.c:753 [inline]
->>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2540
->>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2594
->>  __sys_sendmsg net/socket.c:2623 [inline]
->>  __do_sys_sendmsg net/socket.c:2632 [inline]
->>  __se_sys_sendmsg net/socket.c:2630 [inline]
->>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2630
+>>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+>>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+>>  __sys_sendmsg net/socket.c:2624 [inline]
+>>  __do_sys_sendmsg net/socket.c:2633 [inline]
+>>  __se_sys_sendmsg net/socket.c:2631 [inline]
+>>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
 >>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
 >>  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
 >>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
@@ -123,71 +122,59 @@ On Tue, 03 Oct 2023 10:52:50 +0200, Paolo Abeni wrote:
 >>  slab_post_alloc_hook+0x12f/0xb70 mm/slab.h:767
 >>  slab_alloc_node mm/slub.c:3478 [inline]
 >>  kmem_cache_alloc_node+0x577/0xa80 mm/slub.c:3523
->>  kmalloc_reserve+0x148/0x470 net/core/skbuff.c:559
->>  __alloc_skb+0x318/0x740 net/core/skbuff.c:644
+>>  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:559
+>>  __alloc_skb+0x318/0x740 net/core/skbuff.c:650
 >>  alloc_skb include/linux/skbuff.h:1286 [inline]
 >>  netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
 >>  netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
 >>  sock_sendmsg_nosec net/socket.c:730 [inline]
 >>  sock_sendmsg net/socket.c:753 [inline]
->>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2540
->>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2594
->>  __sys_sendmsg net/socket.c:2623 [inline]
->>  __do_sys_sendmsg net/socket.c:2632 [inline]
->>  __se_sys_sendmsg net/socket.c:2630 [inline]
->>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2630
+>>  ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2541
+>>  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2595
+>>  __sys_sendmsg net/socket.c:2624 [inline]
+>>  __do_sys_sendmsg net/socket.c:2633 [inline]
+>>  __se_sys_sendmsg net/socket.c:2631 [inline]
+>>  __x64_sys_sendmsg+0x307/0x490 net/socket.c:2631
 >>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
 >>  do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
 >>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
 >> 
->> Bearer names must be null-terminated strings. If a bearer name which is not
->> null-terminated is passed through netlink, strcpy() and similar functions
+>> Link names must be null-terminated strings. If a link name which is not
+>> null-terminated is passed through netlink, strstr() and similar functions
 >> can cause buffer overrun. This causes the above issue.
 >> 
 >> This patch fixes this issue by returning -EINVAL if a non-null-terminated
->> bearer name is passed.
+>> link name is passed.
 >> 
->> Fixes: 0655f6a8635b ("tipc: add bearer disable/enable to new netlink api")
->> Reported-and-tested-by: syzbot+9425c47dccbcb4c17d51@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=9425c47dccbcb4c17d51
+>> Fixes: ae36342b50a9 ("tipc: add link stat reset to new netlink api")
+>> Reported-and-tested-by: syzbot+5138ca807af9d2b42574@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=5138ca807af9d2b42574
 >> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 >> ---
->>  net/tipc/bearer.c | 4 ++++
+>>  net/tipc/node.c | 4 ++++
 >>  1 file changed, 4 insertions(+)
 >> 
->> diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c
->> index 2cde375477e3..62047d20e14d 100644
->> --- a/net/tipc/bearer.c
->> +++ b/net/tipc/bearer.c
->> @@ -1025,6 +1025,10 @@ int __tipc_nl_bearer_enable(struct sk_buff *skb, struct genl_info *info)
+>> diff --git a/net/tipc/node.c b/net/tipc/node.c
+>> index 3105abe97bb9..f167bdafc034 100644
+>> --- a/net/tipc/node.c
+>> +++ b/net/tipc/node.c
+>> @@ -2586,6 +2586,10 @@ int tipc_nl_node_reset_link_stats(struct sk_buff *skb, struct genl_info *info)
 >>  
->>  	bearer = nla_data(attrs[TIPC_NLA_BEARER_NAME]);
+>>  	link_name = nla_data(attrs[TIPC_NLA_LINK_NAME]);
 >>  
->> +	if (bearer[strnlen(bearer,
->> +			   nla_len(attrs[TIPC_NLA_BEARER_NAME]))] != '\0')
+>> +	if (link_name[strnlen(link_name,
+>> +			      nla_len(attrs[TIPC_NLA_LINK_NAME]))] != '\0')
+>> +		return -EINVAL;
 > 
-> if 'bearer' is not NULL terminated, the above will access the first
-> byte after the TIPC_NLA_BEARER_NAME attribute.
-> 
-> I think it would cleaner and safer using nla_strscpy() instead.
+> I have the same comment as for the other tipc patch, please use
+> nla_strscpy instead, thanks!
 
-Thank you so much for your comment.  I didn't notice the existence of
-nla_strscpy().
-
-> Quickly skimming over the tpic code, most TIPC_NLA_BEARER_NAME access
-> looks unsafe, and possibly a similar fix should be applied in more
-> places.
-
-I've checked the usage of TIPC_NLA_BEARER_NAME accesses.  These might
-cause the same issue, so the same fix should be needed, as you say.
-
-I'll send a v2 patch.
+Thank you for your comment.  I'll send a v2 patch using nla_strscpy()
+and check if other usage of TIPC_NLA_LINK_NAME have the same issue.
 
 Thanks,
 Shigeru
 
-> 
-> Thanks,
 > 
 > Paolo
 > 
