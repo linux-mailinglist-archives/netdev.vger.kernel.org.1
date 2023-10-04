@@ -1,149 +1,151 @@
-Return-Path: <netdev+bounces-37880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF7D57B7780
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:32:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA17A7B7784
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:40:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9F74E2814B1
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 05:32:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id E58211C20873
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 05:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2951B539D;
-	Wed,  4 Oct 2023 05:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F042053BA;
+	Wed,  4 Oct 2023 05:40:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5659010F8
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 05:32:31 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917F2A7;
-	Tue,  3 Oct 2023 22:32:29 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id C31B9120007;
-	Wed,  4 Oct 2023 08:32:27 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru C31B9120007
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1696397547;
-	bh=CLKlKrCqAdeepCHsWhFMDBWkvkAJ8TxMV8E1PWgt7+I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=Lz/DQ1Bnxvkh6x4hgbzbOndmcddK5Bme0jG82haFWiAEE6AdoX3ISlkVd0+vXEzkU
-	 L5WsUmUNgvX/EC31KRW+kSNDA7R+ra7JmNrRG6RbGmsrWdVbhJttq3wXP6WCT7um4a
-	 VRjN4L3XH9u0jzrgZZmhY48p/4YkoKHkfIJ4EB8FUn8G/UArQT4AKTCOf7AXHs6xqh
-	 j0Oc9YAMdU/ymoBKdBS+2MYkv/+7D07phuZSimQ/sO8nk2njIErtgok/Oa1AtL9bbx
-	 Lfi3Zqsd1pzP+aNq20J91IdZMBiopnIl96Ny/aWZC76zzzcRdWELIaFr4b37aI63ys
-	 rS7jlmLt3RdWg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed,  4 Oct 2023 08:32:27 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Wed, 4 Oct 2023 08:32:27 +0300
-Message-ID: <aef9a438-3c61-44ec-688f-ed89eb886bfd@salutedevices.com>
-Date: Wed, 4 Oct 2023 08:25:36 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487B11C15;
+	Wed,  4 Oct 2023 05:40:48 +0000 (UTC)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70294A7;
+	Tue,  3 Oct 2023 22:40:46 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6910ea9cca1so1284370b3a.1;
+        Tue, 03 Oct 2023 22:40:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696398046; x=1697002846; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7sxPSsTdItOhFW3wfJ8BpxEBHfTI/E9UO9SmffybOvI=;
+        b=BVQD+oRo8Bl6HKM+IiSPbUQFBOPogmHnOM3gwP9YmxKzoFHEmqqioTAI5Y23UCcl4j
+         GGPdPSqQGT7aODQOyESyScwodrMN8AdKh33U3R3ToNA39xFYzeUlC28l0mOVK6onMNxP
+         Gvye38/BYBa0CXiaPlGxAF++dOEFOP9aDPfxiENUVxC9ejk/T/y1+Wj0ctQQ1BzVsp8J
+         9jdNVYMk6SsSxREEQ62HW/BdmxpM6O7XXHVq6yUGP32fW4y9cXNFRUbBwujpclH599Vg
+         iQjgIJ4vHIFhDTI254QBG8YSqq2yXI+IHnBGAeHfK73EYjs6DmKGUsALZVI1j5pJBWtR
+         rg1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696398046; x=1697002846;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7sxPSsTdItOhFW3wfJ8BpxEBHfTI/E9UO9SmffybOvI=;
+        b=v0LJvZey5+hqyRO+6CwqfqkNK8J0Z/1MoJm8I/9euq+rzeKLFU/yJah0+ICZHHrH5+
+         BKBbIf3ktM/6hAwXS9H8zdAGWQC/mXm+/wtLBDg5fzApyu2j5zr813w/LvEHa+4uTmmw
+         NL3/y50vSL4BHP+tqKNmEetUumR2XpMWLiIM+piZUasxkmuimCWhxhRnjC5iF1hHmifp
+         t+Xdkl8wkLagbrk/+clBjo/YhOIrCGSqteA+qyp9npKfehAVpXtBpgJSnL1lbNk36lvl
+         +0aBy0JauYq5nvCZQT/0DKqrGm7FmA71b0ycEuzb/7woHkQp3GN9wecVM3XRC3Y5Rh9I
+         lTVg==
+X-Gm-Message-State: AOJu0YwGfoqnOMz55v4slQUQ6wDRVs1h53NgAvCPGXraLVmABw0G9MON
+	wCNY8v0DHw8z9DVR+RL5MAM=
+X-Google-Smtp-Source: AGHT+IHcaNH0YjVByl+ZAEBtRjoXIBdb2CyL8t4pmQ69R+3lj6gUKXkLasbD3/LcY1hkgOJPy7+qew==
+X-Received: by 2002:a05:6a00:1a94:b0:68f:dfda:182a with SMTP id e20-20020a056a001a9400b0068fdfda182amr1483545pfv.26.1696398045801;
+        Tue, 03 Oct 2023 22:40:45 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba00:f1b6:ede7:e209:917e])
+        by smtp.gmail.com with ESMTPSA id q16-20020a62ae10000000b0069302c3c050sm2318612pff.218.2023.10.03.22.40.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Oct 2023 22:40:45 -0700 (PDT)
+Date: Tue, 03 Oct 2023 22:40:43 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+ bpf <bpf@vger.kernel.org>, 
+ Networking <netdev@vger.kernel.org>, 
+ "davidhwei@meta.com" <davidhwei@meta.com>
+Message-ID: <651cfadbe3308_314bc2083f@john.notmuch>
+In-Reply-To: <CAEf4BzaaCvMdKMA=N01Gm1uN2XB_5bcYDZF0oXZR=XyoDePfXg@mail.gmail.com>
+References: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
+ <64b4c5891096b_2b67208f@john.notmuch>
+ <CAEf4Bzb2=p3nkaTctDcMAabzL41JjCkTso-aFrfv21z7Y0C48w@mail.gmail.com>
+ <64ff278e16f06_2e8f2083a@john.notmuch>
+ <CAEf4Bzb1fMy5beHKxCjvoeCqaYmQFvnjnMi9bgWoML0v27n3SQ@mail.gmail.com>
+ <651ba0f13cb51_4fa3f20824@john.notmuch>
+ <651ba39d55792_53e4920861@john.notmuch>
+ <20231003054156.52816535@kernel.org>
+ <CAEf4BzaaCvMdKMA=N01Gm1uN2XB_5bcYDZF0oXZR=XyoDePfXg@mail.gmail.com>
+Subject: Re: Sockmap's parser/verdict programs and epoll notifications
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH net-next v2 00/12] vsock/virtio: continue MSG_ZEROCOPY
- support
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
- <4nwo6nd2ihjqsoqnjdjhuucqyc4fhfhxk52q6ulrs6sd2fmf7z@24hi65hbpl4i>
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <4nwo6nd2ihjqsoqnjdjhuucqyc4fhfhxk52q6ulrs6sd2fmf7z@24hi65hbpl4i>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180332 [Oct 04 2023]
-X-KSMG-AntiSpam-Version: 5.9.59.0
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;salutedevices.com:7.1.1;100.64.160.123:7.1.2;git.kernel.org:7.1.1;lore.kernel.org:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/10/04 03:39:00
-X-KSMG-LinksScanning: Clean, bases: 2023/10/04 03:39:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/04 04:17:00 #22052298
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Andrii Nakryiko wrote:
+> On Tue, Oct 3, 2023 at 5:42=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >
+> > On Mon, 02 Oct 2023 22:16:13 -0700 John Fastabend wrote:
+> > > > This with the other piece we want from our side to allow running
+> > > > verdict and sk_msg programs on sockets without having them in a
+> > > > sockmap/sockhash it would seem like a better system to me. The
+> > > > idea to drop the sockmap/sockhash is because we never remove prog=
+s
+> > > > once they are added and we add them from sockops side. The filter=
 
+> > > > to socketes is almost always the port + metadata related to the
+> > > > process or environment. This simplifies having to manage the
+> > > > sockmap/sockhash and guess what size it should be. Sometimes we
+> > > > overrun these maps and have to kill connections until we can
+> > > > get more space.
+> >
+> > That's a step in the right direction for sure, but I still think that=
 
-On 03.10.2023 19:26, Stefano Garzarella wrote:
-> Hi Arseniy,
-> 
-> On Sun, Oct 01, 2023 at 12:02:56AM +0300, Arseniy Krasnov wrote:
->> Hello,
->>
->> this patchset contains second and third parts of another big patchset
->> for MSG_ZEROCOPY flag support:
->> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
->>
->> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
->> suggested to split it for three parts to simplify review and merging:
->>
->> 1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
->>   link below)
->> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
->>   tx completions) and update for Documentation/. <-- this patchset
->> 3) Updates for tests and utils. <-- this patchset
->>
->> Part 1) was merged:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
->>
->> Head for this patchset is:
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=236f3873b517acfaf949c23bb2d5dec13bfd2da2
->>
->> Link to v1:
->> https://lore.kernel.org/netdev/20230922052428.4005676-1-avkrasnov@salutedevices.com/
->>
->> Changelog:
->> v1 -> v2:
->> * Patchset rebased and tested on new HEAD of net-next (see hash above).
->> * See per-patch changelog after ---.
-> 
-> Thanks for this new version.
-> I started to include vsock_uring_test in my test suite and tests are
-> going well.
-> 
-> I reviewed code patches, I still need to review the tests.
-> I'll do that by the end of the week, but they looks good!
+> > Google's auto-lowat is the best approach. We just need a hook that
+> > looks at incoming data and sets rcvlowat appropriately. That's it.
+> > TCP looks at rcvlowat in a number of places to make protocol decision=
+s,
+> > not just the wake-up. Plus Google will no longer have to carry their
+> > OOT patch..
+> =
 
-Thanks for review! Ok, I'll wait for tests review, and then send next
-version.
+> David can correct me, but when he tried the SO_RCVLOWAT approach to
+> solving this problem, he saw no improvements (and it might have
+> actually been a regression in terms of behavior). I'd say that this
+> sounds a bit suspicious and we have plans to get back to SO_RCVLOWAT
+> and try to understand the behavior a bit better.
 
-Thanks, Arseniy
+Not sure how large your packets are but you might need to bump your
+sk_rcvbuf size as well otherwise even if you set SO_RCVLOWAT you can
+hit memory pressure which will wake up the application regardless
+iirc.
 
-> 
-> Thanks,
-> Stefano
-> 
+> =
+
+> I'll just say that the simpler the solution - the better. And if this
+> rcvlowat hook gets us the ability to delay network notification to
+> user-space until a full logical packet (where packet size is provided
+> by BPF program without user space involvement) is assembled (up to
+> some reasonable limits, of course), that would be great.
+
+When we created the sockmap/sockhash maps and verdict progs, etc. one
+of the goals was to avoid touching the TCP code paths as much as
+possible. We also wanted to work on top of KTLS. Maybe you wouldn't
+need it, but if you need to read a header across multiple skbs that
+is hard without something to reconstruct them. Perhaps here you
+could get away without needing this though.
+
+I'll still fix the parser program and start working on simplifying
+the verdict programs so they can run without maps and so on because
+it helps other use cases. Maybe it will end up working for this
+case or you find a simpler mechanism.=
 
