@@ -1,118 +1,250 @@
-Return-Path: <netdev+bounces-37895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F007B7AC6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:53:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE067B7A53
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 2ABB01F21F04
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 08:53:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E315D28147B
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 08:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22666107A6;
-	Wed,  4 Oct 2023 08:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9704C101FF;
+	Wed,  4 Oct 2023 08:40:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2711078D;
-	Wed,  4 Oct 2023 08:53:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E8F698;
-	Wed,  4 Oct 2023 01:53:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696409612; x=1727945612;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=jOkGAQMfFt/tof6iuDRfEPv3hBtFiBn7WKU34mkhsf0=;
-  b=TulpEIa6guRndKA2o0LV7cyCrlfA/MfcQq/lrpPYkRynlPhJwudUg3G0
-   AC4gFO7wCChzmkaqDHjb17A2XIWJBP73G+fW3DgkM0e8+Cf4Xal/ct7dE
-   iOVSGy/ZAmjD1KJD1cKF0ae5uFNks9mF49CoLRJhv8oxYF9rJisys8aIZ
-   1iVfvYwwxQdBlTVbnNeAfyc/qxJE8KcxG4XyxfnzZo6d/wuw9slV4o2rr
-   IhJw0kbFavO7P2CYoS6dFAFlwgsvrRFY1gHC4UW1vqO6pUjL/M8wtEpbJ
-   fFv5jt6GMhlvOOsfxD8cLSft+wK3L4Zm8CWyk34bmMmLFpDRdWHZZHh4g
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="469375221"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="469375221"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 01:53:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10852"; a="894850759"
-X-IronPort-AV: E=Sophos;i="6.03,199,1694761200"; 
-   d="scan'208";a="894850759"
-Received: from unknown (HELO paamrpdk12-S2600BPB.aw.intel.com) ([10.228.151.145])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 01:52:05 -0700
-From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com
-Subject: [PATCH net] i40e: sync next_to_clean and next_to_process for programming status desc
-Date: Wed,  4 Oct 2023 14:04:54 +0530
-Message-Id: <20231004083454.20143-1-tirthendu.sarkar@intel.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7A5A21
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 08:40:47 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BC7CBF
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 01:40:46 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qnxQy-0006e0-4I; Wed, 04 Oct 2023 10:40:44 +0200
+Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qnxQx-00Az7a-AW; Wed, 04 Oct 2023 10:40:43 +0200
+Received: from sha by dude02.red.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qnxQx-009I78-1X; Wed, 04 Oct 2023 10:40:43 +0200
+From: Sascha Hauer <s.hauer@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de,
+	Michael Riesch <michael.riesch@wolfvision.net>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Alexander Stein <alexander.stein@ew.tq-group.com>
+Subject: [PATCH v2] net: phy: dp83867: Add support for hardware blinking LEDs
+Date: Wed,  4 Oct 2023 10:40:26 +0200
+Message-Id: <20231004084026.2214537-1-s.hauer@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When a programming status desc is encountered on the rx_ring,
-next_to_process is bumped along with cleaned_count but next_to_clean is
-not. This causes I40E_DESC_UNUSED() macro to misbehave resulting in
-overwriting whole ring with new buffers.
+This implements the led_hw_* hooks to support hardware blinking LEDs on
+the DP83867 phy. The driver supports all LED modes that have a
+corresponding TRIGGER_NETDEV_* define. Error and collision do not have
+a TRIGGER_NETDEV_* define, so these modes are currently not supported.
 
-Update next_to_clean to point to next_to_process on seeing a programming
-status desc if not in the middle of handling a multi-frag packet. Also,
-bump cleaned_count only for such case as otherwise next_to_clean buffer
-may be returned to hardware on reaching clean_threshold.
-
-Fixes: e9031f2da1ae ("i40e: introduce next_to_process to i40e_ring")
-Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reported-by: hq.dev+kernel@msdfc.xyz
-Reported by: Solomon Peachy <pizza@shaftnet.org>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217678
-Tested-by: hq.dev+kernel@msdfc.xyz
-Tested by: Indrek Järve <incx@dustbite.net>
-Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Tested-by: Alexander Stein <alexander.stein@ew.tq-group.com> #TQMa8MxML/MBa8Mx
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
 ---
- drivers/net/ethernet/intel/i40e/i40e_txrx.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-index 0b3a27f118fb..50c70a8e470a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-@@ -2544,7 +2544,14 @@ static int i40e_clean_rx_irq(struct i40e_ring *rx_ring, int budget,
- 			rx_buffer = i40e_rx_bi(rx_ring, ntp);
- 			i40e_inc_ntp(rx_ring);
- 			i40e_reuse_rx_page(rx_ring, rx_buffer);
--			cleaned_count++;
-+			/* Update ntc and bump cleaned count if not in the
-+			 * middle of mb packet.
-+			 */
-+			if (rx_ring->next_to_clean == ntp) {
-+				rx_ring->next_to_clean =
-+					rx_ring->next_to_process;
-+				cleaned_count++;
-+			}
- 			continue;
- 		}
+Notes:
+    Resending because the last send fell into the merge window.
+    
+    Changes since v1:
+     - Add Reviewed-by/Tested-by tags
+
+ drivers/net/phy/dp83867.c | 137 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 137 insertions(+)
+
+diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+index e397e7d642d92..5f08f9d38bd7a 100644
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -159,6 +159,23 @@
+ #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
+ #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
  
++#define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
++#define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
++#define DP83867_LED_FN_RX_ERR		0xe /* Receive Error */
++#define DP83867_LED_FN_RX_TX_ERR	0xd /* Receive Error or Transmit Error */
++#define DP83867_LED_FN_LINK_RX_TX	0xb /* Link established, blink for rx or tx activity */
++#define DP83867_LED_FN_FULL_DUPLEX	0xa /* Full duplex */
++#define DP83867_LED_FN_LINK_100_1000_BT	0x9 /* 100/1000BT link established */
++#define DP83867_LED_FN_LINK_10_100_BT	0x8 /* 10/100BT link established */
++#define DP83867_LED_FN_LINK_10_BT	0x7 /* 10BT link established */
++#define DP83867_LED_FN_LINK_100_BTX	0x6 /* 100 BTX link established */
++#define DP83867_LED_FN_LINK_1000_BT	0x5 /* 1000 BT link established */
++#define DP83867_LED_FN_COLLISION	0x4 /* Collision detected */
++#define DP83867_LED_FN_RX		0x3 /* Receive activity */
++#define DP83867_LED_FN_TX		0x2 /* Transmit activity */
++#define DP83867_LED_FN_RX_TX		0x1 /* Receive or Transmit activity */
++#define DP83867_LED_FN_LINK		0x0 /* Link established */
++
+ enum {
+ 	DP83867_PORT_MIRROING_KEEP,
+ 	DP83867_PORT_MIRROING_EN,
+@@ -1018,6 +1035,123 @@ dp83867_led_brightness_set(struct phy_device *phydev,
+ 			  val);
+ }
+ 
++static int dp83867_led_mode(u8 index, unsigned long rules)
++{
++	if (index >= DP83867_LED_COUNT)
++		return -EINVAL;
++
++	switch (rules) {
++	case BIT(TRIGGER_NETDEV_LINK):
++		return DP83867_LED_FN_LINK;
++	case BIT(TRIGGER_NETDEV_LINK_10):
++		return DP83867_LED_FN_LINK_10_BT;
++	case BIT(TRIGGER_NETDEV_LINK_100):
++		return DP83867_LED_FN_LINK_100_BTX;
++	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
++		return DP83867_LED_FN_FULL_DUPLEX;
++	case BIT(TRIGGER_NETDEV_TX):
++		return DP83867_LED_FN_TX;
++	case BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_RX;
++	case BIT(TRIGGER_NETDEV_LINK_1000):
++		return DP83867_LED_FN_LINK_1000_BT;
++	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_RX_TX;
++	case BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000):
++		return DP83867_LED_FN_LINK_100_1000_BT;
++	case BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100):
++		return DP83867_LED_FN_LINK_10_100_BT;
++	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
++		return DP83867_LED_FN_LINK_RX_TX;
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static int dp83867_led_hw_is_supported(struct phy_device *phydev, u8 index,
++				       unsigned long rules)
++{
++	int ret;
++
++	ret = dp83867_led_mode(index, rules);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++static int dp83867_led_hw_control_set(struct phy_device *phydev, u8 index,
++				      unsigned long rules)
++{
++	int mode, ret;
++
++	mode = dp83867_led_mode(index, rules);
++	if (mode < 0)
++		return mode;
++
++	ret = phy_modify(phydev, DP83867_LEDCR1, DP83867_LED_FN_MASK(index),
++			 DP83867_LED_FN(index, mode));
++	if (ret)
++		return ret;
++
++	return phy_modify(phydev, DP83867_LEDCR2, DP83867_LED_DRV_EN(index), 0);
++}
++
++static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 index,
++				      unsigned long *rules)
++{
++	int val;
++
++	val = phy_read(phydev, DP83867_LEDCR1);
++	if (val < 0)
++		return val;
++
++	val &= DP83867_LED_FN_MASK(index);
++	val >>= index * 4;
++
++	switch (val) {
++	case DP83867_LED_FN_LINK:
++		*rules = BIT(TRIGGER_NETDEV_LINK);
++		break;
++	case DP83867_LED_FN_LINK_10_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10);
++		break;
++	case DP83867_LED_FN_LINK_100_BTX:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100);
++		break;
++	case DP83867_LED_FN_FULL_DUPLEX:
++		*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX);
++		break;
++	case DP83867_LED_FN_TX:
++		*rules = BIT(TRIGGER_NETDEV_TX);
++		break;
++	case DP83867_LED_FN_RX:
++		*rules = BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83867_LED_FN_LINK_1000_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_1000);
++		break;
++	case DP83867_LED_FN_RX_TX:
++		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83867_LED_FN_LINK_100_1000_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_LINK_1000);
++		break;
++	case DP83867_LED_FN_LINK_10_100_BT:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_LINK_100);
++		break;
++	case DP83867_LED_FN_LINK_RX_TX:
++		*rules = BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
++			 BIT(TRIGGER_NETDEV_RX);
++		break;
++	default:
++		*rules = 0;
++		break;
++	}
++
++	return 0;
++}
++
+ static struct phy_driver dp83867_driver[] = {
+ 	{
+ 		.phy_id		= DP83867_PHY_ID,
+@@ -1047,6 +1181,9 @@ static struct phy_driver dp83867_driver[] = {
+ 		.set_loopback	= dp83867_loopback,
+ 
+ 		.led_brightness_set = dp83867_led_brightness_set,
++		.led_hw_is_supported = dp83867_led_hw_is_supported,
++		.led_hw_control_set = dp83867_led_hw_control_set,
++		.led_hw_control_get = dp83867_led_hw_control_get,
+ 	},
+ };
+ module_phy_driver(dp83867_driver);
 -- 
-2.34.1
+2.39.2
 
 
