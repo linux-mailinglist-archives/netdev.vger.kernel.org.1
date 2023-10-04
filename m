@@ -1,59 +1,79 @@
-Return-Path: <netdev+bounces-37992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7047B83CC
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 17:40:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968F47B83D4
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 17:40:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id DB5FA28158D
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 15:40:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4E2C12817C5
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 15:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B1D1B26B;
-	Wed,  4 Oct 2023 15:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0C51B278;
+	Wed,  4 Oct 2023 15:40:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3E213AE9;
-	Wed,  4 Oct 2023 15:40:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B18FC433C7;
-	Wed,  4 Oct 2023 15:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7F51B26B;
+	Wed,  4 Oct 2023 15:40:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 80105C433C9;
+	Wed,  4 Oct 2023 15:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696434012;
-	bh=W9nN7QRuZVUT7tpRXvZ9PJAQeaIUegBNlFb+DkivbT8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lGAY65533YzFiIQlo1Kaur5TW8121s9xQ+sEAsBEhsDF5rfuL6VUBmtOeQn46xzap
-	 IZOB4FAtvmIxfaRNsGxczGeF38nUCCKdMFGJIoj5nBUf2Dzov8ceRkKr1IPKawnWqP
-	 eKe05FXP6uEZhY+XJVXSwdWyRdNRCc35HmXyye8PgJspR8hlkW1yFgLgSejD4O3fhN
-	 3OV0wQQRSId34PQCvU9jvXWdzFMRKP5Br/AAZz2MyPgMiCQ2z6ricnZp52BM5nHQAU
-	 0GSKvUseb7yDzUEa4sbCXOQ4RdcV/2p5dFcf11PjLEAC3jfUyS1bXceUmLjPy5dj1Z
-	 BDBfjBnrA/9GQ==
-Date: Wed, 4 Oct 2023 08:40:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: kernel test robot <oliver.sang@intel.com>, <oe-lkp@lists.linux.dev>,
- <lkp@intel.com>, <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, "Liam R. Howlett" <Liam.Howlett@oracle.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [linus:master] [connector/cn_proc]  2aa1f7a1f4:
- BUG:kernel_NULL_pointer_dereference,address
-Message-ID: <20231004084011.7aeef442@kernel.org>
-In-Reply-To: <202309201456.84c19e27-oliver.sang@intel.com>
-References: <202309201456.84c19e27-oliver.sang@intel.com>
+	s=k20201202; t=1696434028;
+	bh=nkNFy26EseBsFFT7sUMYFpr2rWtycQ0WGNJcGO7xvIQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pb9aBfSSmoUsV28OYjvpvo4F5XeALMe8vUC1xrjfndoOHP3MkaJDg5donVmEm1hBR
+	 sESRH4F4Ql7admSR0B65OytlA6k8nTCRIeN6MzxKELQQGJofsn7bQb5GAAUoypaG9U
+	 2pphhNI8Drp21Ms85uKEynouH9kB7YYkt3TMeQAD3C+Fu/emy/NpZ8xU7Uw80eVv1A
+	 tq1OhJIYc5a3lBDboqw2AG+zFfpY6YjJfLgP0SIHfhPVfSG8nDQtpQqoOHfuiN6w84
+	 rGs2+qtM+7eIyQa1O/EKgTdd2qUf0het0+K3ZPvhclEwMryFcwjFmS1LudatzcSuXW
+	 oBshjA8GF+nyg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 63B61C595D0;
+	Wed,  4 Oct 2023 15:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf 2023-10-02
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169643402840.27884.3176997465575741287.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Oct 2023 15:40:28 +0000
+References: <20231002113417.2309-1-daniel@iogearbox.net>
+In-Reply-To: <20231002113417.2309-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Wed, 20 Sep 2023 14:51:32 +0800 kernel test robot wrote:
-> kernel test robot noticed "BUG:kernel_NULL_pointer_dereference,address" on:
+Hello:
+
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon,  2 Oct 2023 13:34:17 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> commit: 2aa1f7a1f47ce8dac7593af605aaa859b3cf3bb1 ("connector/cn_proc: Add filtering to fix some bugs")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 11 non-merge commits during the last 12 day(s) which contain
+> a total of 12 files changed, 176 insertions(+), 41 deletions(-).
+> 
+> [...]
 
-Anjali, have you had the chance to look into this?
+Here is the summary with links:
+  - pull-request: bpf 2023-10-02
+    https://git.kernel.org/netdev/net/c/1eb3dee16a52
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
