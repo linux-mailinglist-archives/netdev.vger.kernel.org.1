@@ -1,52 +1,46 @@
-Return-Path: <netdev+bounces-37980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5229B7B827C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:36:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002947B8299
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 16:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0423C2815CD
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:36:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id D32B11C2087B
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2277B8BEE;
-	Wed,  4 Oct 2023 14:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC90C12B76;
+	Wed,  4 Oct 2023 14:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B671233FB
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 14:36:16 +0000 (UTC)
-X-Greylist: delayed 333 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 07:36:07 PDT
-Received: from mailo.com (msg-4.mailo.com [213.182.54.15])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F9A114;
-	Wed,  4 Oct 2023 07:36:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=triplefau.lt; s=mailo;
-	t=1696430144; bh=W5PvFP3Gw5uKhxD9CUkqsxWtpbEX48dkIbT12G1DE2A=;
-	h=X-EA-Auth:From:To:Cc:Subject:Date:Message-Id:X-Mailer:
-	 MIME-Version:Content-Transfer-Encoding;
-	b=YDytJxlUUeybvXrdD5LRMZ9ltQOP9sIES6Pe/CZ4fMc0gL6dYTVR+k9Sw0XNcW2Wu
-	 /FRKtv34kfzAAB1VVFBi5888HtKpFtpdbtw9N4ylQKgsn/rB43jRdNIYW/W8TK/p6s
-	 UCARbcW26LMGnQYli5fXhv4AI2Dr/SgC6h9Xcvu0=
-Received: by b221-6.in.mailobj.net [192.168.90.26] with ESMTP
-	via ip-20.mailobj.net [213.182.54.20]
-	Wed,  4 Oct 2023 16:35:44 +0200 (CEST)
-X-EA-Auth: g2dus1cobUlbsNVadb0mm/YbIdgQDytxLe63okReyGpdMx+oXIlNsenYyRsgRwiHak3A83Pk2kowDrLhXv0ofdhKRLPBVNjU
-From: Remi Pommarel <repk@triplefau.lt>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Remi Pommarel <repk@triplefau.lt>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] net: stmmac: remove unneeded stmmac_poll_controller
-Date: Wed,  4 Oct 2023 16:33:56 +0200
-Message-Id: <1c156a6d8c9170bd6a17825f2277115525b4d50f.1696429960.git.repk@triplefau.lt>
-X-Mailer: git-send-email 2.40.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E07D279
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 14:44:28 +0000 (UTC)
+X-Greylist: delayed 337 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Oct 2023 07:44:27 PDT
+Received: from tretyak2.mcst.ru (tretyak2.mcst.ru [212.5.119.215])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE98AB;
+	Wed,  4 Oct 2023 07:44:26 -0700 (PDT)
+Received: from tretyak2.mcst.ru (localhost [127.0.0.1])
+	by tretyak2.mcst.ru (Postfix) with ESMTP id 514B1102397;
+	Wed,  4 Oct 2023 17:38:45 +0300 (MSK)
+Received: from frog.lab.sun.mcst.ru (frog.lab.sun.mcst.ru [176.16.4.50])
+	by tretyak2.mcst.ru (Postfix) with ESMTP id 4BB9D102395;
+	Wed,  4 Oct 2023 17:38:00 +0300 (MSK)
+Received: from artemiev-i.lab.sun.mcst.ru (avior-1 [192.168.63.223])
+	by frog.lab.sun.mcst.ru (8.13.4/8.12.11) with ESMTP id 394Ebxp3003157;
+	Wed, 4 Oct 2023 17:37:59 +0300
+From: Igor Artemiev <Igor.A.Artemiev@mcst.ru>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Igor Artemiev <Igor.A.Artemiev@mcst.ru>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lvc-project@linuxtesting.org
+Subject: [lvc-project] [PATCH] wifi: mac80211: fix buffer overflow in ieee80211_rx_get_bigtk()
+Date: Wed,  4 Oct 2023 17:37:40 +0300
+Message-Id: <20231004143740.40933-1-Igor.A.Artemiev@mcst.ru>
+X-Mailer: git-send-email 2.39.0.152.ga5737674b6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,116 +48,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Anti-Virus: Kaspersky Anti-Virus for Linux Mail Server 5.6.39/RELEASE,
+	 bases: 20111107 #2745587, check: 20231004 notchecked
+X-AV-Checked: ClamAV using ClamSMTP
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Using netconsole netpoll_poll_dev could be called from interrupt
-context, thus using disable_irq() would cause the following kernel
-warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
+If 'idx' is 0, then 'idx2' is -1, and arrays 
+will be accessed by a negative index. 
 
-  BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
-  in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
-  CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
-  Hardware name: aml (r1) (DT)
-  Call trace:
-   dump_backtrace+0x0/0x270
-   show_stack+0x14/0x20
-   dump_stack_lvl+0x8c/0xac
-   dump_stack+0x18/0x30
-   ___might_sleep+0x150/0x194
-   __might_sleep+0x64/0xbc
-   synchronize_irq+0x8c/0x150
-   disable_irq+0x2c/0x40
-   stmmac_poll_controller+0x140/0x1a0
-   netpoll_poll_dev+0x6c/0x220
-   netpoll_send_skb+0x308/0x390
-   netpoll_send_udp+0x418/0x760
-   write_msg+0x118/0x140 [netconsole]
-   console_unlock+0x404/0x500
-   vprintk_emit+0x118/0x250
-   dev_vprintk_emit+0x19c/0x1cc
-   dev_printk_emit+0x90/0xa8
-   __dev_printk+0x78/0x9c
-   _dev_warn+0xa4/0xbc
-   ath10k_warn+0xe8/0xf0 [ath10k_core]
-   ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
-   ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
-   __napi_poll+0x58/0x1f4
-   net_rx_action+0x504/0x590
-   _stext+0x1b8/0x418
-   run_ksoftirqd+0x74/0xa4
-   smpboot_thread_fn+0x210/0x3c0
-   kthread+0x1fc/0x210
-   ret_from_fork+0x10/0x20
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Since [0] .ndo_poll_controller is only needed if driver doesn't or
-partially use NAPI. Because stmmac does so, stmmac_poll_controller
-can be removed fixing the above warning.
-
-[0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
-
-Cc: <stable@vger.kernel.org> # 5.15.x
-Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers")
-Signed-off-by: Remi Pommarel <repk@triplefau.lt>
+Signed-off-by: Igor Artemiev <Igor.A.Artemiev@mcst.ru>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 30 -------------------
- 1 file changed, 30 deletions(-)
+ net/mac80211/rx.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 83c567a89a46..ed1a5a31a491 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6002,33 +6002,6 @@ static irqreturn_t stmmac_msi_intr_rx(int irq, void *data)
- 	return IRQ_HANDLED;
- }
+diff --git a/net/mac80211/rx.c b/net/mac80211/rx.c
+index e751cda5eef6..e686380434bd 100644
+--- a/net/mac80211/rx.c
++++ b/net/mac80211/rx.c
+@@ -1868,10 +1868,13 @@ ieee80211_rx_get_bigtk(struct ieee80211_rx_data *rx, int idx)
+ 		key = rcu_dereference(rx->link_sta->gtk[idx]);
+ 	if (!key)
+ 		key = rcu_dereference(rx->link->gtk[idx]);
+-	if (!key && rx->link_sta)
+-		key = rcu_dereference(rx->link_sta->gtk[idx2]);
+-	if (!key)
+-		key = rcu_dereference(rx->link->gtk[idx2]);
++
++	if (idx2 >= 0) {
++		if (!key && rx->link_sta)
++			key = rcu_dereference(rx->link_sta->gtk[idx2]);
++		if (!key)
++			key = rcu_dereference(rx->link->gtk[idx2]);
++	}
  
--#ifdef CONFIG_NET_POLL_CONTROLLER
--/* Polling receive - used by NETCONSOLE and other diagnostic tools
-- * to allow network I/O with interrupts disabled.
-- */
--static void stmmac_poll_controller(struct net_device *dev)
--{
--	struct stmmac_priv *priv = netdev_priv(dev);
--	int i;
--
--	/* If adapter is down, do nothing */
--	if (test_bit(STMMAC_DOWN, &priv->state))
--		return;
--
--	if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN) {
--		for (i = 0; i < priv->plat->rx_queues_to_use; i++)
--			stmmac_msi_intr_rx(0, &priv->dma_conf.rx_queue[i]);
--
--		for (i = 0; i < priv->plat->tx_queues_to_use; i++)
--			stmmac_msi_intr_tx(0, &priv->dma_conf.tx_queue[i]);
--	} else {
--		disable_irq(dev->irq);
--		stmmac_interrupt(dev->irq, dev);
--		enable_irq(dev->irq);
--	}
--}
--#endif
--
- /**
-  *  stmmac_ioctl - Entry point for the Ioctl
-  *  @dev: Device pointer.
-@@ -6989,9 +6962,6 @@ static const struct net_device_ops stmmac_netdev_ops = {
- 	.ndo_get_stats64 = stmmac_get_stats64,
- 	.ndo_setup_tc = stmmac_setup_tc,
- 	.ndo_select_queue = stmmac_select_queue,
--#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller = stmmac_poll_controller,
--#endif
- 	.ndo_set_mac_address = stmmac_set_mac_address,
- 	.ndo_vlan_rx_add_vid = stmmac_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid = stmmac_vlan_rx_kill_vid,
+ 	return key;
+ }
 -- 
-2.40.0
-
-
+2.30.2
 
 
