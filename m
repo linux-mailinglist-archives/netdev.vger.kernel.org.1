@@ -1,110 +1,174 @@
-Return-Path: <netdev+bounces-38141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A626D7B98CF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:46:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999107B98DF
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 56C7E280DF4
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:46:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3DB1B1C209B2
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB151328CD;
-	Wed,  4 Oct 2023 23:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE4D3AC29;
+	Wed,  4 Oct 2023 23:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1HNdcts"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anDX1AdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A067D262B9
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 23:46:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3BBAC433C7;
-	Wed,  4 Oct 2023 23:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696463168;
-	bh=w/dViWUp5YB4XWOD8iU7p44DNYRKqwMviFPAo/c2t4U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L1HNdctsKN3OkW7bquF41Qx2kws3c3JE3cvcr7O2PBsIpqYDKYOhwwyAdnS7/SPx4
-	 m6CZvhdhNOpqXdMtZFSiPczebVXIrVM9+H9PerfKqoslki3wZHLw03PzdCSj1+P8DX
-	 dAkTTBYeqtfHTasruC5xabsWRxl8ycOYDuMYKb1Ah/Q6P+qJIacsSerJ9HNPLOyajv
-	 HjOSeWMe2XFFjWLRKyKIKgt5E9HxFE1AtB9j9tUkVPIY/DSj6e5pPoiJtDKPvgxJ19
-	 uadusabvjZ8L+6uY5u78kTIFGPyfuKo7EoSEwYNPswdOP3+9r0mb8dYmUsN2OjrLMg
-	 NZEzz/hEtQDGA==
-Date: Wed, 4 Oct 2023 16:46:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, andrew@lunn.ch, mengyuanlou@net-swift.com
-Subject: Re: [RESEND PATCH net-next v2 1/3] net: libwx: support hardware
- statistics
-Message-ID: <20231004164606.31e98eb6@kernel.org>
-In-Reply-To: <20230927061457.993277-2-jiawenwu@trustnetic.com>
-References: <20230927061457.993277-1-jiawenwu@trustnetic.com>
-	<20230927061457.993277-2-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8284A36B0D;
+	Wed,  4 Oct 2023 23:48:32 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F15C9;
+	Wed,  4 Oct 2023 16:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696463310; x=1727999310;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sKOndc796+AQf4UbTaoyi0bTyHR1gldFNWtPzmX48ic=;
+  b=anDX1AdT28/+bMX3h5KVVDAHhzFbORVmGk9UTT/9qIMDHUHwqGDp5bPm
+   3wMOphHAA0v5PHrVwTtpG0OOWTsaRrbdBAmklM5zRxMUjm1RFK51LpEJe
+   PAymLU65wck4lyY1S16DBl9cjHe8SnejBiI8DL6zq12IkME/eAwFa86Ge
+   aO7O06aVzNNQ6Zt34iVIQ5bRujvCHVKfSDbzU9VZyqdcapngSkT59F6Hu
+   Vh5GsiJVOygq4bj1viqvgrZxhc4L1ejmCI05E8VycbaKCev8X0KQGlUW0
+   puAjnwQTapo7mLJNqMJJjByATMdQ+Kp/hBmKL8PJcfzy7i97zyiTE4U6T
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="414312038"
+X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
+   d="scan'208";a="414312038"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 16:48:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="998710887"
+X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
+   d="scan'208";a="998710887"
+Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
+  by fmsmga006.fm.intel.com with ESMTP; 04 Oct 2023 16:48:23 -0700
+Received: from kbuild by c3b01524d57c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qoBbI-000Klg-2P;
+	Wed, 04 Oct 2023 23:48:20 +0000
+Date: Thu, 5 Oct 2023 07:47:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net,
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	kuba@kernel.org, toke@kernel.org, willemb@google.com,
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+	maciej.fijalkowski@intel.com, hawk@kernel.org,
+	yoong.siang.song@intel.com, netdev@vger.kernel.org,
+	xdp-hints@xdp-project.net, Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [PATCH bpf-next v3 04/10] net/mlx5e: Implement AF_XDP TX
+ timestamp and checksum offload
+Message-ID: <202310050738.ZFOKzSlA-lkp@intel.com>
+References: <20231003200522.1914523-5-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231003200522.1914523-5-sdf@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 27 Sep 2023 14:14:55 +0800 Jiawen Wu wrote:
-> +static const struct wx_stats wx_gstrings_stats[] = {
-> +	WX_NETDEV_STAT("rx_packets", rx_packets),
-> +	WX_NETDEV_STAT("tx_packets", tx_packets),
-> +	WX_NETDEV_STAT("rx_bytes", rx_bytes),
-> +	WX_NETDEV_STAT("tx_bytes", tx_bytes),
-> +	WX_NETDEV_STAT("multicast", multicast),
-> +	WX_NETDEV_STAT("rx_errors", rx_errors),
-> +	WX_NETDEV_STAT("rx_length_errors", rx_length_errors),
-> +	WX_NETDEV_STAT("rx_crc_errors", rx_crc_errors),
+Hi Stanislav,
 
-Please don't report standard netdev statistics in ethtool -S.
-Users can get them thru any of the (too) many standard APIs.
+kernel test robot noticed the following build errors:
 
-> +	WX_STAT("rx_pkts_nic", stats.gprc),
-> +	WX_STAT("tx_pkts_nic", stats.gptc),
-> +	WX_STAT("rx_bytes_nic", stats.gorc),
-> +	WX_STAT("tx_bytes_nic", stats.gotc),
-> +	WX_STAT("rx_total_pkts", stats.tpr),
-> +	WX_STAT("tx_total_pkts", stats.tpt),
-> +	WX_STAT("rx_broadcast", stats.bprc),
-> +	WX_STAT("tx_broadcast", stats.bptc),
-> +	WX_STAT("rx_multicast", stats.mprc),
-> +	WX_STAT("tx_multicast", stats.mptc),
-> +	WX_STAT("rx_long_length_count", stats.roc),
-> +	WX_STAT("rx_short_length_count", stats.ruc),
-> +	WX_STAT("rx_flow_control_xon_xoff", stats.lxonoffrxc),
-> +	WX_STAT("tx_flow_control_xon", stats.lxontxc),
-> +	WX_STAT("tx_flow_control_xoff", stats.lxofftxc),
+[auto build test ERROR on bpf-next/master]
 
-Please take a look at the statistics defined in ethtool.h
-Look for callbacks in struct ethtool_ops with "stats" in the name.
-Anything that matches one of the callbacks should go into those
-APIs no to ethtool -S.
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/xsk-Support-tx_metadata_len/20231004-040718
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231003200522.1914523-5-sdf%40google.com
+patch subject: [PATCH bpf-next v3 04/10] net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20231005/202310050738.ZFOKzSlA-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231005/202310050738.ZFOKzSlA-lkp@intel.com/reproduce)
 
-> +	WX_STAT("os2bmc_rx_by_bmc", stats.o2bgptc),
-> +	WX_STAT("os2bmc_tx_by_bmc", stats.b2ospc),
-> +	WX_STAT("os2bmc_tx_by_host", stats.o2bspc),
-> +	WX_STAT("os2bmc_rx_by_host", stats.b2ogprc),
-> +	WX_STAT("rx_no_dma_resources", stats.rdmdrop),
-> +	WX_STAT("tx_busy", tx_busy),
-> +	WX_STAT("non_eop_descs", non_eop_descs),
-> +	WX_STAT("tx_restart_queue", restart_queue),
-> +	WX_STAT("rx_csum_offload_good_count", hw_csum_rx_good),
-> +	WX_STAT("rx_csum_offload_errors", hw_csum_rx_error),
-> +	WX_STAT("alloc_rx_buff_failed", alloc_rx_buff_failed),
-> +};
-> +
-> +static const char wx_gstrings_test[][ETH_GSTRING_LEN] = {
-> +	"Register test  (offline)", "Eeprom test    (offline)",
-> +	"Interrupt test (offline)", "Loopback test  (offline)",
-> +	"Link test   (on/offline)"
-> +};
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310050738.ZFOKzSlA-lkp@intel.com/
 
-You said this adds stats. Why are strings for tests here?
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c: In function 'mlx5e_xsk_tx':
+>> drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c:117:33: error: implicit declaration of function 'xsk_tx_metadata_to_compl'; did you mean 'xsk_tx_metadata_complete'? [-Werror=implicit-function-declaration]
+     117 |                                 xsk_tx_metadata_to_compl(meta, &compl);
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~
+         |                                 xsk_tx_metadata_complete
+   cc1: some warnings being treated as errors
+
+
+vim +117 drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
+
+    63	
+    64	bool mlx5e_xsk_tx(struct mlx5e_xdpsq *sq, unsigned int budget)
+    65	{
+    66		struct xsk_buff_pool *pool = sq->xsk_pool;
+    67		struct xsk_tx_metadata *meta = NULL;
+    68		union mlx5e_xdp_info xdpi;
+    69		bool work_done = true;
+    70		bool flush = false;
+    71	
+    72		xdpi.mode = MLX5E_XDP_XMIT_MODE_XSK;
+    73	
+    74		for (; budget; budget--) {
+    75			int check_result = INDIRECT_CALL_2(sq->xmit_xdp_frame_check,
+    76							   mlx5e_xmit_xdp_frame_check_mpwqe,
+    77							   mlx5e_xmit_xdp_frame_check,
+    78							   sq);
+    79			struct mlx5e_xmit_data xdptxd = {};
+    80			struct xdp_desc desc;
+    81			bool ret;
+    82	
+    83			if (unlikely(check_result < 0)) {
+    84				work_done = false;
+    85				break;
+    86			}
+    87	
+    88			if (!xsk_tx_peek_desc(pool, &desc)) {
+    89				/* TX will get stuck until something wakes it up by
+    90				 * triggering NAPI. Currently it's expected that the
+    91				 * application calls sendto() if there are consumed, but
+    92				 * not completed frames.
+    93				 */
+    94				break;
+    95			}
+    96	
+    97			xdptxd.dma_addr = xsk_buff_raw_get_dma(pool, desc.addr);
+    98			xdptxd.data = xsk_buff_raw_get_data(pool, desc.addr);
+    99			xdptxd.len = desc.len;
+   100			meta = xsk_buff_get_metadata(pool, desc.addr);
+   101	
+   102			xsk_buff_raw_dma_sync_for_device(pool, xdptxd.dma_addr, xdptxd.len);
+   103	
+   104			ret = INDIRECT_CALL_2(sq->xmit_xdp_frame, mlx5e_xmit_xdp_frame_mpwqe,
+   105					      mlx5e_xmit_xdp_frame, sq, &xdptxd,
+   106					      check_result, meta);
+   107			if (unlikely(!ret)) {
+   108				if (sq->mpwqe.wqe)
+   109					mlx5e_xdp_mpwqe_complete(sq);
+   110	
+   111				mlx5e_xsk_tx_post_err(sq, &xdpi);
+   112			} else {
+   113				mlx5e_xdpi_fifo_push(&sq->db.xdpi_fifo, xdpi);
+   114				if (xp_tx_metadata_enabled(sq->xsk_pool)) {
+   115					struct xsk_tx_metadata_compl compl;
+   116	
+ > 117					xsk_tx_metadata_to_compl(meta, &compl);
+
 -- 
-pw-bot: cr
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
