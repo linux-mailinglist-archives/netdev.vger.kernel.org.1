@@ -1,127 +1,76 @@
-Return-Path: <netdev+bounces-38067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8758E7B8DD8
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:09:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 913417B8DDD
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 34BE32817AC
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:09:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9B56C1C20506
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191B0224D1;
-	Wed,  4 Oct 2023 20:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00950224D1;
+	Wed,  4 Oct 2023 20:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=infradead.org header.i=@infradead.org header.b="AkB6IRPV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5kYhPFr"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB085224E0
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 20:09:37 +0000 (UTC)
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60391BF;
-	Wed,  4 Oct 2023 13:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NVCbCcKpAlwu23BYOlruPYffWTQeMxOp6lEM7B0gGYU=; b=AkB6IRPVgNaKj2xb/8d1n3NE21
-	4DtE83V/QE2UYv2uUNkII0R0JJZcbcRnzbdtgMo5OI/7Yb5TRpzV+vpcTD/Eh9prGrX/+xyA8Xtb3
-	IBIN4E+YCDecXpqDnGhrXfo5nh4YOMfstBlNrBlrywZbM0BnCvpR4/9XTACO6BhLfV7aONJAsu25i
-	Yf1xhiZz88NYAUlXsqZ/dP2kaRpGEj1eWOumOcQa/gxmbX8+cw2fzeXWvZkGNmZqdgQWSFbEbJMJF
-	6eH/CK2ZpJT+yff9D4hd2w/ViGB7Diby0ZOt+8WrvWF2zmlRZ3vq51QfBJe6nqAYV+9CqWI50/X/l
-	5ABrmhzg==;
-Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qo8BM-00FpAZ-0X;
-	Wed, 04 Oct 2023 20:09:20 +0000
-Date: Wed, 4 Oct 2023 13:09:16 -0700
-From: Joel Becker <jlbec@evilplan.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	Eric Dumazet <edumazet@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, hch@lst.de,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH 3/3] Documentation: netconsole: add support for cmdline
- targets
-Message-ID: <ZR3GbHOyxx+J4FUn@google.com>
-Mail-Followup-To: Breno Leitao <leitao@debian.org>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com,
-	Eric Dumazet <edumazet@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, hch@lst.de,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-References: <20231002155349.2032826-1-leitao@debian.org>
- <20231002155349.2032826-4-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F551B27F
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 20:09:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33F4C433CC;
+	Wed,  4 Oct 2023 20:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696450199;
+	bh=bQor1saGeB+PRL/MUNk1VQn208AY2/DIznHoyUEXTvM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G5kYhPFroQtnJr+8UcqoNuc4kbyXsULYUd1Q+Pi/yihOyBNXqnAHL3b3X64zzkOoT
+	 f45Hma7sDMmyWaFH4TWva4cOzzLQUBNh8Wrd+MoWHXi8VGXrFipttbQHNiJJVaJAp5
+	 xKOFXxDlVjsPJOt7d/VF9HlAjEM1nD0v01RY8x8HfHfl+hkCkWgNvUgnwofSLZPDP2
+	 RL5zO/z5RxiUxiOHbkhWfe9cHNedjjRxqZxTCZw2Lumx7pQcSfz2ACQGT/ShneFeT7
+	 5xIq3sgQUaEHtCFeLBHbeMBre4gj82DBQBp5ZgpEvYVfVUwhkm7i50yqwjpScuGlaW
+	 eX1ADmqhQVSaw==
+Date: Wed, 4 Oct 2023 13:09:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Vishvambar Panth S <vishvambarpanth.s@microchip.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, andrew@lunn.ch
+Subject: Re: [PATCH net] net: microchip: lan743x : bidirectional throughuput
+ improvement
+Message-ID: <20231004130957.2d633d03@kernel.org>
+In-Reply-To: <b1f64c44-0d1c-480e-a272-fb017e7d8673@gmail.com>
+References: <20230927111623.9966-1-vishvambarpanth.s@microchip.com>
+	<20231004122016.76b403f0@kernel.org>
+	<b1f64c44-0d1c-480e-a272-fb017e7d8673@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231002155349.2032826-4-leitao@debian.org>
-X-Burt-Line: Trees are cool.
-X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
- come to perfection.
-Sender: Joel Becker <jlbec@ftp.linux.org.uk>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 02, 2023 at 08:53:49AM -0700, Breno Leitao wrote:
-> @@ -155,6 +152,24 @@ You can also update the local interface dynamically. This is especially
->  useful if you want to use interfaces that have newly come up (and may not
->  have existed when netconsole was loaded / initialized).
->  
-> +You can control and modify the targets defined at boot time (or module load
-> +time) by creating special targets names. These special targets are named
-> +`cmdline` concatenated to an integer, example: `cmdline0`.
+On Wed, 4 Oct 2023 13:02:17 -0700 Florian Fainelli wrote:
+> > Nobody complained for 5 years, and it's not a regression.
+> > Let's not treat this as a fix, please repost without the Fixes tag for
+> > net-next. =20
+>=20
+> As a driver maintainer, you may want to provide some guarantees to your=20
+> end users/customers that from stable version X.Y.Z the performance=20
+> issues have been fixed. Performance improvements are definitively border=
+=20
+> line in terms of being considered as bug fixes though.
 
-The special names are already "created", so perhaps it's a little
-clearer to say something like:
+I understand that, but too often people just "feel like a device which
+advertises X Mbps / Gbps should reach line rate" while no end user
+cares.
 
-```
-+Netconsole targets defined at boot time (or module load time) with the
-+`netconsole=` param are assigned the name `cmdline<index>`.  For
-+example, the first target in the parameter is named `cmdline0`.  You
-+can control and modify these targets by creating configfs directories
-+with the matching name.
-```
+Luckily stable rules are pretty clear about this (search for
+"performance"):=20
+https://docs.kernel.org/process/stable-kernel-rules.html
 
-> +
-> +Let's suppose you have two netconsole targets defined at boot time::
-> +
-> + netconsole=4444@10.0.0.1/eth1,9353@10.0.0.2/12:34:56:78:9a:bc;4444@10.0.0.1/eth1,9353@10.0.0.3/12:34:56:78:9a:bc
-> +
-> +You can modify these targets in runtime by creating the following targets::
-> +
-> + mkdir cmdline0
-> + cat cmdline0/remote_ip
-> + 10.0.0.2
-> +
-> + mkdir cmdline1
-> + cat cmdline1/remote_ip
-> + 10.0.0.3
-> +
-
-And of course keep the examples as you've described them.
-
-Thanks,
-Joel
-
--- 
-
-Life's Little Instruction Book #337
-
-	"Reread your favorite book."
-
-			http://www.jlbec.org/
-			jlbec@evilplan.org
+As posted it doesn't fulfill the requirements =F0=9F=A4=B7=EF=B8=8F
 
