@@ -1,151 +1,170 @@
-Return-Path: <netdev+bounces-37888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76AB67B797E
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:04:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B887B79FA
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 333D1281476
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 08:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1AD1C281455
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 08:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF9C101E2;
-	Wed,  4 Oct 2023 08:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBF1101F6;
+	Wed,  4 Oct 2023 08:25:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12357483
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 08:04:46 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686D683
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 01:04:43 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-405524e6769so3458405e9.1
-        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 01:04:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696406682; x=1697011482; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IJdb1qMHJ+Cbk4cGjE6rcjXo+B39SPe1RPD3Rof3+L0=;
-        b=uJJ/Vwbc0CbMnwvQUKkm05V3jEdEI7fTq1hMhAHVV6PdLL0OlR43Bd1K2vOuNk/O40
-         bAdRSrMpAdKyez9746d7xRR68K1j7HWK1XmCkfqCRJ6+/JUTrPnRAKl6+3eVFkA+Q0m+
-         s2sAzLLGcGsoWjohU6ceeBi6wbJ5Foh1AeenJjG91dxaBtbo0H26Hr7TS1xXJDx8ms11
-         gH+6HGdRZG8uOhMdiv8Qig+i60VUrp1yhvRMX8YWHkTo2sosivPydebKsIJ4tm8AV9H7
-         E+7mO20CVym0Rzd0HuzLppaZbnhQXfGziAdC3wP2u66srAYJenzHfpd4uqhYHdPRLgSF
-         JF8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696406682; x=1697011482;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IJdb1qMHJ+Cbk4cGjE6rcjXo+B39SPe1RPD3Rof3+L0=;
-        b=LaMkQnWsJk/PeAHzjbdkQ6b65X2HFCph7qAXqe7+VvsW5e9l9hbV/+Eb+n5UsOeLE6
-         1Y9AQAwi+HHvgH2Mbi5/oWANXv1KoIW18lIFRVRytSYtRa/urwLKX4Qduse+i6qBpQqz
-         PRNwVKJjr9ozIc7t8Ce0zfGNRqJ1fqQHsQ7RGUxO3GE+fApNUSx7XNIZjywE6TdcXjyv
-         63yGCrVXOCp6mZqatQzjO5gCtOoKNeuTgkoAdwudZjfsTS8IjXOHQ7KBDW4ecojy0mU6
-         eI2HDeuv3o0dSE9U2kpIPCLHYkTjTVnholsPEQkRPY+nARLCb+yVajK51gW9VLA0ya19
-         Wf0A==
-X-Gm-Message-State: AOJu0Yyh3UtbadIDSiQN5C0+bxbhSvjJMhXBTCNO/MoZUHRVX09k5MWv
-	crWltg+6KjRSMtBiN0JAqtiwlw==
-X-Google-Smtp-Source: AGHT+IEC7Kk4F818yPH6966d9Z6ExD5ZI8JjXGRj24+Tu4eq1T+SWsvmQBmsuJ3WYMQq3IezkMnwnQ==
-X-Received: by 2002:a05:600c:5014:b0:401:b425:2414 with SMTP id n20-20020a05600c501400b00401b4252414mr3936654wmr.18.1696406681795;
-        Wed, 04 Oct 2023 01:04:41 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id c15-20020a7bc84f000000b00405323d47fdsm859765wml.21.2023.10.04.01.04.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Oct 2023 01:04:41 -0700 (PDT)
-Date: Wed, 4 Oct 2023 11:04:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] iavf: Avoid a memory allocation in
- iavf_print_link_message()
-Message-ID: <8c153188-a5e3-46f9-b126-7ae447236022@kadam.mountain>
-References: <966968bda15a7128a381b589329184dfea3e0548.1695471387.git.christophe.jaillet@wanadoo.fr>
- <a5e933fe-4566-9ae6-9a5d-b3a4c186fe0b@intel.com>
- <abf8d279-b579-4a03-9ae9-053cf5efec3d@wanadoo.fr>
- <ecc05528-ba59-922b-7384-4bedd46cf89b@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DAC8DDAF
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 08:25:26 +0000 (UTC)
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14BDFA6;
+	Wed,  4 Oct 2023 01:25:25 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 563C15C02AC;
+	Wed,  4 Oct 2023 04:25:24 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 04 Oct 2023 04:25:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1696407924; x=1696494324; bh=aq
+	tZu7OFev7NROEvHGfYU30sQ+IlAUffS+3M2Pl5nF4=; b=QjhymVHWCqusF8IFqT
+	ikZjK6+FYk62zzoOY02+GtlFMMYgrPC8q8moBEWyctTt6AEIPTbXPogUOAQlQaU1
+	NFGkH9LjZBkt1/oIQe6NARo3fCY26gdZqXsC/3Ir/spAs7RXGVAy8/lzjY0+XDda
+	Gu0dPduOCOdBizXgePcKUDorKki5BZAg+zKNiZN0BXI0oW2VbDXyQm1dEXnZl9G7
+	ctuLq/yh4R8hodREyyuNZE+2IQU/rEZQPV47uBGDAjb3hqr3Chwv3pJgd85gqkrC
+	wkFzWSISTswJHDyZASe/5WN58Y65xx2XgstA7+PG+Qd3VzX8+AcZgRaAQMCUQbRm
+	sz7A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696407924; x=1696494324; bh=aqtZu7OFev7NR
+	OEvHGfYU30sQ+IlAUffS+3M2Pl5nF4=; b=P+F31/JaounfPvJtB8ifQo9UlK2wY
+	VDzT07Umo/inHQhOv+N20tod9dXqxMBQtMyWQtTn8k5EXWQEx8hvKNWo2wtBqdv8
+	rdzZU/CXPT1TnjROA+MMf65bRX6DPAXtrv7k9wA/tdN0szYX3KCCTtYLw83MoE83
+	3KZ5Yldj302bDaKyo07Yqn29hOfPYWguRVo6WRl5juRSiyk9OQw1H0uVhOIs11xV
+	/XWqiNk2XJixQwOkMqYpxSd2KHs1jJIneViSHugqYq3ZjNaKY7dFJMIquXnAZ/oP
+	qXHdMQjwSSSzkj/cIm/5PbsfXhgdbNHSaBZmC76NJf/Eh8o+slHt7zCxw==
+X-ME-Sender: <xms:cyEdZThGkcgtQKiNst9aTwmEfzTst4M7xcrSYZmWa3IkY3bRp17LkA>
+    <xme:cyEdZQBSh34aldmGUvRX7_wdtWHlOh3lMWKMjw6KHlxYUaiTNBtD4-avXcJaZ8JAs
+    u4Mq1v7YuvMWYk6XOk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrgedvgddtvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:cyEdZTFCqgKmgsRORsrDsuR3xr0oiFQ3Ydqt6Y7zeOtu8pp1R0q8Wg>
+    <xmx:cyEdZQShBeKyeRzuSBnw7h22xWk9cVMOAIrLycCyt_kkaMK4v4cHkA>
+    <xmx:cyEdZQzrAm_5oERKTLRD2DEmY3_rMxL8KM0lNK8ZzDxQBMciokUpTA>
+    <xmx:dCEdZVhJC96TxtIqfrsA2ZZ39TmeWfs7mqWtsqOL1RwBAQvUvPxxPQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id A361EB6008F; Wed,  4 Oct 2023 04:25:23 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ecc05528-ba59-922b-7384-4bedd46cf89b@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Message-Id: <4ed81222-9409-4c9b-bd29-dbaf4275984f@app.fastmail.com>
+In-Reply-To: <20231003154326.213e9c81@kernel.org>
+References: <20230925155858.651425-1-arnd@kernel.org>
+ <1430f3d3-4e84-b0ec-acd9-8a51db178f73@intel.com>
+ <20231003154326.213e9c81@kernel.org>
+Date: Wed, 04 Oct 2023 10:25:03 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Jakub Kicinski" <kuba@kernel.org>,
+ "Anthony L Nguyen" <anthony.l.nguyen@intel.com>
+Cc: "Arnd Bergmann" <arnd@kernel.org>,
+ "Jesse Brandeburg" <jesse.brandeburg@intel.com>,
+ "Lobakin, Alexandr" <alexandr.lobakin@intel.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Alan Brady" <alan.brady@intel.com>,
+ "Sridhar Samudrala" <sridhar.samudrala@intel.com>,
+ "Willem de Bruijn" <willemb@google.com>,
+ "Phani Burra" <phani.r.burra@intel.com>,
+ "Joshua A Hay" <joshua.a.hay@intel.com>,
+ "Pavan Kumar Linga" <pavan.kumar.linga@intel.com>,
+ "Madhu Chittim" <madhu.chittim@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ "Alexander Lobakin" <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH] idpf: fix building without IPv4
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 03, 2023 at 04:01:18PM -0700, Jesse Brandeburg wrote:
-> On 10/3/2023 1:33 PM, Christophe JAILLET wrote:
-> > kasprintf() is much better.
-> 
-> cool! I just sent the patches and cc'd you earlier today.
-> 
-> > > 
-> > > your patch still shows these errors
-> > 
-> > I built-tested the patch before sending, so this is strange.
-> > 
-> > However, I got a similar feedback from Greg KH and the "kernel test
-> > robot" for another similar patch.
-> > 
-> > What version of gcc do you use?
-> > I use 12.3.0, and I suspect that the value range algorithm or how the
-> > diagnostic is done has been improved in recent gcc.
-> 
-> Fedora gcc 12.3.1, with W=1 flag
-> 
-> gcc version 12.3.1 20230508 (Red Hat 12.3.1-1) (GCC)
-> 
-> [linux]$ make W=1 M=drivers/net/ethernet/intel/iavf
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_main.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_ethtool.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_virtchnl.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_fdir.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_adv_rss.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_txrx.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_common.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_adminq.o
->   CC [M]  drivers/net/ethernet/intel/iavf/iavf_client.o
-> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c: In function
-> ‘iavf_virtchnl_completion’:
-> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c:1446:60: warning: ‘%s’
-> directive output may be truncated writing 4 bytes into a region of size
-> between 1 and 11 [-Wformat-truncation=]
->  1446 |                 snprintf(speed, IAVF_MAX_SPEED_STRLEN, "%d %s",
->       |                                                            ^~
->  1447 |                          link_speed_mbps, "Mbps");
->       |                                           ~~~~~~
+On Wed, Oct 4, 2023, at 00:43, Jakub Kicinski wrote:
+> On Mon, 25 Sep 2023 10:05:03 -0700 Tony Nguyen wrote:
+>> Also, a pending patch for this [1], however, this does look a bit more 
+>> efficient. Adding Olek as he's author on the other patch.
+>> 
+>> netdev maintainers,
+>> 
+>> If this is the version that does get picked up, did you want to take it 
+>> directly to close out the compile issues?
+>
+> Sorry for the delays. Should we not add a !INET static inline wrapper
+> for tcp_gro_complete()? Seems a bit backwards to me to make drivers
+> suffer and think about such a preposterous config :S
+>
+> $ git grep tcp_gro_complete -- drivers/
+> drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c:        tcp_gro_complete(skb);
+> drivers/net/ethernet/broadcom/bnxt/bnxt.c:              tcp_gro_complete(skb);
+> drivers/net/ethernet/intel/idpf/idpf_txrx.c:    tcp_gro_complete(skb);
+> drivers/net/ethernet/qlogic/qede/qede_fp.c:     tcp_gro_complete(skb);
+>
+> We have 4 drivers which need ifdefs already and the number will only
+> grow with GRO-HW spreading.
 
-GCC is kind of crap at static analysis, right?  Smatch would know that
-this at most 11 characters long.  It's kind of laziness for GCC to print
-this warning.  If you complained to me about a false positive like this
-in Smatch I would at least think about various ways to silence it.
+That sounds good to me, but it's better if someone that understands
+this code patch better than me writes the stub helpers, to ensure
+all callers have sensible behavior in that configuration.
 
-But I probably wouldn't write a check for this anyway because I don't
-view truncating strings as a note worthy bug...
+I also had a brief look at who might be using kernels without CONFIG_INET.
+In the kernel source tree, there are 19 defconfig files that completely
+enable CONFIG_NET, which means that both INET and ETHERNET are always
+turned off as well.
 
-Smatch also gets stuff wrong, but in that case I just always encourage
-people to mark the warning as old news and move on.  Only new warnings
-are interesting.
+There are four configs that enable CONFIG_NET but not CONFIG_INET:
 
-I feel like as we incorporate more and more static analysis into our
-processes we're going to have to give up on trying to keep every static
-checker happy.
+arch/arm/configs/spear3xx_defconfig
+arch/arm/configs/spear6xx_defconfig
+arch/m68k/configs/virt_defconfig
+arch/s390/configs/zfcpdump_defconfig
 
-regards,
-dan carpenter
+I'm confident that the two arm configs are a mistake, as these are
+regular embedded SoCs with on-chip ethernet that is enabled in
+the config but almost certainly has no other use. The virt defconfig
+lost CONFIG_INET after commit d7385ba13771 ("9p: Remove INET
+dependency") added an 'imply INET'. This sounds like a bad idea,
+since it messes up the 'defconfig' logic when a leaf driver enables
+an entire subsystem.
+
+The s390 zfcpdump defconfig looks like a legitimate case for
+disabling INET, but it's not that size constrained and it might
+not actually need CONFIG_NET either.
+
+So overall, it seems there is no real need to support CONFIG_NET=y
+with CONFIG_INET=n and we could just make them be the same and
+avoid bugs like this. In theory we could also go the opposite way
+and try to make INET a tristate symbol that can live in a loadable
+module like all other network protocols. This would be nice
+conceptually and for smaller vmlinux files (some systems are
+much more limited in the size of their boot partition than their
+RAM and rootfs), but would clearly cause way more build failures.
+
+      Arnd
 
