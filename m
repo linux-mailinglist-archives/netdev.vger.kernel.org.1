@@ -1,58 +1,96 @@
-Return-Path: <netdev+bounces-37966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750237B8119
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 15:37:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B957B8127
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 15:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 9636C1C208BA
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 13:37:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A532128158D
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 13:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B2214AAE;
-	Wed,  4 Oct 2023 13:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E3514F67;
+	Wed,  4 Oct 2023 13:40:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F7C11197
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 13:37:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E64AC433C7;
-	Wed,  4 Oct 2023 13:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F218914A83;
+	Wed,  4 Oct 2023 13:40:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A48EC433C9;
+	Wed,  4 Oct 2023 13:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696426662;
-	bh=EW+SOzweDOTmUrhWR9WwK3lV4TdWi5kkhCLVjj1HcA8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rYGjqez448ydZT0pgKa0kY7NJM73unLs29TRkEh4OWDeLetzzUMoRrd98TB8Oz4I3
-	 xdQKcKnF8Rh45lE17ZLTiHcZHREEyGyhw0DYADHP0WF7VY2KKxVQ3H4ve4+G8A+NUM
-	 sWu/hx9Ec9iWHiG15FUg18KZ+HOOjMkt/mOotqOsquyiT1/s1CfvNBfLry4dOWiwx4
-	 cuJvPLDZR96RLDddCV5iS4W0bTOq+nFUMW0ixnZfpS5vUeYich4qOPQtP6bpXSViK1
-	 AbcQZt4iX/XPc7DegHuF0uWBjUOiu49LjmgwVxpC998aasjZv9fJPhf8bLEkGBdWSc
-	 Wxn/v/kVFovrg==
-Date: Wed, 4 Oct 2023 06:37:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Coco Li <lixiaoyan@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell
- <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Chao Wu
- <wwchao@google.com>, Wei Wang <weiwan@google.com>
-Subject: Re: [PATCH v1 net-next 1/5] Documentations: Analyze heavily used
- Networking related structs
-Message-ID: <20231004063741.0f53bc19@kernel.org>
-In-Reply-To: <20230916010625.2771731-2-lixiaoyan@google.com>
-References: <20230916010625.2771731-1-lixiaoyan@google.com>
-	<20230916010625.2771731-2-lixiaoyan@google.com>
+	s=k20201202; t=1696426830;
+	bh=aee1fouYF045WW8GU3jBWsO3ZVY5Tty+PUGRLhypRsE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HbKyjWaaOcsGP1qt7aXiYld1nlhw73l0+b+8XqT3jXkvF4OKEYDHBcRQM3dHBNe50
+	 gqqQIzv/g9YBE2k56KMsVxUAUEoB7RrAebIe874Hl+1blhcJqnAcOKLlee1tHsFotP
+	 WEi4M6hnfzE3aANOgAfbxTAReQdMqV39UQUXjV9or21kLskuI7bN29DpS1oR5Iw0K/
+	 UxaP4Zdl7/lExVy/9aHkQONgIBvLgFVMk1RWD0qYMe1N0cBbGT/siWIWMigN/Dgi6I
+	 JvUwrvz4KrFK7FsIhVi0e8gjGRXkUp2ypM0YXESP6DSCEB8euFbArQrOPwoNTt7f/H
+	 Q0hhMGFJ70L+w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35F03E632D8;
+	Wed,  4 Oct 2023 13:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v3 0/8] Add a test for SHARED_UMEM feature
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169642683021.23579.808775840588074841.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Oct 2023 13:40:30 +0000
+References: <20230927135241.2287547-1-tushar.vyavahare@intel.com>
+In-Reply-To: <20230927135241.2287547-1-tushar.vyavahare@intel.com>
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ tirthendu.sarkar@intel.com
 
-On Sat, 16 Sep 2023 01:06:21 +0000 Coco Li wrote:
-> +unsigned:1                          threaded                -                   read_mostly         napi_poll(napi_enable,dev_set_threaded)
+Hello:
 
-I don't see ->threaded being used on fast path.
-napi_enable, dev_set_threaded are not fast path.
+This series was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Wed, 27 Sep 2023 19:22:33 +0530 you wrote:
+> Implement a test for the SHARED_UMEM feature in this patch set and make
+> necessary changes/improvements. Ensure that the framework now supports
+> different streams for different sockets.
+> 
+> v2->v3
+> - Set the sock_num at the end of the while loop.
+> - Declare xsk at the top of the while loop.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next,v3,1/8] selftests/xsk: move pkt_stream to the xsk_socket_info
+    https://git.kernel.org/bpf/bpf-next/c/8367eb954e24
+  - [bpf-next,v3,2/8] selftests/xsk: rename xsk_xdp_metadata.h to xsk_xdp_common.h
+    https://git.kernel.org/bpf/bpf-next/c/93ba11247907
+  - [bpf-next,v3,3/8] selftests/xsk: move src_mac and dst_mac to the xsk_socket_info
+    https://git.kernel.org/bpf/bpf-next/c/985fd2145a29
+  - [bpf-next,v3,4/8] selftests/xsk: iterate over all the sockets in the receive pkts function
+    https://git.kernel.org/bpf/bpf-next/c/8913e653e9b8
+  - [bpf-next,v3,5/8] selftests/xsk: remove unnecessary parameter from pkt_set() function call
+    https://git.kernel.org/bpf/bpf-next/c/46e43786cc60
+  - [bpf-next,v3,6/8] selftests/xsk: iterate over all the sockets in the send pkts function
+    https://git.kernel.org/bpf/bpf-next/c/fd0815ae9b8a
+  - [bpf-next,v3,7/8] selftests/xsk: modify xsk_update_xskmap() to accept the index as an argument
+    https://git.kernel.org/bpf/bpf-next/c/fc2cb86495da
+  - [bpf-next,v3,8/8] selftests/xsk: add a test for shared umem feature
+    https://git.kernel.org/bpf/bpf-next/c/6d198a89c004
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
