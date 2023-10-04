@@ -1,84 +1,93 @@
-Return-Path: <netdev+bounces-38073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C52387B8E08
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:30:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4467B8E29
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 22:38:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 30FEE281843
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:30:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id A0A2B1C2084B
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694DD224FD;
-	Wed,  4 Oct 2023 20:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE02101D8;
+	Wed,  4 Oct 2023 20:38:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMGKvZpa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhCZJsNg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EAC22EE9
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 20:30:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BBFB1C433CA;
-	Wed,  4 Oct 2023 20:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB04F568B;
+	Wed,  4 Oct 2023 20:38:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 131DBC433C7;
+	Wed,  4 Oct 2023 20:38:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696451426;
-	bh=oh6xitWr++z2BIqUUKyYoq+1pyDthWDaQ3PK0sgNako=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oMGKvZpaBvxQD5YCtn1K/jw3uH/X/6jhyla+2+lhS/thzFy1z3Vi8G/IULw6tvG2t
-	 hUEntopqfUzCM3+aPTCZAwiTzrQA7iM8LMHghGXBtdTaKsDXq0YPOKXZegP23kquuO
-	 wr2sQvl8dwgBPO6cmvLLBhd5PquqD81YH95HPOOy14dDELpzZGiNo3PDvTLcj55SGr
-	 YHN0hoH14q8XYeC8/0GjrCGdIkk/n30j99naw/itrcWe+6il3pXuW1m33F8wCDUDYV
-	 38SRCwhm70/AKDGxZIXfau/9EqfKgai87WJ/ybXTO/swyYAMu781SZbh20h6LAKk7m
-	 nviI9wY12MDYA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9F697E632D6;
-	Wed,  4 Oct 2023 20:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696451902;
+	bh=QfFTBi9KEdkLlgzoc5JzYXAlZ6hSq3LJtQETAQwzrDQ=;
+	h=From:Subject:Date:To:Cc:From;
+	b=PhCZJsNgjRFjHgA6y0xPEznwTA5TvFKpcL1iQyMRaP8vIS0rEVKMjEg8Q9Hzhgka3
+	 rRr4XB8JbUJBLLX22WALJBI5vZzcxoRgkC3tAAwy9Dl9QjxuQA/uZmoIvrvt0oRD9/
+	 Raxs+dulx5vfv+f/YCYPuTBVki2gEj/+oog2mDQFkmCcVz4XCD/VNQorfZ5sYwhezP
+	 41c5RPBW9AuF4+DkrHMh9BVgc2z/WGAYDuR4DSv0rBwdDahuKqPexuY9vEqu5QY3hJ
+	 Ds+pkivdgU0Vt88h7KoTzk0JxVI++qO9MJHmbNqacQ70t1820NspbEz10uH/9zNVxO
+	 F1I4cPFFZVo7w==
+From: Mat Martineau <martineau@kernel.org>
+Subject: [PATCH net 0/3] mptcp: Fixes and maintainer email update for v6.6
+Date: Wed, 04 Oct 2023 13:38:10 -0700
+Message-Id: <20231004-send-net-20231004-v1-0-28de4ac663ae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] tipc: fix a potential deadlock on &tx->lock
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169645142664.7929.9991674504549336321.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 20:30:26 +0000
-References: <20230927181414.59928-1-dg573847474@gmail.com>
-In-Reply-To: <20230927181414.59928-1-dg573847474@gmail.com>
-To: Chengfeng Ye <dg573847474@gmail.com>
-Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADLNHWUC/z2MQQqAIBREryJ/naAmBF0lWkSO9Te/0IhAvHvSo
+ uUb3rxCGYmRaVSFEm7OfEgD2yla90U2aA6NyRnXW2O8zpCgBZf+lwHWO4cQojfUfmdC5OdrTtR
+ Mmmt9Aa+jY0doAAAA
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthieu Baerts <matttbe@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ Kishen Maloor <kishen.maloor@intel.com>, Florian Westphal <fw@strlen.de>, 
+ Mat Martineau <martineau@kernel.org>, stable@vger.kernel.org, 
+ Geliang Tang <geliang.tang@suse.com>
+X-Mailer: b4 0.12.3
 
-Hello:
+Patch 1 addresses a race condition in MPTCP "delegated actions"
+infrastructure. Affects v5.19 and later.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Patch 2 removes an unnecessary restriction that did not allow additional
+outgoing subflows using the local address of the initial MPTCP subflow.
+v5.16 and later.
 
-On Wed, 27 Sep 2023 18:14:14 +0000 you wrote:
-> It seems that tipc_crypto_key_revoke() could be be invoked by
-> wokequeue tipc_crypto_work_rx() under process context and
-> timer/rx callback under softirq context, thus the lock acquisition
-> on &tx->lock seems better use spin_lock_bh() to prevent possible
-> deadlock.
-> 
-> This flaw was found by an experimental static analysis tool I am
-> developing for irq-related deadlock.
-> 
-> [...]
+Patch 3 updates Matthieu's email address.
 
-Here is the summary with links:
-  - tipc: fix a potential deadlock on &tx->lock
-    https://git.kernel.org/netdev/net/c/08e50cf07184
+Signed-off-by: Mat Martineau <martineau@kernel.org>
+---
+Geliang Tang (1):
+      mptcp: userspace pm allow creating id 0 subflow
 
-You are awesome, thank you!
+Matthieu Baerts (1):
+      MAINTAINERS: update Matthieu's email address
+
+Paolo Abeni (1):
+      mptcp: fix delegated action races
+
+ .mailmap                 |  1 +
+ MAINTAINERS              |  2 +-
+ net/mptcp/pm_userspace.c |  6 ------
+ net/mptcp/protocol.c     | 28 ++++++++++++++--------------
+ net/mptcp/protocol.h     | 35 ++++++++++++-----------------------
+ net/mptcp/subflow.c      | 10 ++++++++--
+ 6 files changed, 36 insertions(+), 46 deletions(-)
+---
+base-commit: 0add5c597f3253a9c6108a0a81d57f44ab0d9d30
+change-id: 20231004-send-net-20231004-7e1422eddf40
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Mat Martineau <martineau@kernel.org>
 
 
