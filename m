@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-37943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D4B7B7F07
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:27:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3D47B7F0B
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 1B2A91F223BA
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:27:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 0E7CC2817C5
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA1813AEB;
-	Wed,  4 Oct 2023 12:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B369413FEC;
+	Wed,  4 Oct 2023 12:27:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB3512B99;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABA913FE6;
+	Wed,  4 Oct 2023 12:27:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0494AC433C7;
 	Wed,  4 Oct 2023 12:27:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75416C433C8;
-	Wed,  4 Oct 2023 12:27:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696422446;
-	bh=RkzvF8X+SXDFLfFH4P6mrq7fuBmqThHF3EmjygH38s8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tCdbg9GWUdthDNNxMYvE7a+R5KpNE1fdxO3rcSy3ibki5AKOYZ0Lt/gpZ/20g5Mvk
-	 ytPpLV7Uoxx9ug7IpnI9UHmzf1dbPyMJaPvem9GjgK/Lg5FJavmEJxeNjtntr0Uqm/
-	 ZflKPumsYQ2Ny/9BxNVQnztfvrAjTsjY+seWYkQy6eyBejCB/rvkTZJAeSzNdEYN6Q
-	 Lm9LaMzQCEXoIl9vRKZQC+eM9ni2Qsxc52jMxDVyfUnKf7p4JTjMwqgUKg9E+V/ojh
-	 zFFI6IbCR+wnvjbirjdr5WVioLGtQ8F1zSp1I0Jy+oS2R/2wwjvOAiz3L4l/L1xvE6
-	 1nLMCm9DXFZKA==
+	s=k20201202; t=1696422449;
+	bh=vZdeekHmX6PRJrot+PinxMvY1FiWo7fqDKl0jsBzl+4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ImQPHdN5Vej8ZQgiOvsRoxKhp/zQ4Hl2xHXEjV4iyS98p1zFUHKHL50ytHlMRK484
+	 9hzk0/ouyrOenAmjzEdDDnUHYfH6QmpzDmo1bL4rmj8feQ7JTPlFiv8OU0V9caUc61
+	 IC3WjJiR2dah3NRJhNL5VcKtF0magsuCqJAVTnNZmhxEysDJC+p0Rfvb2uT2R9h1s1
+	 ns7MX2dQ183fjYtbfCOPvPfvlf0BA4j9YQr/LxGTtCjjYa3UicdOf3eqrUunR1dZh9
+	 QL5CYN/+QLMn8L1zku2UjN0HmQ/AjQeLhR9bQK0bMQArhxh3LGzK95NdheiCoQbN12
+	 z4jEO4wgv/U8g==
 From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -39,10 +39,12 @@ Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: [PATCH bpf-next 0/3] selftest/bpf, riscv: Improved cross-building support
-Date: Wed,  4 Oct 2023 14:27:18 +0200
-Message-Id: <20231004122721.54525-1-bjorn@kernel.org>
+Subject: [PATCH bpf-next 1/3] selftests/bpf: Add cross-build support for urandom_read et al
+Date: Wed,  4 Oct 2023 14:27:19 +0200
+Message-Id: <20231004122721.54525-2-bjorn@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231004122721.54525-1-bjorn@kernel.org>
+References: <20231004122721.54525-1-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,28 +56,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Björn Töpel <bjorn@rivosinc.com>
 
-Yet another "more cross-building support for RISC-V" series.
+Some userland programs in the BPF test suite, e.g. urandom_read, is
+missing cross-build support. Add cross-build support for these
+programs
 
-An example how to invoke a gen_tar build:
+Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
+---
+ tools/testing/selftests/bpf/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-  | make ARCH=riscv CROSS_COMPILE=riscv64-linux-gnu- CC=riscv64-linux-gnu-gcc \
-  |    HOSTCC=gcc O=/workspace/kbuild FORMAT= \
-  |    SKIP_TARGETS="arm64 ia64 powerpc sparc64 x86 sgx" -j $(($(nproc)-1)) \
-  |    -C tools/testing/selftests gen_tar
-
-
-Björn
-
-Björn Töpel (3):
-  selftests/bpf: Add cross-build support for urandom_read et al
-  selftests/bpf: Enable lld usage for RISC-V
-  selftests/bpf: Add uprobe_multi to gen_tar target
-
- tools/testing/selftests/bpf/Makefile | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-
-base-commit: 2147c8d07e1abc8dfc3433ca18eed5295e230ede
+diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+index 47365161b6fc..a9cbb85fa180 100644
+--- a/tools/testing/selftests/bpf/Makefile
++++ b/tools/testing/selftests/bpf/Makefile
+@@ -198,7 +198,7 @@ endif
+ # do not fail. Static builds leave urandom_read relying on system-wide shared libraries.
+ $(OUTPUT)/liburandom_read.so: urandom_read_lib1.c urandom_read_lib2.c liburandom_read.map
+ 	$(call msg,LIB,,$@)
+-	$(Q)$(CLANG) $(filter-out -static,$(CFLAGS) $(LDFLAGS))   \
++	$(Q)$(CLANG) $(CLANG_TARGET_ARCH) $(filter-out -static,$(CFLAGS) $(LDFLAGS))   \
+ 		     $(filter %.c,$^) $(filter-out -static,$(LDLIBS)) \
+ 		     -fuse-ld=$(LLD) -Wl,-znoseparate-code -Wl,--build-id=sha1 \
+ 		     -Wl,--version-script=liburandom_read.map \
+@@ -206,7 +206,7 @@ $(OUTPUT)/liburandom_read.so: urandom_read_lib1.c urandom_read_lib2.c liburandom
+ 
+ $(OUTPUT)/urandom_read: urandom_read.c urandom_read_aux.c $(OUTPUT)/liburandom_read.so
+ 	$(call msg,BINARY,,$@)
+-	$(Q)$(CLANG) $(filter-out -static,$(CFLAGS) $(LDFLAGS)) $(filter %.c,$^) \
++	$(Q)$(CLANG) $(CLANG_TARGET_ARCH) $(filter-out -static,$(CFLAGS) $(LDFLAGS)) $(filter %.c,$^) \
+ 		     -lurandom_read $(filter-out -static,$(LDLIBS)) -L$(OUTPUT)  \
+ 		     -fuse-ld=$(LLD) -Wl,-znoseparate-code -Wl,--build-id=sha1 \
+ 		     -Wl,-rpath=. -o $@
 -- 
 2.39.2
 
