@@ -1,86 +1,174 @@
-Return-Path: <netdev+bounces-37914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0C17B7C68
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507797B7C6D
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 11:41:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 12D981C20803
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:40:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id EC590281476
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C9310A25;
-	Wed,  4 Oct 2023 09:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAE710A29;
+	Wed,  4 Oct 2023 09:41:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A881B10979
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 162E8C433C8;
-	Wed,  4 Oct 2023 09:40:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696412424;
-	bh=VcgIT2baXF7GIo+TcyTXEp764GHUJp+tJ8ZoUXL5kgY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K8zl/tPNZnw6gQ0DpX8aVcHO+b0yEpfJiNK9Ondp4atmPSUgd8N9tic9HPn9RxTRq
-	 yAtQgfBJ3TNLR9aecSHdf4xX+DuJG0W5WO4PWW1rSjlnzqHnKAWCWTjcX1y3IOfIY2
-	 qAuo6bXMZLDctYOHIYmMDdiYsZlLRrSniMNfrCvsEqlpILqJmXmzvkCivFLXSjLiHP
-	 Ua7sOzDMokKQsfkFiZRKNMU0G05D2GW2PFBxWi2noXhw7P7ih++eLYaUPiJgw2zomH
-	 spMpFC/NagBmoWGUHMifB+jbP6y5iocPneyQHOV/QqSskpSwAF5wWqHpmZlr/HnORU
-	 WIgpVWIwbgylQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF3B4C595D2;
-	Wed,  4 Oct 2023 09:40:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 762F163C3
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 09:41:25 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C137EAF
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 02:41:23 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qnyNS-0000aU-7O; Wed, 04 Oct 2023 11:41:10 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qnyNR-00AzuG-78; Wed, 04 Oct 2023 11:41:09 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id CB6AB22EC80;
+	Wed,  4 Oct 2023 09:41:08 +0000 (UTC)
+Date: Wed, 4 Oct 2023 11:41:08 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	=?utf-8?B?SsOpcsOpbWll?= Dautheribes <jeremie.dautheribes@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	sylvain.girard@se.com, pascal.eberhard@se.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] can: sja1000: Always restart the Tx queue after an
+ overrun
+Message-ID: <20231004-uneasy-backed-e01d77be9f51-mkl@pengutronix.de>
+References: <20231002160206.190953-1-miquel.raynal@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/3 net] net: ethernet: ti: am65-cpsw: Fix error code in
- am65_cpsw_nuss_init_tx_chns()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169641242397.19946.703213074993184771.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 09:40:23 +0000
-References: <4c2073cc-e7ef-4f16-9655-1a46cfed9fe9@moroto.mountain>
-In-Reply-To: <4c2073cc-e7ef-4f16-9655-1a46cfed9fe9@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: grygorii.strashko@ti.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, rogerq@kernel.org, s-vadapalli@ti.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 26 Sep 2023 17:04:43 +0300 you wrote:
-> This accidentally returns success, but it should return a negative error
-> code.
-> 
-> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> Sorry for the delay on this.  I wrote this before traveling and meant
-> to send it earlier but forgot.
-> 
-> [...]
-
-Here is the summary with links:
-  - [1/3,net] net: ethernet: ti: am65-cpsw: Fix error code in am65_cpsw_nuss_init_tx_chns()
-    https://git.kernel.org/netdev/net/c/37d4f5556798
-  - [2/3,net] net: ti: icssg-prueth: Fix signedness bug in prueth_init_tx_chns()
-    https://git.kernel.org/netdev/net/c/a325f174d708
-  - [3/3,net] dmaengine: ti: k3-udma-glue: clean up k3_udma_glue_tx_get_irq() return
-    https://git.kernel.org/netdev/net/c/f9a1d3216a49
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gjgeg42sjz3xlio6"
+Content-Disposition: inline
+In-Reply-To: <20231002160206.190953-1-miquel.raynal@bootlin.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 
+--gjgeg42sjz3xlio6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 02.10.2023 18:02:06, Miquel Raynal wrote:
+> Upstream commit 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with
+> a soft reset on Renesas SoCs") fixes an issue with Renesas own SJA1000
+> CAN controller reception: the Rx buffer is only 5 messages long, so when
+> the bus loaded (eg. a message every 50us), overrun may easily
+> happen. Upon an overrun situation, due to a possible internal crosstalk
+> situation, the controller enters a frozen state which only can be
+> unlocked with a soft reset (experimentally). The solution was to offload
+> a call to sja1000_start() in a threaded handler. This needs to happen in
+> process context as this operation requires to sleep. sja1000_start()
+> basically enters "reset mode", performs a proper software reset and
+> returns back into "normal mode".
+>=20
+> Since this fix was introduced, we no longer observe any stalls in
+> reception. However it was sporadically observed that the transmit path
+> would now freeze. Further investigation blamed the fix mentioned above,
+> and especially the reset operation. Reproducing the reset in a loop
+> helped identifying what could possibly go wrong. The sja1000 is a single
+> Tx queue device, which leverages the netdev helpers to process one Tx
+> message at a time. The logic is: the queue is stopped, the message sent
+> to the transceiver, once properly transmitted the controller sets a
+> status bit which triggers an interrupt, in the interrupt handler the
+> transmission status is checked and the queue woken up. Unfortunately, if
+> an overrun happens, we might perform the soft reset precisely between
+> the transmission of the buffer to the transceiver and the advent of the
+> transmission status bit. We would then stop the transmission operation
+> without re-enabling the queue, leading to all further transmissions to
+> be ignored.
+>=20
+> The reset interrupt can only happen while the device is "open", and
+> after a reset we anyway want to resume normal operations, no matter if a
+> packet to transmit got dropped in the process, so we shall wake up the
+> queue. Restarting the device and waking-up the queue is exactly what
+> sja1000_set_mode(CAN_MODE_START) does. In order to be consistent about
+> the queue state, we must acquire a lock both in the reset handler and in
+> the transmit path to ensure serialization of both operations. It turns
+> out, a lock is already held when entering the transmit path, so we can
+> just acquire/release it as well with the regular net helpers inside the
+> threaded interrupt handler and this way we should be safe. As the
+> reset handler might still be called after the transmission of a frame to
+> the transceiver but before it actually gets transmitted, we must ensure
+> we don't leak the skb, so we free it (the behavior is consistent, no
+> matter if there was an skb on the stack or not).
+>=20
+> Fixes: 717c6ec241b5 ("can: sja1000: Prevent overrun stalls with a soft re=
+set on Renesas SoCs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+Have you compile tested this against current net/main?
+
+|   CC [M]  drivers/net/can/sja1000/sja1000.o
+| drivers/net/can/sja1000/sja1000.c: In function =E2=80=98sja1000_reset_int=
+errupt=E2=80=99:
+| drivers/net/can/sja1000/sja1000.c:398:9: error: too few arguments to func=
+tion =E2=80=98can_free_echo_skb=E2=80=99
+|   398 |         can_free_echo_skb(dev, 0);
+|       |         ^~~~~~~~~~~~~~~~~
+| In file included from include/linux/can/dev.h:22,
+|                  from drivers/net/can/sja1000/sja1000.c:62:
+| include/linux/can/skb.h:28:6: note: declared here
+|    28 | void can_free_echo_skb(struct net_device *dev, unsigned int idx,
+|       |      ^~~~~~~~~~~~~~~~~
+|
+
+This chance is mainline since v5.13-rc1~94^2~297^2~34. I've fixed the
+problem while applying the patch.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--gjgeg42sjz3xlio6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUdMzAACgkQvlAcSiqK
+BOgJewf/Y2usjEyhkOtF96jCF8Hs6PViTHhYOPcoZkncutXTZ+/XJmRP0PEk8h6A
+XNA/80yzpnwHtQQ/DXfcMGyQWY+3QNhYwQJMdt10i/BVowbwxiNy0cgVEPqichv/
+kpf1wnkJZAr1W30xcn9K2hvZ0VT9KSgjNYuK5QygoJHhLGDnoyHEcZptOE7lTvMW
+NKE69lpZoHYDGr1Q2rVD9R6E1hDiDTOaLPeKsPEUjVf/j49JLG3tKQ0FfL7jneH7
+jlNxg4oUfqC7g2fJgCDDRWsCtQqPZMtxAAR+WDs6z1VL03Ljw7lTyoUTh83PbO4f
+nJHApVhpS3o88GZ4HJqKyPBAa+BEFw==
+=gLbK
+-----END PGP SIGNATURE-----
+
+--gjgeg42sjz3xlio6--
 
