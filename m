@@ -1,213 +1,146 @@
-Return-Path: <netdev+bounces-37883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4123A7B784D
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:03:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CB77B786A
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 09:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 52BE21C20381
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:03:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E38A11F21DB2
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F076AAE;
-	Wed,  4 Oct 2023 07:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30B36AD9;
+	Wed,  4 Oct 2023 07:12:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF7C63C0
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 07:03:09 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8727AB0
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 00:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696402987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kDu6btx99QXs0kSLMHh2AKh2KZqG8BWNFgkrbgEVHdw=;
-	b=fyWBgOfTQkDbZ1e6NNJtWVmBlXHDvQMx7Dc743WDQKMCy/25uejtDHLKRMF1hw3peo8Y/I
-	jC6+kHlFU6uCOCVW2rUXJhh7/9fRoZ0vCx8Qr7rCRCI39YRh+bNXSf7K7bCd3Tb3PEUjpd
-	p71jvCo7DO3Us/lXXiayysglyQPK08k=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-283-uQEUgsEkNvisFnqZy2eq6Q-1; Wed, 04 Oct 2023 03:03:02 -0400
-X-MC-Unique: uQEUgsEkNvisFnqZy2eq6Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 68D80382135E;
-	Wed,  4 Oct 2023 07:03:01 +0000 (UTC)
-Received: from alecto.usersys.redhat.com (unknown [10.43.17.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E9D2140E950;
-	Wed,  4 Oct 2023 07:02:59 +0000 (UTC)
-Date: Wed, 4 Oct 2023 09:02:57 +0200
-From: Artem Savkov <asavkov@redhat.com>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-	linux-rt-users@vger.kernel.org, Jiri Olsa <jolsa@kernel.org>
-Subject: Re: [RFC PATCH] tracing: change syscall number type in struct
- syscall_trace_*
-Message-ID: <20231004070257.GA311687@alecto.usersys.redhat.com>
-References: <20231002135242.247536-1-asavkov@redhat.com>
- <CAEf4BzbM1z-ccRq-gH7UkVrSa6Vhewu3R7wV3sHW6BKxhm9k2Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D7D1856
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 07:12:03 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52037AB
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 00:12:02 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c77449a6daso15232365ad.0
+        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 00:12:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696403522; x=1697008322; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=unfr2glM4e5rcWyEYwMhlURFjnUIdCG1ShH//sT9JY0=;
+        b=JTl7WROrLh8u1apw3mDpQrhuCMnFyyxKyivAo4U0pkRyZECNOLqPnGT3f/SQ5c7x+S
+         USLmlBPp7PTcvz3ORbGT8sVmyUk6Mhf8fWnon3SYgV9Dp+ngG20cTZTLW4C4UN6KaZfq
+         kfBhXiIZajMv8qW7D7RNuqEuk+obx8xxWBySwu4LlOeNBwSZvRjk7DP/4mXBjfjxQTA0
+         7vHsSBWYSnARAr7vUg4gwdBVPAbsAx9KSX09eq1oMwccUb5SMChz5Y/kN7inCzIih9az
+         j7Ilx9WseTlRcBv7TRFPP5qjJtnUaoP288PLoUqaZTxOKGjOaHSObwr4+tiHOZg/6ugK
+         CWSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696403522; x=1697008322;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=unfr2glM4e5rcWyEYwMhlURFjnUIdCG1ShH//sT9JY0=;
+        b=fEr4fB2IMoYiNYQRfVpdEdHnCxuVX1eChdO2jQa6KcoZaEyMv6NYZoumwddtUETuZ8
+         beVovuP/RpJ1LDWvqUbTNpH0pdcc7M0O2TEUHKE8p24fyxu2333Dfi4faEQttKsfU/J+
+         EsBtFI1G3nlAMMmrgMT4IxsF/G/KwdHgoPMEAlZOngxAZYEVVAjNXpBGuvkcI9+0l/Q+
+         Th8+0BehBr82aC6qCK20Hcw+hIvIy/e+EZAtjAqxKvu2Ffyoru96bX4ctPDUQxwhZA9j
+         NkCfgJHGnSaEdFsVwNFTt9qrzCm9LBrFXxgJD/2Va0N9r5EWM7tMs1ilZOpkNlPrb+Vk
+         hLPg==
+X-Gm-Message-State: AOJu0YzWHllozq4x6TqLmKnE1E1kRr0eOSbTVnktSF59dUzBCIYR9WxY
+	iBZMgulpD7Ja+/uN+HZZOaw=
+X-Google-Smtp-Source: AGHT+IGy1YXQnXcqcXfF7VkB4bihpYMG9fIGU9+z0HYrgDYjtoi1omj40trqM3KfspfKz7RHniBxEg==
+X-Received: by 2002:a17:903:1208:b0:1c3:92de:1b23 with SMTP id l8-20020a170903120800b001c392de1b23mr2025281plh.59.1696403521611;
+        Wed, 04 Oct 2023 00:12:01 -0700 (PDT)
+Received: from localhost (193-116-195-242.tpgi.com.au. [193.116.195.242])
+        by smtp.gmail.com with ESMTPSA id e8-20020a17090301c800b001c60c8d6b4asm2845267plh.149.2023.10.04.00.11.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Oct 2023 00:12:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4BzbM1z-ccRq-gH7UkVrSa6Vhewu3R7wV3sHW6BKxhm9k2Q@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 04 Oct 2023 17:11:56 +1000
+Message-Id: <CVZGUWQGYWQX.1W7BH28XB6WKM@wheely>
+Cc: "Aaron Conole" <aconole@redhat.com>, <netdev@vger.kernel.org>,
+ <dev@openvswitch.org>, "Ilya Maximets" <imaximet@redhat.com>, "Flavio
+ Leitner" <fbl@redhat.com>
+Subject: Re: [ovs-dev] [RFC PATCH 4/7] net: openvswitch: ovs_vport_receive
+ reduce stack usage
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Eelco Chaudron" <echaudro@redhat.com>
+X-Mailer: aerc 0.15.2
+References: <20230927001308.749910-1-npiggin@gmail.com>
+ <20230927001308.749910-5-npiggin@gmail.com> <f7tfs2ymi8y.fsf@redhat.com>
+ <CVV7HCQYCVOP.2JVVJCKU57CAW@wheely>
+ <34747C51-2F94-4B64-959B-BA4B0AA4224B@redhat.com>
+In-Reply-To: <34747C51-2F94-4B64-959B-BA4B0AA4224B@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 03, 2023 at 03:11:15PM -0700, Andrii Nakryiko wrote:
-> On Mon, Oct 2, 2023 at 6:53 AM Artem Savkov <asavkov@redhat.com> wrote:
+On Fri Sep 29, 2023 at 6:38 PM AEST, Eelco Chaudron wrote:
+>
+>
+> On 29 Sep 2023, at 9:00, Nicholas Piggin wrote:
+>
+> > On Fri Sep 29, 2023 at 1:26 AM AEST, Aaron Conole wrote:
+> >> Nicholas Piggin <npiggin@gmail.com> writes:
+> >>
+> >>> Dynamically allocating the sw_flow_key reduces stack usage of
+> >>> ovs_vport_receive from 544 bytes to 64 bytes at the cost of
+> >>> another GFP_ATOMIC allocation in the receive path.
+> >>>
+> >>> XXX: is this a problem with memory reserves if ovs is in a
+> >>> memory reclaim path, or since we have a skb allocated, is it
+> >>> okay to use some GFP_ATOMIC reserves?
+> >>>
+> >>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> >>> ---
+> >>
+> >> This represents a fairly large performance hit.  Just my own quick
+> >> testing on a system using two netns, iperf3, and simple forwarding rul=
+es
+> >> shows between 2.5% and 4% performance reduction on x86-64.  Note that =
+it
+> >> is a simple case, and doesn't involve a more involved scenario like
+> >> multiple bridges, tunnels, and internal ports.  I suspect such cases
+> >> will see even bigger hit.
+> >>
+> >> I don't know the impact of the other changes, but just an FYI that the
+> >> performance impact of this change is extremely noticeable on x86
+> >> platform.
 > >
-> > linux-rt-devel tree contains a patch that adds an extra member to struct
-> 
-> can you please point to the patch itself that makes that change?
+> > Thanks for the numbers. This patch is probably the biggest perf cost,
+> > but unfortunately it's also about the biggest saving. I might have an
+> > idea to improve it.
+>
+> Also, were you able to figure out why we do not see this problem on
+> x86 and arm64? Is the stack usage so much larger, or is there some
+> other root cause?
 
-Of course, some context would be useful. The patch in question is b1773eac3f29c
-("sched: Add support for lazy preemption") from rt-devel tree [0]. It came up
-a couple of times before: [1] [2] [3] [4].
+Haven't pinpointed it exactly. ppc64le interrupt entry frame is nearly
+3x larger than x86-64, about 200 bytes. So there's 400 if a hard
+interrupt (not seen in the backtrace) is what overflowed it. Stack
+alignment I think is 32 bytes vs 16 for x86-64. And different amount of
+spilling and non-volatile register use and inlining choices by the
+compiler could nudge things one way or another. There is little to no
+ppc64le specific data structures on the stack in any of this call chain
+which should cause much more bloat though, AFAIKS.
 
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/commit/?id=b1773eac3f29cbdcdfd16e0339f1a164066e9f71
-[1] https://lore.kernel.org/linux-rt-users/20200221153541.681468-1-jolsa@kernel.org/t/#u
-[2] https://github.com/iovisor/bpftrace/commit/a2e3d5dbc03ceb49b776cf5602d31896158844a7
-[3] https://lore.kernel.org/bpf/xunyjzy64q9b.fsf@redhat.com/t/#u
-[4] https://lore.kernel.org/bpf/20230727150647.397626-1-ykaliuta@redhat.com/t/#u
+So other archs should not be far away from overflowing 16kB I think.
 
-> > trace_entry. This causes the offset of args field in struct
-> > trace_event_raw_sys_enter be different from the one in struct
-> > syscall_trace_enter:
-> >
-> > struct trace_event_raw_sys_enter {
-> >         struct trace_entry         ent;                  /*     0    12 */
-> >
-> >         /* XXX last struct has 3 bytes of padding */
-> >         /* XXX 4 bytes hole, try to pack */
-> >
-> >         long int                   id;                   /*    16     8 */
-> >         long unsigned int          args[6];              /*    24    48 */
-> >         /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
-> >         char                       __data[];             /*    72     0 */
-> >
-> >         /* size: 72, cachelines: 2, members: 4 */
-> >         /* sum members: 68, holes: 1, sum holes: 4 */
-> >         /* paddings: 1, sum paddings: 3 */
-> >         /* last cacheline: 8 bytes */
-> > };
-> >
-> > struct syscall_trace_enter {
-> >         struct trace_entry         ent;                  /*     0    12 */
-> >
-> >         /* XXX last struct has 3 bytes of padding */
-> >
-> >         int                        nr;                   /*    12     4 */
-> >         long unsigned int          args[];               /*    16     0 */
-> >
-> >         /* size: 16, cachelines: 1, members: 3 */
-> >         /* paddings: 1, sum paddings: 3 */
-> >         /* last cacheline: 16 bytes */
-> > };
-> >
-> > This, in turn, causes perf_event_set_bpf_prog() fail while running bpf
-> > test_profiler testcase because max_ctx_offset is calculated based on the
-> > former struct, while off on the latter:
-> >
-> >   10488         if (is_tracepoint || is_syscall_tp) {
-> >   10489                 int off = trace_event_get_offsets(event->tp_event);
-> >   10490
-> >   10491                 if (prog->aux->max_ctx_offset > off)
-> >   10492                         return -EACCES;
-> >   10493         }
-> >
-> > This patch changes the type of nr member in syscall_trace_* structs to
-> > be long so that "args" offset is equal to that in struct
-> > trace_event_raw_sys_enter.
-> >
-> > Signed-off-by: Artem Savkov <asavkov@redhat.com>
-> > ---
-> >  kernel/trace/trace.h          | 4 ++--
-> >  kernel/trace/trace_syscalls.c | 7 ++++---
-> >  2 files changed, 6 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
-> > index 77debe53f07cf..cd1d24df85364 100644
-> > --- a/kernel/trace/trace.h
-> > +++ b/kernel/trace/trace.h
-> > @@ -135,13 +135,13 @@ enum trace_type {
-> >   */
-> >  struct syscall_trace_enter {
-> >         struct trace_entry      ent;
-> > -       int                     nr;
-> > +       long                    nr;
-> >         unsigned long           args[];
-> >  };
-> >
-> >  struct syscall_trace_exit {
-> >         struct trace_entry      ent;
-> > -       int                     nr;
-> > +       long                    nr;
-> >         long                    ret;
-> >  };
-> >
-> > diff --git a/kernel/trace/trace_syscalls.c b/kernel/trace/trace_syscalls.c
-> > index de753403cdafb..c26939119f2e4 100644
-> > --- a/kernel/trace/trace_syscalls.c
-> > +++ b/kernel/trace/trace_syscalls.c
-> > @@ -101,7 +101,7 @@ find_syscall_meta(unsigned long syscall)
-> >         return NULL;
-> >  }
-> >
-> > -static struct syscall_metadata *syscall_nr_to_meta(int nr)
-> > +static struct syscall_metadata *syscall_nr_to_meta(long nr)
-> >  {
-> >         if (IS_ENABLED(CONFIG_HAVE_SPARSE_SYSCALL_NR))
-> >                 return xa_load(&syscalls_metadata_sparse, (unsigned long)nr);
-> > @@ -132,7 +132,8 @@ print_syscall_enter(struct trace_iterator *iter, int flags,
-> >         struct trace_entry *ent = iter->ent;
-> >         struct syscall_trace_enter *trace;
-> >         struct syscall_metadata *entry;
-> > -       int i, syscall;
-> > +       int i;
-> > +       long syscall;
-> >
-> >         trace = (typeof(trace))ent;
-> >         syscall = trace->nr;
-> > @@ -177,7 +178,7 @@ print_syscall_exit(struct trace_iterator *iter, int flags,
-> >         struct trace_seq *s = &iter->seq;
-> >         struct trace_entry *ent = iter->ent;
-> >         struct syscall_trace_exit *trace;
-> > -       int syscall;
-> > +       long syscall;
-> >         struct syscall_metadata *entry;
-> >
-> >         trace = (typeof(trace))ent;
-> > --
-> > 2.41.0
-> >
-> >
-> 
+> Is there a simple replicator, as this might help you
+> profile the differences between the architectures?
 
--- 
- Artem
+Unfortunately not, it's some kubernetes contraption I don't know how
+to reproduce myself.
 
+Thanks,
+Nick
 
