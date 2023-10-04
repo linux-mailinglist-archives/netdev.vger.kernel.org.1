@@ -1,180 +1,809 @@
-Return-Path: <netdev+bounces-37878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B767B7762
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:16:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 208437B777D
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 07:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 59F26281588
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 05:16:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C736D2814AD
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 05:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414D94C96;
-	Wed,  4 Oct 2023 05:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074CC525E;
+	Wed,  4 Oct 2023 05:31:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6451C31;
-	Wed,  4 Oct 2023 05:16:22 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2094.outbound.protection.outlook.com [40.107.101.94])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72616A7;
-	Tue,  3 Oct 2023 22:16:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WxnHMv92uky9zj38ojZ3hI8YogdKTCFaIOQ5msrqiHf8ZvSH7dtEhY9AXRrKUvHPj1klzFBa+In9kY9NTnIWBle9CuOEln+A/FrHQKaI2Gpc/QlmDO/0TY2rGAfbTFEKXtMBYU5t6Pkx9G4ojaTsZAdIqMJ0d4otgwvH7q9Ddq07W+i1+O/iFbYgupxnWVR8RYXf/25V6T4ngXhSWHUbNHnMO0C/QvN09UGW1+Ilj1C43YCQ7Hl4W7nZttinngEBGTSOYe9UFTgccJ2nKi5iXhMsXs/4rVgxqzL9ATyGSuInZl/uYhATJBopibpf0RGIXQN8YiKQCM5fNB1hRwYz/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TxQYvR9XLDIhzJkZU4ZWAHiDHstHMvznBHyzQ15bRVk=;
- b=V1OD2dUG/jKu15YfEpsoW7/ZoHlIWYL3zxAV2dM9Od15dhIT5AvvBIaSqaH+MtFW+5uKf6IeDqdFa2PsarYfxrDpiVtQ2F2BVo52zHo31WafbsfvBKa+mseSXYQZQvZI/t1B074yUL8UYXLTHEicENQjm8GH2zwMV86LTF6qOOHX+lP2Y/hvoRQ4Ji3zgMGBeQLovkog9UsnKjCk9MJRc2BogzcZg+4dGfZe3vmfE37w0gkFQAHJ/gUPK7dTrru7UOu3dchqyOqyQs5TAAH7FEx0fZ3pIK2tJ+4HhywJkXsOR+Is9TyPEl2F+T5pfVLPZ42PCWl1jPiG6rArjR0QvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TxQYvR9XLDIhzJkZU4ZWAHiDHstHMvznBHyzQ15bRVk=;
- b=Ec9i4ZlxRTyP/O+FQLFjXkvYLVgf8Ac0dikjz0NQHfvhNisUnKPAoXdwncDQyGEJHZ/yam6ZrYagLj1RSSQNZLMmS/OdukJQxh1xo+DDbwgUwwurVEe67uMC6BxzxJYRrpCLG4FV9LNqI3mrndfPd8cubD7L1Yssv6xAUYGy0NQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
- DM6PR13MB3721.namprd13.prod.outlook.com (2603:10b6:5:24a::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.33; Wed, 4 Oct 2023 05:16:17 +0000
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3]) by DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3%6]) with mapi id 15.20.6838.033; Wed, 4 Oct 2023
- 05:16:17 +0000
-Date: Wed, 4 Oct 2023 07:15:58 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Kees Cook <keescook@chromium.org>
-Cc: Simon Horman <horms@kernel.org>,
-	Simon Horman <simon.horman@corigine.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Yinjun Zhang <yinjun.zhang@corigine.com>,
-	Leon Romanovsky <leon@kernel.org>, Yu Xiao <yu.xiao@corigine.com>,
-	Sixiang Chen <sixiang.chen@corigine.com>, oss-drivers@corigine.com,
-	netdev@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] nfp: nsp: Annotate struct nfp_eth_table with __counted_by
-Message-ID: <ZRz1DnlUCmgJdS1Z@LouisNoVo>
-References: <20231003231850.work.335-kees@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231003231850.work.335-kees@kernel.org>
-X-ClientProxiedBy: JNAP275CA0059.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4f::12)
- To DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16251C15
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 05:31:16 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9BB0A7;
+	Tue,  3 Oct 2023 22:31:11 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id C82E4100007;
+	Wed,  4 Oct 2023 08:31:08 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru C82E4100007
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1696397468;
+	bh=zmh/t6POVZG3DThm/TVyWKgXlAT8IQ2vYnY6NLjSVpE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=U7NxXb09kScnjthlvsjM055SO3ClE8lR3J91ts5lITqQIyqT1TQReKDl0peyayfpX
+	 c8w2slKvTZG9ZzdEK60MSw1Lrj9lwHj4K9Iygx01Bc3zXqbQHgxAL6LBUUZ47eWbw/
+	 RhcCqgfKzufnOAnqjs7CpzV51el5VnWW/UmGdkFFGmf5jL2zO8+aC4kFPJSeqdAvYC
+	 y3Zf/LMLaf2T/n9H/Y+V1g8Xos4gXFlvyGyEHT9kmYwFGiuD6KROZwmRDuS8ltD9Tk
+	 okfhkvYASSkE52OGywhjMtMmLVBMBZuwsFlooL6kLUXA2VC/2Gat8sjdpliXGjltZS
+	 GMweXJ+cEkdiw==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed,  4 Oct 2023 08:31:07 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 4 Oct 2023 08:31:07 +0300
+Message-ID: <f54a60f3-b643-e436-ba87-6241b1ade59a@salutedevices.com>
+Date: Wed, 4 Oct 2023 08:24:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|DM6PR13MB3721:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11640dc4-2504-4e5b-955c-08dbc4990983
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BEYCBokDZXmJZNILoqMkFfC7uOq3ajNvI2XYCWTsLvFA984/4rP0JWgVVWiAOxKEoH7lWu+OXR+ZHc2h7QUXkW1Rbpb2qUYszJuMn7M/uU5dkBit5jLGIHLqMippCyHlmyBVTs6sdFJHN3tBlLqU55NVltzP8DDhdG0RC62YRNwmtXcGACG25hesbA6Tckd6C9YHiYgnK3Ap0YrSTDx9Bd/DmBhGHjimN8T2KqMcMwy3/RQ/JQBn7jb0sfKInkPRR6WfCTwBa0uwJBzi5FyJi0Wq3+K062bt91BQlxuzy37lXDQovhGBgDPnvg2Sf8Nlg4qyARvJmwIqq8aq/No1slZ8xUIFdXVvWnFSI1/g19DhPItxMyTGTb7seRvNGRezKSMk5f+gPgZ7WXw9jAfpsRQKn3Bg3WDJlZC3qtrI2jLmDa21eb4XnM3BlAbdVRQxrykOY12+mOk01RB0o/46Lfs67qy6mABZHLWf4uDnv39UIMaCu2B6sgXZ0Qd1OdKu7SCTJ2Nm7D6HVuvc/NHIa1weMmeymlmhuQXsfkd8rl65DNBfBpYjd4wxbDHVLt4+ClIpVbcsFxAafz4m5ppSyw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(39830400003)(136003)(396003)(366004)(346002)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(41300700001)(6486002)(966005)(316002)(6506007)(66556008)(6916009)(6512007)(9686003)(66476007)(54906003)(66946007)(44832011)(8676002)(26005)(4326008)(5660300002)(8936002)(6666004)(478600001)(7416002)(2906002)(83380400001)(33716001)(38100700002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1IKIZpHXVaXuiIAc4nQPxep+gpxYyEe1sMqMAhW0lV0dHMegxa7xRas7naRn?=
- =?us-ascii?Q?HxT7Tvp0kIoz7ZgebosqmTNcrxGCs3gnzXiGSwCzgvkurGFWVXTmMgxkPwEN?=
- =?us-ascii?Q?B8UgY9t4uUOsVBAuHd/44P7+KmAeRvESsmuXo8liSSs9ZcMgduLF/fjIapCf?=
- =?us-ascii?Q?r5ORi7u/rwQbxV0ypfvj57FtnQZE3QYM3hxcWp5cDjFa/Pq6ebowScTOv2W6?=
- =?us-ascii?Q?vKYPyBplAq8aipg/KTBqDf+VXPXnirGnuxJn68Nnp2IrJMhqZvAUqkSuYU5W?=
- =?us-ascii?Q?Fx45qp/zORiWK1FNtqRuyvwiND0PAtPt+/IMtxjYOr4SSonf9YEfQk+tOExX?=
- =?us-ascii?Q?Oa6zd2NIPozKhK8pY77frhnReKqGUM6359jEiMMU4FV6xBtOxdd8jpGRzHCh?=
- =?us-ascii?Q?TwM+jlu0XwgK6crK1Vlh8FOe0ssCSEyeaMpnxJy4XSIB2U7IfnyvTC+a1kRa?=
- =?us-ascii?Q?R+H65BPL4vmPGSzm6octKX6ESk+8GouDUqq+HuIZz6zyDi80BMwlQKsUwqqJ?=
- =?us-ascii?Q?4hbh3reZA2hyx8+z3Q5DeMOAlNpmK3VzKpMpGKYRHKAeQThbJTAQcffZmiAm?=
- =?us-ascii?Q?lDUSL3vtAKX80P+P3vqov3J5AUfTq+8nDqQvK9tuljoNVWm2m9DUvv1ygio4?=
- =?us-ascii?Q?mJxzCtBlO99gpeYR4Ul9DpfS3KHK+UQaO7rXMFzF2Um8by9dNsR/Z5R0EQlf?=
- =?us-ascii?Q?d7psDfmrK2nEWYstKFM5QDdkhqRoNVrGY2w52tF34NeQJZ8uYbqMT3qXklv1?=
- =?us-ascii?Q?PsduApr7yE5bx6hwgHK0I4tSVbM4FOzydXX36hiUm7GodMCWvlIqH84QM4fi?=
- =?us-ascii?Q?IaL7N2qwVnuti95viBS5k0xHcLILvOmxa3mW4JCdpM6olFW2srLPr2l2H6DA?=
- =?us-ascii?Q?W2SkGh9E2OP6pkvRStJgMRqzMCRSSHmCTFcYk6yYXkJQPhDZ1j+ngP0iJb8t?=
- =?us-ascii?Q?SaCamIyhFPj11q4q8cFNQggYgkEOhQGJOY6pjp9yQ3YW0qVpb53OOZLuh8UV?=
- =?us-ascii?Q?bUF1M/1r6McmZw1s0z4B56liHpUlLEvP6gljUu/wo1mPeCn9zTZNxnRB3N9v?=
- =?us-ascii?Q?ekU7OVM2RIEoZUyp1cjLkypV5hV8vDan3BjGAiJ8p3+wtRcNmDXy0K4rAxGg?=
- =?us-ascii?Q?tEp2tA7jJA1m1rAfTzTGN0ifm0dg0N7ZZSRC2EWEniLGO+R85iuq1y8CH2ez?=
- =?us-ascii?Q?TEF8pRoQ55j8Cw8VNKewvICPIcUTDxSGYOXbs9+mBQkQoPdmd0K0XT9yb8xd?=
- =?us-ascii?Q?f0tvS10HE6wW3TkaCoEVqON9F3ZhUQ0NO5XCRrTGUei/xQAgArOD6y+61pu+?=
- =?us-ascii?Q?eyf99lGk50Whndtb7QDhoZ0+v4G3NPL4rRDGogS1StyX9v+etX7H2tE+yfq1?=
- =?us-ascii?Q?kAT2A2/I6snZ1OQWHF2ngu4XLs7WhR29Iu/PzPmapF0MAQIH0So5GJ3vvPkW?=
- =?us-ascii?Q?RD75rmd0x5ghZnr5ZFbrjQnh0NWivE3mEcFJWXZZ4htEaqPT4+XOXxHGGab2?=
- =?us-ascii?Q?4+QnkU2Pi3idQ5RCmaeh62BxDHp/9aPr+yojO00y3YswHzv/CmI5BoPl/a8X?=
- =?us-ascii?Q?w03nt4DGtg5dYY14hls8seQujclidKqFFRhiEkSub1Iieb7dyJLm8E3T4IBG?=
- =?us-ascii?Q?3Q=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11640dc4-2504-4e5b-955c-08dbc4990983
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2023 05:16:17.3703
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 07djJDmyD4HXjdpolIAuMw9iHv0/cO9KNRDFK0Rj2Riv4Gqvw347ZoSGPw+kJzvt+EBhgiYVE/X6jTh4c6yi3kVAyN2gqy8ush7uWjY++n4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR13MB3721
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v2 10/12] test/vsock: MSG_ZEROCOPY flag tests
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230930210308.2394919-1-avkrasnov@salutedevices.com>
+ <20230930210308.2394919-11-avkrasnov@salutedevices.com>
+ <mcpdtv26ehtkn3m72jxl4wobafefubqd3ubaeikvwsgkxj7scb@cheptotsazk7>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <mcpdtv26ehtkn3m72jxl4wobafefubqd3ubaeikvwsgkxj7scb@cheptotsazk7>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180332 [Oct 04 2023]
+X-KSMG-AntiSpam-Version: 5.9.59.0
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/04 04:17:00 #22052298
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 03, 2023 at 04:18:51PM -0700, Kees Cook wrote:
-> Prepare for the coming implementation by GCC and Clang of the __counted_by
-> attribute. Flexible array members annotated with __counted_by can have
-> their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
-> array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-> functions).
-> 
-> As found with Coccinelle[1], add __counted_by for struct nfp_eth_table.
-> 
-> Cc: Simon Horman <simon.horman@corigine.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Yinjun Zhang <yinjun.zhang@corigine.com>
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: Yu Xiao <yu.xiao@corigine.com>
-> Cc: Sixiang Chen <sixiang.chen@corigine.com>
-> Cc: oss-drivers@corigine.com
-> Cc: netdev@vger.kernel.org
-> Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-Likewise here, thanks for updating
 
-Acked-by: Louis Peens <louis.peens@corigine.com>
-> ---
->  drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+
+On 03.10.2023 19:24, Stefano Garzarella wrote:
+> On Sun, Oct 01, 2023 at 12:03:06AM +0300, Arseniy Krasnov wrote:
+>> This adds three tests for MSG_ZEROCOPY feature:
+>> 1) SOCK_STREAM tx with different buffers.
+>> 2) SOCK_SEQPACKET tx with different buffers.
+>> 3) SOCK_STREAM test to read empty error queue of the socket.
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> ---
+>> Changelog:
+>> v1 -> v2:
+>>  * Move 'SOL_VSOCK' and 'VSOCK_RECVERR' from 'util.c' to 'util.h'.
+>>
+>> tools/testing/vsock/Makefile              |   2 +-
+>> tools/testing/vsock/util.c                | 214 +++++++++++++++
+>> tools/testing/vsock/util.h                |  27 ++
+>> tools/testing/vsock/vsock_test.c          |  16 ++
+>> tools/testing/vsock/vsock_test_zerocopy.c | 314 ++++++++++++++++++++++
+>> tools/testing/vsock/vsock_test_zerocopy.h |  15 ++
+>> 6 files changed, 587 insertions(+), 1 deletion(-)
+>> create mode 100644 tools/testing/vsock/vsock_test_zerocopy.c
+>> create mode 100644 tools/testing/vsock/vsock_test_zerocopy.h
+>>
+>> diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
+>> index 21a98ba565ab..1a26f60a596c 100644
+>> --- a/tools/testing/vsock/Makefile
+>> +++ b/tools/testing/vsock/Makefile
+>> @@ -1,7 +1,7 @@
+>> # SPDX-License-Identifier: GPL-2.0-only
+>> all: test vsock_perf
+>> test: vsock_test vsock_diag_test
+>> -vsock_test: vsock_test.o timeout.o control.o util.o
+>> +vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
+>> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
+>> vsock_perf: vsock_perf.o
+>>
+>> diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>> index 6779d5008b27..2a641ab38f08 100644
+>> --- a/tools/testing/vsock/util.c
+>> +++ b/tools/testing/vsock/util.c
+>> @@ -11,10 +11,14 @@
+>> #include <stdio.h>
+>> #include <stdint.h>
+>> #include <stdlib.h>
+>> +#include <string.h>
+>> #include <signal.h>
+>> #include <unistd.h>
+>> #include <assert.h>
+>> #include <sys/epoll.h>
+>> +#include <sys/mman.h>
+>> +#include <linux/errqueue.h>
+>> +#include <poll.h>
+>>
+>> #include "timeout.h"
+>> #include "control.h"
+>> @@ -444,3 +448,213 @@ unsigned long hash_djb2(const void *data, size_t len)
+>>
+>>     return hash;
+>> }
+>> +
+>> +void enable_so_zerocopy(int fd)
+>> +{
+>> +    int val = 1;
+>> +
+>> +    if (setsockopt(fd, SOL_SOCKET, SO_ZEROCOPY, &val, sizeof(val))) {
+>> +        perror("setsockopt");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +}
+>> +
+>> +static void *mmap_no_fail(size_t bytes)
+>> +{
+>> +    void *res;
+>> +
+>> +    res = mmap(NULL, bytes, PROT_READ | PROT_WRITE,
+>> +           MAP_PRIVATE | MAP_ANONYMOUS | MAP_POPULATE, -1, 0);
+>> +    if (res == MAP_FAILED) {
+>> +        perror("mmap");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    return res;
+>> +}
+>> +
+>> +size_t iovec_bytes(const struct iovec *iov, size_t iovnum)
+>> +{
+>> +    size_t bytes;
+>> +    int i;
+>> +
+>> +    for (bytes = 0, i = 0; i < iovnum; i++)
+>> +        bytes += iov[i].iov_len;
+>> +
+>> +    return bytes;
+>> +}
+>> +
+>> +static void iovec_random_init(struct iovec *iov,
+>> +                  const struct vsock_test_data *test_data)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < test_data->vecs_cnt; i++) {
+>> +        int j;
+>> +
+>> +        if (test_data->vecs[i].iov_base == MAP_FAILED)
+>> +            continue;
+>> +
+>> +        for (j = 0; j < iov[i].iov_len; j++)
+>> +            ((uint8_t *)iov[i].iov_base)[j] = rand() & 0xff;
+>> +    }
+>> +}
+>> +
+>> +unsigned long iovec_hash_djb2(struct iovec *iov, size_t iovnum)
+>> +{
+>> +    unsigned long hash;
+>> +    size_t iov_bytes;
+>> +    size_t offs;
+>> +    void *tmp;
+>> +    int i;
+>> +
+>> +    iov_bytes = iovec_bytes(iov, iovnum);
+>> +
+>> +    tmp = malloc(iov_bytes);
+>> +    if (!tmp) {
+>> +        perror("malloc");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    for (offs = 0, i = 0; i < iovnum; i++) {
+>> +        memcpy(tmp + offs, iov[i].iov_base, iov[i].iov_len);
+>> +        offs += iov[i].iov_len;
+>> +    }
+>> +
+>> +    hash = hash_djb2(tmp, iov_bytes);
+>> +    free(tmp);
+>> +
+>> +    return hash;
+>> +}
+>> +
+>> +struct iovec *iovec_from_test_data(const struct vsock_test_data *test_data)
+>> +{
+>> +    const struct iovec *test_iovec;
+>> +    struct iovec *iovec;
+>> +    int i;
+>> +
+>> +    iovec = malloc(sizeof(*iovec) * test_data->vecs_cnt);
+>> +    if (!iovec) {
+>> +        perror("malloc");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    test_iovec = test_data->vecs;
+>> +
+>> +    for (i = 0; i < test_data->vecs_cnt; i++) {
+>> +        iovec[i].iov_len = test_iovec[i].iov_len;
+>> +        iovec[i].iov_base = mmap_no_fail(test_iovec[i].iov_len);
+>> +
+>> +        if (test_iovec[i].iov_base != MAP_FAILED &&
+>> +            test_iovec[i].iov_base)
+>> +            iovec[i].iov_base += (uintptr_t)test_iovec[i].iov_base;
+>> +    }
+>> +
+>> +    /* Unmap "invalid" elements. */
+>> +    for (i = 0; i < test_data->vecs_cnt; i++) {
+>> +        if (test_iovec[i].iov_base == MAP_FAILED) {
+>> +            if (munmap(iovec[i].iov_base, iovec[i].iov_len)) {
+>> +                perror("munmap");
+>> +                exit(EXIT_FAILURE);
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    iovec_random_init(iovec, test_data);
+>> +
+>> +    return iovec;
+>> +}
+>> +
+>> +void free_iovec_test_data(const struct vsock_test_data *test_data,
+>> +              struct iovec *iovec)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < test_data->vecs_cnt; i++) {
+>> +        if (test_data->vecs[i].iov_base != MAP_FAILED) {
+>> +            if (test_data->vecs[i].iov_base)
+>> +                iovec[i].iov_base -= (uintptr_t)test_data->vecs[i].iov_base;
+>> +
+>> +            if (munmap(iovec[i].iov_base, iovec[i].iov_len)) {
+>> +                perror("munmap");
+>> +                exit(EXIT_FAILURE);
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    free(iovec);
+>> +}
+>> +
+>> +#define POLL_TIMEOUT_MS        100
+>> +void vsock_recv_completion(int fd, bool zerocopied, bool completion)
+>> +{
+>> +    struct sock_extended_err *serr;
+>> +    struct msghdr msg = { 0 };
+>> +    struct pollfd fds = { 0 };
+>> +    char cmsg_data[128];
+>> +    struct cmsghdr *cm;
+>> +    ssize_t res;
+>> +
+>> +    fds.fd = fd;
+>> +    fds.events = 0;
+>> +
+>> +    if (poll(&fds, 1, POLL_TIMEOUT_MS) < 0) {
+>> +        perror("poll");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (!(fds.revents & POLLERR)) {
+>> +        if (completion) {
+>> +            fprintf(stderr, "POLLERR expected\n");
+>> +            exit(EXIT_FAILURE);
+>> +        } else {
+>> +            return;
+>> +        }
+>> +    }
+>> +
+>> +    msg.msg_control = cmsg_data;
+>> +    msg.msg_controllen = sizeof(cmsg_data);
+>> +
+>> +    res = recvmsg(fd, &msg, MSG_ERRQUEUE);
+>> +    if (res) {
+>> +        fprintf(stderr, "failed to read error queue: %zi\n", res);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    cm = CMSG_FIRSTHDR(&msg);
+>> +    if (!cm) {
+>> +        fprintf(stderr, "cmsg: no cmsg\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (cm->cmsg_level != SOL_VSOCK) {
+>> +        fprintf(stderr, "cmsg: unexpected 'cmsg_level'\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (cm->cmsg_type != VSOCK_RECVERR) {
+>> +        fprintf(stderr, "cmsg: unexpected 'cmsg_type'\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    serr = (void *)CMSG_DATA(cm);
+>> +    if (serr->ee_origin != SO_EE_ORIGIN_ZEROCOPY) {
+>> +        fprintf(stderr, "serr: wrong origin: %u\n", serr->ee_origin);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (serr->ee_errno) {
+>> +        fprintf(stderr, "serr: wrong error code: %u\n", serr->ee_errno);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (zerocopied && (serr->ee_code & SO_EE_CODE_ZEROCOPY_COPIED)) {
+>> +        fprintf(stderr, "serr: was copy instead of zerocopy\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (!zerocopied && !(serr->ee_code & SO_EE_CODE_ZEROCOPY_COPIED)) {
+>> +        fprintf(stderr, "serr: was zerocopy instead of copy\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +}
+>> diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>> index e5407677ce05..407f415adef6 100644
+>> --- a/tools/testing/vsock/util.h
+>> +++ b/tools/testing/vsock/util.h
+>> @@ -2,9 +2,18 @@
+>> #ifndef UTIL_H
+>> #define UTIL_H
+>>
+>> +#include <stdbool.h>
+>> #include <sys/socket.h>
+>> #include <linux/vm_sockets.h>
+>>
+>> +#ifndef SOL_VSOCK
+>> +#define SOL_VSOCK    287
+>> +#endif
+>> +
+>> +#ifndef VSOCK_RECVERR
+>> +#define VSOCK_RECVERR    1
+>> +#endif
+>> +
+>> /* Tests can either run as the client or the server */
+>> enum test_mode {
+>>     TEST_MODE_UNSET,
+>> @@ -18,6 +27,17 @@ struct test_opts {
+>>     unsigned int peer_cid;
+>> };
+>>
+>> +#define VSOCK_TEST_DATA_MAX_IOV 4
+>> +
+>> +struct vsock_test_data {
+>> +    bool stream_only;    /* Only for SOCK_STREAM. */
+>> +    bool zerocopied;    /* Data must be zerocopied. */
+>> +    bool so_zerocopy;    /* Enable zerocopy mode. */
+>> +    int sendmsg_errno;    /* 'errno' after 'sendmsg()'. */
+>> +    int vecs_cnt;        /* Number of elements in 'vecs'. */
+>> +    struct iovec vecs[VSOCK_TEST_DATA_MAX_IOV];
+>> +};
+>> +
+>> /* A test case definition.  Test functions must print failures to stderr and
+>>  * terminate with exit(EXIT_FAILURE).
+>>  */
+>> @@ -53,4 +73,11 @@ void list_tests(const struct test_case *test_cases);
+>> void skip_test(struct test_case *test_cases, size_t test_cases_len,
+>>            const char *test_id_str);
+>> unsigned long hash_djb2(const void *data, size_t len);
+>> +void enable_so_zerocopy(int fd);
+>> +size_t iovec_bytes(const struct iovec *iov, size_t iovnum);
+>> +unsigned long iovec_hash_djb2(struct iovec *iov, size_t iovnum);
+>> +struct iovec *iovec_from_test_data(const struct vsock_test_data *test_data);
+>> +void free_iovec_test_data(const struct vsock_test_data *test_data,
+>> +              struct iovec *iovec);
+>> +void vsock_recv_completion(int fd, bool zerocopied, bool completion);
+>> #endif /* UTIL_H */
+>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>> index da4cb819a183..c1f7bc9abd22 100644
+>> --- a/tools/testing/vsock/vsock_test.c
+>> +++ b/tools/testing/vsock/vsock_test.c
+>> @@ -21,6 +21,7 @@
+>> #include <poll.h>
+>> #include <signal.h>
+>>
+>> +#include "vsock_test_zerocopy.h"
+>> #include "timeout.h"
+>> #include "control.h"
+>> #include "util.h"
+>> @@ -1269,6 +1270,21 @@ static struct test_case test_cases[] = {
+>>         .run_client = test_stream_shutrd_client,
+>>         .run_server = test_stream_shutrd_server,
+>>     },
+>> +    {
+>> +        .name = "SOCK_STREAM MSG_ZEROCOPY",
+>> +        .run_client = test_stream_msgzcopy_client,
+>> +        .run_server = test_stream_msgzcopy_server,
+>> +    },
+>> +    {
+>> +        .name = "SOCK_SEQPACKET MSG_ZEROCOPY",
+>> +        .run_client = test_seqpacket_msgzcopy_client,
+>> +        .run_server = test_seqpacket_msgzcopy_server,
+>> +    },
+>> +    {
+>> +        .name = "SOCK_STREAM MSG_ZEROCOPY empty MSG_ERRQUEUE",
+>> +        .run_client = test_stream_msgzcopy_empty_errq_client,
+>> +        .run_server = test_stream_msgzcopy_empty_errq_server,
+>> +    },
+>>     {},
+>> };
+>>
+>> diff --git a/tools/testing/vsock/vsock_test_zerocopy.c b/tools/testing/vsock/vsock_test_zerocopy.c
+>> new file mode 100644
+>> index 000000000000..655ef92ef25d
+>> --- /dev/null
+>> +++ b/tools/testing/vsock/vsock_test_zerocopy.c
+>> @@ -0,0 +1,314 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/* MSG_ZEROCOPY feature tests for vsock
+>> + *
+>> + * Copyright (C) 2023 SberDevices.
 > 
-> diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
-> index 6e044ac04917..00264af13b49 100644
-> --- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
-> +++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.h
-> @@ -241,7 +241,7 @@ struct nfp_eth_table {
->  
->  		u64 link_modes_supp[2];
->  		u64 link_modes_ad[2];
-> -	} ports[];
-> +	} ports[] __counted_by(count);
->  };
->  
->  struct nfp_eth_table *nfp_eth_read_ports(struct nfp_cpp *cpp);
-> -- 
-> 2.34.1
+> I saw that you updated the copyright here, I don't know if you need to
+> update your email address as well. Just as a note, it's completely up to
+> you ;-)
+
+Just fixed it, this combination of Copyright and my email is now correct :)
+
+> 
+>> + *
+>> + * Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> + */
+>> +
+>> +#include <stdio.h>
+>> +#include <stdlib.h>
+>> +#include <string.h>
+>> +#include <sys/mman.h>
+>> +#include <unistd.h>
+>> +#include <poll.h>
+>> +#include <linux/errqueue.h>
+>> +#include <linux/kernel.h>
+>> +#include <errno.h>
+>> +
+>> +#include "control.h"
+>> +#include "vsock_test_zerocopy.h"
+>> +
+>> +#define PAGE_SIZE        4096
+>> +
+>> +static struct vsock_test_data test_data_array[] = {
+>> +    /* Last element has non-page aligned size. */
+>> +    {
+>> +        .zerocopied = true,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 3,
+>> +        {
+>> +            { NULL, PAGE_SIZE },
+>> +            { NULL, PAGE_SIZE },
+>> +            { NULL, 200 }
+>> +        }
+>> +    },
+>> +    /* All elements have page aligned base and size. */
+>> +    {
+>> +        .zerocopied = true,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 3,
+>> +        {
+>> +            { NULL, PAGE_SIZE },
+>> +            { NULL, PAGE_SIZE * 2 },
+>> +            { NULL, PAGE_SIZE * 3 }
+>> +        }
+>> +    },
+>> +    /* All elements have page aligned base and size. But
+>> +     * data length is bigger than 64Kb.
+>> +     */
+>> +    {
+>> +        .zerocopied = true,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 3,
+>> +        {
+>> +            { NULL, PAGE_SIZE * 16 },
+>> +            { NULL, PAGE_SIZE * 16 },
+>> +            { NULL, PAGE_SIZE * 16 }
+>> +        }
+>> +    },
+>> +    /* Middle element has both non-page aligned base and size. */
+>> +    {
+>> +        .zerocopied = true,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 3,
+>> +        {
+>> +            { NULL, PAGE_SIZE },
+>> +            { (void *)1, 100 },
+>> +            { NULL, PAGE_SIZE }
+>> +        }
+>> +    },
+>> +    /* Middle element is unmapped. */
+>> +    {
+>> +        .zerocopied = false,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = ENOMEM,
+>> +        .vecs_cnt = 3,
+>> +        {
+>> +            { NULL, PAGE_SIZE },
+>> +            { MAP_FAILED, PAGE_SIZE },
+>> +            { NULL, PAGE_SIZE }
+>> +        }
+>> +    },
+>> +    /* Valid data, but SO_ZEROCOPY is off. This
+>> +     * will trigger fallback to copy.
+>> +     */
+>> +    {
+>> +        .zerocopied = false,
+>> +        .so_zerocopy = false,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 1,
+>> +        {
+>> +            { NULL, PAGE_SIZE }
+>> +        }
+>> +    },
+>> +    /* Valid data, but message is bigger than peer's
+>> +     * buffer, so this will trigger fallback to copy.
+>> +     * This test is for SOCK_STREAM only, because
+>> +     * for SOCK_SEQPACKET, 'sendmsg()' returns EMSGSIZE.
+>> +     */
+>> +    {
+>> +        .stream_only = true,
+>> +        .zerocopied = false,
+>> +        .so_zerocopy = true,
+>> +        .sendmsg_errno = 0,
+>> +        .vecs_cnt = 1,
+>> +        {
+>> +            { NULL, 100 * PAGE_SIZE }
+>> +        }
+>> +    },
+>> +};
+>> +
+>> +static void test_client(const struct test_opts *opts,
+>> +            const struct vsock_test_data *test_data,
+>> +            bool sock_seqpacket)
+>> +{
+>> +    struct msghdr msg = { 0 };
+>> +    ssize_t sendmsg_res;
+>> +    struct iovec *iovec;
+>> +    int fd;
+>> +
+>> +    if (sock_seqpacket)
+>> +        fd = vsock_seqpacket_connect(opts->peer_cid, 1234);
+>> +    else
+>> +        fd = vsock_stream_connect(opts->peer_cid, 1234);
+>> +
+>> +    if (fd < 0) {
+>> +        perror("connect");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (test_data->so_zerocopy)
+>> +        enable_so_zerocopy(fd);
+>> +
+>> +    iovec = iovec_from_test_data(test_data);
+>> +
+>> +    msg.msg_iov = iovec;
+>> +    msg.msg_iovlen = test_data->vecs_cnt;
+>> +
+>> +    errno = 0;
+>> +
+>> +    sendmsg_res = sendmsg(fd, &msg, MSG_ZEROCOPY);
+>> +    if (errno != test_data->sendmsg_errno) {
+>> +        fprintf(stderr, "expected 'errno' == %i, got %i\n",
+>> +            test_data->sendmsg_errno, errno);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (!errno) {
+>> +        if (sendmsg_res != iovec_bytes(iovec, test_data->vecs_cnt)) {
+>> +            fprintf(stderr, "expected 'sendmsg()' == %li, got %li\n",
+>> +                iovec_bytes(iovec, test_data->vecs_cnt),
+>> +                sendmsg_res);
+>> +            exit(EXIT_FAILURE);
+>> +        }
+>> +    }
+>> +
+>> +    /* Receive completion only in case of successful 'sendmsg()'. */
+>> +    vsock_recv_completion(fd, test_data->zerocopied,
+>> +                  test_data->so_zerocopy && !test_data->sendmsg_errno);
+>> +
+>> +    if (!test_data->sendmsg_errno)
+>> +        control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
+>> +    else
+>> +        control_writeulong(0);
+>> +
+>> +    control_writeln("DONE");
+>> +    free_iovec_test_data(test_data, iovec);
+>> +    close(fd);
+>> +}
+>> +
+>> +void test_stream_msgzcopy_client(const struct test_opts *opts)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
+>> +        test_client(opts, &test_data_array[i], false);
+>> +}
+>> +
+>> +void test_seqpacket_msgzcopy_client(const struct test_opts *opts)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < ARRAY_SIZE(test_data_array); i++) {
+>> +        if (test_data_array[i].stream_only)
+>> +            continue;
+>> +
+>> +        test_client(opts, &test_data_array[i], true);
+>> +    }
+>> +}
+>> +
+>> +static void test_server(const struct test_opts *opts,
+>> +            const struct vsock_test_data *test_data,
+>> +            bool sock_seqpacket)
+>> +{
+>> +    unsigned long remote_hash;
+>> +    unsigned long local_hash;
+>> +    ssize_t total_bytes_rec;
+>> +    unsigned char *data;
+>> +    size_t data_len;
+>> +    int fd;
+>> +
+>> +    if (sock_seqpacket)
+>> +        fd = vsock_seqpacket_accept(VMADDR_CID_ANY, 1234, NULL);
+>> +    else
+>> +        fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>> +
+>> +    if (fd < 0) {
+>> +        perror("accept");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
+>> +
+>> +    data = malloc(data_len);
+>> +    if (!data) {
+>> +        perror("malloc");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    total_bytes_rec = 0;
+>> +
+>> +    while (total_bytes_rec != data_len) {
+>> +        ssize_t bytes_rec;
+>> +
+>> +        bytes_rec = read(fd, data + total_bytes_rec,
+>> +                 data_len - total_bytes_rec);
+>> +        if (bytes_rec <= 0)
+>> +            break;
+>> +
+>> +        total_bytes_rec += bytes_rec;
+>> +    }
+>> +
+>> +    if (test_data->sendmsg_errno == 0)
+>> +        local_hash = hash_djb2(data, data_len);
+>> +    else
+>> +        local_hash = 0;
+>> +
+>> +    free(data);
+>> +
+>> +    /* Waiting for some result. */
+>> +    remote_hash = control_readulong();
+>> +    if (remote_hash != local_hash) {
+>> +        fprintf(stderr, "hash mismatch\n");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    control_expectln("DONE");
+>> +    close(fd);
+>> +}
+>> +
+>> +void test_stream_msgzcopy_server(const struct test_opts *opts)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
+>> +        test_server(opts, &test_data_array[i], false);
+>> +}
+>> +
+>> +void test_seqpacket_msgzcopy_server(const struct test_opts *opts)
+>> +{
+>> +    int i;
+>> +
+>> +    for (i = 0; i < ARRAY_SIZE(test_data_array); i++) {
+>> +        if (test_data_array[i].stream_only)
+>> +            continue;
+>> +
+>> +        test_server(opts, &test_data_array[i], true);
+>> +    }
+>> +}
+>> +
+>> +void test_stream_msgzcopy_empty_errq_client(const struct test_opts *opts)
+>> +{
+>> +    struct msghdr msg = { 0 };
+>> +    char cmsg_data[128];
+>> +    ssize_t res;
+>> +    int fd;
+>> +
+>> +    fd = vsock_stream_connect(opts->peer_cid, 1234);
+>> +    if (fd < 0) {
+>> +        perror("connect");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    msg.msg_control = cmsg_data;
+>> +    msg.msg_controllen = sizeof(cmsg_data);
+>> +
+>> +    res = recvmsg(fd, &msg, MSG_ERRQUEUE);
+>> +    if (res != -1) {
+>> +        fprintf(stderr, "expected 'recvmsg(2)' failure, got %zi\n",
+>> +            res);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    control_writeln("DONE");
+>> +    close(fd);
+>> +}
+>> +
+>> +void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts)
+>> +{
+>> +    int fd;
+>> +
+>> +    fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
+>> +    if (fd < 0) {
+>> +        perror("accept");
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    control_expectln("DONE");
+>> +    close(fd);
+>> +}
+>> diff --git a/tools/testing/vsock/vsock_test_zerocopy.h b/tools/testing/vsock/vsock_test_zerocopy.h
+>> new file mode 100644
+>> index 000000000000..3ef2579e024d
+>> --- /dev/null
+>> +++ b/tools/testing/vsock/vsock_test_zerocopy.h
+>> @@ -0,0 +1,15 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +#ifndef VSOCK_TEST_ZEROCOPY_H
+>> +#define VSOCK_TEST_ZEROCOPY_H
+>> +#include "util.h"
+>> +
+>> +void test_stream_msgzcopy_client(const struct test_opts *opts);
+>> +void test_stream_msgzcopy_server(const struct test_opts *opts);
+>> +
+>> +void test_seqpacket_msgzcopy_client(const struct test_opts *opts);
+>> +void test_seqpacket_msgzcopy_server(const struct test_opts *opts);
+>> +
+>> +void test_stream_msgzcopy_empty_errq_client(const struct test_opts *opts);
+>> +void test_stream_msgzcopy_empty_errq_server(const struct test_opts *opts);
+>> +
+>> +#endif /* VSOCK_TEST_ZEROCOPY_H */
+>> -- 
+>> 2.25.1
+>>
 > 
 
