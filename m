@@ -1,120 +1,63 @@
-Return-Path: <netdev+bounces-38040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 947C77B8B49
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:51:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275F57B8B4E
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 474442816AC
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:51:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 380E6B20813
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9A81F5F9;
-	Wed,  4 Oct 2023 18:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9112200B9;
+	Wed,  4 Oct 2023 18:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQhpZsK6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzZFwcE3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF57A1D6A9
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:51:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F0EC433C8;
-	Wed,  4 Oct 2023 18:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD211D6A9
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:52:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6A96C433C8;
+	Wed,  4 Oct 2023 18:52:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696445491;
-	bh=0T+eb7tm4aVFcyKtRjbpTFX3g8MsS2qHFYW8zwU9ucs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UQhpZsK6hBj1e7Yft08HWJGHu5zKZXm1CkdGXn4CRW9uWLyt4hJ+7c4Nd5uIzr4+c
-	 sX6o7rxpQ3zNQAZ5ya5Hfp+urWyvg42+U0jPfuBmYp137ewWzRYRb4kNMMizWD+0Ts
-	 8pUUa6eYHmdLDFhNSUEMQSgLGfvrjiwhYtbyN9mGCpNhRXMoIQ/6PsAFqbh0/40r9I
-	 lzYhPcc7Ut+793oi2vEO02RRb5M/WGpPnTr0nKsX8u6N/G9BwCutOj4EragAK70AYS
-	 Yt5/qJAfiop5C4WJ4+r3elS0Jt9enLorA7hR+C9g4epblyM4oY6jbs3A006Oo/9aGZ
-	 RiuNzFc5fR80Q==
-Date: Wed, 4 Oct 2023 21:51:27 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Joerg Roedel <joro@8bytes.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Matthew Rosato <mjrosato@linux.ibm.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net/mlx5: fix calling mlx5_cmd_init() before DMA
- mask is set
-Message-ID: <20231004185127.GH51282@unreal>
-References: <20230929-mlx5_init_fix-v2-1-51ed2094c9d8@linux.ibm.com>
- <20230930073633.GC1296942@unreal>
- <1acfaaf12d1d24aa255a4da80882f8e0e98d2046.camel@linux.ibm.com>
+	s=k20201202; t=1696445542;
+	bh=x4Pg5cXI3dCKI7KGq5PPllrfX7jO8ITvdEruIzR40UA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VzZFwcE3SXKBH55CeuvlpjLwmP1bWb8ikJ6s5jkw+LmkcV4L2zIXuppz7Hi1cLLyq
+	 KU4Im2Mx7mNHkm/LayF9xGz4oJpj/S+GfE8WjCE/ganc8cg8GrDvcKlKoh/csUH4B1
+	 qlL6g1N1r+ga0JBsk45D8vz4M5qJHxWKKh7qPXOkNlGs58KRHNOGTfP49X9pYhTQwk
+	 lb5sCiJIrlXGvB6CEryfmPXMZZX5IT6ttRQJSFZuBM2jYiQ+ge6y3gbFhJbHbIZj0t
+	 om9F8loyB34QmwIp+oWS70Q9SIHwbMLv/M2VRRFgHbHLsGsoTsRv1vSS6NJO0kalfs
+	 J6er07+2ZqL1A==
+Date: Wed, 4 Oct 2023 11:52:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-spdx@vger.kernel.org, Prarit Bhargava <prarit@redhat.com>, Christoph
+ Hellwig <hch@infradead.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ jschlst@samba.org, Doug Brown <doug@schmorgal.com>, Arnd Bergmann
+ <arnd@arndb.de>
+Subject: Re: [PATCH] net: appletalk: remove cops support
+Message-ID: <20231004115220.5c3776eb@kernel.org>
+In-Reply-To: <20230927090029.44704-2-gregkh@linuxfoundation.org>
+References: <20230927090029.44704-2-gregkh@linuxfoundation.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1acfaaf12d1d24aa255a4da80882f8e0e98d2046.camel@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 04, 2023 at 02:40:49PM +0200, Niklas Schnelle wrote:
-> On Sat, 2023-09-30 at 10:36 +0300, Leon Romanovsky wrote:
-> > On Fri, Sep 29, 2023 at 02:15:49PM +0200, Niklas Schnelle wrote:
-> > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
-> > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
-> > > called in probe_one() before mlx5_pci_init(). This is a problem because
-> > > mlx5_pci_init() is where the DMA and coherent mask is set but
-> > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
-> > > allocation is done during probe before the correct mask is set. This
-> > > causes probe to fail initialization of the cmdif SW structs on s390x
-> > > after that is converted to the common dma-iommu code. This is because on
-> > > s390x DMA addresses below 4 GiB are reserved on current machines and
-> > > unlike the old s390x specific DMA API implementation common code
-> > > enforces DMA masks.
-> > > 
-> > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
-> > > probe_one() before mlx5_mdev_init(). To match the overall naming scheme
-> > > rename it to mlx5_dma_init().
-> > > 
-> > > Link: https://lore.kernel.org/linux-iommu/cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com/
-> > > Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
-> > > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> > > ---
-> > > Note: I ran into this while testing the linked series for converting
-> > > s390x to use dma-iommu. The existing s390x specific DMA API
-> > > implementation doesn't respect DMA masks and is thus not affected
-> > > despite of course also only supporting DMA addresses above 4 GiB.
-> > > ---
-> > > Changes in v2:
-> > > - Instead of moving the whole mlx5_pci_init() only move the
-> > >   set_dma_caps() call so as to keep pci_enable_device() after the FW
-> > >   command interface initialization (Leon)
-> > > - Link to v1: https://lore.kernel.org/r/20230928-mlx5_init_fix-v1-1-79749d45ce60@linux.ibm.com
-> > > ---
-> > >  drivers/net/ethernet/mellanox/mlx5/core/main.c | 18 +++++++++---------
-> > >  1 file changed, 9 insertions(+), 9 deletions(-)
-> > > 
-> > 
-> > Thanks,
-> > Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-> 
-> Thank you for the review. Assuming the mlx5 tree is included in linux-
-> next I think it would be easiest if this goes via that tree thereby
-> unbreaking linux-next for s390. Or do you prefer Joerg to take this via
-> the IOMMU tree or even some other tree?
+On Wed, 27 Sep 2023 11:00:30 +0200 Greg Kroah-Hartman wrote:
+> The COPS Appletalk support is very old, never said to actually work
+> properly, and the firmware code for the devices are under a very suspect
+> license.  Remove it all to clear up the license issue, if it is still
+> needed and actually used by anyone, we can add it back later once the
+> license is cleared up.
 
-Strictly speaking this is net patch, netdev maintainers should pick it.
-We use mlx5 tree [1] for *-next material.
-
-Thanks
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/
-
-> 
-> Thanks,
-> Niklas
+Nice, Doug and Arnd also mentioned this in the past so let me add
+them to the CC as I apply this...
 
