@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-38032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34D87B8AC0
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:38:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A7D87B8ACE
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0B5411C20442
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:38:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id E9C162816C6
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B15D1CA9D;
-	Wed,  4 Oct 2023 18:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6801D68D;
+	Wed,  4 Oct 2023 18:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="onM9nSA/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qaF7Drkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728B71D68D;
-	Wed,  4 Oct 2023 18:38:51 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9481AEA;
-	Wed,  4 Oct 2023 11:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=c9omko4YDrGmNR4EWL/kMfaK1/W1hCSP1tNyvEP0h/w=;
-	t=1696444729; x=1697654329; b=onM9nSA/koMMqzv9mQSmAJzc+787x5mdQD7Gp7uRF2yPtns
-	hU15C/aSIag0FhE0PcYif5heDbWJjoOoGc9ffY1ccSAGPRdQYfj00qaVZ4FstVnagkSUasSGnq3iN
-	mrhzzT4wGNR9ja3x9yotcIJN4CpcttKwnshIMcxSaI5Nmz66zcIJ2DExjaV4usmZe2P6OcpbXJ0Xb
-	gu5GON/GUF3iVd29ad9GeiJy74TvvOZ8u3YJHq5yhgBHOlhSWS8sU8PjHJCQFj0dcTkeo9mA3xUZy
-	uI5B2aPn7yVs6F8LwUud4TOMXj6gOpNPqldLT0R4zIzWv3yb73WAVEHWQyffjA1g==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97-RC0)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qo6lj-00000004Pw2-1zuU;
-	Wed, 04 Oct 2023 20:38:47 +0200
-Message-ID: <46b5785866870e9c1aefbe222d69fbacb93c1cdd.camel@sipsolutions.net>
-Subject: Re: [PATCH 0/4] tracing: improve symbolic printing
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Wed, 04 Oct 2023 20:38:46 +0200
-In-Reply-To: <20231004092205.02c8eb0b@kernel.org>
-References: <20230921085129.261556-5-johannes@sipsolutions.net>
-	 <20231004092205.02c8eb0b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8471BDF1
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A696DC433C9;
+	Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696444829;
+	bh=TdNIT7YcFpP38LtyOuUncJP/3YiSnHJ79w9V/RLoX44=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qaF7DrkdMBO/25ufp9V6HQfAvIBjLT//8Xk3cjvQ9fwDBMD5n5YXfcnX16u4XrM7S
+	 6od4tG1c61ASv+7qQIsGouBru9iZ7VV6GvLzqtFdyGfzQwsCRWudPCYzkpUrOxftqG
+	 n29m2HBrbTSRQIFRFuB38eLa4IDeLb5nv+kZJA8i+zj+f84MV5tM2dx5qiimVu2vIP
+	 s2npcA5JDZyeyb/NDGTZofeQ22msoSegOpRveKsY31JOIYTYzNs1BiiBOTClkDwrmI
+	 MDiCC0+MdlKocKMR26UG9uEXe/SfJKYXBi8dkkqkxn8/qeMZCTzIZG8sTq8PM/vPzp
+	 3B3hXPIsuFyYg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89FC4C395EC;
+	Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: wireless-2023-09-27
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169644482956.7260.12644444542884934909.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Oct 2023 18:40:29 +0000
+References: <20230927095835.25803-2-johannes@sipsolutions.net>
+In-Reply-To: <20230927095835.25803-2-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-On Wed, 2023-10-04 at 09:22 -0700, Jakub Kicinski wrote:
->=20
-> Potentially naive question - the trace point holds enum skb_drop_reason.
-> The user space can get the names from BTF. Can we not teach user space
-> to generically look up names of enums in BTF?
+Hello:
 
-I'll note that, unrelated to the discussion about whether or not we
-could use BTF, we couldn't do it in this case anyway since the whole
-drop reasons aren't captured in enum skb_drop_reason, that contains only
-the core ones, and now other subsystems are adding their own somewhat
-dynamically later.
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-johannes
+On Wed, 27 Sep 2023 11:58:36 +0200 you wrote:
+> Hi,
+> 
+> Here's a first wireless fixes pull request for the 6.6 cycle.
+> There are quite a number of fixes here.
+> 
+> Note that this has conflicts with wireless-next, which I guess
+> then Stephen will report between net and wireless-next after
+> this is pulled, rather than between wireless and wireless-next.
+> 
+> [...]
+
+Here is the summary with links:
+  - pull-request: wireless-2023-09-27
+    https://git.kernel.org/netdev/net/c/72897b295999
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
