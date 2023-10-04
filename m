@@ -1,267 +1,232 @@
-Return-Path: <netdev+bounces-38048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBA17B8BA6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:56:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948C17B8C32
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 21:00:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 42D40281BF4
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:56:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 0CA561F22EC8
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 19:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0142B219EE;
-	Wed,  4 Oct 2023 18:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46C6219E6;
+	Wed,  4 Oct 2023 19:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NqVtdmXP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mMgwIOXS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB58020B05;
-	Wed,  4 Oct 2023 18:56:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 675C9C433D9;
-	Wed,  4 Oct 2023 18:56:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696445777;
-	bh=iC7KwsOJJL3kT0M8KubHc+xTYSGXLa7gjxgf1YgvBK8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NqVtdmXPTE3K9q9deuJTm/G7a71zUKszCFqZsp5GIQNtA7H7/+QIS49PlOMCUfFNJ
-	 1ydyxG0x0Zhc5NXKKvQZoNb0pMC2bwR6porAQ3qOkvHn+oCaXipMdg5DIlUK6kK3dJ
-	 /qGaNm9SdmE2IDbECVrjFagXBbmQuihBc1Xhxlya1LZKKRDWQwFqYqNeRTG4/PcP8U
-	 fjxjbvBWhJKav9Mn2S5Lw52vmEkf02EL+EOCc8xxck+JdDNrgRWXBSojP+3KV6r6+j
-	 osY5RvD+bQgIMRf1FSVwxbtgizfCN1brIMaKXTHpZ/pGKsilyXHn7K+ZkEvj2U6B0B
-	 tzn7voxPB+lnw==
-From: Jeff Layton <jlayton@kernel.org>
-To: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	David Sterba <dsterba@suse.cz>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	Jeremy Kerr <jk@ozlabs.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>,
-	Martijn Coenen <maco@android.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Mattia Dongili <malattia@linux.it>,
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Brad Warrum <bwarrum@linux.ibm.com>,
-	Ritu Agarwal <rituagar@linux.ibm.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Ian Kent <raven@themaw.net>,
-	Luis de Bethencourt <luisbg@kernel.org>,
-	Salah Triki <salah.triki@gmail.com>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu,
-	Joel Becker <jlbec@evilplan.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Nicolas Pitre <nico@fluxnic.net>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	Yue Hu <huyue2@coolpad.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Jan Kara <jack@suse.com>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Christoph Hellwig <hch@infradead.org>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Bob Peterson <rpeterso@redhat.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	Jan Kara <jack@suse.cz>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Anton Altaparmakov <anton@tuxera.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Iurii Zaikin <yzaikin@google.com>,
-	Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Anders Larsen <al@alarsen.net>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Phillip Lougher <phillip@squashfs.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Evgeniy Dushistov <dushistov@mail.ru>,
-	Chandan Babu R <chandan.babu@oracle.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Hugh Dickins <hughd@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Brian Foster <bfoster@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	linux-efi@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	gfs2@lists.linux.dev,
-	linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net,
-	ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org,
-	linux-unionfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	reiserfs-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org
-Subject: [PATCH v2 89/89] fs: move i_generation into new hole created after timestamp conversion
-Date: Wed,  4 Oct 2023 14:55:30 -0400
-Message-ID: <20231004185530.82088-3-jlayton@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231004185530.82088-1-jlayton@kernel.org>
-References: <20231004185530.82088-1-jlayton@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382161D54A
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 19:00:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF6C783CA;
+	Wed,  4 Oct 2023 11:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696445996; x=1727981996;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=dW/dkNl1wqU4puBUJijnvOTIGItv/qp+Q0BD228Rbxw=;
+  b=mMgwIOXSQ3olQb3GlIH6oeztIb1xkPYshiGMRIerazCfNS1QGRpl9EL5
+   63ehOLZUxyuGfTOdp86UT3tMaHFy6FoCkSkpLWu2PJb4zy1ldwFLkwjJQ
+   kq/mn/pK1uHDKAxJrqeQnnaoH7PHTXd9RPjeWG9wjCOblRzQBWHZHHDuq
+   833WPAvTdWu79TssFiWcmvpMg2K9nY0cjgqj0zKn9HXdgxS7qkw/96iGa
+   eeCxfVvQ2t0Mzj58pyu4NVMTc0YNnVVBHUM522l5s5FGYNdYOLbaBvaug
+   Lnh9pCCBa57os0MJ6BjH4YGSRmxw0K4nhJial0XFKuYuLBGhmYdVnyn92
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="373610299"
+X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
+   d="scan'208";a="373610299"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 11:59:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="780913177"
+X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
+   d="scan'208";a="780913177"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Oct 2023 11:59:54 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 4 Oct 2023 11:59:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Wed, 4 Oct 2023 11:59:53 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Wed, 4 Oct 2023 11:59:53 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Wed, 4 Oct 2023 11:59:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hogUNx+4gHzuCxOTxvWYt8d+d7Vvy6vfJNXu2E0dhsF1zvjwTnwhdIO45hSyV8x7wx87z+JKlqHhnuzDPMcf4nctGhSElh3EPhLoC3tOikz1zCNyjp64YbukTZTr3eGdf9yTBbFbS++7XyGPepp5IyMp0lQs2XVRiBn372fiCEgZzbwlnEAn5LatgpCoQbsA/mgLYbT51zzxO6L/Nmq5VHEf3UW7f1/2Ml1hauxYrUvV9UD5zzb8VJ/mwE3Eyxx+oFe09/NGUDtpZIYarKzlTGkFK0BZJTE8HwUBCI9Boo42r8iLZ/NQRVYEpXKUWjiwBLyt1ODM77+alXFz5h7uWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8hEx3OL7Y+QeCXo2FiB6KbCHiiTpo9By9Ex2dhWq5Fw=;
+ b=DdwSy35QMKCSDVNX8YKAOOfwPK0rOh4ul4kH7H/zBByHXG7bXP99jV0ixcB8a/RV+QRvIYmD4WdBJkfbKw0WMDYaGh5q4EE9pm0oeL/L88h1lbrW6ixNh845DGSwB8UvuFdh8zjZ9XSOWtFGscCymdIClQbKvKe1D2t/vcV0ghYG1iX1rrE4h0aDQkcy1gpPGjLRhaflQTOZv4CdyADfVOULPiMK8K2PTzxKxr98X1DEiHz1nPTSn2LO2cYUodA+82b4IZHAZU61XPSUfbgrJZoirGdyP7EH3H9IsZ3ZJ3c2c7t9T5PEmmWzxrhHUGaWE2n/hkZDYrhQqmC3J41trQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com (2603:10b6:303:90::24)
+ by DS0PR11MB7481.namprd11.prod.outlook.com (2603:10b6:8:14b::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.33; Wed, 4 Oct
+ 2023 18:59:45 +0000
+Received: from CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda]) by CO1PR11MB4914.namprd11.prod.outlook.com
+ ([fe80::9c1c:5c49:de36:1cda%3]) with mapi id 15.20.6813.027; Wed, 4 Oct 2023
+ 18:59:45 +0000
+Message-ID: <4b92d9a5-5ff9-4a51-b5f2-6bbef286a502@intel.com>
+Date: Wed, 4 Oct 2023 11:59:42 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net v2] ice: reset first in crash dump kernels
+Content-Language: en-US
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <linux-pci@vger.kernel.org>, <pmenzel@molgen.mpg.de>,
+	<netdev@vger.kernel.org>, <jkc@redhat.com>, Vishal Agrawal
+	<vagrawal@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20231002200232.3682771-1-jesse.brandeburg@intel.com>
+ <9f339067-2d59-80ab-4a8a-51781c623fd5@intel.com>
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Autocrypt: addr=jesse.brandeburg@intel.com; keydata=
+ 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
+ /fnLfll98Nhx
+In-Reply-To: <9f339067-2d59-80ab-4a8a-51781c623fd5@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0348.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::23) To CO1PR11MB4914.namprd11.prod.outlook.com
+ (2603:10b6:303:90::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB4914:EE_|DS0PR11MB7481:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4ba57559-31f8-40f8-e2db-08dbc50c1303
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nX5vD4Mxa1kv9F1OmrIavEUWb2BP/YvOc8VpW4H9IGtt2ZB9yEzqhZHDBLRT85ltBtXzikqm0TgF1S2GhEN+1icPsKt+bjRw8a3iELT2sl5kT6Q3MFEcG2KKQxEgLfjIY2VjbG40vNqtw13UKPjqYjsgACRvZTAbXI/xd6eSj+e1qPoWCttr25jxGYAB710L/DbAnuQh/yXg+mAr9mzH48MC0MrRQp4/ZF6hHA+PiyScZt1PpAfmeFOGT1ZG+x5PWYPUbK78h0MlD/gTQ9gAnBjJIql3AXSli0Wr51+8hcyFpNS3RkEtaDxGHH4dBPJuE/kMcUrTpBTmqfVe8UpB0FzCFolq2ShyM3W4OqssuRnL3ETn1v/qYkuBo9cRUdJKyHOMNonvUO92oiWE41c1cwDWuPohjqhfdf+JNoZ94IEktOG3iw3XtvlZdHTbPE1Sfai431l6uCJqv/NoE7Rif1SUY+maJK9+Z8V+5OrsfowHJp6v56HYgEk9qJJXysq/b49ehqFi+UuVlHYc/x/KRrVufe/L1pziYGdYHG083t8HJ5OmQt9Jdb3j5Z7cECg0ibwzr+H2yEWNNgqO4Wl617YOpJZ6BXonmoklHlqQRLZ8mgsZRNEPF/Ngdd3f1BuPiZg4WLmSz5KjxqB/JBIIyg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB4914.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(366004)(376002)(39860400002)(396003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(82960400001)(107886003)(83380400001)(26005)(44832011)(5660300002)(8676002)(8936002)(4326008)(6512007)(31686004)(2616005)(6506007)(53546011)(6666004)(478600001)(6486002)(38100700002)(316002)(66946007)(66556008)(66476007)(54906003)(36756003)(2906002)(31696002)(4744005)(41300700001)(86362001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z0NOTytTajJjTmtNT2tuNU1hZ2U4bjZzayt3aTd3MDJSdWFIcEF1US9rQlRE?=
+ =?utf-8?B?WEhydUxEQ01HYzFXN0tsZ2IrTnp0OTBGeGtnaFVvQ2tYMGlZdHk2d2RIVkN5?=
+ =?utf-8?B?Uk05T2cvcDk0Zko2UHd6Q1FIVko2V2VIdndRSWVNMW1aaXQ1UVNkNDc3dTFl?=
+ =?utf-8?B?T2YwWDVsY3RMc0x6R3pyR3pUWTROUW9HeEI0NkpEYTNxa1hnM0RoRHpKcUtO?=
+ =?utf-8?B?ZTJoUnN0YkI4TXhMTXlnZTkzVnRnY0tzcUc0eHRuRXc2a2FRSE1neXdtSUtN?=
+ =?utf-8?B?cGsxQWxaZlVJZWkrOFZGNFBwcWxhMjFCTXJWOW16QWtwMlZMM0xuSnQzWExh?=
+ =?utf-8?B?SGtOcWhjVnVDTFgrSGVibFhGbkNMYWQ4YklucEhVSHNqazM2Z0JoRkxHYXVS?=
+ =?utf-8?B?RlVYS0VEQy9iUkN1Sk80ZUVhOFJJeWF1NjlKLy9hOHk1QlJRbWtYb25VTnY0?=
+ =?utf-8?B?Z2xVVlJTSDRCNnY3K2RVSDU4empGbFl6R3ZaU2ZLMUtsUlB1dGxJWEVnUzQv?=
+ =?utf-8?B?ejJjRjhjbUlUaTIwaHVROEtMQ0hWOGpob3g3Q2pHb3NyU0JXREpsMEpvZlFT?=
+ =?utf-8?B?aUZuc09ERlFiQ21xV2JYZVA4RlZwaE9XSmRxNVVnNzV4WGRicVJFUi9UbUJX?=
+ =?utf-8?B?WE9YVDBTZmRkM3QvN2hXbFRpZll0RlpjYjBNYnlPVGdUYU9HKytLNmhGR3hN?=
+ =?utf-8?B?WkhuK0MwTTRoR0cveGlDWWlMeERlZjJMYlhYeWZUdDJoYnI2SnlDM2tpcHk4?=
+ =?utf-8?B?T3RHU3JWWk4zRTlIeU1HZWRxZWIrY3hXS1RXd2JzYjlkWFN4azZpb3o4dkVh?=
+ =?utf-8?B?VE5nb0U1QUhzcnpoQ2xwTU1rVjZndExQd0t5elN5RCtIQSt3QUcyYlp0QlUz?=
+ =?utf-8?B?OElEbWhXMWVzZktFWFN2RFR6SE0yWDBWSTZ2aGl6SnVrUjFrTGlveG1YaUFx?=
+ =?utf-8?B?b2lXQWFDK1FMMEhBZzlPLzZxU1ZGLzE3cEh1MkRvdVpsMHVpcEM5RUpmTzdF?=
+ =?utf-8?B?aTFSdVNRNjY4MkpHVzkzM1dJMXk4UlBsSk9aVmVMd1V1a2RsSTFXMDFSZnI4?=
+ =?utf-8?B?LzhVWHhZeEZSYjhQUE1BQnBIdktzNTNxWjhNU2gzSnFaNmJ4ekVYckdkelU5?=
+ =?utf-8?B?WGxnVnI0bEFmRlM4bC94K0E2M09qZWs3WjV0WXVIaWFBRmovUUpkTWxhU0dC?=
+ =?utf-8?B?RWszZEFycTBVODlkRURyNVRNdmdRZEwyUHZYWmttUmhibUNtZkUzeEN4ZDEr?=
+ =?utf-8?B?d09KWnQ2Z3lmcURGMVM2VytlZURZNXdKTlM5ZHMyNE1IUzFIZ1FHNlJSMm5Q?=
+ =?utf-8?B?U012R0p6NEM2Wlo1Z0FjM1hzWFg2cnNQYkM3TmhyMHNRTkhJRUxFVEcwUDc1?=
+ =?utf-8?B?RzdCeFVhUytCUmFTSmZGblRvZ1Z4M09EbXhnUkVCdnRGUDF0VnlDMk1XYXhR?=
+ =?utf-8?B?M0N3cDdNYTBuWi92dG9xeEJPN05KWjZHWUd0WnpYTTNNQjVJRytNVXpGNkFp?=
+ =?utf-8?B?TnoyNVhHSEwvK1piOTRjYS8zelFHeFpJTGVTOEZPaVBESXpLWUt4U0NDS0RV?=
+ =?utf-8?B?YjhnZ2I2amx2Y2o2MmJrQ1hkRnI0V0E4YkZvTDkwUThOaFFra1M0YkZVODl4?=
+ =?utf-8?B?RDlPWFIxWDBaRTdZallKclZ1bktyMlJQVHZvS1pydmhldm5aZGliRTJHUkZP?=
+ =?utf-8?B?eDVyTEFYMFEvbEFNTUZBTlJTUGhuVnl3STdJRmxYUXRJbW5WcllTRmhQNWxZ?=
+ =?utf-8?B?UHY3MFVvdEJadlBTUHpMT3RXMWVsdXhZck1xaWpVYllnSmZZeTZMdmpFY2Rj?=
+ =?utf-8?B?cnI5Z0RUN25jZEt4b2NabUx1OEphbm5PMm9pRG0zL252VU1hMXFJYTZSWk9r?=
+ =?utf-8?B?SXFlVUhNRlluL2FSTk0yTmVCZW5ZczMzS0R2SkNyUkxlS0VPUXEyYVc1Um80?=
+ =?utf-8?B?QXJ6cjdld0tIOFhwUkRRRGZaVFIzYSt3YjZsdFpOSWR5OWVlRCtSMGw4NUhw?=
+ =?utf-8?B?bU9tOFdWK2xaTnY1MzBBN21YTmlPRFY5b3NCeExkcnVTZ3NOekx6Zjh4am9X?=
+ =?utf-8?B?VjlQWFozSnc3SytwWjR5djBpNVlOV2FpcUJ5TGhFYXo2S3k3MkZnYkE3YWpT?=
+ =?utf-8?B?WnQ3SDNOOGQwUzd0alFkbjVzYm9lcmpRd1Y3SEY3VXZGQlV6UkRDSEJzU0w5?=
+ =?utf-8?B?b1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ba57559-31f8-40f8-e2db-08dbc50c1303
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB4914.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Oct 2023 18:59:45.3564
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hJl9QVkpL/uOYtbzngnlPLuONcpmKjhkZAUgeXp3xKp+LxBemVZSzG/34vqkxREiXfnyel8KOL6YLGN7PhjfpEDU/dIfIP4mc8BigK07lq8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7481
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The recent change to use discrete integers instead of struct timespec64
-shaved 8 bytes off of struct inode, but it also moves the i_lock
-into the previous cacheline, away from the fields that it protects.
+On 10/3/2023 3:41 PM, Tony Nguyen wrote:
 
-Move i_generation above the i_lock, which moves the new 4 byte hole to
-just after the i_fsnotify_mask in my setup.
+> This is missing a Fixes:
 
-Suggested-by: Amir Goldstein <amir73il@gmail.com>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- include/linux/fs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm not sure it is, as I hadn't put it in thinking that there was 
+nothing to "fix". But I guess I can put *something* in here in order to 
+have the auto-backports work nicely for stable. v3 sent!
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 485b5e21c8e5..686c9f33e725 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -677,6 +677,7 @@ struct inode {
- 	u32			i_atime_nsec;
- 	u32			i_mtime_nsec;
- 	u32			i_ctime_nsec;
-+	u32			i_generation;
- 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
- 	unsigned short          i_bytes;
- 	u8			i_blkbits;
-@@ -733,7 +734,6 @@ struct inode {
- 		unsigned		i_dir_seq;
- 	};
- 
--	__u32			i_generation;
- 
- #ifdef CONFIG_FSNOTIFY
- 	__u32			i_fsnotify_mask; /* all events this inode cares about */
--- 
-2.41.0
+> 
+>> Reported-by: Vishal Agrawal <vagrawal@redhat.com>
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
 
 
