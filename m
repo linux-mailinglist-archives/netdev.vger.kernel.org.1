@@ -1,81 +1,89 @@
-Return-Path: <netdev+bounces-38033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7D87B8ACE
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:40:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47FC7B8B02
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E9C162816C6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id F33381C20506
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6801D68D;
-	Wed,  4 Oct 2023 18:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10841DA39;
+	Wed,  4 Oct 2023 18:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qaF7Drkd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gvBSh8+d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8471BDF1
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A696DC433C9;
-	Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D7B1B27F;
+	Wed,  4 Oct 2023 18:44:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7350DC433C7;
+	Wed,  4 Oct 2023 18:44:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696444829;
-	bh=TdNIT7YcFpP38LtyOuUncJP/3YiSnHJ79w9V/RLoX44=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qaF7DrkdMBO/25ufp9V6HQfAvIBjLT//8Xk3cjvQ9fwDBMD5n5YXfcnX16u4XrM7S
-	 6od4tG1c61ASv+7qQIsGouBru9iZ7VV6GvLzqtFdyGfzQwsCRWudPCYzkpUrOxftqG
-	 n29m2HBrbTSRQIFRFuB38eLa4IDeLb5nv+kZJA8i+zj+f84MV5tM2dx5qiimVu2vIP
-	 s2npcA5JDZyeyb/NDGTZofeQ22msoSegOpRveKsY31JOIYTYzNs1BiiBOTClkDwrmI
-	 MDiCC0+MdlKocKMR26UG9uEXe/SfJKYXBi8dkkqkxn8/qeMZCTzIZG8sTq8PM/vPzp
-	 3B3hXPIsuFyYg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89FC4C395EC;
-	Wed,  4 Oct 2023 18:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696445096;
+	bh=kMdSleGdDSkNeDkcR8NOit5Qc/BamxxI/xtLxfY4N7s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gvBSh8+d3KS95DWmkQU5S8YVC+ZI3O+PTcEZCLG5tn4cSI9ZlVpg/QlKMjI9qr1af
+	 W/UIXvUhfw+qogfjtZypafxFlHUHilDm0Jk9S6tOmvbdgEG2EtDZy8qCoi9EssSORJ
+	 lLrVyegmxtJ4obzy8MGR356nWOdRGcW6RPquak3X4gpUNMJPKv8PbWtAn7az9kaiXU
+	 UZKnNiQTI/M3AHuyEwqiFIt8+NTFJuf/+oYTlIsbdkxq/lX4ddY/HTZT9PZgk7sRX3
+	 PX5Zn8tGWJ5JUQXTvUOuJPQuMmDdxZQrjivfV1eFnCqWUh8HiCeOiYu7cDPZpff5vI
+	 b4bzATHFmvxYw==
+Date: Wed, 4 Oct 2023 21:44:52 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Kees Cook <keescook@chromium.org>, Saeed Mahameed <saeedm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Tom Rix <trix@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] net/mlx5: Annotate struct mlx5_fc_bulk with __counted_by
+Message-ID: <20231004184452.GF51282@unreal>
+References: <20231003231718.work.679-kees@kernel.org>
+ <CAFhGd8p_o5xtmrV+Vm0JUR5VQmMenqtm3xbJuE0TSj-_4Bthfw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: wireless-2023-09-27
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169644482956.7260.12644444542884934909.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 18:40:29 +0000
-References: <20230927095835.25803-2-johannes@sipsolutions.net>
-In-Reply-To: <20230927095835.25803-2-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+In-Reply-To: <CAFhGd8p_o5xtmrV+Vm0JUR5VQmMenqtm3xbJuE0TSj-_4Bthfw@mail.gmail.com>
 
-Hello:
+On Tue, Oct 03, 2023 at 04:21:05PM -0700, Justin Stitt wrote:
+> On Tue, Oct 3, 2023 at 4:17 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > Prepare for the coming implementation by GCC and Clang of the __counted_by
+> > attribute. Flexible array members annotated with __counted_by can have
+> > their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
+> > array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
+> > functions).
+> >
+> > As found with Coccinelle[1], add __counted_by for struct mlx5_fc_bulk.
+> >
+> > Cc: Saeed Mahameed <saeedm@nvidia.com>
+> > Cc: Leon Romanovsky <leon@kernel.org>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: netdev@vger.kernel.org
+> > Cc: linux-rdma@vger.kernel.org
+> > Link: https://github.com/kees/kernel-tools/blob/trunk/coccinelle/examples/counted_by.cocci [1]
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
+> > ---
+> >  drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 27 Sep 2023 11:58:36 +0200 you wrote:
-> Hi,
-> 
-> Here's a first wireless fixes pull request for the 6.6 cycle.
-> There are quite a number of fixes here.
-> 
-> Note that this has conflicts with wireless-next, which I guess
-> then Stephen will report between net and wireless-next after
-> this is pulled, rather than between wireless and wireless-next.
-> 
-> [...]
-
-Here is the summary with links:
-  - pull-request: wireless-2023-09-27
-    https://git.kernel.org/netdev/net/c/72897b295999
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
