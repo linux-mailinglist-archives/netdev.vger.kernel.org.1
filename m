@@ -1,101 +1,108 @@
-Return-Path: <netdev+bounces-37924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BCE7B7D26
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:30:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1E17B7D6F
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by am.mirrors.kernel.org (Postfix) with ESMTP id 396EF1F221F6
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:30:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AB0C42814FF
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 10:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C012F748F;
-	Wed,  4 Oct 2023 10:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AAC101FB;
+	Wed,  4 Oct 2023 10:41:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11B64400
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 10:30:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B1F4DC433CA;
-	Wed,  4 Oct 2023 10:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696415427;
-	bh=vWWx1nO4RAxL6LqobAB889h4SVOJTDGvABoerwGt/Jc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VaV4uiYllnOcFw+0XXonrEp/laZm55jnRkC07xo01eJSEKEZc6rk2eet4t0By3OOe
-	 EvPR6x4Q7NIpyIqaaCIAjXaXcacbiD57s9fIKPmPcgWwjpGMubmSjSD8luyaLdNiRG
-	 l9fgw0nvdSXr1yFr6zAKD7kocml+GoH6i2E1fDSD5Olvusqx87ZDkPTE9btkah6GW/
-	 chGvvL6xtDkiA6ptnIS1ykrM+J9szvP2Z/N4sxHryijDl01ObsF4zbjh0Y4O7nnn64
-	 MShyYlp+EmAq8PhB0EN/U8crXfLWiTK8qbeC0o0CDLT9fxH607jgqE+0b8IhF24d2s
-	 fXApE57lIvqbg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9EF2EE632D8;
-	Wed,  4 Oct 2023 10:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1135395
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 10:41:44 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C28A6
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 03:41:41 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53636f98538so3451871a12.1
+        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 03:41:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696416100; x=1697020900; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UzXarj/dIrLAH4tPhBh7BzTA1z+2WH5X+IxGm0B65kk=;
+        b=T/zXgeT6z6FNVR/DpzhL5vkl53Fs6zDhInbzmklFqSVzlqvJtMfbpJRf2yuvOL41/h
+         aV13GoWIPIB/flXQLSBF+2tY6WFfi37t5CBzs4x18OZzR3p19KcKNWaMlvP/6EMeQgwt
+         batpT45rM0YprrV3jvhkBEy3yqsxaKQskMnMnxJtQcEjFxFXdYV761S/7HqioUW9GAC+
+         5oB+Ip46bLQ0Sq8bLVhiwwhRNNtsX+9C28cV5/XsmIc2GRiCARf7mGkEIkLSbxVHTiag
+         FRS+UTYedZGfR1/o4np00II2ah/9LWJqP7cToOxz9Y9mByJ2mFBXpA6i2GJ9l8hJ1Cvq
+         +MFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696416100; x=1697020900;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UzXarj/dIrLAH4tPhBh7BzTA1z+2WH5X+IxGm0B65kk=;
+        b=VX7Gf+tlFx1xQdB/9u3m29Ez9YrGh4WqLKs1VvGN6ICjsOnGttH3TAJhP/8E3/eNpG
+         CfUc/egMrxybuwiGuFCj7cLOXoOoAHOTubkizvF2kqpl0LHRRHQ5MLFlBCOtnJTZqMza
+         QmSG8DRbniH2Ag7qU/o0PzXi+m47rwV14h7dESWv7dws426EKjnuyqyzyh/J40X0WTEC
+         JAq7jX7jaGmnlXJjPjIRK8qLJzbWVO+ra0P9wHXD+WwzdQTSqdiRhq3LooDnTHF2U1vL
+         Y865BSLJ2qrcFbJMKBCAJtpwmvqc0bEzIqqoqMpJlgU1gbBEeaiL8pgkS4VHtlGvJcOs
+         1gKg==
+X-Gm-Message-State: AOJu0Ywwq/WPpE/XQMwofRTyNTgJ261IujT0N3VDQ+4Zxnj7Q00iISAw
+	/N0ALvOChl35PxukK0DKXhHQYA==
+X-Google-Smtp-Source: AGHT+IHLpWQ5S4hZp+7IuOHxp4blL7eubhAEfZYoixgG+l4TPda7KJJaiRndD6JAp2v+zJQCW100Kg==
+X-Received: by 2002:a05:6402:1257:b0:530:c363:449c with SMTP id l23-20020a056402125700b00530c363449cmr1453487edw.40.1696416100316;
+        Wed, 04 Oct 2023 03:41:40 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id g13-20020a50ee0d000000b0051e1660a34esm2227535eds.51.2023.10.04.03.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Oct 2023 03:41:39 -0700 (PDT)
+Date: Wed, 4 Oct 2023 12:41:37 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v2 2/5] dpll: spec: add support for pin-dpll
+ signal phase offset/adjust
+Message-ID: <ZR1BYQuSfdMdDimH@nanopsycho>
+References: <20231004090547.1597844-1-arkadiusz.kubalewski@intel.com>
+ <20231004090547.1597844-3-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/9] bnxt_en: hwmon and SRIOV updates
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169641542764.13675.10570244634679139922.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 10:30:27 +0000
-References: <20230927035734.42816-1-michael.chan@broadcom.com>
-In-Reply-To: <20230927035734.42816-1-michael.chan@broadcom.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, gospo@broadcom.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004090547.1597844-3-arkadiusz.kubalewski@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 26 Sep 2023 20:57:25 -0700 you wrote:
-> The first 7 patches are v2 of the hwmon patches posted about 6 weeks ago
-> on Aug 14.  The last 2 patches are SRIOV related updates.
+Wed, Oct 04, 2023 at 11:05:44AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>Add attributes for providing the user with:
+>- measurement of signals phase offset between pin and dpll
+>- ability to adjust the phase of pin signal
+>
+>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>---
+> Documentation/netlink/specs/dpll.yaml | 33 ++++++++++++++++++++++++++-
+> drivers/dpll/dpll_nl.c                |  8 ++++---
+> drivers/dpll/dpll_nl.h                |  2 +-
+> include/uapi/linux/dpll.h             |  8 ++++++-
+> 4 files changed, 45 insertions(+), 6 deletions(-)
+>
+>diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+>index 8b86b28b47a6..dc057494101f 100644
+>--- a/Documentation/netlink/specs/dpll.yaml
+>+++ b/Documentation/netlink/specs/dpll.yaml
+>@@ -1,7 +1,7 @@
+> # SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
 > 
-> Link to v1 hwmon patches:
-> https://lore.kernel.org/netdev/20230815045658.80494-11-michael.chan@broadcom.com/
-> 
-> Kalesh AP (6):
->   bnxt_en: Enhance hwmon temperature reporting
->   bnxt_en: Move hwmon functions into a dedicated file
->   bnxt_en: Modify the driver to use hwmon_device_register_with_info
->   bnxt_en: Expose threshold temperatures through hwmon
->   bnxt_en: Use non-standard attribute to expose shutdown temperature
->   bnxt_en: Event handler for Thermal event
-> 
-> [...]
+> name: dpll
+>-
+>+version: 2
 
-Here is the summary with links:
-  - [net-next,v2,1/9] bnxt_en: Update firmware interface to 1.10.2.171
-    https://git.kernel.org/netdev/net-next/c/754fbf604ff6
-  - [net-next,v2,2/9] bnxt_en: Enhance hwmon temperature reporting
-    https://git.kernel.org/netdev/net-next/c/6ad71984aa6b
-  - [net-next,v2,3/9] bnxt_en: Move hwmon functions into a dedicated file
-    https://git.kernel.org/netdev/net-next/c/a47f3b3992aa
-  - [net-next,v2,4/9] bnxt_en: Modify the driver to use hwmon_device_register_with_info
-    https://git.kernel.org/netdev/net-next/c/847da8b1178c
-  - [net-next,v2,5/9] bnxt_en: Expose threshold temperatures through hwmon
-    https://git.kernel.org/netdev/net-next/c/cd13244f19eb
-  - [net-next,v2,6/9] bnxt_en: Use non-standard attribute to expose shutdown temperature
-    https://git.kernel.org/netdev/net-next/c/3d9cf962067b
-  - [net-next,v2,7/9] bnxt_en: Event handler for Thermal event
-    https://git.kernel.org/netdev/net-next/c/a19b4801457b
-  - [net-next,v2,8/9] bnxt_en: Support QOS and TPID settings for the SRIOV VLAN
-    https://git.kernel.org/netdev/net-next/c/e76d44fe7227
-  - [net-next,v2,9/9] bnxt_en: Update VNIC resource calculation for VFs
-    https://git.kernel.org/netdev/net-next/c/cbdbf0aa41ba
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Could you reply to my comment about this in V1 please?
 
