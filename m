@@ -1,84 +1,63 @@
-Return-Path: <netdev+bounces-38025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 782AF7B8719
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:00:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA887B871A
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 20:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 7CC14B2084C
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 086B5281CBA
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 18:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825ED1D549;
-	Wed,  4 Oct 2023 18:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D302C1D546;
+	Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60F761C2AB;
-	Wed,  4 Oct 2023 18:00:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BCD15C433C7;
-	Wed,  4 Oct 2023 18:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE24F1D68D
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31EC1C433C8;
+	Wed,  4 Oct 2023 18:00:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696442428;
-	bh=yY3S66xRmuC0GgpwkV5hIXIhJWyD1ynLJX7G6on5lF8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MzB3YECAPjuavQIKSKGrwjLSYt2VkqdYSeocnJZGd0KN26Yc6VzLJ7Nr/onYw66pA
-	 c+byxTTYWJmzWwrRH/VsPGDqwk1bbk7qgvZl4H+46Ju6N72h1VLin93+7x7kbOxg3R
-	 VlclfhVv5wshpeZuZGvvILRwws3r6aPN6ZXP+kSH6kJDalwdoiBE76gIGCp+sBXHSH
-	 613HEOemtE4J91O/iNNw5GvUbpjcL4cEnsq5F/UKpwQ0qPRP2ag9SgaW9xWnxkI08v
-	 MrESba9nlueJIiJb/q0/wvprxHIrXtrdZvNSR3zlIg6Sx68Jgr/DYtZdcorHIPtwiS
-	 fj5Ii+/OVI9Hg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 91C1BC595D2;
-	Wed,  4 Oct 2023 18:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696442432;
+	bh=Kl3qkuDXwVsPtemGj5YLfWsZgo/fk06VDeK+hdq5JiU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j0kwz0zqiLuwTdWFK4Xp5H0+qrsMOkaOOoLenoaD7ZiM72mZsYQNoWYF0eLPbKcB+
+	 nWoyQvPBeaxY0d/KoZj6wCeNVdSlC/vqzojUGHojMwWtuVO4QU67NXI+0dMiMNzuaf
+	 9RK68AGbS1L71+qzsQuILJXwK5U1D4+PYrLsCfbW334BZwjvBDttkvmoFoO7oUpZ3m
+	 P7rUkpU0d0aXnQOUKqjzDvZPMS9Zb59mtI45fBXyFXrDlD9eksA555ibq4Pg7XagAz
+	 fRtaj5ixqSNW+4F7sqVaQh81rJcDD/SDxtdFQn+Y6UfhkpFvQ3sCEZXg4dittX7ShG
+	 yue9UaFDGxiVg==
+Date: Wed, 4 Oct 2023 11:00:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <bryan.whitehead@microchip.com>, <unglinuxdriver@microchip.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next] net: microchip: lan743x: improve throughput
+ with rx timestamp config
+Message-ID: <20231004110031.7e9c32e8@kernel.org>
+In-Reply-To: <20230926155658.159184-1-vishvambarpanth.s@microchip.com>
+References: <20230926155658.159184-1-vishvambarpanth.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] dt-bindings: net: fec: Add imx8dxl description
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169644242859.14307.7824312183665858153.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Oct 2023 18:00:28 +0000
-References: <20230926111017.320409-1-festevam@gmail.com>
-In-Reply-To: <20230926111017.320409-1-festevam@gmail.com>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: kuba@kernel.org, wei.fang@nxp.com, shenwei.wang@nxp.com,
- xiaoning.wang@nxp.com, linux-imx@nxp.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, shawnguo@kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org, festevam@denx.de,
- conor.dooley@microchip.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 26 Sep 2023 21:26:58 +0530 Vishvambar Panth S wrote:
+> +			netif_warn(adapter, drv, adapter->netdev,
+> +				   "rx timestamp = %d is not supported\n",
+> +				   rx_filter);
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I addition to Jake's comments please also drop this warning.
 
-On Tue, 26 Sep 2023 08:10:17 -0300 you wrote:
-> From: Fabio Estevam <festevam@denx.de>
-> 
-> The imx8dl FEC has the same programming model as the one on the imx8qxp.
-> 
-> Add the imx8dl compatible string.
-> 
-> Signed-off-by: Fabio Estevam <festevam@denx.de>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> 
-> [...]
+> +			return -EINVAL;
 
-Here is the summary with links:
-  - [v2,net-next] dt-bindings: net: fec: Add imx8dxl description
-    https://git.kernel.org/netdev/net-next/c/ca6f5c2f94aa
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+And make sure this is the correct return code.
+I thought -ERANGE was more appropriate here, but I could be wrong.
 
