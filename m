@@ -1,98 +1,84 @@
-Return-Path: <netdev+bounces-38050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171067B8C3F
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 21:04:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF437B8C56
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 21:18:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 0B6AE1C20880
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 19:04:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2705D281637
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 19:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347F5219E9;
-	Wed,  4 Oct 2023 19:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65618219FD;
+	Wed,  4 Oct 2023 19:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prcOQ5bR"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65B91D546
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 19:04:10 +0000 (UTC)
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58471BFB;
-	Wed,  4 Oct 2023 12:04:08 -0700 (PDT)
-Received: from [192.168.1.103] (31.173.82.102) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.986.14; Wed, 4 Oct 2023
- 22:04:04 +0300
-Subject: Re: [PATCH net 1/2] ravb: Fix dma_free_coherent() of desc_bat timing
- in ravb_remove()
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
-References: <20231004091253.4194205-1-yoshihiro.shimoda.uh@renesas.com>
- <20231004091253.4194205-2-yoshihiro.shimoda.uh@renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <061d1b91-370b-1427-b591-5ca7d87fd3d1@omp.ru>
-Date: Wed, 4 Oct 2023 22:04:03 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438741B29D
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 19:17:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AD31C433C8;
+	Wed,  4 Oct 2023 19:17:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696447078;
+	bh=1dS0Z9ElgIFUBEHsLYVsPlKwiqE6Sp4y8ahK1w2rhBg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=prcOQ5bRe94hF2LvEsWOm0VuelDW8/mBkP8Okukn2ssJRhwJjqE30UhiqCuDZE3h7
+	 pQEHJcFCeaHbR4KIYSTzPB4zeSjnlfVxQaR+FbFqbc0EPwQfzYX8hY9XHz9f4KfDYL
+	 OE82WHKyKMNOJmzVe4eRjsSPAxe8LUFiTmZtORhvO+7N812m4FehZLYLL9Rtl7/vYE
+	 /jCgQe9sFSTCGLHzM1qhKkSe23eQWGKcDUE7C9co0Afh8UJ73N0ipk9kdL/15rQpX/
+	 KgbssMrWq06wN7lSaesnPhHwDmeUYZucNW34YYKLmeEOPL314Sy/ICCqtGEYgdNIgg
+	 ExBBIRZd+Rqjw==
+Date: Wed, 4 Oct 2023 12:17:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ <anthony.l.nguyen@intel.com>
+Cc: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>,
+ <poros@redhat.com>, <mschmidt@redhat.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>,
+ <intel-wired-lan@lists.osuosl.org>, <linux-kernel@vger.kernel.org>,
+ <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net-next v2 0/9] i40e: House-keeping and clean-up
+Message-ID: <20231004121757.6812fe64@kernel.org>
+In-Reply-To: <95a7c916-dd15-624e-3cd4-f9225324df72@intel.com>
+References: <20230927083135.3237206-1-ivecera@redhat.com>
+	<95a7c916-dd15-624e-3cd4-f9225324df72@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231004091253.4194205-2-yoshihiro.shimoda.uh@renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.82.102]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 10/04/2023 18:50:28
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 180363 [Oct 04 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.102 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;31.173.82.102:7.4.1,7.7.3;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: {cloud_iprep_silent}
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: {rdns complete}
-X-KSE-AntiSpam-Info: {fromrtbl complete}
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.102
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 10/04/2023 18:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 10/4/2023 5:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
-X-Spam-Status: No, score=-3.4 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Concerning the summary: how about the below?
+On Thu, 28 Sep 2023 15:12:09 -0700 Jesse Brandeburg wrote:
+> On 9/27/2023 1:31 AM, Ivan Vecera wrote:
+> > The series makes some house-keeping tasks on i40e driver:
+> > 
+> > Patch 1: Removes unnecessary back pointer from i40e_hw
+> > Patch 2: Moves I40E_MASK macro to i40e_register.h where is used
+> > Patch 3: Refactors I40E_MDIO_CLAUSE* to use the common macro
+> > Patch 4: Add header dependencies to <linux/avf/virtchnl.h>
+> > Patch 5: Simplifies memory alloction functions
+> > Patch 6: Moves mem alloc structures to i40e_alloc.h
+> > Patch 7: Splits i40e_osdep.h to i40e_debug.h and i40e_io.h
+> > Patch 8: Removes circular header deps, fixes and cleans headers
+> > Patch 9: Moves DDP specific macros and structs to i40e_ddp.c
+> > 
+> > Changes:
+> > v2 - Fixed kdoc comment for i40e_hw_to_pf()
+> >     - Reordered patches 5 and 7-9 to make them simplier  
+> 
+> spelling: simpler
+> 
+> Thanks for this cleanup series, the changes all seem sane.
+> 
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 
-ravb: fix up dma_free_coherent() call in ravb_remove()
+I'm marking as "awaiting upstream" but feel free to ask for these
+to be applied directly to net-next if you prefer.
+-- 
+pw-bot: au
 
