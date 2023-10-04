@@ -1,70 +1,65 @@
-Return-Path: <netdev+bounces-38143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999107B98DF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:48:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C757B98DE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 01:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 3DB1B1C209B2
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:48:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 92CE1280E92
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 23:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE4D3AC29;
-	Wed,  4 Oct 2023 23:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9259A374E1;
+	Wed,  4 Oct 2023 23:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="anDX1AdT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cgNT7l6w"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8284A36B0D;
-	Wed,  4 Oct 2023 23:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923AC31A96
+	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 23:48:31 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F15C9;
-	Wed,  4 Oct 2023 16:48:30 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D2BBC0;
+	Wed,  4 Oct 2023 16:48:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696463310; x=1727999310;
+  t=1696463307; x=1727999307;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=sKOndc796+AQf4UbTaoyi0bTyHR1gldFNWtPzmX48ic=;
-  b=anDX1AdT28/+bMX3h5KVVDAHhzFbORVmGk9UTT/9qIMDHUHwqGDp5bPm
-   3wMOphHAA0v5PHrVwTtpG0OOWTsaRrbdBAmklM5zRxMUjm1RFK51LpEJe
-   PAymLU65wck4lyY1S16DBl9cjHe8SnejBiI8DL6zq12IkME/eAwFa86Ge
-   aO7O06aVzNNQ6Zt34iVIQ5bRujvCHVKfSDbzU9VZyqdcapngSkT59F6Hu
-   Vh5GsiJVOygq4bj1viqvgrZxhc4L1ejmCI05E8VycbaKCev8X0KQGlUW0
-   puAjnwQTapo7mLJNqMJJjByATMdQ+Kp/hBmKL8PJcfzy7i97zyiTE4U6T
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="414312038"
+  bh=DeciXl2Atu8VXCLj4G2OA73SHmItxg7YaDBUu5u+dHo=;
+  b=cgNT7l6wwMBlJXw//weht6hNDUUip/HMyxeuXHlN598s+mmnzw6dd8IC
+   zE4Bu9GHPUkgW0ZpFN9W0MmayoObPgdOxwe2SvA6CrVIUbMMcSlSrD3YW
+   kKZ2wPAWiHWtL9RungMkjSmO7AEvo0eOLHOj8HCEOPWL6x50ZtbHkYHMx
+   iO10Zpr1jyMQ9Exw/gL8DCp2m1JV8ANPgzBob5vRs7p6CReUbT49T0I3L
+   HEjkDUnlv/ibe/S4PdXdUs1PSKstyY1TO7etCiq9BZw0X/pD0DaZAD703
+   FDs8snIZcW+MJ5f2auRXUs5vPJnupVzSvi3VrIOFbgScQEz3CWkphsPuJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="414312014"
 X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
-   d="scan'208";a="414312038"
+   d="scan'208";a="414312014"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 16:48:30 -0700
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2023 16:48:26 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="998710887"
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="998710851"
 X-IronPort-AV: E=Sophos;i="6.03,201,1694761200"; 
-   d="scan'208";a="998710887"
+   d="scan'208";a="998710851"
 Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
   by fmsmga006.fm.intel.com with ESMTP; 04 Oct 2023 16:48:23 -0700
 Received: from kbuild by c3b01524d57c with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1qoBbI-000Klg-2P;
+	id 1qoBbI-000Kll-2c;
 	Wed, 04 Oct 2023 23:48:20 +0000
-Date: Thu, 5 Oct 2023 07:47:48 +0800
+Date: Thu, 5 Oct 2023 07:47:49 +0800
 From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
-	kuba@kernel.org, toke@kernel.org, willemb@google.com,
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
-	maciej.fijalkowski@intel.com, hawk@kernel.org,
-	yoong.siang.song@intel.com, netdev@vger.kernel.org,
-	xdp-hints@xdp-project.net, Saeed Mahameed <saeedm@nvidia.com>
-Subject: Re: [PATCH bpf-next v3 04/10] net/mlx5e: Implement AF_XDP TX
- timestamp and checksum offload
-Message-ID: <202310050738.ZFOKzSlA-lkp@intel.com>
-References: <20231003200522.1914523-5-sdf@google.com>
+To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
+	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
+Subject: Re: [PATCH net-next v9 12/13] net:ethernet:realtek: Update the
+ Makefile and Kconfig in the realtek folder
+Message-ID: <202310050703.fr8Txbrs-lkp@intel.com>
+References: <20230928104920.113511-13-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231003200522.1914523-5-sdf@google.com>
+In-Reply-To: <20230928104920.113511-13-justinlai0215@realtek.com>
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
 	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -81,92 +76,64 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Stanislav,
+Hi Justin,
 
-kernel test robot noticed the following build errors:
+kernel test robot noticed the following build warnings:
 
-[auto build test ERROR on bpf-next/master]
+[auto build test WARNING on net-next/main]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/xsk-Support-tx_metadata_len/20231004-040718
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20231003200522.1914523-5-sdf%40google.com
-patch subject: [PATCH bpf-next v3 04/10] net/mlx5e: Implement AF_XDP TX timestamp and checksum offload
-config: s390-defconfig (https://download.01.org/0day-ci/archive/20231005/202310050738.ZFOKzSlA-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231005/202310050738.ZFOKzSlA-lkp@intel.com/reproduce)
+url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20230928-185229
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230928104920.113511-13-justinlai0215%40realtek.com
+patch subject: [PATCH net-next v9 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
+config: i386-randconfig-061-20231005 (https://download.01.org/0day-ci/archive/20231005/202310050703.fr8Txbrs-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231005/202310050703.fr8Txbrs-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310050738.ZFOKzSlA-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310050703.fr8Txbrs-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:203:20: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le64 [usertype] addr @@     got long long @@
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:203:20: sparse:     expected restricted __le64 [usertype] addr
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:203:20: sparse:     got long long
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:362:29: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le64 [usertype] addr @@     got long long @@
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:362:29: sparse:     expected restricted __le64 [usertype] addr
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:362:29: sparse:     got long long
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:686:37: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:687:37: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:692:19: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:694:37: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:708:27: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:710:27: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:727:35: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:729:35: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:732:35: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:734:35: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1580:19: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1584:37: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1614:29: sparse: sparse: cast to restricted __le64
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:1614:29: sparse: sparse: cast from restricted __le32
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1615:36: sparse: sparse: cast to restricted __le64
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:1615:36: sparse: sparse: cast from restricted __le16
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1616:35: sparse: sparse: cast to restricted __le64
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1616:35: sparse: sparse: cast from restricted __le16
 
-   drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c: In function 'mlx5e_xsk_tx':
->> drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c:117:33: error: implicit declaration of function 'xsk_tx_metadata_to_compl'; did you mean 'xsk_tx_metadata_complete'? [-Werror=implicit-function-declaration]
-     117 |                                 xsk_tx_metadata_to_compl(meta, &compl);
-         |                                 ^~~~~~~~~~~~~~~~~~~~~~~~
-         |                                 xsk_tx_metadata_complete
-   cc1: some warnings being treated as errors
+vim +203 drivers/net/ethernet/realtek/rtase/rtase_main.c
 
-
-vim +117 drivers/net/ethernet/mellanox/mlx5/core/en/xsk/tx.c
-
-    63	
-    64	bool mlx5e_xsk_tx(struct mlx5e_xdpsq *sq, unsigned int budget)
-    65	{
-    66		struct xsk_buff_pool *pool = sq->xsk_pool;
-    67		struct xsk_tx_metadata *meta = NULL;
-    68		union mlx5e_xdp_info xdpi;
-    69		bool work_done = true;
-    70		bool flush = false;
-    71	
-    72		xdpi.mode = MLX5E_XDP_XMIT_MODE_XSK;
-    73	
-    74		for (; budget; budget--) {
-    75			int check_result = INDIRECT_CALL_2(sq->xmit_xdp_frame_check,
-    76							   mlx5e_xmit_xdp_frame_check_mpwqe,
-    77							   mlx5e_xmit_xdp_frame_check,
-    78							   sq);
-    79			struct mlx5e_xmit_data xdptxd = {};
-    80			struct xdp_desc desc;
-    81			bool ret;
-    82	
-    83			if (unlikely(check_result < 0)) {
-    84				work_done = false;
-    85				break;
-    86			}
-    87	
-    88			if (!xsk_tx_peek_desc(pool, &desc)) {
-    89				/* TX will get stuck until something wakes it up by
-    90				 * triggering NAPI. Currently it's expected that the
-    91				 * application calls sendto() if there are consumed, but
-    92				 * not completed frames.
-    93				 */
-    94				break;
-    95			}
-    96	
-    97			xdptxd.dma_addr = xsk_buff_raw_get_dma(pool, desc.addr);
-    98			xdptxd.data = xsk_buff_raw_get_data(pool, desc.addr);
-    99			xdptxd.len = desc.len;
-   100			meta = xsk_buff_get_metadata(pool, desc.addr);
-   101	
-   102			xsk_buff_raw_dma_sync_for_device(pool, xdptxd.dma_addr, xdptxd.len);
-   103	
-   104			ret = INDIRECT_CALL_2(sq->xmit_xdp_frame, mlx5e_xmit_xdp_frame_mpwqe,
-   105					      mlx5e_xmit_xdp_frame, sq, &xdptxd,
-   106					      check_result, meta);
-   107			if (unlikely(!ret)) {
-   108				if (sq->mpwqe.wqe)
-   109					mlx5e_xdp_mpwqe_complete(sq);
-   110	
-   111				mlx5e_xsk_tx_post_err(sq, &xdpi);
-   112			} else {
-   113				mlx5e_xdpi_fifo_push(&sq->db.xdpi_fifo, xdpi);
-   114				if (xp_tx_metadata_enabled(sq->xsk_pool)) {
-   115					struct xsk_tx_metadata_compl compl;
-   116	
- > 117					xsk_tx_metadata_to_compl(meta, &compl);
+1f431ee317f33f Justin Lai 2023-09-28  195  
+29576bc3be86aa Justin Lai 2023-09-28  196  static void rtase_unmap_tx_skb(struct pci_dev *pdev, u32 len,
+29576bc3be86aa Justin Lai 2023-09-28  197  			       struct tx_desc *desc)
+29576bc3be86aa Justin Lai 2023-09-28  198  {
+29576bc3be86aa Justin Lai 2023-09-28  199  	dma_unmap_single(&pdev->dev, le64_to_cpu(desc->addr), len,
+29576bc3be86aa Justin Lai 2023-09-28  200  			 DMA_TO_DEVICE);
+29576bc3be86aa Justin Lai 2023-09-28  201  	desc->opts1 = cpu_to_le32(RTK_OPTS1_DEBUG_VALUE);
+29576bc3be86aa Justin Lai 2023-09-28  202  	desc->opts2 = 0x00;
+29576bc3be86aa Justin Lai 2023-09-28 @203  	desc->addr = RTK_MAGIC_NUMBER;
+29576bc3be86aa Justin Lai 2023-09-28  204  }
+29576bc3be86aa Justin Lai 2023-09-28  205  
 
 -- 
 0-DAY CI Kernel Test Service
