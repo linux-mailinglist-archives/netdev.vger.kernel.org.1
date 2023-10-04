@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-37945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-37946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB5C7B7F0E
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:27:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAD27B7F0C
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 14:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 9885828187F
-	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:27:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id A3F4B1F223E0
+	for <lists+netdev@lfdr.de>; Wed,  4 Oct 2023 12:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D356713AF6;
-	Wed,  4 Oct 2023 12:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90B113AF6;
+	Wed,  4 Oct 2023 12:27:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C092013FE0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61AA13FE0;
+	Wed,  4 Oct 2023 12:27:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10B52C433CB;
 	Wed,  4 Oct 2023 12:27:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E9CBC433C8;
-	Wed,  4 Oct 2023 12:27:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696422451;
-	bh=ijfr6HFXllf/luvFREpH5FQI3TulGFgVtkvmLdbFv64=;
+	s=k20201202; t=1696422454;
+	bh=wY6Lz/zx7I9HiBpRiawuNkcCXD5tjJfz6F8komvznPE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ScLODdL0FrTl5WcI4ZFVzGB/3dhIzfv39c91kHKpMnyUpcbtbtAicWM3hO66nM6Jb
-	 bVGqwF21qcWd+bm1lueR+jBY8wwIWKYNoYTYcMV5uUX7HMo0X13sbX81fvHZnopNo5
-	 1Rs4OiEOAF+6PrpMN19sAkF6KeNRClItyAajXK9P4zN5/jtP0FFPT0NH8sVkCsO0IR
-	 As5LUiW+61xLkD2OZ1LrQPGhaRqCIxEKNQFMrM9rKHv0Zp81Ws7ZX1n+IbeEys5JI1
-	 MRPxVyJR7R7Nz6m5m+bZ3h1RwL7RYNlZzN2W5NJaI3R9hQmaMf1Ni4HoZgRsQyAp7L
-	 AZQTBqgRtdMfQ==
+	b=JXrJm4DS5M4NI/TAZPxlBg/4QQ0mBVNPLkmxB0BQ+hyoYvazGaRUKOD7m7X9a7Jsv
+	 9BQSthEQTVVz3PvMnA853dexF644DxsIXZd7XMY0YUqA1h6IW1y8arPOx6lBVwS3NY
+	 tzRySzd1Ui1cu7I/GOXbI9Z0Y3orcUbZRhpb1WCz40Mz0Rw0FFuhs04+N2qo8lr6pX
+	 FvVqjZjX1j9HBv6WKAzAchdr1V/PrsjijZk4T+8ZmndGXybhpnaq+piKKLj+Wo7MGq
+	 kc24UfdHzDd8tkC5q7PZ7SQZRleU1B42NmDDujJtqhl/bQzMIwGKl4oFIQzSHi10vS
+	 8op2PCRoSiVBQ==
 From: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -39,9 +39,9 @@ Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-riscv@lists.infradead.org
-Subject: [PATCH bpf-next 2/3] selftests/bpf: Enable lld usage for RISC-V
-Date: Wed,  4 Oct 2023 14:27:20 +0200
-Message-Id: <20231004122721.54525-3-bjorn@kernel.org>
+Subject: [PATCH bpf-next 3/3] selftests/bpf: Add uprobe_multi to gen_tar target
+Date: Wed,  4 Oct 2023 14:27:21 +0200
+Message-Id: <20231004122721.54525-4-bjorn@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231004122721.54525-1-bjorn@kernel.org>
 References: <20231004122721.54525-1-bjorn@kernel.org>
@@ -56,8 +56,8 @@ Content-Transfer-Encoding: 8bit
 
 From: Björn Töpel <bjorn@rivosinc.com>
 
-RISC-V has proper lld support. Use that, similar to what x86 does, for
-urandom_read et al.
+The uprobe_multi program was not picked up for the gen_tar target. Fix
+by adding it to TEST_GEN_FILES.
 
 Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
 ---
@@ -65,18 +65,18 @@ Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index a9cbb85fa180..098e32c684d5 100644
+index 098e32c684d5..07ac73cc339d 100644
 --- a/tools/testing/selftests/bpf/Makefile
 +++ b/tools/testing/selftests/bpf/Makefile
-@@ -188,7 +188,7 @@ $(OUTPUT)/%:%.c
- 	$(Q)$(LINK.c) $^ $(LDLIBS) -o $@
+@@ -104,7 +104,7 @@ TEST_GEN_PROGS_EXTENDED = test_sock_addr test_skb_cgroup_id_user \
+ 	xskxceiver xdp_redirect_multi xdp_synproxy veristat xdp_hw_metadata \
+ 	xdp_features
  
- # LLVM's ld.lld doesn't support all the architectures, so use it only on x86
--ifeq ($(SRCARCH),x86)
-+ifeq ($(SRCARCH),$(filter $(SRCARCH),x86 riscv))
- LLD := lld
- else
- LLD := ld
+-TEST_GEN_FILES += liburandom_read.so urandom_read sign-file
++TEST_GEN_FILES += liburandom_read.so urandom_read sign-file uprobe_multi
+ 
+ # Emit succinct information message describing current building step
+ # $1 - generic step name (e.g., CC, LINK, etc);
 -- 
 2.39.2
 
