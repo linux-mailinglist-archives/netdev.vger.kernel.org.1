@@ -1,108 +1,177 @@
-Return-Path: <netdev+bounces-38365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571BC7BA951
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:42:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD6E7BA953
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:42:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 73282B2097A
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:42:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 25B661C208BE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5BA3B793;
-	Thu,  5 Oct 2023 18:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960603C68A;
+	Thu,  5 Oct 2023 18:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7VnANBm"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="YTdnCZaq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8772E65A
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:04 +0000 (UTC)
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1878CAD;
-	Thu,  5 Oct 2023 11:42:01 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-352a1a0348fso5325585ab.1;
-        Thu, 05 Oct 2023 11:42:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE422E65A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:52 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A75C0
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:42:50 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-692d2e8c003so1899265b3a.1
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 11:42:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696531320; x=1697136120; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C38Q1C9r7lwS5fW7UNhnL/vCgr/OGwg6SzySJrMoliQ=;
-        b=k7VnANBmadqwur+QcdDRV4m2Twrlu1VMrFTDWDSrlCAus7VrjdhfQi1CRt1BPLguZZ
-         G0ktkDIIMOEk7/UcVXlZmk6M4wVFpeL2x2h+Krhwmd+wd7oBiHg3Nn2XBpKUaqt3N1/b
-         AzVvduEEV9gaR/lVUsrsyKIp/IiwkqDR3w7swXGlbKVleEo2t02tWaQ/Z1eL8BaM7pMM
-         k+Mm2uJnW4ees2NQhhyScmcokveR0za6zYmUKpJujifyr5YPBiIdqDk5nxlMV4yWp9Hu
-         YtMdBN8Aj1WC6EZlBb3zgXwLzP8teU5wlKBKaRG0i22i8EYtb7+o7vcF5QQ4QKeVdLaf
-         yMpA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696531370; x=1697136170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Og4ZdxssU8L1R5eTzBywzenE0Sa3mA8E/G01mteTkJU=;
+        b=YTdnCZaqlfz3clHtXEnUIxWcF9TZwsCgj3FjEWzcd9ky5IzLOZ5xtPiOyVOR7stlyU
+         qJemCUZhvFmFNGnQK2ZFugnJ0EWHIIBTQgpEQjHjKudYsEjQMRw9DRGR/qiHEyYRhUUI
+         jW6W1kzIDznroi5rplm8jYf+iEGcVJCE3e0V+UIuBFLR4W9xRnG3shb+KhvJ+baOqd/C
+         nT3Tehe1Euvnooad6cttausudwY2Ik2o0+vIhxY18BO4ZltkVlwDa1hvPFLmmvePzeSi
+         3z/3WPoyx4hIOjNQNX/a96r5sEDBd4Zd9N9XfVsHQGmSsIvvCfWVu6R5G+Z32jpAAr+q
+         9l3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696531320; x=1697136120;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C38Q1C9r7lwS5fW7UNhnL/vCgr/OGwg6SzySJrMoliQ=;
-        b=ssHDSsyEkCcVLli0kpj13J6WBKQVLtn4wnnVldbY5+MCByk3TfhEICc9JCC60gUgzi
-         zA9yH+NA4SSL79NrVMYeu9P/4QuusToVdQS4ZvYZw1F8KWeJgN6lLp2UGsuQBn+MTdIK
-         g6rHiXg/8vmwYYy4fIU2xUQqqUkNtrk1BXnmpmUmgsDeiDd4grkRSuTMdz4IpfZh5T4q
-         +mY63EVIJBCaUQip6XNdSiFt45mDTZsHR0zkhd8G1u6Q/m73AHrBbpSqUPTvPVYfHWzr
-         BrC95opCRepxlwx0UikSiSSqtr4gOuJifWMts8t1hCc5i3S2l4LQP1288TzxMHFvvdNz
-         e5sA==
-X-Gm-Message-State: AOJu0YwdYnM0iD2p+mOmocw37TXCa3wYauWPjII2+TMUQZsevhW2m6x2
-	sEovGeHRyTmSoEFSnT+25aU=
-X-Google-Smtp-Source: AGHT+IH/MiC5uTZ2tc7c7WqzhaItMMseY+YztPQrfyluZFiivc3EvIyxz9Vgf3PzyA0zY0+JYrUNZw==
-X-Received: by 2002:a92:c54d:0:b0:352:8b80:4744 with SMTP id a13-20020a92c54d000000b003528b804744mr6937010ilj.4.1696531320295;
-        Thu, 05 Oct 2023 11:42:00 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id m123-20020a633f81000000b00577f8f4df6bsm1741553pga.18.2023.10.05.11.41.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 11:41:59 -0700 (PDT)
-Message-ID: <1c5df4b9-faeb-49c1-a276-964ba96f22b7@gmail.com>
-Date: Thu, 5 Oct 2023 11:41:56 -0700
+        d=1e100.net; s=20230601; t=1696531370; x=1697136170;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Og4ZdxssU8L1R5eTzBywzenE0Sa3mA8E/G01mteTkJU=;
+        b=YifhIrFxdSAdACd+MK8t64Be/TCUwG+8JTPQmZ5kjeN0U57k5Ua6B/YduYo0TCt7uo
+         mTT5rBY+WE1jUJba11adk62eE15Y6+dpvP2eYLT51D1g3WmrU8uH/CqsHBbj10Vboh8Z
+         BSAWKSeLDcX4EezjhTGLq9pjEX3thsHYnx2NEagfoWUBt260eyAjp+FO86rPP5oPNIUd
+         dkyQcwkZieC0ncmBJfQ+M7JzTgeXivMvgS+kMRnPSNnWNbv8emKi58HUeQmNdlpnp+cf
+         MC8ZWQx/L1EOWlmw587Bjhz03vrePSgcZrFSH6xUXgqhMVfrkUPLf8Pbnv8aC3ktPTsC
+         f3fw==
+X-Gm-Message-State: AOJu0YwBrH/eRKbXsT7Whs1THgeXnwRD2I4vnWUWEg/N51Tud5myQkgH
+	W9GMds5wfE0YNkkcmQ+dTM/X2A==
+X-Google-Smtp-Source: AGHT+IERHDyiGcSySCG+0kXDAyTbk6izd1tli09B3QVLHc6xKDva6Bmp+Ji4dTG0yy6fRPHee7P+5A==
+X-Received: by 2002:a05:6a20:8e28:b0:140:d536:d434 with SMTP id y40-20020a056a208e2800b00140d536d434mr5531865pzj.10.1696531370037;
+        Thu, 05 Oct 2023 11:42:50 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f1:e2c2:b6b7:54d9:6465:eb2f:5366])
+        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b00690d4c16296sm1725831pff.154.2023.10.05.11.42.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 11:42:49 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org
+Cc: mleitner@redhat.com,
+	vladbu@nvidia.com,
+	simon.horman@corigine.com,
+	pctammela@mojatatu.com,
+	netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: [PATCH net-next v4 0/3] net/sched: Introduce tc block ports tracking and use
+Date: Thu,  5 Oct 2023 15:42:25 -0300
+Message-ID: <20231005184228.467845-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] net: phy: broadcom: add support for BCM5221 phy
-Content-Language: en-US
-To: Giulio Benetti <giulio.benetti@benettiengineering.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Giulio Benetti <giulio.benetti+tekvox@benettiengineering.com>,
- Jim Reinhart <jimr@tekvox.com>, James Autry <jautry@tekvox.com>,
- Matthew Maron <matthewm@tekvox.com>
-References: <20231005182915.153815-1-giulio.benetti@benettiengineering.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231005182915.153815-1-giulio.benetti@benettiengineering.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/5/23 11:29, Giulio Benetti wrote:
-> From: Giulio Benetti <giulio.benetti+tekvox@benettiengineering.com>
-> 
-> This patch adds the BCM5221 PHY support by reusing brcm_fet_*()
-> callbacks and adding quirks for BCM5221 when needed.
-> 
-> Cc: Jim Reinhart <jimr@tekvox.com>
-> Cc: James Autry <jautry@tekvox.com>
-> Cc: Matthew Maron <matthewm@tekvox.com>
-> Signed-off-by: Giulio Benetti <giulio.benetti+tekvox@benettiengineering.com>
+__Context__
+The "tc block" is a collection of netdevs/ports which allow qdiscs to share
+match-action block instances (as opposed to the traditional tc filter per
+netdev/port)[1].
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Example setup:
+$ tc qdisc add dev ens7 ingress block 22
+$ tc qdisc add dev ens8 ingress block 22
+
+Once the block is created we can add a filter using the block index:
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action drop
+
+A packet with dst IP matching 192.168.0.0/16 arriving on the ingress of
+either ens7 or ens8 is dropped.
+
+__This patchset__
+Up to this point in the implementation, the block is unaware of its ports.
+This patch fixes that and makes the tc block ports available to the
+datapath.
+
+For the datapath we provide a use case of the tc block in an action
+we call "blockcast" in patch 3. This action can be used in an example as
+such:
+
+$ tc qdisc add dev ens7 ingress block 22
+$ tc qdisc add dev ens8 ingress block 22
+$ tc qdisc add dev ens9 ingress block 22
+$ tc filter add block 22 protocol ip pref 25 \
+  flower dst_ip 192.168.0.0/16 action blockcast
+
+When a packet(matching dst IP 192.168.0.0/16) arrives on the ingress of any
+of ens7, ens8 or ens9 it will be copied to all ports other than itself.
+For example, if it arrives on ens8 then a copy of the packet will be
+"blockcasted";-> to both ens7 and ens9 (unmodified), but not to ens8.
+
+Patch 1 introduces the required infra. Patch 2 exposes the tc block to the
+tc datapath and patch 3 implements datapath usage via a new tc action
+"blockcast".
+
+__Acknowledgements__
+Suggestions from Vlad Buslov and Marcelo Ricardo Leitner made this patchset
+better. The idea of integrating the ports into the tc block was suggested
+by Jiri Pirko.
+
+[1] See commit ca46abd6f89f ("Merge branch 'net-sched-allow-qdiscs-to-share-filter-block-instances'")
+
+Changes in v2:
+  - Remove RFC tag
+  - Add more details in patch 0(Jiri)
+  - When CONFIG_NET_TC_SKB_EXT is selected we have unused qdisc_cb
+    Reported-by: kernel test robot <lkp@intel.com> (and horms@kernel.org)
+  - Fix bad dev dereference in printk of blockcast action (Simon)
+
+Changes in v3:
+  - Add missing xa_destroy (pointed out by Vlad)
+  - Remove bugfix pointed by Vlad (will send in separate patch)
+  - Removed ports from subject in patch #2 and typos (suggested by Marcelo)
+  - Remove net_notice_ratelimited debug messages in error
+    cases (suggested by Marcelo)
+  - Minor changes to appease sparse's lock context warning
+
+Changes in v4:
+  - Avoid code repetition using gotos in cast_one (suggested by Paolo)
+  - Fix typo in cover letter (pointed out by Paolo)
+  - Create a module description for act_blockcast
+    (reported by Paolo and CI)
+
+Victor Nogueira (3):
+  net/sched: Introduce tc block netdev tracking infra
+  net/sched: cls_api: Expose tc block to the datapath
+  net/sched: act_blockcast: Introduce blockcast tc action
+
+ include/net/sch_generic.h    |   8 +
+ include/net/tc_wrapper.h     |   5 +
+ include/uapi/linux/pkt_cls.h |   1 +
+ net/sched/Kconfig            |  13 ++
+ net/sched/Makefile           |   1 +
+ net/sched/act_blockcast.c    | 297 +++++++++++++++++++++++++++++++++++
+ net/sched/cls_api.c          |  12 +-
+ net/sched/sch_api.c          |  58 +++++++
+ net/sched/sch_generic.c      |  34 +++-
+ 9 files changed, 426 insertions(+), 3 deletions(-)
+ create mode 100644 net/sched/act_blockcast.c
+
 -- 
-Florian
+2.25.1
 
 
