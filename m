@@ -1,101 +1,179 @@
-Return-Path: <netdev+bounces-38442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6BF67BAF28
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 01:13:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12DEB7BAF2A
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 01:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 363251C208BB
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:13:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id ACFB3281FF1
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1514369D;
-	Thu,  5 Oct 2023 23:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703BF43A89;
+	Thu,  5 Oct 2023 23:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H5gB3pBe"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cs+gUPJ4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB1743689
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 23:13:20 +0000 (UTC)
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326961BCF
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:13:11 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-65b02e42399so8163276d6.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 16:13:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD3E43693
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 23:14:44 +0000 (UTC)
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610E52133
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:14:38 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-57de9237410so833543eaf.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 16:14:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696547590; x=1697152390; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m2O2X72sw/T7xt9ZYaaZg62x6tjZu36SBUEiSSeviOQ=;
-        b=H5gB3pBeJMg6Ej5sug8/52RRMg6NHi6N27nHUwQMTQvKHZLgdLpsv5YnhXPE8umvcn
-         Z9xKLlh6K14rmHeT9MSbVq6g+Ccg8xHY/bdK4eVeUyKhmZ5Ho+FuiLOTz9qHy28budTU
-         Nyoa4qk5l2lRsEt5OidagroRsXsJh+wzgOeSsWD15j8In9I4fAVGDkyxyKU/UrbW09Il
-         O6ZNbd8aQrVcWtnTXP53qJ4CPvM10wFwMwXWV6KLMRvT6vKFZl9Z1ReileMmg668MHIV
-         lK+iFnB3bdbjO/viT2aal8LS5SA89ZFF/bRFOvNCBN1LJLxpgYHVz6rUwuhLW6GviEPZ
-         GtVQ==
+        d=chromium.org; s=google; t=1696547677; x=1697152477; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=irJXSE0omX7Ex5LSZzNgKfqZeUDyCk8wvHecGIiPTPc=;
+        b=Cs+gUPJ4qQLS5V+jWRjdw5/Dtz7zVJChF5shjDXymHNzsPAd4o6Ql5FRfGr7i2DBAv
+         JkIyIeLQnuOUKUiESy0v+Vz7gTVnxYM6RoEEtuWSf98RrWxVK1eQhA5TPWOnrBieTDDj
+         zZhPEoVHMgkVS3QEnGLRTBCHsGR/aExiLAMLk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696547590; x=1697152390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m2O2X72sw/T7xt9ZYaaZg62x6tjZu36SBUEiSSeviOQ=;
-        b=kNH5arUOzkv6MBkJXrLf0vpKRq4RvThR7lYfWKrEhDb4BROR1jhJQ8yyi5kA43TgMC
-         Sjw92plnsEqVrRkah8HjdKRs5OzL8IJgvgybiYYPjknKmXrXeu1UTQlKp8BNHFcnMsO/
-         OBqeMyAvSVKtYG+KLDRvG+n7HZfOjkGVzeMxvFYxqt3PbcDhUjSyu3yt0pGet5lxjqwe
-         fL41UzDyujM516GLqaqijd17fCjH4V39wGbRZYKNhh3S/9WNmbxoUOCkfe8r9NV5RDdP
-         UX1lpvoux3H61FM5wZFIhxXshDxeKSrAH7b2ZZPU8yn3fRUlq2HsaN5dkajaDHR/DKDM
-         5UUA==
-X-Gm-Message-State: AOJu0YygyBuW41fclCR8c+SuKporRm/MgbUheA6ml6yGaBKpbhre+rb+
-	hMMYl/Q1v08Nyk3xv2zIG+741LeNU5OY4F19n1FNXA==
-X-Google-Smtp-Source: AGHT+IG5c0/pTKX96AVCxurr+fBXRzMwArsZvBBKtDR/g63IMgCzmXqnBgT2HDZ+O+ChaD+FDoqOkc/v3DsFrZzmd88=
-X-Received: by 2002:a05:6214:808:b0:655:d870:7306 with SMTP id
- df8-20020a056214080800b00655d8707306mr6553318qvb.25.1696547590132; Thu, 05
- Oct 2023 16:13:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696547677; x=1697152477;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=irJXSE0omX7Ex5LSZzNgKfqZeUDyCk8wvHecGIiPTPc=;
+        b=eR1BHcunNgbjlhlqfq8N5FaTdvR0xdoJ4DScKGTBsdbMw4VzYywe2tiSKCLkmlw8bJ
+         uYfDMnBVPAHqzVuZdIgV8+pVKMOFMJuWbfoCaEe1XEzFWW5FusahDfvK3gk0fSnF0j/I
+         mzzIFagPO5BScEfQVgAdhuH0nStl8UZbVs3wMt0mbG96JInPTCX2w1zDJPmCtnUMdOUB
+         nid8x6yPIir382n02isjMdpnsL7oG/1Hsm1g4uHf/Vtf17zyzE24HJPgfd09q7Afdn+E
+         ydyph1qf4ct+aoUMfwyrAwTZaZ0PNHa0ubOZL6ZRNrs7hivnzlZjCOTIslZKNU1/BWTK
+         2hJw==
+X-Gm-Message-State: AOJu0Yz6NnBex9KZOPD3L9NkUbpa4r/Ap3jts5jyGmL0jY5YMhJ8V0sA
+	IMLSYKVw8OUyFQtzazJ6ggF57A==
+X-Google-Smtp-Source: AGHT+IHBOijir4biZsLjBKOWnhShZC2IeLyv1yORJ7HB6ckpE5kbk4Cbl0nN0LtKeofidT5uyC7Sqg==
+X-Received: by 2002:a05:6358:8824:b0:143:7d04:36bb with SMTP id hv36-20020a056358882400b001437d0436bbmr6454599rwb.6.1696547677527;
+        Thu, 05 Oct 2023 16:14:37 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id x5-20020a17090abc8500b0026f4bb8b2casm4138869pjr.6.2023.10.05.16.14.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 16:14:36 -0700 (PDT)
+Date: Thu, 5 Oct 2023 16:14:31 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Derek Chickles <dchickles@marvell.com>,
+	Satanand Burla <sburla@marvell.com>,
+	Felix Manlunas <fmanlunas@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] liquidio: replace deprecated strncpy/strcpy with strscpy
+Message-ID: <202310051610.01453F60F@keescook>
+References: <20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_ethtool-c-v1-1-ab565ab4d197@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231003041701.1745953-1-maheshb@google.com> <ZRzqLeAR3PtCV83h@hoboy.vegasvil.org>
-In-Reply-To: <ZRzqLeAR3PtCV83h@hoboy.vegasvil.org>
-From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Date: Thu, 5 Oct 2023 16:12:44 -0700
-Message-ID: <CAF2d9jggffd6HtehuL-78ZFPqcJhO+HAe1FX-ehXc5oBmZ72Dw@mail.gmail.com>
-Subject: Re: [PATCHv2 next 1/3] ptp: add ptp_gettimex64any() support
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, Don Hatchett <hatch@google.com>, 
-	Yuliang Li <yuliangli@google.com>, Mahesh Bandewar <mahesh@bandewar.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_ethtool-c-v1-1-ab565ab4d197@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 3, 2023 at 9:29=E2=80=AFPM Richard Cochran <richardcochran@gmai=
-l.com> wrote:
->
-> On Mon, Oct 02, 2023 at 09:17:01PM -0700, Mahesh Bandewar wrote:
-> > add support for TS sandwich of the user preferred timebase. The options
-> > supported are PTP_TS_REAL (CLOCK_REALTIME), PTP_TS_MONO (CLOCK_MONOTONI=
-C),
-> > and PTP_TS_RAW (CLOCK_MONOTONIC_RAW)
-> >
-> > Option of PTP_TS_REAL is equivalent of using ptp_gettimex64().
->
-> NAK
->
-> Don't just ignore feedback and repost.
+On Thu, Oct 05, 2023 at 09:33:19PM +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> NUL-padding is not required as drvinfo is memset to 0:
+> |	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
+> 
+> A suitable replacement is `strscpy` [2] due to the fact that it
+> guarantees NUL-termination on the destination buffer without
+> unnecessarily NUL-padding.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+> Note: build-tested only.
+> ---
+>  drivers/net/ethernet/cavium/liquidio/lio_ethtool.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c b/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
+> index 9d56181a301f..d3e07b6ed5e1 100644
+> --- a/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
+> +++ b/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
+> @@ -442,10 +442,11 @@ lio_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
+>  	oct = lio->oct_dev;
+>  
+>  	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
 
-I replied to all your earlier comments, which one do you think I had ignore=
-d?
+struct ethtool_drvinfo {
+        char    driver[32];
+	...
+        char    fw_version[ETHTOOL_FWVERS_LEN];
+        char    bus_info[ETHTOOL_BUSINFO_LEN];
+
+> -	strcpy(drvinfo->driver, "liquidio");
+> +	strscpy(drvinfo->driver, "liquidio", sizeof(drvinfo->driver));
+
+Yup, this is basically what FORTIFY_SOURCE will do automatically to
+strcpy().
+
+> -	strncpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
+> -		ETHTOOL_FWVERS_LEN);
+> +	strscpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
+> +		sizeof(drvinfo->fw_version));
+
+Yup, ETHTOOL_FWVERS_LEN == sizeof(drvinfo->fw_version)
+
+> -	strncpy(drvinfo->bus_info, pci_name(oct->pci_dev), 32);
+> +	strscpy(drvinfo->bus_info, pci_name(oct->pci_dev),
+> +		sizeof(drvinfo->bus_info));
+
+Yup, ETHTOOL_BUSINFO_LEN == sizeof(drvinfo->bus_info)
+
+>  }
+>  
+>  static void
+> @@ -458,10 +459,11 @@ lio_get_vf_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
+>  	oct = lio->oct_dev;
+>  
+>  	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
+> -	strcpy(drvinfo->driver, "liquidio_vf");
+> -	strncpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
+> -		ETHTOOL_FWVERS_LEN);
+> -	strncpy(drvinfo->bus_info, pci_name(oct->pci_dev), 32);
+> +	strscpy(drvinfo->driver, "liquidio_vf", sizeof(drvinfo->driver));
+> +	strscpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
+> +		sizeof(drvinfo->fw_version));
+> +	strscpy(drvinfo->bus_info, pci_name(oct->pci_dev),
+> +		sizeof(drvinfo->bus_info));
+>  }
+
+Yup, looks good.
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+>  
+>  static int
+> 
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_ethtool-c-b6932c0f80f1
+> 
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+> 
+> 
+
+-- 
+Kees Cook
 
