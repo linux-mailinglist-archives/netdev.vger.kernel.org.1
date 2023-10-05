@@ -1,238 +1,221 @@
-Return-Path: <netdev+bounces-38287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5BB7B9FB8
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:28:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7517B9E6F
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:06:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2F42C1C20912
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 974EE1C20A3F
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F417B28E32;
-	Thu,  5 Oct 2023 14:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855A228DD7;
+	Thu,  5 Oct 2023 14:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lybtdu9n"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="R9IKYeSc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6270A286A6
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:28:44 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A3BB3D1B;
-	Thu,  5 Oct 2023 07:28:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696516121; x=1728052121;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Er89vX52G/zC+elLCVKrqj5b6xTnFrf3UQkARHVQqFc=;
-  b=lybtdu9n8N2o5VJJJC67En7T7O46XycxR3lw0N8UA6krUnm/tw61rxXu
-   DinUqbN3V5z5YILYt0pPcuKqmDWdhw1pqWPGkDF3YbwMZcapEhbKm08im
-   deukP2SOmRHxyQEXR6d41InMUh8LDTZEGG5GPzeOHW+iP/ZhStZS150rT
-   MEfR434te2vFT131ciufmErTyJFzBSLrBxoy3pVnw0u5233W7feSSTREO
-   +ji8w585TWJ3yANEa9w2lU7N2Nw+BpS2AexSCM7h85zzUIr6Qt4oTFNGP
-   vJrZ5i7bbgm0pEzmnIYCL/IfZIslDxWCuygSwb54B/ZtUUT6lJ3wKczHp
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="449934788"
-X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
-   d="scan'208";a="449934788"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 01:22:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="1082924472"
-X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
-   d="scan'208";a="1082924472"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Oct 2023 01:22:14 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 5 Oct 2023 01:22:14 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 5 Oct 2023 01:22:13 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 5 Oct 2023 01:22:13 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 5 Oct 2023 01:22:13 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iaCVHJcTHkpuGUx/juS/wMbkqclQdYEJ3Ke5vrRvu52mYeWPJ3JZY2damSH3w/ekGGU/FLvR5ZOyPsYsux7oHfBkqRmqOiT+s92qvn3pU/05B+AYgHE1ydVyemokENrx7Ql+gdZKvZdJMcX+17aaFgKofT1KvjetWvk4Oo1lc+INcUwv2JaoCF//xb/QnriQxf1MS/RUqA9T3JhPzMJmpy4IIp5PlUmZqO7Y1FoFc8RW3hfhG444JqgFgBpsXyPcKcgROr5KcQNsn9fDGXEurL3vLFktvKh4mfANaOdREPUZZr9YPefj1eDclF9uzC2oWhDs+u6TjASNxlerXC5HAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NWZpvcFr6A3EicQjTi+9D7CGzZXTUu6Fz5R2h/sTnLk=;
- b=TIf+JV/9g2plyvZ0aOZOqVSTao7o9Mw0l1Z2qkA5tXBJC15mUGR01afWVNPy03uJFzOAKmbWAWho01Vfw3OxzlOScko5L41s0g9r39rvY6bCZbRjITnYgSzN+fu9XUTMhOklk8/3TPF9gKLBq2dXCtT0I+ilTrpSo/8eTIV3sCtoNr9I0uiLKAezgXObB/RE4+UDvan/DlG/rGFzWob4rT/SwWZDGWAP27QD1LJgARo8TK4N8bDO6GU9cGlTeAhFuCG2iw1Lp1XAWW37PCSpkEiDUBkhRnurw1yAtoN8fH+/1o0uAuLNyQ/ENOjeaQ4RwOkObM0UXDnF6FJs+CmMgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by SA1PR11MB8473.namprd11.prod.outlook.com (2603:10b6:806:3a7::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.33; Thu, 5 Oct
- 2023 08:22:06 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6838.024; Thu, 5 Oct 2023
- 08:22:06 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "edumazet@google.com" <edumazet@google.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Nguyen,
- Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular
- header dependencies and fix headers
-Thread-Topic: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular
- header dependencies and fix headers
-Thread-Index: AQHZ8R1TpSizpDLlFkeA5ZoIhKoZsrA65wkQ
-Date: Thu, 5 Oct 2023 08:22:06 +0000
-Message-ID: <BL0PR11MB3122EA0512BBE5CCCF62C66BBDCAA@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20230927083135.3237206-1-ivecera@redhat.com>
- <20230927083135.3237206-9-ivecera@redhat.com>
-In-Reply-To: <20230927083135.3237206-9-ivecera@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SA1PR11MB8473:EE_
-x-ms-office365-filtering-correlation-id: 9a1abbd9-87e6-4ba9-8510-08dbc57c295b
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: LE9SNQaBBt+sRcw9c5sL2IFm9CY914Ui1NOnZ8N++lZjaSf8jLRX5ai3bwxKvttme3SQbq3v4tlLa/rte+LduHzOxcZaZUVQxWYSHuVyprG22CnaPKG0u46TbUKHQVJin/ia9AgbxOaVw4VOxvkSJS+CTC34nQyvBb0bENGhcA582JfdEot6zbCZyQplbZdHczkcwOIXtQ5kKv9SOTbpmNzK4JR86l4bD3WEhL+yE7rTV2w3ePqhRTdZOPnRbU+rAiLmaytGIO0MqaRTo1m0Rqo/PXC7abJpwVAsJGnQLxvYpqEq4OkmmBrHEr9DH7FX252Yd9DRYzj90Ni6vBCybf8rjx+IUxH88oE1SNMUvP7ufZcOB+3KUgz6Uwa3g1Oy2oXzNcexiJoS2xEJPncSc0UK1XPPjmCMleLWtdMk46UflT66ti4ovD51TzmNHSSgNFnYTpsm9Thb7yM+kckgFwZ5YOOIHaZ5PnuMFqfI/hgJTgoemMtsB+qTRj9S7nZHcqyNnywmNOxAi2pqq90PaiLTFYxgAGj1zP9dojKEjLboi8vhiZIiWnjlwggfvSkSvhEquWcDFeBJI/wxVXBiRKfqM7duQEiDrbfTY4Gw2ffL8RSZHzQ9ldh3hdbfZ84h
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(39860400002)(136003)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(66446008)(53546011)(110136005)(54906003)(86362001)(66556008)(66946007)(76116006)(66476007)(4326008)(41300700001)(33656002)(38100700002)(2906002)(8936002)(52536014)(8676002)(38070700005)(122000001)(5660300002)(83380400001)(82960400001)(316002)(26005)(55016003)(64756008)(9686003)(71200400001)(6506007)(7696005)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?69c0rkGwD/mPd1cLCkKp+/ul6L4YBmy3Qxm/VxNQDLsC/2TVmmf+HtEYW3oZ?=
- =?us-ascii?Q?vNMbvoB3mVn+HLWN5voGoCwq7yIwwPW2HxCc1sKWKufNqWJxXXbVzWAmtUT4?=
- =?us-ascii?Q?GwUwwc9Cp479Z2Rhrc0+Z8/RHP2Qfx3B1dKplGmUtckkv0V5AMMfr6z+ZSjO?=
- =?us-ascii?Q?s6qBJ9pNgFwdw7mVF71/THQPEYvsdlMklVBK7JJPxBYrXuva/JZgYJoATefT?=
- =?us-ascii?Q?WyRJCPIo32VS4AnjMOkVZPY4J3R6U9NDHWI0jnJlm47ukcRClDWwlbQz2DJ1?=
- =?us-ascii?Q?SowqIOgm+pITkaRy6CtJ+O5hJc7+M9Sma9Dd2QwPOqrhuMPHHFpFDWsYkW0A?=
- =?us-ascii?Q?6eVBFCCjT/D1YB+QjnOw6fu7JPL9eoLViWQNNfXo18WLeu+A+5kWME1GIeA2?=
- =?us-ascii?Q?NjkD7faKab+j61dS9K5onbTqyKRG6LIuRvcGWIqF96A7pbrkokh8F7VRnBqO?=
- =?us-ascii?Q?vrR9ou6JwWo0A+GF5rtcn70Oiarb/fYdQhBEPJqhAm6PjCin3MclxMy4AA50?=
- =?us-ascii?Q?OzE4FW5jgrqrpOgyz4IFxGyFfXje6brcDFJXAtqwiDsQyA9leIVSeAbn7zuS?=
- =?us-ascii?Q?ngRNgbDvx/jPEICAabgfZoDwEdvYk+ghQ2HF5SqAdDBVQ96JOWc6wKIFOpUl?=
- =?us-ascii?Q?efr3OE7cLTvVH7u41KXJ/tSZ+Pbu4tokIii0xNQmE32EFm+ehoRINV0Wjw3A?=
- =?us-ascii?Q?aQk5tscL2ZC/3dp2eg/4vMDkUhPhVBsEYRtIxOGW3rOkcFHhUV2pN9wVTS0N?=
- =?us-ascii?Q?c1G7acXIPy79qDLhYOW2e7f2M/sHUm9f/h/ULW+DrTPcuj9gRFKxmX6jZKe6?=
- =?us-ascii?Q?YEbTqsyjSMODEmrd2qoNsA9Jazox/73/lpXLGNtYv/s7uLToaa/dSYwkGOrB?=
- =?us-ascii?Q?Qe4mtkgKRXxdLlJEk1ycPaxV+rRTtT3Fl9FfndWmr+tMjJX2AAMSMcHes35N?=
- =?us-ascii?Q?aV6nxRQT++isjEuDbenceqIwVdCcRaOJWuDQT1Yy3abs47MpnUOTH6vv8cFi?=
- =?us-ascii?Q?qUyb++uULagvnWRyOh3x+B65VfS0W/9dwABUBLfcXuk0GU8vCjNkl0gos9sq?=
- =?us-ascii?Q?ilfmx/JbpcNoMng2qJbd8h5NQ+4WbMrXryG1+Z9v08T1l4kcRwstRFEUReBS?=
- =?us-ascii?Q?hlKNXXEUHUv7WETRT/KUWTnIe+8OgLDrVRbr6lu5BhEsLCsTI7sOmaiM1O90?=
- =?us-ascii?Q?+PkGEl/A+BQpM5WOXvLkvt5IkpuxYRCVKGxzLD0Z8Qrf68XTg31UbOb1jD5R?=
- =?us-ascii?Q?u72lEk300XogQCA3VSDyr0zbfiboWsR0NAHA2oOD7oztq6lwMU20wL8uqHYS?=
- =?us-ascii?Q?HNs2Te7+ZsKalWBXtc/rbwAF9JuukaBxNz/xyNQJ200MZ0GPShJh8jt9oGvb?=
- =?us-ascii?Q?tqHSbjhE9m54qnFGUyR0kcLT4+MAjqnd6cWa+6kPiqVRaV53OMHxrikcTq1H?=
- =?us-ascii?Q?Mh1cHmrF+W6ZuP7+UC9mDLq7YIGhPamNA4smJ5TFtRFQ2jgQpbkFPH9KIKCE?=
- =?us-ascii?Q?FjlTHT4v0ZgOv5MJbl1bKRCmNA/5epTTgYMeOeolNPzSrz2TYQLanluB5k0k?=
- =?us-ascii?Q?nMFeEBMOsoaoCnwTeQqs9JKLaMqKnzYvbFYi4ktx53G1eFUqdn34bVOoxrAm?=
- =?us-ascii?Q?Zw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF8228E0C;
+	Thu,  5 Oct 2023 14:05:51 +0000 (UTC)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D69D55DEC;
+	Thu,  5 Oct 2023 07:05:47 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20231005084047euoutp0157366671422ee79fb9d4488c4343312b~LKXBm3CcK0218602186euoutp01D;
+	Thu,  5 Oct 2023 08:40:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20231005084047euoutp0157366671422ee79fb9d4488c4343312b~LKXBm3CcK0218602186euoutp01D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1696495247;
+	bh=3m+W8OZ+q7U0Z5Xd3tHyUE/jHnrt0jaco7nrd9bM4bY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=R9IKYeScFoZXwjr2IF9SUrMEOhixk6cOMLyr/PJ071E6QDl2N68SjjAemnKbtLIq5
+	 npS97x9n8m08e+7ZQebeQ/eZ/6qj9xmfGbnnItS73bd6a5OCSUBQf8XhsezLAN6M8Z
+	 oPggeWIXs4GLHKoD1/rdCWq/rGhBUM7GkeTWbQzg=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20231005084047eucas1p1da5e0df7825edbc7344cb463cc3f8a9b~LKXBTTGYc1320813208eucas1p1_;
+	Thu,  5 Oct 2023 08:40:47 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id 41.1D.42423.E867E156; Thu,  5
+	Oct 2023 09:40:46 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20231005084046eucas1p1a8dcb84361cc0ef1242768ecc1a96664~LKXA8RBwW0854408544eucas1p19;
+	Thu,  5 Oct 2023 08:40:46 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20231005084046eusmtrp110d01553a8e57750494a7a7668d25921~LKXA7op2P1084310843eusmtrp1F;
+	Thu,  5 Oct 2023 08:40:46 +0000 (GMT)
+X-AuditID: cbfec7f2-a51ff7000002a5b7-85-651e768e23d3
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id D0.38.25043.E867E156; Thu,  5
+	Oct 2023 09:40:46 +0100 (BST)
+Received: from localhost (unknown [106.120.51.111]) by eusmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20231005084046eusmtip1fb381a4d3621657d165da451e1e6f248~LKXAxc23d0602606026eusmtip1W;
+	Thu,  5 Oct 2023 08:40:46 +0000 (GMT)
+From: Lukasz Stelmach <l.stelmach@samsung.com>
+To: Justin Stitt <justinstitt@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
+	<edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+	<pabeni@redhat.com>,  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: ax88796c: replace deprecated strncpy with strscpy
+Date: Thu, 05 Oct 2023 10:40:46 +0200
+In-Reply-To: <20231005-strncpy-drivers-net-ethernet-asix-ax88796c_ioctl-c-v1-1-6fafdc38b170@google.com>
+	(Justin Stitt's message of "Thu, 05 Oct 2023 01:06:26 +0000")
+Message-ID: <oypijd34yp5unl.fsf%l.stelmach@samsung.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a1abbd9-87e6-4ba9-8510-08dbc57c295b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2023 08:22:06.3290
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OuDmKgAnWt1fgFJWnKkgpsn2huQuRq9IUqjR/cBWThloNKFc/CmJqwnjl0+HH+WIp5tV7WwhIDukAkX2uKpurgChtWIPlQvyQZX5NiJEe2s1EjiY8an4JjghUFep42tQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8473
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
+	protocol="application/pgp-signature"
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrDKsWRmVeSWpSXmKPExsWy7djP87p9ZXKpBpd+mlvMOd/CYvH02CN2
+	i2mrF7NZXNjWx2oxb/1PRovLu+awWRxbIGbx7fQbRgcOjy0rbzJ5LNhU6rFpVSebx/t9V9k8
+	Pm+SC2CN4rJJSc3JLEst0rdL4MqYteYvY8EUyYrdm7axNTBuFu1i5OSQEDCR6Jh+gbGLkYtD
+	SGAFo8TlE0eZIZwvjBKPlr9ngnA+M0rsPfuFtYuRA6zlyGoHiPhyRok5N95Dtb9glDje/ZQJ
+	pIhNQE9i7doIkBUiApoSZ7dOZAepYQaZ2jOjhRkkISzgLdH6u5kNxGYRUJWYsmYn2CBOkKlt
+	604wgiR4Bcwl+k7+YwGxRQUsJY5vbWeDiAtKnJz5BCzOLJArMfP8G7BmCYEfHBJbjq5jg/jO
+	ReLGv3/MELawxKvjW9ghbBmJ05N7WCAa2hklmq4sZIVwJjBKfO5oYoKospa4c+4X1CRHiS2z
+	Z0ADgE/ixltBiM18EpO2TWeGCPNKdLQJQVSrSKzr38MCYUtJ9L5awQhhe0i07DvJAgmuXYwS
+	byZ0sExgVJiF5KFZSB6aBTSWGRh863fpQ4S1JZYtfM0MYdtKrFv3nmUBI+sqRvHU0uLc9NRi
+	w7zUcr3ixNzi0rx0veT83E2MwER1+t/xTzsY5776qHeIkYmD8RCjClDzow2rLzBKseTl56Uq
+	ifCmN8ikCvGmJFZWpRblxxeV5qQWH2KU5mBREufVtj2ZLCSQnliSmp2aWpBaBJNl4uCUamBy
+	eMEk7vYo39UnOtitpHvLw61WGncempsLRMZmPbHxiDnLc3Ph01DVr/MDVzDHds1ZynFcnnHt
+	KsPHb6ZHTc//+v7x9T6h2cInVouejXhyrbd4621epi+7FWa73m5+mO6w7NfCJV1bnhp+ebe5
+	2mB2UZrBBYvdHl9C2JZdun9ssddKuXUpmcprLY/PtAgIFJRtqVgW8/rRnYnmu7/+WXGjUWPj
+	hQPZV69O/p3clihhFHPlcuU0V0apI68aMqLWnjF6vb2+wiFndmSnQtiWMwJKW7UP+HP8qBC1
+	u7vV7vONKydZn53Vvf5w75UpsUGzTLM/hXfsc5wfeTbwWfbPE+vFavb8FdaUiPun6Zx9zmuP
+	jRJLcUaioRZzUXEiAO0gP1jPAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPIsWRmVeSWpSXmKPExsVy+t/xu7p9ZXKpBosmqVjMOd/CYvH02CN2
+	i2mrF7NZXNjWx2oxb/1PRovLu+awWRxbIGbx7fQbRgcOjy0rbzJ5LNhU6rFpVSebx/t9V9k8
+	Pm+SC2CN0rMpyi8tSVXIyC8usVWKNrQw0jO0tNAzMrHUMzQ2j7UyMlXSt7NJSc3JLEst0rdL
+	0MuYteYvY8EUyYrdm7axNTBuFu1i5OCQEDCROLLaoYuRk0NIYCmjxNS2KoiwlMTKuekgYQkB
+	YYk/17rYuhi5gEqeMUosOfKDEaSGTUBPYu3aCJAaEQFNibNbJ7KD2MwCXxklGqf4gdjCAt4S
+	rb+b2SDGp0ncf9bHAmKzCKhKTFmzkxFkJqfAckaJtnUnGEESvALmEn0n/4EViQpYShzf2s4G
+	EReUODnzCQvEgmyJr6ufM09gFJiFJDULSWoW0HnMQDet36UPEdaWWLbwNTOEbSuxbt17lgWM
+	rKsYRVJLi3PTc4uN9IoTc4tL89L1kvNzNzECY2vbsZ9bdjCufPVR7xAjEwfjIUYVoM5HG1Zf
+	YJRiycvPS1US4U1vkEkV4k1JrKxKLcqPLyrNSS0+xGgK9NtEZinR5Hxg1OeVxBuaGZgamphZ
+	GphamhkrifN6FnQkCgmkJ5akZqemFqQWwfQxcXBKNTDN4th+dFMt/w8GS5a7p60czLfzu/ff
+	1rxg88XJfe173o17OjTKnsQklU3wnL6lRj96c+zPtInX8u4sMLJJvDDxcVAix8tjGuE7WKf3
+	/M7rv+nwLnwbq/g1KaEHv6YF3jPLXFN87+gaG+7nB5Z95fZSKljhpX4uWvavv/kdw5muPvcD
+	pIPb/qUl6/Sm8MwvX+QvV/N21eXe+EiTuq2pXzbYfJkoqr5AZuOz+M4Tiq5Fj6d7cDad7dp2
+	Nuu/g6I0n8hCpiVb3ALDV23ff8k080t6S+KKP5cNPV7VnTPuW5e78EXcdWZle5n/NTXZ759c
+	XHZATb5cQmDtHYbkCifWnwoBZUlNxf4GWz2nHm6qDVZiKc5INNRiLipOBAB3/X3cQgMAAA==
+X-CMS-MailID: 20231005084046eucas1p1a8dcb84361cc0ef1242768ecc1a96664
+X-Msg-Generator: CA
+X-RootMTR: 20231005084046eucas1p1a8dcb84361cc0ef1242768ecc1a96664
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20231005084046eucas1p1a8dcb84361cc0ef1242768ecc1a96664
+References: <20231005-strncpy-drivers-net-ethernet-asix-ax88796c_ioctl-c-v1-1-6fafdc38b170@google.com>
+	<CGME20231005084046eucas1p1a8dcb84361cc0ef1242768ecc1a96664@eucas1p1.samsung.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
-van Vecera
-> Sent: Wednesday, September 27, 2023 2:02 PM
-> To: netdev@vger.kernel.org
-> Cc: edumazet@google.com; intel-wired-lan@lists.osuosl.org; Brandeburg, Je=
-sse <jesse.brandeburg@intel.com>; linux-kernel@vger.kernel.org; Nguyen, Ant=
-hony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitsze=
-l@intel.com>; kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net
-> Subject: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular =
-header dependencies and fix headers
+--=-=-=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+It was <2023-10-05 czw 01:06>, when Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
 >
-> Similarly as for ice driver [1] there are also circular header
-> dependencies in i40e driver:
-> i40e.h -> i40e_virtchnl_pf.h -> i40e.h
+> A suitable replacement is `strscpy` [2] due to the fact that it
+> guarantees NUL-termination on the destination buffer without
+> unnecessarily NUL-padding.
 >
-> Another issue is that i40e header files does not contain their own
-> depenencies on other header files (both private and standard) so their
-> inclusion in .c file require to add these deps in certain order to
-> that .c file to make it compilable.
+> It should be noted that there doesn't currently exist a bug here as
+> DRV_NAME is a small string literal which means no overread bugs are
+> present.
 >
-> Fix both issues by removal the mentioned circular dependency, by filling
-> i40e headers with their dependencies so they can be placed anywhere in
-> a source code. Additionally remove bunch of includes from i40e.h super
-> header file that are not necessary and include i40e.h only in .c files
-> that really require it.
+> Also to note, other ethernet drivers are using strscpy in a similar
+> pattern:
+> |       dec/tulip/tulip_core.c
+> |       861:    strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> |
+> |       8390/ax88796.c
+> |       582:    strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> |
+> |       dec/tulip/dmfe.c
+> |       1077:   strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+> |
+> |       8390/etherh.c
+> |       558:    strscpy(info->driver, DRV_NAME, sizeof(info->driver));
 >
-> [1] 649c87c6ff52 ("ice: remove circular header dependencies on ice.h")
->
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strn=
+cpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.h=
+tml [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 > ---
->  drivers/net/ethernet/intel/i40e/i40e.h        | 43 ++++---------------
->  drivers/net/ethernet/intel/i40e/i40e_adminq.c |  4 +-
->  .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  2 +
->  drivers/net/ethernet/intel/i40e/i40e_client.c |  1 -
->  drivers/net/ethernet/intel/i40e/i40e_common.c | 11 +++--
->  drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  4 +-
->  drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  2 +-
->  drivers/net/ethernet/intel/i40e/i40e_ddp.c    |  2 +-
->  .../net/ethernet/intel/i40e/i40e_debugfs.c    |  3 +-
->  drivers/net/ethernet/intel/i40e/i40e_diag.h   |  5 ++-
->  .../net/ethernet/intel/i40e/i40e_ethtool.c    |  3 +-
->  drivers/net/ethernet/intel/i40e/i40e_hmc.c    |  3 +-
->  drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  4 ++
->  .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  8 ++--
->  .../net/ethernet/intel/i40e/i40e_lan_hmc.h    |  2 +
->  drivers/net/ethernet/intel/i40e/i40e_main.c   | 15 ++++---
->  drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  2 +
->  .../net/ethernet/intel/i40e/i40e_prototype.h  |  5 +--
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  3 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  7 ++-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
->  .../ethernet/intel/i40e/i40e_txrx_common.h    |  2 +
->  drivers/net/ethernet/intel/i40e/i40e_type.h   |  7 +--
->  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  2 +
->  .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  4 +-
->  drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 --
->  drivers/net/ethernet/intel/i40e/i40e_xsk.h    |  4 ++
->  27 files changed, 72 insertions(+), 81 deletions(-)
+> Note: build-tested only.
+> ---
+>  drivers/net/ethernet/asix/ax88796c_ioctl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+Reviewed-by: Lukasz Stelmach <l.stelmach@samsung.com>
 
+> diff --git a/drivers/net/ethernet/asix/ax88796c_ioctl.c b/drivers/net/eth=
+ernet/asix/ax88796c_ioctl.c
+> index 916ae380a004..7d2fe2e5af92 100644
+> --- a/drivers/net/ethernet/asix/ax88796c_ioctl.c
+> +++ b/drivers/net/ethernet/asix/ax88796c_ioctl.c
+> @@ -24,7 +24,7 @@ static void
+>  ax88796c_get_drvinfo(struct net_device *ndev, struct ethtool_drvinfo *in=
+fo)
+>  {
+>  	/* Inherit standard device info */
+> -	strncpy(info->driver, DRV_NAME, sizeof(info->driver));
+> +	strscpy(info->driver, DRV_NAME, sizeof(info->driver));
+>  }
+>=20=20
+>  static u32 ax88796c_get_msglevel(struct net_device *ndev)
+>
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231005-strncpy-drivers-net-ethernet-asix-ax88796c_ioctl-c-56=
+af20b7d992
+>
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+>
+>
+>
+
+=2D-=20
+=C5=81ukasz Stelmach
+Samsung R&D Institute Poland
+Samsung Electronics
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmUedo4ACgkQsK4enJil
+gBBtOgf/bIfVw7cQUrX08F5M1kR+r8NPkBJEcRU0/LsDSm7kFknOqcpcT0HY9P4u
+BXSG73gLX18UvSzi+wshSzsDbyGNbwSHtvO3z1ADa1jAfTfKcXjKXPK7A+I9e6FV
+ooqTslmfuO/kTYkwUUSvy//kI7HSL4cmJWFvKridRMhqXmui3UNaRymFCoeUXf1z
+D/Xuf6VgmPEUZ3wZH7UaKi07IgmkryxGz5J3U+XJi8Xk0jg72gALO+6IGmeYyPUu
+jHrj75qYCCoQ4uynjloHO0QlKpfs3Wu46SRdoFQdGNYIGrGdrSNAwGDK/86Z26k4
+Zei/eRNsNhk5YQA2CC67DK/JHM76WA==
+=MNNw
+-----END PGP SIGNATURE-----
+--=-=-=--
 
