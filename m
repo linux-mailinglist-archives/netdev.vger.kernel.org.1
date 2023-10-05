@@ -1,85 +1,102 @@
-Return-Path: <netdev+bounces-38189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 564F17B9B5C
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:26:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42E4F7B9B5B
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:26:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 61C491C20856
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 07:26:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B5A732813B6
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 07:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0231453B9;
-	Thu,  5 Oct 2023 07:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6004933FE;
+	Thu,  5 Oct 2023 07:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSp+iZgB"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NjUMWPZL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEBA97F
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:26:10 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18EB77AA6;
-	Thu,  5 Oct 2023 00:26:08 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-32329d935d4so621809f8f.2;
-        Thu, 05 Oct 2023 00:26:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B5F7F
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:26:00 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D097AA6
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 00:25:58 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9a645e54806so118495266b.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 00:25:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696490766; x=1697095566; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=AGYYSttdjbm4Vxe6u7LT5aarQ17DelLXBIN0Cg3r5h0=;
-        b=gSp+iZgBL+GY5YKW3bfrLjpntaDeEO+0qhTN2KY/OydrdBKBLu3WO6PIyav9HxkjQd
-         eFeFRM62rAsXFVA+S4A68kY+hIxr/Q5fWL3hXLQ17S8/pbwjtxrtpY3W7HAjWleka584
-         t/auVaCI6k+goMXWoAq2bUxjQmIuEXNBt+defnMzY+VQHfTfWLqG+Dz2NfbIMl1lNrMb
-         sx+fh31TU3nWV9qGTyHBrVgd7UKftqbpDi8ZDPHOgsZTljQZXtWkfzVh0CGcMXBW5an4
-         ABfwZGwvO8EaEVoJRER5gRx7s3TyiS50qDdmOIS81CHpdkdUJfbz1aXFW/FHUZDkZt8c
-         Fn+A==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696490757; x=1697095557; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jtN0im4D7gpLTF/HWTRaQvPFV67NzB2x4wio4/NNMOs=;
+        b=NjUMWPZLRh/TC8TwMavyDBwjOksaYV+tjXaAzYj+NLXSO5Md4yTlialyzEoGg2+J0O
+         wW5bKk8ebH8mAxJQ8oLSxht0+YGnpdp7laStwdDeNkxW77+D8Nk2GHMAnbM9hKunMUQK
+         /4LLC1MIaH0Gix0jxM8V0gChS2Ac11uVTSsnPvQ6wsWnzip8KYikIMcjfg+mIT+GXBTy
+         MQHvpicZUi6SRy7EC6MDFEtd1TOZo/YVK/UL4YJ2aAf46ewjWCpZo+nj/7Wd13fMpd/k
+         T0rXpCsog1JcrEsY2ePZNVYXfzU/pim5wkkRlr73uxD2HHQX2wO1wlDStrNLxhxFh//I
+         Soig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696490766; x=1697095566;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AGYYSttdjbm4Vxe6u7LT5aarQ17DelLXBIN0Cg3r5h0=;
-        b=TmaLEYD0y4EpUzqBiCOD/AEHTBmK36VzBeZGNnuQtLreCJGjWsqoX2bCV5HGCzvaMu
-         /82+hpiRPdn9mkQmEc07+d5efSyuJdj7CD9NoA7caA6oKQC5NlAGwBfEW69lAjrwYvuu
-         5APVNKJ1/ZiELlpIZyuAi2QpxApIEFKrMBXk8mfFbRTbZSu7TyCEAXFyMoS5KyjmM3up
-         epOak/0gW0+BoDaCt0wyK4dGssCcAmV7OPFRFJCJd4RHT5ofiB81uxXDu18AePfUK4Sj
-         G9egCPHCujJMVc4wmDtJ3mfRd7mIqteObOZGA/iVH+fF/2hPtzeLmdJguLmNHqJLgsLy
-         Mgxw==
-X-Gm-Message-State: AOJu0Yxq7IceECszt+PfD3XomiqitSC483Bi3+F9kM0qp+f3BO/EP3cg
-	9gwffayZdEZ66RGyUNs4mcuuwQ3rexEAzluXYVM=
-X-Google-Smtp-Source: AGHT+IFOsR8bcDAMN52/cj4X6a3+o51XI/0aWe2O05i8XzyO1gLayHsWVB5H9d49ZRLb/znFkUaNAUvhg71omLR3Rxo=
-X-Received: by 2002:adf:fd12:0:b0:321:4ca9:ee86 with SMTP id
- e18-20020adffd12000000b003214ca9ee86mr4214908wrr.53.1696490766088; Thu, 05
- Oct 2023 00:26:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696490757; x=1697095557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jtN0im4D7gpLTF/HWTRaQvPFV67NzB2x4wio4/NNMOs=;
+        b=j8f8RbwpbXy3W/Ajf+mAZ2POzI82XfXpzlHd1E7v2WMB6WiEtS2uvtyqeb3fF2ryJu
+         tbOTlFCON35hOnKFtS1g1Tg0kS7oBzyC4XdfAz5FzDkJpnXLUuB66wonpiVwJarRrOoB
+         3KobrvLuZdtndWZlWSZ5Q2RSSxUNDo4F7AqNBXCWYkhVLiDnBBO1GQZp+Kt8JGbUKA7M
+         bQqI+wGeJe5IqZ0vDUc0C2pJ1i/lA4mGqKPWikP3RiARbejo2wAO+9Fk9wXrocz9Am2E
+         RrbqnNfoqWYcaCtatVhHq2TlN24xS/0RvILPL3Fw0HEZ13gm/dpwI+15EviMS3SxUsub
+         D9Dg==
+X-Gm-Message-State: AOJu0YxbJxdXBIZ2li+Wz/xJf/FhC3dCtxlaLI6Qy4B7eZkwArbsz9L4
+	L+7VnfSGwekIsfvC1pXWDX5n5Q==
+X-Google-Smtp-Source: AGHT+IG7IngGqdjtz9E4ZqCaT6njSsPeiLhVPD3lunzy8aB84eyrIKFvSIZznZrqYd5/FUTUsgLxVQ==
+X-Received: by 2002:a17:906:76cf:b0:9b2:a7e5:c47 with SMTP id q15-20020a17090676cf00b009b2a7e50c47mr4151554ejn.9.1696490756591;
+        Thu, 05 Oct 2023 00:25:56 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id x6-20020a170906b08600b009a19701e7b5sm682302ejy.96.2023.10.05.00.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 00:25:56 -0700 (PDT)
+Date: Thu, 5 Oct 2023 09:25:55 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, donald.hunter@gmail.com
+Subject: Re: [patch net-next v2 3/3] tools: ynl-gen: raise exception when
+ subset attribute contains more than "name" key
+Message-ID: <ZR5lA7SwQr3ecUp9@nanopsycho>
+References: <20230929134742.1292632-1-jiri@resnulli.us>
+ <20230929134742.1292632-4-jiri@resnulli.us>
+ <20231004171350.1f59cd1d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230926105732.10864-1-dg573847474@gmail.com> <20230930161434.GC92317@kernel.org>
- <20231004105317.212f1207@kernel.org>
-In-Reply-To: <20231004105317.212f1207@kernel.org>
-From: Chengfeng Ye <dg573847474@gmail.com>
-Date: Thu, 5 Oct 2023 15:25:54 +0800
-Message-ID: <CAAo+4rVuwAsJ=mr8u3tG5XdwBzY_QQ=G4UkA3nxkB_hux7581w@mail.gmail.com>
-Subject: Re: [PATCH] ax25: Fix potential deadlock on &ax25_list_lock
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, jreuter@yaina.de, ralf@linux-mips.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004171350.1f59cd1d@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-No problem, I just sent a v2 patch.
+Thu, Oct 05, 2023 at 02:13:50AM CEST, kuba@kernel.org wrote:
+>On Fri, 29 Sep 2023 15:47:42 +0200 Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> The only key used in the elem dictionary is "name" to lookup the real
+>> attribute of a set. Raise exception in case there are other keys
+>> present.
+>
+>Mm, there are definitely other things that can be set. I'm not fully
 
-Thanks,
-Chengfeng
+Which ones? The name is used, the rest is ignored in the existing code.
+I just make this obvious to the user. If future show other keys are
+needed here, the patch adding that would just adjust the exception
+condition. Do you see any problem in that?
+
+
+>sold that type can't change but even if - checks can easily be adjusted
+>or nested-attributes, based on the parsing path.
 
