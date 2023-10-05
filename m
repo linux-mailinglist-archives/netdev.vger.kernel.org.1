@@ -1,138 +1,132 @@
-Return-Path: <netdev+bounces-38419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B48F7BABA2
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:51:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7248C7BABA6
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:54:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 87B451C208A3
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:51:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id AE2CBB2097A
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F4C3CCE7;
-	Thu,  5 Oct 2023 20:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591063F4B1;
+	Thu,  5 Oct 2023 20:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xG+CTsJT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWjiUAVB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6C737165
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 20:51:45 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9004895
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:51:43 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59c0dd156e5so21166747b3.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 13:51:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97BD37165
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 20:54:29 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3686393
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:54:28 -0700 (PDT)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-405361bb9f7so12494545e9.2
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 13:54:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696539103; x=1697143903; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pWpal7Doqq48f7+hvv3YlQfRBTUj+OxMigJ6y40qk1g=;
-        b=xG+CTsJTTp+oaimkbFjqus/BKGf8TqNesqXt/WXK02iGj+0jNuNqx68rDw+nVpaPS1
-         V9PZmIScV5m4mDEa72dLtZYhZsTC1wuSQIojR5uteUiZyR31B8okSDRgRY3cSarlM8I5
-         u+ef1NxW6CA1qId1ztismbL+bUHCuAuwaTB4ZLpzT0ntY0fcoG68PdkAAkeyim9hzC8m
-         /3gj4/jqGTgXepQLdC+pVYdVdRDphoBel7HxVciyCBKyXV6zsg1WwRoUWZiRA/b+fcvZ
-         tHM3uA9Oq5D9irU5YdzgE5Nj+lXXPvIG0OH32Zr98y5XyNjI2/RfJWYvYm8mdxkL8t/H
-         kRWw==
+        d=gmail.com; s=20230601; t=1696539266; x=1697144066; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LW7J5Eogx0IMqgws4xItscTcrJtWbUjqxExVZKfWMf0=;
+        b=PWjiUAVBXLptu5JReW8ZgRjkK/jtljnqYek0rGC2MXh8VJVyM1ZmDCBSc14MmF7GgS
+         F3FyMjUwzJMy0Qrv3Zp2BkRxy66UrZ2hrdLigDF3VI69H7IFBiAfLoEKBTgOoxT1qX0m
+         IQcdGRz0grxNAXtAugj45gR2/k/NPH9tGR1gHEBVHUlhEHQCcPUwjMuC902IU8pjZ6pQ
+         bD3D4G+NQWwlx1e1szimFy9xkZvnmcPgkyVA0AFBoyK32BjXgZqjl+RNl1O83lpm717h
+         QdvY+Thm62l0oUIFFUVmwLXY6aoRAjTERAYISQia2BQ7SwyENCyOqI/Fs1uwW1H2ShE7
+         LU9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696539103; x=1697143903;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pWpal7Doqq48f7+hvv3YlQfRBTUj+OxMigJ6y40qk1g=;
-        b=VnWzFozq2h1dNOT8uKWBbDvKmMLvXUxosZGfrQt8bOXfoQqbTRh6HSD3awO5BmXPCC
-         5r3xzcvqjYsySqChXXgcuMY3hugLwhMa50H1TsqvI2lHBL8/W3mrap485eN7xp/hY7nv
-         k1eY/L8hiCcF7eF4RwH/pHCsfHq2rXmPaN2Qpx+gG0n9kI14fXpsjqSrnN+0QeCassdl
-         EhNMh9eWjbKjr+vimnG6gQCXat0XOsmMqjJTeGt97REvQ21G911HEwoJ7ZymQ3ZDzkwW
-         5lZXGLQD0HHnP3XDvsKY+VxFSdYS3DKg2iW1sBawnIKM9WPpF8xQhoHBZSQZKx3Ld4MN
-         0xXA==
-X-Gm-Message-State: AOJu0YxMRUPBQfFHIucPENcxTRf/y/Je+8q3RnmFnAyF9NVXdLoKHTXN
-	U/+aDNhDAdWWSOB1cDxD3K5GhY45mCvw2+EMgA==
-X-Google-Smtp-Source: AGHT+IGqcipxr9mLYWAXnLc/UolSpoC3KLcNCHXG3TB8SdXjwnoEzD0TUipTTDv2sPCy+uHcy/NIrlZhpW1v7T7Rdg==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a81:8d46:0:b0:59b:ec33:ec6d with SMTP
- id w6-20020a818d46000000b0059bec33ec6dmr120908ywj.5.1696539102785; Thu, 05
- Oct 2023 13:51:42 -0700 (PDT)
-Date: Thu, 05 Oct 2023 20:51:40 +0000
+        d=1e100.net; s=20230601; t=1696539266; x=1697144066;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LW7J5Eogx0IMqgws4xItscTcrJtWbUjqxExVZKfWMf0=;
+        b=BH5skzY/8NWgMxRbcrfQ6LoXhC/1yGIOn463pzrjr1m0WrASurLYh+8RAHyzfUs/rm
+         y4ujlsG0ZGv4BzNMCj5yjWCsqd9z0bJf7IwqEyBl4o/IEp9ZmvWBFA6s7v1teJbx+nGt
+         Lqyoe9OHJtMN9bia0kqWBd0WfwFsqe5qzAEOONbCcbAIcizp4LOIsmLBTIYU7Uo8ttQK
+         bSid7g7kodoHxSXoF796xH+9JgI6wsnYiBddMA9L36SIaRU48hR/AWhYGxeCk3clJNaS
+         7F2EXqTH+ZtnhCT0LQFINnXqI5h3TiqUUadDdFUnCDakBsKRWkNlv7bGgyEXB2KJCepQ
+         0DPQ==
+X-Gm-Message-State: AOJu0Yz5ekvmgYOEYOgZ7m0D89PHdKmYlOZc8UDEM5LB49l5tMJH9umv
+	VDGU+x63ud/BfRQFjf+JJk4=
+X-Google-Smtp-Source: AGHT+IFzmybofl+Nu9ZxZo3Ei+XT4bl7BduYGf15yICC5f8ho0ONDYvJSsRXOuzuhs8ECGo6Ls8yeg==
+X-Received: by 2002:a05:600c:2a4e:b0:406:3c2b:8639 with SMTP id x14-20020a05600c2a4e00b004063c2b8639mr5474180wme.30.1696539266392;
+        Thu, 05 Oct 2023 13:54:26 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 12-20020a05600c024c00b0040531f5c51asm2334403wmj.5.2023.10.05.13.54.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Oct 2023 13:54:26 -0700 (PDT)
+Subject: Re: [PATCH v4 net-next 7/7] sfc: use new rxfh_context API
+To: edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, sudheer.mogilappagari@intel.com, jdamato@fastly.com,
+ andrew@lunn.ch, mw@semihalf.com, linux@armlinux.org.uk,
+ sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ hkelam@marvell.com, saeedm@nvidia.com, leon@kernel.org
+References: <cover.1695838185.git.ecree.xilinx@gmail.com>
+ <e4f1a70b649ade2fc03c41b3ee05803b2ee92975.1695838185.git.ecree.xilinx@gmail.com>
+ <20231002130101.GG21694@gmail.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <b61284b2-8e8e-c867-62fd-0f8090f1eac1@gmail.com>
+Date: Thu, 5 Oct 2023 21:54:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIANshH2UC/x2NQQqDMBBFryKz7kBiqtBepZQSJ9M6CxOZBEkR7
- 97Y3Xtv8f8OmVU4w73bQXmTLCk2sZcOaPbxwyihOfSmd9aYAXPRSOsXg8rGmjFyQS4z6wmTJh8 oLTjRMrpaX3xWQuNvAwXn7HU00KZX5bfU/+3jeRw/mVzKc4YAAAA=
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696539101; l=2256;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=HxayhA1aIuyooSvwu5FkzbNfRLctZ8S9IVA9YM7wlQ4=; b=cNbM0i4jK1A3lEG+pC81fjLHqpJikLXzKR/UUwfLOkhbplaGtwiOVGPOSKdIomtH14tQ9TAvl
- +Iyswe7yIH0DdajsI7UZ9M2Jp/MQSYuZlg9bAaeb5E2g3FXhQMaWt5V
-X-Mailer: b4 0.12.3
-Message-ID: <20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-v1-1-6823b3c3c443@google.com>
-Subject: [PATCH] bcm63xx_enet: replace deprecated strncpy with strscpy
-From: Justin Stitt <justinstitt@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+MIME-Version: 1.0
+In-Reply-To: <20231002130101.GG21694@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-strncpy() is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+On 02/10/2023 14:01, Martin Habets wrote:
+> On Wed, Sep 27, 2023 at 07:13:38PM +0100, edward.cree@amd.com wrote:
+>> From: Edward Cree <ecree.xilinx@gmail.com>
+>>
+>> The core is now responsible for allocating IDs and a memory region for
+>>  us to store our state (struct efx_rss_context_priv), so we no longer
+>>  need efx_alloc_rss_context_entry() and friends.
+>> Since the contexts are now maintained by the core, use the core's lock
+>>  (net_dev->ethtool->rss_lock), rather than our own mutex (efx->rss_lock),
+>>  to serialise access against changes; and remove the now-unused
+>>  efx->rss_lock from struct efx_nic.
+>>
+>> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+...
+>> +		rc = efx_mcdi_rx_push_rss_context_config(efx, priv, indir, key,
+>> +							 false);
+>>  		if (rc)
+>>  			netif_warn(efx, probe, efx->net_dev,
+>> -				   "failed to restore RSS context %u, rc=%d"
+>> +				   "failed to restore RSS context %lu, rc=%d"
+>>  				   "; RSS filters may fail to be applied\n",
+>> -				   ctx->user_id, rc);
+>> +				   context, rc);
+> 
+> If this fails the state in the core is out-of-sync with that in the NIC.
+> Should we remove the RSS context from efx->net_dev->ethtool->rss_ctx, or do
+> we expect admins to do that manually?
+> 
+> Martin
 
-A suitable replacement is strscpy() [2] due to the fact that it
-guarantees NUL-termination on the destination buffer without
-unnecessarily NUL-padding.
+I definitely think it's a bad idea to have drivers removing things
+ from the array behind the kernel's back.  Besides, I think it ought
+ to keep the configuration the user asked for, so that if they fix
+ something and then trigger another MC reboot the original config
+ will get reapplied.
+Possibly if we go with Jakub's suggestion of a replay mechanism
+ then the core can react to failure returns from the reoffload call,
+ either by removing the context from the array or by setting some
+ kind of 'broken' flag that can be reported to userspace in dumps.
 
-bcm_enet_get_drvinfo() already uses strscpy(), let's match it's
-implementation:
-|       static void bcm_enet_get_drvinfo(struct net_device *netdev,
-|       				 struct ethtool_drvinfo *drvinfo)
-|       {
-|       	strscpy(drvinfo->driver, bcm_enet_driver_name, sizeof(drvinfo->driver));
-|       	strscpy(drvinfo->bus_info, "bcm63xx", sizeof(drvinfo->bus_info));
-|       }
-
-Note that now bcm_enet_get_drvinfo() and bcm_enetsw_get_drvinfo() do the
-exact same thing.
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
- drivers/net/ethernet/broadcom/bcm63xx_enet.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bcm63xx_enet.c b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-index a741070f1f9a..8b18493759bf 100644
---- a/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-+++ b/drivers/net/ethernet/broadcom/bcm63xx_enet.c
-@@ -2531,8 +2531,8 @@ static int bcm_enetsw_get_sset_count(struct net_device *netdev,
- static void bcm_enetsw_get_drvinfo(struct net_device *netdev,
- 				   struct ethtool_drvinfo *drvinfo)
- {
--	strncpy(drvinfo->driver, bcm_enet_driver_name, sizeof(drvinfo->driver));
--	strncpy(drvinfo->bus_info, "bcm63xx", sizeof(drvinfo->bus_info));
-+	strscpy(drvinfo->driver, bcm_enet_driver_name, sizeof(drvinfo->driver));
-+	strscpy(drvinfo->bus_info, "bcm63xx", sizeof(drvinfo->bus_info));
- }
- 
- static void bcm_enetsw_get_ethtool_stats(struct net_device *netdev,
-
----
-base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-0a95cd331460
-
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
-
+-ed
 
