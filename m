@@ -1,151 +1,216 @@
-Return-Path: <netdev+bounces-38264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18447B9DF5
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:58:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7FC7B9DFD
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4FF361C209E7
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C3B2E281EBC
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5131273C3;
-	Thu,  5 Oct 2023 13:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9AD273DC;
+	Thu,  5 Oct 2023 14:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pZrE38V/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fYy6hQV7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0173D266D0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:58:54 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C3239EE7
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:58:24 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-405361bb9f7so8611115e9.2
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 06:58:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696514285; x=1697119085; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cbV1aUniv7FDwoYe4l9QjP2aDA1u/O0qniF8u91BDus=;
-        b=pZrE38V/8z8QcVKvZoFHf9jCSpU3SPDoj1toEPUHTKaxcyzxQg8HngyjXDQfifmtI4
-         eNT8EEh6tZyPDu3KWaR7tDH2/qyezYGAw0Q0N2NQnY4AYb696fLFQ/J5srNnY5n3S2Hp
-         9CDcJRd7bJAx3Cq6C7NZd4QRTwViH4gmEkt03F3QGERB1Gl7M1Kk29xJOEFSRgokOVAq
-         5db2kL7hiPyjfubPVx4Qp8bC0sieI6gy30HTFrFVFMyGDYCwTHzcEdO//SFhtBM8z1Ck
-         ljdVEsO8mElBTB2XQhRGaqLBRLw4rNCkxUOoyCt8LFM4FX8DP9hO2l9C3X7JLnysd2NC
-         QnKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696514285; x=1697119085;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cbV1aUniv7FDwoYe4l9QjP2aDA1u/O0qniF8u91BDus=;
-        b=ZUOa/rhFgB/MaJK6ZnXUYp9qZTOdG9bZXglz0MrCMCfJ58tojpYQ0UnBMNI9FGHv0s
-         RACan15cdZ5mSNWK0cKrfBAkBT+fzRhzynX18+mrgoQpLRWkftISfqGDUCs/babyWsjr
-         gnljGSkUJjk5WYIHOF9vGLTI9q1tcVXG0fCtdrH58ilaZChXVK9pSV4YBYB4Ch8jOPut
-         w1i7TuiRW/9JiQYL/0qmzeY+E7D98YhEkhUYtwf5d5VYuGQilRFCuLMkS3mPUto9HVDj
-         BwMuPVQHo2U7CA2y6X4fk4hdJXujh7qMdRQwNaTBKYgytGzwdtATFCorP6WWvUoW51iH
-         IUVA==
-X-Gm-Message-State: AOJu0Yw71CKrrJoIPFpBqEqBHQB/gyHSqr24dpH9JcsfrzF+hhSm6uPU
-	8YdZHEpslV7qVtHgJvxHNhZGfA==
-X-Google-Smtp-Source: AGHT+IE/iWnwqmpAF4wqaA6W5GsdMwBdfNIcUdBB5OSIxRFtjMweSLN1TdvH9Iybz2DfnfNeSgB9KA==
-X-Received: by 2002:a5d:538e:0:b0:317:6a7c:6e07 with SMTP id d14-20020a5d538e000000b003176a7c6e07mr4788087wrv.32.1696514284749;
-        Thu, 05 Oct 2023 06:58:04 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id e14-20020a5d594e000000b0030ae53550f5sm1858644wri.51.2023.10.05.06.58.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 06:58:04 -0700 (PDT)
-Date: Thu, 5 Oct 2023 16:58:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net-next 2/2] ixgbe: fix end of loop test in
- ixgbe_set_vf_macvlan()
-Message-ID: <34603f41-1d51-48df-9bca-a28fd5b27a53@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20893266D0
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:00:07 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCD740F8D
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:58:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696514346; x=1728050346;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=SwQAbiKv8tfZMATdL0IzMcDSFGSxKf6OlZl1SM81bhI=;
+  b=fYy6hQV7BTpOoxGpapYY2CCJQX6YidTOnLZWrjhLUpnv06ZCVeBMabkH
+   eyZP5XE5HsEzVcS4c005f0SfS0DZgLDV8BYKXrqpdZDXsmJ2DO1b40jpF
+   5vuhosfaoX1QGgSC1QncHKzK6ascnBJU2xq0kgX7S7vxl/NzI/ESYtREK
+   Az9so7lVwDqrprnbYulxLwEkOxeRWC8+RbU7yeZUs1iFwYeYMtyn3w1dz
+   iV/qs4u6Nm5Xm5c+sc+ZZ1NrQOWFZkaJwoJ9LVw/AIWx0E1qcw2ixRfO/
+   1eoWrjTGaZEmm0OlrZSrG0Bs/9Cmq8Scl/EHGjeBvXjg3izaaQMVV6pfn
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="368577817"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="368577817"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 06:58:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="867910201"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="867910201"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Oct 2023 06:58:19 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 5 Oct 2023 06:58:19 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 5 Oct 2023 06:58:19 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 5 Oct 2023 06:58:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BIkiKGOtScXdzp/xL9RNKRxsnioba5FFFRtNRgJOh04nrXK9wXukO34anN3+3efc19HU6fjYjBY9+WTPfP7z7xqkEZ28jlfnUTAcec//MByA1VdKCCeeMUvWJZjO8pBBNd3v2ioWpJ/ig1n8Lmk4fj1r81H7wDZfj77Hsgl8cfCpmzNkqtH+hRUPf75+Dp2Bw8BrtgE2SsJgm6ZdXVgWrs7W3Z5Fv+rrqdfuUao9XA7CLD8nWjBpUstiSwwPrWZA2XyyBJytxh8npHqJCvZWJG3gfseyU9Pg+bG3IMBzVcXDbyF+MmxjdOVvXXZgi6uVTaB1YlQpoYNP/NbqmCFOTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hCfbGl0Td/7NnTQJ8kPTr/mU4KHB8/aeAgMNMphChZ4=;
+ b=OMw+JO/rGvoNwpivcnr7XVNno/S3rsDQI80m/H+Iu0uTLpJGdVht5pNtejAgQY9LJqyyHW1d8mNhG/PX7ZWuv5LQLcflXKviPBTxr65P9LJnoD36MctBmdIyRSYHjJhOxPiMmG/1dv6RsCBeDi7S291p3wtY1qhxGlIBPCj9VFLR4LwZoGMD/k2gAmbH/un+bu4TwC9iTXPshWvccxTxuG7MR3k5GFqC9c0lgbZxOYfEt6MXePGwVcBQilMbv1v89035G9AXS9Tueaem5xdF4B1O8At6Yib8gZz28CkKSU4O7ZamPCTyHWWFnpPhlxm7s9t91lJyVjtzGAo0X6TULA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by DS0PR11MB7651.namprd11.prod.outlook.com (2603:10b6:8:149::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.25; Thu, 5 Oct
+ 2023 13:58:17 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ec0:108e:7afe:f1a4]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ec0:108e:7afe:f1a4%5]) with mapi id 15.20.6838.029; Thu, 5 Oct 2023
+ 13:58:17 +0000
+From: "Drewek, Wojciech" <wojciech.drewek@intel.com>
+To: Ido Schimmel <idosch@idosch.org>
+CC: Jakub Kicinski <kuba@kernel.org>, "idosch@nvidia.com" <idosch@nvidia.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ice: Disable Cage Max Power
+ override
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ice: Disable Cage Max
+ Power override
+Thread-Index: AQHZ1qBBv7SVSOjez0eHlWI2L+3Nxa/6wcIAgAMXFgCAAydJcIAB/MqAgAL2T4CAEWnMgIAEjlqwgAlwSACAFh7YMA==
+Date: Thu, 5 Oct 2023 13:58:17 +0000
+Message-ID: <MW4PR11MB577610BC86B83874A398FD22FDCAA@MW4PR11MB5776.namprd11.prod.outlook.com>
+References: <20230824085459.35998-1-wojciech.drewek@intel.com>
+ <20230824083201.79f79513@kernel.org>
+ <MW4PR11MB57768054635E8DEF841BB2A9FDE3A@MW4PR11MB5776.namprd11.prod.outlook.com>
+ <ZOsNhgd3ZxXEaEA5@shredder>
+ <MW4PR11MB57766C3B9C05C94F51630251FDE7A@MW4PR11MB5776.namprd11.prod.outlook.com>
+ <ZO9dhzhK+psufXqS@shredder>
+ <MW4PR11MB5776601FD7C2C577C78576A3FDE4A@MW4PR11MB5776.namprd11.prod.outlook.com>
+ <ZQB1HcpTsB2Sf6Co@shredder>
+ <MW4PR11MB5776FD835D06ED08B07D3FD6FDF6A@MW4PR11MB5776.namprd11.prod.outlook.com>
+ <ZQwycrJW5nhXu0TF@shredder>
+In-Reply-To: <ZQwycrJW5nhXu0TF@shredder>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5776:EE_|DS0PR11MB7651:EE_
+x-ms-office365-filtering-correlation-id: b11220cb-8ece-422d-ed28-08dbc5ab2046
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: V43ZiiHed0VMCxiNW9GcHexJ2CD13hYQM4cB61qAZHUQQSMV6CZSBQdYU80N0PyUSdC/JpFiKF6md6VCKZ/Z3GrWu0CrEuj6WJ+nPjYQHwWreWyAorJDZbl/tNc56F2E+sH+ODaDFrG80LdmsyG5cD0oKtZvwzepxaentzuP6/RMcJwrRsUnk73HjLLh2a8wbFhiC8Cfb4nq4oHkTUHYu3KFdyuQDyAA1WhdR1L7Zfl84XwH3u/4IM4iFslp3Nw5P59iE1s33AJ7tv9m3AA3DU2vvu9aW6ohsI/28lE4vCAB1uVH8vCOWfLbBR8EWPcocA3V0rk3cB+8mCIue+oyfWuqW61drk/eF3LaPrg5mZb8iT3cNwelLtrdXaCeUzyRl8v4qs2OciwTEGP0VeWspcDqVMcI181LPG1K4FZpVWv30eL2/hDgCCNsdGbrZOFdzZhECk5/k2D0SyUXh6M+9Dv8CSOQnX4/xSrQwBOg3z6KQm895JF8JPiGVCna/1gwh3+rpo+fnGS15GSTQjU0ZFLuN9HD0Gjbw6qtaWm4t38q6q17l0sU0dc8rwF+k8akASOARaSkXp5RXihmwBNywg2LKdyVAfmOS0l6SJqW4T4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(376002)(39860400002)(136003)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(26005)(9686003)(122000001)(82960400001)(966005)(478600001)(54906003)(316002)(76116006)(66946007)(41300700001)(66446008)(66476007)(66556008)(64756008)(7696005)(6916009)(71200400001)(38070700005)(53546011)(83380400001)(6506007)(38100700002)(5660300002)(55016003)(52536014)(8936002)(8676002)(86362001)(33656002)(4326008)(2906002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8NSns82hD6VrxtPdIqqKK+x/f+f91fxHMG2CUTGZh4NdYVTVoSiVFP5iEOVc?=
+ =?us-ascii?Q?7hLDVCvkEkRnacH24VkkO0wVQal0i/WZNvzumVOTt82Hf/Ufxc/J4CNdw6Bt?=
+ =?us-ascii?Q?ga0+ByY125eZnvJ+vcDaNwFvBh0vMMEzrKkNhVp8HEblaVHlX0+1rcit1K9c?=
+ =?us-ascii?Q?zgYrDPFKSOmotD38XQhPPjvQmFPzugcdwV5vpO8SOZKLvO3biNgVRpXWh9JK?=
+ =?us-ascii?Q?FQxH4FZAklnr1TA8ak4rInGyYV8DbMSH35Igu7eKZ7lfH6JNyj2IHbbdsi8N?=
+ =?us-ascii?Q?Ymu9hS4upwBwDYes84qBUaDA6cA4g+Quf7WhZfPvK2uw2XOPrMOzF1dBLxx5?=
+ =?us-ascii?Q?EF2L5d8U8H3jRKLHfqn68OOE/PcJMsANlqmYT/afMPTeFJimQ/eKb6M2dyvQ?=
+ =?us-ascii?Q?3CEKEo2S6nB4YgANCqHR9GRxyVva8EsiMcRvCx37wQrfdWT9fQRgWhtAtSVN?=
+ =?us-ascii?Q?Jb8iyDugHIzTw4E6pyWatKTgAiuS1fkYOU8QmlDLmH8plviFtLW6ewO/SArl?=
+ =?us-ascii?Q?LMoGJH1n1MBNIOqTy2A7K1h1IrDq5Zt40Lq+Fm3fD1t4NvS3mIw8Fo8XE5ww?=
+ =?us-ascii?Q?Xt0W4IO4vPx6VyMZGBDVFlgNE7aHS0vfOyyccnZ96fexSZ5ZL+gTrH7flxkh?=
+ =?us-ascii?Q?XHY4Y0WuBQzGfx98UXPBUZ9P5NLr84IzSg2hrOOJF2jIP+gB80UgzHO6LwnG?=
+ =?us-ascii?Q?pRLFgiZvUyXEqABFYrnH7876Uovp5wCrc17RP3J9VFfoy2Dka23ujisi/5af?=
+ =?us-ascii?Q?DP381kXxBpzVBDmEolau66Q0X+R5txPT++N7Z3HhPInYlpDcEaaeBrO8lAPO?=
+ =?us-ascii?Q?5iGnTZtDA5UkYDbFVpKuW+pPSvjK3GccKxovurMfpYDOT2jbIkUvor9BIQa2?=
+ =?us-ascii?Q?DJ+Ehkvl+sc8T5Z4BYubTiOsvJdlVbBw+3u6yCtSKbNkVHPJQo9RmDiMIolb?=
+ =?us-ascii?Q?+KIOiKk64VxLUMF6VDYfqwgGIwgugPV9M+OmuY8vvMRC7j6728fa9tNNmht4?=
+ =?us-ascii?Q?U/EyLzqyckLIN6c22huDmPedzyGpIjfQk/wBCQneDEhvegG6pwrs4K0jSiMC?=
+ =?us-ascii?Q?rk4h+J2+l11Zg/mwI0TT3tbeTieSXt3XBRohMMwILHxnXXeeBF//NYfdCr/c?=
+ =?us-ascii?Q?goLZAi2rCn2zWJJO3xJdYTNDuRGCuK9k35QS4czMtnL4yrbSN4EtKKamuUi1?=
+ =?us-ascii?Q?CrbaE3Tx8UrxAcFAu9igq8ekXZkGiva4Q/MMy3Esny9B7t3n6xTloNljywFZ?=
+ =?us-ascii?Q?3lAbM2W6daq0C/2hgqkdbtz1Qgk/+eDjPEKuLXqZcTw9B+hu0PWYSW0qPQRi?=
+ =?us-ascii?Q?lg4dZXx4XcOKLJSj752P5JhyXjYtOV9Sl5fYT0ojGjWVd8LZsDKJfBHHP41u?=
+ =?us-ascii?Q?iW/YRBXya45YZXWAgq055amvKirJsYvL2BjHDgnyQm9XASOljw7jfmDIaNA4?=
+ =?us-ascii?Q?kjsAq6/Ejm9bnb7TaERIq3opbHXDZjiZjhpCGU5t8i4/pc9Zfq2t49emY8sO?=
+ =?us-ascii?Q?7OMHCGjB4csQ3JchFNzN3OYGb0F75uSntJAZCI5jvao+VQOr439FR1ZYtO4l?=
+ =?us-ascii?Q?e+TFBnVGNSSXgUQBsrYyWLHlKyzEwtkNBi2wToQ8?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d61f086-c7b4-4762-b025-0ba5df08968b@moroto.mountain>
-X-Mailer: git-send-email haha only kidding
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b11220cb-8ece-422d-ed28-08dbc5ab2046
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2023 13:58:17.4421
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1GZXI8Nv7dAHm/p3/JhZ1Y4y4bznari8QZTu8lBGC0ummIkYYOmJEdiwR854998A+dnPpf1GZ+WBUfSrtsvatomP0U+C4pkh5KbhrfyhCr8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7651
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The list iterator in a list_for_each_entry() loop can never be NULL.
-If the loop exits without hitting a break then the iterator points
-to an offset off the list head and dereferencing it is an out of
-bounds access.
 
-Before we transitioned to using list_for_each_entry() loops, then
-it was possible for "entry" to be NULL and the comments mention
-this.  I have updated the comments to match the new code.
 
-Fixes: c1fec890458a ("ethernet/intel: Use list_for_each_entry() helper")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+do
+> Schimmel
+> Sent: Thursday, September 21, 2023 2:09 PM
+> To: Drewek, Wojciech <wojciech.drewek@intel.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>; idosch@nvidia.com; intel-wired-
+> lan@lists.osuosl.org; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>;
+> netdev@vger.kernel.org
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v2] ice: Disable Cage Max =
+Power
+> override
+>=20
+> On Fri, Sep 15, 2023 at 01:15:01PM +0000, Drewek, Wojciech wrote:
+> > In ice driver port split works per device not per port. According to
+> > /Documentation/networking/devlink/ice.rst, section "Port split":
+> > 	The "ice" driver supports port splitting only for port 0, as the FW ha=
+s
+> > 	a predefined set of available port split options for the whole device.
+> > And if you look at available port options (same file) you'll see that i=
+n case of
+> "Split count" 1
+> > only quad 1 is working. And in case of "Split count" 2 the second quad =
+might
+> be used. So, if we
+> > increase max_pwr in the first quad in case of "Split count" 1 and then =
+switch
+> to "Split count" 2,
+> > the second quad might end up with no link (because it will have decreas=
+ed
+> max_pwr).
+>=20
+> But there's also an option where the second cage isn't actually used.
+> Anyway, my suggestion is to allow user space to set / get the max power
+> using ethtool and give user space visibility about link down reason via
+> the ethtool extended state.
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index 4c6e2a485d8e..a703ba975205 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -639,6 +639,7 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
- 				int vf, int index, unsigned char *mac_addr)
- {
- 	struct vf_macvlans *entry;
-+	bool found = false;
- 	int retval = 0;
- 
- 	if (index <= 1) {
-@@ -660,22 +661,22 @@ static int ixgbe_set_vf_macvlan(struct ixgbe_adapter *adapter,
- 	if (!index)
- 		return 0;
- 
--	entry = NULL;
--
- 	list_for_each_entry(entry, &adapter->vf_mvs.l, l) {
--		if (entry->free)
-+		if (entry->free) {
-+			found = true;
- 			break;
-+		}
- 	}
- 
- 	/*
- 	 * If we traversed the entire list and didn't find a free entry
--	 * then we're out of space on the RAR table.  Also entry may
--	 * be NULL because the original memory allocation for the list
--	 * failed, which is not fatal but does mean we can't support
--	 * VF requests for MACVLAN because we couldn't allocate
--	 * memory for the list management required.
-+	 * then we're out of space on the RAR table.  It's also possible
-+	 * for the &adapter->vf_mvs.l list to be empty because the original
-+	 * memory allocation for the list failed, which is not fatal but does
-+	 * mean we can't support VF requests for MACVLAN because we couldn't
-+	 * allocate memory for the list management required.
- 	 */
--	if (!entry || !entry->free)
-+	if (!found)
- 		return -ENOSPC;
- 
- 	retval = ixgbe_add_mac_filter(adapter, mac_addr, vf);
--- 
-2.39.2
+Thanks for discussion Ido, we will follow your suggestion.
 
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
