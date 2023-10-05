@@ -1,204 +1,118 @@
-Return-Path: <netdev+bounces-38245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0017B9D86
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:49:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E5337B9D8C
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:49:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 527DA281FAB
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:49:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4CF04281D74
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CADE26296;
-	Thu,  5 Oct 2023 13:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDF7266C0;
+	Thu,  5 Oct 2023 13:49:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GLtz3Nve"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUzAqhWV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C4824205
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:49:08 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F7B173F
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:49:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696513744;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WUFBDdELdueKekAKn28l3cuGTc8E2A1Wmz1k6PVvTYE=;
-	b=GLtz3NveczNXfWJmppSqREfEVh/YQrb1XzrNMH73Eps4XRx5x+GO7C4ThFfE9IMohsGY4u
-	pMjOIRML+OLY9+O/ApFFyn7x6AipuxBWV2w+rgzhv1TpiGjHTNOCHNfnrMZ3QlgfbfSTlw
-	vQvyLyO1lpeQGzuWw9sMXiBYC5HGfY0=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-VLU08dvLOmyRF0YHrb5MOw-1; Thu, 05 Oct 2023 09:48:52 -0400
-X-MC-Unique: VLU08dvLOmyRF0YHrb5MOw-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7742bd869e4so17527185a.1
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 06:48:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7001E26285
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:49:26 +0000 (UTC)
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9968319AB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:49:23 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id 3f1490d57ef6-d8168d08bebso1066133276.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 06:49:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696513763; x=1697118563; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tf9xeOok9EGJhHgMlaxE0Y86ea7FsKfAgGBIu7eRuiE=;
+        b=JUzAqhWVVGP9oR/UmffHcZJAiavYmY6144oCX2dvCV2RvV9Kt+70GoNcTQQOYrz9N8
+         XQU3fwef0jWasVAx36784XaS/Y4UnD7BjtBbrhDX1nygBwDYSMph7rJtNI71YPLwHr5k
+         djOyEP0OvouWCArBVOGBhhhL/ZQQhTNSqKxpfToytTrfs7K8ZOvUAs2oofICUE3vjEsV
+         +spWEhpjMyxLhszuxbJjbvasgxTeZB1sRXk4r8HbsVEAam/08EJUZT4IPQZ3GAontv/n
+         lZqanP9qAFMZ1rX4qdXHQH3jmHlKWWNdsi8FMrKKrmiAnNE/PNaoQgUUYG3lRY5ZEmy1
+         GzRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696513732; x=1697118532;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WUFBDdELdueKekAKn28l3cuGTc8E2A1Wmz1k6PVvTYE=;
-        b=XhtVWUZnjd24fjoLrllLvMMiO/VbGjYSAsbV+MYbadlb+ID/wlMpMZwlJrrQFZf12C
-         E80N3IVD1NvuN3r7lE6vv0lhGAbssIF//0txnUYphqtJCMfnc6Z4w5fk5piomgZ1FMYq
-         kaFzW/wKDfkMIRzcaTbrdMZPnh3/KQcaEcX5l28wHxmBZuh1Omrmd6uYo5q1lnOfVpah
-         jr6JJfTTfDKifc94a4yw9F9PGKINklgu27bYmk6wq3hrSwMqqkjCd/7KjUZFGPs/WGE4
-         TWd+dSjVb/4Rp5FDuRXZCVKtSwpO3g4hdHjjkifpa1yDVJyNysbQRovJytCi4LZUfTrH
-         HH0g==
-X-Gm-Message-State: AOJu0YxoTwM4CwhBWzeZCzeAoB7ETkL3toxarBdC/Po0LxUp5x9NcT+1
-	nz7ZFQc05r+IzBT19GZBFQW+5pyJgJARe/LPxKfdCyLiBmsXVuG4NOp4gJ49fTY8JZ192tBsEA8
-	NlGz9LhW0vcQz2xpm
-X-Received: by 2002:a05:620a:2915:b0:775:7520:5214 with SMTP id m21-20020a05620a291500b0077575205214mr5945537qkp.0.1696513732193;
-        Thu, 05 Oct 2023 06:48:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF2wtaXq1pHzz6hwXZa4E2xm2NacBrWxiRKjpHT50618ghR5jmmr+RqCR72p5u/LAer+oWUdA==
-X-Received: by 2002:a05:620a:2915:b0:775:7520:5214 with SMTP id m21-20020a05620a291500b0077575205214mr5945510qkp.0.1696513731890;
-        Thu, 05 Oct 2023 06:48:51 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-225-9.dyn.eolo.it. [146.241.225.9])
-        by smtp.gmail.com with ESMTPSA id s17-20020a05620a031100b00767177a5bebsm490081qkm.56.2023.10.05.06.48.49
+        d=1e100.net; s=20230601; t=1696513763; x=1697118563;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tf9xeOok9EGJhHgMlaxE0Y86ea7FsKfAgGBIu7eRuiE=;
+        b=co/nttZxf95FgdAlcAjRSyjow1WLqk9eW2UEsMdMWDxEAHFpAy2DBdHPF90hxN8g71
+         u6Yg3/m9LgsB488YS2Db0AaCyqCTGjBZ24DB1W3P2TxbB2TLOsYHzxx+NatU4VhG5vzS
+         g1+y8ylAvmZnN5dzxaOULxJM8XFeMUbofbHq88PMHgE5UsjN2vEJ1VId1ZV+oVrmF6/Q
+         +8mqPc5Snzcv7f0812ns6OfBVgsH9R6pwvzeqpuc5IvK8MOrYWD6F2BAv/rtO+PLzGrY
+         eKuAtadCp5kI4wt1GfNP5XSDE96D+fb9dAjaSR4G8dz1dUSRYkPzNL47L3Nl3IFsQ6sn
+         aOUw==
+X-Gm-Message-State: AOJu0YzgY4xJvC3rzFmS8QBN86UqCszqXcrbKwuk5tv/KSvHfzgYgEF1
+	O7x6oGZQRbFghlkJ+vgsK+Gej3TvJJUeXw==
+X-Google-Smtp-Source: AGHT+IHq17NuBkOGwIBO1TeMqrmjgKXmcy473SgZrCesgpNcQIB9MGjKwYoQedSFCS/4p3NS/xLRvQ==
+X-Received: by 2002:a25:cb8b:0:b0:d47:47c0:d7c1 with SMTP id b133-20020a25cb8b000000b00d4747c0d7c1mr5547605ybg.62.1696513762735;
+        Thu, 05 Oct 2023 06:49:22 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id n20-20020a0cdc94000000b0065b1e6c33dfsm512591qvk.18.2023.10.05.06.49.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 06:48:51 -0700 (PDT)
-Message-ID: <97f3ac0d8b49305390ed799c1965fd665b755e77.camel@redhat.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3 2/2] ice: Refactor finding
- advertised link speed
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pawel Chmielewski <pawel.chmielewski@intel.com>, netdev@vger.kernel.org
-Cc: andrew@lunn.ch, aelior@marvell.com, manishc@marvell.com, 
- vladimir.oltean@nxp.com, jdamato@fastly.com, edumazet@google.com, 
- intel-wired-lan@lists.osuosl.org, Paul Greenwalt
- <paul.greenwalt@intel.com>,  horms@kernel.org, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
- kuba@kernel.org, d-tatianin@yandex-team.ru,  davem@davemloft.net
-Date: Thu, 05 Oct 2023 15:48:47 +0200
-In-Reply-To: <20231002144412.1755194-3-pawel.chmielewski@intel.com>
-References: <20231002144412.1755194-1-pawel.chmielewski@intel.com>
-	 <20231002144412.1755194-3-pawel.chmielewski@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Thu, 05 Oct 2023 06:49:22 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	alexander.duyck@gmail.com,
+	fw@strlen.de,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next 0/3] add skb_segment kunit coverage
+Date: Thu,  5 Oct 2023 09:48:54 -0400
+Message-ID: <20231005134917.2244971-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.42.0.582.g8ccd20d70d-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_NONE autolearn=no
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-10-02 at 16:44 +0200, Pawel Chmielewski wrote:
-> Refactor ice_get_link_ksettings to using forced speed to link modes mappi=
-ng.
->=20
-> Suggested-by : Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-> Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice.h         |   1 +
->  drivers/net/ethernet/intel/ice/ice_ethtool.c | 200 +++++++++++++------
->  drivers/net/ethernet/intel/ice/ice_main.c    |   2 +
->  3 files changed, 138 insertions(+), 65 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/=
-intel/ice/ice.h
-> index fcaa5c3b8ec0..988b177d9388 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -960,6 +960,7 @@ int ice_stop(struct net_device *netdev);
->  void ice_service_task_schedule(struct ice_pf *pf);
->  int ice_load(struct ice_pf *pf);
->  void ice_unload(struct ice_pf *pf);
-> +void ice_adv_lnk_speed_maps_init(void);
-> =20
->  /**
->   * ice_set_rdma_cap - enable RDMA support
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/e=
-thernet/intel/ice/ice_ethtool.c
-> index d3cb08e66dcb..b027788c42f6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -345,6 +345,86 @@ static const struct ice_priv_flag ice_gstrings_priv_=
-flags[] =3D {
-> =20
->  #define ICE_PRIV_FLAG_ARRAY_SIZE	ARRAY_SIZE(ice_gstrings_priv_flags)
-> =20
-> +static const u32 ice_adv_lnk_speed_100[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_1000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
-> +	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-> +	ETHTOOL_LINK_MODE_1000baseKX_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_2500[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
-> +	ETHTOOL_LINK_MODE_2500baseX_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_5000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_10000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
-> +	ETHTOOL_LINK_MODE_10000baseKR_Full_BIT,
-> +	ETHTOOL_LINK_MODE_10000baseSR_Full_BIT,
-> +	ETHTOOL_LINK_MODE_10000baseLR_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_25000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
-> +	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
-> +	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_40000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_40000baseSR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_40000baseLR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_40000baseKR4_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_50000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
-> +	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
-> +	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
-> +};
-> +
-> +static const u32 ice_adv_lnk_speed_100000[] __initconst =3D {
-> +	ETHTOOL_LINK_MODE_100000baseCR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseSR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseLR4_ER4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseKR4_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT,
-> +	ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
-> +};
-> +
-> +#define ICE_ADV_LNK_SPEED_MAP(value)					\
-> +{									\
-> +	.speed		=3D SPEED_##value,				\
-> +	.cap_arr	=3D ice_adv_lnk_speed_##value,			\
-> +	.arr_size	=3D ARRAY_SIZE(ice_adv_lnk_speed_##value),	\
-> +}
+From: Willem de Bruijn <willemb@google.com>
 
-I think it could make sense move even the above macro definition to the
-common APIs (adding a 'prefix' argument).
+As discussed at netconf last week. Some kernel code is exercised in
+many different ways. skb_segment is a prime example. This ~350 line
+function has 49 different patches in git blame with 28 different
+authors.
 
-Cheers,
+When making a change, e.g., to fix a bug in one specific use case,
+it is hard to establish through analysis alone that the change does
+not break the many other paths through the code. It is impractical to
+exercise all code paths through regression testing from userspace.
 
-Paolo
+Add the minimal infrastructure needed to add KUnit tests to networking,
+and add code coverage for this function.
+
+Patch 1 adds the infra and the first simple test case: a linear skb
+Patch 2 adds variants with frags[]
+Patch 3 adds variants with frag_list skbs
+
+Willem de Bruijn (3):
+  net: add skb_segment kunit test
+  net: parametrize skb_segment unit test to expand coverage
+  net: expand skb_segment unit test with frag_list coverage
+
+ net/Kconfig         |   9 ++
+ net/core/Makefile   |   1 +
+ net/core/gso_test.c | 274 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 284 insertions(+)
+ create mode 100644 net/core/gso_test.c
+
+-- 
+2.42.0.582.g8ccd20d70d-goog
 
 
