@@ -1,138 +1,131 @@
-Return-Path: <netdev+bounces-38424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 807037BADC7
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:41:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651867BAE19
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 239911C20904
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 584BF281CEF
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:46:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F299042BE4;
-	Thu,  5 Oct 2023 21:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9C741E5E;
+	Thu,  5 Oct 2023 21:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yih8VVQV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KmtTPcAJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5BA41E59
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:41:05 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588CADB
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:41:02 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f67676065so21254897b3.0
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 14:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696542061; x=1697146861; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jUNTafqkYZ7pS8TSpllde2onzuaLMD5Rpj1fQvAjFxs=;
-        b=yih8VVQVbfsOJD+xe9G7VSjmr3gkSrWedv7OE+hc/NKhaEz52vDlJjfpANDyNCOo++
-         ZuJQ5KRjVDHPo3XqJ+3Fi9+WyvUDWIRT2JMMe2m9BamJcMN7BXvENbovA9X18peyHhY2
-         CYe/EFiW+eEqOOFmJ5qGoW1QFRdrwmx9o5Wz9wYT0cygBGmU9GdUgKjmziDI6554PGNM
-         JvREF67MTmmfgu2+KTBQHUZREQ6k1YrkV2Gcg3M/myhyUZHmt/Rpdrf4bbKJQLymPb8O
-         Uw1RfHbJr41a9wxTeNqTy0PQ3+o1lK3YxuX58TOExUz0iXqBa9QSwaTUsM8yVwnyifNg
-         jEFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696542061; x=1697146861;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jUNTafqkYZ7pS8TSpllde2onzuaLMD5Rpj1fQvAjFxs=;
-        b=b1yL/jqkBHjsQpznd0WczUgNKI9s0M6ttIXmV8PAZCWOAqydZfqh1KCDXLxM05DaLY
-         3ab1HvD8I4LxfS0hbBccAZYMGzt3dfc0c5fUi94SXELd1H+t9D1cshxKc0zbl9HeCPww
-         iMSei0KE6v+LPeKJST7jl7No5U9Qp1k3NmKPj5+SEGZHlqtUkfSrkQfo4kwnHPaJb6y+
-         qZ/dlGnKpfoltWKBGM7MBd6dOGBR7y+sjiEaKSeYNdsjA+7tgJkOyeWQntu2m+4S/acG
-         EDNV3Ud5I1CpTiiU5+F9/oqabX6DqAJHlKCzZR2fHYojj34Xit/wA9otROdvl0abMfbh
-         WQOA==
-X-Gm-Message-State: AOJu0YzQhTyXKVoX1vZWLmfcRc8C9PPv8t6PskR1xRGVzhv2RbFO5u1C
-	ZgxRfLNdhwYEm7Uhx06ujDdH6CjFz8HUfvjsmQ==
-X-Google-Smtp-Source: AGHT+IHIj5z+jvjYSjnBQF7WCdI7cYn9+zHtt+lT2Tek1tSQxg8/n/kE/wh2oRCpNDC0LT+wVxbd/NvsJuSfkIjCmg==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a81:bd08:0:b0:59b:c811:a702 with SMTP
- id b8-20020a81bd08000000b0059bc811a702mr115088ywi.6.1696542061583; Thu, 05
- Oct 2023 14:41:01 -0700 (PDT)
-Date: Thu, 05 Oct 2023 21:41:01 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5552134CF8
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:46:26 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5861A9E
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:46:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696542383; x=1728078383;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=O9gVJq8pRjhkuugdq7kz+kmA4VDD5HLqbMMbl0uWA80=;
+  b=KmtTPcAJn3zLDiIdXK6fLQ8naysdFB3Lpq0O1ufSKI8i1LDnPJp10TWV
+   2bNoctt3rrz6uQkSIUzziRJ6wztsOzDE5K9TjER+ggZEEJbriDxkCDdLk
+   vPYldtwcc4SNvOYEXCPwNDOU91fmltSjHufQJXDxlxLW4mm2SQnx/Ftd1
+   RhzBJLhBKUWDfFWPe7+iD+7GErJ5PAI7lP3QhD0/26deRvkidCnrZd+KV
+   swGIoInJPjM4TZb+K29N8PjAzuS6fPV3yjIAHLEaynmMN6JRszAKkL8Qs
+   BliWAQo33IPLihT1cHYA7+1Lh8woGnjjrYCKKUQ63O9/XCJqBR7J0DyKT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="373977680"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="373977680"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 14:46:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="822271019"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="822271019"
+Received: from tsicinsk-mobl.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.35.190])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 14:46:21 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next 0/6] Support symmetric RSS (Toeplitz) hash
+Date: Thu,  5 Oct 2023 15:46:01 -0600
+Message-Id: <20231005214607.3178614-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAGwtH2UC/x2NQQ7CIBAAv9Ls2U2gDWj8ijEGYWs3sVAXSjRN/
- y56m7nMbJBJmDKcuw2EKmdOsYk+dOAnFx+EHJpDr/pBK2UwF4l++WAQriQZIxWkMpH8wLvK64x Pfq0cODVIt9lxRI93ZcbjyVptBwOtvgiN/P6fL9d9/wIUVboaiQAAAA==
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696542060; l=1918;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=yhFq2y5Pvep99s3JFnDeKpoF+G2I2fKxp4dpMs9PGrs=; b=IYKSrXCoOucrIGOtUWa4qysZwdksei5CHi15EgsgQOrR/qCXqCUliEBjohbluw3vTmot+IDW9
- T5berNGOdbtBJlSvm1r9BfJbMiOaF5ISWKSrN++2bykFZjoprZKmXdg
-X-Mailer: b4 0.12.3
-Message-ID: <20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_main-c-v1-1-663e3f1d8f99@google.com>
-Subject: [PATCH] net: liquidio: replace deprecated strncpy with strscpy_pad
-From: Justin Stitt <justinstitt@google.com>
-To: Derek Chickles <dchickles@marvell.com>, Satanand Burla <sburla@marvell.com>, 
-	Felix Manlunas <fmanlunas@marvell.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-`strncpy` is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+Patch 1 adds the support at the Kernel level, allowing the user to set a
+symmetric RSS hash for any flow type via:
 
-We know `fw_type` must be NUL-terminated based on use here:
-|       static bool fw_type_is_auto(void)
-|       {
-|       	return strncmp(fw_type, LIO_FW_NAME_TYPE_AUTO,
-|       		       sizeof(LIO_FW_NAME_TYPE_AUTO)) == 0;
-|       }
-...and here
-|       module_param_string(fw_type, fw_type, sizeof(fw_type), 0444);
+    # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n symmetric
 
-Let's opt to NUL-pad the destination buffer as well so that we maintain
-the same exact behavior that `strncpy` provided here.
+Support for the new "symmetric" flag will be later sent to the "ethtool" 
+user-space tool.
 
-A suitable replacement is `strscpy_pad` due to the fact that it
-guarantees both NUL-termination and NUL-padding on the destination
-buffer.
+Patch 2 fixes a long standing bug with the register values. The bug has
+been benign for now since only symmetric Toeplitz hash (Zero) has been
+used.
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Note: build-tested only.
----
- drivers/net/ethernet/cavium/liquidio/lio_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patches 3 and 4 lay some groundwork refactoring. While the first is
+mainly cosmetic, the second is needed since there is no more room in the
+previous 64-bit RSS profile ID for the symmetric attribute introduced in 
+the next patch.
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-index 100daadbea2a..34f02a8ec2ca 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
-@@ -1689,7 +1689,7 @@ static int load_firmware(struct octeon_device *oct)
- 
- 	if (fw_type_is_auto()) {
- 		tmp_fw_type = LIO_FW_NAME_TYPE_NIC;
--		strncpy(fw_type, tmp_fw_type, sizeof(fw_type));
-+		strscpy_pad(fw_type, tmp_fw_type, sizeof(fw_type));
- 	} else {
- 		tmp_fw_type = fw_type;
- 	}
+Finally, patches 5 and 6 add the symmetric Toeplitz support for the ice 
+(E800 PFs) and the iAVF drivers.
 
----
-base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_main-c-b05f78661635
+Ahmed Zaki (4):
+  net: ethtool: allow symmetric RSS hash for any flow type
+  ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+  ice: refactor the FD and RSS flow ID generation
+  iavf: enable symmetric RSS Toeplitz hash
 
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+Jeff Guo (1):
+  ice: enable symmetric RSS Toeplitz hash for any flow type
+
+Qi Zhang (1):
+  ice: refactor RSS configuration
+
+ Documentation/networking/scaling.rst          |   6 +
+ .../net/ethernet/intel/iavf/iavf_adv_rss.c    |   8 +-
+ .../net/ethernet/intel/iavf/iavf_adv_rss.h    |   3 +-
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |  22 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   8 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  14 +-
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c |  35 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |  43 +-
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |   4 +-
+ .../net/ethernet/intel/ice/ice_flex_type.h    |   7 +
+ drivers/net/ethernet/intel/ice/ice_flow.c     | 439 +++++++++++++-----
+ drivers/net/ethernet/intel/ice/ice_flow.h     |  46 +-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |   4 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 117 ++---
+ drivers/net/ethernet/intel/ice/ice_main.c     |  49 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  55 ++-
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  35 +-
+ include/linux/avf/virtchnl.h                  |  16 +-
+ include/uapi/linux/ethtool.h                  |   1 +
+ net/ethtool/ioctl.c                           |  11 +
+ 23 files changed, 629 insertions(+), 298 deletions(-)
+
+-- 
+2.34.1
 
 
