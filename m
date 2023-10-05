@@ -1,160 +1,310 @@
-Return-Path: <netdev+bounces-38289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A0177BA020
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:34:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C73B77BA1DE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id A74051C2090A
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:34:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id F1846B20A75
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7442228E35;
-	Thu,  5 Oct 2023 14:34:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB142E62A;
+	Thu,  5 Oct 2023 15:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+3sokuc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeA6QDV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525B0125DD;
-	Thu,  5 Oct 2023 14:34:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F308BC433CD;
-	Thu,  5 Oct 2023 14:34:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696516449;
-	bh=5DAflvk7cbMnfEphlkIQb4Pvn2YbEBIrbMQlws3K4as=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=X+3sokucHjrIlIyYRnc9gdfLJNhOAfTzxxTeIfaIREAYKQIme+4rbmr4+YFyClCav
-	 /KlagsUdirWgfwRxhBm89m5fNiQ03SSis3/h5lrr1rz/Rlnpn5Z4S3a0rMIn3urAAk
-	 bTF3R7VyvRQD+0dpnmphvKXxF8hdsy38tL4rfPoESsD8YZfAYa1Qnr0VmHMcKI/Jm9
-	 QZT2zN6z6PWVPHCJsAqD+S5laip19lHiY/cVbHcbGPeuLiu5wM0VP6+wr+OSKd4DEu
-	 qsATEHjkL1VcCJMImzFpf0LDgK9GGSQYOAQDm2bqAXsWOS4mwo00J9ScGKE9wmi/m3
-	 MGtA3lH3OxMDQ==
-Date: Thu, 5 Oct 2023 07:34:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jinjie Ruan
- <ruanjinjie@huawei.com>, stable@vger.kernel.org, patches@lists.linux.dev,
- linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
- akpm@linux-foundation.org, linux@roeck-us.net, shuah@kernel.org,
- patches@kernelci.org, lkft-triage@lists.linaro.org, pavel@denx.de,
- jonathanh@nvidia.com, f.fainelli@gmail.com, sudipm.mukherjee@gmail.com,
- srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org, Netdev
- <netdev@vger.kernel.org>, kunit-dev@googlegroups.com, Eric Dumazet
- <edumazet@google.com>, chuck.lever@oracle.com
-Subject: Re: [PATCH 6.5 000/321] 6.5.6-rc1 review
-Message-ID: <20231005073408.6bb52351@kernel.org>
-In-Reply-To: <CA+G9fYuH90g8jQ5SZHE98k16iQV5n+d2-G64xT9W9wrVmpt_Dg@mail.gmail.com>
-References: <20231004175229.211487444@linuxfoundation.org>
-	<CA+G9fYuH90g8jQ5SZHE98k16iQV5n+d2-G64xT9W9wrVmpt_Dg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7192E625
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:01:37 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450495C6AE
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:50:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696517345;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a/yNHt/CLpU1k87Q82jDDK9Qnc6mSBeqZnRL1JtCpEw=;
+	b=PeA6QDV7ZNJJ8GJidFZzXvlM6LKMqT9FllKfyJmtLIYQai6AH33nj3S4Ot+/P3BCAXvjXT
+	KTFZ2eh6peBLgx9WG1wOJn060ZzIoKb7kfl7YyrGK5zQkO2SRhxPcu/C7G9XLpeEBRrhis
+	ZpkNEmUeiLfF6X7zTKg682M0FgT1QFw=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-223-aG1zMn4ZMeeNCsmCCV4HkQ-1; Thu, 05 Oct 2023 10:49:03 -0400
+X-MC-Unique: aG1zMn4ZMeeNCsmCCV4HkQ-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-59b59e1ac70so15569747b3.1
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 07:49:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696517343; x=1697122143;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a/yNHt/CLpU1k87Q82jDDK9Qnc6mSBeqZnRL1JtCpEw=;
+        b=v/ZYhJhnDtCKk6ZWTByhk+mBFN/DcQt/gMZMwtZXVXQkLcaBUiCm17BqbFUZ8Uo4xs
+         KTwYMtSiPhZWudiQQ4DVcLwfyOlHgogzvJizvSI8z/VfgLvVmgekkNGT1N5iyFKDETDC
+         t2bi5QageJjl5kl27Y0AeecQkWgSzf8EvNk+Tcyhhd7FOOyjR64Xn5XaUetRHHmbiqbR
+         3g6Bjlbl1CYJF5/lYA29IsJOvmi8SYRj8t5zH4k3dbBAZVkx9UnBOxHEbSD2aHUU/XJV
+         tZEk5QxTUwU5Rj8q24qnamOKEJ1s+jJYg1JWEJsUMipYAli6Ki1izFPACfsfYru2LX0b
+         dLVw==
+X-Gm-Message-State: AOJu0YwfpwRWhAJ6Am3G0ycqm9ckd1AJXiSDONkNq2q5REapp5uA0zIb
+	I4q+z3C6NNXNaj6WAuimlkJto40DspjmIckR3kLXvH31XXHQJJYVo1RNHfZJnUmIDVjEa9ltY7X
+	ZNaFgXzmPXg6Ho/Yj3QctmHWphq6/p0DzVKC7BbU0
+X-Received: by 2002:a0d:d4c4:0:b0:59f:4c3a:711d with SMTP id w187-20020a0dd4c4000000b0059f4c3a711dmr5539976ywd.11.1696517342998;
+        Thu, 05 Oct 2023 07:49:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG8JZNkhK4RosNSHOVvt6DiJr3wTa8hoYOfAU8v71Y0P2njDI2akXwHoO4KlZ+xhR2ScGqHb3TX4k1sBDGrx0I=
+X-Received: by 2002:a0d:d4c4:0:b0:59f:4c3a:711d with SMTP id
+ w187-20020a0dd4c4000000b0059f4c3a711dmr5539962ywd.11.1696517342733; Thu, 05
+ Oct 2023 07:49:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230928164550.980832-2-dtatulea@nvidia.com> <20230928164550.980832-16-dtatulea@nvidia.com>
+ <CAJaqyWeRhJNZ8wbpEFARwBBNbE07n4xQdd-RvUoZooCeB4piPA@mail.gmail.com> <9f0ef4ebd801a35873561384b2aedc920faecd03.camel@nvidia.com>
+In-Reply-To: <9f0ef4ebd801a35873561384b2aedc920faecd03.camel@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 5 Oct 2023 16:48:26 +0200
+Message-ID: <CAJaqyWeOXQiZ885vP_ffSnwhs0rAdORYHyROe-eXjLj2Xred1Q@mail.gmail.com>
+Subject: Re: [PATCH vhost 14/16] vdpa/mlx5: Enable hw support for vq
+ descriptor mapping
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Gal Pressman <gal@nvidia.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"leon@kernel.org" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "mst@redhat.com" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-It'd probably make sense to run the path to the test that's failing
-thru get_maintainer and throw the right people on the CC. Adding Chuck.
+On Thu, Oct 5, 2023 at 2:16=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com>=
+ wrote:
+>
+> On Thu, 2023-10-05 at 11:42 +0200, Eugenio Perez Martin wrote:
+> > On Thu, Sep 28, 2023 at 6:50=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> > >
+> > > Vq descriptor mappings are supported in hardware by filling in an
+> > > additional mkey which contains the descriptor mappings to the hw vq.
+> > >
+> > > A previous patch in this series added support for hw mkey (mr) creati=
+on
+> > > for ASID 1.
+> > >
+> > > This patch fills in both the vq data and vq descriptor mkeys based on
+> > > group ASID mapping.
+> > >
+> > > The feature is signaled to the vdpa core through the presence of the
+> > > .get_vq_desc_group op.
+> > >
+> > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > ---
+> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 26 ++++++++++++++++++++++++--
+> > >  include/linux/mlx5/mlx5_ifc_vdpa.h |  7 ++++++-
+> > >  2 files changed, 30 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > index 25bd2c324f5b..46441e41892c 100644
+> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > > @@ -823,6 +823,7 @@ static int create_virtqueue(struct mlx5_vdpa_net =
+*ndev,
+> > > struct mlx5_vdpa_virtque
+> > >         u32 out[MLX5_ST_SZ_DW(create_virtio_net_q_out)] =3D {};
+> > >         struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
+> > >         struct mlx5_vdpa_mr *vq_mr;
+> > > +       struct mlx5_vdpa_mr *vq_desc_mr;
+> > >         void *obj_context;
+> > >         u16 mlx_features;
+> > >         void *cmd_hdr;
+> > > @@ -878,6 +879,11 @@ static int create_virtqueue(struct mlx5_vdpa_net=
+ *ndev,
+> > > struct mlx5_vdpa_virtque
+> > >         vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GROUP]=
+];
+> > >         if (vq_mr)
+> > >                 MLX5_SET(virtio_q, vq_ctx, virtio_q_mkey, vq_mr->mkey=
+);
+> > > +
+> > > +       vq_desc_mr =3D mvdev->mr[mvdev-
+> > > >group2asid[MLX5_VDPA_DATAVQ_DESC_GROUP]];
+> > > +       if (vq_desc_mr)
+> > > +               MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_desc_m=
+r-
+> > > >mkey);
+> > > +
+> > >         MLX5_SET(virtio_q, vq_ctx, umem_1_id, mvq->umem1.id);
+> > >         MLX5_SET(virtio_q, vq_ctx, umem_1_size, mvq->umem1.size);
+> > >         MLX5_SET(virtio_q, vq_ctx, umem_2_id, mvq->umem2.id);
+> > > @@ -2265,6 +2271,16 @@ static u32 mlx5_vdpa_get_vq_group(struct vdpa_=
+device
+> > > *vdev, u16 idx)
+> > >         return MLX5_VDPA_DATAVQ_GROUP;
+> > >  }
+> > >
+> > > +static u32 mlx5_vdpa_get_vq_desc_group(struct vdpa_device *vdev, u16=
+ idx)
+> > > +{
+> > > +       struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+> > > +
+> > > +       if (is_ctrl_vq_idx(mvdev, idx))
+> > > +               return MLX5_VDPA_CVQ_GROUP;
+> > > +
+> > > +       return MLX5_VDPA_DATAVQ_DESC_GROUP;
+> > > +}
+> > > +
+> > >  static u64 mlx_to_vritio_features(u16 dev_features)
+> > >  {
+> > >         u64 result =3D 0;
+> > > @@ -3139,7 +3155,7 @@ static int mlx5_set_group_asid(struct vdpa_devi=
+ce
+> > > *vdev, u32 group,
+> > >  {
+> > >         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+> > >
+> > > -       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS)
+> > > +       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS || asid >=3D MLX5_VDPA_=
+NUM_AS)
+> >
+> > Nit: the check for asid >=3D MLX5_VDPA_NUM_AS is redundant, as it will
+> > be already checked by VHOST_VDPA_SET_GROUP_ASID handler in
+> > drivers/vhost/vdpa.c:vhost_vdpa_vring_ioctl. Not a big deal.
+> Ack.
+>
+> >
+> > >                 return -EINVAL;
+> > >
+> > >         mvdev->group2asid[group] =3D asid;
+> > > @@ -3160,6 +3176,7 @@ static const struct vdpa_config_ops mlx5_vdpa_o=
+ps =3D {
+> > >         .get_vq_irq =3D mlx5_get_vq_irq,
+> > >         .get_vq_align =3D mlx5_vdpa_get_vq_align,
+> > >         .get_vq_group =3D mlx5_vdpa_get_vq_group,
+> > > +       .get_vq_desc_group =3D mlx5_vdpa_get_vq_desc_group, /* Op dis=
+abled if
+> > > not supported. */
+> > >         .get_device_features =3D mlx5_vdpa_get_device_features,
+> > >         .set_driver_features =3D mlx5_vdpa_set_driver_features,
+> > >         .get_driver_features =3D mlx5_vdpa_get_driver_features,
+> > > @@ -3258,6 +3275,7 @@ struct mlx5_vdpa_mgmtdev {
+> > >         struct vdpa_mgmt_dev mgtdev;
+> > >         struct mlx5_adev *madev;
+> > >         struct mlx5_vdpa_net *ndev;
+> > > +       struct vdpa_config_ops vdpa_ops;
+> > >  };
+> > >
+> > >  static int config_func_mtu(struct mlx5_core_dev *mdev, u16 mtu)
+> > > @@ -3371,7 +3389,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_d=
+ev
+> > > *v_mdev, const char *name,
+> > >                 max_vqs =3D 2;
+> > >         }
+> > >
+> > > -       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, =
+mdev-
+> > > >device, &mlx5_vdpa_ops,
+> > > +       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, =
+mdev-
+> > > >device, &mgtdev->vdpa_ops,
+> > >                                  MLX5_VDPA_NUMVQ_GROUPS, MLX5_VDPA_NU=
+M_AS,
+> > > name, false);
+> > >         if (IS_ERR(ndev))
+> > >                 return PTR_ERR(ndev);
+> > > @@ -3546,6 +3564,10 @@ static int mlx5v_probe(struct auxiliary_device=
+ *adev,
+> > >                 MLX5_CAP_DEV_VDPA_EMULATION(mdev, max_num_virtio_queu=
+es) +
+> > > 1;
+> > >         mgtdev->mgtdev.supported_features =3D get_supported_features(=
+mdev);
+> > >         mgtdev->madev =3D madev;
+> > > +       mgtdev->vdpa_ops =3D mlx5_vdpa_ops;
+> > > +
+> > > +       if (!MLX5_CAP_DEV_VDPA_EMULATION(mdev, desc_group_mkey_suppor=
+ted))
+> > > +               mgtdev->vdpa_ops.get_vq_desc_group =3D NULL;
+> >
+> > I think this is better handled by splitting mlx5_vdpa_ops in two: One
+> > with get_vq_desc_group and other without it. You can see an example of
+> > this in the simulator, where one version supports .dma_map incremental
+> > updating with .dma_map and the other supports .set_map. Otherwise,
+> > this can get messy if more members opt-out or opt-in.
+> >
+> I implemented it this way because the upcoming resumable vq support will =
+also
+> need to selectively implement .resume if the hw capability is there. That=
+ would
+> result in needing 4 different ops for all combinations. The other option =
+would
+> be to force these two ops together (.get_vq_desc_group and .resume). But =
+I would
+> prefer to not do that.
+>
 
-On Thu, 5 Oct 2023 11:25:24 +0530 Naresh Kamboju wrote:
-> On Wed, 4 Oct 2023 at 23:53, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
+That's a good point. As more features are optional per device, maybe
+this approach is better.
+
+I'm not sure what Jason prefers, but I think it would be easy to
+change it on top.
+
+Thanks!
+
+> > But I'm ok with this too, so whatever version you choose:
 > >
-> > This is the start of the stable review cycle for the 6.5.6 release.
-> > There are 321 patches in this series, all will be posted as a response
-> > to this one.  If anyone has any issues with these being applied, please
-> > let me know.
+> > Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 > >
-> > Responses should be made by Fri, 06 Oct 2023 17:51:12 +0000.
-> > Anything received after that time might be too late.
+> > >
+> > >         err =3D vdpa_mgmtdev_register(&mgtdev->mgtdev);
+> > >         if (err)
+> > > diff --git a/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > b/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > index 9becdc3fa503..b86d51a855f6 100644
+> > > --- a/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > +++ b/include/linux/mlx5/mlx5_ifc_vdpa.h
+> > > @@ -74,7 +74,11 @@ struct mlx5_ifc_virtio_q_bits {
+> > >         u8    reserved_at_320[0x8];
+> > >         u8    pd[0x18];
+> > >
+> > > -       u8    reserved_at_340[0xc0];
+> > > +       u8    reserved_at_340[0x20];
+> > > +
+> > > +       u8    desc_group_mkey[0x20];
+> > > +
+> > > +       u8    reserved_at_380[0x80];
+> > >  };
+> > >
+> > >  struct mlx5_ifc_virtio_net_q_object_bits {
+> > > @@ -141,6 +145,7 @@ enum {
+> > >         MLX5_VIRTQ_MODIFY_MASK_STATE                    =3D (u64)1 <<=
+ 0,
+> > >         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_PARAMS      =3D (u64)1 <<=
+ 3,
+> > >         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_DUMP_ENABLE =3D (u64)1 <<=
+ 4,
+> > > +       MLX5_VIRTQ_MODIFY_MASK_DESC_GROUP_MKEY          =3D (u64)1 <<=
+ 14,
+> > >  };
+> > >
+> > >  enum {
+> > > --
+> > > 2.41.0
+> > >
 > >
-> > The whole patch series can be found in one patch at:
-> >         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/patch-6.5.6-rc1.gz
-> > or in the git tree and branch at:
-> >         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git linux-6.5.y
-> > and the diffstat can be found below.
-> >
-> > thanks,
-> >
-> > greg k-h  
-> 
-> While running kunit testing on qemu-armv7 following test failures noticed
-> on stable rc 6.5.6-rc1.
-> 
-> # req_destroy works: EXPECTATION FAILED at net/handshake/handshake-test.c:477
-> 
-> Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> 
-> Test log:
-> ----------
-> <6>[ 1351.687335]     KTAP version 1
-> <6>[ 1351.688300]     # Subtest: Handshake API tests
-> <6>[ 1351.688760]     1..11
-> <6>[ 1351.689362]         KTAP version 1
-> <6>[ 1351.689985]         # Subtest: req_alloc API fuzzing
-> <6>[ 1351.694360]         ok 1 handshake_req_alloc NULL proto
-> <6>[ 1351.705855]         ok 2 handshake_req_alloc CLASS_NONE
-> <6>[ 1351.710878]         ok 3 handshake_req_alloc CLASS_MAX
-> <6>[ 1351.715435]         ok 4 handshake_req_alloc no callbacks
-> <6>[ 1351.722026]         ok 5 handshake_req_alloc no done callback
-> <6>[ 1351.726579]         ok 6 handshake_req_alloc excessive privsize
-> <6>[ 1351.732397]         ok 7 handshake_req_alloc all good
-> <6>[ 1351.732934]     # req_alloc API fuzzing: pass:7 fail:0 skip:0 total:7
-> <6>[ 1351.733586]     ok 1 req_alloc API fuzzing
-> <6>[ 1351.741251]     ok 2 req_submit NULL req arg
-> <6>[ 1351.745979]     ok 3 req_submit NULL sock arg
-> <6>[ 1351.753307]     ok 4 req_submit NULL sock->file
-> <6>[ 1351.763090]     ok 5 req_lookup works
-> <6>[ 1351.770057]     ok 6 req_submit max pending
-> <6>[ 1351.774878]     ok 7 req_submit multiple
-> <6>[ 1351.782411]     ok 8 req_cancel before accept
-> <6>[ 1351.787423]     ok 9 req_cancel after accept
-> <6>[ 1351.795660]     ok 10 req_cancel after done
-> <3>[ 1351.799741]     # req_destroy works: EXPECTATION FAILED at
-> net/handshake/handshake-test.c:477
-> <3>[ 1351.799741]     Expected handshake_req_destroy_test == req, but
-> <3>[ 1351.799741]         handshake_req_destroy_test == 00000000
-> <3>[ 1351.799741]         req == cae22700
-> <6>[ 1351.803368]     not ok 11 req_destroy works
-> <6>[ 1351.804539] # Handshake API tests: pass:10 fail:1 skip:0 total:11
-> <6>[ 1351.805460] # Totals: pass:16 fail:1 skip:0 total:17
-> <6>[ 1351.806276] not ok 95 Handshake API tests
-> 
-> Links:
->  - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.5.y/build/v6.5.5-322-g9327d0db36be/testrun/20257175/suite/kunit/test/req_alloc/log
->  - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.5.y/build/v6.5.5-322-g9327d0db36be/testrun/20257175/suite/kunit/test/req_alloc/details/
->  - https://storage.tuxsuite.com/public/linaro/lkft/builds/2WJGlCUgDzR8asQbd2BxMssFcEc/
->  - https://storage.tuxsuite.com/public/linaro/lkft/builds/2WJGlCUgDzR8asQbd2BxMssFcEc/config
-> 
-> Steps to reproduce:
-> # To install tuxrun to your home directory at ~/.local/bin:
-> # pip3 install -U --user tuxrun==0.49.2
-> #
-> # Or install a deb/rpm depending on the running distribution
-> # See https://tuxmake.org/install-deb/ or
-> # https://tuxmake.org/install-rpm/
-> #
-> # See https://tuxrun.org/ for complete documentation.
-> Link to reproducer,
-> https://storage.tuxsuite.com/public/linaro/lkft/builds/2WJGlCUgDzR8asQbd2BxMssFcEc/tuxmake_reproducer.sh
-> 
-> or
-> 
-> tuxrun --runtime podman --device qemu-armv7 --boot-args rw --kernel
-> https://storage.tuxsuite.com/public/linaro/lkft/builds/2WJGlCUgDzR8asQbd2BxMssFcEc/zImage
-> --modules https://storage.tuxsuite.com/public/linaro/lkft/builds/2WJGlCUgDzR8asQbd2BxMssFcEc/modules.tar.xz
-> --rootfs https://storage.tuxboot.com/debian/bookworm/armhf/rootfs.ext4.xz
-> --parameters SKIPFILE=skipfile-lkft.yaml --image
-> docker.io/linaro/tuxrun-dispatcher:v0.49.2 --tests kunit --timeouts
-> boot=30
-> 
-> 
-> --
-> Linaro LKFT
-> https://lkft.linaro.org
-> 
+>
 
 
