@@ -1,163 +1,111 @@
-Return-Path: <netdev+bounces-38265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366BA7B9DF8
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:59:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9C37B9E3B
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id D606C281CC9
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:59:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id CEA992817CA
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DDA26E2F;
-	Thu,  5 Oct 2023 13:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841DC273E1;
+	Thu,  5 Oct 2023 14:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1EsiQvZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q4HA2HFP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93AC266D0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:59:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AB4CC43215;
-	Thu,  5 Oct 2023 13:59:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696514360;
-	bh=5SmXWapcJyPZQUeif7XTx8G5LatpZwA1DoGJ9KZSHH0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j1EsiQvZxi2OzCy8jzXh6IS84qtfOMBw8ea/qT3HyImvMlI0vOqtnTEOEgkV1P2Ms
-	 R7P6JWNUOcdaI4Qesf6+uZDVvs+InTeBeX/wpk87kXHfchAnovr1SuqU8Mox36MkFd
-	 Kv5Dk3n0rJWhKgkZR19XGzBEsZzHZpbYfRlg8zWRHxcUc7hnx3a5RvW9ivEydQgi6Z
-	 nCX6GVX4qGa3br/NzpchHu0lvpujd6ArQEPIRd6qRCwjgXXvN3BG9ShxWnnElIR73a
-	 o4qyfknOt5jVovGnPZubtlee+WMfnfcB0MqW6kVk5YMJVOhNzRrnNLf4QsgYDQEHxL
-	 cc96rJPwY9IEg==
-Date: Thu, 5 Oct 2023 06:59:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Jeff Layton
- <jlayton@kernel.org>, linux-nfs@vger.kernel.org, neilb@suse.de,
- chuck.lever@oracle.com, netdev@vger.kernel.org
-Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
- netlink commands
-Message-ID: <20231005065919.6001b7ca@kernel.org>
-In-Reply-To: <ZR55TnN4Sr/O5z4a@lore-desk>
-References: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
-	<cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
-	<ZQ2+1NhagxR5bZF+@lore-desk>
-	<20231004100428.3ca993aa@kernel.org>
-	<ZR55TnN4Sr/O5z4a@lore-desk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948F5273D7
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:02:40 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D9E3B49F
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:00:22 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-405361bb94eso9715275e9.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 07:00:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696514415; x=1697119215; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XKYvXra/D0tLphe3ZYt8M2FkTUMUP0fbv8DSSHNP3AU=;
+        b=q4HA2HFPnByx2wqryKNgqw7msNORxZy4rtAadz53kSnuGzKXoU5CALJUlPMjAkIcws
+         qaj7dSLiV6U1u8lFE1A7o79bCJTHxXe2NC3PIwNgo6vwY1VdjMArA4Jg4zKlbf9Z5kwK
+         XknL/scw5r5t6yLHgfpQ7g68TBkQIt86sO0YRS+DQylp1sGM+hMvtKcsIyDjZzPd3GWp
+         xcvy2ow0i4UHquJrs8fMN47sdLEcg2NcJkeY05Cn5TkOv9L2/Q2cIp07f7EE54OiDcFk
+         BuljjSEQDhwPeHQV9UthYNhdEBXVbxWU1sV3/If1j2dvHuB+k82B4FfOm+ravcz5LKA+
+         hRbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696514415; x=1697119215;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XKYvXra/D0tLphe3ZYt8M2FkTUMUP0fbv8DSSHNP3AU=;
+        b=kgkb3OmWMtfucTIPbH5HVFTcZ80rucgVALxWfyizYXXdnnIswQzHqyA6Dni5El89U1
+         a/eH8d0kGx42SGHBHJHc1m3ziOYoAsH+DxqUZjgFz4dB2adekQFeLrmcrlZ0iBbuwbA7
+         j9WXkGzlH5Q+kkc271oUl4kZeiAvm1nmuPC/YN/R96v6pwhd7GpPHwcb4b7ObxIbUXL6
+         H4RkJHtEMWW52OiJ2xsTr1tqBJ7vmL2mA46nvX6gJEkPE0KLjSZf81XPm+OfQhC85Ra4
+         Arj4w1tnOT70S1ZnfzS95fRr7hk6vgj4SCnu8dbijEwYgzklwsZWwmFkVIIpX+mXW2N9
+         YiVQ==
+X-Gm-Message-State: AOJu0YyanceGoZqC9IaTAG7c9MeHJ5hl6Pp/ZmTXK3BWWigDCKgljs3z
+	xm/8O78IqY5WWLqQYxwq2kSInw==
+X-Google-Smtp-Source: AGHT+IFeXTKirNHzitQdtS6ll6h532Honm6zVck6PvhrBG0gk4w02aInvnn9ivNnit9lXF/4TmElFA==
+X-Received: by 2002:a05:600c:2981:b0:403:8fb9:8d69 with SMTP id r1-20020a05600c298100b004038fb98d69mr4991682wmd.25.1696514415402;
+        Thu, 05 Oct 2023 07:00:15 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id hn32-20020a05600ca3a000b004053e9276easm3840958wmb.32.2023.10.05.07.00.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 07:00:15 -0700 (PDT)
+Date: Thu, 5 Oct 2023 17:00:12 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ido Schimmel <idosch@mellanox.com>
+Cc: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
+Message-ID: <6b2eb847-1d23-4b72-a1da-204df03f69d3@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 5 Oct 2023 10:52:30 +0200 Lorenzo Bianconi wrote:
-> running ynl-regen.sh, I got the following error for the get method:
-> 
-> $ ./tools/net/ynl/ynl-regen.sh
->         GEN kernel      fs/nfsd/netlink.h
-> Traceback (most recent call last):
->   File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line 2609, in <module>
->     main()
->   File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line 2445, in main
->     print_req_policy_fwd(cw, ri.struct['request'], ri=ri)
->                              ~~~~~~~~~^^^^^^^^^^^
-> KeyError: 'request'
-> 
-> am I missing something?
+The mlxsw_sp2_nve_vxlan_learning_set() function is supposed to return
+zero on success or negative error codes.  So it needs to be type int
+instead of bool.
 
-Not at all, the codegen was only handling dumps with no ops.
-This change seems to make it a little happier, at least it
-doesn't throw any exceptions. Will it work for your case?
+Fixes: 4ee70efab68d ("mlxsw: spectrum_nve: Add support for VXLAN on Spectrum-2")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 168fe612b029..593be2632f23 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -645,6 +645,33 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         self.inherited = [c_lower(x) for x in sorted(self._inherited)]
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c
+index bb8eeb86edf7..52c2fe3644d4 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c
+@@ -310,8 +310,8 @@ const struct mlxsw_sp_nve_ops mlxsw_sp1_nve_vxlan_ops = {
+ 	.fdb_clear_offload = mlxsw_sp_nve_vxlan_clear_offload,
+ };
  
+-static bool mlxsw_sp2_nve_vxlan_learning_set(struct mlxsw_sp *mlxsw_sp,
+-					     bool learning_en)
++static int mlxsw_sp2_nve_vxlan_learning_set(struct mlxsw_sp *mlxsw_sp,
++					    bool learning_en)
+ {
+ 	char tnpc_pl[MLXSW_REG_TNPC_LEN];
  
-+class StructNone:
-+    def __init__(self, family, space_name):
-+        self.family = family
-+        self.space_name = space_name
-+        self.attr_set = family.attr_sets[space_name]
-+
-+        if family.name == c_lower(space_name):
-+            self.render_name = f"{family.name}"
-+        else:
-+            self.render_name = f"{family.name}_{c_lower(space_name)}"
-+
-+        self.request = False
-+        self.reply = False
-+
-+        self.attr_list = []
-+        self.attrs = dict()
-+
-+    def __iter__(self):
-+        yield from self.attrs
-+
-+    def __getitem__(self, key):
-+        return self.attrs[key]
-+
-+    def member_list(self):
-+        return self.attr_list
-+
-+
- class EnumEntry(SpecEnumEntry):
-     def __init__(self, enum_set, yaml, prev, value_start):
-         super().__init__(enum_set, yaml, prev, value_start)
-@@ -1041,9 +1068,12 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         if op_mode == 'notify':
-             op_mode = 'do'
-         for op_dir in ['request', 'reply']:
--            if op and op_dir in op[op_mode]:
--                self.struct[op_dir] = Struct(family, self.attr_set,
--                                             type_list=op[op_mode][op_dir]['attributes'])
-+            if op:
-+                if op_dir in op[op_mode]:
-+                    self.struct[op_dir] = Struct(family, self.attr_set,
-+                                                 type_list=op[op_mode][op_dir]['attributes'])
-+                else:
-+                    self.struct[op_dir] = StructNone(family, self.attr_set)
-         if op_mode == 'event':
-             self.struct['reply'] = Struct(family, self.attr_set, type_list=op['event']['attributes'])
- 
-@@ -1752,6 +1782,8 @@ _C_KW = {
- 
- 
- def print_req_type_helpers(ri):
-+    if isinstance(ri.struct["request"], StructNone):
-+        return
-     print_alloc_wrapper(ri, "request")
-     print_type_helpers(ri, "request")
- 
-@@ -1773,6 +1805,8 @@ _C_KW = {
- 
- 
- def print_req_type(ri):
-+    if isinstance(ri.struct["request"], StructNone):
-+        return
-     print_type(ri, "request")
- 
- 
-@@ -2515,9 +2549,8 @@ _C_KW = {
-                 if 'dump' in op:
-                     cw.p(f"/* {op.enum_name} - dump */")
-                     ri = RenderInfo(cw, parsed, args.mode, op, 'dump')
--                    if 'request' in op['dump']:
--                        print_req_type(ri)
--                        print_req_type_helpers(ri)
-+                    print_req_type(ri)
-+                    print_req_type_helpers(ri)
-                     if not ri.type_consistent:
-                         print_rsp_type(ri)
-                     print_wrapped_type(ri)
 -- 
-2.41.0
+2.39.2
 
 
