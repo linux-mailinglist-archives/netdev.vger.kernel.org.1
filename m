@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-38366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD6E7BA953
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:42:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FBAE7BA954
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 25B661C208BE
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:42:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4150E1C20924
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960603C68A;
-	Thu,  5 Oct 2023 18:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625523D990;
+	Thu,  5 Oct 2023 18:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="YTdnCZaq"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RH8ZmPqf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE422E65A
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:52 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A75C0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:42:50 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-692d2e8c003so1899265b3a.1
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 11:42:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995772E65A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:56 +0000 (UTC)
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381529E
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:42:54 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso982005a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 11:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696531370; x=1697136170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Og4ZdxssU8L1R5eTzBywzenE0Sa3mA8E/G01mteTkJU=;
-        b=YTdnCZaqlfz3clHtXEnUIxWcF9TZwsCgj3FjEWzcd9ky5IzLOZ5xtPiOyVOR7stlyU
-         qJemCUZhvFmFNGnQK2ZFugnJ0EWHIIBTQgpEQjHjKudYsEjQMRw9DRGR/qiHEyYRhUUI
-         jW6W1kzIDznroi5rplm8jYf+iEGcVJCE3e0V+UIuBFLR4W9xRnG3shb+KhvJ+baOqd/C
-         nT3Tehe1Euvnooad6cttausudwY2Ik2o0+vIhxY18BO4ZltkVlwDa1hvPFLmmvePzeSi
-         3z/3WPoyx4hIOjNQNX/a96r5sEDBd4Zd9N9XfVsHQGmSsIvvCfWVu6R5G+Z32jpAAr+q
-         9l3w==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696531373; x=1697136173; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y3FzuamDMqc3cHGN57FU3P1A3vYgTC4SAk7aG0mI3ac=;
+        b=RH8ZmPqfNZoMVGa1C3ybKFenu6pCAB8/V0EapxeiXaabZNdUSzOnknFJN1RLS629NT
+         EhGGKRxGu6Mp8VQiD+ptFc77KplcllmcVctvLnfPy9w6LLvmtteotc9UseY3l6p0PRC3
+         D7awzt+7V0jHsinI4hPnM1kkpfvS8UxiAJB5o5p9pJR2URUcp3wFON1CJMXaKJ4ZJJrh
+         4vkNu1YPnsRZUnQyJF4ZgW5vIffXOkRA6xOosVFvr9LiPTBvgOmQ56QvLlfSz9Zf56ID
+         sP4gjzsuWDRpRY9PTRHYhvQLQwhe8bw/puHwOeqJGEgEKddWpsqCjgfT/Bi+9D8SHA6K
+         9bnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696531370; x=1697136170;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Og4ZdxssU8L1R5eTzBywzenE0Sa3mA8E/G01mteTkJU=;
-        b=YifhIrFxdSAdACd+MK8t64Be/TCUwG+8JTPQmZ5kjeN0U57k5Ua6B/YduYo0TCt7uo
-         mTT5rBY+WE1jUJba11adk62eE15Y6+dpvP2eYLT51D1g3WmrU8uH/CqsHBbj10Vboh8Z
-         BSAWKSeLDcX4EezjhTGLq9pjEX3thsHYnx2NEagfoWUBt260eyAjp+FO86rPP5oPNIUd
-         dkyQcwkZieC0ncmBJfQ+M7JzTgeXivMvgS+kMRnPSNnWNbv8emKi58HUeQmNdlpnp+cf
-         MC8ZWQx/L1EOWlmw587Bjhz03vrePSgcZrFSH6xUXgqhMVfrkUPLf8Pbnv8aC3ktPTsC
-         f3fw==
-X-Gm-Message-State: AOJu0YwBrH/eRKbXsT7Whs1THgeXnwRD2I4vnWUWEg/N51Tud5myQkgH
-	W9GMds5wfE0YNkkcmQ+dTM/X2A==
-X-Google-Smtp-Source: AGHT+IERHDyiGcSySCG+0kXDAyTbk6izd1tli09B3QVLHc6xKDva6Bmp+Ji4dTG0yy6fRPHee7P+5A==
-X-Received: by 2002:a05:6a20:8e28:b0:140:d536:d434 with SMTP id y40-20020a056a208e2800b00140d536d434mr5531865pzj.10.1696531370037;
-        Thu, 05 Oct 2023 11:42:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696531373; x=1697136173;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y3FzuamDMqc3cHGN57FU3P1A3vYgTC4SAk7aG0mI3ac=;
+        b=JJ47+LovYzd+fHw6/3pew79IsSKRGnmXB3uAnF62WaDF6h2YkmgTJjx5HqDnVGbApS
+         3DlycnP7q3vbqvy0cx94dKxeqFCMNhckFa2eJvYiZAxtVrZCK2SXexrR/qkZdulP7lRO
+         ZRRUUxa2cKzK6kFiqcJeWZyLYUdeRkkO8UW8Dft7XJldVq0BY2rTaCB2odGLAemWEWJk
+         1k6noaES0UhaEQyJRca0EBxsBMPaqFVILRSO9iSMXiawc+vKm/RqPv/x1LgIAAg8Hfof
+         Wqqx4AAqVPv+c44gfWBLXE1MbZNWYrqOxXoYzgcKj8KjpqS37bDuiKKBuMaCJ9uZsP9w
+         OW+A==
+X-Gm-Message-State: AOJu0YyGBLNynoj3PKw/dgr34H03l8ATJ1dlV8tuwDqUz+Ctvo3Wtvgr
+	W2fkL0W9RUIgAZ+CBxgfyu+JzA==
+X-Google-Smtp-Source: AGHT+IGLwovphLLnYTswhoolRg6NRFKLzDVLtBQnk/tqlrlZ1ixKzcHsbZQ2UFTwR0oeZeVfCTyz5A==
+X-Received: by 2002:a05:6a20:564d:b0:160:97a3:cae7 with SMTP id is13-20020a056a20564d00b0016097a3cae7mr5151306pzc.57.1696531373583;
+        Thu, 05 Oct 2023 11:42:53 -0700 (PDT)
 Received: from localhost.localdomain ([2804:7f1:e2c2:b6b7:54d9:6465:eb2f:5366])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b00690d4c16296sm1725831pff.154.2023.10.05.11.42.46
+        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b00690d4c16296sm1725831pff.154.2023.10.05.11.42.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 11:42:49 -0700 (PDT)
+        Thu, 05 Oct 2023 11:42:53 -0700 (PDT)
 From: Victor Nogueira <victor@mojatatu.com>
 To: jhs@mojatatu.com,
 	xiyou.wangcong@gmail.com,
@@ -69,10 +70,12 @@ Cc: mleitner@redhat.com,
 	pctammela@mojatatu.com,
 	netdev@vger.kernel.org,
 	kernel@mojatatu.com
-Subject: [PATCH net-next v4 0/3] net/sched: Introduce tc block ports tracking and use
-Date: Thu,  5 Oct 2023 15:42:25 -0300
-Message-ID: <20231005184228.467845-1-victor@mojatatu.com>
+Subject: [PATCH net-next v4 1/3] net/sched: Introduce tc block netdev tracking infra
+Date: Thu,  5 Oct 2023 15:42:26 -0300
+Message-ID: <20231005184228.467845-2-victor@mojatatu.com>
 X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231005184228.467845-1-victor@mojatatu.com>
+References: <20231005184228.467845-1-victor@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,91 +89,213 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-__Context__
-The "tc block" is a collection of netdevs/ports which allow qdiscs to share
-match-action block instances (as opposed to the traditional tc filter per
-netdev/port)[1].
-
-Example setup:
+The tc block is a collection of netdevs/ports which allow qdiscs to share
+filter block instances (as opposed to the traditional tc filter per port).
+Example:
 $ tc qdisc add dev ens7 ingress block 22
 $ tc qdisc add dev ens8 ingress block 22
 
-Once the block is created we can add a filter using the block index:
+Now we can add a filter using the block index:
 $ tc filter add block 22 protocol ip pref 25 \
   flower dst_ip 192.168.0.0/16 action drop
 
-A packet with dst IP matching 192.168.0.0/16 arriving on the ingress of
-either ens7 or ens8 is dropped.
+Up to this point, the block is unaware of its ports. This patch fixes that
+and makes the tc block ports available to the datapath.
 
-__This patchset__
-Up to this point in the implementation, the block is unaware of its ports.
-This patch fixes that and makes the tc block ports available to the
-datapath.
+Suggested-by: Jiri Pirko <jiri@nvidia.com>
+Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+---
+ include/net/sch_generic.h |  4 +++
+ net/sched/cls_api.c       |  2 ++
+ net/sched/sch_api.c       | 58 +++++++++++++++++++++++++++++++++++++++
+ net/sched/sch_generic.c   | 34 +++++++++++++++++++++--
+ 4 files changed, 96 insertions(+), 2 deletions(-)
 
-For the datapath we provide a use case of the tc block in an action
-we call "blockcast" in patch 3. This action can be used in an example as
-such:
-
-$ tc qdisc add dev ens7 ingress block 22
-$ tc qdisc add dev ens8 ingress block 22
-$ tc qdisc add dev ens9 ingress block 22
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 192.168.0.0/16 action blockcast
-
-When a packet(matching dst IP 192.168.0.0/16) arrives on the ingress of any
-of ens7, ens8 or ens9 it will be copied to all ports other than itself.
-For example, if it arrives on ens8 then a copy of the packet will be
-"blockcasted";-> to both ens7 and ens9 (unmodified), but not to ens8.
-
-Patch 1 introduces the required infra. Patch 2 exposes the tc block to the
-tc datapath and patch 3 implements datapath usage via a new tc action
-"blockcast".
-
-__Acknowledgements__
-Suggestions from Vlad Buslov and Marcelo Ricardo Leitner made this patchset
-better. The idea of integrating the ports into the tc block was suggested
-by Jiri Pirko.
-
-[1] See commit ca46abd6f89f ("Merge branch 'net-sched-allow-qdiscs-to-share-filter-block-instances'")
-
-Changes in v2:
-  - Remove RFC tag
-  - Add more details in patch 0(Jiri)
-  - When CONFIG_NET_TC_SKB_EXT is selected we have unused qdisc_cb
-    Reported-by: kernel test robot <lkp@intel.com> (and horms@kernel.org)
-  - Fix bad dev dereference in printk of blockcast action (Simon)
-
-Changes in v3:
-  - Add missing xa_destroy (pointed out by Vlad)
-  - Remove bugfix pointed by Vlad (will send in separate patch)
-  - Removed ports from subject in patch #2 and typos (suggested by Marcelo)
-  - Remove net_notice_ratelimited debug messages in error
-    cases (suggested by Marcelo)
-  - Minor changes to appease sparse's lock context warning
-
-Changes in v4:
-  - Avoid code repetition using gotos in cast_one (suggested by Paolo)
-  - Fix typo in cover letter (pointed out by Paolo)
-  - Create a module description for act_blockcast
-    (reported by Paolo and CI)
-
-Victor Nogueira (3):
-  net/sched: Introduce tc block netdev tracking infra
-  net/sched: cls_api: Expose tc block to the datapath
-  net/sched: act_blockcast: Introduce blockcast tc action
-
- include/net/sch_generic.h    |   8 +
- include/net/tc_wrapper.h     |   5 +
- include/uapi/linux/pkt_cls.h |   1 +
- net/sched/Kconfig            |  13 ++
- net/sched/Makefile           |   1 +
- net/sched/act_blockcast.c    | 297 +++++++++++++++++++++++++++++++++++
- net/sched/cls_api.c          |  12 +-
- net/sched/sch_api.c          |  58 +++++++
- net/sched/sch_generic.c      |  34 +++-
- 9 files changed, 426 insertions(+), 3 deletions(-)
- create mode 100644 net/sched/act_blockcast.c
-
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index c7318c73cfd6..a01979b0a2a1 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -19,6 +19,7 @@
+ #include <net/gen_stats.h>
+ #include <net/rtnetlink.h>
+ #include <net/flow_offload.h>
++#include <linux/xarray.h>
+ 
+ struct Qdisc_ops;
+ struct qdisc_walker;
+@@ -126,6 +127,8 @@ struct Qdisc {
+ 
+ 	struct rcu_head		rcu;
+ 	netdevice_tracker	dev_tracker;
++	netdevice_tracker	in_block_tracker;
++	netdevice_tracker	eg_block_tracker;
+ 	/* private data */
+ 	long privdata[] ____cacheline_aligned;
+ };
+@@ -458,6 +461,7 @@ struct tcf_chain {
+ };
+ 
+ struct tcf_block {
++	struct xarray ports; /* datapath accessible */
+ 	/* Lock protects tcf_block and lifetime-management data of chains
+ 	 * attached to the block (refcnt, action_refcnt, explicitly_created).
+ 	 */
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index a193cc7b3241..06b55344a948 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -531,6 +531,7 @@ static void tcf_block_destroy(struct tcf_block *block)
+ {
+ 	mutex_destroy(&block->lock);
+ 	mutex_destroy(&block->proto_destroy_lock);
++	xa_destroy(&block->ports);
+ 	kfree_rcu(block, rcu);
+ }
+ 
+@@ -1003,6 +1004,7 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
+ 	refcount_set(&block->refcnt, 1);
+ 	block->net = net;
+ 	block->index = block_index;
++	xa_init(&block->ports);
+ 
+ 	/* Don't store q pointer for blocks which are shared */
+ 	if (!tcf_block_shared(block))
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index e9eaf637220e..66543e4d6cdc 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1180,6 +1180,60 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
+ 	return 0;
+ }
+ 
++static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
++			       struct nlattr **tca,
++			       struct netlink_ext_ack *extack)
++{
++	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
++	struct tcf_block *in_block = NULL;
++	struct tcf_block *eg_block = NULL;
++	unsigned long cl = 0;
++	int err;
++
++	if (tca[TCA_INGRESS_BLOCK]) {
++		/* works for both ingress and clsact */
++		cl = TC_H_MIN_INGRESS;
++		in_block = cl_ops->tcf_block(sch, cl, NULL);
++		if (!in_block) {
++			NL_SET_ERR_MSG(extack, "Shared ingress block missing");
++			return -EINVAL;
++		}
++
++		err = xa_insert(&in_block->ports, dev->ifindex, dev, GFP_KERNEL);
++		if (err) {
++			NL_SET_ERR_MSG(extack, "ingress block dev insert failed");
++			return err;
++		}
++
++		netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
++	}
++
++	if (tca[TCA_EGRESS_BLOCK]) {
++		cl = TC_H_MIN_EGRESS;
++		eg_block = cl_ops->tcf_block(sch, cl, NULL);
++		if (!eg_block) {
++			NL_SET_ERR_MSG(extack, "Shared egress block missing");
++			err = -EINVAL;
++			goto err_out;
++		}
++
++		err = xa_insert(&eg_block->ports, dev->ifindex, dev, GFP_KERNEL);
++		if (err) {
++			NL_SET_ERR_MSG(extack, "Egress block dev insert failed");
++			goto err_out;
++		}
++		netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
++	}
++
++	return 0;
++err_out:
++	if (in_block) {
++		xa_erase(&in_block->ports, dev->ifindex);
++		netdev_put(dev, &sch->in_block_tracker);
++	}
++	return err;
++}
++
+ static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
+ 				   struct netlink_ext_ack *extack)
+ {
+@@ -1350,6 +1404,10 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
+ 	qdisc_hash_add(sch, false);
+ 	trace_qdisc_create(ops, dev, parent);
+ 
++	err = qdisc_block_add_dev(sch, dev, tca, extack);
++	if (err)
++		goto err_out4;
++
+ 	return sch;
+ 
+ err_out4:
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 4195a4bc26ca..b0c28b2ee713 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -1049,7 +1049,12 @@ static void qdisc_free_cb(struct rcu_head *head)
+ 
+ static void __qdisc_destroy(struct Qdisc *qdisc)
+ {
+-	const struct Qdisc_ops  *ops = qdisc->ops;
++	struct net_device *dev = qdisc_dev(qdisc);
++	const struct Qdisc_ops *ops = qdisc->ops;
++	const struct Qdisc_class_ops *cops;
++	struct tcf_block *block;
++	unsigned long cl;
++	u32 block_index;
+ 
+ #ifdef CONFIG_NET_SCHED
+ 	qdisc_hash_del(qdisc);
+@@ -1060,11 +1065,36 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
+ 
+ 	qdisc_reset(qdisc);
+ 
++	cops = ops->cl_ops;
++	if (ops->ingress_block_get) {
++		block_index = ops->ingress_block_get(qdisc);
++		if (block_index) {
++			cl = TC_H_MIN_INGRESS;
++			block = cops->tcf_block(qdisc, cl, NULL);
++			if (block) {
++				if (xa_erase(&block->ports, dev->ifindex))
++					netdev_put(dev, &qdisc->in_block_tracker);
++			}
++		}
++	}
++
++	if (ops->egress_block_get) {
++		block_index = ops->egress_block_get(qdisc);
++		if (block_index) {
++			cl = TC_H_MIN_EGRESS;
++			block = cops->tcf_block(qdisc, cl, NULL);
++			if (block) {
++				if (xa_erase(&block->ports, dev->ifindex))
++					netdev_put(dev, &qdisc->eg_block_tracker);
++			}
++		}
++	}
++
+ 	if (ops->destroy)
+ 		ops->destroy(qdisc);
+ 
+ 	module_put(ops->owner);
+-	netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
++	netdev_put(dev, &qdisc->dev_tracker);
+ 
+ 	trace_qdisc_destroy(qdisc);
+ 
 -- 
 2.25.1
 
