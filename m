@@ -1,144 +1,103 @@
-Return-Path: <netdev+bounces-38197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 000AE7B9BEF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:52:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 648767B9BFA
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 11:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 159BC1C20853
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 08:52:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 15F7C281A69
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094B2DDAD;
-	Thu,  5 Oct 2023 08:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D87E579;
+	Thu,  5 Oct 2023 09:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EasewVdw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rl9qiaC6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5D75690
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 08:52:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090C0C116B4;
-	Thu,  5 Oct 2023 08:52:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696495954;
-	bh=kdOVueCUGc2zsRpYF5bysHxKXG55y67tcQidRcCIZ4U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EasewVdwafoq1yx5+UNUcJalaL3xX5dSjjN+pyIqUFn5/aR2m2nSP3mS4on9JKg+p
-	 G/jLyzOGa/cKdy//fnXTwvpp96dopSUsnkSx2WE4GLx0Bm1f/JAmZfpvUZTIZPVj8c
-	 lm8nU3NWPMw3WioArHBHdUbVEe7FeZf0o1VB00JzAsvhpfzC22EHj1U+rFiqLG0HAz
-	 GUkMU9x6PZkzDq9NaG444korw8CX4jNAahoJb6tBBt7sMiHxnHAxj7wmG10UurFtSo
-	 u9QGCVeT5zvvssOZBONO3snD22mkZ8XicLO5YoX2qrprbxPBoOxpAPLEP4sVvN6AHz
-	 eAw0TOVqn1T/Q==
-Date: Thu, 5 Oct 2023 10:52:30 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
-	neilb@suse.de, chuck.lever@oracle.com, netdev@vger.kernel.org
-Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
- netlink commands
-Message-ID: <ZR55TnN4Sr/O5z4a@lore-desk>
-References: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
- <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
- <ZQ2+1NhagxR5bZF+@lore-desk>
- <20231004100428.3ca993aa@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C300E63A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:01:22 +0000 (UTC)
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDBE9EC3;
+	Thu,  5 Oct 2023 02:01:21 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-325e9cd483eso731265f8f.2;
+        Thu, 05 Oct 2023 02:01:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696496480; x=1697101280; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=nyCjyMRZJPpmlXHrivKxtsx8HD0NSj+fcEZELdzdDEQ=;
+        b=Rl9qiaC6E4CPjVzA2ffAgqUOlM7epwfWWskPrOAtio1Bgz9Ivh+hpIMkTOaqW6MG6g
+         tC5BvfdSlJq8My5xgrklxIGUASaG2C4EkkuggdwPPQhDl9jz8VGKJcljBEQQRaBBHcXs
+         HKkXgphDYCLa02Z+WBGEL2hYgO/Un1JLQYPc3/xsdscqmnUVkzM2N9e/4k7jpbZOr1+9
+         h7tDTg+kiuJDlxWFzWWzEYhJIP4ZLA8X9A77RmuJGfkK+yMp19dy2v24ouIOdklavYvS
+         AAp3SIlX3UaPILsFzXd5PBZghRktUSpeHUNDuNbHIDB5rYSbrjqVycQ8ASPRQbSIHNac
+         AGSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696496480; x=1697101280;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nyCjyMRZJPpmlXHrivKxtsx8HD0NSj+fcEZELdzdDEQ=;
+        b=r0aHURFeQ4YALc5AJ1LKezB3Nlhoc3oW6Sq2PUVm87wDfKB9kE8dnGwbf8Y4ADO19X
+         Gkv3vxgpSMk8S4PnFurBgesMDKVEPYQ4YU2rL0EEyQd/iK3voJXnbOOeaR8WKvFo4fkV
+         Ca2+mXeRK48pavz5tCLh7gCWqUCY6SbRjQsrW/r9zSZ/BYjcgBTZ2jbLIEyGn0ExjMR4
+         pXf/nbsLVGaadhktaRBr82r6YlPRi84G/2tGekyJ8XkA0cWjfbrMLObG11q0ze8O1RAr
+         YyCj6burZHlHstjNS4szvJmWXVtvfJhppdYz+an+JPh0IBSuOjAP5j2jj9CFjJX7Y2fb
+         v+EQ==
+X-Gm-Message-State: AOJu0YyU4BsKhS30/ewHEfAxeAILYS/1ugDyTSLKUhzP5mTSkQU7ngL1
+	ZraEM+10f7+XRNb7Y4C++S2yNkUhlhBIWjzs4Jw=
+X-Google-Smtp-Source: AGHT+IFIPFt0C+RQD6SfEGDNp/O1EcsXM3cXS55wuqm/OjC897gfV9/lodgbKZQ3zWKSi7n3ZjBLYo9o40siMK6OUUQ=
+X-Received: by 2002:adf:edc3:0:b0:321:56af:5ef9 with SMTP id
+ v3-20020adfedc3000000b0032156af5ef9mr3840408wro.70.1696496479494; Thu, 05 Oct
+ 2023 02:01:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7N7cDQtYTEJaPqIG"
-Content-Disposition: inline
-In-Reply-To: <20231004100428.3ca993aa@kernel.org>
+References: <20230926182625.72475-1-dg573847474@gmail.com> <20231004170120.1c80b3b4@kernel.org>
+In-Reply-To: <20231004170120.1c80b3b4@kernel.org>
+From: Chengfeng Ye <dg573847474@gmail.com>
+Date: Thu, 5 Oct 2023 17:01:07 +0800
+Message-ID: <CAAo+4rW=zh_d7AxJSP0uLuO7w+_PmbBfBr6D4=4X2Ays7ATqoA@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: use spin_lock_bh() on &gact->tcf_lock
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Hi Jakub,
 
---7N7cDQtYTEJaPqIG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the reply,
 
-> On Fri, 22 Sep 2023 18:20:36 +0200 Lorenzo Bianconi wrote:
-> > > matter at all. Do we have to send down a value at all? =20
-> >=20
-> > I am not sure if ynl supports a doit operation with a request with no p=
-arameters.
-> > @Chuck, Jakub: any input here?
->=20
-> It should, if it doesn't LMK, I will fix..
+I inspected the code a bit more, it seems that the TC action is called from
+tcf_proto_ops.classify() callback, which is called from Qdisc_ops enqueue
+callback.
 
-ack, what I want to do is add a 'get' method w/o any parameter in the reque=
-st and
-with just one parameter in the reply (i.e. the number of running threads). =
-E.g:
+Then Qdisc enqueue callback is from
 
-+++ b/Documentation/netlink/specs/nfsd.yaml
-@@ -62,6 +62,18 @@ attribute-sets:
-         name: compound-ops
-         type: u32
-         multi-attr: true
-+  -
-+    name: control-plane
-+    attributes:
-+      -
-+        name: threads
-+        type: u32
-=20
- operations:
-   list:
-@@ -72,3 +84,54 @@ operations:
-       dump:
-         pre: nfsd-nl-rpc-status-get-start
-         post: nfsd-nl-rpc-status-get-done
-+    -
-+      name: threads-set
-+      doc: set the number of running threads
-+      attribute-set: control-plane
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - threads
-+    -
-+      name: threads-get
-+      doc: get the number of running threads
-+      attribute-set: control-plane
-+      do:
-+        reply:
-+          attributes:
-+            - threads
+-> __dev_queue_xmit()
+-> __dev_xmit_skb()
+-> dev_qdisc_enqueue()
 
-running ynl-regen.sh, I got the following error for the get method:
+inside the net core. It seems that this __dev_queue_xmit() callback is
+typically called from BH context (e.g.,  NET_TX_SOFTIRQ) with BH
+already disabled, but sometimes also can from a work queue under
+process context, one case is the br_mrp_test_work_expired() inside
+net/bridge/br_mrp.c. Does it indicate that this TC action could also be
+called with BH enable? I am not a developer so really not sure about it,
+as the networking code is a bit long and complicated.
 
-$ ./tools/net/ynl/ynl-regen.sh
-        GEN kernel      fs/nfsd/netlink.h
-Traceback (most recent call last):
-  File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line=
- 2609, in <module>
-    main()
-  File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line=
- 2445, in main
-    print_req_policy_fwd(cw, ri.struct['request'], ri=3Dri)
-                             ~~~~~~~~~^^^^^^^^^^^
-KeyError: 'request'
-
-am I missing something?
-
-Regards,
-Lorenzo
-
---7N7cDQtYTEJaPqIG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZR55TgAKCRA6cBh0uS2t
-rN7DAQDYvw5l8F0Tv6kl9SuPPswPeHXr1Pynz59ksPeQTxeqaQD/Q6msrDMf8c0K
-TY2kVQ03zUHHaVJ7j68Ld650M0i1nQA=
-=QllE
------END PGP SIGNATURE-----
-
---7N7cDQtYTEJaPqIG--
+Thanks again,
+Chengfeng
 
