@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-38423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28FA87BADA4
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:33:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807037BADC7
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:41:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 52810281E9F
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 239911C20904
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E26741E5B;
-	Thu,  5 Oct 2023 21:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F299042BE4;
+	Thu,  5 Oct 2023 21:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w7WfL1/G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yih8VVQV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A484934CF8
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:33:23 +0000 (UTC)
-Received: from mail-oo1-xc49.google.com (mail-oo1-xc49.google.com [IPv6:2607:f8b0:4864:20::c49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C471FE8
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:33:20 -0700 (PDT)
-Received: by mail-oo1-xc49.google.com with SMTP id 006d021491bc7-57b63eba015so1755077eaf.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 14:33:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5BA41E59
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:41:05 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588CADB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:41:02 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f67676065so21254897b3.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 14:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696541600; x=1697146400; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696542061; x=1697146861; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=DBeGsTEWaeHMVhG88NcKDZwFuePbfbjL4RyYq3i7W/U=;
-        b=w7WfL1/G6/y1GScimOJYHT+87Q8GMHJNBFsijTmekIyEQMcgZEcTh815QBNPe8vhUD
-         J83dm8TvK7umU+fVBL7mDSyWfYlZX3OVkCvu4a58MXdRkFIqi1lT4IBq3rbbS3LZHg+4
-         /9Ya1TbRfR5EFgoDapnJDipaTzGaAXv474aJj71A9jt4qC9kOvD2v4LbVGjkKY2PuPIF
-         bSQKwZK/0FrFQs+5Tyids8wKoaVVe8lGJY52MpD8/qcp5TGX4sydFZxaUMBEfH1Mab3G
-         QQEkNkrZFWymaSuqfShJc2qjAUF4S+ZeJn7bFvEQfQAawSTa6ENKyH+j6pMd1LEcsPvL
-         EVeg==
+        bh=jUNTafqkYZ7pS8TSpllde2onzuaLMD5Rpj1fQvAjFxs=;
+        b=yih8VVQVbfsOJD+xe9G7VSjmr3gkSrWedv7OE+hc/NKhaEz52vDlJjfpANDyNCOo++
+         ZuJQ5KRjVDHPo3XqJ+3Fi9+WyvUDWIRT2JMMe2m9BamJcMN7BXvENbovA9X18peyHhY2
+         CYe/EFiW+eEqOOFmJ5qGoW1QFRdrwmx9o5Wz9wYT0cygBGmU9GdUgKjmziDI6554PGNM
+         JvREF67MTmmfgu2+KTBQHUZREQ6k1YrkV2Gcg3M/myhyUZHmt/Rpdrf4bbKJQLymPb8O
+         Uw1RfHbJr41a9wxTeNqTy0PQ3+o1lK3YxuX58TOExUz0iXqBa9QSwaTUsM8yVwnyifNg
+         jEFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696541600; x=1697146400;
+        d=1e100.net; s=20230601; t=1696542061; x=1697146861;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DBeGsTEWaeHMVhG88NcKDZwFuePbfbjL4RyYq3i7W/U=;
-        b=dMoXoX+b33XMNCRrWCKrEzNiuO2oEw2KJU1Ksn0k0XAUO1CrgCcHi0a9Hf+JjL1lzN
-         W4YIUc6x3l41og9xi9ROIioAB2ffGSHFAYiJHQ7kx2PBgPZJfTH948uTD/0xxiGNlrrf
-         9Xfdmr4hflWe+9dvxMU5F0SMN9hOoAK9mCeeY3r8CJ3PrXNYHTHz5Mgby4pHRQvc6Uzd
-         2Zqi9AZwIYsEohToQDKzPvi+tIXG+zzZh8edOvoT2uLBWDYMubbqjyo77q9V1xlwaEWg
-         s7Hk0Otm1VnD+OaEoH5CoDY1IAPfQ0XkbB08VSUBkPNWk3k6/w3+QyDrqF1JvoIVoPvb
-         H6eA==
-X-Gm-Message-State: AOJu0YylQvSJ4UO0HmhMZQQsID/BU/4bydYjo674sm+RhJ/N1Iq3DJWX
-	GRdJmwijPigDGmbvG6p7bIS83eI/ZCJwN/IRWQ==
-X-Google-Smtp-Source: AGHT+IERmtuCbXgTxMb6GCIs82t5NHgtdhXCBck4p3yQOXrj8TSuyBNg0Kjon0YrX+XoIVuXYQ74AU/tz2JVombgFA==
+        bh=jUNTafqkYZ7pS8TSpllde2onzuaLMD5Rpj1fQvAjFxs=;
+        b=b1yL/jqkBHjsQpznd0WczUgNKI9s0M6ttIXmV8PAZCWOAqydZfqh1KCDXLxM05DaLY
+         3ab1HvD8I4LxfS0hbBccAZYMGzt3dfc0c5fUi94SXELd1H+t9D1cshxKc0zbl9HeCPww
+         iMSei0KE6v+LPeKJST7jl7No5U9Qp1k3NmKPj5+SEGZHlqtUkfSrkQfo4kwnHPaJb6y+
+         qZ/dlGnKpfoltWKBGM7MBd6dOGBR7y+sjiEaKSeYNdsjA+7tgJkOyeWQntu2m+4S/acG
+         EDNV3Ud5I1CpTiiU5+F9/oqabX6DqAJHlKCzZR2fHYojj34Xit/wA9otROdvl0abMfbh
+         WQOA==
+X-Gm-Message-State: AOJu0YzQhTyXKVoX1vZWLmfcRc8C9PPv8t6PskR1xRGVzhv2RbFO5u1C
+	ZgxRfLNdhwYEm7Uhx06ujDdH6CjFz8HUfvjsmQ==
+X-Google-Smtp-Source: AGHT+IHIj5z+jvjYSjnBQF7WCdI7cYn9+zHtt+lT2Tek1tSQxg8/n/kE/wh2oRCpNDC0LT+wVxbd/NvsJuSfkIjCmg==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a4a:4f42:0:b0:57b:3840:4c85 with SMTP
- id c63-20020a4a4f42000000b0057b38404c85mr2335028oob.1.1696541600124; Thu, 05
- Oct 2023 14:33:20 -0700 (PDT)
-Date: Thu, 05 Oct 2023 21:33:19 +0000
+ (user=justinstitt job=sendgmr) by 2002:a81:bd08:0:b0:59b:c811:a702 with SMTP
+ id b8-20020a81bd08000000b0059bc811a702mr115088ywi.6.1696542061583; Thu, 05
+ Oct 2023 14:41:01 -0700 (PDT)
+Date: Thu, 05 Oct 2023 21:41:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJ4rH2UC/x2NQQrCMBAAv1L27EKSoqhfEZGabOxCTepuGpTSv
- xu9zTCHWUFJmBTO3QpClZVzamJ3HfhxSA9CDs3BGddbY/aoRZKfPxiEK4liooJURpIf+KHy8sS JXwsHzg3yrcWS84Qe74dT77yJRxMttMEsFPn9n1+u2/YFMCiAn4wAAAA=
+X-B4-Tracking: v=1; b=H4sIAGwtH2UC/x2NQQ7CIBAAv9Ls2U2gDWj8ijEGYWs3sVAXSjRN/
+ y56m7nMbJBJmDKcuw2EKmdOsYk+dOAnFx+EHJpDr/pBK2UwF4l++WAQriQZIxWkMpH8wLvK64x Pfq0cODVIt9lxRI93ZcbjyVptBwOtvgiN/P6fL9d9/wIUVboaiQAAAA==
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696541598; l=2730;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696542060; l=1918;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=PKPsb45o8cJUMR1NbV9bY/ZXdX56wnhP8PdDKS7CtXE=; b=V1BHnD4OOJXpH/xgsaKnRxTqiT9ViCdlfEibIwEOSbm+ZYxyvmHL5E4Z4Ng26ZmlHpUNgDba/
- +ghPh0uvDd3Cp21R6QwP2QMeWaE/vV57KKgtRZYIt+iUrL/D/xjBytE
+ bh=yhFq2y5Pvep99s3JFnDeKpoF+G2I2fKxp4dpMs9PGrs=; b=IYKSrXCoOucrIGOtUWa4qysZwdksei5CHi15EgsgQOrR/qCXqCUliEBjohbluw3vTmot+IDW9
+ T5berNGOdbtBJlSvm1r9BfJbMiOaF5ISWKSrN++2bykFZjoprZKmXdg
 X-Mailer: b4 0.12.3
-Message-ID: <20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_ethtool-c-v1-1-ab565ab4d197@google.com>
-Subject: [PATCH] liquidio: replace deprecated strncpy/strcpy with strscpy
+Message-ID: <20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_main-c-v1-1-663e3f1d8f99@google.com>
+Subject: [PATCH] net: liquidio: replace deprecated strncpy with strscpy_pad
 From: Justin Stitt <justinstitt@google.com>
 To: Derek Chickles <dchickles@marvell.com>, Satanand Burla <sburla@marvell.com>, 
 	Felix Manlunas <fmanlunas@marvell.com>, "David S. Miller" <davem@davemloft.net>, 
@@ -77,9 +77,9 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -87,64 +87,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 [1] and as such we should prefer more robust and less ambiguous string
 interfaces.
 
-NUL-padding is not required as drvinfo is memset to 0:
-|	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
+We know `fw_type` must be NUL-terminated based on use here:
+|       static bool fw_type_is_auto(void)
+|       {
+|       	return strncmp(fw_type, LIO_FW_NAME_TYPE_AUTO,
+|       		       sizeof(LIO_FW_NAME_TYPE_AUTO)) == 0;
+|       }
+...and here
+|       module_param_string(fw_type, fw_type, sizeof(fw_type), 0444);
 
-A suitable replacement is `strscpy` [2] due to the fact that it
-guarantees NUL-termination on the destination buffer without
-unnecessarily NUL-padding.
+Let's opt to NUL-pad the destination buffer as well so that we maintain
+the same exact behavior that `strncpy` provided here.
+
+A suitable replacement is `strscpy_pad` due to the fact that it
+guarantees both NUL-termination and NUL-padding on the destination
+buffer.
 
 Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
 Link: https://github.com/KSPP/linux/issues/90
 Cc: linux-hardening@vger.kernel.org
 Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
 Note: build-tested only.
 ---
- drivers/net/ethernet/cavium/liquidio/lio_ethtool.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/cavium/liquidio/lio_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c b/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
-index 9d56181a301f..d3e07b6ed5e1 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_ethtool.c
-@@ -442,10 +442,11 @@ lio_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- 	oct = lio->oct_dev;
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_main.c b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+index 100daadbea2a..34f02a8ec2ca 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_main.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_main.c
+@@ -1689,7 +1689,7 @@ static int load_firmware(struct octeon_device *oct)
  
- 	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
--	strcpy(drvinfo->driver, "liquidio");
--	strncpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
--		ETHTOOL_FWVERS_LEN);
--	strncpy(drvinfo->bus_info, pci_name(oct->pci_dev), 32);
-+	strscpy(drvinfo->driver, "liquidio", sizeof(drvinfo->driver));
-+	strscpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
-+		sizeof(drvinfo->fw_version));
-+	strscpy(drvinfo->bus_info, pci_name(oct->pci_dev),
-+		sizeof(drvinfo->bus_info));
- }
- 
- static void
-@@ -458,10 +459,11 @@ lio_get_vf_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- 	oct = lio->oct_dev;
- 
- 	memset(drvinfo, 0, sizeof(struct ethtool_drvinfo));
--	strcpy(drvinfo->driver, "liquidio_vf");
--	strncpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
--		ETHTOOL_FWVERS_LEN);
--	strncpy(drvinfo->bus_info, pci_name(oct->pci_dev), 32);
-+	strscpy(drvinfo->driver, "liquidio_vf", sizeof(drvinfo->driver));
-+	strscpy(drvinfo->fw_version, oct->fw_info.liquidio_firmware_version,
-+		sizeof(drvinfo->fw_version));
-+	strscpy(drvinfo->bus_info, pci_name(oct->pci_dev),
-+		sizeof(drvinfo->bus_info));
- }
- 
- static int
+ 	if (fw_type_is_auto()) {
+ 		tmp_fw_type = LIO_FW_NAME_TYPE_NIC;
+-		strncpy(fw_type, tmp_fw_type, sizeof(fw_type));
++		strscpy_pad(fw_type, tmp_fw_type, sizeof(fw_type));
+ 	} else {
+ 		tmp_fw_type = fw_type;
+ 	}
 
 ---
 base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_ethtool-c-b6932c0f80f1
+change-id: 20231005-strncpy-drivers-net-ethernet-cavium-liquidio-lio_main-c-b05f78661635
 
 Best regards,
 --
