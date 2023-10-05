@@ -1,138 +1,130 @@
-Return-Path: <netdev+bounces-38190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DFB7B9B73
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:43:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBEAF7B9B7E
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 55B402817D0
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 07:43:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C23C91C2084A
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 07:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB635684;
-	Thu,  5 Oct 2023 07:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DB15694;
+	Thu,  5 Oct 2023 07:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ivhElYd4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwPOWyQX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D13C53B9;
-	Thu,  5 Oct 2023 07:43:52 +0000 (UTC)
-Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4007C7DA5;
-	Thu,  5 Oct 2023 00:43:50 -0700 (PDT)
-Received: by mail-ej1-x643.google.com with SMTP id a640c23a62f3a-9b2cee55056so121729766b.3;
-        Thu, 05 Oct 2023 00:43:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9504A63A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:49:14 +0000 (UTC)
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149757ECB;
+	Thu,  5 Oct 2023 00:49:12 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-578e33b6fb7so442125a12.3;
+        Thu, 05 Oct 2023 00:49:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696491829; x=1697096629; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=434RHBUC25tmTHbc0SxjMGW/nyMWNCPZ1Bst5eTtmeM=;
-        b=ivhElYd4rVggN+9kl3Xzsj4jDQSDcuYdxNTSa5f6rhrsVyJdknEm32pX+w5BuS/zzV
-         KFpUEYvE6hhTURfaVqNnlsYtRuR05ZnlqnI0y2JT8oASQtr9oYMzkAHEiPMB3rmHksS6
-         YoqrEY9t4gfqkXriyXERdnhe80zzscAWQVdkRo0dHaiyUCcYNMkteROguJQXydnW1BXA
-         jUXUxERj346Xd9lKbV1kj6OWFB7UhjI0zsWTHhbBMcFvu5Pww0Q9ePxma8a+VMQIKCGs
-         V2njjowe/7zBasctc+OT10saUR1szLEy2TlhW/ZtlTv4kNEqhrrDYFvajg/6r1wj0I13
-         IiVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696491829; x=1697096629;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1696492151; x=1697096951; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=434RHBUC25tmTHbc0SxjMGW/nyMWNCPZ1Bst5eTtmeM=;
-        b=VCcgJ+6Yddx0G/kw9nh1hhyRWHQLJ+IsF1vvly5jD7P2tbcrwSomnHcDs1as9ZcTW2
-         wJjfS4cL6KQmv8iMNay1ijHpsMHc78nlM4/3pfajCVdWnvlHgBOiJt/qx7XzJUKnOC4C
-         9s7H6sjB7zhFzsG+PDax5W2Git+8Fya5ATk6xcDZKuEuZ3GhCJZvkEAPf5Yk+johO666
-         W9BS5Lq/xsaWgNVnCqP0ns5rWDyCTcSJfF7AFnai9Nc9LleCqjBMg1Z9uWcFnG57n11f
-         ir+GrgGCl8sMmA6+kE5MB+vbnkxVj/M4xNd2XNzETRgO8rw0kwUoGv0Wlas2MHlfvstu
-         H1iA==
-X-Gm-Message-State: AOJu0YzdTNbDvyjF96k+6rooLkCEGcX6vi8ww8acAUqhYd22t8YNoFEj
-	ZETfVZUkFYLyVgE4WgrwYaU=
-X-Google-Smtp-Source: AGHT+IFvDmJPhDO8Jx+ZQXEtd1a2eMdmo4I9tmenB4y4AIYQ55Kkp0YyeiGHG29nPu9RkmJ6ihEApg==
-X-Received: by 2002:a17:906:253:b0:9b8:9b4f:1cc2 with SMTP id 19-20020a170906025300b009b89b4f1cc2mr3632778ejl.43.1696491828442;
-        Thu, 05 Oct 2023 00:43:48 -0700 (PDT)
-Received: from akanner-r14. ([62.4.56.169])
-        by smtp.gmail.com with ESMTPSA id j16-20020a170906051000b0099bcf1c07c6sm714925eja.138.2023.10.05.00.43.45
+        bh=Z+shXokc3b1SA2zWfnMnBrWdVnpdHWbiNYj8YxjiEvU=;
+        b=GwPOWyQXLWjt0gMeqbtH7MH09TVrU8FdgtirXbDp8jKarK8U0KC5nLYWajknACwLG9
+         ds7E0GlgpHLc0iZJj5ThZPPYKj4oDVN4t55KBZfTlrV6x9/zxm7lLtlx+aaUEA/8bAb1
+         DZppdof1/p6Mn5wERoglfYhZo4pgZuwC8EYN7qyA1IWRG19W9fUX2iF7HnqgieodPPN5
+         a4LJlZZT6GIIOcBfhfmlAQUTZ3jW/1teS9PJIxAcRFZkadQ3NYu+NcGOvv1E5W9Dttk6
+         VbK8rkKxQqKV97AddkPyPYA6fEN85e8HoX8vYroElORIpHKBKrUBazml4w+j++X+K57j
+         U7ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696492151; x=1697096951;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z+shXokc3b1SA2zWfnMnBrWdVnpdHWbiNYj8YxjiEvU=;
+        b=CRsyGrdpZ/LwEqpjTj7ImUK2NWr6dS2HYKvWr2Hw1NJl2sa0FjTXqygOZKVWTrbw6A
+         QsodeOuqjXHYeezFxK3a0XSjVnDhqZwlQhqxJH+IDr/2T1rHpXBLRlXp+kj3xAZ8mD/v
+         ZSrW5/QG1oExBTpiQFFpT3FZEhwodQsxvgug2HK97xsuB/GtC89/X+QQkO13jfE+poBU
+         OuMZt6xvekvpEneKhFbQF/RIRoLtLlCPHLYg0lKPvquY9BHSI5tgFNV9BQ/SdeGVT+xr
+         AEtQdfbUi7ezArFOlJOeDzNr9bjbZZWPV95m70/2ioE6atG19JCemUGbZ0UhG/u6Cvoz
+         scmg==
+X-Gm-Message-State: AOJu0Yz3IyWfyXltAietjKO/5IA7gT0QLO+Z7F7hgZ8tQP6FxW8b8fB8
+	cm3elO0OuXKYZDkbi4+ySxI=
+X-Google-Smtp-Source: AGHT+IFctSNXXRG6BjXN/xRDMVWMn9ZK2l+5Q7fGGJM5KNiZ1ViEQTsL+oyBbyLQdCa3dYEgDyLXuw==
+X-Received: by 2002:a17:90a:c9:b0:274:46cd:5af2 with SMTP id v9-20020a17090a00c900b0027446cd5af2mr4174201pjd.34.1696492151357;
+        Thu, 05 Oct 2023 00:49:11 -0700 (PDT)
+Received: from 377044c6c369.cse.ust.hk (191host097.mobilenet.cse.ust.hk. [143.89.191.97])
+        by smtp.gmail.com with ESMTPSA id y14-20020a17090a134e00b00277560ecd5dsm2772178pjf.46.2023.10.05.00.49.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 00:43:47 -0700 (PDT)
-Message-ID: <651e6933.170a0220.f6f76.1a12@mx.google.com>
-X-Google-Original-Message-ID: <ZR5nSFVu9XhIHjit@akanner-r14.>
-Date: Thu, 5 Oct 2023 10:35:56 +0300
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, aleksander.lobakin@intel.com,
-	xuanzhuo@linux.alibaba.com, ast@kernel.org, hawk@kernel.org,
-	john.fastabend@gmail.com,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	netdev@vger.kernel.org, bpf@vger.kernel.org,
+        Thu, 05 Oct 2023 00:49:10 -0700 (PDT)
+From: Chengfeng Ye <dg573847474@gmail.com>
+To: 3chas3@gmail.com,
+	davem@davemloft.net,
+	horms@kernel.org
+Cc: linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next v2] net/xdp: fix zero-size allocation warning in
- xskq_create()
-References: <20231002222939.1519-1-andrew.kanner@gmail.com>
- <2f5abbf8-8d50-3deb-19cd-9bfd654e1ceb@iogearbox.net>
+	Chengfeng Ye <dg573847474@gmail.com>
+Subject: [PATCH v2 1/2] atm: solos-pci: Fix potential deadlock on &cli_queue_lock
+Date: Thu,  5 Oct 2023 07:48:58 +0000
+Message-Id: <20231005074858.65082-1-dg573847474@gmail.com>
+X-Mailer: git-send-email 2.17.1
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f5abbf8-8d50-3deb-19cd-9bfd654e1ceb@iogearbox.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 12:49:23AM +0200, Daniel Borkmann wrote:
-[...]
-> > 
-> > Reported-and-tested-by: syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/all/000000000000c84b4705fb31741e@google.com/T/
-> > Link: https://syzkaller.appspot.com/bug?extid=fae676d3cf469331fc89
-> > Fixes: 9f78bf330a66 ("xsk: support use vaddr as ring")
-> > Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
-> 
-> I guess also:
-> 
-> Reported-by: syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
-> 
-> Moreover, this fix is needed in bpf/net tree (as opposed to *-next tree), right?
->
+As &card->cli_queue_lock is acquired under softirq context along the
+following call chain from solos_bh(), other acquisition of the same
+lock inside process context should disable at least bh to avoid double
+lock.
 
-Seems, so - I will check.
+<deadlock #1>
+console_show()
+--> spin_lock(&card->cli_queue_lock)
+<interrupt>
+   --> solos_bh()
+   --> spin_lock(&card->cli_queue_lock)
 
-> >   net/xdp/xsk_queue.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
-> > index f8905400ee07..b03d1bfb6978 100644
-> > --- a/net/xdp/xsk_queue.c
-> > +++ b/net/xdp/xsk_queue.c
-> > @@ -34,6 +34,9 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
-> >   	q->ring_mask = nentries - 1;
-> >   	size = xskq_get_ring_size(q, umem_queue);
-> > +	if (unlikely(size == SIZE_MAX))
-> > +		return NULL;
-> 
-> Doesn't this leak q here ?
-> 
-> >   	size = PAGE_ALIGN(size);
-> >   	q->ring = vmalloc_user(size);
-> > 
-> 
+This flaw was found by an experimental static analysis tool I am
+developing for irq-related deadlock.
 
-It is.
-Thanks, Daniel, I will fix it in v3. 
+To prevent the potential deadlock, the patch uses spin_lock_irqsave()
+on the card->cli_queue_lock under process context code consistently
+to prevent the possible deadlock scenario.
 
-pw-bot: cr
+Fixes: 9c54004ea717 ("atm: Driver for Solos PCI ADSL2+ card.")
+Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
+---
+V2: add fix tag, and slipt into two patches
 
---
-Andrew Kanner
+ drivers/atm/solos-pci.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
+index 94fbc3abe60e..48cf9b36b61a 100644
+--- a/drivers/atm/solos-pci.c
++++ b/drivers/atm/solos-pci.c
+@@ -447,11 +447,12 @@ static ssize_t console_show(struct device *dev, struct device_attribute *attr,
+ 	struct atm_dev *atmdev = container_of(dev, struct atm_dev, class_dev);
+ 	struct solos_card *card = atmdev->dev_data;
+ 	struct sk_buff *skb;
++	unsigned long flags;
+ 	unsigned int len;
+ 
+-	spin_lock(&card->cli_queue_lock);
++	spin_lock_irqsave(&card->cli_queue_lock, flags);
+ 	skb = skb_dequeue(&card->cli_queue[SOLOS_CHAN(atmdev)]);
+-	spin_unlock(&card->cli_queue_lock);
++	spin_unlock_irqrestore(&card->cli_queue_lock, flags);
+ 	if(skb == NULL)
+ 		return sprintf(buf, "No data.\n");
+ 
+-- 
+2.17.1
+
 
