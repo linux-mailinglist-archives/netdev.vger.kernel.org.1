@@ -1,324 +1,238 @@
-Return-Path: <netdev+bounces-38303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87ECC7BA1E5
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:03:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5BB7B9FB8
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2BB7D281CB8
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:03:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2F42C1C20912
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45182E645;
-	Thu,  5 Oct 2023 15:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F417B28E32;
+	Thu,  5 Oct 2023 14:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wo1i9/Zm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lybtdu9n"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DD4F51C
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:03:04 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A8AD8862;
-	Thu,  5 Oct 2023 08:03:01 -0700 (PDT)
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 395ExjYd006794;
-	Thu, 5 Oct 2023 15:02:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=YgYYgzYwO9PSxWqLIRQnBK4k7RetQefF9XdOzJSQoYc=;
- b=Wo1i9/ZmRfW+sOiV10vsxsaYC2jRqByRanJsB4FrEnZn9bx9PzoFf+uVU3oYGNJf2K5Q
- cqIAI9o+2h7qveiTI9VjL5eAoEwi0edPMBMDeRIjj21UO23MbKH6FAF/i280UuuzpMIR
- piw4jTA3pd7iB8a1Y06BL2rps7aUne+rPu8gxdKU+MCdwR1QSsiZzDQDByoehrUg8H5W
- H/BU7BYWW7pFf0vGpv5+osvAk7QAFqQ2kFiONNViyhy3Bb14l9Bj1K0bazOipMncyG2V
- nO8F8T2GX6AUsVNpv81JsNNDpSeUsSRU+XfyMmgzTl3o90+7K44mEOnCB9dqXGnmO/g4 Zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thy9q845k-69
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Oct 2023 15:02:51 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 395A5MFL024567;
-	Thu, 5 Oct 2023 10:31:57 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3thsaqcufv-154
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Oct 2023 10:31:57 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3956oBos006684;
-	Thu, 5 Oct 2023 08:21:07 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tf07khqq6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Oct 2023 08:21:07 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3958L4cY18940654
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 5 Oct 2023 08:21:04 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9E5902004B;
-	Thu,  5 Oct 2023 08:21:04 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7114E20040;
-	Thu,  5 Oct 2023 08:21:03 +0000 (GMT)
-Received: from [9.171.88.212] (unknown [9.171.88.212])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  5 Oct 2023 08:21:03 +0000 (GMT)
-Message-ID: <dcc46fedda57e7e3ade14685ddb262309544ad7e.camel@linux.ibm.com>
-Subject: Re: [PATCH net-next v4 00/18] net/smc: implement virtual ISM
- extension and loopback-ism
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
-        wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: wintera@linux.ibm.com, gbayer@linux.ibm.com, pasic@linux.ibm.com,
-        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 05 Oct 2023 10:21:03 +0200
-In-Reply-To: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
-References: <1695568613-125057-1-git-send-email-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WlOKwDSQ3j-4dmb_5lF51_EYmohTTJVy
-X-Proofpoint-ORIG-GUID: XGcQ2sILzvao8M7KWvTeOWeqmLTjaIxY
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6270A286A6
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:28:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9A3BB3D1B;
+	Thu,  5 Oct 2023 07:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696516121; x=1728052121;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Er89vX52G/zC+elLCVKrqj5b6xTnFrf3UQkARHVQqFc=;
+  b=lybtdu9n8N2o5VJJJC67En7T7O46XycxR3lw0N8UA6krUnm/tw61rxXu
+   DinUqbN3V5z5YILYt0pPcuKqmDWdhw1pqWPGkDF3YbwMZcapEhbKm08im
+   deukP2SOmRHxyQEXR6d41InMUh8LDTZEGG5GPzeOHW+iP/ZhStZS150rT
+   MEfR434te2vFT131ciufmErTyJFzBSLrBxoy3pVnw0u5233W7feSSTREO
+   +ji8w585TWJ3yANEa9w2lU7N2Nw+BpS2AexSCM7h85zzUIr6Qt4oTFNGP
+   vJrZ5i7bbgm0pEzmnIYCL/IfZIslDxWCuygSwb54B/ZtUUT6lJ3wKczHp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="449934788"
+X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
+   d="scan'208";a="449934788"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 01:22:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="1082924472"
+X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
+   d="scan'208";a="1082924472"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Oct 2023 01:22:14 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 5 Oct 2023 01:22:14 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 5 Oct 2023 01:22:13 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 5 Oct 2023 01:22:13 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 5 Oct 2023 01:22:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iaCVHJcTHkpuGUx/juS/wMbkqclQdYEJ3Ke5vrRvu52mYeWPJ3JZY2damSH3w/ekGGU/FLvR5ZOyPsYsux7oHfBkqRmqOiT+s92qvn3pU/05B+AYgHE1ydVyemokENrx7Ql+gdZKvZdJMcX+17aaFgKofT1KvjetWvk4Oo1lc+INcUwv2JaoCF//xb/QnriQxf1MS/RUqA9T3JhPzMJmpy4IIp5PlUmZqO7Y1FoFc8RW3hfhG444JqgFgBpsXyPcKcgROr5KcQNsn9fDGXEurL3vLFktvKh4mfANaOdREPUZZr9YPefj1eDclF9uzC2oWhDs+u6TjASNxlerXC5HAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NWZpvcFr6A3EicQjTi+9D7CGzZXTUu6Fz5R2h/sTnLk=;
+ b=TIf+JV/9g2plyvZ0aOZOqVSTao7o9Mw0l1Z2qkA5tXBJC15mUGR01afWVNPy03uJFzOAKmbWAWho01Vfw3OxzlOScko5L41s0g9r39rvY6bCZbRjITnYgSzN+fu9XUTMhOklk8/3TPF9gKLBq2dXCtT0I+ilTrpSo/8eTIV3sCtoNr9I0uiLKAezgXObB/RE4+UDvan/DlG/rGFzWob4rT/SwWZDGWAP27QD1LJgARo8TK4N8bDO6GU9cGlTeAhFuCG2iw1Lp1XAWW37PCSpkEiDUBkhRnurw1yAtoN8fH+/1o0uAuLNyQ/ENOjeaQ4RwOkObM0UXDnF6FJs+CmMgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by SA1PR11MB8473.namprd11.prod.outlook.com (2603:10b6:806:3a7::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.33; Thu, 5 Oct
+ 2023 08:22:06 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6838.024; Thu, 5 Oct 2023
+ 08:22:06 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "edumazet@google.com" <edumazet@google.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular
+ header dependencies and fix headers
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular
+ header dependencies and fix headers
+Thread-Index: AQHZ8R1TpSizpDLlFkeA5ZoIhKoZsrA65wkQ
+Date: Thu, 5 Oct 2023 08:22:06 +0000
+Message-ID: <BL0PR11MB3122EA0512BBE5CCCF62C66BBDCAA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20230927083135.3237206-1-ivecera@redhat.com>
+ <20230927083135.3237206-9-ivecera@redhat.com>
+In-Reply-To: <20230927083135.3237206-9-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|SA1PR11MB8473:EE_
+x-ms-office365-filtering-correlation-id: 9a1abbd9-87e6-4ba9-8510-08dbc57c295b
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: LE9SNQaBBt+sRcw9c5sL2IFm9CY914Ui1NOnZ8N++lZjaSf8jLRX5ai3bwxKvttme3SQbq3v4tlLa/rte+LduHzOxcZaZUVQxWYSHuVyprG22CnaPKG0u46TbUKHQVJin/ia9AgbxOaVw4VOxvkSJS+CTC34nQyvBb0bENGhcA582JfdEot6zbCZyQplbZdHczkcwOIXtQ5kKv9SOTbpmNzK4JR86l4bD3WEhL+yE7rTV2w3ePqhRTdZOPnRbU+rAiLmaytGIO0MqaRTo1m0Rqo/PXC7abJpwVAsJGnQLxvYpqEq4OkmmBrHEr9DH7FX252Yd9DRYzj90Ni6vBCybf8rjx+IUxH88oE1SNMUvP7ufZcOB+3KUgz6Uwa3g1Oy2oXzNcexiJoS2xEJPncSc0UK1XPPjmCMleLWtdMk46UflT66ti4ovD51TzmNHSSgNFnYTpsm9Thb7yM+kckgFwZ5YOOIHaZ5PnuMFqfI/hgJTgoemMtsB+qTRj9S7nZHcqyNnywmNOxAi2pqq90PaiLTFYxgAGj1zP9dojKEjLboi8vhiZIiWnjlwggfvSkSvhEquWcDFeBJI/wxVXBiRKfqM7duQEiDrbfTY4Gw2ffL8RSZHzQ9ldh3hdbfZ84h
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(376002)(39860400002)(136003)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(66446008)(53546011)(110136005)(54906003)(86362001)(66556008)(66946007)(76116006)(66476007)(4326008)(41300700001)(33656002)(38100700002)(2906002)(8936002)(52536014)(8676002)(38070700005)(122000001)(5660300002)(83380400001)(82960400001)(316002)(26005)(55016003)(64756008)(9686003)(71200400001)(6506007)(7696005)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?69c0rkGwD/mPd1cLCkKp+/ul6L4YBmy3Qxm/VxNQDLsC/2TVmmf+HtEYW3oZ?=
+ =?us-ascii?Q?vNMbvoB3mVn+HLWN5voGoCwq7yIwwPW2HxCc1sKWKufNqWJxXXbVzWAmtUT4?=
+ =?us-ascii?Q?GwUwwc9Cp479Z2Rhrc0+Z8/RHP2Qfx3B1dKplGmUtckkv0V5AMMfr6z+ZSjO?=
+ =?us-ascii?Q?s6qBJ9pNgFwdw7mVF71/THQPEYvsdlMklVBK7JJPxBYrXuva/JZgYJoATefT?=
+ =?us-ascii?Q?WyRJCPIo32VS4AnjMOkVZPY4J3R6U9NDHWI0jnJlm47ukcRClDWwlbQz2DJ1?=
+ =?us-ascii?Q?SowqIOgm+pITkaRy6CtJ+O5hJc7+M9Sma9Dd2QwPOqrhuMPHHFpFDWsYkW0A?=
+ =?us-ascii?Q?6eVBFCCjT/D1YB+QjnOw6fu7JPL9eoLViWQNNfXo18WLeu+A+5kWME1GIeA2?=
+ =?us-ascii?Q?NjkD7faKab+j61dS9K5onbTqyKRG6LIuRvcGWIqF96A7pbrkokh8F7VRnBqO?=
+ =?us-ascii?Q?vrR9ou6JwWo0A+GF5rtcn70Oiarb/fYdQhBEPJqhAm6PjCin3MclxMy4AA50?=
+ =?us-ascii?Q?OzE4FW5jgrqrpOgyz4IFxGyFfXje6brcDFJXAtqwiDsQyA9leIVSeAbn7zuS?=
+ =?us-ascii?Q?ngRNgbDvx/jPEICAabgfZoDwEdvYk+ghQ2HF5SqAdDBVQ96JOWc6wKIFOpUl?=
+ =?us-ascii?Q?efr3OE7cLTvVH7u41KXJ/tSZ+Pbu4tokIii0xNQmE32EFm+ehoRINV0Wjw3A?=
+ =?us-ascii?Q?aQk5tscL2ZC/3dp2eg/4vMDkUhPhVBsEYRtIxOGW3rOkcFHhUV2pN9wVTS0N?=
+ =?us-ascii?Q?c1G7acXIPy79qDLhYOW2e7f2M/sHUm9f/h/ULW+DrTPcuj9gRFKxmX6jZKe6?=
+ =?us-ascii?Q?YEbTqsyjSMODEmrd2qoNsA9Jazox/73/lpXLGNtYv/s7uLToaa/dSYwkGOrB?=
+ =?us-ascii?Q?Qe4mtkgKRXxdLlJEk1ycPaxV+rRTtT3Fl9FfndWmr+tMjJX2AAMSMcHes35N?=
+ =?us-ascii?Q?aV6nxRQT++isjEuDbenceqIwVdCcRaOJWuDQT1Yy3abs47MpnUOTH6vv8cFi?=
+ =?us-ascii?Q?qUyb++uULagvnWRyOh3x+B65VfS0W/9dwABUBLfcXuk0GU8vCjNkl0gos9sq?=
+ =?us-ascii?Q?ilfmx/JbpcNoMng2qJbd8h5NQ+4WbMrXryG1+Z9v08T1l4kcRwstRFEUReBS?=
+ =?us-ascii?Q?hlKNXXEUHUv7WETRT/KUWTnIe+8OgLDrVRbr6lu5BhEsLCsTI7sOmaiM1O90?=
+ =?us-ascii?Q?+PkGEl/A+BQpM5WOXvLkvt5IkpuxYRCVKGxzLD0Z8Qrf68XTg31UbOb1jD5R?=
+ =?us-ascii?Q?u72lEk300XogQCA3VSDyr0zbfiboWsR0NAHA2oOD7oztq6lwMU20wL8uqHYS?=
+ =?us-ascii?Q?HNs2Te7+ZsKalWBXtc/rbwAF9JuukaBxNz/xyNQJ200MZ0GPShJh8jt9oGvb?=
+ =?us-ascii?Q?tqHSbjhE9m54qnFGUyR0kcLT4+MAjqnd6cWa+6kPiqVRaV53OMHxrikcTq1H?=
+ =?us-ascii?Q?Mh1cHmrF+W6ZuP7+UC9mDLq7YIGhPamNA4smJ5TFtRFQ2jgQpbkFPH9KIKCE?=
+ =?us-ascii?Q?FjlTHT4v0ZgOv5MJbl1bKRCmNA/5epTTgYMeOeolNPzSrz2TYQLanluB5k0k?=
+ =?us-ascii?Q?nMFeEBMOsoaoCnwTeQqs9JKLaMqKnzYvbFYi4ktx53G1eFUqdn34bVOoxrAm?=
+ =?us-ascii?Q?Zw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-05_08,2023-10-05_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0 phishscore=0
- clxscore=1015 suspectscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310050115
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NUMERIC_HTTP_ADDR,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a1abbd9-87e6-4ba9-8510-08dbc57c295b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2023 08:22:06.3290
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: OuDmKgAnWt1fgFJWnKkgpsn2huQuRq9IUqjR/cBWThloNKFc/CmJqwnjl0+HH+WIp5tV7WwhIDukAkX2uKpurgChtWIPlQvyQZX5NiJEe2s1EjiY8an4JjghUFep42tQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8473
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, 2023-09-24 at 23:16 +0800, Wen Gu wrote:
-> Hi, all
->=20
-> # Background
->=20
-> SMC-D is now used in IBM z with ISM function to optimize network intercon=
-nect
-> for intra-CPC communications. Inspired by this, we try to make SMC-D avai=
-lable
-> on the non-s390 architecture through a software-simulated virtual ISM dev=
-ice,
-> such as loopback-ism device here, to accelerate inter-process or inter-co=
-ntainers
-> communication within the same OS.
->=20
-> # Design
->=20
-> This patch set includes 4 parts:
->=20
->  - Patch #1-#3: decouple ISM device hard code from SMC-D stack.
->  - Patch #4-#8: implement virtual ISM extension defined in SMCv2.1.
->  - Patch #9-#13: implement loopback-ism device.
->  - Patch #14-#18: memory copy optimization for the case using loopback.
->=20
-> The loopback-ism device is designed as a kernel device and not be limited=
- to
-> a specific net namespace, ends of both inter-process connection (1/1' in =
-diagram
-> below) or inter-container connection (2/2' in diagram below) will find th=
-at peer
-> shares the same loopback-ism device during the CLC handshake. Then loopba=
-ck-ism
-> device will be chosen.
->=20
->  Container 1 (ns1)                              Container 2 (ns2)
->  +-----------------------------------------+    +------------------------=
--+
->  | +-------+      +-------+      +-------+ |    |        +-------+       =
- |
->  | | App A |      | App B |      | App C | |    |        | App D |<-+    =
- |
->  | +-------+      +---^---+      +-------+ |    |        +-------+  |(2')=
- |
->  |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|    =
- |
->  |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+=
- |
->  |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  |=
- |
->  +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+=
--+
->               |   |           |                                  |
->  Kernel       |   |           |                                  |
->  +----+-------v---+-----------v----------------------------------+---+---=
--+
->  |    |                            TCP                               |   =
- |
->  |    |                                                              |   =
- |
->  |    +--------------------------------------------------------------+   =
- |
->  |                                                                       =
- |
->  |                           +--------------+                            =
- |
->  |                           | smc loopback |                            =
- |
->  +---------------------------+--------------+----------------------------=
--+
->=20
->=20
-> loopback-ism device allocs RMBs and sndbufs for each connection peer and =
-'moves'
-> data from sndbuf at one end to RMB at the other end. Since communication =
-occurs
-> within the same kernel, the sndbuf can be mapped to peer RMB so that the =
-data
-> copy in loopback-ism case can be avoided.
->=20
->  Container 1 (ns1)                              Container 2 (ns2)
->  +-----------------------------------------+    +------------------------=
--+
->  | +-------+      +-------+      +-------+ |    |        +-------+       =
- |
->  | | App A |      | App B |      | App C | |    |        | App D |       =
- |
->  | +-------+      +--^----+      +-------+ |    |        +---^---+       =
- |
->  |       |           |               |     |    |            |           =
- |
->  |   (1) |      (1') |           (2) |     |    |       (2') |           =
- |
->  |       |           |               |     |    |            |           =
- |
->  +-------|-----------|---------------|-----+    +------------|-----------=
--+
->          |           |               |                       |
->  Kernel  |           |               |                       |
->  +-------|-----------|---------------|-----------------------|-----------=
--+
->  | +-----v-+      +-------+      +---v---+               +-------+       =
- |
->  | | snd A |-+    | RMB B |<--+  | snd C |-+          +->| RMB D |       =
- |
->  | +-------+ |    +-------+   |  +-------+ |          |  +-------+       =
- |
->  | +-------+ |    +-------+   |  +-------+ |          |  +-------+       =
- |
->  | | RMB A | |    | snd B |   |  | RMB C | |          |  | snd D |       =
- |
->  | +-------+ |    +-------+   |  +-------+ |          |  +-------+       =
- |
->  |           |               +-------------v+         |                  =
- |
->  |           +-------------->| smc loopback |---------+                  =
- |
->  +---------------------------+--------------+----------------------------=
--+
->=20
-> # Benchmark Test
->=20
->  * Test environments:
->       - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->       - SMC sndbuf/RMB size 1MB.
->=20
->  * Test object:
->       - TCP: run on TCP loopback.
->       - domain: run on UNIX domain.
->       - SMC lo: run on SMC loopback device.
->=20
-> 1. ipc-benchmark (see [1])
->=20
->  - ./<foo> -c 1000000 -s 100
->=20
->                             TCP                  SMC-lo
-> Message
-> rate (msg/s)              81539                  151251(+85.50%)
->=20
-> 2. sockperf
->=20
->  - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
->  - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size=
-=3D{ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
->=20
->                             TCP                  SMC-lo
-> Bandwidth(MBps)         5313.66                 8270.51(+55.65%)
-> Latency(us)               5.806                   3.207(-44.76%)
->=20
-> 3. nginx/wrk
->=20
->  - serv: <smc_run> nginx
->  - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->=20
->                            TCP                   SMC-lo
-> Requests/s           194641.79                258656.13(+32.89%)
->=20
-> 4. redis-benchmark
->=20
->  - serv: <smc_run> redis-server
->  - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -=
-c 200 -d 1024
->=20
->                            TCP                   SMC-lo
-> GET(Requests/s)       85855.34                115640.35(+34.69%)
-> SET(Requests/s)       86337.15                118203.30(+36.90%)
->=20
-> [1] https://github.com/goldsborough/ipc-bench
->=20
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+van Vecera
+> Sent: Wednesday, September 27, 2023 2:02 PM
+> To: netdev@vger.kernel.org
+> Cc: edumazet@google.com; intel-wired-lan@lists.osuosl.org; Brandeburg, Je=
+sse <jesse.brandeburg@intel.com>; linux-kernel@vger.kernel.org; Nguyen, Ant=
+hony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitsze=
+l@intel.com>; kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH net-next v2 8/9] i40e: Remove circular =
+header dependencies and fix headers
+>
+> Similarly as for ice driver [1] there are also circular header
+> dependencies in i40e driver:
+> i40e.h -> i40e_virtchnl_pf.h -> i40e.h
+>
+> Another issue is that i40e header files does not contain their own
+> depenencies on other header files (both private and standard) so their
+> inclusion in .c file require to add these deps in certain order to
+> that .c file to make it compilable.
+>
+> Fix both issues by removal the mentioned circular dependency, by filling
+> i40e headers with their dependencies so they can be placed anywhere in
+> a source code. Additionally remove bunch of includes from i40e.h super
+> header file that are not necessary and include i40e.h only in .c files
+> that really require it.
+>
+> [1] 649c87c6ff52 ("ice: remove circular header dependencies on ice.h")
+>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e.h        | 43 ++++---------------
+>  drivers/net/ethernet/intel/i40e/i40e_adminq.c |  4 +-
+>  .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  2 +
+>  drivers/net/ethernet/intel/i40e/i40e_client.c |  1 -
+>  drivers/net/ethernet/intel/i40e/i40e_common.c | 11 +++--
+>  drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  4 +-
+>  drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_ddp.c    |  2 +-
+>  .../net/ethernet/intel/i40e/i40e_debugfs.c    |  3 +-
+>  drivers/net/ethernet/intel/i40e/i40e_diag.h   |  5 ++-
+>  .../net/ethernet/intel/i40e/i40e_ethtool.c    |  3 +-
+>  drivers/net/ethernet/intel/i40e/i40e_hmc.c    |  3 +-
+>  drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  4 ++
+>  .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  8 ++--
+>  .../net/ethernet/intel/i40e/i40e_lan_hmc.h    |  2 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   | 15 ++++---
+>  drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  2 +
+>  .../net/ethernet/intel/i40e/i40e_prototype.h  |  5 +--
+>  drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  3 +-
+>  drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  7 ++-
+>  drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
+>  .../ethernet/intel/i40e/i40e_txrx_common.h    |  2 +
+>  drivers/net/ethernet/intel/i40e/i40e_type.h   |  7 +--
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  2 +
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  4 +-
+>  drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 --
+>  drivers/net/ethernet/intel/i40e/i40e_xsk.h    |  4 ++
+>  27 files changed, 72 insertions(+), 81 deletions(-)
+>
 
-Hi Wen Gu,
-
-I've been trying out your series with iperf3, qperf, and uperf on
-s390x. I'm using network namespaces with a ConnectX VF from the same
-card in each namespace for the initial TCP/IP connection i.e. initially
-it goes out to a real NIC even if that can switch internally. All of
-these look great for streaming workloads both in terms of performance
-and stability. With a Connect-Request-Response workload and uperf
-however I've run into issues. The test configuration I use is as
-follows:
-
-Client Command:
-
-# host=3D$ip_server ip netns exec client smc_run uperf -m tcp_crr.xml
-
-Server Command:
-
-# ip netns exec server smc_run uperf -s &> /dev/null
-
-Uperf tcp_crr.xml:
-
-<?xml version=3D"1.0"?>
-<profile name=3D"TCP_CRR">
-        <group nthreads=3D"12">
-                <transaction duration=3D"120">
-                        <flowop type=3D"connect" options=3D"remotehost=3D$h=
-ost protocol=3Dtcp" />
-                        <flowop type=3D"write" options=3D"size=3D200"/>
-                        <flowop type=3D"read" options=3D"size=3D1000"/>
-                        <flowop type=3D"disconnect" />
-                </transaction>
-        </group>
-</profile>
-
-The workload first runs fine but then after about 4 GB of data
-transferred fails with "Connection refused" and "Connection reset by
-peer" errors. The failure is not permanent however and re-running
-the streaming workloads run fine again (with both uperf server and
-client restarted). So I suspect something gets stuck in either the
-client or server sockets. The same workload runs fine with TCP/IP of
-course.
-
-Thanks,
-Niklas
-
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
