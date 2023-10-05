@@ -1,134 +1,148 @@
-Return-Path: <netdev+bounces-38315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D3637BA613
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:25:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1362C7BA64B
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 5DED0281CD8
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id B62BC281A34
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467E334CE9;
-	Thu,  5 Oct 2023 16:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77AEF28E2D;
+	Thu,  5 Oct 2023 16:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bp9X388J"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jKjYtKXc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C33347D8
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:25:04 +0000 (UTC)
-Received: from mail-ot1-x32f.google.com (mail-ot1-x32f.google.com [IPv6:2607:f8b0:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 127C15263
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:25:03 -0700 (PDT)
-Received: by mail-ot1-x32f.google.com with SMTP id 46e09a7af769-6b9e478e122so817513a34.1
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 09:25:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696523102; x=1697127902; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fj4Gd1fbatAsLSbuEz2dtHGL2Wq1DMvXOYfE8V925HQ=;
-        b=Bp9X388JHmf8zeEsBNaBaAvGA49xqNhef0cLUJKNNEBKRTdC7KfMuwBu/G7q3gLJs7
-         t/obTQQ6CkhsLR1kWXFHDJHCrTi0G5jHWTGiqTDJZPPtAPavONfnoo/uxP9iM9+dDwk9
-         uMKedbbmqBZXOPEEPyEJSheYwAvhFCrUrkOCUDTliujA/L8pXwCRQfdzvwg+HU06fXj9
-         NUS6f20jyasSqr2vBAxReStCKlQMKBXXibiShaYB7VQSLGdTozDl6NEKTA1WqywH/tHG
-         teS01wJc1l1WEFrB6pIJn2LqRbkA7LMmLfb9/PmyEVrlkB4vwnEbfJnylONsQ8SGd+gu
-         Lh8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696523102; x=1697127902;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Fj4Gd1fbatAsLSbuEz2dtHGL2Wq1DMvXOYfE8V925HQ=;
-        b=A1V1E7K6I9a17HlJC/uxM184qgDiTP0xUQuNQRCYEA8sK8NIzUZ0qy4kyTOE1URVTK
-         MITIhWEDBGeW0tOKpTygNUwWUT2e9jMtLdX6V3jnd1xblcjZKQK8+ROj47NoP5J2zui8
-         Lh80o+JfaIR5KrYOQnBWGTtKc3blgt6pSPuAcqtOdXNFLeCIIdO3q8rH8wVFZp2ZSkNB
-         V/IMxfVyW9WfuiEODWUILBTQhdjZLgu2ZNipLZe4mXVjZgX85XJq+urx9YO/i0cuyl5M
-         GdBXmoXaBgTPh6VNtHjMmqCD59PZpZTAtfdpTMBkE4B5vwIInInS6CPvnBRJ2DWUqGU3
-         gBsA==
-X-Gm-Message-State: AOJu0YyIb60Uld16ZflrmKH/voRSrSaHk3Y9E0ZhmiSlxk+u6Z0Q3xnI
-	B5di39w0K7KkqzWrEeCAIGs+hyTaQ5mBh7ldVD8=
-X-Google-Smtp-Source: AGHT+IHgJsAHmHdUK0ubd/llvOkkkApOjEVY5ii1EKAzSFHN2jfBPCwNCSl+RLIImJ6ELw9mS8LLw5tb9XcVIjzratQ=
-X-Received: by 2002:a05:6358:2806:b0:14c:79ec:1b86 with SMTP id
- k6-20020a056358280600b0014c79ec1b86mr7101127rwb.24.1696523102214; Thu, 05 Oct
- 2023 09:25:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7318434CE2
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:33:18 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3D43683
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:30:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696523462; x=1728059462;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GPombCDQ3i1w+SXg+v6h92vp5NBZZDS00D8narxQbeM=;
+  b=jKjYtKXcSILtZHhVNsUkm/xNOI04YUNmqjyfK1ZTDrzcVnpsHQ3D6m1B
+   S72bo3KmklZSQOQ0G5gTyET5TfACblR361KG+eNyEIAzoqNCOlJU764IY
+   ShVYqxQcH2+Hcne6Mx5X0jTgGAaGiNjbqTPP9KZP9eK8w4MMDLj17SPy4
+   AenhO+8+Yer8MXlllm2x0Kh76TA4uR6fNyaXMw6Tjb/kwropduFV3m+4g
+   qXgMkbVV6Mcz9mWOa21Z2aRu6QsDOSLmhGw8hNkp+mlVO5KHh4n++VEY/
+   gvdwEhEY5ttXZthIMeSOqvzP0Wt0ZyTyaoc/t7eSPXT59zjagl9iFzvk0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="2152643"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="2152643"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 09:29:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="875607725"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="875607725"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga004.jf.intel.com with ESMTP; 05 Oct 2023 09:29:54 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	przemyslaw.kitszel@intel.com,
+	jesse.brandeburg@intel.com,
+	aleksandr.loktionov@intel.com,
+	jacob.e.keller@intel.com
+Subject: [PATCH net-next 0/9][pull request] i40e: House-keeping and clean-up
+Date: Thu,  5 Oct 2023 09:28:41 -0700
+Message-Id: <20231005162850.3218594-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927082918.197030-1-k.kahurani@gmail.com> <20231004114758.44944e5d@kernel.org>
- <CAAZOf27_Cy8jaJBnjKV7YgyaKO2WohYrxcftV5BdOdm66g_Apw@mail.gmail.com> <20231005090328.73e87e71@kernel.org>
-In-Reply-To: <20231005090328.73e87e71@kernel.org>
-From: David Kahurani <k.kahurani@gmail.com>
-Date: Thu, 5 Oct 2023 19:24:50 +0300
-Message-ID: <CAAZOf25k-c_C3sYz_0zwnc4k5Yf66=LZUSmnwusomZx_CJt1rw@mail.gmail.com>
-Subject: Re: [PATCH] net/xen-netback: Break build if netback slots > max_skbs
- + 1
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org, netdev@vger.kernel.org, 
-	wei.liu@kernel.org, paul@xen.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 5, 2023 at 7:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu, 5 Oct 2023 18:39:51 +0300 David Kahurani wrote:
-> > > MAX_SKB_FRAGS can now be set via Kconfig, this allows us to create
-> > > larger super-packets. Can XEN_NETBK_LEGACY_SLOTS_MAX be made relative
-> > > to MAX_SKB_FRAGS, or does the number have to match between guest and
-> > > host?
-> >
-> > Historically, netback driver allows for a maximum of 18 fragments.
-> > With recent changes, it also relies on the assumption that the
-> > difference between MAX_SKB_FRAGS and XEN_NETBK_LEGACY_SLOTS_MAX is one
-> > and MAX_SKB_FRAGS is the lesser value.
-> >
-> > Now, look at Ubuntu kernel for instance( a change has been made and,
-> > presumably, with good reason so we have reason to assume that the
-> > change will persist in future releases).
-> >
-> > /* To allow 64K frame to be packed as single skb without frag_list we
-> >  * require 64K/PAGE_SIZE pages plus 1 additional page to allow for
-> >  * buffers which do not start on a page boundary.
-> >  *
-> >  * Since GRO uses frags we allocate at least 16 regardless of page
-> >  * size.
-> >  */
-> > #if (65536/PAGE_SIZE + 1) < 16
-> > #define MAX_SKB_FRAGS 16UL
-> > #else
-> > #define MAX_SKB_FRAGS (65536/PAGE_SIZE + 1)
-> > #endif
-> >
-> > So, MAX_SKB_FRAGS can sometimes be 16. This is exactly what we're
-> > trying to avoid with this patch. I host running with this change is
-> > vulnerable to attack by the guest(though, this will only happen when
-> > PAGE_SIZE > 4096).
->
-> My bad, you're protecting from the inverse condition than I thought.
->
-> But to be clear the code you're quoting (the defines for MAX_SKB_FRAGS)
-> are what has been there upstream forever until 3948b059 was merged.
-> Not 100% sure why 3948b059 switched the min from 16 to 17, I think it
-> was just to keep consistency between builds.
+Ivan Vecera says:
 
-Okay, now that might change everything because the patch was made with
-the assumption that Ubuntu(and probably others) have code modifying
-the default values for MAX_SKB_FRAGS. If this was upstream, then,
-maybe when the time comes they will grab 3948b059. I consider this
-solved at this point :-)
+The series makes some house-keeping tasks on i40e driver:
 
->
-> If this change gets backported to 6.1 stable it will break ppc build
-> of stable, right? Since ppc has 64k pages.
+Patch 1: Removes unnecessary back pointer from i40e_hw
+Patch 2: Moves I40E_MASK macro to i40e_register.h where is used
+Patch 3: Refactors I40E_MDIO_CLAUSE* to use the common macro
+Patch 4: Add header dependencies to <linux/avf/virtchnl.h>
+Patch 5: Simplifies memory alloction functions
+Patch 6: Moves mem alloc structures to i40e_alloc.h
+Patch 7: Splits i40e_osdep.h to i40e_debug.h and i40e_io.h
+Patch 8: Removes circular header deps, fixes and cleans headers
+Patch 9: Moves DDP specific macros and structs to i40e_ddp.c
+
+The following are changes since commit 49e7265fd098fdade2bbdd9331e6b914cda7fa83:
+  net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+
+Ivan Vecera (9):
+  i40e: Remove back pointer from i40e_hw structure
+  i40e: Move I40E_MASK macro to i40e_register.h
+  i40e: Refactor I40E_MDIO_CLAUSE* macros
+  virtchnl: Add header dependencies
+  i40e: Simplify memory allocation functions
+  i40e: Move memory allocation structures to i40e_alloc.h
+  i40e: Split i40e_osdep.h
+  i40e: Remove circular header dependencies and fix headers
+  i40e: Move DDP specific macros and structures to i40e_ddp.c
+
+ drivers/net/ethernet/intel/i40e/i40e.h        | 76 +++++--------------
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c |  8 +-
+ drivers/net/ethernet/intel/i40e/i40e_adminq.h |  3 +-
+ .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  2 +
+ drivers/net/ethernet/intel/i40e/i40e_alloc.h  | 24 +++---
+ drivers/net/ethernet/intel/i40e/i40e_client.c |  1 -
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 11 ++-
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  4 +-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  2 +-
+ drivers/net/ethernet/intel/i40e/i40e_ddp.c    | 24 +++++-
+ drivers/net/ethernet/intel/i40e/i40e_debug.h  | 47 ++++++++++++
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  3 +-
+ drivers/net/ethernet/intel/i40e/i40e_diag.h   |  5 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |  3 +-
+ drivers/net/ethernet/intel/i40e/i40e_hmc.c    | 16 ++--
+ drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  4 +
+ drivers/net/ethernet/intel/i40e/i40e_io.h     | 16 ++++
+ .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  9 +--
+ .../net/ethernet/intel/i40e/i40e_lan_hmc.h    |  2 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 57 ++++++++------
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  2 +
+ drivers/net/ethernet/intel/i40e/i40e_osdep.h  | 59 --------------
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |  9 ++-
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  3 +-
+ .../net/ethernet/intel/i40e/i40e_register.h   |  5 ++
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  7 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
+ .../ethernet/intel/i40e/i40e_txrx_common.h    |  2 +
+ drivers/net/ethernet/intel/i40e/i40e_type.h   | 59 +++-----------
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  2 +
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  4 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 -
+ drivers/net/ethernet/intel/i40e/i40e_xsk.h    |  4 +
+ include/linux/avf/virtchnl.h                  |  4 +
+ 34 files changed, 231 insertions(+), 251 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/i40e/i40e_debug.h
+ create mode 100644 drivers/net/ethernet/intel/i40e/i40e_io.h
+ delete mode 100644 drivers/net/ethernet/intel/i40e/i40e_osdep.h
+
+-- 
+2.38.1
+
 
