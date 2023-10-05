@@ -1,93 +1,198 @@
-Return-Path: <netdev+bounces-38350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B057BA89E
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:06:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D41F7BA8A4
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 214F0281CA7
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:06:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 1F2782821A5
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05C93D39F;
-	Thu,  5 Oct 2023 18:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F093D970;
+	Thu,  5 Oct 2023 18:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8U/1MOe"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="GOiHsDVI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B89A3B79D;
-	Thu,  5 Oct 2023 18:06:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 165D8C433C8;
-	Thu,  5 Oct 2023 18:06:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696529197;
-	bh=j3yuvekkRlzjwP+X1S3U4vfcJhX90l/G2jFB+lby8J8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H8U/1MOeMmkz/fiYJ2qC5kivExGxkQv0jc+YIUGCD2lx/oVojDyCXXJzZzp8GMDMB
-	 shzSmWgYDBdDBvuwnGbuQItv1J9OAJVcvSj/0gkxC13lAgmlTESieos2oyzy/J/ZIW
-	 hm8HD/c9RMPS1kjYVjS6+h1JIR/rlQv6Z1oN8BgyQUkpa4cxJT9k1LvERFAvBG7SdN
-	 VVIkkOPef/5ppA0reFHX8UzRBaitvus71DYsGBtG8ZBO/VTHuj41x+58sc+eqahJET
-	 r9rvl6KLYHj/Dm5xDqcFdOQ6qb50vEkeknx/0uUYq7SsxfK1t0gf3vQp0IVKdGpiAr
-	 QJeMGU/UR2uZg==
-Date: Thu, 5 Oct 2023 11:06:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, Willem de Bruijn
- <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly
- Burakov <anatoly.burakov@intel.com>, Alexander Lobakin
- <alexandr.lobakin@intel.com>, Magnus Karlsson <magnus.karlsson@gmail.com>,
- Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
- netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>, Simon Horman
- <simon.horman@corigine.com>, Tariq Toukan <tariqt@mellanox.com>, Saeed
- Mahameed <saeedm@mellanox.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Subject: Re: [xdp-hints] Re: [RFC bpf-next v2 09/24] xdp: Add VLAN tag hint
-Message-ID: <20231005110635.7020d23b@kernel.org>
-In-Reply-To: <0be2e89e-8a08-e52c-fecd-3064262c2ecb@gmail.com>
-References: <20230927075124.23941-1-larysa.zaremba@intel.com>
-	<20230927075124.23941-10-larysa.zaremba@intel.com>
-	<20231003053519.74ae8938@kernel.org>
-	<8e9d830b-556b-b8e6-45df-0bf7971b4237@intel.com>
-	<20231004110850.5501cd52@kernel.org>
-	<e4bbe997-326f-b6cf-b6d6-f0a24f5aef39@intel.com>
-	<20231005101604.33b382d8@kernel.org>
-	<0be2e89e-8a08-e52c-fecd-3064262c2ecb@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD44B374FB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:07:40 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2085.outbound.protection.outlook.com [40.107.21.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CC49B;
+	Thu,  5 Oct 2023 11:07:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jp3uowfF7F43a4Qslqn56sctlbIqT0k+7BAjzHc122NN+JLIFknxfPq8wdQrBUrXFGW9jWbJ3iVhYY4dmtbF3d+3aWHlYvCuZ/jhMFobGDDEVmOMxGrVh9T1LX8td7TK1JCsnHGORDPwUnFzs3n9Q6lfxgguS2n12jXfbs5qtrj8Njx5InXFf1zCK1xIcmaNABRHf7avJattlVoT2aWf2tjiu4k8UJ0f/1CSZnxK7UFgG7hC+indnH8UhPGjMu3uc2/GJR6VsjwoCsRxb/Wn7WkJtJX+zTvR6x3KDesfnmNvtpXgz8zSGSRP6HntNxguJGGce5b4zWXcxqUGsgfsLg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iCDNtZXqj+fVRDTaNBQMlm5rUOVakf209c8DevZDY1U=;
+ b=b39cB4LqtydQAcJnyS2pegQTnzV0fe1VQmY83yhbU3e8T1RRkSrNGw7XlvPAvUnMx4KgkV0byjGc/Mb/mvYJ0V21H+V/37nNGme7wLWUmTAgoml7Re8Ku7tKsOwWyyljL07APKgcZKkSo159PXf4duT9yrgKUs2rtcSwAtuNotNPwyRlK1JZDTDcbJD4Fp0wmc0fBadj23NnRt+W2mxvfob062UuYMD3rWfbgN/zj6fCc4n7CzJ7/IprjP5WdVzMPIUP/I/zjNkRrfIlX3GR4yDULxMQWCmRyOFt6BmLbqvAXSpldIqGyk8MZOVMHyQYbdGI94AAV9XTMUBphlcu8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iCDNtZXqj+fVRDTaNBQMlm5rUOVakf209c8DevZDY1U=;
+ b=GOiHsDVIuGN+7eWDesjMvnvkkL9WZOZjwU9B3PCoMPo93q2BZKx4obN96bcQnJrkuwtKtDAkAPCdJdrhEsiq+2xQ2V6emiai6kEvh+CMv9AuQVOtHI0xwnlLwfiuFwEHjZIZqTAQdsxjLzR4VeMLsF+cbxUgH372i9LJ+EJ3PRY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by AM8PR04MB7890.eurprd04.prod.outlook.com (2603:10a6:20b:24e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6813.23; Thu, 5 Oct
+ 2023 18:07:36 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::e109:7026:7d76:5617%7]) with mapi id 15.20.6838.033; Thu, 5 Oct 2023
+ 18:07:36 +0000
+From: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: sgoutham@marvell.com,
+	gakula@marvell.com,
+	sbhatta@marvell.com,
+	hkelam@marvell.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	borisp@nvidia.com,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	sd@queasysnail.net,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	richardcochran@gmail.com,
+	sebastian.tobuschat@oss.nxp.com,
+	phaddad@nvidia.com,
+	ehakim@nvidia.com,
+	raeds@nvidia.com,
+	atenart@kernel.org,
+	"Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
+Subject: [PATCH net v7 3/4] net: phy: mscc: macsec: reject PN update requests
+Date: Thu,  5 Oct 2023 21:06:35 +0300
+Message-Id: <20231005180636.672791-4-radu-nicolae.pirea@oss.nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231005180636.672791-1-radu-nicolae.pirea@oss.nxp.com>
+References: <20231005180636.672791-1-radu-nicolae.pirea@oss.nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: VI1P194CA0041.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:803:3c::30) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|AM8PR04MB7890:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45c83d54-9bf0-4a39-4cad-08dbc5cdf446
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	hQ5oilt0JSq3vb5dwQGOij8t6NrE1wwfafJr5HtyzkWHwzpbMB+WI/RzQ+S9vbxvQ6wvqv42M7o3KnVqaipce1nfPS8jXmnmaRnrD6LE2hXzviyXqPfg7MZ7h1/BM1HAGlS99vbT1VAj5e0MQn9X0/HfH9dnJ9VVrD59NIKCQV9WDFOtCmseWBfahe/jJf1h/Zv5iKwbJi+mEXbeb2n+dO7Pdr3jn03QNKCSK2wQlpOp0zPfBrG+RVJ72k4+7kYx0RcjYnCle0CP/pE35rEjO1I40H9rnmvEYviAIp/5TTFOK8aekN0pHsFMhqmry3fZD9Lg/936qI5y2msig97jQw3vxxvGVMRh/zo0BO1iGFiSVDdzzVevmca521cIyrAoMHBuH7iEmoUvxFTswsk7g4ytTvlpeU5tE0cu4C0QnloCn+I3ySMRrFeDwJuGTiAiAUruv4NIeMT/EX2VA4+/r14fCDxRDfLuk6zCmg1sjI1RjqMQow22SUEWw5urKfoOoVvehgTULF5nbk1LX3t1RQCRP90HfnAuD+eWKzVDdYP+XpvKaMjmdRVMtZ15yzjE9RP5TDBtnpfwnSxlCeUj7cFWZn2cfLkcFlpvLE3Je+08x3lJ7I/HY3ZNnnSFmx7w
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(366004)(376002)(136003)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(6512007)(52116002)(6506007)(478600001)(6486002)(83380400001)(26005)(1076003)(7416002)(2906002)(2616005)(15650500001)(316002)(66476007)(66556008)(66946007)(4326008)(41300700001)(8936002)(8676002)(5660300002)(38100700002)(38350700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?K1nS7W7ldY4V4Mx3NQqH2hLy/OsTfgRV23xY+zFaOURB1TelYqBjmAkxvvX6?=
+ =?us-ascii?Q?iKZzIRclVKTNxNkeAk0qLoOBdjkw+U8kGEbLe/0Mtz2XCrIFnLk+Qb6kLPCm?=
+ =?us-ascii?Q?ke0/g9QJz7WAnLXTtQPvydAMG4micDaAEJOangKM4jAFcOuJ9HsfTO55rK5C?=
+ =?us-ascii?Q?iqGulAwiIWVeWJP2bHz041f8srS1LH7JEhVujABJBIaVV6xo7ckTGiLM2EC+?=
+ =?us-ascii?Q?p/TJxg3MPH0zqUHAfaWKVPHjwsfCF6xTCcp546Q+sXiCrOrb0Q00pZvuO6IQ?=
+ =?us-ascii?Q?VmTogpCcHy32sb7hevIkTieHsmJM9tCz0dpdqyVfuiXEzUS2BcN+GaYX9DMU?=
+ =?us-ascii?Q?8u23KmBNR1yRvvBld1mqrwNcQA2E6BOXfeLe5L5eAq3KWYvX20OWoYYL0bh0?=
+ =?us-ascii?Q?n0Pgkrk6oBXqes02Yi5qfP7BX/MLqpzCiONrKW/1UPDCbd+rKVrokEFI3xcp?=
+ =?us-ascii?Q?9/QtKdlHwANTz/VHROrK4yW7v3y2EwQOXhcfZkAmAff9XAgLM3+IBo4pKJ3Y?=
+ =?us-ascii?Q?IChfF7ZneUE1zz0lV3SzAFOvgUg/Ij/idijTNuNhQd7u03r9zAeldvMqHmOI?=
+ =?us-ascii?Q?QyFYOnKvF/FzDC6wTGFge0tJMBd7JtxKe1vb6Siog/zwBKBZzyad+9aOfMsO?=
+ =?us-ascii?Q?FXOjQvkrchZXGYVVeceEvec8OSZzbFtbtlgEo5WU0lyC+fDtMz8QDXRFjaTD?=
+ =?us-ascii?Q?nA916esHmL0im+lU9AAdRSmWGJAb+bVfIwVNp8yQDoyGwOGm2RhwC42/A32F?=
+ =?us-ascii?Q?RoxRqGSHnSSTIZhDCi0AWJPHAqsKv9sfu0KOPdwdfmQ2RKkCDhsi8ANaD+Ut?=
+ =?us-ascii?Q?ds8maORAo1y1YBjqzIcL//pBlo+x0/h1P8GYejbJG3ENSmcutCiyN0dc3diY?=
+ =?us-ascii?Q?zrCgW5eFjeCdOCYnuHdYE7sdU602UWipuNxM//qGhgqTTkriFAEi4jHxL90F?=
+ =?us-ascii?Q?UqJZJklWQ1stXmTAv5ih7xr6W7Dh8sQ6OUbRujbyoEDN+QPw4cCslZOWXARg?=
+ =?us-ascii?Q?53Ku0tzT1fZ9ZKFMdGt8+eBe+FOy9GhGNuWwto2Y35/kRXwNY6Cgo9qLYGON?=
+ =?us-ascii?Q?+3uX+bZ8fryrEd3MbNnXsTkoFugCbiruB+jfHetn6j26LYVrtef4Bnop/IdL?=
+ =?us-ascii?Q?honK87vV2Lcy3M5LLVJgFJkwNCiuOoo/PKAmqrVfwRzJUFkm2CKkZf5BRQzB?=
+ =?us-ascii?Q?qUo7VcVsQci47p90z0snalPSTTO4N5rFrV3/9DnlATKFoOfuKqsCxCeBQ2SN?=
+ =?us-ascii?Q?gyj4DC1AL/r4N4oFowVmr94WKEpEhYV90reebmNCPgMv9CEnjWox3M5H9ZR9?=
+ =?us-ascii?Q?t/j5l/cx5BiJOZ/QcRDAOwpSdi0TbQdaYWccjluIm/GGSEONFQZq1UzPh5ex?=
+ =?us-ascii?Q?/mvOR4Tvkd1598vDhWM1yUGtQlfQ5fdl6z2XPqkeHSlLrc9N5xOvD3uOMVHz?=
+ =?us-ascii?Q?JwbSdcHVPQHM1l0ok9osslqzamf0QVeKrkM4ASI7mfNIjD12XQGEa+UPHXhH?=
+ =?us-ascii?Q?DFsjXmHONsGAk33a/17Z9eWiZAX5GkIm/oFHkG2cNVxIsV70NqcI94KO5ygy?=
+ =?us-ascii?Q?hqwp5XehDPetGXrSnw0k8NLyn9OutekzJFJtJdRYNl/0iHpkYlyp0IxFaFZz?=
+ =?us-ascii?Q?5A=3D=3D?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45c83d54-9bf0-4a39-4cad-08dbc5cdf446
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2023 18:07:36.1728
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7O0tpvS8pSYvn3AQHiAQQ6qD7XIxlH24L+y2mO1ly7HUsvRZ4d/V0iuw8RAKRHvznvf6JeFUB3aUlrpS9NVtIxkM7aIHyhCwWkLgtl+Wyks=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7890
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 5 Oct 2023 11:20:49 -0600 David Ahern wrote:
-> > Every time I'm involved in conversations about NIC datapath host
-> > interfaces I cringe at this stupid VLAN offload. Maybe I'm too
-> > daft to understand it's amazing value but we just shift 2B from
-> > the packet to the descriptor and then we have to worry about all
-> > the corner cases that come from vlan stacking :(  
-> 
-> 4B (vlan tci + protocol).
-> 
-> VLAN stripping in S/W and pushing the header on Tx is measurable and
-> does have a noticeable performance impact.
-> 
-> XDP programs need to co-exist with enabled offloads. If the tag is not
-> stripped, XDP program needs to handle it. If the tag is stripped, the
-> XDP program needs to access to the value.
+Updating the PN is not supported.
+Return -EINVAL if update_pn is true.
 
-Well, I thought I'd ask :) I'm not opposed.
+The following command succeeded, but it should fail because the driver
+does not update the PN:
+ip macsec set macsec0 tx sa 0 pn 232 on
 
-But if either of you have the data on how much slower well-implemented
-Rx stripping in the driver is than putting the info in the descriptor,
-I'd be very interested.
+Fixes: 28c5107aa904 ("net: phy: mscc: macsec support")
+Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+---
+Changes in v7:
+- none
 
-Tx is a different situation.
+Changes in v6:
+- patch added in v6
+
+ drivers/net/phy/mscc/mscc_macsec.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/phy/mscc/mscc_macsec.c b/drivers/net/phy/mscc/mscc_macsec.c
+index 018253a573b8..4f39ba63a9a9 100644
+--- a/drivers/net/phy/mscc/mscc_macsec.c
++++ b/drivers/net/phy/mscc/mscc_macsec.c
+@@ -849,6 +849,9 @@ static int vsc8584_macsec_upd_rxsa(struct macsec_context *ctx)
+ 	struct macsec_flow *flow;
+ 	int ret;
+ 
++	if (ctx->sa.update_pn)
++		return -EINVAL;
++
+ 	flow = vsc8584_macsec_find_flow(ctx, MACSEC_INGR);
+ 	if (IS_ERR(flow))
+ 		return PTR_ERR(flow);
+@@ -900,6 +903,9 @@ static int vsc8584_macsec_upd_txsa(struct macsec_context *ctx)
+ 	struct macsec_flow *flow;
+ 	int ret;
+ 
++	if (ctx->sa.update_pn)
++		return -EINVAL;
++
+ 	flow = vsc8584_macsec_find_flow(ctx, MACSEC_EGR);
+ 	if (IS_ERR(flow))
+ 		return PTR_ERR(flow);
+-- 
+2.34.1
+
 
