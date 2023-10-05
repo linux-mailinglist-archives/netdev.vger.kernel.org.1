@@ -1,441 +1,197 @@
-Return-Path: <netdev+bounces-38244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA59E7B9D85
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:49:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC68C7B9D92
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 96A01281E67
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:49:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id C49361C20957
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E92CF2511E;
-	Thu,  5 Oct 2023 13:49:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13755266CE;
+	Thu,  5 Oct 2023 13:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pVOSXx4i"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bWQMnzxc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FB2250FF;
-	Thu,  5 Oct 2023 13:49:03 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0117D1739;
-	Thu,  5 Oct 2023 06:49:01 -0700 (PDT)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3955UF26018871;
-	Thu, 5 Oct 2023 06:26:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=CcsIv7YWrDFtqS8p7L4Hnf/WZ0s0bXHXE3vvfyCUL18=;
- b=pVOSXx4i604AJiBS5pAb2QwglCSPZgpUNnNr5g6J96WGjZtgUZQTqj7OOmnhSXXpnK67
- ewVDsHLmoKPG3sUS6qWrKBIkxtyFWslsSAnb6EWgJMZ8Xnew3vRcLuSCaZmqb9sky9Fb
- TNN+3u2k8C6D058yW5QCE5HkF+BVMQTD4oE55UGFXoMgzjVQmqc72GEMt9CiRsZ8APyV
- wCS6UV+BIDbIa92ICjYPyPehhGyfeHYNlzzm3gtgakjtyTGmCTMKNUfhtSShhWSljJXC
- 5vbSqBbHwWlHbJXRJ9Q9RX6+fNKZxDw/56rZaLPUbPlbj1y3TfSzuWc16Jon6a7FrWHx iA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3thq18r2s7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Oct 2023 06:26:30 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3956QTre013221
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 5 Oct 2023 06:26:29 GMT
-Received: from [10.216.40.132] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Wed, 4 Oct
- 2023 23:26:20 -0700
-Message-ID: <65b030c6-6fab-53ea-2774-48698905dd96@quicinc.com>
-Date: Thu, 5 Oct 2023 11:55:37 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E813266B5
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:49:58 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 733E619A6;
+	Thu,  5 Oct 2023 06:49:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696513797; x=1728049797;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=j7ezo2GsjdPYtugNDtlq+ArH3PuIjLniCYEwnoZzvao=;
+  b=bWQMnzxchn+HWxz+nyrEbBMBJX/BT0Bw0itHe8M73R4Ee1jN5GC8MPOh
+   51sHHgu0QCdJRG80XuuHuvOyfS7ZDekClbCLyfW9ehTYh7S00eCrLlzYY
+   eDot52bk8arcV2O4V41AFzzw3pVFmhsQuxPvswRxlVOl6cbA1GkROhV4s
+   fn+JaGcz7/V92H56zqLWPA6aGxEfIeb3FUiIl4hfTQcW9UU8XjuamUavj
+   q1J/eulDthfpeiOlslV+7AlQvPP3InQ/oUm52BD+2NpcS6W95Er0SvR8+
+   vb4wDE7cGV1yA4IUWrEw+Wny4lWhcVB2gB7jGZ5UuaxX+ziftVJ4GJgpX
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="383338292"
+X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
+   d="scan'208";a="383338292"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 01:10:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="875473872"
+X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
+   d="scan'208";a="875473872"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Oct 2023 01:10:57 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Thu, 5 Oct 2023 01:10:57 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Thu, 5 Oct 2023 01:10:56 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.44) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Thu, 5 Oct 2023 01:10:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mm1T9aJikQWdeLaUw2ScD04N8QVkE+xCY78g9VjyRlco51fEWsRAfE2vi2HzrukkvYrr3/Gc7i7QHuwfFRwTc7ccW+MG4HPcnx/xNPkBZ/RrqPP1wDo1Nj7awnJXetsmZjsB8NKP7SrXOIxIhs+RedfHgNbzp6bjjGELd/C8CWl0KSGSMrieZuBMU1xoYlgmZ85jOCxHFGnV3QhtBwjsyQO58uWwSUXHjzfWy1jGPA/Cp6WWxukCePqRnJoXOKbfdlFeGTOLLMBLacBWJCpAQjpfy47shOpc3v28CLWcw7CSq0yE4tXCKuJE0CumqyeomHMT3eOA4SHoW1f7sbhylg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BKto3yP3T8IBQG6HyJPtUx3mD5sokZrK07W5tid75xs=;
+ b=eYup8bDdXXRpxruW5/s73OYxStsnVAKzuOMPCpHZaT+GjRapzQmrDqZ21EYN2D6bVyBfnlzg5dmOoStdtBMimoWktI2DmrHPBdBQoKgIRf+xyi9wy7pwF81mFzbMqPWyo+2UOBxxYaYK4ARyg3D2pNcGaaUiAK7ZuBy9u0LEVbru3wsEXIdk3eZig4O8MVB5R1UEHVUqusuVLN0ZSlwyI/e/kiDzC/BSeQNBdUCWRFTk/OzSlJx6hALVUsesIeQIMM0igOmENFVrdwMgLROsZbNKnD9eNSRIzmISz2ox2GdoiWvVPq87S8I7ESLrMBClDQJt+lwTCgl9RXmRbMsdfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by DM4PR11MB5245.namprd11.prod.outlook.com (2603:10b6:5:388::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.35; Thu, 5 Oct
+ 2023 08:10:53 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6838.024; Thu, 5 Oct 2023
+ 08:10:53 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "edumazet@google.com" <edumazet@google.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net-next v2 2/9] i40e: Move I40E_MASK
+ macro to i40e_register.h
+Thread-Topic: [Intel-wired-lan] [PATCH net-next v2 2/9] i40e: Move I40E_MASK
+ macro to i40e_register.h
+Thread-Index: AQHZ8R1EkIslCyq9bkiNuAqcNmXTprA65DHg
+Date: Thu, 5 Oct 2023 08:10:52 +0000
+Message-ID: <BL0PR11MB3122F0459852D93094E5CFECBDCAA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20230927083135.3237206-1-ivecera@redhat.com>
+ <20230927083135.3237206-3-ivecera@redhat.com>
+In-Reply-To: <20230927083135.3237206-3-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|DM4PR11MB5245:EE_
+x-ms-office365-filtering-correlation-id: 79f718c3-825e-4b74-b6d0-08dbc57a980a
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iSQKNmg7xZbnh6xIEZ2F3THhTdVcoBO3Xgd4F73ql5SWOoD8a7zF/7xA2J6WBHyF0JnEkRZY+MYCq8oP0SKe936wuNe/X5ImCkF1GH36cgO8g4tqzcuBlMmQfl5A2/82zFXhc1tYCmr0eQS5Q30MWqJBAkT7zdf0AaOPPYwzoUdT3hwETvbKr0N9Qj5etTFMSQjPp9mTBP8XwgEJsXtwKB4wCWDfflRJ/lH3NZ9dUNmMyRPIyBSoN3/BT3Ak2moQOLNSvhr1UL8FQXF8oVOVxeuuKhAb73mcrmLxHza0YBzKMDNq3MA+sTLE8LEP+rEL+NDUtImWk4WnQmtT/bFlPoyfDryzFq8Mty8L/4fxkqVA71M/HFme9efmqHPU6V4qZU7ha21Yt3ZAx3OtYHqH5S4CIS++gcvH+pj5zcl/7UFm7B7bQGP7HVqwrDSMERfzoHDEZWPmsZOlbDRSpyeKgol8ne9Ak5Dae0iTFTQxu3KKq0mVqLURO4CcJjMO3GgRLwcL+vUPCTT2wT6I8kdiQ+ufQsRac330m+lli5Meg60OTAcWscyJEgYpxAw5K60a+zBIzqYUAHabFxpttX78/zOekjea9mLKsXS86yu2moBGyQtfLQmmJ3HWpuR0Ubp4
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(366004)(39860400002)(346002)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(53546011)(66446008)(64756008)(54906003)(66556008)(66476007)(66946007)(316002)(41300700001)(76116006)(9686003)(33656002)(26005)(71200400001)(7696005)(6506007)(478600001)(38100700002)(38070700005)(122000001)(82960400001)(86362001)(83380400001)(110136005)(55016003)(4744005)(2906002)(8936002)(4326008)(8676002)(5660300002)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TMHTcSruiKL+3QF6aAkdXbwCpw4JTkmAQBED5R/bExxN0w4w+6Lm+ZpgIZwd?=
+ =?us-ascii?Q?XJ0u4LjvyaWRCraiN/0keEAd2UnAnbsqjP+RlohcDv/iAA5RuyQlqCvYsoTD?=
+ =?us-ascii?Q?IdDTwUpwgOYm+I7yfR0i0vLbhhzYKtBNGoIBrkMo+FIf3RwA1yTZzJxDefnq?=
+ =?us-ascii?Q?D6jZUoLFIaPr7cQb9XpCBRxlOYpd20qu0dF/ATN9kCeSecmqsNCDMYRDJGWP?=
+ =?us-ascii?Q?n4LQyjYnvjnwjIEfv2sCmxsR9X6r738R5w3rKY8qo/VZFyUFaZKHsU+BB6tz?=
+ =?us-ascii?Q?zw9cyIhDB/oFr3DTNMuL+jDLGPwSgbfInhfZ36ZNgDeuS8L8rATyw/95fzCD?=
+ =?us-ascii?Q?QEl6p4iXlY/g/wC58IcK4oiU0J46NTWXPIxN+IeEM8By+x1uvJVUmrm1TupH?=
+ =?us-ascii?Q?Jncb35DU6+CcETzy0NFgRsqdDUwa0i25ZbtceyZAulnk8N9Bcglyxd0uqUP7?=
+ =?us-ascii?Q?M6f5K19JoOSa52L4yU56FPfVMuCpBavP6r9kYukZDQRtpsBlXybQwq8H0k19?=
+ =?us-ascii?Q?WgYTN2/riLL8ivOjRzd3SrFeLx+R9TfXFmpJjBnu3ew6sc9Ns472Xf6kC0ui?=
+ =?us-ascii?Q?BvqTYNKK55JQBG+WaRIa80HQNGz5241C1ntL5IrG28GgSuxOKtmtEOUxQrrs?=
+ =?us-ascii?Q?kocVRs/QpoSK2UKk5CjRrey0DmfwMT6ynBOENX2OjHGL/idXJxl6LAVGVQgD?=
+ =?us-ascii?Q?40GnxjhfC23O28u0hGHy9pYLNTbFE+cm+IAL1mcsRqbCVcQ0nURlPlvZzNiS?=
+ =?us-ascii?Q?9aUf8frixYP7pgbwrjwzopUBbBl/A111vltd1xevfZxazJ2efy72PHfHQKZB?=
+ =?us-ascii?Q?0IXKhGlOisNwe2GIm1AqwHKR/4LHCtkC6FQA/JJ+AaC/XbMTIKG7UotyX8gZ?=
+ =?us-ascii?Q?JMSZvoAgFBTyIF9h4WVUXqA/nJbY1Wig5x5p5zXXqKH7Vpxu1mjFDPXX1F+t?=
+ =?us-ascii?Q?J2hp00ZMZELibgf8OXxdrTAHYdq/B7y6v8vlIwFzoK0uDtYTIHJP1BDulgTR?=
+ =?us-ascii?Q?9EluzrEixD3q1fZbhB1mBKmG0YIBWa7TAEbN9jgipzI/uQTQK12ooxGF2WTJ?=
+ =?us-ascii?Q?D1/lM9LEss7qzmjOieGBzybSPoeSD+bq6asLrZY5JeJH+nFFFQcU5SWk0Dfb?=
+ =?us-ascii?Q?3rpJhFHodZfd3z8LvhxPdBVL1tWW9vw0wdE2G/bGnlGNbnf82sPuTT9i3RMh?=
+ =?us-ascii?Q?II5xWfg6+wkuKHAxpeBsHlARqcQZlMDmoPNyzxrFh3GEd+AA68JfCRqvZhJx?=
+ =?us-ascii?Q?nNmsUMIVCfvc3nr24wOcwPYa/maiZZdvu3nv37pSneAj0+R7GBO5v9I95I1r?=
+ =?us-ascii?Q?CuvkAqhE6xW5NgCv4t4sKpNE/1ttrjBCSfxURULlUgN/hgJ9EZ2hXvxskiMk?=
+ =?us-ascii?Q?U8y/lxBtyqcGBgupnvXtQ6fySDOGiRo0v+9YqKsxCoft2Pn2qOXKw5iPb9e4?=
+ =?us-ascii?Q?nRPhYeK0du0e1qnz7DwL6ht43HO17jlvadR5xsD8p69h26DtdO4cZrnFv/tX?=
+ =?us-ascii?Q?m1MbNwLB5MelXxNwfDz5Q/SdkdcLHlSwEuQTOOEMxzIciCX14ZkPceTZ1ISa?=
+ =?us-ascii?Q?neWC7YRh/cQW7QmWNxBFKC4VrwatK4lYVjAPdm7ovOFV83W2uLxaO/IQVi22?=
+ =?us-ascii?Q?cg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.0
-Subject: Re: [PATCH V2 5/7] clk: qcom: Add NSS clock Controller driver for
- IPQ9574
-From: Devi Priya <quic_devipriy@quicinc.com>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: <andersson@kernel.org>, <agross@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <arnd@arndb.de>, <geert+renesas@glider.be>,
-        <nfraprado@collabora.com>, <rafal@milecki.pl>, <peng.fan@nxp.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <quic_saahtoma@quicinc.com>
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-6-quic_devipriy@quicinc.com>
- <CAA8EJpr+Wwgot-PDRtj-LVi79aD13B9WVREmjTXiR-8XEEx-rQ@mail.gmail.com>
- <652b55cc-87dd-46d1-e480-e25f5f22b8d8@quicinc.com>
- <a4c9baae-f328-22b5-48d7-fc7df0b62a79@quicinc.com>
- <CAA8EJpq0uawrOBHA8XHygEpGYF--HyxJWxKG44iiFdAZZz7O2w@mail.gmail.com>
- <45f96567-553c-9214-eb7e-c75c6e09d78b@quicinc.com>
-Content-Language: en-US
-In-Reply-To: <45f96567-553c-9214-eb7e-c75c6e09d78b@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: R3cUPQIT8WaHJWuznVtje5OVVoJp7VVC
-X-Proofpoint-ORIG-GUID: R3cUPQIT8WaHJWuznVtje5OVVoJp7VVC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-05_03,2023-10-02_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- suspectscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501 mlxscore=0
- phishscore=0 adultscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310050051
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79f718c3-825e-4b74-b6d0-08dbc57a980a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Oct 2023 08:10:52.9990
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Oy28xA+h4iBIh4zcf9zm4kQ6NHo2//ZB4l9jVEN3z4HeWHPTFA9rxMWqGC//1/Ehsd5Xnu93yhqzHi4eJOSVBYu2Vh7WKM/pkL/sDTU35RRcYZLJEOhjAvdZXLKrRd+Z
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5245
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+van Vecera
+> Sent: Wednesday, September 27, 2023 2:01 PM
+> To: netdev@vger.kernel.org
+> Cc: edumazet@google.com; intel-wired-lan@lists.osuosl.org; Brandeburg, Je=
+sse <jesse.brandeburg@intel.com>; linux-kernel@vger.kernel.org; Nguyen, Ant=
+hony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitsze=
+l@intel.com>; kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH net-next v2 2/9] i40e: Move I40E_MASK m=
+acro to i40e_register.h
+>=20
+> The macro is practically used only in i40e_register.h header file except
+> few I40E_MDIO_CLAUSE* macros that are defined in i40e_type.h
+> Move I40E_MASK macro to i40e_register.h header, I40E_MDIO_CLAUSE* macros
+> are refactored in subsequent patch.
+>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_register.h | 3 +++
+>  drivers/net/ethernet/intel/i40e/i40e_type.h     | 3 ---
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+>
 
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-On 9/22/2023 5:31 PM, Devi Priya wrote:
-> 
-> 
-> On 9/20/2023 1:50 PM, Dmitry Baryshkov wrote:
->> On Wed, 20 Sept 2023 at 09:39, Devi Priya <quic_devipriy@quicinc.com> 
->> wrote:
->>>
->>>
->>>
->>> On 9/12/2023 7:38 PM, Devi Priya wrote:
->>>>
->>>>
->>>> On 8/25/2023 5:14 PM, Dmitry Baryshkov wrote:
->>>>> On Fri, 25 Aug 2023 at 12:15, Devi Priya <quic_devipriy@quicinc.com>
->>>>> wrote:
->>>>>>
->>>>>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574
->>>>>> based
->>>>>> devices.
->>>>>>
->>>>>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
->>>>>> ---
->>>>>>    Changes in V2:
->>>>>>           - Added depends on ARM64 || COMPILE_TEST in Kconfig
->>>>>>           - Added module_platform_driver
->>>>>>           - Dropped patch [2/6] - clk: qcom: gcc-ipq9574: Mark nssnoc
->>>>>> clocks as critical
->>>>>>              & added pm_clk for nssnoc clocks
->>>>>>           - Updated the uniphy clock names
->>>>>>
->>>>>>    drivers/clk/qcom/Kconfig         |    7 +
->>>>>>    drivers/clk/qcom/Makefile        |    1 +
->>>>>>    drivers/clk/qcom/nsscc-ipq9574.c | 3109 
->>>>>> ++++++++++++++++++++++++++++++
->>>>>>    3 files changed, 3117 insertions(+)
->>>>>>    create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
->>>>>>
->>>>>> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
->>>>>> index bd9bfb11b328..3ecc11e2c8e3 100644
->>>>>> --- a/drivers/clk/qcom/Kconfig
->>>>>> +++ b/drivers/clk/qcom/Kconfig
->>>>>> @@ -203,6 +203,13 @@ config IPQ_GCC_9574
->>>>>>             i2c, USB, SD/eMMC, etc. Select this for the root clock
->>>>>>             of ipq9574.
->>>>>>
->>>>>> +config IPQ_NSSCC_9574
->>>>>> +       tristate "IPQ9574 NSS Clock Controller"
->>>>>> +       depends on ARM64 || COMPILE_TEST
->>>>>> +       depends on IPQ_GCC_9574
->>>>>> +       help
->>>>>> +         Support for NSS clock controller on ipq9574 devices.
->>>>>> +
->>>>>>    config MSM_GCC_8660
->>>>>>           tristate "MSM8660 Global Clock Controller"
->>>>>>           depends on ARM || COMPILE_TEST
->>>>>> diff --git a/drivers/clk/qcom/Makefile b/drivers/clk/qcom/Makefile
->>>>>> index 4790c8cca426..3f084928962e 100644
->>>>>> --- a/drivers/clk/qcom/Makefile
->>>>>> +++ b/drivers/clk/qcom/Makefile
->>>>>> @@ -30,6 +30,7 @@ obj-$(CONFIG_IPQ_GCC_6018) += gcc-ipq6018.o
->>>>>>    obj-$(CONFIG_IPQ_GCC_806X) += gcc-ipq806x.o
->>>>>>    obj-$(CONFIG_IPQ_GCC_8074) += gcc-ipq8074.o
->>>>>>    obj-$(CONFIG_IPQ_GCC_9574) += gcc-ipq9574.o
->>>>>> +obj-$(CONFIG_IPQ_NSSCC_9574)   += nsscc-ipq9574.o
->>>>>>    obj-$(CONFIG_IPQ_LCC_806X) += lcc-ipq806x.o
->>>>>>    obj-$(CONFIG_MDM_GCC_9607) += gcc-mdm9607.o
->>>>>>    obj-$(CONFIG_MDM_GCC_9615) += gcc-mdm9615.o
->>>>>> diff --git a/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>> b/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>> new file mode 100644
->>>>>> index 000000000000..65bdb449ae5f
->>>>>> --- /dev/null
->>>>>> +++ b/drivers/clk/qcom/nsscc-ipq9574.c
->>>>>> @@ -0,0 +1,3109 @@
->>>>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>>>> +/*
->>>>>> + * Copyright (c) 2021, The Linux Foundation. All rights reserved.
->>>>>> + * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights
->>>>>> reserved.
->>>>>> + */
->>>>>> +
->>>>>> +#include <linux/clk-provider.h>
->>>>>> +#include <linux/err.h>
->>>>>> +#include <linux/kernel.h>
->>>>>> +#include <linux/module.h>
->>>>>> +#include <linux/of.h>
->>>>>> +#include <linux/of_device.h>
->>>>>> +#include <linux/regmap.h>
->>>>>> +#include <linux/pm_clock.h>
->>>>>> +#include <linux/pm_runtime.h>
->>>>>> +
->>>>>> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
->>>>>> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
->>>>>> +
->>>>>> +#include "clk-alpha-pll.h"
->>>>>> +#include "clk-branch.h"
->>>>>> +#include "clk-pll.h"
->>>>>> +#include "clk-rcg.h"
->>>>>> +#include "clk-regmap.h"
->>>>>> +#include "clk-regmap-divider.h"
->>>>>> +#include "clk-regmap-mux.h"
->>>>>> +#include "common.h"
->>>>>> +#include "reset.h"
->>>>>> +
->>>>>> +/* Need to match the order of clocks in DT binding */
->>>>>> +enum {
->>>>>> +       DT_NSSNOC_NSSCC_CLK,
->>>>>> +       DT_NSSNOC_SNOC_CLK,
->>>>>> +       DT_NSSNOC_SNOC_1_CLK,
->>>>>
->>>>> Not using the index makes it seem that these clocks are not used,
->>>>> until one scrolls down to pm_clks.
->>>> Okay, got it
->>>>>
->>>>> BTW: The NSSNOC_SNOC clocks make it look like there is an interconnect
->>>>> here (not a simple NIU).
->>>>
->>>> Hi Dmitry, We are exploring on the ICC driver. In the meantime to
->>>> unblock PCIe/NSS changes getting merged, shall we use 
->>>> regmap_update_bits
->>>> and turn on the critical NSSNOC clocks, ANOC & SNOC pcie clocks in the
->>>> probe function of the gcc driver itself as like sm8550 driver to get 
->>>> the
->>>> changes merged?
->>>>
->>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/clk/qcom/gcc-sm8550.c#n3347
->>>
->>> Hi Dmitry,
->>> Just curious to know if we could send out the next series with the
->>> proposed approach if that holds good.
->>
->> The answer really depends on the structure of your hardware. The issue
->> is that once you commit the device bindings,you have to support them
->> forever. So, if you commit the NSS clock support without interconnects
->> in place, you have to keep this ANOC/SNOC/etc code forever, even after
->> you land the interconnect. So I'd suggest landing the icc driver first
->> (or at least implementing and sending to the mailing list), so that we
->> can see how all these pieces fit together.
-> 
-> Hi Dmitry,
-> Unlike MSM chipsets, IPQ chipsets does not have any use case wherein the
-> NOC clocks have to be scaled. So if these clocks can be enabled in the
-> probe, there is no need for an interconnect driver at all. The same
-> applies to both ipq9574 and ipq5332 SoCs.
-> 
-
-Hi Dmitry,
-Just curious to know if we can go ahead with the proposed solution of
-enabling the NOC clocks in the probe as these clocks need not be scaled
-in IPQ chipsets & hence there would be no need for an ICC driver in
-ipq9574 & ipq5332 targets.
-
-Thanks,
-Devi Priya
-
-> Thanks,
-> Devi Priya
->>
->>> Thanks,
->>> Devi Priya
->>>
->>>>>
->>>>>> +       DT_BIAS_PLL_CC_CLK,
->>>>>> +       DT_BIAS_PLL_NSS_NOC_CLK,
->>>>>> +       DT_BIAS_PLL_UBI_NC_CLK,
->>>>>> +       DT_GCC_GPLL0_OUT_AUX,
->>>>>> +       DT_UNIPHY0_NSS_RX_CLK,
->>>>>> +       DT_UNIPHY0_NSS_TX_CLK,
->>>>>> +       DT_UNIPHY1_NSS_RX_CLK,
->>>>>> +       DT_UNIPHY1_NSS_TX_CLK,
->>>>>> +       DT_UNIPHY2_NSS_RX_CLK,
->>>>>> +       DT_UNIPHY2_NSS_TX_CLK,
->>>>>> +       DT_XO,
->>>>>
->>>>> As I wrote, please move DT_XO closer to the beginning of the list.
->>>>>
->>>>>> +};
->>>>>> +
->>>>>> +enum {
->>>>>> +       P_BIAS_PLL_CC_CLK,
->>>>>> +       P_BIAS_PLL_NSS_NOC_CLK,
->>>>>> +       P_BIAS_PLL_UBI_NC_CLK,
->>>>>> +       P_GCC_GPLL0_OUT_AUX,
->>>>>> +       P_UBI32_PLL_OUT_MAIN,
->>>>>> +       P_UNIPHY0_NSS_RX_CLK,
->>>>>> +       P_UNIPHY0_NSS_TX_CLK,
->>>>>> +       P_UNIPHY1_NSS_RX_CLK,
->>>>>> +       P_UNIPHY1_NSS_TX_CLK,
->>>>>> +       P_UNIPHY2_NSS_RX_CLK,
->>>>>> +       P_UNIPHY2_NSS_TX_CLK,
->>>>>> +       P_XO,
->>>>>> +};
->>>>>> +
->>>>>> +static const struct alpha_pll_config ubi32_pll_config = {
->>>>>> +       .l = 0x3e,
->>>>>> +       .alpha = 0x6666,
->>>>>> +       .config_ctl_val = 0x200d4aa8,
->>>>>> +       .config_ctl_hi_val = 0x3c,
->>>>>> +       .main_output_mask = BIT(0),
->>>>>> +       .aux_output_mask = BIT(1),
->>>>>> +       .pre_div_val = 0x0,
->>>>>> +       .pre_div_mask = BIT(12),
->>>>>> +       .post_div_val = 0x0,
->>>>>> +       .post_div_mask = GENMASK(9, 8),
->>>>>> +       .alpha_en_mask = BIT(24),
->>>>>> +       .test_ctl_val = 0x1c0000c0,
->>>>>> +       .test_ctl_hi_val = 0x4000,
->>>>>> +};
->>>>>> +
->>>>>> +static struct clk_alpha_pll ubi32_pll_main = {
->>>>>> +       .offset = 0x28000,
->>>>>> +       .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
->>>>>> +       .flags = SUPPORTS_DYNAMIC_UPDATE,
->>>>>> +       .clkr = {
->>>>>> +               .hw.init = &(const struct clk_init_data) {
->>>>>> +                       .name = "ubi32_pll_main",
->>>>>> +                       .parent_data = &(const struct 
->>>>>> clk_parent_data) {
->>>>>> +                               .index = DT_XO,
->>>>>> +                       },
->>>>>> +                       .num_parents = 1,
->>>>>> +                       .ops = &clk_alpha_pll_huayra_ops,
->>>>>> +               },
->>>>>> +       },
->>>>>> +};
->>>>>> +
->>>>>> +static struct clk_alpha_pll_postdiv ubi32_pll = {
->>>>>> +       .offset = 0x28000,
->>>>>> +       .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
->>>>>> +       .width = 2,
->>>>>> +       .clkr.hw.init = &(const struct clk_init_data) {
->>>>>> +               .name = "ubi32_pll",
->>>>>> +               .parent_hws = (const struct clk_hw *[]) {
->>>>>> +                       &ubi32_pll_main.clkr.hw
->>>>>> +               },
->>>>>> +               .num_parents = 1,
->>>>>> +               .ops = &clk_alpha_pll_postdiv_ro_ops,
->>>>>> +               .flags = CLK_SET_RATE_PARENT,
->>>>>> +       },
->>>>>> +};
->>>>>> +
->>>>>
->>>>> [skipped clock tables, LGTM]
->>>>>
->>>>>> +static const struct of_device_id nss_cc_ipq9574_match_table[] = {
->>>>>> +       { .compatible = "qcom,ipq9574-nsscc" },
->>>>>> +       { }
->>>>>> +};
->>>>>> +MODULE_DEVICE_TABLE(of, nss_cc_ipq9574_match_table);
->>>>>> +
->>>>>> +static int nss_cc_ipq9574_probe(struct platform_device *pdev)
->>>>>> +{
->>>>>> +       struct regmap *regmap;
->>>>>> +       struct qcom_cc_desc nsscc_ipq9574_desc = nss_cc_ipq9574_desc;
->>>>>> +
->>>>>> +       int ret;
->>>>>> +
->>>>>> +       ret = devm_pm_runtime_enable(&pdev->dev);
->>>>>> +       if (ret < 0)
->>>>>> +               return ret;
->>>>>> +
->>>>>> +       ret = devm_pm_clk_create(&pdev->dev);
->>>>>> +       if (ret < 0)
->>>>>> +               return ret;
->>>>>> +
->>>>>> +       ret = of_pm_clk_add_clk(&pdev->dev, "nssnoc_nsscc");
->>>>>
->>>>> As we are switching to DT indices, better add new API that takes index
->>>>> rather than mixing indices and names.
->>>> sure okay
->>>>
->>>> Thanks,
->>>> Devi Priya
->>>>>
->>>>>> +       if (ret < 0) {
->>>>>> +               dev_err(&pdev->dev, "Failed to acquire nssnoc_nsscc
->>>>>> clock\n");
->>>>>> +               return ret;
->>>>>> +       }
->>>>>> +
->>>>>> +       ret = of_pm_clk_add_clk(&pdev->dev, "nssnoc_snoc");
->>>>>> +       if (ret < 0) {
->>>>>> +               dev_err(&pdev->dev, "Failed to acquire nssnoc_snoc
->>>>>> clock\n");
->>>>>> +               return ret;
->>>>>> +       }
->>>>>> +
->>>>>> +       ret = of_pm_clk_add_clk(&pdev->dev, "nssnoc_snoc_1");
->>>>>> +       if (ret < 0) {
->>>>>> +               dev_err(&pdev->dev, "Failed to acquire nssnoc_snoc_1
->>>>>> clock\n");
->>>>>> +               return ret;
->>>>>> +       }
->>>>>> +
->>>>>> +       ret = pm_runtime_get(&pdev->dev);
->>>>>> +       if (ret)
->>>>>> +               return ret;
->>>>>> +
->>>>>> +       regmap = qcom_cc_map(pdev, &nsscc_ipq9574_desc);
->>>>>> +       if (IS_ERR(regmap))
->>>>>> +               return PTR_ERR(regmap);
->>>>>> +
->>>>>> +       clk_alpha_pll_configure(&ubi32_pll_main, regmap,
->>>>>> &ubi32_pll_config);
->>>>>> +
->>>>>> +       return qcom_cc_really_probe(pdev, &nsscc_ipq9574_desc, 
->>>>>> regmap);
->>>>>> +}
->>>>>> +
->>>>>> +static const struct dev_pm_ops nss_cc_pm_ops = {
->>>>>> +       SET_RUNTIME_PM_OPS(pm_clk_suspend, pm_clk_resume, NULL)
->>>>>> +};
->>>>>> +
->>>>>> +static struct platform_driver nss_cc_ipq9574_driver = {
->>>>>> +       .probe = nss_cc_ipq9574_probe,
->>>>>> +       .driver = {
->>>>>> +               .name = "qcom,nsscc-ipq9574",
->>>>>> +               .of_match_table = nss_cc_ipq9574_match_table,
->>>>>> +               .pm = &nss_cc_pm_ops,
->>>>>> +       },
->>>>>> +};
->>>>>> +
->>>>>> +module_platform_driver(nss_cc_ipq9574_driver);
->>>>>> +
->>>>>> +MODULE_DESCRIPTION("QTI NSS_CC IPQ9574 Driver");
->>>>>> +MODULE_LICENSE("GPL");
->>>>>> -- 
->>>>>> 2.34.1
->>>>>>
->>>>>
->>>>>
->>
->>
->>
 
