@@ -1,120 +1,118 @@
-Return-Path: <netdev+bounces-38307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8FD87BA330
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 981F97BA0BC
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:43:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8B89E281A64
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id 177D71F233D4
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DDE30D16;
-	Thu,  5 Oct 2023 15:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF082AB4F;
+	Thu,  5 Oct 2023 14:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="XASewxDb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9PhZ/m+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2D32AB5F
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:52:29 +0000 (UTC)
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CC08C27;
-	Thu,  5 Oct 2023 08:52:27 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3955e7Cv037929;
-	Thu, 5 Oct 2023 00:40:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1696484407;
-	bh=iacW/bffmnzgmS8vl8HxLPwXy/XTDkcCnrPlXbOzKeI=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=XASewxDbXR9MjecUGxfHiVjJW3Q7Mvwc/beYKngZC2Q1+XGQ9EW/0W5EoOu4IjssR
-	 dLRlVcc2rnuebB9L+6wt3/ylpzdXrki2FNZpbRB3lC6DXenX0yDGtjGeWHpqYxlRiC
-	 WdwFA9OLCpOARfJECcmAPTzVatLTTcCOdd1hLd1U=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3955e7Dl021794
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 5 Oct 2023 00:40:07 -0500
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 5
- Oct 2023 00:40:07 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 5 Oct 2023 00:40:07 -0500
-Received: from [10.24.69.31] (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3955e1fl034891;
-	Thu, 5 Oct 2023 00:40:02 -0500
-Message-ID: <fba767da-ae4d-9fb8-b637-955363a57540@ti.com>
-Date: Thu, 5 Oct 2023 11:10:00 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A480F2AB41
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:43:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2192067A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:43:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696516984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DHM0xHF2kv3BLjLoSwriKAoHSAm/JAv+ui/sTdWa+9U=;
+	b=T9PhZ/m+s7jLKFTBAvB6Q4+6ChGyzBdclVHrm8M5tpvf5T4paiQ9j0QvCZhlmWLlV98x46
+	7A1H2e42FIk3VSqxEIYJWN+Nac5FwB3eNuyQDL+jLLxSvR6KYh0NB97qrY+K+TIABuPc+l
+	efD+HmZu154zyHV6s2K5nmj76BqKRdQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-S61onmmZNIWqMHx6X_rBTA-1; Thu, 05 Oct 2023 03:37:25 -0400
+X-MC-Unique: S61onmmZNIWqMHx6X_rBTA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9b295d163fdso17179466b.1
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 00:37:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696491444; x=1697096244;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DHM0xHF2kv3BLjLoSwriKAoHSAm/JAv+ui/sTdWa+9U=;
+        b=wzgz3CGMrrvWoFcXv4DAxr7KSLMcDXxXo4pCYX7JiAFhkUd1zufP0z/CDMtAXxHqvJ
+         J6PiFPScuV0jmI1yc4uz3aaHoImBeJrBWlDwRrPsljiYFwbnW4u4F9Gxh9U25RoYsrvH
+         qqNgUZAUdtiv16srt9JUTLXtWE6EVqbO3BBXVCQvcpGN+Cb1RME0QamWvYW24O8Aoru1
+         j7PIB4SYR1shmsQKWGPWmSdyGEofUCHIlUB31HkExeAmnZULcCHUgD+25VjkLKI3FaU/
+         w4QGPBgc5dTRHVZD4FRlXpHVbbSK7IkvSjMbDTecUHBypefHuhy8CfXBfCqfX9ANXNhW
+         pGuA==
+X-Gm-Message-State: AOJu0Yzda6Zhh+N3pvYm51nwe7Hq3ygROTrskNpi53moRRs3AsFAHhOE
+	A5bYz436cP7KDXlcVjadfUo/7pNQ2QGMLKplQekMOl8b39onRj6YZwbz5yWEaBkPkcNt2kxuUbS
+	Mslgke0Ipgaq3paWq
+X-Received: by 2002:a17:906:7389:b0:9ae:2f35:442a with SMTP id f9-20020a170906738900b009ae2f35442amr4002371ejl.5.1696491444122;
+        Thu, 05 Oct 2023 00:37:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGdFCAAdCKfZyRjyhsGRK+djz3pK0cRwljeBcUUAtdaOoJFV7XbegYiGlFskH2Ho7U/h+CKg==
+X-Received: by 2002:a17:906:7389:b0:9ae:2f35:442a with SMTP id f9-20020a170906738900b009ae2f35442amr4002357ejl.5.1696491443781;
+        Thu, 05 Oct 2023 00:37:23 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-237-55.dyn.eolo.it. [146.241.237.55])
+        by smtp.gmail.com with ESMTPSA id lr5-20020a170906fb8500b009adcb6c0f0esm689732ejb.193.2023.10.05.00.37.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 00:37:23 -0700 (PDT)
+Message-ID: <0c0b0fade091a701624379d91813cfb9f30a5111.camel@redhat.com>
+Subject: Re: [PATCH net-next] net: ixp4xx_eth: Specify min/max MTU
+From: Paolo Abeni <pabeni@redhat.com>
+To: Linus Walleij <linus.walleij@linaro.org>, 
+	patchwork-bot+netdevbpf@kernel.org
+Cc: khalasa@piap.pl, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org,  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 05 Oct 2023 09:37:21 +0200
+In-Reply-To: <CACRpkdacagNg8EA54_9euW8M4WHivLb01C7yEubAreNan06sGA@mail.gmail.com>
+References: <20230923-ixp4xx-eth-mtu-v1-1-9e88b908e1b2@linaro.org>
+	 <169632602529.26043.5537275057934582250.git-patchwork-notify@kernel.org>
+	 <CACRpkdacagNg8EA54_9euW8M4WHivLb01C7yEubAreNan06sGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [EXTERNAL] Re: [PATCH net-next v3] net: ti: icssg_prueth: add
- TAPRIO offload support
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        "David
- S. Miller" <davem@davemloft.net>, <vladimir.oltean@nxp.com>,
-        Simon Horman
-	<horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>,
-        <linux-omap@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        Roger Quadros <rogerq@ti.com>,
-        Vinicius Costa Gomes <vinicius.gomes@intel.com>
-References: <20230928103000.186304-1-danishanwar@ti.com>
- <20231004135833.6efdbced@kernel.org>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20231004135833.6efdbced@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-6.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 05/10/23 02:28, Jakub Kicinski wrote:
-> On Thu, 28 Sep 2023 16:00:00 +0530 MD Danish Anwar wrote:
->> +/**
->> + * Config state machine variables. See IEEE Std 802.1Q-2018 8.6.8.4
->> + */
-> 
-> Please use correct kdoc format with all members documented or not use
-> the /** marker.
-> 
+On Tue, 2023-10-03 at 23:54 +0200, Linus Walleij wrote:
+> On Tue, Oct 3, 2023 at 11:40=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.o=
+rg> wrote:
+>=20
+> > This patch was applied to netdev/net-next.git (main)
+> > by Paolo Abeni <pabeni@redhat.com>:
+>=20
+> Sorry Paolo, this is the latest version of this patch, which sadly change=
+d
+> Subject in the process:
+> https://lore.kernel.org/netdev/20230928-ixp4xx-eth-mtu-v3-1-cb18eaa0edb9@=
+linaro.org/
 
-Sure. I will update the documentation with correct kdoc format.
+Ouch, my bad :(
 
->> +struct tas_config_list {
->> +	/* New list is copied at this time */
->> +	u64 config_change_time;
->> +	/* config change error counter, incremented if
->> +	 * admin->BaseTime < current time and TAS_enabled is true
->> +	 */
->> +	u32 config_change_error_counter;
->> +	/* True if list update is pending */
->> +	u8 config_pending;
->> +	/* Set to true when application trigger updating of admin list
->> +	 * to active list, cleared when configChangeTime is updated
->> +	 */
->> +	u8 config_change;
->> +};
+The change of subject baffled both me and patchwork. As I process the
+backlog fifo, and was unable to reach the most recent versions due to
+the backlog size, I missed the newer revisions.
 
--- 
-Thanks and Regards,
-Danish
+In the future, please try to avoid subject change. If the subject chane
+is needed, please explicitly mark the old version as superseded, it
+will help us a lot, thanks!
+
+Paolo
+
 
