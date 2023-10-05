@@ -1,72 +1,68 @@
-Return-Path: <netdev+bounces-38436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29FDF7BAEEA
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 00:42:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACCAC7BAEF0
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 00:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id CAE4E281FBE
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:42:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id DC569B2099B
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426034120B;
-	Thu,  5 Oct 2023 22:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD4841756;
+	Thu,  5 Oct 2023 22:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MiifTB1O"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iuROY2lN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D371154AB
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 22:42:12 +0000 (UTC)
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ECEBE4
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:42:10 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-5859e22c7daso1037514a12.1
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 15:42:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE58E154AB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 22:46:12 +0000 (UTC)
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE6BCE
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:46:10 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3af65455e7fso1061241b6e.3
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 15:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696545730; x=1697150530; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1696545969; x=1697150769; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nz7lk7ASZyzYk8GD9c9UI0XKLO+hFISo62X4fmfBjLs=;
-        b=MiifTB1OW2EQSGbn8uFBfa+BeiveCEke0uMAPHIm4aaUAjKKIcpMghHK5G2n9Rae98
-         Kx/ynOtpHDU43KdyJuoA/A3Dvde3JMe/hL1NMVOFnEIAr38uZOoH41jT14cOF4IBgZo2
-         mXyn0wYyaruDOfkyOGFGnL8AyLF7fOSw0FzN8=
+        bh=ePyskiEJCEOltRf//00HdVQ4cJ67D/wO+W+PB1Wu8iw=;
+        b=iuROY2lNaoGjIIE9uohhCqFE4Q/gSKmQAQnrfz2eaypGCLHwS6nnLVL46Qily4BlHV
+         CddSMA+7bcZY5bNhiBO+tmSUpHOWNQAsp9HuqcOr7d2dyQ6jrXa/tGKUZA5ue7FtXGQ0
+         fqSokBtGSpL3/tcooiE5689m5uIwx+1w3XmTI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696545730; x=1697150530;
+        d=1e100.net; s=20230601; t=1696545969; x=1697150769;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nz7lk7ASZyzYk8GD9c9UI0XKLO+hFISo62X4fmfBjLs=;
-        b=japInzfdt8YrUqlDoKFk4TNEFRSpSEYVs6HKZgoQ9MgaME8HE5O74wT79MBUAWkihw
-         Fn68AtB6wEh/2iVV0id7R4JaW3mjCNFDtOKpdv4ro/NEzVvfqRNdKLX1tfFTu5J30nMa
-         qpmaQ1IY+li2xsPjqrNrvllu77BFVL1ClOMwmebkUJCgFlhtqx7D4Ydpx95NBg/oae5O
-         ahusTyV5bF1hZ741ZFn/TnGCfq6nKdrVeibl47M9YChxNyXQSBpQc4MnFZ8+K9h0Fl4p
-         ONRfv9LJp6ySo2GQfpZVO+1BuObFjgJ2XmNr6KT33kavVnArHt7huPodAjxQaGC1zyPL
-         Cp3Q==
-X-Gm-Message-State: AOJu0YzybPAiCT+ybgkIENFfLNlEWcqV0qjuKg6Kz8+lPsU5CV/LdLtj
-	mL/PyMIZZG53mcsBOzU6nnUj3A==
-X-Google-Smtp-Source: AGHT+IEgQZTEs2BdqQ0GOWFAgas7OCDMFaKUSGv2iXW7ue7c1U+XG351TvMd1vGVOqGjStDFLsY+kA==
-X-Received: by 2002:a05:6a21:819f:b0:15d:8409:8804 with SMTP id pd31-20020a056a21819f00b0015d84098804mr5926846pzb.57.1696545729755;
-        Thu, 05 Oct 2023 15:42:09 -0700 (PDT)
+        bh=ePyskiEJCEOltRf//00HdVQ4cJ67D/wO+W+PB1Wu8iw=;
+        b=ucGIdHpc9hUt1kgNjYZqXJusJ16qPN3M66h9azgTO0fgmdMH5LqFDg7onfmhjnJYaS
+         FgYTiEKO/kObYpnEvI1FFsefEMOK6QGXlRnZk5s9ltdmmrK2q2sMJusV/lcyvohbICiB
+         1YQSfLM8EYS5+Um81qTgoaY8+mfsf7jasu8/dbJYHChod4w06XUIidJliPEqrF0B6tpb
+         PM8m9nmZPgozE4JEMtw3X0E3zGiR1ff95Hleb1O4R5UDbOqFJaEoxDZNUcJr9RlfCLHP
+         uGFhQyqCL2uXQLDJti1bs6AUa9dFUDHKSy6JpE6y0a22Z7HPFmbSrw/lwWKa6uJGgykY
+         DIRw==
+X-Gm-Message-State: AOJu0YxYBhr57d+gx1ndkVsy17H1zo0tqzWFSli7WVQtLZ4JpIhPB/eM
+	MDNtaMmVAHlwMHMwKtou4e6qgw==
+X-Google-Smtp-Source: AGHT+IGaIDqu6BSYW2le6DfTb8YAwAbC27p7HsJYK0cA5SoI/rfP7fY4ed258/zRZ4xNHEbx5qw3Bg==
+X-Received: by 2002:a05:6808:110:b0:3ae:87c8:437e with SMTP id b16-20020a056808011000b003ae87c8437emr6462389oie.41.1696545969449;
+        Thu, 05 Oct 2023 15:46:09 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id j2-20020a170902da8200b001c5de06f13bsm2284923plx.226.2023.10.05.15.42.08
+        by smtp.gmail.com with ESMTPSA id p19-20020a639513000000b00585391d0aafsm1984306pgd.6.2023.10.05.15.46.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 15:42:09 -0700 (PDT)
-Date: Thu, 5 Oct 2023 15:42:08 -0700
+        Thu, 05 Oct 2023 15:46:08 -0700 (PDT)
+Date: Thu, 5 Oct 2023 15:46:08 -0700
 From: Kees Cook <keescook@chromium.org>
 To: Justin Stitt <justinstitt@google.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v2] net: dsa: lan9303: use ethtool_sprintf() for
- lan9303_get_strings()
-Message-ID: <202310051539.B2D34DB@keescook>
-References: <20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com>
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] bcm63xx_enet: replace deprecated strncpy with strscpy
+Message-ID: <202310051544.822967F55@keescook>
+References: <20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-v1-1-6823b3c3c443@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,34 +71,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com>
+In-Reply-To: <20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-v1-1-6823b3c3c443@google.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 06:56:50PM +0000, Justin Stitt wrote:
-> This pattern of strncpy with some pointer arithmetic setting fixed-sized
-> intervals with string literal data is a bit weird so let's use
-> ethtool_sprintf() as this has more obvious behavior and is less-error
-> prone.
+On Thu, Oct 05, 2023 at 08:51:40PM +0000, Justin Stitt wrote:
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
 > 
-> Nicely, we also get to drop a usage of the now deprecated strncpy() [1].
+> A suitable replacement is strscpy() [2] due to the fact that it
+> guarantees NUL-termination on the destination buffer without
+> unnecessarily NUL-padding.
 > 
-> One might consider this pattern:
-> |       ethtool_sprintf(&buf, lan9303_mib[u].name);
-> ... but this triggers a -Wformat-security warning.
+> bcm_enet_get_drvinfo() already uses strscpy(), let's match it's
+> implementation:
+> |       static void bcm_enet_get_drvinfo(struct net_device *netdev,
+> |       				 struct ethtool_drvinfo *drvinfo)
+> |       {
+> |       	strscpy(drvinfo->driver, bcm_enet_driver_name, sizeof(drvinfo->driver));
+> |       	strscpy(drvinfo->bus_info, "bcm63xx", sizeof(drvinfo->bus_info));
+> |       }
+> 
+> Note that now bcm_enet_get_drvinfo() and bcm_enetsw_get_drvinfo() do the
+> exact same thing.
 > 
 > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
 > Link: https://github.com/KSPP/linux/issues/90
 > Cc: linux-hardening@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
 > Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Ah, cool ethtool_sprintf() works. Maybe some day we can fix the whole
-API to actually have bounds, but yes, this is fine.
+Looks good. Other writers to drvinfo, as you saw, do the same strscpy,
+so this looks correct to me.
 
 Reviewed-by: Kees Cook <keescook@chromium.org>
 
