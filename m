@@ -1,84 +1,93 @@
-Return-Path: <netdev+bounces-38290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 496697BA027
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:35:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC3C7BA0BA
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id E03B0281AF1
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:35:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTP id E8CF71F233CD
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972E129438;
-	Thu,  5 Oct 2023 14:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A0D2AB41;
+	Thu,  5 Oct 2023 14:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IrckMHJU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UQ/8vbZu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC5629434
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E838F1D698
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:42:48 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7418B4CD3
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:35:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 300ED29B35
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:42:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696516506;
+	s=mimecast20190719; t=1696516933;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IJEa+gWdlvljcsxPLx3PWHMvt63pRc6Ikwaz2vOfIPg=;
-	b=IrckMHJUYzDlE8vJXwjY5OYAh/vE0BqfsFEyncI4npHdbfqiXlzM2TrQIiK5nQZBgZbiqQ
-	NiV2Vb2owsD9xrtLzaLMcOYkuulMUm9M36HLGUmVe3I6wIb4ZecbYY9ZeaLtNoG54eBAd2
-	E2zIxJqXfY1s6U574y3Z/Hut8yxFLvQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=EcYpFc5fQ2y3uLxjaGAy7lsrM21+5zwRHwXefFI3p3Q=;
+	b=UQ/8vbZuGoQ9t158NccRXBVxt79EErtuzCofWy6hSIISWc6s+8Vq1VXPaRE6OzELi2AAhM
+	gR4EoYTrwTuEYhCDHA5jgTcB7T7nSxIBc+oTTpVJ9gtxbAvQh5WFuLi/bfp3K8JCfPLY66
+	+h6jilfhuBiA6Gtlzy7TWrS76idN5hM=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-1Tdt2WKiOsWsaZTO4hcGUw-1; Thu, 05 Oct 2023 06:34:04 -0400
-X-MC-Unique: 1Tdt2WKiOsWsaZTO4hcGUw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-51e3bb0aeedso93423a12.0
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 03:34:04 -0700 (PDT)
+ us-mta-175-vjSSkmL7M4GhkEwbLrB0TA-1; Thu, 05 Oct 2023 06:39:09 -0400
+X-MC-Unique: vjSSkmL7M4GhkEwbLrB0TA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9b989422300so19028966b.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 03:39:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696502043; x=1697106843;
+        d=1e100.net; s=20230601; t=1696502348; x=1697107148;
         h=mime-version:user-agent:content-transfer-encoding:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IJEa+gWdlvljcsxPLx3PWHMvt63pRc6Ikwaz2vOfIPg=;
-        b=QXr06zPJ45ILL32dE4XytwvEx9e9312l/x2KDydgq1h4k5Ag3a0GzLY02rhe2Me9m0
-         bmKWviTgGeHjsfbUjpdOiOEBeZCU0baY7PdmfZZZaop6/gSphwa50ya6mFKlnrT6FqF4
-         0wm9G2rSdZLblAsFvLmJO9z5ms5CX7unIl8+j3uvRFSdFg7zENVC6Ck9F5R3yKirzHaM
-         cIcg1nRTtX0ff5NPfcQjoC09Yngkk9ctpOA5rRnENNPgjgHbEfKTCdkECBNiGHRa2C7x
-         a0VADwUVScXbgynn+keVybhF2Rn1aRN2GWHgV8Km4pSoVhKlrbvrGhc2RHWQLQZDDggW
-         z1ig==
-X-Gm-Message-State: AOJu0YzpQl9h0mO5ruKVy5bDPzPuOmGdbKKCFikxfub+fFky9/315cFD
-	RKhetmpWi7bJcwBa5vXd5pAwip0T4dmajOOfiSY9zA40hHErT6ix8bFoCho+IS1v3N3ZuKuceMN
-	euFcBWDJUb3dQP5TG
-X-Received: by 2002:a05:6402:278c:b0:523:2e64:122b with SMTP id b12-20020a056402278c00b005232e64122bmr4222448ede.3.1696502043141;
-        Thu, 05 Oct 2023 03:34:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBjwOxGN0mroujhop9lSt9BQu5QPOyNH8DNEdnCagtFe3aIYksxxEYiMpkoc5gI5XLXtgVuw==
-X-Received: by 2002:a05:6402:278c:b0:523:2e64:122b with SMTP id b12-20020a056402278c00b005232e64122bmr4222432ede.3.1696502042791;
-        Thu, 05 Oct 2023 03:34:02 -0700 (PDT)
+        bh=EcYpFc5fQ2y3uLxjaGAy7lsrM21+5zwRHwXefFI3p3Q=;
+        b=vmrt1XiP4QyhSMByNlmZ/k6M9Z6KYcq6nIOVUo5My3PMcc/gZWjYaWKhbMJuIXLNPy
+         EfIdIJZHWIbDg1YSI2w3llsb1JDxnEP/UcFkw3EeQGuFlPIjlpNndyVEN+bJx+zp8GaS
+         ohYUf7N2GlEtEWisqRB4RQ008v9CDbE2ekVN+S0yjfYiLeA3z8ekq7w9H/cJUAiRuPnP
+         AyHa8h7iW0ra7KGq/WL81BziKltOEXEqX7Y3Agy0UMQB2yKAPmJTniCPnCmp6GsaRzkg
+         cUVJ7e465rvpkPU83DOKH+IklF/k68Amo9Ee6KXEafy6qoqYsW9WWzacPavZSXKtAR/G
+         OZnA==
+X-Gm-Message-State: AOJu0Ywne+SBvq9Fqfdiw64i+JH4na7DSf2q3a2VUotWwg2ZtC+fDzCq
+	xRWs7sxUKwowXJR1CcjdqtL7HNTATt00aZiXqjwLv+k7Y7wLilaV786mysNdYn3PNtMsIy1HabR
+	+8CO7HMnjYQw9xFZU
+X-Received: by 2002:a05:6402:5191:b0:51e:5dd8:fc59 with SMTP id q17-20020a056402519100b0051e5dd8fc59mr4227639edd.1.1696502348314;
+        Thu, 05 Oct 2023 03:39:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEXoi9NQo5thKA2z7QAg6O6iVK7LWh7JCWMxNO5nWP25rBMF90nlazkgDGpx4ETuytneK118Q==
+X-Received: by 2002:a05:6402:5191:b0:51e:5dd8:fc59 with SMTP id q17-20020a056402519100b0051e5dd8fc59mr4227628edd.1.1696502347918;
+        Thu, 05 Oct 2023 03:39:07 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-225-9.dyn.eolo.it. [146.241.225.9])
-        by smtp.gmail.com with ESMTPSA id i13-20020a056402054d00b005231e3d89efsm867932edx.31.2023.10.05.03.34.01
+        by smtp.gmail.com with ESMTPSA id y20-20020aa7d514000000b00537708be5c6sm869929edq.73.2023.10.05.03.39.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 03:34:02 -0700 (PDT)
-Message-ID: <6845daf40e0bd79c9768e83928b308e84459c010.camel@redhat.com>
-Subject: Re: [PATCH v3] net: phy: broadcom: add support for BCM5221 phy
+        Thu, 05 Oct 2023 03:39:07 -0700 (PDT)
+Message-ID: <2554ed057e08e66dd110c3e09a27378b9a06bdd6.camel@redhat.com>
+Subject: Re: [PATCH 3/3] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
 From: Paolo Abeni <pabeni@redhat.com>
-To: Giulio Benetti <giulio.benetti@benettiengineering.com>, 
-	linux-kernel@vger.kernel.org
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, Giulio Benetti
- <giulio.benetti+tekvox@benettiengineering.com>, Jim Reinhart
- <jimr@tekvox.com>,  James Autry <jautry@tekvox.com>, Matthew Maron
- <matthewm@tekvox.com>
-Date: Thu, 05 Oct 2023 12:34:00 +0200
-In-Reply-To: <20230928185949.1731477-1-giulio.benetti@benettiengineering.com>
-References: <20230928185949.1731477-1-giulio.benetti@benettiengineering.com>
+To: Hannes Reinecke <hare@suse.de>, Greg Kroah-Hartman
+	 <gregkh@linuxfoundation.org>, Jerry Snitselaar <jsnitsel@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>, Chris Leech <cleech@redhat.com>, Rasesh
+ Mody <rmody@marvell.com>, Ariel Elior <aelior@marvell.com>, Sudarsana
+ Kalluru <skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, Nilesh
+ Javali <njavali@marvell.com>, Manish Rangankar <mrangankar@marvell.com>,
+ John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>, Mike
+ Christie <michael.christie@oracle.com>, Hannes Reinecke <hare@kernel.org>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 05 Oct 2023 12:39:05 +0200
+In-Reply-To: <0e0040be-0375-4461-914d-1ea9d04ee62c@suse.de>
+References: <20230929170023.1020032-1-cleech@redhat.com>
+	 <20230929170023.1020032-4-cleech@redhat.com>
+	 <2023093055-gotten-astronomy-a98b@gregkh>
+	 <ZRhmqBRNUB3AfLv/@rhel-developer-toolbox>
+	 <2023093002-unlighted-ragged-c6e1@gregkh>
+	 <e0360d8f-6d36-4178-9069-d633d9b7031d@suse.de>
+	 <2023100114-flatware-mourner-3fed@gregkh>
+	 <7pq4ptas5wpcxd3v4p7iwvgoj7vrpta6aqfppqmuoccpk4mg5t@fwxm3apjkez3>
+	 <20231002060424.GA781@lst.de>
+	 <tf2zu6gqaii2bjipbo2mn2hz64px2624rfcmyg36rkq4bskxiw@zgjzznig6e22>
+	 <2023100233-salsa-joyous-6d8c@gregkh>
+	 <0e0040be-0375-4461-914d-1ea9d04ee62c@suse.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
@@ -95,33 +104,55 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-09-28 at 20:59 +0200, Giulio Benetti wrote:
-> From: Giulio Benetti <giulio.benetti+tekvox@benettiengineering.com>
+On Mon, 2023-10-02 at 10:59 +0200, Hannes Reinecke wrote:
+> On 10/2/23 10:46, Greg Kroah-Hartman wrote:
+> > On Mon, Oct 02, 2023 at 12:50:21AM -0700, Jerry Snitselaar wrote:
+> > > On Mon, Oct 02, 2023 at 08:04:24AM +0200, Christoph Hellwig wrote:
+> > > > On Sun, Oct 01, 2023 at 07:22:36AM -0700, Jerry Snitselaar wrote:
+> > > > > Changes last year to the dma-mapping api to no longer allow __GFP=
+_COMP,
+> > > > > in particular these two (from the e529d3507a93 dma-mapping pull f=
+or
+> > > > > 6.2):
+> > > >=20
+> > > > That's complete BS.  The driver was broken since day 1 and always
+> > > > ignored the DMA API requirement to never try to grab the page from =
+the
+> > > > dma coherent allocation because you generally speaking can't.  It j=
+ust
+> > > > happened to accidentally work the trivial dma coherent allocator th=
+at
+> > > > is used on x86.
+> > > >=20
+> > >=20
+> > > re-sending since gmail decided to not send plain text:
+> > >=20
+> > > Yes, I agree that it has been broken and misusing the API. Greg's
+> > > question was what changed though, and it was the clean up of
+> > > __GFP_COMP in dma-mapping that brought the problem in the driver to
+> > > light.
+> > >=20
+> > > I already said the other day that cnic has been doing this for 14
+> > > years. I'm not blaming you or your __GFP_COMP cleanup commits, they
+> > > just uncovered that cnic was doing something wrong. My apologies if
+> > > you took it that way.
+> >=20
+> > As these devices aren't being made anymore, and this api is really not =
+a
+> > good idea in the first place, why don't we just leave it broken and see
+> > if anyone notices?
+> >=20
+> Guess what triggered this mail thread.
+> Some customers did notice.
 >=20
-> This patch adds the BCM5221 PHY support by reusing brcm_fet_*()
-> callbacks and adding quirks for BCM5221 when needed.
->=20
-> Cc: Jim Reinhart <jimr@tekvox.com>
-> Cc: James Autry <jautry@tekvox.com>
-> Cc: Matthew Maron <matthewm@tekvox.com>
-> Signed-off-by: Giulio Benetti <giulio.benetti+tekvox@benettiengineering.c=
-om>
-> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
-> ---
-> V1->V2:
-> Suggested by Andrew Lunn:
-> * handle mdix_ctrl adding bcm5221_config_aneg() and bcm5221_read_status()
-> * reorder PHY_ID_BCM5241 in broadcom_tbl[]
-> Suggested by Russell King:
-> * add comment on phy_read(..., MII_BRCM_FET_INTREG)
-> * lock mdio bus when in shadow mode
-> Suggested by Florian Fainelli:
-> * reuse brcm_fet_*() callbacks checking for phy_id =3D=3D PHY_ID_BCM5221
->=20
-> V2->V3:
-> * rebase on master branch
+> Problem is that these devices were built as the network interface in=20
+> some bladecenter machines, so you can't just replace them with a=20
+> different Ethernet card.
 
-LGTM, but waiting an extra bit for explicit ack from Florian.
+This route looks a no-go.
+
+Out of sheer ignorance, would the iommu hack hinted in the cover letter
+require similar controversial changes?
 
 Cheers,
 
