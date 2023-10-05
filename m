@@ -1,135 +1,230 @@
-Return-Path: <netdev+bounces-38231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EE6C7B9D03
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:37:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6207B9D0E
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id D99B3B20A89
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 12:37:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id DA7F2281C93
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 12:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A827E15E90;
-	Thu,  5 Oct 2023 12:37:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E75134C8;
+	Thu,  5 Oct 2023 12:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnYQeBCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA7615E80
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 12:37:19 +0000 (UTC)
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E15A26A50;
-	Thu,  5 Oct 2023 05:37:16 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9b2cee55056so174066266b.3;
-        Thu, 05 Oct 2023 05:37:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696509433; x=1697114233;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g1QRKkBNjznWASHX/P+4TGpYOnsgJ03ZF7D0qhU3Ymk=;
-        b=THZhQKjBURgWFrHOguq0FKgavxdXtW620tLZcSdNpjWRChw9exBJYzQRfok/Ak9Wj9
-         kn7JCff//bOBiALqTsFWDEyagWD0s3GJIQvtr7uYbNznitbeTEe1wJStwX96/TTuz6QJ
-         r4gbdA3jI91SMZ9z8JHwgFToFQrfq7tAEYFDTrvFIw4bYVf8rlbJ8pjlxeV8wQffnX5X
-         3SQG0jMmhHSoyvr9+Cp2it40DJPR/kWXoFEl/uJHCl2Lf1VfECgHIKWYXON+77gbZ03k
-         YRSilmTofOfGykgwQVxKZp+3/7y2M51bXVe2k0XhI+B34sKyLFpHCSLpi49jbgRmIlTd
-         44oQ==
-X-Gm-Message-State: AOJu0Yy6fuD89YdQTndK7yXcQ8ASSqz9V7Bui/U1iBxWsn2ko50DKvdV
-	YK1TLTo/zbW/OXvKdfypPZU=
-X-Google-Smtp-Source: AGHT+IEFrhWzf73Qi+s9hSUvWpt+21JCI4T91oVdGuvxeB+YC2q1crDLgs/yjf+gkDjXUoiymGjgvQ==
-X-Received: by 2002:a17:906:3051:b0:9a5:7759:19c0 with SMTP id d17-20020a170906305100b009a5775919c0mr4687111ejd.64.1696509432977;
-        Thu, 05 Oct 2023 05:37:12 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-007.fbsv.net. [2a03:2880:31ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id e25-20020a1709062c1900b009adc77fe164sm1156979ejh.66.2023.10.05.05.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 05:37:12 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: jlbec@evilplan.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	Eric Dumazet <edumazet@google.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: hch@lst.de,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION)
-Subject: [PATCH net-next v2 3/3] Documentation: netconsole: add support for cmdline targets
-Date: Thu,  5 Oct 2023 05:36:36 -0700
-Message-Id: <20231005123637.2685334-4-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231005123637.2685334-1-leitao@debian.org>
-References: <20231005123637.2685334-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3162017F5
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 12:44:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1880C3279C;
+	Thu,  5 Oct 2023 12:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696509897;
+	bh=tfP78HkdL2aboDchfP7ZoYSDLCLouHOG9G2V0CQzbiI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TnYQeBCHeTPdu4n9iiu7+5L3J+kLoVMQkmnPfWS6z+qjC6EryDY+tsf3PsbdE4r/Y
+	 ontRAVI/JXGFC1YDwiJejv6LJ7xdAN5WizhwtZdC7/RY0vB/cw29XXrapjcH3WvJHW
+	 /fEEvpCOb0UnQ3wkBkXQnUzNrB5VsgExVkWu0nkcbF8Z5q4s9sqAYKmP5Tt5f4hmHU
+	 PhyB4dEISSZ0nxu5ZJr2YOS4gsloJhAUTXv1KkoG7Mun/DkbhPykOzcuWlvyq1INPW
+	 ItTeaG4lKNw4EGXfa2fbBgMJyOItFyPKHUcFyivOTgInaTAi0jq6lhceqtqYWnkEBf
+	 FE//vq5P6upZQ==
+Date: Thu, 5 Oct 2023 14:44:53 +0200
+From: Simon Horman <horms@kernel.org>
+To: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev, lkp@intel.com,
+	Sean Tranchetti <quic_stranche@quicinc.com>
+Subject: Re: [PATCH net-next v3] net: qualcomm: rmnet: Add side band flow
+ control support
+Message-ID: <ZR6vxaot4AP7FXTg@kernel.org>
+References: <20231004204320.1068010-1-quic_subashab@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004204320.1068010-1-quic_subashab@quicinc.com>
 
-With the previous patches, there is no more limitation at modifying the
-targets created at boot time (or module load time).
+On Wed, Oct 04, 2023 at 01:43:20PM -0700, Subash Abhinov Kasiviswanathan wrote:
+> Individual rmnet devices map to specific network types such as internet,
+> multimedia messaging services, IP multimedia subsystem etc. Each of
+> these network types may support varying quality of service for different
+> bearers or traffic types.
+> 
+> The physical device interconnect to radio hardware may support a
+> higher data rate than what is actually supported by the radio network.
+> Any packets transmitted to the radio hardware which exceed the radio
+> network data rate limit maybe dropped. This patch tries to minimize the
+> loss of packets by adding support for bearer level flow control within a
+> rmnet device by ensuring that the packets transmitted do not exceed the
+> limit allowed by the radio network.
+> 
+> In order to support multiple bearers, rmnet must be created as a
+> multiqueue TX netdevice. Radio hardware communicates the supported
+> bearer information for a given network via side band signalling.
+> Consider the following mapping -
+> 
+> IPv4 UDP port 1234 - Mark 0x1001 - Queue 1
+> IPv6 TCP port 2345 - Mark 0x2001 - Queue 2
+> 
+> iptables can be used to install filters which mark packets matching these
+> specific traffic patterns and the RMNET_QUEUE_MAPPING_ADD operation can
+> then be to install the mapping of the mark to the specific txqueue.
+> 
+> If the traffic limit is exceeded for a particular bearer, radio hardware
+> would notify that the bearer cannot accept more packets and the
+> corresponding txqueue traffic can be stopped using RMNET_QUEUE_DISABLE.
+> 
+> Conversely, if radio hardware can send more traffic for a particular
+> bearer, RMNET_QUEUE_ENABLE can be used to allow traffic on that
+> particular txqueue. RMNET_QUEUE_MAPPING_REMOVE can be used to remove the
+> mark to queue mapping in case the radio network doesn't support that
+> particular bearer any longer.
+> 
+> Signed-off-by: Sean Tranchetti <quic_stranche@quicinc.com>
+> Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
 
-Document the way on how to create the configfs directories to be able to
-modify these netconsole targets.
+Hi Subash and Sean,
 
-The design discussion about this topic could be found at:
-https://lore.kernel.org/all/ZRWRal5bW93px4km@gmail.com/
+a few comments on error handling from my side.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- Documentation/networking/netconsole.rst | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+...
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index 7a9de0568e84..390730a74332 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -99,9 +99,6 @@ Dynamic reconfiguration:
- Dynamic reconfigurability is a useful addition to netconsole that enables
- remote logging targets to be dynamically added, removed, or have their
- parameters reconfigured at runtime from a configfs-based userspace interface.
--[ Note that the parameters of netconsole targets that were specified/created
--from the boot/module option are not exposed via this interface, and hence
--cannot be modified dynamically. ]
- 
- To include this feature, select CONFIG_NETCONSOLE_DYNAMIC when building the
- netconsole module (or kernel, if netconsole is built-in).
-@@ -155,6 +152,25 @@ You can also update the local interface dynamically. This is especially
- useful if you want to use interfaces that have newly come up (and may not
- have existed when netconsole was loaded / initialized).
- 
-+Netconsole targets defined at boot time (or module load time) with the
-+`netconsole=` param are assigned the name `cmdline<index>`.  For example, the
-+first target in the parameter is named `cmdline0`.  You can control and modify
-+these targets by creating configfs directories with the matching name.
-+
-+Let's suppose you have two netconsole targets defined at boot time::
-+
-+ netconsole=4444@10.0.0.1/eth1,9353@10.0.0.2/12:34:56:78:9a:bc;4444@10.0.0.1/eth1,9353@10.0.0.3/12:34:56:78:9a:bc
-+
-+You can modify these targets in runtime by creating the following targets::
-+
-+ mkdir cmdline0
-+ cat cmdline0/remote_ip
-+ 10.0.0.2
-+
-+ mkdir cmdline1
-+ cat cmdline1/remote_ip
-+ 10.0.0.3
-+
- Extended console:
- =================
- 
--- 
-2.34.1
+> @@ -88,6 +90,66 @@ static int rmnet_register_real_device(struct net_device *real_dev,
+>  	return 0;
+>  }
+>  
+> +static int rmnet_update_queue_map(struct net_device *dev, u8 operation,
+> +				  u8 txqueue, u32 mark,
+> +				  struct netlink_ext_ack *extack)
+> +{
+> +	struct rmnet_priv *priv = netdev_priv(dev);
+> +	struct netdev_queue *q;
+> +	void *p;
+> +	u8 txq;
+> +
+> +	if (unlikely(txqueue >= dev->num_tx_queues)) {
+> +		NL_SET_ERR_MSG_MOD(extack, "invalid txqueue");
+> +		return -EINVAL;
+> +	}
+> +
+> +	switch (operation) {
+> +	case RMNET_QUEUE_MAPPING_ADD:
+> +		p = xa_store(&priv->queue_map, mark, xa_mk_value(txqueue),
+> +			     GFP_ATOMIC);
+> +		if (xa_is_err(p)) {
+> +			NL_SET_ERR_MSG_MOD(extack, "unable to add mapping");
+> +			return -EINVAL;
+> +		}
+> +		break;
+> +	case RMNET_QUEUE_MAPPING_REMOVE:
+> +		p = xa_erase(&priv->queue_map, mark);
+> +		if (xa_is_err(p)) {
+> +			NL_SET_ERR_MSG_MOD(extack, "unable to remove mapping");
+> +			return -EINVAL;
+> +		}
+> +		break;
+> +	case RMNET_QUEUE_ENABLE:
+> +	case RMNET_QUEUE_DISABLE:
+> +		p = xa_load(&priv->queue_map, mark);
+> +		if (p && xa_is_value(p)) {
+> +			txq = xa_to_value(p);
+> +
+> +			q = netdev_get_tx_queue(dev, txq);
+> +			if (unlikely(!q)) {
+> +				NL_SET_ERR_MSG_MOD(extack,
+> +						   "unsupported queue mapping");
+> +				return -EINVAL;
+> +			}
+> +
+> +			if (operation == RMNET_QUEUE_ENABLE)
+> +				netif_tx_wake_queue(q);
+> +			else
+> +				netif_tx_stop_queue(q);
+> +		} else {
+> +			NL_SET_ERR_MSG_MOD(extack, "invalid queue mapping");
+> +			return -EINVAL;
+> +		}
+> +		break;
+> +	default:
+> +		NL_SET_ERR_MSG_MOD(extack, "unsupported operation");
+> +		return -EINVAL;
 
+I'm wondering if EOPNOTSUPP is appropriate here.
+
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static void rmnet_unregister_bridge(struct rmnet_port *port)
+>  {
+>  	struct net_device *bridge_dev, *real_dev, *rmnet_dev;
+> @@ -175,8 +237,24 @@ static int rmnet_newlink(struct net *src_net, struct net_device *dev,
+>  	netdev_dbg(dev, "data format [0x%08X]\n", data_format);
+>  	port->data_format = data_format;
+>  
+> +	if (data[IFLA_RMNET_QUEUE]) {
+> +		struct rmnet_queue_mapping *queue_map;
+> +
+> +		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
+> +		if (rmnet_update_queue_map(dev, queue_map->operation,
+> +					   queue_map->txqueue, queue_map->mark,
+> +					   extack))
+
+Should the return value of rmnet_update_queue_map() be stored in err
+so that it is also the return value of this function?
+
+> +			goto err3;
+> +
+> +		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
+> +			   queue_map->operation, queue_map->txqueue,
+> +			   queue_map->mark);
+> +	}
+> +
+>  	return 0;
+>  
+> +err3:
+> +	hlist_del_init_rcu(&ep->hlnode);
+
+Is a call to netdev_upper_dev_unlink() needed here?
+
+>  err2:
+>  	unregister_netdevice(dev);
+>  	rmnet_vnd_dellink(mux_id, port, ep);
+> @@ -352,6 +430,20 @@ static int rmnet_changelink(struct net_device *dev, struct nlattr *tb[],
+>  		}
+>  	}
+>  
+> +	if (data[IFLA_RMNET_QUEUE]) {
+> +		struct rmnet_queue_mapping *queue_map;
+> +
+> +		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
+> +		if (rmnet_update_queue_map(dev, queue_map->operation,
+> +					   queue_map->txqueue, queue_map->mark,
+> +					   extack))
+> +			return -EINVAL;
+
+I guess that with the current implementation of rmnet_update_queue_map()
+it makes no difference, but perhaps it would be better to return
+the return value of rmnet_update_queue_map() rather than hard coding
+-EINVAL here.
+
+> +
+> +		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
+> +			   queue_map->operation, queue_map->txqueue,
+> +			   queue_map->mark);
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+
+...
 
