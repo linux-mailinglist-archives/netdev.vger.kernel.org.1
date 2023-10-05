@@ -1,310 +1,107 @@
-Return-Path: <netdev+bounces-38300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73B77BA1DE
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:01:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6CB7BA1DD
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:01:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id F1846B20A75
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4D53B281F7C
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB142E62A;
-	Thu,  5 Oct 2023 15:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5602E63A;
+	Thu,  5 Oct 2023 15:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeA6QDV7"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="b5HkRgXM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7192E625
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:01:37 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 450495C6AE
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:50:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696517345;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a/yNHt/CLpU1k87Q82jDDK9Qnc6mSBeqZnRL1JtCpEw=;
-	b=PeA6QDV7ZNJJ8GJidFZzXvlM6LKMqT9FllKfyJmtLIYQai6AH33nj3S4Ot+/P3BCAXvjXT
-	KTFZ2eh6peBLgx9WG1wOJn060ZzIoKb7kfl7YyrGK5zQkO2SRhxPcu/C7G9XLpeEBRrhis
-	ZpkNEmUeiLfF6X7zTKg682M0FgT1QFw=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-aG1zMn4ZMeeNCsmCCV4HkQ-1; Thu, 05 Oct 2023 10:49:03 -0400
-X-MC-Unique: aG1zMn4ZMeeNCsmCCV4HkQ-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-59b59e1ac70so15569747b3.1
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 07:49:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF462374C
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:01:39 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B01514DF51
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:50:18 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-99c3c8adb27so193325766b.1
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 07:50:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696517416; x=1697122216; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=l2yZsVHLsd9Gf/3G1xrb7hl5PCatHdGXYN1ZP/+N1NI=;
+        b=b5HkRgXMj3jmeQT5iMXeMvlf9SbepJfm7eP1LHWKkirYxx5jKs9SARunaW+c+jhG20
+         mvauXQAmLcQx2Eq0fa5WJCCFvfpIoFEV3vBAJxxps2cOOJbRoRYh7BCHsOCw0d12gXKF
+         DM+3XEDG9PCSG4IkAVUikVJoMco/L01+9Tet6nBRs74yHNQhhUAubbFFr9Jw0cn0kjpI
+         IKbiJWdjyYmmMfCKeoT1NyBvRtlGCPJromTLg9xuP6vAzvtz7gs3cUPJXmWzNaWgSX0M
+         ubeob9I2WNgqslRMa5aOzOTw+U+vJXY0TFzFx31tep4iy8lEjA+Vmrg4SVZgsaNqsGxR
+         Xehg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696517343; x=1697122143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a/yNHt/CLpU1k87Q82jDDK9Qnc6mSBeqZnRL1JtCpEw=;
-        b=v/ZYhJhnDtCKk6ZWTByhk+mBFN/DcQt/gMZMwtZXVXQkLcaBUiCm17BqbFUZ8Uo4xs
-         KTwYMtSiPhZWudiQQ4DVcLwfyOlHgogzvJizvSI8z/VfgLvVmgekkNGT1N5iyFKDETDC
-         t2bi5QageJjl5kl27Y0AeecQkWgSzf8EvNk+Tcyhhd7FOOyjR64Xn5XaUetRHHmbiqbR
-         3g6Bjlbl1CYJF5/lYA29IsJOvmi8SYRj8t5zH4k3dbBAZVkx9UnBOxHEbSD2aHUU/XJV
-         tZEk5QxTUwU5Rj8q24qnamOKEJ1s+jJYg1JWEJsUMipYAli6Ki1izFPACfsfYru2LX0b
-         dLVw==
-X-Gm-Message-State: AOJu0YwfpwRWhAJ6Am3G0ycqm9ckd1AJXiSDONkNq2q5REapp5uA0zIb
-	I4q+z3C6NNXNaj6WAuimlkJto40DspjmIckR3kLXvH31XXHQJJYVo1RNHfZJnUmIDVjEa9ltY7X
-	ZNaFgXzmPXg6Ho/Yj3QctmHWphq6/p0DzVKC7BbU0
-X-Received: by 2002:a0d:d4c4:0:b0:59f:4c3a:711d with SMTP id w187-20020a0dd4c4000000b0059f4c3a711dmr5539976ywd.11.1696517342998;
-        Thu, 05 Oct 2023 07:49:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG8JZNkhK4RosNSHOVvt6DiJr3wTa8hoYOfAU8v71Y0P2njDI2akXwHoO4KlZ+xhR2ScGqHb3TX4k1sBDGrx0I=
-X-Received: by 2002:a0d:d4c4:0:b0:59f:4c3a:711d with SMTP id
- w187-20020a0dd4c4000000b0059f4c3a711dmr5539962ywd.11.1696517342733; Thu, 05
- Oct 2023 07:49:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696517416; x=1697122216;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l2yZsVHLsd9Gf/3G1xrb7hl5PCatHdGXYN1ZP/+N1NI=;
+        b=DownvKentRB9QsI79gYiK71Yv3nBcfHD/BddVqU8ussyoJoHvvdtqHFdvvyJKCKyAg
+         BA1xmB0DP4ki9cqTvTTjmM/NftYrHliKK7TAsQl6MRi3q7msw/4hwhhBdZzSTK3D1tvm
+         HFUQKbAryXndTL8TaD9PxkGyMVelo3rIcdjs978zWmEgNtTPvgO+CfR07sNDFC92L8ig
+         F7K/Geb5JnE8dJhxW4azD+JKfn+R14t5AYKkI+0WVKq2kpzA88ovrlvbsVNDfKr08NgC
+         Ibyio9Ogt+MnIhfzVcORQWYJeiiaGNcuE28D7hV0vUBc9Rz7VKWX7Q6a7n8FxERFspmQ
+         hW+w==
+X-Gm-Message-State: AOJu0YztE/MjorgAisoWRsl2D6qLZL3sTGi+v+/VpxwNhbib+ygIjMmH
+	fYJjWtLwIl+X4aCjWSs7Zs+nKQ==
+X-Google-Smtp-Source: AGHT+IFtoI1WxOWEk94azb2QahBk3G0jJM/LiFiNWFSgFTWGqRY5y/B24N9dAuodukIrMkAw9bemkQ==
+X-Received: by 2002:a17:907:780d:b0:9b6:4df9:e5b5 with SMTP id la13-20020a170907780d00b009b64df9e5b5mr5136647ejc.61.1696517416200;
+        Thu, 05 Oct 2023 07:50:16 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id l12-20020a170906078c00b00992b510089asm1309860ejc.84.2023.10.05.07.50.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 07:50:15 -0700 (PDT)
+Date: Thu, 5 Oct 2023 16:50:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, donald.hunter@gmail.com
+Subject: Re: [patch net-next v2 3/3] tools: ynl-gen: raise exception when
+ subset attribute contains more than "name" key
+Message-ID: <ZR7NJt3tdviFqb2a@nanopsycho>
+References: <20230929134742.1292632-1-jiri@resnulli.us>
+ <20230929134742.1292632-4-jiri@resnulli.us>
+ <20231004171350.1f59cd1d@kernel.org>
+ <ZR5lA7SwQr3ecUp9@nanopsycho>
+ <20231005072151.2a71ec59@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230928164550.980832-2-dtatulea@nvidia.com> <20230928164550.980832-16-dtatulea@nvidia.com>
- <CAJaqyWeRhJNZ8wbpEFARwBBNbE07n4xQdd-RvUoZooCeB4piPA@mail.gmail.com> <9f0ef4ebd801a35873561384b2aedc920faecd03.camel@nvidia.com>
-In-Reply-To: <9f0ef4ebd801a35873561384b2aedc920faecd03.camel@nvidia.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 5 Oct 2023 16:48:26 +0200
-Message-ID: <CAJaqyWeOXQiZ885vP_ffSnwhs0rAdORYHyROe-eXjLj2Xred1Q@mail.gmail.com>
-Subject: Re: [PATCH vhost 14/16] vdpa/mlx5: Enable hw support for vq
- descriptor mapping
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, Gal Pressman <gal@nvidia.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, 
-	"leon@kernel.org" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "mst@redhat.com" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231005072151.2a71ec59@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 5, 2023 at 2:16=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
+Thu, Oct 05, 2023 at 04:21:51PM CEST, kuba@kernel.org wrote:
+>On Thu, 5 Oct 2023 09:25:55 +0200 Jiri Pirko wrote:
+>> >> The only key used in the elem dictionary is "name" to lookup the real
+>> >> attribute of a set. Raise exception in case there are other keys
+>> >> present.  
+>> >
+>> >Mm, there are definitely other things that can be set. I'm not fully  
+>> 
+>> Which ones? The name is used, the rest is ignored in the existing code.
+>> I just make this obvious to the user. If future show other keys are
+>> needed here, the patch adding that would just adjust the exception
+>> condition. Do you see any problem in that?
 >
-> On Thu, 2023-10-05 at 11:42 +0200, Eugenio Perez Martin wrote:
-> > On Thu, Sep 28, 2023 at 6:50=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia=
-.com> wrote:
-> > >
-> > > Vq descriptor mappings are supported in hardware by filling in an
-> > > additional mkey which contains the descriptor mappings to the hw vq.
-> > >
-> > > A previous patch in this series added support for hw mkey (mr) creati=
-on
-> > > for ASID 1.
-> > >
-> > > This patch fills in both the vq data and vq descriptor mkeys based on
-> > > group ASID mapping.
-> > >
-> > > The feature is signaled to the vdpa core through the presence of the
-> > > .get_vq_desc_group op.
-> > >
-> > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > > ---
-> > >  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 26 ++++++++++++++++++++++++--
-> > >  include/linux/mlx5/mlx5_ifc_vdpa.h |  7 ++++++-
-> > >  2 files changed, 30 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > index 25bd2c324f5b..46441e41892c 100644
-> > > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> > > @@ -823,6 +823,7 @@ static int create_virtqueue(struct mlx5_vdpa_net =
-*ndev,
-> > > struct mlx5_vdpa_virtque
-> > >         u32 out[MLX5_ST_SZ_DW(create_virtio_net_q_out)] =3D {};
-> > >         struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
-> > >         struct mlx5_vdpa_mr *vq_mr;
-> > > +       struct mlx5_vdpa_mr *vq_desc_mr;
-> > >         void *obj_context;
-> > >         u16 mlx_features;
-> > >         void *cmd_hdr;
-> > > @@ -878,6 +879,11 @@ static int create_virtqueue(struct mlx5_vdpa_net=
- *ndev,
-> > > struct mlx5_vdpa_virtque
-> > >         vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GROUP]=
-];
-> > >         if (vq_mr)
-> > >                 MLX5_SET(virtio_q, vq_ctx, virtio_q_mkey, vq_mr->mkey=
-);
-> > > +
-> > > +       vq_desc_mr =3D mvdev->mr[mvdev-
-> > > >group2asid[MLX5_VDPA_DATAVQ_DESC_GROUP]];
-> > > +       if (vq_desc_mr)
-> > > +               MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_desc_m=
-r-
-> > > >mkey);
-> > > +
-> > >         MLX5_SET(virtio_q, vq_ctx, umem_1_id, mvq->umem1.id);
-> > >         MLX5_SET(virtio_q, vq_ctx, umem_1_size, mvq->umem1.size);
-> > >         MLX5_SET(virtio_q, vq_ctx, umem_2_id, mvq->umem2.id);
-> > > @@ -2265,6 +2271,16 @@ static u32 mlx5_vdpa_get_vq_group(struct vdpa_=
-device
-> > > *vdev, u16 idx)
-> > >         return MLX5_VDPA_DATAVQ_GROUP;
-> > >  }
-> > >
-> > > +static u32 mlx5_vdpa_get_vq_desc_group(struct vdpa_device *vdev, u16=
- idx)
-> > > +{
-> > > +       struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
-> > > +
-> > > +       if (is_ctrl_vq_idx(mvdev, idx))
-> > > +               return MLX5_VDPA_CVQ_GROUP;
-> > > +
-> > > +       return MLX5_VDPA_DATAVQ_DESC_GROUP;
-> > > +}
-> > > +
-> > >  static u64 mlx_to_vritio_features(u16 dev_features)
-> > >  {
-> > >         u64 result =3D 0;
-> > > @@ -3139,7 +3155,7 @@ static int mlx5_set_group_asid(struct vdpa_devi=
-ce
-> > > *vdev, u32 group,
-> > >  {
-> > >         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
-> > >
-> > > -       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS)
-> > > +       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS || asid >=3D MLX5_VDPA_=
-NUM_AS)
-> >
-> > Nit: the check for asid >=3D MLX5_VDPA_NUM_AS is redundant, as it will
-> > be already checked by VHOST_VDPA_SET_GROUP_ASID handler in
-> > drivers/vhost/vdpa.c:vhost_vdpa_vring_ioctl. Not a big deal.
-> Ack.
->
-> >
-> > >                 return -EINVAL;
-> > >
-> > >         mvdev->group2asid[group] =3D asid;
-> > > @@ -3160,6 +3176,7 @@ static const struct vdpa_config_ops mlx5_vdpa_o=
-ps =3D {
-> > >         .get_vq_irq =3D mlx5_get_vq_irq,
-> > >         .get_vq_align =3D mlx5_vdpa_get_vq_align,
-> > >         .get_vq_group =3D mlx5_vdpa_get_vq_group,
-> > > +       .get_vq_desc_group =3D mlx5_vdpa_get_vq_desc_group, /* Op dis=
-abled if
-> > > not supported. */
-> > >         .get_device_features =3D mlx5_vdpa_get_device_features,
-> > >         .set_driver_features =3D mlx5_vdpa_set_driver_features,
-> > >         .get_driver_features =3D mlx5_vdpa_get_driver_features,
-> > > @@ -3258,6 +3275,7 @@ struct mlx5_vdpa_mgmtdev {
-> > >         struct vdpa_mgmt_dev mgtdev;
-> > >         struct mlx5_adev *madev;
-> > >         struct mlx5_vdpa_net *ndev;
-> > > +       struct vdpa_config_ops vdpa_ops;
-> > >  };
-> > >
-> > >  static int config_func_mtu(struct mlx5_core_dev *mdev, u16 mtu)
-> > > @@ -3371,7 +3389,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_d=
-ev
-> > > *v_mdev, const char *name,
-> > >                 max_vqs =3D 2;
-> > >         }
-> > >
-> > > -       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, =
-mdev-
-> > > >device, &mlx5_vdpa_ops,
-> > > +       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, =
-mdev-
-> > > >device, &mgtdev->vdpa_ops,
-> > >                                  MLX5_VDPA_NUMVQ_GROUPS, MLX5_VDPA_NU=
-M_AS,
-> > > name, false);
-> > >         if (IS_ERR(ndev))
-> > >                 return PTR_ERR(ndev);
-> > > @@ -3546,6 +3564,10 @@ static int mlx5v_probe(struct auxiliary_device=
- *adev,
-> > >                 MLX5_CAP_DEV_VDPA_EMULATION(mdev, max_num_virtio_queu=
-es) +
-> > > 1;
-> > >         mgtdev->mgtdev.supported_features =3D get_supported_features(=
-mdev);
-> > >         mgtdev->madev =3D madev;
-> > > +       mgtdev->vdpa_ops =3D mlx5_vdpa_ops;
-> > > +
-> > > +       if (!MLX5_CAP_DEV_VDPA_EMULATION(mdev, desc_group_mkey_suppor=
-ted))
-> > > +               mgtdev->vdpa_ops.get_vq_desc_group =3D NULL;
-> >
-> > I think this is better handled by splitting mlx5_vdpa_ops in two: One
-> > with get_vq_desc_group and other without it. You can see an example of
-> > this in the simulator, where one version supports .dma_map incremental
-> > updating with .dma_map and the other supports .set_map. Otherwise,
-> > this can get messy if more members opt-out or opt-in.
-> >
-> I implemented it this way because the upcoming resumable vq support will =
-also
-> need to selectively implement .resume if the hw capability is there. That=
- would
-> result in needing 4 different ops for all combinations. The other option =
-would
-> be to force these two ops together (.get_vq_desc_group and .resume). But =
-I would
-> prefer to not do that.
->
+>Just don't want to give people the impression that this is what's
+>intended, rather than it was simply not implemented yet.
+>If you want to keep the exception please update the message
+>(and the if, no outer brackets necessary in Python ;)).
 
-That's a good point. As more features are optional per device, maybe
-this approach is better.
-
-I'm not sure what Jason prefers, but I think it would be easy to
-change it on top.
-
-Thanks!
-
-> > But I'm ok with this too, so whatever version you choose:
-> >
-> > Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> >
-> > >
-> > >         err =3D vdpa_mgmtdev_register(&mgtdev->mgtdev);
-> > >         if (err)
-> > > diff --git a/include/linux/mlx5/mlx5_ifc_vdpa.h
-> > > b/include/linux/mlx5/mlx5_ifc_vdpa.h
-> > > index 9becdc3fa503..b86d51a855f6 100644
-> > > --- a/include/linux/mlx5/mlx5_ifc_vdpa.h
-> > > +++ b/include/linux/mlx5/mlx5_ifc_vdpa.h
-> > > @@ -74,7 +74,11 @@ struct mlx5_ifc_virtio_q_bits {
-> > >         u8    reserved_at_320[0x8];
-> > >         u8    pd[0x18];
-> > >
-> > > -       u8    reserved_at_340[0xc0];
-> > > +       u8    reserved_at_340[0x20];
-> > > +
-> > > +       u8    desc_group_mkey[0x20];
-> > > +
-> > > +       u8    reserved_at_380[0x80];
-> > >  };
-> > >
-> > >  struct mlx5_ifc_virtio_net_q_object_bits {
-> > > @@ -141,6 +145,7 @@ enum {
-> > >         MLX5_VIRTQ_MODIFY_MASK_STATE                    =3D (u64)1 <<=
- 0,
-> > >         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_PARAMS      =3D (u64)1 <<=
- 3,
-> > >         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_DUMP_ENABLE =3D (u64)1 <<=
- 4,
-> > > +       MLX5_VIRTQ_MODIFY_MASK_DESC_GROUP_MKEY          =3D (u64)1 <<=
- 14,
-> > >  };
-> > >
-> > >  enum {
-> > > --
-> > > 2.41.0
-> > >
-> >
->
-
+I don't mind dropping the patch entirely. I just thought it would be
+nice to do some sanitization so the user is not surprised that other
+possible keys are ignored. I tried and I was :)
 
