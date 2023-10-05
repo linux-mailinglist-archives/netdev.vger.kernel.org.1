@@ -1,92 +1,109 @@
-Return-Path: <netdev+bounces-38218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C8F7B9CC6
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:40:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C2BB7B9CC8
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 221421C20837
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 11:40:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 68ECD281AB9
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 11:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C5A134A7;
-	Thu,  5 Oct 2023 11:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1F6134A8;
+	Thu,  5 Oct 2023 11:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TekfBu60"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lrd+4GNY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30DB11CA6
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:40:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EFF8C4936D;
-	Thu,  5 Oct 2023 11:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D29F125B9
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:44:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1559C3278F;
+	Thu,  5 Oct 2023 11:43:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696506029;
-	bh=4pACL5HWda+e9AWnT6cUgDZsSSumw6F/Dt93tnglR4E=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TekfBu60DC1HnNcqn+WzLmFOtqME+V68pkPq27Agt9AS+tAkaLLqelmSGTJaBjMZi
-	 xZYZC6hBRU1mNhvy6StTM4yL8wrIn4sSyK0LdQyTTXAbOhrZ51cGPQ7hj+xpoZJ97v
-	 WJAUlfH/V0PHkuugyChPKGMemOXLFlJympdy4Gv7Ec2wxpQH5RW4y7PnAZOiOxKnQX
-	 Px9ziBiuPqHTRz+kKzP6qcaJZ+dnDAFlqJSIpWU6w34iY7balopgAdZkOI+SFgdUb3
-	 Nb00fJj/z4kAaygL8Q/fa+HtZZb7oMQ/0s1jMZpj98Uxd6I4S0mLTIgNyD2BzPTZk8
-	 Pht0ba5J+OcXw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EAC67E11F51;
-	Thu,  5 Oct 2023 11:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696506241;
+	bh=9S3XPaei5Hs4cBIZ21emTSZSs610PV4eDaKI5Q00L8w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Lrd+4GNYq6JYWhNiUPWJFO2CMFBR3kkJkrV24vDshQ2pi2sCFehGj90t00bX2kgOl
+	 duguPsgCc1M7yC/UFYzpoXpc8voUQi0/GqCr2Eo2MatQ84CpUH2QhKTAlQhcLdilry
+	 wejIeQCmTy5zXzs90zAEKXRw6ljLr4DvsvSifKBbsdddDOIkTFM/wMmkzlWBJsh3of
+	 Kx6wu6OF4FIT3i9PiFdRFHznTLCLbSq9jq4PZM3dDq2Vro2TRyKVuiVs0ijiIaQcVz
+	 WOKxRT1OIKo4OJIOWEamVVhDHiHTz4DzHFhMnCUq9yzY4jVXXaBbO1VFssgci6hy7Y
+	 JKEbE7J7kkIDw==
+Date: Thu, 5 Oct 2023 13:43:56 +0200
+From: Simon Horman <horms@kernel.org>
+To: Remi Pommarel <repk@triplefau.lt>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: stmmac: remove unneeded
+ stmmac_poll_controller
+Message-ID: <ZR6hfMSSbMvHozaM@kernel.org>
+References: <1c156a6d8c9170bd6a17825f2277115525b4d50f.1696429960.git.repk@triplefau.lt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/4] net_sched: sch_fq: add WRR scheduling and 3
- bands
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169650602895.11144.4055004484580068482.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Oct 2023 11:40:28 +0000
-References: <20231002131738.1868703-1-edumazet@google.com>
-In-Reply-To: <20231002131738.1868703-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- willemb@google.com, soheil@google.com, ncardwell@google.com,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, toke@redhat.com,
- jiri@resnulli.us, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c156a6d8c9170bd6a17825f2277115525b4d50f.1696429960.git.repk@triplefau.lt>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon,  2 Oct 2023 13:17:34 +0000 you wrote:
-> As discussed in Netconf 2023 in Paris last week, this series adds
-> to FQ the possibility of replacing pfifo_fast for most setups.
+On Wed, Oct 04, 2023 at 04:33:56PM +0200, Remi Pommarel wrote:
+> Using netconsole netpoll_poll_dev could be called from interrupt
+> context, thus using disable_irq() would cause the following kernel
+> warning with CONFIG_DEBUG_ATOMIC_SLEEP enabled:
 > 
-> FQ provides fairness among flows, but malicious applications
-> can cause problems by using thousands of sockets.
+>   BUG: sleeping function called from invalid context at kernel/irq/manage.c:137
+>   in_atomic(): 1, irqs_disabled(): 128, non_block: 0, pid: 10, name: ksoftirqd/0
+>   CPU: 0 PID: 10 Comm: ksoftirqd/0 Tainted: G        W         5.15.42-00075-g816b502b2298-dirty #117
+>   Hardware name: aml (r1) (DT)
+>   Call trace:
+>    dump_backtrace+0x0/0x270
+>    show_stack+0x14/0x20
+>    dump_stack_lvl+0x8c/0xac
+>    dump_stack+0x18/0x30
+>    ___might_sleep+0x150/0x194
+>    __might_sleep+0x64/0xbc
+>    synchronize_irq+0x8c/0x150
+>    disable_irq+0x2c/0x40
+>    stmmac_poll_controller+0x140/0x1a0
+>    netpoll_poll_dev+0x6c/0x220
+>    netpoll_send_skb+0x308/0x390
+>    netpoll_send_udp+0x418/0x760
+>    write_msg+0x118/0x140 [netconsole]
+>    console_unlock+0x404/0x500
+>    vprintk_emit+0x118/0x250
+>    dev_vprintk_emit+0x19c/0x1cc
+>    dev_printk_emit+0x90/0xa8
+>    __dev_printk+0x78/0x9c
+>    _dev_warn+0xa4/0xbc
+>    ath10k_warn+0xe8/0xf0 [ath10k_core]
+>    ath10k_htt_txrx_compl_task+0x790/0x7fc [ath10k_core]
+>    ath10k_pci_napi_poll+0x98/0x1f4 [ath10k_pci]
+>    __napi_poll+0x58/0x1f4
+>    net_rx_action+0x504/0x590
+>    _stext+0x1b8/0x418
+>    run_ksoftirqd+0x74/0xa4
+>    smpboot_thread_fn+0x210/0x3c0
+>    kthread+0x1fc/0x210
+>    ret_from_fork+0x10/0x20
 > 
-> Having 3 bands like pfifo_fast can make sure that applications
-> using high prio packets (eg AF4) can get guaranteed throughput
-> even if thousands of low priority flows are competing.
+> Since [0] .ndo_poll_controller is only needed if driver doesn't or
+> partially use NAPI. Because stmmac does so, stmmac_poll_controller
+> can be removed fixing the above warning.
 > 
-> [...]
+> [0] commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
+> 
+> Cc: <stable@vger.kernel.org> # 5.15.x
+> Fixes: 47dd7a540b8a ("net: add support for STMicroelectronics Ethernet controllers")
+> Signed-off-by: Remi Pommarel <repk@triplefau.lt>
 
-Here is the summary with links:
-  - [v2,net-next,1/4] net_sched: sch_fq: remove q->ktime_cache
-    https://git.kernel.org/netdev/net-next/c/2ae45136a938
-  - [v2,net-next,2/4] net_sched: export pfifo_fast prio2band[]
-    https://git.kernel.org/netdev/net-next/c/5579ee462dfe
-  - [v2,net-next,3/4] net_sched: sch_fq: add 3 bands and WRR scheduling
-    https://git.kernel.org/netdev/net-next/c/29f834aa326e
-  - [v2,net-next,4/4] net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
-    https://git.kernel.org/netdev/net-next/c/49e7265fd098
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
