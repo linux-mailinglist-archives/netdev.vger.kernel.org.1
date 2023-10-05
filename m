@@ -1,183 +1,144 @@
-Return-Path: <netdev+bounces-38196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB247B9BEC
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:49:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 000AE7B9BEF
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2BFBA1C2089C
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 08:49:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 159BC1C20853
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 08:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187E97479;
-	Thu,  5 Oct 2023 08:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094B2DDAD;
+	Thu,  5 Oct 2023 08:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EasewVdw"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE0420E3
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 08:49:48 +0000 (UTC)
-Received: from mail-oa1-x4d.google.com (mail-oa1-x4d.google.com [IPv6:2001:4860:4864:20::4d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B14F903D
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 01:49:46 -0700 (PDT)
-Received: by mail-oa1-x4d.google.com with SMTP id 586e51a60fabf-1dcf6a4378bso905055fac.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 01:49:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696495784; x=1697100584;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O5CT72nr6fyLIM2HBIZewHuJMtsZSdhGCa8W/NlrzdE=;
-        b=KTdFN1NSllT3yeNWjPsD32W851ZK/czCfzAl4nntKPGpu5ejkT26RCisYTRD3Zw+GJ
-         ulse6CTdKkYdSnT5QY9dlshJ21luWbClDwnmah/jyHDPpsCjggZz0yr6/GGvI40QL+FG
-         puM7mUgWpIs1vcdh6fNM8S6raVmxHckauMqpdiaxlVU341hZLCx7Za/B2UVVj0GRLH5R
-         3Dl3NxM1dAxQUvFomyaFJ7g2glED4lg+PR8QLC9imgKUIEpYxEmWAYxNTFZ7MvH29gAa
-         KlebX5zsJREtblFcC8TP9bohEdV856zcH7kIHoge7Q9z3J19eL8iLzz5GPTbmFOHyIph
-         c26w==
-X-Gm-Message-State: AOJu0YwPPY/O7SolLoPNA+opM+BBDY0tHS+MhmjnKmdMTDW3NqVg4OkT
-	2UlRymmDoPCjaU9mU03/61VFuQqDuuWgnTqLYmunK4hf4Zuo
-X-Google-Smtp-Source: AGHT+IHo2mnMCI10UV5TXKADf/v1RkgnT7tekZCDwNptOcZZfYxVDZ7TggD0WGNuei7CQm9SVjBSkU+Mt7tLm3HnsTxz0UA+JsN/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5D75690
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 08:52:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 090C0C116B4;
+	Thu,  5 Oct 2023 08:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696495954;
+	bh=kdOVueCUGc2zsRpYF5bysHxKXG55y67tcQidRcCIZ4U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EasewVdwafoq1yx5+UNUcJalaL3xX5dSjjN+pyIqUFn5/aR2m2nSP3mS4on9JKg+p
+	 G/jLyzOGa/cKdy//fnXTwvpp96dopSUsnkSx2WE4GLx0Bm1f/JAmZfpvUZTIZPVj8c
+	 lm8nU3NWPMw3WioArHBHdUbVEe7FeZf0o1VB00JzAsvhpfzC22EHj1U+rFiqLG0HAz
+	 GUkMU9x6PZkzDq9NaG444korw8CX4jNAahoJb6tBBt7sMiHxnHAxj7wmG10UurFtSo
+	 u9QGCVeT5zvvssOZBONO3snD22mkZ8XicLO5YoX2qrprbxPBoOxpAPLEP4sVvN6AHz
+	 eAw0TOVqn1T/Q==
+Date: Thu, 5 Oct 2023 10:52:30 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>, linux-nfs@vger.kernel.org,
+	neilb@suse.de, chuck.lever@oracle.com, netdev@vger.kernel.org
+Subject: Re: [PATCH] NFSD: convert write_threads and write_v4_end_grace to
+ netlink commands
+Message-ID: <ZR55TnN4Sr/O5z4a@lore-desk>
+References: <b7985d6f0708d4a2836e1b488d641cdc11ace61b.1695386483.git.lorenzo@kernel.org>
+ <cc6341a7c5f09b731298236b260c9dfd94a811d8.camel@kernel.org>
+ <ZQ2+1NhagxR5bZF+@lore-desk>
+ <20231004100428.3ca993aa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:1a89:b0:1d6:e8f0:4c47 with SMTP id
- ef9-20020a0568701a8900b001d6e8f04c47mr1782979oab.9.1696495782543; Thu, 05 Oct
- 2023 01:49:42 -0700 (PDT)
-Date: Thu, 05 Oct 2023 01:49:42 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007b47270606f43464@google.com>
-Subject: [syzbot] [net?] [wireless?] memory leak in regulatory_init_db
-From: syzbot <syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    3b517966c561 Merge tag 'dma-mapping-6.6-2023-09-30' of git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=130dac2a680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aa96152f5a3192e3
-dashboard link: https://syzkaller.appspot.com/bug?extid=39ec16ff6cc18b1d066d
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1695bd3e680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ae8c4e680000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/cb67ab976a91/disk-3b517966.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/21326eb3ef67/vmlinux-3b517966.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a95555fe120/bzImage-3b517966.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com
-
-executing program
-BUG: memory leak
-unreferenced object 0xffff888108f880c0 (size 64):
-  comm "swapper/0", pid 1, jiffies 4294938895 (age 68.260s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    ff ff ff ff 00 00 00 00 00 00 00 00 30 30 00 00  ............00..
-  backtrace:
-    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
-    [<ffffffff875a3f05>] kmalloc include/linux/slab.h:599 [inline]
-    [<ffffffff875a3f05>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff875a3f05>] regulatory_hint_core net/wireless/reg.c:3218 [inline]
-    [<ffffffff875a3f05>] regulatory_init_db+0xe5/0x1d0 net/wireless/reg.c:4290
-    [<ffffffff81001cb6>] do_one_initcall+0x76/0x430 init/main.c:1232
-    [<ffffffff874d86ea>] do_initcall_level init/main.c:1294 [inline]
-    [<ffffffff874d86ea>] do_initcalls init/main.c:1310 [inline]
-    [<ffffffff874d86ea>] do_basic_setup init/main.c:1329 [inline]
-    [<ffffffff874d86ea>] kernel_init_freeable+0x25a/0x460 init/main.c:1547
-    [<ffffffff84b3928b>] kernel_init+0x1b/0x290 init/main.c:1437
-    [<ffffffff81149f25>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
-    [<ffffffff81002be1>] ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-
-BUG: memory leak
-unreferenced object 0xffff88814490d800 (size 2048):
-  comm "syz-executor220", pid 5026, jiffies 4294943369 (age 23.530s)
-  hex dump (first 32 bytes):
-    d8 4c a8 0d 81 88 ff ff 22 01 00 00 00 00 ad de  .L......".......
-    00 00 00 00 ff ff ff ff ff ff 00 aa aa aa aa aa  ................
-  backtrace:
-    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
-    [<ffffffff84527e6f>] kmalloc include/linux/slab.h:599 [inline]
-    [<ffffffff84527e6f>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff84527e6f>] hci_conn_add+0x4f/0x5e0 net/bluetooth/hci_conn.c:957
-    [<ffffffff84528668>] hci_connect_acl+0x198/0x1b0 net/bluetooth/hci_conn.c:1632
-    [<ffffffff8452b4cb>] hci_connect_sco+0x4b/0x520 net/bluetooth/hci_conn.c:1685
-    [<ffffffff8459d6b3>] sco_connect net/bluetooth/sco.c:266 [inline]
-    [<ffffffff8459d6b3>] sco_sock_connect+0x1c3/0x520 net/bluetooth/sco.c:591
-    [<ffffffff83e96b01>] __sys_connect_file+0x91/0xb0 net/socket.c:2033
-    [<ffffffff83e96c06>] __sys_connect+0xe6/0x110 net/socket.c:2050
-    [<ffffffff83e96c4c>] __do_sys_connect net/socket.c:2060 [inline]
-    [<ffffffff83e96c4c>] __se_sys_connect net/socket.c:2057 [inline]
-    [<ffffffff83e96c4c>] __x64_sys_connect+0x1c/0x20 net/socket.c:2057
-    [<ffffffff84b33fc8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-    [<ffffffff84b33fc8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
-    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-BUG: memory leak
-unreferenced object 0xffff8881091dc400 (size 512):
-  comm "kworker/u5:2", pid 5022, jiffies 4294943869 (age 18.530s)
-  hex dump (first 32 bytes):
-    00 d8 90 44 81 88 ff ff c0 b9 e2 0c 81 88 ff ff  ...D............
-    fd 03 00 00 00 00 00 00 00 06 0c 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
-    [<ffffffff845627dd>] kmalloc include/linux/slab.h:599 [inline]
-    [<ffffffff845627dd>] kzalloc include/linux/slab.h:720 [inline]
-    [<ffffffff845627dd>] l2cap_conn_add.part.0+0x3d/0x340 net/bluetooth/l2cap_core.c:7845
-    [<ffffffff845703b4>] l2cap_conn_add net/bluetooth/l2cap_core.c:71 [inline]
-    [<ffffffff845703b4>] l2cap_connect_cfm+0x264/0x740 net/bluetooth/l2cap_core.c:8242
-    [<ffffffff8452ba43>] hci_connect_cfm include/net/bluetooth/hci_core.h:1935 [inline]
-    [<ffffffff8452ba43>] hci_conn_failed+0xa3/0x120 net/bluetooth/hci_conn.c:1251
-    [<ffffffff84594cc6>] hci_abort_conn_sync+0x4d6/0x6d0 net/bluetooth/hci_sync.c:5435
-    [<ffffffff8452560d>] abort_conn_sync+0x7d/0xa0 net/bluetooth/hci_conn.c:2894
-    [<ffffffff8458b3ad>] hci_cmd_sync_work+0xcd/0x150 net/bluetooth/hci_sync.c:306
-    [<ffffffff812c8d9d>] process_one_work+0x23d/0x530 kernel/workqueue.c:2630
-    [<ffffffff812c99c7>] process_scheduled_works kernel/workqueue.c:2703 [inline]
-    [<ffffffff812c99c7>] worker_thread+0x327/0x590 kernel/workqueue.c:2784
-    [<ffffffff812d6d9b>] kthread+0x12b/0x170 kernel/kthread.c:388
-    [<ffffffff81149f25>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
-    [<ffffffff81002be1>] ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="7N7cDQtYTEJaPqIG"
+Content-Disposition: inline
+In-Reply-To: <20231004100428.3ca993aa@kernel.org>
 
 
+--7N7cDQtYTEJaPqIG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> On Fri, 22 Sep 2023 18:20:36 +0200 Lorenzo Bianconi wrote:
+> > > matter at all. Do we have to send down a value at all? =20
+> >=20
+> > I am not sure if ynl supports a doit operation with a request with no p=
+arameters.
+> > @Chuck, Jakub: any input here?
+>=20
+> It should, if it doesn't LMK, I will fix..
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ack, what I want to do is add a 'get' method w/o any parameter in the reque=
+st and
+with just one parameter in the reply (i.e. the number of running threads). =
+E.g:
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
++++ b/Documentation/netlink/specs/nfsd.yaml
+@@ -62,6 +62,18 @@ attribute-sets:
+         name: compound-ops
+         type: u32
+         multi-attr: true
++  -
++    name: control-plane
++    attributes:
++      -
++        name: threads
++        type: u32
+=20
+ operations:
+   list:
+@@ -72,3 +84,54 @@ operations:
+       dump:
+         pre: nfsd-nl-rpc-status-get-start
+         post: nfsd-nl-rpc-status-get-done
++    -
++      name: threads-set
++      doc: set the number of running threads
++      attribute-set: control-plane
++      flags: [ admin-perm ]
++      do:
++        request:
++          attributes:
++            - threads
++    -
++      name: threads-get
++      doc: get the number of running threads
++      attribute-set: control-plane
++      do:
++        reply:
++          attributes:
++            - threads
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+running ynl-regen.sh, I got the following error for the get method:
 
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+$ ./tools/net/ynl/ynl-regen.sh
+        GEN kernel      fs/nfsd/netlink.h
+Traceback (most recent call last):
+  File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line=
+ 2609, in <module>
+    main()
+  File "/home/lorenzo/workspace/nfsd-next/tools/net/ynl/ynl-gen-c.py", line=
+ 2445, in main
+    print_req_policy_fwd(cw, ri.struct['request'], ri=3Dri)
+                             ~~~~~~~~~^^^^^^^^^^^
+KeyError: 'request'
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
+am I missing something?
 
-If you want to undo deduplication, reply with:
-#syz undup
+Regards,
+Lorenzo
+
+--7N7cDQtYTEJaPqIG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZR55TgAKCRA6cBh0uS2t
+rN7DAQDYvw5l8F0Tv6kl9SuPPswPeHXr1Pynz59ksPeQTxeqaQD/Q6msrDMf8c0K
+TY2kVQ03zUHHaVJ7j68Ld650M0i1nQA=
+=QllE
+-----END PGP SIGNATURE-----
+
+--7N7cDQtYTEJaPqIG--
 
