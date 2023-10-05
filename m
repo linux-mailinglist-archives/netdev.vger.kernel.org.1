@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-38367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBAE7BA954
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:43:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9C27BA955
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:43:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4150E1C20924
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:43:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4DD3B282216
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625523D990;
-	Thu,  5 Oct 2023 18:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1D43FB3C;
+	Thu,  5 Oct 2023 18:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RH8ZmPqf"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fEeUPq7+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995772E65A
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:56 +0000 (UTC)
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381529E
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:42:54 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso982005a12.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 11:42:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4833F3C68A
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 18:42:59 +0000 (UTC)
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2DFBD
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 11:42:57 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 41be03b00d2f7-578d0d94986so927202a12.2
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 11:42:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696531373; x=1697136173; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696531377; x=1697136177; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y3FzuamDMqc3cHGN57FU3P1A3vYgTC4SAk7aG0mI3ac=;
-        b=RH8ZmPqfNZoMVGa1C3ybKFenu6pCAB8/V0EapxeiXaabZNdUSzOnknFJN1RLS629NT
-         EhGGKRxGu6Mp8VQiD+ptFc77KplcllmcVctvLnfPy9w6LLvmtteotc9UseY3l6p0PRC3
-         D7awzt+7V0jHsinI4hPnM1kkpfvS8UxiAJB5o5p9pJR2URUcp3wFON1CJMXaKJ4ZJJrh
-         4vkNu1YPnsRZUnQyJF4ZgW5vIffXOkRA6xOosVFvr9LiPTBvgOmQ56QvLlfSz9Zf56ID
-         sP4gjzsuWDRpRY9PTRHYhvQLQwhe8bw/puHwOeqJGEgEKddWpsqCjgfT/Bi+9D8SHA6K
-         9bnA==
+        bh=m3O/ERWJdSwPkhO1vOSMkjoPltWYfQOcrySKZI1D6E8=;
+        b=fEeUPq7+RNEBV2yKwOIyu0N//IWOrCjTPEKMqxvuN8PezKB/3ia3JH1FwFBVaBQsz0
+         kQvsDCNDt9YXdDBSMNDPP4xgacUMuiAkfMoTHVZyPqTL01sVrkCwAt5HBaoyJNue2nJd
+         ADfXX6WY/jraqEr2/XamwruRSZdr4y7+gsFCQtiChNmVRsXx8S77M6g4GEoYLjKtwCuD
+         dcksnJfisV5ehOzpHWaRB2FQ3BgrCE3g9Jn10nxDIJg+HIwajBm79TOwmfvnHHD8mNa2
+         imFUvEuMcqlIf/Q4u+tSIsFllAsdPsMWd94tVU53GbeuUUvnXn6SQuRjrO5iZcjRGxaj
+         ufUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696531373; x=1697136173;
+        d=1e100.net; s=20230601; t=1696531377; x=1697136177;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Y3FzuamDMqc3cHGN57FU3P1A3vYgTC4SAk7aG0mI3ac=;
-        b=JJ47+LovYzd+fHw6/3pew79IsSKRGnmXB3uAnF62WaDF6h2YkmgTJjx5HqDnVGbApS
-         3DlycnP7q3vbqvy0cx94dKxeqFCMNhckFa2eJvYiZAxtVrZCK2SXexrR/qkZdulP7lRO
-         ZRRUUxa2cKzK6kFiqcJeWZyLYUdeRkkO8UW8Dft7XJldVq0BY2rTaCB2odGLAemWEWJk
-         1k6noaES0UhaEQyJRca0EBxsBMPaqFVILRSO9iSMXiawc+vKm/RqPv/x1LgIAAg8Hfof
-         Wqqx4AAqVPv+c44gfWBLXE1MbZNWYrqOxXoYzgcKj8KjpqS37bDuiKKBuMaCJ9uZsP9w
-         OW+A==
-X-Gm-Message-State: AOJu0YyGBLNynoj3PKw/dgr34H03l8ATJ1dlV8tuwDqUz+Ctvo3Wtvgr
-	W2fkL0W9RUIgAZ+CBxgfyu+JzA==
-X-Google-Smtp-Source: AGHT+IGLwovphLLnYTswhoolRg6NRFKLzDVLtBQnk/tqlrlZ1ixKzcHsbZQ2UFTwR0oeZeVfCTyz5A==
-X-Received: by 2002:a05:6a20:564d:b0:160:97a3:cae7 with SMTP id is13-20020a056a20564d00b0016097a3cae7mr5151306pzc.57.1696531373583;
-        Thu, 05 Oct 2023 11:42:53 -0700 (PDT)
+        bh=m3O/ERWJdSwPkhO1vOSMkjoPltWYfQOcrySKZI1D6E8=;
+        b=TJusriEVQxr1/2isdNfaeAWJc95XkJ9VHlF5mekzZGEby//tSeOEDUhAYtR5ekTkE6
+         WVeRqFE1xLDI9PENaHN9KM/vUdHRbw71a+gAK1frcwmBqj3ng+3RnGT9SeyEv38+JbJN
+         tbfyT7L4i/Cb34oZtDX40aIjgZe9VINTJ/8m8Z8Rlr2Kl4PueClN0Ewhk8srA0j4NS1F
+         0j3Nx3DmYIzReSV72K2JXEsQCyg3bftIxceDpgYo/u9pTR9sie0zL8v2JEjjK+wQa3Wx
+         KsA9HDtjbV5d7vSv/35Bf0WGfmFNGQXHW7RlmwXU9UvzSosyIfo8eQpRTJv6E6bhnitc
+         rm5Q==
+X-Gm-Message-State: AOJu0YxSfjRth0QBs34B0yX5dDpS9Bg7bYyDd+v/EsySrGqd2kCsZ94Q
+	dHCCDxQlHjYmKqKJMhshEkgX6Q==
+X-Google-Smtp-Source: AGHT+IEJXiQ6ybNJz/HqHWi4aT24Jx1PNg3ECmGtniOswyJbELYi85ubyqEZ/Qx/bH0+2dxEgxBEXw==
+X-Received: by 2002:a05:6a20:1007:b0:169:cd02:65ed with SMTP id gs7-20020a056a20100700b00169cd0265edmr3132550pzc.34.1696531377123;
+        Thu, 05 Oct 2023 11:42:57 -0700 (PDT)
 Received: from localhost.localdomain ([2804:7f1:e2c2:b6b7:54d9:6465:eb2f:5366])
-        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b00690d4c16296sm1725831pff.154.2023.10.05.11.42.50
+        by smtp.gmail.com with ESMTPSA id x28-20020aa793bc000000b00690d4c16296sm1725831pff.154.2023.10.05.11.42.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 11:42:53 -0700 (PDT)
+        Thu, 05 Oct 2023 11:42:56 -0700 (PDT)
 From: Victor Nogueira <victor@mojatatu.com>
 To: jhs@mojatatu.com,
 	xiyou.wangcong@gmail.com,
@@ -70,9 +70,9 @@ Cc: mleitner@redhat.com,
 	pctammela@mojatatu.com,
 	netdev@vger.kernel.org,
 	kernel@mojatatu.com
-Subject: [PATCH net-next v4 1/3] net/sched: Introduce tc block netdev tracking infra
-Date: Thu,  5 Oct 2023 15:42:26 -0300
-Message-ID: <20231005184228.467845-2-victor@mojatatu.com>
+Subject: [PATCH net-next v4 2/3] net/sched: cls_api: Expose tc block to the datapath
+Date: Thu,  5 Oct 2023 15:42:27 -0300
+Message-ID: <20231005184228.467845-3-victor@mojatatu.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231005184228.467845-1-victor@mojatatu.com>
 References: <20231005184228.467845-1-victor@mojatatu.com>
@@ -89,213 +89,94 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The tc block is a collection of netdevs/ports which allow qdiscs to share
-filter block instances (as opposed to the traditional tc filter per port).
-Example:
-$ tc qdisc add dev ens7 ingress block 22
-$ tc qdisc add dev ens8 ingress block 22
+The datapath can now find the block of the port in which the packet arrived
+at. It can then use it for various activities.
 
-Now we can add a filter using the block index:
-$ tc filter add block 22 protocol ip pref 25 \
-  flower dst_ip 192.168.0.0/16 action drop
+In the next patch we show a simple action that multicasts to all ports
+except for the port in which the packet arrived on.
 
-Up to this point, the block is unaware of its ports. This patch fixes that
-and makes the tc block ports available to the datapath.
-
-Suggested-by: Jiri Pirko <jiri@nvidia.com>
 Co-developed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 ---
- include/net/sch_generic.h |  4 +++
- net/sched/cls_api.c       |  2 ++
- net/sched/sch_api.c       | 58 +++++++++++++++++++++++++++++++++++++++
- net/sched/sch_generic.c   | 34 +++++++++++++++++++++--
- 4 files changed, 96 insertions(+), 2 deletions(-)
+ include/net/sch_generic.h |  4 ++++
+ net/sched/cls_api.c       | 10 +++++++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index c7318c73cfd6..a01979b0a2a1 100644
+index a01979b0a2a1..03ab3730ba09 100644
 --- a/include/net/sch_generic.h
 +++ b/include/net/sch_generic.h
-@@ -19,6 +19,7 @@
- #include <net/gen_stats.h>
- #include <net/rtnetlink.h>
- #include <net/flow_offload.h>
-+#include <linux/xarray.h>
- 
- struct Qdisc_ops;
- struct qdisc_walker;
-@@ -126,6 +127,8 @@ struct Qdisc {
- 
- 	struct rcu_head		rcu;
- 	netdevice_tracker	dev_tracker;
-+	netdevice_tracker	in_block_tracker;
-+	netdevice_tracker	eg_block_tracker;
- 	/* private data */
- 	long privdata[] ____cacheline_aligned;
- };
-@@ -458,6 +461,7 @@ struct tcf_chain {
+@@ -440,6 +440,8 @@ struct qdisc_skb_cb {
+ 	};
+ #define QDISC_CB_PRIV_LEN 20
+ 	unsigned char		data[QDISC_CB_PRIV_LEN];
++	/* This should allow eBPF to continue to align */
++	u32                     block_index;
  };
  
- struct tcf_block {
-+	struct xarray ports; /* datapath accessible */
- 	/* Lock protects tcf_block and lifetime-management data of chains
- 	 * attached to the block (refcnt, action_refcnt, explicitly_created).
- 	 */
+ typedef void tcf_chain_head_change_t(struct tcf_proto *tp_head, void *priv);
+@@ -488,6 +490,8 @@ struct tcf_block {
+ 	struct mutex proto_destroy_lock; /* Lock for proto_destroy hashtable. */
+ };
+ 
++struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index);
++
+ static inline bool lockdep_tcf_chain_is_locked(struct tcf_chain *chain)
+ {
+ 	return lockdep_is_held(&chain->filter_chain_lock);
 diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index a193cc7b3241..06b55344a948 100644
+index 06b55344a948..c102fe26ac5e 100644
 --- a/net/sched/cls_api.c
 +++ b/net/sched/cls_api.c
-@@ -531,6 +531,7 @@ static void tcf_block_destroy(struct tcf_block *block)
- {
- 	mutex_destroy(&block->lock);
- 	mutex_destroy(&block->proto_destroy_lock);
-+	xa_destroy(&block->ports);
- 	kfree_rcu(block, rcu);
+@@ -1012,12 +1012,13 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
+ 	return block;
  }
  
-@@ -1003,6 +1004,7 @@ static struct tcf_block *tcf_block_create(struct net *net, struct Qdisc *q,
- 	refcount_set(&block->refcnt, 1);
- 	block->net = net;
- 	block->index = block_index;
-+	xa_init(&block->ports);
+-static struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index)
++struct tcf_block *tcf_block_lookup(struct net *net, u32 block_index)
+ {
+ 	struct tcf_net *tn = net_generic(net, tcf_net_id);
  
- 	/* Don't store q pointer for blocks which are shared */
- 	if (!tcf_block_shared(block))
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index e9eaf637220e..66543e4d6cdc 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1180,6 +1180,60 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
- 	return 0;
+ 	return idr_find(&tn->idr, block_index);
  }
++EXPORT_SYMBOL(tcf_block_lookup);
  
-+static int qdisc_block_add_dev(struct Qdisc *sch, struct net_device *dev,
-+			       struct nlattr **tca,
-+			       struct netlink_ext_ack *extack)
-+{
-+	const struct Qdisc_class_ops *cl_ops = sch->ops->cl_ops;
-+	struct tcf_block *in_block = NULL;
-+	struct tcf_block *eg_block = NULL;
-+	unsigned long cl = 0;
-+	int err;
-+
-+	if (tca[TCA_INGRESS_BLOCK]) {
-+		/* works for both ingress and clsact */
-+		cl = TC_H_MIN_INGRESS;
-+		in_block = cl_ops->tcf_block(sch, cl, NULL);
-+		if (!in_block) {
-+			NL_SET_ERR_MSG(extack, "Shared ingress block missing");
-+			return -EINVAL;
-+		}
-+
-+		err = xa_insert(&in_block->ports, dev->ifindex, dev, GFP_KERNEL);
-+		if (err) {
-+			NL_SET_ERR_MSG(extack, "ingress block dev insert failed");
-+			return err;
-+		}
-+
-+		netdev_hold(dev, &sch->in_block_tracker, GFP_KERNEL);
-+	}
-+
-+	if (tca[TCA_EGRESS_BLOCK]) {
-+		cl = TC_H_MIN_EGRESS;
-+		eg_block = cl_ops->tcf_block(sch, cl, NULL);
-+		if (!eg_block) {
-+			NL_SET_ERR_MSG(extack, "Shared egress block missing");
-+			err = -EINVAL;
-+			goto err_out;
-+		}
-+
-+		err = xa_insert(&eg_block->ports, dev->ifindex, dev, GFP_KERNEL);
-+		if (err) {
-+			NL_SET_ERR_MSG(extack, "Egress block dev insert failed");
-+			goto err_out;
-+		}
-+		netdev_hold(dev, &sch->eg_block_tracker, GFP_KERNEL);
-+	}
-+
-+	return 0;
-+err_out:
-+	if (in_block) {
-+		xa_erase(&in_block->ports, dev->ifindex);
-+		netdev_put(dev, &sch->in_block_tracker);
-+	}
-+	return err;
-+}
-+
- static int qdisc_block_indexes_set(struct Qdisc *sch, struct nlattr **tca,
- 				   struct netlink_ext_ack *extack)
+ static struct tcf_block *tcf_block_refcnt_get(struct net *net, u32 block_index)
  {
-@@ -1350,6 +1404,10 @@ static struct Qdisc *qdisc_create(struct net_device *dev,
- 	qdisc_hash_add(sch, false);
- 	trace_qdisc_create(ops, dev, parent);
- 
-+	err = qdisc_block_add_dev(sch, dev, tca, extack);
-+	if (err)
-+		goto err_out4;
-+
- 	return sch;
- 
- err_out4:
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 4195a4bc26ca..b0c28b2ee713 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -1049,7 +1049,12 @@ static void qdisc_free_cb(struct rcu_head *head)
- 
- static void __qdisc_destroy(struct Qdisc *qdisc)
+@@ -1738,9 +1739,13 @@ int tcf_classify(struct sk_buff *skb,
+ 		 const struct tcf_proto *tp,
+ 		 struct tcf_result *res, bool compat_mode)
  {
--	const struct Qdisc_ops  *ops = qdisc->ops;
-+	struct net_device *dev = qdisc_dev(qdisc);
-+	const struct Qdisc_ops *ops = qdisc->ops;
-+	const struct Qdisc_class_ops *cops;
-+	struct tcf_block *block;
-+	unsigned long cl;
-+	u32 block_index;
- 
- #ifdef CONFIG_NET_SCHED
- 	qdisc_hash_del(qdisc);
-@@ -1060,11 +1065,36 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
- 
- 	qdisc_reset(qdisc);
- 
-+	cops = ops->cl_ops;
-+	if (ops->ingress_block_get) {
-+		block_index = ops->ingress_block_get(qdisc);
-+		if (block_index) {
-+			cl = TC_H_MIN_INGRESS;
-+			block = cops->tcf_block(qdisc, cl, NULL);
-+			if (block) {
-+				if (xa_erase(&block->ports, dev->ifindex))
-+					netdev_put(dev, &qdisc->in_block_tracker);
-+			}
-+		}
-+	}
++	struct qdisc_skb_cb *qdisc_cb = qdisc_skb_cb(skb);
 +
-+	if (ops->egress_block_get) {
-+		block_index = ops->egress_block_get(qdisc);
-+		if (block_index) {
-+			cl = TC_H_MIN_EGRESS;
-+			block = cops->tcf_block(qdisc, cl, NULL);
-+			if (block) {
-+				if (xa_erase(&block->ports, dev->ifindex))
-+					netdev_put(dev, &qdisc->eg_block_tracker);
-+			}
-+		}
-+	}
+ #if !IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+ 	u32 last_executed_chain = 0;
+ 
++	qdisc_cb->block_index = block ? block->index : 0;
 +
- 	if (ops->destroy)
- 		ops->destroy(qdisc);
+ 	return __tcf_classify(skb, tp, tp, res, compat_mode, NULL, 0,
+ 			      &last_executed_chain);
+ #else
+@@ -1752,6 +1757,7 @@ int tcf_classify(struct sk_buff *skb,
+ 	int ret;
  
- 	module_put(ops->owner);
--	netdev_put(qdisc_dev(qdisc), &qdisc->dev_tracker);
-+	netdev_put(dev, &qdisc->dev_tracker);
+ 	if (block) {
++		qdisc_cb->block_index = block->index;
+ 		ext = skb_ext_find(skb, TC_SKB_EXT);
  
- 	trace_qdisc_destroy(qdisc);
+ 		if (ext && (ext->chain || ext->act_miss)) {
+@@ -1779,6 +1785,8 @@ int tcf_classify(struct sk_buff *skb,
+ 			tp = rcu_dereference_bh(fchain->filter_chain);
+ 			last_executed_chain = fchain->index;
+ 		}
++	} else {
++		qdisc_cb->block_index = 0;
+ 	}
  
+ 	ret = __tcf_classify(skb, tp, orig_tp, res, compat_mode, n, act_index,
 -- 
 2.25.1
 
