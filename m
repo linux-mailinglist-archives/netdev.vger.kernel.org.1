@@ -1,86 +1,96 @@
-Return-Path: <netdev+bounces-38343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1167BA761
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 19:12:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A857BA77B
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 19:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id BAA621C2099A
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:12:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 4DDE71C2090D
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BABD38DF9;
-	Thu,  5 Oct 2023 17:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB2D38F83;
+	Thu,  5 Oct 2023 17:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r96k5lzF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OQgZ4R74"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13544374EC
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 17:12:49 +0000 (UTC)
-Received: from out-208.mta0.migadu.com (out-208.mta0.migadu.com [91.218.175.208])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A52E1725
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 10:12:48 -0700 (PDT)
-Message-ID: <49517916-e848-8dfe-48c5-f2240c6e740d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696525966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vii37jAyx8EVIx/ZlExvw6UxL7OjVsc8nrTRMrjp3jc=;
-	b=r96k5lzFgpIu5UgPGWtUScIvT9tdI59KRDq1Qp6uzidmZPtdlClwod3r7UgmImziZRh7HP
-	3Ibcgvz4nnaVj6KuXwwl2lCn6lfH4bVJDNfKBBmIhTIogjNg9iAMOWal8BqDZp/crUhCKK
-	x+m+tF0+JEyAZqwf6tGdkvGFfl3Z3yc=
-Date: Thu, 5 Oct 2023 10:12:40 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6911358B5;
+	Thu,  5 Oct 2023 17:16:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6398EC433CA;
+	Thu,  5 Oct 2023 17:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696526166;
+	bh=6TQPomYGzW80iUud7BEbLiiItfun6wvVQP2bFLm/bWs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OQgZ4R74PH/6FVF4WXTtHbAPY4fs3kBrO1oPh4677MYWPjNQRLnppFa63YkDQtCZV
+	 lDT+5a+MV1b275EQ5LYdUwoj2juDbcHv3LlqDGJhZlkg6CnMLpXX2NbCoSAdhiQevH
+	 J0VuMf0Jp7gW6AjCHUnH2ScMM6/y60bnSr3nJI38IKuFSw/ExgOy7xj6bIRIfWZ4mr
+	 AftudFVaHtmN05gZZa1Vqfu65P64Cv+Ri8n3duDa3yt1/1XeCJ94VduIV9OWCQHkjz
+	 LU5JbVwIB7UJ2HDjLDyrt2gCs5iPYbaJ6JZS9pqZCy1v/XIr/kbfl1vVhKJiT9bEiX
+	 rMPagj8eXtI1A==
+Date: Thu, 5 Oct 2023 10:16:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>, <bpf@vger.kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
+ <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+ <john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+ <haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+ Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer
+ <brouer@redhat.com>, Anatoly Burakov <anatoly.burakov@intel.com>,
+ "Alexander Lobakin" <alexandr.lobakin@intel.com>, Magnus Karlsson
+ <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>,
+ <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Simon Horman <simon.horman@corigine.com>,
+ Tariq Toukan <tariqt@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: Re: [xdp-hints] Re: [RFC bpf-next v2 09/24] xdp: Add VLAN tag hint
+Message-ID: <20231005101604.33b382d8@kernel.org>
+In-Reply-To: <e4bbe997-326f-b6cf-b6d6-f0a24f5aef39@intel.com>
+References: <20230927075124.23941-1-larysa.zaremba@intel.com>
+	<20230927075124.23941-10-larysa.zaremba@intel.com>
+	<20231003053519.74ae8938@kernel.org>
+	<8e9d830b-556b-b8e6-45df-0bf7971b4237@intel.com>
+	<20231004110850.5501cd52@kernel.org>
+	<e4bbe997-326f-b6cf-b6d6-f0a24f5aef39@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v7 9/9] selftests/bpf: Add tests for cgroup unix
- socket address hooks
-Content-Language: en-US
-To: Daan De Meyer <daan.j.demeyer@gmail.com>
-Cc: kernel-team@meta.com, netdev@vger.kernel.org, bpf <bpf@vger.kernel.org>
-References: <20231003093025.475450-1-daan.j.demeyer@gmail.com>
- <20231003093025.475450-10-daan.j.demeyer@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231003093025.475450-10-daan.j.demeyer@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 10/3/23 2:30 AM, Daan De Meyer wrote:
-> These selftests are written in prog_tests style instead of adding
-> them to the existing test_sock_addr tests. Migrating the existing
-> sock addr tests to prog_tests style is left for future work. This
-> commit adds support for testing bind() sockaddr hooks, even though
-> there's no unix socket sockaddr hook for bind(). We leave this code
-> intact for when the INET and INET6 tests are migrated in the future
-> which do support intercepting bind().
+On Thu, 5 Oct 2023 18:58:33 +0200 Alexander Lobakin wrote:
+> > No unsharing - you can still strip it in the driver.  
 > 
-> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-> ---
->   tools/testing/selftests/bpf/bpf_kfuncs.h      |  14 +
->   tools/testing/selftests/bpf/network_helpers.c |  34 +
->   tools/testing/selftests/bpf/network_helpers.h |   1 +
->   .../selftests/bpf/prog_tests/section_names.c  |  25 +
->   .../selftests/bpf/prog_tests/sock_addr.c      | 612 ++++++++++++++++++
+> Nobody manually strips VLAN tags in the drivers. You either have HW
+> stripping or pass VLAN-tagged skb to the stack, so that skb_vlan_untag()
+> takes care of it.
 
-The progs/*_unix_prog.c is missing again, probably due to the rename. Please 
-monitor the CI test result:
-https://patchwork.kernel.org/project/netdevbpf/patch/20231003093025.475450-2-daan.j.demeyer@gmail.com/
-https://github.com/kernel-patches/bpf/actions/runs/6391271804/job/17346211558
+Isn't it just a case of circular logic tho?
+We don't optimize the stack for SW stripping because HW does it.
+Then HW does it because SW is not optimized.
 
-A 'git status' to check for untracked file before 'git format-patch' can help also.
+> > Do you really think that for XDP kfunc call will be cheaper?  
+> 
+> Wait, you initially asked:
+> 
+> * discussion about the validity of VLAN stripping as an offload?
+> * Do people actually care about having it enabled?
+> 
+> I did read this as "do we still need HW VLAN stripping in general?", not
+> only for XDP. So I replied for "in general" -- yes.
+> Forcefully disabling stripping when XDP is active is obscure IMO, let
+> the user decide.
 
+Every time I'm involved in conversations about NIC datapath host
+interfaces I cringe at this stupid VLAN offload. Maybe I'm too
+daft to understand it's amazing value but we just shift 2B from
+the packet to the descriptor and then we have to worry about all
+the corner cases that come from vlan stacking :(
 
