@@ -1,86 +1,59 @@
-Return-Path: <netdev+bounces-38377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524417BAAAF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:49:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD25A7BAADE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:58:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id F3FA9281DA1
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 19:49:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id A7697281D9D
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 19:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD4F41771;
-	Thu,  5 Oct 2023 19:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4BlTaBF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5114177C;
+	Thu,  5 Oct 2023 19:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8C894174F;
-	Thu,  5 Oct 2023 19:49:32 +0000 (UTC)
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0E42F9;
-	Thu,  5 Oct 2023 12:49:30 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-50307acd445so1751927e87.0;
-        Thu, 05 Oct 2023 12:49:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696535369; x=1697140169; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPYaRKIDdTM5S6kpvnsOytPvCHdetsXKEErzIEZmPrQ=;
-        b=T4BlTaBFwK7y3+VYAETVgSaBeoWkM+4e4bRMbJ9gINri8r9ldWnJCMxmHPtwBJeUdj
-         gLH2LTvAUO8ccvXRnH1zQFwrqWgA4/558CKYkK/ZG/XJeh/EF5F77kALamf7t61fvm2B
-         98YySvFSxtskCfupBke7nAUcw3zBYSMLpRsUGUJ0xIF85XIFktfCUm212BB7ptcCMSlV
-         iWsQxdHbnv5p8lhX+FQwxPSmLF9bHKh+fkYuhmmm2dUpMx82Q+tZWdj4URwq1bAwfTTI
-         Cth96ipNh7So36Q5luKTWjQ/pI2Be/X/JkSsKmGmg5tMV1gLZ/2rixf58ceRgm4pPxv5
-         3Zmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696535369; x=1697140169;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qPYaRKIDdTM5S6kpvnsOytPvCHdetsXKEErzIEZmPrQ=;
-        b=t2LMJxEYi44G7e54b7VNil2sjVOfW7eM75awU6Z0WBoAV54OAtzuY8h3tTJxn3htZn
-         KwCg6iCfH8fOPPMYhfr7XOujwvaOzL2OBn1ip/gZXK7h0hCSIkPBG6gp3FYWPeg/Bu4L
-         QzVtArKcoZOjCKivrDssRAf/+ijygOiZW2+bYyD+U4/BK5Z0QR7NV6MyOAEi2KA9dyER
-         U044LoBERLi5sbpjs15DAo/Tu4BL3gtN1rQ6FIXXEhhciuZXFAO1NVcXQxBwHtdA0N0p
-         uO9aUpznkTx92dbz2jOVxrzp4QozHHiW1reeDxbsyheKxY8yFFgvDi4J9y0jdsgufSNZ
-         tzyA==
-X-Gm-Message-State: AOJu0YxBRLeDPy/pvf9UPNFS74KddezP5Y0wdhRegALE4TjXuWMb4aO6
-	yFiSSSmkdVcInzxVchmhKlg=
-X-Google-Smtp-Source: AGHT+IFcBI1mK2an0Jghnbh8e/bVxELhzBhXb8uEW5u/Me2UPPHFkwieF1bwG3mOh94+4+n6Vm+wFw==
-X-Received: by 2002:a19:6518:0:b0:500:acf1:b42f with SMTP id z24-20020a196518000000b00500acf1b42fmr4489663lfb.53.1696535368815;
-        Thu, 05 Oct 2023 12:49:28 -0700 (PDT)
-Received: from localhost.localdomain ([77.222.24.57])
-        by smtp.gmail.com with ESMTPSA id x12-20020a19f60c000000b004fe28e3841bsm415655lfe.267.2023.10.05.12.49.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 12:49:28 -0700 (PDT)
-From: Andrew Kanner <andrew.kanner@gmail.com>
-To: bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3D7266D5
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 19:58:21 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C65DEB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 12:58:17 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qoUUC-0004dV-0Q
+	for netdev@vger.kernel.org; Thu, 05 Oct 2023 21:58:16 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qoUUB-00BLDC-HY
+	for netdev@vger.kernel.org; Thu, 05 Oct 2023 21:58:15 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 3C00822FF7C
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 19:58:15 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 024E322FF5F;
+	Thu,  5 Oct 2023 19:58:14 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 28c759e5;
+	Thu, 5 Oct 2023 19:58:13 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	aleksander.lobakin@intel.com,
-	xuanzhuo@linux.alibaba.com,
-	ast@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	daniel@iogearbox.net
-Cc: linux-kernel-mentees@lists.linuxfoundation.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
-	syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com,
-	Andrew Kanner <andrew.kanner@gmail.com>
-Subject: [PATCH bpf v3] net/xdp: fix zero-size allocation warning in xskq_create()
-Date: Thu,  5 Oct 2023 22:35:49 +0300
-Message-Id: <20231005193548.515-1-andrew.kanner@gmail.com>
-X-Mailer: git-send-email 2.39.3
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/37] pull-request: can-next 2023-10-05
+Date: Thu,  5 Oct 2023 21:57:35 +0200
+Message-Id: <20231005195812.549776-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,112 +61,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Syzkaller reported the following issue:
- ------------[ cut here ]------------
- WARNING: CPU: 0 PID: 2807 at mm/vmalloc.c:3247 __vmalloc_node_range (mm/vmalloc.c:3361)
- Modules linked in:
- CPU: 0 PID: 2807 Comm: repro Not tainted 6.6.0-rc2+ #12
- Hardware name: Generic DT based system
- unwind_backtrace from show_stack (arch/arm/kernel/traps.c:258)
- show_stack from dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
- dump_stack_lvl from __warn (kernel/panic.c:633 kernel/panic.c:680)
- __warn from warn_slowpath_fmt (./include/linux/context_tracking.h:153 kernel/panic.c:700)
- warn_slowpath_fmt from __vmalloc_node_range (mm/vmalloc.c:3361 (discriminator 3))
- __vmalloc_node_range from vmalloc_user (mm/vmalloc.c:3478)
- vmalloc_user from xskq_create (net/xdp/xsk_queue.c:40)
- xskq_create from xsk_setsockopt (net/xdp/xsk.c:953 net/xdp/xsk.c:1286)
- xsk_setsockopt from __sys_setsockopt (net/socket.c:2308)
- __sys_setsockopt from ret_fast_syscall (arch/arm/kernel/entry-common.S:68)
+Hello netdev-team,
 
-xskq_get_ring_size() uses struct_size() macro to safely calculate the
-size of struct xsk_queue and q->nentries of desc members. But the
-syzkaller repro was able to set q->nentries with the value initially
-taken from copy_from_sockptr() high enough to return SIZE_MAX by
-struct_size(). The next PAGE_ALIGN(size) is such case will overflow
-the size_t value and set it to 0. This will trigger WARN_ON_ONCE in
-vmalloc_user() -> __vmalloc_node_range().
+this is a pull request of 37 patches for net-next/master.
 
-The issue is reproducible on 32-bit arm kernel.
+The first patch is by Miquel Raynal and fixes a comment in the sja1000
+driver.
 
-Reported-and-tested-by: syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000c84b4705fb31741e@google.com/T/
-Link: https://syzkaller.appspot.com/bug?extid=fae676d3cf469331fc89
-Reported-by: syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000e20df20606ebab4f@google.com/T/
-Fixes: 9f78bf330a66 ("xsk: support use vaddr as ring")
-Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
+Vincent Mailhol contributes 2 patches that fix W=1 compiler warnings
+in the etas_es58x driver.
+
+Jiapeng Chong's patch removes an unneeded NULL pointer check before
+dev_put() in the CAN raw protocol.
+
+A patch by Justin Stittreplaces a strncpy() by strscpy() in the
+peak_pci sja1000 driver.
+
+The next 5 patches are by me and fix the can_restart() handler and
+replace BUG_ON()s in the CAN dev helpers with proper error handling.
+
+The last 27 patches are also by me and target the at91_can driver.
+First a new helper function is introduced, the at91_can driver is
+cleaned up and updated to use the rx-offload helper.
+
+regards,
+Marc
+
 ---
 
-Notes (akanner):
-    v3:
-      - free kzalloc-ed memory before return, the leak was noticed by
-        Daniel Borkmann <daniel@iogearbox.net>
-    v2: https://lore.kernel.org/all/20231002222939.1519-1-andrew.kanner@gmail.com/raw
-      - use unlikely() optimization for the case with SIZE_MAX return from
-        struct_size(), suggested by Alexander Lobakin
-        <aleksander.lobakin@intel.com>
-      - cc-ed 4 more maintainers, mentioned by cc_maintainers patchwork
-        test
-    
-    v1: https://lore.kernel.org/all/20230928204440.543-1-andrew.kanner@gmail.com/T/
-      - RFC notes:
-        It was found that net/xdp/xsk.c:xsk_setsockopt() uses
-        copy_from_sockptr() to get the number of entries (int) for cases
-        with XDP_RX_RING / XDP_TX_RING and XDP_UMEM_FILL_RING /
-        XDP_UMEM_COMPLETION_RING.
-    
-        Next in xsk_init_queue() there're 2 sanity checks (entries == 0)
-        and (!is_power_of_2(entries)) for which -EINVAL will be returned.
-    
-        After that net/xdp/xsk_queue.c:xskq_create() will calculate the
-        size multipling the number of entries (int) with the size of u64,
-        at least.
-    
-        I wonder if there should be the upper bound (e.g. the 3rd sanity
-        check inside xsk_init_queue()). It seems that without the upper
-        limit it's quiet easy to overflow the allocated size (SIZE_MAX),
-        especially for 32-bit architectures, for example arm nodes which
-        were used by the syzkaller.
-    
-        In this patch I added a naive check for SIZE_MAX which helped to
-        skip zero-size allocation after overflow, but maybe it's not quite
-        right. Please, suggest if you have any thoughts about the
-        appropriate limit for the size of these xdp rings.
-    
-        PS: the initial number of entries is 0x20000000 in syzkaller
-        repro: syscall(__NR_setsockopt, (intptr_t)r[0], 0x11b, 3,
-        0x20000040, 0x20);
-    
-        Link:
-        https://syzkaller.appspot.com/text?tag=ReproC&x=10910f18280000
+The following changes since commit 473267a4911f2469722c74ca58087d951072f72a:
 
- net/xdp/xsk_queue.c | 5 +++++
- 1 file changed, 5 insertions(+)
+  net: add sysctl to disable rfc4862 5.5.3e lifetime handling (2023-10-03 15:51:04 -0700)
 
-diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
-index f8905400ee07..c7e8bbb12752 100644
---- a/net/xdp/xsk_queue.c
-+++ b/net/xdp/xsk_queue.c
-@@ -34,6 +34,11 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
- 	q->ring_mask = nentries - 1;
- 
- 	size = xskq_get_ring_size(q, umem_queue);
-+	if (unlikely(size == SIZE_MAX)) {
-+		kfree(q);
-+		return NULL;
-+	}
-+
- 	size = PAGE_ALIGN(size);
- 
- 	q->ring = vmalloc_user(size);
--- 
-2.39.3
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.7-20231005
+
+for you to fetch changes up to bf176313c62ec4f97daa893888aa4fde86749cb2:
+
+  Merge patch series "can: at91: add can_state_get_by_berr_counter() helper, cleanup and convert to rx_offload" (2023-10-05 21:48:09 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.7-20231005
+
+----------------------------------------------------------------
+Jiapeng Chong (1):
+      can: raw: Remove NULL check before dev_{put, hold}
+
+Justin Stitt (1):
+      can: peak_pci: replace deprecated strncpy with strscpy
+
+Marc Kleine-Budde (35):
+      Merge patch series "can: etas_es58x: clean-up of new GCC W=1 and old checkpatch warnings"
+      can: dev: can_restart(): don't crash kernel if carrier is OK
+      can: dev: can_restart(): fix race condition between controller restart and netif_carrier_on()
+      can: dev: can_restart(): reverse logic to remove need for goto
+      can: dev: can_restart(): move debug message and stats after successful restart
+      can: dev: can_put_echo_skb(): don't crash kernel if can_priv::echo_skb is accessed out of bounds
+      Merge patch series "can: dev: fix can_restart() and replace BUG_ON() by error handling"
+      can: dev: add can_state_get_by_berr_counter() to return the CAN state based on the current error counters
+      can: at91_can: use a consistent indention
+      can: at91_can: at91_irq_tx(): remove one level of indention
+      can: at91_can: BR register: convert to FIELD_PREP()
+      can: at91_can: ECR register: convert to FIELD_GET()
+      can: at91_can: MMR registers: convert to FIELD_PREP()
+      can: at91_can: MID registers: convert access to FIELD_PREP(), FIELD_GET()
+      can: at91_can: MSR Register: convert to FIELD_PREP()
+      can: at91_can: MCR Register: convert to FIELD_PREP()
+      can: at91_can: add more register definitions
+      can: at91_can: at91_setup_mailboxes(): update comments
+      can: at91_can: rename struct at91_priv::{tx_next,tx_echo} to {tx_head,tx_tail}
+      can: at91_can: at91_set_bittiming(): demote register output to debug level
+      can: at91_can: at91_chip_start(): don't disable IRQs twice
+      can: at91_can: at91_open(): forward request_irq()'s return value in case or an error
+      can: at91_can: add CAN transceiver support
+      can: at91_can: at91_poll_err(): fold in at91_poll_err_frame()
+      can: at91_can: at91_poll_err(): increase stats even if no quota left or OOM
+      can: at91_can: at91_irq_err_frame(): call directly from IRQ handler
+      can: at91_can: at91_irq_err_frame(): move next to at91_irq_err()
+      can: at91_can: at91_irq_err(): rename to at91_irq_err_line()
+      can: at91_can: at91_irq_err_line(): make use of can_state_get_by_berr_counter()
+      can: at91_can: at91_irq_err_line(): take reg_sr into account for bus off
+      can: at91_can: at91_irq_err_line(): make use of can_change_state() and can_bus_off()
+      can: at91_can: at91_irq_err_line(): send error counters with state change
+      can: at91_can: at91_alloc_can_err_skb() introduce new function
+      can: at91_can: switch to rx-offload implementation
+      Merge patch series "can: at91: add can_state_get_by_berr_counter() helper, cleanup and convert to rx_offload"
+
+Miquel Raynal (1):
+      can: sja1000: Fix comment
+
+Vincent Mailhol (2):
+      can: etas_es58x: rework the version check logic to silence -Wformat-truncation
+      can: etas_es58x: add missing a blank line after declaration
+
+ drivers/net/can/Kconfig                        |   1 +
+ drivers/net/can/at91_can.c                     | 998 ++++++++++---------------
+ drivers/net/can/dev/dev.c                      |  51 +-
+ drivers/net/can/dev/skb.c                      |   6 +-
+ drivers/net/can/sja1000/peak_pci.c             |   2 +-
+ drivers/net/can/sja1000/sja1000.c              |   2 +-
+ drivers/net/can/usb/etas_es58x/es58x_core.c    |   1 +
+ drivers/net/can/usb/etas_es58x/es58x_core.h    |   6 +-
+ drivers/net/can/usb/etas_es58x/es58x_devlink.c |  57 +-
+ include/linux/can/dev.h                        |   4 +
+ net/can/raw.c                                  |   3 +-
+ 11 files changed, 497 insertions(+), 634 deletions(-)
+
 
 
