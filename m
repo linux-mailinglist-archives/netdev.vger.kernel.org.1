@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-38263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652D87B9DEA
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:57:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B7B7B9DFE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id 48276B20843
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:57:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C9E98281FA2
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6109E26E20;
-	Thu,  5 Oct 2023 13:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA73273EB;
+	Thu,  5 Oct 2023 14:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lCazjyMT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RXHKOdEK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7381266D0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:57:36 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0791D2755B
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:57:08 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4065dea9a33so9413475e9.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 06:57:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9B426E36
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:00:08 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EAC11347F
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 06:57:26 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40684f53ef3so9525665e9.3
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 06:57:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696514226; x=1697119026; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1696514245; x=1697119045; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=kIDUUDyPCMDnmf6dgpyyTfj6uNBxPsdSSFa0JLZBazw=;
-        b=lCazjyMTJzIespSvCCMrWe3Xzr0lRGcJ3t0VvohDnyzfrci/2V54iBYcMhzui1tANx
-         XeWEHijdBumD7/ZLLR/JQrP0t0516N0yrVmwZKGUgypW+JEVt6qavbfgDhASN7ZLB/Pu
-         8Ucm430cVWVnkwyRpywxCIP1rsOMuP66TQ7d8Pem1x25E1WS10p1nMHEPrzKFYLawQQA
-         tx7rSFtzGmr9kgNXcdDbHd36zqbyhvljVmYfqix42po9Zhv+Zv/t5yjP+TfmpKDNgduF
-         J5ef/2t9eeWc8N1LqjF3RNw3iWtag8Vu0qby240Fuea5EGIbgZmtm9HQYmQrIxnu1Ms2
-         eraw==
+        bh=AooGTYUy452CMDPClrlTisOX8k1qSdGixxMstg0I9q0=;
+        b=RXHKOdEK900FcuhVBywDk8NW2QQyrPnVZzSGHaCppaXF0yqIKMULLollDslbMvc0W2
+         FcMBed8lKnDktsfnD+TmkWNtV0Aqs3C6gDFTvaaj4HWE/OxmUB60K/wMv05dmX9jcBC+
+         a2qTcHku8g5tAt40GYteCXkgQZpauuTQmPCU7bYYprUZpxtH4t1VMoxWl4Hnp4TnkNVl
+         nQ1ky6ZjrZGCNKP5N3V6Dixagr5IDmdZ9FMy/k2vEYKTgy3C5xfS5/S7XG5JFyKrCtN3
+         71syKa/+TeN/zF1lD7/x7OsBB6tcO905CWXQtRFxGY1g8WHTChIJqjnxxu0dshJvllM8
+         jvZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696514226; x=1697119026;
+        d=1e100.net; s=20230601; t=1696514245; x=1697119045;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kIDUUDyPCMDnmf6dgpyyTfj6uNBxPsdSSFa0JLZBazw=;
-        b=VdrPQ7z4gdJ1jxFP/orGDbIzzmS13nIuf9OVo6cObv/5S8ywmzD8lH0CkwG6y1f5aI
-         /KwtILy+Mud8+n9UxcQeoHdjZC8UuQ2uAP1P+IkzXtPSZ7/Lp0aiOiEZCVBotu3dbXdz
-         wSWPa3zdapykbzYFSvvwhee+ISPq8zKsfV6XLseU7SYcxJBMrnt4Iq07AYnCY/0UzJ8P
-         S+LGXxOA3GgILBU2udGVyaUgwOCKYlVwpHkv16rMc7PuST0CeGCdsWziJIfbSksasM4p
-         k8Lghn4SvjB5mfOIqWptq36cBfPXgu1+l9bcOAjMAIJcTZ18aBmLCF/Z7DoiDxLDpoHP
-         wyLg==
-X-Gm-Message-State: AOJu0YwPWeEpFsy4JkIo1PATd5JgX6pUi/49Nj+fWnvUNuwIGICbo6CG
-	SmWnuqrwA6BGneRXF6gEuNAOVw==
-X-Google-Smtp-Source: AGHT+IH+50km3L9x7FNGDdpi8jFVFT/mSqPZ1f1vTJoCUCMCRuejoPXyRAO7AbAoq0zfWgzr9nEAVw==
-X-Received: by 2002:a05:600c:211:b0:401:bf56:8ba6 with SMTP id 17-20020a05600c021100b00401bf568ba6mr5087166wmi.28.1696514226615;
-        Thu, 05 Oct 2023 06:57:06 -0700 (PDT)
+        bh=AooGTYUy452CMDPClrlTisOX8k1qSdGixxMstg0I9q0=;
+        b=fYVWFiNJRCXmg3/loRAn9W6PHL/96fPdnUAT6MziFQ6Zx4/CGX6I3/4H8KpRs9lQ3p
+         kakyZhUc0C5Hg9JaKY9L2j9qDg7LsJGCyBuNvSDKZ5slsaJ6+16WV8Z7DeKJlqoHq8wP
+         PSOt1UsyQCJub0fIT2F+gUVs44y31n6Sw0s7aYE7zof3ORcswomRf/HvjcvsKGnPR5xV
+         0q4QNiUXFLKMk15etoRFa4/3YxiUheWxDyaNh3evmPCqR/79dyLbsb9GpUkzId2A4i4G
+         MFlezW5YbA7impo3cDGCTogZn1wvhF5RYCsBRC1aw+hvUtrrnPB6Kvn4zKQe1HB/Ls0c
+         LEgw==
+X-Gm-Message-State: AOJu0Yza0KoOOsy68BvsdeKM/IPl3an1utaQHl+qkJrE0Eff6kdUGfj+
+	K9NVYieJ3IMui0N1GVVvaBNGiQ==
+X-Google-Smtp-Source: AGHT+IGEGxGJ8wEps7sHxei6GOKIWpDvnRrTfQ/aBGCmZAYI2aBq2ytwW6bqUoWdRMnKb5xGjvnu4Q==
+X-Received: by 2002:a5d:45c8:0:b0:317:dd94:ed38 with SMTP id b8-20020a5d45c8000000b00317dd94ed38mr4875974wrs.42.1696514244730;
+        Thu, 05 Oct 2023 06:57:24 -0700 (PDT)
 Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id n16-20020a05600c3b9000b0040684abb623sm3774428wms.24.2023.10.05.06.57.05
+        by smtp.gmail.com with ESMTPSA id q13-20020adff78d000000b0032415213a6fsm1861805wrp.87.2023.10.05.06.57.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 06:57:06 -0700 (PDT)
-Date: Thu, 5 Oct 2023 16:57:02 +0300
+        Thu, 05 Oct 2023 06:57:24 -0700 (PDT)
+Date: Thu, 5 Oct 2023 16:57:21 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Greg Rose <gregory.v.rose@intel.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
 Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net] ixgbe: fix crash with empty VF macvlan list
-Message-ID: <3cee09b8-4c49-4a39-b889-75c0798dfe1c@moroto.mountain>
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Simon Horman <horms@kernel.org>, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next 1/2] igb: Fix an end of loop test
+Message-ID: <4d61f086-c7b4-4762-b025-0ba5df08968b@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,44 +77,55 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 X-Mailer: git-send-email haha only kidding
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The adapter->vf_mvs.l list needs to be initialized even if the list is
-empty.  Otherwise it will lead to crashes.
+When we exit a list_for_each_entry() without hitting a break statement,
+the list iterator isn't NULL, it just point to an offset off the
+list_head.  In that situation, it wouldn't be too surprising for
+entry->free to be true and we end up corrupting memory.
 
-Fixes: c6bda30a06d9 ("ixgbe: Reconfigure SR-IOV Init")
+The way to test for these is to just set a flag.
+
+Fixes: c1fec890458a ("ethernet/intel: Use list_for_each_entry() helper")
 Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/igb/igb_main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index a703ba975205..9cfdfa8a4355 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -28,6 +28,9 @@ static inline void ixgbe_alloc_vf_macvlans(struct ixgbe_adapter *adapter,
- 	struct vf_macvlans *mv_list;
- 	int num_vf_macvlans, i;
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 2ac9dffd0bf8..c45b1e7cde58 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -7857,7 +7857,8 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
+ {
+ 	struct pci_dev *pdev = adapter->pdev;
+ 	struct vf_data_storage *vf_data = &adapter->vf_data[vf];
+-	struct vf_mac_filter *entry = NULL;
++	struct vf_mac_filter *entry;
++	bool found = false;
+ 	int ret = 0;
  
-+	/* Initialize list of VF macvlans */
-+	INIT_LIST_HEAD(&adapter->vf_mvs.l);
-+
- 	num_vf_macvlans = hw->mac.num_rar_entries -
- 			  (IXGBE_MAX_PF_MACVLANS + 1 + num_vfs);
- 	if (!num_vf_macvlans)
-@@ -36,8 +39,6 @@ static inline void ixgbe_alloc_vf_macvlans(struct ixgbe_adapter *adapter,
- 	mv_list = kcalloc(num_vf_macvlans, sizeof(struct vf_macvlans),
- 			  GFP_KERNEL);
- 	if (mv_list) {
--		/* Initialize list of VF macvlans */
--		INIT_LIST_HEAD(&adapter->vf_mvs.l);
- 		for (i = 0; i < num_vf_macvlans; i++) {
- 			mv_list[i].vf = -1;
- 			mv_list[i].free = true;
+ 	if ((vf_data->flags & IGB_VF_FLAG_PF_SET_MAC) &&
+@@ -7888,11 +7889,13 @@ static int igb_set_vf_mac_filter(struct igb_adapter *adapter, const int vf,
+ 	case E1000_VF_MAC_FILTER_ADD:
+ 		/* try to find empty slot in the list */
+ 		list_for_each_entry(entry, &adapter->vf_macs.l, l) {
+-			if (entry->free)
++			if (entry->free) {
++				found = true;
+ 				break;
++			}
+ 		}
+ 
+-		if (entry && entry->free) {
++		if (found) {
+ 			entry->free = false;
+ 			entry->vf = vf;
+ 			ether_addr_copy(entry->vf_mac, addr);
 -- 
 2.39.2
 
