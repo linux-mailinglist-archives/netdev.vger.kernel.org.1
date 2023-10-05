@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-38156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E437B9942
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:30:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE647B9941
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id DF9D6B2097D
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 4DC1D281C4D
 	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 00:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C42182;
-	Thu,  5 Oct 2023 00:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BEB2374;
+	Thu,  5 Oct 2023 00:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YGb+h+jX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="igf4HDIU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D53381390
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 00:30:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C1FAC433CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5307136F;
+	Thu,  5 Oct 2023 00:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 66BF2C433C9;
 	Thu,  5 Oct 2023 00:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1696465828;
-	bh=C71E9jV0/5P9BFfjMb53X2iDS2X84LVKvmaUWSJvAZY=;
+	bh=1TriRVhzmRAnwBtw4BTSYXYMCl4ZxHt/kPTjqM0ght8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YGb+h+jX8rVGYy96addL7tr1tMGhtpAe25WIuQxWuSLzOoLnciO/pA4gAXkoz1roW
-	 FdbRrRDuA1QsL2Nbxg6XbrFQpunmYlu802+0ChZwqdlod5V2emGUUc17LbntSH3yhm
-	 G82obiDoKqK1Ng3RxHS5KJ4VTzU0xNtRHGw2oCUcKMiPmphcB2tfmMOqMm9SUswntf
-	 wGec2re+2yH4gqWHPivS4j0HqOqFbUvrE969mblclcPGkerGSNXwAjXiyjhBf70h9q
-	 nKtYyAtNagRTyxfJj9YmXBuJXb6hUAvb8fkYNQkA7KbvQEebttqMT0FObwSILeXMTy
-	 YLZcLF1TyGlTw==
+	b=igf4HDIUBsEa/7o+MytU4wHIbMHOuDc29n1/ioq+MrFvvVWd3YTuYMBQHrHEPA+NN
+	 glzjlcXFGJiVsx6JJL6SymGoN568RYWzpx+lQC2Qzrwd5MV2zkjfV/XW4oiqShWWLQ
+	 L1oy6lvnFWRpZKyXRhddgp/UHWv8s8WIB2Wk7E6Xk2BoKJplaE1t4b0YSqUDoJRsMw
+	 tVcUDA5QbhU/ZTBBF3ul0gIgj5OfPMgkThgyJ5bxLgd/p6RPXWM8utTsrTZe9M3RJ9
+	 qukYinl4P0yBDZhpbpCKZ1Rt+JdWITUXF6plovtg5p/NLBAmIaWoXYrgOSr32WNOa/
+	 jHckA2n840FHA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4E907C595D2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 431F3E632D6;
 	Thu,  5 Oct 2023 00:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2][pull request] Intel Wired LAN Driver Updates
- 2023-10-03 (i40e, iavf)
+Subject: Re: [PATCH 0/2] Fix a couple recent instances of
+ -Wincompatible-function-pointer-types-strict from ->mode_get()
+ implementations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169646582831.1612.15989179714660721631.git-patchwork-notify@kernel.org>
+ <169646582827.1612.12032165586969190674.git-patchwork-notify@kernel.org>
 Date: Thu, 05 Oct 2023 00:30:28 +0000
-References: <20231003223610.2004976-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20231003223610.2004976-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+References: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
+In-Reply-To: <20231002-net-wifpts-dpll_mode_get-v1-0-a356a16413cf@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vadfed@fb.com, arkadiusz.kubalewski@intel.com,
+ jiri@resnulli.us, netdev@vger.kernel.org, llvm@lists.linux.dev,
+ patches@lists.linux.dev, richardcochran@gmail.com, jonathan.lemon@gmail.com,
+ saeedm@nvidia.com, leon@kernel.org, linux-rdma@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  3 Oct 2023 15:36:08 -0700 you wrote:
-> This series contains updates to i40e and iavf drivers.
+On Mon, 02 Oct 2023 13:55:19 -0700 you wrote:
+> Hi all,
 > 
-> Yajun Deng aligns reporting of buffer exhaustion statistics to follow
-> documentation for i40e.
-> 
-> Jake removes undesired 'inline' from functions in iavf.
+> This series fixes a couple of instances of
+> -Wincompatible-function-pointer-types-strict that were introduced by a
+> recent series that added a new type of ops, struct dpll_device_ops,
+> along with implementations of the callback ->mode_get() that had a
+> mismatched mode type.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/2] i40e: Add rx_missed_errors for buffer exhaustion
-    https://git.kernel.org/netdev/net-next/c/5337d2949733
-  - [net-next,v2,2/2] iavf: remove "inline" functions from iavf_txrx.c
-    https://git.kernel.org/netdev/net-next/c/70dc7ab7645a
+  - [1/2] ptp: Fix type of mode parameter in ptp_ocp_dpll_mode_get()
+    https://git.kernel.org/netdev/net-next/c/26cc115d590c
+  - [2/2] mlx5: Fix type of mode parameter in mlx5_dpll_device_mode_get()
+    https://git.kernel.org/netdev/net-next/c/f4ecb3d44a11
 
 You are awesome, thank you!
 -- 
