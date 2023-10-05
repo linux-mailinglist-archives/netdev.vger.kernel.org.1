@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-38311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFAE7BA4DF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:12:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F947BA564
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:16:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 23E301C2088B
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:12:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id AEE9D28139F
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FC834CC2;
-	Thu,  5 Oct 2023 16:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A62234CCE;
+	Thu,  5 Oct 2023 16:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o681KbIh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pBanUm71"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1240E30F93
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:12:11 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF8924234
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:12:09 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-405459d9a96so99565e9.0
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 09:12:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5E630F93
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:16:44 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7697A3C1D
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:16:40 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-534694a9f26so12948a12.1
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 09:16:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696522328; x=1697127128; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696522598; x=1697127398; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0r0z6lg6WCpdjTrIkK0dVsLYyVCZ/7MdG8Aqn4UL8Rc=;
-        b=o681KbIh2TlLlhg8XG13gpUMzwdOWGu93tlv1/AmAQmTSR1pYFOLQ39scqoBCGGlhi
-         4twWQG1uOshmLs2xF5w3/nPDQegq0pHr0IWitMDfaFoK/bDa9m+nCYE67EVozR0MX0+X
-         EyGpMb4MPF9fy3rf61gcJROjNqNa6HcEqJuxmhB+ki0io7BHtCw0U0i/lw4kIKZpWQfR
-         6Kjip00dYddoVNJ958TrIuB6gJsLypWAVPUE31LC1LfuJ6rivEEgPkbYFRhuBmoZQOui
-         QtqcpUzWEIo2mO1rI7Z0w5A7W0peQitW15tx4IKCl23o7rV+GX/ihXN7g61y1pw7elN7
-         oC2A==
+        bh=LaaqTDoZqbafDQ3l5zFKWxmU6cOLxM0ZIJSzVNTzttI=;
+        b=pBanUm71ICytkySd7ssQu81m990I3+BLnwYzRiL6TltMvvKuykTTF08MNB5w6+x1Z4
+         tET1HrckbF7IhqBt138j/ON0Cdqqm/yOWYnSQtXBiLQW3RRKk703v+ajvZmZFkpWXLzv
+         5GFaukBKBOSzg7JcaupQTAK6Kkh+8pmMxDAvJlurz9DdkMEo+1NzvnpsBk5r0c7rERYX
+         VwEVZsACBLEN9c6CuEhEWhjaQe/eaIlbgJ0GhlUWqdpRPDPAg8EGycEvju1ld9xa6eRy
+         Ev24pZiVRJqgtwLbJS9hHZ+3qiiisFEuurJYJzFhV5Kr/CQNBtgkQvp7J3BIYJNoKTB0
+         QoUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696522328; x=1697127128;
+        d=1e100.net; s=20230601; t=1696522598; x=1697127398;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0r0z6lg6WCpdjTrIkK0dVsLYyVCZ/7MdG8Aqn4UL8Rc=;
-        b=cfEzgaSzYd4uzgVc8xgtkZl4e0kWuV9nojOWZAi7S6ZlsfyGrReLDcNgpm5cp5nYC4
-         k3sg98NQEOIxfdRjNgShJGojo85Gr+FoByJG34vZjuzMT9P2QIojMsTlYKkCCufWfVKO
-         dHv5LVdomSrsoWK3EI6TF2GjPoN34TTe+Q10nRP5ETRyBww86ICk2DJphdCo/1+iJP8t
-         qzsrJlm0ZeutjgASkl101Ow3bkviOvrIQqAzVA7CT+I0HZahUK8mwZqawDXJr4ddnSsa
-         EoBygFpYW1OJOHYxu0XuLLAdqf8j2wXOfbIdxUPCO/z/EWqd91T8SWHEIHC3rAPKMmrm
-         SzQQ==
-X-Gm-Message-State: AOJu0YzIdc2D5wORgFFvbh6eQYkfJrLy8AJZQxwq12spvI5i9Z++66R1
-	Srt8SGBNDkGpH6rUoOj+Qqu6s2l0Mqy9Dx52MZlMSw==
-X-Google-Smtp-Source: AGHT+IHsG9cALy9l/AGtf9WGqoTk1+vFPuwod1G0A2HPE9T+W6tIBWkayyF2LSEa5O28SfRy9xIMPv/xnERf3BuOFTY=
-X-Received: by 2002:a05:600c:b93:b0:3fe:eb42:7ec with SMTP id
- fl19-20020a05600c0b9300b003feeb4207ecmr61696wmb.1.1696522327966; Thu, 05 Oct
- 2023 09:12:07 -0700 (PDT)
+        bh=LaaqTDoZqbafDQ3l5zFKWxmU6cOLxM0ZIJSzVNTzttI=;
+        b=qIqZBt+CgcXEpaqLlbcu2WYclXHFsJ6aN3BsJfe5cLhdyDlS/JKDkEk/rKhIWaJ5O1
+         +2D+9CS1RfWwVZAuACnvIfAvzCSj2RgbOEECZdmDZdnnljDakU/E9u2F+Y7dVbiU8EOh
+         V27rB7rgweNrguH8vknZ7uO65Ha6GfFgSn3w7qhQF3fRgZvGcLb7DCi1wEtjBzHTT/KU
+         p5rgtuz3mxIHhxY1o4lnNyQb9fsHo/25fnFNQgBJkps08c9Y9KD3p9SMh5MhZng06xT3
+         2xcf2tQjRYAXYU6fMy7M4jO5qebO6rn0LQxjg+dKzTlxHu/SvXabQzfLN4rSAgQONSoC
+         MTAw==
+X-Gm-Message-State: AOJu0Yw02arUmiOIsogvCqvQBxNUE7/YFG61bfTrz3LSkyLnCCVQnSyH
+	E2WfzmyQZU5YitvYDUEd2MYOSxYvhATycsdpKxQIQQ==
+X-Google-Smtp-Source: AGHT+IF0jOJDhaZhmEhxxLATvP2gGYnCETDcm8l2Y4huhZvHpOvz7u8otUILcV3a8DA5O+J6BhBCfMIuLNxeTSP/Dy0=
+X-Received: by 2002:a50:8d5a:0:b0:538:2941:ad10 with SMTP id
+ t26-20020a508d5a000000b005382941ad10mr73466edt.5.1696522598066; Thu, 05 Oct
+ 2023 09:16:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231003145150.2498-1-ansuelsmth@gmail.com> <20231003145150.2498-3-ansuelsmth@gmail.com>
-In-Reply-To: <20231003145150.2498-3-ansuelsmth@gmail.com>
+References: <20231003145150.2498-1-ansuelsmth@gmail.com> <20231003145150.2498-4-ansuelsmth@gmail.com>
+In-Reply-To: <20231003145150.2498-4-ansuelsmth@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 5 Oct 2023 18:11:56 +0200
-Message-ID: <CANn89iK226C-pHUJm7HKMyEtMycGC=KCA2M6kw2KJaUj0cCT6w@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 3/4] netdev: replace napi_reschedule with napi_schedule
+Date: Thu, 5 Oct 2023 18:16:26 +0200
+Message-ID: <CANn89iLtYZJPOQE7OkAbEdmhT8qjzAJ+27poa__3c8Nf0M6u_w@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 4/4] netdev: use napi_schedule bool instead of napi_schedule_prep/__napi_schedule
 To: Christian Marangi <ansuelsmth@gmail.com>
 Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
 	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
@@ -114,21 +114,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 On Tue, Oct 3, 2023 at 8:36=E2=80=AFPM Christian Marangi <ansuelsmth@gmail.=
 com> wrote:
 >
-> Now that napi_schedule return a bool, we can drop napi_reschedule that
-> does the same exact function. The function comes from a very old commit
-> bfe13f54f502 ("ibm_emac: Convert to use napi_struct independent of struct
-> net_device") and the purpose is actually deprecated in favour of
-> different logic.
->
-> Convert every user of napi_reschedule to napi_schedule.
+> Replace if condition of napi_schedule_prep/__napi_schedule and use bool
+> from napi_schedule directly where possible.
 >
 > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> Acked-by: Jeff Johnson <quic_jjohnson@quicinc.com> # ath10k
-> Acked-by: Nick Child <nnac123@linux.ibm.com> # ibm
-> Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for can/dev/rx-offload=
-.c
+> ---
+>  drivers/net/ethernet/atheros/atlx/atl1.c     | 4 +---
+>  drivers/net/ethernet/toshiba/tc35815.c       | 4 +---
+>  drivers/net/wireless/intel/iwlwifi/pcie/rx.c | 4 +---
+>  3 files changed, 3 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ether=
+net/atheros/atlx/atl1.c
+> index 02aa6fd8ebc2..a9014d7932db 100644
+> --- a/drivers/net/ethernet/atheros/atlx/atl1.c
+> +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
+> @@ -2446,7 +2446,7 @@ static int atl1_rings_clean(struct napi_struct *nap=
+i, int budget)
+>
+>  static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
+>  {
+> -       if (!napi_schedule_prep(&adapter->napi))
+> +       if (!napi_schedule(&adapter->napi))
+>                 /* It is possible in case even the RX/TX ints are disable=
+d via IMR
+>                  * register the ISR bits are set anyway (but do not produ=
+ce IRQ).
+>                  * To handle such situation the napi functions used to ch=
+eck is
+> @@ -2454,8 +2454,6 @@ static inline int atl1_sched_rings_clean(struct atl=
+1_adapter* adapter)
+>                  */
+>                 return 0;
+>
+> -       __napi_schedule(&adapter->napi);
+> -
+>         /*
+>          * Disable RX/TX ints via IMR register if it is
+>          * allowed. NAPI handler must reenable them in same
+> diff --git a/drivers/net/ethernet/toshiba/tc35815.c b/drivers/net/etherne=
+t/toshiba/tc35815.c
+> index 14cf6ecf6d0d..a8b8a0e13f9a 100644
+> --- a/drivers/net/ethernet/toshiba/tc35815.c
+> +++ b/drivers/net/ethernet/toshiba/tc35815.c
+> @@ -1436,9 +1436,7 @@ static irqreturn_t tc35815_interrupt(int irq, void =
+*dev_id)
+>         if (!(dmactl & DMA_IntMask)) {
+>                 /* disable interrupts */
+>                 tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
+> -               if (napi_schedule_prep(&lp->napi))
+> -                       __napi_schedule(&lp->napi);
+> -               else {
+> +               if (!napi_schedule(&lp->napi)) {
+>                         printk(KERN_ERR "%s: interrupt taken in poll\n",
+>                                dev->name);
+>                         BUG();
 
-OK, but I suspect some users of napi_reschedule() might not be race-free...
+Hmmm... could you also remove this BUG() ? I think this code path can be ta=
+ken
+if some applications are using busy polling.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Or simply rewrite this with the traditional
+
+if (napi_schedule_prep(&lp->napi)) {
+   /* disable interrupts */
+   tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
+    __napi_schedule(&lp->napi);
+}
+
+
+
+> diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c b/drivers/net/w=
+ireless/intel/iwlwifi/pcie/rx.c
+> index 23b5a0adcbd6..146bc7bd14fb 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
+> @@ -1660,9 +1660,7 @@ irqreturn_t iwl_pcie_irq_rx_msix_handler(int irq, v=
+oid *dev_id)
+>         IWL_DEBUG_ISR(trans, "[%d] Got interrupt\n", entry->entry);
+>
+>         local_bh_disable();
+> -       if (napi_schedule_prep(&rxq->napi))
+> -               __napi_schedule(&rxq->napi);
+> -       else
+> +       if (!napi_schedule(&rxq->napi))
+>                 iwl_pcie_clear_irq(trans, entry->entry);
+
+Same remark here about twisted logic.
+
+>         local_bh_enable();
+>
+> --
+> 2.40.1
+>
 
