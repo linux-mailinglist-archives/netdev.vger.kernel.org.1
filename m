@@ -1,125 +1,183 @@
-Return-Path: <netdev+bounces-38195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73727B9BBD
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:11:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB247B9BEC
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id EE49B1C2091F
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 08:11:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 2BFBA1C2089C
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 08:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D9963BB;
-	Thu,  5 Oct 2023 08:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 187E97479;
+	Thu,  5 Oct 2023 08:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BFB5690
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 08:11:01 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB06869B
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 01:11:00 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qoJRY-0007TQ-8T; Thu, 05 Oct 2023 10:10:48 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qoJRW-00BDt4-Vq; Thu, 05 Oct 2023 10:10:47 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 96E5722F885;
-	Thu,  5 Oct 2023 08:10:46 +0000 (UTC)
-Date: Thu, 5 Oct 2023 10:10:46 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] can: peak_pci: replace deprecated strncpy with strscpy
-Message-ID: <20231005-protract-trough-04a747b5dae2-mkl@pengutronix.de>
-References: <20231005-strncpy-drivers-net-can-sja1000-peak_pci-c-v1-1-c36e1702cd56@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE0420E3
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 08:49:48 +0000 (UTC)
+Received: from mail-oa1-x4d.google.com (mail-oa1-x4d.google.com [IPv6:2001:4860:4864:20::4d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B14F903D
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 01:49:46 -0700 (PDT)
+Received: by mail-oa1-x4d.google.com with SMTP id 586e51a60fabf-1dcf6a4378bso905055fac.3
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 01:49:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696495784; x=1697100584;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O5CT72nr6fyLIM2HBIZewHuJMtsZSdhGCa8W/NlrzdE=;
+        b=KTdFN1NSllT3yeNWjPsD32W851ZK/czCfzAl4nntKPGpu5ejkT26RCisYTRD3Zw+GJ
+         ulse6CTdKkYdSnT5QY9dlshJ21luWbClDwnmah/jyHDPpsCjggZz0yr6/GGvI40QL+FG
+         puM7mUgWpIs1vcdh6fNM8S6raVmxHckauMqpdiaxlVU341hZLCx7Za/B2UVVj0GRLH5R
+         3Dl3NxM1dAxQUvFomyaFJ7g2glED4lg+PR8QLC9imgKUIEpYxEmWAYxNTFZ7MvH29gAa
+         KlebX5zsJREtblFcC8TP9bohEdV856zcH7kIHoge7Q9z3J19eL8iLzz5GPTbmFOHyIph
+         c26w==
+X-Gm-Message-State: AOJu0YwPPY/O7SolLoPNA+opM+BBDY0tHS+MhmjnKmdMTDW3NqVg4OkT
+	2UlRymmDoPCjaU9mU03/61VFuQqDuuWgnTqLYmunK4hf4Zuo
+X-Google-Smtp-Source: AGHT+IHo2mnMCI10UV5TXKADf/v1RkgnT7tekZCDwNptOcZZfYxVDZ7TggD0WGNuei7CQm9SVjBSkU+Mt7tLm3HnsTxz0UA+JsN/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yfy7e5plv3snihai"
-Content-Disposition: inline
-In-Reply-To: <20231005-strncpy-drivers-net-can-sja1000-peak_pci-c-v1-1-c36e1702cd56@google.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6870:1a89:b0:1d6:e8f0:4c47 with SMTP id
+ ef9-20020a0568701a8900b001d6e8f04c47mr1782979oab.9.1696495782543; Thu, 05 Oct
+ 2023 01:49:42 -0700 (PDT)
+Date: Thu, 05 Oct 2023 01:49:42 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007b47270606f43464@google.com>
+Subject: [syzbot] [net?] [wireless?] memory leak in regulatory_init_db
+From: syzbot <syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello,
 
---yfy7e5plv3snihai
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syzbot found the following issue on:
 
-On 05.10.2023 00:05:35, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
->=20
-> NUL-padding is not required since card is already zero-initialized:
-> |       card =3D kzalloc(sizeof(*card), GFP_KERNEL);
->=20
-> A suitable replacement is `strscpy` [2] due to the fact that it
-> guarantees NUL-termination on the destination buffer without
-> unnecessarily NUL-padding.
->=20
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strn=
-cpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.h=
-tml [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
+HEAD commit:    3b517966c561 Merge tag 'dma-mapping-6.6-2023-09-30' of git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=130dac2a680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aa96152f5a3192e3
+dashboard link: https://syzkaller.appspot.com/bug?extid=39ec16ff6cc18b1d066d
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1695bd3e680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ae8c4e680000
 
-applied to linux-can-next/testing.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cb67ab976a91/disk-3b517966.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/21326eb3ef67/vmlinux-3b517966.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0a95555fe120/bzImage-3b517966.xz
 
-regards,
-Marc
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+39ec16ff6cc18b1d066d@syzkaller.appspotmail.com
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+executing program
+BUG: memory leak
+unreferenced object 0xffff888108f880c0 (size 64):
+  comm "swapper/0", pid 1, jiffies 4294938895 (age 68.260s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    ff ff ff ff 00 00 00 00 00 00 00 00 30 30 00 00  ............00..
+  backtrace:
+    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
+    [<ffffffff875a3f05>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff875a3f05>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff875a3f05>] regulatory_hint_core net/wireless/reg.c:3218 [inline]
+    [<ffffffff875a3f05>] regulatory_init_db+0xe5/0x1d0 net/wireless/reg.c:4290
+    [<ffffffff81001cb6>] do_one_initcall+0x76/0x430 init/main.c:1232
+    [<ffffffff874d86ea>] do_initcall_level init/main.c:1294 [inline]
+    [<ffffffff874d86ea>] do_initcalls init/main.c:1310 [inline]
+    [<ffffffff874d86ea>] do_basic_setup init/main.c:1329 [inline]
+    [<ffffffff874d86ea>] kernel_init_freeable+0x25a/0x460 init/main.c:1547
+    [<ffffffff84b3928b>] kernel_init+0x1b/0x290 init/main.c:1437
+    [<ffffffff81149f25>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
+    [<ffffffff81002be1>] ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
---yfy7e5plv3snihai
-Content-Type: application/pgp-signature; name="signature.asc"
+BUG: memory leak
+unreferenced object 0xffff88814490d800 (size 2048):
+  comm "syz-executor220", pid 5026, jiffies 4294943369 (age 23.530s)
+  hex dump (first 32 bytes):
+    d8 4c a8 0d 81 88 ff ff 22 01 00 00 00 00 ad de  .L......".......
+    00 00 00 00 ff ff ff ff ff ff 00 aa aa aa aa aa  ................
+  backtrace:
+    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
+    [<ffffffff84527e6f>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff84527e6f>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff84527e6f>] hci_conn_add+0x4f/0x5e0 net/bluetooth/hci_conn.c:957
+    [<ffffffff84528668>] hci_connect_acl+0x198/0x1b0 net/bluetooth/hci_conn.c:1632
+    [<ffffffff8452b4cb>] hci_connect_sco+0x4b/0x520 net/bluetooth/hci_conn.c:1685
+    [<ffffffff8459d6b3>] sco_connect net/bluetooth/sco.c:266 [inline]
+    [<ffffffff8459d6b3>] sco_sock_connect+0x1c3/0x520 net/bluetooth/sco.c:591
+    [<ffffffff83e96b01>] __sys_connect_file+0x91/0xb0 net/socket.c:2033
+    [<ffffffff83e96c06>] __sys_connect+0xe6/0x110 net/socket.c:2050
+    [<ffffffff83e96c4c>] __do_sys_connect net/socket.c:2060 [inline]
+    [<ffffffff83e96c4c>] __se_sys_connect net/socket.c:2057 [inline]
+    [<ffffffff83e96c4c>] __x64_sys_connect+0x1c/0x20 net/socket.c:2057
+    [<ffffffff84b33fc8>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b33fc8>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
------BEGIN PGP SIGNATURE-----
+BUG: memory leak
+unreferenced object 0xffff8881091dc400 (size 512):
+  comm "kworker/u5:2", pid 5022, jiffies 4294943869 (age 18.530s)
+  hex dump (first 32 bytes):
+    00 d8 90 44 81 88 ff ff c0 b9 e2 0c 81 88 ff ff  ...D............
+    fd 03 00 00 00 00 00 00 00 06 0c 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff81574195>] kmalloc_trace+0x25/0x90 mm/slab_common.c:1114
+    [<ffffffff845627dd>] kmalloc include/linux/slab.h:599 [inline]
+    [<ffffffff845627dd>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff845627dd>] l2cap_conn_add.part.0+0x3d/0x340 net/bluetooth/l2cap_core.c:7845
+    [<ffffffff845703b4>] l2cap_conn_add net/bluetooth/l2cap_core.c:71 [inline]
+    [<ffffffff845703b4>] l2cap_connect_cfm+0x264/0x740 net/bluetooth/l2cap_core.c:8242
+    [<ffffffff8452ba43>] hci_connect_cfm include/net/bluetooth/hci_core.h:1935 [inline]
+    [<ffffffff8452ba43>] hci_conn_failed+0xa3/0x120 net/bluetooth/hci_conn.c:1251
+    [<ffffffff84594cc6>] hci_abort_conn_sync+0x4d6/0x6d0 net/bluetooth/hci_sync.c:5435
+    [<ffffffff8452560d>] abort_conn_sync+0x7d/0xa0 net/bluetooth/hci_conn.c:2894
+    [<ffffffff8458b3ad>] hci_cmd_sync_work+0xcd/0x150 net/bluetooth/hci_sync.c:306
+    [<ffffffff812c8d9d>] process_one_work+0x23d/0x530 kernel/workqueue.c:2630
+    [<ffffffff812c99c7>] process_scheduled_works kernel/workqueue.c:2703 [inline]
+    [<ffffffff812c99c7>] worker_thread+0x327/0x590 kernel/workqueue.c:2784
+    [<ffffffff812d6d9b>] kthread+0x12b/0x170 kernel/kthread.c:388
+    [<ffffffff81149f25>] ret_from_fork+0x45/0x50 arch/x86/kernel/process.c:147
+    [<ffffffff81002be1>] ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUeb4MACgkQvlAcSiqK
-BOi/9AgAsHPVzlJglzleNQFMFyxaqGkZkwgc5tOD3xnbqtN9QtO26R+8Aoq7BBSz
-Sh/g6gASRMZ+SLHQRN+kREceexYQE9Yj9/LQ5btjEEQDvtqCH18wFbKs8UPUrTM6
-OVxPY2nABTwkAlPHflfFqZMj8e04Dj5xzINkzL5Y/zJb0EjQkW//vArdwsoN1MaZ
-Xl416b4G1VEvnRiL1r72stKahrdcatuVGeFiX3h/MaK9dxEh9TTDfbRBy4as9ffL
-ce5iKQRJRC2Cdwz1e59lQNS1Swk+uBuE70TNJmMD7+0oI6DG2HCulCIsPGoHxvii
-gpVabP87ZEiCOeIynVbyyJeYAxNsSA==
-=Ov1N
------END PGP SIGNATURE-----
 
---yfy7e5plv3snihai--
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
