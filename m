@@ -1,160 +1,101 @@
-Return-Path: <netdev+bounces-38171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A3A07B99DA
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 04:15:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D11E47B9A05
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 04:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id BE41F281CAF
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 81109281D92
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B74B15B8;
-	Thu,  5 Oct 2023 02:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41401106;
+	Thu,  5 Oct 2023 02:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="W+KmyvEx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VD9VMX3Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A6EEA9
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 02:15:27 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31469C1;
-	Wed,  4 Oct 2023 19:15:25 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 394Fdvjh019027;
-	Wed, 4 Oct 2023 19:14:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=YB9+Nmw4dr/PPR04PoBlvPvn37t1bScOgxylfQ7VBb4=;
- b=W+KmyvExwsWP+5lTIXo1rMJMxx6X/doCIKlDDkXCwLoTJy1oS3t/zfN978r1Q8jT3Wjf
- qWl4fzIwEyWWBrqCMQDzX5kiCv+tg+klOyC/JcCibCaDYG7puTIn3SHx81RJhm8SiN3z
- lWaPeyUSn23MFz9oA28Tf9jJHAf9uOIws2bD8ZFahow683pudx7d1ZGLTpWHvKure/gT
- jiwcqf9LvzfK1JQx349HUm+nkk4guPM08MgM2pzUVn20Qes2GehhrUdxuXwRnjZE8pNc
- rVIG0VH8Sq9uDy5rbQC9w1WT4OZXnogKnU4SmeSZn+e4N/4Ehd1DNC5QyKKfw5m3UXDa ZA== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3th29um538-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 04 Oct 2023 19:14:43 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 4 Oct
- 2023 19:14:41 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 4 Oct 2023 19:14:41 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 479BE3F707B;
-	Wed,  4 Oct 2023 19:14:32 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
-        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
-        <bigeasy@linutronix.de>
-Subject: [PATCH net v1] octeontx2-pf: Fix page pool frag allocation failure.
-Date: Thu, 5 Oct 2023 07:44:34 +0530
-Message-ID: <20231005021434.3427404-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06817E;
+	Thu,  5 Oct 2023 02:44:07 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22D3C0;
+	Wed,  4 Oct 2023 19:44:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0NQ/g4PmP3KmQk0o9HxrWTK9sWaymND2wvzIv9n7au0=; b=VD9VMX3YpO4p8fBX8lciuydeA6
+	WyT4s8XUgioC6EOCKNETFxjIG9C5ZcUGuN3RqKzqIYq/AFI8xGJrr66v3/Gcgp3gvshBwFj4sTrGS
+	sJwR/zVWIlcIltPUmUwRafp50nLbHGGtSVXvPQAcR7hKJepgX6aUat7loXwwgaRT4pq8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qoEL9-008ICm-Od; Thu, 05 Oct 2023 04:43:51 +0200
+Date: Thu, 5 Oct 2023 04:43:51 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Robert Marko <robimarko@gmail.com>, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Luis Chamberlain <mcgrof@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: aquantia: add firmware load
+ support
+Message-ID: <56227e76-f01f-4b90-b325-1cd9ecb8d5a3@lunn.ch>
+References: <20230930104008.234831-1-robimarko@gmail.com>
+ <20231004162831.0cf1f6a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: evaUIMMyftB6kJu6KHLG9UfVepScin-n
-X-Proofpoint-ORIG-GUID: evaUIMMyftB6kJu6KHLG9UfVepScin-n
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-04_13,2023-10-02_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004162831.0cf1f6a8@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since page pool param's "order" is set to 0, will result
-in below warn message if interface is configured higher
-rx buffer size.
+On Wed, Oct 04, 2023 at 04:28:31PM -0700, Jakub Kicinski wrote:
+> On Sat, 30 Sep 2023 12:39:44 +0200 Robert Marko wrote:
+> > +	ret = of_property_read_string(dev->of_node, "firmware-name",
+> > +				      &fw_name);
+> 
+> Perhaps a well established weirdness of the embedded world but why read
+> the fw name from OF?! You can identify what PHY it is and decide the
+> file name based on that. And also put that fw name in MODULE_FIRMWARE()
+> so that initramfs can be built with appropriate file in place :S
 
-Steps to reproduce the issue.
-1. devlink dev param set pci/0002:04:00.0 name receive_buffer_size \
-   value 8196 cmode runtime
-2. ifconfig eth0 up
+The Aquantia PHY and its `firmware` is just weird. It is more than
+just firmware, it also contains what i think they call provisioning.
+That is basically the reset defaults for registers. And not everything
+is documented, and i think parts of that provision contains SERDES eye
+configuration. So i think you end up with a custom firmware per board?
+And you can never trust the firmware in one device will do the same
+thing as a different firmware in another device, because the reset
+defaults are a bit fuzzy. The PHY driver is somewhat built on sand,
+since you cannot really trust any register to have any specific reset
+value.
 
-[   19.901356] ------------[ cut here ]------------
-[   19.901361] WARNING: CPU: 11 PID: 12331 at net/core/page_pool.c:567 page_pool_alloc_frag+0x3c/0x230
-[   19.901449] pstate: 82401009 (Nzcv daif +PAN -UAO +TCO -DIT +SSBS BTYPE=--)
-[   19.901451] pc : page_pool_alloc_frag+0x3c/0x230
-[   19.901453] lr : __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901460] sp : ffff80000f66b970
-[   19.901461] x29: ffff80000f66b970 x28: 0000000000000000 x27: 0000000000000000
-[   19.901464] x26: ffff800000d15b68 x25: ffff000195b5c080 x24: ffff0002a5a32dc0
-[   19.901467] x23: ffff0001063c0878 x22: 0000000000000100 x21: 0000000000000000
-[   19.901469] x20: 0000000000000000 x19: ffff00016f781000 x18: 0000000000000000
-[   19.901472] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[   19.901474] x14: 0000000000000000 x13: ffff0005ffdc9c80 x12: 0000000000000000
-[   19.901477] x11: ffff800009119a38 x10: 4c6ef2e3ba300519 x9 : ffff800000d13844
-[   19.901479] x8 : ffff0002a5a33cc8 x7 : 0000000000000030 x6 : 0000000000000030
-[   19.901482] x5 : 0000000000000005 x4 : 0000000000000000 x3 : 0000000000000a20
-[   19.901484] x2 : 0000000000001080 x1 : ffff80000f66b9d4 x0 : 0000000000001000
-[   19.901487] Call trace:
-[   19.901488]  page_pool_alloc_frag+0x3c/0x230
-[   19.901490]  __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901494]  otx2_rq_aura_pool_init+0x1c4/0x240 [rvu_nicpf]
-[   19.901498]  otx2_open+0x228/0xa70 [rvu_nicpf]
-[   19.901501]  otx2vf_open+0x20/0xd0 [rvu_nicvf]
-[   19.901504]  __dev_open+0x114/0x1d0
-[   19.901507]  __dev_change_flags+0x194/0x210
-[   19.901510]  dev_change_flags+0x2c/0x70
-[   19.901512]  devinet_ioctl+0x3a4/0x6c4
-[   19.901515]  inet_ioctl+0x228/0x240
-[   19.901518]  sock_ioctl+0x2ac/0x480
-[   19.901522]  __arm64_sys_ioctl+0x564/0xe50
-[   19.901525]  invoke_syscall.constprop.0+0x58/0xf0
-[   19.901529]  do_el0_svc+0x58/0x150
-[   19.901531]  el0_svc+0x30/0x140
-[   19.901533]  el0t_64_sync_handler+0xe8/0x114
-[   19.901535]  el0t_64_sync+0x1a0/0x1a4
-[   19.901537] ---[ end trace 678c0bf660ad8116 ]---
+So i can understand putting the board specific firmware name in DT,
+and that the firmware will never be in linux-firmware because it would
+not scale, and there never being one firmware usable for all
+boards. And this odd way of doing things means the usual mechanisms
+for getting the firmware in initramfs does not work.
 
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+I suppose the question is, do we want to say this is all too ugly for
+Linux, solve it in the bootloader, or spend the extra $0.50 for a
+flash chip and put the firmware in at the factory. As a kernel
+developer i would want the boot loader to solve this, so i can TFTP
+boot the kernel. I would also like having a rescue mechanism for when
+i brick Linux on the box and need to boot a Debian install image to
+recover it.
 
----
-ChangeLog
-
-v0 -> v1: Used get_order() and PAGE_ALIGN. Fixed commit message
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 997fedac3a98..a917577d5092 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1357,7 +1357,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 	struct page_pool_params pp_params = { 0 };
- 	struct npa_aq_enq_req *aq;
- 	struct otx2_pool *pool;
--	int err;
-+	int err, sz;
- 
- 	pool = &pfvf->qset.pool[pool_id];
- 	/* Alloc memory for stack which is used to store buffer pointers */
-@@ -1403,6 +1403,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 		return 0;
- 	}
- 
-+	sz = PAGE_ALIGN(ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN));
-+	pp_params.order = get_order(sz);
- 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
- 	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
- 	pp_params.nid = NUMA_NO_NODE;
--- 
-2.25.1
-
+    Andrew
 
