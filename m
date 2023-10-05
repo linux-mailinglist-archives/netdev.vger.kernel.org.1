@@ -1,223 +1,142 @@
-Return-Path: <netdev+bounces-38234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4811B7B9D35
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:10:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBB97B9D36
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 40227281851
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:10:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id C72A5281899
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 13:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77D418E1B;
-	Thu,  5 Oct 2023 13:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED5918E1D;
+	Thu,  5 Oct 2023 13:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ju6KwXVz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2Qn3soMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA558182A0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:10:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9786C3279E;
-	Thu,  5 Oct 2023 13:10:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696511440;
-	bh=LxKcAbPkS1cN5cY1R9jQZD6PER+7X5ZwZdPa6n8vJGg=;
-	h=Subject:From:To:Cc:Date:From;
-	b=Ju6KwXVz3gkwfKkmEA3JF3RM+/2VRh1g1trHhqI0As4yUigUHpPWgpwcJBsZ6isKm
-	 ew2AN+WZ150cZNuv7SPIoqxDV6TNCVT9aOnQhM2BiQB04A89TRPBXW15majKXBdd1U
-	 Mzlv1OdMSCmt7NCfug/NvCk2Wf4ncl2XtgZl1MK/nuoiH6raasAI7A0Z1j0ywpxcuk
-	 WE0MhJuj/ES+eXZ0U4R1P13sjnMO8jKsDSeEuYmjCXfKbYm1Ed+FHb2ePp1NmXYNgU
-	 K00wiM4HO4Tz2YVQWHx+VREZKU82u1DMnynnwyay/tU1TZiAGTw1bPKed10iRNCIj9
-	 jazG71SlqTDBA==
-Subject: [PATCH RFC] tools: ynl: Add source files for nfsd netlink protocol
-From: Chuck Lever <cel@kernel.org>
-To: kuba@kernel.org
-Cc: Chuck Lever <chuck.lever@oracle.com>, netdev@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Date: Thu, 05 Oct 2023 09:10:38 -0400
-Message-ID: 
- <169651139213.16787.3812644920847558917.stgit@klimt.1015granger.net>
-User-Agent: StGit/1.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625A9182A0
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:11:22 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061d.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::61d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8853C2754B;
+	Thu,  5 Oct 2023 06:11:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gJ9cNH3O0DX0e3VvJnIzbvaZFW9/XTP4LIp4IsM7GHBWDrF5t6iQXlHATvZFZUtLRsiwqVDCUzUpVOn8HolvP9zPFpfIFAdD7dao16+YuYTbuxIOEbPGMtYNla2jvu/6N6AJiEuokS4Rl4qeDGZ2jgrlUqSl2AjnYqQrYn9ShU8vPZrDTz9bd2ofFY2ReAME8YFrZ10fHYz7O8naGvjPw+N8rtlF+lj2i+ww66Sp0e/18EKcA4Ce28ur0Tm38aG3TztfmmiWFOCfPRGIVrNmGVp4lbjyGmQnRA0pRyFYBVaJTH8fUKfMhyKJ691b7nxy6o+Ewj8f4ze8VfoZ12ATdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hnX3GY+UMWUJ7I9J9bGhVbe0a7Xsp9/YkMeWG4j92cI=;
+ b=hXZ0Haw5XsdExQvr/xjSRqzEsY9tXH7wkQJGFN4khJR8ZJecns55Q5q+qbCA8P3MT/vPwiIw2e3SzB7qVNZZr/4EQyuBFmXekrFEGi5O/Nqi6eZA2zHI5eFMFmudzPjW5YE1FFpgD8PBWvoB/2ga7DMZUlo1KUmVCLvye0LRaF9yw7JtNhKH8FW5Yr1KS8iNVa0EK4n9KbfkDpUlAjmaURfCaUiUBxmGJ1NgyNF1MjH3HexNUHomuD7w7rIo20JOkEzMaQTmieOurCHBZ/c1xRvr4yWB7QXbg5P2npoGRfMM+ybNb0VRPVJCeL69iCWKG42yZA3wH0AuqZ8RNZnE9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hnX3GY+UMWUJ7I9J9bGhVbe0a7Xsp9/YkMeWG4j92cI=;
+ b=2Qn3soMe5t4ztdgSmedTSqgfiwsbCebtkf/bsRJ8uagpA4CnHoYbBb9LE4Bb4JvvoEz/3iZ7ljWoa8qpngj7fK2Q9ZvxH7jMC/pLL8mbwgMPAdJBH7XX5Nc2SQa51d2HdpAbY+ufz2WFqplSfMlp//PdVSazel9CREeS5pHof9o=
+Received: from MW4PR04CA0373.namprd04.prod.outlook.com (2603:10b6:303:81::18)
+ by DM4PR12MB8475.namprd12.prod.outlook.com (2603:10b6:8:190::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.22; Thu, 5 Oct
+ 2023 13:11:04 +0000
+Received: from MWH0EPF000989E7.namprd02.prod.outlook.com
+ (2603:10b6:303:81:cafe::f6) by MW4PR04CA0373.outlook.office365.com
+ (2603:10b6:303:81::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.37 via Frontend
+ Transport; Thu, 5 Oct 2023 13:11:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989E7.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6838.14 via Frontend Transport; Thu, 5 Oct 2023 13:11:03 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 5 Oct
+ 2023 08:11:01 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
+ (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 5 Oct
+ 2023 08:10:44 -0500
+Received: from xhdharinik40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.27 via Frontend
+ Transport; Thu, 5 Oct 2023 08:10:40 -0500
+From: Harini Katakam <harini.katakam@amd.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <esben@geanix.com>, <jsc@umbraculum.org>,
+	<christophe.jaillet@wanadoo.fr>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <harinikatakamlinux@gmail.com>,
+	<michal.simek@amd.com>, <harini.katakam@amd.com>,
+	<radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next] MAINTAINERS: Update LL TEMAC entry to Orphan
+Date: Thu, 5 Oct 2023 18:40:39 +0530
+Message-ID: <20231005131039.25881-1-harini.katakam@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E7:EE_|DM4PR12MB8475:EE_
+X-MS-Office365-Filtering-Correlation-Id: 259475cb-6751-46a2-73d5-08dbc5a48727
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	4PKvaW5IGuG6Pwt4xw8tau0cEKh4yivPWdwi33GWJavJbW62zwigBCAS0eBiv8yJYEPFW7Zq4sbsANc2+uMKIJijYve94xfWHVmTw0uMnGGETqAaAmopdAhkHkb51oXTK6ucXKMEbulAsOaOAC8O0RsYgrB9lq1Ek8zyCdXiDRRfDs5SmisP2lErmjwEEgX22IzX8LMsBHn+DsG5/8XuXKDkvpiPFo2GrTHG3bPRAyGKUMYRqfcI5pDl5TTRYxJZkdNFAjYdNdKaBFmLm1s6HywLzR9/huOG54k6Xn6wqIOi0hwaiIK5pGQi8UhdWTE4n6Nu90MhMCI5ck2CqpNR5xYvu7VFC912rSopyj32k90JMiSWJwBwm6aESqOVjSp9HOPNx75HenjapDWULhMOhMvMnsajd3H6FPAVyoWNsOIM3VgoWPuASOrBozTWS4o3tdUApWQ/dkeLqKQ0NHDL3B3o0s0AtQvXwc/nDL2OTApTWFRKTgf05cNDFcTHfTwNZ8uS+nW56lXabnFeC8sm+yiPNx4prkHOFNJ+gTZSRBEeb1SGhBkKxTFSHk/FfbPoVtqbWqEwWUuBRuuzH35U2fcNtnNBmufT/a71G0uLg30f8oDs4AoiHehHGA29BompIrTlSgSgNAoholv1Yzw4Dj0WjxxnuPLu6GRfx/0dNBcdlGOifI3XOCa94f8RpZ90txFCgndZYxKxRdBmTRi6AC5Va81PG4Nu2vXOL3gpnVrB/8lct6/fcW8bQQ5RWD4l3Wjs7KWCKllV5hhEHAO5oQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(39860400002)(136003)(396003)(376002)(230922051799003)(186009)(64100799003)(451199024)(1800799009)(82310400011)(46966006)(36840700001)(40470700004)(40460700003)(83380400001)(4744005)(2906002)(1076003)(86362001)(26005)(36756003)(40480700001)(336012)(2616005)(426003)(478600001)(82740400003)(41300700001)(316002)(47076005)(44832011)(5660300002)(36860700001)(8676002)(54906003)(4326008)(70206006)(8936002)(7416002)(110136005)(81166007)(356005)(70586007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2023 13:11:03.4312
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 259475cb-6751-46a2-73d5-08dbc5a48727
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8475
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_NONE,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Chuck Lever <chuck.lever@oracle.com>
+Since there's no alternate driver, change this entry from obsolete
+to orphan.
 
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
+Signed-off-by: Harini Katakam <harini.katakam@amd.com>
 ---
- tools/net/ynl/generated/Makefile    |    2 -
- tools/net/ynl/generated/nfsd-user.c |   95 +++++++++++++++++++++++++++++++++++
- tools/net/ynl/generated/nfsd-user.h |   33 ++++++++++++
- 3 files changed, 129 insertions(+), 1 deletion(-)
- create mode 100644 tools/net/ynl/generated/nfsd-user.c
- create mode 100644 tools/net/ynl/generated/nfsd-user.h
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Hi Jakub-
-
-Should I include this with the nfsd netlink protocol patches already
-in nfsd-next, or do you want to take it after those have been merged?
-
-
-diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
-index f8817d2e56e4..c1935b01902e 100644
---- a/tools/net/ynl/generated/Makefile
-+++ b/tools/net/ynl/generated/Makefile
-@@ -14,7 +14,7 @@ YNL_GEN_ARG_ethtool:=--user-header linux/ethtool_netlink.h \
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 03011d7ee087..4fa34902d379 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -23698,7 +23698,7 @@ F:	drivers/gpio/gpio-zynq.c
  
- TOOL:=../ynl-gen-c.py
+ XILINX LL TEMAC ETHERNET DRIVER
+ L:	netdev@vger.kernel.org
+-S:	Obsolete
++S:	Orphan
+ F:	drivers/net/ethernet/xilinx/ll_temac*
  
--GENS:=ethtool devlink handshake fou netdev
-+GENS:=ethtool devlink handshake fou netdev nfsd
- SRCS=$(patsubst %,%-user.c,${GENS})
- HDRS=$(patsubst %,%-user.h,${GENS})
- OBJS=$(patsubst %,%-user.o,${GENS})
-diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/generated/nfsd-user.c
-new file mode 100644
-index 000000000000..fec6828680ce
---- /dev/null
-+++ b/tools/net/ynl/generated/nfsd-user.c
-@@ -0,0 +1,95 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/nfsd.yaml */
-+/* YNL-GEN user source */
-+
-+#include <stdlib.h>
-+#include <string.h>
-+#include "nfsd-user.h"
-+#include "ynl.h"
-+#include <linux/nfsd_netlink.h>
-+
-+#include <libmnl/libmnl.h>
-+#include <linux/genetlink.h>
-+
-+/* Enums */
-+static const char * const nfsd_op_strmap[] = {
-+	[NFSD_CMD_RPC_STATUS_GET] = "rpc-status-get",
-+};
-+
-+const char *nfsd_op_str(int op)
-+{
-+	if (op < 0 || op >= (int)MNL_ARRAY_SIZE(nfsd_op_strmap))
-+		return NULL;
-+	return nfsd_op_strmap[op];
-+}
-+
-+/* Policies */
-+struct ynl_policy_attr nfsd_rpc_status_policy[NFSD_A_RPC_STATUS_MAX + 1] = {
-+	[NFSD_A_RPC_STATUS_XID] = { .name = "xid", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_FLAGS] = { .name = "flags", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_PROG] = { .name = "prog", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_VERSION] = { .name = "version", .type = YNL_PT_U8, },
-+	[NFSD_A_RPC_STATUS_PROC] = { .name = "proc", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_SERVICE_TIME] = { .name = "service_time", .type = YNL_PT_U64, },
-+	[NFSD_A_RPC_STATUS_PAD] = { .name = "pad", .type = YNL_PT_IGNORE, },
-+	[NFSD_A_RPC_STATUS_SADDR4] = { .name = "saddr4", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_DADDR4] = { .name = "daddr4", .type = YNL_PT_U32, },
-+	[NFSD_A_RPC_STATUS_SADDR6] = { .name = "saddr6", .type = YNL_PT_BINARY,},
-+	[NFSD_A_RPC_STATUS_DADDR6] = { .name = "daddr6", .type = YNL_PT_BINARY,},
-+	[NFSD_A_RPC_STATUS_SPORT] = { .name = "sport", .type = YNL_PT_U16, },
-+	[NFSD_A_RPC_STATUS_DPORT] = { .name = "dport", .type = YNL_PT_U16, },
-+	[NFSD_A_RPC_STATUS_COMPOUND_OPS] = { .name = "compound-ops", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest nfsd_rpc_status_nest = {
-+	.max_attr = NFSD_A_RPC_STATUS_MAX,
-+	.table = nfsd_rpc_status_policy,
-+};
-+
-+/* Common nested types */
-+/* ============== NFSD_CMD_RPC_STATUS_GET ============== */
-+/* NFSD_CMD_RPC_STATUS_GET - dump */
-+void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp)
-+{
-+	struct nfsd_rpc_status_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		free(rsp->obj.saddr6);
-+		free(rsp->obj.daddr6);
-+		free(rsp->obj.compound_ops);
-+		free(rsp);
-+	}
-+}
-+
-+struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct nfsd_rpc_status_get_list);
-+	yds.cb = nfsd_rpc_status_get_rsp_parse;
-+	yds.rsp_cmd = NFSD_CMD_RPC_STATUS_GET;
-+	yds.rsp_policy = &nfsd_rpc_status_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NFSD_CMD_RPC_STATUS_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	nfsd_rpc_status_get_list_free(yds.first);
-+	return NULL;
-+}
-+
-+const struct ynl_family ynl_nfsd_family =  {
-+	.name		= "nfsd",
-+};
-diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/generated/nfsd-user.h
-new file mode 100644
-index 000000000000..b6b69501031a
---- /dev/null
-+++ b/tools/net/ynl/generated/nfsd-user.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/nfsd.yaml */
-+/* YNL-GEN user header */
-+
-+#ifndef _LINUX_NFSD_GEN_H
-+#define _LINUX_NFSD_GEN_H
-+
-+#include <stdlib.h>
-+#include <string.h>
-+#include <linux/types.h>
-+#include <linux/nfsd_netlink.h>
-+
-+struct ynl_sock;
-+
-+extern const struct ynl_family ynl_nfsd_family;
-+
-+/* Enums */
-+const char *nfsd_op_str(int op);
-+
-+/* Common nested types */
-+/* ============== NFSD_CMD_RPC_STATUS_GET ============== */
-+/* NFSD_CMD_RPC_STATUS_GET - dump */
-+struct nfsd_rpc_status_get_list {
-+	struct nfsd_rpc_status_get_list *next;
-+	struct nfsd_rpc_status_get_rsp obj __attribute__ ((aligned (8)));
-+};
-+
-+void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp);
-+
-+struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys);
-+
-+#endif /* _LINUX_NFSD_GEN_H */
-
+ XILINX PWM DRIVER
+-- 
+2.17.1
 
 
