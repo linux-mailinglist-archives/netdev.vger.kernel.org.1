@@ -1,163 +1,169 @@
-Return-Path: <netdev+bounces-38272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79EDC7B9E48
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:04:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E7747BA277
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 17:38:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 22583281F84
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:04:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 2EC4A2817AE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 15:38:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAAA2773A;
-	Thu,  5 Oct 2023 14:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8467630CFA;
+	Thu,  5 Oct 2023 15:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="wLRTr23x"
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="dgrd4JPX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A6D27722;
-	Thu,  5 Oct 2023 14:04:12 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44AA147886;
-	Thu,  5 Oct 2023 07:02:59 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3959Elmm006036;
-	Thu, 5 Oct 2023 13:27:21 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=vPDJqlOkcYsv+9E6fFIpFrHnKzbiUCA3RfHCCwQImm4=; b=wL
-	RTr23xKY7IlRigOfwIllM/hLW5K9GUXkc/7FSGDPEn5YXwseGCyQ/UKylHdKNSuO
-	bfP1lheXVsK7D7iQ3dleD2h9+5XOp3LGEB33YQCTPT591qrNYamX19LfD/KdYqIH
-	YNg9AorRRHs1+eudFpgYutNUJyZkJVLVwE9kEJ/30sxoLaALrpJWghb5UDQu5ovm
-	fI5Ju8eQwkSDDr/dFuvh7DVlz5pFROmhHyBb9sJyLT8t4i7rAj+4QYaPqC0BJ61Y
-	3Omq6DOM1nxZoJF3swy7hDQf+Ckf1Hq3U3NyONDtSkf1dpXzrAzmr9FvJQptpPYN
-	rvV5RUf4NkD1GEwrgWqQ==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3thtbbrk16-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Oct 2023 13:27:21 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 5A34010005C;
-	Thu,  5 Oct 2023 13:27:20 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4C59F23D3E2;
-	Thu,  5 Oct 2023 13:27:20 +0200 (CEST)
-Received: from [10.252.31.76] (10.252.31.76) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 5 Oct
- 2023 13:27:18 +0200
-Message-ID: <c8804fbe-46e7-2771-e503-4e786df2f97c@foss.st.com>
-Date: Thu, 5 Oct 2023 13:27:18 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E6030CF4
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:38:29 +0000 (UTC)
+X-Greylist: delayed 4506 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 05 Oct 2023 08:38:25 PDT
+Received: from m15.mail.126.com (m15.mail.126.com [45.254.50.224])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6AD0F27B1C;
+	Thu,  5 Oct 2023 08:38:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:Subject:Date:Message-Id; bh=LfDP8Q3SbfxhvYe2p+
+	Jc+kb6Bw/OvEf2Np0A9Pqlpqc=; b=dgrd4JPXyQ6ZcExPM/hkFnTtmxUL3A3ORB
+	TZtgNUJyUf32zlFMQ+xgijCtSL/Ln8596DnwVQhRzEG+J2HyAbOcvvTL3U3+Hqct
+	zYiDRcrXGG4gIGyf3LkycViSLAiVrWSX17CgKF7yBRR/cPoimddzy7arBfrrUVaj
+	dREcK0vq4=
+Received: from localhost.localdomain (unknown [111.48.58.12])
+	by zwqz-smtp-mta-g1-1 (Coremail) with SMTP id _____wD3HxwAox5lI+7GBA--.31668S2;
+	Thu, 05 Oct 2023 19:50:25 +0800 (CST)
+From: xiaolinkui <xiaolinkui@126.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	justinstitt@google.com,
+	kuniyu@amazon.com
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Linkui Xiao <xiaolinkui@kylinos.cn>
+Subject: [PATCH] netfilter: ipset: wait for xt_recseq on all cpus
+Date: Thu,  5 Oct 2023 19:50:22 +0800
+Message-Id: <20231005115022.12902-1-xiaolinkui@126.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:_____wD3HxwAox5lI+7GBA--.31668S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxGF48Ww45Gr1Utw13Wr4DJwb_yoWrXw1xpF
+	W5Wr13Kr48ZFnrAr1DAr10yry5twnxAa1UtF4fGw1fWF17Gw1UWF18tFW7KF17Xr9Yqr13
+	tw1Dt340qr1UWaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jzJP_UUUUU=
+X-Originating-IP: [111.48.58.12]
+X-CM-SenderInfo: p0ld0z5lqn3xa6rslhhfrp/1tbibQYA1lpEFCD44QAAsO
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v3 08/12] net: ethernet: stmmac: stm32: support the
- phy-supply regulator binding
-Content-Language: en-US
-To: Ben Wolsieffer <ben.wolsieffer@hefring.com>
-CC: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20230928151512.322016-1-christophe.roullier@foss.st.com>
- <20230928151512.322016-9-christophe.roullier@foss.st.com>
- <ZRWfhk0aEDwytGv5@dell-precision-5540>
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <ZRWfhk0aEDwytGv5@dell-precision-5540>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.252.31.76]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-05_08,2023-10-05_01,2023-05-22_02
-X-Spam-Status: No, score=-6.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
+From: Linkui Xiao <xiaolinkui@kylinos.cn>
 
-On 9/28/23 17:45, Ben Wolsieffer wrote:
-> Hello,
->
-> On Thu, Sep 28, 2023 at 05:15:08PM +0200, Christophe Roullier wrote:
->> From: Christophe Roullier <christophe.roullier@st.com>
->>
->> Configure the phy regulator if defined by the "phy-supply" DT phandle.
->>
->> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
->> ---
->>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 51 ++++++++++++++++++-
->>   1 file changed, 50 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> index 72dda71850d75..31e3abd2caeaa 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> ... snip ...
->>   static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
->> @@ -455,12 +496,20 @@ static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
->>   	if (dwmac->enable_eth_ck)
->>   		clk_disable_unprepare(dwmac->clk_eth_ck);
->>   
->> +	/* Keep the PHY up if we use Wake-on-Lan. */
->> +	if (!device_may_wakeup(dwmac->dev))
->> +		phy_power_on(dwmac, false);
->> +
->>   	return ret;
->>   }
->>   
->>   static void stm32mp1_resume(struct stm32_dwmac *dwmac)
->>   {
->>   	clk_disable_unprepare(dwmac->clk_ethstp);
->> +
->> +	/* The PHY was up for Wake-on-Lan. */
->> +	if (!device_may_wakeup(dwmac->dev))
->> +		phy_power_on(dwmac, true);
->>   }
->>   
->>   static int stm32mcu_suspend(struct stm32_dwmac *dwmac)
-> Why only turn off the regulator in suspend on the STM32MP1 and not STM32
-> MCUs? It seems like this could just go in stm32_dwmac_suspend/resume().
->
-> Selfishly, I have a use case for this on an STM32F746 platform, so I
-> would like to see support for it and would test an updated version.
->
-Hi,
+Before destroying the ipset, take a check on sequence to ensure that the
+ip_set_test operation of this ipset has been completed.
 
-I'm working on MPU boards, I do not have MCU board, so feel free to 
-contribute on MCU part ;-)
+The code of set_match_v4 is protected by addend=xt_write_recseq_begin() and
+xt_write_recseq_end(addend). So we can ensure that the test operation is
+completed by reading seqcount.
 
-Thanks
+Otherwise, there will be a low probability of use-after-free problems
+occurring:
 
-Christophe
+ PC: ffff0000033c0168  [hash_net4_kadt+56]
+ LR: ffff000002b811bc  [ip_set_test+188]
+ SP: ffff8003fff3f8d0  PSTATE: 60400005
+X29: ffff8003fff3f8d0  X28: ffff8003ab915c4e  X27: ffff8003b0c7a000
+X26: ffff8003b9780040  X25: ffff000000c70600  X24: ffff8003ac2c0200
+X23: ffff000002f70fcc  X22: 0000000000000002  X21: ffff8003ac2c0200
+X20: ffff8003be8e2800  X19: ffff8003fff3f9c8  X18: 0000000000000000
+X17: 0000000000000000  X16: 0000000000000000  X15: 0000000000000000
+X14: 970000002d494600  X13: 0000000000000000  X12: c5d405f139e6e418
+X11: ffff000000c70600  X10: ffff8003b0c7a000   X9: 0000000000000001
+ X8: 0000000000000000   X7: 000000000000005f   X6: 0000000000000000
+ X5: ffff0000033c0130   X4: ffff8003fff3f9c8   X3: 0000000000000002
+ X2: ffff0000033d01d8   X1: 00000000ffffffff   X0: 0000000000000000
+[ffff8003fff3f8d0] hash_net4_kadt at ffff0000033c0164 [ip_set_hash_net]
+[ffff8003fff3f940] ip_set_test at ffff000002b811b8 [ip_set]
+[ffff8003fff3f990] set_match_v4 at ffff000002f70fc8 [xt_set]
+[ffff8003fff3fa20] ipt_do_table at ffff000000c504e0 [ip_tables]
+[ffff8003fff3fb60] iptable_filter_hook at ffff00000266006c [iptable_filter]
+[ffff8003fff3fb80] nf_hook_slow at ffff000008ac7a84
+[ffff8003fff3fbc0] ip_local_deliver at ffff000008ad5d88
+[ffff8003fff3fc10] ip_rcv_finish at ffff000008ad59b4
+[ffff8003fff3fc40] ip_rcv at ffff000008ad5dec
+[ffff8003fff3fca0] __netif_receive_skb_one_core at ffff000008a6c344
+[ffff8003fff3fce0] __netif_receive_skb at ffff000008a6c3ac
+[ffff8003fff3fd00] netif_receive_skb_internal at ffff000008a6c440
+[ffff8003fff3fd30] napi_gro_receive at ffff000008a6d3ec
+[ffff8003fff3fd60] receive_buf at ffff000001c934d8 [virtio_net]
+[ffff8003fff3fe20] virtnet_poll at ffff000001c953e8 [virtio_net]
+[ffff8003fff3fec0] net_rx_action at ffff000008a6c9ec
+[ffff8003fff3ff60] __softirqentry_text_start at ffff0000080819f0
+[ffff8003fff3fff0] irq_exit at ffff0000080f1228
+[ffff8003fff40010] __handle_domain_irq at ffff000008162a10
 
->> -- 
->> 2.25.1
->>
-> Thanks, Ben
+Signed-off-by: Linkui Xiao <xiaolinkui@kylinos.cn>
+---
+ net/netfilter/ipset/ip_set_core.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_set_core.c
+index 46f4f47e29e4..53561176162f 100644
+--- a/net/netfilter/ipset/ip_set_core.c
++++ b/net/netfilter/ipset/ip_set_core.c
+@@ -1187,6 +1187,24 @@ ip_set_destroy_set(struct ip_set *set)
+ 	kfree(set);
+ }
+ 
++static void wait_xt_recseq(void)
++{
++	unsigned int cpu;
++
++	/* wait for even xt_recseq on all cpus */
++	for_each_possible_cpu(cpu) {
++		seqcount_t *s = &per_cpu(xt_recseq, cpu);
++		u32 seq = raw_read_seqcount(s);
++
++		if (seq & 1) {
++			do {
++				cond_resched();
++				cpu_relax();
++			} while (seq == raw_read_seqcount(s));
++		}
++	}
++}
++
+ static int ip_set_destroy(struct sk_buff *skb, const struct nfnl_info *info,
+ 			  const struct nlattr * const attr[])
+ {
+@@ -1225,6 +1243,7 @@ static int ip_set_destroy(struct sk_buff *skb, const struct nfnl_info *info,
+ 		for (i = 0; i < inst->ip_set_max; i++) {
+ 			s = ip_set(inst, i);
+ 			if (s) {
++				wait_xt_recseq();
+ 				ip_set(inst, i) = NULL;
+ 				ip_set_destroy_set(s);
+ 			}
+@@ -1243,6 +1262,7 @@ static int ip_set_destroy(struct sk_buff *skb, const struct nfnl_info *info,
+ 			ret = -IPSET_ERR_BUSY;
+ 			goto out;
+ 		}
++		wait_xt_recseq();
+ 		ip_set(inst, i) = NULL;
+ 		read_unlock_bh(&ip_set_ref_lock);
+ 
+-- 
+2.17.1
+
 
