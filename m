@@ -1,115 +1,138 @@
-Return-Path: <netdev+bounces-38421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68457BABB2
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:56:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26FB7BABC7
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 23:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id DD9EB1C208FA
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 20:56:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 317B2B2098D
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 21:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E943FB27;
-	Thu,  5 Oct 2023 20:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C64B41760;
+	Thu,  5 Oct 2023 21:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BnLGK1W3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3UHxsNuJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13BA134B6
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 20:56:52 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393881B4
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 13:56:50 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32325534cfaso1331823f8f.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 13:56:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEBC4177F
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:05:47 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5FF9C0
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:05:44 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a2318df875so21371347b3.2
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 14:05:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696539408; x=1697144208; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7DAHDrfXtdyG1iqpwyN2VAU+p3Dn2E1eqHCWxsU4Zlw=;
-        b=BnLGK1W3JxsjlZzcPC6z+azEMv+qy/OeOeORhoqwRsuX1/ie+NuZZHkgr1dzaT392b
-         hXiwhhDNstvYcvUuWqGq25c0rKioEV/U2hLJlGK+YLhNn9KXBLqgypAjo5ieSFLIC+AD
-         y/5bG8rGbLjMnPYPUit4aU6d2IVFYM3+LmFY0Hplg9ebb2c7J+23JXEp9ZCbZVAGh1HL
-         xqVaNsbAQyt276BQHpwk4BgLGrfZLsZPcWqJUsjylUOlZqNhYu5Q+JEsV+jDT6QT9O6M
-         e6CcG3zuAq7SEW4rNMcOoFyK/fpgBCxymD9RnAn3yncluy7yuJTtpRNl4NDduv8cCfBZ
-         sy3A==
+        d=google.com; s=20230601; t=1696539944; x=1697144744; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=H4y2YlrnXWnp/3hBKGWFmY8QqOEGdTjDuhv++ThsjEU=;
+        b=3UHxsNuJw13MYYcb1v/IzDb9O+Ehjey4iE5+8L7c4DKUlVB59vKzKp7yRpDq2MORDy
+         uhE9ga55yAyh0ZkC0+58TtAFMP94wBZd9phHO4SBc2KC3bYAncqR6aLIVwyKcrPxvKQv
+         UQtq5gYNQFTQKdzRmWEEDiNhFqb+YndaqyqZzk589ePyq570td+Ur8WNiOYvMHWgO+Qh
+         Pkb9DAAmCfJBB1WU7EsrJcmv3rMDJUp75MFmwXI/iNcNLdCji/gOyAgZkDdqw63uFqfb
+         p2odL43ZiZ19uHM23jeqMWL4aQZ4EPoKAu0S6xiUYgknczYDwVHp5cCiSz2LfxZyco/9
+         oXmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696539408; x=1697144208;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7DAHDrfXtdyG1iqpwyN2VAU+p3Dn2E1eqHCWxsU4Zlw=;
-        b=Z+/QdbrlHRyfgKR18h42CdzvWFXye7Z4QlJ1bOn+wqdddf1sjqUuOPc4iu046m6s1A
-         txIQ38rrGlNPd/6iMMfkxIZ8PKqJ/5KFhTr3Eke8ff9jRVBfLB1KBgzBBOGvE842+M+o
-         sYNkBQNWjzEqjo+SrQfu7t4EPVmF3wUnfsgCMjUdKJIrT2hvUPycxqBEp+Zq0BTur4cn
-         7/s3w5+kwWHo73O0ZfmVHGpX9mj/oTUVSFqkECCYTAClBkYEV4x2rvmG0esN2UL5RC3j
-         3KcTV8OOzj6oIzJ+XVpi9McvhttVkS6VnCCaY4+Afiz5riPIcwwYbhdtDvGQaD8xpYpw
-         ZGkQ==
-X-Gm-Message-State: AOJu0Yw8KaEohkolcX3lnsw5TeaB0jVcHc1BuGopeKCwzw+zVWrr0/8h
-	MsTQdrB+c+MaVqs/LdcKLX4=
-X-Google-Smtp-Source: AGHT+IGDYzPNgrXWA8qBk5sEVaUSdTaKytdHg6KwqdrpfPj21vEh0KRc/Vc7D/Ih/6dwAimXMsTneg==
-X-Received: by 2002:a5d:6548:0:b0:327:e070:15b8 with SMTP id z8-20020a5d6548000000b00327e07015b8mr5912047wrv.41.1696539408560;
-        Thu, 05 Oct 2023 13:56:48 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id f15-20020a5d50cf000000b00323330edbc7sm19537wrt.20.2023.10.05.13.56.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Oct 2023 13:56:48 -0700 (PDT)
-Subject: Re: [PATCH v4 net-next 6/7] net: ethtool: add a mutex protecting RSS
- contexts
-To: Jakub Kicinski <kuba@kernel.org>, edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, habetsm.xilinx@gmail.com,
- sudheer.mogilappagari@intel.com, jdamato@fastly.com, andrew@lunn.ch,
- mw@semihalf.com, linux@armlinux.org.uk, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- saeedm@nvidia.com, leon@kernel.org
-References: <cover.1695838185.git.ecree.xilinx@gmail.com>
- <b5d7b8e243178d63643c8efc1f1c48b3b2468dc7.1695838185.git.ecree.xilinx@gmail.com>
- <20231004161651.76f686f3@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <70e5af64-b696-dec1-1afd-730559b96bfd@gmail.com>
-Date: Thu, 5 Oct 2023 21:56:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1696539944; x=1697144744;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H4y2YlrnXWnp/3hBKGWFmY8QqOEGdTjDuhv++ThsjEU=;
+        b=XWUUOUneoWZynPnCTeWcfejBr4ND/q5mF9bC2HyHxlxeQkRvYlf7qLE3zOJlgqus0B
+         lT7OLatEGQMpqnwywlITy9p57v5Et1GB1IHstL3l5vFhiKWOaZO2/iA4k9FtFiznzi6R
+         HQ5NJno0EILsP0wU1aO2l3WmrD9MmJLvyYOfKTSCZrZQ3w3wI0QSsVmtGolJK56RTAqd
+         qqd/3A/3XjHgkW6Xx75kEP5m2bstt9FuwoBKkJKpTYfRySCDyqyAUvWzb8vynVIaH57c
+         GwHuJZEcwK1oF5XGxep5UrxvybVDT1GPHgimKyMlRVmyYNWLrkqJXXYt30QVXQtilj3Z
+         W1pw==
+X-Gm-Message-State: AOJu0Yy0+k+Np3zKIQnsEAm8L+fig/B71ca/31rFWAVIu/aGQpWNqfiG
+	z+awdLZnFkVrwmvWZahngExL3HIh9BHSoyldJw==
+X-Google-Smtp-Source: AGHT+IFYZDAsDI3aH1FkA57sI5MM9STwBtsstxHMNmmbHQo/N9JCli+azP76TBoo+x7ITXmPrGjh48fOOPj243Ue6Q==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:db48:0:b0:d7a:c85c:725b with SMTP
+ id g69-20020a25db48000000b00d7ac85c725bmr87457ybf.7.1696539943849; Thu, 05
+ Oct 2023 14:05:43 -0700 (PDT)
+Date: Thu, 05 Oct 2023 21:05:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20231004161651.76f686f3@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIACYlH2UC/x2NywrDIBAAfyXsuQsaqdj+SinFx9rsRcMqISXk3
+ 2t7m7nMHNBImBrcpwOENm5cyxB9mSAuvrwJOQ2HWc1GK3XF1qXE9YNJeCNpWKgj9YXkB0Fq9Ik wFI8h+xfXiBGty9rcrM3GORjhVSjz/p8+nuf5BXYfPFuEAAAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696539942; l=1996;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=iWuTwxZczKzh+7gmgNXvK16vk7UgCuMWmTg1ny2oD8c=; b=YUlHgcN+oWStnkY0k8QsPE2sF9MJDlMlJwDVM6YDuXy2QvULO8Sa7bbF2I2FRmDvDk+53iYiN
+ PyeP9/j4AHXAubuga/ZsL0+ZE9XOJq358MDHfpYVgcH2yjIPsxeX8yO
+X-Mailer: b4 0.12.3
+Message-ID: <20231005-strncpy-drivers-net-ethernet-brocade-bna-bfa_ioc-c-v1-1-8dfd30123afc@google.com>
+Subject: [PATCH] bna: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
+	GR-Linux-NIC-Dev@marvell.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 05/10/2023 00:16, Jakub Kicinski wrote:
-> On Wed, 27 Sep 2023 19:13:37 +0100 edward.cree@amd.com wrote:
->> While this is not needed to serialise the ethtool entry points (which
->>  are all under RTNL), drivers may have cause to asynchronously access
->>  dev->ethtool->rss_ctx; taking dev->ethtool->rss_lock allows them to
->>  do this safely without needing to take the RTNL.
-> 
-> Can we use a replay mechanism, like we do in TC offloads and VxLAN/UDP
-> ports? The driver which lost config can ask for the rss contexts to be
-> "replayed" and the core will issue a series of ->create calls for all
-> existing entries?
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-I like that idea, yes.  Will try to implement it for v5.
-There is a question as to how the core should react if the ->create call
- then fails; see my reply to Martin on #7.
+bfa_ioc_get_adapter_manufacturer() simply copies a string literal into
+`manufacturer`.
 
-> Regarding the lock itself - can we hide it under ethtool_rss_lock(dev)
-> / ethtool_rss_unlock(dev) helpers?
+NUL-padding is not needed because bfa_ioc_get_adapter_manufacturer()'s
+only caller passes `ad_attr` (which is from ioc_attr) which is then
+memset to 0.
+ bfa_nw_ioc_get_attr() ->
+   bfa_ioc_get_adapter_attr() ->
+     bfa_nw_ioc_get_attr() ->
+       memset((void *)ioc_attr, 0, sizeof(struct bfa_ioc_attr));
 
-Sure.  If I can't get replay to work then I'll do that.
+Considering the above, a suitable replacement is `strscpy` [2] due to
+the fact that it guarantees NUL-termination on the destination buffer
+without unnecessarily NUL-padding.
 
--ed
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
+---
+ drivers/net/ethernet/brocade/bna/bfa_ioc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/brocade/bna/bfa_ioc.c b/drivers/net/ethernet/brocade/bna/bfa_ioc.c
+index b07522ac3e74..497cb65f2d06 100644
+--- a/drivers/net/ethernet/brocade/bna/bfa_ioc.c
++++ b/drivers/net/ethernet/brocade/bna/bfa_ioc.c
+@@ -2839,7 +2839,7 @@ bfa_ioc_get_adapter_optrom_ver(struct bfa_ioc *ioc, char *optrom_ver)
+ static void
+ bfa_ioc_get_adapter_manufacturer(struct bfa_ioc *ioc, char *manufacturer)
+ {
+-	strncpy(manufacturer, BFA_MFG_NAME, BFA_ADAPTER_MFG_NAME_LEN);
++	strscpy(manufacturer, BFA_MFG_NAME, sizeof(manufacturer));
+ }
+ 
+ static void
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231005-strncpy-drivers-net-ethernet-brocade-bna-bfa_ioc-c-68f13966f388
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
