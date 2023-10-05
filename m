@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-38318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1362C7BA64B
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:33:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 653247BA64C
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 18:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id B62BC281A34
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:33:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 616271C2074E
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77AEF28E2D;
-	Thu,  5 Oct 2023 16:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F34A28E16;
+	Thu,  5 Oct 2023 16:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jKjYtKXc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fTvRRjbC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7318434CE2
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1DA35896
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 16:33:25 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F3D43683
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:30:59 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A3AB6FA
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:31:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696523462; x=1728059462;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GPombCDQ3i1w+SXg+v6h92vp5NBZZDS00D8narxQbeM=;
-  b=jKjYtKXcSILtZHhVNsUkm/xNOI04YUNmqjyfK1ZTDrzcVnpsHQ3D6m1B
-   S72bo3KmklZSQOQ0G5gTyET5TfACblR361KG+eNyEIAzoqNCOlJU764IY
-   ShVYqxQcH2+Hcne6Mx5X0jTgGAaGiNjbqTPP9KZP9eK8w4MMDLj17SPy4
-   AenhO+8+Yer8MXlllm2x0Kh76TA4uR6fNyaXMw6Tjb/kwropduFV3m+4g
-   qXgMkbVV6Mcz9mWOa21Z2aRu6QsDOSLmhGw8hNkp+mlVO5KHh4n++VEY/
-   gvdwEhEY5ttXZthIMeSOqvzP0Wt0ZyTyaoc/t7eSPXT59zjagl9iFzvk0
+  t=1696523473; x=1728059473;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FfaWrPyHsw7fmUhdG9yBqjZXNhdtR2fp4BcrRSRg6yc=;
+  b=fTvRRjbCAlNeh3Y+v96LwkOkCro4/j0zMNod+q4r3Vvg6aLBC5OLmyrD
+   l0Noz90UxpBsdPyBIoEPBxCLQgXWHfUeV4Ma+nUfSKbb2Oy3mFvkm6BMS
+   fj1PSNjLyaAoFFOFv0cNTUtDJ8rlERa51UJqasWMLcUPpL+R9k65yfuav
+   pDD30LSqP7z7XJb9IgsXRJYC9sHw/qvJox4zaieNBCVO8rGly50hseif7
+   O4WjjHnID0a9pvlkJT6O+qppKSqvSCgu+e0V2PUxEwQY3X+bl2fZIywpa
+   LzGIk5dCwgQ1ULOKqra7H5HxUV3xKVien/U9nAlv2stGBStMKZ8W1OwKD
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="2152643"
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="2152653"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="2152643"
+   d="scan'208";a="2152653"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 09:29:54 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="875607725"
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="875607730"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="875607725"
+   d="scan'208";a="875607730"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga004.jf.intel.com with ESMTP; 05 Oct 2023 09:29:54 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -51,15 +51,19 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	przemyslaw.kitszel@intel.com,
-	jesse.brandeburg@intel.com,
-	aleksandr.loktionov@intel.com,
-	jacob.e.keller@intel.com
-Subject: [PATCH net-next 0/9][pull request] i40e: House-keeping and clean-up
-Date: Thu,  5 Oct 2023 09:28:41 -0700
-Message-Id: <20231005162850.3218594-1-anthony.l.nguyen@intel.com>
+Cc: Ivan Vecera <ivecera@redhat.com>,
+	anthony.l.nguyen@intel.com,
+	jacob.e.keller@intel.com,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next 1/9] i40e: Remove back pointer from i40e_hw structure
+Date: Thu,  5 Oct 2023 09:28:42 -0700
+Message-Id: <20231005162850.3218594-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20231005162850.3218594-1-anthony.l.nguyen@intel.com>
+References: <20231005162850.3218594-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,75 +77,140 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ivan Vecera says:
+From: Ivan Vecera <ivecera@redhat.com>
 
-The series makes some house-keeping tasks on i40e driver:
+The .back field placed in i40e_hw is used to get pointer to i40e_pf
+instance but it is not necessary as the i40e_hw is a part of i40e_pf
+and containerof macro can be used to obtain the pointer to i40e_pf.
+Remove .back field from i40e_hw structure, introduce i40e_hw_to_pf()
+and i40e_hw_to_dev() helpers and use them.
 
-Patch 1: Removes unnecessary back pointer from i40e_hw
-Patch 2: Moves I40E_MASK macro to i40e_register.h where is used
-Patch 3: Refactors I40E_MDIO_CLAUSE* to use the common macro
-Patch 4: Add header dependencies to <linux/avf/virtchnl.h>
-Patch 5: Simplifies memory alloction functions
-Patch 6: Moves mem alloc structures to i40e_alloc.h
-Patch 7: Splits i40e_osdep.h to i40e_debug.h and i40e_io.h
-Patch 8: Removes circular header deps, fixes and cleans headers
-Patch 9: Moves DDP specific macros and structs to i40e_ddp.c
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e.h       | 11 ++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_main.c  | 22 ++++++++++++++------
+ drivers/net/ethernet/intel/i40e/i40e_osdep.h |  8 +++----
+ drivers/net/ethernet/intel/i40e/i40e_type.h  |  1 -
+ 4 files changed, 31 insertions(+), 11 deletions(-)
 
-The following are changes since commit 49e7265fd098fdade2bbdd9331e6b914cda7fa83:
-  net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
-
-Ivan Vecera (9):
-  i40e: Remove back pointer from i40e_hw structure
-  i40e: Move I40E_MASK macro to i40e_register.h
-  i40e: Refactor I40E_MDIO_CLAUSE* macros
-  virtchnl: Add header dependencies
-  i40e: Simplify memory allocation functions
-  i40e: Move memory allocation structures to i40e_alloc.h
-  i40e: Split i40e_osdep.h
-  i40e: Remove circular header dependencies and fix headers
-  i40e: Move DDP specific macros and structures to i40e_ddp.c
-
- drivers/net/ethernet/intel/i40e/i40e.h        | 76 +++++--------------
- drivers/net/ethernet/intel/i40e/i40e_adminq.c |  8 +-
- drivers/net/ethernet/intel/i40e/i40e_adminq.h |  3 +-
- .../net/ethernet/intel/i40e/i40e_adminq_cmd.h |  2 +
- drivers/net/ethernet/intel/i40e/i40e_alloc.h  | 24 +++---
- drivers/net/ethernet/intel/i40e/i40e_client.c |  1 -
- drivers/net/ethernet/intel/i40e/i40e_common.c | 11 ++-
- drivers/net/ethernet/intel/i40e/i40e_dcb.c    |  4 +-
- drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_ddp.c    | 24 +++++-
- drivers/net/ethernet/intel/i40e/i40e_debug.h  | 47 ++++++++++++
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |  3 +-
- drivers/net/ethernet/intel/i40e/i40e_diag.h   |  5 +-
- .../net/ethernet/intel/i40e/i40e_ethtool.c    |  3 +-
- drivers/net/ethernet/intel/i40e/i40e_hmc.c    | 16 ++--
- drivers/net/ethernet/intel/i40e/i40e_hmc.h    |  4 +
- drivers/net/ethernet/intel/i40e/i40e_io.h     | 16 ++++
- .../net/ethernet/intel/i40e/i40e_lan_hmc.c    |  9 +--
- .../net/ethernet/intel/i40e/i40e_lan_hmc.h    |  2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 57 ++++++++------
- drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  2 +
- drivers/net/ethernet/intel/i40e/i40e_osdep.h  | 59 --------------
- .../net/ethernet/intel/i40e/i40e_prototype.h  |  9 ++-
- drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  3 +-
- .../net/ethernet/intel/i40e/i40e_register.h   |  5 ++
- drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  7 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
- .../ethernet/intel/i40e/i40e_txrx_common.h    |  2 +
- drivers/net/ethernet/intel/i40e/i40e_type.h   | 59 +++-----------
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  2 +
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  4 +-
- drivers/net/ethernet/intel/i40e/i40e_xsk.c    |  4 -
- drivers/net/ethernet/intel/i40e/i40e_xsk.h    |  4 +
- include/linux/avf/virtchnl.h                  |  4 +
- 34 files changed, 231 insertions(+), 251 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/i40e/i40e_debug.h
- create mode 100644 drivers/net/ethernet/intel/i40e/i40e_io.h
- delete mode 100644 drivers/net/ethernet/intel/i40e/i40e_osdep.h
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+index 6e310a539467..7f79d5929be6 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e.h
++++ b/drivers/net/ethernet/intel/i40e/i40e.h
+@@ -1321,4 +1321,15 @@ static inline u32 i40e_is_tc_mqprio_enabled(struct i40e_pf *pf)
+ 	return pf->flags & I40E_FLAG_TC_MQPRIO;
+ }
+ 
++/**
++ * i40e_hw_to_pf - get pf pointer from the hardware structure
++ * @hw: pointer to the device HW structure
++ **/
++static inline struct i40e_pf *i40e_hw_to_pf(struct i40e_hw *hw)
++{
++	return container_of(hw, struct i40e_pf, hw);
++}
++
++struct device *i40e_hw_to_dev(struct i40e_hw *hw);
++
+ #endif /* _I40E_H_ */
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 4b9788d2ded7..a6f7124d009a 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -119,6 +119,17 @@ static void netdev_hw_addr_refcnt(struct i40e_mac_filter *f,
+ 	}
+ }
+ 
++/**
++ * i40e_hw_to_dev - get device pointer from the hardware structure
++ * @hw: pointer to the device HW structure
++ **/
++struct device *i40e_hw_to_dev(struct i40e_hw *hw)
++{
++	struct i40e_pf *pf = i40e_hw_to_pf(hw);
++
++	return &pf->pdev->dev;
++}
++
+ /**
+  * i40e_allocate_dma_mem_d - OS specific memory alloc for shared code
+  * @hw:   pointer to the HW structure
+@@ -129,7 +140,7 @@ static void netdev_hw_addr_refcnt(struct i40e_mac_filter *f,
+ int i40e_allocate_dma_mem_d(struct i40e_hw *hw, struct i40e_dma_mem *mem,
+ 			    u64 size, u32 alignment)
+ {
+-	struct i40e_pf *pf = (struct i40e_pf *)hw->back;
++	struct i40e_pf *pf = i40e_hw_to_pf(hw);
+ 
+ 	mem->size = ALIGN(size, alignment);
+ 	mem->va = dma_alloc_coherent(&pf->pdev->dev, mem->size, &mem->pa,
+@@ -147,7 +158,7 @@ int i40e_allocate_dma_mem_d(struct i40e_hw *hw, struct i40e_dma_mem *mem,
+  **/
+ int i40e_free_dma_mem_d(struct i40e_hw *hw, struct i40e_dma_mem *mem)
+ {
+-	struct i40e_pf *pf = (struct i40e_pf *)hw->back;
++	struct i40e_pf *pf = i40e_hw_to_pf(hw);
+ 
+ 	dma_free_coherent(&pf->pdev->dev, mem->size, mem->va, mem->pa);
+ 	mem->va = NULL;
+@@ -15619,10 +15630,10 @@ static int i40e_init_recovery_mode(struct i40e_pf *pf, struct i40e_hw *hw)
+  **/
+ static inline void i40e_set_subsystem_device_id(struct i40e_hw *hw)
+ {
+-	struct pci_dev *pdev = ((struct i40e_pf *)hw->back)->pdev;
++	struct i40e_pf *pf = i40e_hw_to_pf(hw);
+ 
+-	hw->subsystem_device_id = pdev->subsystem_device ?
+-		pdev->subsystem_device :
++	hw->subsystem_device_id = pf->pdev->subsystem_device ?
++		pf->pdev->subsystem_device :
+ 		(ushort)(rd32(hw, I40E_PFPCI_SUBSYSID) & USHRT_MAX);
+ }
+ 
+@@ -15692,7 +15703,6 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	set_bit(__I40E_DOWN, pf->state);
+ 
+ 	hw = &pf->hw;
+-	hw->back = pf;
+ 
+ 	pf->ioremap_len = min_t(int, pci_resource_len(pdev, 0),
+ 				I40E_MAX_CSR_SPACE);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_osdep.h b/drivers/net/ethernet/intel/i40e/i40e_osdep.h
+index 2bd4de03dafa..997569a4ad57 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_osdep.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_osdep.h
+@@ -18,10 +18,10 @@
+  * actual OS primitives
+  */
+ 
+-#define hw_dbg(hw, S, A...)							\
+-do {										\
+-	dev_dbg(&((struct i40e_pf *)hw->back)->pdev->dev, S, ##A);		\
+-} while (0)
++struct i40e_hw;
++struct device *i40e_hw_to_dev(struct i40e_hw *hw);
++
++#define hw_dbg(hw, S, A...) dev_dbg(i40e_hw_to_dev(hw), S, ##A)
+ 
+ #define wr32(a, reg, value)	writel((value), ((a)->hw_addr + (reg)))
+ #define rd32(a, reg)		readl((a)->hw_addr + (reg))
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
+index 232131bedc3e..658bc8913278 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_type.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
+@@ -525,7 +525,6 @@ struct i40e_dcbx_config {
+ /* Port hardware description */
+ struct i40e_hw {
+ 	u8 __iomem *hw_addr;
+-	void *back;
+ 
+ 	/* subsystem structs */
+ 	struct i40e_phy_info phy;
 -- 
 2.38.1
 
