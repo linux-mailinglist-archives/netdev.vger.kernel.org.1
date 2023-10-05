@@ -1,116 +1,193 @@
-Return-Path: <netdev+bounces-38437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACCAC7BAEF0
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 00:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 889747BAEFD
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 00:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sy.mirrors.kernel.org (Postfix) with ESMTP id DC569B2099B
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:46:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTP id 5F514B20987
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 22:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD4841756;
-	Thu,  5 Oct 2023 22:46:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E60641E58;
+	Thu,  5 Oct 2023 22:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="iuROY2lN"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LoG/AmGB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE58E154AB
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 22:46:12 +0000 (UTC)
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE6BCE
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:46:10 -0700 (PDT)
-Received: by mail-oi1-x22c.google.com with SMTP id 5614622812f47-3af65455e7fso1061241b6e.3
-        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 15:46:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696545969; x=1697150769; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ePyskiEJCEOltRf//00HdVQ4cJ67D/wO+W+PB1Wu8iw=;
-        b=iuROY2lNaoGjIIE9uohhCqFE4Q/gSKmQAQnrfz2eaypGCLHwS6nnLVL46Qily4BlHV
-         CddSMA+7bcZY5bNhiBO+tmSUpHOWNQAsp9HuqcOr7d2dyQ6jrXa/tGKUZA5ue7FtXGQ0
-         fqSokBtGSpL3/tcooiE5689m5uIwx+1w3XmTI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696545969; x=1697150769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ePyskiEJCEOltRf//00HdVQ4cJ67D/wO+W+PB1Wu8iw=;
-        b=ucGIdHpc9hUt1kgNjYZqXJusJ16qPN3M66h9azgTO0fgmdMH5LqFDg7onfmhjnJYaS
-         FgYTiEKO/kObYpnEvI1FFsefEMOK6QGXlRnZk5s9ltdmmrK2q2sMJusV/lcyvohbICiB
-         1YQSfLM8EYS5+Um81qTgoaY8+mfsf7jasu8/dbJYHChod4w06XUIidJliPEqrF0B6tpb
-         PM8m9nmZPgozE4JEMtw3X0E3zGiR1ff95Hleb1O4R5UDbOqFJaEoxDZNUcJr9RlfCLHP
-         uGFhQyqCL2uXQLDJti1bs6AUa9dFUDHKSy6JpE6y0a22Z7HPFmbSrw/lwWKa6uJGgykY
-         DIRw==
-X-Gm-Message-State: AOJu0YxYBhr57d+gx1ndkVsy17H1zo0tqzWFSli7WVQtLZ4JpIhPB/eM
-	MDNtaMmVAHlwMHMwKtou4e6qgw==
-X-Google-Smtp-Source: AGHT+IGaIDqu6BSYW2le6DfTb8YAwAbC27p7HsJYK0cA5SoI/rfP7fY4ed258/zRZ4xNHEbx5qw3Bg==
-X-Received: by 2002:a05:6808:110:b0:3ae:87c8:437e with SMTP id b16-20020a056808011000b003ae87c8437emr6462389oie.41.1696545969449;
-        Thu, 05 Oct 2023 15:46:09 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id p19-20020a639513000000b00585391d0aafsm1984306pgd.6.2023.10.05.15.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 15:46:08 -0700 (PDT)
-Date: Thu, 5 Oct 2023 15:46:08 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] bcm63xx_enet: replace deprecated strncpy with strscpy
-Message-ID: <202310051544.822967F55@keescook>
-References: <20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-v1-1-6823b3c3c443@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A7941A9B
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 22:53:03 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74552FB
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 15:52:54 -0700 (PDT)
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 395MgAM1028955;
+	Thu, 5 Oct 2023 22:52:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=skMxIOFCafHXmctcavpjeSfnJgeomhtqCHvRRlrSJxs=;
+ b=LoG/AmGBYJwbs4tGzfSedS2EuiwUOVwV/iah5sF49qesDnSwN/DaQUqxJ1VTxe0czk+t
+ 6gzMqU+f61f8iXZFDGaaSef61BbqcDVgERBY4YomoMbZpUkhjLNv93efRqpWPYO8j8d7
+ EMzn142dNxWTZuQ8aMM/NpwcTx1XpjcLCnu/Zft6rXiOoFp/FViWAA1Zv6yl7Xw75Sme
+ hucaF14dP65Ff5kuxjan317qRXmgJpNxJXYRzE7JlUkM39+rsY0m+GjHSAX6gAh7/SEY
+ XlT/fe1PcbaKLzu9g0s2f2h2x9J6msdjx2pixJNVCLKjZvlL2V1zlDjZBWsvTA3Qdp9S Sw== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3thrjdstyd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Oct 2023 22:52:35 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 395MqYT7015721
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 5 Oct 2023 22:52:34 GMT
+Received: from [10.110.21.185] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Thu, 5 Oct
+ 2023 15:52:32 -0700
+Message-ID: <e877c99a-072e-76d5-3c83-d552caf0c1f6@quicinc.com>
+Date: Thu, 5 Oct 2023 16:52:22 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231005-strncpy-drivers-net-ethernet-broadcom-bcm63xx_enet-c-v1-1-6823b3c3c443@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next v3] net: qualcomm: rmnet: Add side band flow
+ control support
+To: Simon Horman <horms@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <vadim.fedorenko@linux.dev>, <lkp@intel.com>,
+        Sean Tranchetti <quic_stranche@quicinc.com>
+References: <20231004204320.1068010-1-quic_subashab@quicinc.com>
+ <ZR6vxaot4AP7FXTg@kernel.org>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <ZR6vxaot4AP7FXTg@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: ZqFpVvqAjZqKJLbTodCjBOQZ5QmyaAVM
+X-Proofpoint-GUID: ZqFpVvqAjZqKJLbTodCjBOQZ5QmyaAVM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-05_17,2023-10-05_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 priorityscore=1501 phishscore=0
+ mlxscore=0 mlxlogscore=704 impostorscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310050174
+X-Spam-Status: No, score=-6.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 08:51:40PM +0000, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> A suitable replacement is strscpy() [2] due to the fact that it
-> guarantees NUL-termination on the destination buffer without
-> unnecessarily NUL-padding.
-> 
-> bcm_enet_get_drvinfo() already uses strscpy(), let's match it's
-> implementation:
-> |       static void bcm_enet_get_drvinfo(struct net_device *netdev,
-> |       				 struct ethtool_drvinfo *drvinfo)
-> |       {
-> |       	strscpy(drvinfo->driver, bcm_enet_driver_name, sizeof(drvinfo->driver));
-> |       	strscpy(drvinfo->bus_info, "bcm63xx", sizeof(drvinfo->bus_info));
-> |       }
-> 
-> Note that now bcm_enet_get_drvinfo() and bcm_enetsw_get_drvinfo() do the
-> exact same thing.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Looks good. Other writers to drvinfo, as you saw, do the same strscpy,
-so this looks correct to me.
+On 10/5/2023 6:44 AM, Simon Horman wrote:
+> On Wed, Oct 04, 2023 at 01:43:20PM -0700, Subash Abhinov Kasiviswanathan wrote:
+>> Individual rmnet devices map to specific network types such as internet,
+>> multimedia messaging services, IP multimedia subsystem etc. Each of
+>> these network types may support varying quality of service for different
+>> bearers or traffic types.
+>>
+> 
+> Hi Subash and Sean,
+> 
+> a few comments on error handling from my side.
+> 
+> ...
+> 
+>> +	default:
+>> +		NL_SET_ERR_MSG_MOD(extack, "unsupported operation");
+>> +		return -EINVAL;
+> 
+> I'm wondering if EOPNOTSUPP is appropriate here.
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Hi Simon
 
--- 
-Kees Cook
+Sure, I can update this error code here and return the appropriate value 
+through the caller functions.
+
+> 
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>   static void rmnet_unregister_bridge(struct rmnet_port *port)
+>>   {
+>>   	struct net_device *bridge_dev, *real_dev, *rmnet_dev;
+>> @@ -175,8 +237,24 @@ static int rmnet_newlink(struct net *src_net, struct net_device *dev,
+>>   	netdev_dbg(dev, "data format [0x%08X]\n", data_format);
+>>   	port->data_format = data_format;
+>>   
+>> +	if (data[IFLA_RMNET_QUEUE]) {
+>> +		struct rmnet_queue_mapping *queue_map;
+>> +
+>> +		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
+>> +		if (rmnet_update_queue_map(dev, queue_map->operation,
+>> +					   queue_map->txqueue, queue_map->mark,
+>> +					   extack))
+> 
+> Should the return value of rmnet_update_queue_map() be stored in err
+> so that it is also the return value of this function?
+> 
+>> +			goto err3;
+>> +
+>> +		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
+>> +			   queue_map->operation, queue_map->txqueue,
+>> +			   queue_map->mark);
+>> +	}
+>> +
+>>   	return 0;
+>>   
+>> +err3:
+>> +	hlist_del_init_rcu(&ep->hlnode);
+> 
+> Is a call to netdev_upper_dev_unlink() needed here?
+
+I'll update this missing API call in the cleanup.
+
+> 
+>>   err2:
+>>   	unregister_netdevice(dev);
+>>   	rmnet_vnd_dellink(mux_id, port, ep);
+>> @@ -352,6 +430,20 @@ static int rmnet_changelink(struct net_device *dev, struct nlattr *tb[],
+>>   		}
+>>   	}
+>>   
+>> +	if (data[IFLA_RMNET_QUEUE]) {
+>> +		struct rmnet_queue_mapping *queue_map;
+>> +
+>> +		queue_map = nla_data(data[IFLA_RMNET_QUEUE]);
+>> +		if (rmnet_update_queue_map(dev, queue_map->operation,
+>> +					   queue_map->txqueue, queue_map->mark,
+>> +					   extack))
+>> +			return -EINVAL;
+> 
+> I guess that with the current implementation of rmnet_update_queue_map()
+> it makes no difference, but perhaps it would be better to return
+> the return value of rmnet_update_queue_map() rather than hard coding
+> -EINVAL here.
+> 
+>> +
+>> +		netdev_dbg(dev, "op %02x txq %02x mark %08x\n",
+>> +			   queue_map->operation, queue_map->txqueue,
+>> +			   queue_map->mark);
+>> +	}
+>> +
+>>   	return 0;
+>>   }
+>>   
+> 
+> ...
 
