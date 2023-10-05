@@ -1,502 +1,263 @@
-Return-Path: <netdev+bounces-38273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9584C7B9E51
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:04:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A41B7BA0C3
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 16:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 3ABFB2823C9
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:04:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTP id 8F8ED1C2098D
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 14:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E639D27EDA;
-	Thu,  5 Oct 2023 14:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81AC250E3;
+	Thu,  5 Oct 2023 14:45:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mZPK3LJg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LC1Y8UmZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E2727EC0
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:04:36 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A4D170F
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:04:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696514656; x=1728050656;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=IGFsHXL/HsUl2+9L3bhw5xoyDcWCshLoEGiAkJXIp1Y=;
-  b=mZPK3LJg9bnWZH7y0fj5KbgvQzj2fgVaifgm6bY3J2jeenWHgl1cs6AS
-   NynwTGEPo8uBM1vrtsRt+aQNvdo85bGHcPVb/lL/2mHaOT5uz03VpbXiS
-   joXXJ3ft/pGRH/Sw5PzvSq3gM72M0xxNwcytkZYvKqz0vwDmZ5lVDEfBJ
-   p0x8tsb1ZsWxXgvULYr9+sGu5AUOXlE5wQzy8PQHwDpXoECWD3glNAJB/
-   0MUDjtQ9I9ZOsT7RG02XaD2yBinrAsQtHJxJj5ZhHy9PdrJRscySo0PAj
-   wJ/1nzOphNhF10mU47/NVchH01YVvMbgVfzEUT2snkONqt7dTJRNi8NQq
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="380729434"
-X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
-   d="scan'208";a="380729434"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 02:10:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10853"; a="895375856"
-X-IronPort-AV: E=Sophos;i="6.03,202,1694761200"; 
-   d="scan'208";a="895375856"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga001.fm.intel.com with ESMTP; 05 Oct 2023 02:09:09 -0700
-Received: from kord.igk.intel.com (kord.igk.intel.com [10.123.220.9])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 4DEAF36C37;
-	Thu,  5 Oct 2023 10:10:36 +0100 (IST)
-From: Konrad Knitter <konrad.knitter@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jdelvare@suse.com,
-	linux@roeck-us.net,
-	Konrad Knitter <konrad.knitter@intel.com>,
-	Marcin Domagala <marcinx.domagala@intel.com>,
-	Eric Joyner <eric.joyner@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next v2] ice: read internal temperature sensor
-Date: Thu,  5 Oct 2023 11:15:18 +0200
-Message-Id: <20231005091517.4630-1-konrad.knitter@intel.com>
-X-Mailer: git-send-email 2.35.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF0C2E630
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 14:44:50 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BF37D498
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 07:44:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696517050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UhsT5XkGXkGRLbCYhr0XYk0IXzGcyPT2/ifidPViMms=;
+	b=LC1Y8UmZCtrUsxiarsZvPpecbBtOG7sXgJ4eypD1r10LWyy4fwrsS5qJhOUy0DKboyjHBi
+	V0UJnXlk9TKZt2d84Uncd0DEJQ48CJ/LhJTDvXTHaKrphOVqchslgqGno1EgOMkaHGOWnT
+	FVNloU2XDT30S16+FAj4PC/yDGu6sSo=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-H-cnMyxmNACDKA5Nfm-Jbg-1; Thu, 05 Oct 2023 05:42:59 -0400
+X-MC-Unique: H-cnMyxmNACDKA5Nfm-Jbg-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-59f2c7a4f24so11058737b3.0
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 02:42:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696498979; x=1697103779;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UhsT5XkGXkGRLbCYhr0XYk0IXzGcyPT2/ifidPViMms=;
+        b=TERzuq4WA9F8Q8jdmkQAH6BPYfD5gaaf1AtQYlfAtzh+D+Knrsos7KvnZIA/087Ric
+         2pLhkr0bJex2T0XP9qCt4kwoLpfCmRxYHthAIcPtOU0acxgAywlC81v/l4CKfmqGCGV5
+         46qwnCNt4cszwvBz4JAUFnnDVVqZHI0pc7ygw5ohVLBN9IBP0OFnuZut8baymJFvakxw
+         KHycEsg7UDs797aMN0S2alPbP9hQXqgoUEVgtWM65dVn2mUFeTaX/dwIaP6Ae+j4Fy+T
+         IlMSg/Fb6vKOzHSvJl0lZQBkuE40ngJ4dobgjwKf/qqpFVT+0pCUjx42jWy2MlRRVWFk
+         BDiA==
+X-Gm-Message-State: AOJu0Yzn3LYLnO4iZvgdEL7EZDSjazYvcxxMM3QLwRDvTix/eIHnoirW
+	oLUnQsbgzpxH7FRptj0o/0Pm5Wa/ouRWodWk/6WCZQQd91B2j3Zvi+RrEtPUZBBtFGmpk3DYjnQ
+	hCNa07eqGyubIbLVNpGLx0zLZP7aRewoxkcvYoce1t9Y=
+X-Received: by 2002:a0d:dd96:0:b0:570:28a9:fe40 with SMTP id g144-20020a0ddd96000000b0057028a9fe40mr4577531ywe.5.1696498979174;
+        Thu, 05 Oct 2023 02:42:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHp5Z4E5qYgA76zUuu87SQ+sKilV0yVrTm45uJW4TSvNm5KBZANPEY1fF3ZtdZv0RvDgnkvhfVDmedjX1JX4b4=
+X-Received: by 2002:a0d:dd96:0:b0:570:28a9:fe40 with SMTP id
+ g144-20020a0ddd96000000b0057028a9fe40mr4577521ywe.5.1696498978891; Thu, 05
+ Oct 2023 02:42:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230928164550.980832-2-dtatulea@nvidia.com> <20230928164550.980832-16-dtatulea@nvidia.com>
+In-Reply-To: <20230928164550.980832-16-dtatulea@nvidia.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 5 Oct 2023 11:42:22 +0200
+Message-ID: <CAJaqyWeRhJNZ8wbpEFARwBBNbE07n4xQdd-RvUoZooCeB4piPA@mail.gmail.com>
+Subject: Re: [PATCH vhost 14/16] vdpa/mlx5: Enable hw support for vq
+ descriptor mapping
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: gal@nvidia.com, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Leon Romanovsky <leon@kernel.org>, 
+	Saeed Mahameed <saeedm@nvidia.com>, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since 4.30 firmware exposes internal thermal sensor reading via admin
-queue commands. Expose those readouts via hwmon API when supported.
+On Thu, Sep 28, 2023 at 6:50=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> Vq descriptor mappings are supported in hardware by filling in an
+> additional mkey which contains the descriptor mappings to the hw vq.
+>
+> A previous patch in this series added support for hw mkey (mr) creation
+> for ASID 1.
+>
+> This patch fills in both the vq data and vq descriptor mkeys based on
+> group ASID mapping.
+>
+> The feature is signaled to the vdpa core through the presence of the
+> .get_vq_desc_group op.
+>
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c  | 26 ++++++++++++++++++++++++--
+>  include/linux/mlx5/mlx5_ifc_vdpa.h |  7 ++++++-
+>  2 files changed, 30 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index 25bd2c324f5b..46441e41892c 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -823,6 +823,7 @@ static int create_virtqueue(struct mlx5_vdpa_net *nde=
+v, struct mlx5_vdpa_virtque
+>         u32 out[MLX5_ST_SZ_DW(create_virtio_net_q_out)] =3D {};
+>         struct mlx5_vdpa_dev *mvdev =3D &ndev->mvdev;
+>         struct mlx5_vdpa_mr *vq_mr;
+> +       struct mlx5_vdpa_mr *vq_desc_mr;
+>         void *obj_context;
+>         u16 mlx_features;
+>         void *cmd_hdr;
+> @@ -878,6 +879,11 @@ static int create_virtqueue(struct mlx5_vdpa_net *nd=
+ev, struct mlx5_vdpa_virtque
+>         vq_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_GROUP]];
+>         if (vq_mr)
+>                 MLX5_SET(virtio_q, vq_ctx, virtio_q_mkey, vq_mr->mkey);
+> +
+> +       vq_desc_mr =3D mvdev->mr[mvdev->group2asid[MLX5_VDPA_DATAVQ_DESC_=
+GROUP]];
+> +       if (vq_desc_mr)
+> +               MLX5_SET(virtio_q, vq_ctx, desc_group_mkey, vq_desc_mr->m=
+key);
+> +
+>         MLX5_SET(virtio_q, vq_ctx, umem_1_id, mvq->umem1.id);
+>         MLX5_SET(virtio_q, vq_ctx, umem_1_size, mvq->umem1.size);
+>         MLX5_SET(virtio_q, vq_ctx, umem_2_id, mvq->umem2.id);
+> @@ -2265,6 +2271,16 @@ static u32 mlx5_vdpa_get_vq_group(struct vdpa_devi=
+ce *vdev, u16 idx)
+>         return MLX5_VDPA_DATAVQ_GROUP;
+>  }
+>
+> +static u32 mlx5_vdpa_get_vq_desc_group(struct vdpa_device *vdev, u16 idx=
+)
+> +{
+> +       struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+> +
+> +       if (is_ctrl_vq_idx(mvdev, idx))
+> +               return MLX5_VDPA_CVQ_GROUP;
+> +
+> +       return MLX5_VDPA_DATAVQ_DESC_GROUP;
+> +}
+> +
+>  static u64 mlx_to_vritio_features(u16 dev_features)
+>  {
+>         u64 result =3D 0;
+> @@ -3139,7 +3155,7 @@ static int mlx5_set_group_asid(struct vdpa_device *=
+vdev, u32 group,
+>  {
+>         struct mlx5_vdpa_dev *mvdev =3D to_mvdev(vdev);
+>
+> -       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS)
+> +       if (group >=3D MLX5_VDPA_NUMVQ_GROUPS || asid >=3D MLX5_VDPA_NUM_=
+AS)
 
-Driver provides current reading from HW as well as device specific
-thresholds for thermal alarm (Warning, Critical, Fatal) events.
+Nit: the check for asid >=3D MLX5_VDPA_NUM_AS is redundant, as it will
+be already checked by VHOST_VDPA_SET_GROUP_ASID handler in
+drivers/vhost/vdpa.c:vhost_vdpa_vring_ioctl. Not a big deal.
 
-$ sensors
+>                 return -EINVAL;
+>
+>         mvdev->group2asid[group] =3D asid;
+> @@ -3160,6 +3176,7 @@ static const struct vdpa_config_ops mlx5_vdpa_ops =
+=3D {
+>         .get_vq_irq =3D mlx5_get_vq_irq,
+>         .get_vq_align =3D mlx5_vdpa_get_vq_align,
+>         .get_vq_group =3D mlx5_vdpa_get_vq_group,
+> +       .get_vq_desc_group =3D mlx5_vdpa_get_vq_desc_group, /* Op disable=
+d if not supported. */
+>         .get_device_features =3D mlx5_vdpa_get_device_features,
+>         .set_driver_features =3D mlx5_vdpa_set_driver_features,
+>         .get_driver_features =3D mlx5_vdpa_get_driver_features,
+> @@ -3258,6 +3275,7 @@ struct mlx5_vdpa_mgmtdev {
+>         struct vdpa_mgmt_dev mgtdev;
+>         struct mlx5_adev *madev;
+>         struct mlx5_vdpa_net *ndev;
+> +       struct vdpa_config_ops vdpa_ops;
+>  };
+>
+>  static int config_func_mtu(struct mlx5_core_dev *mdev, u16 mtu)
+> @@ -3371,7 +3389,7 @@ static int mlx5_vdpa_dev_add(struct vdpa_mgmt_dev *=
+v_mdev, const char *name,
+>                 max_vqs =3D 2;
+>         }
+>
+> -       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev=
+->device, &mlx5_vdpa_ops,
+> +       ndev =3D vdpa_alloc_device(struct mlx5_vdpa_net, mvdev.vdev, mdev=
+->device, &mgtdev->vdpa_ops,
+>                                  MLX5_VDPA_NUMVQ_GROUPS, MLX5_VDPA_NUM_AS=
+, name, false);
+>         if (IS_ERR(ndev))
+>                 return PTR_ERR(ndev);
+> @@ -3546,6 +3564,10 @@ static int mlx5v_probe(struct auxiliary_device *ad=
+ev,
+>                 MLX5_CAP_DEV_VDPA_EMULATION(mdev, max_num_virtio_queues) =
++ 1;
+>         mgtdev->mgtdev.supported_features =3D get_supported_features(mdev=
+);
+>         mgtdev->madev =3D madev;
+> +       mgtdev->vdpa_ops =3D mlx5_vdpa_ops;
+> +
+> +       if (!MLX5_CAP_DEV_VDPA_EMULATION(mdev, desc_group_mkey_supported)=
+)
+> +               mgtdev->vdpa_ops.get_vq_desc_group =3D NULL;
 
-Output
-=========================================================
-ice-pci-b100
-Adapter: PCI adapter
-temp1:        +62.0°C  (high = +95.0°C, crit = +105.0°C)
-                       (emerg = +115.0°C)
+I think this is better handled by splitting mlx5_vdpa_ops in two: One
+with get_vq_desc_group and other without it. You can see an example of
+this in the simulator, where one version supports .dma_map incremental
+updating with .dma_map and the other supports .set_map. Otherwise,
+this can get messy if more members opt-out or opt-in.
 
-Co-developed-by: Marcin Domagala <marcinx.domagala@intel.com>
-Signed-off-by: Marcin Domagala <marcinx.domagala@intel.com>
-Co-developed-by: Eric Joyner <eric.joyner@intel.com>
-Signed-off-by: Eric Joyner <eric.joyner@intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
----
-v2: fix formmating issues, added hwmon maintainers to Cc
----
- drivers/net/ethernet/intel/ice/Makefile       |   1 +
- drivers/net/ethernet/intel/ice/ice.h          |   1 +
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  28 ++++
- drivers/net/ethernet/intel/ice/ice_common.c   |  57 +++++++-
- drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_hwmon.c    | 127 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_hwmon.h    |   7 +
- drivers/net/ethernet/intel/ice/ice_main.c     |   5 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
- 9 files changed, 231 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.c
- create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.h
+But I'm ok with this too, so whatever version you choose:
 
-diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-index 8757bec23fb3..b4c8f5303e57 100644
---- a/drivers/net/ethernet/intel/ice/Makefile
-+++ b/drivers/net/ethernet/intel/ice/Makefile
-@@ -36,6 +36,7 @@ ice-y := ice_main.o	\
- 	 ice_repr.o	\
- 	 ice_tc_lib.o	\
- 	 ice_fwlog.o	\
-+	 ice_hwmon.o	\
- 	 ice_debugfs.o
- ice-$(CONFIG_PCI_IOV) +=	\
- 	ice_sriov.o		\
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index ad5614d4449c..61d26be502b2 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -650,6 +650,7 @@ struct ice_pf {
- #define ICE_MAX_VF_AGG_NODES		32
- 	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
- 	struct ice_dplls dplls;
-+	struct device *hwmon_dev;
- };
- 
- extern struct workqueue_struct *ice_lag_wq;
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index eb4c13b754a4..a32f96dfea28 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -117,6 +117,7 @@ struct ice_aqc_list_caps_elem {
- #define ICE_AQC_CAPS_NET_VER				0x004C
- #define ICE_AQC_CAPS_PENDING_NET_VER			0x004D
- #define ICE_AQC_CAPS_RDMA				0x0051
-+#define ICE_AQC_CAPS_SENSOR_READING			0x0067
- #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
- #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
- #define ICE_AQC_CAPS_NVM_MGMT				0x0080
-@@ -1375,6 +1376,30 @@ struct ice_aqc_get_phy_rec_clk_out {
- 	__le16 node_handle;
- };
- 
-+/* Get sensor reading (direct 0x0632) */
-+struct ice_aqc_get_sensor_reading {
-+	u8 sensor;
-+	u8 format;
-+	u8 reserved[6];
-+	__le32 addr_high;
-+	__le32 addr_low;
-+};
-+
-+/* Get sensor reading response (direct 0x0632) */
-+struct ice_aqc_get_sensor_reading_resp {
-+	union {
-+		u8 raw[8];
-+		/* Output data for sensor 0x00, format 0x00 */
-+		struct {
-+			s8 temp;
-+			u8 temp_warning_threshold;
-+			u8 temp_critical_threshold;
-+			u8 temp_fatal_threshold;
-+			u8 reserved[4];
-+		} s0f0;
-+	} data;
-+};
-+
- struct ice_aqc_link_topo_params {
- 	u8 lport_num;
- 	u8 lport_num_valid;
-@@ -2411,6 +2436,8 @@ struct ice_aq_desc {
- 		struct ice_aqc_restart_an restart_an;
- 		struct ice_aqc_set_phy_rec_clk_out set_phy_rec_clk_out;
- 		struct ice_aqc_get_phy_rec_clk_out get_phy_rec_clk_out;
-+		struct ice_aqc_get_sensor_reading get_sensor_reading;
-+		struct ice_aqc_get_sensor_reading_resp get_sensor_reading_resp;
- 		struct ice_aqc_gpio read_write_gpio;
- 		struct ice_aqc_sff_eeprom read_write_sff_param;
- 		struct ice_aqc_set_port_id_led set_port_id_led;
-@@ -2585,6 +2612,7 @@ enum ice_adminq_opc {
- 	ice_aqc_opc_set_mac_lb				= 0x0620,
- 	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
- 	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
-+	ice_aqc_opc_get_sensor_reading			= 0x0632,
- 	ice_aqc_opc_get_link_topo			= 0x06E0,
- 	ice_aqc_opc_read_i2c				= 0x06E2,
- 	ice_aqc_opc_write_i2c				= 0x06E3,
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index d4e259b816b9..347008cecc23 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2457,6 +2457,26 @@ ice_parse_fdir_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		  dev_p->num_flow_director_fltr);
- }
- 
-+/**
-+ * ice_parse_sensor_reading_cap - Parse ICE_AQC_CAPS_SENSOR_READING cap
-+ * @hw: pointer to the HW struct
-+ * @dev_p: pointer to device capabilities structure
-+ * @cap: capability element to parse
-+ *
-+ * Parse ICE_AQC_CAPS_SENSOR_READING for device capability for reading
-+ * enabled sensors.
-+ */
-+static void
-+ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-+			     struct ice_aqc_list_caps_elem *cap)
-+{
-+	dev_p->supported_sensors = le32_to_cpu(cap->number);
-+
-+	ice_debug(hw, ICE_DBG_INIT,
-+		  "dev caps: supported sensors (bitmap) = 0x%x\n",
-+		  dev_p->supported_sensors);
-+}
-+
- /**
-  * ice_parse_dev_caps - Parse device capabilities
-  * @hw: pointer to the HW struct
-@@ -2502,9 +2522,12 @@ ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		case ICE_AQC_CAPS_1588:
- 			ice_parse_1588_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
--		case  ICE_AQC_CAPS_FD:
-+		case ICE_AQC_CAPS_FD:
- 			ice_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
- 			break;
-+		case ICE_AQC_CAPS_SENSOR_READING:
-+			ice_parse_sensor_reading_cap(hw, dev_p, &cap_resp[i]);
-+			break;
- 		default:
- 			/* Don't list common capabilities as unknown */
- 			if (!found)
-@@ -5299,6 +5322,38 @@ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
- 	return status;
- }
- 
-+/**
-+ * ice_aq_get_sensor_reading
-+ * @hw: pointer to the HW struct
-+ * @sensor: sensor type
-+ * @format: requested response format
-+ * @data: pointer to data to be read from the sensor
-+ *
-+ * Get sensor reading (0x0632)
-+ */
-+int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
-+			      struct ice_aqc_get_sensor_reading_resp *data)
-+{
-+	struct ice_aqc_get_sensor_reading *cmd;
-+	struct ice_aq_desc desc;
-+	int status;
-+
-+	if (!data)
-+		return -EINVAL;
-+
-+	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sensor_reading);
-+	cmd = &desc.params.get_sensor_reading;
-+	cmd->sensor = sensor;
-+	cmd->format = format;
-+
-+	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-+	if (!status)
-+		memcpy(data, &desc.params.get_sensor_reading_resp,
-+		       sizeof(*data));
-+
-+	return status;
-+}
-+
- /**
-  * ice_replay_pre_init - replay pre initialization
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 4a75c0c89301..e23787c17505 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -240,6 +240,8 @@ ice_aq_set_phy_rec_clk_out(struct ice_hw *hw, u8 phy_output, bool enable,
- int
- ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
- 			   u8 *flags, u16 *node_handle);
-+int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
-+			      struct ice_aqc_get_sensor_reading_resp *data);
- void
- ice_stat_update40(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
- 		  u64 *prev_stat, u64 *cur_stat);
-diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.c b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-new file mode 100644
-index 000000000000..3d8a0c204548
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-@@ -0,0 +1,127 @@
-+#include "ice.h"
-+#include "ice_hwmon.h"
-+#include "ice_adminq_cmd.h"
-+
-+#include <linux/hwmon.h>
-+
-+#define ICE_INTERNAL_TEMP_SENSOR 0
-+#define ICE_INTERNAL_TEMP_SENSOR_FORMAT 0
-+
-+#define TEMP_FROM_REG(reg) ((reg) * 1000)
-+
-+static const struct hwmon_channel_info *ice_hwmon_info[] = {
-+	HWMON_CHANNEL_INFO(temp,
-+			   HWMON_T_INPUT | HWMON_T_MAX |
-+			   HWMON_T_CRIT | HWMON_T_EMERGENCY),
-+	NULL
-+};
-+
-+static int ice_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
-+			  u32 attr, int channel, long *val)
-+{
-+	struct ice_aqc_get_sensor_reading_resp resp;
-+	struct ice_pf *pf = dev_get_drvdata(dev);
-+	int ret;
-+
-+	if (type != hwmon_temp)
-+		return -EOPNOTSUPP;
-+
-+	ret = ice_aq_get_sensor_reading(&pf->hw,
-+					ICE_INTERNAL_TEMP_SENSOR,
-+					ICE_INTERNAL_TEMP_SENSOR_FORMAT,
-+					&resp);
-+	if (ret) {
-+		dev_warn(dev, "%s HW read failure (%d)\n", __func__, ret);
-+		return ret;
-+	}
-+
-+	switch (attr) {
-+	case hwmon_temp_input:
-+		*val = TEMP_FROM_REG(resp.data.s0f0.temp);
-+		break;
-+	case hwmon_temp_max:
-+		*val = TEMP_FROM_REG(resp.data.s0f0.temp_warning_threshold);
-+		break;
-+	case hwmon_temp_crit:
-+		*val = TEMP_FROM_REG(resp.data.s0f0.temp_critical_threshold);
-+		break;
-+	case hwmon_temp_emergency:
-+		*val = TEMP_FROM_REG(resp.data.s0f0.temp_fatal_threshold);
-+		break;
-+	default:
-+		dev_warn(dev, "%s unsupported attribute (%d)\n",
-+			 __func__, attr);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static umode_t ice_hwmon_is_visible(const void *data,
-+				    enum hwmon_sensor_types type, u32 attr,
-+				    int channel)
-+{
-+	if (type != hwmon_temp)
-+		return 0;
-+
-+	switch (attr) {
-+	case hwmon_temp_input:
-+	case hwmon_temp_crit:
-+	case hwmon_temp_max:
-+	case hwmon_temp_emergency:
-+		return 0444;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct hwmon_ops ice_hwmon_ops = {
-+	.is_visible = ice_hwmon_is_visible,
-+	.read = ice_hwmon_read
-+};
-+
-+static const struct hwmon_chip_info ice_chip_info = {
-+	.ops = &ice_hwmon_ops,
-+	.info = ice_hwmon_info
-+};
-+
-+static bool ice_is_internal_reading_supported(struct ice_pf *pf)
-+{
-+	if (pf->hw.pf_id)
-+		return false;
-+
-+	unsigned long sensors = pf->hw.dev_caps.supported_sensors;
-+
-+	if (!_test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors))
-+		return false;
-+
-+	return true;
-+};
-+
-+void ice_hwmon_init(struct ice_pf *pf)
-+{
-+	struct device *dev = ice_pf_to_dev(pf);
-+	struct device *hdev;
-+
-+	if (!ice_is_internal_reading_supported(pf))
-+		return;
-+
-+	hdev = hwmon_device_register_with_info(dev, "ice", pf, &ice_chip_info,
-+					       NULL);
-+	if (IS_ERR(hdev)) {
-+		dev_warn(dev,
-+			 "hwmon_device_register_with_info returns error (%ld)",
-+			 PTR_ERR(hdev));
-+		return;
-+	}
-+	pf->hwmon_dev = hdev;
-+}
-+
-+void ice_hwmon_exit(struct ice_pf *pf)
-+{
-+	if (!ice_is_internal_reading_supported(pf))
-+		return;
-+	if (!pf->hwmon_dev)
-+		return;
-+	hwmon_device_unregister(pf->hwmon_dev);
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.h b/drivers/net/ethernet/intel/ice/ice_hwmon.h
-new file mode 100644
-index 000000000000..f95d0f91503e
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ice/ice_hwmon.h
-@@ -0,0 +1,7 @@
-+#ifndef _ICE_HWMON_H_
-+#define _ICE_HWMON_H_
-+
-+void ice_hwmon_init(struct ice_pf *pf);
-+void ice_hwmon_exit(struct ice_pf *pf);
-+
-+#endif /* _ICE_HWMON_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index a6291f29b987..6f573c94b94e 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -13,6 +13,7 @@
- #include "ice_dcb_lib.h"
- #include "ice_dcb_nl.h"
- #include "ice_devlink.h"
-+#include "ice_hwmon.h"
- /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
-  * ice tracepoint functions. This must be done exactly once across the
-  * ice driver.
-@@ -4725,6 +4726,8 @@ static void ice_init_features(struct ice_pf *pf)
- 
- 	if (ice_init_lag(pf))
- 		dev_warn(dev, "Failed to init link aggregation support\n");
-+
-+	ice_hwmon_init(pf);
- }
- 
- static void ice_deinit_features(struct ice_pf *pf)
-@@ -5233,6 +5236,8 @@ static void ice_remove(struct pci_dev *pdev)
- 		ice_free_vfs(pf);
- 	}
- 
-+	ice_hwmon_exit(pf);
-+
- 	ice_service_task_stop(pf);
- 	ice_aq_cancel_waiting_tasks(pf);
- 	set_bit(ICE_DOWN, pf->state);
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index e68425bd0713..805c6aa67384 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -377,6 +377,8 @@ struct ice_hw_func_caps {
- 	struct ice_ts_func_info ts_func_info;
- };
- 
-+#define ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT	0
-+
- /* Device wide capabilities */
- struct ice_hw_dev_caps {
- 	struct ice_hw_common_caps common_cap;
-@@ -385,6 +387,8 @@ struct ice_hw_dev_caps {
- 	u32 num_flow_director_fltr;	/* Number of FD filters available */
- 	struct ice_ts_dev_info ts_dev_info;
- 	u32 num_funcs;
-+	/* bitmap of supported sensors */
-+	u32 supported_sensors;
- };
- 
- /* MAC info */
+Acked-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-base-commit: b6aed813cbe277cd41af1c898e7b8f9b762a75c0
--- 
-2.35.3
+>
+>         err =3D vdpa_mgmtdev_register(&mgtdev->mgtdev);
+>         if (err)
+> diff --git a/include/linux/mlx5/mlx5_ifc_vdpa.h b/include/linux/mlx5/mlx5=
+_ifc_vdpa.h
+> index 9becdc3fa503..b86d51a855f6 100644
+> --- a/include/linux/mlx5/mlx5_ifc_vdpa.h
+> +++ b/include/linux/mlx5/mlx5_ifc_vdpa.h
+> @@ -74,7 +74,11 @@ struct mlx5_ifc_virtio_q_bits {
+>         u8    reserved_at_320[0x8];
+>         u8    pd[0x18];
+>
+> -       u8    reserved_at_340[0xc0];
+> +       u8    reserved_at_340[0x20];
+> +
+> +       u8    desc_group_mkey[0x20];
+> +
+> +       u8    reserved_at_380[0x80];
+>  };
+>
+>  struct mlx5_ifc_virtio_net_q_object_bits {
+> @@ -141,6 +145,7 @@ enum {
+>         MLX5_VIRTQ_MODIFY_MASK_STATE                    =3D (u64)1 << 0,
+>         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_PARAMS      =3D (u64)1 << 3,
+>         MLX5_VIRTQ_MODIFY_MASK_DIRTY_BITMAP_DUMP_ENABLE =3D (u64)1 << 4,
+> +       MLX5_VIRTQ_MODIFY_MASK_DESC_GROUP_MKEY          =3D (u64)1 << 14,
+>  };
+>
+>  enum {
+> --
+> 2.41.0
+>
 
 
