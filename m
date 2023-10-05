@@ -1,164 +1,160 @@
-Return-Path: <netdev+bounces-38170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A72AE7B99D5
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 04:01:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3A07B99DA
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 04:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id A794F1C208FB
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:01:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id BE41F281CAF
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 02:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1661137B;
-	Thu,  5 Oct 2023 02:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B74B15B8;
+	Thu,  5 Oct 2023 02:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="erpHoSQU"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="W+KmyvEx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D0B1373
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 02:01:23 +0000 (UTC)
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973E79E
-	for <netdev@vger.kernel.org>; Wed,  4 Oct 2023 19:01:21 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1c60f1a2652so4257745ad.0
-        for <netdev@vger.kernel.org>; Wed, 04 Oct 2023 19:01:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696471281; x=1697076081; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Az82CAy1ENEE8ZHSQ5TtIVSgE5eqRRKRJ5V7t2KM+YE=;
-        b=erpHoSQUwsqu6mmTSPUcuTld6KITTDKC4MIQRPHLzhtOf7FN3Ymv+K4M0XRRk60l6u
-         Kb4m7vXQztyqlasXE5WHkhN7hv7kEx1XUJ7eEhplIG0b1KsbinrhWkCrl8aN/pg8lH/a
-         qnjkraNJScljrAcP5bTS1eZc8xSwS09usA/wFcuYUcHoph+vIIRvpgv0DJklaQDymcaM
-         g+l1XwxCLpdarxIG9+mfpeVC1tjCBF8a3KJoY7zYhx4n0Orp5UfJzhyzEaP/HzRBbbFm
-         1frDk1/TjwiNNEd55MrplxD8oRCsc49IcbBu4ZhOoam8VCGHJA/u2APnhJOJ1popDFfJ
-         VTmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696471281; x=1697076081;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Az82CAy1ENEE8ZHSQ5TtIVSgE5eqRRKRJ5V7t2KM+YE=;
-        b=TbuLlgViuNjlI9r8XfRBAaXBxAoMwHvHfQoy3SW2rXPjPAwh3ssS0/8+At9rS4WgqT
-         PVqhhBYroY/MMQ5LKDmjO7BQrfJ2NL8SsJxEtKZywZseySew8tvpugniVvsKAkTWFoFq
-         8ucynmu6MuEIxC4Y966umqTo1Zt/Ig9DsX15VlUVQKtchLW67/URcVN0VF8ERUCcxfos
-         aNRSAqu8OMsLigl0qf55K7Mk9KFgmpItTbn690tJ8j7E8o8RlP2ftGGfHRb0hpju8SP3
-         v+C3Sd7Z5IExKLn4xz0tcwJI6IcpPdI7R3IOl/grHHaE6hlgiQ1NAVb6TG+xQpUcCCqM
-         TgWA==
-X-Gm-Message-State: AOJu0YylSimy1oySfmZMvj4+DXwfuk1idht3bMEA1XW/mMd2ExekSjrt
-	t55vanfIJ8mTy7PoyOiPdm9khfjC/Xk=
-X-Google-Smtp-Source: AGHT+IHkSDe9NFUroS5edf/5Zr6JrGi0J614icwqRyqH5PW1BJtdxdeMIc/tuTedqJhiGo/cllqkoQ==
-X-Received: by 2002:a17:902:ce86:b0:1c4:4a4d:cc6 with SMTP id f6-20020a170902ce8600b001c44a4d0cc6mr7690plg.19.1696471280937;
-        Wed, 04 Oct 2023 19:01:20 -0700 (PDT)
-Received: from localhost ([203.221.51.174])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902e5c400b001a9b29b6759sm254064plf.183.2023.10.04.19.01.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Oct 2023 19:01:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A6EEA9
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 02:15:27 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31469C1;
+	Wed,  4 Oct 2023 19:15:25 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 394Fdvjh019027;
+	Wed, 4 Oct 2023 19:14:44 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=YB9+Nmw4dr/PPR04PoBlvPvn37t1bScOgxylfQ7VBb4=;
+ b=W+KmyvExwsWP+5lTIXo1rMJMxx6X/doCIKlDDkXCwLoTJy1oS3t/zfN978r1Q8jT3Wjf
+ qWl4fzIwEyWWBrqCMQDzX5kiCv+tg+klOyC/JcCibCaDYG7puTIn3SHx81RJhm8SiN3z
+ lWaPeyUSn23MFz9oA28Tf9jJHAf9uOIws2bD8ZFahow683pudx7d1ZGLTpWHvKure/gT
+ jiwcqf9LvzfK1JQx349HUm+nkk4guPM08MgM2pzUVn20Qes2GehhrUdxuXwRnjZE8pNc
+ rVIG0VH8Sq9uDy5rbQC9w1WT4OZXnogKnU4SmeSZn+e4N/4Ehd1DNC5QyKKfw5m3UXDa ZA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3th29um538-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 04 Oct 2023 19:14:43 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 4 Oct
+ 2023 19:14:41 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 4 Oct 2023 19:14:41 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 479BE3F707B;
+	Wed,  4 Oct 2023 19:14:32 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
+        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
+        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
+        <bigeasy@linutronix.de>
+Subject: [PATCH net v1] octeontx2-pf: Fix page pool frag allocation failure.
+Date: Thu, 5 Oct 2023 07:44:34 +0530
+Message-ID: <20231005021434.3427404-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 05 Oct 2023 12:01:15 +1000
-Message-Id: <CW04VKYCMTJE.ZX0TQ1Y6H6VB@wheely>
-Cc: "Aaron Conole" <aconole@redhat.com>, <netdev@vger.kernel.org>,
- <dev@openvswitch.org>, "Ilya Maximets" <imaximet@redhat.com>, "Flavio
- Leitner" <fbl@redhat.com>
-Subject: Re: [ovs-dev] [RFC PATCH 4/7] net: openvswitch: ovs_vport_receive
- reduce stack usage
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Eelco Chaudron" <echaudro@redhat.com>
-X-Mailer: aerc 0.15.2
-References: <20230927001308.749910-1-npiggin@gmail.com>
- <20230927001308.749910-5-npiggin@gmail.com> <f7tfs2ymi8y.fsf@redhat.com>
- <CVV7HCQYCVOP.2JVVJCKU57CAW@wheely>
- <34747C51-2F94-4B64-959B-BA4B0AA4224B@redhat.com>
-In-Reply-To: <34747C51-2F94-4B64-959B-BA4B0AA4224B@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: evaUIMMyftB6kJu6KHLG9UfVepScin-n
+X-Proofpoint-ORIG-GUID: evaUIMMyftB6kJu6KHLG9UfVepScin-n
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-04_13,2023-10-02_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri Sep 29, 2023 at 6:38 PM AEST, Eelco Chaudron wrote:
->
->
-> On 29 Sep 2023, at 9:00, Nicholas Piggin wrote:
->
-> > On Fri Sep 29, 2023 at 1:26 AM AEST, Aaron Conole wrote:
-> >> Nicholas Piggin <npiggin@gmail.com> writes:
-> >>
-> >>> Dynamically allocating the sw_flow_key reduces stack usage of
-> >>> ovs_vport_receive from 544 bytes to 64 bytes at the cost of
-> >>> another GFP_ATOMIC allocation in the receive path.
-> >>>
-> >>> XXX: is this a problem with memory reserves if ovs is in a
-> >>> memory reclaim path, or since we have a skb allocated, is it
-> >>> okay to use some GFP_ATOMIC reserves?
-> >>>
-> >>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> >>> ---
-> >>
-> >> This represents a fairly large performance hit.  Just my own quick
-> >> testing on a system using two netns, iperf3, and simple forwarding rul=
-es
-> >> shows between 2.5% and 4% performance reduction on x86-64.  Note that =
-it
-> >> is a simple case, and doesn't involve a more involved scenario like
-> >> multiple bridges, tunnels, and internal ports.  I suspect such cases
-> >> will see even bigger hit.
-> >>
-> >> I don't know the impact of the other changes, but just an FYI that the
-> >> performance impact of this change is extremely noticeable on x86
-> >> platform.
-> >
-> > Thanks for the numbers. This patch is probably the biggest perf cost,
-> > but unfortunately it's also about the biggest saving. I might have an
-> > idea to improve it.
->
-> Also, were you able to figure out why we do not see this problem on x86 a=
-nd arm64? Is the stack usage so much larger, or is there some other root ca=
-use? Is there a simple replicator, as this might help you profile the diffe=
-rences between the architectures?
+Since page pool param's "order" is set to 0, will result
+in below warn message if interface is configured higher
+rx buffer size.
 
-I found some snippets of equivalent call chain (this is for 4.18 RHEL8
-kernels, but it's just to give a general idea of stack overhead
-differences in C code). Frame size annotated on the right hand side:
+Steps to reproduce the issue.
+1. devlink dev param set pci/0002:04:00.0 name receive_buffer_size \
+   value 8196 cmode runtime
+2. ifconfig eth0 up
 
-[c0000007ffdba980] do_execute_actions     496
-[c0000007ffdbab70] ovs_execute_actions    128
-[c0000007ffdbabf0] ovs_dp_process_packet  208
-[c0000007ffdbacc0] clone_execute          176
-[c0000007ffdbad70] do_execute_actions     496
-[c0000007ffdbaf60] ovs_execute_actions    128
-[c0000007ffdbafe0] ovs_dp_process_packet  208
-[c0000007ffdbb0b0] ovs_vport_receive      528
-[c0000007ffdbb2c0] internal_dev_xmit
-                                 total =3D 2368
-[ff49b6d4065a3628] do_execute_actions     416
-[ff49b6d4065a37c8] ovs_execute_actions     48
-[ff49b6d4065a37f8] ovs_dp_process_packet  112
-[ff49b6d4065a3868] clone_execute           64
-[ff49b6d4065a38a8] do_execute_actions     416
-[ff49b6d4065a3a48] ovs_execute_actions     48
-[ff49b6d4065a3a78] ovs_dp_process_packet  112
-[ff49b6d4065a3ae8] ovs_vport_receive      496
-[ff49b6d4065a3cd8] netdev_frame_hook
-                                 total =3D 1712
+[   19.901356] ------------[ cut here ]------------
+[   19.901361] WARNING: CPU: 11 PID: 12331 at net/core/page_pool.c:567 page_pool_alloc_frag+0x3c/0x230
+[   19.901449] pstate: 82401009 (Nzcv daif +PAN -UAO +TCO -DIT +SSBS BTYPE=--)
+[   19.901451] pc : page_pool_alloc_frag+0x3c/0x230
+[   19.901453] lr : __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
+[   19.901460] sp : ffff80000f66b970
+[   19.901461] x29: ffff80000f66b970 x28: 0000000000000000 x27: 0000000000000000
+[   19.901464] x26: ffff800000d15b68 x25: ffff000195b5c080 x24: ffff0002a5a32dc0
+[   19.901467] x23: ffff0001063c0878 x22: 0000000000000100 x21: 0000000000000000
+[   19.901469] x20: 0000000000000000 x19: ffff00016f781000 x18: 0000000000000000
+[   19.901472] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+[   19.901474] x14: 0000000000000000 x13: ffff0005ffdc9c80 x12: 0000000000000000
+[   19.901477] x11: ffff800009119a38 x10: 4c6ef2e3ba300519 x9 : ffff800000d13844
+[   19.901479] x8 : ffff0002a5a33cc8 x7 : 0000000000000030 x6 : 0000000000000030
+[   19.901482] x5 : 0000000000000005 x4 : 0000000000000000 x3 : 0000000000000a20
+[   19.901484] x2 : 0000000000001080 x1 : ffff80000f66b9d4 x0 : 0000000000001000
+[   19.901487] Call trace:
+[   19.901488]  page_pool_alloc_frag+0x3c/0x230
+[   19.901490]  __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
+[   19.901494]  otx2_rq_aura_pool_init+0x1c4/0x240 [rvu_nicpf]
+[   19.901498]  otx2_open+0x228/0xa70 [rvu_nicpf]
+[   19.901501]  otx2vf_open+0x20/0xd0 [rvu_nicvf]
+[   19.901504]  __dev_open+0x114/0x1d0
+[   19.901507]  __dev_change_flags+0x194/0x210
+[   19.901510]  dev_change_flags+0x2c/0x70
+[   19.901512]  devinet_ioctl+0x3a4/0x6c4
+[   19.901515]  inet_ioctl+0x228/0x240
+[   19.901518]  sock_ioctl+0x2ac/0x480
+[   19.901522]  __arm64_sys_ioctl+0x564/0xe50
+[   19.901525]  invoke_syscall.constprop.0+0x58/0xf0
+[   19.901529]  do_el0_svc+0x58/0x150
+[   19.901531]  el0_svc+0x30/0x140
+[   19.901533]  el0t_64_sync_handler+0xe8/0x114
+[   19.901535]  el0t_64_sync+0x1a0/0x1a4
+[   19.901537] ---[ end trace 678c0bf660ad8116 ]---
 
-That's more significant than I thought, nearly 40% more stack usage for
-ppc even with 3 frames having large local variables that can't be
-avoided for either arch.
+Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 
-So, x86_64 could be quite safe with its 16kB stack for the same
-workload, explaining why same overflow has not been seen there.
+---
+ChangeLog
 
-Thanks,
-Nick
+v0 -> v1: Used get_order() and PAGE_ALIGN. Fixed commit message
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 997fedac3a98..a917577d5092 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -1357,7 +1357,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+ 	struct page_pool_params pp_params = { 0 };
+ 	struct npa_aq_enq_req *aq;
+ 	struct otx2_pool *pool;
+-	int err;
++	int err, sz;
+ 
+ 	pool = &pfvf->qset.pool[pool_id];
+ 	/* Alloc memory for stack which is used to store buffer pointers */
+@@ -1403,6 +1403,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+ 		return 0;
+ 	}
+ 
++	sz = PAGE_ALIGN(ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN));
++	pp_params.order = get_order(sz);
+ 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+ 	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
+ 	pp_params.nid = NUMA_NO_NODE;
+-- 
+2.25.1
+
 
