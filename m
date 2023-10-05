@@ -1,195 +1,337 @@
-Return-Path: <netdev+bounces-38201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4F367B9C18
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 11:17:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E5B47B9C24
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 11:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sv.mirrors.kernel.org (Postfix) with ESMTP id 8D453281B49
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:17:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 7498D281ABE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 09:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F0410794;
-	Thu,  5 Oct 2023 09:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32C3107A0;
+	Thu,  5 Oct 2023 09:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="M0LkLNBP"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Rj7c0j+W"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB02620E3
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:16:55 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E102A252
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 02:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cDEEYXUhMsvTrOnhl9uoogQe1VpoH6EccOfKxVkkpII=; b=M0LkLNBPuk9jzv2UQDAk8Hz6CK
-	zWD3AUsNP36d2ZIGhV3B8TVwLwRVnMBcdfh05vMuuEqyOES87xWT4tKvna9T5WBAPDcrDcwyGifbd
-	gAuq3jqHVjRhGGGVZzD2HUsvjUpVqooXFTiYUDFtIuKTKNqnalApVzt30/Awy/a2jGr0+0ub5IuKQ
-	jGRQwOknDolkuDJMZaDFhrpTMcYGCc+E9o9JZ+6Mzw4UKWX8mAzNPyINWhNDttRZYlblZNCT4oGgd
-	NVGi1RfU6X842mRwVUBYIGfye3oQwJZKcZBqCh46XkiXZQjvw48xHqNrhlReewy2d3tiiMpMKe1n8
-	d0znqzpQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33938)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qoKTP-0003jh-1m;
-	Thu, 05 Oct 2023 10:16:47 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qoKTQ-0001tL-By; Thu, 05 Oct 2023 10:16:48 +0100
-Date: Thu, 5 Oct 2023 10:16:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: What is the purpose of the first phylink_validate() call from
- phylink_create()?
-Message-ID: <ZR5/ADvrbMKcKBSy@shell.armlinux.org.uk>
-References: <20231004222523.p5t2cqaot6irstwq@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D37B5690
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 09:30:04 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2062e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaf::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75139199;
+	Thu,  5 Oct 2023 02:30:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=crtdKQbdGHE90CJMVczYAOXGLNFrQYLScCtayQj5Grzfd1O0odsvKxA/OnbTWyQ8d17wIyfo6rg5QHttI36gYYODfjswa2qkHtlkyI7JyjLvltVNJ27+LKI5xA/KjWvojw7661h0YWzLjHyEm63+B7KJaM+8bETQHt8LSPNSZ3GwBbB6LdWZxGveqH8VbAKK+tbmv4HNzZ3hxpTCJKOg5M0ZXJxe2jlecGK7AXCO9QoEV00r90J5ShmACUWa99gHTkUD0dBBEa5F1pXIg0N1OcQjqaWT5jAJIYXLgTk/zIzUU9vYTDQtmKkDz7assNLvhqr3n3qXmTrbw20rrXPAOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nNgPhoMWbao0T2n8TbW+P72iU63JXQ1U4WnWaG3PLDk=;
+ b=CFUoj3/+LPwiA+pkuqAOS8f9iULilUNsQrebSYyISXkNPpiIQtGF1wlvof8MPmZBDTOQL+/wSewW4nh80QXJFxjblV/f+zNDQpO4RSoKj1NdZJJgERMD7LNNHcg7C6KSJeOSWWC+awA5No/WIhol+Rq1kJA9zxW8m+ODKjLz43wUmE4OSQTMTwJP0Ej/oO/MExka9ZoPfhehkUpTo0aH/bFdsjkP7X2leZgWhUb31UHAnhGph3AO4ps/sejfpNjiz3ZUJLHDn5Z5X6UcGg/gZJwKGzkSqZLXnr4EUfXNCWHx9AGe21B/ghiKUzKJIoFbbgvI6MQ63RwW1Kkx3/R9UA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nNgPhoMWbao0T2n8TbW+P72iU63JXQ1U4WnWaG3PLDk=;
+ b=Rj7c0j+WOW2hVotZVoGwnZ90dtQ21RAhMRH3c80rAORtM0oAv20tF63c8JyCATCjtMvKgHPzsSmj4MU06WgRmM5BY2+XHhMpFAC5xY18CAcd/z0I29sgOn4jhS+R7kJvrIzbLkb/QkV0pyTarTK3lCOrksUjU5H8DFqt/r79lKU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM9PR04MB8748.eurprd04.prod.outlook.com (2603:10a6:20b:409::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.22; Thu, 5 Oct
+ 2023 09:29:46 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::992:76c8:4771:8367%6]) with mapi id 15.20.6838.033; Thu, 5 Oct 2023
+ 09:29:46 +0000
+Date: Thu, 5 Oct 2023 12:29:43 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, s-vadapalli@ti.com, srk@ti.com,
+	vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 3/4] net: ethernet: ti: am65-cpsw-qos: Add
+ Frame Preemption MAC Merge support
+Message-ID: <20231005092943.q7no33k32thyo6y4@skbuf>
+References: <20230927072741.21221-1-rogerq@kernel.org>
+ <20230927072741.21221-1-rogerq@kernel.org>
+ <20230927072741.21221-4-rogerq@kernel.org>
+ <20230927072741.21221-4-rogerq@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230927072741.21221-4-rogerq@kernel.org>
+ <20230927072741.21221-4-rogerq@kernel.org>
+X-ClientProxiedBy: FR2P281CA0105.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9c::17) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231004222523.p5t2cqaot6irstwq@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB8748:EE_
+X-MS-Office365-Filtering-Correlation-Id: cda1fa45-3945-4b8c-71d4-08dbc5859d34
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	cWf/xr0I30Y3YptoNQgcxiavpmQ421IJ5+FZoIoP7QRP25femhWiX35L96W/0ccYkiI3VZvzTokqTS7mvSHMwuJ+FAtP5iLzbyIS4uHGfkBtv19G3/Tg+Cf7Zs6CsJsbSxbBzmWfzfXErtZoE8Oawt1UNNLyS37aKf/cPT/oWoZ2kSqvsKsHe/JLDirQ3KqRSALirX5uhmryNfzAJb1BDtqDmTxFPIICrVdTcaw2BX93rXq8oS6xoO5w8rwR0SH2ffN94zx5y0oPEUL98r7mdzAjEb2/T4446GJGkG85PqD/lk3rj5Nz4Ud8JZ7qxeekIvvtMNi6i2KjOgz+bxaf9L9vMb49q3OHObqB2mP84j5+ij0Q1hmhHg0hYlO7C4X0dXF3KMSy9IFhSGlluU4FHTFLH4cMbl3R6d9o/Fa2oXakxZDXQNngqnSD0ljaQqa/oTN6KKmz+ZVXJkDn/aQtWCusvMqxnMN29SOvZorOvMsT4VW+Zii+JiIhYhLmxP9rySDB77o/IwJzcq+xTtsGv2CSAHATPqOjaAgscdZuY9k=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(376002)(136003)(39860400002)(396003)(346002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(1076003)(26005)(9686003)(6512007)(2906002)(33716001)(86362001)(38100700002)(66946007)(66476007)(66556008)(83380400001)(478600001)(5660300002)(44832011)(41300700001)(6916009)(316002)(966005)(6486002)(4326008)(8676002)(8936002)(6506007)(7416002)(6666004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TzMwTm80YkNLSXhRRGRvbk5FYnFQWmhubmEra0k2Vk9FeGtmbHNjWm9jZ1pJ?=
+ =?utf-8?B?ZmRySWw0bTIxVmN5MWZWSTc3SVB2R1FLaTE4OVh5ZmlMdjVySVRYQ25zKzRx?=
+ =?utf-8?B?THlDcHE5c2o2TThhOEE2NGd0UmRiUVJ4K0o3WjRobThQQmIxS1dqcFVsNDlX?=
+ =?utf-8?B?SkFvdHRoMTFRQ2k0K0lodDl0U3FXNWVGLzQ4QmhuOU9MVjZudDNubDV2aGxV?=
+ =?utf-8?B?TW1WeDlTd0gxcVNTdXROblBFSVR2M09LRmhicnlRcjFrZ3diWm5JUWs1V3ZT?=
+ =?utf-8?B?ZlNHVzRWdXh2cHNQdzBCVC8yNTk4UWFNUUtYeGdqdkpia0pROVV1WkpndE9B?=
+ =?utf-8?B?aEJ4N3JwN3kxdVlPdE12b0tWb3QwQWVBWXdZQTdpTkw1b0REUndGR3hhWXBu?=
+ =?utf-8?B?RC9ZdlpTOHR1eE5FQXJGMUhUZExqNjJwdkpyM28ya1ZkMWdwT3VobTBSQk04?=
+ =?utf-8?B?empySkNNelpiUUxoQzF4TjNDWFVEVE85OCs0ZkgwUjNTdUJlQXFBKzZzL01D?=
+ =?utf-8?B?eS9mS21WeU5hd25QTWdjM1ZYUVZabFYzWHhQWm5NMUhrcHdnMjMrY3JXNDF4?=
+ =?utf-8?B?R1p1MkNHTTlpa0pUbHNKZ0xsZGxLdkZpZm12dU5tYmpCQnFlTnR6bFJ1bTdv?=
+ =?utf-8?B?U0xYSm9CK1RHa0lmQVlMSFRUdjJLb1NYTVBPS2s4a3JXYlpiTEltOEdhdzRX?=
+ =?utf-8?B?TWdvcnljWnlNeXh3ZXpzMm1iVjZoQVZPUElaQmJ3OGZSVzZOa0kzUldCYS9x?=
+ =?utf-8?B?WnVMWE51TVNKamdoQ2RoM0lnMkFOWkh3Y0FKVjRla0gybVZ0L3pzckU5aytI?=
+ =?utf-8?B?WnRTTHROSGttT0tFQ05iNHJKdWVzZ3hVcGdqb2NneGxCQjdQbnVUK09TM3pD?=
+ =?utf-8?B?RXVJcmhVLzVWWFNILzF0d2swUnRVWEVzcTA4MnYzTkppOThKSGIvdjY2MDFp?=
+ =?utf-8?B?L0tzL09VZ2htdnNmS0tMYkdYWHdZejF4Tm1PQzdqTkxrNG5raGNMK1REbUdt?=
+ =?utf-8?B?ZVNaRVRwa25rSm5aTktRN3d4NkM3bEhwTzVoOUtnZmVnZDN2K1g3UmxBQnVW?=
+ =?utf-8?B?MkVkWGNTdk9XN2tJbnNTc1dMb1ppUS93cE5PaGNXSStPam9wZnNHNVFvOFV0?=
+ =?utf-8?B?aWVBcG5BcXVQUDcrRU5raGtVU1I1bHdIQlBOM0pFS25BaVJXa3VpYzU0WHJ6?=
+ =?utf-8?B?dXFLK1RheVlaUVdta0E4b3lGeU5QY3gwWS9tbzF0RitCMmNGQzhDNVo5Wmp1?=
+ =?utf-8?B?SVo1SDNNVUxTN1ZnUUg2bDFKSERkbm95Qi81ODVWUmF5bTRSeGtRREV6am40?=
+ =?utf-8?B?dkVTNXl2VVVZeTY0S0p6N09JZDZOU2lqUXpkSllSQWxNbFEyYzc4RVRwbFZo?=
+ =?utf-8?B?dDFvcjJ3c1pKZE1BZGR3bUZZRE9oRVRoeWFXckFoaTlOMTRuMC9kRVY2R21J?=
+ =?utf-8?B?NFJOYUxWUVgxajZseFhFb2xzVXZ3VEJlbmlENEsyUjdETXMyTVVic2FkOFQy?=
+ =?utf-8?B?UzZDcVVRSGdwU1phc3Z6QWhOdWExeFlFMGVqY1U5bU12YXZTTFpsZ3pwQVlR?=
+ =?utf-8?B?U0QwS3RBdUQ1YlJId0F3UXJPMVV5cGc0Z2FuL2Z3SmFKUmkzUmRsQWc1MGtY?=
+ =?utf-8?B?dHlSbXVqa3UycW5MUkRlbzkrNi9Fb1dQU2t6anB6WGJGTisxYStaNkZLRDk5?=
+ =?utf-8?B?Y0JHa1hBMXE3WlE2TmZ1U3IyblVvdDdvT3ZuWXRCWVlzTlVETWg5US84bXpl?=
+ =?utf-8?B?K0lHSHl2aWU0bldNTEJnRjdZWk9DK2FxaUVSY0NYdlVLajR1dzIyUWRjWUgv?=
+ =?utf-8?B?eEZJdVlRVTF2MkN0eVF2Y0Z3Rk0rRFhlMktTNE9pNldvYnZ0VGdsZFIyRVNX?=
+ =?utf-8?B?a3N4aDlVZUJYazB2djBXUHZDTEhzYkFvRm5CQ1NhUE1CYStaSFo0UFlBM3FY?=
+ =?utf-8?B?MkFzM1ZWdllmYWpFYnNNTk9TZzJXc2ZCSUdtNTQvUk5KeE1STHd1dncrZGZW?=
+ =?utf-8?B?ejJrVW4zK3hqalRPdkxCd0NvSFJzWUJ6TW9KMHhXZHljQ1RmMVNsZzAxRi9t?=
+ =?utf-8?B?TmJpaUg5ODVzZy9OcmFXN0VpU0I1Z1MxZGRkYXpKRHBmZkYxcXp3YXpqQk9z?=
+ =?utf-8?B?L2tBRjJsbzJSZFVUMC9PVjZsMjE2czBBdzkzdHg3bm1JaVVKMmtoMFdFYlRM?=
+ =?utf-8?B?OUE9PQ==?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cda1fa45-3945-4b8c-71d4-08dbc5859d34
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2023 09:29:46.3053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZOCEkdeH7CBp0vtRvNy3QTXSQPijWPP1n6fka7GXKLYFX7GQUwNo+dYRZvduLL8lNprdp3WM9QTw/7irsKd37A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8748
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,T_SPF_PERMERROR,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 01:25:23AM +0300, Vladimir Oltean wrote:
-> Hi Russell,
+On Wed, Sep 27, 2023 at 10:27:40AM +0300, Roger Quadros wrote:
+> Add driver support for viewing / changing the MAC Merge sublayer
+> parameters and seeing the verification state machine's current state
+> via ethtool.
 > 
-> In phylink_create() we have this code which populates pl->supported with
-> a maximal link mode configuration and then makes a best-effort attempt
-> to reduce it to what the physical port actually supports:
+> As hardware does not support interrupt notification for verification
+> events we resort to polling on link up. On link up we try a couple of
+> times for verification success and if unsuccessful then give up.
 > 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 3951e5af8cb5..1e89634ec8ae 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -1677,10 +1677,6 @@ struct phylink *phylink_create(struct phylink_config *config,
->  	__set_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state);
->  	timer_setup(&pl->link_poll, phylink_fixed_poll, 0);
+> The Frame Preemption feature is described in the Technical Reference
+> Manual [1] in section:
+> 	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
+> 
+> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
+> 
+> [1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
+> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
+> 
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 150 ++++++++++++
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c    |   2 +
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.h    |   5 +
+>  drivers/net/ethernet/ti/am65-cpsw-qos.c     | 240 ++++++++++++++++----
+>  drivers/net/ethernet/ti/am65-cpsw-qos.h     | 104 +++++++++
+>  5 files changed, 454 insertions(+), 47 deletions(-)
+> 
+> Changelog:
+> v5:
+> - No change
+> 
+> v4:
+> - Rebase and include in the same series as mqprio support.
+> 
+> v3:
+> - Rebase on top of v6.6-rc1 and mqprio support [1]
+> - Support ethtool_ops :: get_mm_stats()
+> - drop unused variables cmn_ctrl and verify_cnt
+> - make am65_cpsw_iet_link_state_update() and
+>   am65_cpsw_iet_change_preemptible_tcs() static
+> 
+> [1] https://lore.kernel.org/all/20230918075358.5878-1-rogerq@kernel.org/
+> 
+> v2:
+> - Use proper control bits for PMAC enable (AM65_CPSW_PN_CTL_IET_PORT_EN)
+>   and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
+> - Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
+>   AM65_CPSW_PN_CTL_IET_PORT_EN set.
+> - Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
+> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
+>   1G link if link is inactive.
+> - resize the RX FIFO based on pmac_enabled, not tx_enabled.
+> 
+> Test Procedure:
+> 
+> - 2 EVMs with AM65-CPSW network port connected to each other
+> - Run iet-setup-mqprio.sh on both
+> 
+> #!/bin/sh
+> #iet-setup-mqprio.sh
+> 
+> ifconfig eth0 down
+> ifconfig eth1 down
+> ethtool -L eth0 tx 4
+> ethtool --set-mm eth0 pmac-enabled on tx-enabled on verify-enabled on verify-time 10 tx-min-frag-size 124
+> ifconfig eth0 up
+> sleep 10
+> 
+> tc qdisc add dev eth0 handle 100: root mqprio \
+> num_tc 4 \
+> map 0 1 2 3 \
+> queues 1@0 1@1 1@2 1@3 \
+> hw 1 \
+> mode dcb \
+> fp P P P E
+> 
+> tc -g class show dev eth0
+> tc qdisc add dev eth0 clsact
+> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5002 0xffff action skbedit priority 2
+> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5003 0xffff action skbedit priority 3
+> ip addr add 192.168.3.102/24 dev eth0 
+> 
+> - check that MAC merge verification has succeeded
+> 
+> ethtool --show-mm eth0
+> 
+>         MAC Merge layer state for eth0:
+>         pMAC enabled: on
+>         TX enabled: on
+>         TX active: on
+>         TX minimum fragment size: 124
+>         RX minimum fragment size: 124
+>         Verify enabled: on
+>         Verify time: 10
+>         Max verify time: 134
+>         Verification status: SUCCEEDED
+> 
+> - On receiver EVM run 2 iperf instances
+> 
+> iperf3 -s -i30 -p5002&
+> iperf3 -s -i30 -p5003&
+> 
+> - On sender EVM run 2 iperf instances
+> 
+> iperf3 -c 192.168.3.102 -u -b200M -l1472 -u -t5 -i30 -p5002&
+> iperf3 -c 192.168.3.102 -u -b50M -l1472 -u -t5 -i30 -p5003&
+> 
+> - Check IET stats on sender. Look for MACMergeFragCountTx: increments
+> 
+> ethtool -I --show-mm eth0
+> MAC Merge layer state for eth0:
+> pMAC enabled: on
+> TX enabled: on
+> TX active: on
+> TX minimum fragment size: 124
+> RX minimum fragment size: 124
+> Verify enabled: on
+> Verify time: 10
+> Max verify time: 134
+> Verification status: SUCCEEDED
+> Statistics:
+>   MACMergeFrameAssErrorCount: 0
+>   MACMergeFrameSmdErrorCount: 0
+>   MACMergeFrameAssOkCount: 0
+>   MACMergeFragCountRx: 0
+>   MACMergeFragCountTx: 57824
+>   MACMergeHoldCount: 0
+> 
+> - Check IET stats on receiver. Look for MACMergeFragCountRx: and
+>   MACMergeFrameAssOkCount:
+> 
+> ethtool -I --show-mm eth0
+> MAC Merge layer state for eth0:
+> pMAC enabled: on
+> TX enabled: on
+> TX active: on
+> TX minimum fragment size: 124
+> RX minimum fragment size: 124
+> Verify enabled: on
+> Verify time: 10
+> Max verify time: 134
+> Verification status: SUCCEEDED
+> Statistics:
+>   MACMergeFrameAssErrorCount: 0
+>   MACMergeFrameSmdErrorCount: 0
+>   MACMergeFrameAssOkCount: 57018
+>   MACMergeFragCountRx: 57824
+>   MACMergeFragCountTx: 0
+>   MACMergeHoldCount: 0
+
+Nice of you to post commands, but could you also please clearly state
+whether the implementation passes tools/testing/selftests/net/forwarding/ethtool_mm.sh?
+
+> +	val &= ~AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK;
+> +	val |= AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(add_frag_size);
+> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
+> +
+> +	/* verify_timeout_count can only be set at valid link */
+> +	port->qos.iet.verify_time_ms = cfg->verify_time;
+> +
+> +	/* enable/disable pre-emption based on link status */
+
+For the benefit of grep, I would appreciate if it was spelled
+"preemption" everywhere.
+
+> +	am65_cpsw_iet_commit_preemptible_tcs(port);
+> +
+> +	mutex_unlock(&priv->mm_lock);
+> +
+> +	return 0;
+> +}
+> +
+>  static int am65_cpsw_port_est_enabled(struct am65_cpsw_port *port)
+>  {
+>  	return port->qos.est_oper || port->qos.est_admin;
+> @@ -602,6 +743,8 @@ static int am65_cpsw_setup_taprio(struct net_device *ndev, void *type_data)
+>  	if (port->qos.link_speed == SPEED_UNKNOWN)
+>  		return -ENOLINK;
 >  
-> -	bitmap_fill(pl->supported, __ETHTOOL_LINK_MODE_MASK_NBITS);
-> -	linkmode_copy(pl->link_config.advertising, pl->supported);
-> -	phylink_validate(pl, pl->supported, &pl->link_config);
-> -
->  	ret = phylink_parse_mode(pl, fwnode);
->  	if (ret < 0) {
->  		kfree(pl);
-> 
-> However:
-> 
-> - in MLO_AN_FIXED mode, the later call to phylink_parse_fixedlink() will
->   overwrite this pl->supported and pl->link_config.advertising with
->   another set
-> 
-> - in MLO_AN_INBAND mode, the later call to phylink_parse_mode() will
->   also overwrite pl->supported and pl->link_config.advertising
-> 
-> - with a PHY (either in MLO_AN_INBAND or MLO_AN_PHY modes),
->   phylink_bringup_phy() will overwrite pl->supported and
->   pl->link_config.advertising with stuff from the PHY
-> 
-> Of these 3 cases, phylink_bringup_phy() is the only one which
-> potentially does not come immediately after phylink_create().
-> So, the effect of the phylink_validate() from phylink_create() will be
-> visible only when it's not overwritten, for example when phylink_connect_phy()
-> (or one of variants) isn't called at probe time but is delayed until
-> ndo_open().
-> 
-> Since mvneta calls phylink_of_phy_connect() from mvneta_open() and I can
-> test that, I'm comparing the "ethtool" output produced before running
-> "ip link set dev eth0 up", in 2 cases:
-> 
-> - With the phylink_validate() from phylink_create() kept in place:
-> 
-> $ ethtool eth0
-> Settings for eth0:
->         Supported ports: [ TP    AUI     MII     FIBRE   BNC     Backplane ]
->         Supported link modes:   10baseT/Half 10baseT/Full
->                                 100baseT/Half 100baseT/Full
->                                 1000baseT/Full
->                                 1000baseKX/Full
->                                 1000baseX/Full
->                                 100baseT1/Full
->                                 1000baseT1/Full
->                                 100baseFX/Half 100baseFX/Full
->                                 10baseT1L/Full
->                                 10baseT1S/Full
->                                 10baseT1S/Half
->                                 10baseT1S_P2MP/Half
->         Supported pause frame use: Symmetric
->         Supports auto-negotiation: Yes
->         Supported FEC modes: Not reported
->         Advertised link modes:  Not reported
->         Advertised pause frame use: No
->         Advertised auto-negotiation: No
->         Advertised FEC modes: Not reported
->         Speed: Unknown!
->         Duplex: Half
->         Auto-negotiation: off
->         Port: MII
->         PHYAD: 0
->         Transceiver: internal
->         Supports Wake-on: d
->         Wake-on: d
->         Link detected: no
-> 
-> - And with it removed (the diff from the beginning):
-> 
-> $ ethtool eth0
-> Settings for eth0:
->         Supported ports: [  ]
->         Supported link modes:   Not reported
->         Supported pause frame use: No
->         Supports auto-negotiation: No
->         Supported FEC modes: Not reported
->         Advertised link modes:  Not reported
->         Advertised pause frame use: No
->         Advertised auto-negotiation: No
->         Advertised FEC modes: Not reported
->         Speed: Unknown!
->         Duplex: Half
->         Auto-negotiation: off
->         Port: MII
->         PHYAD: 0
->         Transceiver: internal
->         Supports Wake-on: d
->         Wake-on: d
->         Link detected: no
+> +	am65_cpsw_iet_change_preemptible_tcs(port, taprio->mqprio.preemptible_tcs);
+> +
 
-You've found the exact reason for it - so that we report something that
-seems at least reasonable to userspace, rather than reporting absolutely
-nothing which may cause issues.
+Hmm, why just look at the preemptible traffic classes and not at
+taprio's entire mqprio configuration? This bypasses the mapping between
+Linux traffic classes and switch priorities that you've established in
+am65_cpsw_setup_mqprio().
 
-The original code in mvneta would've done this:
+With the addition of the "mqprio" structure in tc_taprio_qopt_offload,
+my intention was to facilitate calling am65_cpsw_setup_mqprio() from
+am65_cpsw_setup_taprio().
 
-int mvneta_ethtool_get_settings(struct net_device *dev, struct ethtool_cmd *cmd)
-{
-        struct mvneta_port *pp = netdev_priv(dev);
-
-        if (!pp->phy_dev)
-                return -ENODEV;
-
-        return phy_ethtool_gset(pp->phy_dev, cmd);
-}
-
-Thus making the call fail if the device wasn't up - and that may be
-an alternative if we're expecting a PHY but we have none.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>  	return am65_cpsw_set_taprio(ndev, type_data);
+>  }
 
