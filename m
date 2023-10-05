@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-38212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC797B9C62
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 12:00:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 959867B9C82
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 12:29:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by ny.mirrors.kernel.org (Postfix) with ESMTP id 360661C2096B
-	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTP id 45F9F2814FE
+	for <lists+netdev@lfdr.de>; Thu,  5 Oct 2023 10:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CD511CB2;
-	Thu,  5 Oct 2023 10:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wh24q808"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C4D2125B9;
+	Thu,  5 Oct 2023 10:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B21920E3;
-	Thu,  5 Oct 2023 10:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 950B1C116D3;
-	Thu,  5 Oct 2023 10:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696500025;
-	bh=EEdWp/Ry3IlTSHH5W4iQK0g3V2xPwp6PsEmr0L7SbPA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Wh24q8085oThfBu4okUkjzAOz2rCv38txL0DojMdjiSx3+4w9BDu3PuKT+AOVHJDR
-	 LPagfyMwuaX/L50KJTR5EJ5gzB/f66qPC6qUQO3DjuWgWOiJbmWPq6rjUQoI6WXW/R
-	 LsU85lT1mcB6H9OMj3P3oXO8LMl31elssfFP0uD6yIdlZiGvbvcXtGxkX8swnukc1v
-	 2EG17HvqBq/biFVKnotqLBHAJdKhVJ0aCdo4LDuMAno7nWgxRB8ol7s+j3M992rrhQ
-	 ncD2XclK7nSeMhSW91rIQoCEs/0RX9t+rxzE/cbFwJ28sjOC3Y8cA5cWp1l9V6ka1i
-	 X+1mB7AYYfHvQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 778F6E632D8;
-	Thu,  5 Oct 2023 10:00:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90959125B0
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 10:29:15 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03A120E5C;
+	Thu,  5 Oct 2023 03:29:07 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-99c3c8adb27so144559066b.1;
+        Thu, 05 Oct 2023 03:29:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696501744; x=1697106544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jj5jafkJ0zIFP34snoPmFPYTg/PYDWh3uWvMOXmNhu8=;
+        b=KuA5gHnjgLh2WZyL+/uJF8GoN8lGooBYfdTywPTE1XQytWbqWxIWW/yGUvXymJFr5a
+         d6Fo7FueCYHEywo7K3xl0Mrt0kduPMMDJNrq9CbbJV0p7cinULZPlt2uwRmyvG0x435l
+         J6pQWrdKtnzqsnSNpahdjjD432MEX6a5V/lv5fmcFw6AJL/BzDcKPz0KmU+C6VK6W4zm
+         hEksRKG/JRgVxd2K1ZhMsEHJtYiW4cs9Vd5tM9g5PCXFE+e8Tv0diWQzPLDB+FhNvevv
+         87qv384rIhKr7pz9GQSdpTZPMObGbmVovXgVtnOSAQEnnyRYt+62WvwfkCxJf8f92Vxk
+         xKnw==
+X-Gm-Message-State: AOJu0YwFQTb/jEyBJIjUH/8hGviATDhetUDhXkBK0Dkq+HVVxwNL/tN8
+	ykecOEv/nxVqHB8bgsItEnA=
+X-Google-Smtp-Source: AGHT+IHydoezWpZnKJkj/HxjmRp/jJVxzTNzko/BbjcgxBRaXK5KRLbXhnAIexulQV8Y7S8zD1ac/g==
+X-Received: by 2002:a17:907:7603:b0:9b2:b633:ada2 with SMTP id jx3-20020a170907760300b009b2b633ada2mr4423288ejc.36.1696501744259;
+        Thu, 05 Oct 2023 03:29:04 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-006.fbsv.net. [2a03:2880:31ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a11-20020a17090640cb00b00977eec7b7e8sm963021ejk.68.2023.10.05.03.29.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 03:29:03 -0700 (PDT)
+Date: Thu, 5 Oct 2023 03:29:02 -0700
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	Eric Dumazet <edumazet@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, hch@lst.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH 3/3] Documentation: netconsole: add support for cmdline
+ targets
+Message-ID: <ZR6P7isP8eEy9vdF@gmail.com>
+References: <20231002155349.2032826-1-leitao@debian.org>
+ <20231002155349.2032826-4-leitao@debian.org>
+ <ZR3GbHOyxx+J4FUn@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net,v2, 0/3] net: mana: Fix some TX processing bugs
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169650002548.27211.13692825610419255584.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Oct 2023 10:00:25 +0000
-References: <1696020147-14989-1-git-send-email-haiyangz@microsoft.com>
-In-Reply-To: <1696020147-14989-1-git-send-email-haiyangz@microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, decui@microsoft.com,
- stephen@networkplumber.org, kys@microsoft.com, paulros@microsoft.com,
- olaf@aepfle.de, vkuznets@redhat.com, davem@davemloft.net, wei.liu@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leon@kernel.org,
- longli@microsoft.com, ssengar@linux.microsoft.com,
- linux-rdma@vger.kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
- bpf@vger.kernel.org, ast@kernel.org, sharmaajay@microsoft.com,
- hawk@kernel.org, tglx@linutronix.de, shradhagupta@linux.microsoft.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZR3GbHOyxx+J4FUn@google.com>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 29 Sep 2023 13:42:24 -0700 you wrote:
-> Fix TX processing bugs on error handling, tso_bytes calculation,
-> and sge0 size.
+On Wed, Oct 04, 2023 at 01:09:16PM -0700, Joel Becker wrote:
+> On Mon, Oct 02, 2023 at 08:53:49AM -0700, Breno Leitao wrote:
+> > @@ -155,6 +152,24 @@ You can also update the local interface dynamically. This is especially
+> >  useful if you want to use interfaces that have newly come up (and may not
+> >  have existed when netconsole was loaded / initialized).
+> >  
+> > +You can control and modify the targets defined at boot time (or module load
+> > +time) by creating special targets names. These special targets are named
+> > +`cmdline` concatenated to an integer, example: `cmdline0`.
 > 
-> Haiyang Zhang (3):
->   net: mana: Fix TX CQE error handling
->   net: mana: Fix the tso_bytes calculation
->   net: mana: Fix oversized sge0 for GSO packets
+> The special names are already "created", so perhaps it's a little
+> clearer to say something like:
 > 
-> [...]
+> ```
+> +Netconsole targets defined at boot time (or module load time) with the
+> +`netconsole=` param are assigned the name `cmdline<index>`.  For
+> +example, the first target in the parameter is named `cmdline0`.  You
+> +can control and modify these targets by creating configfs directories
+> +with the matching name.
+> ```
 
-Here is the summary with links:
-  - [net,v2,1/3] net: mana: Fix TX CQE error handling
-    https://git.kernel.org/netdev/net/c/b2b000069a4c
-  - [net,v2,2/3] net: mana: Fix the tso_bytes calculation
-    https://git.kernel.org/netdev/net/c/7a54de926574
-  - [net,v2,3/3] net: mana: Fix oversized sge0 for GSO packets
-    https://git.kernel.org/netdev/net/c/a43e8e9ffa0d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+That is way better. Thanks for the review.
+I will send an updated version soon.
 
