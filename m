@@ -1,164 +1,107 @@
-Return-Path: <netdev+bounces-38666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F371C7BBFC4
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:40:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78E47BBFCC
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B30F281EB1
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:40:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 040EB1C208BB
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:45:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1DF405C7;
-	Fri,  6 Oct 2023 19:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C917405C9;
+	Fri,  6 Oct 2023 19:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vYvUu2ff"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EaDT7pOK"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BB038FBC
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 19:40:07 +0000 (UTC)
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DFEC83
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:40:06 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5a229ac185aso30061827b3.1
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 12:40:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696621205; x=1697226005; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f4bbOBXZo2eHz6gBYk8A+BKEjjzNprtQoptukpt2aww=;
-        b=vYvUu2ffb81XUTZrba104b8jdS2CT8B3rH9P+EEDbzo6tny3iCT4cXgY/myRKKWwQg
-         fuvTxk2gHVC5iKGz2sd3yTmCpalfIcf69H7YTzs5hWZf7vaKVb5B0zZP1AaNf/O1klhU
-         GBEwKz8zPt5yA/+NIEu6/JoMRklH9Ll6xLCKjTZC+Xlgquq2tbmJ1HmssT9jbh4Bj5I9
-         2u106bYCWK6lHyWEU1HYik5m/aRq2ASb1AoZOWDq3uwwAJZLXcrVBb/evV5eav7+ttm6
-         crujZHuuQyY/VKVI4POvVETlMnVxhhHAFGrfA6bnEcko/9tGj8J3AcxAili0t0f2ezHP
-         Fpjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696621205; x=1697226005;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f4bbOBXZo2eHz6gBYk8A+BKEjjzNprtQoptukpt2aww=;
-        b=V4FCtnVId5JW/iTgqvj7vBAFfpMQu1oAYkDa/Jb+ELk7mh4vIFcAGagrgsQfDLOenO
-         w8LwvMtaK/bXA972NR4il/qxsyvcWU8a8MPKIIbA/4Cjl1znJv10hR43aBGMVNT9pjgc
-         1xEujgReRUWPDmumxw46UqkJGAceydybZ/5FVWX/KGtFZ9Gl2qH2vCTj7VO7CTyUYQpv
-         kTn+XprLL6oX51Kku5lxeI79dF7jxtD2ME1KBeiMQ1cazl91/1StCUO6Tq1AKM+bQLyr
-         IpJ7fTLg4DxfTboUpdS+37Ua6ScXE1jRBKKwtaJtHk4EYXT8suweGso0gxNem70NgrAw
-         8wfg==
-X-Gm-Message-State: AOJu0YxAFjSQvsMYmX/5N/S2RKauXomDjuFOe8k2ULLVqT89TyYzSG2x
-	SW8z6ay7jjUNUiRKSEBzDu9ycsIY93HqUMyQ7h+Ubw==
-X-Google-Smtp-Source: AGHT+IEaFNY2/iItPv+snUJRUdtR/Pc89rA5KoayTxI1pN3MtDCHWZtc1Xb1MVMo6mm4ht1ESAmPTj8JQObG7zSRqbk=
-X-Received: by 2002:a25:ce51:0:b0:d91:c3c4:2904 with SMTP id
- x78-20020a25ce51000000b00d91c3c42904mr6920314ybe.17.1696621205377; Fri, 06
- Oct 2023 12:40:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175882AB36
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 19:44:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 276A5C433C8;
+	Fri,  6 Oct 2023 19:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696621498;
+	bh=39zT5U5C6ML4UJu86kiMMCT+A/btFJCDbmSNpW+/ufA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EaDT7pOKoSDEC6eeiApq95BQB7uUBMrmtS9NN52siiSD5klu95fOIt5hHdqvzB8xN
+	 ACA7ABu4I75Z6XvWeuF3BWGPHl7fC+BP8/KmB/QbHW/Cq+y12Nfr9MoYFa7tCvISRF
+	 Vn6pcu/CAg6SO6ugkKdCEUhQHciLolzna9HI5K5C/CDNQPWv85iFDXK9sin4rSAbMe
+	 inCa1/UwHBNCAvvZV+WDnj7St1yTNqY/7vBLETN7p3axqv3QXJ42rU/OF2DwI0NPuN
+	 3jAH8YxZ07ux9L8IXYWMR5rxVritya4oEgIhQeRkbRTTtGDeP2l/HeWfgyRT/gug4E
+	 +AUAHiJm4LReg==
+Date: Fri, 6 Oct 2023 12:44:57 -0700
+From: Kuba Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
+ davem@davemloft.net, pabeni@redhat.com, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v3 2/5] dpll: spec: add support for pin-dpll
+ signal phase offset/adjust
+Message-ID: <20231006124457.26417f37@kernel.org>
+In-Reply-To: <ZSA7cEEc5nKl07/z@nanopsycho>
+References: <20231006114101.1608796-1-arkadiusz.kubalewski@intel.com>
+	<20231006114101.1608796-3-arkadiusz.kubalewski@intel.com>
+	<ZR/9yCVakCrDbBww@nanopsycho>
+	<20231006075536.3b21582e@kernel.org>
+	<ZSA7cEEc5nKl07/z@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230919145951.352548-1-victor@mojatatu.com> <beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
- <CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
- <97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net> <CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
- <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net> <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
- <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net> <CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
- <96532f62-6927-326c-8470-daa1c4ab9699@iogearbox.net> <CAM0EoMkUFcw7k0vX3oH8SHDoXW=DD-h2MkUE-3_MssXvP_uJbA@mail.gmail.com>
- <2ce3a5a1-375d-43a6-052d-d44d7b4a4bf8@iogearbox.net> <20231006063233.74345d36@kernel.org>
- <686dd999-bee4-ecf8-8dc4-c85a098c4a92@iogearbox.net> <20231006071215.4a28b348@kernel.org>
- <CAM0EoM=SHrPg2j3pmp-CG7v1g_7KaENEjgdwQ7HWOhN3NxUnng@mail.gmail.com> <647b0742-8806-cb66-d880-3d25fd9c3480@iogearbox.net>
-In-Reply-To: <647b0742-8806-cb66-d880-3d25fd9c3480@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 6 Oct 2023 15:39:53 -0400
-Message-ID: <CAM0EoMkUv8P5ATy9qsJi_N12oGF-BEq_rrHPt=XB_4+5FC3YNw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return code
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	paulb@nvidia.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
-	martin.lau@linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 6, 2023 at 11:45=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 10/6/23 5:25 PM, Jamal Hadi Salim wrote:
-> > On Fri, Oct 6, 2023 at 10:12=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> >> On Fri, 6 Oct 2023 15:49:18 +0200 Daniel Borkmann wrote:
-> >>>> Which will no longer work with the "pack multiple values into
-> >>>> the reason" scheme of subsys-specific values :(
-> >>>
-> >>> Too bad, do you happen to know why it won't work?
-> >>
-> >> I'm just guessing but the reason is enum skb_drop_reason
-> >> and the values of subsystem specific reasons won't be part
-> >> of that enum.
+On Fri, 6 Oct 2023 18:53:04 +0200 Jiri Pirko wrote:
+> Fri, Oct 06, 2023 at 04:55:36PM CEST, kuba@kernel.org wrote:
+> >> I'm confused. Didn't you say you'll remove this? If not, my question
+> >> from v1 still stands.  
 > >
-> > IIUC, this would gives us the readability and never require any
-> > changes to bpftrace, whereas the major:minor encoding would require
-> > further logic in bpftrace.
->
-> Makes sense, agree.
->
-> >>> Given they went into the
-> >>> length of extending this for subsystems, they presumably would also l=
-ike to
-> >>> benefit from above. :/
-> >>>
-> >>>> What I'm saying is that there is a trade-off here between providing
-> >>>> as much info as possible vs basic user getting intelligible data..
-> >>>
-> >>> Makes sense. I think we can drop that aspect for the subsys specific =
-error
-> >>> codes. Fwiw, TCP has 22 drop codes in the core section alone, so this=
- should
-> >>> be fine if you think it's better. The rest of the patch shown should =
-still
-> >>> apply the same way. I can tweak it to use the core section for codes,=
- and
-> >>> then it can be successively extended if that looks good to you - unle=
-ss you
-> >>> are saying from above, that just one error code is better and then go=
-ing via
-> >>> detailed stats for specific errors is preferred.
-> >>
-> >> No, no, multiple reasons are perfectly fine. The non-technical
-> >> advantage of mac80211 error codes being separate is that there
-> >> are no git conflicts when we add new ones. TC codes can just
-> >> be added to the main enum like TCP =F0=9F=A4=B7=EF=B8=8F
+> >Perhaps we should dis-allow setting version in non-genetlink-legacy
+> >specs? I thought it may be a useful thing to someone, at some point,
+> >but so far the scoreboard is: legit uses: 0, confused uses: 1 :S
 > >
-> > We still need to differentiate policy vs error - I suppose we could go
-> > with Daniel's idea of introducing TC_ACT_ABORT/ERROR and ensure all
-> > the callees set the drop_reason.
->
-> I've simplified the set (attached). The disambiguation could eventually b=
-e on
-> SKB_DROP_REASON_TC_{INGRESS,EGRESS} =3D=3D intentional drop vs SKB_DROP_R=
-EASON_TC_ERROR_*
-> which indicates an internal error code once these are covered on all loca=
-tions.
-> There could probably also be just a SKB_DROP_REASON_TC_ERROR which could =
-act as
-> a catch-all for the time being to initially mark all error locations with=
- something
-> generic. I think this should be flexible where you wouldn't need extra TC=
-_ACT_ABORT.
+> >Thoughts?  
+> 
+> I don't know what the meaning of version is. I just never saw that being
+> touched. Is there any semantics documented for it?
+> 
+> Kuba, any opinion?
 
-I think this should work - either Victor or myself will work on a followup.
+/me switches the first name in From :P
 
-cheers,
-jamal
+I think it basically predates the op / policy introspection,
+and allows people to break backward compat.
 
-> Thanks,
-> Daniel
+drop_monitor bumped to 2 in 2009:
+
+  683703a26e46 ("drop_monitor: Update netlink protocol to include
+netlink attribute header in alert message")
+
+which breaks backward compat.
+
+genetlink ctrl went to 2 in 2006:
+
+  334c29a64507 ("[GENETLINK]: Move command capabilities to flags.")
+
+which moves some info around in attrs, also breaks backward compat
+if someone depended on the old placement.
+
+ovs did it in 2013:
+
+  44da5ae5fbea ("openvswitch: Drop user features if old user space
+attempted to create datapath")
+
+again, breaks backwards compat.
+
+
+I guess it may still make one day to bump the version for some proto
+which has very tight control over the user space. But it hasn't
+happened for 10 years.
 
