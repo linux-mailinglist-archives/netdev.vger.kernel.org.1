@@ -1,137 +1,110 @@
-Return-Path: <netdev+bounces-38636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE8D7BBCB9
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:30:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B1C7BBCE3
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F087281A3B
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E191A1C209BE
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74733D76;
-	Fri,  6 Oct 2023 16:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2401D1A58E;
+	Fri,  6 Oct 2023 16:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWZD4DIQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NovB3Fuy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D3728E0F
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:30:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD69BC433C7;
-	Fri,  6 Oct 2023 16:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696609810;
-	bh=3JkyYeG33bgahfQv5iDtkIsC8aN1qb2VpMLW0TB6Bs4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EWZD4DIQribjkDA4qOQ6firAXYHLeB8Bs9/tRGKshmpg7sCgILn2Nh8iwBRVDBo13
-	 g8pu6QIUK5NpZc/ZdjG+Jy2AWVrXjgVQAMHFlYJnyS0mh1TbEfYq0gCjFK0eRZe9SK
-	 INSoEzkJs1jRYLlCc+qlNa2xhwM63GLtO1n4TyjZRSc9cblKGan3yVzwNwqSWr1RP8
-	 tjrsiIfk6UWyj2AhCHLTswtwFP7UpMokQekLM+UWEzOVaYs5LAQM2WtjHROjqIjhPM
-	 zu175u9MHJXod2TA2z8N7PtCpku4zMH4Lrv2X/qcwHGjaZgfdU8FE8o5rnpu478yRw
-	 CmUrqH7NaWxuQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	jesse.brandeburg@intel.com,
-	sd@queasysnail.net,
-	horms@verge.net.au
-Subject: [RFC] docs: netdev: encourage reviewers
-Date: Fri,  6 Oct 2023 09:30:07 -0700
-Message-ID: <20231006163007.3383971-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10281846
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:38:27 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EB5AD
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:38:25 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4060b623e64so14902485e9.0
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:38:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696610304; x=1697215104; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7dWGSS3YOrcsvfE31ne7UgGiti282vWu0wuljkGr9n4=;
+        b=NovB3Fuyl8NLN0wwOKzZgjEKmXF3HDXE4HVPKQy/s63Gx7PXUrg+YDbJWKjt5rujZ8
+         gCTHWQhHjelAcICjo/Q+1FFzC8wGnsixWjU/FVUYCg7CA8JOmf3DRxmZEDcgKo9HB4Dj
+         bDPBIRSISJF4X+qpSvDLtvat1/1i60znG0CK/uS/lY8FFn/z46kd+TE8NUIiiS9Wp9m8
+         34YuG52733nQrXzwhoYwHuurvpNUbNufKvg5RlJ5yzhKWe8ZeiyCtqtf1YcwhCeSqSIP
+         9Ou7R0OfqI+/PjlX3eslxVCnw1+BRDQRGMRf5V5lx6XFmQgdIdm4PeGYaKpzlBYA89Z3
+         mZuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696610304; x=1697215104;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7dWGSS3YOrcsvfE31ne7UgGiti282vWu0wuljkGr9n4=;
+        b=GkJzYQXTqhfFtZmhLrD0pzkXA+q6fc8B2yl548muruty28r3Ad7qXXDV5yN8JPkAsc
+         z8RshB3iIqyaXbnBxBTUtq/4XbskPC5blmQeskSyKy6msrEPFOHtaUFHzeq54HiqL3nY
+         7GeyKrbN9PvLE5Dq+nQBZ+C4fZQy0AkUh9jx1dDKBKmrSErBhujusu8YFMaHOWjYshDn
+         ugji3Gd/3EXZCE4JqK52CdlAgfuHNI4lJrhNlMBg8KxzdfBn7c+A+CWvBSCCXkjRLKZ/
+         05iLuYZncdhOVIgNI6pGa8fy/S7D/P3V91kuCvyUiDUN23cdcKSNhLhoXefi6uYXnViU
+         DdBQ==
+X-Gm-Message-State: AOJu0Yyti83odPgCZufFsvpWSkWM414HGoeLMFvtKbc5G9IDDjW7AXa7
+	pCxy37wYGUR1RV2G1EYut3k=
+X-Google-Smtp-Source: AGHT+IHtbEc+QIkRxAbCwc9TY9f1d3wwkO7FQVls5eDQewnUGLia8nas2gnOAqPbmytf58a2OzrJ5Q==
+X-Received: by 2002:a7b:cd06:0:b0:406:80ac:3291 with SMTP id f6-20020a7bcd06000000b0040680ac3291mr5134665wmj.13.1696610303677;
+        Fri, 06 Oct 2023 09:38:23 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 11-20020a05600c230b00b004053a6b8c41sm4071788wmo.12.2023.10.06.09.38.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 09:38:23 -0700 (PDT)
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew@lunn.ch, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au
+References: <20231006163007.3383971-1-kuba@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <e3bff9c3-4b0f-c176-4053-9ef7e800b111@gmail.com>
+Date: Fri, 6 Oct 2023 17:38:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231006163007.3383971-1-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Add a section to our maintainer doc encouraging reviewers
-to chime in on the mailing list.
+On 06/10/2023 17:30, Jakub Kicinski wrote:
+> Add a section to our maintainer doc encouraging reviewers
+> to chime in on the mailing list.
+> 
+> The questions about "when is it okay to share feedback"
+> keep coming up (most recently at netconf) and the answer
+> is "pretty much always".
+> 
+> The contents are partially based on a doc we wrote earlier
+> and shared with the vendors (for the "driver review rotation").
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[...]
+> +Last but not least patch review may become a negative process, focused
+> +on pointing out problems. Please throw in a complement once in a while,
+> +particularly for newbies!
 
-The questions about "when is it okay to share feedback"
-keep coming up (most recently at netconf) and the answer
-is "pretty much always".
+sp: compliment.
 
-The contents are partially based on a doc we wrote earlier
-and shared with the vendors (for the "driver review rotation").
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-CC: andrew@lunn.ch
-CC: jesse.brandeburg@intel.com
-CC: sd@queasysnail.net
-CC: horms@verge.net.au
-
-Sending as RFC for early round of reviews before I CC docs@
-and expose this to potentially less constructive feedback :)
----
- Documentation/process/maintainer-netdev.rst | 43 +++++++++++++++++++++
- 1 file changed, 43 insertions(+)
-
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 09dcf6377c27..d5cbcfd44cf8 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -441,6 +441,49 @@ in a way which would break what would normally be considered uAPI.
- new ``netdevsim`` features must be accompanied by selftests under
- ``tools/testing/selftests/``.
- 
-+Reviewer guidance
-+-----------------
-+
-+Reviewing other people's patches on the list is highly encouraged,
-+regardless of the level of expertise. Code reviews not only help
-+the maintainers but also help reviewers themselves to learn and
-+become part of the community.
-+
-+Reviewers can interact with the submissions by: asking questions
-+about the code, sharing relevant experience, suggesting changes, etc.
-+Asking questions is a particularly useful technique, for example rather
-+than stating:
-+
-+``I think there can be a deadlock between A and B here.``
-+
-+it may be better to phrase the feedback as a question:
-+
-+``Could you explain what prevents deadlocks between A and B?``
-+
-+After all, patch submissions should be clear both in terms of the code and
-+the commit message.
-+
-+Another technique useful in case of a disagreement is to ask for others
-+to chime in. I.e. if a discussion reaches a stalemate after a few exchanges,
-+calling for opinions of other reviewers or maintainers. Often those in
-+agreement with a reviewer remain silent unless called upon.
-+Opinion of multiple people carries exponentially more weight.
-+
-+There is no strict requirement to use specific tags like ``Reviewed-by``.
-+In fact reviews in plain English are more informative and encouraged
-+even when a tag is provided (e.g. "I looked at aspects A, B and C of this
-+submission and it looks good to me.")
-+Some form of a review message / reply is obviously necessary otherwise
-+maintainers will not know that the reviewer has looked at the patch at all!
-+
-+It's safe to assume that the maintainers know the community and the level
-+of expertise of the reviewers. The reviewers should not be concerned about
-+their comments impeding or derailing the patch flow.
-+
-+Last but not least patch review may become a negative process, focused
-+on pointing out problems. Please throw in a complement once in a while,
-+particularly for newbies!
-+
- Testimonials / feedback
- -----------------------
- 
--- 
-2.41.0
-
+Otherwise looks good.
+-ed
 
