@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-38634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DEF57BBC7F
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:13:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 425617BBC95
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B77E51C20986
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:13:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A46CA280FE6
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D6528DAD;
-	Fri,  6 Oct 2023 16:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEDA28DBC;
+	Fri,  6 Oct 2023 16:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DN1gdIl2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NVUz30t5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D7D286B4
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:13:45 +0000 (UTC)
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C919E;
-	Fri,  6 Oct 2023 09:13:44 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3231dff4343so1464559f8f.0;
-        Fri, 06 Oct 2023 09:13:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3897A273F9;
+	Fri,  6 Oct 2023 16:21:04 +0000 (UTC)
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE09A6;
+	Fri,  6 Oct 2023 09:21:02 -0700 (PDT)
+Received: by mail-oo1-xc33.google.com with SMTP id 006d021491bc7-57c0775d4fcso307027eaf.0;
+        Fri, 06 Oct 2023 09:21:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696608822; x=1697213622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=42iuHwuqbkZujSXR+0sYzIY5CpxMUDYyAkkaO/7JfyI=;
-        b=DN1gdIl2EtxBRihKRjMcBKOVqyRoY2DWrGmuanFMIX+xBgPIpfquTCYXK2qN0Efbc3
-         UUruxxRRco6uYyVY125L1w7aCXDdvcqlIscr9gvat4xcY9jIeZu3T0DkXpo7cUaYA05i
-         TiWBBoqoBZbnMBRdvtWXrL/+Q2dAeKFXXpyNyAeHsGdGcMe43YIl9W4nv4h3bib86SF0
-         27T6/NEWQSdKIvhnXO25gyUllGoI3psPzwrrgbmyvkHXo0OU5kbKupJowHhdKXIJ9N3u
-         OFBoCXskVE6qZw7ObMroz9XXZFwVng5MYLoi+cQpJkNdnPTeUV+8vG7pYQlWKhSzqWk3
-         Jcmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696608822; x=1697213622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1696609262; x=1697214062; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=42iuHwuqbkZujSXR+0sYzIY5CpxMUDYyAkkaO/7JfyI=;
-        b=aqdmEjWaIqwV8OqMADlfY+qr+53MvGERnCRIPMaNgapA8odpTHgORT6mTf3e4nDRHG
-         oid72twVVBSmOD9GdA8yW5uXax/0+VtkUOuehXpW3S/m08PUKcB4x2W+zJs0uTcPnpvW
-         YLyHtWCztmnBzGCvPE54PTkNg+OpJ40T9Loy/BJcTB56u68KuCsaGs1Zyl8969xM20vz
-         PPaGERYs+g4CLXok/ANXekYoyrA8vxD3ANDjjRgP0DXuDfOyBwkB1RgN6DTkC0J9Ma6h
-         gZVuFx8aOVqdqcbUutj980gVSjsUdsGNSVKAU0WL3QloJEAjWzRIjswkmH5WP4EqmSBQ
-         hMcQ==
-X-Gm-Message-State: AOJu0YwmZoceh0AuoNqB6yBtzliqdzRUmk0X+wtpXKdQTlvqEsigqGNM
-	sQP6KZKTBJVHCJ6EwTrc6Gw40roVfOE=
-X-Google-Smtp-Source: AGHT+IFWlJEd5lcJuO7NBXcmyzk/NQufpyDojp9c/24EWOp99ni3EczYohi8bG69H5WqdF1FOhglbQ==
-X-Received: by 2002:adf:e641:0:b0:320:a4e:acf5 with SMTP id b1-20020adfe641000000b003200a4eacf5mr5026301wrn.34.1696608822284;
-        Fri, 06 Oct 2023 09:13:42 -0700 (PDT)
-Received: from localhost.localdomain ([2001:818:e906:400:b2bc:40c:b83d:9c16])
-        by smtp.gmail.com with ESMTPSA id s4-20020a5d6a84000000b00327bf4f2f14sm1944289wru.88.2023.10.06.09.13.40
+        bh=Nw5/xjBCmUwohSuhLXL/rRAwQj9/lRA3/thm9H4Vl7E=;
+        b=NVUz30t58DJVQHoYLMJYJf0POpQciBUy6LovrfP+Kiz8V13sxtNd8jFBbEznqi50R/
+         cjdfGWEQoAFdLIt+lHx4kfBm0wGv37YIwvRaws00e8/GRVD0T5jzVbJFufuTeEHgygQa
+         a5G4Penf6ZgQCebndLwJ6JA067dokmomXeAHTjoL1HhrNnsTHHEDuwlGtCYJnqZtPqBZ
+         /DyvdBt1mqJ3MYDFfTq/AHXcmNXjqD008xHwxqx2J4+dOz4wKVoLgfSaySwV2Fl4yrc4
+         Dzwfa9d8uOqZkSvWdxkM81OBIINHCoPFzXtXmiHBZy6uzrKVwBEnoUOIsLy8iLVNK9RM
+         UV9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696609262; x=1697214062;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Nw5/xjBCmUwohSuhLXL/rRAwQj9/lRA3/thm9H4Vl7E=;
+        b=sHTVdL7p7BdgWVPDn9fM1gyp4B6QWyEjF9mZTlmqDOrx0ct1h3Gi9Dsr9yda9VGZrB
+         BTVocOj25M2jKycIYsvKVq221CBow3c6rHJ6mgAkmQDS6nbwZpPO4abKzxApJawByYOf
+         VIYhCuITvzZWVZ8YGpVXLKiSi5dhwFmAwm9BrzSVfaCJe29t6N+5m2yL+OW0qr0di4Ru
+         5Z5+OryAmzYtWFnVEXxVvAUXcuBxCQnWNulg7TBWD8GqZYG7DR2JYGmDpsaMP1bFXEOI
+         Rl32DDUisWcH0rc5NkhwOe2FzFfVJrym0KFjK/crlWcVmOVaedS0+9lzrbbpeTIlFkOX
+         S0lA==
+X-Gm-Message-State: AOJu0Yy0Kv2NZbWe6W4ZWnvKGTERrrgQgTLGkxPrf434iAzHv9dGsBcL
+	zE2YwX1SAsXZFdhzHk0bEWctahf6Xvikgkg/
+X-Google-Smtp-Source: AGHT+IFnIp3CF0zJjjt5NEaLlDPrAPXopfdRr1AXulF4fnTUCf8iuvU/P8P2Se04qlZRVFTzHg/0tQ==
+X-Received: by 2002:a05:6359:219:b0:14a:cca4:5601 with SMTP id ej25-20020a056359021900b0014acca45601mr7654906rwb.3.1696609261983;
+        Fri, 06 Oct 2023 09:21:01 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id b2-20020aa78702000000b00690fb385ea9sm1671713pfo.47.2023.10.06.09.21.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 09:13:41 -0700 (PDT)
-From: Ricardo Lopes <ricardoapl.dev@gmail.com>
-To: manishc@marvell.com,
-	GR-Linux-NIC-Dev@marvell.com,
-	coiby.xu@gmail.com,
-	gregkh@linuxfoundation.org
-Cc: netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] staging: qlge: Replace strncpy with strscpy
-Date: Fri,  6 Oct 2023 17:12:24 +0100
-Message-ID: <20231006161240.28048-1-ricardoapl.dev@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Fri, 06 Oct 2023 09:21:01 -0700 (PDT)
+Date: Sat, 07 Oct 2023 01:21:00 +0900 (JST)
+Message-Id: <20231007.012100.297660999016269225.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ miguel.ojeda.sandonis@gmail.com
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <3db1ad51-a2a0-4648-8bc5-7ed089a4e5dd@lunn.ch>
+References: <19161969-1033-4fd5-9a24-ec21d66c6735@lunn.ch>
+	<20231007.002609.681250079112313735.fujita.tomonori@gmail.com>
+	<3db1ad51-a2a0-4648-8bc5-7ed089a4e5dd@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -83,49 +85,82 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Reported by checkpatch:
+On Fri, 6 Oct 2023 17:57:41 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-WARNING: Prefer strscpy, strscpy_pad, or __nonstring over strncpy
+>> Now I'm thinking that this is the best option. Kconfig would be the following:
+>> 
+>> config AX88796B_PHY
+>>         tristate "Asix PHYs"
+>>         help
+>>          Currently supports the Asix Electronics PHY found in the X-Surf 100
+>>          AX88796B package.
+>> 
+>> choice
+>>         prompt "Implementation options"
+>>         depends on AX88796B_PHY
+>>         help
+>>          There are two implementations for a driver for Asix PHYs; C and Rust.
+>>          If not sure, choose C.
+>> 
+>> config AX88796B_C_PHY
+>>         bool "The C version driver for Asix PHYs"
+>> 
+>> config AX88796B_RUST_PHY
+>>         bool "The Rust version driver for Asix PHYs"
+>>         depends on RUST
+>> 
+>> endchoice
+>> 
+>> 
+>> No hack in Makefile:
+>> 
+>> obj-$(CONFIG_AX88796B_C_PHY)    += ax88796b.o
+>> obj-$(CONFIG_AX88796B_RUST_PHY) += ax88796b_rust.o
+> 
+> This looks reasonable. Lets use this. But i still think we need some
+> sort of RUST_PHYLIB_BINDING.
 
-Signed-off-by: Ricardo Lopes <ricardoapl.dev@gmail.com>
----
-v2: Redo changelog text
+How about adding CONFIG_RUST_PHYLIB to the first patch. Not
+selectable, it's just a flag for Rust PHYLIB support.
 
- drivers/staging/qlge/qlge_dbg.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/staging/qlge/qlge_dbg.c b/drivers/staging/qlge/qlge_dbg.c
-index c7e865f51..5f08a8492 100644
---- a/drivers/staging/qlge/qlge_dbg.c
-+++ b/drivers/staging/qlge/qlge_dbg.c
-@@ -696,7 +696,7 @@ static void qlge_build_coredump_seg_header(struct mpi_coredump_segment_header *s
- 	seg_hdr->cookie = MPI_COREDUMP_COOKIE;
- 	seg_hdr->seg_num = seg_number;
- 	seg_hdr->seg_size = seg_size;
--	strncpy(seg_hdr->description, desc, (sizeof(seg_hdr->description)) - 1);
-+	strscpy(seg_hdr->description, desc, sizeof(seg_hdr->description));
- }
+diff --git a/init/Kconfig b/init/Kconfig
+index 4b4e3df1658d..2b6627aeb98c 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1889,7 +1889,7 @@ config RUST
+ 	depends on !GCC_PLUGINS
+ 	depends on !RANDSTRUCT
+ 	depends on !DEBUG_INFO_BTF || PAHOLE_HAS_LANG_EXCLUDE
+	depends on PHYLIB=y
++	select RUST_PHYLIB
+ 	select CONSTRUCTORS
+ 	help
+ 	  Enables Rust support in the kernel.
+@@ -1904,6 +1904,10 @@ config RUST
  
- /*
-@@ -737,7 +737,7 @@ int qlge_core_dump(struct qlge_adapter *qdev, struct qlge_mpi_coredump *mpi_core
- 		sizeof(struct mpi_coredump_global_header);
- 	mpi_coredump->mpi_global_header.image_size =
- 		sizeof(struct qlge_mpi_coredump);
--	strncpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
-+	strscpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
- 		sizeof(mpi_coredump->mpi_global_header.id_string));
+ 	  If unsure, say N.
  
- 	/* Get generic NIC reg dump */
-@@ -1225,7 +1225,7 @@ static void qlge_gen_reg_dump(struct qlge_adapter *qdev,
- 		sizeof(struct mpi_coredump_global_header);
- 	mpi_coredump->mpi_global_header.image_size =
- 		sizeof(struct qlge_reg_dump);
--	strncpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
-+	strscpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
- 		sizeof(mpi_coredump->mpi_global_header.id_string));
- 
- 	/* segment 16 */
--- 
-2.41.0
++config RUST_PHYLIB
++	bool
++
+ config RUSTC_VERSION_TEXT
+ 	string
+ 	depends on RUST
 
+
+Then the driver depends on RUST instead of RUST_PHYLIB.
+
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 82ecfffc276c..e0d7a19ca774 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -119,7 +119,7 @@ config AX88796B_C_PHY
+ 
+ config AX88796B_RUST_PHY
+ 	bool "The Rust version driver for Asix PHYs"
+-	depends on RUST
++	depends on RUST_PHYLIB
+ 
+ endchoice
 
