@@ -1,232 +1,121 @@
-Return-Path: <netdev+bounces-38542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827117BB5CC
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 13:03:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE17E7BB611
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 13:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3E371C20A12
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:03:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3A21C209A2
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A571BDF3;
-	Fri,  6 Oct 2023 11:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320191C2AF;
+	Fri,  6 Oct 2023 11:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="amxSpM34"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TLoyqbf7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1705F1A586;
-	Fri,  6 Oct 2023 11:03:08 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F4BC5;
-	Fri,  6 Oct 2023 04:03:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696590186; x=1728126186;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=+Oj9cWZfF6C+d+uAdm+g5fcf0+MKR1+ZXyJy38ELkUI=;
-  b=amxSpM34Qfm3XB60YT21eqg6iKiI/M1PGuzaeUG4jiE3O4ANJbWbhdTE
-   CfnzjKMYdupn+7FZBVrvin6tAi9I2tKaUizwhS4OEmVFVOKo+mYA0yC4L
-   sM7UAvjpwxOQeh0DnI7hcbiDIRO/ZtQ17OEf+H4hksOJ7VwAG6aTN1weH
-   c=;
-X-IronPort-AV: E=Sophos;i="6.03,203,1694736000"; 
-   d="scan'208";a="158577964"
-Subject: RE: [PATCH] net: ena: replace deprecated strncpy with strscpy
-Thread-Topic: [PATCH] net: ena: replace deprecated strncpy with strscpy
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 11:03:03 +0000
-Received: from EX19D020EUA001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 108B4807C1;
-	Fri,  6 Oct 2023 11:03:02 +0000 (UTC)
-Received: from EX19D047EUA001.ant.amazon.com (10.252.50.171) by
- EX19D020EUA001.ant.amazon.com (10.252.50.154) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Fri, 6 Oct 2023 11:02:39 +0000
-Received: from EX19D022EUA002.ant.amazon.com (10.252.50.201) by
- EX19D047EUA001.ant.amazon.com (10.252.50.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Fri, 6 Oct 2023 11:02:39 +0000
-Received: from EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d]) by
- EX19D022EUA002.ant.amazon.com ([fe80::7f87:7d63:def0:157d%3]) with mapi id
- 15.02.1118.037; Fri, 6 Oct 2023 11:02:39 +0000
-From: "Kiyanovski, Arthur" <akiyano@amazon.com>
-To: Kees Cook <keescook@chromium.org>
-CC: Justin Stitt <justinstitt@google.com>, "Agroskin, Shay"
-	<shayagr@amazon.com>, "Arinzon, David" <darinzon@amazon.com>, "Dagan, Noam"
-	<ndagan@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-hardening@vger.kernel.org"
-	<linux-hardening@vger.kernel.org>
-Thread-Index: AQHZ9ybKM2b6eyqkVE+Gavzwy9pPV7A7w5HwgAAHhICAAIzkkA==
-Date: Fri, 6 Oct 2023 11:02:22 +0000
-Deferred-Delivery: Fri, 6 Oct 2023 07:05:46 +0000
-Message-ID: <5f8d24d16fba49bfb57fd4b6678ac27d@amazon.com>
-References: <20231005-strncpy-drivers-net-ethernet-amazon-ena-ena_netdev-c-v1-1-ba4879974160@google.com>
- <fe65f57f91f342c7a173891b84cda37b@amazon.com>
- <202310051537.7C5CEE6E@keescook>
-In-Reply-To: <202310051537.7C5CEE6E@keescook>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.252.50.216]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B532E125B7
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 11:12:49 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80260DE
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 04:12:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696590765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=zdojGdWffE+9Cjf10X0GBcdJQoHBIFt/nxLMEOIXvf4=;
+	b=TLoyqbf7kU9OMCImwX9400DK64zDwLljX032QgbZfrKiUO3q85dBOL9NZB/wTYj7utIn6P
+	036wb6XpW+l4UDppfj8mcMwXKtSmF6kRcHyMDipEOvCGLgkGlSmdlWUXRCPMBmQCGH2Y2k
+	hEdGiAVaS/5ELgHY6s/FFkYrorDn8Cw=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-55-cq16Oen1MAqn3zhjzEFw0w-1; Fri, 06 Oct 2023 07:12:27 -0400
+X-MC-Unique: cq16Oen1MAqn3zhjzEFw0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F410E3C11C64;
+	Fri,  6 Oct 2023 11:12:26 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.226.36])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 7EEE42027045;
+	Fri,  6 Oct 2023 11:12:25 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: [PATCH net] i40e: prevent crash on probe if hw registers have invalid values
+Date: Fri,  6 Oct 2023 13:11:39 +0200
+Message-ID: <20231006111139.1560132-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The hardware provides the indexes of the first and the last available
+queue and VF. From the indexes, the driver calculates the numbers of
+queues and VFs. In theory, a faulty device might say the last index is
+smaller than the first index. In that case, the driver's calculation
+would underflow, it would attempt to write to non-existent registers
+outside of the ioremapped range and crash.
 
+I ran into this not by having a faulty device, but by an operator error.
+I accidentally ran a QE test meant for i40e devices on an ice device.
+The test used 'echo i40e > /sys/...ice PCI device.../driver_override',
+bound the driver to the device and crashed in one of the wr32 calls in
+i40e_clear_hw.
 
-> -----Original Message-----
-> From: Kees Cook <keescook@chromium.org>
-> Sent: Friday, October 6, 2023 1:39 AM
-> To: Kiyanovski, Arthur <akiyano@amazon.com>
-> Cc: Justin Stitt <justinstitt@google.com>; Agroskin, Shay
-> <shayagr@amazon.com>; Arinzon, David <darinzon@amazon.com>; Dagan,
-> Noam <ndagan@amazon.com>; Bshara, Saeed <saeedb@amazon.com>; David
-> S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
-> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
-> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> hardening@vger.kernel.org
-> Subject: RE: [EXTERNAL] [PATCH] net: ena: replace deprecated strncpy with
-> strscpy
->=20
-> CAUTION: This email originated from outside of the organization. Do not c=
-lick
-> links or open attachments unless you can confirm the sender and know the
-> content is safe.
->=20
->=20
->=20
-> On Thu, Oct 05, 2023 at 10:25:08PM +0000, Kiyanovski, Arthur wrote:
-> > > -----Original Message-----
-> > > From: Justin Stitt <justinstitt@google.com>
-> > > Sent: Thursday, October 5, 2023 3:56 AM
-> > > To: Agroskin, Shay <shayagr@amazon.com>; Kiyanovski, Arthur
-> > > <akiyano@amazon.com>; Arinzon, David <darinzon@amazon.com>; Dagan,
-> > > Noam <ndagan@amazon.com>; Bshara, Saeed <saeedb@amazon.com>;
-> David
-> > > S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
-> > > Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>
-> > > Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; linux-
-> > > hardening@vger.kernel.org; Justin Stitt <justinstitt@google.com>
-> > > Subject: [EXTERNAL] [PATCH] net: ena: replace deprecated strncpy
-> > > with strscpy
-> > >
-> > > CAUTION: This email originated from outside of the organization. Do
-> > > not click links or open attachments unless you can confirm the
-> > > sender and know the content is safe.
-> > >
-> > >
-> > >
-> > > `strncpy` is deprecated for use on NUL-terminated destination
-> > > strings [1] and as such we should prefer more robust and less ambiguo=
-us
-> string interfaces.
-> > >
-> > > NUL-padding is not necessary as host_info is initialized to
-> > > `ena_dev-
-> > > >host_attr.host_info` which is ultimately zero-initialized via
-> > > alloc_etherdev_mq().
-> > >
-> > > A suitable replacement is `strscpy` [2] due to the fact that it
-> > > guarantees NUL- termination on the destination buffer without
-> unnecessarily NUL-padding.
-> > >
-> > > Link:
-> > > https://www.kernel.org/doc/html/latest/process/deprecated.html#strnc
-> > > py-on-
-> > > nul-terminated-strings [1]
-> > > Link:
-> > > https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.ht
-> > > ml
-> > > [2]
-> > > Link: https://github.com/KSPP/linux/issues/90
-> > > Cc: linux-hardening@vger.kernel.org
-> > > Signed-off-by: Justin Stitt <justinstitt@google.com>
-> > > ---
-> > > Note: build-tested only.
-> > > ---
-> > >  drivers/net/ethernet/amazon/ena/ena_netdev.c | 4 ++--
-> > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> > > b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> > > index f955bde10cf9..3118a617c9b6 100644
-> > > --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> > > +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> > > @@ -3276,8 +3276,8 @@ static void ena_config_host_info(struct
-> > > ena_com_dev *ena_dev, struct pci_dev *pd
-> > >         strscpy(host_info->kernel_ver_str, utsname()->version,
-> > >                 sizeof(host_info->kernel_ver_str) - 1);
-> > >         host_info->os_dist =3D 0;
-> > > -       strncpy(host_info->os_dist_str, utsname()->release,
-> > > -               sizeof(host_info->os_dist_str) - 1);
-> > > +       strscpy(host_info->os_dist_str, utsname()->release,
-> > > +               sizeof(host_info->os_dist_str));
-> > >         host_info->driver_version =3D
-> > >                 (DRV_MODULE_GEN_MAJOR) |
-> > >                 (DRV_MODULE_GEN_MINOR <<
-> > > ENA_ADMIN_HOST_INFO_MINOR_SHIFT) |
-> > >
-> > > ---
-> > > base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-> > > change-id:
-> > > 20231005-strncpy-drivers-net-ethernet-amazon-ena-ena_netdev-c-
-> > > 6c4804466aa7
-> > >
-> > > Best regards,
-> > > --
-> > > Justin Stitt <justinstitt@google.com>
-> > >
-> >
-> > Thanks for submitting this change.
-> >
-> > The change looks good but the sentence "NUL-padding is not necessary
-> > as host_info is initialized to `ena_dev->host_attr.host_info` which is
-> > ultimately zero-initialized via alloc_etherdev_mq()." is inaccurate.
-> >
-> > host_info allocation is done in ena_com_allocate_host_info() via
-> > dma_alloc_coherent() and is not zero initialized by alloc_etherdev_mq()=
-.
-> >
-> > I looked at both the documentation of dma_alloc_coherent() in
-> > https://www.kernel.org/doc/Documentation/DMA-API.txt
-> > as well as the code itself, and (maybe I'm wrong but) I didn't see
-> > 100% guarantees the that the memory is zero-initialized.
-> >
-> > However zero initialization of the destination doesn't matter in this
-> > case, because strscpy() guarantees a NULL termination.
->=20
-> If this is in DMA memory, should the string buffer be %NUL-padded? (Or is=
- it
-> consumed strictly as a %NUL-terminated string?)
->=20
-> -Kees
->=20
-> --
-> Kees Cook
+Add checks to prevent underflows in the calculations of num_queues and
+num_vfs. With this fix, the wrong device probing reports errors and
+returns a failure without crashing.
 
-No need for NULL-padding, It is consumed strictly as a NULL-terminated stri=
-ng
+Fixes: 838d41d92a90 ("i40e: clear all queues and interrupts")
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-Arthur Kiyanovski
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
+index eeef20f77106..1b493854f522 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_common.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
+@@ -1082,7 +1082,7 @@ void i40e_clear_hw(struct i40e_hw *hw)
+ 		     I40E_PFLAN_QALLOC_FIRSTQ_SHIFT;
+ 	j = (val & I40E_PFLAN_QALLOC_LASTQ_MASK) >>
+ 	    I40E_PFLAN_QALLOC_LASTQ_SHIFT;
+-	if (val & I40E_PFLAN_QALLOC_VALID_MASK)
++	if (val & I40E_PFLAN_QALLOC_VALID_MASK && j >= base_queue)
+ 		num_queues = (j - base_queue) + 1;
+ 	else
+ 		num_queues = 0;
+@@ -1092,7 +1092,7 @@ void i40e_clear_hw(struct i40e_hw *hw)
+ 	    I40E_PF_VT_PFALLOC_FIRSTVF_SHIFT;
+ 	j = (val & I40E_PF_VT_PFALLOC_LASTVF_MASK) >>
+ 	    I40E_PF_VT_PFALLOC_LASTVF_SHIFT;
+-	if (val & I40E_PF_VT_PFALLOC_VALID_MASK)
++	if (val & I40E_PF_VT_PFALLOC_VALID_MASK && j >= i)
+ 		num_vfs = (j - i) + 1;
+ 	else
+ 		num_vfs = 0;
+-- 
+2.41.0
+
 
