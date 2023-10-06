@@ -1,112 +1,123 @@
-Return-Path: <netdev+bounces-38646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A8D27BBDAD
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:25:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA057BBDD9
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 137F5282070
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:25:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE2928208D
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A88530F9C;
-	Fri,  6 Oct 2023 17:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591A9328A6;
+	Fri,  6 Oct 2023 17:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gw6J0qq4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wLpyrw5+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4B1F611
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:24:59 +0000 (UTC)
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51069BF;
-	Fri,  6 Oct 2023 10:24:57 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4181f8d82b9so14604051cf.0;
-        Fri, 06 Oct 2023 10:24:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10BF2AB3B
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:33:58 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF57C6
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 10:33:57 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a20c7295bbso20032457b3.0
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 10:33:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696613096; x=1697217896; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rx67H5KTarmXEYEDYl/whfWf5psnvMF6kQlD25eZvhI=;
-        b=gw6J0qq4D+G1D6PNZVVcQlbce3xcoeOlzDO7oYzwuo+R5LNlF01fPOPWAUENZgaHtP
-         6Cxp0KLSBaPApyAXUbgKqW/167TybyIZrjnLIFiCKcSGtmYOLmqfI43EV22tUPA2p/rH
-         KalymaM4fOg7YNyOw+ILfXe2FLV/3aWRXg78l8ppxPV81tq3jJSI7x8tw+K/oZaMdGJv
-         KJ+VXkAA79NeIOERWV7s7c8J7fmmoS6a5VuFgMTqmePkB1kT3GY3FgVsaT0TQhbVTBdV
-         pl7Bpcynf3a49SFk4Dx1EYJB1iv+GbGWnvzQmBgSZy7XQFLLdyVexfVhoCmPJeaQq06u
-         qBFw==
+        d=google.com; s=20230601; t=1696613636; x=1697218436; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=i3eyr1ScPVkM7UblKqU4I0ckQ7RDfTsWrFSesSv3dOk=;
+        b=wLpyrw5+wg/vZUBAob3uIgK+vFlIPDSSCfHug+EIcEwkW2+yFsR1xZ0S5BJP4BSTK6
+         qvEBtYeNgS9+BdxHK30w5ECuWwqPUhfJyMWoy2poVdjc/L4tZlGz6vgePEX8os2CoRv/
+         Iwur8NetZghIB31qKi1wj+bLdPliltGbG69gXeNGQu1aEZeSNu46XyIRXYLjvH6b0Bje
+         iB71BZZgjAOpBqP7kNgaCgaSjevJUG5PE2fWhKInma6S3OUhHoX2/2+KOtrishoC0P3N
+         H23Uv5HPRsaNOzxdHSiOWmXGmZ0og35r37hA1ypDyzKPOUtjaZdVl8QjRwsqz/kceP/V
+         BEQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696613096; x=1697217896;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rx67H5KTarmXEYEDYl/whfWf5psnvMF6kQlD25eZvhI=;
-        b=vqTpVedAvsONhVMTf5mX+DKMl3H4MbcIYtHfUSvyw6rTFoJ+O/35E1bkU6bdnR2qQp
-         2+ClYuTjOOR9+5YoH537WV0JVAt+P+w9zeYmUyPzUAQFpolwl8YufIZPTNs+eNa2BX8g
-         +YG6Emz3kkIMpgwRqRjjTvXnnwWZ69iKm7+IaseW1Yy5R/30gaqT4e0jv+bTHDzbJZw/
-         dA4e/JPNSvjJdEAadDMCCcE6IM7/vtZT4dYTjura08UxqzrSOOODhLPesB2a8Yv4mbRf
-         bw7aLG95veYm15sXzjHAOgLZy3R/fujYW0OwDXtvV8xHw95Z2Aqp1oQZi2TcP6ny6J5Z
-         arMw==
-X-Gm-Message-State: AOJu0YymZeC0WkGKRv7vDL7i7cJNDOEDeD50LhdHjkNJzkqjA6l4pRBA
-	iVYeKitSZ/F28z5jY2o/2AM=
-X-Google-Smtp-Source: AGHT+IHwLs/v/pRUwENWm8kO3YiMtI8D7kqXA1W9FqIZdOyxIwFxNccblqEM07hLTqCH+jojBnOs9Q==
-X-Received: by 2002:a05:622a:a:b0:417:a2f9:bba6 with SMTP id x10-20020a05622a000a00b00417a2f9bba6mr9349030qtw.60.1696613096350;
-        Fri, 06 Oct 2023 10:24:56 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id fj19-20020a05622a551300b0041abcc69050sm1145292qtb.95.2023.10.06.10.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Oct 2023 10:24:55 -0700 (PDT)
-Message-ID: <2818465e-e60e-4d6c-a7e3-828c28d8ab59@gmail.com>
-Date: Fri, 6 Oct 2023 10:24:53 -0700
+        d=1e100.net; s=20230601; t=1696613636; x=1697218436;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i3eyr1ScPVkM7UblKqU4I0ckQ7RDfTsWrFSesSv3dOk=;
+        b=Sh4uaxWAxeG87GfEB2K86JN27pNtO6dDbSlXe7z/DCJeetTa6h8WxknyqQlmjEF3DV
+         cwgoVZrtdh31eJN5l3QYwNX+RqRfy5ULGqXMyhv3PyBHVlcnJ8Pfvbm1Jeq+a0ytq0my
+         /+h9neNbzKYVjbKC0vjz/+Gl9d0/HQ3gRDDEHAJ2dHuPKnmzKCCdPfPEp9bKwF7KcTOY
+         pqYYk+LlhZf1k/1akXfdBN28RaH/Rlg7MPCE/GfyUH9Rm5NMj6m4dOjyudLMa2cUwqXP
+         4Gbir8MWNTu5Qjbcva0BPr184ch7vOsQRvAaJr/szVTKaVCgaD1EzWHoRfqzT3nywii2
+         otYg==
+X-Gm-Message-State: AOJu0YxX66Ylza/VKQhM3sa5oEOfixt+iF+caOCUnbgbaaJ0BbcRA3wb
+	L6zXU63M9gMfNYk/BNVi8e1YmlLUq/LI1Q==
+X-Google-Smtp-Source: AGHT+IEtevGE2WYXT52LwRNKXYwr0VJfvatoNg01o4o323Lh9z9x8n/N+/QbpeDPpiSzPqQtOtFEMfp3OTOqEg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:7e06:0:b0:58c:e8da:4d1a with SMTP id
+ o6-20020a817e06000000b0058ce8da4d1amr139702ywn.2.1696613636565; Fri, 06 Oct
+ 2023 10:33:56 -0700 (PDT)
+Date: Fri,  6 Oct 2023 17:33:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: Fix uninitialized
- var in ksz9477_acl_move_entries()
-Content-Language: en-US
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
- Woojung Huh <woojung.huh@microchip.com>,
- Arun Ramadoss <arun.ramadoss@microchip.com>,
- "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, Petr Machata <petrm@nvidia.com>,
- Lukasz Majewski <lukma@denx.de>
-References: <20231006115822.144152-1-o.rempel@pengutronix.de>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231006115822.144152-1-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
+Message-ID: <20231006173355.2254983-1-edumazet@google.com>
+Subject: [PATCH net] net: refine debug info in skb_checksum_help()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/6/23 04:58, Oleksij Rempel wrote:
-> Address an issue in ksz9477_acl_move_entries() where, in the scenario
-> (src_idx == dst_idx), ksz9477_validate_and_get_src_count() returns 0,
-> leading to usage of uninitialized src_count and dst_count variables,
-> which causes undesired behavior as it attempts to move ACL entries
-> around.
-> 
-> Fixes: 002841be134e ("net: dsa: microchip: Add partial ACL support for ksz9477 switches")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+syzbot uses panic_on_warn.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+This means that the skb_dump() I added in the blamed commit are
+not even called.
+
+Rewrite this so that we get the needed skb dump before syzbot crashes.
+
+Fixes: eeee4b77dc52 ("net: add more debug info in skb_checksum_help()")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reported-by: Willem de Bruijn <willemb@google.com>
+---
+ net/core/dev.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 85df22f05c38b663f050410b9f7bcd32dd781951..5aaf5753d4e46c7c4b67b00daadeda9784708dfe 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3292,15 +3292,19 @@ int skb_checksum_help(struct sk_buff *skb)
+ 
+ 	offset = skb_checksum_start_offset(skb);
+ 	ret = -EINVAL;
+-	if (WARN_ON_ONCE(offset >= skb_headlen(skb))) {
++	if (unlikely(offset >= skb_headlen(skb))) {
+ 		DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
++		WARN_ONCE(true, "offset (%d) >= skb_headlen() (%u)\n",
++			  offset, skb_headlen(skb));
+ 		goto out;
+ 	}
+ 	csum = skb_checksum(skb, offset, skb->len - offset, 0);
+ 
+ 	offset += skb->csum_offset;
+-	if (WARN_ON_ONCE(offset + sizeof(__sum16) > skb_headlen(skb))) {
++	if (unlikely(offset + sizeof(__sum16) > skb_headlen(skb))) {
+ 		DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
++		WARN_ONCE(true, "offset+2 (%zu) > skb_headlen() (%u)\n",
++			  offset + sizeof(__sum16), skb_headlen(skb));
+ 		goto out;
+ 	}
+ 	ret = skb_ensure_writable(skb, offset + sizeof(__sum16));
 -- 
-Florian
+2.42.0.609.gbb76f46606-goog
 
 
