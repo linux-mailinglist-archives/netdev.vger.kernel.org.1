@@ -1,167 +1,98 @@
-Return-Path: <netdev+bounces-38504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 689257BB40F
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:16:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D52147BB421
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB831C2098D
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 09:16:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10DA71C20924
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 09:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C8E125B3;
-	Fri,  6 Oct 2023 09:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0C612B74;
+	Fri,  6 Oct 2023 09:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="28RGOWpR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7896D11732
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:16:44 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C659E;
-	Fri,  6 Oct 2023 02:16:41 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qogwp-0007BH-NA; Fri, 06 Oct 2023 11:16:39 +0200
-Message-ID: <740b0d7e-c789-47b5-b419-377014a99f22@leemhuis.info>
-Date: Fri, 6 Oct 2023 11:16:39 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17F8F9D9
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:23:43 +0000 (UTC)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C9F93
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 02:23:40 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-537f07dfe8eso7648a12.1
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 02:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696584218; x=1697189018; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g+2OvC4UsKZZVe9u7q5rQ09fkS7zT+qmc1odAaqtWMQ=;
+        b=28RGOWpRm/BU2DQ+9/2Ma2G0e9oaAshuMLTes5Kg25jTA6qB9Y2iSxwShFDMys2jQ3
+         +iwEbDnbdRvShR4lP3c++LiN5jGqodaWcr2O68pW31VpWeX1EHAvsfl25wU5DBVsbekk
+         GDbSvJwbFv12jf+e6tD2y62ql5GOhdVjEDUvh0HWr1ggoVDv8a0JsxARgBdJHtuncbQ0
+         extx7i2jzGsx6OdladXmkBNkGV5uETHBudV6GgzJU+B8VEHmJ/38FMxS2ny5xpkaPzbF
+         qG+vRYy7uVCDgxe0fapXt5tGiKnpnajBr3HoyLNhajIFjHwwzoRnMhjNWT+ey/gWkAP6
+         4Jog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696584218; x=1697189018;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g+2OvC4UsKZZVe9u7q5rQ09fkS7zT+qmc1odAaqtWMQ=;
+        b=knde5xrMa9S9w4BZU5B7pCETl9vSk4rO8AcGgxyZhGFyOwhgflTnAc3D8zUNQPCQ/7
+         kMQ8nAY0phEnmPbLXDJLADF3ELyXu/mRnSE4cMwRk43TclEnXlsiW1aeXZ/rAyjt4S3V
+         BLKQaH5kmwfiPOU1qV4cSz2PB9cXYCDnn+J1v2r9Zwglyg+jGjb5ZznETjQ2DpMzExx2
+         Iexwrghvhu00CBgXztQ16Ol50Gzxh8ssiuVnnh5fdv+cFgeHtZKoK6L8EeJgUrx5zVLG
+         FBT5zvRzO2k5MAvDIxrpBHllJmNA015tl2iU27RWTiacm57NCxuiyIqz46XlqGI1/QXZ
+         wuEg==
+X-Gm-Message-State: AOJu0Yx+pF+1quqnKR1Y0cDq2jZxU5OEKxOsQ+BO0/9f+hvpP7oiLYD8
+	p+EuSloLOwIT+dEpVlGqIvqE33XF7a9CsrkV/w01Ig==
+X-Google-Smtp-Source: AGHT+IHoIPRhtUQ5uuIPkP4QsVp+QK7bs+DXcxmsIaDAcPgDTfHtOTqkQjKrkJrop+V5dLLPZT7C8FCSJqLUpERZH2o=
+X-Received: by 2002:a50:9e8d:0:b0:52f:2f32:e76c with SMTP id
+ a13-20020a509e8d000000b0052f2f32e76cmr184149edf.2.1696584217891; Fri, 06 Oct
+ 2023 02:23:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
- requirement
-Content-Language: en-US, de-DE
-To: Christian Theune <ct@flyingcircus.io>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
- <207a8e5d-5f2a-4b33-9fc1-86811ad9f48a@leemhuis.info>
- <879EA0B7-F334-4A17-92D5-166F627BEE6F@flyingcircus.io>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <879EA0B7-F334-4A17-92D5-166F627BEE6F@flyingcircus.io>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1696583801;ed113103;
-X-HE-SMSGID: 1qogwp-0007BH-NA
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20231005181747.3017588-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20231005181747.3017588-1-florian.fainelli@broadcom.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 6 Oct 2023 11:23:24 +0200
+Message-ID: <CANn89iKF65tsKRXoAx6tPmgf-y6zBdT7OgNShNrVjdPjGNOEsA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: bcmgenet: Remove custom ndo_poll_controller()
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 06.10.23 11:07, Christian Theune wrote:
-> 
-> it seems that 6.6rc4 is affected as well:
-> 
-> ----
-> commit b3d26c5702c7d6c45456326e56d2ccf3f103e60f
-> Author: Budimir Markovic <markovicbudimir@gmail.com>
-> Date:   Thu Aug 24 01:49:05 2023 -0700
-> 
->     net/sched: sch_hfsc: Ensure inner classes have fsc curve
-> ——
+On Thu, Oct 5, 2023 at 8:19=E2=80=AFPM Florian Fainelli
+<florian.fainelli@broadcom.com> wrote:
+>
+> The driver gained a .ndo_poll_controller() at a time where the TX
+> cleaning process was always done from NAPI which makes this unnecessary.
+> See commit ac3d9dd034e5 ("netpoll: make ndo_poll_controller() optional")
+> for more background.
+>
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Did you actually try if the problem occurs with 6.6-rc4? That the commit
-is in there is expected (everything that lands in stable trees has to go
-to mainline first).
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Ciao, Thorsten
-
-> I have not found newer commits that would suggest they change any behaviour around this in any way, but I might be wrong.
-> 
-> Christian
-> 
->> On 6. Oct 2023, at 11:01, Linux regression tracking (Thorsten Leemhuis) <regressions@leemhuis.info> wrote:
->>
->> On 06.10.23 10:37, Christian Theune wrote:
->>>
->>> (prefix, I was not aware of the regression reporting process and incorrectly reported this informally with the developers mentioned in the change)
->>
->> Don't worry too much about that, but thx for taking care of all the
->> details. FWIW, there is one more thing that would be good to know:
->>
->> Does the problem happen with mainline (e.g. 6.6-rc4) as well? That's
->> relevant, as different people might care[1].
->>
->> Ciao, Thorsten
->>
->> [1] this among others is explained here:
->> https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-kernel-bug-reports-are-ignored/
->>
->>> I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script, leaving me with a non-functional uplink on a remote router.
->>>
->>> The script errors out like this:
->>>
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext=ispA
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext_ingress=ifb0
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe ifb
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe act_mirred
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA root
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2061]: Error: Cannot delete qdisc with handle of zero.
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA ingress
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2064]: Error: Cannot find specified qdisc on specified device.
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 root
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2066]: Error: Cannot delete qdisc with handle of zero.
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 ingress
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2067]: Error: Cannot find specified qdisc on specified device.
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ispA handle ffff: ingress
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ifconfig ifb0 up
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc filter add dev ispA parent ffff: protocol all u32 match u32 0 0 action mirred egress redirect dev ifb0
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ifb0 root handle 1: hfsc default 1
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1: classid 1:999 hfsc rt m2 2.5gbit
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1:999 classid 1:1 hfsc sc rate 50mbit
->>> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2077]: Error: Invalid parent - parent class must have FSC.
->>>
->>> The error message is also a bit weird (but that’s likely due to iproute2 being weird) as the CLI interface for `tc` and the error message do not map well. (I think I would have to choose `hfsc sc` on the parent to enable the FSC option which isn’t mentioned anywhere in the hfsc manpage).
->>>
->>> The breaking change was introduced in 6.1.53[1] and a multitude of other currently supported kernels:
->>>
->>> ----
->>> commit a1e820fc7808e42b990d224f40e9b4895503ac40
->>> Author: Budimir Markovic <markovicbudimir@gmail.com>
->>> Date: Thu Aug 24 01:49:05 2023 -0700
->>>
->>> net/sched: sch_hfsc: Ensure inner classes have fsc curve
->>>
->>> [ Upstream commit b3d26c5702c7d6c45456326e56d2ccf3f103e60f ]
->>>
->>> HFSC assumes that inner classes have an fsc curve, but it is currently
->>> possible for classes without an fsc curve to become parents. This leads
->>> to bugs including a use-after-free.
->>>
->>> Don't allow non-root classes without HFSC_FSC to become parents.
->>>
->>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->>> Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
->>> Signed-off-by: Budimir Markovic <markovicbudimir@gmail.com>
->>> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
->>> Link: https://lore.kernel.org/r/20230824084905.422-1-markovicbudimir@gmail.com
->>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->>> Signed-off-by: Sasha Levin <sashal@kernel.org>
->>> ----
->>>
->>> Regards,
->>> Christian
->>>
->>> [1] https://cdn.kernel.org/pub/linux/kernel/v6.x/ChangeLog-6.1.53
->>>
->>> #regzbot introduced: a1e820fc7808e42b990d224f40e9b4895503ac40
->>>
->>>
-> 
-> Liebe Grüße,
-> Christian Theune
-> 
+Yes, many drivers should do the same...
 
