@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-38492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE9A07BB3A4
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:59:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B8B37BB3A7
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242081C202EA
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C4928207A
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9104879F0;
-	Fri,  6 Oct 2023 08:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD33DF78;
+	Fri,  6 Oct 2023 08:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DUBCclaq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MjPSAJBx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079A94C94
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:59:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6325A4C94
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:59:25 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CE983
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 01:59:09 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CA3A6
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 01:59:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696582749; x=1728118749;
+  t=1696582762; x=1728118762;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DQt2517VgoAndIGYoyeWAclvB+eZPqWs+PgfLuN9Fm4=;
-  b=DUBCclaq7/LrantORkXESAX8e8fSNeXAUxTgoZglh1cMPjZinRPlnapB
-   sRen65nZODb0o+LPJvcOwl7wOy3bOjd0iJPk4VmwQC/mPX2Zu0xudP38C
-   2X1f7LDNTm3bkzZ3vYKU/kkI1HxVXm8Kbx9lgk0+vIwu22DiT9rEgIqaU
-   vlUhD5W2pSjnO2tfOQ0JYoljhQxAqHen/b85U065m7fVp2FJpXTBTU+sA
-   mlna/VD0NjTK65JRYXhfbcc5X9X/tSANtW5sCCtNgGk8T/uM9dZuvRuj5
-   1Qd5wLxjNpuL8/ZwXOEVqnFnV7AXfSVzsXpSBwXlEnI65WS7MxVik5FHJ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="447897864"
+  bh=prgz0NWF3GjOj7SjC0aGQXw73//z9vwfcJ5H6ZuQrEQ=;
+  b=MjPSAJBxjYnSuMZzmCCZxGfxVhsNhF3lnIpcq/5u4n9hxYv3bE158P58
+   ir6VcXIeK/5znuOJ5rwJiJYDnF5yAEXImWefk8hGkCRSRAkqpq5g7bCgP
+   ieE4nF3Y0BjzQgra25P+MW7TQaD5U+FVHbnNgDcRG77dq2AezNfeW7zrP
+   2T/wKj4zR3JGHMsOj5JoMi8qD1MzghXJXXr/gFit8cE/MRpDze9IrR95v
+   EwBcxs7+++o7y4FChLdwkUj9mp90VYPum72FvbJiXKT+zAANxcTbkQLIe
+   2Bp3QWZuygp/vkv+4pQHHFcDpRs+2J7atf0b29sc/CcxOLCs/EykwcyX8
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="447897877"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="447897864"
+   d="scan'208";a="447897877"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 01:59:06 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 01:59:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="895813038"
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="895813101"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="895813038"
+   d="scan'208";a="895813101"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by fmsmga001.fm.intel.com with ESMTP; 06 Oct 2023 01:57:34 -0700
-Subject: [net-next PATCH v4 02/10] net: Add queue and napi association
+  by fmsmga001.fm.intel.com with ESMTP; 06 Oct 2023 01:57:40 -0700
+Subject: [net-next PATCH v4 03/10] ice: Add support in the driver for
+ associating queue with napi
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Fri, 06 Oct 2023 02:14:48 -0700
-Message-ID: <169658368866.3683.5936758786055991674.stgit@anambiarhost.jf.intel.com>
+Date: Fri, 06 Oct 2023 02:14:54 -0700
+Message-ID: <169658369415.3683.8283431592834529906.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <169658340079.3683.13049063254569592908.stgit@anambiarhost.jf.intel.com>
 References: <169658340079.3683.13049063254569592908.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -71,97 +72,125 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add the napi pointer in netdev queue for tracking the napi
-instance for each queue. This achieves the queue<->napi mapping.
+After the napi context is initialized, map the napi instance
+with the queue/queue-set on the corresponding irq line.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
- include/linux/netdevice.h     |    5 +++++
- include/net/netdev_rx_queue.h |    2 ++
- net/core/dev.c                |   34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 41 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_lib.c  |   59 +++++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.h  |    4 ++
+ drivers/net/ethernet/intel/ice/ice_main.c |    4 +-
+ 3 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fba..264ae0bdabe8 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -645,6 +645,8 @@ struct netdev_queue {
- #ifdef CONFIG_XDP_SOCKETS
- 	struct xsk_buff_pool    *pool;
- #endif
-+	/* NAPI instance for the queue */
-+	struct napi_struct      *napi;
- /*
-  * write-mostly part
-  */
-@@ -2619,6 +2621,9 @@ static inline void *netdev_priv(const struct net_device *dev)
-  */
- #define SET_NETDEV_DEVTYPE(net, devtype)	((net)->dev.type = (devtype))
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index acc3ffc940e7..f2554ecdd2bb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2448,6 +2448,12 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
+ 			goto unroll_vector_base;
  
-+int netif_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
-+			 struct napi_struct *napi);
+ 		ice_vsi_map_rings_to_vectors(vsi);
 +
- /* Default NAPI poll() weight
-  * Device drivers are strongly advised to not use bigger value
-  */
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index cdcafb30d437..2e65b03d214d 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -21,6 +21,8 @@ struct netdev_rx_queue {
- #ifdef CONFIG_XDP_SOCKETS
- 	struct xsk_buff_pool            *pool;
- #endif
-+	/* NAPI instance for the queue */
-+	struct napi_struct		*napi;
- } ____cacheline_aligned_in_smp;
++		/* Associate q_vector rings to napi */
++		ret = ice_vsi_add_napi_queues(vsi);
++		if (ret)
++			goto unroll_vector_base;
++
+ 		vsi->stat_offsets_loaded = false;
  
- /*
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 606a366cc209..9b63a7b76c01 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6394,6 +6394,40 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ 		if (ice_is_xdp_ena_vsi(vsi)) {
+@@ -2927,6 +2933,59 @@ void ice_vsi_dis_irq(struct ice_vsi *vsi)
+ 		synchronize_irq(vsi->q_vectors[i]->irq.virq);
  }
- EXPORT_SYMBOL(dev_set_threaded);
  
 +/**
-+ * netif_queue_set_napi - Associate queue with the napi
-+ * @queue_index: Index of queue
-+ * @type: queue type as RX or TX
-+ * @napi: NAPI context
++ * ice_q_vector_add_napi_queues - Add queue[s] associated with the napi
++ * @q_vector: q_vector pointer
 + *
-+ * Set queue with its corresponding napi context
++ * Associate the q_vector napi with all the queue[s] on the vector
++ * Returns 0 on success or < 0 on error
 + */
-+int netif_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
-+			 struct napi_struct *napi)
++int ice_q_vector_add_napi_queues(struct ice_q_vector *q_vector)
 +{
-+	struct net_device *dev = napi->dev;
-+	struct netdev_rx_queue *rxq;
-+	struct netdev_queue *txq;
++	struct ice_rx_ring *rx_ring;
++	struct ice_tx_ring *tx_ring;
++	int ret = 0;
 +
-+	if (!dev)
-+		return -EINVAL;
-+
-+	switch (type) {
-+	case NETDEV_QUEUE_TYPE_RX:
-+		rxq = __netif_get_rx_queue(dev, queue_index);
-+		rxq->napi = napi;
-+		break;
-+	case NETDEV_QUEUE_TYPE_TX:
-+		txq = netdev_get_tx_queue(dev, queue_index);
-+		txq->napi = napi;
-+		break;
-+	default:
-+		return -EINVAL;
++	ice_for_each_rx_ring(rx_ring, q_vector->rx) {
++		ret = netif_queue_set_napi(rx_ring->q_index,
++					   NETDEV_QUEUE_TYPE_RX,
++					   &q_vector->napi);
++		if (ret)
++			return ret;
 +	}
-+	return 0;
-+}
-+EXPORT_SYMBOL(netif_queue_set_napi);
++	ice_for_each_tx_ring(tx_ring, q_vector->tx) {
++		ret = netif_queue_set_napi(tx_ring->q_index,
++					   NETDEV_QUEUE_TYPE_TX,
++					   &q_vector->napi);
++		if (ret)
++			return ret;
++	}
 +
- void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
- 			   int (*poll)(struct napi_struct *, int), int weight)
- {
++	return ret;
++}
++
++/**
++ * ice_vsi_add_napi_queues
++ * @vsi: VSI pointer
++ *
++ * Associate queue[s] with napi for all vectors
++ * Returns 0 on success or < 0 on error
++ */
++int ice_vsi_add_napi_queues(struct ice_vsi *vsi)
++{
++	int i, ret = 0;
++
++	if (!vsi->netdev)
++		return ret;
++
++	ice_for_each_q_vector(vsi, i) {
++		ret = ice_q_vector_add_napi_queues(vsi->q_vectors[i]);
++		if (ret)
++			return ret;
++	}
++	return ret;
++}
++
+ /**
+  * ice_vsi_release - Delete a VSI and free its resources
+  * @vsi: the VSI being removed
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
+index f24f5d1e6f9c..21d164ac1eed 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_lib.h
+@@ -91,6 +91,10 @@ void ice_vsi_cfg_netdev_tc(struct ice_vsi *vsi, u8 ena_tc);
+ struct ice_vsi *
+ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params);
+ 
++int ice_q_vector_add_napi_queues(struct ice_q_vector *q_vector);
++
++int ice_vsi_add_napi_queues(struct ice_vsi *vsi);
++
+ int ice_vsi_release(struct ice_vsi *vsi);
+ 
+ void ice_vsi_close(struct ice_vsi *vsi);
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index c726913bc635..059397d07e69 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3374,9 +3374,11 @@ static void ice_napi_add(struct ice_vsi *vsi)
+ 	if (!vsi->netdev)
+ 		return;
+ 
+-	ice_for_each_q_vector(vsi, v_idx)
++	ice_for_each_q_vector(vsi, v_idx) {
+ 		netif_napi_add(vsi->netdev, &vsi->q_vectors[v_idx]->napi,
+ 			       ice_napi_poll);
++		ice_q_vector_add_napi_queues(vsi->q_vectors[v_idx]);
++	}
+ }
+ 
+ /**
 
 
