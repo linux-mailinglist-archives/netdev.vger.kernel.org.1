@@ -1,273 +1,128 @@
-Return-Path: <netdev+bounces-38671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9C47BC118
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 23:21:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68A647BC11A
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 23:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348C5281FCD
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:21:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB99282435
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DA744485;
-	Fri,  6 Oct 2023 21:21:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8864D44494;
+	Fri,  6 Oct 2023 21:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zBiYODHO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChmVKuCi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733BC38FA6
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 21:21:53 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5795CBE
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 14:21:50 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a200028437so32305297b3.1
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 14:21:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF15544483
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 21:21:54 +0000 (UTC)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4881BD
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 14:21:52 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-53fa455cd94so1859784a12.2
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 14:21:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696627309; x=1697232109; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=T4ChuHX9Ob071qInr4wxaM7NUlx3XF/xti/7NEFhsNI=;
-        b=zBiYODHO8iRYAeISS7f26r7ZuBxCdvXPXm+NtRC4ZjVC8nfl9M/NyOV9Lf/GKmCfeD
-         ZANbY+EmwqeATqBEjIDiGqh+i7xe00FtJ+QFtf/twI8Qe7B7QP7/OYWaXQJTA6zewrVG
-         x86eAhB8mRtDQ5765Dq1fdnconJNOk0nt/JJzgtNkCRVUpQHF+CVPQgq3fLY3b3hMtUn
-         01w37Gt2v2sQimteaMEMcv++ATnsC4936fUY/GBpyqbHWK0HRJfbJu5fKLec/hDYQQPo
-         ZzXX5KqOEhikY4dz3iPyxUMxblKb6IyKjBCVpNdmGmV9+k8B4hMSUzPPLI4tIiFBZTIG
-         Kvhg==
+        d=gmail.com; s=20230601; t=1696627312; x=1697232112; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sal1wT6OgX4gx9I/pTY8Ne5w3VbRzz44eIVM9pCe4Oc=;
+        b=ChmVKuCiSWG6L3iBApPORvD1QovGyu8+0/HUo3e4+D2ADzgoGKAco0ov32SrEMm5/f
+         zwp0iDnFCGVjrDoLA3mNaNI8jOVGggC41oi7DXlwZbC22659S3XRi6iQM488h5fFIAAc
+         BMnKX5LnB3ksPDBMxZPyKa4aTBbLvv5dRpD2uVdryHWPG8nmJ6Amd5JDHbngGMIpRr54
+         lVYPfWES7c/MSSE6w17nczefMCDBFew7Ppew8srJhpRsYW7MW3pXJY+UAe/ITvoA62h/
+         Jrt6rA7v/bdxHvmN8XtM0idr/w3X6x8kkQK/ygrf/zE73j7pL48WHx3/5aAws+JLVBdf
+         kr+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696627309; x=1697232109;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T4ChuHX9Ob071qInr4wxaM7NUlx3XF/xti/7NEFhsNI=;
-        b=BpW3eoI/CbnT99nMnmDV8h43rr4tGuyJ81xHHC3/DjwneXHTHRUWqrST1kUI1+NY7X
-         wNGybM8KEtxOsilx+UpU20WBeWXK0AF7ewoH6oqMy9+jW6rPfOdx0eoYWpc5ApmtVUR+
-         cP2wPOZI7fcGW9ZTo7zTOdRs+ZirIDcSAHuTR8bv2XpqT+bM5thrtSiMfOWgOWjagRju
-         8waHraTpztMDgsdyrQ+6UfTElpOgw+NK1YTKLInPkWPi2ug424y8ijM7aLNgvVEyu+Cv
-         76INJ+0laECj77KbcQHOKJ7G+puTrG2tV8teva6CT7UQwtM/AJgQOB0JQVYx1Lm8TDDd
-         VWFQ==
-X-Gm-Message-State: AOJu0Ywj25N0930abeGQsDq0FwoHhHQXLIK/PeqWCwwkThIdt7qkIpNU
-	62As156ShLnyiQSbHn0wX24hndmZ/yoNpS7Uc27JLw==
-X-Google-Smtp-Source: AGHT+IFu0Uz4vNYYVIAQ7YBqzeP3hYcW1lgde8NHhjHsjXqajig+fqhW8r8e0hxBb0+/iWjuHnkmRklr6+1ndbU3y5c=
-X-Received: by 2002:a81:6c13:0:b0:576:93f1:d118 with SMTP id
- h19-20020a816c13000000b0057693f1d118mr9808606ywc.2.1696627309483; Fri, 06 Oct
- 2023 14:21:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696627312; x=1697232112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sal1wT6OgX4gx9I/pTY8Ne5w3VbRzz44eIVM9pCe4Oc=;
+        b=uznEOjmUP0acKSi0b8C4bgrUwsMA9wYmEz6IPs5on7adFrsksKxEpB98fHnLQBlYZI
+         ZZtlK2ieST2x9vg8+j/PoAqPlNL+/ujdBuJ5o47X7/uuqZfHTvOb3mHLaWGO/iF5pr21
+         3WQ+lpnh/if9t/9SPhTM1JlqKE3B2WkjaZNTuSI3fzojxLr5aZaOT4l1aPwuLYLSDpun
+         S2jjh9+5mUgOh4tcfUiVpU3EMsi1JMebPsSbsXaXUrwD8fjsqlmD8nozX9nYNTgdXC4G
+         /gdFLuq1/cGoSK9Nh3Al6tqXc5GOIvtyfn1DDJ03VbWIhunYMGgOs73Jd/CZt6xUNkIL
+         N81g==
+X-Gm-Message-State: AOJu0Ywuczi10sfzb2tYiZzeaRELZhVvVqk7b+NBmWtbEz1qygl/YQyA
+	buOzVjOyZ0ZJ+NveKo2CO/4=
+X-Google-Smtp-Source: AGHT+IF7UOXoitCsANtivw5D1A8GUEpYF+3WqY7TvyIihlSmZqz4Xhwq4q8zcWpFDz9XHSh//kEMuA==
+X-Received: by 2002:a05:6a20:7490:b0:160:a980:1222 with SMTP id p16-20020a056a20749000b00160a9801222mr10671788pzd.53.1696627311975;
+        Fri, 06 Oct 2023 14:21:51 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id g6-20020a170902740600b001bc18e579aesm4376647pll.101.2023.10.06.14.21.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 14:21:51 -0700 (PDT)
+Message-ID: <add6d13b-c788-427e-a92d-1d07589b86d0@gmail.com>
+Date: Fri, 6 Oct 2023 14:21:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230825091234.32713-1-quic_devipriy@quicinc.com>
- <20230825091234.32713-6-quic_devipriy@quicinc.com> <CAA8EJpr+Wwgot-PDRtj-LVi79aD13B9WVREmjTXiR-8XEEx-rQ@mail.gmail.com>
- <652b55cc-87dd-46d1-e480-e25f5f22b8d8@quicinc.com> <a4c9baae-f328-22b5-48d7-fc7df0b62a79@quicinc.com>
- <CAA8EJpq0uawrOBHA8XHygEpGYF--HyxJWxKG44iiFdAZZz7O2w@mail.gmail.com>
- <45f96567-553c-9214-eb7e-c75c6e09d78b@quicinc.com> <65b030c6-6fab-53ea-2774-48698905dd96@quicinc.com>
- <CAA8EJprSw4MGQKh01mZ5x5rBcRpgD7t4ph2617RhpR2Qg5SB=g@mail.gmail.com> <43aee0f9-3a83-3b90-5e3d-13a935f41b47@quicinc.com>
-In-Reply-To: <43aee0f9-3a83-3b90-5e3d-13a935f41b47@quicinc.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 7 Oct 2023 00:21:37 +0300
-Message-ID: <CAA8EJppabK8j9T40waMv=t-1aksXfqJibWuS41GhruzLhpatrg@mail.gmail.com>
-Subject: Re: [PATCH V2 5/7] clk: qcom: Add NSS clock Controller driver for IPQ9574
-To: Devi Priya <quic_devipriy@quicinc.com>
-Cc: andersson@kernel.org, agross@kernel.org, konrad.dybcio@linaro.org, 
-	mturquette@baylibre.com, sboyd@kernel.org, robh+dt@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
-	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de, 
-	richardcochran@gmail.com, arnd@arndb.de, geert+renesas@glider.be, 
-	nfraprado@collabora.com, rafal@milecki.pl, peng.fan@nxp.com, 
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
-	quic_saahtoma@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au
+References: <20231006163007.3383971-1-kuba@kernel.org>
+ <8270f9b2-ec07-4f07-86cf-425d25829453@lunn.ch>
+ <20231006115715.4f718fd7@kernel.org> <20231006121047.1690b43b@kernel.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231006121047.1690b43b@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 5 Oct 2023 at 12:56, Devi Priya <quic_devipriy@quicinc.com> wrote:
->
->
->
-> On 10/5/2023 12:49 PM, Dmitry Baryshkov wrote:
-> > On Thu, 5 Oct 2023 at 09:26, Devi Priya <quic_devipriy@quicinc.com> wrote:
-> >>
-> >>
-> >>
-> >> On 9/22/2023 5:31 PM, Devi Priya wrote:
-> >>>
-> >>>
-> >>> On 9/20/2023 1:50 PM, Dmitry Baryshkov wrote:
-> >>>> On Wed, 20 Sept 2023 at 09:39, Devi Priya <quic_devipriy@quicinc.com>
-> >>>> wrote:
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> On 9/12/2023 7:38 PM, Devi Priya wrote:
-> >>>>>>
-> >>>>>>
-> >>>>>> On 8/25/2023 5:14 PM, Dmitry Baryshkov wrote:
-> >>>>>>> On Fri, 25 Aug 2023 at 12:15, Devi Priya <quic_devipriy@quicinc.com>
-> >>>>>>> wrote:
-> >>>>>>>>
-> >>>>>>>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574
-> >>>>>>>> based
-> >>>>>>>> devices.
-> >>>>>>>>
-> >>>>>>>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> >>>>>>>> ---
-> >>>>>>>>     Changes in V2:
-> >>>>>>>>            - Added depends on ARM64 || COMPILE_TEST in Kconfig
-> >>>>>>>>            - Added module_platform_driver
-> >>>>>>>>            - Dropped patch [2/6] - clk: qcom: gcc-ipq9574: Mark nssnoc
-> >>>>>>>> clocks as critical
-> >>>>>>>>               & added pm_clk for nssnoc clocks
-> >>>>>>>>            - Updated the uniphy clock names
-> >>>>>>>>
-> >>>>>>>>     drivers/clk/qcom/Kconfig         |    7 +
-> >>>>>>>>     drivers/clk/qcom/Makefile        |    1 +
-> >>>>>>>>     drivers/clk/qcom/nsscc-ipq9574.c | 3109
-> >>>>>>>> ++++++++++++++++++++++++++++++
-> >>>>>>>>     3 files changed, 3117 insertions(+)
-> >>>>>>>>     create mode 100644 drivers/clk/qcom/nsscc-ipq9574.c
-> >>>>>>>>
-> >>>>>>>> diff --git a/drivers/clk/qcom/Kconfig b/drivers/clk/qcom/Kconfig
-> >>>>>>>> index bd9bfb11b328..3ecc11e2c8e3 100644
-> >>>>>>>> --- a/drivers/clk/qcom/Kconfig
-> >>>>>>>> +++ b/drivers/clk/qcom/Kconfig
-> >>>>>>>> @@ -203,6 +203,13 @@ config IPQ_GCC_9574
-> >>>>>>>>              i2c, USB, SD/eMMC, etc. Select this for the root clock
-> >>>>>>>>              of ipq9574.
-> >>>>>>>>
-> >>>>>>>> +config IPQ_NSSCC_9574
-> >>>>>>>> +       tristate "IPQ9574 NSS Clock Controller"
-> >>>>>>>> +       depends on ARM64 || COMPILE_TEST
-> >>>>>>>> +       depends on IPQ_GCC_9574
-> >>>>>>>> +       help
-> >>>>>>>> +         Support for NSS clock controller on ipq9574 devices.
-> >>>>>>>> +
-> >>>>>>>>     config MSM_GCC_8660
-> >>>>>>>>            tristate "MSM8660 Global Clock Controller"
-> >>>>>>>>            depends on ARM || COMPILE_TEST
-> >>>>>>>> diff --git a/drivers/clk/qcom/Makefile b/drivers/clk/qcom/Makefile
-> >>>>>>>> index 4790c8cca426..3f084928962e 100644
-> >>>>>>>> --- a/drivers/clk/qcom/Makefile
-> >>>>>>>> +++ b/drivers/clk/qcom/Makefile
-> >>>>>>>> @@ -30,6 +30,7 @@ obj-$(CONFIG_IPQ_GCC_6018) += gcc-ipq6018.o
-> >>>>>>>>     obj-$(CONFIG_IPQ_GCC_806X) += gcc-ipq806x.o
-> >>>>>>>>     obj-$(CONFIG_IPQ_GCC_8074) += gcc-ipq8074.o
-> >>>>>>>>     obj-$(CONFIG_IPQ_GCC_9574) += gcc-ipq9574.o
-> >>>>>>>> +obj-$(CONFIG_IPQ_NSSCC_9574)   += nsscc-ipq9574.o
-> >>>>>>>>     obj-$(CONFIG_IPQ_LCC_806X) += lcc-ipq806x.o
-> >>>>>>>>     obj-$(CONFIG_MDM_GCC_9607) += gcc-mdm9607.o
-> >>>>>>>>     obj-$(CONFIG_MDM_GCC_9615) += gcc-mdm9615.o
-> >>>>>>>> diff --git a/drivers/clk/qcom/nsscc-ipq9574.c
-> >>>>>>>> b/drivers/clk/qcom/nsscc-ipq9574.c
-> >>>>>>>> new file mode 100644
-> >>>>>>>> index 000000000000..65bdb449ae5f
-> >>>>>>>> --- /dev/null
-> >>>>>>>> +++ b/drivers/clk/qcom/nsscc-ipq9574.c
-> >>>>>>>> @@ -0,0 +1,3109 @@
-> >>>>>>>> +// SPDX-License-Identifier: GPL-2.0-only
-> >>>>>>>> +/*
-> >>>>>>>> + * Copyright (c) 2021, The Linux Foundation. All rights reserved.
-> >>>>>>>> + * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights
-> >>>>>>>> reserved.
-> >>>>>>>> + */
-> >>>>>>>> +
-> >>>>>>>> +#include <linux/clk-provider.h>
-> >>>>>>>> +#include <linux/err.h>
-> >>>>>>>> +#include <linux/kernel.h>
-> >>>>>>>> +#include <linux/module.h>
-> >>>>>>>> +#include <linux/of.h>
-> >>>>>>>> +#include <linux/of_device.h>
-> >>>>>>>> +#include <linux/regmap.h>
-> >>>>>>>> +#include <linux/pm_clock.h>
-> >>>>>>>> +#include <linux/pm_runtime.h>
-> >>>>>>>> +
-> >>>>>>>> +#include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
-> >>>>>>>> +#include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
-> >>>>>>>> +
-> >>>>>>>> +#include "clk-alpha-pll.h"
-> >>>>>>>> +#include "clk-branch.h"
-> >>>>>>>> +#include "clk-pll.h"
-> >>>>>>>> +#include "clk-rcg.h"
-> >>>>>>>> +#include "clk-regmap.h"
-> >>>>>>>> +#include "clk-regmap-divider.h"
-> >>>>>>>> +#include "clk-regmap-mux.h"
-> >>>>>>>> +#include "common.h"
-> >>>>>>>> +#include "reset.h"
-> >>>>>>>> +
-> >>>>>>>> +/* Need to match the order of clocks in DT binding */
-> >>>>>>>> +enum {
-> >>>>>>>> +       DT_NSSNOC_NSSCC_CLK,
-> >>>>>>>> +       DT_NSSNOC_SNOC_CLK,
-> >>>>>>>> +       DT_NSSNOC_SNOC_1_CLK,
-> >>>>>>>
-> >>>>>>> Not using the index makes it seem that these clocks are not used,
-> >>>>>>> until one scrolls down to pm_clks.
-> >>>>>> Okay, got it
-> >>>>>>>
-> >>>>>>> BTW: The NSSNOC_SNOC clocks make it look like there is an interconnect
-> >>>>>>> here (not a simple NIU).
-> >>>>>>
-> >>>>>> Hi Dmitry, We are exploring on the ICC driver. In the meantime to
-> >>>>>> unblock PCIe/NSS changes getting merged, shall we use
-> >>>>>> regmap_update_bits
-> >>>>>> and turn on the critical NSSNOC clocks, ANOC & SNOC pcie clocks in the
-> >>>>>> probe function of the gcc driver itself as like sm8550 driver to get
-> >>>>>> the
-> >>>>>> changes merged?
-> >>>>>>
-> >>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/clk/qcom/gcc-sm8550.c#n3347
-> >>>>>
-> >>>>> Hi Dmitry,
-> >>>>> Just curious to know if we could send out the next series with the
-> >>>>> proposed approach if that holds good.
-> >>>>
-> >>>> The answer really depends on the structure of your hardware. The issue
-> >>>> is that once you commit the device bindings,you have to support them
-> >>>> forever. So, if you commit the NSS clock support without interconnects
-> >>>> in place, you have to keep this ANOC/SNOC/etc code forever, even after
-> >>>> you land the interconnect. So I'd suggest landing the icc driver first
-> >>>> (or at least implementing and sending to the mailing list), so that we
-> >>>> can see how all these pieces fit together.
-> >>>
-> >>> Hi Dmitry,
-> >>> Unlike MSM chipsets, IPQ chipsets does not have any use case wherein the
-> >>> NOC clocks have to be scaled. So if these clocks can be enabled in the
-> >>> probe, there is no need for an interconnect driver at all. The same
-> >>> applies to both ipq9574 and ipq5332 SoCs.
-> >>>
-> >>
-> >> Hi Dmitry,
-> >> Just curious to know if we can go ahead with the proposed solution of
-> >> enabling the NOC clocks in the probe as these clocks need not be scaled
-> >> in IPQ chipsets & hence there would be no need for an ICC driver in
-> >> ipq9574 & ipq5332 targets.
-> >
-> > In the probe of which driver?
-> GCC driver of ipq9574 & ipq5332 targets.
+On 10/6/23 12:10, Jakub Kicinski wrote:
+> On Fri, 6 Oct 2023 11:57:15 -0700 Jakub Kicinski wrote:
+>> :) If I can't get it past you there's no chance I'll get it past docs@
+>>
+>> Let me move some of the staff into general docs and add a reference.
+>> The questions which came up were about use of tags and how maintainers
+>> approach the reviews from less experienced devs, which I think is
+>> subsystem-specific?
+> 
+> So moved most of the paragraphs to the common docs, what I kept in
+> netdev is this:
+> 
+> 
+> Reviewer guidance
+> -----------------
+> 
+> Reviewing other people's patches on the list is highly encouraged,
+> regardless of the level of expertise. For general guidance and
+> helpful tips please see :ref:`development_advancedtopics_reviews`.
+> 
+> It's safe to assume that netdev maintainers know the community and the level
+> of expertise of the reviewers. The reviewers should not be concerned about
+> their comments impeding or derailing the patch flow.
+> 
+> Less experienced reviewers should avoid commenting exclusively on more
+> trivial / subjective matters like code formatting and process aspects
+> (e.g. missing subject tags).
 
-Would you need to handle these clocks additionally in the
-suspend/resume path? Will this increase the power consumption of the
-board?
+Would rephrase the last paragraph and propose:
 
-Generally, I'd say this looks like a bad idea. Consider all the
-troubles we are undergoing now while sorting out the NIU clocks on RPM
-and RPMH platforms.
-So, unless you are 100% sure that this is a permanent solution (like
-AHB clocks being always on), I'd kindly suggest implementing the NoC
-attachment properly. In the end, other Qualcomm platforms use ICC
-drivers, so by following this pattern we will have more common code
-paths.
+Less experienced reviewers are highly encouraged to do more in-depth 
+review of submissions and not focus exclusively on trivial / subject 
+matters like code formatting, tags etc.
+
 
 -- 
-With best wishes
-Dmitry
+Florian
+
 
