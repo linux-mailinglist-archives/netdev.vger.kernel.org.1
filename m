@@ -1,59 +1,50 @@
-Return-Path: <netdev+bounces-38663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4897BBFBC
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:31:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CBC97BBFBE
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C1F41C20956
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:31:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E211C20863
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D4A3D99D;
-	Fri,  6 Oct 2023 19:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924233E46E;
+	Fri,  6 Oct 2023 19:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mInSNLtt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESlrKQus"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F7B3AC2E;
-	Fri,  6 Oct 2023 19:31:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A39F6C433C7;
-	Fri,  6 Oct 2023 19:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FD938F90
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 19:33:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B970AC433C8;
+	Fri,  6 Oct 2023 19:33:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696620701;
-	bh=Q7zwpcJxQRtUxVNDSB8lv/dWjHOWr8CPrXyivyBBXEQ=;
+	s=k20201202; t=1696620824;
+	bh=TZa4ECaf5pdgfpneuFd4EaBuwVX5i6V8hUt4o09+mJk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mInSNLttltzWAQns5eTthws5U0HEsOHcWjvCtmKQ3xy8OmJj69aDMZ4T2gj+oYbme
-	 TtIw/DvxOf5qUQIqhKOT51TDbq0gtYy5/RJh0i//DsEPixnOr9n0QFsg/o6e2OvZeD
-	 LdHwWDoN8aXeoKdOWUBnarkYecoJZCX/yZ244sujD700asGMflyjDMkcSmeDH7KwMX
-	 0ynWdLqev1yyPhTcsNKiQbAziD8S4TuJuxtkdbb43OAqrwSK9LcvqUGoDHsw8qfsY1
-	 gcDq80Ubxv66IYXsJXbNvDUxivoTaGy61ouaMsfVblGYVjxAenuF6DdoU8MDqj4+Mz
-	 2tsNcL4gGU0ZA==
-Date: Fri, 6 Oct 2023 12:31:39 -0700
+	b=ESlrKQuswqYmbv0Amo8aZJp4JRavjDAySLt7V4xFmZAWiXRYP5FrmTK50qVrGwG34
+	 zetAetbmXm7EoNJKB3COZm2GV0MTS4gud3hfXnGOjnAsLlzeDixp7F2afpdCqWmVbr
+	 B3gL/Ag3R4dTLobT2YEGGKQ2dFjXXXkEQadqdJ13b/i40SH460HYDiXuY34nUvzgWL
+	 WkBUEb9x4BKa/bn9UCtuKhdV+SnjvkhY/p4PRcNz9v1J5SyIHN4l0UTsnSvZzmLbsN
+	 H1MTnPR3qU1bfe9+Er5HWHD9ePSq0KPbj8STBQtt5L40zacD+L3Jg3kZ3lxEONe2gc
+	 DrAMXV81W8hJA==
+Date: Fri, 6 Oct 2023 12:33:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Eric Dumazet <edumazet@google.com>,
- Hao Luo <haoluo@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Jiri
- Olsa <jolsa@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Martin KaFai Lau <martin.lau@linux.dev>, Paolo
- Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>, Stanislav Fomichev
- <sdf@google.com>, Thomas Gleixner <tglx@linutronix.de>, Yonghong Song
- <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next v2] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-Message-ID: <20231006123139.5203444e@kernel.org>
-In-Reply-To: <20231006154933.mQgxQHHt@linutronix.de>
-References: <20230929165825.RvwBYGP1@linutronix.de>
-	<20231004070926.5b4ba04c@kernel.org>
-	<20231006154933.mQgxQHHt@linutronix.de>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, donald.hunter@gmail.com
+Subject: Re: [patch net-next v3 1/2] tools: ynl-gen: lift type requirement
+ for attribute subsets
+Message-ID: <20231006123342.5c82cda7@kernel.org>
+In-Reply-To: <ZSA8CVP6+DnPrHly@nanopsycho>
+References: <20231006114436.1725425-1-jiri@resnulli.us>
+	<20231006114436.1725425-2-jiri@resnulli.us>
+	<20231006080039.1955914d@kernel.org>
+	<ZSA8CVP6+DnPrHly@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,18 +54,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 6 Oct 2023 17:49:33 +0200 Sebastian Andrzej Siewior wrote:
->   - Moved xdp_do_check_flushed() to net/core/dev.h.
->   - Stripped __ from function names.
->   - Removed empty lines within an ifdef block.
->   - xdp_do_check_flushed() is now behind CONFIG_DEBUG_NET &&
->     CONFIG_BPF_SYSCALL. dev_check_flush and cpu_map_check_flush are now
->     only behind CONFIG_DEBUG_NET. They have no empty inline function for
->     the !CONFIG_DEBUG_NET case since they are only called in
->     CONFIG_DEBUG_NET case.
+On Fri, 6 Oct 2023 18:55:37 +0200 Jiri Pirko wrote:
+> Took me like 3 hours debugging this. These json schemas are from
+> different world than I am...
 
-
-Other than the minor nit from the build bot - LGTM now thanks!
-
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+That makes two of us. One of the most confusing languages I've worked
+with.. The effort is very much appreciated! :)
 
