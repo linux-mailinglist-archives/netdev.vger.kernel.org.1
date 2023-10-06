@@ -1,195 +1,85 @@
-Return-Path: <netdev+bounces-38659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDAC87BBF93
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:10:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 818207BBF98
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62031C208DE
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:10:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0C5F2820A9
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A673B28E;
-	Fri,  6 Oct 2023 19:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF823C684;
+	Fri,  6 Oct 2023 19:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="J+10qyvG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ck7obc6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242E9200D5;
-	Fri,  6 Oct 2023 19:10:19 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0DFBAD;
-	Fri,  6 Oct 2023 12:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=ezuIapr+ECwuHDlGPgUs5rtVXAdvMq2f7A+v7bYW0ow=; b=J+10qyvGuR7c6DiyxNFSiE9IAH
-	NuvZGhTYHt87BQOvrOV2QcvT5shWXckISbOLnhRxuWJE7r3ujqTsGfBSD52eXYUx+qt1JBiW25JYa
-	R1Vqlc7sPGdfcpAMRnUp1Hk9wIFze/WFkSGyrY20tmqUIFoST/cEhBLTxPrlUJYZfpzkI769vdVVd
-	1eTiXnzgcsrPrUNxxpP5Su4duxvcu7Cy5qK13IWfu1twLE6OL+treSkJFCD+tnBS9LeUXeFCNq7Ut
-	G+kvRzciE02xJ2j+gXx2PZUagGTTthu7LKuvV9jo/L3T6c3qAqp/2uJu4th05r/iCoxc5CveJBPx3
-	CSrgzdgw==;
-Received: from 17.249.197.178.dynamic.dsl-lte-bonding.lssmb00p-msn.res.cust.swisscom.ch ([178.197.249.17] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qoqDD-0009Pf-NS; Fri, 06 Oct 2023 21:10:11 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	jhs@mojatatu.com,
-	victor@mojatatu.com,
-	martin.lau@linux.dev,
-	dxu@dxuuu.xyz,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH net-next 2/2] net, tc: Add tc_set_drop_reason for {__,}tcf_classify
-Date: Fri,  6 Oct 2023 21:09:56 +0200
-Message-Id: <20231006190956.18810-2-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20231006190956.18810-1-daniel@iogearbox.net>
-References: <20231006190956.18810-1-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F2323AC2E
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 19:10:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EC34C433C8;
+	Fri,  6 Oct 2023 19:10:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696619448;
+	bh=BLwlxzNy2jPDF5oRpPNcwVy5X2uDz8Wu1nmUCZHeK1c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ck7obc6Y/SQ/rbF4e+BWL6wVdhRuT0gd8QxIQYXqm+mFbeqoqUCo1W7D7tYwx4YJM
+	 AB//cOu5LTC9W1zqONOhBm5pXb+5vXzeNCOoiHFPKHlt5hm8YFgs86GLL7akM+ioOb
+	 93aiBXpbMWPFSuTtSKHXBQjdJt7Pjexb7LjRq1uyBk5fLRu43+B8iGy1bRq8PDn7Ut
+	 bO6t9gWLXS2+HpV/KQ1owqkdcb6kAhNf/+0FOSeh3iNY/LE3Pv55m/xEbJEiHJP+XL
+	 TjaGUKrCFyMXzxFAIh3o7SEhBFV1X2bDBgpfYfBUtlLnc2G9o2ef0bj7zC3zCPofBV
+	 S/LZYecdFrcXA==
+Date: Fri, 6 Oct 2023 12:10:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+Message-ID: <20231006121047.1690b43b@kernel.org>
+In-Reply-To: <20231006115715.4f718fd7@kernel.org>
+References: <20231006163007.3383971-1-kuba@kernel.org>
+	<8270f9b2-ec07-4f07-86cf-425d25829453@lunn.ch>
+	<20231006115715.4f718fd7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27053/Fri Oct  6 09:44:40 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add an initial user for the newly added tc_set_drop_reason() helper to set the
-drop reason for internal errors leading to TC_ACT_SHOT inside {__,}tcf_classify().
+On Fri, 6 Oct 2023 11:57:15 -0700 Jakub Kicinski wrote:
+> :) If I can't get it past you there's no chance I'll get it past docs@
+> 
+> Let me move some of the staff into general docs and add a reference.
+> The questions which came up were about use of tags and how maintainers
+> approach the reviews from less experienced devs, which I think is
+> subsystem-specific?
 
-Right now this only adds a very basic SKB_DROP_REASON_TC_ERROR as a generic
-fallback indicator to mark drop locations. Where needed, such locations can be
-converted to more specific codes, for example, when hitting the reclassification
-limit, etc.
+So moved most of the paragraphs to the common docs, what I kept in
+netdev is this:
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Victor Nogueira <victor@mojatatu.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
----
- [ Victor, I presume you'll follow-up with replacing to more specific codes. ]
 
- include/net/dropreason-core.h |  3 +++
- net/sched/cls_api.c           | 26 ++++++++++++++++++++------
- 2 files changed, 23 insertions(+), 6 deletions(-)
+Reviewer guidance
+-----------------
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index a587e83fc169..845dce805de7 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -80,6 +80,7 @@
- 	FN(IPV6_NDISC_BAD_OPTIONS)	\
- 	FN(IPV6_NDISC_NS_OTHERHOST)	\
- 	FN(QUEUE_PURGE)			\
-+	FN(TC_ERROR)			\
- 	FNe(MAX)
- 
- /**
-@@ -345,6 +346,8 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_IPV6_NDISC_NS_OTHERHOST,
- 	/** @SKB_DROP_REASON_QUEUE_PURGE: bulk free. */
- 	SKB_DROP_REASON_QUEUE_PURGE,
-+	/** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
-+	SKB_DROP_REASON_TC_ERROR,
- 	/**
- 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index a193cc7b3241..a8e46580a49f 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -1681,12 +1681,16 @@ static inline int __tcf_classify(struct sk_buff *skb,
- 			 * time we got here with a cookie from hardware.
- 			 */
- 			if (unlikely(n->tp != tp || n->tp->chain != n->chain ||
--				     !tp->ops->get_exts))
-+				     !tp->ops->get_exts)) {
-+				tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 				return TC_ACT_SHOT;
-+			}
- 
- 			exts = tp->ops->get_exts(tp, n->handle);
--			if (unlikely(!exts || n->exts != exts))
-+			if (unlikely(!exts || n->exts != exts)) {
-+				tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 				return TC_ACT_SHOT;
-+			}
- 
- 			n = NULL;
- 			err = tcf_exts_exec_ex(skb, exts, act_index, res);
-@@ -1712,8 +1716,10 @@ static inline int __tcf_classify(struct sk_buff *skb,
- 			return err;
- 	}
- 
--	if (unlikely(n))
-+	if (unlikely(n)) {
-+		tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 		return TC_ACT_SHOT;
-+	}
- 
- 	return TC_ACT_UNSPEC; /* signal: continue lookup */
- #ifdef CONFIG_NET_CLS_ACT
-@@ -1723,6 +1729,7 @@ static inline int __tcf_classify(struct sk_buff *skb,
- 				       tp->chain->block->index,
- 				       tp->prio & 0xffff,
- 				       ntohs(tp->protocol));
-+		tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 		return TC_ACT_SHOT;
- 	}
- 
-@@ -1759,8 +1766,10 @@ int tcf_classify(struct sk_buff *skb,
- 			if (ext->act_miss) {
- 				n = tcf_exts_miss_cookie_lookup(ext->act_miss_cookie,
- 								&act_index);
--				if (!n)
-+				if (!n) {
-+					tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 					return TC_ACT_SHOT;
-+				}
- 
- 				chain = n->chain_index;
- 			} else {
-@@ -1768,8 +1777,10 @@ int tcf_classify(struct sk_buff *skb,
- 			}
- 
- 			fchain = tcf_chain_lookup_rcu(block, chain);
--			if (!fchain)
-+			if (!fchain) {
-+				tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 				return TC_ACT_SHOT;
-+			}
- 
- 			/* Consume, so cloned/redirect skbs won't inherit ext */
- 			skb_ext_del(skb, TC_SKB_EXT);
-@@ -1788,8 +1799,11 @@ int tcf_classify(struct sk_buff *skb,
- 			struct tc_skb_cb *cb = tc_skb_cb(skb);
- 
- 			ext = tc_skb_ext_alloc(skb);
--			if (WARN_ON_ONCE(!ext))
-+			if (WARN_ON_ONCE(!ext)) {
-+				tc_set_drop_reason(res, SKB_DROP_REASON_TC_ERROR);
- 				return TC_ACT_SHOT;
-+			}
-+
- 			ext->chain = last_executed_chain;
- 			ext->mru = cb->mru;
- 			ext->post_ct = cb->post_ct;
--- 
-2.34.1
+Reviewing other people's patches on the list is highly encouraged,
+regardless of the level of expertise. For general guidance and
+helpful tips please see :ref:`development_advancedtopics_reviews`.
 
+It's safe to assume that netdev maintainers know the community and the level
+of expertise of the reviewers. The reviewers should not be concerned about
+their comments impeding or derailing the patch flow.
+
+Less experienced reviewers should avoid commenting exclusively on more
+trivial / subjective matters like code formatting and process aspects
+(e.g. missing subject tags).
+
+
+Sounds reasonable?
 
