@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-38494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218B47BB3A6
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:59:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C45027BB3A9
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:59:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16E3F1C20975
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:59:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25AAF282297
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:59:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD7CB79D6;
-	Fri,  6 Oct 2023 08:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DB779D9;
+	Fri,  6 Oct 2023 08:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XpmxLiai"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="keIavnFB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8045079D0
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:59:24 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68639F
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 01:59:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6100F11732
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:59:30 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4306E95
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 01:59:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696582761; x=1728118761;
+  t=1696582768; x=1728118768;
   h=subject:from:to:cc:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dd0IN6RJnB4FPXEFhu3FZcwXYgc8FIDVw+dWtwNRXlE=;
-  b=XpmxLiai0QSkzyHrHKy7ZwB/Eqi3G9WzNxcUamswVYpIQLgjr2TYeNjN
-   lV4DW/CIMOhr8tWVT7v4lwtUxhVlxXMyUumOxLvCGGQweX47yYoTWEz6b
-   Ok/t0g/CEs5eqpiwtT1ZEm1qcSPGq3jbaTT8FumBbuRWfY8blBJmzugRI
-   bUVK9leB7xGWBpSpfkqvC993weiWNYQGC2pEEoYwR27DDfHHDLKRSkdO6
-   y3OLyDLGJKGz3bXQl4rEkRVPRE6jyOx7/9ucztjzomcUxozLqK6UcuGbV
-   r2masgJYhGimDGq4/zy2C0oDOje8/Dq0nWxiof9OwHVa9gw2xgOYRDUe7
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="368789583"
+  bh=nilis8yhp4IF7HAJ4tsqaR74WkcqXuq6jwdcV1nHJrk=;
+  b=keIavnFBiWjHJzUqsjKPdTTHRp9Y8gY2IGXuEDEDTy8wnpk8BCnblZwc
+   ojQkNgwvpWKfBMU+SOIZTPrTwLoLupDKWgi8L8UU9oASKeJOSeOKwUFbL
+   7yTDOqYJp696VO8aau30hNZEQvwmNo+qvYWl5Y3AIk3wFnq82wxU4NJTT
+   a4LRwnydf7kkrp/tCRbnMqWHKJO+DI3HRRFYQhCZUKx4ijmeTekYgcj3k
+   y5SvhCMovOWnMKKOHHjRL7G79lvMTHli5wAW7/4Ovmm/NL5/CDS2UaWs/
+   sLh5a+Xua610RfiCBtUi2BP1ZFLJzUJGBCFWseXLVRb/MCIquKufp9Nt8
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="447897922"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="368789583"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 01:59:21 -0700
+   d="scan'208";a="447897922"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 01:59:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="728772291"
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="895813262"
 X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
-   d="scan'208";a="728772291"
+   d="scan'208";a="895813262"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by orsmga006.jf.intel.com with ESMTP; 06 Oct 2023 01:59:22 -0700
-Subject: [net-next PATCH v4 05/10] netdev-genl: spec: Extend netdev netlink
- spec in YAML for NAPI
+  by fmsmga001.fm.intel.com with ESMTP; 06 Oct 2023 01:57:56 -0700
+Subject: [net-next PATCH v4 06/10] netdev-genl: Add netlink framework
+ functions for napi
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Fri, 06 Oct 2023 02:15:05 -0700
-Message-ID: <169658370500.3683.7094590123652298777.stgit@anambiarhost.jf.intel.com>
+Date: Fri, 06 Oct 2023 02:15:10 -0700
+Message-ID: <169658371009.3683.2263972635869263084.stgit@anambiarhost.jf.intel.com>
 In-Reply-To: <169658340079.3683.13049063254569592908.stgit@anambiarhost.jf.intel.com>
 References: <169658340079.3683.13049063254569592908.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
@@ -66,437 +66,214 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support in netlink spec(netdev.yaml) for napi related information.
-Add code generated from the spec.
+Implement the netdev netlink framework functions for
+napi support. The netdev structure tracks all the napi
+instances and napi fields. The napi instances and associated
+parameters can be retrieved this way.
 
 Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
 Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
- Documentation/netlink/specs/netdev.yaml |   30 ++++++++
- include/uapi/linux/netdev.h             |    9 ++
- net/core/netdev-genl-gen.c              |   24 ++++++
- net/core/netdev-genl-gen.h              |    2 +
- net/core/netdev-genl.c                  |   10 +++
- tools/include/uapi/linux/netdev.h       |    9 ++
- tools/net/ynl/generated/netdev-user.c   |  124 +++++++++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h   |   75 +++++++++++++++++++
- 8 files changed, 283 insertions(+)
+ include/linux/netdevice.h |    2 +
+ net/core/dev.c            |    4 +-
+ net/core/netdev-genl.c    |  117 ++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 119 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 4694acfe0e50..f7b6db071a37 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -91,6 +91,19 @@ attribute-sets:
-         type: u64
-         enum: xdp-rx-metadata
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 264ae0bdabe8..da211f4d81db 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -536,6 +536,8 @@ static inline bool napi_complete(struct napi_struct *n)
+ 	return napi_complete_done(n, 0);
+ }
  
-+  -
-+    name: napi
-+    attributes:
-+      -
-+        name: ifindex
-+        doc: netdev ifindex
-+        type: u32
-+        checks:
-+          min: 1
-+      -
-+        name: napi-id
-+        doc: napi id
-+        type: u32
-   -
-     name: queue
-     attributes:
-@@ -172,6 +185,23 @@ operations:
-           attributes:
-             - ifindex
-         reply: *queue-get-op
-+    -
-+      name: napi-get
-+      doc: napi information such as napi-id
-+      attribute-set: napi
-+      do:
-+        request:
-+          attributes:
-+            - napi-id
-+        reply: &napi-get-op
-+          attributes:
-+            - napi-id
-+            - ifindex
-+      dump:
-+        request:
-+          attributes:
-+            - ifindex
-+        reply: *napi-get-op
- 
- mcast-groups:
-   list:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 69f657a2020f..a58dfbc423b7 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -69,6 +69,14 @@ enum {
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
- };
- 
-+enum {
-+	NETDEV_A_NAPI_IFINDEX = 1,
-+	NETDEV_A_NAPI_NAPI_ID,
++struct napi_struct *napi_by_id(unsigned int napi_id);
 +
-+	__NETDEV_A_NAPI_MAX,
-+	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-+};
-+
- enum {
- 	NETDEV_A_QUEUE_QUEUE_ID = 1,
- 	NETDEV_A_QUEUE_IFINDEX,
-@@ -86,6 +94,7 @@ enum {
- 	NETDEV_CMD_DEV_DEL_NTF,
- 	NETDEV_CMD_DEV_CHANGE_NTF,
- 	NETDEV_CMD_QUEUE_GET,
-+	NETDEV_CMD_NAPI_GET,
+ int dev_set_threaded(struct net_device *dev, bool threaded);
  
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 85d556a051db..77a340f6c285 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -27,6 +27,16 @@ static const struct nla_policy netdev_queue_get_dump_nl_policy[NETDEV_A_QUEUE_IF
- 	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
- };
+ /**
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 9b63a7b76c01..85448451b9fa 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -165,7 +165,6 @@ static int netif_rx_internal(struct sk_buff *skb);
+ static int call_netdevice_notifiers_extack(unsigned long val,
+ 					   struct net_device *dev,
+ 					   struct netlink_ext_ack *extack);
+-static struct napi_struct *napi_by_id(unsigned int napi_id);
  
-+/* NETDEV_CMD_NAPI_GET - do */
-+static const struct nla_policy netdev_napi_get_do_nl_policy[NETDEV_A_NAPI_NAPI_ID + 1] = {
-+	[NETDEV_A_NAPI_NAPI_ID] = { .type = NLA_U32, },
-+};
-+
-+/* NETDEV_CMD_NAPI_GET - dump */
-+static const struct nla_policy netdev_napi_get_dump_nl_policy[NETDEV_A_NAPI_IFINDEX + 1] = {
-+	[NETDEV_A_NAPI_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
-+};
-+
- /* Ops table for netdev */
- static const struct genl_split_ops netdev_nl_ops[] = {
- 	{
-@@ -55,6 +65,20 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.maxattr	= NETDEV_A_QUEUE_IFINDEX,
- 		.flags		= GENL_CMD_CAP_DUMP,
- 	},
-+	{
-+		.cmd		= NETDEV_CMD_NAPI_GET,
-+		.doit		= netdev_nl_napi_get_doit,
-+		.policy		= netdev_napi_get_do_nl_policy,
-+		.maxattr	= NETDEV_A_NAPI_NAPI_ID,
-+		.flags		= GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd		= NETDEV_CMD_NAPI_GET,
-+		.dumpit		= netdev_nl_napi_get_dumpit,
-+		.policy		= netdev_napi_get_dump_nl_policy,
-+		.maxattr	= NETDEV_A_NAPI_IFINDEX,
-+		.flags		= GENL_CMD_CAP_DUMP,
-+	},
- };
+ /*
+  * The @dev_base_head list is protected by @dev_base_lock and the rtnl
+@@ -6133,7 +6132,7 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+ EXPORT_SYMBOL(napi_complete_done);
  
- static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index 263c94f77bad..ffc94956d1f5 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -16,6 +16,8 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
- int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info);
- int netdev_nl_queue_get_dumpit(struct sk_buff *skb,
- 			       struct netlink_callback *cb);
-+int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info);
-+int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
+ /* must be called under rcu_read_lock(), as we dont take a reference */
+-static struct napi_struct *napi_by_id(unsigned int napi_id)
++struct napi_struct *napi_by_id(unsigned int napi_id)
+ {
+ 	unsigned int hash = napi_id % HASH_SIZE(napi_hash);
+ 	struct napi_struct *napi;
+@@ -6144,6 +6143,7 @@ static struct napi_struct *napi_by_id(unsigned int napi_id)
  
- enum {
- 	NETDEV_NLGRP_MGMT,
+ 	return NULL;
+ }
++EXPORT_SYMBOL(napi_by_id);
+ 
+ #if defined(CONFIG_NET_RX_BUSY_POLL)
+ 
 diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 8e8eddf68018..fdd67c67e9aa 100644
+index fdd67c67e9aa..530d6f474bd5 100644
 --- a/net/core/netdev-genl.c
 +++ b/net/core/netdev-genl.c
-@@ -144,6 +144,16 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+@@ -7,6 +7,7 @@
+ #include <net/sock.h>
+ #include <net/xdp.h>
+ #include <net/netdev_rx_queue.h>
++#include <net/busy_poll.h>
+ 
+ #include "netdev-genl-gen.h"
+ 
+@@ -14,6 +15,7 @@ struct netdev_nl_dump_ctx {
+ 	unsigned long	ifindex;
+ 	unsigned int	rxq_idx;
+ 	unsigned int	txq_idx;
++	unsigned int	napi_id;
+ };
+ 
+ static struct netdev_nl_dump_ctx *netdev_dump_ctx(struct netlink_callback *cb)
+@@ -144,14 +146,125 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
  	return skb->len;
  }
  
-+int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
++static int
++netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
++			const struct genl_info *info)
 +{
-+	return -EOPNOTSUPP;
++	void *hdr;
++
++	if (WARN_ON_ONCE(!napi->dev))
++		return -EINVAL;
++
++	hdr = genlmsg_iput(rsp, info);
++	if (!hdr)
++		return -EMSGSIZE;
++
++	if (napi->napi_id >= MIN_NAPI_ID &&
++	    nla_put_u32(rsp, NETDEV_A_NAPI_NAPI_ID, napi->napi_id))
++		goto nla_put_failure;
++
++	if (nla_put_u32(rsp, NETDEV_A_NAPI_IFINDEX, napi->dev->ifindex))
++		goto nla_put_failure;
++
++	genlmsg_end(rsp, hdr);
++	return 0;
++
++nla_put_failure:
++	genlmsg_cancel(rsp, hdr);
++	return -EMSGSIZE;
 +}
 +
-+int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	return -EOPNOTSUPP;
+ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+-	return -EOPNOTSUPP;
++	struct napi_struct *napi;
++	struct sk_buff *rsp;
++	u32 napi_id;
++	int err;
++
++	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_NAPI_ID))
++		return -EINVAL;
++
++	napi_id = nla_get_u32(info->attrs[NETDEV_A_NAPI_NAPI_ID]);
++
++	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!rsp)
++		return -ENOMEM;
++
++	rcu_read_lock();
++
++	napi = napi_by_id(napi_id);
++	if (napi)
++		err  = netdev_nl_napi_fill_one(rsp, napi, info);
++	else
++		err = -EINVAL;
++
++	rcu_read_unlock();
++
++	if (err)
++		goto err_free_msg;
++
++	return genlmsg_reply(rsp, info);
++
++err_free_msg:
++	nlmsg_free(rsp);
++	return err;
 +}
 +
- static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 69f657a2020f..a58dfbc423b7 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -69,6 +69,14 @@ enum {
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
- };
- 
-+enum {
-+	NETDEV_A_NAPI_IFINDEX = 1,
-+	NETDEV_A_NAPI_NAPI_ID,
++static int
++netdev_nl_napi_dump_one(struct net_device *netdev, struct sk_buff *rsp,
++			const struct genl_info *info, unsigned int *start)
++{
++	struct napi_struct *napi;
++	int err = 0;
 +
-+	__NETDEV_A_NAPI_MAX,
-+	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-+};
++	list_for_each_entry(napi, &netdev->napi_list, dev_list) {
++		if (*start && napi->napi_id >= *start)
++			continue;
 +
- enum {
- 	NETDEV_A_QUEUE_QUEUE_ID = 1,
- 	NETDEV_A_QUEUE_IFINDEX,
-@@ -86,6 +94,7 @@ enum {
- 	NETDEV_CMD_DEV_DEL_NTF,
- 	NETDEV_CMD_DEV_CHANGE_NTF,
- 	NETDEV_CMD_QUEUE_GET,
-+	NETDEV_CMD_NAPI_GET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index b597bab2b85b..29c5e0212328 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -19,6 +19,7 @@ static const char * const netdev_op_strmap[] = {
- 	[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf",
- 	[NETDEV_CMD_DEV_CHANGE_NTF] = "dev-change-ntf",
- 	[NETDEV_CMD_QUEUE_GET] = "queue-get",
-+	[NETDEV_CMD_NAPI_GET] = "napi-get",
- };
- 
- const char *netdev_op_str(int op)
-@@ -98,6 +99,16 @@ struct ynl_policy_nest netdev_queue_nest = {
- 	.table = netdev_queue_policy,
- };
- 
-+struct ynl_policy_attr netdev_napi_policy[NETDEV_A_NAPI_MAX + 1] = {
-+	[NETDEV_A_NAPI_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+	[NETDEV_A_NAPI_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest netdev_napi_nest = {
-+	.max_attr = NETDEV_A_NAPI_MAX,
-+	.table = netdev_napi_policy,
-+};
-+
- /* Common nested types */
- /* ============== NETDEV_CMD_DEV_GET ============== */
- /* NETDEV_CMD_DEV_GET - do */
-@@ -356,6 +367,119 @@ netdev_queue_get_dump(struct ynl_sock *ys,
- 	return NULL;
++		err = netdev_nl_napi_fill_one(rsp, napi, info);
++		if (err)
++			break;
++		*start = napi->napi_id;
++	}
++	return err;
  }
  
-+/* ============== NETDEV_CMD_NAPI_GET ============== */
-+/* NETDEV_CMD_NAPI_GET - do */
-+void netdev_napi_get_req_free(struct netdev_napi_get_req *req)
-+{
-+	free(req);
-+}
+ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+-	return -EOPNOTSUPP;
++	struct netdev_nl_dump_ctx *ctx = netdev_dump_ctx(cb);
++	const struct genl_info *info = genl_info_dump(cb);
++	struct net *net = sock_net(skb->sk);
++	unsigned int n_id = ctx->napi_id;
++	struct net_device *netdev;
++	u32 ifindex = 0;
++	int err = 0;
 +
-+void netdev_napi_get_rsp_free(struct netdev_napi_get_rsp *rsp)
-+{
-+	free(rsp);
-+}
++	if (info->attrs[NETDEV_A_NAPI_IFINDEX])
++		ifindex = nla_get_u32(info->attrs[NETDEV_A_NAPI_IFINDEX]);
 +
-+int netdev_napi_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
-+{
-+	struct ynl_parse_arg *yarg = data;
-+	struct netdev_napi_get_rsp *dst;
-+	const struct nlattr *attr;
-+
-+	dst = yarg->data;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_NAPI_NAPI_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.napi_id = 1;
-+			dst->napi_id = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_NAPI_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
++	rtnl_lock();
++	if (ifindex) {
++		netdev = __dev_get_by_index(net, ifindex);
++		if (netdev)
++			err = netdev_nl_napi_dump_one(netdev, skb, info, &n_id);
++		else
++			err = -ENODEV;
++	} else {
++		for_each_netdev_dump(net, netdev, ctx->ifindex) {
++			err = netdev_nl_napi_dump_one(netdev, skb, info, &n_id);
++			if (err < 0)
++				break;
++			if (!err)
++				n_id = 0;
 +		}
 +	}
++	rtnl_unlock();
 +
-+	return MNL_CB_OK;
-+}
++	if (err != -EMSGSIZE)
++		return err;
 +
-+struct netdev_napi_get_rsp *
-+netdev_napi_get(struct ynl_sock *ys, struct netdev_napi_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_napi_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_NAPI_GET, 1);
-+	ys->req_policy = &netdev_napi_nest;
-+	yrs.yarg.rsp_policy = &netdev_napi_nest;
-+
-+	if (req->_present.napi_id)
-+		mnl_attr_put_u32(nlh, NETDEV_A_NAPI_NAPI_ID, req->napi_id);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_napi_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_NAPI_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_napi_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_NAPI_GET - dump */
-+void netdev_napi_get_list_free(struct netdev_napi_get_list *rsp)
-+{
-+	struct netdev_napi_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_napi_get_list *
-+netdev_napi_get_dump(struct ynl_sock *ys, struct netdev_napi_get_req_dump *req)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_napi_get_list);
-+	yds.cb = netdev_napi_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_NAPI_GET;
-+	yds.rsp_policy = &netdev_napi_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_NAPI_GET, 1);
-+	ys->req_policy = &netdev_napi_nest;
-+
-+	if (req->_present.ifindex)
-+		mnl_attr_put_u32(nlh, NETDEV_A_NAPI_IFINDEX, req->ifindex);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_napi_get_list_free(yds.first);
-+	return NULL;
-+}
-+
- static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 	[NETDEV_CMD_DEV_ADD_NTF] =  {
- 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index 1650850820bc..870cf90993b4 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -189,4 +189,79 @@ struct netdev_queue_get_list *
- netdev_queue_get_dump(struct ynl_sock *ys,
- 		      struct netdev_queue_get_req_dump *req);
++	ctx->napi_id = n_id;
++	return skb->len;
+ }
  
-+/* ============== NETDEV_CMD_NAPI_GET ============== */
-+/* NETDEV_CMD_NAPI_GET - do */
-+struct netdev_napi_get_req {
-+	struct {
-+		__u32 napi_id:1;
-+	} _present;
-+
-+	__u32 napi_id;
-+};
-+
-+static inline struct netdev_napi_get_req *netdev_napi_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_napi_get_req));
-+}
-+void netdev_napi_get_req_free(struct netdev_napi_get_req *req);
-+
-+static inline void
-+netdev_napi_get_req_set_napi_id(struct netdev_napi_get_req *req, __u32 napi_id)
-+{
-+	req->_present.napi_id = 1;
-+	req->napi_id = napi_id;
-+}
-+
-+struct netdev_napi_get_rsp {
-+	struct {
-+		__u32 napi_id:1;
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u32 napi_id;
-+	__u32 ifindex;
-+};
-+
-+void netdev_napi_get_rsp_free(struct netdev_napi_get_rsp *rsp);
-+
-+/*
-+ * napi information such as napi-id
-+ */
-+struct netdev_napi_get_rsp *
-+netdev_napi_get(struct ynl_sock *ys, struct netdev_napi_get_req *req);
-+
-+/* NETDEV_CMD_NAPI_GET - dump */
-+struct netdev_napi_get_req_dump {
-+	struct {
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u32 ifindex;
-+};
-+
-+static inline struct netdev_napi_get_req_dump *
-+netdev_napi_get_req_dump_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_napi_get_req_dump));
-+}
-+void netdev_napi_get_req_dump_free(struct netdev_napi_get_req_dump *req);
-+
-+static inline void
-+netdev_napi_get_req_dump_set_ifindex(struct netdev_napi_get_req_dump *req,
-+				     __u32 ifindex)
-+{
-+	req->_present.ifindex = 1;
-+	req->ifindex = ifindex;
-+}
-+
-+struct netdev_napi_get_list {
-+	struct netdev_napi_get_list *next;
-+	struct netdev_napi_get_rsp obj __attribute__ ((aligned (8)));
-+};
-+
-+void netdev_napi_get_list_free(struct netdev_napi_get_list *rsp);
-+
-+struct netdev_napi_get_list *
-+netdev_napi_get_dump(struct ynl_sock *ys, struct netdev_napi_get_req_dump *req);
-+
- #endif /* _LINUX_NETDEV_GEN_H */
+ static int
 
 
