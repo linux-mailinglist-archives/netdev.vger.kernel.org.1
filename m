@@ -1,150 +1,136 @@
-Return-Path: <netdev+bounces-38648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2094D7BBDE0
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:38:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA497BBE38
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 801BA281574
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:38:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD05281DBC
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39A5328CA;
-	Fri,  6 Oct 2023 17:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD1C347CF;
+	Fri,  6 Oct 2023 17:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WfD9FbXP"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="iDPMpCpw";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="D4KZyUE4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F3D286A5
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:38:01 +0000 (UTC)
-Received: from out-193.mta0.migadu.com (out-193.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39982AD
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 10:38:00 -0700 (PDT)
-Message-ID: <57c35480-983d-2056-1d72-f6e555069b83@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696613876;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qpXKuzg71AgBMcaKo6kzSKg7OXzsFHX5EQqRaIUxIhA=;
-	b=WfD9FbXP+XfaMTekiCdxwIA2Ul/LvowsY4QBrZ5BWJNt6IM4YA16uruGqTq54eIe4xeXf6
-	pPDH/1uRgfEVVr24mekBmZ544XqEhwaPL+soaK/g99hIBxGcRgu0DCFI6WceegYvhmfhzv
-	rtE8yomic9cJM1uYaQGbmi3/EfQMvfM=
-Date: Fri, 6 Oct 2023 10:37:44 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C30A34198;
+	Fri,  6 Oct 2023 17:59:50 +0000 (UTC)
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38D7BE;
+	Fri,  6 Oct 2023 10:59:49 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.nyi.internal (Postfix) with ESMTP id 3C72F5C02DF;
+	Fri,  6 Oct 2023 13:59:49 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Fri, 06 Oct 2023 13:59:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1696615189; x=1696701589; bh=LU
+	R07i/CoESe7pjWusXonCUaiL+SxGLf47l6Wv1tu/w=; b=iDPMpCpws5+opJ0cJR
+	mVm7Oaitor5ON6fRkKhILbj1ctyrxTQTRSsyU5K/bpHZ8/6N1h++vEaGiWvODID9
+	H319RMNd314Nns3TdL7+JJa5cgP6wy8drzlqdLezU0ROSvZkLPYVYRs3Uggn059c
+	S8OwLEYoTnu7T/LGaumHLrNEKWxU1jcnYhJSxMYxYF3XCu/yzOcnbXfWpBNpfz+a
+	gJ0imzuso0yUNLZGd9eJ9Vfx77awoR+d2IRr8GDmb5TxTkdNpEq0dFaTYisTbFLb
+	ARZRVYwm36zJnaeTNq61GIvYZP07WOkGVF6bsRpB30ptGkSeGcvhanrD0jJmSNGZ
+	EV/A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696615189; x=1696701589; bh=LUR07i/CoESe7
+	pjWusXonCUaiL+SxGLf47l6Wv1tu/w=; b=D4KZyUE4v1vOMLpbZpBek+IGDl1Q2
+	loqhf1k0j6U26VFd6c+UNikD1CQJ1GMrIzHlRt1Vul5rlWZJVOp6CZPMUmmtPelf
+	ZPLY0J9GLD3v61sGplSCUDCwqwULfqbYPiZ0EF1VSCgERm6ip50jylXDglbKZG65
+	6rhnWlJjfKg1fEGBcQVesY5Kp3ovJzPF5hUGzBpMbQlw3uI4wjRvZb6vFoi5zNDW
+	USV9BZ/uAhVAFSt53pyGiC1Kj5Au4PDtfw5gfer9CpQXfvLYaqgwZLjXVgie0ZH+
+	ONSFknMrt6H9NLkN3Cq/z0tLVn5Ow+Wj6oKWIVYV/5OxD7w39P0iIYkQQ==
+X-ME-Sender: <xms:FEsgZV-SH8thipwzI3rvLubXy2r9TxZnuz3pR98Y2wIj1HkDfD8dKA>
+    <xme:FEsgZZvIfHPGUR_XsBSOlJrnGYpxufXSXEORHrCV5iBziWOYJX40flDCl-k782f-R
+    k7-sJHPlMcIHQHXGg>
+X-ME-Received: <xmr:FEsgZTAEoZiJb4HWtcLZ3-FQCuKfyf7CMCNjqzYq_vujy5I28D_OeNw5fK0X4CDACT0xfizBwMSEOjWV6K0C34P-YgHZbng-FAYdA3U>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrgeeigdduudejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdfstddt
+    tddvnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
+    cuggftrfgrthhtvghrnhepvdefkeetuddufeeigedtheefffekuedukeehudffudfffffg
+    geeitdetgfdvhfdvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:FEsgZZdUdWefjYIAp6yI_pworw8nfNPycqX05xoix3vma4Bm2sja6w>
+    <xmx:FEsgZaNybKAv-qBUShHn8OJJ9E-myR4ki3GGoY_2rwiaklXoSfPCbg>
+    <xmx:FEsgZbndVUZbNoOvnRET1QNARggLCxZbTjb71Pb97SYPIc-KwPq5ww>
+    <xmx:FUsgZWmYPynFNQQyCgrFIOxHkjbjDCsyRHbln5nliph2kucPePA1zw>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 6 Oct 2023 13:59:47 -0400 (EDT)
+Date: Fri, 6 Oct 2023 11:59:46 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	paulb@nvidia.com, netdev@vger.kernel.org, kernel@mojatatu.com, 
+	martin.lau@linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from return
+ code
+Message-ID: <ncblypbr7vshhgeuuxxvs6k7lapu4ooxyiecqn3yitlhnmw5bl@tdjlc4s4tgvj>
+References: <1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net>
+ <CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
+ <cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
+ <CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
+ <96532f62-6927-326c-8470-daa1c4ab9699@iogearbox.net>
+ <CAM0EoMkUFcw7k0vX3oH8SHDoXW=DD-h2MkUE-3_MssXvP_uJbA@mail.gmail.com>
+ <2ce3a5a1-375d-43a6-052d-d44d7b4a4bf8@iogearbox.net>
+ <20231006063233.74345d36@kernel.org>
+ <686dd999-bee4-ecf8-8dc4-c85a098c4a92@iogearbox.net>
+ <20231006071215.4a28b348@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v3] net/xdp: fix zero-size allocation warning in
- xskq_create()
-Content-Language: en-US
-To: Andrew Kanner <andrew.kanner@gmail.com>
-Cc: linux-kernel-mentees@lists.linuxfoundation.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
- syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, aleksander.lobakin@intel.com,
- xuanzhuo@linux.alibaba.com, ast@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, daniel@iogearbox.net
-References: <20231005193548.515-1-andrew.kanner@gmail.com>
- <7aa47549-5a95-22d7-1d03-ffdd251cec6d@linux.dev>
- <651fb2a8.c20a0220.8d6c3.0fd9@mx.google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <651fb2a8.c20a0220.8d6c3.0fd9@mx.google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006071215.4a28b348@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/6/23 12:09 AM, Andrew Kanner wrote:
-> On Thu, Oct 05, 2023 at 06:00:46PM -0700, Martin KaFai Lau wrote:
-> [...]
->>> diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
->>> index f8905400ee07..c7e8bbb12752 100644
->>> --- a/net/xdp/xsk_queue.c
->>> +++ b/net/xdp/xsk_queue.c
->>> @@ -34,6 +34,11 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
->>>    	q->ring_mask = nentries - 1;
->>>    	size = xskq_get_ring_size(q, umem_queue);
->>> +	if (unlikely(size == SIZE_MAX)) {
->>
->> What if "size" is SIZE_MAX-1? Would it still overflow the PAGE_ALIGN below?
->>
->>> +		kfree(q);
->>> +		return NULL;
->>> +	}
->>> +
->>>    	size = PAGE_ALIGN(size);
->>>    	q->ring = vmalloc_user(size);
->>
+On Fri, Oct 06, 2023 at 07:12:15AM -0700, Jakub Kicinski wrote:
+> On Fri, 6 Oct 2023 15:49:18 +0200 Daniel Borkmann wrote:
+> > > Which will no longer work with the "pack multiple values into
+> > > the reason" scheme of subsys-specific values :(  
+> > 
+> > Too bad, do you happen to know why it won't work? 
 > 
-> I asked myself the same question before v1. E.g. thinking about the
-> check: (size > SIZE_MAX - PAGE_SIZE + 1)
-> 
-> But xskq_create() is called after the check for
-> !is_power_of_2(entries) in xsk_init_queue(). So I tried the same
-> reproducer and divided the (nentries) value by 2 in a loop - it hits
-> either SIZE_MAX case or the normal cases without overflow (sometimes
-> throwing vmalloc error complaining about size which exceed total pages
-> in my arm setup).
-> 
-> So I can't see a way size will be SIZE_MAX-1, etc. Correct me if I'm
-> wrong, please.
-> 
-> PS: In the output below the first 2 values of (nentries) hit SIZE_MAX
+> I'm just guessing but the reason is enum skb_drop_reason
+> and the values of subsystem specific reasons won't be part
+> of that enum.
 
-Thanks for the explanation, so iiuc it means it will overflow the struct_size() 
-first because of the is_power_of_2(nentries) requirement? Could you help adding 
-some comment to explain? Thanks.
+Yeah, looks like the subsystem reasons are different enums right?
+There's probably a way to still support it in bpftrace but it might take
+some minor changes and/or ugly conditionals in scripts.
 
-> case, the rest hit the normal case, vmalloc_user() is complaining
-> about 1 allocation:
-> 
-> 0x20000000
-> 0x10000000
-> 0x8000000
-> [   41.759195][ T2807] pre PAGE_ALIGN size = 2147483968 (0x80000140), PAGE_SIZE = 4096 (0x1000)
-> [   41.759621][ T2807] repro-iter: vmalloc error: size 2147487744, exceeds total pages, mode:0xdc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null),cpuset=/,mems_allowed=0
-> [...]
-> 0x4000000
-> 0x2000000
-> 0x1000000
-> 0x800000
-> 0x400000
-> 0x200000
-> 0x100000
-> 0x80000
-> 0x40000
-> 0x20000
-> 0x10000
-> 0x8000
-> 0x4000
-> 0x2000
-> 0x1000
-> 0x800
-> 0x400
-> 0x200
-> 0x100
-> 0x80
-> 0x40
-> 0x20
-> 0x10
-> 0x8
-> 0x4
-> 0x2
-> 
+But I also wonder: why are the subsystem error codes not included into
+`enum skb_drop_reason`? It looks like the enum space is partitioned
+already. And the modules have already registered themselves into core
+kernel (in `enum skb_drop_reason_subsys`). So even if modules are
+compiled out there are still hints of it laying around vmlinux.
 
+Thanks,
+Daniel
+
+[..]
 
