@@ -1,261 +1,161 @@
-Return-Path: <netdev+bounces-38652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A034A7BBEF8
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 20:49:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAFE7BBF03
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 20:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 473F32820F0
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:49:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36ABC282138
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F9538BB1;
-	Fri,  6 Oct 2023 18:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C044638F90;
+	Fri,  6 Oct 2023 18:51:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M+VuO8kI"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="FFk1/nxT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0E137CAC
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 18:49:46 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96221CE;
-	Fri,  6 Oct 2023 11:49:44 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-4064867903cso23648685e9.2;
-        Fri, 06 Oct 2023 11:49:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86E926E04
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 18:51:22 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539B7BF
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 11:51:19 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c874b43123so20667455ad.2
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 11:51:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696618183; x=1697222983; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=J8TnZukIluCCYT6M1BV1r+HvisyoMBi+KKDF01G+Mhg=;
-        b=M+VuO8kI5wZUDXLEV6RujN0d4RyRfRhwuuqxrt5xrHfHfn3YNP6rk+RqNVTtDtyMnj
-         /weoqEDta1TErA2m3SK5LnJPLm9ZOlvk0hNgyb64q7SIIWgGxgG6GMErgFShx3FlOPrR
-         M1vJ6FhqKHQJDOvfK/qkfDFC8gU+RD55LhGYOh8ih6s5Hp7oNfCZAIIpng0ez4XaFTgr
-         6QQkR2xcLWYA64VcrPG+IQYDtoyCiGrAvQQgdwFxgcqqrv+dK/EhJAJdU2QrcmYMPD/k
-         TYSQ5iz9GIW8BE7Avzxopo+Urxd6kMBrODndeoKBYy4s9+fiSeBZvnBkPozo7/qCsB9w
-         PK4A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696618279; x=1697223079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xCV04zCvYMSRZ8PLVrYCErwlWKz0o53q1/ujh2vCW2I=;
+        b=FFk1/nxTCSIyAwRQiKs1Ezb+gJEOmBaNx39KtBO3YvDg+GW25uJD5Tzv124epVi2Jw
+         +9oqqTTomuxoYVyJLGjAiSeA9untb2CGDeUv1LsI3sRuzD9pVftFZi4gR35Ya+MDJrKJ
+         fbObCNCaHE97KRKoj7xXMXC5KQY6U7D3/r4+Z3ZqPEsd7kg0rmJ/C3tLcHgyeq9qOKWJ
+         QwGUzvOpB1L6tayyZVu/bG2xnPrCqNn+DFzyndMzmuo+Z/w3FsGhjwuEq0IWpQWk8IOS
+         yZ7fC3xLkNtHfvIrJe72dktcNOLB3qsfrKf/fhBuumJ0SRpFpnLnYMh3tWIhkwIlrQLq
+         /kDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696618183; x=1697222983;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
+        d=1e100.net; s=20230601; t=1696618279; x=1697223079;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J8TnZukIluCCYT6M1BV1r+HvisyoMBi+KKDF01G+Mhg=;
-        b=jzvLhBScqiquwVYSN7AK446RuiYk8DgsflAm+dwf2g0zsJ85l+vaOKGusL265wA19a
-         P4SLmFhu3ecwTLFUZPuk7Nc73tKOANWG+bQ8lWiHO6mwGk56f6a7PEvUIVPaJyQz9kV2
-         EaXmByuGYCJgvdLHWQCkxmf6gB4SpRq+GxD8sQ0oFTWnY/xjKsjsNFLIpxVxZ2rxh6hM
-         vkmCjH3/mdd5TD9gz1YtbmSiRjw0XAI1Ukzob4mFKR+LsyV6NCQihTkyTZN6XcCZ7sfT
-         AnXhCUYn8FWXv+MsFP28/G9q9PYz50SxSRIXeVBvEAiy/i0//Gdh0mofLjNcHypCkyHa
-         MXXw==
-X-Gm-Message-State: AOJu0YyPuSmyWHivwk1mcMPmeKq5lzFOvs2VjggLWdxZ7+tin8hh9cZs
-	2ACU3b4S5PkkSy5qDIkrbRA=
-X-Google-Smtp-Source: AGHT+IGnyXDNMYk8HFRpUEcTSZlI2oSIFcmKPz3Tef9zJ6V0zvxO56KtfzCWQ2oyr2OO4KuUJibc4g==
-X-Received: by 2002:a05:6000:48:b0:31f:f8a5:15db with SMTP id k8-20020a056000004800b0031ff8a515dbmr8155280wrx.48.1696618182580;
-        Fri, 06 Oct 2023 11:49:42 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id p4-20020a5d68c4000000b003232f167df5sm2217218wrw.108.2023.10.06.11.49.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 11:49:41 -0700 (PDT)
-Message-ID: <652056c5.5d0a0220.2b60d.c5dc@mx.google.com>
-X-Google-Original-Message-ID: <ZSBWxW8ba8P0szfD@Ansuel-xps.>
-Date: Fri, 6 Oct 2023 20:49:41 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Douglas Miller <dougmill@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Dany Madden <danymadden@us.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Intel Corporation <linuxwwan@intel.com>,
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Rushil Gupta <rushilg@google.com>, Coco Li <lixiaoyan@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Wei Fang <wei.fang@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Yuri Karpov <YKarpov@ispras.ru>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Zheng Zengkai <zhengzengkai@huawei.com>, Lee Jones <lee@kernel.org>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Dawei Li <set_pte_at@outlook.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH v2 4/4] netdev: use napi_schedule bool instead
- of napi_schedule_prep/__napi_schedule
-References: <20231003145150.2498-1-ansuelsmth@gmail.com>
- <20231003145150.2498-4-ansuelsmth@gmail.com>
- <CANn89iLtYZJPOQE7OkAbEdmhT8qjzAJ+27poa__3c8Nf0M6u_w@mail.gmail.com>
+        bh=xCV04zCvYMSRZ8PLVrYCErwlWKz0o53q1/ujh2vCW2I=;
+        b=pczZTV4ubPvPj0FgHtyZ/RhrLDoMc+tSnEcexuFnOouuKrdp+op+75V1dKmClPwWCB
+         Wb3mSo960y3lPMjeuHWq/IuY5a/c7jCzVr9zbr5vsXndToXKE2XQN1bPt6labzG8umEb
+         Ng2eY+BrfPSrWSjpf1vdeuZPleZRptBoo6Mk56WI/QCdNce9DB8G8VNg5eyyuEcr4lA5
+         W5a4ekco/eX1ps6SQZgQiPFWP7hl5qN63dW8NT+FOXTyVuKsOJW7sKKXr8wavFsOPvQb
+         fpJwqBXrHPHXOxteopXJhDpAy7FORR3W2lYNcGwRe7F7f0IXT7brNsYEPJR6I5fp5BPq
+         bTGA==
+X-Gm-Message-State: AOJu0YwlnY4XOQgY2aBbAtYtmpKqb8RKFAxh5jI0DBwLqh2YFsEP1cB/
+	ocUN7BCCal3DTHw4JTzb/i3lNg==
+X-Google-Smtp-Source: AGHT+IEFrO5y5ULP5CWa6iaqkAW2+FU1lSXIQ3Vc6+v8Jz0uz9VPVoCU5MsvSwDlydQL8BKJvZTrlQ==
+X-Received: by 2002:a17:902:e5c7:b0:1c5:b855:38f with SMTP id u7-20020a170902e5c700b001c5b855038fmr10107695plf.24.1696618278642;
+        Fri, 06 Oct 2023 11:51:18 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:c07e:d4ae:2d8a:ba4? ([2804:14d:5c5e:44fb:c07e:d4ae:2d8a:ba4])
+        by smtp.gmail.com with ESMTPSA id o1-20020a170902d4c100b001b9f7bc3e77sm4251840plg.189.2023.10.06.11.51.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 11:51:18 -0700 (PDT)
+Message-ID: <c7d4fe7e-5229-71c7-b93d-f6203e163f02@mojatatu.com>
+Date: Fri, 6 Oct 2023 15:51:14 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
+ requirement
+Content-Language: en-US
+To: Christian Theune <ct@flyingcircus.io>, stable@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: regressions@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Jamal Hadi Salim <jhs@mojatatu.com>
+References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLtYZJPOQE7OkAbEdmhT8qjzAJ+27poa__3c8Nf0M6u_w@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 06:16:26PM +0200, Eric Dumazet wrote:
-> On Tue, Oct 3, 2023 at 8:36 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
-> >
-> > Replace if condition of napi_schedule_prep/__napi_schedule and use bool
-> > from napi_schedule directly where possible.
-> >
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  drivers/net/ethernet/atheros/atlx/atl1.c     | 4 +---
-> >  drivers/net/ethernet/toshiba/tc35815.c       | 4 +---
-> >  drivers/net/wireless/intel/iwlwifi/pcie/rx.c | 4 +---
-> >  3 files changed, 3 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
-> > index 02aa6fd8ebc2..a9014d7932db 100644
-> > --- a/drivers/net/ethernet/atheros/atlx/atl1.c
-> > +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
-> > @@ -2446,7 +2446,7 @@ static int atl1_rings_clean(struct napi_struct *napi, int budget)
-> >
-> >  static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
-> >  {
-> > -       if (!napi_schedule_prep(&adapter->napi))
-> > +       if (!napi_schedule(&adapter->napi))
-> >                 /* It is possible in case even the RX/TX ints are disabled via IMR
-> >                  * register the ISR bits are set anyway (but do not produce IRQ).
-> >                  * To handle such situation the napi functions used to check is
-> > @@ -2454,8 +2454,6 @@ static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
-> >                  */
-> >                 return 0;
-> >
-> > -       __napi_schedule(&adapter->napi);
-> > -
-> >         /*
-> >          * Disable RX/TX ints via IMR register if it is
-> >          * allowed. NAPI handler must reenable them in same
-> > diff --git a/drivers/net/ethernet/toshiba/tc35815.c b/drivers/net/ethernet/toshiba/tc35815.c
-> > index 14cf6ecf6d0d..a8b8a0e13f9a 100644
-> > --- a/drivers/net/ethernet/toshiba/tc35815.c
-> > +++ b/drivers/net/ethernet/toshiba/tc35815.c
-> > @@ -1436,9 +1436,7 @@ static irqreturn_t tc35815_interrupt(int irq, void *dev_id)
-> >         if (!(dmactl & DMA_IntMask)) {
-> >                 /* disable interrupts */
-> >                 tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
-> > -               if (napi_schedule_prep(&lp->napi))
-> > -                       __napi_schedule(&lp->napi);
-> > -               else {
-> > +               if (!napi_schedule(&lp->napi)) {
-> >                         printk(KERN_ERR "%s: interrupt taken in poll\n",
-> >                                dev->name);
-> >                         BUG();
+On 06/10/2023 05:37, Christian Theune wrote:
+> Hi,
 > 
-> Hmmm... could you also remove this BUG() ? I think this code path can be taken
-> if some applications are using busy polling.
+> (prefix, I was not aware of the regression reporting process and incorrectly reported this informally with the developers mentioned in the change)
 > 
-> Or simply rewrite this with the traditional
+> I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script, leaving me with a non-functional uplink on a remote router.
 > 
-> if (napi_schedule_prep(&lp->napi)) {
->    /* disable interrupts */
->    tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
->     __napi_schedule(&lp->napi);
-> }
+> The script errors out like this:
 > 
->
-
-Mhhh is it safe to do so? I mean it seems very wrong to print a warning
-and BUG() instead of disabling the interrupt only if napi can be
-scheduled... Maybe is very old code? The more I see this the more I see
-problem... (randomly disabling the interrupt and then make the kernel
-die)
-
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext=ispA
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext_ingress=ifb0
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe ifb
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe act_mirred
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA root
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2061]: Error: Cannot delete qdisc with handle of zero.
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA ingress
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2064]: Error: Cannot find specified qdisc on specified device.
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 root
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2066]: Error: Cannot delete qdisc with handle of zero.
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 ingress
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2067]: Error: Cannot find specified qdisc on specified device.
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ispA handle ffff: ingress
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ifconfig ifb0 up
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc filter add dev ispA parent ffff: protocol all u32 match u32 0 0 action mirred egress redirect dev ifb0
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ifb0 root handle 1: hfsc default 1
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1: classid 1:999 hfsc rt m2 2.5gbit
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1:999 classid 1:1 hfsc sc rate 50mbit
+> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2077]: Error: Invalid parent - parent class must have FSC.
 > 
-> > diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-> > index 23b5a0adcbd6..146bc7bd14fb 100644
-> > --- a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-> > +++ b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-> > @@ -1660,9 +1660,7 @@ irqreturn_t iwl_pcie_irq_rx_msix_handler(int irq, void *dev_id)
-> >         IWL_DEBUG_ISR(trans, "[%d] Got interrupt\n", entry->entry);
-> >
-> >         local_bh_disable();
-> > -       if (napi_schedule_prep(&rxq->napi))
-> > -               __napi_schedule(&rxq->napi);
-> > -       else
-> > +       if (!napi_schedule(&rxq->napi))
-> >                 iwl_pcie_clear_irq(trans, entry->entry);
+> The error message is also a bit weird (but that’s likely due to iproute2 being weird) as the CLI interface for `tc` and the error message do not map well. (I think I would have to choose `hfsc sc` on the parent to enable the FSC option which isn’t mentioned anywhere in the hfsc manpage).
 > 
-> Same remark here about twisted logic.
+> The breaking change was introduced in 6.1.53[1] and a multitude of other currently supported kernels:
+> 
+> ----
+> commit a1e820fc7808e42b990d224f40e9b4895503ac40
+> Author: Budimir Markovic <markovicbudimir@gmail.com>
+> Date: Thu Aug 24 01:49:05 2023 -0700
+> 
+> net/sched: sch_hfsc: Ensure inner classes have fsc curve
+> 
+> [ Upstream commit b3d26c5702c7d6c45456326e56d2ccf3f103e60f ]
+> 
+> HFSC assumes that inner classes have an fsc curve, but it is currently
+> possible for classes without an fsc curve to become parents. This leads
+> to bugs including a use-after-free.
+> 
+> Don't allow non-root classes without HFSC_FSC to become parents.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
+> Signed-off-by: Budimir Markovic <markovicbudimir@gmail.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Link: https://lore.kernel.org/r/20230824084905.422-1-markovicbudimir@gmail.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Sasha Levin <sashal@kernel.org>
+> ----
+> 
+> Regards,
+> Christian
+> 
+> [1] https://cdn.kernel.org/pub/linux/kernel/v6.x/ChangeLog-6.1.53
+> 
+> #regzbot introduced: a1e820fc7808e42b990d224f40e9b4895503ac40
+> 
 > 
 
-Ehhh here we need to be careful... We can do the usual prep/__schedule
-with the DMA disable in between...
-
-From the comments of iwl_pcie_clear_irq.
-
-	/*
-	 * Before sending the interrupt the HW disables it to prevent
-	 * a nested interrupt. This is done by writing 1 to the corresponding
-	 * bit in the mask register. After handling the interrupt, it should be
-	 * re-enabled by clearing this bit. This register is defined as
-	 * write 1 clear (W1C) register, meaning that it's being clear
-	 * by writing 1 to the bit.
-	 */
-
-So the device disable the interrupt after being fired and the bit needs
-to set again for the interrupt to be reenabled. So the function
-correctly reenable the irq if a napi can't be scheduled... Think there
-isn't another way to handle this.
-
-> >         local_bh_enable();
-> >
-> > --
-> > 2.40.1
-> >
-
--- 
-	Ansuel
+I will take a look,
+Thanks!
 
