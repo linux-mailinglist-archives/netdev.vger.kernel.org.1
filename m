@@ -1,106 +1,102 @@
-Return-Path: <netdev+bounces-38530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09D247BB547
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:32:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D61617BB552
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8FEB282200
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:32:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3B171C209E6
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 10:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC7C11730;
-	Fri,  6 Oct 2023 10:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i122yJp6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC7E63CE;
+	Fri,  6 Oct 2023 10:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4A21C296;
-	Fri,  6 Oct 2023 10:32:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36B4C433C8;
-	Fri,  6 Oct 2023 10:32:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696588322;
-	bh=5Z6FbpvSWqYW39gaTXVzZcm8RSENORgYCe3p8oowV8o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i122yJp6UhVSV7Hdjj8wpNNXk6il2mfCSwwCJB0RRdNsH09OAWKWYgL3/7c8wy/78
-	 AsT5qDEFqxoOireypYBwJHsMKMfetR147tZOrR6o37vhN2Ct/gfv9Z6TuEDAzQf954
-	 CJgW55CphcXv24/erWRLzFKPt9o6OJ3mGy7ouNxw=
-Date: Fri, 6 Oct 2023 12:31:59 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
-Message-ID: <2023100635-product-gills-3d7e@gregkh>
-References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
- <20231006094911.3305152-4-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99D7C1C281
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 10:33:49 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F6F79F
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 03:33:48 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qoi9R-0003Mi-Bu; Fri, 06 Oct 2023 12:33:45 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qoi9O-00BUbQ-I4; Fri, 06 Oct 2023 12:33:42 +0200
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qoi9O-00D3kd-FU; Fri, 06 Oct 2023 12:33:42 +0200
+Date: Fri, 6 Oct 2023 12:33:42 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org,
+	stable@vger.kernel.org, linux-can@vger.kernel.org,
+	kernel@pengutronix.de, Sili Luo <rootlab@huawei.com>,
+	davem@davemloft.net
+Subject: Re: [PATCH net 1/7] can: j1939: Fix UAF in j1939_sk_match_filter
+ during setsockopt(SO_J1939_FILTER)
+Message-ID: <20231006103342.GA3112038@pengutronix.de>
+References: <20231005094639.387019-1-mkl@pengutronix.de>
+ <20231005094639.387019-2-mkl@pengutronix.de>
+ <20231005094421.09a6a58f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231006094911.3305152-4-fujita.tomonori@gmail.com>
+In-Reply-To: <20231005094421.09a6a58f@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Oct 06, 2023 at 06:49:11PM +0900, FUJITA Tomonori wrote:
-> +config AX88796B_RUST_PHY
-> +	bool "Rust reference driver"
-> +	depends on RUST && AX88796B_PHY
-> +	default n
+Hi Jakub,
 
-Nit, "n" is always the default, there is no need for this line.
+On Thu, Oct 05, 2023 at 09:44:21AM -0700, Jakub Kicinski wrote:
+> On Thu,  5 Oct 2023 11:46:33 +0200 Marc Kleine-Budde wrote:
+> > Lock jsk->sk to prevent UAF when setsockopt(..., SO_J1939_FILTER, ...)
+> > modifies jsk->filters while receiving packets.
+> 
+> Doesn't it potentially introduce sleep in atomic?
+> 
+> j1939_sk_recv_match()
+>   spin_lock_bh(&priv->j1939_socks_lock);
+>   j1939_sk_recv_match_one()
+>     j1939_sk_match_filter()
+>       lock_sock()
+>         sleep
 
-> +	help
-> +	  Uses the Rust version driver for Asix PHYs.
+Good point! Thank you for the review.
 
-You need more text here please.  Provide a better description of what
-hardware is supported and the name of the module if it is built aas a
-module.
+@Sili Luo, can you please take a look at this?
 
-Also that if you select this one, the C driver will not be built (which
-is not expressed in the Kconfig language, why not?
-
-> +
->  config BROADCOM_PHY
->  	tristate "Broadcom 54XX PHYs"
->  	select BCM_NET_PHYLIB
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index c945ed9bd14b..58d7dfb095ab 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
->  endif
->  obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
->  obj-$(CONFIG_AT803X_PHY)	+= at803x.o
-> -obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-> +ifdef CONFIG_AX88796B_RUST_PHY
-> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
-> +else
-> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
-> +endif
-
-This can be expressed in Kconfig, no need to put this here, right?
-
->  obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
->  obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
->  obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
-> diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-> new file mode 100644
-> index 000000000000..d11c82a9e847
-> --- /dev/null
-> +++ b/drivers/net/phy/ax88796b_rust.rs
-> @@ -0,0 +1,129 @@
-> +// SPDX-License-Identifier: GPL-2.0
-
-No copyright line?  Are you sure?
-
-thanks,
-
-greg k-h
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
