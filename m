@@ -1,146 +1,129 @@
-Return-Path: <netdev+bounces-38605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AE47BBA46
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:31:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71C07BBA5C
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C364280DBE
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:31:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1381A1C202E8
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4078C15AF4;
-	Fri,  6 Oct 2023 14:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52ED114017;
+	Fri,  6 Oct 2023 14:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kuj+4wnn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ojCqw3Y6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCEC26E0D;
-	Fri,  6 Oct 2023 14:30:57 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3DCD6;
-	Fri,  6 Oct 2023 07:30:56 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-69361132a60so439686b3a.1;
-        Fri, 06 Oct 2023 07:30:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696602656; x=1697207456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I0VsJJBDF3+U7XrumLQnlE/99arpPJYvGpzNWrljfp0=;
-        b=Kuj+4wnnKESRZ6NpOlo7yFN4tAfLWrQldvXpG6OFtopzTpesr2fxhLImAbKxzisQWH
-         2OGg8hxuA4MunBgj3LkiIFNsaH0rYH7bFYk8/glEkskXfvmnWL+mxs8g7cMSqYVO9LUq
-         G5CxRdjuliYJKQBFcgNsLxeRszeqWUSHNOG4xhpfAMRIM5Zmia6px/hLfuEQBObx+Hnr
-         Ak1aPWMZg8M6DN8RYtn4r+lzjULkyX4b7am6vMOCeUaEx9x4OYzG0YhkUpwgIelenbsn
-         jZSQzyXZipw7YCa3awuvaMo8E82arcDRxfNdQOlDNiNq6jkMJSFYQ8UyTU9OG28kRqH1
-         e1yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696602656; x=1697207456;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=I0VsJJBDF3+U7XrumLQnlE/99arpPJYvGpzNWrljfp0=;
-        b=fUX5kqFYWIFwaWJUb+52fiFTZq5SoFKIuzLe4n8MA2+JIF9BI+CECCV1mFquIGt041
-         j97CuJVYhScRbf02/jjrjHglzajPS6aGTS/UElLPhFTf+UXyoVtRNvXeiG/92fb+Q1Ru
-         3v6gODKrXwDOFWSF6x0K2TbePPiBkN5gLWnNG4QyQii7AI7CsGOI2h2OHpxFQwaS1jc9
-         yVM2l+UPVcsS1+czTqkmEBIy1fx7h80e0H3razFljW5BL1sq2NXCCjzg2GlwSX7+W33U
-         eC1LhnAKpQLibKra2pv49+qpK0qcSNmIL1vPh3shWJlQBq1/64mp7B5d2/mQwkB2dgs2
-         +twg==
-X-Gm-Message-State: AOJu0Yz0d9fHPcOq7mJF4CVtImx8WyZjGLVQK+A1s5ogNKKvSL+w20tr
-	whBzd6XT80MisAP51H15tJw5sXz4AFdHOFh9
-X-Google-Smtp-Source: AGHT+IGOR2WMRn9sJtwNCxw6wfQ7Iw8lms8t11f8Aq4zg5lrAfgU0g6b6QR4wuFnSX0JFSbRAdBxVA==
-X-Received: by 2002:a05:6a00:1d22:b0:693:38c5:4d6d with SMTP id a34-20020a056a001d2200b0069338c54d6dmr8841224pfx.2.1696602655583;
-        Fri, 06 Oct 2023 07:30:55 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id z11-20020a6552cb000000b00578afd8e012sm2982624pgp.92.2023.10.06.07.30.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 07:30:55 -0700 (PDT)
-Date: Fri, 06 Oct 2023 23:30:54 +0900 (JST)
-Message-Id: <20231006.233054.318856023136859648.fujita.tomonori@gmail.com>
-To: gregkh@linuxfoundation.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- miguel.ojeda.sandonis@gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FB926E05;
+	Fri,  6 Oct 2023 14:35:37 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83163CA;
+	Fri,  6 Oct 2023 07:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=kKfx47fCkhJedgI0pV3Mmb8FdvLnLdQ41ephI4q9c+E=; b=ojCqw3Y6KzNSAk+wWv0XLorpb7
+	T7EuCyGabZsD/4wkNqC515OAS6v3A6E62xnmE92pTHGnmYYRUjFG3klqs5hT16MTPJvWfMy4JqJgd
+	T7IRzZpgv84R4NdLJu05YgxAn+aIeMyQIJGLMRNQzzblVu9IPg6jxK+8mHu2A7anuZGk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qolvM-0001gK-SS; Fri, 06 Oct 2023 16:35:28 +0200
+Date: Fri, 6 Oct 2023 16:35:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com
 Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <2023100637-episode-espresso-7a5a@gregkh>
-References: <2023100635-product-gills-3d7e@gregkh>
-	<20231006.225325.1176505861124451190.fujita.tomonori@gmail.com>
-	<2023100637-episode-espresso-7a5a@gregkh>
+Message-ID: <19161969-1033-4fd5-9a24-ec21d66c6735@lunn.ch>
+References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+ <20231006094911.3305152-4-fujita.tomonori@gmail.com>
+ <2023100635-product-gills-3d7e@gregkh>
+ <20231006.225325.1176505861124451190.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006.225325.1176505861124451190.fujita.tomonori@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 6 Oct 2023 16:12:24 +0200
-Greg KH <gregkh@linuxfoundation.org> wrote:
-
-> On Fri, Oct 06, 2023 at 10:53:25PM +0900, FUJITA Tomonori wrote:
->> On Fri, 6 Oct 2023 12:31:59 +0200
->> Greg KH <gregkh@linuxfoundation.org> wrote:
->> 
->> > On Fri, Oct 06, 2023 at 06:49:11PM +0900, FUJITA Tomonori wrote:
->> >> +config AX88796B_RUST_PHY
->> >> +	bool "Rust reference driver"
->> >> +	depends on RUST && AX88796B_PHY
->> >> +	default n
->> > 
->> > Nit, "n" is always the default, there is no need for this line.
->> 
->> Understood, I'll remove this line.
->> 
->> >> +	help
->> >> +	  Uses the Rust version driver for Asix PHYs.
->> > 
->> > You need more text here please.  Provide a better description of what
->> > hardware is supported and the name of the module if it is built aas a
->> > module.
->> > 
->> > Also that if you select this one, the C driver will not be built (which
->> > is not expressed in the Kconfig language, why not?
->> 
->> Because the way to load a PHY driver module can't handle multiple
->> modules with the same phy id (a NIC driver loads a PHY driver module).
->> There is no machinism to specify which PHY driver module should be
->> loaded when multiple PHY modules have the same phy id (as far as I know).
+> The Kconfig file would be like the following. AX88796B_RUST_PHY
+> depends on AX88796B_PHY so the description of AX88796B_PHY is enough?
+> I'll add the name of the module.
 > 
-> Sorry, I know that, I mean I am pretty sure you can express this "one or
-> the other" type of restriction in Kconfig, no need to encode it in the
-> Makefile logic.
 > 
-> Try doing "depens on AX88796B_PHY=n" as the dependency for the rust
-> driver.
+> config AX88796B_PHY
+> 	tristate "Asix PHYs"
+> 	help
+> 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
+> 	  AX88796B package.
 
-You meant the following?
+I _think_ you can add
 
-config AX88796B_PHY
-	tristate "Asix PHYs"
-	help
-	  Currently supports the Asix Electronics PHY found in the X-Surf 100
-	  AX88796B package.
+	depends on !AX88796B_RUST_PHY
 
-config AX88796B_RUST_PHY
-	bool "Rust reference driver"
-	depends on RUST && AX88796B_PHY
-	default n
-	help
-	  Uses the Rust version driver for Asix PHYs.
+> config AX88796B_RUST_PHY
+> 	bool "Rust reference driver"
+> 	depends on RUST && AX88796B_PHY
 
+And then this becomes
 
-The problem is that there are NIC drivers that `select
-AX88796B_PHY`. the Kconfig language doesn't support something like
-`select AX88796B_PHY or AX88796B_RUST_PHY`, I guess.
+    	depends on RUST && !AX88796B_PHY
+
+> 	default n
+> 	help
+> 	  Uses the Rust version driver for Asix PHYs.
+
+You then express the mutual exclusion in Kconfig, so that only one of
+AX88796B_PHY and AX88796B_RUST_PHY is ever enabled.
+
+I've not actually tried this, so it might not work. Ideally you need
+to be able disable both, so that you can enable one.
+
+There is good documentation in
+
+Documentation/kbuild/kconfig-language.rst
+
+> >> +ifdef CONFIG_AX88796B_RUST_PHY
+> >> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
+> >> +else
+> >> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+> >> +endif
+> > 
+> > This can be expressed in Kconfig, no need to put this here, right?
+> 
+> Not sure. Is it possible? If we allow both modules to be built, I
+> guess it's possible though.
+
+If what i suggested above works, you don't need the ifdef, just list
+the two drivers are normal and let Kconfig only enable one at most.
+Or go back to your idea of using choice. Maybe something like
+
+choice
+	tristate "AX88796B PHY driver"
+
+	config CONFIG_AX88796B_PHY
+		bool "C driver"
+
+	config CONFIG_AX88796B_RUST_PHY
+	        bool "Rust driver"
+		depends on RUST
+endchoice
+
+totally untested....
+
+	Andrew
 
