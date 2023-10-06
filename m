@@ -1,92 +1,158 @@
-Return-Path: <netdev+bounces-38585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE097BB829
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:54:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2E517BB874
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 15:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06AD32821B5
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:54:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84F2D282219
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 13:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4021F5F5;
-	Fri,  6 Oct 2023 12:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19331F613;
+	Fri,  6 Oct 2023 13:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e+PwAyyl"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aMB5Ynww"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873161D6A8;
-	Fri,  6 Oct 2023 12:54:49 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0434DB;
-	Fri,  6 Oct 2023 05:54:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nj8di1Doiv9HJrh6Mz+/sHoFuT+RYme/VOtqumM9Ryg=; b=e+PwAyylswn4ZzFzOXXg5n30qS
-	TVxssA9K2wZsy0WTjdUlXonYafhPs8bCj73Uy22bvZxmAyl4RJTs0QmeDMf53jc/IxTrK+1J82Mei
-	lgJZx0WtYDz1q/NxJqzqzGlMcrxVFGHw3TYWo98HLfyVjoNVyUk+FtKD8A7JHhIJlTjI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qokLr-008QWN-8k; Fri, 06 Oct 2023 14:54:43 +0200
-Date: Fri, 6 Oct 2023 14:54:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	miguel.ojeda.sandonis@gmail.com, greg@kroah.com
-Subject: Re: [PATCH v2 0/3] Rust abstractions for network PHY drivers
-Message-ID: <6aac66e0-9cbd-4a7b-91e6-ea429dbe6831@lunn.ch>
-References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33AA18AFA
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 13:02:09 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48196ED;
+	Fri,  6 Oct 2023 06:02:00 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 396Clq1s026747;
+	Fri, 6 Oct 2023 13:00:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=EzIkQvdqHkvqU8pfoi8auX9WuaFYkA4CdPiXxhdMDJM=;
+ b=aMB5YnwwdD81Fs/pqdankSbbxB248JstoF0QDgTEXcNgMPh6hDJl4ljJ/elSctI4U3cA
+ odFrSY0WBNjrfkVOIOxdU+C7KTFQrPXFanavJa4aUYjPiKprhYxZ65BfEQgK+ItWNzdH
+ HKjS20ScH6jlpvQgNT+Lbsu7D5kPzb/L94rWRLXESGsGCxlSaBRt1XqcuZ11awQene6s
+ oRMeJk7fL7oRyjZEiKtPYMWNYFJCpIHdhg8eVeKPV5DnFwXrzetDqwzb9jl+YL3rDsQa
+ nmwqGoCeNiLeCdipYkI851Q5t5LbmfDgIwf47BK+Xnzjn5refTy4+P3aEx+h0e1VRSW2 eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tjjj70h27-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Oct 2023 13:00:06 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 396Cm8ur027771;
+	Fri, 6 Oct 2023 12:59:25 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tjjj70edd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Oct 2023 12:59:25 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 396CPqMk017592;
+	Fri, 6 Oct 2023 12:58:53 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tey0pkg8n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Oct 2023 12:58:53 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 396Cwm2G43254510
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 6 Oct 2023 12:58:48 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F17F320043;
+	Fri,  6 Oct 2023 12:58:47 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A4E3D2004B;
+	Fri,  6 Oct 2023 12:58:47 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  6 Oct 2023 12:58:47 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: rdunlap@infradead.org, wenjia@linux.ibm.com
+Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        netdev@vger.kernel.org, raspl@linux.ibm.com, sfr@canb.auug.org.au,
+        alibuda@linux.alibaba.com, wintera@linux.ibm.com,
+        guwen@linux.alibaba.com, tonylu@linux.alibaba.com, jaka@linux.ibm.com
+Subject: [PATCH net] net/smc: Fix dependency of SMC on ISM
+Date: Fri,  6 Oct 2023 14:58:47 +0200
+Message-Id: <20231006125847.1517840-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <d9a2d47d-c8bd-cf17-83e0-d9b82561a594@linux.ibm.com>
+References: <d9a2d47d-c8bd-cf17-83e0-d9b82561a594@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: SG6ZWIKrpDqZYggufCdzL7By_oFzYgj7
+X-Proofpoint-GUID: wzbrlymHai5pgffCHOQI33fNRdJYEgKO
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-06_10,2023-10-06_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=816
+ suspectscore=0 clxscore=1011 malwarescore=0 phishscore=0 spamscore=0
+ adultscore=0 impostorscore=0 priorityscore=1501 lowpriorityscore=0
+ mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310060096
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 06, 2023 at 06:49:08PM +0900, FUJITA Tomonori wrote:
-> This patchset adds Rust abstractions for network PHY drivers. It
-> doesn't fully cover the C APIs for PHY drivers yet but I think that
-> it's already useful. I implement two PHY drivers (Asix AX88772A PHYs
-> and Realtek Generic FE-GE). Seems they work well with real hardware.
+When the SMC protocol is built into the kernel proper while ISM is
+configured to be built as module, linking the kernel fails due to
+unresolved dependencies out of net/smc/smc_ism.o to
+ism_get_smcd_ops, ism_register_client, and ism_unregister_client
+as reported via the linux-next test automation (see link).
+This however is a bug introduced a while ago.
 
-One of the conventions for submitting patches for netdev is to include
-the tree in the Subject.
+Correct the dependency list in ISM's and SMC's Kconfig to reflect the
+dependencies that are actually inverted. With this you cannot build a
+kernel with CONFIG_SMC=y and CONFIG_ISM=m. Either ISM needs to be 'y',
+too - or a 'n'. That way, SMC can still be configured on non-s390
+architectures that do not have (nor need) an ISM driver.
 
-[PATCH net-next v2 1/3] rust: core abstractions for network PHY drivers
+Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
 
-This is described here, along with other useful hits for working with
-netdev.
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/linux-next/d53b5b50-d894-4df8-8969-fd39e63440ae@infradead.org/
+Co-developed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+---
+ drivers/s390/net/Kconfig | 2 +-
+ net/smc/Kconfig          | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+index 74760c1a163b..4902d45e929c 100644
+--- a/drivers/s390/net/Kconfig
++++ b/drivers/s390/net/Kconfig
+@@ -102,7 +102,7 @@ config CCWGROUP
+ 
+ config ISM
+ 	tristate "Support for ISM vPCI Adapter"
+-	depends on PCI && SMC
++	depends on PCI
+ 	default n
+ 	help
+ 	  Select this option if you want to use the Internal Shared Memory
+diff --git a/net/smc/Kconfig b/net/smc/Kconfig
+index 1ab3c5a2c5ad..746be3996768 100644
+--- a/net/smc/Kconfig
++++ b/net/smc/Kconfig
+@@ -2,6 +2,7 @@
+ config SMC
+ 	tristate "SMC socket protocol family"
+ 	depends on INET && INFINIBAND
++	depends on m || ISM != m
+ 	help
+ 	  SMC-R provides a "sockets over RDMA" solution making use of
+ 	  RDMA over Converged Ethernet (RoCE) technology to upgrade
+-- 
+2.39.2
 
-This tag helps patchworks decide which tree to apply your patches to
-and then run build tests on it:
-
-https://patchwork.kernel.org/project/netdevbpf/patch/20231006094911.3305152-4-fujita.tomonori@gmail.com/
-
-I don't know if it made the wrong decision based on the missing tag,
-or it simply does not know what to do with Rust yet.
-
-There is also the question of how we merge this. Does it all come
-through netdev? Do we split the patches, the abstraction merged via
-rust and the rest via netdev? Is the Kconfig sufficient that if a tree
-only contains patches 2 and 3 it does not allow the driver to be
-enabled?
-
-	Andrew
-	
 
