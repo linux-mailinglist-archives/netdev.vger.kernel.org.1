@@ -1,175 +1,227 @@
-Return-Path: <netdev+bounces-38508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A737BB453
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:36:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8047BB45C
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF2D12822D6
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 09:36:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16DFE2821CA
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 09:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C9813AD9;
-	Fri,  6 Oct 2023 09:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF15413ADF;
+	Fri,  6 Oct 2023 09:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2iYMWoU+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QE8HkUK+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D499134A5
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:36:15 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407FF9F
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 02:36:13 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9b98a699f45so328671366b.3
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 02:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696584972; x=1697189772; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cjliP84cNex8iX/xFxD5gf52DEPDu15y5gIQAC9tZlE=;
-        b=2iYMWoU+aCExjHze/1OzDSdmqyFMED0fy7MkSg+2Xi73ClyHY+2wlHpFVlJuTM7soL
-         QJi6s3MVK01jsORCii+jVTh9SgaFGHYb5LJly8uIclKnlu1hb24OJ+06kmCkAW2kRl11
-         J8G5j0pxD7AVjaMXY9Pd53d4fxT+1vqPLvCVWLSXDrhixIj0ge3rGTy+6oaS5nf1qKkR
-         Kit8knS8kfUzIchN9WcVpNEXzAlZ9aXuAk7hXhBFP3Uz6lxE/Bva6lv6XDnu6VYVTbPX
-         VgpY4vNS7SS/35BOvpr3g/lQDQkZYu9xcZyqLQ0Udx+1ng64UwNSjf5SShK776KZ9JIy
-         4UrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696584972; x=1697189772;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjliP84cNex8iX/xFxD5gf52DEPDu15y5gIQAC9tZlE=;
-        b=JJdTbezeDLIvohoharmlDSQC1SCnWf8WUmM/ocRzXuH03XeK6u5NyXMcPMYe5rXdTz
-         ywHONor/L5mFDcgImN5+6MDXIj0tIR134SEYpEkV8EdbNZ3/5rcO3qlASf9hmaUzwXod
-         JRu/yJpP03S3GaoQxTQFK4Mfh/K2oXLX90s/74w8i3cKcRMiUildJUZKVwImPTzqj9lh
-         9hF/XY7BrjfIoJGhUR5A1sNitjCBg+iDwo+qyYEhRWRXgaJxxXge6ZMxanFceVbsMXnF
-         5q6RrzJEZ3udN5LekosfPUUAtmSKGMgUhZorB4PJ+hoLnIjmT0z83/qsQPMAonZbjY3w
-         0sMQ==
-X-Gm-Message-State: AOJu0YyHOHE/5ZLK51m0MtwPmWXQAnv3wLx3d+OyaZim4H8WCLDEHRF3
-	E+TxcPQGhYUBx1+CFkjl7mSLhg==
-X-Google-Smtp-Source: AGHT+IEn7uEu28fsrp34nJlwlapCGvHJ5RfK2gucLzLSWqPEfhDJc/8BoRh2L2YLPNWKqw6h0xyKbw==
-X-Received: by 2002:a17:906:530c:b0:9ae:3f69:9b8c with SMTP id h12-20020a170906530c00b009ae3f699b8cmr7587614ejo.2.1696584971409;
-        Fri, 06 Oct 2023 02:36:11 -0700 (PDT)
-Received: from google.com (61.134.90.34.bc.googleusercontent.com. [34.90.134.61])
-        by smtp.gmail.com with ESMTPSA id g20-20020a17090613d400b009b96e88759bsm2662951ejc.13.2023.10.06.02.36.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 02:36:09 -0700 (PDT)
-Date: Fri, 6 Oct 2023 09:36:05 +0000
-From: Matt Bobrowski <mattbobrowski@google.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
-	Yonghong Song <yhs@fb.com>, Marek Majkowski <marek@cloudflare.com>,
-	Lorenz Bauer <lmb@cloudflare.com>,
-	Alan Maguire <alan.maguire@oracle.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Network Development <netdev@vger.kernel.org>,
-	bpf <bpf@vger.kernel.org>
-Subject: Re: bpf indirect calls
-Message-ID: <ZR_VBYHYKZzHqjb8@google.com>
-References: <87sgo3lkx9.fsf@toke.dk>
- <20191009015117.pldowv6n3k5p3ghr@ast-mbp.dhcp.thefacebook.com>
- <87o8yqjqg0.fsf@toke.dk>
- <20191010044156.2hno4sszysu3c35g@ast-mbp.dhcp.thefacebook.com>
- <87v9srijxa.fsf@toke.dk>
- <20191016022849.weomgfdtep4aojpm@ast-mbp>
- <8736fshk7b.fsf@toke.dk>
- <20191019200939.kiwuaj7c4bg25vqs@ast-mbp>
- <ZRQtsyYM810Oh4px@google.com>
- <CAADnVQJpCe9e2Qrnsaj4+ab47z00-bEYyHhN_mmpCh4+9i17vQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A919125B3;
+	Fri,  6 Oct 2023 09:38:56 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4219F;
+	Fri,  6 Oct 2023 02:38:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696585135; x=1728121135;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=KDZzYJDlF1tjy9kEed1WOMPAgjiIxlC0srjk2wI/LzM=;
+  b=QE8HkUK+wxoTUFd/PzTqjYISWQFVxGy18hxSm8/ObALXVha5Wd878E55
+   rD2m5ziSXA/fuuXP/w1l2EMQazor/2ixJI/vdDeinIeoWpihmFQfUOr9E
+   7AX45m35rJIVFuxgjMKJSGmIRnwGGotY9czAQ+fJBoQeReix3myKP1HAn
+   6idv+SKDKijxoQHWEgKnnespqQ7QO0yGk2EjGLe4643I6Ws7K9K+96PXm
+   2CRuH0k4S5956j2Adqm3DaBlI4nMGNBvnzlXnx4JZ0FQZm8Ky0AHEYCeb
+   ZKofMPNP1Ox2YWexAdKIq90H3Fju6AKYTx4VdNrw4eS/tbqAc7Y4AEMCL
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="469987496"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="469987496"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 02:38:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="822447021"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="822447021"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Oct 2023 02:38:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 6 Oct 2023 02:38:52 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 6 Oct 2023 02:38:52 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.44) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 6 Oct 2023 02:38:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jF73cp86yAqc/lvZBaVmONpK3bbo5MsCxtUwGiJ5pL12qqjFk3bmuf/3FnzkX6aOSH1BjUyZOLT3kYi83mwWBn+PsysyTBgq5EyHDKff/ESFWCQc+Mr2Nr3ixP0QZvjJa6VmtMzh71RkGwIVcE5mGq2rT7afceFh/VUAte9UEUxmSMKK7qtWrN+QAAViiJRJHwOlsk7gAp5eXeb8Dn4IQlu1T21DGyFfw2etYnhILo+fZQZ72wk3KuaRlLA9VHYk5lAWlFlPWlRe/8cWsJp4BJ7498n43LAPQD4cZJHQNDvhNaLeu/V+D9bWX5H/nw3Aqfly2JVhJIVN6AACS/hVsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sefaXW9mo0g6avM1v9SU964V67TH7RCJJcCWUz0uBZ0=;
+ b=OXX1IpLP0uP02UjBeDtZHM/62QSG41jHAi383oq3p0Z2lRVEj8OcZ+xr4RQlw7uszQc4e4u5bf8AfqQ3uKLVN3gyZpj2xnAfJQICVdJE3p477a+telTau2nll2wvgJ5JTZEPe2DnXghwk7VIoKbr6xj8a0T7Qdj1y4Gw0bChd8PlkNsU6J2dJtoSuoeSerS6SOPed7/RpRC5GyHBnLM45o19cP90RrQeS8JGuiUZkyclP9I00VNRpB4hwCHSfjOppI3It/4HM+fstcrqP6gu52lOiWKrdlEfXSAWMIj3Lxd01w8OAWYMaxbaJIio3dZExBYJPt5pkaTyCBnNcJ9Hiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SN7PR11MB7705.namprd11.prod.outlook.com (2603:10b6:806:32f::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.37; Fri, 6 Oct
+ 2023 09:38:50 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::bede:bd20:31e9:fcb4]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::bede:bd20:31e9:fcb4%7]) with mapi id 15.20.6768.029; Fri, 6 Oct 2023
+ 09:38:50 +0000
+Message-ID: <2bd3fad0-a109-838e-a495-f0ac27286c04@intel.com>
+Date: Fri, 6 Oct 2023 11:37:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2] net: dsa: lan9303: use ethtool_sprintf() for
+ lan9303_get_strings()
+To: Justin Stitt <justinstitt@google.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>, Kees Cook
+	<keescook@chromium.org>
+References: <20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0015.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1d::13) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQJpCe9e2Qrnsaj4+ab47z00-bEYyHhN_mmpCh4+9i17vQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SN7PR11MB7705:EE_
+X-MS-Office365-Filtering-Correlation-Id: a53b8202-1ae6-42f1-868f-08dbc6500ab6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 249xHO8KCa+5hiArOyHsWuDwOL9sWVdqhaGNziGdTlxBVcVMPJGRQa4T6YtonRX/YbJrLz3kUcXZpDVzgcOYZpNYjTP0cmft3BSzUCazWT+gJIDpN9skVqjGOZwxhFwJErswUMJwUfcn+NtG44bFXR9AlV/IL6tuBft0wfH/cpEBaU5/RhUy5V89My3pX9BeFTJZhK43YwhivorqHoPlMOFt1exkWcTcVwxXmgvjpvldY/zjpSC80ZoBEIsTimR4qc/1PuDepm5ePH4Qe0nxTvyUywtoGf/6xFc3pXB8PgvFphHZWfCARPDZMJo2Q+D7qLGuGP7B0U5ZdbSdc6573osR+yg+aP+EJFI3/BbfsU2ZXxzOPK++m7RKX8SSV7x7vYIMRAxn/Y+f7LoZTVyCW5f/BrnA8WmCPI0+UvLWsAXgskjG9QFIDVMOz/GPYmmV9Mcj+eDQDnZOJ738++TMDQcWvQ+mFQR7QjdQzAZrCDsamwmi4PAlhngpOcxBHnTTsDNiWBKWHDYdhZ99uaKbvI/S0fLidvysGR9hMHfS63qYeTxK2SslhAWZ6Rqe05Tasdbf5MENCnaQAemT8I3C99aFxkeM6gESIEmIkZ+3yfS5St5q6kUApsfAR+C7CfI9kLhpSRI9TyQTN1ByI51D7w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(376002)(366004)(396003)(136003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(31686004)(6506007)(6486002)(478600001)(6666004)(6512007)(86362001)(38100700002)(82960400001)(31696002)(2906002)(26005)(2616005)(7416002)(36756003)(66946007)(8936002)(66476007)(4326008)(66556008)(6916009)(54906003)(5660300002)(316002)(41300700001)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dEloNVZBNVl6UjArZThaQ3RoMDBZOFhpdHpkb3FmU1F5WFpKMlBOM0RwdWNk?=
+ =?utf-8?B?M203YVgvb3MzakFNTjZldis2SFowOWxsd0VQS0pockNwamVSbTdqR2MrZXA1?=
+ =?utf-8?B?N2ZXMGhCSE45ZTY4TldYbU03VWs4QWsveEdRL2h3bU0wQTNUSW5odWtWL2pE?=
+ =?utf-8?B?TlFGQndUZTRlVndwUHpqeFRZbWhYOGlRRlY5WnFjTmxlaW1WU1hsczdnKzJa?=
+ =?utf-8?B?R2p3aFQ5R2FaQkRCaHdQaWVHOGVxcTdybkFhbElxNlRJZ0IxdTF0MWVIWG1W?=
+ =?utf-8?B?L1hBMkJaMDJRc2lrZXFsNlB1MzJabXVNcGQxQUhDSWllTThRWEMzMlNIOFRV?=
+ =?utf-8?B?bmYzVDljZ2FBSkMvdENwL0dYeEwzdUVteGFMQUJlV3ZobFIwSkRyS1F5bGtG?=
+ =?utf-8?B?ZlFvamdnUy9JWmEvaTZISytENmdLV0ovakpYYk1kUUFvMWFvR084TjFVSEoz?=
+ =?utf-8?B?b2ZBamlIbUc2ZjJ0TndLcVdQL2c5aDRaZDEvbGM4UTRTemFENzVWcUU2MDBa?=
+ =?utf-8?B?U0RQb05CbzVGU3FJNnBnb3lKbkZtOGNYRDR4dTZvMWdHeUxXT3FKNzZSUnBi?=
+ =?utf-8?B?ZmdncDhkZEVqSUdGWklVTEIrbWFsWlk3SnRvd3YyQkhhb1BXVGloOFNRbXYy?=
+ =?utf-8?B?ZUh5KzNkanN3eUZMSXJXUmpGa3k4WHhKUnRLYXRIb2d3NHJLRE8vZlFKaEVu?=
+ =?utf-8?B?c1N6MzJpZm5Pc0dKV2pzMmcwSFlrcTV0MUU5aC92WDZxTGQwb1lZYWxaYWRC?=
+ =?utf-8?B?RnNRQ20xL0l0OU9RWStkeGRzVkhTam5pd3hPclVULyswOXRwdWNLcW1PMzdU?=
+ =?utf-8?B?Z1ZsdDc4dTAvWUxadkJHZTVOVWtyd1BVTEhEVnVsRzMzZk1PQ2pjMjFjaUFk?=
+ =?utf-8?B?NDQvYUV2ZEtRUHRkb1RjNVJkMEdxNE5TZDZwWXMzQmZTd3E0NTNzek5vR00y?=
+ =?utf-8?B?a2lES1JJU0FRdGNNQWZzVDZwWk9zUjRiWWJUUXVHdHl3d1ZBWmxDakczenMw?=
+ =?utf-8?B?WThzUloycCtWa2lqeWxjdUtQR0ZVdlJEekJWMzQrNXJwbjl0WStsYVdVNnQv?=
+ =?utf-8?B?UFNZVVRzTjJqTFAzRUhpK0JlaHJmNVBKQmRrTVNiY3hDRmNzWGdGWml2ZC8v?=
+ =?utf-8?B?Q2JjMFZWaXhjdE91R1F6UzNQeDlCTktzbjRlYnFmUXpLZXhUVVg1VUR5Qmg4?=
+ =?utf-8?B?NVlmRW5hemRjTHRzNk5ocmhmYTBxME1FS2FEZnB0S2ZJNytqRWtmdUlzM2pN?=
+ =?utf-8?B?MldEblJPQUJKK0gzMERYUE0zK1lqa2FPT1FjaDcwRHREaUM2TXgybUc3TjZV?=
+ =?utf-8?B?Y2Rmbm9MVjBRVklBUjdhUVFEekNycitUb1pXQ0lEZFVURzVWYm1LK0hGRXBn?=
+ =?utf-8?B?V0NxUENxWHdkVmk2Y2ZPZU5oSnFIbFlNWUNDQjdHWllXbStmd29JWTc1S0VU?=
+ =?utf-8?B?bjJTbkc5YXhqT1RDem4weXpsVDhjYzMxbllVRi9XUHRkYzI4OHpLelo5R3lR?=
+ =?utf-8?B?ZHJXN0NDSThhODFZSTFNdEJSUWFLb2VhNFZsa3BXV0NPemVlT2UyWFkveG9Y?=
+ =?utf-8?B?UGsyU2thQ1NhWGJ4RFExOU1nQS9DZnpxelo1eEo5YW1PN0tLamtFVExtOVVu?=
+ =?utf-8?B?eUdBZFdDdjExblJlM045b1lwNzNNU3o5WWI2dGkyWFBpQm9WcmpCcHZ0NURH?=
+ =?utf-8?B?S0N0NkdCYlBtT2dmcXFYaGVFMytVSDU5YmxDaEI4SkdXZkZXS0NHL1BoZEFi?=
+ =?utf-8?B?NG1nNnNtMWpXQndRUUh1Tzl4SWFneW9hVmw3UXlsSVNBR00wc2hLZmlXVFl5?=
+ =?utf-8?B?TENxdjRONUZxL2F4QjlPVmh5Q2s0YWFDRnRBL2FjM1QrSmRKQ3FtalozZ1VM?=
+ =?utf-8?B?ak9QZ2hFVndYOW1XL1FPK2JodjZRdDhKTlYyNm1MUXZPZ3VEeExITkg5S0s4?=
+ =?utf-8?B?cFY4ektYVnZNNnpQZGxnWEQwYlgwZWcyVEg5aFJCeFQ5Z2V5VFpnaTF0bHFq?=
+ =?utf-8?B?RkJYbUprVFhGMmU1MCtlZlY0eUd5SWxjUXpvdFgxVmp2aWVrSHJoUVVWV3Vu?=
+ =?utf-8?B?RHgrV1JmYUU3dFF3QTAxVnM2bWJicFg2dzB1QVN4OGw1UG9xdE5wVmM4dmFu?=
+ =?utf-8?B?ZGx1L1Qwd2R5TmpQeEc3RmlUU1lQSVZsbGd5UzZiMExoNFptTDEzQjFoSGpq?=
+ =?utf-8?B?Nnc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a53b8202-1ae6-42f1-868f-08dbc6500ab6
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Oct 2023 09:38:48.6892
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CfQECaMuZpwEm7nx0hogHSM86np/jxOLK7HEt3pnIxXO44r8aDdkJMrdlJNS1HWL8wHR1Q1u9Wf9hXX/iDHnOpyYH1B98zcvzyMxYoYbBKU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7705
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Sep 29, 2023 at 02:06:10PM -0700, Alexei Starovoitov wrote:
-> On Wed, Sep 27, 2023 at 6:27 AM Matt Bobrowski <mattbobrowski@google.com> wrote:
-> > static void testing(void) {
-> >   bpf_printk("testing");
-> > }
-> >
-> > struct iter_ctx {
-> >   void (*f) (void);
-> > };
-> > static u64 iter_callback(struct bpf_map *map, u32 *key,
-> >                          u64 *value, struct iter_ctx *ctx) {
-> >   if (ctx->f) {
-> >     ctx->f();
-> >   }
-> >   return 0;
-> > }
-> >
-> > SEC("lsm.s/file_open")
-> > int BPF_PROG(file_open, struct file *file)
-> > {
-> >   struct iter_ctx iter_ctx = {
-> >     .f = testing,
-> >   };
-> >   bpf_for_each_map_elem(&map, iter_callback, &iter_ctx, 0);
-> >   return 0;
-> > }
-> > ```
-> ...
-> > The fundamental difference between the two call instructions if I'm
-> > not mistaken is that one attempts to perform a call using an immediate
-> > value as its source operand, whereas the other attempts to perform a
-> > call using a source register as its source operand. AFAIU, the latter
-> > is not currently permitted by the BPF verifier. Is that right?
+From: Justin Stitt <justinstitt@google.com>
+Date: Thu, 05 Oct 2023 18:56:50 +0000
+
+> This pattern of strncpy with some pointer arithmetic setting fixed-sized
+> intervals with string literal data is a bit weird so let's use
+> ethtool_sprintf() as this has more obvious behavior and is less-error
+> prone.
+
+[...]
+
+> diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
+> index ee67adeb2cdb..95a8e5168c2a 100644
+> --- a/drivers/net/dsa/lan9303-core.c
+> +++ b/drivers/net/dsa/lan9303-core.c
+> @@ -1007,14 +1007,14 @@ static const struct lan9303_mib_desc lan9303_mib[] = {
+>  static void lan9303_get_strings(struct dsa_switch *ds, int port,
+>  				u32 stringset, uint8_t *data)
+>  {
+> +	u8 *buf = data;
+
+Is it needed here? I thought you could pass @data directly to
+ethtool_sprintf(), if it doesn't mind.
+
+>  	unsigned int u;
+>  
+>  	if (stringset != ETH_SS_STATS)
+>  		return;
+>  
+>  	for (u = 0; u < ARRAY_SIZE(lan9303_mib); u++) {
+> -		strncpy(data + u * ETH_GSTRING_LEN, lan9303_mib[u].name,
+> -			ETH_GSTRING_LEN);
+> +		ethtool_sprintf(&buf, "%s", lan9303_mib[u].name);
+>  	}
+>  }
+
+Either way, this was a nitpick, so
+
+Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+
+>  
 > 
-> Correct. Indirect calls via 'callx' instruction are not supported yet.
-> Please use bpf_tail_call() as a workaround for now.
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231005-strncpy-drivers-net-dsa-lan9303-core-c-6386858e5c22
+> 
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+> 
 
-Noted.
-
-> Over the years the verifier became progressively smarter and maybe
-> now is a good time to support true indirect calls.
-
-This is something that I wouldn't mind exploring myself as a little
-research/contribution project. Would you object to me taking this on?
-I feel as though this would give me an opportunity to develop a better
-understanding when it comes to the internals of the BPF subsystem.
-
-> For certain cases like your example above it's relatively easy to
-> add such support, but before we do that please describe the full use
-> case that you wanted to implement with indirect calls.
-
-For the specific example I provided above, using indirect calls was an
-approach that I considered using within one of our BPF programs in
-order to work around this [0] specific BPF verifier shortcoming. For
-the workaround, I needed to implement 2 BPF programs that more or less
-done the same thing using the same set of routines, but differed ever
-so slightly for one particular routine. The way I envisioned
-controlling that one small difference between the 2 BPF programs is by
-supplying in different function pointers within the iteration context
-passed to bpf_for_each_map_elem(), but I quickly figured out that it
-wasn't possible and now I'm left with some highly undersirable code
-duplication across the 2 BPF programs. Understandably, this was an
-incredibly trivial and niche use case where using indirect calls would
-nicely solve this kind of problem, but I'm almost certain I could find
-other places where using indirect calls would be considered incredibly
-useful.
-
-[0] https://lore.kernel.org/bpf/CAADnVQLkB4dkdje5hq9ZLW0fgiDhEWU0DW67zRtJzLOKTRGhbQ@mail.gmail.com/
-
-/M
+Thanks,
+Olek
 
