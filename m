@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-38582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6497BB7FD
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:41:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B198A7BB814
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:49:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD1331C20868
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E20671C2098F
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A820D1CF9A;
-	Fri,  6 Oct 2023 12:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBBF1D69F;
+	Fri,  6 Oct 2023 12:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i3nyjPTW"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AerCDRue"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BA3C1D55B
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:41:45 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F9DCF
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 05:41:43 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-533d6a8d6b6so3821823a12.2
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 05:41:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5CC1CA93
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:49:45 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D7EBC6
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 05:49:44 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4056ce55e7eso18622475e9.2
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 05:49:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696596102; x=1697200902; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1696596582; x=1697201382; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mW5SVktj2xUWf9LqoXpgBXu7K2ICps52XbOnVUo46IM=;
-        b=i3nyjPTWpnkWzEj/THfuRj8o7jQ0jJ8ceI69hsiWJFd768iOkaw8kuB7wlZU6mfcLW
-         5C5mnnWwdyCDvlhh2+rQw3gclpLMQZMdOz9PCE4PhkkfKGit/74f5Tf388rn1kWm1Y12
-         +m6OKTK7U+7Jg1mZCgOfMI+Z+y9JXFG3jZOuONhZ8wDjIyNJcw+dczZl/XrlUq3QSMoV
-         SMo/E2zgkzLLTMqqmwaKjk+7NSYLZnVqaPSpjn0jVHB08zuoDJLZnVGaJQ0vKaXBa3np
-         LklUdg5XDDdmUFCRRHkvu8yyMNRSPOdl0yzlGIwnSNdyLjbSzPeqZreCzetssCzlpzOq
-         RyqA==
+        bh=oHjBNst/lhil+UcE/qDI5coR6SVyilLvcP6sMcHytls=;
+        b=AerCDRuezhOwH+X4RX6pC/yUdwS9mqzaDmw52jg11c8+LY2ymgKBsep2sXcM5rMMfY
+         hO6PZsME6MzRHbrJrR4tfgjiV9vb01eNZJ5UBpZpEEBKSwtuzcCknMl3qxJyFKENZhN2
+         OHWcE7li7dyfZuumlRHOoYaOvmB5Xgsswoc+Jnts06mTsqxoS/oUGG9J7ZsSs46Imeig
+         3LwLB1rr5uscUfbn1c/YqEJoYFeNYGaIek6egfls9BWkixBSxOG8l6ucGBHczSWT3U+D
+         BhGi+FdJ5OfxBnU4XluFomXgk82vggNYHJXRG1nTFzUuoSJmMC0p4JMf4EGqwPgij6yE
+         TIcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696596102; x=1697200902;
+        d=1e100.net; s=20230601; t=1696596582; x=1697201382;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mW5SVktj2xUWf9LqoXpgBXu7K2ICps52XbOnVUo46IM=;
-        b=KpLdHaEWAxkbKkf758YOoN0SAoMLlfGDvuPqj6lbO66nVDq6giw2Unz071lh5wtrDq
-         Qnvd3PyBqV2mtGLxXGx9TzpCtHl4MfNPVhROh0iFnp9xTH46vMj/c6DrDcCpW5CHYBqc
-         PeZ0b0lQvr5ixtvXatAhO5lCLJTRQQXdsS6+uhY3aQ+ibIDQSfhr9xRjJ0Y4GnPRPg9u
-         rNXaKMS99Ya9f21QJJmHNWxtS5mLutCy1PTDWRfb8eov/0TtY0oDRpgNr0pqPT5lys6H
-         XEZMhvbaDApIYgYBr/Xv6rGaIFqkBGdElKvIbjZTyDMulXlcfIquoVSaWzLAkGt39DET
-         ekqw==
-X-Gm-Message-State: AOJu0Yz4CsKqcD63b7G4bXwEiaAvxa009GEjqesUsp/W8kbR71otWVM1
-	za4rqyqP7PMK/9B2uRjR4d5Qi+5Xexfdj6DlmzA9OA==
-X-Google-Smtp-Source: AGHT+IGDzND6oeHj41td9dY/OmMaIkCdkLJphE1fmDDVPuSEB4VwAnf7dRKhLynRWUzgKd6WFcyYhw==
-X-Received: by 2002:a17:907:b10:b0:9aa:e08:9fb7 with SMTP id h16-20020a1709070b1000b009aa0e089fb7mr6240513ejl.76.1696596102024;
-        Fri, 06 Oct 2023 05:41:42 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id oz10-20020a170906cd0a00b009ad8acac02asm2849794ejb.172.2023.10.06.05.41.40
+        bh=oHjBNst/lhil+UcE/qDI5coR6SVyilLvcP6sMcHytls=;
+        b=ZOxfhdrnWIWrxG3oohExdkNHd9yBsaomoot5owbL5PICMhceDPbtzZAfmDTkKfdJj8
+         lJv7QXHdL2x9/QGki6UkozOe4r9ubpw0O9wwx9erxMqLggML9G2XHhToSZE0LA9MWzZw
+         s8/TIk8Lfrvik769A/56jDHZg0VynoSAiR81JzopFHDgU8VINjohER+gyEpV89I1yTmt
+         ABcL/yZb401TAsALBjdjpN1YWMPciO8xvIbpfuf0EfLjurTas1k2V2zh886KMyh94XZd
+         uDdOgTZrnmfjvZCP7ah8TScKTdQY9eBlrLNmcD2Uh+RuZFR9xZa3NwkND1ECGmiCClUg
+         AQyA==
+X-Gm-Message-State: AOJu0YymLkfmVA2WeoE8VgOJSdoQUK5uV6M5uRc11E3+PhIF7cNiHK/A
+	J3cbgtfy0iiWvIs0T/5uZv0elvnFZN1R6++6qsI=
+X-Google-Smtp-Source: AGHT+IErZT4Z9JOnQab8/UPM9P5VYK8b44c4GNP61Z9e5SRanKoOeNOUL0LBngvKhNZHSCtY36Ax5g==
+X-Received: by 2002:adf:ecd2:0:b0:317:e1fb:d57b with SMTP id s18-20020adfecd2000000b00317e1fbd57bmr6910194wro.56.1696596582480;
+        Fri, 06 Oct 2023 05:49:42 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id v7-20020adfedc7000000b003197efd1e7bsm1563290wro.114.2023.10.06.05.49.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 05:41:41 -0700 (PDT)
-Date: Fri, 6 Oct 2023 14:41:39 +0200
-From: Jiri Pirko <jiri@resnulli.us>
+        Fri, 06 Oct 2023 05:49:41 -0700 (PDT)
+Date: Fri, 6 Oct 2023 15:49:39 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Simon Horman <horms@kernel.org>
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v3 4/5] ice: dpll: implement phase related
- callbacks
-Message-ID: <ZSAAg39SzlDS55Kn@nanopsycho>
-References: <20231006114101.1608796-1-arkadiusz.kubalewski@intel.com>
- <20231006114101.1608796-5-arkadiusz.kubalewski@intel.com>
- <ZR/+noRCdnsy6QJo@kernel.org>
+Cc: Greg Rose <gregory.v.rose@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] ixgbe: fix crash with empty VF macvlan list
+Message-ID: <569ba96b-2bc3-45ea-b397-36e7ef88ed8f@kadam.mountain>
+References: <3cee09b8-4c49-4a39-b889-75c0798dfe1c@moroto.mountain>
+ <ZR/si/di5IbSB9Gq@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,106 +81,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZR/+noRCdnsy6QJo@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <ZR/si/di5IbSB9Gq@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Oct 06, 2023 at 02:33:34PM CEST, horms@kernel.org wrote:
->On Fri, Oct 06, 2023 at 01:41:00PM +0200, Arkadiusz Kubalewski wrote:
->> Implement new callback ops related to measurment and adjustment of
->> signal phase for pin-dpll in ice driver.
->> 
->> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->
->Hi Arkadiusz,
->
->some minor feedback from my side.
->
->If you do end up re-spinning the series, please consider
->running checkpatch.pl --codespell.
->
->> ---
->>  drivers/net/ethernet/intel/ice/ice_dpll.c | 224 +++++++++++++++++++++-
->>  drivers/net/ethernet/intel/ice/ice_dpll.h |  10 +-
->>  2 files changed, 230 insertions(+), 4 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
->
->...
->
->> +/**
->> + * ice_dpll_phase_offset_get - callback for get dpll phase shift value
->> + * @pin: pointer to a pin
->> + * @pin_priv: private data pointer passed on pin registration
->> + * @dpll: registered dpll pointer
->> + * @dpll_priv: private data pointer passed on dpll registration
->> + * @phase_adjust: on success holds pin phase_adjust value
->
->nit: The parameter is called phase_offset, not phase_adjust in the code below
+On Fri, Oct 06, 2023 at 01:16:27PM +0200, Simon Horman wrote:
+> On Thu, Oct 05, 2023 at 04:57:02PM +0300, Dan Carpenter wrote:
+> > The adapter->vf_mvs.l list needs to be initialized even if the list is
+> > empty.  Otherwise it will lead to crashes.
+> > 
+> > Fixes: c6bda30a06d9 ("ixgbe: Reconfigure SR-IOV Init")
+> 
+> Hi Dan,
+> 
+> I see that the patch cited above added the line you are changing.
+> But it also seems to me that patch was moving it from elsewhere.
+> 
+> Perhaps I am mistaken, but I wonder if this is a better tag.
+> 
+> Fixes: a1cbb15c1397 ("ixgbe: Add macvlan support for VF")
+> 
 
-Yeah, the non-sense static function docs and how buggy they are. Nobody
-reads them anyway. Same old story for ice I guess....
+Yeah.  You're right.  I'll resend.
 
 
->
->> + * @extack: error reporting
->> + *
->> + * Dpll subsystem callback. Handler for getting phase shift value between
->> + * dpll's input and output.
->> + *
->> + * Context: Acquires pf->dplls.lock
->> + * Return:
->> + * * 0 - success
->> + * * negative - error
->> + */
->> +static int
->> +ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
->> +			  const struct dpll_device *dpll, void *dpll_priv,
->> +			  s64 *phase_offset, struct netlink_ext_ack *extack)
->> +{
->> +	struct ice_dpll *d = dpll_priv;
->> +	struct ice_pf *pf = d->pf;
->> +
->> +	mutex_lock(&pf->dplls.lock);
->> +	if (d->active_input == pin)
->> +		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
->> +	else
->> +		*phase_offset = 0;
->> +	mutex_unlock(&pf->dplls.lock);
->> +
->> +	return 0;
->> +}
->> +
->>  /**
->>   * ice_dpll_rclk_state_on_pin_set - set a state on rclk pin
->>   * @pin: pointer to a pin
->
->...
->
->> @@ -1656,6 +1867,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
->>  				return ret;
->>  			pins[i].prop.capabilities |=
->>  				DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE;
->> +			pins[i].prop.phase_range.min =
->> +				pf->dplls.input_phase_adj_max;
->> +			pins[i].prop.phase_range.max =
->> +				-pf->dplls.input_phase_adj_max;
->> +		} else {
->> +			pins[i].prop.phase_range.min =
->> +				pf->dplls.output_phase_adj_max,
->
->nit: It probably doesn't make any difference, but perhaps ',' should be ';'.
->
->As flagged by clang-16 with -Wcomma
->
->> +			pins[i].prop.phase_range.max =
->> +				-pf->dplls.output_phase_adj_max;
->>  		}
->>  		pins[i].prop.capabilities |=
->>  			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
->
->...
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > ---
+> >  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> > index a703ba975205..9cfdfa8a4355 100644
+> > --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> > +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+> > @@ -28,6 +28,9 @@ static inline void ixgbe_alloc_vf_macvlans(struct ixgbe_adapter *adapter,
+> >  	struct vf_macvlans *mv_list;
+> >  	int num_vf_macvlans, i;
+> >  
+> > +	/* Initialize list of VF macvlans */
+> > +	INIT_LIST_HEAD(&adapter->vf_mvs.l);
+> > +
+> >  	num_vf_macvlans = hw->mac.num_rar_entries -
+> >  			  (IXGBE_MAX_PF_MACVLANS + 1 + num_vfs);
+> >  	if (!num_vf_macvlans)
+> > @@ -36,8 +39,6 @@ static inline void ixgbe_alloc_vf_macvlans(struct ixgbe_adapter *adapter,
+> >  	mv_list = kcalloc(num_vf_macvlans, sizeof(struct vf_macvlans),
+> >  			  GFP_KERNEL);
+> >  	if (mv_list) {
+> 
+> I'm not sure it it is worth it, but perhaps more conventional error
+> handling could be used here:
+> 
+> 	if (!mv_list)
+> 		return;
+> 
+> 	for (i = 0; i < num_vf_macvlans; i++) {
+> 		...
+
+I mean error handling is always cleaner than success handling but it's
+probably not worth cleaning up in old code.  I say it's not worth
+cleaning up old code and yet I secretly reversed two if statements like
+this yesterday.  :P
+https://lore.kernel.org/all/d9da4c97-0da9-499f-9a21-1f8e3f148dc1@moroto.mountain/
+It really is nicer, yes.  But it just makes the patch too noisy.
+
+regards,
+dan carpenter
+
 
