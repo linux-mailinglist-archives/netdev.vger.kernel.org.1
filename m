@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-38690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00267BC266
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 00:47:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CA47BC268
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 00:47:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8029828189C
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 22:47:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 940DC1C209F2
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 22:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1026F38F86;
-	Fri,  6 Oct 2023 22:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08E13C6B5;
+	Fri,  6 Oct 2023 22:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZEqwDaNs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E2inWBDO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298E21CA82
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 22:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119591CA82
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 22:47:52 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C45A6;
-	Fri,  6 Oct 2023 15:47:46 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE388A6;
+	Fri,  6 Oct 2023 15:47:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696632466; x=1728168466;
+  t=1696632471; x=1728168471;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=32akxHSYhb17D+XQtNXel6BwEp9EweKFmYRPZqxIveM=;
-  b=ZEqwDaNsOutjV1XqFFzHvENYgerYgNubn0sOoORqGO+9W3rQfdXlPwUf
-   aIKys78bnyt/o22DzMTh4N4V7Gu+wRUp7e1qNBjQqPFDQ9LAEy+P8H+Yo
-   DfVaF8J4wkUoxsttak4FRntVrZfpUtH7f4fiqn5iOv/VOy52FqdyAL8cK
-   0i++hL0J43mHmfQgymaVajGrffNKYGGrOXKGv7FMvcKRO+9h7VkGBJWpR
-   34TW9Ycxl3/F556dCEzSzc9gwxRUBcJV+KSgZ6G72M3MWNm3GKeTKmfj4
-   FP7zwPN4bNZGd2RhxC1Q/H+2hz2z4djM3NK/m85kdEzEv5Be1kDfpUYiD
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="363201059"
+  bh=NM9EE9HTl9rWpj1CsHsY211ttABfbYDKg9zIqN+1XE4=;
+  b=E2inWBDOfiG2WIRuLW8sw9TWbSAUwmYRbpdXlmCZ5xpFv1gjswzfY2iI
+   a+hgfX4d1acAPICz1mXlAK2BZA2touW140mGeXHeOv5U3w2zB9lhrh1SH
+   6XViHHs6OzdKkas26XdowcBkwWdIlbR0L6c3L9+gXGGZjdDUwK4cqFCJj
+   K8zFr6W4DFdlIbNtGsz39UqrS7X03UqfPG13xS7WGkIZ8XRO36waYzB2N
+   aAgaYeHPla/F3oHCD9B8g5MVqATC3Ze0F1+8shmysRwEvC9lSOrU3YPCS
+   6ct1PAe6OCSOE2TTfk2N7i73m9io7i/48vpPd9hgzACiwJCxiz40uHQbp
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="363201091"
 X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="363201059"
+   d="scan'208";a="363201091"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 15:47:46 -0700
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 15:47:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="1083610304"
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="1083610336"
 X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="1083610304"
+   d="scan'208";a="1083610336"
 Received: from dianaman-mobl1.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.35.113])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 15:47:41 -0700
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 15:47:46 -0700
 From: Ahmed Zaki <ahmed.zaki@intel.com>
 To: netdev@vger.kernel.org
 Cc: intel-wired-lan@lists.osuosl.org,
@@ -64,9 +64,9 @@ Cc: intel-wired-lan@lists.osuosl.org,
 	mkubecek@suse.cz,
 	Ahmed Zaki <ahmed.zaki@intel.com>,
 	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH net-next v2 1/6] net: ethtool: allow symmetric RSS hash for any flow type
-Date: Fri,  6 Oct 2023 16:47:21 -0600
-Message-Id: <20231006224726.443836-2-ahmed.zaki@intel.com>
+Subject: [PATCH net-next v2 2/6] ice: fix ICE_AQ_VSI_Q_OPT_RSS_* register values
+Date: Fri,  6 Oct 2023 16:47:22 -0600
+Message-Id: <20231006224726.443836-3-ahmed.zaki@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231006224726.443836-1-ahmed.zaki@intel.com>
 References: <20231006224726.443836-1-ahmed.zaki@intel.com>
@@ -76,7 +76,6 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
@@ -84,81 +83,93 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Symmetric RSS hash functions are beneficial in applications that monitor
-both Tx and Rx packets of the same flow (IDS, software firewalls, ..etc).
-Getting all traffic of the same flow on the same RX queue results in
-higher CPU cache efficiency.
+Fix the values of the ICE_AQ_VSI_Q_OPT_RSS_* registers. Shifting is
+already done when the values are used, no need to double shift. Bug was
+not discovered earlier since only ICE_AQ_VSI_Q_OPT_RSS_TPLZ (Zero) is
+currently used.
 
-Only fields that has counterparts in the other direction can be
-accepted; IP src/dst and L4 src/dst ports.
+Also, rename ICE_AQ_VSI_Q_OPT_RSS_XXX to ICE_AQ_VSI_Q_OPT_RSS_HASH_XXX
+for consistency.
 
-The user may request RSS hash symmetry for a specific flow type, via:
-
-    # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n symmetric
-
-or turn symmetry off (asymmetric) by:
-
-    # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
-
+Fixes: 7bd527aa174f ("ice: Adjust naming for inner VLAN operations")
+Co-developed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 ---
- Documentation/networking/scaling.rst |  6 ++++++
- include/uapi/linux/ethtool.h         |  1 +
- net/ethtool/ioctl.c                  | 11 +++++++++++
- 3 files changed, 18 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_adminq_cmd.h |  8 ++++----
+ drivers/net/ethernet/intel/ice/ice_lib.c        |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c   | 12 +++++-------
+ 3 files changed, 11 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/networking/scaling.rst b/Documentation/networking/scaling.rst
-index 92c9fb46d6a2..64f3d7566407 100644
---- a/Documentation/networking/scaling.rst
-+++ b/Documentation/networking/scaling.rst
-@@ -44,6 +44,12 @@ by masking out the low order seven bits of the computed hash for the
- packet (usually a Toeplitz hash), taking this number as a key into the
- indirection table and reading the corresponding value.
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 51281b58ad72..56ec1897f4d8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -491,10 +491,10 @@ struct ice_aqc_vsi_props {
+ #define ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_M		(0xF << ICE_AQ_VSI_Q_OPT_RSS_GBL_LUT_S)
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_S		6
+ #define ICE_AQ_VSI_Q_OPT_RSS_HASH_M		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_TPLZ		(0x0 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_SYM_TPLZ		(0x1 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_XOR		(0x2 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
+-#define ICE_AQ_VSI_Q_OPT_RSS_JHASH		(0x3 << ICE_AQ_VSI_Q_OPT_RSS_HASH_S)
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ		0x0U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ	0x1U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR		0x2U
++#define ICE_AQ_VSI_Q_OPT_RSS_HASH_JHASH		0x3U
+ 	u8 q_opt_tc;
+ #define ICE_AQ_VSI_Q_OPT_TC_OVR_S		0
+ #define ICE_AQ_VSI_Q_OPT_TC_OVR_M		(0x1F << ICE_AQ_VSI_Q_OPT_TC_OVR_S)
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index acc3ffc940e7..1adf65d88ef0 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1186,12 +1186,12 @@ static void ice_set_rss_vsi_ctx(struct ice_vsi_ctx *ctxt, struct ice_vsi *vsi)
+ 	case ICE_VSI_PF:
+ 		/* PF VSI will inherit RSS instance of PF */
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_PF;
+-		hash_type = ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 		break;
+ 	case ICE_VSI_VF:
+ 		/* VF VSI will gets a small RSS table which is a VSI LUT type */
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_VSI;
+-		hash_type = ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
+ 		break;
+ 	default:
+ 		dev_dbg(dev, "Unsupported VSI type %s\n",
+diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+index 01e88b6e43a1..55bf7891981f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
++++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
+@@ -823,8 +823,8 @@ static int ice_vc_handle_rss_cfg(struct ice_vf *vf, u8 *msg, bool add)
+ 		int status;
  
-+Some NICs support symmetric RSS hashing where, if the IP (source address,
-+destination address) and TCP/UDP (source port, destination port) tuples
-+are swapped, the computed hash is the same. This is beneficial in some
-+applications that monitor TCP/IP flows (IDS, firewalls, ...etc) and need
-+both directions of the flow to land on the same Rx queue (and CPU).
-+
- Some advanced NICs allow steering packets to queues based on
- programmable filters. For example, webserver bound TCP port 80 packets
- can be directed to their own receive queue. Such “n-tuple” filters can
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index f7fba0dc87e5..bf67c8094ae0 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2025,6 +2025,7 @@ static inline int ethtool_validate_duplex(__u8 duplex)
- #define	RXH_IP_DST	(1 << 5)
- #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
- #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
-+#define	RXH_SYMMETRIC	(1 << 30)
- #define	RXH_DISCARD	(1 << 31)
+ 		lut_type = ICE_AQ_VSI_Q_OPT_RSS_LUT_VSI;
+-		hash_type = add ? ICE_AQ_VSI_Q_OPT_RSS_XOR :
+-				ICE_AQ_VSI_Q_OPT_RSS_TPLZ;
++		hash_type = add ? ICE_AQ_VSI_Q_OPT_RSS_HASH_XOR :
++				ICE_AQ_VSI_Q_OPT_RSS_HASH_TPLZ;
  
- #define	RX_CLS_FLOW_DISC	0xffffffffffffffffULL
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 0b0ce4f81c01..44742653a4bd 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -980,6 +980,17 @@ static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
- 	if (rc)
- 		return rc;
+ 		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 		if (!ctx) {
+@@ -832,11 +832,9 @@ static int ice_vc_handle_rss_cfg(struct ice_vf *vf, u8 *msg, bool add)
+ 			goto error_param;
+ 		}
  
-+	/* If a symmetric hash is requested, then:
-+	 * 1 - no other fields besides IP src/dst and/or L4 src/dst
-+	 * 2 - If src is set, dst must also be set
-+	 */
-+	if ((info.data & RXH_SYMMETRIC) &&
-+	    ((info.data & ~(RXH_SYMMETRIC | RXH_IP_SRC | RXH_IP_DST |
-+	      RXH_L4_B_0_1 | RXH_L4_B_2_3)) ||
-+	     (!!(info.data & RXH_IP_SRC) ^ !!(info.data & RXH_IP_DST)) ||
-+	     (!!(info.data & RXH_L4_B_0_1) ^ !!(info.data & RXH_L4_B_2_3))))
-+		return -EINVAL;
-+
- 	rc = dev->ethtool_ops->set_rxnfc(dev, &info);
- 	if (rc)
- 		return rc;
+-		ctx->info.q_opt_rss = ((lut_type <<
+-					ICE_AQ_VSI_Q_OPT_RSS_LUT_S) &
+-				       ICE_AQ_VSI_Q_OPT_RSS_LUT_M) |
+-				       (hash_type &
+-					ICE_AQ_VSI_Q_OPT_RSS_HASH_M);
++		ctx->info.q_opt_rss =
++			FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_LUT_M, lut_type) |
++			FIELD_PREP(ICE_AQ_VSI_Q_OPT_RSS_HASH_M, hash_type);
+ 
+ 		/* Preserve existing queueing option setting */
+ 		ctx->info.q_opt_rss |= (vsi->info.q_opt_rss &
 -- 
 2.34.1
 
