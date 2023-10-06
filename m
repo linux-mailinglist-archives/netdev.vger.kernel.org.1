@@ -1,163 +1,123 @@
-Return-Path: <netdev+bounces-38572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876B87BB77C
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:23:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D67A7BB78C
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A918F1C20965
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:23:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6822282259
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5752C1CFAE;
-	Fri,  6 Oct 2023 12:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678DD1D52B;
+	Fri,  6 Oct 2023 12:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPDPrQ9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D1214F79
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:23:45 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 759F9CA
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 05:23:42 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qojrn-00008q-N2; Fri, 06 Oct 2023 14:23:39 +0200
-Date: Fri, 6 Oct 2023 14:23:39 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Christian Theune <ct@flyingcircus.io>
-Cc: Linux regressions mailing list <regressions@lists.linux.dev>,
-	netdev@vger.kernel.org, markovicbudimir@gmail.com
-Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
- requirement
-Message-ID: <20231006122339.GC29258@breakpoint.cc>
-References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
- <207a8e5d-5f2a-4b33-9fc1-86811ad9f48a@leemhuis.info>
- <879EA0B7-F334-4A17-92D5-166F627BEE6F@flyingcircus.io>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C52D1CF8F
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:28:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 312EDC433C7;
+	Fri,  6 Oct 2023 12:28:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696595297;
+	bh=3SAB/z4JQ4yxIUvay/XIvVc0hYSL/L+0t04LAbPkpLk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WPDPrQ9+pRgzQfUM0f3fFkybB7R/kGWvExeuUXVpngubEpgHTnWMQb4rVb9tP+ycF
+	 oItjTvm8E6AsrpKfvQVvlFwQDKjqczh/KzYSw5jlwd11vR+E8m8YBKb9ibvgkFcck7
+	 lQteEFVfKoH+wpZXut06j4jpEPYHSeaFGahTYyqeqFpDgCIwzK1hjaRTJsna4HJCyn
+	 m6f6zvVO8XVwLn+KJ8uoSAykfCgSy+Bocz6WGQbGmln35r9fG0dU20R5OgWthwMxRy
+	 /90WvZrhMPr+QXc0Qn+xycU0S+4jgplvxN45zloqlpqBbMcHKrAu3FZ+6yddfSaSY0
+	 Xflvv0YmEq7pQ==
+Message-ID: <f6eb4bfc-e8f5-491b-8b3b-4cb9eed79483@kernel.org>
+Date: Fri, 6 Oct 2023 15:28:11 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <879EA0B7-F334-4A17-92D5-166F627BEE6F@flyingcircus.io>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 2/4] net: ethernet: ti: am65-cpsw: add mqprio
+ qdisc offload in channel mode
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com, srk@ti.com,
+ vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230927072741.21221-1-rogerq@kernel.org>
+ <20230927072741.21221-3-rogerq@kernel.org>
+ <20231001065554.GH92317@kernel.org>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231001065554.GH92317@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Christian Theune <ct@flyingcircus.io> wrote:
 
-[ Trimming CCs, adding patch author ]
+On 01/10/2023 09:55, Simon Horman wrote:
+> On Wed, Sep 27, 2023 at 10:27:39AM +0300, Roger Quadros wrote:
+> 
+> ...
+> 
+>> +static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
+>> +{
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_mqprio *p_mqprio = &port->qos.mqprio;
+>> +	struct tc_mqprio_qopt_offload *mqprio = type_data;
+>> +	struct am65_cpsw_common *common = port->common;
+>> +	struct tc_mqprio_qopt *qopt = &mqprio->qopt;
+>> +	int tc, offset, count, ret, prio;
+>> +	u8 num_tc = qopt->num_tc;
+>> +	u32 tx_prio_map = 0;
+>> +	int i;
+>> +
+>> +	memcpy(&p_mqprio->mqprio_hw, mqprio, sizeof(*mqprio));
+>> +
+>> +	ret = pm_runtime_get_sync(common->dev);
+>> +	if (ret < 0) {
+>> +		pm_runtime_put_noidle(common->dev);
+>> +		return ret;
+>> +	}
+>> +
+>> +	if (!num_tc) {
+>> +		am65_cpsw_reset_tc_mqprio(ndev);
+>> +		goto exit_put;am65_cpsw_iet_commit_preemptible_tcs
+>> +	}
+>> +
+>> +	ret = am65_cpsw_mqprio_verify_shaper(port, mqprio);
+>> +	if (ret)
+>> +		goto exit_put;
+>> +
+>> +	netdev_set_num_tc(ndev, num_tc);
+>> +
+>> +	/* Multiple Linux priorities can map to a Traffic Class
+>> +	 * A Traffic Class can have multiple contiguous Queues,
+>> +	 * Queues get mapped to Channels (thread_id),
+>> +	 *	if not VLAN tagged, thread_id is used as packet_priority
+>> +	 *	if VLAN tagged. VLAN priority is used as packet_priorit
+> 
+> Hi,
+> 
+> I don't think it is worth respinning just because of this, but
+> there seems to be a 'y' missing from the end of the line above.
 
-> it seems that 6.6rc4 is affected as well:
-> ----
-> commit b3d26c5702c7d6c45456326e56d2ccf3f103e60f
-> Author: Budimir Markovic <markovicbudimir@gmail.com>
-> Date:   Thu Aug 24 01:49:05 2023 -0700
+Now that there will be  a re-spin. I'll fix this. Thanks!
+
 > 
->     net/sched: sch_hfsc: Ensure inner classes have fsc curve
-> ——
+>> +	 * packet_priority gets mapped to header_priority in p0_rx_pri_map,
+>> +	 * header_priority gets mapped to switch_priority in pn_tx_pri_map.
+>> +	 * As p0_rx_pri_map is left at defaults (0x76543210), we can
+>> +	 * assume that Queue_n gets mapped to header_priority_n. We can then
+>> +	 * set the switch priority in pn_tx_pri_map.
+>> +	 */
 > 
-> I have not found newer commits that would suggest they change any behaviour around this in any way, but I might be wrong.
-> 
-> Christian
-> 
-> > On 6. Oct 2023, at 11:01, Linux regression tracking (Thorsten Leemhuis) <regressions@leemhuis.info> wrote:
-> > 
-> > On 06.10.23 10:37, Christian Theune wrote:
-> >> 
-> >> (prefix, I was not aware of the regression reporting process and incorrectly reported this informally with the developers mentioned in the change)
-> > 
-> > Don't worry too much about that, but thx for taking care of all the
-> > details. FWIW, there is one more thing that would be good to know:
-> > 
-> > Does the problem happen with mainline (e.g. 6.6-rc4) as well? That's
-> > relevant, as different people might care[1].
-> > 
-> > Ciao, Thorsten
-> > 
-> > [1] this among others is explained here:
-> > https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-kernel-bug-reports-are-ignored/
-> > 
-> >> I upgraded from 6.1.38 to 6.1.55 this morning and it broke my traffic shaping script, leaving me with a non-functional uplink on a remote router.
-> >> 
-> >> The script errors out like this:
-> >> 
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext=ispA
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ext_ingress=ifb0
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe ifb
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + modprobe act_mirred
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA root
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2061]: Error: Cannot delete qdisc with handle of zero.
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ispA ingress
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2064]: Error: Cannot find specified qdisc on specified device.
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 root
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2066]: Error: Cannot delete qdisc with handle of zero.
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc del dev ifb0 ingress
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2067]: Error: Cannot find specified qdisc on specified device.
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + true
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ispA handle ffff: ingress
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + ifconfig ifb0 up
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc filter add dev ispA parent ffff: protocol all u32 match u32 0 0 action mirred egress redirect dev ifb0
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc qdisc add dev ifb0 root handle 1: hfsc default 1
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1: classid 1:999 hfsc rt m2 2.5gbit
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2053]: + tc class add dev ifb0 parent 1:999 classid 1:1 hfsc sc rate 50mbit
-> >> Oct 06 05:49:22 wendy00 isp-setup-shaping-start[2077]: Error: Invalid parent - parent class must have FSC.
-> >> 
-> >> The error message is also a bit weird (but that’s likely due to iproute2 being weird) as the CLI interface for `tc` and the error message do not map well. (I think I would have to choose `hfsc sc` on the parent to enable the FSC option which isn’t mentioned anywhere in the hfsc manpage).
-> >> 
-> >> The breaking change was introduced in 6.1.53[1] and a multitude of other currently supported kernels:
-> >> 
-> >> ----
-> >> commit a1e820fc7808e42b990d224f40e9b4895503ac40
-> >> Author: Budimir Markovic <markovicbudimir@gmail.com>
-> >> Date: Thu Aug 24 01:49:05 2023 -0700
-> >> 
-> >> net/sched: sch_hfsc: Ensure inner classes have fsc curve
-> >> 
-> >> [ Upstream commit b3d26c5702c7d6c45456326e56d2ccf3f103e60f ]
-> >> 
-> >> HFSC assumes that inner classes have an fsc curve, but it is currently
-> >> possible for classes without an fsc curve to become parents. This leads
-> >> to bugs including a use-after-free.
-> >> 
-> >> Don't allow non-root classes without HFSC_FSC to become parents.
-> >> 
-> >> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> >> Reported-by: Budimir Markovic <markovicbudimir@gmail.com>
-> >> Signed-off-by: Budimir Markovic <markovicbudimir@gmail.com>
-> >> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >> Link: https://lore.kernel.org/r/20230824084905.422-1-markovicbudimir@gmail.com
-> >> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> >> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> >> ----
-> >> 
-> >> Regards,
-> >> Christian
-> >> 
-> >> [1] https://cdn.kernel.org/pub/linux/kernel/v6.x/ChangeLog-6.1.53
-> >> 
-> >> #regzbot introduced: a1e820fc7808e42b990d224f40e9b4895503ac40
-> >> 
-> >> 
-> 
-> Liebe Grüße,
-> Christian Theune
-> 
-> -- 
-> Christian Theune · ct@flyingcircus.io · +49 345 219401 0
-> Flying Circus Internet Operations GmbH · https://flyingcircus.io
-> Leipziger Str. 70/71 · 06108 Halle (Saale) · Deutschland
-> HR Stendal HRB 21169 · Geschäftsführer: Christian Theune, Christian Zagrodnick
+> ...
+
+-- 
+cheers,
+-roger
 
