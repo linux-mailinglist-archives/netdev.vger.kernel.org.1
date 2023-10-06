@@ -1,144 +1,112 @@
-Return-Path: <netdev+bounces-38645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8187BBDA3
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:22:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A8D27BBDAD
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 874E32820F5
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:22:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 137F5282070
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E3030F97;
-	Fri,  6 Oct 2023 17:22:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A88530F9C;
+	Fri,  6 Oct 2023 17:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e/pV6Ixj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gw6J0qq4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 413642E624;
-	Fri,  6 Oct 2023 17:22:54 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B06DC2;
-	Fri,  6 Oct 2023 10:22:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696612972; x=1728148972;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kjjkqAvDUUE79c02Z9GctG9biEdnrD/qQT+SEoiCCtc=;
-  b=e/pV6Ixj+lryoafZdKczFOkjJxZZxfEkBDFj3FIEMJULfVYaPp3qTqUm
-   VySXvaMx+zOQGLHJrOC5s3OQxR5ejQoStyxRG8GPZr0DKMbm+eNycX8gU
-   1seLk7WEnh/le7XMCM7gMKJU7/7F+Frc8gBhIrfmsoNZ6SWI9BGns5PlF
-   Yl7iKywlkElFgdtDF8b6h1qBEkMTdfsBffEBVktVUFb+7iWNtgqMX8une
-   08dzWlOmKKMUnwDsYWcGRVF3Yf0pCVQh5PAzAUackMPVtbYXFVKZj1IjU
-   MvvxEiCpzyNfAagOetHVHdBA3cqjtJ+k1AOihq98xK9/y0Jk6bJa2xkQD
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="5348275"
-X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="5348275"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 10:22:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="755921845"
-X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="755921845"
-Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 06 Oct 2023 10:22:23 -0700
-Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qooWr-0003T1-2L;
-	Fri, 06 Oct 2023 17:22:21 +0000
-Date: Sat, 7 Oct 2023 01:21:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next v2] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-Message-ID: <202310070134.JX5try68-lkp@intel.com>
-References: <20231006154933.mQgxQHHt@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4B1F611
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:24:59 +0000 (UTC)
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51069BF;
+	Fri,  6 Oct 2023 10:24:57 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4181f8d82b9so14604051cf.0;
+        Fri, 06 Oct 2023 10:24:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696613096; x=1697217896; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Rx67H5KTarmXEYEDYl/whfWf5psnvMF6kQlD25eZvhI=;
+        b=gw6J0qq4D+G1D6PNZVVcQlbce3xcoeOlzDO7oYzwuo+R5LNlF01fPOPWAUENZgaHtP
+         6Cxp0KLSBaPApyAXUbgKqW/167TybyIZrjnLIFiCKcSGtmYOLmqfI43EV22tUPA2p/rH
+         KalymaM4fOg7YNyOw+ILfXe2FLV/3aWRXg78l8ppxPV81tq3jJSI7x8tw+K/oZaMdGJv
+         KJ+VXkAA79NeIOERWV7s7c8J7fmmoS6a5VuFgMTqmePkB1kT3GY3FgVsaT0TQhbVTBdV
+         pl7Bpcynf3a49SFk4Dx1EYJB1iv+GbGWnvzQmBgSZy7XQFLLdyVexfVhoCmPJeaQq06u
+         qBFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696613096; x=1697217896;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rx67H5KTarmXEYEDYl/whfWf5psnvMF6kQlD25eZvhI=;
+        b=vqTpVedAvsONhVMTf5mX+DKMl3H4MbcIYtHfUSvyw6rTFoJ+O/35E1bkU6bdnR2qQp
+         2+ClYuTjOOR9+5YoH537WV0JVAt+P+w9zeYmUyPzUAQFpolwl8YufIZPTNs+eNa2BX8g
+         +YG6Emz3kkIMpgwRqRjjTvXnnwWZ69iKm7+IaseW1Yy5R/30gaqT4e0jv+bTHDzbJZw/
+         dA4e/JPNSvjJdEAadDMCCcE6IM7/vtZT4dYTjura08UxqzrSOOODhLPesB2a8Yv4mbRf
+         bw7aLG95veYm15sXzjHAOgLZy3R/fujYW0OwDXtvV8xHw95Z2Aqp1oQZi2TcP6ny6J5Z
+         arMw==
+X-Gm-Message-State: AOJu0YymZeC0WkGKRv7vDL7i7cJNDOEDeD50LhdHjkNJzkqjA6l4pRBA
+	iVYeKitSZ/F28z5jY2o/2AM=
+X-Google-Smtp-Source: AGHT+IHwLs/v/pRUwENWm8kO3YiMtI8D7kqXA1W9FqIZdOyxIwFxNccblqEM07hLTqCH+jojBnOs9Q==
+X-Received: by 2002:a05:622a:a:b0:417:a2f9:bba6 with SMTP id x10-20020a05622a000a00b00417a2f9bba6mr9349030qtw.60.1696613096350;
+        Fri, 06 Oct 2023 10:24:56 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id fj19-20020a05622a551300b0041abcc69050sm1145292qtb.95.2023.10.06.10.24.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Oct 2023 10:24:55 -0700 (PDT)
+Message-ID: <2818465e-e60e-4d6c-a7e3-828c28d8ab59@gmail.com>
+Date: Fri, 6 Oct 2023 10:24:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006154933.mQgxQHHt@linutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: Fix uninitialized
+ var in ksz9477_acl_move_entries()
+Content-Language: en-US
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>,
+ Woojung Huh <woojung.huh@microchip.com>,
+ Arun Ramadoss <arun.ramadoss@microchip.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, Petr Machata <petrm@nvidia.com>,
+ Lukasz Majewski <lukma@denx.de>
+References: <20231006115822.144152-1-o.rempel@pengutronix.de>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20231006115822.144152-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Sebastian,
+On 10/6/23 04:58, Oleksij Rempel wrote:
+> Address an issue in ksz9477_acl_move_entries() where, in the scenario
+> (src_idx == dst_idx), ksz9477_validate_and_get_src_count() returns 0,
+> leading to usage of uninitialized src_count and dst_count variables,
+> which causes undesired behavior as it attempts to move ACL entries
+> around.
+> 
+> Fixes: 002841be134e ("net: dsa: microchip: Add partial ACL support for ksz9477 switches")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on bpf-next/master]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Sebastian-Andrzej-Siewior/net-Add-a-warning-if-NAPI-cb-missed-xdp_do_flush/20231006-235117
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20231006154933.mQgxQHHt%40linutronix.de
-patch subject: [PATCH bpf-next v2] net: Add a warning if NAPI cb missed xdp_do_flush().
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231007/202310070134.JX5try68-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231007/202310070134.JX5try68-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310070134.JX5try68-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/core/filter.c:4211:6: warning: no previous prototype for 'xdp_do_check_flushed' [-Wmissing-prototypes]
-    4211 | void xdp_do_check_flushed(struct napi_struct *napi)
-         |      ^~~~~~~~~~~~~~~~~~~~
-
-
-vim +/xdp_do_check_flushed +4211 net/core/filter.c
-
-  4209	
-  4210	#if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
-> 4211	void xdp_do_check_flushed(struct napi_struct *napi)
-  4212	{
-  4213		bool ret;
-  4214	
-  4215		ret = dev_check_flush();
-  4216		ret |= cpu_map_check_flush();
-  4217		ret |= xsk_map_check_flush();
-  4218	
-  4219		WARN_ONCE(ret, "Missing xdp_do_flush() invocation after NAPI by %ps\n",
-  4220			  napi->poll);
-  4221	}
-  4222	#endif
-  4223	
-
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Florian
+
 
