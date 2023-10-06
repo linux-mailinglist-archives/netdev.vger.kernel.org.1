@@ -1,103 +1,141 @@
-Return-Path: <netdev+bounces-38599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB43D7BBA01
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:12:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A3517BBA03
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65F9F282231
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8617282250
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16E92421B;
-	Fri,  6 Oct 2023 14:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E7D250EA;
+	Fri,  6 Oct 2023 14:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enOPmrhQ"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bdwvwaRl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFAD23778;
-	Fri,  6 Oct 2023 14:12:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D6EC433C7;
-	Fri,  6 Oct 2023 14:12:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696601537;
-	bh=Zdd7DNTlVeoT74N6zv6LNwFKPiqOlfIZkXfohcQuj+A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=enOPmrhQ9Tbhdq7mBSBhbAbqydrYWwmaoB5Xr6lHhV3WmtpKknKzHrj3PdA1tJUKR
-	 0nehUWr4us3av0jhUGE3w3GRqlZyZZ/fqlfeI5OfQ6YQWawKGtl8abSBZyOElLDv66
-	 N5dq7gOuMRUOP2ODpjjcL4w+mMovWtKxHWsEBJU/5TVzeHo/IIQQ2BzDDgMkIcZWSy
-	 KpFLK4RLMkDKb1LdNZNLHdcILtmgN6yF7wn9fNZGPd8OMcnvGwG5wqUHl5vnczTmtK
-	 jCE1Udjbn0XXTO1LQ1QnksbykEGbCKSyz6PlNRlFDHT8EOHsdndzaa7PUHA9Tz/scD
-	 QkVbvV+QRmD6w==
-Date: Fri, 6 Oct 2023 07:12:15 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira
- <victor@mojatatu.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- paulb@nvidia.com, netdev@vger.kernel.org, kernel@mojatatu.com,
- martin.lau@linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 1/1] net/sched: Disambiguate verdict from
- return code
-Message-ID: <20231006071215.4a28b348@kernel.org>
-In-Reply-To: <686dd999-bee4-ecf8-8dc4-c85a098c4a92@iogearbox.net>
-References: <20230919145951.352548-1-victor@mojatatu.com>
-	<beb5e6f3-e2a1-637d-e06d-247b36474e95@iogearbox.net>
-	<CAM0EoMncgehpwCOxaUUKhOP7V0DyJtbDP9Q5aUkMG2h5dmfQJA@mail.gmail.com>
-	<97f318a1-072d-80c2-7de7-6d0d71ca0b10@iogearbox.net>
-	<CAM0EoMnPVxYA=7jn6AU7D3cJJbY5eeMLOxCrj4UJcFr=pCZ+Aw@mail.gmail.com>
-	<1df2e804-5d58-026c-5daa-413a3605c129@iogearbox.net>
-	<CAM0EoM=SH8i_-veiyUtT6Wd4V7DxNm-tF9sP2BURqN5B2yRRVQ@mail.gmail.com>
-	<cb4db95b-89ff-02ef-f36f-7a8b0edc5863@iogearbox.net>
-	<CAM0EoMkYCaxHT22-b8N6u7A=2SUydNp9vDcio29rPrHibTVH5Q@mail.gmail.com>
-	<96532f62-6927-326c-8470-daa1c4ab9699@iogearbox.net>
-	<CAM0EoMkUFcw7k0vX3oH8SHDoXW=DD-h2MkUE-3_MssXvP_uJbA@mail.gmail.com>
-	<2ce3a5a1-375d-43a6-052d-d44d7b4a4bf8@iogearbox.net>
-	<20231006063233.74345d36@kernel.org>
-	<686dd999-bee4-ecf8-8dc4-c85a098c4a92@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF491F959;
+	Fri,  6 Oct 2023 14:12:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F786C433C8;
+	Fri,  6 Oct 2023 14:12:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696601547;
+	bh=5bSiy7MeUuv/xS7PXgRB7JPFcw8e/OWz7TBIF02ndWA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bdwvwaRlN6VaH0OXV6I0jY236IRe99X0gEEzRPvxsg7dLWtoJi+4jVeHvB3RLeFby
+	 aqUBdx4nXGjQLhhEJ/kt5+OspwKjuyLnoz+UbckP5pgDBj3xnFaFMgVK16oPDbIIF2
+	 DQrc8YLnZ05mcjOt0R1PTpSS6wiCnedpql7MaXLs=
+Date: Fri, 6 Oct 2023 16:12:24 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+	miguel.ojeda.sandonis@gmail.com
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
+Message-ID: <2023100637-episode-espresso-7a5a@gregkh>
+References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+ <20231006094911.3305152-4-fujita.tomonori@gmail.com>
+ <2023100635-product-gills-3d7e@gregkh>
+ <20231006.225325.1176505861124451190.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006.225325.1176505861124451190.fujita.tomonori@gmail.com>
 
-On Fri, 6 Oct 2023 15:49:18 +0200 Daniel Borkmann wrote:
-> > Which will no longer work with the "pack multiple values into
-> > the reason" scheme of subsys-specific values :( =20
->=20
-> Too bad, do you happen to know why it won't work?=20
+On Fri, Oct 06, 2023 at 10:53:25PM +0900, FUJITA Tomonori wrote:
+> On Fri, 6 Oct 2023 12:31:59 +0200
+> Greg KH <gregkh@linuxfoundation.org> wrote:
+> 
+> > On Fri, Oct 06, 2023 at 06:49:11PM +0900, FUJITA Tomonori wrote:
+> >> +config AX88796B_RUST_PHY
+> >> +	bool "Rust reference driver"
+> >> +	depends on RUST && AX88796B_PHY
+> >> +	default n
+> > 
+> > Nit, "n" is always the default, there is no need for this line.
+> 
+> Understood, I'll remove this line.
+> 
+> >> +	help
+> >> +	  Uses the Rust version driver for Asix PHYs.
+> > 
+> > You need more text here please.  Provide a better description of what
+> > hardware is supported and the name of the module if it is built aas a
+> > module.
+> > 
+> > Also that if you select this one, the C driver will not be built (which
+> > is not expressed in the Kconfig language, why not?
+> 
+> Because the way to load a PHY driver module can't handle multiple
+> modules with the same phy id (a NIC driver loads a PHY driver module).
+> There is no machinism to specify which PHY driver module should be
+> loaded when multiple PHY modules have the same phy id (as far as I know).
 
-I'm just guessing but the reason is enum skb_drop_reason
-and the values of subsystem specific reasons won't be part
-of that enum.
+Sorry, I know that, I mean I am pretty sure you can express this "one or
+the other" type of restriction in Kconfig, no need to encode it in the
+Makefile logic.
 
-> Given they went into the
-> length of extending this for subsystems, they presumably would also like =
-to
-> benefit from above. :/
->=20
-> > What I'm saying is that there is a trade-off here between providing
-> > as much info as possible vs basic user getting intelligible data.. =20
->=20
-> Makes sense. I think we can drop that aspect for the subsys specific error
-> codes. Fwiw, TCP has 22 drop codes in the core section alone, so this sho=
-uld
-> be fine if you think it's better. The rest of the patch shown should still
-> apply the same way. I can tweak it to use the core section for codes, and
-> then it can be successively extended if that looks good to you - unless y=
-ou
-> are saying from above, that just one error code is better and then going =
-via
-> detailed stats for specific errors is preferred.
+Try doing "depens on AX88796B_PHY=n" as the dependency for the rust
+driver.
 
-No, no, multiple reasons are perfectly fine. The non-technical
-advantage of mac80211 error codes being separate is that there
-are no git conflicts when we add new ones. TC codes can just=20
-be added to the main enum like TCP =F0=9F=A4=B7=EF=B8=8F
+> The Kconfig file would be like the following. AX88796B_RUST_PHY
+> depends on AX88796B_PHY so the description of AX88796B_PHY is enough?
+> I'll add the name of the module.
+> 
+> 
+> config AX88796B_PHY
+> 	tristate "Asix PHYs"
+> 	help
+> 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
+> 	  AX88796B package.
+> 
+> config AX88796B_RUST_PHY
+> 	bool "Rust reference driver"
+> 	depends on RUST && AX88796B_PHY
+> 	default n
+> 	help
+> 	  Uses the Rust version driver for Asix PHYs.
+
+"This is the rust version of a driver to support...  It will be
+called..."
+
+> 
+> >> +
+> >>  config BROADCOM_PHY
+> >>  	tristate "Broadcom 54XX PHYs"
+> >>  	select BCM_NET_PHYLIB
+> >> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+> >> index c945ed9bd14b..58d7dfb095ab 100644
+> >> --- a/drivers/net/phy/Makefile
+> >> +++ b/drivers/net/phy/Makefile
+> >> @@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
+> >>  endif
+> >>  obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
+> >>  obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+> >> -obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+> >> +ifdef CONFIG_AX88796B_RUST_PHY
+> >> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
+> >> +else
+> >> +  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+> >> +endif
+> > 
+> > This can be expressed in Kconfig, no need to put this here, right?
+> 
+> Not sure. Is it possible? If we allow both modules to be built, I
+> guess it's possible though.
+
+see above, this is expressed in the Kconfig language and then no ifdef
+is needed here at all.
+
+thanks,
+
+greg k-h
 
