@@ -1,77 +1,174 @@
-Return-Path: <netdev+bounces-38564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43DF7BB6E9
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 13:48:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 725227BB6FE
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 13:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D47E1C209B7
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BB01282328
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 11:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327A01CA91;
-	Fri,  6 Oct 2023 11:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518511CAA8;
+	Fri,  6 Oct 2023 11:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="eVTnBSVh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873471CA88
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 11:48:07 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7ADCCA;
-	Fri,  6 Oct 2023 04:48:05 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qojJ9-0008Nn-Kd; Fri, 06 Oct 2023 13:47:51 +0200
-Date: Fri, 6 Oct 2023 13:47:51 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Ma Ke <make_ruc2021@163.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: xfrm: fix return value check in ipcomp_compress
-Message-ID: <20231006114751.GA29258@breakpoint.cc>
-References: <20231006114106.3982925-1-make_ruc2021@163.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27F6C1C6B6;
+	Fri,  6 Oct 2023 11:53:52 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7626FCA;
+	Fri,  6 Oct 2023 04:53:51 -0700 (PDT)
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 396BnWcb023037;
+	Fri, 6 Oct 2023 13:53:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=FTF/KnFa4HI87ODyf1fZyRJiPCg00/ZE8IQgxm+KA2U=; b=eV
+	TnBSVhmLnyHkzhBohrMS3uPcsvYCoh2rqZHs68euBl3pxOwPn7YFnq49qy34Yy6o
+	TKOs1HzDmXeDezvYVDIyiBU8sjyKOxt3MaG5AOyKxmJV2vFV9f2mlG3fqMV22Xdj
+	sFfNC2aAXYTfg3J/ph9ItApXmL+RDGbDPbRWaFWIu2qsVo7wu+41TvLWZs5036Cl
+	LpNdAHRdT1vVx6xLQvK51jvfHApx5UR/f6aRv+5oq2SmmPZtfdspXvepdyc69xUL
+	VMFVWI0VD0lk83rUXIZppZDn0D/owwc9G6iJ697pas2f2LHxHuTNp3P4F1Vz42MD
+	VmQzDoV+WzTnuG5M58EA==
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tj06tkeyw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Oct 2023 13:53:30 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id EE253100053;
+	Fri,  6 Oct 2023 13:53:29 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 049B222AFF5;
+	Fri,  6 Oct 2023 13:53:25 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 6 Oct
+ 2023 13:53:24 +0200
+Message-ID: <162c98ab-52ca-5f90-d28d-78e7903391b1@foss.st.com>
+Date: Fri, 6 Oct 2023 13:53:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006114106.3982925-1-make_ruc2021@163.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 08/12] net: ethernet: stmmac: stm32: support the
+ phy-supply regulator binding
+Content-Language: en-US
+To: Christophe ROULLIER <christophe.roullier@foss.st.com>,
+        Ben Wolsieffer
+	<ben.wolsieffer@hefring.com>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Richard Cochran
+	<richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20230928151512.322016-1-christophe.roullier@foss.st.com>
+ <20230928151512.322016-9-christophe.roullier@foss.st.com>
+ <ZRWfhk0aEDwytGv5@dell-precision-5540>
+ <c8804fbe-46e7-2771-e503-4e786df2f97c@foss.st.com>
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <c8804fbe-46e7-2771-e503-4e786df2f97c@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-06_09,2023-10-06_01,2023-05-22_02
+X-Spam-Status: No, score=-4.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ma Ke <make_ruc2021@163.com> wrote:
-> In ipcomp_compress, to avoid an unexpected result returned by
-> pskb_trim, we should check the return value of pskb_trim().
+On 10/5/23 13:27, Christophe ROULLIER wrote:
 > 
-> Signed-off-by: Ma Ke <make_ruc2021@163.com>
-> ---
->  net/xfrm/xfrm_ipcomp.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> On 9/28/23 17:45, Ben Wolsieffer wrote:
+>> Hello,
+>>
+>> On Thu, Sep 28, 2023 at 05:15:08PM +0200, Christophe Roullier wrote:
+>>> From: Christophe Roullier <christophe.roullier@st.com>
+>>>
+>>> Configure the phy regulator if defined by the "phy-supply" DT phandle.
+>>>
+>>> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+>>> ---
+>>>   .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 51 ++++++++++++++++++-
+>>>   1 file changed, 50 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c 
+>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>>> index 72dda71850d75..31e3abd2caeaa 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>> ... snip ...
+>>>   static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
+>>> @@ -455,12 +496,20 @@ static int stm32mp1_suspend(struct stm32_dwmac 
+>>> *dwmac)
+>>>       if (dwmac->enable_eth_ck)
+>>>           clk_disable_unprepare(dwmac->clk_eth_ck);
+>>> +    /* Keep the PHY up if we use Wake-on-Lan. */
+>>> +    if (!device_may_wakeup(dwmac->dev))
+>>> +        phy_power_on(dwmac, false);
+>>> +
+>>>       return ret;
+>>>   }
+>>>   static void stm32mp1_resume(struct stm32_dwmac *dwmac)
+>>>   {
+>>>       clk_disable_unprepare(dwmac->clk_ethstp);
+>>> +
+>>> +    /* The PHY was up for Wake-on-Lan. */
+>>> +    if (!device_may_wakeup(dwmac->dev))
+>>> +        phy_power_on(dwmac, true);
+>>>   }
+>>>   static int stm32mcu_suspend(struct stm32_dwmac *dwmac)
+>> Why only turn off the regulator in suspend on the STM32MP1 and not STM32
+>> MCUs? It seems like this could just go in stm32_dwmac_suspend/resume().
+>>
+>> Selfishly, I have a use case for this on an STM32F746 platform, so I
+>> would like to see support for it and would test an updated version.
+>>
+> Hi,
 > 
-> diff --git a/net/xfrm/xfrm_ipcomp.c b/net/xfrm/xfrm_ipcomp.c
-> index 9c0fa0e1786a..5f2e6edadf48 100644
-> --- a/net/xfrm/xfrm_ipcomp.c
-> +++ b/net/xfrm/xfrm_ipcomp.c
-> @@ -144,7 +144,9 @@ static int ipcomp_compress(struct xfrm_state *x, struct sk_buff *skb)
->  	memcpy(start + sizeof(struct ip_comp_hdr), scratch, dlen);
->  	local_bh_enable();
->  
-> -	pskb_trim(skb, dlen + sizeof(struct ip_comp_hdr));
-> +	err = pskb_trim(skb, dlen + sizeof(struct ip_comp_hdr));
-> +	if (unlikely(err))
-> +		goto out;
+> I'm working on MPU boards, I do not have MCU board, so feel free to 
+> contribute on MCU part ;-)
 
-This can't be right, this now calls local_bh_enable() twice.
+Christophe,
+
+The point here is to manage regulator for MPU and MCU. If you don't have 
+MCU board it doesn't seem to be an issue as Ben proposed to test the 
+patch for you.
+
+> 
+> Thanks
+> 
+> Christophe
+> 
+>>> -- 
+>>> 2.25.1
+>>>
+>> Thanks, Ben
+
 
