@@ -1,102 +1,234 @@
-Return-Path: <netdev+bounces-38465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAAB17BB0EA
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:35:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D8E7BB0EE
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9A3A1C2031C
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 04:35:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A38901C20997
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 04:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B33A15C0;
-	Fri,  6 Oct 2023 04:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC7C20E3;
+	Fri,  6 Oct 2023 04:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ojf9w5wJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GCuIu02U"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB4A139B
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 04:35:54 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF29DB;
-	Thu,  5 Oct 2023 21:35:49 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c61c511cbeso2672215ad.1;
-        Thu, 05 Oct 2023 21:35:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696566949; x=1697171749; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=daTh0xMFvxN23blHxI+gAT68kyBArx5W5lkuWAo1sT8=;
-        b=Ojf9w5wJ0k/2CRqWiDFkBHApEyHO86GUM9xyOF8teono0Pp22HGKTk7PBcu1xa9mgx
-         O+E+2jw9nZ+6mH7NoPZ6dLu1AeFKAph6KryksiNd+Vt9f4LvxcMQXlNPNKbg4KIi0xkY
-         uAljNOBZvt1dB5qw3LUxW1U/b6O3tfMp0QD9XCubpylD//aAjaJ8KyrgRoXOzFNdYSY7
-         vZjbCpeXPXNVZdrWggd2+bkECR9jKZC9IhbkcBxtIK/ObWGnkBsT3TOXkH2uCS3r7/DV
-         nj3a0kAVAqU4Tq3HDLDWfwRp9XF5vWm6IAZ/l7z5xWLDhIYRepvUuOSeiXkv+0JCLwRx
-         QH4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696566949; x=1697171749;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=daTh0xMFvxN23blHxI+gAT68kyBArx5W5lkuWAo1sT8=;
-        b=jBwZfVQibwJvXSjeIq9/Axc4i6Dn6MDAmpKFe40LcV54w6saDJ0wWg5RlalvG2Ko3O
-         wfWkGITcItXU8EIK5blTmlMeiEyRjaC5Ckm36xuAjqDVskg4HpEKd+V6BQqs/kAt5zTb
-         d5UbLUrZNWwbYRVFCe4IWWdQaHvKHwQt7dFXXKNv+IzKI48MsL6iiO1M4UzbOs6oCfU4
-         8LTmA16L26lwCTYHaIi368Yi1rFTxTbFFHvvsDa85x48TNxr5LRr3bGuIzvTeWrjXxa7
-         LVDtdXHYxm0dzPrU+jpP78FOLEsF5hIYV8j+VxbLXyfH2wGXkdiW+bpXHk4kN8phJMV+
-         49xA==
-X-Gm-Message-State: AOJu0YxIgIYylgGBhHgEeYp7KCZkU3P7V4fwTHYCcBueNtNqy1pft32t
-	wCrJohg+sorJh+PHgYSn+uU=
-X-Google-Smtp-Source: AGHT+IHMgNySTDWuvdltyf83eVz6rdlkBcm1Z/wAeTLHVV6QePo6bGPtBcfd8Vx1rJkyKxb9+MrXOA==
-X-Received: by 2002:a17:902:dacd:b0:1b3:d8ac:8db3 with SMTP id q13-20020a170902dacd00b001b3d8ac8db3mr7532594plx.6.1696566949241;
-        Thu, 05 Oct 2023 21:35:49 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170902d48200b001c55db80b14sm2653217plg.221.2023.10.05.21.35.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Oct 2023 21:35:48 -0700 (PDT)
-Date: Thu, 5 Oct 2023 21:35:46 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Mahesh Bandewar =?utf-8?B?KOCkruCkueClh+CktiDgpKzgpILgpKHgpYfgpLXgpL4=?=
-	=?utf-8?B?4KSwKQ==?= <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
-	Don Hatchett <hatch@google.com>, Yuliang Li <yuliangli@google.com>,
-	Mahesh Bandewar <mahesh@bandewar.net>
-Subject: Re: [PATCHv2 next 1/3] ptp: add ptp_gettimex64any() support
-Message-ID: <ZR+OouM1rSXX7vyV@hoboy.vegasvil.org>
-References: <20231003041701.1745953-1-maheshb@google.com>
- <ZRzqLeAR3PtCV83h@hoboy.vegasvil.org>
- <CAF2d9jggffd6HtehuL-78ZFPqcJhO+HAe1FX-ehXc5oBmZ72Dw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18801FB2;
+	Fri,  6 Oct 2023 04:39:03 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05312DE;
+	Thu,  5 Oct 2023 21:39:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696567142; x=1728103142;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lwz8dh5i4hfu2JGlBGmn/i2VE2F6ip9fAIHvqo5nI3U=;
+  b=GCuIu02UuJ7b/D2gYBMWXH3oOOuvJc9+k94FMf3FtqYxInb6TnAzCWNV
+   e/jXwOxSwfMLk2g2xQyL9YxxioFWjI5yIuacszhPAK8Ur8W7VCfPjBhDC
+   ws0tJwhZuUq2d7KIO22Tp6mv68j4hqL/Qumf3NM13nSomIIfZKKnHiQ2h
+   jWxS1ZvRuWPypPVSwulIkWabhyk+mPIOZlKO/lImfOhcFWSU2N4Xarc+C
+   exlo80nJRbSKSsZJdK6UO6goqOpSgvhTk5hTzCCz2hTAhGjoHjk6W0J5T
+   1DkpXFidAYcAXuXA2nt7s7azsAk5QSIdfSuT96TrDej8dRc4Ui9TdfyhS
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="387555827"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="387555827"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2023 21:39:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10854"; a="745726711"
+X-IronPort-AV: E=Sophos;i="6.03,203,1694761200"; 
+   d="scan'208";a="745726711"
+Received: from lkp-server02.sh.intel.com (HELO c3b01524d57c) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 05 Oct 2023 21:38:55 -0700
+Received: from kbuild by c3b01524d57c with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qocc0-000MFk-2h;
+	Fri, 06 Oct 2023 04:38:52 +0000
+Date: Fri, 6 Oct 2023 12:38:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org,
+	willemb@google.com, dsahern@kernel.org, magnus.karlsson@intel.com,
+	bjorn@kernel.org, maciej.fijalkowski@intel.com, hawk@kernel.org,
+	yoong.siang.song@intel.com, netdev@vger.kernel.org,
+	xdp-hints@xdp-project.net
+Subject: Re: [PATCH bpf-next v3 05/10] net: stmmac: Add Tx HWTS support to
+ XDP ZC
+Message-ID: <202310061208.tATL34LR-lkp@intel.com>
+References: <20231003200522.1914523-6-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAF2d9jggffd6HtehuL-78ZFPqcJhO+HAe1FX-ehXc5oBmZ72Dw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20231003200522.1914523-6-sdf@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 05, 2023 at 04:12:44PM -0700, Mahesh Bandewar (महेश बंडेवार) wrote:
+Hi Stanislav,
 
-> I replied to all your earlier comments, which one do you think I had ignored?
+kernel test robot noticed the following build errors:
 
-new enums -- go back and read my reply again!
+[auto build test ERROR on bpf-next/master]
 
-Thanks,
-Richard
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/xsk-Support-tx_metadata_len/20231004-040718
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231003200522.1914523-6-sdf%40google.com
+patch subject: [PATCH bpf-next v3 05/10] net: stmmac: Add Tx HWTS support to XDP ZC
+config: riscv-rv32_defconfig (https://download.01.org/0day-ci/archive/20231006/202310061208.tATL34LR-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231006/202310061208.tATL34LR-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310061208.tATL34LR-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:2554:3: error: call to undeclared function 'xsk_tx_metadata_to_compl'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+    2554 |                 xsk_tx_metadata_to_compl(meta, &tx_q->tx_skbuff_dma[entry].xsk_meta);
+         |                 ^
+   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:2554:3: note: did you mean 'xsk_tx_metadata_complete'?
+   include/net/xdp_sock.h:185:20: note: 'xsk_tx_metadata_complete' declared here
+     185 | static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_compl *compl,
+         |                    ^
+   1 error generated.
+
+
+vim +/xsk_tx_metadata_to_compl +2554 drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+
+  2464	
+  2465	static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+  2466	{
+  2467		struct netdev_queue *nq = netdev_get_tx_queue(priv->dev, queue);
+  2468		struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
+  2469		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[queue];
+  2470		struct xsk_buff_pool *pool = tx_q->xsk_pool;
+  2471		unsigned int entry = tx_q->cur_tx;
+  2472		struct dma_desc *tx_desc = NULL;
+  2473		struct xdp_desc xdp_desc;
+  2474		bool work_done = true;
+  2475		u32 tx_set_ic_bit = 0;
+  2476		unsigned long flags;
+  2477	
+  2478		/* Avoids TX time-out as we are sharing with slow path */
+  2479		txq_trans_cond_update(nq);
+  2480	
+  2481		budget = min(budget, stmmac_tx_avail(priv, queue));
+  2482	
+  2483		while (budget-- > 0) {
+  2484			struct stmmac_metadata_request meta_req;
+  2485			struct xsk_tx_metadata *meta = NULL;
+  2486			dma_addr_t dma_addr;
+  2487			bool set_ic;
+  2488	
+  2489			/* We are sharing with slow path and stop XSK TX desc submission when
+  2490			 * available TX ring is less than threshold.
+  2491			 */
+  2492			if (unlikely(stmmac_tx_avail(priv, queue) < STMMAC_TX_XSK_AVAIL) ||
+  2493			    !netif_carrier_ok(priv->dev)) {
+  2494				work_done = false;
+  2495				break;
+  2496			}
+  2497	
+  2498			if (!xsk_tx_peek_desc(pool, &xdp_desc))
+  2499				break;
+  2500	
+  2501			if (likely(priv->extend_desc))
+  2502				tx_desc = (struct dma_desc *)(tx_q->dma_etx + entry);
+  2503			else if (tx_q->tbs & STMMAC_TBS_AVAIL)
+  2504				tx_desc = &tx_q->dma_entx[entry].basic;
+  2505			else
+  2506				tx_desc = tx_q->dma_tx + entry;
+  2507	
+  2508			dma_addr = xsk_buff_raw_get_dma(pool, xdp_desc.addr);
+  2509			meta = xsk_buff_get_metadata(pool, xdp_desc.addr);
+  2510			xsk_buff_raw_dma_sync_for_device(pool, dma_addr, xdp_desc.len);
+  2511	
+  2512			tx_q->tx_skbuff_dma[entry].buf_type = STMMAC_TXBUF_T_XSK_TX;
+  2513	
+  2514			/* To return XDP buffer to XSK pool, we simple call
+  2515			 * xsk_tx_completed(), so we don't need to fill up
+  2516			 * 'buf' and 'xdpf'.
+  2517			 */
+  2518			tx_q->tx_skbuff_dma[entry].buf = 0;
+  2519			tx_q->xdpf[entry] = NULL;
+  2520	
+  2521			tx_q->tx_skbuff_dma[entry].map_as_page = false;
+  2522			tx_q->tx_skbuff_dma[entry].len = xdp_desc.len;
+  2523			tx_q->tx_skbuff_dma[entry].last_segment = true;
+  2524			tx_q->tx_skbuff_dma[entry].is_jumbo = false;
+  2525	
+  2526			stmmac_set_desc_addr(priv, tx_desc, dma_addr);
+  2527	
+  2528			tx_q->tx_count_frames++;
+  2529	
+  2530			if (!priv->tx_coal_frames[queue])
+  2531				set_ic = false;
+  2532			else if (tx_q->tx_count_frames % priv->tx_coal_frames[queue] == 0)
+  2533				set_ic = true;
+  2534			else
+  2535				set_ic = false;
+  2536	
+  2537			meta_req.priv = priv;
+  2538			meta_req.tx_desc = tx_desc;
+  2539			meta_req.set_ic = &set_ic;
+  2540			xsk_tx_metadata_request(meta, &stmmac_xsk_tx_metadata_ops, &meta_req);
+  2541	
+  2542			if (set_ic) {
+  2543				tx_q->tx_count_frames = 0;
+  2544				stmmac_set_tx_ic(priv, tx_desc);
+  2545				tx_set_ic_bit++;
+  2546			}
+  2547	
+  2548			stmmac_prepare_tx_desc(priv, tx_desc, 1, xdp_desc.len,
+  2549					       true, priv->mode, true, true,
+  2550					       xdp_desc.len);
+  2551	
+  2552			stmmac_enable_dma_transmission(priv, priv->ioaddr);
+  2553	
+> 2554			xsk_tx_metadata_to_compl(meta, &tx_q->tx_skbuff_dma[entry].xsk_meta);
+  2555	
+  2556			tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
+  2557			entry = tx_q->cur_tx;
+  2558		}
+  2559		flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+  2560		txq_stats->tx_set_ic_bit += tx_set_ic_bit;
+  2561		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+  2562	
+  2563		if (tx_desc) {
+  2564			stmmac_flush_tx_descriptors(priv, queue);
+  2565			xsk_tx_release(pool);
+  2566		}
+  2567	
+  2568		/* Return true if all of the 3 conditions are met
+  2569		 *  a) TX Budget is still available
+  2570		 *  b) work_done = true when XSK TX desc peek is empty (no more
+  2571		 *     pending XSK TX for transmission)
+  2572		 */
+  2573		return !!budget && work_done;
+  2574	}
+  2575	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
