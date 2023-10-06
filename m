@@ -1,272 +1,147 @@
-Return-Path: <netdev+bounces-38577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A247BB7AF
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:32:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E183F7BB7B4
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 358591C20A12
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:32:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D6F71C20A14
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 12:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80D518650;
-	Fri,  6 Oct 2023 12:32:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C51C2BA;
+	Fri,  6 Oct 2023 12:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNGJGeeh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ny9UHmuN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877C11D545
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:32:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04511C433C8;
-	Fri,  6 Oct 2023 12:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516AB1D543
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 12:33:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B3EC433C7;
+	Fri,  6 Oct 2023 12:33:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696595566;
-	bh=61DYdc53aKk3vt7BSVcWpMssttdDG8L65eoi6rh4zxQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JNGJGeeh/xb2lnmH/Z5KJ4/LKFvtvGVMmz/tk/DHO8sgDP4P5/642radicsHW28GK
-	 SfU6fOY5HV7BaSCwxg7wRnh1YiYbtbCmSx/uk0npL9lU/Tb0+6zbM/rnUmFHWDiLPk
-	 vo2Jw5CgOTzCPZP9HDg2kQvB9do7YCLuP48Ejn2MEk62Z0ObMVT47tDnBYtHXS1tCm
-	 t/xnJ44noa8fu1Ti5Id/9FsVSzZm7a7cSbaNHCfbjgj7sopoEf0ZLTWkBZyOtSVrN2
-	 eVoB7yl698z2RNrLSYesekc3QhWgycdwOVAkbVADcds5o+EtqmP9VScES/vswhkzOB
-	 C8O8hg/HRI3Dg==
-Message-ID: <7b001e41-47b2-467e-b63c-b654b856c2e3@kernel.org>
-Date: Fri, 6 Oct 2023 15:32:40 +0300
+	s=k20201202; t=1696595618;
+	bh=C0l7PeGE1vtEgo9DM9OGtxhUx5rYGAf3MThJoKdVq7U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ny9UHmuNzt0oHqRHoVuzX6mix3ZySYkhx3RVjnK+s1jzfIoQhCC2KKfXRiyneWF6/
+	 S6KS4GGL1wCrNhYmxwc55p9xyTCTjQrZzEbUUiHSgaXeqY6UgWtBsggqbI4IA9qSBq
+	 ay2XMiEe1UlsI1HkZ15xNeIbHukbaDfIen9EcQEdQ80Bcq6tsuXBHNXgRi5gWru8z7
+	 YC0zrUGwSDI6+BjTAIb+aHYpo1n0eaMjN5LtgmF/tJdAhrvvJY//ZdL2wUlOQbl/g1
+	 vzOYJookGLQzCEeo0RNGUjjUrLzJ7SYcaq/DK28xFJkqtr4nFVVuInynNjyvB/T5F5
+	 ctK6dyBdcTYAQ==
+Date: Fri, 6 Oct 2023 14:33:34 +0200
+From: Simon Horman <horms@kernel.org>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, jiri@resnulli.us,
+	corbet@lwn.net, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com, linux-doc@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v3 4/5] ice: dpll: implement phase related
+ callbacks
+Message-ID: <ZR/+noRCdnsy6QJo@kernel.org>
+References: <20231006114101.1608796-1-arkadiusz.kubalewski@intel.com>
+ <20231006114101.1608796-5-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 3/4] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
-Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, s-vadapalli@ti.com, srk@ti.com,
- vigneshr@ti.com, p-varis@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230927072741.21221-1-rogerq@kernel.org>
- <20230927072741.21221-1-rogerq@kernel.org>
- <20230927072741.21221-4-rogerq@kernel.org>
- <20230927072741.21221-4-rogerq@kernel.org>
- <20231005092943.q7no33k32thyo6y4@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231005092943.q7no33k32thyo6y4@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006114101.1608796-5-arkadiusz.kubalewski@intel.com>
 
-
-
-On 05/10/2023 12:29, Vladimir Oltean wrote:
-> On Wed, Sep 27, 2023 at 10:27:40AM +0300, Roger Quadros wrote:
->> Add driver support for viewing / changing the MAC Merge sublayer
->> parameters and seeing the verification state machine's current state
->> via ethtool.
->>
->> As hardware does not support interrupt notification for verification
->> events we resort to polling on link up. On link up we try a couple of
->> times for verification success and if unsuccessful then give up.
->>
->> The Frame Preemption feature is described in the Technical Reference
->> Manual [1] in section:
->> 	12.3.1.4.6.7 Intersperced Express Traffic (IET – P802.3br/D2.0)
->>
->> Due to Silicon Errata i2208 [2] we set limit min IET fragment size to 124.
->>
->> [1] AM62x TRM - https://www.ti.com/lit/ug/spruiv7a/spruiv7a.pdf
->> [2] AM62x Silicon Errata - https://www.ti.com/lit/er/sprz487c/sprz487c.pdf
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 150 ++++++++++++
->>  drivers/net/ethernet/ti/am65-cpsw-nuss.c    |   2 +
->>  drivers/net/ethernet/ti/am65-cpsw-nuss.h    |   5 +
->>  drivers/net/ethernet/ti/am65-cpsw-qos.c     | 240 ++++++++++++++++----
->>  drivers/net/ethernet/ti/am65-cpsw-qos.h     | 104 +++++++++
->>  5 files changed, 454 insertions(+), 47 deletions(-)
->>
->> Changelog:
->> v5:
->> - No change
->>
->> v4:
->> - Rebase and include in the same series as mqprio support.
->>
->> v3:
->> - Rebase on top of v6.6-rc1 and mqprio support [1]
->> - Support ethtool_ops :: get_mm_stats()
->> - drop unused variables cmn_ctrl and verify_cnt
->> - make am65_cpsw_iet_link_state_update() and
->>   am65_cpsw_iet_change_preemptible_tcs() static
->>
->> [1] https://lore.kernel.org/all/20230918075358.5878-1-rogerq@kernel.org/
->>
->> v2:
->> - Use proper control bits for PMAC enable (AM65_CPSW_PN_CTL_IET_PORT_EN)
->>   and TX enable (AM65_CPSW_PN_IET_MAC_PENABLE)
->> - Common IET Enable (AM65_CPSW_CTL_IET_EN) is set if any port has
->>   AM65_CPSW_PN_CTL_IET_PORT_EN set.
->> - Fix workaround for erratum i2208. i.e. Limit rx_min_frag_size to 124
->> - Fix am65_cpsw_iet_get_verify_timeout_ms() to default to timeout for
->>   1G link if link is inactive.
->> - resize the RX FIFO based on pmac_enabled, not tx_enabled.
->>
->> Test Procedure:
->>
->> - 2 EVMs with AM65-CPSW network port connected to each other
->> - Run iet-setup-mqprio.sh on both
->>
->> #!/bin/sh
->> #iet-setup-mqprio.sh
->>
->> ifconfig eth0 down
->> ifconfig eth1 down
->> ethtool -L eth0 tx 4
->> ethtool --set-mm eth0 pmac-enabled on tx-enabled on verify-enabled on verify-time 10 tx-min-frag-size 124
->> ifconfig eth0 up
->> sleep 10
->>
->> tc qdisc add dev eth0 handle 100: root mqprio \
->> num_tc 4 \
->> map 0 1 2 3 \
->> queues 1@0 1@1 1@2 1@3 \
->> hw 1 \
->> mode dcb \
->> fp P P P E
->>
->> tc -g class show dev eth0
->> tc qdisc add dev eth0 clsact
->> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5002 0xffff action skbedit priority 2
->> tc filter add dev eth0 egress protocol ip prio 1 u32 match ip dport 5003 0xffff action skbedit priority 3
->> ip addr add 192.168.3.102/24 dev eth0 
->>
->> - check that MAC merge verification has succeeded
->>
->> ethtool --show-mm eth0
->>
->>         MAC Merge layer state for eth0:
->>         pMAC enabled: on
->>         TX enabled: on
->>         TX active: on
->>         TX minimum fragment size: 124
->>         RX minimum fragment size: 124
->>         Verify enabled: on
->>         Verify time: 10
->>         Max verify time: 134
->>         Verification status: SUCCEEDED
->>
->> - On receiver EVM run 2 iperf instances
->>
->> iperf3 -s -i30 -p5002&
->> iperf3 -s -i30 -p5003&
->>
->> - On sender EVM run 2 iperf instances
->>
->> iperf3 -c 192.168.3.102 -u -b200M -l1472 -u -t5 -i30 -p5002&
->> iperf3 -c 192.168.3.102 -u -b50M -l1472 -u -t5 -i30 -p5003&
->>
->> - Check IET stats on sender. Look for MACMergeFragCountTx: increments
->>
->> ethtool -I --show-mm eth0
->> MAC Merge layer state for eth0:
->> pMAC enabled: on
->> TX enabled: on
->> TX active: on
->> TX minimum fragment size: 124
->> RX minimum fragment size: 124
->> Verify enabled: on
->> Verify time: 10
->> Max verify time: 134
->> Verification status: SUCCEEDED
->> Statistics:
->>   MACMergeFrameAssErrorCount: 0
->>   MACMergeFrameSmdErrorCount: 0
->>   MACMergeFrameAssOkCount: 0
->>   MACMergeFragCountRx: 0
->>   MACMergeFragCountTx: 57824
->>   MACMergeHoldCount: 0
->>
->> - Check IET stats on receiver. Look for MACMergeFragCountRx: and
->>   MACMergeFrameAssOkCount:
->>
->> ethtool -I --show-mm eth0
->> MAC Merge layer state for eth0:
->> pMAC enabled: on
->> TX enabled: on
->> TX active: on
->> TX minimum fragment size: 124
->> RX minimum fragment size: 124
->> Verify enabled: on
->> Verify time: 10
->> Max verify time: 134
->> Verification status: SUCCEEDED
->> Statistics:
->>   MACMergeFrameAssErrorCount: 0
->>   MACMergeFrameSmdErrorCount: 0
->>   MACMergeFrameAssOkCount: 57018
->>   MACMergeFragCountRx: 57824
->>   MACMergeFragCountTx: 0
->>   MACMergeHoldCount: 0
+On Fri, Oct 06, 2023 at 01:41:00PM +0200, Arkadiusz Kubalewski wrote:
+> Implement new callback ops related to measurment and adjustment of
+> signal phase for pin-dpll in ice driver.
 > 
-> Nice of you to post commands, but could you also please clearly state
-> whether the implementation passes tools/testing/selftests/net/forwarding/ethtool_mm.sh?
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Honestly, I didn't spend much time with it. I will try to run
-those tests and get back.
+Hi Arkadiusz,
 
+some minor feedback from my side.
+
+If you do end up re-spinning the series, please consider
+running checkpatch.pl --codespell.
+
+> ---
+>  drivers/net/ethernet/intel/ice/ice_dpll.c | 224 +++++++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_dpll.h |  10 +-
+>  2 files changed, 230 insertions(+), 4 deletions(-)
 > 
->> +	val &= ~AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK;
->> +	val |= AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(add_frag_size);
->> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
->> +
->> +	/* verify_timeout_count can only be set at valid link */
->> +	port->qos.iet.verify_time_ms = cfg->verify_time;
->> +
->> +	/* enable/disable pre-emption based on link status */
-> 
-> For the benefit of grep, I would appreciate if it was spelled
-> "preemption" everywhere.
+> diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
 
-OK.
+...
 
-> 
->> +	am65_cpsw_iet_commit_preemptible_tcs(port);
->> +
->> +	mutex_unlock(&priv->mm_lock);
->> +
->> +	return 0;
->> +}
->> +
->>  static int am65_cpsw_port_est_enabled(struct am65_cpsw_port *port)
->>  {
->>  	return port->qos.est_oper || port->qos.est_admin;
->> @@ -602,6 +743,8 @@ static int am65_cpsw_setup_taprio(struct net_device *ndev, void *type_data)
->>  	if (port->qos.link_speed == SPEED_UNKNOWN)
->>  		return -ENOLINK;
->>  
->> +	am65_cpsw_iet_change_preemptible_tcs(port, taprio->mqprio.preemptible_tcs);
->> +
-> 
-> Hmm, why just look at the preemptible traffic classes and not at
-> taprio's entire mqprio configuration? This bypasses the mapping between
-> Linux traffic classes and switch priorities that you've established in
-> am65_cpsw_setup_mqprio().
-> 
-> With the addition of the "mqprio" structure in tc_taprio_qopt_offload,
-> my intention was to facilitate calling am65_cpsw_setup_mqprio() from
-> am65_cpsw_setup_taprio().
+> +/**
+> + * ice_dpll_phase_offset_get - callback for get dpll phase shift value
+> + * @pin: pointer to a pin
+> + * @pin_priv: private data pointer passed on pin registration
+> + * @dpll: registered dpll pointer
+> + * @dpll_priv: private data pointer passed on dpll registration
+> + * @phase_adjust: on success holds pin phase_adjust value
 
-OK. I will take a look at this. Thanks!
+nit: The parameter is called phase_offset, not phase_adjust in the code below
 
-> 
->>  	return am65_cpsw_set_taprio(ndev, type_data);
->>  }
+> + * @extack: error reporting
+> + *
+> + * Dpll subsystem callback. Handler for getting phase shift value between
+> + * dpll's input and output.
+> + *
+> + * Context: Acquires pf->dplls.lock
+> + * Return:
+> + * * 0 - success
+> + * * negative - error
+> + */
+> +static int
+> +ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
+> +			  const struct dpll_device *dpll, void *dpll_priv,
+> +			  s64 *phase_offset, struct netlink_ext_ack *extack)
+> +{
+> +	struct ice_dpll *d = dpll_priv;
+> +	struct ice_pf *pf = d->pf;
+> +
+> +	mutex_lock(&pf->dplls.lock);
+> +	if (d->active_input == pin)
+> +		*phase_offset = d->phase_offset * ICE_DPLL_PHASE_OFFSET_FACTOR;
+> +	else
+> +		*phase_offset = 0;
+> +	mutex_unlock(&pf->dplls.lock);
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * ice_dpll_rclk_state_on_pin_set - set a state on rclk pin
+>   * @pin: pointer to a pin
 
--- 
-cheers,
--roger
+...
+
+> @@ -1656,6 +1867,15 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
+>  				return ret;
+>  			pins[i].prop.capabilities |=
+>  				DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE;
+> +			pins[i].prop.phase_range.min =
+> +				pf->dplls.input_phase_adj_max;
+> +			pins[i].prop.phase_range.max =
+> +				-pf->dplls.input_phase_adj_max;
+> +		} else {
+> +			pins[i].prop.phase_range.min =
+> +				pf->dplls.output_phase_adj_max,
+
+nit: It probably doesn't make any difference, but perhaps ',' should be ';'.
+
+As flagged by clang-16 with -Wcomma
+
+> +			pins[i].prop.phase_range.max =
+> +				-pf->dplls.output_phase_adj_max;
+>  		}
+>  		pins[i].prop.capabilities |=
+>  			DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE;
+
+...
 
