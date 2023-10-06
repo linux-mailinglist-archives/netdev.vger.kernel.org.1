@@ -1,113 +1,228 @@
-Return-Path: <netdev+bounces-38623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F017BBB73
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:13:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F577BBB91
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C55331C209AF
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 15:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34057281FA4
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 15:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17386273E9;
-	Fri,  6 Oct 2023 15:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C422273F4;
+	Fri,  6 Oct 2023 15:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0iBQyAw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JPh4UOzI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2CA273E6
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 15:13:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6811DF4
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696605195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BBBTecis4bs5YluD0BKJX2HGCbDC8Ki7O67H1hXsk1U=;
-	b=M0iBQyAwqhIQ9HRp43WbIjKDTuxXTw1A7CuPaLFgNL3+2MOY/EXZy+9Fa80EzMJgNoOcrB
-	SLtWhuRX3vJlJ19TA0Ft6p4nZYbQaxmA11p/goPL37G/yxyONMnE9JjDSdfEmNl5ZoCunh
-	ITE6Rc5bpdT7SkxsjPMU+InwFqNQa3g=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-22-J__u-p-BPL6NobSryWhYgw-1; Fri, 06 Oct 2023 11:13:02 -0400
-X-MC-Unique: J__u-p-BPL6NobSryWhYgw-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E2FF23C1E9D3;
-	Fri,  6 Oct 2023 15:13:01 +0000 (UTC)
-Received: from RHTPC1VM0NT.lan (unknown [10.22.33.74])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 65D6A40D1EA;
-	Fri,  6 Oct 2023 15:13:01 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dev@openvswitch.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Adrian Moreno <amorenoz@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>
-Subject: [PATCH net 4/4] selftests: openvswitch: Fix the ct_tuple for v4
-Date: Fri,  6 Oct 2023 11:12:58 -0400
-Message-Id: <20231006151258.983906-5-aconole@redhat.com>
-In-Reply-To: <20231006151258.983906-1-aconole@redhat.com>
-References: <20231006151258.983906-1-aconole@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7701C2B9
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 15:16:32 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5C8A9F
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 08:16:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696605390; x=1728141390;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WTGjyMW2FIJC1/l3thBJWKsgE+/xODElBa5V4llWyIA=;
+  b=JPh4UOzIbp5V33FVAyicbPBXEFVXk2x19E4QicH/izCFvW4aYAQic4QM
+   fkJtoLDIy4Br6vAlj65x058sI/oUSDvaoOCISmVD9NT1ii7DxWaC9XCK5
+   tzZdLIYf9GRt+6mjx3AxITBqniOyyF/GUvdv+i/wNKCIedWh89ORrf0AG
+   8L6VYBpK7wrIkDDolEvVzBb9RzbDtLUxi3j9qTpNvTk7APYKLVsZn1zS1
+   nd7aGugiR9BcL0xCeqg0F+JKYmFiYVSZHBz/TYETlhHmlzAQdmdHYqnDl
+   I0nhvYPzaze9PFfxocECtgBx1683qNdp1YTb01BMH60Mw/Yc12Lw4XR+4
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="2371581"
+X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
+   d="scan'208";a="2371581"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 08:16:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="999353507"
+X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
+   d="scan'208";a="999353507"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Oct 2023 08:16:19 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 6 Oct 2023 08:16:19 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Fri, 6 Oct 2023 08:16:18 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Fri, 6 Oct 2023 08:16:18 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Fri, 6 Oct 2023 08:16:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b/ps4UyxJIf4n75+VfVUxtuVm16MeKRif/Xh39JHmeXqntqCkA1PP65ZD0PNw1+kQ8QfDQCIzlNULQcqI/8FFE/QTgAvy+4hAr+rQ9ddldxtPLeTIdVuf7MNmeS2uOOnMbiRRoipyTSqp4CcCcWiXITf3tz7v3cLKYi8RXoUoh51HKMDvg/K7XQM1iiHtEdDcwvfT1+tBCxqbiXaHdiqAbacrzBb5HujakWe0hZWA/f6mPe/lLkCo+lv/6+U1P/DTTXgrBJAp4qgphs9RxGNi3yQhPNqLoDmi/RPVIyYavLZZyoHZsDUOA51nwCvm1BFv2xkFGSablSeOVO3XdEBgw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fMImQZBc81uB5ITDlH6G5jJanVvP5eok1uwvY/ZeqoI=;
+ b=c5ZynBiQnDpXOes6We8gcC9zP8l9vu4fibh8MIfbQJdlL0x2gcJNxm4ch5+tfbRCheTZCsOqhzTpTHYjkZsCZhCIR6vRnm65C+xlq2qxOaV4upuXGYfsQLeOmmUStJMk9qBUkiFIWkC9ATPnwpF1hv0B4A87mRN0wF0n/YZsGnIqz9JoR0z4PJ5PQeSk8yqSZu0gQ2Yp0GZSeEw/GVAeDgwDWS9o7dqFUizpshwZBsfxDtnJvFs8i6X6po1rScXwlF2wqeYDoNh+Ksg1elJrXGr9YLQrV+rrGRkL3RykQ7ppoIdXjaPJOTadkFIsmBQBws8pDbkDa1n9uSo2LaA8vQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
+ by DS0PR11MB7407.namprd11.prod.outlook.com (2603:10b6:8:136::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.38; Fri, 6 Oct
+ 2023 15:16:16 +0000
+Received: from BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::a2bc:136a:3f41:c858]) by BL0PR11MB3521.namprd11.prod.outlook.com
+ ([fe80::a2bc:136a:3f41:c858%6]) with mapi id 15.20.6838.033; Fri, 6 Oct 2023
+ 15:16:16 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: Simon Horman <horms@kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Christophe JAILLET
+	<christophe.jaillet@wanadoo.fr>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format specifier
+ cleanups
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format
+ specifier cleanups
+Thread-Index: AQHZ9imUBhsgBp8lu0qqiq68v2AWE7A5pd8AgAM9zoA=
+Date: Fri, 6 Oct 2023 15:16:15 +0000
+Message-ID: <BL0PR11MB3521CB784A9F8B8265C45F108FC9A@BL0PR11MB3521.namprd11.prod.outlook.com>
+References: <20231003183603.3887546-1-jesse.brandeburg@intel.com>
+ <ZR1slAb0AQ3ayARW@kernel.org>
+In-Reply-To: <ZR1slAb0AQ3ayARW@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|DS0PR11MB7407:EE_
+x-ms-office365-filtering-correlation-id: 2542c3f3-cd74-459f-a073-08dbc67f2f56
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: R6R9EJN4srmV9Co+94xeKMLGMoPi0S+dax0OQuIZxSHL7ScLxLJ3GQv05UXaU4sGd/7LCWeX+UACSO0Zf5ztDE5Dm0+cKR3AInlYxo7TO81S9WtC7LegOxIEYOqunuxwGH9fuI/O7B1mkLyArcu3IVEuJujCtoTmJ36psXN6YmLXUr0ODx7a/qsPegKe1gQPZDRe4+HS85dIv3I/TfsNVM1Yww8LyRSYZsMo3xypaM6woHbhDuS9VCk6iGTwpArWYAKI7ThGSKXBUmgd1DxcNImnUiGa4hXTAGDSQ4UqyMEafPibS7hQdJnpEpEebR0iR5H69svMuo6CQsTa8sHt1d/7KbXhoQ0w8DYPFptVC6csuzNNEIQi2ypinM9COiglzCGgWqfSi4a19RD46QNbpl+esCIUVU7kBLSnCpaBDKvLN5FBjOV/xFLihJIC/GLSKenZlcUmfMeNlDDGv97xm740Ip+tcckvxbFMymQdYJHGdCI1UZ4KzkxlY6t2MYukCVSycPkBc/7lSuGmWVQlTnVZRuUezBY9MzHpIPEZzdp0Nc0cTXzuWJAboaGkvvUVf5u7vmq2QaB2v7w8CN9CKdvf3x703S/Tl+Voy2Tj0VY=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(136003)(376002)(396003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(8676002)(2906002)(8936002)(4326008)(5660300002)(52536014)(41300700001)(316002)(6636002)(66476007)(66556008)(64756008)(66446008)(54906003)(66946007)(110136005)(55016003)(76116006)(26005)(71200400001)(7696005)(82960400001)(107886003)(6506007)(53546011)(33656002)(86362001)(9686003)(122000001)(966005)(38100700002)(38070700005)(478600001)(83380400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Td/Rti8NB298ukqFKryi3SGpbZgEa6NRberuuTRVMdBU49V8wG6we6vv6nMp?=
+ =?us-ascii?Q?5auV2hNMAmLuGtKwrfLeba9WDB70AFX/A67K2wzLkfwZIyjFy1Mej/5yLzl4?=
+ =?us-ascii?Q?Ke94KaeC9Ru+E93YJULNLg8VoY9BBdObjeGpccLB9SGvZPScFgfy0MDsoCEv?=
+ =?us-ascii?Q?XGsgIOkHLWjQCsYFWUhe2smtH/lWFd2N+MkG5fI+hp1vB+uk1lA7Y3ot04Vi?=
+ =?us-ascii?Q?Q8X+YOjd9uyjv7yL3Sl7qlKm+aAWp097kPwTOo7zmrHLI+MpbNIQLtqFkNxS?=
+ =?us-ascii?Q?CoCue+LtTajwXgTu9l/aa62WFwujFYjN/U1sDTKxFCiKVMn2C5nq34VHRGbA?=
+ =?us-ascii?Q?gPmvnoGnIE2szZueWfNMwIdTb1B9/0p3Bpn/X27GsMvIgDeMZqr//V8estJ1?=
+ =?us-ascii?Q?KDTOS3VDIGDP3pt9p8TgMHuRNVHmLjxXEp63HoB6LO142llTVAGl7wpHNHdC?=
+ =?us-ascii?Q?DrI1Y6A3Cv7U79tM8BkLKmMCNI53WWePW4NviJyibdh5lnWMxwmFFS8bFO0V?=
+ =?us-ascii?Q?l2upE+2nQE/M5v6lPz3aQ/OpbdpJ58b1Dbh7nTRUli9cymSsYX92nxSS3CZ5?=
+ =?us-ascii?Q?ZCXt5xVjLRX5FgMU6HhshLqCwKb1PQVlwDHi8EN6rrWikUX6ONUj6AOTKAmg?=
+ =?us-ascii?Q?I77F2ce19SbrgDFQ6NGoLm8POalpCEMvOqwimvRAee2s+HFpe9Qht5E/hxGY?=
+ =?us-ascii?Q?ve2YMfHidmJb4ORELZZU/tU1j2CmywzuLV5xdrQ0IIO2B+CoqczDhC/ikHDs?=
+ =?us-ascii?Q?1+6TL8wk7Oasod3ORkiCetwmn2dmpRvFUJkcrF+p7AoxM81rg5fDdLJeND2m?=
+ =?us-ascii?Q?P01WHJW5bqtkAG1tyY0kCbRw0pv9+6QX+cKt0rh8b2a6cVHE14bY4s3O+foh?=
+ =?us-ascii?Q?o7nK124mm/G3ul0+jVlVWtIP4rAEPbEgjkWPaGFl9Y8iTaomutwq+94m+F30?=
+ =?us-ascii?Q?vQ3S8ZXv0cF8FueVNqRErepdwGexhDhBRuflfGNPOnfSmpyhsQTX/eUWRjO0?=
+ =?us-ascii?Q?pnjJPOY4vGfQb2DNldm24XeA7QpBCf0RWIs0GlH8vro3ENuQAOJy4uAb47gf?=
+ =?us-ascii?Q?GZVWj1oirzqADz0UCKwjWiVfjuh5J8/SEVScozS7QKn0u5x7svbY4FHEBXkO?=
+ =?us-ascii?Q?mG76epocpAhRNlOgq9A427GcRLTWoW9m6k+TqyeOZxazik6QLVhsKDPAWQhM?=
+ =?us-ascii?Q?5r+h1HYN7yTSxiOOAEcWAtYbl14ZYBrLfMoPB9FPxfEu26tJfUpolI46+Ylh?=
+ =?us-ascii?Q?pc7HfQ1W2UEFtzGAmSjfjI7lNze9bYPz7SrsCmFFB8vuRlN9AbGBM4OYhp74?=
+ =?us-ascii?Q?DA8gRYzmKV015FWjOiRTk3XnHvwUbrj8XNZ11G5SpklVCKvKgjU0vZ3Qd3Ba?=
+ =?us-ascii?Q?TUwIvuadA4IdjuMN77XatTaGgeZF5fnVFI0jV+SX6ustb+wDHFbB6yCsn8uk?=
+ =?us-ascii?Q?f6fWL1whU+HMvvS/jZ+FOHy21gw5B+gmoZYlnaUrf4qxRNHfnf8CP8y0GfMZ?=
+ =?us-ascii?Q?n2zfqLJU1uuoT9kKaPDE2ltZqlKZpsPdfX5YbbuX8RoeEjkhNYxUhu4UMQSN?=
+ =?us-ascii?Q?tgzCPQ0Hd1lfQTl9kvYQDQ/iNwGIUWpIYKebCLKWy0NI2jlaE+2LBReP1PjV?=
+ =?us-ascii?Q?/A=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2542c3f3-cd74-459f-a073-08dbc67f2f56
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Oct 2023 15:16:16.0260
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ouihi0DGHgTC2eLBJCvpVO4/Q80ei27lNQ0IQsLaZjr91zEzTOt6dswFbE23xLQVCA+0bFHlz9bCUbUYLczq8aGjwWD8WMnCjrMTl279P/s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7407
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Caught during code review.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Simon Horman
+> Sent: Wednesday, October 4, 2023 3:46 PM
+> To: Brandeburg, Jesse <jesse.brandeburg@intel.com>
+> Cc: netdev@vger.kernel.org; Christophe JAILLET
+> <christophe.jaillet@wanadoo.fr>; intel-wired-lan@lists.osuosl.org; Kitsze=
+l,
+> Przemyslaw <przemyslaw.kitszel@intel.com>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format spec=
+ifier
+> cleanups
+>=20
+> On Tue, Oct 03, 2023 at 11:36:01AM -0700, Jesse Brandeburg wrote:
+> > Clean up some warnings from the W=3D1 build which moves the intel
+> > directory back to "clean" state. This mostly involved converting to
+> > using ethtool_sprintf where appropriate and kasprintf in other places.
+> >
+> > The second patch goes the extra mile and cleans up -Wformat=3D2 warning=
+s
+> > as suggested by Alex Lobakin, since those flags will likely be turned
+> > on as well.
+> >
+> > gcc-12 runs clean after these changes, and clang-15 still has some
+> > minor complaints as mentioned in patch-2.
+> >
+> > Jesse Brandeburg (2):
+> >   intel: fix string truncation warnings
+> >   intel: fix format warnings
+> >
+> >  .../net/ethernet/intel/i40e/i40e_ethtool.c    |  6 ++-
+> >  .../net/ethernet/intel/iavf/iavf_ethtool.c    |  8 ++--
+> >  .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 22 ++++-------
+> >  drivers/net/ethernet/intel/ice/ice_ethtool.c  |  7 ++--
+> >  drivers/net/ethernet/intel/ice/ice_ptp.c      |  4 +-
+> >  drivers/net/ethernet/intel/igb/igb_ethtool.c  |  4 +-
+> >  drivers/net/ethernet/intel/igb/igb_main.c     | 37 +++++++++----------
+> >  drivers/net/ethernet/intel/igc/igc_ethtool.c  |  5 ++-
+> > .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  4 +-
+> >  9 files changed, 46 insertions(+), 51 deletions(-)
+>=20
+> For series,
+>=20
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Simon Horman <horms@kernel.org> # build-tested
+>=20
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
-Fixes: e52b07aa1a54 ("selftests: openvswitch: add flow dump support")
-Signed-off-by: Aaron Conole <aconole@redhat.com>
----
- tools/testing/selftests/net/openvswitch/ovs-dpctl.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 153042c1e8c13..ed7bef7ca6883 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -1119,12 +1119,14 @@ class ovskey(nla):
-                 "src",
-                 lambda x: str(ipaddress.IPv4Address(x)),
-                 int,
-+                convert_ipv4,
-             ),
-             (
-                 "dst",
-                 "dst",
--                lambda x: str(ipaddress.IPv6Address(x)),
-+                lambda x: str(ipaddress.IPv4Address(x)),
-                 int,
-+                convert_ipv4,
-             ),
-             ("tp_src", "tp_src", "%d", int),
-             ("tp_dst", "tp_dst", "%d", int),
--- 
-2.40.1
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+
+
 
 
