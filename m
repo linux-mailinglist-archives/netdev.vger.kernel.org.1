@@ -1,123 +1,150 @@
-Return-Path: <netdev+bounces-38647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA057BBDD9
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:34:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2094D7BBDE0
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 19:38:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE2928208D
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:34:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 801BA281574
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 17:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591A9328A6;
-	Fri,  6 Oct 2023 17:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39A5328CA;
+	Fri,  6 Oct 2023 17:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wLpyrw5+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WfD9FbXP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10BF2AB3B
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:33:58 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF57C6
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 10:33:57 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a20c7295bbso20032457b3.0
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 10:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696613636; x=1697218436; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=i3eyr1ScPVkM7UblKqU4I0ckQ7RDfTsWrFSesSv3dOk=;
-        b=wLpyrw5+wg/vZUBAob3uIgK+vFlIPDSSCfHug+EIcEwkW2+yFsR1xZ0S5BJP4BSTK6
-         qvEBtYeNgS9+BdxHK30w5ECuWwqPUhfJyMWoy2poVdjc/L4tZlGz6vgePEX8os2CoRv/
-         Iwur8NetZghIB31qKi1wj+bLdPliltGbG69gXeNGQu1aEZeSNu46XyIRXYLjvH6b0Bje
-         iB71BZZgjAOpBqP7kNgaCgaSjevJUG5PE2fWhKInma6S3OUhHoX2/2+KOtrishoC0P3N
-         H23Uv5HPRsaNOzxdHSiOWmXGmZ0og35r37hA1ypDyzKPOUtjaZdVl8QjRwsqz/kceP/V
-         BEQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696613636; x=1697218436;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=i3eyr1ScPVkM7UblKqU4I0ckQ7RDfTsWrFSesSv3dOk=;
-        b=Sh4uaxWAxeG87GfEB2K86JN27pNtO6dDbSlXe7z/DCJeetTa6h8WxknyqQlmjEF3DV
-         cwgoVZrtdh31eJN5l3QYwNX+RqRfy5ULGqXMyhv3PyBHVlcnJ8Pfvbm1Jeq+a0ytq0my
-         /+h9neNbzKYVjbKC0vjz/+Gl9d0/HQ3gRDDEHAJ2dHuPKnmzKCCdPfPEp9bKwF7KcTOY
-         pqYYk+LlhZf1k/1akXfdBN28RaH/Rlg7MPCE/GfyUH9Rm5NMj6m4dOjyudLMa2cUwqXP
-         4Gbir8MWNTu5Qjbcva0BPr184ch7vOsQRvAaJr/szVTKaVCgaD1EzWHoRfqzT3nywii2
-         otYg==
-X-Gm-Message-State: AOJu0YxX66Ylza/VKQhM3sa5oEOfixt+iF+caOCUnbgbaaJ0BbcRA3wb
-	L6zXU63M9gMfNYk/BNVi8e1YmlLUq/LI1Q==
-X-Google-Smtp-Source: AGHT+IEtevGE2WYXT52LwRNKXYwr0VJfvatoNg01o4o323Lh9z9x8n/N+/QbpeDPpiSzPqQtOtFEMfp3OTOqEg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:7e06:0:b0:58c:e8da:4d1a with SMTP id
- o6-20020a817e06000000b0058ce8da4d1amr139702ywn.2.1696613636565; Fri, 06 Oct
- 2023 10:33:56 -0700 (PDT)
-Date: Fri,  6 Oct 2023 17:33:54 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F3D286A5
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:38:01 +0000 (UTC)
+Received: from out-193.mta0.migadu.com (out-193.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39982AD
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 10:38:00 -0700 (PDT)
+Message-ID: <57c35480-983d-2056-1d72-f6e555069b83@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696613876;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qpXKuzg71AgBMcaKo6kzSKg7OXzsFHX5EQqRaIUxIhA=;
+	b=WfD9FbXP+XfaMTekiCdxwIA2Ul/LvowsY4QBrZ5BWJNt6IM4YA16uruGqTq54eIe4xeXf6
+	pPDH/1uRgfEVVr24mekBmZ544XqEhwaPL+soaK/g99hIBxGcRgu0DCFI6WceegYvhmfhzv
+	rtE8yomic9cJM1uYaQGbmi3/EfQMvfM=
+Date: Fri, 6 Oct 2023 10:37:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-Message-ID: <20231006173355.2254983-1-edumazet@google.com>
-Subject: [PATCH net] net: refine debug info in skb_checksum_help()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+Subject: Re: [PATCH bpf v3] net/xdp: fix zero-size allocation warning in
+ xskq_create()
+Content-Language: en-US
+To: Andrew Kanner <andrew.kanner@gmail.com>
+Cc: linux-kernel-mentees@lists.linuxfoundation.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
+ syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, aleksander.lobakin@intel.com,
+ xuanzhuo@linux.alibaba.com, ast@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, daniel@iogearbox.net
+References: <20231005193548.515-1-andrew.kanner@gmail.com>
+ <7aa47549-5a95-22d7-1d03-ffdd251cec6d@linux.dev>
+ <651fb2a8.c20a0220.8d6c3.0fd9@mx.google.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <651fb2a8.c20a0220.8d6c3.0fd9@mx.google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot uses panic_on_warn.
+On 10/6/23 12:09 AM, Andrew Kanner wrote:
+> On Thu, Oct 05, 2023 at 06:00:46PM -0700, Martin KaFai Lau wrote:
+> [...]
+>>> diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
+>>> index f8905400ee07..c7e8bbb12752 100644
+>>> --- a/net/xdp/xsk_queue.c
+>>> +++ b/net/xdp/xsk_queue.c
+>>> @@ -34,6 +34,11 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
+>>>    	q->ring_mask = nentries - 1;
+>>>    	size = xskq_get_ring_size(q, umem_queue);
+>>> +	if (unlikely(size == SIZE_MAX)) {
+>>
+>> What if "size" is SIZE_MAX-1? Would it still overflow the PAGE_ALIGN below?
+>>
+>>> +		kfree(q);
+>>> +		return NULL;
+>>> +	}
+>>> +
+>>>    	size = PAGE_ALIGN(size);
+>>>    	q->ring = vmalloc_user(size);
+>>
+> 
+> I asked myself the same question before v1. E.g. thinking about the
+> check: (size > SIZE_MAX - PAGE_SIZE + 1)
+> 
+> But xskq_create() is called after the check for
+> !is_power_of_2(entries) in xsk_init_queue(). So I tried the same
+> reproducer and divided the (nentries) value by 2 in a loop - it hits
+> either SIZE_MAX case or the normal cases without overflow (sometimes
+> throwing vmalloc error complaining about size which exceed total pages
+> in my arm setup).
+> 
+> So I can't see a way size will be SIZE_MAX-1, etc. Correct me if I'm
+> wrong, please.
+> 
+> PS: In the output below the first 2 values of (nentries) hit SIZE_MAX
 
-This means that the skb_dump() I added in the blamed commit are
-not even called.
+Thanks for the explanation, so iiuc it means it will overflow the struct_size() 
+first because of the is_power_of_2(nentries) requirement? Could you help adding 
+some comment to explain? Thanks.
 
-Rewrite this so that we get the needed skb dump before syzbot crashes.
-
-Fixes: eeee4b77dc52 ("net: add more debug info in skb_checksum_help()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reported-by: Willem de Bruijn <willemb@google.com>
----
- net/core/dev.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 85df22f05c38b663f050410b9f7bcd32dd781951..5aaf5753d4e46c7c4b67b00daadeda9784708dfe 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3292,15 +3292,19 @@ int skb_checksum_help(struct sk_buff *skb)
- 
- 	offset = skb_checksum_start_offset(skb);
- 	ret = -EINVAL;
--	if (WARN_ON_ONCE(offset >= skb_headlen(skb))) {
-+	if (unlikely(offset >= skb_headlen(skb))) {
- 		DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-+		WARN_ONCE(true, "offset (%d) >= skb_headlen() (%u)\n",
-+			  offset, skb_headlen(skb));
- 		goto out;
- 	}
- 	csum = skb_checksum(skb, offset, skb->len - offset, 0);
- 
- 	offset += skb->csum_offset;
--	if (WARN_ON_ONCE(offset + sizeof(__sum16) > skb_headlen(skb))) {
-+	if (unlikely(offset + sizeof(__sum16) > skb_headlen(skb))) {
- 		DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-+		WARN_ONCE(true, "offset+2 (%zu) > skb_headlen() (%u)\n",
-+			  offset + sizeof(__sum16), skb_headlen(skb));
- 		goto out;
- 	}
- 	ret = skb_ensure_writable(skb, offset + sizeof(__sum16));
--- 
-2.42.0.609.gbb76f46606-goog
+> case, the rest hit the normal case, vmalloc_user() is complaining
+> about 1 allocation:
+> 
+> 0x20000000
+> 0x10000000
+> 0x8000000
+> [   41.759195][ T2807] pre PAGE_ALIGN size = 2147483968 (0x80000140), PAGE_SIZE = 4096 (0x1000)
+> [   41.759621][ T2807] repro-iter: vmalloc error: size 2147487744, exceeds total pages, mode:0xdc0(GFP_KERNEL|__GFP_ZERO), nodemask=(null),cpuset=/,mems_allowed=0
+> [...]
+> 0x4000000
+> 0x2000000
+> 0x1000000
+> 0x800000
+> 0x400000
+> 0x200000
+> 0x100000
+> 0x80000
+> 0x40000
+> 0x20000
+> 0x10000
+> 0x8000
+> 0x4000
+> 0x2000
+> 0x1000
+> 0x800
+> 0x400
+> 0x200
+> 0x100
+> 0x80
+> 0x40
+> 0x20
+> 0x10
+> 0x8
+> 0x4
+> 0x2
+> 
 
 
