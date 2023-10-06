@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-38678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A33B7BC18C
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 23:47:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28D27BC1F3
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 00:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0652D2820CF
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 21:47:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAB011C2093D
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 22:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF260450C3;
-	Fri,  6 Oct 2023 21:47:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0851450CE;
+	Fri,  6 Oct 2023 22:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UIB5D7QU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mr5hNZS7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C738344483;
-	Fri,  6 Oct 2023 21:47:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B17AC433C7;
-	Fri,  6 Oct 2023 21:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C530D450C9;
+	Fri,  6 Oct 2023 22:02:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C4CC433C7;
+	Fri,  6 Oct 2023 22:02:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696628829;
-	bh=7ShH9lM/jTtdIpDBd5tkXIdLZJ6EOzXUhDKKnj55xPo=;
+	s=k20201202; t=1696629774;
+	bh=5qNpTHdPbPHNPOq+CPvh8QULUoFCrWL4op5DAxKIpGM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UIB5D7QUgappiPLI6dOoUHSxvt5YAjXDxSa8MYt3/cAFv/c5IHJYHnYTPpU858ZTu
-	 ClL/Cf8dYmT/K2AsekQJqM/9c+T/Lu+ejjHS7ojVK3HC8q8o9i3501u//0M0XEEIUA
-	 kQhpB665WwNyXG+96GLLJwQmYMwetRfLQ0qkrS4cswc44g/UYawosmoi4NMFiFOe4q
-	 duYX45Tg97UhJ6fdrukD6yY2MmoCfaH9XlYzON02quQybVLTyXOqpCIZOPLdLN7pvz
-	 WNUh6/12mNBI+Q820T8snzNGUsqfrHG91QPyG1E9MvoRh77CxpA+aVQH87ZXbvLdOH
-	 hY2YnF6sVQk4Q==
-Date: Fri, 6 Oct 2023 14:47:02 -0700
+	b=mr5hNZS7cPEC9fZ9Pm1otMuyEoQtn5x0MebbmvDKT1ysxZd56Xx+tCIEM8QZkQ0Rx
+	 2HUNxrgaPRHz8QjWANUbD1mH6curuCdl6HomjYf2KnrCtmGyAAnY5ufgjcVH8v/6jb
+	 QG2jDbcpxxyNYg4G8snQQRAUJZiH1mXGOYt8SQQGeANRY51XoIQTOlWK6yuYXJMFzl
+	 JuNX4YzwFq+kxxRqEiTycDfkPmkv5j5xhBajGBUP1pMm0yb+NbugndmWBLihXxE3sN
+	 +UAuDIx49s6xJ7b8nNHq77RCfPL2Bx0miv1JSuqRDSCA4eQG0Z9vQ8/jx1890NcVXF
+	 fyDg6rJJsfGGg==
+Date: Fri, 6 Oct 2023 15:02:52 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Herve Codina <herve.codina@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -52,11 +52,12 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  Horman <horms@kernel.org>, Christophe JAILLET
  <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
  <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v7 10/30] net: wan: Add support for QMC HDLC
-Message-ID: <20231006144702.778c165e@kernel.org>
-In-Reply-To: <20230928070652.330429-11-herve.codina@bootlin.com>
+Subject: Re: [PATCH v7 26/30] net: wan: framer: Add support for the Lantiq
+ PEF2256 framer
+Message-ID: <20231006150252.6d45be95@kernel.org>
+In-Reply-To: <20230928070652.330429-27-herve.codina@bootlin.com>
 References: <20230928070652.330429-1-herve.codina@bootlin.com>
-	<20230928070652.330429-11-herve.codina@bootlin.com>
+	<20230928070652.330429-27-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,40 +67,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 28 Sep 2023 09:06:28 +0200 Herve Codina wrote:
-> +static int qmc_hdlc_close(struct net_device *netdev)
-> +{
-> +	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
-> +	struct qmc_hdlc_desc *desc;
-> +	int i;
-> +
-> +	netif_stop_queue(netdev);
-> +
-> +	qmc_chan_stop(qmc_hdlc->qmc_chan, QMC_CHAN_ALL);
-> +	qmc_chan_reset(qmc_hdlc->qmc_chan, QMC_CHAN_ALL);
+On Thu, 28 Sep 2023 09:06:44 +0200 Herve Codina wrote:
+> +	for (i = 0; i < count; i++) {
+> +		(audio_devs + i)->name = "framer-codec";
+> +		(audio_devs + i)->of_compatible = compatible;
+> +		(audio_devs + i)->id = i;
 
-stopping the queue looks a bit racy, a completion may come in 
-and restart the queue
+Why not array notation?
 
-> +	for (i = 0; i < ARRAY_SIZE(qmc_hdlc->tx_descs); i++) {
-> +		desc = &qmc_hdlc->tx_descs[i];
-> +		if (!desc->skb)
-> +			continue;
-> +		dma_unmap_single(qmc_hdlc->dev, desc->dma_addr, desc->dma_size,
-> +				 DMA_TO_DEVICE);
-> +		kfree_skb(desc->skb);
-> +		desc->skb = NULL;
 > +	}
 > +
-> +	for (i = 0; i < ARRAY_SIZE(qmc_hdlc->rx_descs); i++) {
-> +		desc = &qmc_hdlc->rx_descs[i];
-> +		if (!desc->skb)
-> +			continue;
-> +		dma_unmap_single(qmc_hdlc->dev, desc->dma_addr, desc->dma_size,
-> +				 DMA_FROM_DEVICE);
-> +		kfree_skb(desc->skb);
-> +		desc->skb = NULL;
-> +	}
-> +
-> +	hdlc_close(netdev);
+> +	ret = mfd_add_devices(pef2256->dev, 0, audio_devs, count, NULL, 0, NULL);
+
+Should Lee be CCed for the MFD part?
 
