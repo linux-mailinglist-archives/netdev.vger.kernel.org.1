@@ -1,185 +1,80 @@
-Return-Path: <netdev+bounces-38655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201AB7BBF0A
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 20:53:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8557BBF61
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 20:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CED552820D9
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:53:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46368282148
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59843374E7;
-	Fri,  6 Oct 2023 18:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85D038FB2;
+	Fri,  6 Oct 2023 18:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtTHJ7bh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1smp2O3"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD92F26E04
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 18:53:01 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0B83125;
-	Fri,  6 Oct 2023 11:52:59 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-317c3ac7339so2172481f8f.0;
-        Fri, 06 Oct 2023 11:52:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696618378; x=1697223178; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=X70lVOFCcfRrz5BPTne6oD5pXVKA4lkjxXDB0TaolDY=;
-        b=EtTHJ7bh7i2ZFGjdOIyW6uq1bhu+psU/u9RnXVZwwMHbTV7UZxGoYE8vnv2riL7bwc
-         fuPuZq7pDtRvAPNWxCFN/s7S/FSz5JveMSRDhFrBi1eo68QWfxGuBR4wYWF5MsZ86mXG
-         1ZBFudI4YduVH7oqLrqh8sG/RwHZ0v5SHjtmSWutZRYDuL9TML4yqrs4UZubGv5JpiIg
-         iHK2aQIPrCmyWnJXvpGDQ5tVCSP1LrKCpWD1+zWkbb+EVrbRUrHVZ+44Ant/76nupM+c
-         cvlHDd4xhTueioZoCiPNNLpe7GK87rUfEZX2kJyDkSiF2nuhelG2aaPaYZxm8VuGfuqU
-         M1Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696618378; x=1697223178;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X70lVOFCcfRrz5BPTne6oD5pXVKA4lkjxXDB0TaolDY=;
-        b=RT7l6vK8xZbyEPMiGYQ4CCwU+1PLonOaL1JWKtXj67Hrkpqvwn5/s2ovq00r06NR+n
-         vwDBb54kRX4D0KznWNhKjsTsyEycEQfm2b5RRsNJLICNpjsqHoswmV3bRujTqgAo7w8S
-         arAhnp4+k7IXgkWbOakhgvIMDzK526lwvhoAoZlUxJ9BFs3igtwToeXUqpP/xq2kWjQv
-         MP+8LUTBlAEU0xdLZbifdS8loORnL5NdmPclD5KJK5oxu5GnOJIt3hyMPXUd/VWiAB8U
-         +zggeE7g4YDVuAWAP20TtWGUyPlmkmYtZsQvcqKJ0gvhLx/JgQt4Kk6BZZeUi0nrS2BG
-         ZAyg==
-X-Gm-Message-State: AOJu0Yw/SGRJstUMfsVzPyOyM7wBmj7vdRs7MI44wkVxcF4FoVZTzEjM
-	e1HvLAvZyyR0vpQHAZLCxKk=
-X-Google-Smtp-Source: AGHT+IG8xdl5PYYzmkg371/9IVLxOcEUg0/AO4c3FMmCpHBI1rBYraaud13cZvVNCZmgDH81LCr6PA==
-X-Received: by 2002:a5d:4d8e:0:b0:324:7bdd:678e with SMTP id b14-20020a5d4d8e000000b003247bdd678emr7728648wru.60.1696618377892;
-        Fri, 06 Oct 2023 11:52:57 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id h9-20020a5d5489000000b003179d5aee67sm2231805wrv.94.2023.10.06.11.52.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 11:52:57 -0700 (PDT)
-Message-ID: <65205789.5d0a0220.7e49b.ccb0@mx.google.com>
-X-Google-Original-Message-ID: <ZSBXiecYhFuSdjkC@Ansuel-xps.>
-Date: Fri, 6 Oct 2023 20:52:57 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Douglas Miller <dougmill@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Dany Madden <danymadden@us.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Intel Corporation <linuxwwan@intel.com>,
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Rushil Gupta <rushilg@google.com>, Coco Li <lixiaoyan@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Wei Fang <wei.fang@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Yuri Karpov <YKarpov@ispras.ru>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Zheng Zengkai <zhengzengkai@huawei.com>, Lee Jones <lee@kernel.org>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Dawei Li <set_pte_at@outlook.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH v2 3/4] netdev: replace napi_reschedule with
- napi_schedule
-References: <20231003145150.2498-1-ansuelsmth@gmail.com>
- <20231003145150.2498-3-ansuelsmth@gmail.com>
- <CANn89iK226C-pHUJm7HKMyEtMycGC=KCA2M6kw2KJaUj0cCT6w@mail.gmail.com>
- <20231005093253.2e25533a@kernel.org>
- <CANn89iJQ50AdXP2C1YB2pGjE02WCJ-QCsZqE1yGXtcGsfLA0Jw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9C4328C3
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 18:57:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 325C1C433C8;
+	Fri,  6 Oct 2023 18:57:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696618636;
+	bh=YfL+m9ds7WTaojs/Iarhw4Oi2gSQuduYuEM7beYt9us=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n1smp2O3K/IK+HuWDTGTFZrTTI676iHfiYg4dRdb9sjrOK3xg7UGmB9vMj5I7SwDh
+	 /jDPPbSFG6zEbep6uzKQ2MCeyG++xVnbCT6C8Wyz3/JQGQK1DHE6jpA3b3+L8VlFhc
+	 rZY5uvxA2H56BbHXw9jbNd3IuVzf+L0Fo8SyI2Mk3p10MohbvzqABR6dHhby9yh7nf
+	 CmtCxwNHjKkA0aqgtlnfieCT+zzw2zbv+4lFfKo94HsR6Ye3bAk/HxmNdv5wc/tH5R
+	 Cm102627ZJoyZ2XUSjDdzs3VNwaDR4g1ZxPTcx2cLRH/WHb38nD3PNiiT4fQ5RKym2
+	 qUIRWLyvCcdSA==
+Date: Fri, 6 Oct 2023 11:57:15 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+Message-ID: <20231006115715.4f718fd7@kernel.org>
+In-Reply-To: <8270f9b2-ec07-4f07-86cf-425d25829453@lunn.ch>
+References: <20231006163007.3383971-1-kuba@kernel.org>
+	<8270f9b2-ec07-4f07-86cf-425d25829453@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJQ50AdXP2C1YB2pGjE02WCJ-QCsZqE1yGXtcGsfLA0Jw@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,WEIRD_QUOTING
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 05, 2023 at 06:41:03PM +0200, Eric Dumazet wrote:
-> On Thu, Oct 5, 2023 at 6:32 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Thu, 5 Oct 2023 18:11:56 +0200 Eric Dumazet wrote:
-> > > OK, but I suspect some users of napi_reschedule() might not be race-free...
-> >
-> > What's the race you're thinking of?
+On Fri, 6 Oct 2023 20:41:19 +0200 Andrew Lunn wrote:
+> We already have:
 > 
-> This sort of thing... the race is in fl_starving() though...
+> https://docs.kernel.org/process/7.AdvancedTopics.html#reviewing-patches
 > 
-> diff --git a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-> b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-> index 98dd78551d89..b5ff2e1a9975 100644
-> --- a/drivers/net/ethernet/chelsio/cxgb4/sge.c
-> +++ b/drivers/net/ethernet/chelsio/cxgb4/sge.c
-> @@ -4261,7 +4261,7 @@ static void sge_rx_timer_cb(struct timer_list *t)
+> which has some of the same concepts. I don't think anything in the
+> proposed new text is specific to netdev, unlike most of the rest of
+> maintainer-netdev.rst which does reference netdev specific rules or
+> concepts.
 > 
->                         if (fl_starving(adap, fl)) {
->                                 rxq = container_of(fl, struct sge_eth_rxq, fl);
-> -                               if (napi_reschedule(&rxq->rspq.napi))
-> +                               if (napi_schedule(&rxq->rspq.napi))
->                                         fl->starving++;
->                                 else
->                                         set_bit(id, s->starving_fl);
+> So i wounder if this even belongs in netdev? Do we actually want to
+> extend the current text in "A guide to the Kernel Development
+> Process", and maintainer-netdev.rst say something like:
+> 
+>     Reviewing other people's patches on the list is highly encouraged,
+>     regardless of the level of expertise.
+> 
+> and cross reference to the text in section 7.2?
 
-Ehhh problem is that this is a simple rename so if any race is present,
-it's already there and not caused by this rename :(
+:) If I can't get it past you there's no chance I'll get it past docs@
 
-Don't know maybe this is out of scope and should be investigated with a
-bug report?
-
-Maybe this should be changed to prep/__schedule to prevent any kind of
-race? But doing so doesn't prevent any kind of ""starving""?
-
--- 
-	Ansuel
+Let me move some of the staff into general docs and add a reference.
+The questions which came up were about use of tags and how maintainers
+approach the reviews from less experienced devs, which I think is
+subsystem-specific?
 
