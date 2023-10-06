@@ -1,122 +1,102 @@
-Return-Path: <netdev+bounces-38473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4E17BB18B
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:30:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4DB07BB1A2
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38991C2094E
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B47991C208FA
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5A217F2;
-	Fri,  6 Oct 2023 06:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5D8523D;
+	Fri,  6 Oct 2023 06:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CoivroCh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W3776beY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D452107
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 06:29:59 +0000 (UTC)
-Received: from out-190.mta0.migadu.com (out-190.mta0.migadu.com [91.218.175.190])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F0CCA
-	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 23:29:58 -0700 (PDT)
-Message-ID: <47294480-506a-e22e-7466-3cdc106c395e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696573796;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rG5Ff9znLNDf/VzoV0lfrajhNAh/LlwOqwUkx96AOjA=;
-	b=CoivroCht4AHq/DflGYIogpH2FhfWMxVhLstpWtx7PXGESHLg5Gxmox+G6ZNPGHLOLNl5M
-	sMZrkhIjPPhFgE+wVwcQSg1dlf6uhp5mhmS18wabo6TP1asK9qD1q97ONXJI7J3JYdG49h
-	r7ZNa+nq3faHMe2W4ajWczIgZ8EepOA=
-Date: Thu, 5 Oct 2023 23:29:50 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C667646B3
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 06:42:48 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78ED6E9
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 23:42:46 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-5041d6d8b10so2323973e87.2
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 23:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696574565; x=1697179365; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=W48qcl+qVVYwRgZC9dzFeOYmfNEtgKzD22rI+wL+TnY=;
+        b=W3776beY1WhbnwkPTXU43k1YN3bvA4HlOBqBgtXAJzQprzX/UGxajTumHDGQWNKiKm
+         /1t0l/pO3krDhIBHQ3XxXDVbArB99i2ZUh3oZY4SPbIb8YXPAszCWNYcHvHou3oE3HSB
+         QSohK1xz+5hgMrNeV9sWOQy4R2JEhL6cXNk/MDq3ta2/xSwcLVQLdSCgt5Lwonn/VKv+
+         TqccQKyo2IfiWDGqqjrC6vfv1TR9o27kSf/Tr+j/wOI8z1YC5f4AV07jnTEN14AZBlDV
+         V/t1IVApB6pmJRcgwoWp7Erq46w0NLVOKO/gHgc7qkcazCMOqgMtIfwAQmTxjEmFuuWs
+         c/wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696574565; x=1697179365;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W48qcl+qVVYwRgZC9dzFeOYmfNEtgKzD22rI+wL+TnY=;
+        b=H/wUYAXydGHKfH1Zg/3ziczAPF7oA7i4N+OzPq8i/LW8ANIIn9f5qW0D2ZPbjvXq2c
+         ncgvP77C2Q1z0Y71CxtmXEq73WtXz8NUUrPHv+J0q+5rlVZFMhOglw9kTEsDXVv28DGG
+         s0PVVkbySiOmnPwp0X4lZVgXO1BSRbh9d0BCclzNVFrPyvDCwf4Pp5/wD9qlKRFLYjUI
+         BP5iV3vslE2eIWKrxBFnIZ1ic6I/Tqe5UXtm/Y4s2C/uUoXRwTkwBG5S8inzAi2IHyU+
+         GE9w4rxCk8jSQJxRwYSndXriJGc5Tgh8cVsAvveZeF0RM0LLPLjWXXzAVi6trnfegRkH
+         A8tg==
+X-Gm-Message-State: AOJu0YzEOSBgh67rtVIEMB0WEjKYg5lSTgwZRznniPlh6dwbTt8joKet
+	1HgfRhRd9Q72Du7Ka4XmrQo6dQ==
+X-Google-Smtp-Source: AGHT+IFIWdwm8yYcilcNJBfYGLjSxm5s+ZR2i1auLhHaCiDm+4VaFO3iNGZddB32L6PiCOJ5HAbcYw==
+X-Received: by 2002:ac2:5f5b:0:b0:4fd:cae7:2393 with SMTP id 27-20020ac25f5b000000b004fdcae72393mr5162245lfz.2.1696574564680;
+        Thu, 05 Oct 2023 23:42:44 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id f17-20020a1c6a11000000b004063ea92492sm3019275wmc.22.2023.10.05.23.42.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 23:42:44 -0700 (PDT)
+Date: Fri, 6 Oct 2023 09:42:41 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Ricardo Lopes <ricardoapl.dev@gmail.com>
+Cc: manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
+	gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] staging: qlge: Replace strncpy with strscpy
+Message-ID: <0b78b29f-2a84-487c-a43b-f8d3fa20d935@kadam.mountain>
+References: <20231005191459.10698-1-ricardoapl.dev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 1/2] bpf: Derive source IP addr via
- bpf_*_fib_lookup()
-Content-Language: en-US
-To: Martynas <m@lambda.lt>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev <netdev@vger.kernel.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, bpf@vger.kernel.org
-References: <20231003071013.824623-1-m@lambda.lt>
- <20231003071013.824623-2-m@lambda.lt>
- <5bef21a3-18c0-e335-d64e-bcd6f1e304a4@linux.dev>
- <e7b992e3-8059-4058-8561-cb017c200c8d@app.fastmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <e7b992e3-8059-4058-8561-cb017c200c8d@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231005191459.10698-1-ricardoapl.dev@gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/5/23 1:16 PM, Martynas wrote:
->>> @@ -5992,6 +5995,19 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
->>>    	params->rt_metric = res.f6i->fib6_metric;
->>>    	params->ifindex = dev->ifindex;
->>>    
->>> +	if (flags & BPF_FIB_LOOKUP_SET_SRC) {
->>> +		if (res.f6i->fib6_prefsrc.plen) {
->>> +			*(struct in6_addr *)params->ipv6_src = res.f6i->fib6_prefsrc.addr;
-
-A nit. just noticed. Similar to the "*dst" assignment a few lines above:
-
-			*src = res.f6i->fib6_prefsrc.addr;
-
->>> +		} else {
->>> +			err = ipv6_bpf_stub->ipv6_dev_get_saddr(net, dev,
->>> +								&fl6.daddr, 0,
->>> +								(struct in6_addr *)
->>> +								params->ipv6_src);
-
-Same here. Use the "src".
-
->>> +			if (err)
->>> +				return BPF_FIB_LKUP_RET_NO_SRC_ADDR;
->>
->> This error also implies BPF_FIB_LKUP_RET_NO_NEIGH. I don't have a clean way of
->> improving the API. May be others have some ideas.
->>
->> Considering dev has no saddr is probably (?) an unlikely case, it should be ok
->> to leave it as is but at least a comment in the uapi will be needed. Otherwise,
->> the bpf prog may use the 0 dmac as-is.
+On Thu, Oct 05, 2023 at 08:14:55PM +0100, Ricardo Lopes wrote:
+> Avoid read overflows and other misbehavior due to missing termination.
 > 
-> I expect that a user of the helper checks that err == 0 before using any of the output params.
 
-For example, the bpf prog gets BPF_FIB_LKUP_RET_NO_NEIGH and learns neigh is not 
-available but ipv6_dst (and the optional ipv6_src) is still valid.
+There aren't any read overflows in the current code.
 
-If the bpf prog gets BPF_FIB_LKUP_RET_NO_SRC_ADDR, intuitively, only ipv6_src is 
-not available. The bpf prog will continue to use the ipv6_dst and dmac (which is 
-actually 0).
-
+> Reported by checkpatch:
 > 
->>
->> I feel the current bpf_ipv[46]_fib_lookup helper is doing many things
->> in one
->> function and then requires different BPF_FIB_LOOKUP_* bits to select
->> what/how to
->> do. In the future, it may be worth to consider breaking it into smaller
->> kfunc(s). e.g. the __ipv[46]_neigh_lookup could be in its own kfunc.
->>
-> 
-> Yep, good idea. At least it seems that the neigh lookup could live in its own function.
+> WARNING: Prefer strscpy, strscpy_pad, or __nonstring over strncpy
 
-To be clear, it could be independent of this set.
+But making checkpatch happy is good and the patch is fine.
 
-Thanks.
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
+
+regards,
+dan carpenter
 
 
