@@ -1,92 +1,91 @@
-Return-Path: <netdev+bounces-38637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B1C7BBCE3
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:38:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7B67BBD13
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:42:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E191A1C209BE
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03BED281994
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2401D1A58E;
-	Fri,  6 Oct 2023 16:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077AB262A1;
+	Fri,  6 Oct 2023 16:42:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NovB3Fuy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aq6iAUV3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10281846
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:38:27 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EB5AD
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:38:25 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4060b623e64so14902485e9.0
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:38:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77CA28E03
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:42:32 +0000 (UTC)
+Received: from mail-ua1-x92a.google.com (mail-ua1-x92a.google.com [IPv6:2607:f8b0:4864:20::92a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 519A310E5
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:42:08 -0700 (PDT)
+Received: by mail-ua1-x92a.google.com with SMTP id a1e0cc1a2514c-7ae19da7b79so938979241.2
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:42:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696610304; x=1697215104; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7dWGSS3YOrcsvfE31ne7UgGiti282vWu0wuljkGr9n4=;
-        b=NovB3Fuyl8NLN0wwOKzZgjEKmXF3HDXE4HVPKQy/s63Gx7PXUrg+YDbJWKjt5rujZ8
-         gCTHWQhHjelAcICjo/Q+1FFzC8wGnsixWjU/FVUYCg7CA8JOmf3DRxmZEDcgKo9HB4Dj
-         bDPBIRSISJF4X+qpSvDLtvat1/1i60znG0CK/uS/lY8FFn/z46kd+TE8NUIiiS9Wp9m8
-         34YuG52733nQrXzwhoYwHuurvpNUbNufKvg5RlJ5yzhKWe8ZeiyCtqtf1YcwhCeSqSIP
-         9Ou7R0OfqI+/PjlX3eslxVCnw1+BRDQRGMRf5V5lx6XFmQgdIdm4PeGYaKpzlBYA89Z3
-         mZuw==
+        d=gmail.com; s=20230601; t=1696610527; x=1697215327; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r7fLMnqL2G3VingLYxATjYUEpnWfC+K5xF5x8ar3oyI=;
+        b=aq6iAUV3sK9U9Bzj1Un7WLEKrd6wwceecF+JTKUEaQ0OyisLJ/IwvoB9naOmgIoZeG
+         dZe4T2+fLBg38dtGGnQzedgMozRWdZ0WNX8fR1mav7CQpED7dotc5JGfQ92NxW0wEjMF
+         uNStdk1wt2g8Oi7P1THZn1ifgLDEcKYy6RC5MW/bX1hhlCZWxbBUavF9EC6XObHbdWsx
+         +Cu6LdeVpO7l1LiuVngLtvFmrJhaXN9Dl3wcCpTU+wWhkQsi5GRUKCT9hAv9e7zKHi3a
+         isFLdTCd6lryG0a9H2MB2XwtZ3zcx3vii0Elg9cojf1eV6ehhZ0HaQIg8mRzWr9EUuSh
+         fMdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696610304; x=1697215104;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
+        d=1e100.net; s=20230601; t=1696610527; x=1697215327;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7dWGSS3YOrcsvfE31ne7UgGiti282vWu0wuljkGr9n4=;
-        b=GkJzYQXTqhfFtZmhLrD0pzkXA+q6fc8B2yl548muruty28r3Ad7qXXDV5yN8JPkAsc
-         z8RshB3iIqyaXbnBxBTUtq/4XbskPC5blmQeskSyKy6msrEPFOHtaUFHzeq54HiqL3nY
-         7GeyKrbN9PvLE5Dq+nQBZ+C4fZQy0AkUh9jx1dDKBKmrSErBhujusu8YFMaHOWjYshDn
-         ugji3Gd/3EXZCE4JqK52CdlAgfuHNI4lJrhNlMBg8KxzdfBn7c+A+CWvBSCCXkjRLKZ/
-         05iLuYZncdhOVIgNI6pGa8fy/S7D/P3V91kuCvyUiDUN23cdcKSNhLhoXefi6uYXnViU
-         DdBQ==
-X-Gm-Message-State: AOJu0Yyti83odPgCZufFsvpWSkWM414HGoeLMFvtKbc5G9IDDjW7AXa7
-	pCxy37wYGUR1RV2G1EYut3k=
-X-Google-Smtp-Source: AGHT+IHtbEc+QIkRxAbCwc9TY9f1d3wwkO7FQVls5eDQewnUGLia8nas2gnOAqPbmytf58a2OzrJ5Q==
-X-Received: by 2002:a7b:cd06:0:b0:406:80ac:3291 with SMTP id f6-20020a7bcd06000000b0040680ac3291mr5134665wmj.13.1696610303677;
-        Fri, 06 Oct 2023 09:38:23 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 11-20020a05600c230b00b004053a6b8c41sm4071788wmo.12.2023.10.06.09.38.22
+        bh=r7fLMnqL2G3VingLYxATjYUEpnWfC+K5xF5x8ar3oyI=;
+        b=fn2Og/i0DaCwURuwL9qpAsD2SBJkm/risZiDzQvBHvcFcKGqis6770dAu0m9pUufu9
+         um/n3VkpIL3n+w1kpSC6Uf1RVk+RLtKq04gSs0gqmQGHR86XtPLnC4MrxBqZ7VYlbLCe
+         sHA3i4XVJOtFIiN5Q4JKmNzRwZ9KDCoAJzM7OPGIGF0/+sTRIelFUXhP+BuManZd1VL4
+         KxtXRhmGMm911bJTG/7wPyM8AllClQ5GhSy5/05GTa6FGsSFJZvjqNgJsVPIaXDY8omn
+         8AhifmB9TRLp2mQbMTimq5ddCDlyHdIZQ/Ajtajh6ucxximB+1klCS6Q3LFpmfYoSADc
+         1oSw==
+X-Gm-Message-State: AOJu0YyZLr79AmNglca8AlZRRuUmSp7HHVDU+8bm7aX7XP03htSCnf6b
+	xnP5+oNrHkZPR3yVKbNSTDk=
+X-Google-Smtp-Source: AGHT+IHycAY1/QmneOzg1FGb3DR/zSPkFy6zkqyMGozsR7XBsM5R8X5ywadFX43/HQ7RQ/pdrPdJNA==
+X-Received: by 2002:a67:f6c1:0:b0:452:635e:2710 with SMTP id v1-20020a67f6c1000000b00452635e2710mr9044729vso.0.1696610526838;
+        Fri, 06 Oct 2023 09:42:06 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id kb4-20020a05622a448400b00415268abe26sm1400029qtb.8.2023.10.06.09.42.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Oct 2023 09:38:23 -0700 (PDT)
-Subject: Re: [RFC] docs: netdev: encourage reviewers
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew@lunn.ch, jesse.brandeburg@intel.com, sd@queasysnail.net,
- horms@verge.net.au
-References: <20231006163007.3383971-1-kuba@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <e3bff9c3-4b0f-c176-4053-9ef7e800b111@gmail.com>
-Date: Fri, 6 Oct 2023 17:38:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        Fri, 06 Oct 2023 09:42:06 -0700 (PDT)
+Message-ID: <37df3fd6-1ae4-4251-b27f-4e32298c0da8@gmail.com>
+Date: Fri, 6 Oct 2023 09:42:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew@lunn.ch, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au
+References: <20231006163007.3383971-1-kuba@kernel.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
 In-Reply-To: <20231006163007.3383971-1-kuba@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 06/10/2023 17:30, Jakub Kicinski wrote:
+On 10/6/23 09:30, Jakub Kicinski wrote:
 > Add a section to our maintainer doc encouraging reviewers
 > to chime in on the mailing list.
 > 
@@ -98,13 +97,9 @@ On 06/10/2023 17:30, Jakub Kicinski wrote:
 > and shared with the vendors (for the "driver review rotation").
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[...]
-> +Last but not least patch review may become a negative process, focused
-> +on pointing out problems. Please throw in a complement once in a while,
-> +particularly for newbies!
 
-sp: compliment.
+LGTM with the typo that Edward spotted, thanks!
+-- 
+Florian
 
-Otherwise looks good.
--ed
 
