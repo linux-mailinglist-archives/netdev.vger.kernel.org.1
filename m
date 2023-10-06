@@ -1,83 +1,122 @@
-Return-Path: <netdev+bounces-38472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08EE47BB15A
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:06:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4E17BB18B
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 08:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D205282060
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38991C2094E
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FC95226;
-	Fri,  6 Oct 2023 06:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5A217F2;
+	Fri,  6 Oct 2023 06:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CoivroCh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D3D46B3
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 06:06:45 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E19690;
-	Thu,  5 Oct 2023 23:06:42 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qodyp-0006fE-FF; Fri, 06 Oct 2023 08:06:31 +0200
-Date: Fri, 6 Oct 2023 08:06:31 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Henrik =?iso-8859-15?Q?Lindstr=F6m?= <lindstrom515@gmail.com>
-Cc: Florian Westphal <fw@strlen.de>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: macvtap performs IP defragmentation, causing MTU problems for
- virtual machines
-Message-ID: <20231006060631.GC11420@breakpoint.cc>
-References: <CAHkKap3sdN4wZm_euAZEyt3XB4bvr6cV-oAMGtrmrm5Z8biZ_Q@mail.gmail.com>
- <2197902.NgBsaNRSFp@pc>
- <20231004080037.GC15013@breakpoint.cc>
- <3259970.44csPzL39Z@pc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D452107
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 06:29:59 +0000 (UTC)
+Received: from out-190.mta0.migadu.com (out-190.mta0.migadu.com [91.218.175.190])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23F0CCA
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 23:29:58 -0700 (PDT)
+Message-ID: <47294480-506a-e22e-7466-3cdc106c395e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696573796;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rG5Ff9znLNDf/VzoV0lfrajhNAh/LlwOqwUkx96AOjA=;
+	b=CoivroCht4AHq/DflGYIogpH2FhfWMxVhLstpWtx7PXGESHLg5Gxmox+G6ZNPGHLOLNl5M
+	sMZrkhIjPPhFgE+wVwcQSg1dlf6uhp5mhmS18wabo6TP1asK9qD1q97ONXJI7J3JYdG49h
+	r7ZNa+nq3faHMe2W4ajWczIgZ8EepOA=
+Date: Thu, 5 Oct 2023 23:29:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3259970.44csPzL39Z@pc>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Subject: Re: [PATCH bpf v2 1/2] bpf: Derive source IP addr via
+ bpf_*_fib_lookup()
+Content-Language: en-US
+To: Martynas <m@lambda.lt>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev <netdev@vger.kernel.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, bpf@vger.kernel.org
+References: <20231003071013.824623-1-m@lambda.lt>
+ <20231003071013.824623-2-m@lambda.lt>
+ <5bef21a3-18c0-e335-d64e-bcd6f1e304a4@linux.dev>
+ <e7b992e3-8059-4058-8561-cb017c200c8d@app.fastmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <e7b992e3-8059-4058-8561-cb017c200c8d@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Henrik Lindström <lindstrom515@gmail.com> wrote:
-> On onsdag 4 oktober 2023 10:00:37 CEST Florian Westphal wrote:
-> > Can you submit this formally, with proper changelog and Signed-off-by?
-> > See scripts/checkpatch.pl in the kernel tree.
-> Sure, i can give it a shot. How do i properly credit you if i submit your
-> patch with some small changes of my own?
+On 10/5/23 1:16 PM, Martynas wrote:
+>>> @@ -5992,6 +5995,19 @@ static int bpf_ipv6_fib_lookup(struct net *net, struct bpf_fib_lookup *params,
+>>>    	params->rt_metric = res.f6i->fib6_metric;
+>>>    	params->ifindex = dev->ifindex;
+>>>    
+>>> +	if (flags & BPF_FIB_LOOKUP_SET_SRC) {
+>>> +		if (res.f6i->fib6_prefsrc.plen) {
+>>> +			*(struct in6_addr *)params->ipv6_src = res.f6i->fib6_prefsrc.addr;
 
-You can use:
+A nit. just noticed. Similar to the "*dst" assignment a few lines above:
 
-"Suggested-by:" tag here.
+			*src = res.f6i->fib6_prefsrc.addr;
 
-> > You could also mention in changelog that this is ipv4 only because
-> > ipv6 already considers the interface index during reassembly.
-> Interesting. I've been trying to understand the code and it seems like
-> ipv6 does defragmentation per-interface, while ipv4 does it "per-vrf"
-> (correct me if i'm wrong). Is there any reason for this difference? 
+>>> +		} else {
+>>> +			err = ipv6_bpf_stub->ipv6_dev_get_saddr(net, dev,
+>>> +								&fl6.daddr, 0,
+>>> +								(struct in6_addr *)
+>>> +								params->ipv6_src);
 
-Only for linklocal and multicasts.  Added in
-264640fc2c5f4f913db5c73fa3eb1ead2c45e9d7 . Even mentions macvlan in the
-changelog.
+Same here. Use the "src".
 
-> The idea being that bcast/mcast packets are always defragmented
-> per-interface, and unicast packets always "per-vrf".
+>>> +			if (err)
+>>> +				return BPF_FIB_LKUP_RET_NO_SRC_ADDR;
+>>
+>> This error also implies BPF_FIB_LKUP_RET_NO_NEIGH. I don't have a clean way of
+>> improving the API. May be others have some ideas.
+>>
+>> Considering dev has no saddr is probably (?) an unlikely case, it should be ok
+>> to leave it as is but at least a comment in the uapi will be needed. Otherwise,
+>> the bpf prog may use the 0 dmac as-is.
+> 
+> I expect that a user of the helper checks that err == 0 before using any of the output params.
 
-LGTM, but please CC dsahern@kernel.org once you submit the patch.
+For example, the bpf prog gets BPF_FIB_LKUP_RET_NO_NEIGH and learns neigh is not 
+available but ipv6_dst (and the optional ipv6_src) is still valid.
+
+If the bpf prog gets BPF_FIB_LKUP_RET_NO_SRC_ADDR, intuitively, only ipv6_src is 
+not available. The bpf prog will continue to use the ipv6_dst and dmac (which is 
+actually 0).
+
+> 
+>>
+>> I feel the current bpf_ipv[46]_fib_lookup helper is doing many things
+>> in one
+>> function and then requires different BPF_FIB_LOOKUP_* bits to select
+>> what/how to
+>> do. In the future, it may be worth to consider breaking it into smaller
+>> kfunc(s). e.g. the __ipv[46]_neigh_lookup could be in its own kfunc.
+>>
+> 
+> Yep, good idea. At least it seems that the neigh lookup could live in its own function.
+
+To be clear, it could be independent of this set.
+
+Thanks.
+
 
