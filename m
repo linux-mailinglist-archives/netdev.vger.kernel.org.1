@@ -1,82 +1,108 @@
-Return-Path: <netdev+bounces-38614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C5A7BBABA
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:48:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CCE57BBAC4
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F9FC1C20948
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:48:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E9B2823C7
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 14:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D5A250EA;
-	Fri,  6 Oct 2023 14:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4986266CA;
+	Fri,  6 Oct 2023 14:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pw4cglRd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hlNdoc4K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A94322EF8
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 14:48:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1391C433C8;
-	Fri,  6 Oct 2023 14:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986B322EFC
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 14:48:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC3C9C433C7;
+	Fri,  6 Oct 2023 14:48:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696603700;
-	bh=tpz2lJHsFpXAdojf/r2F+CjbjlhID/zdHJhAMnUPoCo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pw4cglRdfnNQIC+v8UHZFG9a8HZIFKlwmn8crhYx3+RrtDuK/Umh0/7FsERtCn7R4
-	 yEaIj7ty0itLM2i1EjAWcqxRaQDxBDvKKBCk4aSis+ZYZGyJ7rirPb8+wvJcfTe2X6
-	 ORJvvnuzdLyrsQnhNN/1hn19HGLs6ceD84WuebNp0U08JxkqLJeJANE51iAQfxUKxc
-	 NjMyXpnXhWpL/Fpew1ALhW7OrQpKPE8ZTT9MBfOmzjIanNM2T7svMBG08yXegkygnx
-	 iTMvKnL+r2rU66lKgBvyFyBLiVz1aqQZDgZx0RD/aBKRNa5ytE46xX8PqmZ2Iu0aNn
-	 WkJqroi9ENOfw==
-Date: Fri, 6 Oct 2023 16:48:15 +0200
-From: Simon Horman <horms@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: rdunlap@infradead.org, wenjia@linux.ibm.com,
-	linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-	netdev@vger.kernel.org, raspl@linux.ibm.com, sfr@canb.auug.org.au,
-	alibuda@linux.alibaba.com, wintera@linux.ibm.com,
-	guwen@linux.alibaba.com, tonylu@linux.alibaba.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH net] net/smc: Fix dependency of SMC on ISM
-Message-ID: <ZSAeL1aLpkXVweg6@kernel.org>
-References: <d9a2d47d-c8bd-cf17-83e0-d9b82561a594@linux.ibm.com>
- <20231006125847.1517840-1-gbayer@linux.ibm.com>
+	s=k20201202; t=1696603723;
+	bh=S93LvOU1CKbDaBjxEm6t05wR9R5agBOs0aTrpTBC+Ko=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hlNdoc4KFQDG+xiHQM4gqzoWUEeIxBIijnS+VIMnnDmZnAullLCe7h4eB9RvZFjnD
+	 goE9sqNY73N2VBBcxz7OlXDzVEBd/Ui9Z7PSkh2hjBqNzpIAbxl23riydDBSVItP8g
+	 rUvuckRXHkGFgWOXUS3QMqbMbOo26jAtjot+lfMug1VKoHuonG3nsn70DQmbCSaOFK
+	 1Tot4whn5FU4RyRVRg9y2fzjqDUfEWnF0w92Udh52OCZxjhD6nIYJxQ1lh34ObfHXK
+	 E6hABHyLrGkvoyZLUExO/e6V5oQm+VyRXs1NrjlBAk5PEEvyi9u/kgYLn2b2dBaL07
+	 Nyos2NbY/0OWg==
+Date: Fri, 6 Oct 2023 07:48:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, gal@nvidia.com
+Subject: Re: [patch net-next] devlink: don't take instance lock for nested
+ handle put
+Message-ID: <20231006074842.4908ead4@kernel.org>
+In-Reply-To: <ZR+1mc/BEDjNQy9A@nanopsycho>
+References: <20231003074349.1435667-1-jiri@resnulli.us>
+	<20231005183029.32987349@kernel.org>
+	<ZR+1mc/BEDjNQy9A@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231006125847.1517840-1-gbayer@linux.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 06, 2023 at 02:58:47PM +0200, Gerd Bayer wrote:
-> When the SMC protocol is built into the kernel proper while ISM is
-> configured to be built as module, linking the kernel fails due to
-> unresolved dependencies out of net/smc/smc_ism.o to
-> ism_get_smcd_ops, ism_register_client, and ism_unregister_client
-> as reported via the linux-next test automation (see link).
-> This however is a bug introduced a while ago.
+On Fri, 6 Oct 2023 09:22:01 +0200 Jiri Pirko wrote:
+> Fri, Oct 06, 2023 at 03:30:29AM CEST, kuba@kernel.org wrote:
+> >> @@ -310,6 +299,7 @@ static void devlink_release(struct work_struct *work)
+> >>  
+> >>  	mutex_destroy(&devlink->lock);
+> >>  	lockdep_unregister_key(&devlink->lock_key);
+> >> +	put_device(devlink->dev);  
+> >
+> >IDK.. holding references until all references are gone may lead 
+> >to reference cycles :(  
 > 
-> Correct the dependency list in ISM's and SMC's Kconfig to reflect the
-> dependencies that are actually inverted. With this you cannot build a
-> kernel with CONFIG_SMC=y and CONFIG_ISM=m. Either ISM needs to be 'y',
-> too - or a 'n'. That way, SMC can still be configured on non-s390
-> architectures that do not have (nor need) an ISM driver.
-> 
-> Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Closes: https://lore.kernel.org/linux-next/d53b5b50-d894-4df8-8969-fd39e63440ae@infradead.org/
-> Co-developed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> I don't follow. What seems to be the problematic flow? I can't spot any
+> reference cycle, do you?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
+I can't remember to be honest. But we already assume that we can access
+struct device of a devlink instance without holding the instance lock.
+Because the relationship between devlink objects is usually fairly
+straightforward and non-cyclical.
+
+Isn't the "rel infrastructure"... well.. over-designed?
+
+The user creates a port on an instance A, which spawns instance B.
+Instance A links instance B to itself.
+Instance A cannot disappear before instance B disappears.
+Also instance A is what controls the destruction of instance B
+so it can unlink it.
+
+We can tell lockdep how the locks nest, too.
+
+> >Overall I feel like recording the references on the objects will be
+> >an endless source of locking pain. Would it be insane if we held 
+> >the relationships as independent objects? Not as attributes of either
+> >side?   
+> 
+> How exactly do you envision this? rel struct would hold the bus/name
+> strings direcly?
+
+No exactly, if we want bi-directional relationships we can create 
+the link struct as a:
+
+rel {
+	u32 rel_id;
+	struct devlink *instanceA, *instanceB; // hold reference
+	struct list_head rel_listA, rel_listB; // under instance locks
+	u32 state;
+	struct list_head ntf_process_queue;
+}
+
+Operations on relationship can take the instance locks (sequentially).
+Notifications from a workqueue.
+Instance dumps would only report rel IDs, but the get the "members" of
+the relationship user needs to issue a separate DL command / syscall.
 
