@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-38641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88D77BBD52
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:55:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4293E7BBD56
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EAFA2821A7
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F541C209BE
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CF328E23;
-	Fri,  6 Oct 2023 16:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4032942A;
+	Fri,  6 Oct 2023 16:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LXsI3yB/"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fQzLwbjS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9748C286B4;
-	Fri,  6 Oct 2023 16:55:27 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50BADC6;
-	Fri,  6 Oct 2023 09:55:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XBLPQTyQ5AVy/jXm8OQ04sHa8uGh6ojfEJTVaQIw4XA=; b=LXsI3yB//hMlSRQsRIAqzB03+G
-	MFt6pbgY5saQP8PPN0EZWl71RshO5a4Su/J/vbOykcRaZ5e5+N8pJnQ+B3VIdMi2VgbKqD5Yaf5CZ
-	NJzneH7/Ewu3JbmWJfLOWbUpBjdbsmtqeRxXK+sCfANZMBOjzrtf1OiOeMKTlHjlbA1M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qoo6l-0003YD-Tx; Fri, 06 Oct 2023 18:55:23 +0200
-Date: Fri, 6 Oct 2023 18:55:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: gregkh@linuxfoundation.org, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
-Message-ID: <a8625fd5-6083-4a4d-872a-c755c214b891@lunn.ch>
-References: <19161969-1033-4fd5-9a24-ec21d66c6735@lunn.ch>
- <20231007.002609.681250079112313735.fujita.tomonori@gmail.com>
- <3db1ad51-a2a0-4648-8bc5-7ed089a4e5dd@lunn.ch>
- <20231007.012100.297660999016269225.fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB71128E23
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:55:43 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DABFC2
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:55:42 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9b98a699f45so404037866b.3
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:55:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696611341; x=1697216141; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0ELyR6s0FsCfN5rMtpom3ZBEeSdSq0wiuuVBwt3jRG8=;
+        b=fQzLwbjSYf3eu/jM2bL9AFg5lT4qNqNNLrhsPO0nhBJBzIM7Kwt41JM4Jzfhpfvwu5
+         tclKV7Jhs0ohulPfJJ37CcqAFUPB4zMWQtjEzYlPr2U1eIMCdrNNSgqborSpwEM62yS5
+         NYtiiLAjUHqsXYPetQM71knYnT1J7r1PoE2YkiQgdVddkVsXD0ur3go5HHhQIKb7hmi0
+         bN7jz8bYav7M6WyFmtK62CKjhaGxuvQjjBSkugW2Bwihn3+MY7NMRh4s4L0xPtGa+nrD
+         tyXklmZu9Y2h5rNz6FanlyOFtdUH34AWQgB3/y/YXJi8uE42PCI4QI40P5pAKGZ3FpzY
+         +Q+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696611341; x=1697216141;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0ELyR6s0FsCfN5rMtpom3ZBEeSdSq0wiuuVBwt3jRG8=;
+        b=VZiHTCFoguEn2zzJjA/d054c35Y3WSr1H6jchXtY8VUehA8H3L4dDZ+iYOAXnR6BL4
+         N/leeuaLkKIAr8rSakkj8hrdjeDZAWvTt/ttNvhrvTmyyi9IlZuFlubBQiAywfTpOHs6
+         eFiZ6UhXqsVqa/t9WHsMIWOvSfVXFiGl+FRwKniOAd2fzUWWhNgJKedKCbP3LCo+Jfdy
+         Jel0C3lGimgBedBk0OT85ikTHTwGQMURXmN1kcEceulAXqpmpitoetgzmsONk+LzH591
+         Novvjzwd6RstmUaFv4qxprZqed4ktTgIZtQEnDRzCvvZ58iCPwnQLX/OdqIIEgcaOMuN
+         PBjg==
+X-Gm-Message-State: AOJu0YwvmYqIFxcTV/3rwRnN+9HN/4kvhbVz0gE+bUprkbOr7XzcC7oQ
+	nBiLGq9Ht1n4ajRTcUVryNdS2g==
+X-Google-Smtp-Source: AGHT+IHbJk072pbAQTGSzT0ca4ib3vENZ5SuPaFhziRneWIn/1IA43vWox9DabMo0o2UPH6ozwtBUg==
+X-Received: by 2002:a17:906:53d4:b0:9ae:5bd7:d2b4 with SMTP id p20-20020a17090653d400b009ae5bd7d2b4mr8478061ejo.68.1696611340713;
+        Fri, 06 Oct 2023 09:55:40 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id e10-20020a1709062c0a00b009b64987e1absm3097809ejh.139.2023.10.06.09.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Oct 2023 09:55:39 -0700 (PDT)
+Date: Fri, 6 Oct 2023 18:55:37 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, donald.hunter@gmail.com
+Subject: Re: [patch net-next v3 1/2] tools: ynl-gen: lift type requirement
+ for attribute subsets
+Message-ID: <ZSA8CVP6+DnPrHly@nanopsycho>
+References: <20231006114436.1725425-1-jiri@resnulli.us>
+ <20231006114436.1725425-2-jiri@resnulli.us>
+ <20231006080039.1955914d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,68 +76,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231007.012100.297660999016269225.fujita.tomonori@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20231006080039.1955914d@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> How about adding CONFIG_RUST_PHYLIB to the first patch. Not
-> selectable, it's just a flag for Rust PHYLIB support.
+Fri, Oct 06, 2023 at 05:00:39PM CEST, kuba@kernel.org wrote:
+>On Fri,  6 Oct 2023 13:44:35 +0200 Jiri Pirko wrote:
+>> +      # type property is only required if not in subset definition
+>> +      if:
+>> +        properties:
+>> +          subset-of:
+>> +            not:
+>> +              type: string
+>> +      then:
+>> +        properties:
+>> +          attributes:
+>> +            items:
+>> +              required: [ type ]
+>
+>Nice!
 
-We have to be careful with names. To some extent, CONFIG_PHYLIB means
-the core of phylib. So it could be that CONFIG_RUST_PHYLIB means the
-core of phylib written in rust? I doubt that will ever happen, but we
-are setting a naming scheme here which i expect others will blindly
-cut/paste. What we actually want is a symbol which represents the Rust
-binding onto the phylib core. So i think it should have BINDING, or
-WRAPPER or something like that in the name.
-
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 4b4e3df1658d..2b6627aeb98c 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1889,7 +1889,7 @@ config RUST
->  	depends on !GCC_PLUGINS
->  	depends on !RANDSTRUCT
->  	depends on !DEBUG_INFO_BTF || PAHOLE_HAS_LANG_EXCLUDE
-> 	depends on PHYLIB=y
-> +	select RUST_PHYLIB
-
-I know the rust build system is rather limited at the moment, but is
-this required? Is it possible to build the rust code without the
-phylib binding? Can your `RUST_PHYLIB` add phylib.rs to a Makefile
-target only if it is enabled?
-
->  	select CONSTRUCTORS
->  	help
->  	  Enables Rust support in the kernel.
-> @@ -1904,6 +1904,10 @@ config RUST
->  
->  	  If unsure, say N.
->  
-> +config RUST_PHYLIB
-> +	bool
-
-This is where the depends on PHYLIB should be. It is the Rust binding
-on phylib which has the dependency on phylib, not the core rust code.
+Took me like 3 hours debugging this. These json schemas are from
+different world than I am...
 
 
-What i think the end state should be, once the Rust build system is
-better is that in drivers/net/phy/Kconfig we have:
-
-if PHYLIB
-
-config RUST_PHYLIB_BINDING
-    bool
-    depends on RUST
-    help
-      Adds support needed for PHY drivers written in Rust. It provides
-      a wrapper around the C phlib core.
-
-and the Makefile when uses this to build the binding as a kernel
-module.
-
-	Andrew
+>
+>Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
