@@ -1,73 +1,71 @@
-Return-Path: <netdev+bounces-38642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4293E7BBD56
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:55:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E12A47BBD64
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 18:59:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F541C209BE
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:55:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98611281E58
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 16:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4032942A;
-	Fri,  6 Oct 2023 16:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D1F2AB2A;
+	Fri,  6 Oct 2023 16:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fQzLwbjS"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DKlz1GAM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB71128E23
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:55:43 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DABFC2
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:55:42 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9b98a699f45so404037866b.3
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:55:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7DF2273C5
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 16:59:12 +0000 (UTC)
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B37AD
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 09:59:10 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9936b3d0286so434638466b.0
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 09:59:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696611341; x=1697216141; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696611549; x=1697216349; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ELyR6s0FsCfN5rMtpom3ZBEeSdSq0wiuuVBwt3jRG8=;
-        b=fQzLwbjSYf3eu/jM2bL9AFg5lT4qNqNNLrhsPO0nhBJBzIM7Kwt41JM4Jzfhpfvwu5
-         tclKV7Jhs0ohulPfJJ37CcqAFUPB4zMWQtjEzYlPr2U1eIMCdrNNSgqborSpwEM62yS5
-         NYtiiLAjUHqsXYPetQM71knYnT1J7r1PoE2YkiQgdVddkVsXD0ur3go5HHhQIKb7hmi0
-         bN7jz8bYav7M6WyFmtK62CKjhaGxuvQjjBSkugW2Bwihn3+MY7NMRh4s4L0xPtGa+nrD
-         tyXklmZu9Y2h5rNz6FanlyOFtdUH34AWQgB3/y/YXJi8uE42PCI4QI40P5pAKGZ3FpzY
-         +Q+Q==
+        bh=uyN8VYYSeUZkA8K6OYxn1GebMFQmwAIvZCPDtYmEOAo=;
+        b=DKlz1GAMoyltZHrSQx/XBz4tneWhbzA7KmFhM7rju+qUK9CPqj25/7rOCcskQm8y3x
+         mCc5rLEaX95LkFnVsaDsyH+PepQgyKdL7nZXbIfIAtZeT2d4IjHY+3Cj3hKP/t/8Pxjg
+         cTdyZifJhcmeXytJsEtjrM9gJnao8H6db0RcbLSMlrQbAZjrRn1jRRtQDXnMUqiDRs4L
+         1pP2i1y0MW9rIrxE+G6ZReZhrwBRPoUCbRuvjXBPH2b8wnozu3tPcTZrGKq4EDQhgkGA
+         i7nW5P9j+ZmrEQI4cueKZzaBfik3CPH561YWuOeiX38EeWCoUoboAMtQ1+sIEA2qTLwH
+         RAiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696611341; x=1697216141;
+        d=1e100.net; s=20230601; t=1696611549; x=1697216349;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0ELyR6s0FsCfN5rMtpom3ZBEeSdSq0wiuuVBwt3jRG8=;
-        b=VZiHTCFoguEn2zzJjA/d054c35Y3WSr1H6jchXtY8VUehA8H3L4dDZ+iYOAXnR6BL4
-         N/leeuaLkKIAr8rSakkj8hrdjeDZAWvTt/ttNvhrvTmyyi9IlZuFlubBQiAywfTpOHs6
-         eFiZ6UhXqsVqa/t9WHsMIWOvSfVXFiGl+FRwKniOAd2fzUWWhNgJKedKCbP3LCo+Jfdy
-         Jel0C3lGimgBedBk0OT85ikTHTwGQMURXmN1kcEceulAXqpmpitoetgzmsONk+LzH591
-         Novvjzwd6RstmUaFv4qxprZqed4ktTgIZtQEnDRzCvvZ58iCPwnQLX/OdqIIEgcaOMuN
-         PBjg==
-X-Gm-Message-State: AOJu0YwvmYqIFxcTV/3rwRnN+9HN/4kvhbVz0gE+bUprkbOr7XzcC7oQ
-	nBiLGq9Ht1n4ajRTcUVryNdS2g==
-X-Google-Smtp-Source: AGHT+IHbJk072pbAQTGSzT0ca4ib3vENZ5SuPaFhziRneWIn/1IA43vWox9DabMo0o2UPH6ozwtBUg==
-X-Received: by 2002:a17:906:53d4:b0:9ae:5bd7:d2b4 with SMTP id p20-20020a17090653d400b009ae5bd7d2b4mr8478061ejo.68.1696611340713;
-        Fri, 06 Oct 2023 09:55:40 -0700 (PDT)
+        bh=uyN8VYYSeUZkA8K6OYxn1GebMFQmwAIvZCPDtYmEOAo=;
+        b=S79jDGWLFhAU3WwoNsT16C3Xlx1mTfkZLiyRP43OFvRIk5jX5ynN1uOBSlAOHj0bKA
+         QYtWhwE1YUgD9mrszvkYhwAgcjgxUOtgRSwKi6tMSLlaSB1J52sl1jCEULtxgnIWUIcQ
+         Ig1UYkXs1nRiXaCIQjVpaDxS2MHmEBXQwucEXts+ozALueDP0w76pUpBMeN9ZY0xIikv
+         +VkvSmJwssrX94CpmoSMW1NFbTQNEN1gYyhhM/lT88aqhD4prZW2U6ai0xpwOm8jvU/d
+         60Y0lkD/8Ari0TwawCm/4+KvCAB7ox33MIgJPpJGFC0q6IXS7FvdCRwMIiIfETUzCCsF
+         zouA==
+X-Gm-Message-State: AOJu0YwzgiYEU/2Dd64gyIjczZVoMEqQUy2+vMoipoDDHC72rj2B4D+v
+	p8U6NoGFQoRp/hNKA8ku5Ret0A==
+X-Google-Smtp-Source: AGHT+IGp3hDmxmj0aF2sFJeRmRwziquKM+zmL/oatKNk5/6Z0/XsfCeyl9ywon0NTiGsHqTQaOMhvQ==
+X-Received: by 2002:a17:906:76d1:b0:9b6:8155:cbef with SMTP id q17-20020a17090676d100b009b68155cbefmr8549878ejn.61.1696611548821;
+        Fri, 06 Oct 2023 09:59:08 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id e10-20020a1709062c0a00b009b64987e1absm3097809ejh.139.2023.10.06.09.55.38
+        by smtp.gmail.com with ESMTPSA id o23-20020a17090611d700b00991e2b5a27dsm3171230eja.37.2023.10.06.09.59.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Oct 2023 09:55:39 -0700 (PDT)
-Date: Fri, 6 Oct 2023 18:55:37 +0200
+        Fri, 06 Oct 2023 09:59:06 -0700 (PDT)
+Date: Fri, 6 Oct 2023 18:59:04 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, donald.hunter@gmail.com
-Subject: Re: [patch net-next v3 1/2] tools: ynl-gen: lift type requirement
- for attribute subsets
-Message-ID: <ZSA8CVP6+DnPrHly@nanopsycho>
-References: <20231006114436.1725425-1-jiri@resnulli.us>
- <20231006114436.1725425-2-jiri@resnulli.us>
- <20231006080039.1955914d@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew@lunn.ch, jesse.brandeburg@intel.com,
+	sd@queasysnail.net, horms@verge.net.au
+Subject: Re: [RFC] docs: netdev: encourage reviewers
+Message-ID: <ZSA82AYG8GF+HYgy@nanopsycho>
+References: <20231006163007.3383971-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,33 +74,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231006080039.1955914d@kernel.org>
+In-Reply-To: <20231006163007.3383971-1-kuba@kernel.org>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Oct 06, 2023 at 05:00:39PM CEST, kuba@kernel.org wrote:
->On Fri,  6 Oct 2023 13:44:35 +0200 Jiri Pirko wrote:
->> +      # type property is only required if not in subset definition
->> +      if:
->> +        properties:
->> +          subset-of:
->> +            not:
->> +              type: string
->> +      then:
->> +        properties:
->> +          attributes:
->> +            items:
->> +              required: [ type ]
+Fri, Oct 06, 2023 at 06:30:07PM CEST, kuba@kernel.org wrote:
+>Add a section to our maintainer doc encouraging reviewers
+>to chime in on the mailing list.
 >
->Nice!
-
-Took me like 3 hours debugging this. These json schemas are from
-different world than I am...
-
-
+>The questions about "when is it okay to share feedback"
+>keep coming up (most recently at netconf) and the answer
+>is "pretty much always".
 >
->Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+>The contents are partially based on a doc we wrote earlier
+>and shared with the vendors (for the "driver review rotation").
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+Looks awesome. Thanks for doing this!
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
