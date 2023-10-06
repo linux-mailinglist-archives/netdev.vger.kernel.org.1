@@ -1,221 +1,122 @@
-Return-Path: <netdev+bounces-38463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28DF67BB0A9
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:03:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0C047BB0AD
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 06:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DEC128202B
-	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 04:03:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69C31C2093E
+	for <lists+netdev@lfdr.de>; Fri,  6 Oct 2023 04:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2981878;
-	Fri,  6 Oct 2023 04:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8732187D;
+	Fri,  6 Oct 2023 04:07:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rr70CsHt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C645629
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 04:03:34 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C664FDB;
-	Thu,  5 Oct 2023 21:03:30 -0700 (PDT)
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 39642neN61336496, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.92/5.92) with ESMTPS id 39642neN61336496
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 6 Oct 2023 12:02:51 +0800
-Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Fri, 6 Oct 2023 12:02:49 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Fri, 6 Oct 2023 12:02:49 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
- RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
- 15.01.2375.007; Fri, 6 Oct 2023 12:02:49 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "kuba@kernel.org" <kuba@kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        Ping-Ke Shih <pkshih@realtek.com>,
-        Larry Chiu
-	<larry.chiu@realtek.com>
-Subject: RE: [PATCH net-next v9 08/13] net:ethernet:realtek:rtase: Implement net_device_ops
-Thread-Topic: [PATCH net-next v9 08/13] net:ethernet:realtek:rtase: Implement
- net_device_ops
-Thread-Index: AQHZ8fl5hDe6qB9qzkmKif0/hXC9sLAvvsaAgAxiTMA=
-Date: Fri, 6 Oct 2023 04:02:48 +0000
-Message-ID: <99dfcd7363dc412f877730fab4a9f7dd@realtek.com>
-References: <20230928104920.113511-1-justinlai0215@realtek.com>
- <20230928104920.113511-9-justinlai0215@realtek.com>
- <b28a3ea6-d75e-45e0-8b87-0b062b5c3a64@lunn.ch>
-In-Reply-To: <b28a3ea6-d75e-45e0-8b87-0b062b5c3a64@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-x-originating-ip: [172.21.210.185]
-x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8669C629
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 04:07:42 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2646E8
+	for <netdev@vger.kernel.org>; Thu,  5 Oct 2023 21:07:38 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-4056ce55e7eso15252335e9.2
+        for <netdev@vger.kernel.org>; Thu, 05 Oct 2023 21:07:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1696565257; x=1697170057; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
+        b=rr70CsHtSYjU0JhuGFjffW8UqdVt7tisVHvQjKqRBq0ngNi2560ND07JBb+qwjAHuZ
+         FTyXL1EfPNruFYt1199hZkF3Pc42WhFfSp8pFKkrg5ZauTM2rfd/H++JJ3JQnXfwM+85
+         qfwUlLdsK96KiJn86HWiKTihhbNswz6n9ecgKERdqi/5UyFq8+6VigFSl+ajV1Alm2Zb
+         ndm76/3PMRJc9uosUdccTwV4XMJw4hEhnYr9TkNoR04ixKiektOVp30QIxprJN7/7ojQ
+         gFyqEPNYJCe1DVexm+scSgh7JUQZaQM2FeX9IKBF12mkqO82yEX0RHTWhBJzmYWvHgzK
+         nPqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696565257; x=1697170057;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SfmJdBPydu0BZJi6LE/RTqA11QEqZm0bT62TNJwMfLU=;
+        b=PRWwTslxG8CN+w4oxrm13HHMIxI6QWTZQDr6sTcEZXHhsQMfqbsYGyN74Pz0GSWnqr
+         33SKlMCgIk/Bk+RlrKlyzf1oBmojlt30wA75B18rWY8bFaTyzTxzOsvKw4HjzAgijxUA
+         TpS2Rz1SwPx9PxNTihT6BBp+6G4wr3eq7gTSuvGb+B/lWLvMYJDp4ZoD3zbAueUc+UOi
+         SCRsy5jOeFDXMVWC4cAAKrIXpinCpSJOaY/T/LE4Z6looSJb7/8Q0EG1WxUjX6NE2urK
+         7nEUErehgQN31lAQ3DImgNUnZk4S5EPMCQ2ff4xRQMoil6vFQDH1KIEDbiw/U7l2sF/R
+         11sQ==
+X-Gm-Message-State: AOJu0YyP4+I60jLDXtdeRPAGhQsKQRp2w5MRT8dini6Pc5Hkn4ixTy8c
+	e+ic3FHv8y55fFacWEwmKQLhQw==
+X-Google-Smtp-Source: AGHT+IFjeXrQUs7p/saYuWWFYACMu2/fI8dWiPv6wIANSyumueY5p9GrWNrq8I5Iy/tR2cn2JV/ZzQ==
+X-Received: by 2002:a05:600c:2117:b0:402:f55c:faee with SMTP id u23-20020a05600c211700b00402f55cfaeemr5918406wml.26.1696565257030;
+        Thu, 05 Oct 2023 21:07:37 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id s26-20020a7bc39a000000b004064cd71aa8sm2784785wmj.34.2023.10.05.21.07.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Oct 2023 21:07:36 -0700 (PDT)
+Date: Fri, 6 Oct 2023 07:07:34 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Angus Chen <angus.chen@jaguarmicro.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Joel Granados <joel.granados@gmail.com>, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] 6lowpan: fix double free in lowpan_frag_rcv()
+Message-ID: <e438fc67-665a-48b6-b414-0641821e0bf3@kadam.mountain>
+References: <3c91e145-5cd5-4d9d-9590-3b74b811436a@moroto.mountain>
+ <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK-6q+iG=jX0qudCcszP64HxCwYSpmx7=Fh+Kf3qVft7Z8hBfg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > +static int rtase_change_mtu(struct net_device *dev, int new_mtu) {
-> > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > +     int ret;
-> > +
-> > +     dev->mtu =3D new_mtu;
-> > +
-> > +     if (!netif_running(dev))
-> > +             goto out;
-> > +
-> > +     rtase_down(dev);
-> > +
-> > +     rtase_set_rxbufsize(tp, dev);
-> > +
-> > +     ret =3D rtase_init_ring(dev);
-> > +
-> > +     if (ret)
-> > +             return ret;
->=20
-> If this fails, what state is the interface in?
->=20
-> What you often see is that the new ring is first allocated. If that is su=
-ccessful,
-> you free the old rung. If the allocation fails, it does not matter, you s=
-till have
-> the old ring, and you keep using it.
->=20
+On Thu, Oct 05, 2023 at 06:10:13PM -0400, Alexander Aring wrote:
+> Hi,
+> 
+> On Wed, Oct 4, 2023 at 5:22 AM Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> >
+> > The skb() is freed by the caller in lowpan_invoke_rx_handlers() so this
+> > free is a double free.
+> >
+> 
+> lowpan_frag_rcv() does not call lowpan_invoke_rx_handlers(), it calls
+> lowpan_invoke_frag_rx_handlers(), or is there something I overlooked
+> here?
 
-If it fails, the driver will not work properly. We will make modifications =
-based on your suggestions.
+Actually now that I look at it more closely this isn't a bug.
 
-> > +
-> > +     netif_stop_queue(dev);
-> > +     netif_carrier_off(dev);
-> > +     rtase_hw_config(dev);
-> > +
-> > +     /* always link, so start to transmit & receive */
-> > +     rtase_hw_start(dev);
-> > +     netif_carrier_on(dev);
-> > +     netif_wake_queue(dev);
->=20
-> I don't think you need to down/up the carrier when changing the MTU.
+The way I was looking at it was that it was the other way around.
+lowpan_invoke_rx_handlers() is the caller.  But actually this returns
+-1.  lowpan_invoke_rx_handlers() will pass the freed skb to
+lowpan_rx_handlers_result() but the -1 gets translated to RX_DROP in
+lowpan_rx_h_frag() then it just returns NET_RX_DROP.  It's a no-op and
+not a double free.
 
-Thank you for your suggestion, we will confirm this part again.
+Sorry!
 
->=20
-> > +static void rtase_sw_reset(struct net_device *dev) {
-> > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > +     int ret;
-> > +
-> > +     netif_stop_queue(dev);
-> > +     netif_carrier_off(dev);
-> > +     rtase_hw_reset(dev);
-> > +
-> > +     /* let's wait a bit while any (async) irq lands on */
-> > +     rtase_wait_for_quiescence(dev);
-> > +     rtase_tx_clear(tp);
-> > +     rtase_rx_clear(tp);
-> > +
-> > +     ret =3D rtase_init_ring(dev);
-> > +     if (ret)
-> > +             netdev_alert(dev, "unable to init ring\n");
-> > +
-> > +     rtase_hw_config(dev);
-> > +     /* always link, so start to transmit & receive */
-> > +     rtase_hw_start(dev);
-> > +
-> > +     netif_carrier_on(dev);
-> > +     netif_wake_queue(dev);
-> > +}
-> > +
-> > +static void rtase_tx_timeout(struct net_device *dev, unsigned int
-> > +txqueue) {
-> > +     rtase_sw_reset(dev);
->=20
-> Do you actually see this happening? The timeout is set pretty high, i thi=
-nk 5
-> seconds. If it does happen, it probably means you have a hardware/firmwar=
-e
-> bug. So you want to be noisy here, so you get to know about these problem=
-s,
-> rather than silently work around them.
+regards,
+dan carpenter
 
-I would like to ask if we can dump some information that will help us under=
-stand the cause of the problem before doing the reset? And should we use ne=
-tdev_warn to print this information?
-
->=20
-> > +static int rtase_setup_tc(struct net_device *dev, enum tc_setup_type t=
-ype,
-> > +                       void *type_data) {
-> > +     struct rtase_private *tp =3D netdev_priv(dev);
-> > +     int ret =3D 0;
-> > +
-> > +     switch (type) {
-> > +     case TC_SETUP_QDISC_MQPRIO:
-> > +             break;
-> > +     case TC_SETUP_BLOCK:
-> > +             break;
->=20
-> This looks odd. You silently return 0, doing nothing?
-
-Thank you for your reminder, we will remove it.
-
->=20
-> > +     case TC_SETUP_QDISC_CBS:
-> > +             ret =3D rtase_setup_tc_cbs(tp, type_data);
-> > +             break;
-> > +     default:
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +static netdev_features_t rtase_fix_features(struct net_device *dev,
-> > +                                         netdev_features_t
-> features)
-> > +{
-> > +     netdev_features_t features_fix =3D features;
-> > +
-> > +     if (dev->mtu > MSS_MAX)
-> > +             features_fix &=3D ~NETIF_F_ALL_TSO;
-> > +
-> > +     if (dev->mtu > ETH_DATA_LEN) {
-> > +             features_fix &=3D ~NETIF_F_ALL_TSO;
-> > +             features_fix &=3D ~NETIF_F_CSUM_MASK;
-> > +     }
->=20
-> So the hardware does not support TSO and checksumming for jumbo frames?
-
-This hardware supports checksumming for jumbo frames, but does not support =
-TSO. We will modify this part, thank you.
-
->=20
->    Andrew
 
