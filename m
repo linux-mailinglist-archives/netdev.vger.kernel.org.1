@@ -1,151 +1,121 @@
-Return-Path: <netdev+bounces-38719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55D287BC353
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 02:35:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF417BC364
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 02:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19E5D282188
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 00:35:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901581C2094F
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 00:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3195197;
-	Sat,  7 Oct 2023 00:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97607EA5;
+	Sat,  7 Oct 2023 00:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kbfB1iSu"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="nsB9FD2R"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D851840
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 00:35:05 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE77CBF
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696638903; x=1728174903;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=k0BqfISFy7h5/w/xjzEu6/my4JGiGU9v00Ry7SuT/6Q=;
-  b=kbfB1iSu3nSES37HX5OnzTex1/lAhIDiQPq0IFVnswxhZD8Vc619UB41
-   Q+3PVDgKooiW2REnyIdqCPH41ORhv/QBd96Xpr7azvhwQC6sGyfn7WuSd
-   5qXKV59G0QPqZOH/LOf+qOCmPPuBKE/eQuSrlDwOAeuGSnuIVgmbz5k5+
-   4HLRVWw28nuqaOpCr9f8bKpyZEs1Y1aDVrTQ6IQl+Zwhpo9fcbKxu2LCW
-   MORxO8H/Q6ItBmgtOmXR85g+xnt9lbj1jwzYIhlEJc93c7xg9Ac3MSvq5
-   CmG1fbaG5gNirarZNFEX8UV28CFoGdyRy85jQyzULzoouLKDYMs26bMtK
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="363215536"
-X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="363215536"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 17:35:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="756020660"
-X-IronPort-AV: E=Sophos;i="6.03,204,1694761200"; 
-   d="scan'208";a="756020660"
-Received: from vcostago-mobl3.jf.intel.com (HELO vcostago-mobl3) ([10.24.14.106])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 17:35:03 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Xabier Marquiegui <reibax@gmail.com>, reibax@gmail.com
-Cc: chrony-dev@chrony.tuxfamily.org, davem@davemloft.net, horms@kernel.org,
- jstultz@google.com, mlichvar@redhat.com, netdev@vger.kernel.org,
- ntp-lists@mattcorallo.com, richardcochran@gmail.com,
- rrameshbabu@nvidia.com, shuah@kernel.org, tglx@linutronix.de
-Subject: Re: [PATCH net-next v4 4/6] ptp: support event queue reader channel
- masks
-In-Reply-To: <20231006233537.7721-1-reibax@gmail.com>
-References: <5525d56c5feff9b28c6caa93e03d8f198d7412ce.1696511486.git.reibax@gmail.com>
- <20231006233537.7721-1-reibax@gmail.com>
-Date: Fri, 06 Oct 2023 17:35:02 -0700
-Message-ID: <8734yn8e2x.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242A77E2
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 00:42:50 +0000 (UTC)
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA543BF
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 17:42:49 -0700 (PDT)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-59f6e6b7600so31489557b3.3
+        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 17:42:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1696639369; x=1697244169; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zVMlXLjXbEq9vkPA0/Z3RLtT7q/8Tx9JfOtfoXdMJ+E=;
+        b=nsB9FD2RnHUhUX5pwQ15W+L57RxFQ6KmzQxVXcdbxBQFsoHh8q6jR/r43dCTWGJtgx
+         huA4KvDL5/1JfjNidR5FCsssJjLfrOZ0wPFrdemNRCmHn6ETFSS0KIxZvYlNU7Alq8Us
+         928Sm6zICYlGiiDfQUq6gYSZm5C3PhGnK6C5h9npqIPrvR+VG61CE+zDlKU85WPVXoY0
+         2iwV4beq+wOMzfSblrkbvjJNCST1ODNwihDiM3OP5FcjIBmfGHraw+Sg0JUrVPuuc20d
+         SLjMBWcyAzjcT0ohaaSexBS1HuRQGkfBsEViXjfzs5NTUelEaIVhSbbhXdS0oGzDLgrC
+         E5Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696639369; x=1697244169;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zVMlXLjXbEq9vkPA0/Z3RLtT7q/8Tx9JfOtfoXdMJ+E=;
+        b=E1g6fV5maILRAcZgknlCk2Bq99vPW8ZhUUp9Vr+dzp6pFuEUj+UaTPn4NbQvBOmw37
+         1EDATXXZSTCimflUix7Kht/EjrTz3G4PHao24kjMP2w49WbwrVfhVC/BkCw5aiefpvDa
+         ozuaB7P289pDq1b5x8G6Qfb+dcM4zBmPVOy1yt3AAeTi3hMZ3rJW8wFSXWO+76Y/SP27
+         uhgwCkS1qo7BmaOtiX060aHl/XAn8zVc8UsN0WaxULvYg8hJ1lAmxjKVCYtuwByStYdS
+         IgUfVyOZn1Y28e+vIo+s6WXsNcc+7suoTynk3DRgGd2USLvlS4dlu/5lNjUNCEP3cN4Q
+         M5UA==
+X-Gm-Message-State: AOJu0YwroHoqA89uGz7002aoB+3nzk3tottvk53us3njqLZqCT5PFg6P
+	kLmaqEWDwjmHqHuSgqdg1xqbRkavtoVuZGdB8PARwg==
+X-Google-Smtp-Source: AGHT+IGxNYP/x8ROOvJMkfr8xsFLz063uBLH6vkb57HGoVMrT4zefQCOGZM2pFi3Mn5almLSsA7UIlUVB859evCX7Sc=
+X-Received: by 2002:a81:83c1:0:b0:59f:64ca:45e5 with SMTP id
+ t184-20020a8183c1000000b0059f64ca45e5mr9707365ywf.25.1696639368797; Fri, 06
+ Oct 2023 17:42:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+In-Reply-To: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Fri, 6 Oct 2023 20:42:37 -0400
+Message-ID: <CALNs47uzWDOt2ZS9JHOfPYRC4B4pm+bPrp1EnyT-PCRUwUVsFQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] Rust abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, andrew@lunn.ch
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	miguel.ojeda.sandonis@gmail.com, greg@kroah.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Xabier Marquiegui <reibax@gmail.com> writes:
+Replying here to a missed followup on rfc v3 [1]
 
-> Simon Horman said:
->> Hi Xabier,
->>
->> queue appears to be leaked here.
->>
->> As flagged by Smatch.
+On Mon, Oct 2, 2023 at 3:08=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+> The kernel is documented using kerneldoc. It would seem odd to me to
+> have a second parallel set of Documentation for Rust. Just like Rust
+> is integrated into the kernel tree, is configured using Kconfig, built
+> using make at the top level, i would also expect it to integrate into
+> kerneldoc somehow. I see the Rust API for PHY drivers next to the C
+> API for PHY drivers. Its just another API in the kernel, nothing
+> special. I just use 'make htmldocs' at the top level and out come the
+> HTML documentation in Documentation/output/
 >
-> Nice catch Simon. Thank you very much. I think I know how to fix it. I
-> will keep it in mind for the next revision.
+> But kerneldoc is not my subsystem. MAINTAINERS say:
 >
-> Vinicius Costa Gomes said:
->> Sorry that I only noticed a (possible) change in behavior now.
->>
->> Before this series, when there was a single queue, events where
->> accumulated until the application reads the fd associated with the PTP
->> device. i.e. it doesn't matter when the application calls open().
+> DOCUMENTATION
+> M:      Jonathan Corbet <corbet@lwn.net>
+> L:      linux-doc@vger.kernel.org
+> S:      Maintained
 >
-> You are totally correct about that observation. I had never thought of
-> this angle until you mentioned it. Thank you for bringing it up.
+> So this discussion should really have Jonathon Corbet involved, if it
+> has not already been done.
 >
->> AFter this series events, are only accumulated after the queue
->> associated with that fd is created, i.e. after open(). Events that
->> happened before open() are lost (is this true? are we leaking them?).
->
-> Old events are indeed lost for a new reader, but I don't see how that
-> could be causing a leak. The way it works is, we always have at least
-> one queue: the one corresponding to sysfs.
->
+>     Andrew
 
-Ah, yeah! I forgot that sysfs is a separate events consumer. Disregard
-my comment about leaking events, then.
+Having the documentation in the same place and able to easily
+crosslink is a goal, but it's still a work in progress. It won't look
+the same of course but I think that the rustdoc output will be under
+kerneldoc, with some sort of automated crosslinking between related
+modules.
 
-> Whenever a new reader accesses the device, a new queue is created and
-> starts to get fed with new coming timestamps alongside the rest of
-> existing queues.
->
->> Is this a desired/wanted change? Is it possible that we have
->> applications that depend on the "old" behavior?
->
-> I would really like to hear the voice of more experience people on this.
-> On my limited experience this is a non-issue because I can control the
-> sequencing and I am sure to have the reader ready before I trigger events,
-> but you might be right that there might be some use-cases I didn't imagine
-> that could be affected by this change in behavior.
->
+The docs team is in the loop, see [2] which was merged. (I suppose it
+must not be getting published still)
 
-I am not a heavy user of these APIs, but I don't think this will break
-anything. Just thought it important to voice this so when we make this
-change in behavior we make it knowingly. (and my imagination could not
-produce any practical case that this would be a problem)
+- Trevor
 
-But let's see what others say.
-
-> We could tweak the system a little bit by having an additional reference
-> fifo with no readers. Whenever a new ptp_open happens, I could just copy
-> the entire reference fifo to the new one. I guess this would bring back
-> the need to have the fifo mutex.
->
-> If this idea works we could be maintaining the same functionality, at the
-> cost of making the system be more complex and slower. Is it worth it?
-
-Probably not. I would say that this change in behavior is fine/harmless.
-Just a matter of being aware of it.
-
->
-> I look forward to hearing opinions on this. Thank you everyone for your
-> feedback.
->
-
-Cheers,
--- 
-Vinicius
+[1]: https://lore.kernel.org/rust-for-linux/78da96fc-cf66-4645-a98f-80e4048=
+00d3e@lunn.ch/
+[2]: https://lore.kernel.org/rust-for-linux/20230718151534.4067460-1-carlos=
+.bilbao@amd.com/
 
