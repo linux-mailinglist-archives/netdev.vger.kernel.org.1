@@ -1,171 +1,124 @@
-Return-Path: <netdev+bounces-38799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BF477BC8A5
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 17:35:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D177BC8A6
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 17:36:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74F3C1C20934
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 15:35:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E330281E2E
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 15:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A3E2E623;
-	Sat,  7 Oct 2023 15:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227282E62C;
+	Sat,  7 Oct 2023 15:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SRt13PZy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ns0WE/H3"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC75DDC8;
-	Sat,  7 Oct 2023 15:35:12 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 499C6BF;
-	Sat,  7 Oct 2023 08:35:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=DHa/FWV1S4maK1jlq54/gZd3w4VVg95kUVb3AtSLPUw=; b=SR
-	t13PZyKrbVlzqjWr1JDyvox9C8vwiJ9SmUgZ2aWgbyeZWScARQ6Vfi0Fj/LuTZoXnw6HV2W925cag
-	dliT6itRUyBjPSl/yAyv+HUhmb6aLPCZ3EoppFS4SEjELQW9HR0UH/tyDrXS0uO+tsZNkmdtkBdjI
-	lkgJqqcHhEnPSH8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qp9Ke-000KGR-3r; Sat, 07 Oct 2023 17:35:08 +0200
-Date: Sat, 7 Oct 2023 17:35:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Trevor Gross <tmgross@umich.edu>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
-	greg@kroah.com
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
-Message-ID: <d824a34f-7290-477e-8198-c16164e34861@lunn.ch>
-References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
- <20231006094911.3305152-4-fujita.tomonori@gmail.com>
- <CALNs47syMxiZBUwKLk3vKxzmCbX0FS5A37FjwUzZO9Fn-iPaoA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037B029428
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 15:36:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56166C433C7;
+	Sat,  7 Oct 2023 15:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696692961;
+	bh=dI7Vf6iCe6cdUXeiNYo7FnhV2+HASKHA1tQ/ju+n2k4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ns0WE/H3SkV0Os6XJJhmHQGR8gJ6yW6St0imuJFbj0o4xuxoxQL6eB8qg5MRWh4Hm
+	 el/0Vli43OQdRwLu6eoTx2feayCbvfxJq5fyXMUwZ6tUARVSwGaohd3WhWypHfBwSV
+	 1HV1WC83cjq/K2fhIPjMlBEWZmkYuYHcsRGF9dZp8ysdrfKP6iVx1MqjAtJS0N3XZr
+	 HF5E0uX0mvD47wQWBe9UuA7/w4t8ilHDflQ8eL1I9+GN09gKd4J2DFQc8lJnM5Re8Z
+	 VtlNk9EQ6GgkPfJnz7+HowfiW4OXGsmOnbFse9Og00zHC/3j7FQxZ8U5ricVRSJ9gR
+	 LVUpS33yUsgXg==
+Date: Sat, 7 Oct 2023 17:35:58 +0200
+From: Simon Horman <horms@kernel.org>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Michal Wilczynski <michal.wilczynski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2 5/5] ice: Document
+ tx_scheduling_layers parameter
+Message-ID: <20231007153558.GE831234@kernel.org>
+References: <20231006110212.96305-1-mateusz.polchlopek@intel.com>
+ <20231006110212.96305-6-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALNs47syMxiZBUwKLk3vKxzmCbX0FS5A37FjwUzZO9Fn-iPaoA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20231006110212.96305-6-mateusz.polchlopek@intel.com>
 
-On Sat, Oct 07, 2023 at 03:19:20AM -0400, Trevor Gross wrote:
-> On Fri, Oct 6, 2023 at 5:49 AM FUJITA Tomonori
-> <fujita.tomonori@gmail.com> wrote:
+On Fri, Oct 06, 2023 at 07:02:12AM -0400, Mateusz Polchlopek wrote:
+> From: Michal Wilczynski <michal.wilczynski@intel.com>
 > 
-> > diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-> > new file mode 100644
-> > index 000000000000..d11c82a9e847
-> > --- /dev/null
-> > +++ b/drivers/net/phy/ax88796b_rust.rs
+> New driver specific parameter 'tx_scheduling_layers' was introduced.
+> Describe parameter in the documentation.
 > 
-> Maybe want to link to the C version, just for the crossref?
-> 
-> > +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-> > +        dev.genphy_update_link()?;
-> > +        if !dev.get_link() {
-> > +            return Ok(0);
-> > +        }
-> 
-> Looking at this usage, I think `get_link()` should be renamed to just
-> `link()`. `get_link` makes me think that it is performing an action
-> like calling `genphy_update_link`, just `link()` sounds more like a
-> static accessor.
+> Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-Naming is hard, and i had the exact opposite understanding.
+Hi,
 
-The rust binding seems to impose getter/setters on members of
-phydev. So my opinion was, using get_/set_ makes it clear this is just
-a dumb getter/setter, and nothing more.
+I'm not expert here,
+but this seems to cause a splat when building documentation.
 
-> Or maybe it's worth replacing `get_link` with a `get_updated_link`
-> that calls `genphy_update_link` and then returns `link`, the user can
-> store it if they need to reuse it. This seems somewhat less accident
-> prone than someone calling `.link()`/`.get_link()` repeatedly and
-> wondering why their phy isn't coming up.
+.../ice.rst:70: WARNING: Unexpected indentation.
+.../ice.rst:25: WARNING: Error parsing content block for the "list-table" directive: uniform two-level bullet list expected, but row 2 does not contain the same number of items as row 1 (3 vs 4).
 
-You have to be very careful with reading the link state. It is latched
-low. Meaning if the link is dropped and then comes back again, the
-first read of the link will tell you it went away, and the second read
-will give you current status. The core expects the driver to read the
-link state only once, when asked what is the state of the link, so it
-gets informed about this short link down events.
+.. list-table:: Driver-specific parameters implemented
+   :widths: 5 5 5 85
 
-> In any case, please make the docs clear about what behavior is
-> executed and what the preconditions are, it should be clear what's
-> going to wait for the bus vs. simple field access.
-> 
-> > +        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-> > +            dev.set_speed(100);
-> > +        } else {
-> > +            dev.set_speed(10);
-> > +        }
-> 
-> Speed should probably actually be an enum since it has defined values.
-> Something like
-> 
->     #[non_exhaustive]
->     enum Speed {
->         Speed10M,
->         Speed100M,
->         Speed1000M,
->         // 2.5G, 5G, 10G, 25G?
->     }
+   * - Name
+     - Type
+     - Mode
+     - Description
+   * - ``tx_scheduling_layers``
+     - u8
+     - permanent
+       The ice hardware uses hierarchical scheduling for Tx with a fixed
+       number of layers in the scheduling tree. Root node is representing a
+       port, while all the leaves represents the queues. This way of
+       configuring Tx scheduler allows features like DCB or devlink-rate
+       (documented below) for fine-grained configuration how much BW is given
+       to any given queue or group of queues, as scheduling parameters can be
+       configured at any given layer of the tree. By default 9-layer tree
+       topology was deemed best for most workloads, as it gives optimal
+       performance to configurability ratio. However for some specific cases,
+       this might not be the case. A great example would be sending traffic to
+       queues that is not a multiple of 8. Since in 9-layer topology maximum
+       number of children is limited to 8, the 9th queue has a different parent
+       than the rest, and it's given more BW credits. This causes a problem
+       when the system is sending traffic to 9 queues:
 
-This beings us back to how do you make use of C #defines. All the
-values defined here are theoretically valid:
+       | tx_queue_0_packets: 24163396
+       | tx_queue_1_packets: 24164623
+       | tx_queue_2_packets: 24163188
+       | tx_queue_3_packets: 24163701
+       | tx_queue_4_packets: 24163683
+       | tx_queue_5_packets: 24164668
+       | tx_queue_6_packets: 23327200
+       | tx_queue_7_packets: 24163853
+       | tx_queue_8_packets: 91101417 < Too much traffic is sent to 9th
 
-https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ethtool.h#L1887
+       Sometimes this might be a big concern, so the idea is to empower the
+       user to switch to 5-layer topology, enabling performance gains but
+       sacrificing configurability for features like DCB and devlink-rate.
 
-#define SPEED_10		10
-#define SPEED_100		100
-#define SPEED_1000		1000
-#define SPEED_2500		2500
-#define SPEED_5000		5000
-#define SPEED_10000		10000
-#define SPEED_14000		14000
-#define SPEED_20000		20000
-#define SPEED_25000		25000
-#define SPEED_40000		40000
-#define SPEED_50000		50000
-#define SPEED_56000		56000
-#define SPEED_100000		100000
-#define SPEED_200000		200000
-#define SPEED_400000		400000
-#define SPEED_800000		800000
+       This parameter gives user flexibility to choose the 5-layer transmit
+       scheduler topology. After switching parameter reboot is required for
+       the feature to start working.
 
-and more speeds keep getting added.
+       User could choose 9 (the default) or 5 as a value of parameter, e.g.:
+       $ devlink dev param set pci/0000:16:00.0 name tx_scheduling_layers
+         value 5 cmode permanent
 
-Also, the kAPI actually would allow the value 42, not that any
-hardware i know of actually supports that.
-
-> > +    fn link_change_notify(dev: &mut phy::Device) {
-> > +        // Reset PHY, otherwise MII_LPA will provide outdated information.
-> > +        // This issue is reproducible only with some link partner PHYs.
-> > +        if dev.state() == phy::DeviceState::NoLink {
-> > +            let _ = dev.init_hw();
-> > +            let _ = dev.start_aneg();
-> > +        }
-> > +    }
-> > +}
-> 
-> Is it worth doing anything with these errors? I know that the C driver doesn't.
-
-You could do a phydev_err(). But if these fail, the hardware is dead,
-and there is not much you can do about that.
-
-    Andrew
+       And verify that value has been set:
+       $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
 
