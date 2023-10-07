@@ -1,184 +1,99 @@
-Return-Path: <netdev+bounces-38805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C5D7BC8F1
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 17:57:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 578867BC8F3
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 17:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6B331C2082D
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 15:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10EBF281E40
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 15:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766DE31A71;
-	Sat,  7 Oct 2023 15:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F57131A72;
+	Sat,  7 Oct 2023 15:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBd1o104"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Gg9ObMRa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F6D18B14
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 15:57:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48388C433C7;
-	Sat,  7 Oct 2023 15:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696694254;
-	bh=FdT0hRiVUetymc4htP5coHs/oBEZ3Uyq+kymb8Y2DpQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nBd1o104P6neQxI5O+GltjAU3rrUklfWY8d2142pc/H7mAqrbdQu02oK2QjMNS/M7
-	 YiGP5Ro+vzKL8/E3g2d1Ctkd6QpA6WdK+uQOGn9/1JANxW8aAJZ3XULf0TmSoPAaXG
-	 r6SMq0pwVsOW/R2cr/mKSVu5UIh/ff5OzwDtbq8TbXgiwKvpUmB4zkwCkvziWzy6sp
-	 HalIoKSTqTDanMYRlnx465Cb9/xomChLFzTnAO5n2TE0CS3ukSsDcrr2FcEtoW2bRu
-	 BdNAnqdw6H7/YBba6/p4azRz70rNmkWITuxORN795qPnDm0OybnccFMMD+tu5NRePF
-	 cC6dZnQa5Fnbw==
-Date: Sat, 7 Oct 2023 17:57:30 +0200
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	thomas.petazzoni@bootlin.com, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v2 1/1] ethtool: Fix mod state of verbose no_mask
- bitset
-Message-ID: <20231007155730.GF831234@kernel.org>
-References: <20231006141246.3747944-1-kory.maincent@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A1D18B14
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 15:57:39 +0000 (UTC)
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2025BA
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 08:57:37 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1dd54aca17cso2278325fac.3
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 08:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1696694257; x=1697299057; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YXMnBmVZNTmd1/teXe44k/LwLmaHAv9BZ0ZKFmAyKxg=;
+        b=Gg9ObMRadsaGYu/j7A1/ANcwoQF2aITIaM4BT9grkiRNtghblCzuY4qUSp0tunl+OB
+         XH4FS5At7RLhF8yFU24WC2J87G544iY3tyidTvquQf4ocOh8DPIhuPUOTrFafM1KkX67
+         rA/Et8etFio8n4sgd7Uev98wq1xlSRkOb5ViOp5O+HxYy52qdSImez8GCU8XvODlmFgz
+         YIP7L3GfiUxYrkhzMuXfp6uCVgHeIhON0QkGIIVvpyoHSk8mWQ2Shnisaldf3W+Sm/wZ
+         g7I6sFwqVQ/JUHuHtnAB9Es+labyw5dpy6KRKON80i+rzCDaoAJXGBCBuDr/zrn+7OhC
+         /h9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696694257; x=1697299057;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YXMnBmVZNTmd1/teXe44k/LwLmaHAv9BZ0ZKFmAyKxg=;
+        b=d8bMYK5YRioDqZEOmKxws9Q0K7/hlSpfUOo3m5L5IhzCXTmipRY0ks20PTd4JO1Tnl
+         NjXXp8lqUvpOHWpjI5lybX1BEtbCgCFYuHw+eb8poD5sTC1Nk4hV9RK8gkCzltPxKd0G
+         cMTuo59CO6e+aEwUZmbBy3s7MfsUlTPizDgDP/r3616D3N0fh0LHH90A7r4lF5rlk4ej
+         7d1WONz4gTG9WzW8lgAo9jV9NHjfuF6HbKjDNmLYg5HaiPLLC+6m7FyggMnohxmTF2dB
+         EpDn1iACWMiB4ct3NLe+HfTnj2hPJNoVahUOa3T2LcVW83PL0S9ym7umcgzjXeBhMWo8
+         ECfQ==
+X-Gm-Message-State: AOJu0YyQAMzHL42NPdqHu+SlhDgtldgkIPMz3W5W0WJhnkorH1c4QzLX
+	k5H7Evujb9QTDA0CXBkgwxvKsfZJwKEDtPTctu8=
+X-Google-Smtp-Source: AGHT+IFH7hzEINq4xpkKSRr5z6v7uIuhLvhZrcLRo9XounHbUQI6Naa/DyuXgkj+oek8BYcmmAkaDg==
+X-Received: by 2002:a05:6870:1814:b0:1bb:83e9:6277 with SMTP id t20-20020a056870181400b001bb83e96277mr12289709oaf.33.1696694257158;
+        Sat, 07 Oct 2023 08:57:37 -0700 (PDT)
+Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
+        by smtp.gmail.com with ESMTPSA id b20-20020a17090a489400b0027732eb24bbsm7312901pjh.4.2023.10.07.08.57.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Oct 2023 08:57:36 -0700 (PDT)
+Date: Sat, 7 Oct 2023 08:57:35 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Willy Tarreau <w@1wt.eu>
+Cc: netdev@vger.kernel.org, rootlab@huawei.com
+Subject: Re: Race Condition Vulnerability in atalk_bind of appletalk module
+ leading to UAF
+Message-ID: <20231007085735.1594417f@hermes.local>
+In-Reply-To: <20231007063512.GQ20998@1wt.eu>
+References: <20231007063512.GQ20998@1wt.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231006141246.3747944-1-kory.maincent@bootlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Oct 06, 2023 at 04:12:46PM +0200, Köry Maincent wrote:
-> From: Kory Maincent <kory.maincent@bootlin.com>
+On Sat, 7 Oct 2023 08:35:12 +0200
+Willy Tarreau <w@1wt.eu> wrote:
+
+> Hello,
 > 
-> A bitset without mask in a _SET request means we want exactly the bits in
-> the bitset to be set. This works correctly for compact format but when
-> verbose format is parsed, ethnl_update_bitset32_verbose() only sets the
-> bits present in the request bitset but does not clear the rest. The commit
-> 6699170376ab fixes this issue by clearing the whole target bitmap before we
-> start iterating. The solution proposed brought an issue with the behavior
-> of the mod variable. As the bitset is always cleared the old val will
-> always differ to the new val.
+> Sili Luo of Huawei sent this to the security list. Eric and I think it
+> does not deserve special handling from the security team and will be
+> better addressed here.
 > 
-> Fix it by adding a new temporary variable which save the state of the old
-> bitmap.
+> Regards,
+> Willy
 > 
-> Fixes: 6699170376ab ("ethtool: fix application of verbose no_mask bitset")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
-> 
-> Changes in v2:
-> - Fix the allocated size.
-> ---
->  net/ethtool/bitset.c | 31 +++++++++++++++++++++++++------
->  1 file changed, 25 insertions(+), 6 deletions(-)
-> 
-> diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
-> index 0515d6604b3b..8a6b35c920cd 100644
-> --- a/net/ethtool/bitset.c
-> +++ b/net/ethtool/bitset.c
-> @@ -432,7 +432,9 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
->  			      struct netlink_ext_ack *extack, bool *mod)
->  {
->  	struct nlattr *bit_attr;
-> +	u32 *tmp = NULL;
->  	bool no_mask;
-> +	bool dummy;
->  	int rem;
->  	int ret;
->  
-> @@ -448,8 +450,16 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
->  	}
->  
->  	no_mask = tb[ETHTOOL_A_BITSET_NOMASK];
-> -	if (no_mask)
-> -		ethnl_bitmap32_clear(bitmap, 0, nbits, mod);
-> +	if (no_mask) {
-> +		unsigned int nwords = DIV_ROUND_UP(nbits, 32);
-> +		unsigned int nbytes = nwords * sizeof(u32);
+> PS: there are 6 reports for atalk in this series.
 
-Hi Köry,
-
-Thanks for addressing my concerns regarding the size calculations in v1.
-
-I think that a comment is warranted describing the fact that only the map,
-and not the mask part, is taken into account in the size calculations
-above.
-
-> +
-> +		tmp = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
-> +		if (!tmp)
-> +			return -ENOMEM;
-> +		memcpy(tmp, bitmap, nbytes);
-> +		ethnl_bitmap32_clear(bitmap, 0, nbits, &dummy);
-> +	}
-
-Perhaps we could consider something line the following.
-Which would avoid the need for the n_mask condition
-in the nla_for_each_nested() loop further below.
-
-		...
-
-                saved_bitmap = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
-                if (!saved_bitmap)
-                        return -ENOMEM;
-                memcpy(saved_bitmap, bitmap, nbytes);
-                ethnl_bitmap32_clear(bitmap, 0, nbits, &dummy);
-
-                orig_bitmap = saved_bitmap;
-        } else {
-                orig_bitmap = bitmap;
-        }
-
-(Choosing names for variables seems hard today.)
-
->  
->  	nla_for_each_nested(bit_attr, tb[ETHTOOL_A_BITSET_BITS], rem) {
->  		bool old_val, new_val;
-> @@ -458,13 +468,19 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
->  		if (nla_type(bit_attr) != ETHTOOL_A_BITSET_BITS_BIT) {
->  			NL_SET_ERR_MSG_ATTR(extack, bit_attr,
->  					    "only ETHTOOL_A_BITSET_BITS_BIT allowed in ETHTOOL_A_BITSET_BITS");
-> -			return -EINVAL;
-> +			ret = -EINVAL;
-> +			goto out;
->  		}
->  		ret = ethnl_parse_bit(&idx, &new_val, nbits, bit_attr, no_mask,
->  				      names, extack);
->  		if (ret < 0)
-> -			return ret;
-> -		old_val = bitmap[idx / 32] & ((u32)1 << (idx % 32));
-> +			goto out;
-> +
-> +		if (no_mask)
-> +			old_val = tmp[idx / 32] & ((u32)1 << (idx % 32));
-> +		else
-> +			old_val = bitmap[idx / 32] & ((u32)1 << (idx % 32));
-> +
->  		if (new_val != old_val) {
->  			if (new_val)
->  				bitmap[idx / 32] |= ((u32)1 << (idx % 32));
-> @@ -474,7 +490,10 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
->  		}
->  	}
->  
-> -	return 0;
-> +	ret = 0;
-> +out:
-> +	kfree(tmp);
-> +	return ret;
->  }
->  
->  static int ethnl_compact_sanity_checks(unsigned int nbits,
-> -- 
-> 2.25.1
-> 
+Maybe time has come to kill Appletalk like DecNet was removed?
 
