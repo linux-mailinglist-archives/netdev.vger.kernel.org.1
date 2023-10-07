@@ -1,512 +1,1161 @@
-Return-Path: <netdev+bounces-38822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5676F7BC962
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 19:29:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9827BC98E
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 20:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A7DA1C20B73
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 17:29:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20DB1C20A8A
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 18:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEFDA341A4;
-	Sat,  7 Oct 2023 17:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="TzTuif1F"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C085418B08;
+	Sat,  7 Oct 2023 18:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22D9328D8
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 17:28:56 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E86CB9;
-	Sat,  7 Oct 2023 10:28:51 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 4BB2910000A;
-	Sat,  7 Oct 2023 20:28:49 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 4BB2910000A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1696699729;
-	bh=OtNDlWrkt7+jXGIeT0ZjpI1aaKRCSMFBzwsjOpwx1Nw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=TzTuif1Fmtf+aQLLSYo1cl1/1ZSLh30G5yZ/iSBkxsjcVuNCYGe3eF5WyjCoSCB48
-	 JXwi6vyCp1EuxZNQPdBsk8xSSL6iPRMRxM33ie6iCSIK0CvJRXeqwAu53BvhVyfotO
-	 Gsiup3EFaJIoTM/Jflz1FkguA9HvEgnkQTuH5SnuM3dzL2AVsLB/civWYYrKpg8IZq
-	 p20KcBHngJo1ieB7umYlQgM/Cg+ttE7hIYPPIAXT79hl81XJ6gZlYiICNBqeDn0MOR
-	 BYj5VOLxJEPHjNfuN6NBG+14jhrYYco+lHQ9z2LyT86MErZsViFnXT1+7fgZzK7lxP
-	 NGOkBQ3WuiXVw==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Sat,  7 Oct 2023 20:28:49 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 7 Oct 2023 20:28:48 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v3 12/12] test/vsock: io_uring rx/tx tests
-Date: Sat, 7 Oct 2023 20:21:39 +0300
-Message-ID: <20231007172139.1338644-13-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231007172139.1338644-1-avkrasnov@salutedevices.com>
-References: <20231007172139.1338644-1-avkrasnov@salutedevices.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026682904
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 18:33:56 +0000 (UTC)
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B1CBC
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 11:33:51 -0700 (PDT)
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-1e1dc572fbeso5010795fac.2
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 11:33:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696703631; x=1697308431;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YRY4ZQ41Bg9zPG+xFZ0ZH7y84tUqPOIQ4L9dgVu2AMM=;
+        b=ZcBBA47FnKOzr+jblHRJ1zbBHgEhLZy7tyoortQN+SYEZd60woUaed2MCXuG0V6THd
+         TVpX3nRGl+T/rqMw0cWpjHGFnTMUlm7XhsRtIBgHkhaLjfmo7sZBuzx39km1DsvFGQ64
+         NP9qzu7528TQi0llvaLEpH31cfK5RSP5hv8iFVyc9Sqj4MCDX2MpfGd5Wu1PRQttfevv
+         1by1d62M3CFgLbxT6T8V/dp31OzcYyXY7+CsAqM7CsWtvsEMyZNz6MbDMakLspKe1Eg4
+         4/brSMRW+OUBTTtdIgUeA3gUOQWU8bLFPzMxbbUccaElrChum279DnUlcslvovxgJ5pe
+         98dw==
+X-Gm-Message-State: AOJu0YwJfjQHzkzVf9Hh8mwvGuzo4vQ05G4cUqWr+BWggH/3fG7dgvK9
+	SyS4eL7xzZo3AqaY2uWCCldbhtmR9HS82OxQHLwuig8gqJLs
+X-Google-Smtp-Source: AGHT+IHjuQlCQwgJFUP3DX0nAOU8Ira5+4zKc6rR34EBBvt9ppDBFCSWX3pqU2GdrjvU5Ip9BjKLtEjZ1nToLzwJ39vcSkT6vOlV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180453 [Oct 07 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 535 535 da804c0ea8918f802fc60e7a20ba49783d957ba2, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/07 16:48:00 #22085983
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6870:a8ad:b0:1d6:899d:6ed9 with SMTP id
+ eb45-20020a056870a8ad00b001d6899d6ed9mr4402414oab.9.1696703630839; Sat, 07
+ Oct 2023 11:33:50 -0700 (PDT)
+Date: Sat, 07 Oct 2023 11:33:50 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003495bf060724994a@google.com>
+Subject: [syzbot] [net?] [usb?] INFO: rcu detected stall in worker_thread (9)
+From: syzbot <syzbot+225bfad78b079744fd5e@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This adds set of tests which use io_uring for rx/tx. This test suite is
-implemented as separated util like 'vsock_test' and has the same set of
-input arguments as 'vsock_test'. These tests only cover cases of data
-transmission (no connect/bind/accept etc).
+Hello,
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+syzbot found the following issue on:
+
+HEAD commit:    ce36c8b14987 Merge tag 'ubifs-for-linus-6.6-rc5' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1172ade1680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=57da1ac039c4c78a
+dashboard link: https://syzkaller.appspot.com/bug?extid=225bfad78b079744fd5e
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10429ee6680000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4081cc91aa2a/disk-ce36c8b1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eaf09d1ab3e5/vmlinux-ce36c8b1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c542d28356db/bzImage-ce36c8b1.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+225bfad78b079744fd5e@syzkaller.appspotmail.com
+
+rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 1-....
+ } 2682 jiffies s: 16081 root: 0x2/.
+rcu: blocking rcu_node structures (internal RCU debug):
+
+Sending NMI from CPU 0 to CPUs 1:
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+NMI backtrace for cpu 1
+CPU: 1 PID: 5131 Comm: kworker/1:5 Not tainted 6.6.0-rc4-syzkaller-00012-gce36c8b14987 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+Workqueue: events nsim_dev_trap_report_work
+RIP: 0010:io_serial_in+0x76/0xb0 drivers/tty/serial/8250/8250_port.c:417
+Code: 60 35 c6 fc 89 e9 41 d3 e6 48 83 c3 40 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 51 b1 20 fd 44 03 33 44 89 f2 ec <0f> b6 c0 5b 41 5e 41 5f 5d c3 89 e9 80 e1 07 38 c1 7c ad 48 89 ef
+RSP: 0018:ffffc900001efed8 EFLAGS: 00000002
+RAX: 1ffffffff2443700 RBX: ffffffff9221bd60 RCX: 0000000000000000
+RDX: 00000000000003fd RSI: 0000000000000000 RDI: 0000000000000020
+RBP: 0000000000000000 R08: ffffffff84c7d646 R09: 1ffff110039be046
+R10: dffffc0000000000 R11: ffffed10039be047 R12: dffffc0000000000
+R13: 0000000000002703 R14: 00000000000003fd R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fcd51aff0f0 CR3: 000000000d130000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ serial_in drivers/tty/serial/8250/8250.h:117 [inline]
+ serial_lsr_in drivers/tty/serial/8250/8250.h:139 [inline]
+ wait_for_lsr drivers/tty/serial/8250/8250_port.c:2089 [inline]
+ serial8250_console_fifo_write drivers/tty/serial/8250/8250_port.c:3374 [inline]
+ serial8250_console_write+0x110e/0x1820 drivers/tty/serial/8250/8250_port.c:3452
+ console_emit_next_record kernel/printk/printk.c:2910 [inline]
+ console_flush_all+0x7ff/0xec0 kernel/printk/printk.c:2966
+ console_unlock+0x13b/0x4d0 kernel/printk/printk.c:3035
+ vprintk_emit+0x508/0x720 kernel/printk/printk.c:2307
+ dev_vprintk_emit+0x2ae/0x330 drivers/base/core.c:4849
+ dev_printk_emit+0xdd/0x120 drivers/base/core.c:4860
+ _dev_warn+0x122/0x170 drivers/base/core.c:4916
+ usb_rx_callback_intf0+0x156/0x190 drivers/media/rc/imon.c:1771
+ __usb_hcd_giveback_urb+0x371/0x530 drivers/usb/core/hcd.c:1650
+ dummy_timer+0x8aa/0x3210 drivers/usb/gadget/udc/dummy_hcd.c:1987
+ call_timer_fn+0x17a/0x580 kernel/time/timer.c:1700
+ expire_timers kernel/time/timer.c:1751 [inline]
+ __run_timers+0x64f/0x860 kernel/time/timer.c:2022
+ run_timer_softirq+0x67/0xf0 kernel/time/timer.c:2035
+ __do_softirq+0x2ab/0x908 kernel/softirq.c:553
+ invoke_softirq kernel/softirq.c:427 [inline]
+ __irq_exit_rcu+0xf1/0x1b0 kernel/softirq.c:632
+ irq_exit_rcu+0x9/0x20 kernel/softirq.c:644
+ sysvec_apic_timer_interrupt+0x95/0xb0 arch/x86/kernel/apic/apic.c:1074
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
+RIP: 0010:jhash2 include/linux/jhash.h:129 [inline]
+RIP: 0010:hash_stack lib/stackdepot.c:322 [inline]
+RIP: 0010:__stack_depot_save+0x64/0x650 lib/stackdepot.c:382
+Code: 00 43 8d 34 00 46 8d 34 c5 7b 71 f5 75 83 fe 04 72 70 44 89 f5 44 89 f0 4c 89 fa 03 02 03 6a 04 44 03 72 08 44 89 f7 c1 c7 04 <44> 29 f0 31 c7 41 01 ee 29 fd 89 fb c1 c3 06 31 eb 44 01 f7 89 d9
+RSP: 0018:ffffc900043df6b8 EFLAGS: 00000a07
+RAX: 00000000062d8798 RBX: 00000000fe584f8b RCX: 00000000838c8150
+RDX: ffffc900043df758 RSI: 0000000000000004 RDI: 00000000385a93f7
+RBP: 000000006c0b3f46 R08: 000000000000000b R09: ffffffff813da4e7
+R10: 0000000000000002 R11: ffff888026631dc0 R12: 0000000000000820
+R13: 0000000000000001 R14: 000000007385a93f R15: ffffc900043df710
+ kasan_save_stack mm/kasan/common.c:46 [inline]
+ kasan_set_track+0x61/0x70 mm/kasan/common.c:52
+ __kasan_slab_alloc+0x66/0x70 mm/kasan/common.c:328
+ kasan_slab_alloc include/linux/kasan.h:188 [inline]
+ slab_post_alloc_hook+0x67/0x3d0 mm/slab.h:762
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x148/0x330 mm/slub.c:3523
+ __alloc_skb+0x181/0x420 net/core/skbuff.c:640
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ nsim_dev_trap_skb_build drivers/net/netdevsim/dev.c:748 [inline]
+ nsim_dev_trap_report drivers/net/netdevsim/dev.c:805 [inline]
+ nsim_dev_trap_report_work+0x250/0xa90 drivers/net/netdevsim/dev.c:850
+ process_one_work kernel/workqueue.c:2630 [inline]
+ process_scheduled_works+0x90f/0x1400 kernel/workqueue.c:2703
+ worker_thread+0xa5f/0xff0 kernel/workqueue.c:2784
+ kthread+0x2d3/0x370 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+raw-gadget.5 gadget.4: ignoring, device is not running
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 2-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 6-1:0.0: imon usb_rx_callback_intf0: status(-71): ignored
+imon 1-1:0.0: imon usb_rx_callback_intf0: status(-
+
 ---
- Changelog:
- v1 -> v2:
-  * Add 'LDLIBS = -luring' to the target 'vsock_uring_test'.
-  * Add 'vsock_uring_test' to the target 'test'.
- v2 -> v3:
-  * Make 'struct vsock_test_data' private by placing it to the .c file.
-    Rename it and add comments to this struct to clarify sense of its
-    fields.
-  * Add 'vsock_uring_test' to the '.gitignore'.
-  * Add receive loop to the server side - this is needed to read entire
-    data sent by client.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- tools/testing/vsock/.gitignore         |   1 +
- tools/testing/vsock/Makefile           |   7 +-
- tools/testing/vsock/vsock_uring_test.c | 350 +++++++++++++++++++++++++
- 3 files changed, 356 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/vsock/vsock_uring_test.c
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/tools/testing/vsock/.gitignore b/tools/testing/vsock/.gitignore
-index a8adcfdc292b..d9f798713cd7 100644
---- a/tools/testing/vsock/.gitignore
-+++ b/tools/testing/vsock/.gitignore
-@@ -3,3 +3,4 @@
- vsock_test
- vsock_diag_test
- vsock_perf
-+vsock_uring_test
-diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
-index 1a26f60a596c..b80e7c7def1e 100644
---- a/tools/testing/vsock/Makefile
-+++ b/tools/testing/vsock/Makefile
-@@ -1,12 +1,15 @@
- # SPDX-License-Identifier: GPL-2.0-only
- all: test vsock_perf
--test: vsock_test vsock_diag_test
-+test: vsock_test vsock_diag_test vsock_uring_test
- vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
- vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
- vsock_perf: vsock_perf.o
- 
-+vsock_uring_test: LDLIBS = -luring
-+vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o
-+
- CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
- .PHONY: all test clean
- clean:
--	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf
-+	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf vsock_uring_test
- -include *.d
-diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
-new file mode 100644
-index 000000000000..889887cf3989
---- /dev/null
-+++ b/tools/testing/vsock/vsock_uring_test.c
-@@ -0,0 +1,350 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* io_uring tests for vsock
-+ *
-+ * Copyright (C) 2023 SberDevices.
-+ *
-+ * Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
-+ */
-+
-+#include <getopt.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <liburing.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <linux/kernel.h>
-+#include <error.h>
-+
-+#include "util.h"
-+#include "control.h"
-+#include "msg_zerocopy_common.h"
-+
-+#define PAGE_SIZE		4096
-+#define RING_ENTRIES_NUM	4
-+
-+#define VSOCK_TEST_DATA_MAX_IOV 3
-+
-+struct vsock_io_uring_test {
-+	/* Number of valid elements in 'vecs'. */
-+	int vecs_cnt;
-+	/* Array how to allocate buffers for test.
-+	 * 'iov_base' == NULL -> valid buf: mmap('iov_len').
-+	 *
-+	 * 'iov_base' == MAP_FAILED -> invalid buf:
-+	 *               mmap('iov_len'), then munmap('iov_len').
-+	 *               'iov_base' still contains result of
-+	 *               mmap().
-+	 *
-+	 * 'iov_base' == number -> unaligned valid buf:
-+	 *               mmap('iov_len') + number.
-+	 */
-+	struct iovec vecs[VSOCK_TEST_DATA_MAX_IOV];
-+};
-+
-+static struct vsock_io_uring_test test_data_array[] = {
-+	/* All elements have page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ NULL, 2 * PAGE_SIZE },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	},
-+	/* Middle element has both non-page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ (void *)1, 200  },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	}
-+};
-+
-+static void vsock_io_uring_client(const struct test_opts *opts,
-+				  const struct vsock_io_uring_test *test_data,
-+				  bool msg_zerocopy)
-+{
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring ring;
-+	struct iovec *iovec;
-+	struct msghdr msg;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (msg_zerocopy)
-+		enable_so_zerocopy(fd);
-+
-+	iovec = iovec_from_test_data(test_data->vecs, test_data->vecs_cnt);
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
-+		error(1, errno, "io_uring_register_buffers");
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iovec;
-+	msg.msg_iovlen = test_data->vecs_cnt;
-+	sqe = io_uring_get_sqe(&ring);
-+
-+	if (msg_zerocopy)
-+		io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
-+	else
-+		io_uring_prep_sendmsg(sqe, fd, &msg, 0);
-+
-+	if (io_uring_submit(&ring) != 1)
-+		error(1, errno, "io_uring_submit");
-+
-+	if (io_uring_wait_cqe(&ring, &cqe))
-+		error(1, errno, "io_uring_wait_cqe");
-+
-+	io_uring_cqe_seen(&ring, cqe);
-+
-+	control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
-+
-+	control_writeln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free_iovec_test_data(test_data->vecs, iovec, test_data->vecs_cnt);
-+	close(fd);
-+}
-+
-+static void vsock_io_uring_server(const struct test_opts *opts,
-+				  const struct vsock_io_uring_test *test_data)
-+{
-+	unsigned long remote_hash;
-+	unsigned long local_hash;
-+	struct io_uring ring;
-+	size_t data_len;
-+	size_t recv_len;
-+	void *data;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
-+
-+	data = malloc(data_len);
-+	if (!data) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	recv_len = 0;
-+
-+	while (recv_len < data_len) {
-+		struct io_uring_sqe *sqe;
-+		struct io_uring_cqe *cqe;
-+		struct iovec iovec;
-+
-+		sqe = io_uring_get_sqe(&ring);
-+		iovec.iov_base = data + recv_len;
-+		iovec.iov_len = data_len;
-+
-+		io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
-+
-+		if (io_uring_submit(&ring) != 1)
-+			error(1, errno, "io_uring_submit");
-+
-+		if (io_uring_wait_cqe(&ring, &cqe))
-+			error(1, errno, "io_uring_wait_cqe");
-+
-+		recv_len += cqe->res;
-+		io_uring_cqe_seen(&ring, cqe);
-+	}
-+
-+	if (recv_len != data_len) {
-+		fprintf(stderr, "expected %zu, got %zu\n", data_len,
-+			recv_len);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	local_hash = hash_djb2(data, data_len);
-+
-+	remote_hash = control_readulong();
-+	if (remote_hash != local_hash) {
-+		fprintf(stderr, "hash mismatch\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free(data);
-+}
-+
-+void test_stream_uring_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], false);
-+}
-+
-+void test_stream_uring_msg_zc_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_msg_zc_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], true);
-+}
-+
-+static struct test_case test_cases[] = {
-+	{
-+		.name = "SOCK_STREAM io_uring test",
-+		.run_server = test_stream_uring_server,
-+		.run_client = test_stream_uring_client,
-+	},
-+	{
-+		.name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
-+		.run_server = test_stream_uring_msg_zc_server,
-+		.run_client = test_stream_uring_msg_zc_client,
-+	},
-+	{},
-+};
-+
-+static const char optstring[] = "";
-+static const struct option longopts[] = {
-+	{
-+		.name = "control-host",
-+		.has_arg = required_argument,
-+		.val = 'H',
-+	},
-+	{
-+		.name = "control-port",
-+		.has_arg = required_argument,
-+		.val = 'P',
-+	},
-+	{
-+		.name = "mode",
-+		.has_arg = required_argument,
-+		.val = 'm',
-+	},
-+	{
-+		.name = "peer-cid",
-+		.has_arg = required_argument,
-+		.val = 'p',
-+	},
-+	{
-+		.name = "help",
-+		.has_arg = no_argument,
-+		.val = '?',
-+	},
-+	{},
-+};
-+
-+static void usage(void)
-+{
-+	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
-+		"\n"
-+		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
-+		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
-+		"\n"
-+		"Run transmission tests using io_uring. Usage is the same as\n"
-+		"in ./vsock_test\n"
-+		"\n"
-+		"Options:\n"
-+		"  --help                 This help message\n"
-+		"  --control-host <host>  Server IP address to connect to\n"
-+		"  --control-port <port>  Server port to listen on/connect to\n"
-+		"  --mode client|server   Server or client mode\n"
-+		"  --peer-cid <cid>       CID of the other side\n"
-+		);
-+	exit(EXIT_FAILURE);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	const char *control_host = NULL;
-+	const char *control_port = NULL;
-+	struct test_opts opts = {
-+		.mode = TEST_MODE_UNSET,
-+		.peer_cid = VMADDR_CID_ANY,
-+	};
-+
-+	init_signals();
-+
-+	for (;;) {
-+		int opt = getopt_long(argc, argv, optstring, longopts, NULL);
-+
-+		if (opt == -1)
-+			break;
-+
-+		switch (opt) {
-+		case 'H':
-+			control_host = optarg;
-+			break;
-+		case 'm':
-+			if (strcmp(optarg, "client") == 0) {
-+				opts.mode = TEST_MODE_CLIENT;
-+			} else if (strcmp(optarg, "server") == 0) {
-+				opts.mode = TEST_MODE_SERVER;
-+			} else {
-+				fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
-+				return EXIT_FAILURE;
-+			}
-+			break;
-+		case 'p':
-+			opts.peer_cid = parse_cid(optarg);
-+			break;
-+		case 'P':
-+			control_port = optarg;
-+			break;
-+		case '?':
-+		default:
-+			usage();
-+		}
-+	}
-+
-+	if (!control_port)
-+		usage();
-+	if (opts.mode == TEST_MODE_UNSET)
-+		usage();
-+	if (opts.peer_cid == VMADDR_CID_ANY)
-+		usage();
-+
-+	if (!control_host) {
-+		if (opts.mode != TEST_MODE_SERVER)
-+			usage();
-+		control_host = "0.0.0.0";
-+	}
-+
-+	control_init(control_host, control_port,
-+		     opts.mode == TEST_MODE_SERVER);
-+
-+	run_tests(test_cases, &opts);
-+
-+	control_cleanup();
-+
-+	return 0;
-+}
--- 
-2.25.1
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
