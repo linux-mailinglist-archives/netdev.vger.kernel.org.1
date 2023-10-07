@@ -1,191 +1,182 @@
-Return-Path: <netdev+bounces-38762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02F07BC60B
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 10:27:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E907BC629
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 10:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C19BC1C208EB
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:27:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C96E7282144
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FB415ACA;
-	Sat,  7 Oct 2023 08:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237486FBE;
+	Sat,  7 Oct 2023 08:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HAMeR4m5"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="i9Y8JQmw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2F614ABC
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 08:27:01 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44C1BF
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 01:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696667208;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g++Z06hUi+nwKmqMr5D89B4LyEuvDaU7tbd/BBtAbPA=;
-	b=HAMeR4m5tAagLBf+DBQJxH47mzoy/338tfwMSWoXe4arE3M+QEhE6tSnHAvhZyjgpAJXVo
-	/I2uYRE5hDVShbFStPdDrhcWI7DEJrNWx5PYCsbn2QgG3nf7u9C0Y9y/gKViXVNHfwnv+H
-	Hd5purbCh0GkzzEMsajrRWM2/pU3dtQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-223-ChLCTsy5M7adIWnH4U3WNg-1; Sat, 07 Oct 2023 04:26:45 -0400
-X-MC-Unique: ChLCTsy5M7adIWnH4U3WNg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-32320b3ee93so1901714f8f.3
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 01:26:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857055687
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 08:44:46 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208CBC5
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 01:44:44 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c5db4925f9so22802565ad.1
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 01:44:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1696668283; x=1697273083; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DYsTV8KQJWPLnxFgGwY07YV1sQ8Lujc5noM4wlj3swY=;
+        b=i9Y8JQmwfQqJop84DuisE1icfL0vhmW8XcScyqc2zOUTQuTR7IPVhnBMVHkv4GVBXL
+         iUghLCwdBfOsST9UzpPItj604USqSCCYA8nc0Vfwy/ovyvaVDVkTpY2FBhPqh8MXrYO5
+         hl8fJE4QAswjwXrFGnFG5jyjXhuYmHSykZ/dHboHAdBHK54ZsPTZfdLPpBxiwqbL/QBu
+         h4q0UMq7z7vfh6GYo9BAB14OCrSsobbAp1cWLRbgWOfag2qW56A469tixam3fzrUo0/j
+         E4abxO4Y4HRuf9SZKUX6eBmWBzOClDL17FZEzvHMQg6PjiKZWLc4lGL9u1lJHSKXWQhF
+         Xpnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696667203; x=1697272003;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g++Z06hUi+nwKmqMr5D89B4LyEuvDaU7tbd/BBtAbPA=;
-        b=RTuAqjHGNXbCPK94dE4jPDnWCMYMdha9r2VlFwAyyrlw1jQW1MrXurTkCAYtTp3i/F
-         P9oFXXTQScJDz+0e4Z37itMrDlyVj9wFTLsU9VO+wX9tKUZxhuKlOobkS6apb9hHtwU0
-         lw4uBg7H+0vdVTU7NoxeGYMkg+rpk4plvdM36FPzY94Q9Uzp2UwzG+L6NAlqZsqDPuty
-         bysQ4qVvgjtIxaT1DPAgZkVcyvCbwdZTsTAssLlBGCnRmld01s7DYWAYPud5rpXR3kzT
-         P/+FZEuI4wNG3Om961g+aTf7e79z21Son4c13DrZq6au2Z+rHlv+uinJ7lIEUiqAGlKt
-         skoQ==
-X-Gm-Message-State: AOJu0YyFK/tCnjvAMYqbrHvLl54kEGVqcOvCknqFk3T4sdJkC/U0AUoY
-	aosmQJw4eItUC2+NkJmAPd0RLKlbANRIvo/k94+guE9vYXqAhBIHaeDxhVxiwsMzO2DZqSWSNBp
-	M/06s27IuiNsVh06t3ykI03+y
-X-Received: by 2002:adf:f74c:0:b0:320:aea6:abb9 with SMTP id z12-20020adff74c000000b00320aea6abb9mr8836686wrp.6.1696667203160;
-        Sat, 07 Oct 2023 01:26:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE53995CoUMxEsnjkzfJ5vVQN8PApdPb4y2zPGI5VVYSOYYDv9ptTo5oq3Rfardm6LgexU6Aw==
-X-Received: by 2002:adf:f74c:0:b0:320:aea6:abb9 with SMTP id z12-20020adff74c000000b00320aea6abb9mr8836674wrp.6.1696667202823;
-        Sat, 07 Oct 2023 01:26:42 -0700 (PDT)
-Received: from localhost (net-93-66-52-16.cust.vodafonedsl.it. [93.66.52.16])
-        by smtp.gmail.com with ESMTPSA id t4-20020a5d6904000000b0032710f5584fsm3586367wru.25.2023.10.07.01.26.42
+        d=1e100.net; s=20230601; t=1696668283; x=1697273083;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DYsTV8KQJWPLnxFgGwY07YV1sQ8Lujc5noM4wlj3swY=;
+        b=DJa+C+RO/DwVQH80c67C2quKvKcHuv2Lo6TmngZdRyTYnIpMicXVj34tkTnzsLcvLo
+         KWyaK9Rp+GQIhI7he4W+l/ZNpSBITViIEy4ShNurN6vmrwNwRlrxtwtb+fO44kLvvODB
+         RBBmB5Rj+vAYWMEMUtDpX+4wA7lyHEEfsgG/W+Jge+ZGdZ/TH/T61v7cd2yZFynPn7yi
+         6RWi8sBB9EUC/ziA13SKJCTiZuAp74yOVsrROBp0WRzBHvmSqERBSYtPMBtduP4JYcid
+         OtVT0Q1nQrOKpJfVgjCiYrdZ2MGhd5PzI0kfrURPDF4bUqh8BTD/xMkCt9BDUiGaSJGb
+         8vZQ==
+X-Gm-Message-State: AOJu0YzZkEyrhQOaQs+wZaulKbwfNQoe+FAc/BJeza2UUDmrnIND06fE
+	fsPmU8eA7qdTlUZKjceetkUB3w==
+X-Google-Smtp-Source: AGHT+IFfYluDDpg6ygH4dFg5jy5tmXVAf4NvvaUhFb/Bu6EObCEfHdWAO6/qFYUW1VtuzlH5uGhaHw==
+X-Received: by 2002:a17:902:ec90:b0:1c7:27a1:a9e5 with SMTP id x16-20020a170902ec9000b001c727a1a9e5mr12310794plg.33.1696668283532;
+        Sat, 07 Oct 2023 01:44:43 -0700 (PDT)
+Received: from C02FG34NMD6R.bytedance.net ([203.208.189.14])
+        by smtp.gmail.com with ESMTPSA id e4-20020a17090301c400b001c75627545csm5298205plh.135.2023.10.07.01.44.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 01:26:42 -0700 (PDT)
-Date: Sat, 7 Oct 2023 10:26:40 +0200
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] tools: ynl-gen: handle do ops with no input
- attrs
-Message-ID: <ZSEWQM0Wdq2PJcLu@lore-desk>
-References: <20231006135032.3328523-1-kuba@kernel.org>
+        Sat, 07 Oct 2023 01:44:42 -0700 (PDT)
+From: Albert Huang <huangjie.albert@bytedance.com>
+To: Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>
+Cc: Albert Huang <huangjie.albert@bytedance.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net/smc: fix smc clc failed issue when netdevice not in init_net
+Date: Sat,  7 Oct 2023 16:44:19 +0800
+Message-Id: <20231007084420.80236-1-huangjie.albert@bytedance.com>
+X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ojaLuNKP6E9rr8iP"
-Content-Disposition: inline
-In-Reply-To: <20231006135032.3328523-1-kuba@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+If the netdevice is within a container and communicates externally
+through network technologies such as VxLAN, we won't be able to find
+routing information in the init_net namespace. To address this issue,
+we need to add a struct net parameter to the smc_ib_find_route function.
+This allow us to locate the routing information within the corresponding
+net namespace, ensuring the correct completion of the SMC CLC interaction.
 
---ojaLuNKP6E9rr8iP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+---
+ net/smc/af_smc.c | 3 ++-
+ net/smc/smc_ib.c | 7 ++++---
+ net/smc/smc_ib.h | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
-> The code supports dumps with no input attributes currently
-> thru a combination of special-casing and luck.
-> Clean up the handling of ops with no inputs. Create empty
-> Structs, and skip printing of empty types.
-> This makes dos with no inputs work.
->=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> --
-> CC: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
->=20
-> Hi Lorenzo, the StructNone from my initial patch felt a little
-> too hacky, so I ditched it :) Could you double check that this
-> works the same as the previous version?
-> ---
->  tools/net/ynl/ynl-gen-c.py | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
-
-Tested-by: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-
-Regards,
-Lorenzo
-
->=20
-> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-> index 168fe612b029..f125b5f704ba 100755
-> --- a/tools/net/ynl/ynl-gen-c.py
-> +++ b/tools/net/ynl/ynl-gen-c.py
-> @@ -1041,9 +1041,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr,=
- SpecOperation, SpecEnumSet, S
->          if op_mode =3D=3D 'notify':
->              op_mode =3D 'do'
->          for op_dir in ['request', 'reply']:
-> -            if op and op_dir in op[op_mode]:
-> -                self.struct[op_dir] =3D Struct(family, self.attr_set,
-> -                                             type_list=3Dop[op_mode][op_=
-dir]['attributes'])
-> +            if op:
-> +                type_list =3D []
-> +                if op_dir in op[op_mode]:
-> +                    type_list =3D op[op_mode][op_dir]['attributes']
-> +                self.struct[op_dir] =3D Struct(family, self.attr_set, ty=
-pe_list=3Dtype_list)
->          if op_mode =3D=3D 'event':
->              self.struct['reply'] =3D Struct(family, self.attr_set, type_=
-list=3Dop['event']['attributes'])
-> =20
-> @@ -1752,6 +1754,8 @@ _C_KW =3D {
-> =20
-> =20
->  def print_req_type_helpers(ri):
-> +    if len(ri.struct["request"].attr_list) =3D=3D 0:
-> +        return
->      print_alloc_wrapper(ri, "request")
->      print_type_helpers(ri, "request")
-> =20
-> @@ -1773,6 +1777,8 @@ _C_KW =3D {
-> =20
-> =20
->  def print_req_type(ri):
-> +    if len(ri.struct["request"].attr_list) =3D=3D 0:
-> +        return
->      print_type(ri, "request")
-> =20
-> =20
-> @@ -2515,9 +2521,8 @@ _C_KW =3D {
->                  if 'dump' in op:
->                      cw.p(f"/* {op.enum_name} - dump */")
->                      ri =3D RenderInfo(cw, parsed, args.mode, op, 'dump')
-> -                    if 'request' in op['dump']:
-> -                        print_req_type(ri)
-> -                        print_req_type_helpers(ri)
-> +                    print_req_type(ri)
-> +                    print_req_type_helpers(ri)
->                      if not ri.type_consistent:
->                          print_rsp_type(ri)
->                      print_wrapped_type(ri)
-> --=20
-> 2.41.0
->=20
-
---ojaLuNKP6E9rr8iP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZSEWQAAKCRA6cBh0uS2t
-rNfWAP9zp4JYAlBwpoZM2eWXudgolJL+kJSmP6F78IckEWvtLAEAhDoluGQOAsuS
-Yna7WhxajbWibjiBgkXbVcg9mf9s/gc=
-=L8bG
------END PGP SIGNATURE-----
-
---ojaLuNKP6E9rr8iP--
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index bacdd971615e..7a874da90c7f 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+ 		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
+ 	struct smc_clc_first_contact_ext *fce =
+ 		smc_get_clc_first_contact_ext(clc_v2, false);
++	struct net *net = sock_net(&smc->sk);
+ 	int rc;
+ 
+ 	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
+@@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+ 		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+ 		ini->smcrv2.uses_gateway = false;
+ 	} else {
+-		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
++		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+ 				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+ 				      ini->smcrv2.nexthop_mac,
+ 				      &ini->smcrv2.uses_gateway))
+diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+index 9b66d6aeeb1a..89981dbe46c9 100644
+--- a/net/smc/smc_ib.c
++++ b/net/smc/smc_ib.c
+@@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
+ 	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
+ }
+ 
+-int smc_ib_find_route(__be32 saddr, __be32 daddr,
++int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+ 		      u8 nexthop_mac[], u8 *uses_gateway)
+ {
+ 	struct neighbour *neigh = NULL;
+@@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
+ 
+ 	if (daddr == cpu_to_be32(INADDR_NONE))
+ 		goto out;
+-	rt = ip_route_output_flow(&init_net, &fl4, NULL);
++	rt = ip_route_output_flow(net, &fl4, NULL);
+ 	if (IS_ERR(rt))
+ 		goto out;
+ 	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
+@@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
+ 	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
+ 	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
+ 		struct in_device *in_dev = __in_dev_get_rcu(ndev);
++		struct net *net = dev_net(ndev);
+ 		const struct in_ifaddr *ifa;
+ 		bool subnet_match = false;
+ 
+@@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
+ 		}
+ 		if (!subnet_match)
+ 			goto out;
+-		if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
++		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
+ 						       smcrv2->daddr,
+ 						       smcrv2->nexthop_mac,
+ 						       &smcrv2->uses_gateway))
+diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
+index 4df5f8c8a0a1..ef8ac2b7546d 100644
+--- a/net/smc/smc_ib.h
++++ b/net/smc/smc_ib.h
+@@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *lnk,
+ int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
+ 			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
+ 			 struct smc_init_info_smcrv2 *smcrv2);
+-int smc_ib_find_route(__be32 saddr, __be32 daddr,
++int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+ 		      u8 nexthop_mac[], u8 *uses_gateway);
+ bool smc_ib_is_valid_local_systemid(void);
+ int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
+-- 
+2.37.1 (Apple Git-137.1)
 
 
