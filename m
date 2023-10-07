@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-38723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DCF77BC452
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:15:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B946B7BC453
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 940F528204B
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 03:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42281C20ADE
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 03:15:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95369CA6C;
-	Sat,  7 Oct 2023 03:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24479CA76;
+	Sat,  7 Oct 2023 03:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C2017D4
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 03:15:39 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6802CBD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781E917E8
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 03:15:40 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E9ABF;
 	Fri,  6 Oct 2023 20:15:37 -0700 (PDT)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S2VhW6GX8zVlX2;
-	Sat,  7 Oct 2023 11:12:11 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S2VjZ6WltzrT7b;
+	Sat,  7 Oct 2023 11:13:06 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.2) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Sat, 7 Oct 2023 11:15:34 +0800
+ 15.1.2507.31; Sat, 7 Oct 2023 11:15:35 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -36,10 +36,12 @@ To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
 CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V2 net-next 0/2] add vf fault detect support for HNS3 ethernet driver
-Date: Sat, 7 Oct 2023 11:12:13 +0800
-Message-ID: <20231007031215.1067758-1-shaojijie@huawei.com>
+Subject: [PATCH V2 net-next 1/2] net: hns3: add hns3 vf fault detect cap bit support
+Date: Sat, 7 Oct 2023 11:12:14 +0800
+Message-ID: <20231007031215.1067758-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20231007031215.1067758-1-shaojijie@huawei.com>
+References: <20231007031215.1067758-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,23 +60,81 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-add vf fault detect support for HNS3 ethernet driver
+From: Jie Wang <wangjie125@huawei.com>
 
-Jie Wang (2):
-  net: hns3: add hns3 vf fault detect cap bit support
-  net: hns3: add vf fault detect support
+Currently hns3 driver is designed to support VF fault detect feature in
+new hardwares. For code compatibility, vf fault detect cap bit is added to
+the driver.
 
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   5 +
- .../hns3/hns3_common/hclge_comm_cmd.c         |   1 +
- .../hns3/hns3_common/hclge_comm_cmd.h         |   2 +
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    |   3 +
- .../hisilicon/hns3/hns3pf/hclge_err.c         | 116 +++++++++++++++++-
- .../hisilicon/hns3/hns3pf/hclge_err.h         |   2 +
- .../hisilicon/hns3/hns3pf/hclge_main.c        |   3 +-
- .../hisilicon/hns3/hns3pf/hclge_main.h        |   2 +
- .../hisilicon/hns3/hns3pf/hclge_mbx.c         |   2 +-
- 9 files changed, 129 insertions(+), 7 deletions(-)
+Signed-off-by: Jie Wang <wangjie125@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h                   | 4 ++++
+ .../net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c  | 1 +
+ .../net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h  | 1 +
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c            | 3 +++
+ 4 files changed, 9 insertions(+)
 
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index aaf1f42624a7..46062106fc6a 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -103,6 +103,7 @@ enum HNAE3_DEV_CAP_BITS {
+ 	HNAE3_DEV_SUPPORT_LANE_NUM_B,
+ 	HNAE3_DEV_SUPPORT_WOL_B,
+ 	HNAE3_DEV_SUPPORT_TM_FLUSH_B,
++	HNAE3_DEV_SUPPORT_VF_FAULT_B,
+ };
+ 
+ #define hnae3_ae_dev_fd_supported(ae_dev) \
+@@ -177,6 +178,9 @@ enum HNAE3_DEV_CAP_BITS {
+ #define hnae3_ae_dev_tm_flush_supported(hdev) \
+ 	test_bit(HNAE3_DEV_SUPPORT_TM_FLUSH_B, (hdev)->ae_dev->caps)
+ 
++#define hnae3_ae_dev_vf_fault_supported(ae_dev) \
++	test_bit(HNAE3_DEV_SUPPORT_VF_FAULT_B, (ae_dev)->caps)
++
+ enum HNAE3_PF_CAP_BITS {
+ 	HNAE3_PF_SUPPORT_VLAN_FLTR_MDF_B = 0,
+ };
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+index dcecb23daac6..d92ad6082d8e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+@@ -157,6 +157,7 @@ static const struct hclge_comm_caps_bit_map hclge_pf_cmd_caps[] = {
+ 	{HCLGE_COMM_CAP_LANE_NUM_B, HNAE3_DEV_SUPPORT_LANE_NUM_B},
+ 	{HCLGE_COMM_CAP_WOL_B, HNAE3_DEV_SUPPORT_WOL_B},
+ 	{HCLGE_COMM_CAP_TM_FLUSH_B, HNAE3_DEV_SUPPORT_TM_FLUSH_B},
++	{HCLGE_COMM_CAP_VF_FAULT_B, HNAE3_DEV_SUPPORT_VF_FAULT_B},
+ };
+ 
+ static const struct hclge_comm_caps_bit_map hclge_vf_cmd_caps[] = {
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+index 2b7197ce0ae8..92e73d44f0e5 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+@@ -348,6 +348,7 @@ enum HCLGE_COMM_CAP_BITS {
+ 	HCLGE_COMM_CAP_GRO_B = 20,
+ 	HCLGE_COMM_CAP_FD_B = 21,
+ 	HCLGE_COMM_CAP_FEC_STATS_B = 25,
++	HCLGE_COMM_CAP_VF_FAULT_B = 26,
+ 	HCLGE_COMM_CAP_LANE_NUM_B = 27,
+ 	HCLGE_COMM_CAP_WOL_B = 28,
+ 	HCLGE_COMM_CAP_TM_FLUSH_B = 31,
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+index b8508533878b..0b138635bafa 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
+@@ -414,6 +414,9 @@ static struct hns3_dbg_cap_info hns3_dbg_cap[] = {
+ 	}, {
+ 		.name = "support tm flush",
+ 		.cap_bit = HNAE3_DEV_SUPPORT_TM_FLUSH_B,
++	}, {
++		.name = "support vf fault detect",
++		.cap_bit = HNAE3_DEV_SUPPORT_VF_FAULT_B,
+ 	}
+ };
+ 
 -- 
 2.30.0
 
