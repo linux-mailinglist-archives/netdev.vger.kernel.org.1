@@ -1,136 +1,106 @@
-Return-Path: <netdev+bounces-38770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB927BC66E
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D20467BC6AF
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 12:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FBEA281D88
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06F201C20945
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 10:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BBF168DE;
-	Sat,  7 Oct 2023 09:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2033D1803B;
+	Sat,  7 Oct 2023 10:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OfKuyt06"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TqjR/rQm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194A0168BA
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 09:28:33 +0000 (UTC)
-X-Greylist: delayed 379 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 07 Oct 2023 02:28:32 PDT
-Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903B8B9
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 02:28:32 -0700 (PDT)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696670531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=S5S6Bq/7hDO06XukKZO/A8hT6aAJLIcw9FkCCFsFcrU=;
-	b=OfKuyt06uvla2JwmSaRP6rudbR3SVvhlLJS3/RFt0oaL6UFITpEI7c7wxH1VGk48Jug7PV
-	ZRRM7b1W9+PJHRo2D5CJSKYEBGklbiR4pM05SxfFbYcN6IbzL48q+qW9671+bMC83p7KyU
-	8cR2jNKbHq8RnPM8N7CpJ4i2gTLAwdw=
-From: George Guo <dongtai.guo@linux.dev>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	George Guo <guodongtai@kylinos.cn>
-Subject: [PATCH] tcp: fix secure_{tcp, tcpv6}_ts_off call parameter order mistake
-Date: Sat,  7 Oct 2023 17:23:37 +0800
-Message-Id: <20231007092337.1540036-1-dongtai.guo@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A89317EC
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 10:17:37 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A23DB
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 03:17:35 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-533df112914so4985475a12.0
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 03:17:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696673854; x=1697278654; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jmwqVJFJZhYX1nwNiKAJDjZmEjH8n5HDdTZtNatfmcI=;
+        b=TqjR/rQm9YVLglf3IkWcS4u6IxHi7ojozK9vKuHEM01QmT5rjoRTkFOkKFJsoLb8xN
+         X0uE1bDZ3K/pRKMNVUBM+BWx5RMqDC911OULm5sedpwrmHdEjcO+4M88zLYkgV6WLl0F
+         XBJGxbS5SHvAofY81aysaUuesWoGin5jLFN8GntRSx4zVYeluKmXVXAllaVB/gkzwzz6
+         YdGYzzCDHBt5kjL7F+Wcx8Pg5kEozlWf4AKetsMH4jYPGsQx2FWL8sii3mGqakb8eDzI
+         juqyIYod1EEibYitP8SOWGof8PMz1u1CRvfhwbd7nsj1D1BUjNRxlnHOVxGncyvYU0sf
+         AXYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696673854; x=1697278654;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jmwqVJFJZhYX1nwNiKAJDjZmEjH8n5HDdTZtNatfmcI=;
+        b=PLr8bCSl5T1SSuijnrW5oSTFuaU5iFthg6+OmzUVjTODPU15GmJIr/Qy17BMGNSwAk
+         vcGvqfTB5dRkGmw+juUCC5OMUWOd8z+vT8PzLmvUpQVnMhM+sidynERExAM1LI7pY6PL
+         cXuuOBznkcvWSKFWiQHGdciBTaxIA3y96ERRIoPFPk/Z3J8I61aaj8doXv1vjVlHfqIZ
+         E4aAt/1QOw0Tlo9aeooLESAzSpeyAX94qvIKyJH4kCw8KMCpnWzzjB6Iuu39uFZQgttr
+         yeJstZmFuu4nckvK6va0M/vEZZjpIsLapnSQzS6KzyM6WZvKJBVA/MriUL1YijgJPusZ
+         rvdw==
+X-Gm-Message-State: AOJu0YxQi2BWay1dyuuNTSKnW/DsdFo3eW/hI0nWBKm4c49qSIgL+g3p
+	5eNVaAB+dtYIuEzF4wKf5CBBCw==
+X-Google-Smtp-Source: AGHT+IG/g6iz+W4hv6c9f0KfGLlhlzulMdgK8+UNv4VFkae+A/lzrPDaq5m5nQ/EbZTMBeXIIlWU+g==
+X-Received: by 2002:a17:907:75f4:b0:9ae:6d0:84ec with SMTP id jz20-20020a17090775f400b009ae06d084ecmr8981249ejc.25.1696673853620;
+        Sat, 07 Oct 2023 03:17:33 -0700 (PDT)
+Received: from localhost ([91.218.191.82])
+        by smtp.gmail.com with ESMTPSA id w10-20020a056402128a00b0053404772535sm3713321edv.81.2023.10.07.03.17.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 Oct 2023 03:17:32 -0700 (PDT)
+Date: Sat, 7 Oct 2023 12:17:31 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, gal@nvidia.com
+Subject: Re: [patch net-next] devlink: don't take instance lock for nested
+ handle put
+Message-ID: <ZSEwO+1pLuV6F6K/@nanopsycho>
+References: <20231003074349.1435667-1-jiri@resnulli.us>
+ <20231005183029.32987349@kernel.org>
+ <ZR+1mc/BEDjNQy9A@nanopsycho>
+ <20231006074842.4908ead4@kernel.org>
+ <ZSA+1qA6gNVOKP67@nanopsycho>
+ <20231006151446.491b5965@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006151446.491b5965@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: George Guo <guodongtai@kylinos.cn>
+Sat, Oct 07, 2023 at 12:14:46AM CEST, kuba@kernel.org wrote:
+>On Fri, 6 Oct 2023 19:07:34 +0200 Jiri Pirko wrote:
+>> >The user creates a port on an instance A, which spawns instance B.
+>> >Instance A links instance B to itself.
+>> >Instance A cannot disappear before instance B disappears.  
+>> 
+>> It can. mlx5 port sf removal is very nice example of that. It just tells
+>> the FW to remove the sf and returns. The actual SF removal is spawned
+>> after that when processing FW events.
+>
+>Isn't the PF driver processing the "FW events"? A is PF here, and B 
+>is SF, are you saying that the PF devlink instance can be completely
+>removed (not just unregistered, freed) before the SF instance is
+>unregistered?
 
-Fix secure_tcp_ts_off and secure_tcpv6_ts_off call parameter order mistake
-
-Signed-off-by: George Guo <guodongtai@kylinos.cn>
----
- net/ipv4/syncookies.c | 4 ++--
- net/ipv4/tcp_ipv4.c   | 2 +-
- net/ipv6/syncookies.c | 4 ++--
- net/ipv6/tcp_ipv6.c   | 4 ++--
- 4 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-index dc478a0574cb..537f368a0b66 100644
---- a/net/ipv4/syncookies.c
-+++ b/net/ipv4/syncookies.c
-@@ -360,8 +360,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
- 
- 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
- 		tsoff = secure_tcp_ts_off(sock_net(sk),
--					  ip_hdr(skb)->daddr,
--					  ip_hdr(skb)->saddr);
-+					  ip_hdr(skb)->saddr,
-+					  ip_hdr(skb)->daddr);
- 		tcp_opt.rcv_tsecr -= tsoff;
- 	}
- 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 27140e5cdc06..3d6c9b286b5a 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -104,7 +104,7 @@ static u32 tcp_v4_init_seq(const struct sk_buff *skb)
- 
- static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
- {
--	return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
-+	return secure_tcp_ts_off(net, ip_hdr(skb)->saddr, ip_hdr(skb)->daddr);
- }
- 
- int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index 5014aa663452..9af484a4d518 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -162,8 +162,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 
- 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
- 		tsoff = secure_tcpv6_ts_off(sock_net(sk),
--					    ipv6_hdr(skb)->daddr.s6_addr32,
--					    ipv6_hdr(skb)->saddr.s6_addr32);
-+					    ipv6_hdr(skb)->saddr.s6_addr32,
-+					    ipv6_hdr(skb)->daddr.s6_addr32);
- 		tcp_opt.rcv_tsecr -= tsoff;
- 	}
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3a88545a265d..ce9cc4c43cf2 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -119,8 +119,8 @@ static u32 tcp_v6_init_seq(const struct sk_buff *skb)
- 
- static u32 tcp_v6_init_ts_off(const struct net *net, const struct sk_buff *skb)
- {
--	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->daddr.s6_addr32,
--				   ipv6_hdr(skb)->saddr.s6_addr32);
-+	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->saddr.s6_addr32,
-+				   ipv6_hdr(skb)->daddr.s6_addr32);
- }
- 
- static int tcp_v6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
--- 
-2.34.1
-
+Kernel-wise, yes. The FW probably holds necessary resource until SF goes
+away.
 
