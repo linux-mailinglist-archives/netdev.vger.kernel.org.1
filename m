@@ -1,28 +1,28 @@
-Return-Path: <netdev+bounces-38784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78C27BC744
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 13:48:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2687BC745
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 13:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B27751C20956
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:48:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FEB82821BD
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C179C1A58D;
-	Sat,  7 Oct 2023 11:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 664471A5A7;
+	Sat,  7 Oct 2023 11:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
 	dkim=pass (1024-bit key) header.d=safebits.tech header.i=@safebits.tech header.b="JiKeRER2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1520E18633
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F087199C3
 	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 11:48:23 +0000 (UTC)
 X-Greylist: delayed 514 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 07 Oct 2023 04:48:21 PDT
-Received: from thor.cnix.ro (thor.cnix.ro [178.238.226.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442B4B9
+Received: from thor.cnix.ro (thor.cnix.ro [IPv6:2a02:c205:2011:3247::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C38CB6
 	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 04:48:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=safebits.tech;
 	s=thor; t=1696678784;
@@ -35,7 +35,7 @@ Received: from localhost (localhost [127.0.0.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: luci@safebits.tech)
-	by thor.cnix.ro (Postfix) with ESMTPSA id 6DF2B556E2;
+	by thor.cnix.ro (Postfix) with ESMTPSA id AF133557E0;
 	Sat,  7 Oct 2023 14:39:44 +0300 (EEST)
 From: Luci Stanescu <luci@safebits.tech>
 Content-Type: multipart/signed;
@@ -56,9 +56,8 @@ To: "David S. Miller" <davem@davemloft.net>,
 Message-Id: <06798029-660D-454E-8628-3A9B9E1AF6F8@safebits.tech>
 X-Mailer: Apple Mail (2.3731.700.6)
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HTML_MESSAGE,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HTML_MESSAGE,SPF_HELO_PASS,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
