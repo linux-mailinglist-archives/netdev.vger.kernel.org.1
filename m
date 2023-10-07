@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-38737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A597BC4CC
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:29:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A387BC4E8
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:50:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF81F1C2093C
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:29:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72E1F2820DF
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AF553AE;
-	Sat,  7 Oct 2023 05:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CAB6D1B;
+	Sat,  7 Oct 2023 05:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OiAMtXJ6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="juA1LG2r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9BA39D
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 05:29:38 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AD32BD
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 22:29:37 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-537f07dfe8eso3182a12.1
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 22:29:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696656576; x=1697261376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ehXIAL9COr2p+SJpJYVkLUs7bLNsHpyoys6ti/OmwOI=;
-        b=OiAMtXJ6tynmtPbNf0oVtLtakB4w672tZqGGFGc20uXHn8lXontrHzK4qP1tuSYiUH
-         tLyVfpdQWpzYGzwjZLup748DMmHPLUY0ksXcxOjj6dbos+c/jnmf5EkjJbwz3Gu3KWHH
-         AVIyMbQpxnTa7TxQTI48+P0ceptkAh4J9DuF5UzwMMQYVEa5StYB1tzsJPk89rOkYKit
-         zMgtXb8LXQpzPCbwS5oZc+e3lFxRdXQIypFnvypgIbmnBl2YN8AGc6Rrt3m13xzJswBu
-         6fCc/bjDt1sg5eUX7Eg1qQodtZkXA/rdY85AK+AP++rpClTfNPyuKDek3KS1PlhruFt+
-         +NaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696656576; x=1697261376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ehXIAL9COr2p+SJpJYVkLUs7bLNsHpyoys6ti/OmwOI=;
-        b=g9yy+R1n+B9v5YfJfaliePcxx4074oZQY18ezr5pP6wJ3LAMS06se0Ai0LJgtL09PZ
-         YHPTs/TF4WM1HkuaY3DvMqVHScmXi2WAbAWUxSAIHm3Jj56M3vydtKG9prBx2DSDb4ws
-         I9Cj0EoBrWBHHM79dLPE/tQCAekYbIpkKKsJeEXFKx9GmFTNxo2TTJdQxrUTOvFoiRsY
-         f3xQpl7I7Ebb/hAfwALVz3bbqVE+6ywTtKNmmnqsBgGm3TOMP1guxiyOLCyt+XJH9cbg
-         rGwQHjl/UICKbYjxkZP9i56aSsjIXjyeMyX4AlUAyXE2CYYjUvArz4mkvcrNE3IZnZI3
-         Ko3Q==
-X-Gm-Message-State: AOJu0YxfY70okHNAbNbrOQPlq0vU+8lmQ3NTPObM23byIO+zpgmyPkiC
-	Deuo4frvoxY+i4Oo5+e5MTMg3H4KikT7roDuY4Nn1Q==
-X-Google-Smtp-Source: AGHT+IE/hTkf8AkZ8ITlkwNVi2PQWbMg9VbCiFwnsi2YbVc9094IqpEkM9HeLWBd/UWOs4drgL5TpFtxUxnWyQHg7ME=
-X-Received: by 2002:a50:bb67:0:b0:519:7d2:e256 with SMTP id
- y94-20020a50bb67000000b0051907d2e256mr268054ede.0.1696656575664; Fri, 06 Oct
- 2023 22:29:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221EE2568;
+	Sat,  7 Oct 2023 05:50:53 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A166BBB;
+	Fri,  6 Oct 2023 22:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696657851; x=1728193851;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dkHv+oAcL7tENq1Yd73stD/FY/Ihm49Ba/5lg337PbE=;
+  b=juA1LG2rVJuXSQjjiuekToZHAaOk5iTHOzTB9pFa93PHNcyLmxKPd19t
+   rtDzVcjWbb0qkOSDNVf7YTTBX/bewG/shOxVsM6dwoNmPToVBHH8k7zKA
+   tNF6kULKq1Oledwa3GwymwrtyBaP5nPBUg+DOqRADu4Adg+7eMw5wG+l7
+   iD50e3NV7F12JwYiwu/iALhWQbKY8r9sj2F3nBlpbNeciV8qv/jiRcYim
+   mvi+SuJ8iPdhAQixYlZID3yOQJhpn0K2GvgRvUlhuEY8g2QgxySx/H/Ha
+   yD7Z34t3qcZDobEBDRQEwUXEOpN8dPehEF0iKyiCvL1ODqzvPiOc1k217
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="368973970"
+X-IronPort-AV: E=Sophos;i="6.03,205,1694761200"; 
+   d="scan'208";a="368973970"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2023 22:50:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10855"; a="822754753"
+X-IronPort-AV: E=Sophos;i="6.03,205,1694761200"; 
+   d="scan'208";a="822754753"
+Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 06 Oct 2023 22:50:47 -0700
+Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qp0D7-000425-2h;
+	Sat, 07 Oct 2023 05:50:45 +0000
+Date: Sat, 7 Oct 2023 13:50:44 +0800
+From: kernel test robot <lkp@intel.com>
+To: Matt Johnston <matt@codeconstruct.com.au>,
+	linux-i3c@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next v4 3/3] mctp i3c: MCTP I3C driver
+Message-ID: <202310071339.iWeOdKQk-lkp@intel.com>
+References: <20231004031316.725107-4-matt@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231007050621.1706331-1-yajun.deng@linux.dev>
-In-Reply-To: <20231007050621.1706331-1-yajun.deng@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 7 Oct 2023 07:29:24 +0200
-Message-ID: <CANn89iL-zUw1FqjYRSC7BGB0hfQ5uKpJzUba3YFd--c=GdOoGg@mail.gmail.com>
-Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231004031316.725107-4-matt@codeconstruct.com.au>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 7, 2023 at 7:06=E2=80=AFAM Yajun Deng <yajun.deng@linux.dev> wr=
-ote:
->
-> Although there is a kfree_skb_reason() helper function that can be used t=
-o
-> find the reason why this skb is dropped, but most callers didn't increase
-> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
->
-...
+Hi Matt,
 
-> +
-> +void netdev_core_stats_inc(struct net_device *dev, u32 offset)
-> +{
-> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_all=
-oc() */
-> +       struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->core_=
-stats);
-> +       unsigned long *field;
-> +
-> +       if (unlikely(!p))
-> +               p =3D netdev_core_stats_alloc(dev);
-> +
-> +       if (p) {
-> +               field =3D (unsigned long *)((void *)this_cpu_ptr(p) + off=
-set);
-> +               WRITE_ONCE(*field, READ_ONCE(*field) + 1);
+kernel test robot noticed the following build errors:
 
-This is broken...
+[auto build test ERROR on net-next/main]
 
-As I explained earlier, dev_core_stats_xxxx(dev) can be called from
-many different contexts:
+url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/dt-bindings-i3c-Add-mctp-controller-property/20231004-111533
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231004031316.725107-4-matt%40codeconstruct.com.au
+patch subject: [PATCH net-next v4 3/3] mctp i3c: MCTP I3C driver
+config: x86_64-buildonly-randconfig-005-20231007 (https://download.01.org/0day-ci/archive/20231007/202310071339.iWeOdKQk-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231007/202310071339.iWeOdKQk-lkp@intel.com/reproduce)
 
-1) process contexts, where preemption and migration are allowed.
-2) interrupt contexts.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310071339.iWeOdKQk-lkp@intel.com/
 
-Adding WRITE_ONCE()/READ_ONCE() is not solving potential races.
+All errors (new ones prefixed by >>):
 
-I _think_ I already gave you how to deal with this ?
+   In file included from drivers/net/mctp/mctp-i3c.c:13:0:
+>> drivers/net/mctp/mctp-i3c.c:710:12: error: initializer element is not constant
+     I3C_CLASS(I3C_DCR_MCTP, NULL),
+               ^
+   include/linux/i3c/device.h:166:10: note: in definition of macro 'I3C_CLASS'
+      .dcr = _dcr,      \
+             ^~~~
+   drivers/net/mctp/mctp-i3c.c:710:12: note: (near initialization for 'mctp_i3c_ids[0].dcr')
+     I3C_CLASS(I3C_DCR_MCTP, NULL),
+               ^
+   include/linux/i3c/device.h:166:10: note: in definition of macro 'I3C_CLASS'
+      .dcr = _dcr,      \
+             ^~~~
 
-Please try instead:
 
-+void netdev_core_stats_inc(struct net_device *dev, u32 offset)
-+{
-+       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc=
-() */
-+       struct net_device_core_stats __percpu *p =3D READ_ONCE(dev->core_st=
-ats);
-+       unsigned long __percpu *field;
-+
-+       if (unlikely(!p)) {
-+               p =3D netdev_core_stats_alloc(dev);
-+               if (!p)
-+                       return;
-+       }
-+       field =3D (__force unsigned long __percpu *)((__force void *)p + of=
-fset);
-+       this_cpu_inc(*field);
-+}
+vim +710 drivers/net/mctp/mctp-i3c.c
+
+   708	
+   709	static const struct i3c_device_id mctp_i3c_ids[] = {
+ > 710		I3C_CLASS(I3C_DCR_MCTP, NULL),
+   711		{ 0 },
+   712	};
+   713	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
