@@ -1,133 +1,210 @@
-Return-Path: <netdev+bounces-38755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C568A7BC5AA
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:41:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D3A7BC5C8
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81E5E282016
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:41:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922DD1C209BE
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05BD11C82;
-	Sat,  7 Oct 2023 07:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4323812B6D;
+	Sat,  7 Oct 2023 07:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c1gXc2m8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joZKHjJg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E89E54A;
-	Sat,  7 Oct 2023 07:41:15 +0000 (UTC)
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D6EB9;
-	Sat,  7 Oct 2023 00:41:12 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-277317a0528so585945a91.0;
-        Sat, 07 Oct 2023 00:41:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEC88481;
+	Sat,  7 Oct 2023 07:52:52 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19E7A6;
+	Sat,  7 Oct 2023 00:52:50 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-533d31a8523so5294767a12.1;
+        Sat, 07 Oct 2023 00:52:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696664472; x=1697269272; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G9SDgvSUqsFrdWIu2qz/7AkqL4vIEqi9zxwIB5I4Svc=;
-        b=c1gXc2m8fGHDCgDKYCcVhQk4q5ylA2u93+Hf75kc5YZ55ix/AUzDc09fXb0Fq7GGos
-         r+RYIVmmcrmU+LqvFDGDzcpIYxlDPlGlzv6QNLNVDMUTuPei5K5w9BstnSBGjERZbeid
-         8dnM7vsYn4UV/8OI38HZrvLboZNajyZWO8zpAs6UELuCzLsK5uo5qPphrAcikhRR4/CE
-         Mkyxmi8kxyc6DQO3dGphLVFuT3qSgB2TICUcWwix7LSKtr7ZJvcgjkEYyWCUqHCQX0GT
-         oCv3b71AjR5TcrXHl9y+HS4BktAWGFyP5Wr1FMbaXlBdlXcQkBFBEU5JCj1VKB0seGpr
-         rAGQ==
+        d=gmail.com; s=20230601; t=1696665169; x=1697269969; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FYYo8GR3oiE1tO7of8Zj0AJ+1K2a6alvRcy0hRc5+D0=;
+        b=joZKHjJgRJLEAaiqi+g/61Q7wUZkNDC2rPdP/J/g/++zZHTqARZg7CVziDrMEb9NqU
+         2yuHRlJ/aGB6zaZWhmOJMGpJ6lRub6OfNcPgA/tG2znMn3j7AdyDcY7PcNuI6Fqtrne/
+         BM67BLYO8bM/CuqxPHVrptm2eBM9BAadnjHtKbQ9+9caDcb6x84H00+o+f1WQAMxVpnI
+         SpHB3s6nZmfk3I4ojSQ8FLIKsT+WHzWHtrMXFbsjrdgCsPLgagfP6nl+T/JFHOtvPP6U
+         8nMV7TnPzXN9rrZF9CSsO0NGA4qUSzU1HI4cWK7vcdP3gLtxEBPK/g7L4qRIZohiFgzz
+         gn3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696664472; x=1697269272;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=G9SDgvSUqsFrdWIu2qz/7AkqL4vIEqi9zxwIB5I4Svc=;
-        b=g10gKsRNLFj+GW22CvMC+pZ6C5+P2fcqYfdljLBNPhnyJyfdgBQXt00kqkWdVAy+p3
-         JVMXOeC6ACBMigI0F0S2crsCTANpzLNAK0w+u/HKTtZ2STwbe4ljj/87NcLo6C1+Rmuh
-         L/OjfU64QfuZyaU+2yZnuoJo/IRQxZQa0Etx+PDIyW8Z+Y16b1/BVaakMI4tVp+PuQ87
-         m3yB+uX4uGduKjteEUMmpzDolkkczlHEKKmI/OLGA3AvsbwEEZzpxupU27rfJtJk4a+u
-         IxlX/v+bgrwkNrFEEic+5u+TxFyfYsO41sBEOClcXL24TWXUD9Dy0lgeI0uyPWMv3V+o
-         x6Uw==
-X-Gm-Message-State: AOJu0YwT1xEX0qjvlYGHIBiiOL8AqkvE3P1J6RvVt4nV+no6l26HlHdr
-	jQlZjofZK0kX9ccsXcVhKQSLdR+zxKR9p2+1
-X-Google-Smtp-Source: AGHT+IEUNrbu0Z9BpUItXofBaI+n5z5lCx24thBAXbpI0Px4fxT7uJcUOynP4KDp00WsSdonRMa8TQ==
-X-Received: by 2002:a17:90a:1783:b0:279:e6f:2e4b with SMTP id q3-20020a17090a178300b002790e6f2e4bmr9188351pja.0.1696664472020;
-        Sat, 07 Oct 2023 00:41:12 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id v6-20020a17090a00c600b00277326038dasm4948411pjd.39.2023.10.07.00.41.11
+        d=1e100.net; s=20230601; t=1696665169; x=1697269969;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FYYo8GR3oiE1tO7of8Zj0AJ+1K2a6alvRcy0hRc5+D0=;
+        b=n2Uy5Tk4ZdpV73L788JGaMXLM5Xehf+oScGNjLVMRhyMNB6voviiQoYPmLk9HuJEIN
+         vlnyQJRZaJoSBEr0pD7sEFNFmvAKBJLdCt4BZt8EyTe1HEonzNDAKAswTrHIMgW0Wkbc
+         dB9SwdwpUwsBmzfrhRox3L7yKD2qb9XY9ZiT4UEz1DX86Wp9yHjaeqH5f6A2I2Ok9208
+         03OEBT2SAWKifkf2RuhMczyqAgYtWclGvx3B9AQZLclFypWLHprFl0C8tJYLabJrxmqK
+         2JBMGAWLR2jCnT+DhOd5Y3uBrOlJabuwy0xX/YCjXGXrlfTAHtHMjvFNtl152/0TG42Y
+         nVfA==
+X-Gm-Message-State: AOJu0YxvosBpb/O+3Z1o3/T/8Q8brmCFDF0Q28FUrqYhbZL6gteo33jG
+	tj3FN91Ue2IZQFJyxtK/AZweP8XCFmDFQw==
+X-Google-Smtp-Source: AGHT+IEa0d+g1RmX9uc9gMWr0k5mS4QILCecL+NREQqJlgOannZCmyfEkeEcOEKCxv16TAPphXhn1Q==
+X-Received: by 2002:a50:ee1a:0:b0:530:a0a9:ee36 with SMTP id g26-20020a50ee1a000000b00530a0a9ee36mr8902769eds.38.1696665168939;
+        Sat, 07 Oct 2023 00:52:48 -0700 (PDT)
+Received: from localhost.localdomain ([77.222.24.57])
+        by smtp.gmail.com with ESMTPSA id n24-20020aa7d058000000b0053331f9094dsm3568685edo.52.2023.10.07.00.52.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 00:41:11 -0700 (PDT)
-Date: Sat, 07 Oct 2023 16:41:10 +0900 (JST)
-Message-Id: <20231007.164110.2300519476669399189.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <3db1ad51-a2a0-4648-8bc5-7ed089a4e5dd@lunn.ch>
-References: <19161969-1033-4fd5-9a24-ec21d66c6735@lunn.ch>
-	<20231007.002609.681250079112313735.fujita.tomonori@gmail.com>
-	<3db1ad51-a2a0-4648-8bc5-7ed089a4e5dd@lunn.ch>
+        Sat, 07 Oct 2023 00:52:44 -0700 (PDT)
+From: Andrew Kanner <andrew.kanner@gmail.com>
+To: martin.lau@linux.dev,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	aleksander.lobakin@intel.com,
+	xuanzhuo@linux.alibaba.com,
+	ast@kernel.org,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	daniel@iogearbox.net
+Cc: linux-kernel-mentees@lists.linuxfoundation.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
+	syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com,
+	Andrew Kanner <andrew.kanner@gmail.com>
+Subject: [PATCH bpf v4] net/xdp: fix zero-size allocation warning in xskq_create()
+Date: Sat,  7 Oct 2023 10:51:49 +0300
+Message-Id: <20231007075148.1759-1-andrew.kanner@gmail.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 6 Oct 2023 17:57:41 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Syzkaller reported the following issue:
+ ------------[ cut here ]------------
+ WARNING: CPU: 0 PID: 2807 at mm/vmalloc.c:3247 __vmalloc_node_range (mm/vmalloc.c:3361)
+ Modules linked in:
+ CPU: 0 PID: 2807 Comm: repro Not tainted 6.6.0-rc2+ #12
+ Hardware name: Generic DT based system
+ unwind_backtrace from show_stack (arch/arm/kernel/traps.c:258)
+ show_stack from dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
+ dump_stack_lvl from __warn (kernel/panic.c:633 kernel/panic.c:680)
+ __warn from warn_slowpath_fmt (./include/linux/context_tracking.h:153 kernel/panic.c:700)
+ warn_slowpath_fmt from __vmalloc_node_range (mm/vmalloc.c:3361 (discriminator 3))
+ __vmalloc_node_range from vmalloc_user (mm/vmalloc.c:3478)
+ vmalloc_user from xskq_create (net/xdp/xsk_queue.c:40)
+ xskq_create from xsk_setsockopt (net/xdp/xsk.c:953 net/xdp/xsk.c:1286)
+ xsk_setsockopt from __sys_setsockopt (net/socket.c:2308)
+ __sys_setsockopt from ret_fast_syscall (arch/arm/kernel/entry-common.S:68)
 
->> Now I'm thinking that this is the best option. Kconfig would be the following:
->> 
->> config AX88796B_PHY
->>         tristate "Asix PHYs"
->>         help
->>          Currently supports the Asix Electronics PHY found in the X-Surf 100
->>          AX88796B package.
->> 
->> choice
->>         prompt "Implementation options"
->>         depends on AX88796B_PHY
->>         help
->>          There are two implementations for a driver for Asix PHYs; C and Rust.
->>          If not sure, choose C.
->> 
->> config AX88796B_C_PHY
->>         bool "The C version driver for Asix PHYs"
->> 
->> config AX88796B_RUST_PHY
->>         bool "The Rust version driver for Asix PHYs"
->>         depends on RUST
->> 
->> endchoice
->> 
->> 
->> No hack in Makefile:
->> 
->> obj-$(CONFIG_AX88796B_C_PHY)    += ax88796b.o
->> obj-$(CONFIG_AX88796B_RUST_PHY) += ax88796b_rust.o
-> 
-> This looks reasonable. Lets use this. But i still think we need some
-> sort of RUST_PHYLIB_BINDING.
+xskq_get_ring_size() uses struct_size() macro to safely calculate the
+size of struct xsk_queue and q->nentries of desc members. But the
+syzkaller repro was able to set q->nentries with the value initially
+taken from copy_from_sockptr() high enough to return SIZE_MAX by
+struct_size(). The next PAGE_ALIGN(size) is such case will overflow
+the size_t value and set it to 0. This will trigger WARN_ON_ONCE in
+vmalloc_user() -> __vmalloc_node_range().
 
-Sorry, I found that it doesn't work well when you try to build
-AX88796B_PHY as a module.
+The issue is reproducible on 32-bit arm kernel.
 
-With AX88796B_PHY=m, if you choose the C version, then you got
-AX88796B_C_PHY=y; the driver will be built-in.
+Reported-and-tested-by: syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000c84b4705fb31741e@google.com/T/
+Link: https://syzkaller.appspot.com/bug?extid=fae676d3cf469331fc89
+Reported-by: syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000e20df20606ebab4f@google.com/T/
+Fixes: 9f78bf330a66 ("xsk: support use vaddr as ring")
+Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
+---
 
-Seems that we need a trick in Makefile in any ways, I'll go with the
-original version of this patch; the simplest, I think.
+Notes (akanner):
+    v4:
+      - add explanation about SIZE_MAX, suggested by Martin KaFai Lau
+        <martin.lau@linux.dev>
+    v3: https://lore.kernel.org/all/20231005193548.515-1-andrew.kanner@gmail.com/T/
+      - free kzalloc-ed memory before return, the leak was noticed by
+        Daniel Borkmann <daniel@iogearbox.net>
+    v2: https://lore.kernel.org/all/20231002222939.1519-1-andrew.kanner@gmail.com/raw
+      - use unlikely() optimization for the case with SIZE_MAX return from
+        struct_size(), suggested by Alexander Lobakin
+        <aleksander.lobakin@intel.com>
+      - cc-ed 4 more maintainers, mentioned by cc_maintainers patchwork
+        test
+    
+    v1: https://lore.kernel.org/all/20230928204440.543-1-andrew.kanner@gmail.com/T/
+      - RFC notes:
+        It was found that net/xdp/xsk.c:xsk_setsockopt() uses
+        copy_from_sockptr() to get the number of entries (int) for cases
+        with XDP_RX_RING / XDP_TX_RING and XDP_UMEM_FILL_RING /
+        XDP_UMEM_COMPLETION_RING.
+    
+        Next in xsk_init_queue() there're 2 sanity checks (entries == 0)
+        and (!is_power_of_2(entries)) for which -EINVAL will be returned.
+    
+        After that net/xdp/xsk_queue.c:xskq_create() will calculate the
+        size multipling the number of entries (int) with the size of u64,
+        at least.
+    
+        I wonder if there should be the upper bound (e.g. the 3rd sanity
+        check inside xsk_init_queue()). It seems that without the upper
+        limit it's quiet easy to overflow the allocated size (SIZE_MAX),
+        especially for 32-bit architectures, for example arm nodes which
+        were used by the syzkaller.
+    
+        In this patch I added a naive check for SIZE_MAX which helped to
+        skip zero-size allocation after overflow, but maybe it's not quite
+        right. Please, suggest if you have any thoughts about the
+        appropriate limit for the size of these xdp rings.
+    
+        PS: the initial number of entries is 0x20000000 in syzkaller
+        repro: syscall(__NR_setsockopt, (intptr_t)r[0], 0x11b, 3,
+        0x20000040, 0x20);
+    
+        Link:
+        https://syzkaller.appspot.com/text?tag=ReproC&x=10910f18280000
+
+ net/xdp/xsk_queue.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
+index f8905400ee07..d2c264030017 100644
+--- a/net/xdp/xsk_queue.c
++++ b/net/xdp/xsk_queue.c
+@@ -34,6 +34,16 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
+ 	q->ring_mask = nentries - 1;
+ 
+ 	size = xskq_get_ring_size(q, umem_queue);
++
++	/* size which is overflowing or close to SIZE_MAX will become 0 in
++	 * PAGE_ALIGN(), checking SIZE_MAX is enough due to the previous
++	 * is_power_of_2(), the rest will be handled by vmalloc_user()
++	 */
++	if (unlikely(size == SIZE_MAX)) {
++		kfree(q);
++		return NULL;
++	}
++
+ 	size = PAGE_ALIGN(size);
+ 
+ 	q->ring = vmalloc_user(size);
+-- 
+2.39.3
 
 
