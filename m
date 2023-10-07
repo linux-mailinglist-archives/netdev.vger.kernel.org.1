@@ -1,337 +1,170 @@
-Return-Path: <netdev+bounces-38735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBCDD7BC4C2
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:06:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633E27BC4C4
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 07:06:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43CC22821AF
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:06:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 946201C20956
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 05:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435115394;
-	Sat,  7 Oct 2023 05:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7121A5392;
+	Sat,  7 Oct 2023 05:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="sgCMYs8s"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QvEOrQlh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0B839D
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 05:06:19 +0000 (UTC)
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E131ABF
-	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 22:06:16 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5a1f00b75aaso33120567b3.2
-        for <netdev@vger.kernel.org>; Fri, 06 Oct 2023 22:06:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1696655176; x=1697259976; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xJFbEA2LhcSHF5iy6HPEiwc3v3rv9bj6ovpPK8v+1BM=;
-        b=sgCMYs8sLVTTAfSSi+liNzMLlPUpyzdD+Z6962FoGJVulniTz5unr9uYMYQe/wrjf5
-         EpvlscIIE+oqqfVU3gHwyeqYTDSgCWT18HqPRRi72NtBrbazSTYdx3/0g6BXZnK3P78O
-         3FTCTE/Z8+vmKt6FsHzuT/4xSjCGBB3wfnm8fqT/gPLATC1IJQxUmUJBxabKtBkhyzAR
-         aWvmgznMzbza2/XKgmSXBnab02YHDyR3heTPeKOyr716XDKQd1EDStp0lCrTHUdv2wlj
-         3CKVMVnUVOHhs0sX11wj0gI9I1YzppoBqj4hYdqArTDba7iZ9rUqLDH6N1+ucv/I3EFE
-         ewnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696655176; x=1697259976;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xJFbEA2LhcSHF5iy6HPEiwc3v3rv9bj6ovpPK8v+1BM=;
-        b=XQIn3X1mvLPq7RvMifYZ5cYN0QtwCfrNaRpeEaWFq2x2IuFCoDHyTiYHqUCYUakPod
-         Re+ZGasHN/KPFf50fl/jrTUprLggHHiacW3M6BwyzYn7DpywzUhUtPFsqelyeORCCQ6+
-         COwAX4luskIldqduL/GqRznd/r0wmpb+pZ2mdodCUEwGteeNAnVSA0hICQ5quJ8JzrEb
-         7vui2Av3bzcmgVeEHRi+ew32mvaqnt7T75Hdr/Adpw2XDyXP+cksYInZ7oNjQkaoQVot
-         r5/lRczRLsBbu8ixj/crYqJpk+RVIXpbWQCcnvYE1GiPVKFr4oKSy7h72FRAxCZwUTXF
-         lrzA==
-X-Gm-Message-State: AOJu0YzFfWaAS6tZZuV1Bk3bHId1zjG5uaI0NjwRfhJshmFz9keEuLvc
-	SNfumvqKuzjA5NNK1qEtbKXn6pwt3JA7CVkMuzPFjA==
-X-Google-Smtp-Source: AGHT+IG/173MdRuZwr7/Aa2FuA5ysUdImNnIIsBZ0FTeQu6e2SR+P33Lef8ddV2i/F62oEoQgGL7PdP5ftzHPR9eKEM=
-X-Received: by 2002:a81:7242:0:b0:589:e4aa:7b67 with SMTP id
- n63-20020a817242000000b00589e4aa7b67mr10706719ywc.41.1696655175981; Fri, 06
- Oct 2023 22:06:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3DE523B
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 05:06:43 +0000 (UTC)
+Received: from out-193.mta1.migadu.com (out-193.mta1.migadu.com [IPv6:2001:41d0:203:375::c1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F8FC2
+	for <netdev@vger.kernel.org>; Fri,  6 Oct 2023 22:06:40 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696655199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q7I3d9LwjafU5Kv12eU37aaf8qZaT/OjOVOphwidH2Y=;
+	b=QvEOrQlhdKmpbmzesqy3Qzfk18HpjUCqpVfC2Qd5xNkN+I/tGZMybjRDTXE50F/ZLECqcg
+	Tw//uSdQORQPNXsUcPAo10ISuHPuhYdKt1rpXAvAwfNiaFHMZv7YMAlUv+zQ17weCYWoU8
+	l4S+si4z35nG0b08FnXFpkU9iM1xPn0=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yajun Deng <yajun.deng@linux.dev>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
+Date: Sat,  7 Oct 2023 13:06:21 +0800
+Message-Id: <20231007050621.1706331-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231006094911.3305152-1-fujita.tomonori@gmail.com> <20231006094911.3305152-2-fujita.tomonori@gmail.com>
-In-Reply-To: <20231006094911.3305152-2-fujita.tomonori@gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Sat, 7 Oct 2023 01:06:04 -0400
-Message-ID: <CALNs47sdj2onJS3wFUVoONYL_nEgT+PTLTVuMLcmE6W6JgZAXA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] rust: core abstractions for network PHY drivers
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
-	miguel.ojeda.sandonis@gmail.com, greg@kroah.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 6, 2023 at 5:49=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
-> +/// Wraps the kernel's `struct phy_device`.
-> +///
-> +/// # Invariants
-> +///
-> +/// `self.0` is always in a valid state.
-> +#[repr(transparent)]
-> +pub struct Device(Opaque<bindings::phy_device>);
+Although there is a kfree_skb_reason() helper function that can be used to
+find the reason why this skb is dropped, but most callers didn't increase
+one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
 
-Can you just add `An instance of a PHY` to the docs for reference?
+For the users, people are more concerned about why the dropped in ip
+is increasing.
 
-> +impl Device {
-> +    /// Creates a new [`Device`] instance from a raw pointer.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// For the duration of the lifetime 'a, the pointer must be valid f=
-or writing and nobody else
-> +    /// may read or write to the `phy_device` object.
-> +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mu=
-t Self {
-> +        unsafe { &mut *ptr.cast() }
-> +    }
+Introduce netdev_core_stats_inc() for trace the caller of
+dev_core_stats_*_inc(). Also, add __code to netdev_core_stats_alloc(), as
+it's called unlinkly.
 
-The safety comment here still needs something like
+Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+v7: use WRITE_ONCE and READ_ONCE instead of '++'
+v6: merge netdev_core_stats and netdev_core_stats_inc together
+v5: Access the per cpu pointer before reach the relevant offset.
+v4: Introduce netdev_core_stats_inc() instead of export dev_core_stats_*_inc()
+v3: __cold should be added to the netdev_core_stats_alloc().
+v2: use __cold instead of inline in dev_core_stats().
+v1: https://lore.kernel.org/netdev/20230911082016.3694700-1-yajun.deng@linux.dev/
+---
+ include/linux/netdevice.h | 21 ++++-----------------
+ net/core/dev.c            | 20 ++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 19 deletions(-)
 
-    with the exception of fields that are synchronized via the `lock` mutex
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index e070a4540fba..11d704bfec9b 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4002,32 +4002,19 @@ static __always_inline bool __is_skb_forwardable(const struct net_device *dev,
+ 	return false;
+ }
+ 
+-struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev);
+-
+-static inline struct net_device_core_stats __percpu *dev_core_stats(struct net_device *dev)
+-{
+-	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
+-	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
+-
+-	if (likely(p))
+-		return p;
+-
+-	return netdev_core_stats_alloc(dev);
+-}
++void netdev_core_stats_inc(struct net_device *dev, u32 offset);
+ 
+ #define DEV_CORE_STATS_INC(FIELD)						\
+ static inline void dev_core_stats_##FIELD##_inc(struct net_device *dev)		\
+ {										\
+-	struct net_device_core_stats __percpu *p;				\
+-										\
+-	p = dev_core_stats(dev);						\
+-	if (p)									\
+-		this_cpu_inc(p->FIELD);						\
++	netdev_core_stats_inc(dev,						\
++			offsetof(struct net_device_core_stats, FIELD));		\
+ }
+ DEV_CORE_STATS_INC(rx_dropped)
+ DEV_CORE_STATS_INC(tx_dropped)
+ DEV_CORE_STATS_INC(rx_nohandler)
+ DEV_CORE_STATS_INC(rx_otherhost_dropped)
++#undef DEV_CORE_STATS_INC
+ 
+ static __always_inline int ____dev_forward_skb(struct net_device *dev,
+ 					       struct sk_buff *skb,
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 606a366cc209..a38ea90771f5 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10497,7 +10497,8 @@ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
+ }
+ EXPORT_SYMBOL(netdev_stats_to_stats64);
+ 
+-struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device *dev)
++static __cold struct net_device_core_stats __percpu *netdev_core_stats_alloc(
++		struct net_device *dev)
+ {
+ 	struct net_device_core_stats __percpu *p;
+ 
+@@ -10510,7 +10511,22 @@ struct net_device_core_stats __percpu *netdev_core_stats_alloc(struct net_device
+ 	/* This READ_ONCE() pairs with the cmpxchg() above */
+ 	return READ_ONCE(dev->core_stats);
+ }
+-EXPORT_SYMBOL(netdev_core_stats_alloc);
++
++void netdev_core_stats_inc(struct net_device *dev, u32 offset)
++{
++	/* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
++	struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
++	unsigned long *field;
++
++	if (unlikely(!p))
++		p = netdev_core_stats_alloc(dev);
++
++	if (p) {
++		field = (unsigned long *)((void *)this_cpu_ptr(p) + offset);
++		WRITE_ONCE(*field, READ_ONCE(*field) + 1);
++	}
++}
++EXPORT_SYMBOL_GPL(netdev_core_stats_inc);
+ 
+ /**
+  *	dev_get_stats	- get network device statistics
+-- 
+2.25.1
 
-> +    /// Gets the id of the PHY.
-> +    pub fn phy_id(&mut self) -> u32 {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        unsafe { (*phydev).phy_id }
-> +    }
-> +
-> +    /// Gets the state of the PHY.
-> +    pub fn state(&mut self) -> DeviceState {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        let state =3D unsafe { (*phydev).state };
-> +        match state {
-> +            bindings::phy_state::PHY_DOWN =3D> DeviceState::Down,
-> +            bindings::phy_state::PHY_READY =3D> DeviceState::Ready,
-> +            bindings::phy_state::PHY_HALTED =3D> DeviceState::Halted,
-> +            bindings::phy_state::PHY_ERROR =3D> DeviceState::Error,
-> +            bindings::phy_state::PHY_UP =3D> DeviceState::Up,
-> +            bindings::phy_state::PHY_RUNNING =3D> DeviceState::Running,
-> +            bindings::phy_state::PHY_NOLINK =3D> DeviceState::NoLink,
-> +            bindings::phy_state::PHY_CABLETEST =3D> DeviceState::CableTe=
-st,
-> +        }
-> +    }
-
-Could you add a comment like `// FIXME:enum-cast` or something? Then
-when we have a better solution for enums handling we can revise this.
-
-> +    /// Sets the speed of the PHY.
-> +    pub fn set_speed(&mut self, speed: u32) {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        unsafe { (*phydev).speed =3D speed as i32 };
-> +    }
-
-Since we're taking user input, it probably doesn't hurt to do some
-sort of sanity check rather than casting. Maybe warn once then return
-the biggest nowrapping value
-
-    let speed_i32 =3D i32::try_from(speed).unwrap_or_else(|_| {
-        warn_once!("excessive speed {speed}");
-        i32::MAX
-    })
-    unsafe { (*phydev).speed =3D speed_i32 };
-
-> +    /// Executes software reset the PHY via BMCR_RESET bit.
-> +    pub fn genphy_soft_reset(&mut self) -> Result {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        to_result(unsafe { bindings::genphy_soft_reset(phydev) })
-> +    }
-> +
-> +    /// Initializes the PHY.
-> +    pub fn init_hw(&mut self) -> Result {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // so an FFI call with a valid pointer.
-> +        to_result(unsafe { bindings::phy_init_hw(phydev) })
-> +    }
-
-Andrew, are there any restrictions about calling phy_init_hw more than
-once? Or are there certain things that you are not allowed to do until
-you call that function?
-
-If so, maybe a simple typestate would make sense here
-
-> +impl<T: Driver> Adapter<T> {
-> +    unsafe extern "C" fn soft_reset_callback(
-> +        phydev: *mut bindings::phy_device,
-> +    ) -> core::ffi::c_int {
-> +        from_result(|| {
-> +            // SAFETY: The C API guarantees that `phydev` is valid while=
- this function is running.
-> +            let dev =3D unsafe { Device::from_raw(phydev) };
-> +            T::soft_reset(dev)?;
-> +            Ok(0)
-> +        })
-> +    }
-
-All of these functions need a `# Safety` doc section, you could
-probably just say to follow `Device::from_raw`'s rules. And then you
-can update the comments to say caller guarantees preconditions
-
-If you care to, these functions are so similar that you could just use
-a macro to make your life easier
-
-    macro_rules! make_phydev_callback{
-        ($fn_name:ident, $c_fn_name:ident) =3D> {
-            /// ....
-            /// # Safety
-            /// `phydev` must be valid and registered
-            unsafe extern "C" fn $fn_name(
-                phydev: *mut ::bindings::phy_device
-            ) -> $ret_ty {
-                from_result(|| {
-                    // SAFETY: Preconditions ensure `phydev` is valid and
-                    let dev =3D unsafe { Device::from_raw(phydev) };
-                    T::$c_fn_name(dev)?;
-                    Ok(0)
-                }
-            }
-        }
-    }
-
-    make_phydev_callback!(get_features_callback, get_features);
-    make_phydev_callback!(suspend_callback, suspend);
-
-> +    unsafe extern "C" fn read_mmd_callback(
-> +        phydev: *mut bindings::phy_device,
-> +        devnum: i32,
-> +        regnum: u16,
-> +    ) -> i32 {
-> +        from_result(|| {
-> +            // SAFETY: The C API guarantees that `phydev` is valid while=
- this function is running.
-> +            let dev =3D unsafe { Device::from_raw(phydev) };
-> +            let ret =3D T::read_mmd(dev, devnum as u8, regnum)?;
-> +            Ok(ret.into())
-> +        })
-> +    }
-
-Since your're reading a bus, it probably doesn't hurt to do a quick
-check when converting
-
-    let devnum_u8 =3D u8::try_from(devnum).(|_| {
-        warn_once!("devnum {devnum} exceeds u8 limits");
-        code::EINVAL
-    })?
-    // ...
-
-
-> +    unsafe extern "C" fn write_mmd_callback(
-> +        phydev: *mut bindings::phy_device,
-> +        devnum: i32,
-> +        regnum: u16,
-> +        val: u16,
-> +    ) -> i32 {
-> +        from_result(|| {
-> +            // SAFETY: The C API guarantees that `phydev` is valid while=
- this function is running.
-> +            let dev =3D unsafe { Device::from_raw(phydev) };
-> +            T::write_mmd(dev, devnum as u8, regnum, val)?;
-> +            Ok(0)
-> +        })
-> +    }
-
-Same as above with the conversion errors
-
-
-> +/// Creates the kernel's `phy_driver` instance.
-> +///
-> +/// This is used by [`module_phy_driver`] macro to create a static array=
- of phy_driver`.
-> +pub const fn create_phy_driver<T: Driver>() -> Opaque<bindings::phy_driv=
-er> {
-> +    Opaque::new(bindings::phy_driver {
-> +        name: T::NAME.as_char_ptr() as *mut i8,
-
-`.cast_mut()`, just makes the mutability change more clear
-
-I guess the C side could technically be `const char *name`
-
-> +        // SAFETY: The rest is zeroed out to initialize `struct phy_driv=
-er`,
-> +        // sets `Option<&F>` to be `None`.
-> +        ..unsafe { core::mem::MaybeUninit::<bindings::phy_driver>::zeroe=
-d().assume_init() }
-> +    })
-> +}
-
-Btw I double checked and this should be OK to use, hopefully will be
-stable in the near future
-https://github.com/rust-lang/rust/pull/116218
-
-> +/// Declares a kernel module for PHYs drivers.
-> +///
-> +/// This creates a static array of `struct phy_driver` and registers it.
-> +/// This also corresponds to the kernel's MODULE_DEVICE_TABLE macro, whi=
-ch embeds the information
-> +/// for module loading into the module binary file.
-
-Could you add information about the relationship between drivers and
-device_table?
-
-> +/// # Examples
-> +///
-> +/// ```ignore
-> +///
-> +/// use kernel::net::phy::{self, DeviceId, Driver};
-> +/// use kernel::prelude::*;
-> +///
-> +/// kernel::module_phy_driver! {
-> +///     drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
-> +///     device_table: [
-> +///         DeviceId::new_with_driver::<PhyAX88772A>(),
-> +///         DeviceId::new_with_driver::<PhyAX88772C>(),
-> +///         DeviceId::new_with_driver::<PhyAX88796B>()
-> +///     ],
-> +///     type: RustAsixPhy,
-> +///     name: "rust_asix_phy",
-> +///     author: "Rust for Linux Contributors",
-> +///     description: "Rust Asix PHYs driver",
-> +///     license: "GPL",
-> +/// }
-> +/// ```
-
-I can't find the discussion we had about this, but you said you have
-the `type` parameter to be consistent with `module!`, correct?
-
-I think that it is more important to be consistent with C's
-`MODULE_PHY_DRIVER` where you don't need to specify anything extra,
-since the module doesn't do anything else. And I think it is less
-confusing for users if they don't wonder why they need to define a
-type they never use.
-
-Why not just remove the field and create an internal type based on
-`name` for now? We can always make it an optional field later on if it
-turns out there is a use case.
-
-- Trevor
 
