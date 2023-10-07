@@ -1,105 +1,158 @@
-Return-Path: <netdev+bounces-38768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F107BC650
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:03:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0FD7BC65C
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:13:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDF10282179
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:02:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191521C2093C
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A6E168BD;
-	Sat,  7 Oct 2023 09:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCjL0Qir"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C233168BA;
+	Sat,  7 Oct 2023 09:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F27316407
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 09:02:56 +0000 (UTC)
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517EFB9
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 02:02:55 -0700 (PDT)
-Received: by mail-vk1-xa36.google.com with SMTP id 71dfb90a1353d-49aa8518df8so1959250e0c.1
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 02:02:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696669374; x=1697274174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bncvbRKL75jaTSKRCrOH4RHFEMNg9I0EHn5AgUSN3WU=;
-        b=QCjL0QirPT70BiZ9gIuE0Oe0JyG7Pwzj3oUYLfQNITHUgeT5N1MJ8KuPaU6DWZNjNN
-         MmS88pqTaBSp/SCqzqrhkEZuBwTLS3N6ApfxEwamKrvJ8U/6v0JNXTlC+uJnZUx1Inmt
-         oBse5zLgZO0pGIScgczVlH5cT989L5vFHdza9cNcEKVeMACIlwbWyYfMsqBHrhbHTOML
-         wjSmFFilLBFqxeroN3fNFmIRptOTIImgkfup+THygs4Sms0of4/x9r5eYFJsN4QxeFNi
-         nZnZg52EiH+JAYMLleM9OryWnn7Y3vUPeaQSmMQw9A02KXQa5bP/q6hPMYuYzEozT6W+
-         axJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696669374; x=1697274174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bncvbRKL75jaTSKRCrOH4RHFEMNg9I0EHn5AgUSN3WU=;
-        b=dJK1q4LsVxzwv31bYSAF5uhIRq/QF+/mUqc1RoH1NW9gfbBD5ApGWHJb4PzudOembl
-         VcR4hgDtxXaRS63f7fNKwoeJ5qKFC2PW9v2GZakWEoZ49AS27Hb4CkcDlIZK1Rbbj+OD
-         +M0oEY4AjWDtebu/JQ+AhWJlzkDIHXnUFm2zvql7TAPJocehvHwY9/RIOmZMvbtd4bMZ
-         L/YEgceM3LndWLEcymj055O8Q9BY8AH7Yj3T3ldk4oygHaXS4jxDLEFjYbaeAK435NZg
-         V+c6hYWP++1J+lZL4gcvQoNQbQ76orzlP/BKI7y7E/xGyZqOvBC0/LicqYy2r0xiPfC8
-         3rUQ==
-X-Gm-Message-State: AOJu0YzfrI+1KMir44lSw1GtkSbPm2uOsyJwih19SKoN0znruJU+Lkmu
-	LaVc4eMbpWvPUDniFFeLVt2iCfedgRNbgK3Q9EU=
-X-Google-Smtp-Source: AGHT+IHLPwvDITF0YQnDbDRJtUQBCPq1Aqb0Or0sS9616FcvprxtCuoB4hDKT4Jp/6U9i/KxORj8pAe3BOQtPWKA6cs=
-X-Received: by 2002:a1f:9889:0:b0:49d:2a13:58fc with SMTP id
- a131-20020a1f9889000000b0049d2a1358fcmr3395240vke.2.1696669374359; Sat, 07
- Oct 2023 02:02:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC217EC
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 09:13:45 +0000 (UTC)
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CCBDB9;
+	Sat,  7 Oct 2023 02:13:43 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VtZZePq_1696670019;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VtZZePq_1696670019)
+          by smtp.aliyun-inc.com;
+          Sat, 07 Oct 2023 17:13:40 +0800
+Date: Sat, 7 Oct 2023 17:13:39 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Albert Huang <huangjie.albert@bytedance.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>
+Cc: Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net/smc: fix smc clc failed issue when netdevice not
+ in init_net
+Message-ID: <20231007091339.GH92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20231007084420.80236-1-huangjie.albert@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231005134917.2244971-1-willemdebruijn.kernel@gmail.com> <20231006173030.4908a356@kernel.org>
-In-Reply-To: <20231006173030.4908a356@kernel.org>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sat, 7 Oct 2023 04:02:17 -0500
-Message-ID: <CAF=yD-KCb8K46qdDvSjqkdfMNWJuLdVjH1wrkm0ea83CTZkzsA@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] add skb_segment kunit coverage
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, alexander.duyck@gmail.com, fw@strlen.de, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231007084420.80236-1-huangjie.albert@bytedance.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 6, 2023 at 7:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Sat, Oct 07, 2023 at 04:44:19PM +0800, Albert Huang wrote:
+>If the netdevice is within a container and communicates externally
+>through network technologies such as VxLAN, we won't be able to find
+>routing information in the init_net namespace. To address this issue,
+>we need to add a struct net parameter to the smc_ib_find_route function.
+>This allow us to locate the routing information within the corresponding
+>net namespace, ensuring the correct completion of the SMC CLC interaction.
 >
-> On Thu,  5 Oct 2023 09:48:54 -0400 Willem de Bruijn wrote:
-> > As discussed at netconf last week. Some kernel code is exercised in
-> > many different ways. skb_segment is a prime example. This ~350 line
-> > function has 49 different patches in git blame with 28 different
-> > authors.
-> >
-> > When making a change, e.g., to fix a bug in one specific use case,
-> > it is hard to establish through analysis alone that the change does
-> > not break the many other paths through the code. It is impractical to
-> > exercise all code paths through regression testing from userspace.
-> >
-> > Add the minimal infrastructure needed to add KUnit tests to networking,
-> > and add code coverage for this function.
->
-> Apparently we're supposed add descriptions to all modules now:
->
-> WARNING: modpost: missing MODULE_DESCRIPTION() in net/core/gso_test.o
 
-Will fix and resend. Thanks.
+You should add a Fixes tag here, I think it should be:
+Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
+
+>Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+>---
+> net/smc/af_smc.c | 3 ++-
+> net/smc/smc_ib.c | 7 ++++---
+> net/smc/smc_ib.h | 2 +-
+> 3 files changed, 7 insertions(+), 5 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index bacdd971615e..7a874da90c7f 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+> 		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
+> 	struct smc_clc_first_contact_ext *fce =
+> 		smc_get_clc_first_contact_ext(clc_v2, false);
+>+	struct net *net = sock_net(&smc->sk);
+> 	int rc;
+> 
+> 	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
+>@@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
+> 		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
+> 		ini->smcrv2.uses_gateway = false;
+> 	} else {
+>-		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
+>+		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
+> 				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
+> 				      ini->smcrv2.nexthop_mac,
+> 				      &ini->smcrv2.uses_gateway))
+>diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+>index 9b66d6aeeb1a..89981dbe46c9 100644
+>--- a/net/smc/smc_ib.c
+>+++ b/net/smc/smc_ib.c
+>@@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
+> 	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
+> }
+> 
+>-int smc_ib_find_route(__be32 saddr, __be32 daddr,
+>+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+> 		      u8 nexthop_mac[], u8 *uses_gateway)
+> {
+> 	struct neighbour *neigh = NULL;
+>@@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
+> 
+> 	if (daddr == cpu_to_be32(INADDR_NONE))
+> 		goto out;
+>-	rt = ip_route_output_flow(&init_net, &fl4, NULL);
+>+	rt = ip_route_output_flow(net, &fl4, NULL);
+> 	if (IS_ERR(rt))
+> 		goto out;
+> 	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
+>@@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
+> 	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
+> 	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
+> 		struct in_device *in_dev = __in_dev_get_rcu(ndev);
+>+		struct net *net = dev_net(ndev);
+> 		const struct in_ifaddr *ifa;
+> 		bool subnet_match = false;
+> 
+>@@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
+> 		}
+> 		if (!subnet_match)
+> 			goto out;
+>-		if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
+>+		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
+> 						       smcrv2->daddr,
+> 						       smcrv2->nexthop_mac,
+> 						       &smcrv2->uses_gateway))
+>diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
+>index 4df5f8c8a0a1..ef8ac2b7546d 100644
+>--- a/net/smc/smc_ib.h
+>+++ b/net/smc/smc_ib.h
+>@@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *lnk,
+> int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
+> 			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
+> 			 struct smc_init_info_smcrv2 *smcrv2);
+>-int smc_ib_find_route(__be32 saddr, __be32 daddr,
+>+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
+> 		      u8 nexthop_mac[], u8 *uses_gateway);
+> bool smc_ib_is_valid_local_systemid(void);
+> int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
+>-- 
+>2.37.1 (Apple Git-137.1)
 
