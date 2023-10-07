@@ -1,158 +1,136 @@
-Return-Path: <netdev+bounces-38769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0FD7BC65C
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:13:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB927BC66E
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:28:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191521C2093C
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:13:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FBEA281D88
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 09:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C233168BA;
-	Sat,  7 Oct 2023 09:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BBF168DE;
+	Sat,  7 Oct 2023 09:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OfKuyt06"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CC217EC
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 09:13:45 +0000 (UTC)
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CCBDB9;
-	Sat,  7 Oct 2023 02:13:43 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VtZZePq_1696670019;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VtZZePq_1696670019)
-          by smtp.aliyun-inc.com;
-          Sat, 07 Oct 2023 17:13:40 +0800
-Date: Sat, 7 Oct 2023 17:13:39 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Albert Huang <huangjie.albert@bytedance.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: fix smc clc failed issue when netdevice not
- in init_net
-Message-ID: <20231007091339.GH92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231007084420.80236-1-huangjie.albert@bytedance.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194A0168BA
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 09:28:33 +0000 (UTC)
+X-Greylist: delayed 379 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 07 Oct 2023 02:28:32 PDT
+Received: from out-205.mta0.migadu.com (out-205.mta0.migadu.com [91.218.175.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903B8B9
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 02:28:32 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696670531;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=S5S6Bq/7hDO06XukKZO/A8hT6aAJLIcw9FkCCFsFcrU=;
+	b=OfKuyt06uvla2JwmSaRP6rudbR3SVvhlLJS3/RFt0oaL6UFITpEI7c7wxH1VGk48Jug7PV
+	ZRRM7b1W9+PJHRo2D5CJSKYEBGklbiR4pM05SxfFbYcN6IbzL48q+qW9671+bMC83p7KyU
+	8cR2jNKbHq8RnPM8N7CpJ4i2gTLAwdw=
+From: George Guo <dongtai.guo@linux.dev>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	George Guo <guodongtai@kylinos.cn>
+Subject: [PATCH] tcp: fix secure_{tcp, tcpv6}_ts_off call parameter order mistake
+Date: Sat,  7 Oct 2023 17:23:37 +0800
+Message-Id: <20231007092337.1540036-1-dongtai.guo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231007084420.80236-1-huangjie.albert@bytedance.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 07, 2023 at 04:44:19PM +0800, Albert Huang wrote:
->If the netdevice is within a container and communicates externally
->through network technologies such as VxLAN, we won't be able to find
->routing information in the init_net namespace. To address this issue,
->we need to add a struct net parameter to the smc_ib_find_route function.
->This allow us to locate the routing information within the corresponding
->net namespace, ensuring the correct completion of the SMC CLC interaction.
->
+From: George Guo <guodongtai@kylinos.cn>
 
-You should add a Fixes tag here, I think it should be:
-Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
+Fix secure_tcp_ts_off and secure_tcpv6_ts_off call parameter order mistake
 
->Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
->---
-> net/smc/af_smc.c | 3 ++-
-> net/smc/smc_ib.c | 7 ++++---
-> net/smc/smc_ib.h | 2 +-
-> 3 files changed, 7 insertions(+), 5 deletions(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index bacdd971615e..7a874da90c7f 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
-> 		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
-> 	struct smc_clc_first_contact_ext *fce =
-> 		smc_get_clc_first_contact_ext(clc_v2, false);
->+	struct net *net = sock_net(&smc->sk);
-> 	int rc;
-> 
-> 	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
->@@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
-> 		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
-> 		ini->smcrv2.uses_gateway = false;
-> 	} else {
->-		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
->+		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
-> 				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
-> 				      ini->smcrv2.nexthop_mac,
-> 				      &ini->smcrv2.uses_gateway))
->diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
->index 9b66d6aeeb1a..89981dbe46c9 100644
->--- a/net/smc/smc_ib.c
->+++ b/net/smc/smc_ib.c
->@@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
-> 	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
-> }
-> 
->-int smc_ib_find_route(__be32 saddr, __be32 daddr,
->+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
-> 		      u8 nexthop_mac[], u8 *uses_gateway)
-> {
-> 	struct neighbour *neigh = NULL;
->@@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> 
-> 	if (daddr == cpu_to_be32(INADDR_NONE))
-> 		goto out;
->-	rt = ip_route_output_flow(&init_net, &fl4, NULL);
->+	rt = ip_route_output_flow(net, &fl4, NULL);
-> 	if (IS_ERR(rt))
-> 		goto out;
-> 	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
->@@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
-> 	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
-> 	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
-> 		struct in_device *in_dev = __in_dev_get_rcu(ndev);
->+		struct net *net = dev_net(ndev);
-> 		const struct in_ifaddr *ifa;
-> 		bool subnet_match = false;
-> 
->@@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
-> 		}
-> 		if (!subnet_match)
-> 			goto out;
->-		if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
->+		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
-> 						       smcrv2->daddr,
-> 						       smcrv2->nexthop_mac,
-> 						       &smcrv2->uses_gateway))
->diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
->index 4df5f8c8a0a1..ef8ac2b7546d 100644
->--- a/net/smc/smc_ib.h
->+++ b/net/smc/smc_ib.h
->@@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *lnk,
-> int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
-> 			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
-> 			 struct smc_init_info_smcrv2 *smcrv2);
->-int smc_ib_find_route(__be32 saddr, __be32 daddr,
->+int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
-> 		      u8 nexthop_mac[], u8 *uses_gateway);
-> bool smc_ib_is_valid_local_systemid(void);
-> int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
->-- 
->2.37.1 (Apple Git-137.1)
+Signed-off-by: George Guo <guodongtai@kylinos.cn>
+---
+ net/ipv4/syncookies.c | 4 ++--
+ net/ipv4/tcp_ipv4.c   | 2 +-
+ net/ipv6/syncookies.c | 4 ++--
+ net/ipv6/tcp_ipv6.c   | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index dc478a0574cb..537f368a0b66 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -360,8 +360,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+ 		tsoff = secure_tcp_ts_off(sock_net(sk),
+-					  ip_hdr(skb)->daddr,
+-					  ip_hdr(skb)->saddr);
++					  ip_hdr(skb)->saddr,
++					  ip_hdr(skb)->daddr);
+ 		tcp_opt.rcv_tsecr -= tsoff;
+ 	}
+ 
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 27140e5cdc06..3d6c9b286b5a 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -104,7 +104,7 @@ static u32 tcp_v4_init_seq(const struct sk_buff *skb)
+ 
+ static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
+ {
+-	return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
++	return secure_tcp_ts_off(net, ip_hdr(skb)->saddr, ip_hdr(skb)->daddr);
+ }
+ 
+ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+index 5014aa663452..9af484a4d518 100644
+--- a/net/ipv6/syncookies.c
++++ b/net/ipv6/syncookies.c
+@@ -162,8 +162,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+ 		tsoff = secure_tcpv6_ts_off(sock_net(sk),
+-					    ipv6_hdr(skb)->daddr.s6_addr32,
+-					    ipv6_hdr(skb)->saddr.s6_addr32);
++					    ipv6_hdr(skb)->saddr.s6_addr32,
++					    ipv6_hdr(skb)->daddr.s6_addr32);
+ 		tcp_opt.rcv_tsecr -= tsoff;
+ 	}
+ 
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 3a88545a265d..ce9cc4c43cf2 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -119,8 +119,8 @@ static u32 tcp_v6_init_seq(const struct sk_buff *skb)
+ 
+ static u32 tcp_v6_init_ts_off(const struct net *net, const struct sk_buff *skb)
+ {
+-	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->daddr.s6_addr32,
+-				   ipv6_hdr(skb)->saddr.s6_addr32);
++	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->saddr.s6_addr32,
++				   ipv6_hdr(skb)->daddr.s6_addr32);
+ }
+ 
+ static int tcp_v6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
+-- 
+2.34.1
+
 
