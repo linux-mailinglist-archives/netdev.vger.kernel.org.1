@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-38793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CCED7BC86C
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 16:47:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E88A7BC86D
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 16:48:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B2B281D8E
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 14:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A10F1281DF3
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 14:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8106F28E06;
-	Sat,  7 Oct 2023 14:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162BF28E0E;
+	Sat,  7 Oct 2023 14:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npVi0yxa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4259V6/x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644D11D6AF
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 14:47:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2F05C433C7;
-	Sat,  7 Oct 2023 14:47:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696690045;
-	bh=toBbiQLzqioyx3ESZzgeMUmDaIvxlXr2inUPTTVY7VM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=npVi0yxa2LNPlvtS1ysPrOCYdtE8fIhgoJ1yeYf9EZqv87t95Uk6c7uVO0YCLLM4B
-	 NNceouB6JIkkKaVmqZIWZ5bdgO+zJTc4TMX5IYVZUMhY8xrq/oDsqFad6NUe5LKm1V
-	 Ft8uERIUV5vLe6PH9QdUsaroLDYzgBlVw0nUcxGdyVnMUZpdAcX0nbqq9bA8UAaiUc
-	 7zVBvT56NAd2dWgjdq7dCxlVJpMb09dP5S2gUIutPOg1PVVEE9q35AX2m2kLyYSMnN
-	 xP62TxCInwwMqnhWqgQqmDjBFtX+HBCmQt/EG5PBJDiQGl7iJTHD6vDiT0tXTiTxJo
-	 hIxJAfTM9/a0g==
-Date: Sat, 7 Oct 2023 16:47:20 +0200
-From: Simon Horman <horms@kernel.org>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, netfilter-devel@vger.kernel.org,
-	linux-sctp@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: Re: [PATCHv2 nf 0/2] netfilter: handle the sctp collision properly
- and add selftest
-Message-ID: <20231007144720.GA831234@kernel.org>
-References: <cover.1696353375.git.lucien.xin@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CACE1D6AF;
+	Sat,  7 Oct 2023 14:48:01 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4026FB9;
+	Sat,  7 Oct 2023 07:48:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mhXFaHuS2j0fqNHfQmC4j72FTsL7wOUo9d74uHVqouw=; b=4259V6/xAJMaC4niT4y7Fo4AJu
+	vguxFVOMngyaZUGQFyxY59mxNJpWNHd2KdXsPI5Gv56uLgT8H9ALUJYu1MpB7vEEzveFhdJ/Siv0h
+	o8Z9UtNPLWJlnS1A0Qc7gQLozr8u5go1drI+6reaG6ue/huEDLq2B989eY6eE/pTVIrQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qp8ax-000JjX-8j; Sat, 07 Oct 2023 16:47:55 +0200
+Date: Sat, 7 Oct 2023 16:47:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Trevor Gross <tmgross@umich.edu>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	greg@kroah.com
+Subject: Re: [PATCH v2 1/3] rust: core abstractions for network PHY drivers
+Message-ID: <96800001-5d19-4b48-b43e-0cfbeccb48c1@lunn.ch>
+References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+ <20231006094911.3305152-2-fujita.tomonori@gmail.com>
+ <CALNs47sdj2onJS3wFUVoONYL_nEgT+PTLTVuMLcmE6W6JgZAXA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,20 +53,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1696353375.git.lucien.xin@gmail.com>
+In-Reply-To: <CALNs47sdj2onJS3wFUVoONYL_nEgT+PTLTVuMLcmE6W6JgZAXA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 03, 2023 at 01:17:52PM -0400, Xin Long wrote:
-> Patch 1/2 is to fix the insufficient processing for sctp collision in netfilter
-> nf_conntrack, and Patch 2/2 is to add a selftest for it, as Florian suggested.
+> > +    /// Sets the speed of the PHY.
+> > +    pub fn set_speed(&mut self, speed: u32) {
+> > +        let phydev = self.0.get();
+> > +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> > +        unsafe { (*phydev).speed = speed as i32 };
+> > +    }
 > 
-> Xin Long (2):
->   netfilter: handle the connecting collision properly in
->     nf_conntrack_proto_sctp
->   selftests: netfilter: test for sctp collision processing in
->     nf_conntrack
+> Since we're taking user input, it probably doesn't hurt to do some
+> sort of sanity check rather than casting. Maybe warn once then return
+> the biggest nowrapping value
 
-For series,
+After reading the thread, we first have a terminology problem. In the
+kernel world, 'user input' generally means from user space. And user
+space should never be trusted, but user space should also not be
+allowed to bring the system to its knees. Return -EINVAL to userspace
+is the correct thing to do and keep going. Don't do a kernel splat
+because the user passed 42 as a speed, not 10.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+However, what Trevor was meaning is that whoever called set_speed()
+passed an invalid value. But what are valid values?
 
+We have this file which devices the KAPI
+https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ethtool.h#L1883
+
+says:
+
+/* The forced speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+
+and we also have
+
+#define SPEED_UNKNOWN		-1
+
+and there is a handy little helper:
+
+static inline int ethtool_validate_speed(__u32 speed)
+{
+	return speed <= INT_MAX || speed == (__u32)SPEED_UNKNOWN;
+}
+
+so if you want to validate speed, call this helper.
+
+However, this is a kernel driver, and we generally trust kernel
+drivers. There is not much we can do except trust them. And passing an
+invalid speed here is very unlikely to cause the kernel to explode
+sometime later.
+
+   Andrew
 
