@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-38829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9568D7BC9B1
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 22:13:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A330F7BC9B7
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 22:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E551C208DC
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 20:13:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D19BA281D4A
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 20:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C396B328D5;
-	Sat,  7 Oct 2023 20:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30BB6328DB;
+	Sat,  7 Oct 2023 20:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsKRybrg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1Q3wsEt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7C831A9A
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 20:13:09 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 996AEBA
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 13:13:07 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-68fb85afef4so2614539b3a.1
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 13:13:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2BD1845
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 20:15:32 +0000 (UTC)
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B008BD
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 13:15:31 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-57d086365f7so1862005eaf.0
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 13:15:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696709587; x=1697314387; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696709730; x=1697314530; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9fAkfRv9CZ4vTgRP0KXquUoYAbWMhsIRQZJmWBTBUIo=;
-        b=IsKRybrgkCKbER4pMAiReimF0cMbDO+Lgi+e+bYShXfPbcP9f+0BlGte22q7Xxk/gW
-         oJgBDsJmyQsZTTtbfN6TDl+fEKp0qslGjoF1mpCTHZHDRIk7RHmDXTrHTYqdZ/HPaaTg
-         61RzKr4gfbLEvTQILhubSWfwTuWIz/8aJmo9w1JVf2gxHW7psoxzuTBtZVrhn1tEMYwP
-         EHLb9URGzAR3422gOf86+CLqJy306k5t9B+n6o6zo1dR3PcD2XZ7G197T+DBgJgflxKb
-         qy7SQz76pfhUJmf+pJzBG0LIusWkBMn7/8E2qonNfqhiFhCi7BJ1MpJP/UVsegaPjxzn
-         3Kyg==
+        bh=t+x6rfQhWXhTm1RSMqMW84m0RDGbyDjggmhf9IGytII=;
+        b=F1Q3wsEttvRKAodb39OTfa7SPesuHbJKEYI0fVcca+4YAjD6lGQja7WzyoyzS0AeQ6
+         WX/3XrgBwntA/LPFiGRLg1Pg/EC2Y1jR0rBA/GYTifrJ0yKf0HRMOSQ0FqT2GpQweQIC
+         CVtMqam09zE3kxHRHFsVbXMCQ7Uuq8qg/p0IaCq8JqbjNfOusXizc+HnIJpG7K9hWpox
+         iHay8W5t9TprlDmzSY5sRYb57DiAN7lFI1K+3lZi84q/XVVPa1SRMKmzyyA6Wv86dFrj
+         Q9iLO4lENRDTrnark1/d0czDGgTq1X9iUQsjRZx7ve4LOzg8cRgj/wUfo6okxj6fWdpe
+         tCgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696709587; x=1697314387;
+        d=1e100.net; s=20230601; t=1696709730; x=1697314530;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9fAkfRv9CZ4vTgRP0KXquUoYAbWMhsIRQZJmWBTBUIo=;
-        b=PXQlTg5DvOFcZAvABfAwShlId4QYDTTMZWdgAoD/yMpqeSJ7lMesmJuBWmhIuldX52
-         YCTXhy6bJKiPVheGieBT7JcRHygpTDZ2b+V2cT1RJpIVPRb1wJowGN5/EcyBqKe28IbE
-         CZTP9Kf/MWHMkwMgcmZRHEoxOFWtsDEAc9sAPIi+X/KFlFqd4mmEPYmHNK5betpnKB0e
-         uGMzUgdBvch9aK5Zr2ScajV6+SnHr6FK0PmQx+EL3t6Jut5XyxKsnB+YzEQg7wbIchJI
-         UdLmApymTgKxJsB8OZGyRjMBj8Q1tEY3yOwtu+ZKmxbvocIwetPnmEMuWJjY5VYpvXTt
-         3iWA==
-X-Gm-Message-State: AOJu0YzB2i0kkdywFrnUFI5d304ySZ2OWpXLJLFQCbUtpNGlCzDsIjyZ
-	uZK1oOm4mL5cuf1IiyhaYNwQ1sRYHYk=
-X-Google-Smtp-Source: AGHT+IEBNGkBR0J2fB6sdFCsiTFraHAqiP/9Q/QJ20q3i8BKG0EP7GxlsTRYxX5dvAtvewGuJJgEWw==
-X-Received: by 2002:a05:6a20:138a:b0:159:c918:1016 with SMTP id hn10-20020a056a20138a00b00159c9181016mr9891270pzc.49.1696709586743;
-        Sat, 07 Oct 2023 13:13:06 -0700 (PDT)
+        bh=t+x6rfQhWXhTm1RSMqMW84m0RDGbyDjggmhf9IGytII=;
+        b=JQInlPHmLQ8bImBs3w/9ENBQ0JkpAukccs+YF33CA555/mp0qKJW0lBDuG6r2xPBNp
+         Q32QtfxWALJtvETyYoES1fcc+LMwVKZtqprKtgfWgHrEf99coZ11gkMRQ9dDwbdfFHBq
+         U983EeqrwOE61t7oOHDwul8Kz+/+yst7DIi3fLVoCIlnfEeeIMGP2wIPXsLlxRUCZ46t
+         BQRDVZMJCN2Ax3uVnA0YzD3zKefjIHghJfF5vl0WSIAV6/57OBroHwSZMZg42NfLAM+I
+         g8xGQce/IwVqoFiyqdp7TElf9WaUJEYjpbhNKV4QwFrlpux3S7ne1BE30AY05buu1h1x
+         GHyg==
+X-Gm-Message-State: AOJu0YwIYfmOhFjyR5giYe5VtOh88wYE4C3gnOBufmQlVIETQ8B1B5Ld
+	vWy6smpW/kBkowklEexdFTOaaQiGR0U=
+X-Google-Smtp-Source: AGHT+IHIdPwllCeONLOkL+NJSpwdsIMpT8NzeRLVN2a8uxDnZE0AfXndAFhw2AEqXqp/DPwO2YFTzg==
+X-Received: by 2002:a05:6358:9042:b0:143:788c:2560 with SMTP id f2-20020a056358904200b00143788c2560mr13252418rwf.15.1696709730170;
+        Sat, 07 Oct 2023 13:15:30 -0700 (PDT)
 Received: from takehaya-main.. ([2001:e42:407:1028::1000])
-        by smtp.gmail.com with ESMTPSA id q16-20020a62ae10000000b0069343e474bcsm3533952pff.104.2023.10.07.13.13.05
+        by smtp.gmail.com with ESMTPSA id 6-20020a170902c24600b001b89a6164desm6321246plg.118.2023.10.07.13.15.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 13:13:06 -0700 (PDT)
+        Sat, 07 Oct 2023 13:15:29 -0700 (PDT)
 From: Takeru Hayasaka <hayatake396@gmail.com>
 To: netdev@vger.kernel.org
 Cc: mkubecek@suse.cz,
 	Takeru Hayasaka <hayatake396@gmail.com>
 Subject: [PATCH ethtool-next] ethtool: add support for rx-flow-hash gtp
-Date: Sun,  8 Oct 2023 05:12:52 +0900
-Message-Id: <20231007201252.64870-1-hayatake396@gmail.com>
+Date: Sun,  8 Oct 2023 05:15:16 +0900
+Message-Id: <20231007201516.65612-1-hayatake396@gmail.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -88,8 +88,6 @@ Extension Header's QFI in the hash computation.
 
 Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
 ---
-I forgot to include it in the commit, so I recommitted it and resubmitted it.
-
  ethtool.c            | 38 ++++++++++++++++++++++++++++++++++----
  test-cmdline.c       |  2 +-
  uapi/linux/ethtool.h |  6 ++++++
@@ -193,7 +191,7 @@ index af51220b63cc..8cb307596ad7 100644
  			  "ip6|tcp6|udp6|ah6|esp6|sctp6\n"
  			  "			[ src %x:%x:%x:%x:%x:%x [m %x:%x:%x:%x:%x:%x] ]\n"
 diff --git a/test-cmdline.c b/test-cmdline.c
-index cb803ed1a93d..99d7b40400be 100644
+index cb803ed1a93d..c958ea9b159d 100644
 --- a/test-cmdline.c
 +++ b/test-cmdline.c
 @@ -168,7 +168,7 @@ static struct test_case {
@@ -201,7 +199,7 @@ index cb803ed1a93d..99d7b40400be 100644
  	{ 1, "-f" },
  	/* Argument parsing for -N/-U is specialised */
 -	{ 0, "-N devname rx-flow-hash tcp4 mvtsdfn" },
-+	{ 0, "-N devname rx-flow-hash tcp4 mvtsdfnce" },
++	{ 0, "-N devname rx-flow-hash tcp4 mvtsdfnceuw" },
  	{ 0, "--config-ntuple devname rx-flow-hash tcp4 r" },
  	{ 1, "-U devname rx-flow-hash tcp4" },
  	{ 1, "--config-nfc devname rx-flow-hash foo" },
