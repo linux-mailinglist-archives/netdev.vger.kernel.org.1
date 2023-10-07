@@ -1,46 +1,43 @@
-Return-Path: <netdev+bounces-38782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B11E7BC71E
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 13:31:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB7607BC721
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 13:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A0421C20957
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:31:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F737281FAA
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 11:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6CC18651;
-	Sat,  7 Oct 2023 11:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EFE18AF3;
+	Sat,  7 Oct 2023 11:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="oGE+9dEj"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="rDr1R2um"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E75E18629;
-	Sat,  7 Oct 2023 11:30:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 982C0C433C7;
-	Sat,  7 Oct 2023 11:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9289CF9F4
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 11:33:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9A7DC433C8;
+	Sat,  7 Oct 2023 11:33:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696678257;
-	bh=AIGMiXDqNs9QpOVtwXFgcyXyIZU52lszBZSZ7GvzYL8=;
+	s=korg; t=1696678400;
+	bh=MhC2Xsh1F0Dp/xiGufKa2htr3zYIzm0ooEtftPrfJ5g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oGE+9dEj7DDbO+hMv6MWU5vq9wTFzPBnjmS+LRnKSfoj1UUTxqVtzBCMLfakHq0t2
-	 3wDEcD39SvamJeGlbG4a7pKDRV86fFSF9I94w0bQMUjWZQhKD9ut2zlMRAEH0svOol
-	 caPPTD03GlYxVZgScU/MfGckUoG6+Mc4vmd0Ld8k=
-Date: Sat, 7 Oct 2023 13:30:54 +0200
+	b=rDr1R2umQ5BwJUJxxoc2jFkKlxL2yQU6SkCbIMRVdn4NYYTg8CmJH154fL9154PU2
+	 +ZKCVfl5tqG5SksBNrtI6kwF0uNqyQdfZTSpXm9eEl80y2j2YQUafulniKHjQHtmxf
+	 ldQuN/RPF5ZBqHna+Mn9BpEnAE7SFVvcMSO8BCS8=
+Date: Sat, 7 Oct 2023 13:33:17 +0200
 From: Greg KH <gregkh@linuxfoundation.org>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: tmgross@umich.edu, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH v2 1/3] rust: core abstractions for network PHY drivers
-Message-ID: <2023100728-unloving-snowboard-d558@gregkh>
-References: <CALNs47sdj2onJS3wFUVoONYL_nEgT+PTLTVuMLcmE6W6JgZAXA@mail.gmail.com>
- <20231007.195857.292080693191739384.fujita.tomonori@gmail.com>
- <2023100757-crewman-mascot-bc1d@gregkh>
- <20231007.202324.2257155764500021886.fujita.tomonori@gmail.com>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH RESEND] i40e: fix the wrong PTP frequency calculation
+Message-ID: <2023100707-hydrogen-tapestry-62e8@gregkh>
+References: <20230926071059.1239033-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,30 +46,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231007.202324.2257155764500021886.fujita.tomonori@gmail.com>
+In-Reply-To: <20230926071059.1239033-1-yajun.deng@linux.dev>
 
-On Sat, Oct 07, 2023 at 08:23:24PM +0900, FUJITA Tomonori wrote:
-> On Sat, 7 Oct 2023 13:17:13 +0200
-> Greg KH <gregkh@linuxfoundation.org> wrote:
+On Tue, Sep 26, 2023 at 03:10:59PM +0800, Yajun Deng wrote:
+> The new adjustment should be based on the base frequency, not the
+> I40E_PTP_40GB_INCVAL in i40e_ptp_adjfine().
 > 
-> > On Sat, Oct 07, 2023 at 07:58:57PM +0900, FUJITA Tomonori wrote:
-> >> > Since we're taking user input, it probably doesn't hurt to do some
-> >> > sort of sanity check rather than casting. Maybe warn once then return
-> >> > the biggest nowrapping value
-> >> > 
-> >> >     let speed_i32 = i32::try_from(speed).unwrap_or_else(|_| {
-> >> >         warn_once!("excessive speed {speed}");
-> > 
-> > NEVER call WARN() on user input, as you now just rebooted the machine
-> > and caused a DoS (and syzbot will start to spam you with reports.)
+> This issue was introduced in commit 3626a690b717 ("i40e: use
+> mul_u64_u64_div_u64 for PTP frequency calculation"), frequency is left
+> just as base I40E_PTP_40GB_INCVAL before the commit. After the commit,
+> frequency is the I40E_PTP_40GB_INCVAL times the ptp_adj_mult value.
+> But then the diff is applied on the wrong value, and no multiplication
+> is done afterwards.
 > 
-> Trevor uses `user` as the user of this function, which is a PHY driver.
+> It was accidentally fixed in commit 1060707e3809 ("ptp: introduce helpers
+> to adjust by scaled parts per million"). It uses adjust_by_scaled_ppm
+> correctly performs the calculation and uses the base adjustment, so
+> there's no error here. But it is a new feature and doesn't need to
+> backported to the stable releases.
 > 
+> This issue affects both v6.0 and v6.1, and the v6.1 version is an LTS
+> release. Therefore, the patch only needs to be applied to v6.1 stable.
+> 
+> Fixes: 3626a690b717 ("i40e: use mul_u64_u64_div_u64 for PTP frequency calculation")
+> Cc: <stable@vger.kernel.org> # 6.1
+> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_ptp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ok, same thing in a way, just do a dev_warn() and return an error, no
-need to do a full traceback splat at all.
-
-thanks,
+Now queued up, thanks.
 
 greg k-h
 
