@@ -1,101 +1,96 @@
-Return-Path: <netdev+bounces-38808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ADE27BC8FB
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 18:00:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD2D7BC916
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 18:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47A7F1C20837
-	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 16:00:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F08AB1C2093C
+	for <lists+netdev@lfdr.de>; Sat,  7 Oct 2023 16:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF6D31A86;
-	Sat,  7 Oct 2023 16:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7F1522F;
+	Sat,  7 Oct 2023 16:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SEMFqg5h";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v7Sxfo5o"
+	dkim=pass (2048-bit key) header.d=sembritzki.org header.i=@sembritzki.org header.b="jWaaR47u"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447FB2E63E
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 16:00:01 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36B51BA;
-	Sat,  7 Oct 2023 09:00:00 -0700 (PDT)
-Date: Sat, 7 Oct 2023 17:59:57 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1696694398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=35TTRveXU2Ka7eoxo3UirDZ5E25/uzkse4gLA2aaRG4=;
-	b=SEMFqg5hGSJNguDX9id9Wo/3ADKEUNIAazqz0QWmfUT1VUAk426yEbYBuuu2Bsck34Rxvr
-	JBi6/IuLmVvwtOb9YRX7mMc4aDb80Hju6TUdLWsdEoh6WFePS6Fqv1zMmxjXWOtOQ/yPLI
-	ANFhdYIkd6HTERjGJhCPHkKLNAK9mrw5oy9w7VQEBOvZ7jOmJk5NVIBFoOTR8YIUKnThqq
-	+2alK5zWoRgyvDZrV+oq3aKZKRKuPIRKUbABrm3PK1nhVfck/BGxxv0Z6eGvBH1DPOoRqD
-	gwTCdeNtJktA0Z0MyZHITjpFnERhuXaL0xvRSOgoAhwvrHcdA33Tv2I0VOVWfw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1696694398;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=35TTRveXU2Ka7eoxo3UirDZ5E25/uzkse4gLA2aaRG4=;
-	b=v7Sxfo5oPzPYHqoTaT2fz2jGOvxx9dP2ovpzBpe0JfddaRFWxWMUYP3UKiMF2bZldMd4FH
-	kibF+uyqJjeMANAw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <hawk@kernel.org>
-Subject: Re: [PATCH net-next 0/2] net: Use SMP threads for backlog NAPI (or
- optional).
-Message-ID: <20231007155957.aPo0ImuG@linutronix.de>
-References: <20230929162121.1822900-1-bigeasy@linutronix.de>
- <20231004154609.6007f1a0@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE2F522C
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 16:37:01 +0000 (UTC)
+X-Greylist: delayed 356 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 07 Oct 2023 09:36:59 PDT
+Received: from smtp.sembritzki.me (smtp.sembritzki.me [5.45.101.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00263B9;
+	Sat,  7 Oct 2023 09:36:59 -0700 (PDT)
+Received: from smtp.sembritzki.me (v22018013267558932.luckysrv.de [5.45.101.249])
+	by smtp.sembritzki.me (Postfix) with ESMTP id D0D539DBAD;
+	Sat,  7 Oct 2023 18:30:54 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=sembritzki.org;
+	s=dkim001; t=1696696252;
+	bh=/6nMdMcn0y3Q6d91mungNpuVA8MtUc6RPQr6wF32CAI=;
+	h=Message-ID:Date:MIME-Version:User-Agent:To:Cc:From:Subject:
+	 Content-Transfer-Encoding:subject:to:from:date:cc:reply-to:
+	 message-id;
+	b=jWaaR47uFiKjStJEbeslT83GMvnq1giElvwDzAMcan1DwgOqSjy3mOtS6xnwJ0NO4
+	 65/E9cWOASCAgjVsYwlbEK1qA7yHWpeGDfKHDrdL0KL62msfHV4ss8ltkDuubHkXx6
+	 /XvBQ6rUHp5vWYccc80mwbMeOwkvMaeY5OKhTU3y2TQvyHAza5u+BALvnaAbldCpWt
+	 KCOXBnxrBd1efmA8hfmL8y0762FjdK9044KgaJPeoQTKQbbKxVQkO984qwWWnCAvMR
+	 dgcHMuNuWLBZ2ptjW23MxfnGp2VmjlOa2FPTXdqnmgiUz1LeKakUPKdtKiFgGoa09J
+	 fvtwM5cV07D/g==
+Received: (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.sembritzki.me (Postfix) with ESMTPSA id D3B149DBB0;
+	Sat,  7 Oct 2023 18:30:52 +0200 (CEST)
+Message-ID: <78adf50c-e8f9-d1ce-e933-418a850b6a44@sembritzki.org>
+Date: Sat, 7 Oct 2023 18:30:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231004154609.6007f1a0@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Content-Language: en-US
+To: Alejandro Colomar <alx@kernel.org>
+Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
+From: Yannik Sembritzki <yannik@sembritzki.org>
+Subject: [PATCH] Correct list of flags returned by SIOCGIFFLAGS in netdevice.7
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-10-04 15:46:09 [-0700], Jakub Kicinski wrote:
-> On Fri, 29 Sep 2023 18:20:18 +0200 Sebastian Andrzej Siewior wrote:
-> >    - Patch #2 has been removed. Removing the warning is still an option.
-> > 
-> >    - There are two patches in the series:
-> >      - Patch #1 always creates backlog threads
-> >      - Patch #2 creates the backlog threads if requested at boot time,
-> >        mandatory on PREEMPT_RT.
-> >      So it is either or and I wanted to show how both look like.
-> > 
-> >    - The kernel test robot reported a performance regression with
-> >      loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
-> >      The regression is now avoided by using local-NAPI if backlog
-> >      processing is requested on the local CPU.
-> 
-> Not what we asked for, and it doesn't apply.
+As per 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=746e6ad23cd6fec2edce056e014a0eabeffa838c
+and https://lkml.org/lkml/2009/5/28/224
 
-Apologies if I misunderstood. You said to make it optional which I did
-with the static key in the second patch of this series. The first patch
-is indeed not what we talked about I just to show what it would look
-like now that there is no "delay" for backlog-NAPI on the local CPU.
+Signed-off-by: Yannik Sembritzki <yannik@sembritzki.org>
+---
+  man7/netdevice.7 | 3 ---
+  1 file changed, 3 deletions(-)
 
-If the optional part is okay then I can repost only that patch against
-current net-next.
+diff --git a/man7/netdevice.7 b/man7/netdevice.7
+index 0087a8115..01356476d 100644
+--- a/man7/netdevice.7
++++ b/man7/netdevice.7
+@@ -127,9 +127,6 @@ IFF_AUTOMEDIA:Auto media selection active.
+  IFF_DYNAMIC:T{
+  The addresses are lost when the interface goes down.
+  T}
+-IFF_LOWER_UP:Driver signals L1 up (since Linux 2.6.17)
+-IFF_DORMANT:Driver signals dormant (since Linux 2.6.17)
+-IFF_ECHO:Echo sent packets (since Linux 2.6.25)
+  .TE
+  .ad
+  .PP
+-- 
+2.41.0
 
-Sebastian
 
