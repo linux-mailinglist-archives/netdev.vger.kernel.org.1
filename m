@@ -1,407 +1,184 @@
-Return-Path: <netdev+bounces-38880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73467BCD14
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 09:54:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2D07BCD32
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 10:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C932F1C20841
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA041281997
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822F2883A;
-	Sun,  8 Oct 2023 07:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7qdmnXy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8EAE8BE8;
+	Sun,  8 Oct 2023 08:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92BD4426
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 07:54:07 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84CF3B9;
-	Sun,  8 Oct 2023 00:54:05 -0700 (PDT)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-59f55c276c3so44007267b3.2;
-        Sun, 08 Oct 2023 00:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696751644; x=1697356444; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NZxvUPc0BhnwiDbJCKmaxQ0rdkiyEaqH40H6qCqFDAc=;
-        b=j7qdmnXypiAcJsNzkhgLxwJykpdLtXrNFyvu33RemTdoIM604tER0bu6PPm40f5vMR
-         2LyIHppwG488j2yxLQIqrvQh2hJCHHl3GAPZxgJJwE4ueUvOJYbnYlqxXVSkLu+MF2G0
-         D7y2qjRXhHv0+QMrCCjTR1akBHdLCEzNbhGHyNyKMfSCPHgcz8lQrMILmU+qXq5X9nA/
-         uuluMrXuLOqO4Z2H7OKBBblFellb6oYVHWyPzf8LVOahMrSYTJmb5K/bDBoZXr+Z7Eyf
-         9hwknd5PVygbdrocMVuzB/HEdkAgshDJMnA0JuM4d2Nhslt8bXpjsm5KMk9mksNJ83sK
-         NeEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696751644; x=1697356444;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NZxvUPc0BhnwiDbJCKmaxQ0rdkiyEaqH40H6qCqFDAc=;
-        b=gz6kPo0xldkaEwwekctAyeHDrGH/tBc/Nr93lv1IK7t0lw3OLohi7pyTadInkZSNLf
-         QmR7OS2kb1idRBTiNW5BmGNVWt3FKC2RZzTo+ovgC9JtbLb17Q1xh0xbI9wIOn2Pb5h0
-         /R8jgpTye2lc0+UWe0xPezmj0Aze83jM86YLc7FJd3nDqHxg4JtRpJUxXu0GsxFocclM
-         Dl0QQ3D1UdqFI7mUvPe22cNW+NEjcXMGdZovbeRe2Bnc1U0MHkngSzEvB8FHuDJC7LXo
-         pp01rrTCIkWme4dD+OSvif+htM4qm28a0Cxyz0XcNOq8B54my0qma2KYrBdwzHCtErDb
-         Lt0A==
-X-Gm-Message-State: AOJu0YwNOMEUmknjL0xjUI4Adwh9nCLg2d9oSnpZKr8Ky6NSXej5DxR/
-	nBeuxnI7KTb0OQYLdw7TR/8=
-X-Google-Smtp-Source: AGHT+IHpDcOc923WIIl4ZPCG22n/xC1XbcFXbWIr/t4GneLXge7flEdXmRqG6TJ5A/E156F2C8LPaw==
-X-Received: by 2002:a0d:cbca:0:b0:59b:f152:8997 with SMTP id n193-20020a0dcbca000000b0059bf1528997mr13688152ywd.0.1696751644630;
-        Sun, 08 Oct 2023 00:54:04 -0700 (PDT)
-Received: from ocxma-dut.. ([153.126.233.62])
-        by smtp.gmail.com with ESMTPSA id x74-20020a81a04d000000b0058c55d40765sm2667127ywg.106.2023.10.08.00.54.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Oct 2023 00:54:04 -0700 (PDT)
-From: Takeru Hayasaka <hayatake396@gmail.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Takeru Hayasaka <hayatake396@gmail.com>
-Subject: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP from ethtool
-Date: Sun,  8 Oct 2023 07:52:22 +0000
-Message-Id: <20231008075221.61863-1-hayatake396@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645128472
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 08:23:08 +0000 (UTC)
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCB1C6;
+	Sun,  8 Oct 2023 01:23:05 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VtdcqcW_1696753375;
+Received: from 30.221.145.250(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VtdcqcW_1696753375)
+          by smtp.aliyun-inc.com;
+          Sun, 08 Oct 2023 16:23:02 +0800
+Message-ID: <3e41f49d-abec-34b4-283b-7ad4bbff3b41@linux.alibaba.com>
+Date: Sun, 8 Oct 2023 16:22:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
+ closing listen socket
+Content-Language: en-US
+To: Wenjia Zhang <wenjia@linux.ibm.com>,
+ Alexandra Winter <wintera@linux.ibm.com>
+Cc: jaka@linux.ibm.com, kgraul@linux.ibm.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
+ <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
+ <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
+ <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
+ <c03dad67-169a-bf6d-1915-a9bb722a7259@linux.alibaba.com>
+ <d18e1a78-3b3a-8f23-6db1-20c16795d3ef@linux.ibm.com>
+ <ab417654-8aba-f357-8ac5-16c4c2b291e1@linux.alibaba.com>
+ <b4470cec-7b9b-5ce5-01e0-9270f6564fbb@linux.ibm.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <b4470cec-7b9b-5ce5-01e0-9270f6564fbb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-11.7 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a patch that enables RSS functionality for GTP packets using
-ethtool.
-A user can include her TEID and make RSS work for GTP-U over IPv4 by
-doing the following:
-`ethtool -N ens3 rx-flow-hash gtpu4 sd`
-In addition to gtpu(4|6), we now support gtpc(4|6), gtpu(4|6)e,
-gtpu(4|6)u, and gtpu(4|6)d.
 
-Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
----
- sorry. i signed off by mistake in email. i fixed.
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 98 +++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_flow.h    | 15 +++
- drivers/net/ethernet/intel/ice/ice_lib.c     | 70 ++++++++++++++
- include/uapi/linux/ethtool.h                 | 10 ++
- 4 files changed, 191 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index ad4d4702129f..a5ee6638bc60 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -2404,6 +2404,21 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	case SCTP_V4_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV4;
- 		break;
-+	case GTPU_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPC_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_EH_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_UL_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_DL_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
- 	case TCP_V6_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6;
- 		break;
-@@ -2413,9 +2428,25 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	case SCTP_V6_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV6;
- 		break;
-+	case GTPU_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPC_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_EH_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_UL_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_DL_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
- 	default:
- 		break;
- 	}
-+
- 	return hdrs;
- }
- 
-@@ -2431,6 +2462,12 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_SRC_PORT)
- #define ICE_FLOW_HASH_FLD_SCTP_DST_PORT	\
- 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_DST_PORT)
-+#define ICE_FLOW_HASH_FLD_GTPC_TEID	BIT_ULL(ICE_FLOW_FIELD_IDX_GTPC_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_IP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_IP_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_EH_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_EH_QFI BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_QFI)
-+#define ICE_FLOW_HASH_FLD_GTPU_UP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_DWN_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID)
- 
- /**
-  * ice_parse_hash_flds - parses hash fields from RSS hash input
-@@ -2448,6 +2485,11 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 		case TCP_V4_FLOW:
- 		case UDP_V4_FLOW:
- 		case SCTP_V4_FLOW:
-+		case GTPU_V4_FLOW:
-+		case GTPC_V4_FLOW:
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_DL_V4_FLOW:
- 			if (nfc->data & RXH_IP_SRC)
- 				hfld |= ICE_FLOW_HASH_FLD_IPV4_SA;
- 			if (nfc->data & RXH_IP_DST)
-@@ -2456,6 +2498,11 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 		case TCP_V6_FLOW:
- 		case UDP_V6_FLOW:
- 		case SCTP_V6_FLOW:
-+		case GTPU_V6_FLOW:
-+		case GTPC_V6_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+		case GTPU_DL_V6_FLOW:
- 			if (nfc->data & RXH_IP_SRC)
- 				hfld |= ICE_FLOW_HASH_FLD_IPV6_SA;
- 			if (nfc->data & RXH_IP_DST)
-@@ -2489,11 +2536,50 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 			if (nfc->data & RXH_L4_B_2_3)
- 				hfld |= ICE_FLOW_HASH_FLD_SCTP_DST_PORT;
- 			break;
-+		case GTPU_V4_FLOW:
-+		case GTPU_V6_FLOW:
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+		case GTPU_DL_V4_FLOW:
-+		case GTPU_DL_V6_FLOW:
-+			if (nfc->data & RXH_L4_B_0_1)
-+				hfld |= ICE_FLOW_HASH_FLD_TCP_SRC_PORT |
-+						ICE_FLOW_HASH_FLD_UDP_SRC_PORT;
-+			if (nfc->data & RXH_L4_B_2_3)
-+				hfld |= ICE_FLOW_HASH_FLD_TCP_DST_PORT |
-+						ICE_FLOW_HASH_FLD_UDP_DST_PORT;
-+			break;
- 		default:
- 			break;
- 		}
- 	}
- 
-+	switch (nfc->flow_type) {
-+	case GTPC_V4_FLOW:
-+	case GTPC_V6_FLOW:
-+		hfld |= ICE_FLOW_HASH_FLD_GTPC_TEID;
-+		break;
-+	case GTPU_V4_FLOW:
-+	case GTPU_V6_FLOW:
-+		hfld |= ICE_FLOW_HASH_FLD_GTPU_IP_TEID;
-+		break;
-+	case GTPU_EH_V4_FLOW:
-+	case GTPU_EH_V6_FLOW:
-+		hfld |= ICE_FLOW_HASH_FLD_GTPU_EH_TEID;
-+		break;
-+	case GTPU_UL_V4_FLOW:
-+	case GTPU_UL_V6_FLOW:
-+		hfld |= ICE_FLOW_HASH_FLD_GTPU_UP_TEID;
-+		break;
-+	case GTPU_DL_V4_FLOW:
-+	case GTPU_DL_V6_FLOW:
-+		hfld |= ICE_FLOW_HASH_FLD_GTPU_DWN_TEID;
-+		break;
-+	default:
-+		break;
-+	}
- 	return hfld;
- }
- 
-@@ -2590,12 +2676,20 @@ ice_get_rss_hash_opt(struct ice_vsi *vsi, struct ethtool_rxnfc *nfc)
- 
- 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_SRC_PORT ||
- 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_SRC_PORT ||
--	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT)
-+	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
- 		nfc->data |= (u64)RXH_L4_B_0_1;
- 
- 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_DST_PORT ||
- 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_DST_PORT ||
--	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT)
-+	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
- 		nfc->data |= (u64)RXH_L4_B_2_3;
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
-index b465d27d9b80..7ddf6ce994e7 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.h
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.h
-@@ -64,6 +64,21 @@
- 	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_EH_TEID | \
- 	 ICE_FLOW_HASH_GTP_U_EH_QFI)
- 
-+#define ICE_FLOW_HASH_GTP_U_UP_TEID \
-+	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID))
-+#define ICE_FLOW_HASH_GTP_U_DWN_TEID \
-+	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID))
-+
-+#define ICE_FLOW_HASH_GTP_U_IPV4_UP \
-+	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_UP_TEID)
-+#define ICE_FLOW_HASH_GTP_U_IPV6_UP \
-+	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_UP_TEID)
-+
-+#define ICE_FLOW_HASH_GTP_U_IPV4_DWN \
-+	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
-+#define ICE_FLOW_HASH_GTP_U_IPV6_DWN \
-+	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
-+
- #define ICE_FLOW_HASH_PPPOE_SESS_ID \
- 	(BIT_ULL(ICE_FLOW_FIELD_IDX_PPPOE_SESS_ID))
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 201570cd2e0b..a9664b48eddb 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1667,6 +1667,41 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
- 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp4 flow, vsi = %d, error = %d\n",
- 			vsi_num, status);
- 
-+	/* configure RSS for gtpc4 with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV4_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4 with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4e with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_EH,
-+				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4e flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4u with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_UP,
-+				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4u flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4d with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_DWN,
-+				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
- 	/* configure RSS for tcp6 with input set IPv6 src/dst, TCP src/dst */
- 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_HASH_TCP_IPV6,
- 				 ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6);
-@@ -1688,6 +1723,41 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
- 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp6 flow, vsi = %d, error = %d\n",
- 			vsi_num, status);
- 
-+	/* configure RSS for gtpc6 with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV6_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc6 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6 with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6e with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_EH,
-+				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6e flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6u with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_UP,
-+				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6u flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6d with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_DWN,
-+				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
- 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_ESP_SPI,
- 				 ICE_FLOW_SEG_HDR_ESP);
- 	if (status)
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index f7fba0dc87e5..f3af2a78f7dd 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2011,6 +2011,16 @@ static inline int ethtool_validate_duplex(__u8 duplex)
- #define	IPV4_FLOW	0x10	/* hash only */
- #define	IPV6_FLOW	0x11	/* hash only */
- #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
-+#define GTPU_V4_FLOW 0x13	/* hash only */
-+#define GTPU_V6_FLOW 0x14	/* hash only */
-+#define GTPC_V4_FLOW 0x15	/* hash only */
-+#define GTPC_V6_FLOW 0x16	/* hash only */
-+#define GTPU_EH_V4_FLOW 0x17	/* hash only */
-+#define GTPU_EH_V6_FLOW 0x18	/* hash only */
-+#define GTPU_UL_V4_FLOW 0x19	/* hash only */
-+#define GTPU_UL_V6_FLOW 0x20	/* hash only */
-+#define GTPU_DL_V4_FLOW 0x21	/* hash only */
-+#define GTPU_DL_V6_FLOW 0x22	/* hash only */
- /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
- #define	FLOW_EXT	0x80000000
- #define	FLOW_MAC_EXT	0x40000000
--- 
-2.34.1
+On 10/6/23 2:14 AM, Wenjia Zhang wrote:
+>
+>
+> On 26.09.23 11:06, D. Wythe wrote:
+>>
+>>
+>> On 9/26/23 3:18 PM, Alexandra Winter wrote:
+>>>
+>>> On 26.09.23 05:00, D. Wythe wrote:
+>>>> You are right. The key point is how to ensure the valid of smc sock 
+>>>> during the life time of clc sock, If so, READ_ONCE is good
+>>>> enough. Unfortunately, I found  that there are no such guarantee, 
+>>>> so it's still a life-time problem.
+>>> Did you discover a scenario, where clc sock could live longer than 
+>>> smc sock?
+>>> Wouldn't that be a dangerous scenario in itself? I still have some 
+>>> hope that the lifetime of an smc socket is by design longer
+>>> than that of the corresponding tcp socket.
+>>
+>>
+>> Hi Alexandra,
+>>
+>> Yes there is. Considering scenario:
+>>
+>> tcp_v4_rcv(skb)
+>>
+>> /* req sock */
+>> reqsk = _inet_lookup_skb(skb)
+>>
+>> /* listen sock */
+>> sk = reqsk(reqsk)->rsk_listener;
+>> sock_hold(sk);
+>> tcp_check_req(sk)
+>>
+>>
+>>                                                  smc_release /* 
+>> release smc listen sock */
+>>                                                  __smc_release
+>> smc_close_active()         /*  smc_sk->sk_state = SMC_CLOSED; */
+>>                                                      if 
+>> (smc_sk->sk_state == SMC_CLOSED)
+>> smc_clcsock_release();
+>> sock_release(clcsk);        /* close clcsock */
+>>      sock_put(sk);              /* might not  the final refcnt */
+>>
+>> sock_put(smc_sk)    /* might be the final refcnt of smc_sock  */
+>>
+>> syn_recv_sock(sk...)
+>> /* might be the final refcnt of tcp listen sock */
+>> sock_put(sk);
+>>
+>> Fortunately, this scenario only affects smc_syn_recv_sock and 
+>> smc_hs_congested, as other callbacks already have locks to protect smc,
+>> which can guarantee that the sk_user_data is either NULL (set in 
+>> smc_close_active) or valid under the lock.
+>> I'm kind of confused with this scenario. How could the 
+> smc_clcsock_release()->sock_release(clcsk) happen?
+> Because the syn_recv_sock happens short prior to accept(), that means 
+> that the &smc->tcp_listen_work is already triggered but the real 
+> accept() is still not happening. At this moment, the incoming 
+> connection is being added into the accept queue. Thus, if the 
+> sk->sk_state is changed from SMC_LISTEN to SMC_CLOSED in 
+> smc_close_active(), there is still 
+> "flush_work(&smc->tcp_listen_work);" after that. That ensures the 
+> smc_clcsock_release() should not happen, if smc_clcsock_accept() is 
+> not finished. Do you think that the execution of the 
+> &smc->tcp_listen_work is already done? Or am I missing something?
+>
+Hi wenjia,
+
+Sorry for late reply, we have just returned from vacation.
+
+The smc_clcsock_release here release the listen clcsock rather than the 
+child clcsock.
+So the flush_work might not be helpful for this scenario.
+
+Best wishes,
+D. Wythe
+
+
+>>> Considering the const, maybe
+>>>> we need to do :
+>>>>
+>>>> 1. hold a refcnt of smc_sock for syn_recv_sock to keep smc sock 
+>>>> valid during life time of clc sock
+>>>> 2. put the refcnt of smc_sock in sk_destruct in tcp_sock to release 
+>>>> the very smc sock .
+>>>>
+>>>> In that way, we can always make sure the valid of smc sock during 
+>>>> the life time of clc sock. Then we can use READ_ONCE rather
+>>>> than lock.  What do you think ?
+>>> I am not sure I fully understand the details what you propose to do. 
+>>> And it is not only syn_recv_sock(), right?
+>>> You need to consider all relations between smc socks and tcp socks; 
+>>> fallback to tcp, initial creation, children of listen sockets, 
+>>> variants of shutdown, ... Preferrably a single simple mechanism 
+>>> covers all situations. Maybe there is such a mechanism already today?
+>>> (I don't think clcsock->sk->sk_user_data or sk_callback_lock provide 
+>>> this general coverage)
+>>> If we really have a gap, a general refcnt'ing on smc sock could be a 
+>>> solution, but needs to be designed carefully.
+>>
+>> You are right , we need designed it with care, we will try the 
+>> referenced solutions internally first, and I will also send some RFCs 
+>> so that everyone can track the latest progress
+>> and make it can be all agreed.
+>>> Many thanks to you and the team to help make smc more stable and 
+>>> robust.
+>>
+>> Our pleasure 😁.  The stability of smc is important to us too.
+>>
+>> Best wishes,
+>> D. Wythe
+>>
+>>
 
 
