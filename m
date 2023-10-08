@@ -1,97 +1,93 @@
-Return-Path: <netdev+bounces-38887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B7837BCD8C
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 11:37:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2627BCDB2
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 11:58:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6215B1C20896
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 09:37:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79A7C281B41
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 09:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA768C11;
-	Sun,  8 Oct 2023 09:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B3EBE4D;
+	Sun,  8 Oct 2023 09:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="BylOMK7N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382DD8C00
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 09:37:04 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B12B5B6;
-	Sun,  8 Oct 2023 02:37:01 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4S3H5Y26QpzRhp3;
-	Sun,  8 Oct 2023 17:33:05 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Sun, 8 Oct
- 2023 17:36:59 +0800
-Subject: Re: [PATCH net-next v10 1/6] page_pool: fragment API support for
- 32-bit arch with 64-bit DMA
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>
-CC: Alexander Duyck <alexander.duyck@gmail.com>, Paolo Abeni
-	<pabeni@redhat.com>, <davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>, Liang
- Chen <liangchen.linux@gmail.com>, Guillaume Tucker
-	<guillaume.tucker@collabora.com>, Matthew Wilcox <willy@infradead.org>,
-	Linux-MM <linux-mm@kvack.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
-	<edumazet@google.com>
-References: <20230922091138.18014-1-linyunsheng@huawei.com>
- <20230922091138.18014-2-linyunsheng@huawei.com>
- <b70b44bec789b60a99c18e43f6270f9c48e3d704.camel@redhat.com>
- <20231003151216.1a3d6901@kernel.org>
- <c2ef79ea-468e-ce25-a597-cc1684389143@intel.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <943e7a57-1285-4123-578c-1bb8d1a926c4@huawei.com>
-Date: Sun, 8 Oct 2023 17:36:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BAF210D
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 09:58:43 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318EEB6
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 02:58:42 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-59f6441215dso43732597b3.2
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 02:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1696759121; x=1697363921; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4BUOfZ5u4Lzp581IO/H3NzM1c5ss1yPUdACAcJ9LVNM=;
+        b=BylOMK7NmVSahNBAlo1SDdHmhmy+RdGakW0TSqehnucOdj8zoJlzKZt/zkuNgaqtf9
+         TG/cqny8r6JOJfpjHOjA2zoBEyKq57KqB27zZLVCWVY3xdN2YgFRqCT81dida0mNrsYb
+         5fXnX6aAQjm0VXBHcd1bdSTJRktC8BqTBJ9P0p2sD833ccOk097rV8nbBnhTVDxHpbee
+         jhkOpzP3TWTziSWYnPuPaccCdKqvjEkh+Z/droVlNWXyCAfYoQ2/wJEB/m1Iqi7zJZU9
+         sx3jvAUF2qii4Mjt9dulG2zNCjkr/14ZMutsrE1nmmrE8KGdY+hEYWXNjRu04RhGVRvh
+         FJpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696759121; x=1697363921;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4BUOfZ5u4Lzp581IO/H3NzM1c5ss1yPUdACAcJ9LVNM=;
+        b=KC3WExuPL5KjQBKdZPAFzQNx68EAKj2ntEXMyU9TUrnRnLqkC5/XhYoqeYtAtCDTbJ
+         9rGRLUtszLtU2lPn2Ge+DCOnG3HjUdbnTlWHea/SVXaOOp+FGY6d+I3Wtbe2/2u/jS18
+         qOo2TTZ4gVlPa25Yf+npUAP+wLRXtCFzie1WV5e1Kg7Z+i0KIC8cd2FRIs9+vveEPyek
+         lLRTKl7l0bNUSJa/RzH5saI8lOBu1QwrzktBQawgjRU2Yd3GbGG58VniCVbDGlmQfssR
+         TDBeqU9FN3cmV+L6utjYZUiohtMX63wvpbURWE1VHbSzhn8tbwpUr630ierGSGrgypKL
+         ZhxA==
+X-Gm-Message-State: AOJu0Yyol0VVZv7PqsdVWDHr4/7DaR104NxdQ3QwhujZJDxl1gZnSUvN
+	BwjNkNQzgfPkqPLngmEKTtkQW7Ue+MAe+gD2mqP+XA==
+X-Google-Smtp-Source: AGHT+IFYOapup9gAZulsLb2yT23Pw+WtoQf6F8HLfw0peZSp+NaZDSv11chD2x3ak9BjYSOZSCCsE/cEu0u/YnZ14LI=
+X-Received: by 2002:a0d:cdc2:0:b0:59b:d3cd:ffb6 with SMTP id
+ p185-20020a0dcdc2000000b0059bd3cdffb6mr12651258ywd.33.1696759121425; Sun, 08
+ Oct 2023 02:58:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <c2ef79ea-468e-ce25-a597-cc1684389143@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <CALNs47v3cE-_LiJBTg0_Zkh_cinktHHP3xJ3tL3PAHn5+NBNCA@mail.gmail.com>
+ <20231008.164906.1151622782836568538.fujita.tomonori@gmail.com>
+ <CALNs47sh+vAXrZRQR8aK2B_mVoUfiHMzFEF=vxbb-+TbgwGpQw@mail.gmail.com> <20231008.180257.1638765262944543712.fujita.tomonori@gmail.com>
+In-Reply-To: <20231008.180257.1638765262944543712.fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Sun, 8 Oct 2023 05:58:29 -0400
+Message-ID: <CALNs47u66Lr5LaD_+V14eh4vyrV_FKsQYdxyDTzgD35gBc5FOQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	miguel.ojeda.sandonis@gmail.com, greg@kroah.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/10/4 17:31, Alexander Lobakin wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Tue, 3 Oct 2023 15:12:16 -0700
-> 
->> On Tue, 03 Oct 2023 09:45:56 +0200 Paolo Abeni wrote:
->>> I think it would be nice also an explicit ack from Jesper and/or Ilias.
->>
->> Also a review tag from one or both of the Alexanders would be great!
-> 
-> I got back to libie/iavf this week, hoping I'll rebase without major
-> issues and will be able to give a Tested-by as well, will see :>
+On Sun, Oct 8, 2023 at 5:03=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
+> Yeah, now I don't use paste! in PHY bindings.
 
-It is great to have some Tested-by tag to confirm that this patchset
-works for other driver. Please let me know if there is any problem when
-rebasing and testing, thanks.
+Even better!
 
-
-> Thanks,
-> Olek
-> 
-> .
-> 
+The fix was small so I sent it anyway,
+https://lore.kernel.org/rust-for-linux/20231008094816.320424-1-tmgross@umic=
+h.edu/T/#u
 
