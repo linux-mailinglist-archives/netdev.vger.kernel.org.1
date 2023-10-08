@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-38919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17FD7BD007
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEEF7BD006
 	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:12:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C701C20A3C
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61FFF1C20B2B
 	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E131A5BA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655631A5B6;
 	Sun,  8 Oct 2023 20:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fl2mfED1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0zrcUJi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75E31A59B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5731A59A
 	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 20:12:52 +0000 (UTC)
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C58B6
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:12:49 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-7742da399a2so264989985a.0
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 13:12:49 -0700 (PDT)
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B632BA
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:12:50 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-4181462ebf0so26192021cf.3
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 13:12:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696795968; x=1697400768; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696795969; x=1697400769; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xSWNewQqlaIQyWDI9hrczm+cy6FgsRoLMTzAic6qvbE=;
-        b=fl2mfED1N+xk57Rka4OQi2pPaSoe84Qy0gG8WyzhxIlHfbz0B1gTMOq0niq6PoyA7P
-         eiWC71RwGoBRa+0dIjMNbdJPtI8wRpbi0pP76TIonCvcs/qGofuatoyfbE5STZS7eyVr
-         hGIGGpHXvv58ceSdKBywwAcUVbFaABe4YT1psd20lzXOMdhD2qV0ghdxBxREDYVAgdtF
-         lBBOmLPoMVbiiuqmQI448nJmGpxmEao683FwJQ1x9z6LzirOE1PviiuD9LkS7mldJst6
-         FZvhC3NPaNPoxX1tvT0O/JGoAy9Hhklvgr4vlbIB4jMG07DD+0I+KB8VYFK/UHhsiCe4
-         FEww==
+        bh=17yqKc1kHaOMA6mN8raOlE7hraCjIklZ3SgNF0zPb1c=;
+        b=j0zrcUJiK+qguZJp1HkwDxVytc50EuWIq9D428LlyEOs/kRs621icXA4fj3iJLQKSA
+         L7b2fIW3d8zJMmWot4R7+aMRme2WSnXCGz8lc6+SWPNRE0Ys6bFEpW65XfFqN6/bbFkP
+         3Q2vMm3ylIBNaBEf1UwTHqvCpmLu7eWVBC2PPTOJl5n/M44hzEIuzkytL3DccNQ6HRR2
+         Xq13aNbXCGOmEWR21+Aod61zOeY6GzLNXgBhsY1r3Z6NDNC0qfeJLSc+92KoUzWm7vdG
+         A4HclQpkAqMlpdALp7cvZQ2oyr3nonPrItpqBFQ8NhZou8N9CohlTlsu/hm5Oan/qlCo
+         WH0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696795968; x=1697400768;
+        d=1e100.net; s=20230601; t=1696795969; x=1697400769;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xSWNewQqlaIQyWDI9hrczm+cy6FgsRoLMTzAic6qvbE=;
-        b=iocVcgVN5w+UJ9JSFjLn4fNr88Y9xv+OMCFid7aKHXyT5KP4wk022SVDH7AqurnYc+
-         PfIAmKgUp3RZSNv1u8/UKndR4hpU6fMzkMlrU2Z4GXR+5Aay324EZLfc58pdK6vy4w5B
-         9ugMIGTyE2YcXkMGHuPOWs6tLqzf0SMTRnFQVwATwE4oXECaDHGja5mc+PcdIIkifOYh
-         zCe0QHGMCkkOKOE+hPJm65jr9rCe/4I4Vh1rXnRUdbdfQYH/gkQtbwQp9nZYqr7qyR/W
-         eB8FQGnlpF4UfAAqeewTPDlDylEpIrHYdIonYXgdLLx5bNKXNmLnlcxbBvmFbXQiurrv
-         6kYw==
-X-Gm-Message-State: AOJu0YyimSKgKT8W2nRmlL6+2L3KIlbLHumkuxyY0g8j6cu835GVp/+5
-	zwSR9YaRl+s1NJ/5EUWhZfiAC8xrRb5UQg==
-X-Google-Smtp-Source: AGHT+IFHy9eUlWfG/7QtSRnZ00C79CtPuMap2tocjK9ndMR2kelO+ZznXK8aeC6TRKxIfRa1PKvnuQ==
-X-Received: by 2002:a05:622a:647:b0:418:12d4:c096 with SMTP id a7-20020a05622a064700b0041812d4c096mr17986455qtb.2.1696795968664;
-        Sun, 08 Oct 2023 13:12:48 -0700 (PDT)
+        bh=17yqKc1kHaOMA6mN8raOlE7hraCjIklZ3SgNF0zPb1c=;
+        b=h7vjfdeG7zvppow+PPdlzg4XV7kY3AwFxS82RW2SQHkZfnTRsTGYP3L88cEI6Vv4eE
+         1hRvf5J1ubaqk/cCkbxDl+doA44CqgSXo4C7YIBkYIVslRu+1XEyjGIDhzmP0J0mSpYb
+         C++cJX7znvVYz/jS6HAiqFuLn30JemGMjva4soZ3XkLGRcoabm9u81WF5WEXNZ5dOqAr
+         P63iuLO8dFubhmrwZkpfqDYP7aKsT2gmpgV+WUy5qiK7WwphcTJcJ/RYegOyJh6PBkiL
+         lQ7ED8TpecaQ+M42C1gFdRBwDvCb6jF4EnDv6kxoxsmGT54kk3E/H0NUh0viQUcn8Emd
+         2Kaw==
+X-Gm-Message-State: AOJu0YyeSn5Ts82ciMfbqy5MzawyZoOmtKijDgfesJ6Ec1o2BpnKJhdK
+	22fyvj7M5PfafBkd8n4z0IWn5CKxKZkU/A==
+X-Google-Smtp-Source: AGHT+IFzMwRntua6Sj7EEjeQiR2jzYNjwGuLrAAobzJEJigzgI5Ohz9gCtsRY/P6ZWIvCNAIKWU6Bw==
+X-Received: by 2002:a05:622a:1cb:b0:418:10d0:96f6 with SMTP id t11-20020a05622a01cb00b0041810d096f6mr18456834qtw.23.1696795969128;
+        Sun, 08 Oct 2023 13:12:49 -0700 (PDT)
 Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
         by smtp.gmail.com with ESMTPSA id v18-20020ac87292000000b00419c9215f0asm3075533qto.53.2023.10.08.13.12.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -67,9 +67,9 @@ Cc: davem@davemloft.net,
 	alexander.duyck@gmail.com,
 	fw@strlen.de,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 2/3] net: parametrize skb_segment unit test to expand coverage
-Date: Sun,  8 Oct 2023 16:12:33 -0400
-Message-ID: <20231008201244.3700784-3-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next v2 3/3] net: expand skb_segment unit test with frag_list coverage
+Date: Sun,  8 Oct 2023 16:12:34 -0400
+Message-ID: <20231008201244.3700784-4-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
 In-Reply-To: <20231008201244.3700784-1-willemdebruijn.kernel@gmail.com>
 References: <20231008201244.3700784-1-willemdebruijn.kernel@gmail.com>
@@ -89,205 +89,152 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Willem de Bruijn <willemb@google.com>
 
-Expand the test with variants
+Expand the test with these variants that use skb frag_list:
 
-- GSO_TEST_NO_GSO:      payload size less than or equal to gso_size
-- GSO_TEST_FRAGS:       payload in both linear and page frags
-- GSO_TEST_FRAGS_PURE:  payload exclusively in page frags
-- GSO_TEST_GSO_PARTIAL: produce one gso segment of multiple of gso_size,
-                        plus optionally one non-gso trailer segment
-
-Define a test struct that encodes the input gso skb and output segs.
-Input in terms of linear and fragment lengths. Output as length of
-each segment.
+- GSO_TEST_FRAG_LIST:             frag_skb length is gso_size
+- GSO_TEST_FRAG_LIST_PURE:        same, data exclusively in frag skbs
+- GSO_TEST_FRAG_LIST_NON_UNIFORM: frag_skb length may vary
+- GSO_TEST_GSO_BY_FRAGS:          frag_skb length defines gso_size,
+                                  i.e., segs may have varying sizes.
 
 Signed-off-by: Willem de Bruijn <willemb@google.com>
+
 ---
- net/core/gso_test.c | 129 ++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 112 insertions(+), 17 deletions(-)
+
+v1->v2
+  - maintain reverse christmas tree
+---
+ net/core/gso_test.c | 92 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
 diff --git a/net/core/gso_test.c b/net/core/gso_test.c
-index eaa85939ed208..c4e0b0832dbac 100644
+index c4e0b0832dbac..c1a6cffb6f961 100644
 --- a/net/core/gso_test.c
 +++ b/net/core/gso_test.c
-@@ -4,10 +4,7 @@
- #include <linux/skbuff.h>
+@@ -27,6 +27,10 @@ enum gso_test_nr {
+ 	GSO_TEST_FRAGS,
+ 	GSO_TEST_FRAGS_PURE,
+ 	GSO_TEST_GSO_PARTIAL,
++	GSO_TEST_FRAG_LIST,
++	GSO_TEST_FRAG_LIST_PURE,
++	GSO_TEST_FRAG_LIST_NON_UNIFORM,
++	GSO_TEST_GSO_BY_FRAGS,
+ };
  
- static const char hdr[] = "abcdefgh";
--static const int gso_size = 1000, last_seg_size = 1;
--
--/* default: create 3 segment gso packet */
--static const int payload_len = (2 * gso_size) + last_seg_size;
-+static const int gso_size = 1000;
+ struct gso_test_case {
+@@ -37,6 +41,8 @@ struct gso_test_case {
+ 	unsigned int linear_len;
+ 	unsigned int nr_frags;
+ 	const unsigned int *frags;
++	unsigned int nr_frag_skbs;
++	const unsigned int *frag_skbs;
  
- static void __init_skb(struct sk_buff *skb)
- {
-@@ -24,21 +21,121 @@ static void __init_skb(struct sk_buff *skb)
- 	skb_shinfo(skb)->gso_size = gso_size;
- }
- 
-+enum gso_test_nr {
-+	GSO_TEST_LINEAR,
-+	GSO_TEST_NO_GSO,
-+	GSO_TEST_FRAGS,
-+	GSO_TEST_FRAGS_PURE,
-+	GSO_TEST_GSO_PARTIAL,
-+};
-+
-+struct gso_test_case {
-+	enum gso_test_nr id;
-+	const char *name;
-+
-+	/* input */
-+	unsigned int linear_len;
-+	unsigned int nr_frags;
-+	const unsigned int *frags;
-+
-+	/* output as expected */
-+	unsigned int nr_segs;
-+	const unsigned int *segs;
-+};
-+
-+static struct gso_test_case cases[] = {
+ 	/* output as expected */
+ 	unsigned int nr_segs;
+@@ -84,6 +90,48 @@ static struct gso_test_case cases[] = {
+ 		.nr_segs = 2,
+ 		.segs = (const unsigned int[]) { 2 * gso_size, 3 },
+ 	},
 +	{
-+		.id = GSO_TEST_NO_GSO,
-+		.name = "no_gso",
++		/* commit 89319d3801d1: frag_list on mss boundaries */
++		.id = GSO_TEST_FRAG_LIST,
++		.name = "frag_list",
 +		.linear_len = gso_size,
-+		.nr_segs = 1,
-+		.segs = (const unsigned int[]) { gso_size },
-+	},
-+	{
-+		.id = GSO_TEST_LINEAR,
-+		.name = "linear",
-+		.linear_len = gso_size + gso_size + 1,
++		.nr_frag_skbs = 2,
++		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
 +		.nr_segs = 3,
-+		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
++		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size },
 +	},
 +	{
-+		.id = GSO_TEST_FRAGS,
-+		.name = "frags",
-+		.linear_len = gso_size,
-+		.nr_frags = 2,
-+		.frags = (const unsigned int[]) { gso_size, 1 },
-+		.nr_segs = 3,
-+		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
-+	},
-+	{
-+		.id = GSO_TEST_FRAGS_PURE,
-+		.name = "frags_pure",
-+		.nr_frags = 3,
-+		.frags = (const unsigned int[]) { gso_size, gso_size, 2 },
-+		.nr_segs = 3,
-+		.segs = (const unsigned int[]) { gso_size, gso_size, 2 },
-+	},
-+	{
-+		.id = GSO_TEST_GSO_PARTIAL,
-+		.name = "gso_partial",
-+		.linear_len = gso_size,
-+		.nr_frags = 2,
-+		.frags = (const unsigned int[]) { gso_size, 3 },
++		.id = GSO_TEST_FRAG_LIST_PURE,
++		.name = "frag_list_pure",
++		.nr_frag_skbs = 2,
++		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
 +		.nr_segs = 2,
-+		.segs = (const unsigned int[]) { 2 * gso_size, 3 },
++		.segs = (const unsigned int[]) { gso_size, gso_size },
 +	},
-+};
-+
-+static void gso_test_case_to_desc(struct gso_test_case *t, char *desc)
-+{
-+	sprintf(desc, "%s", t->name);
-+}
-+
-+KUNIT_ARRAY_PARAM(gso_test, cases, gso_test_case_to_desc);
-+
- static void gso_test_func(struct kunit *test)
- {
- 	const int shinfo_size = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+	const struct gso_test_case *tcase;
- 	struct sk_buff *skb, *segs, *cur;
-+	netdev_features_t features;
- 	struct page *page;
-+	int i;
-+
-+	tcase = test->param_value;
++	{
++		/* commit 43170c4e0ba7: GRO of frag_list trains */
++		.id = GSO_TEST_FRAG_LIST_NON_UNIFORM,
++		.name = "frag_list_non_uniform",
++		.linear_len = gso_size,
++		.nr_frag_skbs = 4,
++		.frag_skbs = (const unsigned int[]) { gso_size, 1, gso_size, 2 },
++		.nr_segs = 4,
++		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size, 3 },
++	},
++	{
++		/* commit 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes") and
++		 * commit 90017accff61 ("sctp: Add GSO support")
++		 *
++		 * "there will be a cover skb with protocol headers and
++		 *  children ones containing the actual segments"
++		 */
++		.id = GSO_TEST_GSO_BY_FRAGS,
++		.name = "gso_by_frags",
++		.nr_frag_skbs = 4,
++		.frag_skbs = (const unsigned int[]) { 100, 200, 300, 400 },
++		.nr_segs = 4,
++		.segs = (const unsigned int[]) { 100, 200, 300, 400 },
++	},
+ };
  
- 	page = alloc_page(GFP_KERNEL);
- 	KUNIT_ASSERT_NOT_NULL(test, page);
--	skb = build_skb(page_address(page), sizeof(hdr) + payload_len + shinfo_size);
-+	skb = build_skb(page_address(page), sizeof(hdr) + tcase->linear_len + shinfo_size);
- 	KUNIT_ASSERT_NOT_NULL(test, skb);
--	__skb_put(skb, sizeof(hdr) + payload_len);
-+	__skb_put(skb, sizeof(hdr) + tcase->linear_len);
+ static void gso_test_case_to_desc(struct gso_test_case *t, char *desc)
+@@ -131,10 +179,54 @@ static void gso_test_func(struct kunit *test)
+ 		skb->truesize += skb->data_len;
+ 	}
  
- 	__init_skb(skb);
- 
--	segs = skb_segment(skb, NETIF_F_SG | NETIF_F_HW_CSUM);
-+	if (tcase->nr_frags) {
-+		unsigned int pg_off = 0;
++	if (tcase->frag_skbs) {
++		unsigned int total_size = 0, total_true_size = 0, alloc_size = 0;
++		struct sk_buff *frag_skb, *prev = NULL;
 +
 +		page = alloc_page(GFP_KERNEL);
 +		KUNIT_ASSERT_NOT_NULL(test, page);
-+		page_ref_add(page, tcase->nr_frags - 1);
++		page_ref_add(page, tcase->nr_frag_skbs - 1);
 +
-+		for (i = 0; i < tcase->nr_frags; i++) {
-+			skb_fill_page_desc(skb, i, page, pg_off, tcase->frags[i]);
-+			pg_off += tcase->frags[i];
++		for (i = 0; i < tcase->nr_frag_skbs; i++) {
++			unsigned int frag_size;
++
++			frag_size = tcase->frag_skbs[i];
++			frag_skb = build_skb(page_address(page) + alloc_size,
++					     frag_size + shinfo_size);
++			KUNIT_ASSERT_NOT_NULL(test, frag_skb);
++			__skb_put(frag_skb, frag_size);
++
++			if (prev)
++				prev->next = frag_skb;
++			else
++				skb_shinfo(skb)->frag_list = frag_skb;
++			prev = frag_skb;
++
++			total_size += frag_size;
++			total_true_size += frag_skb->truesize;
++			alloc_size += frag_size + shinfo_size;
 +		}
 +
-+		KUNIT_ASSERT_LE(test, pg_off, PAGE_SIZE);
++		KUNIT_ASSERT_LE(test, alloc_size, PAGE_SIZE);
 +
-+		skb->data_len = pg_off;
-+		skb->len += skb->data_len;
-+		skb->truesize += skb->data_len;
++		skb->len += total_size;
++		skb->data_len += total_size;
++		skb->truesize += total_true_size;
++
++		if (tcase->id == GSO_TEST_GSO_BY_FRAGS)
++			skb_shinfo(skb)->gso_size = GSO_BY_FRAGS;
 +	}
 +
-+	features = NETIF_F_SG | NETIF_F_HW_CSUM;
-+	if (tcase->id == GSO_TEST_GSO_PARTIAL)
-+		features |= NETIF_F_GSO_PARTIAL;
+ 	features = NETIF_F_SG | NETIF_F_HW_CSUM;
+ 	if (tcase->id == GSO_TEST_GSO_PARTIAL)
+ 		features |= NETIF_F_GSO_PARTIAL;
+ 
++	/* TODO: this should also work with SG,
++	 * rather than hit BUG_ON(i >= nfrags)
++	 */
++	if (tcase->id == GSO_TEST_FRAG_LIST_NON_UNIFORM)
++		features &= ~NETIF_F_SG;
 +
-+	segs = skb_segment(skb, features);
+ 	segs = skb_segment(skb, features);
  	if (IS_ERR(segs)) {
  		KUNIT_FAIL(test, "segs error %lld", PTR_ERR(segs));
- 		goto free_gso_skb;
-@@ -47,7 +144,9 @@ static void gso_test_func(struct kunit *test)
- 		goto free_gso_skb;
- 	}
- 
--	for (cur = segs; cur; cur = cur->next) {
-+	for (cur = segs, i = 0; cur; cur = cur->next, i++) {
-+		KUNIT_ASSERT_EQ(test, cur->len, sizeof(hdr) + tcase->segs[i]);
-+
- 		/* segs have skb->data pointing to the mac header */
- 		KUNIT_ASSERT_PTR_EQ(test, skb_mac_header(cur), cur->data);
- 		KUNIT_ASSERT_PTR_EQ(test, skb_network_header(cur), cur->data + sizeof(hdr));
-@@ -55,24 +154,20 @@ static void gso_test_func(struct kunit *test)
- 		/* header was copied to all segs */
- 		KUNIT_ASSERT_EQ(test, memcmp(skb_mac_header(cur), hdr, sizeof(hdr)), 0);
- 
--		/* all segs are gso_size, except for last */
--		if (cur->next) {
--			KUNIT_ASSERT_EQ(test, cur->len, sizeof(hdr) + gso_size);
--		} else {
--			KUNIT_ASSERT_EQ(test, cur->len, sizeof(hdr) + last_seg_size);
--
--			/* last seg can be found through segs->prev pointer */
-+		/* last seg can be found through segs->prev pointer */
-+		if (!cur->next)
- 			KUNIT_ASSERT_PTR_EQ(test, cur, segs->prev);
--		}
- 	}
- 
-+	KUNIT_ASSERT_EQ(test, i, tcase->nr_segs);
-+
- 	consume_skb(segs);
- free_gso_skb:
- 	consume_skb(skb);
- }
- 
- static struct kunit_case gso_test_cases[] = {
--	KUNIT_CASE(gso_test_func),
-+	KUNIT_CASE_PARAM(gso_test_func, gso_test_gen_params),
- 	{}
- };
- 
 -- 
 2.42.0.609.gbb76f46606-goog
 
