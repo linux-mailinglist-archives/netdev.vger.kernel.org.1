@@ -1,251 +1,199 @@
-Return-Path: <netdev+bounces-38890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246317BCE5D
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 14:38:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7FF7BCE5F
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 14:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E749C1C20895
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 12:38:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 666D5280E48
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 12:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20805666;
-	Sun,  8 Oct 2023 12:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F89BE48;
+	Sun,  8 Oct 2023 12:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="i1hCHGNe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1EEC6Vk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C689CA49
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 12:38:39 +0000 (UTC)
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47902B9
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 05:38:37 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-d81afd5273eso3831614276.3
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 05:38:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696768716; x=1697373516; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XQcs+qLJDNkL6RiaeHMSDMsbvnhk8FvSJ0wbhhkdGFo=;
-        b=i1hCHGNeUkYuAJYnBCUcIgd6v1vVP3SS/TlWeW1BusSWUUIeB+TdAq9HcLozdo6xIZ
-         N9QysffWwkMG8v9Vyx4Fgoud1rIBJ2fkkUIXVFCes54kt85hmJg8lNMpJYMy3ZcUk0EV
-         Viz6lT4PSQVcASSPsw8p6HiqImvCB/TXo85li3heq+33gwXe1IwM+jy0yA3Y/M0P/SwD
-         vFExSOOnEUu6rssGmogUXkhKWA5EJTTb/dZAPP6uUwkZSSgQQmkR5KG3lX8Nw97W4dD2
-         mnDYGmxOqFAyUhMf2t0jpwj0aedR7qBwdCPdyR4FV3hRfdSbzkTgTV0je9ZBZp8TYrAx
-         B+zQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F14568C1D
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 12:55:59 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08FB3D6
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 05:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696769756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c0nF39BML0PfnEg8EYtnUaYzCy2YCCsILfREV9RebgY=;
+	b=P1EEC6Vkid/7JdWEj+7ifmuR5Sn4lv9bLPZxS6ku/qEKNkHaVeEuAEDKA3EVz49WWpz2J+
+	MZSVoiyoLvt3BezM53DRTO6NhDDNzVd2O/Utee5F+luqTUFY7pKBv+GFrg7i56OGn2qE1j
+	0+x7H+FBA8TdbVD0t7uGBFMOTZRasGw=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-175-ih7ZmMvDMvOMhW_gUfVlAw-1; Sun, 08 Oct 2023 08:55:54 -0400
+X-MC-Unique: ih7ZmMvDMvOMhW_gUfVlAw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-537a183caa3so390290a12.1
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 05:55:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696768716; x=1697373516;
+        d=1e100.net; s=20230601; t=1696769753; x=1697374553;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XQcs+qLJDNkL6RiaeHMSDMsbvnhk8FvSJ0wbhhkdGFo=;
-        b=H7guzw7oM7hv91+Ncy1oNsnmYsp29bhArVS5Crmz7a+6CCJlVqIoeYaJVDoLChbsXw
-         9hrznHxR2vlyE497go5YJQLhZWUm0X0FnjG5inwQ9y9h+eAqIXPcSxsfDI6h8OpkUrco
-         OpcgEGlHR+d2w9PobR7bqp7x2eINUUslLUq38C66ni/L2PXH71aTJPBB9UoHlkgOsRCZ
-         Zkdef8rZTGBGvFb5eLtm1WBKvtPMjiv0zOsPl+QDhrOR6ImUF+iU/aAWxWpbhb4/P9+o
-         kymIcT6R62rXUEO/63vqmu51tO0vwIpIldSEtdxOg7qZNLNgNflom0zyphJnN6tlMhWA
-         1ZKQ==
-X-Gm-Message-State: AOJu0Ywkeme13sIb0kLKBGSSo299Rw1uJzH3BE29X5gcBKLjyiZwaCp7
-	R17vmf0+mBOwJDUI0HPWZ2hSFeKWdukrCSXSCwzu2Q==
-X-Google-Smtp-Source: AGHT+IE2PCdnzcrj8fnwiLSEaKtOplUJtOxLu3uDSvumLMWewx1sZunVAHJ6ZRdSsCYDzagmrmM275SqDV35Wo6Ja5E=
-X-Received: by 2002:a25:e00a:0:b0:d86:357:e314 with SMTP id
- x10-20020a25e00a000000b00d860357e314mr12452636ybg.47.1696768716457; Sun, 08
- Oct 2023 05:38:36 -0700 (PDT)
+        bh=c0nF39BML0PfnEg8EYtnUaYzCy2YCCsILfREV9RebgY=;
+        b=KzSYxBCTfRBm6LpruRDb+N5HFLk6pz8QMUM+rqNesoPtwoXqC8+6IKCTpPcx43dPWI
+         4UPDeGLpIa2bQlYtJ+nJeLbIFPhyTfcMF6rD4EPHY344osu+1god9MhquACSB0OG9Wt5
+         iE0x356OJrqq0VB0wC5QUfnjWzy5HZo7e8xnjzt+P2mVZrYHYXadNJZ7svKhTGotYENv
+         bhFuxy/IEiqrykn6rQZmECWNH6EW78G1og9LPItW4EYN2h/552FEICuirc9uhXInl97d
+         7ZRl3lJRtu1UaPltnComjdiJ0SyYLUrWs20SGQX91I9HkTm7sUTMuK0pU11eViOkhD9V
+         8Byg==
+X-Gm-Message-State: AOJu0YyYvHd2iVXmiExsniB5TUXChYjBl8aLg+ePLoEpv2pTYK0b4UW5
+	UNyQQlcwCfVwJZ4mw1znvfmQ516d49kaQUrS73S9KuW+YTAdumioRAsv4wdjif73mQPYXQ5o8wl
+	9dH9NMF9LlPfCZUddMEjzn6ZDX6/r2Woa
+X-Received: by 2002:a05:6402:1219:b0:530:77e6:849f with SMTP id c25-20020a056402121900b0053077e6849fmr11262459edw.27.1696769753713;
+        Sun, 08 Oct 2023 05:55:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFwuP5OldwI2lirgcFqdgqLuiwfXybdqWPqtq7WHhBAHTyaUl0LsDbO3SeDWNbNgLhU8D5uYo8GQPksNhx7/pw=
+X-Received: by 2002:a05:6402:1219:b0:530:77e6:849f with SMTP id
+ c25-20020a056402121900b0053077e6849fmr11262452edw.27.1696769753309; Sun, 08
+ Oct 2023 05:55:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZSAEp+tr1oXHOy/C@nanopsycho> <CAM0EoM=HDgawk5W70OxJThVsNvpyQ3npi_6Lai=nsk14SDM_xQ@mail.gmail.com>
- <ZSA60cyLDVw13cLi@nanopsycho> <CAM0EoMn1rNX=A3Gd81cZrnutpuch-ZDsSgXdG72uPQ=N2fGoAg@mail.gmail.com>
- <20231006152516.5ff2aeca@kernel.org> <CAM0EoM=LMQu5ae53WEE5Giz3z4u87rP+R4skEmUKD5dRFh5q7w@mail.gmail.com>
- <ZSEw32MVPK/qCsyz@nanopsycho> <CAM0EoMnJszhTDFuYZHojEZtfNueHe_WDAVXgLVWNSOtoZ2KapQ@mail.gmail.com>
- <ZSFSfPFXuvMC/max@nanopsycho> <CAM0EoMmKNEQuV8iRT-+hwm2KVDi5FK0JCNOpiaar90GwqjA-zw@mail.gmail.com>
- <ZSGTdA/5WkVI7lvQ@nanopsycho>
-In-Reply-To: <ZSGTdA/5WkVI7lvQ@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sun, 8 Oct 2023 08:38:25 -0400
-Message-ID: <CAM0EoMmohH3VdMGZDNb6zkte774uohp1u0Fzxo24_tPT+PBb=Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 0/3] net/sched: Introduce tc block ports
- tracking and use
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	mleitner@redhat.com, vladbu@nvidia.com, simon.horman@corigine.com, 
-	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
+References: <20230912030008.3599514-1-lulu@redhat.com> <20230912030008.3599514-4-lulu@redhat.com>
+ <CACGkMEuKcgH0kdLPmWZ69fL6SYvoVPfeGv11QwhQDW2sr9DZ3Q@mail.gmail.com>
+ <db93d5aa-64c4-42a4-73dc-ae25e9e3833e@redhat.com> <CACGkMEsNfLOQkmnWUH53iTptAmhELs_U8B4D-CfO49rs=+HfLw@mail.gmail.com>
+In-Reply-To: <CACGkMEsNfLOQkmnWUH53iTptAmhELs_U8B4D-CfO49rs=+HfLw@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Sun, 8 Oct 2023 20:55:12 +0800
+Message-ID: <CACLfguU5_8u-n5UopwzDKEEtFJ1GJ9NezEU7LGG=BY3BrZdhrg@mail.gmail.com>
+Subject: Re: [RFC v2 3/4] vduse: update the vq_info in ioctl
+To: Jason Wang <jasowang@redhat.com>
+Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, mst@redhat.com, xieyongji@bytedance.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 7, 2023 at 1:20=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote:
->
-> Sat, Oct 07, 2023 at 04:09:15PM CEST, jhs@mojatatu.com wrote:
-> >On Sat, Oct 7, 2023 at 8:43=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wro=
+On Sun, Oct 8, 2023 at 1:17=E2=80=AFPM Jason Wang <jasowang@redhat.com> wro=
 te:
-> >>
-> >> Sat, Oct 07, 2023 at 01:06:43PM CEST, jhs@mojatatu.com wrote:
-> >> >On Sat, Oct 7, 2023 at 6:20=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> =
-wrote:
-> >> >>
-> >> >> Sat, Oct 07, 2023 at 01:00:00AM CEST, jhs@mojatatu.com wrote:
-> >> >> >On Fri, Oct 6, 2023 at 6:25=E2=80=AFPM Jakub Kicinski <kuba@kernel=
-.org> wrote:
-> >> >> >>
-> >> >> >> On Fri, 6 Oct 2023 15:06:45 -0400 Jamal Hadi Salim wrote:
-> >> >> >> > > I don't understand the need for configuration less here. You=
- don't have
-> >> >> >> > > it for the rest of the actions. Why this is special?
-> >> >> >>
-> >> >> >> +1, FWIW
-> >> >> >
-> >> >> >We dont have any rule that says all actions MUST have parameters ;=
-->
-> >> >> >There is nothing speacial about any action that doesnt have a
-> >> >> >parameter.
-> >> >>
-> >> >> You are getting the configuration from the block/device the action =
-is
-> >> >> attached to. Can you point me to another action doing that?
-> >> >
-> >> >We are entering a pedantic road i am afraid. If there is no existing
-> >> >action that has zero config then consider this one the first one. We
-> >>
-> >> Nope, nothing pedantic about it. I was just curious if there's anythin=
-g
-> >> out there I missed.
-> >>
-> >
-> >Not sure if you noticed in the patch: the blockid on which the skb
-> >arrived on is now available in the tc_cb[] so when it shows up at the
-> >action we can just use it.
 >
-> I see, but does it has to be? I don't think so with the solution I'm
-> proposing.
-
-It's a simplistic use for a broadcast. We should support the one you
-suggested as well.
-
+> On Fri, Sep 29, 2023 at 5:12=E2=80=AFPM Maxime Coquelin
+> <maxime.coquelin@redhat.com> wrote:
 > >
-> >>
-> >> >use skb->metadata all the time as a source of information for actions=
-,
-> >> >classifiers, qdiscs. If i dont need config i dont need to invent one
-> >>
-> >> skb->metadata is something that is specific to a packet. That has
-> >> nothing to do with the actual configuration.
 > >
-> >Essentially we turned blockid into skb metadata. A user specifying
-> >configuration of a different blockid is certainly useful. My point is
-> >we can have both worlds: when such a user config is missing we'll
-> >assume a default which happens to be in the skb.
 > >
-> >>
-> >> >just because, well, all other actions are using one or more config;->
-> >> >Your suggestion to specify an extra config to select a block - which
-> >> >may be different than the one the one packet on - is a useful
-> >> >feature(it just adds more code) but really should be optional. i.e if
-> >> >you dont specify a block id configuration then we pick the metadata
-> >> >one.
-> >>
-> >> My primary point is, this should be mirred redirect to block instead o=
-f
-> >> what we currently have only for dev. That's it.
+> > On 9/12/23 09:39, Jason Wang wrote:
+> > > On Tue, Sep 12, 2023 at 11:00=E2=80=AFAM Cindy Lu <lulu@redhat.com> w=
+rote:
+> > >>
+> > >> In VDUSE_VQ_GET_INFO, the driver will sync the last_avail_idx
+> > >> with reconnect info, After mapping the reconnect pages to userspace
+> > >> The userspace App will update the reconnect_time in
+> > >> struct vhost_reconnect_vring, If this is not 0 then it means this
+> > >> vq is reconnected and will update the last_avail_idx
+> > >>
+> > >> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > >> ---
+> > >>   drivers/vdpa/vdpa_user/vduse_dev.c | 13 +++++++++++++
+> > >>   include/uapi/linux/vduse.h         |  6 ++++++
+> > >>   2 files changed, 19 insertions(+)
+> > >>
+> > >> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_=
+user/vduse_dev.c
+> > >> index 2c69f4004a6e..680b23dbdde2 100644
+> > >> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > >> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > >> @@ -1221,6 +1221,8 @@ static long vduse_dev_ioctl(struct file *file,=
+ unsigned int cmd,
+> > >>                  struct vduse_vq_info vq_info;
+> > >>                  struct vduse_virtqueue *vq;
+> > >>                  u32 index;
+> > >> +               struct vdpa_reconnect_info *area;
+> > >> +               struct vhost_reconnect_vring *vq_reconnect;
+> > >>
+> > >>                  ret =3D -EFAULT;
+> > >>                  if (copy_from_user(&vq_info, argp, sizeof(vq_info))=
+)
+> > >> @@ -1252,6 +1254,17 @@ static long vduse_dev_ioctl(struct file *file=
+, unsigned int cmd,
+> > >>
+> > >>                  vq_info.ready =3D vq->ready;
+> > >>
+> > >> +               area =3D &vq->reconnect_info;
+> > >> +
+> > >> +               vq_reconnect =3D (struct vhost_reconnect_vring *)are=
+a->vaddr;
+> > >> +               /*check if the vq is reconnect, if yes then update t=
+he last_avail_idx*/
+> > >> +               if ((vq_reconnect->last_avail_idx !=3D
+> > >> +                    vq_info.split.avail_index) &&
+> > >> +                   (vq_reconnect->reconnect_time !=3D 0)) {
+> > >> +                       vq_info.split.avail_index =3D
+> > >> +                               vq_reconnect->last_avail_idx;
+> > >> +               }
+> > >> +
+> > >>                  ret =3D -EFAULT;
+> > >>                  if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
+> > >>                          break;
+> > >> diff --git a/include/uapi/linux/vduse.h b/include/uapi/linux/vduse.h
+> > >> index 11bd48c72c6c..d585425803fd 100644
+> > >> --- a/include/uapi/linux/vduse.h
+> > >> +++ b/include/uapi/linux/vduse.h
+> > >> @@ -350,4 +350,10 @@ struct vduse_dev_response {
+> > >>          };
+> > >>   };
+> > >>
+> > >> +struct vhost_reconnect_vring {
+> > >> +       __u16 reconnect_time;
+> > >> +       __u16 last_avail_idx;
+> > >> +       _Bool avail_wrap_counter;
+> > >
+> > > Please add a comment for each field.
+> > >
+> > > And I never saw _Bool is used in uapi before, maybe it's better to
+> > > pack it with last_avail_idx into a __u32.
 > >
-> >Agreed (and such a feature should be added regardless of this action).
-> >The tc block provides a simple abstraction, but do you think it is
-> >enough? Alternative is to use a list of ports given to mirred: it
-> >allows us to group ports from different tc blocks or even just a
-> >subset of what is in a tc block - but it will require a lot more code
-> >to express such functionality.
+> > Better as two distincts __u16 IMHO.
 >
-> Again, you attach filter to either dev or block. If you extend mirred
-> redirect to accept the same 2 types of target, I think it would be best.
+> Fine with me.
 >
-
-We are going to make block work with mirror, it makes sense. I am not
-sure about the redirect, what is the semantic? mirror to everyone but
-redirect to the last one?
-
->
-> >
-> >>
-> >>
-> >> >
-> >> >> >If we can adequately cleanup mirred,  then we can put it there but
-> >> >> >certainly now we are adding more buttons to click on mirred. It ma=
-y
-> >> >> >make sense to refactor the mirred code then reuse the refactored c=
-ode
-> >> >> >in a new action.
-> >> >>
-> >> >> I don't understand why you need any new action. mirred redirect to =
-block
-> >> >> instead of dev is exactly what you need. Isn't it?
-> >> >
-> >> >The actions have different meanings and lumping them together then
-> >> >selecting via a knob is not the right approach.
-> >> >There's shared code for sure. Infact the sending code was ripped from
-> >> >mirred so as not to touch the rest because like i said mirred has
-> >> >since grown a couple of horns and tails. In retrospect mirred should
-> >> >have been two actions with shared code - but it is too late to change
-> >> >now because it is very widely used. If someone like me was afraid of
-> >> >touching it is because there's a maintainance challenge. I consider i=
-t
-> >> >in the same zone as trying to restructure something in the skb.
-> >> >I agree mirroring to a group of ports with a simple config is a usefu=
-l
-> >> >feature. Mirroring to a group via a tc block is simpler but adding a
-> >> >list of ports instead is more powerful. So this feature is useful to
-> >> >have in mirred - just the adding of yet one more button to say "skip
-> >> >this port" is my concern.
-> >>
-> >> Why? Perhaps skb->iif could be used for check in the tx iteration.
-> >>
-> >
-> >We use skb->dev->ifindex to find the exception. Is iif better?.
->
-> iif contains ifindex of the actual ingress device. So if the netdev is
-> part of bond for example, this still contains the original ifindex.
-> So I buess that this depends on what you need. Looks to me that
-> skb->dev->ifindex would be probaly better. It contains the netdev that
-> the filter is attached on, right?
+> Thanks
 >
 
-Note: you can use mirred to redirect to either ingress or egress of
-other ports - I believe one of these ifindices changes to reflect the
-new ifindex. We'll take a closer look.
-
->
-> >Jiri - but why does this have to be part of mirred::mirror? I am
-> >asking the same question of why mirror and redirect have to be part
-> >mirred instead of separate actions.
->
-> You have to maintain the backwards compatibility. Currently mirred is
-> one action right? Does not matter how you do it in kernel, user should
-> not tell any difference.
-
-I dont mean to break existing mirred. What i meant was in retrospect i
-wish i had the insight to separate mirred into two actions(and share
-the code instead), it would have simplified the code and its
-maintainance. It is for the same reason i am not in favor of is adding
-the "skip this port" in mirror. This is in the spirit of unix
-philosophy, which we have been mostly adhering to: write small
-features/actions which do one thing well and stitch them together to
-compose.
-
-cheers,
-jamal
->
+sure will fix  this
+Thanks
+Cindy
 > >
-> >cheers,
-> >jamal
+> > Thanks,
+> > Maxime
+> >
+> > >
+> > > Btw, do we need to track inflight descriptors as well?
+> > >
+> > > Thanks
+> > >
+> > >> +};
+> > >> +
+> > >>   #endif /* _UAPI_VDUSE_H_ */
+> > >> --
+> > >> 2.34.3
+> > >>
+> > >
+> >
+>
+
 
