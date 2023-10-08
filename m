@@ -1,70 +1,78 @@
-Return-Path: <netdev+bounces-38869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74FA17BCCBB
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:30:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA177BCCC1
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95CBC1C208CC
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 06:30:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7093E1C20863
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 06:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19AD15D1;
-	Sun,  8 Oct 2023 06:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 618D21864;
+	Sun,  8 Oct 2023 06:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="he2iJUnZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQf8pOqq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF09F881F
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 06:30:50 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F8A6D6
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 23:30:48 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5a4e29928c3so42901307b3.1
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 23:30:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3376015D1
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 06:36:12 +0000 (UTC)
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E01D8;
+	Sat,  7 Oct 2023 23:36:10 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-59f6041395dso43622857b3.1;
+        Sat, 07 Oct 2023 23:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696746647; x=1697351447; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696746969; x=1697351769; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DckoAtf8/2zr94zYIuCUUFNBHI0b/baWJy40NnU6w/8=;
-        b=he2iJUnZuS+K85MgzcbgRazccybMWIj1Bv7MqZi407yksdl1XCvtOfj0qCtLgkqgDa
-         e96w4idjc4c1z/qoAqXxn5TLKzIJXJosvbcO8qwFgmyqiIGe69pflj5oFwTgMZXyMSTx
-         xTZkA9shsikjqxBRrjcv1JVFvI1W17fMt7PFQxj5bQ+2P1rR4ajbVzvEjzPq0xtMRqUu
-         kl/UgTmK2KKYNUi5IBp2xzni/GtCtpw2gmC4oXXnKGc/fgfOti3VqqV6ZZrszOikPB6x
-         AwVCGL9pQubZ+JnwE0zUH5E6uiRTr2W9NpYAMZ7QtUCAsz9X/GEpuGeGv0F0L1GZX4B+
-         4/Iw==
+        bh=2ZcY7LYYHgfRnAS6/MqMsfJ+TF7feUNbMBV189+9vhw=;
+        b=lQf8pOqqkS4ogvG3Gp+spCu/gpuKlECHRalNJsJZaAopomI9pCJjj7zOAXfibmsAcB
+         k9C8xFsxaNG/rMKMjIoHkz2XnE9HZv7kJVm3Hhm2qUYcm1u/8zqlf9YpmfCPoB5cXbmU
+         LJcRVn0J5ZCbQXnKlaR6Kkx2I9bugr8sjfCkv1XSawcNqC9u/1T5uVPgWE4BRbP3OpWZ
+         WNpCz1cOmr8CHK/h/O/IixUWVohOYT76CG+z87CqQ+uZPhpeLEZ4zvgyMLVxiE2pvejf
+         qxtpyTHoplHlXPmY1RZGGWu3YzFP0wPNalyw9BlSI7bsQvI3NLGeYEiX60FUX9Y9xamE
+         hvAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696746647; x=1697351447;
+        d=1e100.net; s=20230601; t=1696746969; x=1697351769;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DckoAtf8/2zr94zYIuCUUFNBHI0b/baWJy40NnU6w/8=;
-        b=J0E+YqGHWUzEEb0tAjULETiizg2Pl30nQFYWcVbm2AdPtxGUtW2I3NkqcnmjhrwmPa
-         F4cMGUX21Okdhq4B+BzJwHvzH70DitaFAansw2JSE227MBELcjOTmyA0zx5lBaS+c5yC
-         BZLXlMFvU+N/07b/C/JGiblc0oHf97jKnvOf+4NjDKy36S5JZx83k3WrJnY+ql5NUsaD
-         9hcTvN0fdgL0MxjxLTwGjv/jlH1trSnKfYI51tTnYBn2lEvBNFdN2XyAXZlDx3oqkyxo
-         m70yLK86bxEsI0deasnWT7M6qekcGpJQC5QkX6fQBDAbgmhNyv8cRvREBNm0E3FKfVcC
-         qhcQ==
-X-Gm-Message-State: AOJu0YyXRvIn4mgFa7e1MXdFrcUhp5pi2XNW2C1s6DCqnhUD2DzjlDRw
-	So1V5OxvVLPOY7t46XZ2yUlUIwUqKRNXuA==
-X-Google-Smtp-Source: AGHT+IHKiymLFvecEP4SiEiD36rY4j2YZtXfpA8NRNLFD+kGAzpFBmWp+zI+I+bHEqwa+A3q+PlGRg==
-X-Received: by 2002:a0d:cbc9:0:b0:59c:bab:eb4f with SMTP id n192-20020a0dcbc9000000b0059c0babeb4fmr11929432ywd.16.1696746647364;
-        Sat, 07 Oct 2023 23:30:47 -0700 (PDT)
+        bh=2ZcY7LYYHgfRnAS6/MqMsfJ+TF7feUNbMBV189+9vhw=;
+        b=Iezgk/GmJDawQSbsjvS2+U8ni1EjyI3L+MC7c6dczDGrCRwNwtTAHyRBqzAcWQ67fA
+         rlKEuGuj9OUv21QD6JEv+WQhG8mvggR9Ft2jM4rxlzJRJwJFahbb0gFJRIRR5UjC15V6
+         bwY8/ep9C6tbtEJob4gyHZUNylcoTuwnP3tskaiAY+FJVHN7bnG6yiKCwmO/jmic694m
+         Ct1J44ZqQElhGTqqDAZ6R8DDFvB/X7Y3JSkySxdXOr8HcPpNZGU1VTNU3ZRuJmGYJsrA
+         7ySOHOfGLYQa79Jj0f2yLiFTJeDs4NRYnm2emxQXrWtFODN59QTGWTvOtbEisfrPC33a
+         oSFg==
+X-Gm-Message-State: AOJu0YwidSgU/2nlSWCjngL0unpDaTtQQQ1UCjXTqd4u99/qvhP4pi0U
+	Z/EGjrRZi7KmTs6OVA0O6ng=
+X-Google-Smtp-Source: AGHT+IE+oXMPVuBZmST15ZL+Vl9YSp/yrk8QAaLaSC7UDJUPbeoCczAYRb5b2LLP6zEEAQ+7h2W7zw==
+X-Received: by 2002:a81:7cd6:0:b0:59b:6c4:b822 with SMTP id x205-20020a817cd6000000b0059b06c4b822mr13517377ywc.36.1696746968956;
+        Sat, 07 Oct 2023 23:36:08 -0700 (PDT)
 Received: from ocxma-dut.. ([153.126.233.61])
-        by smtp.gmail.com with ESMTPSA id y134-20020a81a18c000000b0059f650f46b2sm2646691ywg.7.2023.10.07.23.30.45
+        by smtp.gmail.com with ESMTPSA id y76-20020a0dd64f000000b0058c668e46cbsm2661460ywd.46.2023.10.07.23.36.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Oct 2023 23:30:47 -0700 (PDT)
+        Sat, 07 Oct 2023 23:36:08 -0700 (PDT)
 From: Takeru Hayasaka <hayatake396@gmail.com>
 X-Google-Original-From: Takeru Hayasaka <t-hayasaka@bbsakura.net>
-To: netdev@vger.kernel.org
-Cc: mkubecek@suse.cz,
-	Takeru Hayasaka <hayatake396@gmail.com>
-Subject: [PATCH net-next v2] ethtool: add support for rx-flow-hash gtp
-Date: Sun,  8 Oct 2023 06:30:41 +0000
-Message-Id: <20231008063041.61709-1-t-hayasaka@bbsakura.net>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Takeru Hayasaka <hayatake396@gmail.com>,
+	Takeru Hayasaka <t-hayasaka@bbsakura.net>
+Subject: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP from ethtool
+Date: Sun,  8 Oct 2023 06:36:01 +0000
+Message-Id: <20231008063601.61674-1-t-hayasaka@bbsakura.net>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -82,130 +90,314 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Takeru Hayasaka <hayatake396@gmail.com>
 
-GTP Flow hash was added to the ice driver.
-By executing "ethtool -N <dev> rx-flow-hash gtp4 sd", RSS can include
-not only the IP's src/dst but also the TEID of GTP packets.
-Additionally, options [c|e] have been support.
-These allow specification to include GTPv2-C cases as well as the
-Extension Header's QFI in the hash computation.
+This is a patch that enables RSS functionality for GTP packets using
+ethtool.
+A user can include her TEID and make RSS work for GTP-U over IPv4 by
+doing the following:
+`ethtool -N ens3 rx-flow-hash gtpu4 sd`
+In addition to gtpu(4|6), we now support gtpc(4|6), gtpu(4|6)e,
+gtpu(4|6)u, and gtpu(4|6)d.
 
-Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
+Signed-off-by: Takeru Hayasaka <t-hayasaka@bbsakura.net>
 ---
-While implementing it, I found that I was using the wrong parameters for
-ethtool rx-hash-flow, so I fixed it.
+Hi mentainers.
 
- ethtool.c            | 58 +++++++++++++++++++++++++++++++++++++++++---
- uapi/linux/ethtool.h | 10 ++++++++
- 2 files changed, 64 insertions(+), 4 deletions(-)
+I wrote a patch to enable RSS for GTP-U/C (+Exthdr) using ethtool.
+This is an advantage for users who use Linux on mobile networks.
 
-diff --git a/ethtool.c b/ethtool.c
-index af51220..5325299 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -360,6 +360,16 @@ static int rxflow_str_to_type(const char *str)
- 		flow_type = AH_ESP_V4_FLOW;
- 	else if (!strcmp(str, "sctp4"))
- 		flow_type = SCTP_V4_FLOW;
-+	else if (!strcmp(str, "gtpc4"))
-+		flow_type = GTPC_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4"))
-+		flow_type = GTPU_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4e"))
-+		flow_type = GTPU_EH_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4u"))
-+		flow_type = GTPU_UL_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4d"))
-+		flow_type = GTPU_DL_V4_FLOW;
- 	else if (!strcmp(str, "tcp6"))
- 		flow_type = TCP_V6_FLOW;
- 	else if (!strcmp(str, "udp6"))
-@@ -370,6 +380,16 @@ static int rxflow_str_to_type(const char *str)
- 		flow_type = SCTP_V6_FLOW;
- 	else if (!strcmp(str, "ether"))
- 		flow_type = ETHER_FLOW;
-+	else if (!strcmp(str, "gtpc6"))
-+		flow_type = GTPC_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6"))
-+		flow_type = GTPU_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6e"))
-+		flow_type = GTPU_EH_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6u"))
-+		flow_type = GTPU_UL_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6d"))
-+		flow_type = GTPU_DL_V6_FLOW;
- 
- 	return flow_type;
- }
-@@ -1559,6 +1579,21 @@ static int dump_rxfhash(int fhash, u64 val)
+Here is the ethtool patch
+cf. https://lore.kernel.org/netdev/20231008063041.61709-1-t-hayasaka@bbsakura.net/T/#u
+
+Thank you.
+
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 98 +++++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_flow.h    | 15 +++
+ drivers/net/ethernet/intel/ice/ice_lib.c     | 70 ++++++++++++++
+ include/uapi/linux/ethtool.h                 | 10 ++
+ 4 files changed, 191 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index ad4d4702129f..a5ee6638bc60 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -2404,6 +2404,21 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
  	case SCTP_V4_FLOW:
- 		fprintf(stdout, "SCTP over IPV4 flows");
+ 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV4;
  		break;
-+	case GTPC_V4_FLOW:
-+		fprintf(stdout, "GTP-C over IPV4 flows");
-+		break;
 +	case GTPU_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4;
++		break;
++	case GTPC_V4_FLOW:
++		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4;
 +		break;
 +	case GTPU_EH_V4_FLOW:
-+		fprintf(stdout, "GTP-U and Extension Header over IPV4 flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4;
 +		break;
 +	case GTPU_UL_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 Uplink flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4;
 +		break;
 +	case GTPU_DL_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 Downlink flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4;
 +		break;
- 	case AH_ESP_V4_FLOW:
- 	case AH_V4_FLOW:
- 	case ESP_V4_FLOW:
-@@ -1573,6 +1608,21 @@ static int dump_rxfhash(int fhash, u64 val)
- 	case SCTP_V6_FLOW:
- 		fprintf(stdout, "SCTP over IPV6 flows");
+ 	case TCP_V6_FLOW:
+ 		hdrs |= ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6;
  		break;
-+	case GTPC_V6_FLOW:
-+		fprintf(stdout, "GTP-C over IPV6 flows");
-+		break;
+@@ -2413,9 +2428,25 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
+ 	case SCTP_V6_FLOW:
+ 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV6;
+ 		break;
 +	case GTPU_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6;
++		break;
++	case GTPC_V6_FLOW:
++		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6;
 +		break;
 +	case GTPU_EH_V6_FLOW:
-+		fprintf(stdout, "GTP-U and Extension Header over IPV6 flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6;
 +		break;
 +	case GTPU_UL_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 Uplink flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6;
 +		break;
 +	case GTPU_DL_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 Downlink flows");
++		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6;
 +		break;
- 	case AH_ESP_V6_FLOW:
- 	case AH_V6_FLOW:
- 	case ESP_V6_FLOW:
-@@ -5832,16 +5882,16 @@ static const struct option args[] = {
- 		.opts	= "-n|-u|--show-nfc|--show-ntuple",
- 		.func	= do_grxclass,
- 		.help	= "Show Rx network flow classification options or rules",
--		.xhelp	= "		[ rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|"
--			  "tcp6|udp6|ah6|esp6|sctp6 [context %d] |\n"
-+		.xhelp	= "		[ rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|gtp4|"
-+			  "tcp6|udp6|ah6|esp6|sctp6|gtp6 [context %d] |\n"
- 			  "		  rule %d ]\n"
- 	},
- 	{
- 		.opts	= "-N|-U|--config-nfc|--config-ntuple",
- 		.func	= do_srxclass,
- 		.help	= "Configure Rx network flow classification options or rules",
--		.xhelp	= "		rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|"
--			  "tcp6|udp6|ah6|esp6|sctp6 m|v|t|s|d|f|n|r... [context %d] |\n"
-+		.xhelp	= "		rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|gtp4|"
-+			  "tcp6|udp6|ah6|esp6|sctp6|gtp6 m|v|t|s|d|f|n|r|c|e|u|w... [context %d] |\n"
- 			  "		flow-type ether|ip4|tcp4|udp4|sctp4|ah4|esp4|"
- 			  "ip6|tcp6|udp6|ah6|esp6|sctp6\n"
- 			  "			[ src %x:%x:%x:%x:%x:%x [m %x:%x:%x:%x:%x:%x] ]\n"
-diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
-index 1d0731b..768fe8c 100644
---- a/uapi/linux/ethtool.h
-+++ b/uapi/linux/ethtool.h
-@@ -2009,6 +2009,16 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
+ 	default:
+ 		break;
+ 	}
++
+ 	return hdrs;
+ }
+ 
+@@ -2431,6 +2462,12 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
+ 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_SRC_PORT)
+ #define ICE_FLOW_HASH_FLD_SCTP_DST_PORT	\
+ 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_DST_PORT)
++#define ICE_FLOW_HASH_FLD_GTPC_TEID	BIT_ULL(ICE_FLOW_FIELD_IDX_GTPC_TEID)
++#define ICE_FLOW_HASH_FLD_GTPU_IP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_IP_TEID)
++#define ICE_FLOW_HASH_FLD_GTPU_EH_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_TEID)
++#define ICE_FLOW_HASH_FLD_GTPU_EH_QFI BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_QFI)
++#define ICE_FLOW_HASH_FLD_GTPU_UP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID)
++#define ICE_FLOW_HASH_FLD_GTPU_DWN_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID)
+ 
+ /**
+  * ice_parse_hash_flds - parses hash fields from RSS hash input
+@@ -2448,6 +2485,11 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
+ 		case TCP_V4_FLOW:
+ 		case UDP_V4_FLOW:
+ 		case SCTP_V4_FLOW:
++		case GTPU_V4_FLOW:
++		case GTPC_V4_FLOW:
++		case GTPU_EH_V4_FLOW:
++		case GTPU_UL_V4_FLOW:
++		case GTPU_DL_V4_FLOW:
+ 			if (nfc->data & RXH_IP_SRC)
+ 				hfld |= ICE_FLOW_HASH_FLD_IPV4_SA;
+ 			if (nfc->data & RXH_IP_DST)
+@@ -2456,6 +2498,11 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
+ 		case TCP_V6_FLOW:
+ 		case UDP_V6_FLOW:
+ 		case SCTP_V6_FLOW:
++		case GTPU_V6_FLOW:
++		case GTPC_V6_FLOW:
++		case GTPU_EH_V6_FLOW:
++		case GTPU_UL_V6_FLOW:
++		case GTPU_DL_V6_FLOW:
+ 			if (nfc->data & RXH_IP_SRC)
+ 				hfld |= ICE_FLOW_HASH_FLD_IPV6_SA;
+ 			if (nfc->data & RXH_IP_DST)
+@@ -2489,11 +2536,50 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
+ 			if (nfc->data & RXH_L4_B_2_3)
+ 				hfld |= ICE_FLOW_HASH_FLD_SCTP_DST_PORT;
+ 			break;
++		case GTPU_V4_FLOW:
++		case GTPU_V6_FLOW:
++		case GTPU_EH_V4_FLOW:
++		case GTPU_EH_V6_FLOW:
++		case GTPU_UL_V4_FLOW:
++		case GTPU_UL_V6_FLOW:
++		case GTPU_DL_V4_FLOW:
++		case GTPU_DL_V6_FLOW:
++			if (nfc->data & RXH_L4_B_0_1)
++				hfld |= ICE_FLOW_HASH_FLD_TCP_SRC_PORT |
++						ICE_FLOW_HASH_FLD_UDP_SRC_PORT;
++			if (nfc->data & RXH_L4_B_2_3)
++				hfld |= ICE_FLOW_HASH_FLD_TCP_DST_PORT |
++						ICE_FLOW_HASH_FLD_UDP_DST_PORT;
++			break;
+ 		default:
+ 			break;
+ 		}
+ 	}
+ 
++	switch (nfc->flow_type) {
++	case GTPC_V4_FLOW:
++	case GTPC_V6_FLOW:
++		hfld |= ICE_FLOW_HASH_FLD_GTPC_TEID;
++		break;
++	case GTPU_V4_FLOW:
++	case GTPU_V6_FLOW:
++		hfld |= ICE_FLOW_HASH_FLD_GTPU_IP_TEID;
++		break;
++	case GTPU_EH_V4_FLOW:
++	case GTPU_EH_V6_FLOW:
++		hfld |= ICE_FLOW_HASH_FLD_GTPU_EH_TEID;
++		break;
++	case GTPU_UL_V4_FLOW:
++	case GTPU_UL_V6_FLOW:
++		hfld |= ICE_FLOW_HASH_FLD_GTPU_UP_TEID;
++		break;
++	case GTPU_DL_V4_FLOW:
++	case GTPU_DL_V6_FLOW:
++		hfld |= ICE_FLOW_HASH_FLD_GTPU_DWN_TEID;
++		break;
++	default:
++		break;
++	}
+ 	return hfld;
+ }
+ 
+@@ -2590,12 +2676,20 @@ ice_get_rss_hash_opt(struct ice_vsi *vsi, struct ethtool_rxnfc *nfc)
+ 
+ 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_SRC_PORT ||
+ 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_SRC_PORT ||
+-	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT)
++	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
+ 		nfc->data |= (u64)RXH_L4_B_0_1;
+ 
+ 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_DST_PORT ||
+ 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_DST_PORT ||
+-	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT)
++	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
++		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
+ 		nfc->data |= (u64)RXH_L4_B_2_3;
+ }
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
+index b465d27d9b80..7ddf6ce994e7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_flow.h
++++ b/drivers/net/ethernet/intel/ice/ice_flow.h
+@@ -64,6 +64,21 @@
+ 	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_EH_TEID | \
+ 	 ICE_FLOW_HASH_GTP_U_EH_QFI)
+ 
++#define ICE_FLOW_HASH_GTP_U_UP_TEID \
++	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID))
++#define ICE_FLOW_HASH_GTP_U_DWN_TEID \
++	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID))
++
++#define ICE_FLOW_HASH_GTP_U_IPV4_UP \
++	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_UP_TEID)
++#define ICE_FLOW_HASH_GTP_U_IPV6_UP \
++	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_UP_TEID)
++
++#define ICE_FLOW_HASH_GTP_U_IPV4_DWN \
++	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
++#define ICE_FLOW_HASH_GTP_U_IPV6_DWN \
++	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
++
+ #define ICE_FLOW_HASH_PPPOE_SESS_ID \
+ 	(BIT_ULL(ICE_FLOW_FIELD_IDX_PPPOE_SESS_ID))
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 201570cd2e0b..a9664b48eddb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -1667,6 +1667,41 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
+ 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp4 flow, vsi = %d, error = %d\n",
+ 			vsi_num, status);
+ 
++	/* configure RSS for gtpc4 with input set IPv4 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV4_TEID,
++				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc4 flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu4 with input set IPv4 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_TEID,
++				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu4e with input set IPv4 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_EH,
++				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4e flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu4u with input set IPv4 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_UP,
++				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4u flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu4d with input set IPv4 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_DWN,
++				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
+ 	/* configure RSS for tcp6 with input set IPv6 src/dst, TCP src/dst */
+ 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_HASH_TCP_IPV6,
+ 				 ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6);
+@@ -1688,6 +1723,41 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
+ 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp6 flow, vsi = %d, error = %d\n",
+ 			vsi_num, status);
+ 
++	/* configure RSS for gtpc6 with input set IPv6 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV6_TEID,
++				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc6 flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu6 with input set IPv6 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_TEID,
++				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu6e with input set IPv6 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_EH,
++				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6e flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu6u with input set IPv6 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_UP,
++				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6u flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
++	/* configure RSS for gtpu6d with input set IPv6 src/dst */
++	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_DWN,
++				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6);
++	if (status)
++		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
++			vsi_num, status);
++
+ 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_ESP_SPI,
+ 				 ICE_FLOW_SEG_HDR_ESP);
+ 	if (status)
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index f7fba0dc87e5..f3af2a78f7dd 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -2011,6 +2011,16 @@ static inline int ethtool_validate_duplex(__u8 duplex)
  #define	IPV4_FLOW	0x10	/* hash only */
  #define	IPV6_FLOW	0x11	/* hash only */
  #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
