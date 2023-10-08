@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-38859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F34747BCC70
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:41:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 954167BCC83
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 231331C208D1
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 05:41:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54CDC28198C
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 06:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5B2442F;
-	Sun,  8 Oct 2023 05:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCB35380;
+	Sun,  8 Oct 2023 06:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="nzLnkJsF"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="iFaU5ccu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E64817F3
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 05:41:17 +0000 (UTC)
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5094B6
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 22:41:15 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-d81dd7d76e0so4083119276.1
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 22:41:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB394522F
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 06:07:58 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE970C5
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 23:07:56 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-59f82ad1e09so43767047b3.0
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 23:07:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1696743675; x=1697348475; darn=vger.kernel.org;
+        d=umich.edu; s=google-2016-06-03; t=1696745276; x=1697350076; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mCb4+UxH6VOx93WA8wa+Sb6s6TIg+WvR43TpytW6CYo=;
-        b=nzLnkJsF9VcVb2smT8/0i6FNDtEwwtbsv6GJ73++0BgDhLv51UKndPJRWZBj6+UkRY
-         YM37uNiYzUobsdEY9p91fX3epzXxg+SQafrN0tZ9em5gcCzz6VtucNwpXmHQMkctsAbA
-         fcj6WbrY4TDIrFNZBc2InQjCjyEKDYXZtPGh996fJiWuENakMX0cyQW6rZUT96mVK4Ti
-         CfNGSr1cITJ/Awg88R68v0QtayYvv+Sf9AyZ5OJVvXc6pCpBWJsad2Jy8p6HFA88qCw9
-         L7GRMN4Kvw+v8qf/1nfZ2QTE3qCFBhAtZF3T1yL9Y6iYOIeEDajIE6vkbl+dg+gmiLLM
-         W3YA==
+        bh=Fxqx667kBWfkjF2qFi33yc23pvm6KglFMRleGmFUdZk=;
+        b=iFaU5ccuxSc52/07eMZt4dwDW0MzOHN1W1ZTojFb4jes+vSTt564qBw6deCx7V4Bxj
+         6P2Dzb8nSmlUIc7cGik5pl94DzJLbSMI65iwfTsnLXMujDMiH/BKSUXmnbO8+pYKJuSc
+         TS/RUNo2sb26k4+uoG++7F7VlDnmQJ9smaIEC1FeuJUsh4NFQyVtvSjhFV56hva5xOHq
+         CI/7R7Rws2Ki203KNKQXjAugZT6p6gLF9EPebueOCva42iiLm6SRMo+IrrC7PfkdJYhg
+         xvZxhlFhKsmxJC5Zlk+axt0cwIaWQx8ozDEuLUvVZWttY78KHUoD25lKiyHCXJzNxD+G
+         6FHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696743675; x=1697348475;
+        d=1e100.net; s=20230601; t=1696745276; x=1697350076;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mCb4+UxH6VOx93WA8wa+Sb6s6TIg+WvR43TpytW6CYo=;
-        b=IxzxumEBlxFJTibFd8z3Oe7hWQXCjeUhjYkRqZZd8pFcpiu2Ed2vYZdwyMrBV2H+/y
-         Nb0PdO7VApHo2MJS5O3J1Ta0aA3tKZqw600BsTp7k0d0IYBjZvuTA4bqYzg6iSCkaOKk
-         1clrcCw6KLFkBA4FHfSBB0q/LA3q4XxFvSZxyTDQ9Ix+G6cZuNPCXqpFyPgwMr4QwV5l
-         Vi0pc8KsnDpp1D5a+BH5Vhns1/q50b1slUc9cCYw8pvNYIwYquQZszBudRpodF6oFtWF
-         O/5mL6TNAsxoruEALJRFdHbe3r3kfi0GmgDP4ZjmbCwfPQmqICl6VY7cMr8qBNQMsrn6
-         H3Pw==
-X-Gm-Message-State: AOJu0YxlNNmdxwulbJaO+h4RDwtBYZBW1SbJ1CY+YhXO0U0RZ/1nH0sM
-	9tKaOB+VFIbbt/9/W3Is63g1TIAcMi/MEDuWphj38Q==
-X-Google-Smtp-Source: AGHT+IG7CAHeV343kwOXw+s1arT79L8yQuwHXEmqFvrnHVrMxPcTGVs2/R5kuaWpladeD6jWZz3JodNt1cWKhnI27Gg=
-X-Received: by 2002:a81:8491:0:b0:59f:4e6d:b569 with SMTP id
- u139-20020a818491000000b0059f4e6db569mr13248266ywf.4.1696743674934; Sat, 07
- Oct 2023 22:41:14 -0700 (PDT)
+        bh=Fxqx667kBWfkjF2qFi33yc23pvm6KglFMRleGmFUdZk=;
+        b=xA6KWwpwpI23ErBiJGDzVvpUnuuA4BPABaCgDw4Ca4OK5np8RHQCuIqXHvY5onY8B1
+         K2Tnf46OatwLYkrXcQBSiOZP4uYcDcjAEn5zKbHhdVUHI58Ns5AoRulAJE3sWrCgYBuY
+         HkYd+yy7vWK/unvL0bNR6GW7dUL1N+dJqDzC+AF+LoOnGrt6ylAseFlmW5uaKkCYgiWG
+         T9TNLew3HVzmF2MUiRClnpfNTYK1t+xBW3Ccg+pGr5TMbAwQYeiD7FA0Oop2JoLsjIMc
+         VjaSVCNP7dsKO4FPoKGFepNvPs27HgN1xrcNjsasQHDl6Pf6EFGfCk0Io7GrEcKb1GrP
+         gNAg==
+X-Gm-Message-State: AOJu0Yyv7I1chXeshLC5Cv4ZY0S5CSqzhr7LkHQp/ICa64k2MamHucPO
+	JlAOp30EYbc+S9MWgQKWS1JTlBRnqXxTzIOhuWAR+w==
+X-Google-Smtp-Source: AGHT+IHnZjv1L+yTcIOxYDaalcI/MuZQ9D4pB9+JjwoSVbPY1u0GNT4LSDy25FqIlJV9ve7JzC3c6uZqWTMqhDzfHEQ=
+X-Received: by 2002:a0d:f387:0:b0:589:c065:b419 with SMTP id
+ c129-20020a0df387000000b00589c065b419mr14486211ywf.34.1696745276185; Sat, 07
+ Oct 2023 23:07:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,11 +63,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
  <20231006094911.3305152-2-fujita.tomonori@gmail.com> <CALNs47sdj2onJS3wFUVoONYL_nEgT+PTLTVuMLcmE6W6JgZAXA@mail.gmail.com>
- <96800001-5d19-4b48-b43e-0cfbeccb48c1@lunn.ch>
-In-Reply-To: <96800001-5d19-4b48-b43e-0cfbeccb48c1@lunn.ch>
+ <7edb5c43-f17b-4352-8c93-ae5bb9a54412@lunn.ch>
+In-Reply-To: <7edb5c43-f17b-4352-8c93-ae5bb9a54412@lunn.ch>
 From: Trevor Gross <tmgross@umich.edu>
-Date: Sun, 8 Oct 2023 01:41:02 -0400
-Message-ID: <CALNs47s0bpyL1Zo9VmXcyG2X1SKLB3WZdrG+OOCfWi_uQUiYjA@mail.gmail.com>
+Date: Sun, 8 Oct 2023 02:07:44 -0400
+Message-ID: <CALNs47ujBcwHG+sgeH3m7gvkW6JKWtD0ZS66ujmswLODuExJhg@mail.gmail.com>
 Subject: Re: [PATCH v2 1/3] rust: core abstractions for network PHY drivers
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
@@ -77,57 +77,88 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Oct 7, 2023 at 10:48=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
-> After reading the thread, we first have a terminology problem. In the
-> kernel world, 'user input' generally means from user space. And user
-> space should never be trusted, but user space should also not be
-> allowed to bring the system to its knees. Return -EINVAL to userspace
-> is the correct thing to do and keep going. Don't do a kernel splat
-> because the user passed 42 as a speed, not 10.
+On Sat, Oct 7, 2023 at 11:13=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > The safety comment here still needs something like
+> >
+> >     with the exception of fields that are synchronized via the `lock` m=
+utex
+>
+> I'm not sure that really adds much useful information. Which values
+> are protected by the lock? More importantly, which are not protected
+> by the lock?
+>
+> As a general rule of thumb, driver writers don't understand
+> locking. Yes, there are some which do, but many don't. So the
+> workaround to that is make it so they don't need to understand
+> locking. All the locking happens in the core.
+>
+> The exception is suspend and resume, which are called without the
+> lock. So if i was to add a comment about locking, i would only put a
+> comment on those two.
 
-Yes, sorry about the terminology. I was indeed referring to a user of
-this function and am still figuring out the failure modes (thanks also
-Greg for the corrections).
+This doesn't get used by driver implementations, it's only used within
+the abstractions here. I think anyone who needs the details can refer
+to the C side, I just suggested to note the locking caveat based on
+your second comment at
+https://lore.kernel.org/rust-for-linux/ec6d8479-f893-4a3f-bf3e-aa0c81c4adad=
+@lunn.ch/
 
-> However, what Trevor was meaning is that whoever called set_speed()
-> passed an invalid value. But what are valid values?
->
-> We have this file which devices the KAPI
-> https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ethtool=
-.h#L1883
->
-> says:
->
-> /* The forced speed, in units of 1Mb. All values 0 to INT_MAX are legal.
->
-> and we also have
->
-> #define SPEED_UNKNOWN           -1
->
-> and there is a handy little helper:
->
-> static inline int ethtool_validate_speed(__u32 speed)
-> {
->         return speed <=3D INT_MAX || speed =3D=3D (__u32)SPEED_UNKNOWN;
-> }
->
-> so if you want to validate speed, call this helper.
->
-> However, this is a kernel driver, and we generally trust kernel
-> drivers. There is not much we can do except trust them. And passing an
-> invalid speed here is very unlikely to cause the kernel to explode
-> sometime later.
->
->    Andrew
+Fujita - since this doesn't get exposed, could this be pub(crate)?)
 
-I didn't mean the suggestion to be a way of handling untrusted input,
-just a means of providing a fallback value with module author feedback
-if something > INT_MAX winds up getting passed somehow.
+> > Andrew, are there any restrictions about calling phy_init_hw more than
+> > once? Or are there certain things that you are not allowed to do until
+> > you call that function?
+>
+> phy_init_hw can be called multiple times. It used by drivers as a work
+> around to broken hardware/firmware to get the device back into a good
+> state. It is also used during resume, since often the PHY looses its
+> settings when suspended.
 
-Agreed that this is more than necessary for such a trivial situation,
-the original is of course fine.
+Great, thank you for the clarification
+
+> > > +    unsafe extern "C" fn read_mmd_callback(
+> > > +        phydev: *mut bindings::phy_device,
+> > > +        devnum: i32,
+> > > +        regnum: u16,
+> > > +    ) -> i32 {
+> > > +        from_result(|| {
+> > > +            // SAFETY: The C API guarantees that `phydev` is valid w=
+hile this function is running.
+> > > +            let dev =3D unsafe { Device::from_raw(phydev) };
+> > > +            let ret =3D T::read_mmd(dev, devnum as u8, regnum)?;
+> > > +            Ok(ret.into())
+> > > +        })
+> > > +    }
+> >
+> > Since your're reading a bus, it probably doesn't hurt to do a quick
+> > check when converting
+> >
+> >     let devnum_u8 =3D u8::try_from(devnum).(|_| {
+> >         warn_once!("devnum {devnum} exceeds u8 limits");
+> >         code::EINVAL
+> >     })?
+>
+> I would actually say this is the wrong place to do that. Such checks
+> should happen in the core, so it checks all drivers, not just the
+> current one Rust driver. Feel free to submit a C patch adding this.
+>
+>         Andrew
+
+I guess it does that already:
+https://elixir.bootlin.com/linux/v6.6-rc4/source/drivers/net/phy/phy-core.c=
+#L556
+
+Fujita, I think we started doing comments when we know that
+lossy/bitwise `as` casts are correct. Maybe just leave the code as-is
+but add
+
+    // CAST: the C side verifies devnum < 32
+
+?
 
