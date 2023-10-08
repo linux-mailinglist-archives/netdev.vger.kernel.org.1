@@ -1,48 +1,45 @@
-Return-Path: <netdev+bounces-38895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20AA7BCEA9
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:59:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB197BCEDD
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 16:09:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C97281765
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:59:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7D91C208D9
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 14:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844CFC8E0;
-	Sun,  8 Oct 2023 13:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B5DD30B;
+	Sun,  8 Oct 2023 14:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LA70vUo6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h8v9ntIo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640A38BF3
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:59:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 391D4C433C8;
-	Sun,  8 Oct 2023 13:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8757C8EA
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 14:09:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88A87C433C8;
+	Sun,  8 Oct 2023 14:09:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696773581;
-	bh=2XNEcD+UIoF1P8CQWuQPztAhTTNKspPsD1DJEKJBTUo=;
+	s=k20201202; t=1696774177;
+	bh=8N7Vu6fE1UJTylpIcqubQbtnPqSDc9vbK19cmandGTQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LA70vUo6tC88H+DsBix5t/sO1Xmyu92IEy+oVfv+BolOrqgFZ3eS87hWrCt5gZ2g4
-	 zFyiQYedsx5YlW4TD6IEWNYRIXHm+azKUlFTUJA3i9SCgMh9wzJ3vZoYjetMPIqZB4
-	 D6CZj4lLN8Lkd5698WfIkC5XE1VykLiDQRY1kTb4ILVMBsxIsNioSteie50z4kwFS7
-	 6Ei0Drq1wQmkyLMxneSBkOzZNuY/7gamewifa/bebrdg5FxkjP1b5FZh/mTTrZkjPE
-	 a+snJ0Vlp2JhE1Psj8FSRy+O4lKY7rzQHElWZi2AouxLB94vA/tHZupOyvnCLM8ab/
-	 ahAG4YJu7kXPQ==
-Date: Sun, 8 Oct 2023 15:59:37 +0200
+	b=h8v9ntIo4lhKIghBZSRBhlYjXsHkQY3sWR2jPYFyw9FdI99M4fFj093QZe5y+QYJl
+	 znMoQDTEZlkmhHZLKC5pCyL+oprcaqZetk+sDbg+0bv4yelyRe6NpgGf+G8FLBUWl6
+	 00gzF9iYydvCzVdiF44VN4otPc+eKoTZu2pzezz+kYx4miTAUROAiobh/71rUjsRbY
+	 LhD36ezyhf7H0APKZNWkK4ir0Ca7Q/E4wPbTqS4iRGkyGl8ZIl4jnfO6Kr0shTYYV0
+	 R8DKmiG170ypeGTN75QVZOito3Ojhj4nawIIVw4ZeCiwFMczeS2lUUa2mZQ25wo7Yi
+	 olsgoxsMr9BGA==
+Date: Sun, 8 Oct 2023 16:09:34 +0200
 From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 0/2] mlxsw: Fix -Wformat-truncation warnings
-Message-ID: <20231008135937.GH831234@kernel.org>
-References: <cover.1696600763.git.petrm@nvidia.com>
+To: Dave Ertman <david.m.ertman@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next] ice: Fix SRIOV LAG disable on non-compliant
+ aggreagate
+Message-ID: <20231008140934.GI831234@kernel.org>
+References: <20231006210211.1443696-1-david.m.ertman@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,23 +48,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1696600763.git.petrm@nvidia.com>
+In-Reply-To: <20231006210211.1443696-1-david.m.ertman@intel.com>
 
-On Fri, Oct 06, 2023 at 04:43:15PM +0200, Petr Machata wrote:
-> Ido Schimmel writes:
+On Fri, Oct 06, 2023 at 02:02:11PM -0700, Dave Ertman wrote:
+> If an attribute of an aggregate interface disqualifies it from supporting
+> SRIOV, the driver will unwind the SRIOV support.  Currently the driver is
+> clearing the feature bit for all interfaces in the aggregate, but this is
+> not allowing the other interfaces to unwind successfully on driver unload.
 > 
-> Commit 6d4ab2e97dcf ("extrawarn: enable format and stringop overflow
-> warnings in W=1") enabled format warnings as part of W=1 builds,
-> resulting in two new warnings in mlxsw. Fix both and target at net-next
-> as the warnings are not indicative of actual bugs.
+> Only clear the feature bit for the interface that is currently unwinding.
 > 
-> Ido Schimmel (2):
->   mlxsw: core_thermal: Fix -Wformat-truncation warning
->   mlxsw: spectrum_ethtool: Fix -Wformat-truncation warning
+> Fixes: bf65da2eb279 ("ice: enforce interface eligibility and add messaging for SRIOV LAG")
+> Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_lag.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+> index 2c96d1883e19..c9071228b1ea 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lag.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+> @@ -1513,17 +1513,12 @@ static void ice_lag_chk_disabled_bond(struct ice_lag *lag, void *ptr)
+>   */
+>  static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
+>  {
+> -	struct ice_lag_netdev_list *entry;
+>  	struct ice_netdev_priv *np;
+> -	struct net_device *netdev;
+>  	struct ice_pf *pf;
+>  
+> -	list_for_each_entry(entry, lag->netdev_head, node) {
+> -		netdev = entry->netdev;
+> -		np = netdev_priv(netdev);
+> -		pf = np->vsi->back;
+> -
+> -		ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
+> +	np = netdev_priv(lag->netdev);
+> +	pf = np->vsi->back;
+> +	ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
+>  	}
+>  }
 
-For series,
+Hi Dave,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
+unfortunately applying this patch results in a build failure.
+
+-- 
+pw-bot: changes-requested
+
 
 
