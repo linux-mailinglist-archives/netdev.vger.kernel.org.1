@@ -1,210 +1,183 @@
-Return-Path: <netdev+bounces-38874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300567BCCF2
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 09:09:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CAA7BCCF8
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 09:11:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55DB2817BB
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82AB72817A1
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4998F7497;
-	Sun,  8 Oct 2023 07:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0F38486;
+	Sun,  8 Oct 2023 07:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F39qHPk5"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="QJvTAWmR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B415D522E
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 07:09:00 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191C3FD
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 00:08:57 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so8142a12.0
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 00:08:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161163205
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 07:11:50 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D918B6
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 00:11:49 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5a22eaafd72so43680417b3.3
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 00:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696748935; x=1697353735; darn=vger.kernel.org;
+        d=umich.edu; s=google-2016-06-03; t=1696749108; x=1697353908; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6boweBsbEPYLh1haUGvUFhb+7tfvWfkGzP1aLPKTUnI=;
-        b=F39qHPk5zk2pyBIKhEM6PcfKPQRqnY9pi/x8dTGkHBXtoFP1RZ9kgEew/bWJahSX7u
-         ijedCeuRSfwz7OjfdCyxdqgtiBIWDVnZ+085y5EzOmOe01pKu/WoqWvlKM610Lf5ihNv
-         BMUgGXOMdVPIH/J4H13eMVDC7AnXJsSP84YgXJgXK+hcNEhDJZUgmt1wUlUZv3PKqkU0
-         g3k1jhh3eNn9QqkZXTNDOqxxoGlKUKZouNkqgcyvOvgTA+tlURIcHSfsmXi4Jc2lAOHi
-         Va+NwqU0sc3x25H3/Yd53hz8MkS+gfLDgULe90K8Q9KqVKkuV57WLP+bSXUphgxnKMpJ
-         4SZg==
+        bh=6SEOXfJA7vzTv4ptNNIVK7Ccy8v0ranMjIXDfq2q8cM=;
+        b=QJvTAWmRMAL84cGrwiVkNfCPYA3D/XTSgEaBx5OE5H4mp55TSrpgYSVURwE/7I9mMX
+         07/u7cIowFhW0U6t4CXf55gL3Npq2JR7Re3sXBjD0cya4diYvwLrzPE88C6TEmFiKltf
+         wHQMeIBHPul0B1KCDwSl3cst2rq/J1MforB0Ei6I+j+ynzIO/cQeVdcWGmISX/wFuqex
+         uTt28TMD+zP/sDcuxjFhiQa4gVK5m/FJN8uhdjxbSf3xdjiE4QeM0npdsmVrrjsdA+aa
+         aBfSmeo0h21NVwcnHC6ghSEMnPhmoqnxoyJcDb1cKDhAvhSkj50kODnxvx/VQGs8MhKx
+         O1ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696748935; x=1697353735;
+        d=1e100.net; s=20230601; t=1696749108; x=1697353908;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6boweBsbEPYLh1haUGvUFhb+7tfvWfkGzP1aLPKTUnI=;
-        b=qaXDDO0nCQ41pnTrzq/4dCXM4uQh7dnbIVgmdKmWVRiN+jXtarJBcXPsOV4xonCyPJ
-         qlveoF8D/hJWt8ZTOvT3pOsw/qaOilOLwV48fcioP20wbiVhJSVyA7elDZdPDKIT+s6Q
-         PWJvBpqg3t+1qUVrUYXHk2CStq1o33bVfrxMv+tUg2PIRXx2tNlQMHzht/bG79EZ7dTO
-         46Nc5u6c02WJ7PUukUtimznLoR6BCEmCa+ir1B3lPJEqVGHlK+RysMH7pmDoIQtNMLNP
-         tWVbqOox6Kw34TT9VGygLb8keTw1ACGJ/GtsEfe02QIxtUjwMf485yueZyG0GbUlZ8+b
-         HhRg==
-X-Gm-Message-State: AOJu0Yxhst+OK0Z79gSX3HwDDcL1lUd0Wx6GmraGA9gQvRMl+M+WTt75
-	EYfpSNU0QDHDYiVMp4lvMnmLkHQSrYSEaIqZS/C72g==
-X-Google-Smtp-Source: AGHT+IEVhxr/hi+K678k9mZTv6OusdxrCYSsJHysJnZbWTvXJuhiZ+72RbS/nL58DWxeXDrsThbghNBmT+06iJCcOf8=
-X-Received: by 2002:a50:9f6c:0:b0:52e:f99a:b5f8 with SMTP id
- b99-20020a509f6c000000b0052ef99ab5f8mr308559edf.7.1696748935193; Sun, 08 Oct
- 2023 00:08:55 -0700 (PDT)
+        bh=6SEOXfJA7vzTv4ptNNIVK7Ccy8v0ranMjIXDfq2q8cM=;
+        b=Az0Qt9ATium3BWAUmIQjvx59OyvTU4+m6Tbh4HH47Q30MVvdjrQH46oWkUiGKZkNrT
+         tRor0pIr2r+Qz4uXqUxEwfCIrhRSb8Rvqx44veK3SwInsGBz2pemr+JXEWBhP31r6ELq
+         NQ3BlASKFajqgXQFBug7aI13wNpWcRv3HFyBkeulnVqB4f7tj17p5xzrb/KfzvBhfH4l
+         DQ4YliTllugIvzt2BPNNcVHbFcoCRk7v0XjdnoloTF6ZRbIUYK+qSBYPUxD2iBvgFepm
+         aDNK1pCSCuXhz0p3xLacj6nVyRU6XuThQil1MYlU+eTuFnjzJbALzsRpa4PwjQUlLUx3
+         TvKA==
+X-Gm-Message-State: AOJu0Yzml4l0MHHFgEHvawBsoG6DlaW885G0y9R/VIKlWrKzoz1CAJ/G
+	bL4FqxI3yNMduO3CUv6EcIoG/mnf8tUa+q1Eo/NpFg==
+X-Google-Smtp-Source: AGHT+IHiLam8NYeG4w8zFjLq9SzVce7FiePeqlro3AOd9i6WDLpmhFete+ozBjcwvjpfp2PkYO9N82WSAO3uZ4ueyfY=
+X-Received: by 2002:a25:374b:0:b0:d0a:da40:638e with SMTP id
+ e72-20020a25374b000000b00d0ada40638emr10999315yba.12.1696749108528; Sun, 08
+ Oct 2023 00:11:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231003145150.2498-1-ansuelsmth@gmail.com> <20231003145150.2498-4-ansuelsmth@gmail.com>
- <CANn89iLtYZJPOQE7OkAbEdmhT8qjzAJ+27poa__3c8Nf0M6u_w@mail.gmail.com> <652056c5.5d0a0220.2b60d.c5dc@mx.google.com>
-In-Reply-To: <652056c5.5d0a0220.2b60d.c5dc@mx.google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 8 Oct 2023 09:08:41 +0200
-Message-ID: <CANn89i+Cie+oE_hTWkyJWutTG9CnPy+dbW+-A97Q+E9Rq-f9rQ@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 4/4] netdev: use napi_schedule bool instead of napi_schedule_prep/__napi_schedule
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
-	Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Chris Snook <chris.snook@gmail.com>, Raju Rangoju <rajur@chelsio.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Shailend Chand <shailend@google.com>, Douglas Miller <dougmill@linux.ibm.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Nick Child <nnac123@linux.ibm.com>, 
-	Haren Myneni <haren@linux.ibm.com>, Rick Lindsley <ricklind@linux.ibm.com>, 
-	Dany Madden <danymadden@us.ibm.com>, Thomas Falcon <tlfalcon@linux.ibm.com>, 
-	Tariq Toukan <tariqt@nvidia.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>, 
-	Jeff Johnson <quic_jjohnson@quicinc.com>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>, Intel Corporation <linuxwwan@intel.com>, 
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>, Liu Haijun <haijun.liu@mediatek.com>, 
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>, 
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>, Loic Poulain <loic.poulain@linaro.org>, 
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>, 
-	Yuanjun Gong <ruc_gongyuanjun@163.com>, Simon Horman <horms@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Ziwei Xiao <ziweixiao@google.com>, 
-	Rushil Gupta <rushilg@google.com>, Coco Li <lixiaoyan@google.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Junfeng Guo <junfeng.guo@intel.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	Wei Fang <wei.fang@nxp.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	Yuri Karpov <YKarpov@ispras.ru>, Zhengchao Shao <shaozhengchao@huawei.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Zheng Zengkai <zhengzengkai@huawei.com>, Lee Jones <lee@kernel.org>, 
-	Maximilian Luz <luzmaximilian@gmail.com>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, 
-	Dawei Li <set_pte_at@outlook.com>, Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>, 
-	Benjamin Berg <benjamin.berg@intel.com>, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org, 
-	linux-wireless@vger.kernel.org
+References: <20231006094911.3305152-1-fujita.tomonori@gmail.com>
+ <20231006094911.3305152-4-fujita.tomonori@gmail.com> <CALNs47syMxiZBUwKLk3vKxzmCbX0FS5A37FjwUzZO9Fn-iPaoA@mail.gmail.com>
+ <20231007.210734.448113675800173824.fujita.tomonori@gmail.com>
+In-Reply-To: <20231007.210734.448113675800173824.fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Sun, 8 Oct 2023 03:11:36 -0400
+Message-ID: <CALNs47sxuGVXBwhXZa5NgHQ8F0MH2OoUzsgthAURE+OuTtJ1wQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Asix PHY driver
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	greg@kroah.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 6, 2023 at 8:49=E2=80=AFPM Christian Marangi <ansuelsmth@gmail.=
-com> wrote:
+On Sat, Oct 7, 2023 at 8:10=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+> >> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
+> >> +        dev.genphy_update_link()?;
+> >> +        if !dev.get_link() {
+> >> +            return Ok(0);
+> >> +        }
+> >
+> > Looking at this usage, I think `get_link()` should be renamed to just
+> > `link()`. `get_link` makes me think that it is performing an action
+> > like calling `genphy_update_link`, just `link()` sounds more like a
+> > static accessor.
 >
-> On Thu, Oct 05, 2023 at 06:16:26PM +0200, Eric Dumazet wrote:
-> > On Tue, Oct 3, 2023 at 8:36=E2=80=AFPM Christian Marangi <ansuelsmth@gm=
-ail.com> wrote:
-> > >
-> > > Replace if condition of napi_schedule_prep/__napi_schedule and use bo=
-ol
-> > > from napi_schedule directly where possible.
-> > >
-> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > ---
-> > >  drivers/net/ethernet/atheros/atlx/atl1.c     | 4 +---
-> > >  drivers/net/ethernet/toshiba/tc35815.c       | 4 +---
-> > >  drivers/net/wireless/intel/iwlwifi/pcie/rx.c | 4 +---
-> > >  3 files changed, 3 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/e=
-thernet/atheros/atlx/atl1.c
-> > > index 02aa6fd8ebc2..a9014d7932db 100644
-> > > --- a/drivers/net/ethernet/atheros/atlx/atl1.c
-> > > +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
-> > > @@ -2446,7 +2446,7 @@ static int atl1_rings_clean(struct napi_struct =
-*napi, int budget)
-> > >
-> > >  static inline int atl1_sched_rings_clean(struct atl1_adapter* adapte=
-r)
-> > >  {
-> > > -       if (!napi_schedule_prep(&adapter->napi))
-> > > +       if (!napi_schedule(&adapter->napi))
-> > >                 /* It is possible in case even the RX/TX ints are dis=
-abled via IMR
-> > >                  * register the ISR bits are set anyway (but do not p=
-roduce IRQ).
-> > >                  * To handle such situation the napi functions used t=
-o check is
-> > > @@ -2454,8 +2454,6 @@ static inline int atl1_sched_rings_clean(struct=
- atl1_adapter* adapter)
-> > >                  */
-> > >                 return 0;
-> > >
-> > > -       __napi_schedule(&adapter->napi);
-> > > -
-> > >         /*
-> > >          * Disable RX/TX ints via IMR register if it is
-> > >          * allowed. NAPI handler must reenable them in same
-> > > diff --git a/drivers/net/ethernet/toshiba/tc35815.c b/drivers/net/eth=
-ernet/toshiba/tc35815.c
-> > > index 14cf6ecf6d0d..a8b8a0e13f9a 100644
-> > > --- a/drivers/net/ethernet/toshiba/tc35815.c
-> > > +++ b/drivers/net/ethernet/toshiba/tc35815.c
-> > > @@ -1436,9 +1436,7 @@ static irqreturn_t tc35815_interrupt(int irq, v=
-oid *dev_id)
-> > >         if (!(dmactl & DMA_IntMask)) {
-> > >                 /* disable interrupts */
-> > >                 tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
-> > > -               if (napi_schedule_prep(&lp->napi))
-> > > -                       __napi_schedule(&lp->napi);
-> > > -               else {
-> > > +               if (!napi_schedule(&lp->napi)) {
-> > >                         printk(KERN_ERR "%s: interrupt taken in poll\=
-n",
-> > >                                dev->name);
-> > >                         BUG();
+> Andrew suggested to rename link() to get_link(), I think.
+>
+> Then we discussed again last week:
+>
+> https://lore.kernel.org/rust-for-linux/20231004.084644.50784533959398755.=
+fujita.tomonori@gmail.com/
+
+Thanks for the link, in that case LGTM
+
+>
+> >> +        if ret as u32 & uapi::BMCR_SPEED100 !=3D 0 {
+> >> +            dev.set_speed(100);
+> >> +        } else {
+> >> +            dev.set_speed(10);
+> >> +        }
 > >
-> > Hmmm... could you also remove this BUG() ? I think this code path can b=
-e taken
-> > if some applications are using busy polling.
+> > Speed should probably actually be an enum since it has defined values.
+> > Something like
 > >
-> > Or simply rewrite this with the traditional
+> >     #[non_exhaustive]
+> >     enum Speed {
+> >         Speed10M,
+> >         Speed100M,
+> >         Speed1000M,
+> >         // 2.5G, 5G, 10G, 25G?
+> >     }
 > >
-> > if (napi_schedule_prep(&lp->napi)) {
-> >    /* disable interrupts */
-> >    tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
-> >     __napi_schedule(&lp->napi);
-> > }
-> >
+> >     impl Speed {
+> >         fn as_mb(self) -> u32;
+> >     }
 > >
 >
-> Mhhh is it safe to do so? I mean it seems very wrong to print a warning
-> and BUG() instead of disabling the interrupt only if napi can be
-> scheduled... Maybe is very old code? The more I see this the more I see
-> problem... (randomly disabling the interrupt and then make the kernel
-> die)
+> ethtool.h says:
+>
+> /* The forced speed, in units of 1Mb. All values 0 to INT_MAX are legal.
+>  * Update drivers/net/phy/phy.c:phy_speed_to_str() and
+>  * drivers/net/bonding/bond_3ad.c:__get_link_speed() when adding new valu=
+es.
+>  */
+>
+> I don't know there are drivers that set such values.
 
-I am pretty sure this BUG() can be hit these days with busy polling or
-setting gro_flush_timeout.
+Andrew replied to this too and an enum wouldn't work. Maybe good to
+add uapi/linux/ethtool.h to the bindings and use the SPEED_X defined
+there?
 
-I wish we could remove these bugs before someone copy-paste them.
+> >> +        let duplex =3D if ret as u32 & uapi::BMCR_FULLDPLX !=3D 0 {
+> >> +            phy::DuplexMode::Full
+> >> +        } else {
+> >> +            phy::DuplexMode::Half
+> >> +        };
+> >
+> > BMCR_x and MII_x are generated as `u32` but that's just a bindgen
+> > thing. It seems we should reexport them as the correct types so users
+> > don't need to cast all over:
+> >
+> >     pub MII_BMCR: u8 =3D bindings::MII_BMCR as u8;
+> >     pub BMCR_RESV: u16 =3D bindings::BMCR_RESV as u16; ...
+> >     // (I'd just make a macro for this)
+> >
+> > But I'm not sure how to handle that since the uapi crate exposes its
+> > bindings directly. We're probably going to run into this issue with
+> > other uapi items at some point, any thoughts Miguel?
+>
+> reexporting all the BMCR_ values by hand doesn't sound fun. Can we
+> automaticall generate such?
 
-Again, this is orthogonal, I might simply stop doing reviews if this
-is not useful.
+Definitely not by hand, I don't think bindgen allows finer control
+over what types are created from `#define` yet. I am not sure what our
+policy is on build scripts but the below would work:
+
+    # repeat this with a different prefix (BMCR) and type (u16) as needed
+    perl -ne 'print if
+s/^#define\s+(BMCR\w+)\s+([0-9xX]+)\s+(?:\/\*(.*)\*\/)?/\/\/\/ \3\npub
+const \1: u16 =3D \2;/' include/uapi/linux/mii.h > somefile.rs
+
+That creates outputs
+
+    ///  MSB of Speed (1000)
+    pub const BMCR_SPEED1000: u16 =3D 0x0040;
+    ///  Collision test
+    pub const BMCR_CTST: u16 =3D 0x0080;
+    ///  Full duplex
+    pub const BMCR_FULLDPLX: u16 =3D 0x0100;
+
+Miguel, any suggestions here?
 
