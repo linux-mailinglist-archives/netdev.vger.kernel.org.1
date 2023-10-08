@@ -1,142 +1,154 @@
-Return-Path: <netdev+bounces-38845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C675A7BCC1A
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 06:37:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F6E7BCC34
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 06:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3544A2818F7
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 04:37:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96CF81C20895
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 04:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9482C10E6;
-	Sun,  8 Oct 2023 04:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8855415C1;
+	Sun,  8 Oct 2023 04:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GqenPu+d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DEELYKyb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83F7630
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 04:37:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A017BF
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 21:37:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB37630
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 04:53:37 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DC8BD
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 21:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696739835;
+	s=mimecast20190719; t=1696740814;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dvtyRRz+nwNRt7FvkUoa8BCNkTJILEam9tMkM/HCha0=;
-	b=GqenPu+dl1ud/IxCDURRYbNVjTgPCujCHHXdSDZd37ePVwRBPQH+e+lQIvHXclmWTfiFRn
-	j08r00G7lFrM64wh7Vp5Zp7NMUoSATufx4oxnDMG6Jii5JskukYP2hlM2f8x/CveqT1Px7
-	7rvJPsNEga3Wed0/lC3rLF8pqvzW+iI=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S1HJ6vv1pBVf5AB5L3VKI3WzniTIFfMuA6xvDuFUoaw=;
+	b=DEELYKybU53AReOif20uz1K+ysScYr1wjNcziexsadG2INxvmB6wJlaLbCEbUhRAA+j/9T
+	1NK++PBcsuSJ2RDmpXDSYjd1TCdwJ1FXjubLp66yaYnB9tRbfU/tXgpZzJygbi/amOV/oc
+	8NkjLSc7CyYb0RQEViH0vc5+tTHNj6E=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-BBWjlrkfP9CBZThhFix8vw-1; Sun, 08 Oct 2023 00:37:13 -0400
-X-MC-Unique: BBWjlrkfP9CBZThhFix8vw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-50433961a36so3017114e87.3
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 21:37:13 -0700 (PDT)
+ us-mta-623-jgFT4IqJPaa8rCD2a_xWng-1; Sun, 08 Oct 2023 00:53:32 -0400
+X-MC-Unique: jgFT4IqJPaa8rCD2a_xWng-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2c296e65210so30279381fa.3
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 21:53:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696739832; x=1697344632;
+        d=1e100.net; s=20230601; t=1696740810; x=1697345610;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dvtyRRz+nwNRt7FvkUoa8BCNkTJILEam9tMkM/HCha0=;
-        b=agqjQZ/CoPW5smq5FG08C9qS5hsLwZBp9Bbq4/GITAr1tdWe3AvMF9Te7xwH6dNBya
-         nUUkZMBByRZmKOJp32fPy44D2FVRTtbIE/C7lbzur8S+1MBuNlUOQ5HhovxRK5M+rCS3
-         P/tlKXqXb3FVscdEOzbUePiRsoL5dABRBFK7cibo4HDnFG9GRJX5u9sndXRMV+cmcDSL
-         rq6s46ahxxlL2tBaUQrF5ldI0bc4pOAgWqshMbo/teY6RhqAN4aUPFTcl2l0/fCqszt8
-         QE1uDbTC6JCHbXI5ZKK6WQg74aOCETn02xvRng+rk+mW2vvvkx0slmqYn4G8MIGpkH4G
-         XBGQ==
-X-Gm-Message-State: AOJu0Yxrrmxe48QGTVYjO7oGAh1uxqIyMMwiDr7d/USoQ4H4d0VlxZ8p
-	J1LcgZA+ulY9RRY8D0rt5cZv53SwLH5s1i1m1nu0I5IDb7jlvEsDybK4iYLiLF9c1VoEyAXXvYv
-	5pEAxXRm1vOL+6qNFdgiCFy6wOnV4wCJQxOD6K55ndLgCMA==
-X-Received: by 2002:ac2:4c9b:0:b0:500:9a15:9054 with SMTP id d27-20020ac24c9b000000b005009a159054mr8820042lfl.20.1696739831933;
-        Sat, 07 Oct 2023 21:37:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGbwdFniTDysoOdy55vJ9mvDY2iLbB22GYbgOhSxJ2xBXcK3O2G6gfgJld3IG0br8gYtQV4XFjb14Blx0X7c18=
-X-Received: by 2002:ac2:4c9b:0:b0:500:9a15:9054 with SMTP id
- d27-20020ac24c9b000000b005009a159054mr8820036lfl.20.1696739831548; Sat, 07
- Oct 2023 21:37:11 -0700 (PDT)
+        bh=S1HJ6vv1pBVf5AB5L3VKI3WzniTIFfMuA6xvDuFUoaw=;
+        b=qXjDhM5o3tZoCZg1x/qdBGADxQJR0UQA4EFlnBE67tJzXYKqWGocvOC4j9+K+h4Jzk
+         DOvVl//ca80gaSnmPVlNuVRBgNLLPnJvlLauvhnYNeUvvmre3O+5dlyioRZT2DS9sj68
+         PXIoEBbovA5tLmTgD2dBRjFYclNfUksDHD8yQNR/K77lFLtG7EMO/JkhNZpKcELkJGgq
+         whJm9j5bX/453KmaNWQEEogER3on9ck9SBPnGavJx5uNjTM6zb5xgvRCaCDXsjuJsnHL
+         YQ1/f5qnAsRqbRGSYKeu+opvlLSEuRvzB5K5R94DG4K/CQVPC+25tVgOBxoRZB+y3Ozq
+         YlEw==
+X-Gm-Message-State: AOJu0Yy7bOO+LsS0dYgBEvXIM1Pm3wHw2lSZEHWFSH4oQJTmBndAe3zC
+	eOPGo5nmnFthxmhzQZ+i1eG/m/u42CZZkrvcQGTR6C1HQEMsCH5zha45OeLOMf5outwqmSySZUD
+	uz+kAb+Ydcrfyqk/882xOAcMNit54+9tlf7t2F1N5zgtFKg==
+X-Received: by 2002:a05:6512:2017:b0:503:19bc:efb with SMTP id a23-20020a056512201700b0050319bc0efbmr9800261lfb.29.1696740810524;
+        Sat, 07 Oct 2023 21:53:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHhCGfnVmse6ZZuQQWAmYfgT7YAlMeenDBKY01p6eCrBmjMIn7mjAZeYKlmo1VJDR/G2Nc1dmlcz7Aaz3comfo=
+X-Received: by 2002:a05:6512:2017:b0:503:19bc:efb with SMTP id
+ a23-20020a056512201700b0050319bc0efbmr9800243lfb.29.1696740810133; Sat, 07
+ Oct 2023 21:53:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
-In-Reply-To: <20230926050021.717-1-liming.wu@jaguarmicro.com>
+References: <20230927055246.121544-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20230927055246.121544-1-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Sun, 8 Oct 2023 12:37:00 +0800
-Message-ID: <CACGkMEtF7hZ8kGYi8rF68SzZqdYJ6i1SeuVU2hiBTY-FLapSBw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] tools/virtio: Add dma sync api for virtio test
-To: liming.wu@jaguarmicro.com
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 398776277@qq.com
+Date: Sun, 8 Oct 2023 12:53:19 +0800
+Message-ID: <CACGkMEvubQojB-SxFvqV1D1LPiL2PL+oMP1G29t6702JYdVdXQ@mail.gmail.com>
+Subject: Re: [PATCH vhost] virtio_net: fix the missing of the dma cpu sync
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Michael Roth <michael.roth@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Sep 26, 2023 at 1:00=E2=80=AFPM <liming.wu@jaguarmicro.com> wrote:
+On Wed, Sep 27, 2023 at 1:53=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
 >
-> From: Liming Wu <liming.wu@jaguarmicro.com>
+> Commit 295525e29a5b ("virtio_net: merge dma operations when filling
+> mergeable buffers") unmaps the buffer with DMA_ATTR_SKIP_CPU_SYNC when
+> the dma->ref is zero. We do that with DMA_ATTR_SKIP_CPU_SYNC, because we
+> do not want to do the sync for the entire page_frag. But that misses the
+> sync for the current area.
 >
-> Fixes: 8bd2f71054bd ("virtio_ring: introduce dma sync api for virtqueue")
-> also add dma sync api for virtio test.
+> This patch does cpu sync regardless of whether the ref is zero or not.
 >
-> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling merge=
+able buffers")
+> Reported-by: Michael Roth <michael.roth@amd.com>
+> Closes: http://lore.kernel.org/all/20230926130451.axgodaa6tvwqs3ut@amd.co=
+m
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
 > ---
->  tools/virtio/linux/dma-mapping.h | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  drivers/net/virtio_net.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
-> diff --git a/tools/virtio/linux/dma-mapping.h b/tools/virtio/linux/dma-ma=
-pping.h
-> index 834a90bd3270..822ecaa8e4df 100644
-> --- a/tools/virtio/linux/dma-mapping.h
-> +++ b/tools/virtio/linux/dma-mapping.h
-> @@ -24,11 +24,23 @@ enum dma_data_direction {
->  #define dma_map_page(d, p, o, s, dir) (page_to_phys(p) + (o))
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 98dc9b49d56b..9ece27dc5144 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -589,16 +589,16 @@ static void virtnet_rq_unmap(struct receive_queue *=
+rq, void *buf, u32 len)
 >
->  #define dma_map_single(d, p, s, dir) (virt_to_phys(p))
-> +#define dma_map_single_attrs(d, p, s, dir, a) (virt_to_phys(p))
->  #define dma_mapping_error(...) (0)
+>         --dma->ref;
 >
->  #define dma_unmap_single(d, a, s, r) do { (void)(d); (void)(a); (void)(s=
-); (void)(r); } while (0)
->  #define dma_unmap_page(d, a, s, r) do { (void)(d); (void)(a); (void)(s);=
- (void)(r); } while (0)
+> -       if (dma->ref) {
+> -               if (dma->need_sync && len) {
+> -                       offset =3D buf - (head + sizeof(*dma));
+> +       if (dma->need_sync && len) {
+> +               offset =3D buf - (head + sizeof(*dma));
 >
-> +#define sg_dma_address(sg) (0)
-> +#define dma_need_sync(v, a) (0)
-> +#define dma_unmap_single_attrs(d, a, s, r, t) do { \
-> +       (void)(d); (void)(a); (void)(s); (void)(r); (void)(t); \
-> +} while (0)
-> +#define dma_sync_single_range_for_cpu(d, a, o, s, r) do { \
-> +       (void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
-> +} while (0)
-> +#define dma_sync_single_range_for_device(d, a, o, s, r) do { \
-> +       (void)(d); (void)(a); (void)(o); (void)(s); (void)(r); \
-> +} while (0)
->  #define dma_max_mapping_size(...) SIZE_MAX
+> -                       virtqueue_dma_sync_single_range_for_cpu(rq->vq, d=
+ma->addr, offset,
+> -                                                               len, DMA_=
+FROM_DEVICE);
+> -               }
+> +               virtqueue_dma_sync_single_range_for_cpu(rq->vq, dma->addr=
+,
+> +                                                       offset, len,
+> +                                                       DMA_FROM_DEVICE);
+> +       }
 >
->  #endif
+> +       if (dma->ref)
+>                 return;
+> -       }
+>
+>         virtqueue_dma_unmap_single_attrs(rq->vq, dma->addr, dma->len,
+>                                          DMA_FROM_DEVICE, DMA_ATTR_SKIP_C=
+PU_SYNC);
 > --
-> 2.34.1
+> 2.32.0.3.g01195cf9f
+>
 >
 
 
