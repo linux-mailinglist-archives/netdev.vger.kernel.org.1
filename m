@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-38851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C5A7BCC47
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:22:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 675D87BCC4A
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 07:22:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6802281B59
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 05:22:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F997281DCD
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 05:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A1817F3;
-	Sun,  8 Oct 2023 05:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C06F4405;
+	Sun,  8 Oct 2023 05:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="oS7RsZl2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="pDAjb8r1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E9F4407
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 05:22:07 +0000 (UTC)
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C366CC5
-	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 22:22:06 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1c0fcbf7ae4so2609048fac.0
-        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 22:22:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D2C1FDE
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 05:22:17 +0000 (UTC)
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0032DF
+	for <netdev@vger.kernel.org>; Sat,  7 Oct 2023 22:22:15 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5855333fbadso2137049a12.1
+        for <netdev@vger.kernel.org>; Sat, 07 Oct 2023 22:22:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696742526; x=1697347326; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696742535; x=1697347335; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wYCQ+fW716tmGuChYsDFVDZG3YnuxKzHlfuupc0GLGY=;
-        b=oS7RsZl2BBnB13+koV64IOlKKa8vg2ZwAA/borqfKqPEZa/1e3+is7Ylvf4yRH48En
-         iM74iFDL+D8j1YB2iuDwT+xMVEjhq9iCvCBkQDHUBJRYBSUzIYozVUFbecU1eeGizeuh
-         42mLyVZFsb2cOdH1sZL8DOtxPsWZHEjLkGytWmOuBeV4J69kynpFTd36Qln9bm8HWp7j
-         baPvIi9taQCh5Q3QH+VpAMRj+fGuByknwJ+yXcf3pavrBIp5mAzJvoKN3ppi6sVXkps+
-         +xw5aIYmJQkfJI9U+7+JsLX7XaIx8l2xevaZ+LmPeUXYUmvNpsR1RI3R6i4hCXusxdA4
-         QQxw==
+        bh=k5mxF0OX9xOXmYEMR+WWj7I9pRqOisNzgsEMTbX9Fcw=;
+        b=pDAjb8r1pyoOoIgkbxYqZiqols5A9mnuszTRbedtgUp3glqaEpXhshft/kpn1fYZf8
+         63HnfxHvVoGFIxk75z/mnIa0QQ71xh6FvDZpx+FrAqj2lVlPZSXzfabwpUXJ3HNh8hsK
+         VIJXWv3CRbQ31VBWx6LjmhYZ5eCvu5OADYUtRRP4ghrbuTwrADrBvQ+uy2u5kjIdcugg
+         FV1bD7mueXYtjBMWKzN+kKdYeXRzbHOKDalr7cUVQb/jw/5zHhCbs8mJzrKtweu7qvVq
+         0GV/6vQRsSdMk5qNsbAAv1R5shF+vflFG86pHYBmNnAQsEFECIVuUdNqO1WJwb5qW3cd
+         CWXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696742526; x=1697347326;
+        d=1e100.net; s=20230601; t=1696742535; x=1697347335;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wYCQ+fW716tmGuChYsDFVDZG3YnuxKzHlfuupc0GLGY=;
-        b=cx41JLrfjjEu62MmtTtNkOrPLtRKB7J5X0OA8LRcSFGkQJ7trBQtBQ9i6D8wIbYXAF
-         PX9+LUkw+YxzFrFjd5KEYYul7n7O4MbbFPxFNa5ngOs2fVtg0fXlOTAscH8me1x6x2ej
-         X15Vt3T0GgjMhMHmvWP3GYX9VmEozFzbZe94XBgs9JIyqYv38nmV3sjSp3U8UTTlc6KS
-         zgOGCfMTQJc2J8VKWjzVpq/buB7ZGILhLFnmhL3TJdU0HbhlRpdmqctJpwPQS0wG+tEs
-         hguRVerOPT/1JCSIijukmW60dWlkbHi+prBXiaoTedq8qk3qy5BC12A15aqSk5MCew7W
-         S1rA==
-X-Gm-Message-State: AOJu0YwWjspD1yB7e8DcVW92FtQW4F0kffoDP4sZsY3PYG+dB7zweYnd
-	9MHMYCW3BOSju9B+Nbsq90VAkMRcWG9VAI1Ur6DhoQ==
-X-Google-Smtp-Source: AGHT+IEBBXm6m/WtSPUhh5oF+VJBXDbr96mbF1KkK7r1eDIobYG0/oD0fn8R1wf3qYfKO3KIRt7bgg==
-X-Received: by 2002:a05:6870:ab83:b0:1e2:665:49e4 with SMTP id gs3-20020a056870ab8300b001e2066549e4mr10360254oab.23.1696742526036;
-        Sat, 07 Oct 2023 22:22:06 -0700 (PDT)
+        bh=k5mxF0OX9xOXmYEMR+WWj7I9pRqOisNzgsEMTbX9Fcw=;
+        b=kserq/D5W+4ywiyE2xw8oDekcaLADX2JAoZTSMVp6pINHerFyGxRzv+ZoLsss7U8z4
+         nkkPpXDdDEGjZ+nDb27n+1JgBwYWRzzUCWOPry+8A9ZSKyZin7hZ6ndjxlOtpK6tXY/+
+         ns0F3XqS30A6n8x43VLlkOtzXC1N57tEVv2Umol1f+lfwdTAHiReZ1qfw47voIZi6jzs
+         5X2ZlRixDem9ZCx7AG4XjJQ9QkaG2CwPjJhm1PGnpNvki5HknfkB+4MFiwwHJKWztR+G
+         iIIxRSrOT3Ybraw+gYvxaBh31cL4ZGEvI7+4xhspaK5bDSYr8Oze/cH0N66Hi6vVcb/o
+         o6yw==
+X-Gm-Message-State: AOJu0YwSQCn1kyPSuQIbobQBHet7XukG2MwEdvsXm8/KH0YC14zHIInd
+	JmhOPN49y/ZbwHWu8Lq34EtTzA==
+X-Google-Smtp-Source: AGHT+IG9O4pTvHffkcpbfSSY2BqjAJCrJuGtiCOgDSHXbFaxRlalyaGem1e7MjUKpdr/veWyOVwJJw==
+X-Received: by 2002:a05:6a00:807:b0:68f:b7f6:f1df with SMTP id m7-20020a056a00080700b0068fb7f6f1dfmr12856183pfk.5.1696742535241;
+        Sat, 07 Oct 2023 22:22:15 -0700 (PDT)
 Received: from localhost ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with UTF8SMTPSA id g22-20020a1709029f9600b001c61e628e9dsm6783558plq.77.2023.10.07.22.21.59
+        by smtp.gmail.com with UTF8SMTPSA id ff13-20020a056a002f4d00b00693390caf39sm3945943pfb.113.2023.10.07.22.22.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 07 Oct 2023 22:22:05 -0700 (PDT)
+        Sat, 07 Oct 2023 22:22:14 -0700 (PDT)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: 
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
@@ -77,9 +77,9 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	elver@google.com, pabeni@redhat.com,
 	Yuri Benditovich <yuri.benditovich@daynix.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [RFC PATCH 1/7] net: skbuff: Add tun_vnet_hash flag
-Date: Sun,  8 Oct 2023 14:20:45 +0900
-Message-ID: <20231008052101.144422-2-akihiko.odaki@daynix.com>
+Subject: [RFC PATCH 2/7] net/core: Ensure qdisc_skb_cb will not be overwritten
+Date: Sun,  8 Oct 2023 14:20:46 +0900
+Message-ID: <20231008052101.144422-3-akihiko.odaki@daynix.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231008052101.144422-1-akihiko.odaki@daynix.com>
 References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
@@ -91,39 +91,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-tun_vnet_hash can use this flag to indicate it stored virtio-net hash
-cache to cb.
+Later qdisc_skb_cb will be used to deliver virtio-net hash information
+for tun.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 ---
- include/linux/skbuff.h | 2 ++
- 1 file changed, 2 insertions(+)
+ net/core/dev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 4174c4b82d13..e638f157c13c 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -837,6 +837,7 @@ typedef unsigned char *sk_buff_data_t;
-  *	@truesize: Buffer size
-  *	@users: User count - see {datagram,tcp}.c
-  *	@extensions: allocated extensions, valid if active_extensions is nonzero
-+ *	@tun_vnet_hash: tun stored virtio-net hash cache to cb
-  */
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 85df22f05c38..305fb465cc1e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3622,6 +3622,7 @@ static struct sk_buff *validate_xmit_skb(struct sk_buff *skb, struct net_device
+ 	if (netif_needs_gso(skb, features)) {
+ 		struct sk_buff *segs;
  
- struct sk_buff {
-@@ -989,6 +990,7 @@ struct sk_buff {
- #if IS_ENABLED(CONFIG_IP_SCTP)
- 	__u8			csum_not_inet:1;
- #endif
-+	__u8			tun_vnet_hash:1;
- 
- #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
- 	__u16			tc_index;	/* traffic control index */
++		BUILD_BUG_ON(sizeof(struct qdisc_skb_cb) > SKB_GSO_CB_OFFSET);
+ 		segs = skb_gso_segment(skb, features);
+ 		if (IS_ERR(segs)) {
+ 			goto out_kfree_skb;
 -- 
 2.42.0
 
