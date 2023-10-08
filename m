@@ -1,184 +1,272 @@
-Return-Path: <netdev+bounces-38881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2D07BCD32
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 10:23:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C01D7BCD3B
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 10:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA041281997
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:23:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 607231C2087B
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 08:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8EAE8BE8;
-	Sun,  8 Oct 2023 08:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559B020E1;
+	Sun,  8 Oct 2023 08:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aDQH/FCM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645128472
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 08:23:08 +0000 (UTC)
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCB1C6;
-	Sun,  8 Oct 2023 01:23:05 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VtdcqcW_1696753375;
-Received: from 30.221.145.250(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VtdcqcW_1696753375)
-          by smtp.aliyun-inc.com;
-          Sun, 08 Oct 2023 16:23:02 +0800
-Message-ID: <3e41f49d-abec-34b4-283b-7ad4bbff3b41@linux.alibaba.com>
-Date: Sun, 8 Oct 2023 16:22:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568F2185E
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 08:45:01 +0000 (UTC)
+Received: from out-209.mta0.migadu.com (out-209.mta0.migadu.com [91.218.175.209])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B79CC6
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 01:44:58 -0700 (PDT)
+Message-ID: <9f4fb613-d63f-9b86-fe92-11bf4dfb7275@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696754696;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S6pf1kOiw+fY5q6aOEgpqP2H9JhiK3RlCR8Ngy4F2wY=;
+	b=aDQH/FCMpkPG/iPlbfZJQ/dwoHwfQB8lL5oe10SdskBcfkk+npL1XYn/q0Hhmp0aPrtrFj
+	bqYa+TTDTW9TLP3ywoK9B1BHZVtUs20fLso4KvnnuSGxro5w5k2OjGK9fRzJFGOhUZLwjt
+	Yp9DQWcR1cfYjvwfyYfdwxFib2VBhfU=
+Date: Sun, 8 Oct 2023 16:44:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net] net/smc: fix panic smc_tcp_syn_recv_sock() while
- closing listen socket
+Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20231007050621.1706331-1-yajun.deng@linux.dev>
+ <CANn89iL-zUw1FqjYRSC7BGB0hfQ5uKpJzUba3YFd--c=GdOoGg@mail.gmail.com>
+ <917708b5-cb86-f233-e878-9233c4e6c707@linux.dev>
+ <CANn89i+navyRe8-AV=ehM3qFce2hmnOEKBqvK5Xnev7KTaS5Lg@mail.gmail.com>
+ <a53a3ff6-8c66-07c4-0163-e582d88843dd@linux.dev>
+ <CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
 Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>
-Cc: jaka@linux.ibm.com, kgraul@linux.ibm.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <1695211714-66958-1-git-send-email-alibuda@linux.alibaba.com>
- <0902f55b-0d51-7f4d-0a9e-4b9423217fcf@linux.ibm.com>
- <ee2a5f8c-4119-c84a-05bc-03015e6c9bea@linux.alibaba.com>
- <3d1b5c12-971f-3464-5f28-79477f1f9eb2@linux.ibm.com>
- <c03dad67-169a-bf6d-1915-a9bb722a7259@linux.alibaba.com>
- <d18e1a78-3b3a-8f23-6db1-20c16795d3ef@linux.ibm.com>
- <ab417654-8aba-f357-8ac5-16c4c2b291e1@linux.alibaba.com>
- <b4470cec-7b9b-5ce5-01e0-9270f6564fbb@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <b4470cec-7b9b-5ce5-01e0-9270f6564fbb@linux.ibm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yajun Deng <yajun.deng@linux.dev>
+In-Reply-To: <CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-11.7 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-
-On 10/6/23 2:14 AM, Wenjia Zhang wrote:
->
->
-> On 26.09.23 11:06, D. Wythe wrote:
+On 2023/10/8 15:18, Eric Dumazet wrote:
+> On Sun, Oct 8, 2023 at 9:00 AM Yajun Deng <yajun.deng@linux.dev> wrote:
 >>
->>
->> On 9/26/23 3:18 PM, Alexandra Winter wrote:
+>> On 2023/10/8 14:45, Eric Dumazet wrote:
+>>> On Sat, Oct 7, 2023 at 8:34 AM Yajun Deng <yajun.deng@linux.dev> wrote:
+>>>> On 2023/10/7 13:29, Eric Dumazet wrote:
+>>>>> On Sat, Oct 7, 2023 at 7:06 AM Yajun Deng <yajun.deng@linux.dev> wrote:
+>>>>>> Although there is a kfree_skb_reason() helper function that can be used to
+>>>>>> find the reason why this skb is dropped, but most callers didn't increase
+>>>>>> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
+>>>>>>
+>>>>> ...
+>>>>>
+>>>>>> +
+>>>>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset)
+>>>>>> +{
+>>>>>> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
+>>>>>> +       struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
+>>>>>> +       unsigned long *field;
+>>>>>> +
+>>>>>> +       if (unlikely(!p))
+>>>>>> +               p = netdev_core_stats_alloc(dev);
+>>>>>> +
+>>>>>> +       if (p) {
+>>>>>> +               field = (unsigned long *)((void *)this_cpu_ptr(p) + offset);
+>>>>>> +               WRITE_ONCE(*field, READ_ONCE(*field) + 1);
+>>>>> This is broken...
+>>>>>
+>>>>> As I explained earlier, dev_core_stats_xxxx(dev) can be called from
+>>>>> many different contexts:
+>>>>>
+>>>>> 1) process contexts, where preemption and migration are allowed.
+>>>>> 2) interrupt contexts.
+>>>>>
+>>>>> Adding WRITE_ONCE()/READ_ONCE() is not solving potential races.
+>>>>>
+>>>>> I _think_ I already gave you how to deal with this ?
+>>>> Yes, I replied in v6.
+>>>>
+>>>> https://lore.kernel.org/all/e25b5f3c-bd97-56f0-de86-b93a3172870d@linux.dev/
+>>>>
+>>>>> Please try instead:
+>>>>>
+>>>>> +void netdev_core_stats_inc(struct net_device *dev, u32 offset)
+>>>>> +{
+>>>>> +       /* This READ_ONCE() pairs with the write in netdev_core_stats_alloc() */
+>>>>> +       struct net_device_core_stats __percpu *p = READ_ONCE(dev->core_stats);
+>>>>> +       unsigned long __percpu *field;
+>>>>> +
+>>>>> +       if (unlikely(!p)) {
+>>>>> +               p = netdev_core_stats_alloc(dev);
+>>>>> +               if (!p)
+>>>>> +                       return;
+>>>>> +       }
+>>>>> +       field = (__force unsigned long __percpu *)((__force void *)p + offset);
+>>>>> +       this_cpu_inc(*field);
+>>>>> +}
+>>>> This wouldn't trace anything even the rx_dropped is in increasing. It
+>>>> needs to add an extra operation, such as:
+>>> I honestly do not know what you are talking about.
 >>>
->>> On 26.09.23 05:00, D. Wythe wrote:
->>>> You are right. The key point is how to ensure the valid of smc sock 
->>>> during the life time of clc sock, If so, READ_ONCE is good
->>>> enough. Unfortunately, I found  that there are no such guarantee, 
->>>> so it's still a life-time problem.
->>> Did you discover a scenario, where clc sock could live longer than 
->>> smc sock?
->>> Wouldn't that be a dangerous scenario in itself? I still have some 
->>> hope that the lifetime of an smc socket is by design longer
->>> than that of the corresponding tcp socket.
+>>> Have you even tried to change your patch to use
+>>>
+>>> field = (__force unsigned long __percpu *)((__force void *)p + offset);
+>>> this_cpu_inc(*field);
 >>
+>> Yes, I tested this code. But the following couldn't show anything even
+>> if the rx_dropped is increasing.
 >>
->> Hi Alexandra,
->>
->> Yes there is. Considering scenario:
->>
->> tcp_v4_rcv(skb)
->>
->> /* req sock */
->> reqsk = _inet_lookup_skb(skb)
->>
->> /* listen sock */
->> sk = reqsk(reqsk)->rsk_listener;
->> sock_hold(sk);
->> tcp_check_req(sk)
->>
->>
->>                                                  smc_release /* 
->> release smc listen sock */
->>                                                  __smc_release
->> smc_close_active()         /*  smc_sk->sk_state = SMC_CLOSED; */
->>                                                      if 
->> (smc_sk->sk_state == SMC_CLOSED)
->> smc_clcsock_release();
->> sock_release(clcsk);        /* close clcsock */
->>      sock_put(sk);              /* might not  the final refcnt */
->>
->> sock_put(smc_sk)    /* might be the final refcnt of smc_sock  */
->>
->> syn_recv_sock(sk...)
->> /* might be the final refcnt of tcp listen sock */
->> sock_put(sk);
->>
->> Fortunately, this scenario only affects smc_syn_recv_sock and 
->> smc_hs_congested, as other callbacks already have locks to protect smc,
->> which can guarantee that the sk_user_data is either NULL (set in 
->> smc_close_active) or valid under the lock.
->> I'm kind of confused with this scenario. How could the 
-> smc_clcsock_release()->sock_release(clcsk) happen?
-> Because the syn_recv_sock happens short prior to accept(), that means 
-> that the &smc->tcp_listen_work is already triggered but the real 
-> accept() is still not happening. At this moment, the incoming 
-> connection is being added into the accept queue. Thus, if the 
-> sk->sk_state is changed from SMC_LISTEN to SMC_CLOSED in 
-> smc_close_active(), there is still 
-> "flush_work(&smc->tcp_listen_work);" after that. That ensures the 
-> smc_clcsock_release() should not happen, if smc_clcsock_accept() is 
-> not finished. Do you think that the execution of the 
-> &smc->tcp_listen_work is already done? Or am I missing something?
+>> 'sudo python3 /usr/share/bcc/tools/trace netdev_core_stats_inc'
+> Well, I am not sure about this, "bpftrace" worked for me.
 >
-Hi wenjia,
+> Make sure your toolchain generates something that looks like what I got:
+>
+> 000000000000ef20 <netdev_core_stats_inc>:
+>      ef20: f3 0f 1e fa          endbr64
+>      ef24: e8 00 00 00 00        call   ef29 <netdev_core_stats_inc+0x9>
+> ef25: R_X86_64_PLT32 __fentry__-0x4
+>      ef29: 55                    push   %rbp
+>      ef2a: 48 89 e5              mov    %rsp,%rbp
+>      ef2d: 53                    push   %rbx
+>      ef2e: 89 f3                mov    %esi,%ebx
+>      ef30: 48 8b 87 f0 01 00 00 mov    0x1f0(%rdi),%rax
+>      ef37: 48 85 c0              test   %rax,%rax
+>      ef3a: 74 0b                je     ef47 <netdev_core_stats_inc+0x27>
+>      ef3c: 89 d9                mov    %ebx,%ecx
+>      ef3e: 65 48 ff 04 08        incq   %gs:(%rax,%rcx,1)
+>      ef43: 5b                    pop    %rbx
+>      ef44: 5d                    pop    %rbp
+>      ef45: c3                    ret
+>      ef46: cc                    int3
+>      ef47: e8 00 00 00 00        call   ef4c <netdev_core_stats_inc+0x2c>
+> ef48: R_X86_64_PLT32 .text.unlikely.+0x13c
+>      ef4c: 48 85 c0              test   %rax,%rax
+>      ef4f: 75 eb                jne    ef3c <netdev_core_stats_inc+0x1c>
+>      ef51: eb f0                jmp    ef43 <netdev_core_stats_inc+0x23>
+>      ef53: 66 66 66 66 2e 0f 1f data16 data16 data16 cs nopw 0x0(%rax,%rax,1)
+>      ef5a: 84 00 00 00 00 00
 
-Sorry for late reply, we have just returned from vacation.
 
-The smc_clcsock_release here release the listen clcsock rather than the 
-child clcsock.
-So the flush_work might not be helpful for this scenario.
+I'll share some I can see it.
 
-Best wishes,
-D. Wythe
+1.
+
+objdump -D vmlinux
+
+ffffffff81b2f170 <netdev_core_stats_inc>:
+ffffffff81b2f170:    e8 8b ea 55 ff           callq ffffffff8108dc00 
+<__fentry__>
+ffffffff81b2f175:    55                       push   %rbp
+ffffffff81b2f176:    48 89 e5                 mov    %rsp,%rbp
+ffffffff81b2f179:    48 83 ec 08              sub    $0x8,%rsp
+ffffffff81b2f17d:    48 8b 87 e8 01 00 00     mov 0x1e8(%rdi),%rax
+ffffffff81b2f184:    48 85 c0                 test   %rax,%rax
+ffffffff81b2f187:    74 0d                    je ffffffff81b2f196 
+<netdev_core_stats_inc+0x26>
+ffffffff81b2f189:    89 f6                    mov    %esi,%esi
+ffffffff81b2f18b:    65 48 ff 04 30           incq %gs:(%rax,%rsi,1)
+ffffffff81b2f190:    c9                       leaveq
+ffffffff81b2f191:    e9 aa 31 6d 00           jmpq ffffffff82202340 
+<__x86_return_thunk>
+ffffffff81b2f196:    89 75 fc                 mov %esi,-0x4(%rbp)
+ffffffff81b2f199:    e8 82 ff ff ff           callq ffffffff81b2f120 
+<netdev_core_stats_alloc>
+ffffffff81b2f19e:    8b 75 fc                 mov -0x4(%rbp),%esi
+ffffffff81b2f1a1:    48 85 c0                 test   %rax,%rax
+ffffffff81b2f1a4:    75 e3                    jne ffffffff81b2f189 
+<netdev_core_stats_inc+0x19>
+ffffffff81b2f1a6:    c9                       leaveq
+ffffffff81b2f1a7:    e9 94 31 6d 00           jmpq ffffffff82202340 
+<__x86_return_thunk>
+ffffffff81b2f1ac:    0f 1f 40 00              nopl   0x0(%rax)
 
 
->>> Considering the const, maybe
->>>> we need to do :
->>>>
->>>> 1. hold a refcnt of smc_sock for syn_recv_sock to keep smc sock 
->>>> valid during life time of clc sock
->>>> 2. put the refcnt of smc_sock in sk_destruct in tcp_sock to release 
->>>> the very smc sock .
->>>>
->>>> In that way, we can always make sure the valid of smc sock during 
->>>> the life time of clc sock. Then we can use READ_ONCE rather
->>>> than lock.  What do you think ?
->>> I am not sure I fully understand the details what you propose to do. 
->>> And it is not only syn_recv_sock(), right?
->>> You need to consider all relations between smc socks and tcp socks; 
->>> fallback to tcp, initial creation, children of listen sockets, 
->>> variants of shutdown, ... Preferrably a single simple mechanism 
->>> covers all situations. Maybe there is such a mechanism already today?
->>> (I don't think clcsock->sk->sk_user_data or sk_callback_lock provide 
->>> this general coverage)
->>> If we really have a gap, a general refcnt'ing on smc sock could be a 
->>> solution, but needs to be designed carefully.
->>
->> You are right , we need designed it with care, we will try the 
->> referenced solutions internally first, and I will also send some RFCs 
->> so that everyone can track the latest progress
->> and make it can be all agreed.
->>> Many thanks to you and the team to help make smc more stable and 
->>> robust.
->>
->> Our pleasure 😁.  The stability of smc is important to us too.
->>
->> Best wishes,
->> D. Wythe
->>
->>
+2.
+
+sudo cat /proc/kallsyms | grep netdev_core_stats_inc
+
+ffffffff9c72f120 T netdev_core_stats_inc
+ffffffff9ca2676c t netdev_core_stats_inc.cold
+ffffffff9d5235e0 r __ksymtab_netdev_core_stats_inc
+
+
+3.
+
+➜  ~ ifconfig enp34s0f0
+enp34s0f0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+         inet 10.10.30.88  netmask 255.255.255.0  broadcast 10.10.30.255
+         inet6 fe80::6037:806c:14b6:f1ca  prefixlen 64  scopeid 0x20<link>
+         ether 04:d4:c4:5c:81:42  txqueuelen 1000  (Ethernet)
+         RX packets 29024  bytes 3118278 (3.1 MB)
+         RX errors 0  dropped 794  overruns 0  frame 0
+         TX packets 16961  bytes 2662290 (2.6 MB)
+         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+         device interrupt 29  memory 0x39fff4000000-39fff47fffff
+
+➜  ~ ifconfig enp34s0f0
+enp34s0f0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+         inet 10.10.30.88  netmask 255.255.255.0  broadcast 10.10.30.255
+         inet6 fe80::6037:806c:14b6:f1ca  prefixlen 64  scopeid 0x20<link>
+         ether 04:d4:c4:5c:81:42  txqueuelen 1000  (Ethernet)
+         RX packets 29272  bytes 3148997 (3.1 MB)
+         RX errors 0  dropped 798  overruns 0  frame 0
+         TX packets 17098  bytes 2683547 (2.6 MB)
+         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+         device interrupt 29  memory 0x39fff4000000-39fff47fffff
+
+
+The rx_dropped is increasing.
+
+
+4.
+
+sudo python3 /usr/share/bcc/tools/trace netdev_core_stats_inc
+
+TIME     PID     TID     COMM            FUNC
+
+(Empty, I didn't see anything.)
+
+
+5.
+
+sudo trace-cmd record -p function -l netdev_core_stats_inc
+
+sudo trace-cmd report
+
+(Empty, I didn't see anything.)
+
+
+If I add a 'pr_info("\n");'   like:
+
++      pr_info("\n");
+         field = (__force unsigned long __percpu *)((__force void *)p + 
+offset);
+         this_cpu_inc(*field);
+
+
+Everything is OK. The 'pr_info("\n");' can be changed to anything else, 
+but not
+
+without it.
+
 
 
