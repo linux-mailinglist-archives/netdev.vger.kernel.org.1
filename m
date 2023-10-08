@@ -1,241 +1,236 @@
-Return-Path: <netdev+bounces-38918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CEEF7BD006
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:12:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E657BD01F
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:46:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61FFF1C20B2B
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:12:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA1791C20899
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655631A5B6;
-	Sun,  8 Oct 2023 20:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85C1156C8;
+	Sun,  8 Oct 2023 20:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j0zrcUJi"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="y7XiJN2x"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5731A59A
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 20:12:52 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B632BA
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:12:50 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-4181462ebf0so26192021cf.3
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 13:12:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99ABFBE3
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 20:46:16 +0000 (UTC)
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A44FAC
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:46:14 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1dd0526b5easo2940035fac.2
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 13:46:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696795969; x=1697400769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=17yqKc1kHaOMA6mN8raOlE7hraCjIklZ3SgNF0zPb1c=;
-        b=j0zrcUJiK+qguZJp1HkwDxVytc50EuWIq9D428LlyEOs/kRs621icXA4fj3iJLQKSA
-         L7b2fIW3d8zJMmWot4R7+aMRme2WSnXCGz8lc6+SWPNRE0Ys6bFEpW65XfFqN6/bbFkP
-         3Q2vMm3ylIBNaBEf1UwTHqvCpmLu7eWVBC2PPTOJl5n/M44hzEIuzkytL3DccNQ6HRR2
-         Xq13aNbXCGOmEWR21+Aod61zOeY6GzLNXgBhsY1r3Z6NDNC0qfeJLSc+92KoUzWm7vdG
-         A4HclQpkAqMlpdALp7cvZQ2oyr3nonPrItpqBFQ8NhZou8N9CohlTlsu/hm5Oan/qlCo
-         WH0w==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696797974; x=1697402774; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cfsry7RRRFg349Lpy0RzecaUl8H+SbsoQ6M3B1LKkpk=;
+        b=y7XiJN2x2bhxMX0nu8N6qKwZNpBx6gQp9fS7IVRUzqIGUv5AYH77bJAPUrXxVeM02N
+         A4oiNXlPEw3l+CEzF8kF9s10ldbGUrIJoPaaAOeMntcCIOuDZIGaU7Ph4in/ZoaqGvxr
+         giY0r72cZvZYFApDmRl8TzECK8GF9t1N7KMnLh+SKtOGIdhiKTF23Lm2Nkw9XGtQWiWa
+         lMxRrkhIhqLWt2nRkW+28XBsIk1J+EnlSF5UpmtJ/8rJaH0EGqSTlojs/oSn3WNJ+zTx
+         k3hEzeFAo2H8/LXwbQ8kkdcdQtOOYOenlmEtqAroMWmx9sYIhSiHBHszsTys9u6BZa74
+         pudw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696795969; x=1697400769;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=17yqKc1kHaOMA6mN8raOlE7hraCjIklZ3SgNF0zPb1c=;
-        b=h7vjfdeG7zvppow+PPdlzg4XV7kY3AwFxS82RW2SQHkZfnTRsTGYP3L88cEI6Vv4eE
-         1hRvf5J1ubaqk/cCkbxDl+doA44CqgSXo4C7YIBkYIVslRu+1XEyjGIDhzmP0J0mSpYb
-         C++cJX7znvVYz/jS6HAiqFuLn30JemGMjva4soZ3XkLGRcoabm9u81WF5WEXNZ5dOqAr
-         P63iuLO8dFubhmrwZkpfqDYP7aKsT2gmpgV+WUy5qiK7WwphcTJcJ/RYegOyJh6PBkiL
-         lQ7ED8TpecaQ+M42C1gFdRBwDvCb6jF4EnDv6kxoxsmGT54kk3E/H0NUh0viQUcn8Emd
-         2Kaw==
-X-Gm-Message-State: AOJu0YyeSn5Ts82ciMfbqy5MzawyZoOmtKijDgfesJ6Ec1o2BpnKJhdK
-	22fyvj7M5PfafBkd8n4z0IWn5CKxKZkU/A==
-X-Google-Smtp-Source: AGHT+IFzMwRntua6Sj7EEjeQiR2jzYNjwGuLrAAobzJEJigzgI5Ohz9gCtsRY/P6ZWIvCNAIKWU6Bw==
-X-Received: by 2002:a05:622a:1cb:b0:418:10d0:96f6 with SMTP id t11-20020a05622a01cb00b0041810d096f6mr18456834qtw.23.1696795969128;
-        Sun, 08 Oct 2023 13:12:49 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id v18-20020ac87292000000b00419c9215f0asm3075533qto.53.2023.10.08.13.12.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Oct 2023 13:12:48 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	alexander.duyck@gmail.com,
-	fw@strlen.de,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v2 3/3] net: expand skb_segment unit test with frag_list coverage
-Date: Sun,  8 Oct 2023 16:12:34 -0400
-Message-ID: <20231008201244.3700784-4-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
-In-Reply-To: <20231008201244.3700784-1-willemdebruijn.kernel@gmail.com>
-References: <20231008201244.3700784-1-willemdebruijn.kernel@gmail.com>
+        d=1e100.net; s=20230601; t=1696797974; x=1697402774;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cfsry7RRRFg349Lpy0RzecaUl8H+SbsoQ6M3B1LKkpk=;
+        b=DnDccJqeC97dUd/jyqZ056EKVLAtbdWBEMHwPO3RJ+5Suh0NdcXs7Vt1bycGdGvgra
+         09vRcOMQwttQJyd+ZN9IVCGugFo6WWMMuL4qE18Ty84gS8CKgkZYAR9KmuxO71Wnec1/
+         7k+MwywtBrfv+mO6+qlz7hXWuMRb0N8ZaHn209yoliQfvuMIm2bkt6635awlu/HurGjX
+         tOAtOXUyiOOJyPGO2bSE3vx3cF3izGy7X+IRgPqOAs02/CwluF75D7h7BZeJUGMhF04u
+         OnFatezsNy4KF2qp8iG0pIZugg6pxBBTsWtx3kHC1pBR5/JTznX72WwUlKj0JLtW8WiF
+         O11w==
+X-Gm-Message-State: AOJu0YynfUTqY04fG+0gQGQjuk9KvSn0bZ9cLQdoZtwEG8HBCR4A2xPb
+	vWUjv3UK+Md9pufsMkmQlkvRpg==
+X-Google-Smtp-Source: AGHT+IEJF97ednY3hDsinvKtdS7voVn3JItzYo/nlZ1tdFFEz5UdqbQl3lRNX4+5qnwbSDOlC5F8qg==
+X-Received: by 2002:a05:6870:889e:b0:1bb:c0ee:5536 with SMTP id m30-20020a056870889e00b001bbc0ee5536mr16118298oam.47.1696797973856;
+        Sun, 08 Oct 2023 13:46:13 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
+        by smtp.gmail.com with ESMTPSA id y2-20020a1709027c8200b001c736746d33sm7858505pll.217.2023.10.08.13.46.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Oct 2023 13:46:13 -0700 (PDT)
+Message-ID: <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com>
+Date: Mon, 9 Oct 2023 05:46:06 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+ songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
+ gustavoars@kernel.org, herbert@gondor.apana.org.au,
+ steffen.klassert@secunet.com, nogikh@google.com, pablo@netfilter.org,
+ decui@microsoft.com, jakub@cloudflare.com, elver@google.com,
+ pabeni@redhat.com, Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com>
+ <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+ <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
+ <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Willem de Bruijn <willemb@google.com>
+On 2023/10/09 5:08, Willem de Bruijn wrote:
+> On Sun, Oct 8, 2023 at 10:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2023/10/09 4:07, Willem de Bruijn wrote:
+>>> On Sun, Oct 8, 2023 at 7:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> virtio-net have two usage of hashes: one is RSS and another is hash
+>>>> reporting. Conventionally the hash calculation was done by the VMM.
+>>>> However, computing the hash after the queue was chosen defeats the
+>>>> purpose of RSS.
+>>>>
+>>>> Another approach is to use eBPF steering program. This approach has
+>>>> another downside: it cannot report the calculated hash due to the
+>>>> restrictive nature of eBPF.
+>>>>
+>>>> Introduce the code to compute hashes to the kernel in order to overcome
+>>>> thse challenges. An alternative solution is to extend the eBPF steering
+>>>> program so that it will be able to report to the userspace, but it makes
+>>>> little sense to allow to implement different hashing algorithms with
+>>>> eBPF since the hash value reported by virtio-net is strictly defined by
+>>>> the specification.
+>>>>
+>>>> The hash value already stored in sk_buff is not used and computed
+>>>> independently since it may have been computed in a way not conformant
+>>>> with the specification.
+>>>>
+>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>> ---
+>>>
+>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap = {
+>>>> +       .max_indirection_table_length =
+>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+>>>> +
+>>>> +       .types = VIRTIO_NET_SUPPORTED_HASH_TYPES
+>>>> +};
+>>>
+>>> No need to have explicit capabilities exchange like this? Tun either
+>>> supports all or none.
+>>
+>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
+>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
+>>
+>> It is because the flow dissector does not support IPv6 extensions. The
+>> specification is also vague, and does not tell how many TLVs should be
+>> consumed at most when interpreting destination option header so I chose
+>> to avoid adding code for these hash types to the flow dissector. I doubt
+>> anyone will complain about it since nobody complains for Linux.
+>>
+>> I'm also adding this so that we can extend it later.
+>> max_indirection_table_length may grow for systems with 128+ CPUs, or
+>> types may have other bits for new protocols in the future.
+>>
+>>>
+>>>>           case TUNSETSTEERINGEBPF:
+>>>> -               ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>>>> +               bpf_ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>>>> +               if (IS_ERR(bpf_ret))
+>>>> +                       ret = PTR_ERR(bpf_ret);
+>>>> +               else if (bpf_ret)
+>>>> +                       tun->vnet_hash.flags &= ~TUN_VNET_HASH_RSS;
+>>>
+>>> Don't make one feature disable another.
+>>>
+>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+>>> functions. If one is enabled the other call should fail, with EBUSY
+>>> for instance.
+>>>
+>>>> +       case TUNSETVNETHASH:
+>>>> +               len = sizeof(vnet_hash);
+>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+>>>> +                       ret = -EFAULT;
+>>>> +                       break;
+>>>> +               }
+>>>> +
+>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
+>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hdr_v1_hash) ||
+>>>> +                     !tun_is_little_endian(tun))) ||
+>>>> +                    vnet_hash.indirection_table_mask >=
+>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
+>>>> +                       ret = -EINVAL;
+>>>> +                       break;
+>>>> +               }
+>>>> +
+>>>> +               argp = (u8 __user *)argp + len;
+>>>> +               len = (vnet_hash.indirection_table_mask + 1) * 2;
+>>>> +               if (copy_from_user(vnet_hash_indirection_table, argp, len)) {
+>>>> +                       ret = -EFAULT;
+>>>> +                       break;
+>>>> +               }
+>>>> +
+>>>> +               argp = (u8 __user *)argp + len;
+>>>> +               len = virtio_net_hash_key_length(vnet_hash.types);
+>>>> +
+>>>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
+>>>> +                       ret = -EFAULT;
+>>>> +                       break;
+>>>> +               }
+>>>
+>>> Probably easier and less error-prone to define a fixed size control
+>>> struct with the max indirection table size.
+>>
+>> I made its size variable because the indirection table and key may grow
+>> in the future as I wrote above.
+>>
+>>>
+>>> Btw: please trim the CC: list considerably on future patches.
+>>
+>> I'll do so in the next version with the TUNSETSTEERINGEBPF change you
+>> proposed.
+> 
+> To be clear: please don't just resubmit with that one change.
+> 
+> The skb and cb issues are quite fundamental issues that need to be resolved.
+> 
+> I'd like to understand why adjusting the existing BPF feature for this
+> exact purpose cannot be amended to return the key it produced.
 
-Expand the test with these variants that use skb frag_list:
+eBPF steering program is not designed for this particular problem in my 
+understanding. It was introduced to derive hash values with an 
+understanding of application-specific semantics of packets instead of 
+generic IP/TCP/UDP semantics.
 
-- GSO_TEST_FRAG_LIST:             frag_skb length is gso_size
-- GSO_TEST_FRAG_LIST_PURE:        same, data exclusively in frag skbs
-- GSO_TEST_FRAG_LIST_NON_UNIFORM: frag_skb length may vary
-- GSO_TEST_GSO_BY_FRAGS:          frag_skb length defines gso_size,
-                                  i.e., segs may have varying sizes.
+This problem is rather different in terms that the hash derivation is 
+strictly defined by virtio-net. I don't think it makes sense to 
+introduce the complexity of BPF when you always run the same code.
 
-Signed-off-by: Willem de Bruijn <willemb@google.com>
+It can utilize the existing flow dissector and also make it easier to 
+use for the userspace by implementing this in the kernel.
 
----
-
-v1->v2
-  - maintain reverse christmas tree
----
- net/core/gso_test.c | 92 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
-
-diff --git a/net/core/gso_test.c b/net/core/gso_test.c
-index c4e0b0832dbac..c1a6cffb6f961 100644
---- a/net/core/gso_test.c
-+++ b/net/core/gso_test.c
-@@ -27,6 +27,10 @@ enum gso_test_nr {
- 	GSO_TEST_FRAGS,
- 	GSO_TEST_FRAGS_PURE,
- 	GSO_TEST_GSO_PARTIAL,
-+	GSO_TEST_FRAG_LIST,
-+	GSO_TEST_FRAG_LIST_PURE,
-+	GSO_TEST_FRAG_LIST_NON_UNIFORM,
-+	GSO_TEST_GSO_BY_FRAGS,
- };
- 
- struct gso_test_case {
-@@ -37,6 +41,8 @@ struct gso_test_case {
- 	unsigned int linear_len;
- 	unsigned int nr_frags;
- 	const unsigned int *frags;
-+	unsigned int nr_frag_skbs;
-+	const unsigned int *frag_skbs;
- 
- 	/* output as expected */
- 	unsigned int nr_segs;
-@@ -84,6 +90,48 @@ static struct gso_test_case cases[] = {
- 		.nr_segs = 2,
- 		.segs = (const unsigned int[]) { 2 * gso_size, 3 },
- 	},
-+	{
-+		/* commit 89319d3801d1: frag_list on mss boundaries */
-+		.id = GSO_TEST_FRAG_LIST,
-+		.name = "frag_list",
-+		.linear_len = gso_size,
-+		.nr_frag_skbs = 2,
-+		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
-+		.nr_segs = 3,
-+		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size },
-+	},
-+	{
-+		.id = GSO_TEST_FRAG_LIST_PURE,
-+		.name = "frag_list_pure",
-+		.nr_frag_skbs = 2,
-+		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
-+		.nr_segs = 2,
-+		.segs = (const unsigned int[]) { gso_size, gso_size },
-+	},
-+	{
-+		/* commit 43170c4e0ba7: GRO of frag_list trains */
-+		.id = GSO_TEST_FRAG_LIST_NON_UNIFORM,
-+		.name = "frag_list_non_uniform",
-+		.linear_len = gso_size,
-+		.nr_frag_skbs = 4,
-+		.frag_skbs = (const unsigned int[]) { gso_size, 1, gso_size, 2 },
-+		.nr_segs = 4,
-+		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size, 3 },
-+	},
-+	{
-+		/* commit 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes") and
-+		 * commit 90017accff61 ("sctp: Add GSO support")
-+		 *
-+		 * "there will be a cover skb with protocol headers and
-+		 *  children ones containing the actual segments"
-+		 */
-+		.id = GSO_TEST_GSO_BY_FRAGS,
-+		.name = "gso_by_frags",
-+		.nr_frag_skbs = 4,
-+		.frag_skbs = (const unsigned int[]) { 100, 200, 300, 400 },
-+		.nr_segs = 4,
-+		.segs = (const unsigned int[]) { 100, 200, 300, 400 },
-+	},
- };
- 
- static void gso_test_case_to_desc(struct gso_test_case *t, char *desc)
-@@ -131,10 +179,54 @@ static void gso_test_func(struct kunit *test)
- 		skb->truesize += skb->data_len;
- 	}
- 
-+	if (tcase->frag_skbs) {
-+		unsigned int total_size = 0, total_true_size = 0, alloc_size = 0;
-+		struct sk_buff *frag_skb, *prev = NULL;
-+
-+		page = alloc_page(GFP_KERNEL);
-+		KUNIT_ASSERT_NOT_NULL(test, page);
-+		page_ref_add(page, tcase->nr_frag_skbs - 1);
-+
-+		for (i = 0; i < tcase->nr_frag_skbs; i++) {
-+			unsigned int frag_size;
-+
-+			frag_size = tcase->frag_skbs[i];
-+			frag_skb = build_skb(page_address(page) + alloc_size,
-+					     frag_size + shinfo_size);
-+			KUNIT_ASSERT_NOT_NULL(test, frag_skb);
-+			__skb_put(frag_skb, frag_size);
-+
-+			if (prev)
-+				prev->next = frag_skb;
-+			else
-+				skb_shinfo(skb)->frag_list = frag_skb;
-+			prev = frag_skb;
-+
-+			total_size += frag_size;
-+			total_true_size += frag_skb->truesize;
-+			alloc_size += frag_size + shinfo_size;
-+		}
-+
-+		KUNIT_ASSERT_LE(test, alloc_size, PAGE_SIZE);
-+
-+		skb->len += total_size;
-+		skb->data_len += total_size;
-+		skb->truesize += total_true_size;
-+
-+		if (tcase->id == GSO_TEST_GSO_BY_FRAGS)
-+			skb_shinfo(skb)->gso_size = GSO_BY_FRAGS;
-+	}
-+
- 	features = NETIF_F_SG | NETIF_F_HW_CSUM;
- 	if (tcase->id == GSO_TEST_GSO_PARTIAL)
- 		features |= NETIF_F_GSO_PARTIAL;
- 
-+	/* TODO: this should also work with SG,
-+	 * rather than hit BUG_ON(i >= nfrags)
-+	 */
-+	if (tcase->id == GSO_TEST_FRAG_LIST_NON_UNIFORM)
-+		features &= ~NETIF_F_SG;
-+
- 	segs = skb_segment(skb, features);
- 	if (IS_ERR(segs)) {
- 		KUNIT_FAIL(test, "segs error %lld", PTR_ERR(segs));
--- 
-2.42.0.609.gbb76f46606-goog
-
+> 
+> As you point out, the C flow dissector is insufficient. The BPF flow
+> dissector does not have this problem. The same argument would go for
+> the pre-existing BPF steering program.
+It is possible to extend the C flow dissector just as it is possible to 
+implement a BPF flow dissector. The more serious problem is that 
+virtio-net specification (and Microsoft RSS it follows) does not tell 
+how to implement IPv6 extension support.
 
