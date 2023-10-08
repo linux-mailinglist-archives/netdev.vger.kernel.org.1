@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-38892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3B9A7BCE63
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:01:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D345A7BCE68
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:01:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E28751C20895
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:01:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CACB281875
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3974C152;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8399C153;
 	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAvRQ3ao"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghPM3dBY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10E68F50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C111BBE7E
 	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56AD9C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A371C433CA;
 	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1696770105;
-	bh=DQk+Uo1Aj7m6CN1WR/ZmAdwJnWTi1NCYCK8zikDFlOk=;
+	bh=HMuod/sQIBw25FNhGwfbVXfGLURFP8W2BfMfTcjpq+o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QAvRQ3ao3Vl8wpZWph0A/wBAApb3xqHFpF7ki5GRsl+xTA7nthe5xhWDBpgosTwG2
-	 /tb2JuNL2BbJl/E6L/Ax5jN7e9rjv2ZUW8db1aqZDV26h9PeEyfvoBhZBVK2y/MX0s
-	 kTC8+y5jNEVT3NPidyvqQlHDRFj7TLx2GMVZkVP6EqG5XBdhOH6fyW+orqX2pafaiH
-	 mstHg4cV0hsaEvx+QMElQAZeot2u0hnGoW0DmA7Uk5iYnY36AVgkPP+pkCjgRBalAm
-	 +Xm6r5irjkQzrywjH/v57LuOlhTcxWgQr1CT/S5KPoJN29iEzzoAcdtrgVgMCY5Noz
-	 jOg+boJA5StrQ==
+	b=ghPM3dBYNFZaBw/WGu7afyySXeE3nhQ5KkfF75BcjKKPfsrBM2k0/zW1NuquFgLFL
+	 v75QORsaFHH3flxcllDSImgy65GbqqZAxLJTGEKbx5hLi6yGy2FDwOtByGbMq3L7jq
+	 j5UqSoqiQ9irS7aCcHPp7j7pU0svn2iF8vXHal4c2tUO07ZNhZ3PtQdCqKCLqi/l4M
+	 gC4N1DqVVWk4xiCZeyj83kHOZFM010K2Viwc+oyzveM2J6r4S4RPYgsvsLIsBpmnSo
+	 6c1PFvHCWpehkWN9z3wgzNeR+/7XgcuXEBedUOR/tvuazSBK/gu6IKcRGV95svNdzm
+	 9JNax29I1DoGw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 37774E11F5C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3FEBDC395E0;
 	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,41 +43,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] xen-netback: use default TX queue size for vifs
+Subject: Re: [PATCH net] mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169677010522.31796.399436279906419737.git-patchwork-notify@kernel.org>
+ <169677010525.31796.12660644499166832802.git-patchwork-notify@kernel.org>
 Date: Sun, 08 Oct 2023 13:01:45 +0000
-References: <20231005140831.89117-1-roger.pau@citrix.com>
-In-Reply-To: <20231005140831.89117-1-roger.pau@citrix.com>
-To: =?utf-8?b?Um9nZXIgUGF1IE1vbm7DqSA8cm9nZXIucGF1QGNpdHJpeC5jb20+?=@codeaurora.org
-Cc: linux-kernel@vger.kernel.org, ross.lagerwall@citrix.com,
- wei.liu@kernel.org, paul@xen.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Ian.Campbell@citrix.com,
- bhutchings@solarflare.com, xen-devel@lists.xenproject.org,
- netdev@vger.kernel.org
+References: <6b2eb847-1d23-4b72-a1da-204df03f69d3@moroto.mountain>
+In-Reply-To: <6b2eb847-1d23-4b72-a1da-204df03f69d3@moroto.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: idosch@mellanox.com, idosch@nvidia.com, petrm@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  5 Oct 2023 16:08:31 +0200 you wrote:
-> Do not set netback interfaces (vifs) default TX queue size to the ring size.
-> The TX queue size is not related to the ring size, and using the ring size (32)
-> as the queue size can lead to packet drops.  Note the TX side of the vif
-> interface in the netback domain is the one receiving packets to be injected
-> to the guest.
+On Thu, 5 Oct 2023 17:00:12 +0300 you wrote:
+> The mlxsw_sp2_nve_vxlan_learning_set() function is supposed to return
+> zero on success or negative error codes.  So it needs to be type int
+> instead of bool.
 > 
-> Do not explicitly set the TX queue length to any value when creating the
-> interface, and instead use the system default.  Note that the queue length can
-> also be adjusted at runtime.
+> Fixes: 4ee70efab68d ("mlxsw: spectrum_nve: Add support for VXLAN on Spectrum-2")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - xen-netback: use default TX queue size for vifs
-    https://git.kernel.org/netdev/net/c/66cf7435a269
+  - [net] mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
+    https://git.kernel.org/netdev/net/c/1e0b72a2a643
 
 You are awesome, thank you!
 -- 
