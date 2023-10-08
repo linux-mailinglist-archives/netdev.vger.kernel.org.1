@@ -1,83 +1,90 @@
-Return-Path: <netdev+bounces-38893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D345A7BCE68
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:01:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988277BCEA0
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CACB281875
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:01:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E681C20939
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8399C153;
-	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DA3C8C8;
+	Sun,  8 Oct 2023 13:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghPM3dBY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uAc0d7Eu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C111BBE7E
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A371C433CA;
-	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04FAC2D0;
+	Sun,  8 Oct 2023 13:48:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C84B1C433C9;
+	Sun,  8 Oct 2023 13:48:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696770105;
-	bh=HMuod/sQIBw25FNhGwfbVXfGLURFP8W2BfMfTcjpq+o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ghPM3dBYNFZaBw/WGu7afyySXeE3nhQ5KkfF75BcjKKPfsrBM2k0/zW1NuquFgLFL
-	 v75QORsaFHH3flxcllDSImgy65GbqqZAxLJTGEKbx5hLi6yGy2FDwOtByGbMq3L7jq
-	 j5UqSoqiQ9irS7aCcHPp7j7pU0svn2iF8vXHal4c2tUO07ZNhZ3PtQdCqKCLqi/l4M
-	 gC4N1DqVVWk4xiCZeyj83kHOZFM010K2Viwc+oyzveM2J6r4S4RPYgsvsLIsBpmnSo
-	 6c1PFvHCWpehkWN9z3wgzNeR+/7XgcuXEBedUOR/tvuazSBK/gu6IKcRGV95svNdzm
-	 9JNax29I1DoGw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3FEBDC395E0;
-	Sun,  8 Oct 2023 13:01:45 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1696772911;
+	bh=YqTjTo5qyvkFsUpprDwEhsylJzLXDife+dFG3kvmIos=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uAc0d7Eu3wsB7TPeiq8k9jJaW1Pux44ZYGjqdsRj/D/qotZsKSpRwF/mRF+5do/4L
+	 vozcc4+E92ocPnK+oeNCSJhUHBUSciurAxrkapFAO9ulag/udKrJ+sECmiUfoYtCs/
+	 BoJuz5pe6dJXd7osLrF5Q6xRWTML4LgfX5d+p/eCyAP/g5YCLsKUwXV/qKByy/JlyE
+	 MPf/FgjZ+eH2bI4dzof8Uq6cz17B7GXqOp3XZfis0NgfXKxdojdYh7nCL5ejN6ojzZ
+	 93OW06nc2lmB8OBelv4+PeoaI/iyLKVoA0QQSTpu9eC+OT4rKLPpVRKaft8kQgSwrg
+	 Jr4evKXMXpyEA==
+Date: Sun, 8 Oct 2023 15:48:24 +0200
+From: Simon Horman <horms@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Olsa <jolsa@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Yonghong Song <yonghong.song@linux.dev>
+Subject: Re: [PATCH bpf-next v2] net: Add a warning if NAPI cb missed
+ xdp_do_flush().
+Message-ID: <20231008134824.GG831234@kernel.org>
+References: <20230929165825.RvwBYGP1@linutronix.de>
+ <20231004070926.5b4ba04c@kernel.org>
+ <20231006154933.mQgxQHHt@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169677010525.31796.12660644499166832802.git-patchwork-notify@kernel.org>
-Date: Sun, 08 Oct 2023 13:01:45 +0000
-References: <6b2eb847-1d23-4b72-a1da-204df03f69d3@moroto.mountain>
-In-Reply-To: <6b2eb847-1d23-4b72-a1da-204df03f69d3@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: idosch@mellanox.com, idosch@nvidia.com, petrm@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006154933.mQgxQHHt@linutronix.de>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 5 Oct 2023 17:00:12 +0300 you wrote:
-> The mlxsw_sp2_nve_vxlan_learning_set() function is supposed to return
-> zero on success or negative error codes.  So it needs to be type int
-> instead of bool.
+On Fri, Oct 06, 2023 at 05:49:33PM +0200, Sebastian Andrzej Siewior wrote:
+> A few drivers were missing a xdp_do_flush() invocation after
+> XDP_REDIRECT.
 > 
-> Fixes: 4ee70efab68d ("mlxsw: spectrum_nve: Add support for VXLAN on Spectrum-2")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Add three helper functions each for one of the per-CPU lists. Return
+> true if the per-CPU list is non-empty and flush the list.
+> Add xdp_do_check_flushed() which invokes each helper functions and
+> creats a warning if one of the functions had a non-empty list.
+
+nit: creates
+
+> Hide everything behind CONFIG_DEBUG_NET.
 > 
-> [...]
+> Suggested-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Here is the summary with links:
-  - [net] mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
-    https://git.kernel.org/netdev/net/c/1e0b72a2a643
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+...
 
