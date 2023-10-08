@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-38927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B597BD108
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 00:49:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 078337BD109
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 00:49:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E5651C20958
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:49:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6571C20B61
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A7233997;
-	Sun,  8 Oct 2023 22:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55589347A1;
+	Sun,  8 Oct 2023 22:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cfuUw1U+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWDpc/uF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B12833999
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 22:49:41 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3956BA
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 15:49:39 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40537481094so36317095e9.0
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 15:49:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A74341AF
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 22:49:43 +0000 (UTC)
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1FECA
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 15:49:41 -0700 (PDT)
+Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-40566f89f6eso39156605e9.3
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 15:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696805378; x=1697410178; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696805380; x=1697410180; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3k5+MAFhsYftTSV76Xqg3Eq5Ki7v0F2ma63z3/DOQXU=;
-        b=cfuUw1U+DN6VB01cajljt1wL85UXovDfiujlQkr2Nwd2XjjFLCWRIMRjPgnTXJ4jkE
-         ap2S+9bHvXNocr5M/w9Qa7yH8UZA7GP5XufIOO/3/6625yjbR/0MR5BWthLVRJpqAmKh
-         pI6SZqdPRNZn6hOqsohZdDkgdVOCPghxOsQbbVEhkUXqwEXfJYZOHJRFNbSflnFLYN8i
-         wSv5phDOAXNbSkMe99131UZae+qHYqkYLkZaSKdr9vimW/UeIFrhomnM8xIKuCJhrDND
-         IcaFGFMp4H1W6VNlEle6bGsDszhoKRLMGiLGX/J9iv1g2rZTx7uJOXAfkesIHDs5tuhR
-         n1BA==
+        bh=udUJrXKMN6awb+8Gzc1UqEAcMJV7VS83x6Mg+K4d1jA=;
+        b=AWDpc/uFSAy5bHIRNo0kTN2pNhgGIGQcDLAGUVnE0mXkQYVJWLL1I88amiC64bbqL0
+         NL/y9UC81A7AKTbV/JGqCbEw7liKUQRL/atW9t2NVUX60UODz9mIusXdg1i2z96BbiUQ
+         GkCV4kujHOulcraq0EunJHOASib4fyDR87VakCK9W+CzlGveCBnDui6msxdDNKi5Eutp
+         GvNAk+5OTSIZIPPBYjyBMJOG6K7V4pcQT9MZbfbAD/YIX6lgusUiNHhLn98QaKgbQRyz
+         dUpGOstxe7UKKhgUciRUH0poO+31REAqKWzsao+rqWg5hSPFgEFaqrU2Fv3bPFIihtc9
+         mdBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696805378; x=1697410178;
+        d=1e100.net; s=20230601; t=1696805380; x=1697410180;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3k5+MAFhsYftTSV76Xqg3Eq5Ki7v0F2ma63z3/DOQXU=;
-        b=hEy1jKDgGmpbXqxEGV+iSz1ZqtqiMq2qNXxeNLUEAXF8hhW5dk9DMgjURnzEr1sU8q
-         BPGFveqqXDLCO05siugn4plrjs849jyvDtKVuGHLNw5Iw2YNt5t2J/IItkJ1KcMuN+Jl
-         zjuqzbFA2fFFN0HjZHi5RfI7gCPvlEYlVlaqA+zefNXA6wb+2S7z3tdRdBU+JkGxe8hJ
-         axD9NT/AVdE1pL0WISxhRK6U+DwqS0a5CqMfuAuNc2s9BocW5xxHoB9ZFmJjZbvd4pYq
-         5I8I9tfFedLiPTmI9gg91/xc8ZeGUvWSXgxUJ9Je6aYfhhK+FYg0s+uSqW+FhSq+b0ic
-         ctYA==
-X-Gm-Message-State: AOJu0YzU6UKTjkRw0FoZzWTxLvWS++jQH/3r3lsO/aWLfFulNECieHbf
-	eiafual+O8zHosZiWpqCiF375FSCjLeJdw==
-X-Google-Smtp-Source: AGHT+IGeBUjRGetCJmzAiarYFCM07LBNZdH+lMa1q2uf0dpnxY8ph6ufmSWopr8rqaLJQFGPtUdHFA==
-X-Received: by 2002:a7b:cd0a:0:b0:405:3dbc:8821 with SMTP id f10-20020a7bcd0a000000b004053dbc8821mr11811445wmj.22.1696805377872;
-        Sun, 08 Oct 2023 15:49:37 -0700 (PDT)
+        bh=udUJrXKMN6awb+8Gzc1UqEAcMJV7VS83x6Mg+K4d1jA=;
+        b=gv1bkstaWKxk/y3oO0mZdAOFEDCooUaZTOUOGYGjY55UciSI4akSaG+Re5sHsS6Iri
+         t2OgP46WE3h02RrDKVrEue600EIE0pxvnkJAK/V1ZrcF1QK/uT6QAv75vg0tQvjnsE7L
+         BZuU2pYkGDhuZs4fwJc6aGLN7fVk2XO2hvNpROxoFF+PtQ1SMVfoOw5K4bFFBqbpzsIN
+         ykZ8NHtZOVZmpXsURi7IfLv0UkrMRKuYU9b10hBhex8CxqKUx+T/WDGdoFYBLcOrj6BQ
+         mhoC9iI6P4odrROyCNXBt9rCK5VTz9eHCEEg5v8fqQtonamwJHwT2ofkzzak31vwODck
+         9knQ==
+X-Gm-Message-State: AOJu0YyvvSiIbTin0gCNvEeFyp5u0G6ddRazBNPucD8r6Bk9Oai8ShoW
+	XBz1Ipn0WHdpl8R9a1gFyiV6FuEzmj5mRw==
+X-Google-Smtp-Source: AGHT+IE7ZYCsZP0d11dRnWftpWvNFGXshA5vn5NsvaxowFpdC21oLG9BhPDeU915doV+KJmjLmw/JA==
+X-Received: by 2002:a7b:cd8e:0:b0:405:3a3d:6f53 with SMTP id y14-20020a7bcd8e000000b004053a3d6f53mr11874647wmj.3.1696805379692;
+        Sun, 08 Oct 2023 15:49:39 -0700 (PDT)
 Received: from reibax-minipc.lan ([2a0c:5a80:3e06:7600::978])
-        by smtp.gmail.com with ESMTPSA id 6-20020a05600c22c600b0040303a9965asm11804891wmg.40.2023.10.08.15.49.37
+        by smtp.gmail.com with ESMTPSA id 6-20020a05600c22c600b0040303a9965asm11804891wmg.40.2023.10.08.15.49.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Oct 2023 15:49:37 -0700 (PDT)
+        Sun, 08 Oct 2023 15:49:39 -0700 (PDT)
 From: Xabier Marquiegui <reibax@gmail.com>
 To: netdev@vger.kernel.org
 Cc: richardcochran@gmail.com,
@@ -72,9 +72,9 @@ Cc: richardcochran@gmail.com,
 	davem@davemloft.net,
 	rrameshbabu@nvidia.com,
 	shuah@kernel.org
-Subject: [PATCH net-next v5 5/6] ptp: add debugfs interface to see applied channel masks
-Date: Mon,  9 Oct 2023 00:49:20 +0200
-Message-Id: <72ae11ff23793730a64cc1a037f9a6d59dbfbeea.1696804243.git.reibax@gmail.com>
+Subject: [PATCH net-next v5 6/6] ptp: add testptp mask test
+Date: Mon,  9 Oct 2023 00:49:21 +0200
+Message-Id: <3056b7800f0dae65a2128b09b5c8d6142fd8df11.1696804243.git.reibax@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <cover.1696804243.git.reibax@gmail.com>
 References: <cover.1696804243.git.reibax@gmail.com>
@@ -92,163 +92,110 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use debugfs to be able to view channel mask applied to every timestamp
-event queue.
+Add option to test timestamp event queue mask manipulation in testptp.
 
-Every time the device is opened, a new entry is created in
-`$DEBUGFS_MOUNTPOINT/ptpN/$INSTANCE_ADDRESS/mask`.
+Option -F allows the user to specify a single channel that will be
+applied on the mask filter via IOCTL.
 
-The mask value can be viewed grouped in 32bit decimal values using cat,
-or converted to hexadecimal with the included `ptpchmaskfmt.sh` script.
-32 bit values are listed from least significant to most significant.
+The test program will maintain the file open until user input is
+received.
+
+This allows checking the effect of the IOCTL in debugfs.
+
+eg:
+
+Console 1:
+```
+Channel 12 exclusively enabled. Check on debugfs.
+Press any key to continue
+```
+
+Console 2:
+```
+0x00000000 0x00000001 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
+0x00000000 0x00000000 0x00000000 0x00000000
+```
 
 Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
+Suggested-by: Richard Cochran <richardcochran@gmail.com>
 Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 ---
-v1: https://lore.kernel.org/netdev/27d47d720dfa7a0b5a59b32626ed6d02745b6ee0.1696511486.git.reibax@gmail.com/
-  - First version
+v2: https://lore.kernel.org/netdev/85bfc30fb60bc4e1d98fd8ea7f694c66172e9d5d.1696511486.git.reibax@gmail.com/
+  - split from previous patch that combined more changes
+  - make more secure and simple: mask is only applied to the testptp
+    instance. Use debugfs to verify effects.
+v1: https://lore.kernel.org/netdev/20230928133544.3642650-4-reibax@gmail.com/
 ---
- drivers/ptp/ptp_chardev.c                   | 14 ++++++++++++++
- drivers/ptp/ptp_clock.c                     |  7 +++++++
- drivers/ptp/ptp_private.h                   |  4 ++++
- tools/testing/selftests/ptp/ptpchmaskfmt.sh | 14 ++++++++++++++
- 4 files changed, 39 insertions(+)
- create mode 100644 tools/testing/selftests/ptp/ptpchmaskfmt.sh
+ tools/testing/selftests/ptp/testptp.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index ac2f2b5ea0b7..282cd7d24077 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -10,6 +10,7 @@
- #include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/timekeeping.h>
-+#include <linux/debugfs.h>
+diff --git a/tools/testing/selftests/ptp/testptp.c b/tools/testing/selftests/ptp/testptp.c
+index c9f6cca4feb4..011252fe238c 100644
+--- a/tools/testing/selftests/ptp/testptp.c
++++ b/tools/testing/selftests/ptp/testptp.c
+@@ -121,6 +121,7 @@ static void usage(char *progname)
+ 		" -d name    device to open\n"
+ 		" -e val     read 'val' external time stamp events\n"
+ 		" -f val     adjust the ptp clock frequency by 'val' ppb\n"
++		" -F chan    Enable single channel mask and keep device open for debugfs verification.\n"
+ 		" -g         get the ptp clock time\n"
+ 		" -h         prints this message\n"
+ 		" -i val     index for event/trigger\n"
+@@ -187,6 +188,7 @@ int main(int argc, char *argv[])
+ 	int pps = -1;
+ 	int seconds = 0;
+ 	int settime = 0;
++	int channel = -1;
  
- #include <linux/nospec.h>
+ 	int64_t t1, t2, tp;
+ 	int64_t interval, offset;
+@@ -196,7 +198,7 @@ int main(int argc, char *argv[])
  
-@@ -106,6 +107,7 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
- 	struct ptp_clock *ptp =
- 		container_of(pccontext->clk, struct ptp_clock, clock);
- 	struct timestamp_event_queue *queue;
-+	char debugfsname[32];
- 
- 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
- 	if (!queue)
-@@ -119,6 +121,17 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
- 	spin_lock_init(&queue->lock);
- 	list_add_tail(&queue->qlist, &ptp->tsevqs);
- 	pccontext->private_clkdata = queue;
-+
-+	/* Debugfs contents */
-+	sprintf(debugfsname, "0x%p", queue);
-+	queue->debugfs_instance =
-+		debugfs_create_dir(debugfsname, ptp->debugfs_root);
-+	queue->dfs_bitmap.array = (u32 *)queue->mask;
-+	queue->dfs_bitmap.n_elements =
-+		DIV_ROUND_UP(PTP_MAX_CHANNELS, BITS_PER_BYTE * sizeof(u32));
-+	debugfs_create_u32_array("mask", 0444, queue->debugfs_instance,
-+				 &queue->dfs_bitmap);
-+
- 	return 0;
- }
- 
-@@ -128,6 +141,7 @@ int ptp_release(struct posix_clock_context *pccontext)
- 	unsigned long flags;
- 
- 	if (queue) {
-+		debugfs_remove(queue->debugfs_instance);
- 		pccontext->private_clkdata = NULL;
- 		spin_lock_irqsave(&queue->lock, flags);
- 		list_del(&queue->qlist);
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index ed16d9787ce9..2e801cd33220 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -15,6 +15,7 @@
- #include <linux/slab.h>
- #include <linux/syscalls.h>
- #include <linux/uaccess.h>
-+#include <linux/debugfs.h>
- #include <uapi/linux/sched/types.h>
- 
- #include "ptp_private.h"
-@@ -185,6 +186,7 @@ static void ptp_clock_release(struct device *dev)
- 	spin_unlock_irqrestore(&tsevq->lock, flags);
- 	bitmap_free(tsevq->mask);
- 	kfree(tsevq);
-+	debugfs_remove(ptp->debugfs_root);
- 	ida_free(&ptp_clocks_map, ptp->index);
- 	kfree(ptp);
- }
-@@ -218,6 +220,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	struct ptp_clock *ptp;
- 	struct timestamp_event_queue *queue = NULL;
- 	int err = 0, index, major = MAJOR(ptp_devt);
-+	char debugfsname[8];
- 	size_t size;
- 
- 	if (info->n_alarm > PTP_MAX_ALARMS)
-@@ -339,6 +342,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 		return ERR_PTR(err);
+ 	progname = strrchr(argv[0], '/');
+ 	progname = progname ? 1+progname : argv[0];
+-	while (EOF != (c = getopt(argc, argv, "cd:e:f:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xz"))) {
++	while (EOF != (c = getopt(argc, argv, "cd:e:f:F:ghH:i:k:lL:n:o:p:P:sSt:T:w:x:Xz"))) {
+ 		switch (c) {
+ 		case 'c':
+ 			capabilities = 1;
+@@ -210,6 +212,9 @@ int main(int argc, char *argv[])
+ 		case 'f':
+ 			adjfreq = atoi(optarg);
+ 			break;
++		case 'F':
++			channel = atoi(optarg);
++			break;
+ 		case 'g':
+ 			gettime = 1;
+ 			break;
+@@ -604,6 +609,18 @@ int main(int argc, char *argv[])
+ 		free(xts);
  	}
  
-+	/* Debugfs initialization */
-+	sprintf(debugfsname, "ptp%d", ptp->index);
-+	ptp->debugfs_root = debugfs_create_dir(debugfsname, NULL);
++	if (channel >= 0) {
++		if (ioctl(fd, PTP_MASK_CLEAR_ALL)) {
++			perror("PTP_MASK_CLEAR_ALL");
++		} else if (ioctl(fd, PTP_MASK_EN_SINGLE, (unsigned int *)&channel)) {
++			perror("PTP_MASK_EN_SINGLE");
++		} else {
++			printf("Channel %d exclusively enabled. Check on debugfs.\n", channel);
++			printf("Press any key to continue\n.");
++			getchar();
++		}
++	}
 +
- 	return ptp;
- 
- no_pps:
-diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index ad4ce1b25c86..52f87e394aa6 100644
---- a/drivers/ptp/ptp_private.h
-+++ b/drivers/ptp/ptp_private.h
-@@ -17,6 +17,7 @@
- #include <linux/time.h>
- #include <linux/list.h>
- #include <linux/bitmap.h>
-+#include <linux/debugfs.h>
- 
- #define PTP_MAX_TIMESTAMPS 128
- #define PTP_BUF_TIMESTAMPS 30
-@@ -30,6 +31,8 @@ struct timestamp_event_queue {
- 	spinlock_t lock;
- 	struct list_head qlist;
- 	unsigned long *mask;
-+	struct dentry *debugfs_instance;
-+	struct debugfs_u32_array dfs_bitmap;
- };
- 
- struct ptp_clock {
-@@ -57,6 +60,7 @@ struct ptp_clock {
- 	struct mutex n_vclocks_mux; /* protect concurrent n_vclocks access */
- 	bool is_virtual_clock;
- 	bool has_cycles;
-+	struct dentry *debugfs_root;
- };
- 
- #define info_to_vclock(d) container_of((d), struct ptp_vclock, info)
-diff --git a/tools/testing/selftests/ptp/ptpchmaskfmt.sh b/tools/testing/selftests/ptp/ptpchmaskfmt.sh
-new file mode 100644
-index 000000000000..0a06ba8af300
---- /dev/null
-+++ b/tools/testing/selftests/ptp/ptpchmaskfmt.sh
-@@ -0,0 +1,14 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# Simple helper script to transform ptp debugfs timestamp event queue filtering
-+# masks from decimal values to hexadecimal values
-+
-+# Only takes the debugfs mask file path as an argument
-+DEBUGFS_MASKFILE="${1}"
-+
-+#shellcheck disable=SC2013,SC2086
-+for int in $(cat "$DEBUGFS_MASKFILE") ; do
-+    printf '0x%08X ' "$int"
-+done
-+echo
+ 	close(fd);
+ 	return 0;
+ }
 -- 
 2.30.2
 
