@@ -1,238 +1,116 @@
-Return-Path: <netdev+bounces-38909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565287BCF8F
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:27:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6AB07BCF98
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 790211C20849
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 18:27:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 905131C2093C
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 18:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E9A1863B;
-	Sun,  8 Oct 2023 18:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016F6154B1;
+	Sun,  8 Oct 2023 18:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSwbmiZC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bw2CaHJV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56E7FBF0
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 18:27:38 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F27A3;
-	Sun,  8 Oct 2023 11:27:37 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3247cefa13aso3504021f8f.1;
-        Sun, 08 Oct 2023 11:27:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5022CA9;
+	Sun,  8 Oct 2023 18:37:35 +0000 (UTC)
+Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6230AC;
+	Sun,  8 Oct 2023 11:37:33 -0700 (PDT)
+Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-49618e09f16so1256513e0c.2;
+        Sun, 08 Oct 2023 11:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696789654; x=1697394454; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UYhUlM0v/kiBnSA7qqkERNTe3ha0hd9wd9BeXsJuFRo=;
-        b=JSwbmiZCaHGFO9Si6aH78Qhj9fM1wPHsOC6QWVJSzNk857ic9djFm1+pqpk7pKGGxp
-         WK3OroWhyW83kshoTJkBSqAM1tR+Ha3SNMtzTkzxy1+isDHg9DCb4sfzdO7iJyuJ4vM6
-         GR2qEFcddyvF98b18yVubStOuYHQp2n0ihk/bQA6RkeUJIo/sveVPblAg0ZN09hsaqyM
-         dG01SXARf3kz3CV69rmGyz7YMWvRliAwYR/MGwfFklyf+gu5FEFUxCYFM2/q+RPlmJX4
-         C/c22d/ojpo4+0PIJCZW8bq3aphc45v1g8lUjODL6QBp1vFVIxeZE+lgJLSKmsTX/Dxg
-         6ODw==
+        d=gmail.com; s=20230601; t=1696790253; x=1697395053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XeJ1AX0Emm0B1MNXW9ufDQ+zSWl6WDvAagaRLQUTatk=;
+        b=bw2CaHJV30W1P8hD9Sxix6Raciuwqe4hW0Uk0mlEYlzd4OnuO5uc7GuIHkz0hbHfTK
+         RQNJ7ycAjlpUYPmJ7Zp4Vo6l/OEQfi1YZkMhxrDvsNUL6B5C6GdunbC/oAcekOHT/AIO
+         RT+yUssx6Vta3fHXs+lPFlhJ5PIZtHmw7Fj7/hicQDhLH7xSJyLZXBX7Twj2ZIzm08Xp
+         XvnSmZZG5yoXH+BiOry4Pzc/k1Dq3tdrCIm21aw4kTB7pR1B91fzk/s9sUZGhDtoUVre
+         i3g8QculUQYsY7ufD/DfMtzkzPBGw3IMo9OKizsufXdIasJuD8Z0y1K0EzMp/PQrhNuH
+         ziGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696789654; x=1697394454;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UYhUlM0v/kiBnSA7qqkERNTe3ha0hd9wd9BeXsJuFRo=;
-        b=WASWiYr5sredpi3vQS1/AmmtvabMd5lZPwX3X+pCdWlas685T/aeukaJTe1NBGjjqz
-         yuK6Iw2W7tN+r/cVUcjwQw31/MyXl3wenZx4YAPUCy+MAKfhLRDgyuxFq6HyWX6LIEwb
-         jbUsN0YI1cMDojNxa5lcHfk0KOYMsXapjwuyyLGGr+7d/vHsOxPuLsSNtvJzadipK0oF
-         JmRSDYPsRYPG6yY9cdsx2i8Wags3/yNj5YNy8ouRDYcYfkoDjcGNLr/kkh162swm0Wgx
-         V7bu4qs8hVWpaCKKoa+XPhamUDwni8IBhWk974uao9Y0P06vjHmuRPgZsWwYXaSz2fe0
-         onUA==
-X-Gm-Message-State: AOJu0Yy9/hL3kn78PiCc3H19pEopZxmLbFnorDbRsO6fcEN9Unjx4ePY
-	xE3KXStg9Tfq9CbOTiQz4k4=
-X-Google-Smtp-Source: AGHT+IG1Z2UQG/8uimtzwOsX0SSnSzQeAnFClPvayUdx2bESkKFHKQw9/TSlsvhrREuwaEcXQ8SiYA==
-X-Received: by 2002:a5d:50c8:0:b0:316:f24b:597a with SMTP id f8-20020a5d50c8000000b00316f24b597amr11755917wrt.46.1696789653876;
-        Sun, 08 Oct 2023 11:27:33 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id j14-20020adff54e000000b003233a31a467sm7413627wrp.34.2023.10.08.11.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Oct 2023 11:27:33 -0700 (PDT)
-Message-ID: <6522f495.df0a0220.326ed.de6c@mx.google.com>
-X-Google-Original-Message-ID: <ZSL0kLgKGmK2HJ9x@Ansuel-xps.>
-Date: Sun, 8 Oct 2023 20:27:28 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Douglas Miller <dougmill@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Dany Madden <danymadden@us.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Halasa <khalasa@piap.pl>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Intel Corporation <linuxwwan@intel.com>,
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Simon Horman <horms@kernel.org>, Rob Herring <robh@kernel.org>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Rushil Gupta <rushilg@google.com>, Coco Li <lixiaoyan@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Wei Fang <wei.fang@nxp.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Yuri Karpov <YKarpov@ispras.ru>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Zheng Zengkai <zhengzengkai@huawei.com>, Lee Jones <lee@kernel.org>,
-	Maximilian Luz <luzmaximilian@gmail.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Dawei Li <set_pte_at@outlook.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: Re: [net-next PATCH v2 4/4] netdev: use napi_schedule bool instead
- of napi_schedule_prep/__napi_schedule
-References: <20231003145150.2498-1-ansuelsmth@gmail.com>
- <20231003145150.2498-4-ansuelsmth@gmail.com>
- <CANn89iLtYZJPOQE7OkAbEdmhT8qjzAJ+27poa__3c8Nf0M6u_w@mail.gmail.com>
- <652056c5.5d0a0220.2b60d.c5dc@mx.google.com>
- <CANn89i+Cie+oE_hTWkyJWutTG9CnPy+dbW+-A97Q+E9Rq-f9rQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1696790253; x=1697395053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XeJ1AX0Emm0B1MNXW9ufDQ+zSWl6WDvAagaRLQUTatk=;
+        b=wD3nZzd6qpSJKuO+gHs5SSVQPdeZLT8WTQRqz57JgzF3OkHlXF2tJZS4DPDBbAAn6N
+         lshIHjgGFM6mU9ol6e0j7S0wO27xQQ7xPAx3iwkb3+Zj0nWfbmV6jLXk0FI6aWfaAQZ4
+         WhtnG4+IIQpxe0tMlv4V/E1vE+QJ/0ryp+XOctTn2vxf2AOcnpzK4F5AJMuXG24DQga/
+         /hQRx3P8LyaE0+qQ/rIDGAYaWXDpmfSnzpyAoIgORaVUY57LKpOulF46onLPniZvoDYj
+         vy1XKWwMxBQM3zbY2eGOHMlkJjfJ4e5SEQ0eCyh8Az3QIfnmFD38YLExsmie7SDWaX8E
+         cHIA==
+X-Gm-Message-State: AOJu0Yy6D2HJI+U6iNnEEBUaFx6vEJV446fVJ30B9k5ikROq8oJBMw8r
+	240EpahogR6axyPvsHI7f/2yo91KyMbGyc0kg/U=
+X-Google-Smtp-Source: AGHT+IHSB43dF0pLQwl5fSHzzvgSOaQuNELTv/vnarvg9JxIB3dWUKmxutdHnh4vUjKSphH5Pexh5TnlfPVFyCr7FY4=
+X-Received: by 2002:a1f:e641:0:b0:48f:8891:29d9 with SMTP id
+ d62-20020a1fe641000000b0048f889129d9mr10186430vkh.13.1696790252736; Sun, 08
+ Oct 2023 11:37:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+Cie+oE_hTWkyJWutTG9CnPy+dbW+-A97Q+E9Rq-f9rQ@mail.gmail.com>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+In-Reply-To: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Sun, 8 Oct 2023 20:36:56 +0200
+Message-ID: <CAF=yD-LnqYQ2qdiV+oygfHq5ZQb7QaSZ81XikzKjY8unfCTGRQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/7] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
+	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
+	pablo@netfilter.org, decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, 
+	elver@google.com, pabeni@redhat.com, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 08, 2023 at 09:08:41AM +0200, Eric Dumazet wrote:
-> On Fri, Oct 6, 2023 at 8:49 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
-> >
-> > On Thu, Oct 05, 2023 at 06:16:26PM +0200, Eric Dumazet wrote:
-> > > On Tue, Oct 3, 2023 at 8:36 PM Christian Marangi <ansuelsmth@gmail.com> wrote:
-> > > >
-> > > > Replace if condition of napi_schedule_prep/__napi_schedule and use bool
-> > > > from napi_schedule directly where possible.
-> > > >
-> > > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > > ---
-> > > >  drivers/net/ethernet/atheros/atlx/atl1.c     | 4 +---
-> > > >  drivers/net/ethernet/toshiba/tc35815.c       | 4 +---
-> > > >  drivers/net/wireless/intel/iwlwifi/pcie/rx.c | 4 +---
-> > > >  3 files changed, 3 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
-> > > > index 02aa6fd8ebc2..a9014d7932db 100644
-> > > > --- a/drivers/net/ethernet/atheros/atlx/atl1.c
-> > > > +++ b/drivers/net/ethernet/atheros/atlx/atl1.c
-> > > > @@ -2446,7 +2446,7 @@ static int atl1_rings_clean(struct napi_struct *napi, int budget)
-> > > >
-> > > >  static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
-> > > >  {
-> > > > -       if (!napi_schedule_prep(&adapter->napi))
-> > > > +       if (!napi_schedule(&adapter->napi))
-> > > >                 /* It is possible in case even the RX/TX ints are disabled via IMR
-> > > >                  * register the ISR bits are set anyway (but do not produce IRQ).
-> > > >                  * To handle such situation the napi functions used to check is
-> > > > @@ -2454,8 +2454,6 @@ static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
-> > > >                  */
-> > > >                 return 0;
-> > > >
-> > > > -       __napi_schedule(&adapter->napi);
-> > > > -
-> > > >         /*
-> > > >          * Disable RX/TX ints via IMR register if it is
-> > > >          * allowed. NAPI handler must reenable them in same
-> > > > diff --git a/drivers/net/ethernet/toshiba/tc35815.c b/drivers/net/ethernet/toshiba/tc35815.c
-> > > > index 14cf6ecf6d0d..a8b8a0e13f9a 100644
-> > > > --- a/drivers/net/ethernet/toshiba/tc35815.c
-> > > > +++ b/drivers/net/ethernet/toshiba/tc35815.c
-> > > > @@ -1436,9 +1436,7 @@ static irqreturn_t tc35815_interrupt(int irq, void *dev_id)
-> > > >         if (!(dmactl & DMA_IntMask)) {
-> > > >                 /* disable interrupts */
-> > > >                 tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
-> > > > -               if (napi_schedule_prep(&lp->napi))
-> > > > -                       __napi_schedule(&lp->napi);
-> > > > -               else {
-> > > > +               if (!napi_schedule(&lp->napi)) {
-> > > >                         printk(KERN_ERR "%s: interrupt taken in poll\n",
-> > > >                                dev->name);
-> > > >                         BUG();
-> > >
-> > > Hmmm... could you also remove this BUG() ? I think this code path can be taken
-> > > if some applications are using busy polling.
-> > >
-> > > Or simply rewrite this with the traditional
-> > >
-> > > if (napi_schedule_prep(&lp->napi)) {
-> > >    /* disable interrupts */
-> > >    tc_writel(dmactl | DMA_IntMask, &tr->DMA_Ctl);
-> > >     __napi_schedule(&lp->napi);
-> > > }
-> > >
-> > >
-> >
-> > Mhhh is it safe to do so? I mean it seems very wrong to print a warning
-> > and BUG() instead of disabling the interrupt only if napi can be
-> > scheduled... Maybe is very old code? The more I see this the more I see
-> > problem... (randomly disabling the interrupt and then make the kernel
-> > die)
-> 
-> I am pretty sure this BUG() can be hit these days with busy polling or
-> setting gro_flush_timeout.
-> 
-> I wish we could remove these bugs before someone copy-paste them.
-> 
-> Again, this is orthogonal, I might simply stop doing reviews if this
-> is not useful.
+On Sun, Oct 8, 2023 at 7:21=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> virtio-net have two usage of hashes: one is RSS and another is hash
+> reporting. Conventionally the hash calculation was done by the VMM.
+> However, computing the hash after the queue was chosen defeats the
+> purpose of RSS.
+>
+> Another approach is to use eBPF steering program. This approach has
+> another downside: it cannot report the calculated hash due to the
+> restrictive nature of eBPF.
+>
+> Introduce the code to compute hashes to the kernel in order to overcome
+> thse challenges.
+>
+> An alternative solution is to extend the eBPF steering program so that it
+> will be able to report to the userspace, but it makes little sense to
+> allow to implement different hashing algorithms with eBPF since the hash
+> value reported by virtio-net is strictly defined by the specification.
 
-They are very useful and thanks a lot for them! I'm asking these as to
-understand how to proceed. I have in queue 2 other series that depends
-on this and I'm just asking info on how to speedup the progress on this!
+But using the existing BPF steering may have the benefit of requiring
+a lot less new code.
 
-Soo think I have to send v3 with the suggested change and BUG() dropped?
-Happy to do everything to fix and improve this series!
-
--- 
-	Ansuel
+There is ample precedence for BPF programs that work this way. The
+flow dissector comes to mind.
 
