@@ -1,88 +1,82 @@
-Return-Path: <netdev+bounces-38915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC67D7BD002
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C25F27BD004
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC69F2815E8
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:09:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52E1F2815A8
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 20:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFFC1A59A;
-	Sun,  8 Oct 2023 20:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15651A5A2;
+	Sun,  8 Oct 2023 20:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mB2r707a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HoU7Kt5A"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6551173A;
-	Sun,  8 Oct 2023 20:09:21 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9428599;
-	Sun,  8 Oct 2023 13:09:19 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7abcef80a82so1465043241.3;
-        Sun, 08 Oct 2023 13:09:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F07EEB4
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 20:12:50 +0000 (UTC)
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D8A3AC
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:12:48 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id d75a77b69052e-4181e268447so26332091cf.1
+        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 13:12:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696795758; x=1697400558; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OKzbBuqUCPwy23ymUT8eWLppkGLME/yOaopQNwUxG30=;
-        b=mB2r707agsWpTrOg+hzMsJGDlaVjWyJHbZ8bjbEjj/17rUwaQRUykX5WounqYOiEec
-         GIQAdGCFZFEWhH1FjLlpAEyKVHjOaOAUyCcBpqVxxWMVLV5Qb0wAKY5DOQLA/vngFXga
-         li++ORimIYvsfVdij7VVk4RIJYQRpzLc6ee8TpFY1cNckzyxJN8pIPT9+Rord9zKC6ec
-         lgOpQntLP/frzk8qvDbGNPuhcpraEG4KPdTj6kwghUIizdduJoXW32ericAg0uT90wJy
-         DEbL7tQHFYBl9N4fHup4IrcsK8DCL9WwDnkXL86JL6/mnMRQ0I85QvhepDNgLr5Uryba
-         kEcA==
+        d=gmail.com; s=20230601; t=1696795967; x=1697400767; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mzJciThIRngmszwGOmWtUINb2s0XQcmrrOyo0Wh/vig=;
+        b=HoU7Kt5AGI062DJ/Z5yG66wZaxbJiaEBxBlBX+SxxxqqSArwafCWEXkUrLNyI585H7
+         TYTcvV2fmk03UzTlgkH7LDB05dO/8h6j0cuqQSgRIeXU/0ZblwQ6yU2+CT1s1tlz9Nyv
+         EmRjF2WOr/OaT/RyHX+pHbt29l15+x/B+jN0eNh2XwpHWPdJeu+PTHHHDXmoC1HoX7OW
+         M8P6QMzvtwsHO8UcvomHs/IenmYidL7Xn2jDgmzGUzGVxqpiZhSJSS387Zc5VYL2LvcP
+         buLTCtRlz5XWoKpuf64QtHqGyfiZbpW4MAXTXYgKMMq1LQkp6Xr2nDNOe+nFkneuhlpj
+         Tkng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696795758; x=1697400558;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OKzbBuqUCPwy23ymUT8eWLppkGLME/yOaopQNwUxG30=;
-        b=cjfnZtjysG5KitGnHSv56gl5IV0SbZGVm+Q0aeaEz9lyDRaHV7S1a642cs92gKGF4q
-         iY4SppQoYN4cqVPW+kb5rAT3Z/oaRUn0XCJdu/AjjLp5m+tzFmnzHvDqJWYWg9XQgQ9P
-         f9zNfCA4TP89AJeIsL3b4oCqUt3DsehhpAGO/aysbjclfIYEBFBP1cQEkO+ZrCHQpa1Z
-         aby9Bk01S3feERu7brfXNVH7mqBQ6NfSTIEE8gFWCI2JDpE7pH4prNB+ixBPfNIVTlak
-         xZDE7My5qBpNEe56tNRCkQMZeMv8JKU6bAPNQk080zmVz55DOTiKoRK9eAg9w9AGPXhw
-         4srA==
-X-Gm-Message-State: AOJu0YzSeExkryXUE+o1xzmfy7iyI5oimFfaGmyhCVndJGiJBnUlGTtv
-	8B+zBukitrt0yI7aIAzrse55DoTwaIbjC2BoDXM=
-X-Google-Smtp-Source: AGHT+IGrYlgQ6F5EY0bVUrDd7waD3CZx2805a119uOAlNTL7Tqx04UAkUDYuRhHdWSoQ7JP98oJjlRy68sXaAxl/L7Y=
-X-Received: by 2002:a1f:ed41:0:b0:495:dcd0:471 with SMTP id
- l62-20020a1fed41000000b00495dcd00471mr10732498vkh.5.1696795758506; Sun, 08
- Oct 2023 13:09:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696795967; x=1697400767;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mzJciThIRngmszwGOmWtUINb2s0XQcmrrOyo0Wh/vig=;
+        b=saGjynlWTmvlhJX8Ytz8nKy1rE26hlIezx+5447s1H1F5MxRy2wRwPGI9QgFp1q0D2
+         vxzlbbpzkYnhwip44u9TQp0UD/JJSAj1iR4rKUoeV3WDp9LIp8lltQNc48zzRFzHK4N+
+         QITKKLdI8RS6lF5YQ9Woc8j2HK+sWySPismSuJdthMPW9ZQR0yhNlEOR4wqO9bMEjnLb
+         buSiLlRoaq9oVJ9a/6wh24gtjXhl6wa59XG68s5Y2zqoviWdOCIz0rkZfbT8H0LOeNXX
+         BbPTrvYbetpUKftnnfdPmx5/ZXAqauuwbnJqZmBl146uL7hg+3Ma5jVP2tJTxpFOlbj5
+         G6EA==
+X-Gm-Message-State: AOJu0YyaDM0FlgWFkhIKyJ/TDH55oh2LBLOCU3IOX1Xae/q7mTnn3mME
+	RabvhcLo/h3pZQydk9sWgpyNVVL3UzdLbQ==
+X-Google-Smtp-Source: AGHT+IEtvU5KztBJM1WIdxEWv5PmizRhbMorIkomPB11iEhX4FdpYdYZNEl7F14HnibEECmzPmjhRg==
+X-Received: by 2002:a05:622a:20b:b0:412:2ed3:38ec with SMTP id b11-20020a05622a020b00b004122ed338ecmr15205872qtx.18.1696795967533;
+        Sun, 08 Oct 2023 13:12:47 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id v18-20020ac87292000000b00419c9215f0asm3075533qto.53.2023.10.08.13.12.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Oct 2023 13:12:47 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	alexander.duyck@gmail.com,
+	fw@strlen.de,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v2 0/3] add skb_segment kunit coverage
+Date: Sun,  8 Oct 2023 16:12:31 -0400
+Message-ID: <20231008201244.3700784-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.42.0.609.gbb76f46606-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
- <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
-In-Reply-To: <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Sun, 8 Oct 2023 22:08:41 +0200
-Message-ID: <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
-	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
-	pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com, 
-	elver@google.com, pabeni@redhat.com, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -90,133 +84,39 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
->
-> On 2023/10/09 4:07, Willem de Bruijn wrote:
-> > On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
-nix.com> wrote:
-> >>
-> >> virtio-net have two usage of hashes: one is RSS and another is hash
-> >> reporting. Conventionally the hash calculation was done by the VMM.
-> >> However, computing the hash after the queue was chosen defeats the
-> >> purpose of RSS.
-> >>
-> >> Another approach is to use eBPF steering program. This approach has
-> >> another downside: it cannot report the calculated hash due to the
-> >> restrictive nature of eBPF.
-> >>
-> >> Introduce the code to compute hashes to the kernel in order to overcom=
-e
-> >> thse challenges. An alternative solution is to extend the eBPF steerin=
-g
-> >> program so that it will be able to report to the userspace, but it mak=
-es
-> >> little sense to allow to implement different hashing algorithms with
-> >> eBPF since the hash value reported by virtio-net is strictly defined b=
-y
-> >> the specification.
-> >>
-> >> The hash value already stored in sk_buff is not used and computed
-> >> independently since it may have been computed in a way not conformant
-> >> with the specification.
-> >>
-> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >> ---
-> >
-> >> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D {
-> >> +       .max_indirection_table_length =3D
-> >> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
-> >> +
-> >> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
-> >> +};
-> >
-> > No need to have explicit capabilities exchange like this? Tun either
-> > supports all or none.
->
-> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
-> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
->
-> It is because the flow dissector does not support IPv6 extensions. The
-> specification is also vague, and does not tell how many TLVs should be
-> consumed at most when interpreting destination option header so I chose
-> to avoid adding code for these hash types to the flow dissector. I doubt
-> anyone will complain about it since nobody complains for Linux.
->
-> I'm also adding this so that we can extend it later.
-> max_indirection_table_length may grow for systems with 128+ CPUs, or
-> types may have other bits for new protocols in the future.
->
-> >
-> >>          case TUNSETSTEERINGEBPF:
-> >> -               ret =3D tun_set_ebpf(tun, &tun->steering_prog, argp);
-> >> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering_prog, arg=
-p);
-> >> +               if (IS_ERR(bpf_ret))
-> >> +                       ret =3D PTR_ERR(bpf_ret);
-> >> +               else if (bpf_ret)
-> >> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_HASH_RSS;
-> >
-> > Don't make one feature disable another.
-> >
-> > TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
-> > functions. If one is enabled the other call should fail, with EBUSY
-> > for instance.
-> >
-> >> +       case TUNSETVNETHASH:
-> >> +               len =3D sizeof(vnet_hash);
-> >> +               if (copy_from_user(&vnet_hash, argp, len)) {
-> >> +                       ret =3D -EFAULT;
-> >> +                       break;
-> >> +               }
-> >> +
-> >> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
-> >> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hdr_=
-v1_hash) ||
-> >> +                     !tun_is_little_endian(tun))) ||
-> >> +                    vnet_hash.indirection_table_mask >=3D
-> >> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
-> >> +                       ret =3D -EINVAL;
-> >> +                       break;
-> >> +               }
-> >> +
-> >> +               argp =3D (u8 __user *)argp + len;
-> >> +               len =3D (vnet_hash.indirection_table_mask + 1) * 2;
-> >> +               if (copy_from_user(vnet_hash_indirection_table, argp, =
-len)) {
-> >> +                       ret =3D -EFAULT;
-> >> +                       break;
-> >> +               }
-> >> +
-> >> +               argp =3D (u8 __user *)argp + len;
-> >> +               len =3D virtio_net_hash_key_length(vnet_hash.types);
-> >> +
-> >> +               if (copy_from_user(vnet_hash_key, argp, len)) {
-> >> +                       ret =3D -EFAULT;
-> >> +                       break;
-> >> +               }
-> >
-> > Probably easier and less error-prone to define a fixed size control
-> > struct with the max indirection table size.
->
-> I made its size variable because the indirection table and key may grow
-> in the future as I wrote above.
->
-> >
-> > Btw: please trim the CC: list considerably on future patches.
->
-> I'll do so in the next version with the TUNSETSTEERINGEBPF change you
-> proposed.
+From: Willem de Bruijn <willemb@google.com>
 
-To be clear: please don't just resubmit with that one change.
+As discussed at netconf last week. Some kernel code is exercised in
+many different ways. skb_segment is a prime example. This ~350 line
+function has 49 different patches in git blame with 28 different
+authors.
 
-The skb and cb issues are quite fundamental issues that need to be resolved=
-.
+When making a change, e.g., to fix a bug in one specific use case,
+it is hard to establish through analysis alone that the change does
+not break the many other paths through the code. It is impractical to
+exercise all code paths through regression testing from userspace.
 
-I'd like to understand why adjusting the existing BPF feature for this
-exact purpose cannot be amended to return the key it produced.
+Add the minimal infrastructure needed to add KUnit tests to networking,
+and add code coverage for this function.
 
-As you point out, the C flow dissector is insufficient. The BPF flow
-dissector does not have this problem. The same argument would go for
-the pre-existing BPF steering program.
+Patch 1 adds the infra and the first simple test case: a linear skb
+Patch 2 adds variants with frags[]
+Patch 3 adds variants with frag_list skbs
+
+Changes v1->v2 in the individual patches.
+
+Willem de Bruijn (3):
+  net: add skb_segment kunit test
+  net: parametrize skb_segment unit test to expand coverage
+  net: expand skb_segment unit test with frag_list coverage
+
+ net/Kconfig         |   9 ++
+ net/core/Makefile   |   1 +
+ net/core/gso_test.c | 274 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 284 insertions(+)
+ create mode 100644 net/core/gso_test.c
+
+-- 
+2.42.0.609.gbb76f46606-goog
+
 
