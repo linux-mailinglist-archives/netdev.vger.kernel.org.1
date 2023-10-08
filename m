@@ -1,65 +1,48 @@
-Return-Path: <netdev+bounces-38894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988277BCEA0
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:48:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20AA7BCEA9
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 15:59:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E681C20939
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:48:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C97281765
+	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 13:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DA3C8C8;
-	Sun,  8 Oct 2023 13:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844CFC8E0;
+	Sun,  8 Oct 2023 13:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uAc0d7Eu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LA70vUo6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04FAC2D0;
-	Sun,  8 Oct 2023 13:48:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C84B1C433C9;
-	Sun,  8 Oct 2023 13:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640A38BF3
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 13:59:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 391D4C433C8;
+	Sun,  8 Oct 2023 13:59:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696772911;
-	bh=YqTjTo5qyvkFsUpprDwEhsylJzLXDife+dFG3kvmIos=;
+	s=k20201202; t=1696773581;
+	bh=2XNEcD+UIoF1P8CQWuQPztAhTTNKspPsD1DJEKJBTUo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uAc0d7Eu3wsB7TPeiq8k9jJaW1Pux44ZYGjqdsRj/D/qotZsKSpRwF/mRF+5do/4L
-	 vozcc4+E92ocPnK+oeNCSJhUHBUSciurAxrkapFAO9ulag/udKrJ+sECmiUfoYtCs/
-	 BoJuz5pe6dJXd7osLrF5Q6xRWTML4LgfX5d+p/eCyAP/g5YCLsKUwXV/qKByy/JlyE
-	 MPf/FgjZ+eH2bI4dzof8Uq6cz17B7GXqOp3XZfis0NgfXKxdojdYh7nCL5ejN6ojzZ
-	 93OW06nc2lmB8OBelv4+PeoaI/iyLKVoA0QQSTpu9eC+OT4rKLPpVRKaft8kQgSwrg
-	 Jr4evKXMXpyEA==
-Date: Sun, 8 Oct 2023 15:48:24 +0200
+	b=LA70vUo6tC88H+DsBix5t/sO1Xmyu92IEy+oVfv+BolOrqgFZ3eS87hWrCt5gZ2g4
+	 zFyiQYedsx5YlW4TD6IEWNYRIXHm+azKUlFTUJA3i9SCgMh9wzJ3vZoYjetMPIqZB4
+	 D6CZj4lLN8Lkd5698WfIkC5XE1VykLiDQRY1kTb4ILVMBsxIsNioSteie50z4kwFS7
+	 6Ei0Drq1wQmkyLMxneSBkOzZNuY/7gamewifa/bebrdg5FxkjP1b5FZh/mTTrZkjPE
+	 a+snJ0Vlp2JhE1Psj8FSRy+O4lKY7rzQHElWZi2AouxLB94vA/tHZupOyvnCLM8ab/
+	 ahAG4YJu7kXPQ==
+Date: Sun, 8 Oct 2023 15:59:37 +0200
 From: Simon Horman <horms@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Eric Dumazet <edumazet@google.com>, Hao Luo <haoluo@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>, Song Liu <song@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yonghong Song <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf-next v2] net: Add a warning if NAPI cb missed
- xdp_do_flush().
-Message-ID: <20231008134824.GG831234@kernel.org>
-References: <20230929165825.RvwBYGP1@linutronix.de>
- <20231004070926.5b4ba04c@kernel.org>
- <20231006154933.mQgxQHHt@linutronix.de>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	mlxsw@nvidia.com
+Subject: Re: [PATCH net-next 0/2] mlxsw: Fix -Wformat-truncation warnings
+Message-ID: <20231008135937.GH831234@kernel.org>
+References: <cover.1696600763.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,23 +51,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231006154933.mQgxQHHt@linutronix.de>
+In-Reply-To: <cover.1696600763.git.petrm@nvidia.com>
 
-On Fri, Oct 06, 2023 at 05:49:33PM +0200, Sebastian Andrzej Siewior wrote:
-> A few drivers were missing a xdp_do_flush() invocation after
-> XDP_REDIRECT.
+On Fri, Oct 06, 2023 at 04:43:15PM +0200, Petr Machata wrote:
+> Ido Schimmel writes:
 > 
-> Add three helper functions each for one of the per-CPU lists. Return
-> true if the per-CPU list is non-empty and flush the list.
-> Add xdp_do_check_flushed() which invokes each helper functions and
-> creats a warning if one of the functions had a non-empty list.
-
-nit: creates
-
-> Hide everything behind CONFIG_DEBUG_NET.
+> Commit 6d4ab2e97dcf ("extrawarn: enable format and stringop overflow
+> warnings in W=1") enabled format warnings as part of W=1 builds,
+> resulting in two new warnings in mlxsw. Fix both and target at net-next
+> as the warnings are not indicative of actual bugs.
 > 
-> Suggested-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Ido Schimmel (2):
+>   mlxsw: core_thermal: Fix -Wformat-truncation warning
+>   mlxsw: spectrum_ethtool: Fix -Wformat-truncation warning
 
-...
+For series,
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
+
 
