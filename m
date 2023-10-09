@@ -1,57 +1,41 @@
-Return-Path: <netdev+bounces-39131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37A067BE276
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:19:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728837BE285
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 312AB1C20CB2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE71D281793
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5577734CEE;
-	Mon,  9 Oct 2023 14:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5322135887;
+	Mon,  9 Oct 2023 14:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uG8joQhw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XV8vwGnW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8ED18043
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:19:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 496DEC433CC;
-	Mon,  9 Oct 2023 14:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3319E347DF;
+	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7763C433D9;
+	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696861195;
-	bh=zrhlLGL/7VohDIuN/EnFdfDCdV/hjo/fxSU8flcn0tg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uG8joQhwT/J1Qi0GHNNGTaNerkrxmX7PXQ4llCcftLvkJc1z1xg8Tj2Rs/7fqKB0R
-	 T6i+1HX38DKH0hHNEHjjc1qjs7vbU7dkiGvdvpfOvpuUjjBwiuDVWbqnL5yraXXhXT
-	 WK1m3es7CZkSw5r0n9c02z5ykEYRY3UIJQ3+vnMGWUathqPiUr8r8Nt3sEnzdaLMdr
-	 e/c+5K89ZslM57E8aEaURB2daDUOW3SY1KlTCDMAhCEjGW2RmMR/hgCO7Il9k3g/Yw
-	 UM6T+cnQ/pj6lGMfcMBi9xtJwMIPO8ZYeg3nOsNsXfpBGJjTJ8/xlgmkXAzXX4mgLu
-	 U4XvAZk1WPXiw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wpan@vger.kernel.org,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org,
-	Doug Brown <doug@schmorgal.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 10/10] net: remove ndo_do_ioctl handler
-Date: Mon,  9 Oct 2023 16:19:08 +0200
-Message-Id: <20231009141908.1767241-10-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
-References: <20231009141908.1767241-1-arnd@kernel.org>
+	s=k20201202; t=1696861223;
+	bh=16U5YsvVXq5mHf2wc80nLuyb9WsMzTKLY8C5x5/BRsc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XV8vwGnW65YlZ2bz5W61tx/7iEkczeYNyZKLTADVKLZOfKmF14tNjl/Nxmkl+6qMf
+	 RG/L8mvRT3gY+4U0DlmjCTqaZbuKuOco3apnnPYd6T41znvviBN74Zc0Iuds37h8pZ
+	 Y5/xI43Zz28WYSytkNpJ7+iEXg1oJqPkzAbR6z9Jd1RLanFzGQT0BQjUWuiwUZKhu5
+	 aEE6vylKr3rb/2LyslogVUKhQQ48O90uB7min8T++dn0CJ4r9Bh15p8Jdyyvh6Ux/L
+	 5RgG4tUTLDNxn/8cIdtP2DANSnxr4WtX1wOfnCkpxkQUx9Xsv+FsrMME+oJ12XL77L
+	 LGRUHMowAaeBQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9031EE0009B;
+	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,63 +43,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf v4] net/xdp: fix zero-size allocation warning in
+ xskq_create()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169686122358.13891.1040766174680237802.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Oct 2023 14:20:23 +0000
+References: <20231007075148.1759-1-andrew.kanner@gmail.com>
+In-Reply-To: <20231007075148.1759-1-andrew.kanner@gmail.com>
+To: Andrew Kanner <andrew.kanner@gmail.com>
+Cc: martin.lau@linux.dev, bjorn@kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ aleksander.lobakin@intel.com, xuanzhuo@linux.alibaba.com, ast@kernel.org,
+ hawk@kernel.org, john.fastabend@gmail.com, daniel@iogearbox.net,
+ linux-kernel-mentees@lists.linuxfoundation.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
+ syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hello:
 
-All of the references to the callback pointer are gone, so remove the
-pointer itself before we grow new references to it.
+This patch was applied to bpf/bpf.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Documentation/networking/netdevices.rst | 8 --------
- include/linux/netdevice.h               | 7 -------
- 2 files changed, 15 deletions(-)
+On Sat,  7 Oct 2023 10:51:49 +0300 you wrote:
+> Syzkaller reported the following issue:
+>  ------------[ cut here ]------------
+>  WARNING: CPU: 0 PID: 2807 at mm/vmalloc.c:3247 __vmalloc_node_range (mm/vmalloc.c:3361)
+>  Modules linked in:
+>  CPU: 0 PID: 2807 Comm: repro Not tainted 6.6.0-rc2+ #12
+>  Hardware name: Generic DT based system
+>  unwind_backtrace from show_stack (arch/arm/kernel/traps.c:258)
+>  show_stack from dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
+>  dump_stack_lvl from __warn (kernel/panic.c:633 kernel/panic.c:680)
+>  __warn from warn_slowpath_fmt (./include/linux/context_tracking.h:153 kernel/panic.c:700)
+>  warn_slowpath_fmt from __vmalloc_node_range (mm/vmalloc.c:3361 (discriminator 3))
+>  __vmalloc_node_range from vmalloc_user (mm/vmalloc.c:3478)
+>  vmalloc_user from xskq_create (net/xdp/xsk_queue.c:40)
+>  xskq_create from xsk_setsockopt (net/xdp/xsk.c:953 net/xdp/xsk.c:1286)
+>  xsk_setsockopt from __sys_setsockopt (net/socket.c:2308)
+>  __sys_setsockopt from ret_fast_syscall (arch/arm/kernel/entry-common.S:68)
+> 
+> [...]
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 9e4cccb90b870..6f9b71c5d37b8 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -218,14 +218,6 @@ ndo_stop:
- 	Context: process
- 	Note: netif_running() is guaranteed false
- 
--ndo_do_ioctl:
--	Synchronization: rtnl_lock() semaphore.
--	Context: process
--
--        This is only called by network subsystems internally,
--        not by user space calling ioctl as it was in before
--        linux-5.14.
--
- ndo_siocbond:
-         Synchronization: rtnl_lock() semaphore.
-         Context: process
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fbaf..8d1cc8f195cb6 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1121,11 +1121,6 @@ struct netdev_net_notifier {
-  * int (*ndo_validate_addr)(struct net_device *dev);
-  *	Test if Media Access Control address is valid for the device.
-  *
-- * int (*ndo_do_ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
-- *	Old-style ioctl entry point. This is used internally by the
-- *	appletalk and ieee802154 subsystems but is no longer called by
-- *	the device ioctl handler.
-- *
-  * int (*ndo_siocbond)(struct net_device *dev, struct ifreq *ifr, int cmd);
-  *	Used by the bonding driver for its device specific ioctls:
-  *	SIOCBONDENSLAVE, SIOCBONDRELEASE, SIOCBONDSETHWADDR, SIOCBONDCHANGEACTIVE,
-@@ -1429,8 +1424,6 @@ struct net_device_ops {
- 	int			(*ndo_set_mac_address)(struct net_device *dev,
- 						       void *addr);
- 	int			(*ndo_validate_addr)(struct net_device *dev);
--	int			(*ndo_do_ioctl)(struct net_device *dev,
--					        struct ifreq *ifr, int cmd);
- 	int			(*ndo_eth_ioctl)(struct net_device *dev,
- 						 struct ifreq *ifr, int cmd);
- 	int			(*ndo_siocbond)(struct net_device *dev,
+Here is the summary with links:
+  - [bpf,v4] net/xdp: fix zero-size allocation warning in xskq_create()
+    https://git.kernel.org/bpf/bpf/c/a12bbb3cccf0
+
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
