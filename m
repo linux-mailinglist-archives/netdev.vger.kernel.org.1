@@ -1,235 +1,63 @@
-Return-Path: <netdev+bounces-38995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5BD7BD652
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:07:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF8A7BD68D
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:15:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B2B2814D3
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:07:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462571C208E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72AFEF9EA;
-	Mon,  9 Oct 2023 09:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YH4ZKAew"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3871613FEA;
+	Mon,  9 Oct 2023 09:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0608C16
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:07:24 +0000 (UTC)
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C02A2;
-	Mon,  9 Oct 2023 02:07:22 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-690bccb0d8aso3221072b3a.0;
-        Mon, 09 Oct 2023 02:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696842442; x=1697447242; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=111oRTH/EVzkglzmw1nqEAQZvZ9xBM6fPYQXVycY0n4=;
-        b=YH4ZKAewF3QlZILuMbXWGiIZEA2VTajTCcwaQFdjx4FtSBP1433mfYdyblhKX5LrRm
-         DWt3eRqHBNFUp7M9jeAzzK24izYeJKqFZVDKZuWZlHNfIPgZq10sYee6DmB9GWqT8PuB
-         UobtYEENZjADQKOb9MWGkO9cM/wSWEA40yGPEwrD6V/XbBs4f6x1NepDsDjzpm0F6/dq
-         ycgSWQfgPpJCsyVuI+WlpRU4Sa4EQuUKxaZgqBB9ynLezcK+A5mHbow1lJI3+7oLqsTj
-         IV8WW2EKYYhi8/bD5nzp6jl5cQZvKcw1E4/fuOfoRbZ/bXGX9qtcOjDVa4jaEvlZY1mN
-         ihOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696842442; x=1697447242;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=111oRTH/EVzkglzmw1nqEAQZvZ9xBM6fPYQXVycY0n4=;
-        b=VupYzyQ1ETC5Nw+0zDHRo+qN+BQdLNsD4HqfyyaXX35GMrRJGyqF/3K7kloPwwKOXw
-         5d6O5l6VN1GYrVcyu//qPgG9V8nLOfbKz66ErIiqfm37RSmeLBN4j74hZB+dedW0WckZ
-         2u7ez9a8KrFXVio6Ed2K4VoJC/ErjtqBaoLC5gvpwedLsnu0mXrJdueGT4CLnLeDBObN
-         +fvsCVwrwa6FEsFsZ/pt11jw1mK8VHM1XOMrTzvaBu+JYC5G0G7LOf2VPaI9yYhirZWH
-         naLta+p3n/scepbLViw7wZQa3VqcB72dkbBvdCUB2IYjaYAe5hn1tOPihOLEYzMF2Xqh
-         MEGw==
-X-Gm-Message-State: AOJu0YzW6o9sdcBt83livvI0Gh8d7pNOSv0Ca8wgTrdbL+8OgfLxw9/3
-	7xkoMTjTAHJxTyvPQC+vemo=
-X-Google-Smtp-Source: AGHT+IECOCEYQcmOLzUiUCj0z+HePP50mNpRUPKN7ODesFDs2Jr3xfQ0/Zgjuq0cdKp9GYZDpQKT8w==
-X-Received: by 2002:a05:6a00:cc4:b0:68f:d6db:5d66 with SMTP id b4-20020a056a000cc400b0068fd6db5d66mr15264066pfv.16.1696842442123;
-        Mon, 09 Oct 2023 02:07:22 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id p25-20020a62ab19000000b006936d053677sm5840143pff.133.2023.10.09.02.07.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 02:07:21 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 1BC888CB5482; Mon,  9 Oct 2023 16:07:18 +0700 (WIB)
-Date: Mon, 9 Oct 2023 16:07:18 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Kalle Valo <kvalo@kernel.org>,
-	Linux Wireless <linux-wireless@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Broadcom Wireless Development <brcm80211-dev-list.pdl@broadcom.com>,
-	SHA-cyfmac-dev-list@infineon.com,
-	Linux ath11k <ath11k@lists.infradead.org>
-Cc: Stanislav Yakovlev <stas.yakovlev@gmail.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Arend van Spriel <aspriel@gmail.com>,
-	Franky Lin <franky.lin@broadcom.com>,
-	Hante Meuleman <hante.meuleman@broadcom.com>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Avraham Stern <avraham.stern@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Mordechay Goodstein <mordechay.goodstein@intel.com>,
-	Minsuk Kang <linuxlovemin@yonsei.ac.kr>,
-	Ruan Jinjie <ruanjinjie@huawei.com>
-Subject: Re: [RFH] wireless-next: fix new W=1 warnings
-Message-ID: <ZSPCxkBvFhP17Vhi@debian.me>
-References: <87fs2k5l1a.fsf@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3B1800
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:15:24 +0000 (UTC)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5812297
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 02:15:23 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 6FF0568CFE; Mon,  9 Oct 2023 11:15:15 +0200 (CEST)
+Date: Mon, 9 Oct 2023 11:15:14 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Christoph Hellwig <hch@lst.de>, iommu@lists.linux.dev,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>,
+	Greg Ungerer <gerg@linux-m68k.org>
+Subject: Re: fix the non-coherent coldfire dma_alloc_coherent
+Message-ID: <20231009091514.GA22463@lst.de>
+References: <20231009074121.219686-1-hch@lst.de> <CAMuHMdU281a+=9SApaCRy5os3k73HGZhQ=Fsv58OD4C430iDDg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="1p7opZ+xi4xHbBQU"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87fs2k5l1a.fsf@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <CAMuHMdU281a+=9SApaCRy5os3k73HGZhQ=Fsv58OD4C430iDDg@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Oct 09, 2023 at 10:39:18AM +0200, Geert Uytterhoeven wrote:
+> CC Greg
 
---1p7opZ+xi4xHbBQU
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ooops.  I was pretty sure I added him as he is one of the most
+relevant persons for this.  Sorry.
 
-On Mon, Oct 09, 2023 at 10:09:53AM +0300, Kalle Valo wrote:
-> Hi,
->=20
-> During the weekend we updated wireless-next tree from v6.5 to v6.6-rc4+.
-> It looks like a new warning was enabled for v6.6 as I see with GCC 13.2
-> and W=3D1 several warnings (list below). In v6.5 wireless code was still
-> W=3D1 warning free with GCC.
-
-Can you pin-point the exact commit that introduces the warnings?
-
->=20
-> For wireless we get lots of questionable cleanup patches. But actually
-> these kind of warnings are what we would prefer to be fixed instead of
-> the random churn we always see. Hence I'm sending this Request For Help
-> (RFH) in case the cleanup people would fix these. Is there a mailing
-> list I should send this to?
-
-[also Cc: maintainers and lists for files below]
-
->=20
-> The sooner these are fixed the better, it makes it difficult for us to
-> see any new warnings from this noise.
->=20
-> Kalle
->=20
-> drivers/net/wireless/intel/ipw2x00/ipw2100.c:5905:63: warning: '%s' direc=
-tive output may be truncated writing up to 63 bytes into a region of size 3=
-2 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/ipw2x00/ipw2100.c:5905:9: note: 'snprintf' out=
-put between 4 and 140 bytes into a destination of size 32
-> drivers/net/wireless/intel/ipw2x00/ipw2200.c:10392:63: warning: '%s' dire=
-ctive output may be truncated writing up to 63 bytes into a region of size =
-32 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/ipw2x00/ipw2200.c:10392:9: note: 'snprintf' ou=
-tput between 4 and 98 bytes into a destination of size 32
-> drivers/net/wireless/intel/iwlwifi/dvm/main.c:1467:19: warning: '%s' dire=
-ctive output may be truncated writing up to 63 bytes into a region of size =
-32 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/dvm/main.c:1465:9: note: 'snprintf' ou=
-tput between 1 and 64 bytes into a destination of size 32
-> drivers/net/wireless/intel/iwlwifi/mvm/ops.c:1307:19: warning: '%s' direc=
-tive output may be truncated writing up to 63 bytes into a region of size 3=
-2 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/mvm/ops.c:1305:9: note: 'snprintf' out=
-put between 1 and 64 bytes into a destination of size 32
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:262:52: warni=
-ng: '%d' directive output may be truncated writing between 1 and 5 bytes in=
-to a region of size 4 [-Wformat-truncation=3D]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:262:46: note:=
- directive argument in the range [0, 65535]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:262:46: note:=
- directive argument in the range [0, 65535]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:262:9: note: =
-'snprintf' output between 9 and 17 bytes into a destination of size 9
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:265:55: warni=
-ng: '%d' directive output may be truncated writing between 1 and 5 bytes in=
-to a region of size 4 [-Wformat-truncation=3D]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:265:48: note:=
- directive argument in the range [0, 65535]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:265:48: note:=
- directive argument in the range [0, 65535]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:265:9: note: =
-'snprintf' output between 10 and 18 bytes into a destination of size 10
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:342:50: warni=
-ng: '/' directive output may be truncated writing 1 byte into a region of s=
-ize between 0 and 4 [-Wformat-truncation=3D]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:342:42: note:=
- directive argument in the range [0, 65535]
-> drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c:342:9: note: =
-'snprintf' output between 10 and 18 bytes into a destination of size 10
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:549:33: warning: '%s' direct=
-ive output may be truncated writing up to 63 bytes into a region of size be=
-tween 48 and 56 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:547:9: note: 'snprintf' outp=
-ut 9 or more bytes (assuming 80) into a destination of size 64
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:729:33: warning: '%s' direct=
-ive output may be truncated writing up to 63 bytes into a region of size be=
-tween 48 and 56 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:727:9: note: 'snprintf' outp=
-ut 9 or more bytes (assuming 80) into a destination of size 64
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:989:51: warning: '%s' direct=
-ive output may be truncated writing up to 63 bytes into a region of size be=
-tween 46 and 58 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:987:33: note: 'snprintf' out=
-put between 7 and 82 bytes into a destination of size 64
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:984:53: warning: '%s' direct=
-ive output may be truncated writing up to 63 bytes into a region of size be=
-tween 40 and 50 [-Wformat-truncation=3D]
-> drivers/net/wireless/intel/iwlwifi/iwl-drv.c:982:33: note: 'snprintf' out=
-put between 15 and 88 bytes into a destination of size 64
-> drivers/net/wireless/ath/ath11k/debugfs.c:1597:51: warning: '%d' directiv=
-e output may be truncated writing between 1 and 3 bytes into a region of si=
-ze 2 [-Wformat-truncation=3D]
-> drivers/net/wireless/ath/ath11k/debugfs.c:1597:48: note: directive argume=
-nt in the range [0, 255]
-> drivers/net/wireless/ath/ath11k/debugfs.c:1597:9: note: 'snprintf' output=
- between 5 and 7 bytes into a destination of size 5
-> drivers/net/wireless/ath/ath9k/hif_usb.c:1223:42: warning: '.0.fw' direct=
-ive output may be truncated writing 5 bytes into a region of size between 4=
- and 11 [-Wformat-truncation=3D]
-> drivers/net/wireless/ath/ath9k/hif_usb.c:1222:17: note: 'snprintf' output=
- between 27 and 34 bytes into a destination of size 32
-
-There is only one commit touching above files in current cycle, that is b2f=
-d72aafb1311 ("wifi: ath9k: Remove unnecessary ternary operators").
-
-That's what I know.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---1p7opZ+xi4xHbBQU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZSPCwgAKCRD2uYlJVVFO
-o8ymAP9LMTtr8chruIr3qE2uP9kaN+rd6CgxbH302q7bheYt4AEA9zEHmUbTdBFW
-CobVmnhLh1HJoVKvdsCEaezhwRnETQM=
-=IWi4
------END PGP SIGNATURE-----
-
---1p7opZ+xi4xHbBQU--
 
