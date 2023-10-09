@@ -1,257 +1,212 @@
-Return-Path: <netdev+bounces-39062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF4F7BD9ED
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC567BD9F9
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:33:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CADB02815C0
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DF0D2815EE
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3092C18655;
-	Mon,  9 Oct 2023 11:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF44618658;
+	Mon,  9 Oct 2023 11:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CqJOaH1N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19630156C3
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:32:43 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4417FAB;
-	Mon,  9 Oct 2023 04:32:40 -0700 (PDT)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S3xcV6WgTzNpC0;
-	Mon,  9 Oct 2023 19:28:42 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 513708F57
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:33:55 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10DE399
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 04:33:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696851234; x=1728387234;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eECKTJHncxdTTPFSFVBeEYrFryUUJ5EFL+QDIR67gho=;
+  b=CqJOaH1NqrOczFP1hICXtaLOEIlK9BEtb4nnl8HvE6kVhAKUncjiZUvB
+   p6apuTvDzMrCQaslpcBXqi8kmtUYEZ4q9CwZvdorYAOVw2mJehdLBh7S6
+   cGryH4SWJpKMReYtB+4oU3GQo9Q2GX8qYfYUQAN2t5Uamc0KeUePO2m86
+   fopSDs7PX+MYupxvu8QO+wCm0b+RrP7TApPtkHEkQ3Isa/Lh59mQEXxxU
+   2EOVQF93309DSoWJEQAaPc3qgy3CUjvrJGbsLlhT2nMFfRBRotp0K5+we
+   sB2Xl16fXQMRGuANkgl9TbagiPOnPrEUMrNgQNSvD3t+N0PTQysU74rU1
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="374450143"
+X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
+   d="scan'208";a="374450143"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 04:33:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="818825318"
+X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
+   d="scan'208";a="818825318"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Oct 2023 04:33:53 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 9 Oct 2023 19:32:37 +0800
-Message-ID: <1a3c2bf5-1984-be4e-79d3-edbe702d5a14@huawei.com>
-Date: Mon, 9 Oct 2023 19:32:37 +0800
+ 15.1.2507.32; Mon, 9 Oct 2023 04:33:52 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Mon, 9 Oct 2023 04:33:52 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Mon, 9 Oct 2023 04:33:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MZdV53wI9nIelMyq1+Zz+Nt/UH+zjcfPdu3UyFCO4DQ8Gr9OWJMzrzlW5N1Ne6tIFtcKmVZCG9Y/PXhfk9Ghw4W93hboxTWXlJgZAzkEGsfIDpT0LiVxEw9sftWXKSVmfdTeLJX/aN6tt+zJIr/wFhwT8qVkEECzPEzSqllnIFRsg6u+5nhH0TQ2wUMp/aQ/D9ETC7EzoEnFSMilaD/+kPJBLwyD6SqaEUhB1tuzuqND9TX+FXkgUyCuOjvfU72uQz1vnhFtgxkXk6KllSwGYdWsYcmgQfNoAvYtTcCcWgtHXPbb1hFms24lu9k69jlLb12ZxM6lnALkL6pj1GD7PQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WDcX9ocVwN9iKudIySe6/8hkfcoMx8r7C0QC7MhN7Jw=;
+ b=BuRK7CrqcjRUFlvOTs8gmWK9Z91versllIYvUSlR2cjaeDGkk52ZmqwLYmwTBQA++LlXEXxsF8UJfml3RG/sxTD5bXYzHGWBHwcqu2OAG6MOpmOlzsMf9KUJY/iovpwOz4eF3xhKGTU2cZwgrgHY2fOmb6LqAkBQyEyv38+wjUWyEZb2ff10UiwmvBXzopdD/NYaVEDlGhoMdnz08zCkzgNlbimDDqYRwHgDIjPUE0JRgrPm8WSKA/o7LN2wBBzeRNLxQfKY5Hx7THL60QBP8Y/5yDQNLB0J3S3Oq6DGN9bxdiSJ4h2qiZucLfwTvbylkyqpRbNeBxpwba3LhNdd/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
+ by DS0PR11MB8114.namprd11.prod.outlook.com (2603:10b6:8:129::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.43; Mon, 9 Oct
+ 2023 11:33:49 +0000
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::2e53:30db:3edf:1f2a]) by BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::2e53:30db:3edf:1f2a%7]) with mapi id 15.20.6863.032; Mon, 9 Oct 2023
+ 11:33:49 +0000
+Message-ID: <84bae196-8e32-4c9d-96c0-c3bcc8d50493@intel.com>
+Date: Mon, 9 Oct 2023 13:33:44 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] docs: fix info about representor identification
+Content-Language: pl
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jacob.e.keller@intel.com>, Wojciech Drewek
+	<wojciech.drewek@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20231009111544.143609-1-mateusz.polchlopek@intel.com>
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20231009111544.143609-1-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0028.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::23) To BL1PR11MB5399.namprd11.prod.outlook.com
+ (2603:10b6:208:318::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-out-of-bounds Read in
- create_monitor_event
-To: syzbot <syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <johan.hedberg@gmail.com>,
-	<kuba@kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
-	<luiz.von.dentz@intel.com>, <marcel@holtmann.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-References: <000000000000ae9ff70607461186@google.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <000000000000ae9ff70607461186@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.66]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|DS0PR11MB8114:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8dc8e07d-5e2c-45d1-ca2e-08dbc8bb9b08
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: P9Ya2G49ZzdBsLeUSLbpjplNY+vTUELGbEyH7x1bSbWEQQIyvtLXQJ1eDzcG1YrZzHjTuW/e/+kd/2xZXQE7RB2KSmER72LcAR99nOsAQpf+Qh6Dd+rPQ7FarzYurx4Pd4voKU9O0i4QF04P+3oFzQaDMTXcfbh4f/YYnstgDCOQtTrLpgHC9r2R2k4Ugo7xknV/sFWWrdOnaWiD8Om9H/mOnLqVqORSxsdU9WTASTDeRguIqcClu/q3hgGQHkiLoZ7aKYs2D98pzfUWcFlIMApJsESHMI0yt4Da7PPtzBiTzLDaobZccVKieC/0jHo15QILU+cOdVqSnoNRY+8QrBBGKjmmEFjav5NsQMJm4zB7rPwYPktdGAK8epbKWFGY/j//6ymlDKtIK1VgJv37mfE3ctkFncUVqeWX8OvH+EeaxJGYjwqBTogs+mznQFU8YV5P2/pLtP4GxgkpBtNhstKDZF8FHBzscgXF+Da8RMtXgUCHc9zY1uUtH7gXaybMZiZM416SjVm9Hg2s+V6EfpXURNLUkr2ixsec1ehwY/vHz7iWq70sM+BX3EemXDV7lWXcab2hZXRwQQL7qqznwRBTQcv7euJCXOmY1WtA6H6hu4buoKTjeJqc/f5mrqk8uG8ZF8NzuL12h4CxwrH1gQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(136003)(366004)(376002)(396003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(107886003)(6512007)(36916002)(53546011)(6486002)(478600001)(6506007)(966005)(2616005)(2906002)(26005)(83380400001)(44832011)(5660300002)(66946007)(66556008)(54906003)(66476007)(8936002)(4326008)(8676002)(41300700001)(316002)(6916009)(38100700002)(82960400001)(36756003)(31696002)(86362001)(6666004)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MllEZGlwUFI4OXl3aE9nQWxtNGxueXFpVTNwa2k2OHdNcjFPc2NHNGsrOG90?=
+ =?utf-8?B?UVp3c01ZdlgraDRZbDBINlRtOEpHbThYWnRwUG9XZkM0T2VjZWtFNCtKMjVO?=
+ =?utf-8?B?c04vQmw1YXZlemNHMndsNmVsV0tLajB1VmFxODFHUEsxRWRTeGx5NHpwdVp6?=
+ =?utf-8?B?Q3BFWnAvK3hGNGpCcUpJdGI5bmVwT04xYzlaYnQrVEdMQ0UvdVlsUTUvek9x?=
+ =?utf-8?B?bjhpUWQ0czhRZyt4S3A2QXVMbG40NmFzYlQzT0c3V09LanFTdUdpTTh3Tmp5?=
+ =?utf-8?B?VUpYT2J1TVFFeEhnOWwwUmxXTHhBdHhjOEEzbmdQK3RUV1ZqbVAwKzdmem00?=
+ =?utf-8?B?TGg4UlcrejZ3ekptVFBKVWU1WEJRbUNHUnpJaWl1anBmREEwaFpVN2hVRUlv?=
+ =?utf-8?B?d2kyTjZONVZGVGFhRG85QWRQRVFMT1poSUFzSTgwdXc5TzNNTERnbUkxMnFw?=
+ =?utf-8?B?MDhhcmxnT29NbGtGdEVZTTVsK2o4V0RhS0RJQmZiM01SeWZrUytvc0Y4d3Nx?=
+ =?utf-8?B?YWxrbU9NeTBEWm5lUi94cGVGWjVoWUdFNHU2SEQ5QzNtVDY5Zm1uYldHY3VS?=
+ =?utf-8?B?QUk4ZDArdHZGL0RQWTVxdWJ3dnR5RUpzSU9xcE83M1ZaSTBxUkFvdXVVaVZG?=
+ =?utf-8?B?WE1nZjJaSFc5TElMN1pDdnJ1T1ZybVU0RGRYOVlVcFllSFdCS2tMZkNOaTVC?=
+ =?utf-8?B?c1lnazN3bE02YVpIZGhYQm5weENHS1gvcjUyeUc4amloY1B0RHBQaUZHMHIr?=
+ =?utf-8?B?MFVlR3k1blgzeEllRUpLaWNhUVA0WUh5aVpMUHo5TEhaRVZiYjZBK2xoODJO?=
+ =?utf-8?B?UzMxV3hqVFMxbDVnT3NLc05xNGIwOEJWNk1EQ3NQWW5jVHBJN2FlckhKVFlo?=
+ =?utf-8?B?ZnBmZmJPK21nT09lU01FeS9NZ0JWWDcrZm9XSThQQ1ZWK3FVbzVRb2FMOW5q?=
+ =?utf-8?B?ZlVzWDBaMkN2L2RxUUlmYmd6YStLY2pEY1o5UkVhSmM3Wm5SNGwySlpqOFBL?=
+ =?utf-8?B?TXI4UkRzQWcxaFlQc0pZM2NQZGNycjZJd1Z4SFA3cUxNdWxFN2ZmWDVsS0NE?=
+ =?utf-8?B?VGRFcVlBNUdnaDkrVFhsRzR0cWhQT1FWRmpjNk5kc1B1eE5Lb0pnT0hPcEMx?=
+ =?utf-8?B?VXcwNWhvMUFZYTdlU2UycEY2S0pqQktMUzA2bmVvWmRIL3NYOS9OZU9TVFZk?=
+ =?utf-8?B?L21NY0M4U3ZzTXJTRFdpZzJoREUyaWpaR3B5aE5NbW9TUmpnUXhjYksyYitk?=
+ =?utf-8?B?cHZOeFFVQnRuN1RRcGNrc1FHUFJId1RzMjJlR1BMTk5tRHJvYk43SG13UVdN?=
+ =?utf-8?B?Sm9ET2wwbm9BZjk4cnl4VFJKMXdyajdudUxnU1BmMjAvM2s0b01TdTFoV2wz?=
+ =?utf-8?B?WTRabHM2dWpvQlhHbWRBMllDYjI5SjdMa0I4eWNOd1o0VlhVTnZ5OTg3bDRO?=
+ =?utf-8?B?cnRJV3p2U3RxZUpta1hRTytQMVprRFBTRHg4RHJWSEFoK0xHUE5KakxFZGRJ?=
+ =?utf-8?B?cHUxVFg3dXpBOUpKUUdKaVlKRE9adm1oc25jVlpGS21PQ256VGNLNVo0Skpp?=
+ =?utf-8?B?Zzd4eGhyY1ZMQU8zalZ6dkhEZ0NZQzd1RzNZMkpVNDdCbEx4dnU1bDFIZ2hw?=
+ =?utf-8?B?MHB1SjhiYXlCNzg5UDJxeStqckU1cVdxa2NHaDlUc3JmOWZMVkdhTFY3ZUFk?=
+ =?utf-8?B?WGRta3h3YnptUmFjQUplZWk1NVpyYnl5Y0Y2QktjYW5jUy92ZzdIdW9LWk95?=
+ =?utf-8?B?QStKSjF4WjdTY29IOGhGNjVaNHpMeDBLSHd6bXAxQll5OCswbW9pWlA4OVQx?=
+ =?utf-8?B?UUpoRlBrVjIvS1p1cCtzVmlVZzF1dXlPZ0NYdk94a0o2U3JxNFAwYnhnQ2U2?=
+ =?utf-8?B?WCt3ZGNRWkpQbFI0QWcyZGNQZVg2enhQWkgvSEhqcHEwcHg5dHVKMC9mV28r?=
+ =?utf-8?B?ZTFsVDhCTEJrb0J4MzR6elB5K25pMW9pWlVFR0JFc2hGajdSa0JtU3pscDBv?=
+ =?utf-8?B?VDY5djl1SFRiQjNDOVdjVTdIaXMzQW51aHBucFFjQ2MvNGpCei9nL3lTUjFV?=
+ =?utf-8?B?T1RjTXhBTzRmQU1FK3Z3S2ZJQkp0OHZXMVBYVkFWRXdYR1Q1MCtadVdNcVM1?=
+ =?utf-8?B?UmtSYVFZbnJOaER3RktLZHp1OHZxQnNSdC9taTdIRjJOSDdDOWhhZHdWSXE4?=
+ =?utf-8?B?cHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8dc8e07d-5e2c-45d1-ca2e-08dbc8bb9b08
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 11:33:49.4251
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PS0+LdWpyI/9Q0QVq72FcCEnSjLFIDMGq055r9Ngpou1yTz/Ft7WTN+ocK4Omgzdi3cshRs/ggyIrdek7rCGeY3L7MZxz4FWHy4eAElIPms=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8114
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 2023/10/9 18:29, syzbot wrote:
-> Hello,
+On 10/9/2023 1:15 PM, Mateusz Polchlopek wrote:
+> Update the "How are representors identified?" documentation
+> subchapter. For newer kernels driver developers should use
+> SET_NETDEV_DEVLINK_PORT instead of ndo_get_devlink_port()
+> callback.
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    f291209eca5e Merge tag 'net-6.6-rc5' of git://git.kernel.o..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11011862680000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=7a5682d32a74b423
-> dashboard link: https://syzkaller.appspot.com/bug?extid=c90849c50ed209d77689
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d8746e680000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1388dbae680000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/c35c46fb9748/disk-f291209e.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/f0cdf2349ddb/vmlinux-f291209e.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/2f4c7b7ed7c4/bzImage-f291209e.xz
-> 
-> The issue was bisected to:
-> 
-> commit dcda165706b9fbfd685898d46a6749d7d397e0c0
-> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date:   Fri Sep 15 21:42:27 2023 +0000
-> 
->      Bluetooth: hci_core: Fix build warnings
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1279df95680000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1179df95680000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1679df95680000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
-> Fixes: dcda165706b9 ("Bluetooth: hci_core: Fix build warnings")
-> 
-> ==================================================================
-> BUG: KASAN: slab-out-of-bounds in create_monitor_event+0x88d/0x930 net/bluetooth/hci_sock.c:491
-> Read of size 8 at addr ffff88801e5458c7 by task syz-executor191/5038
-> 
-> CPU: 0 PID: 5038 Comm: syz-executor191 Not tainted 6.6.0-rc4-syzkaller-00158-gf291209eca5e #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-> Call Trace:
->   <TASK>
->   __dump_stack lib/dump_stack.c:88 [inline]
->   dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
->   print_address_description mm/kasan/report.c:364 [inline]
->   print_report+0x163/0x540 mm/kasan/report.c:475
->   kasan_report+0x175/0x1b0 mm/kasan/report.c:588
->   create_monitor_event+0x88d/0x930 net/bluetooth/hci_sock.c:491
->   send_monitor_replay+0x7a/0x5d0 net/bluetooth/hci_sock.c:723
->   hci_sock_bind+0x85c/0x1140 net/bluetooth/hci_sock.c:1387
->   __sys_bind+0x23a/0x2e0 net/socket.c:1849
->   __do_sys_bind net/socket.c:1860 [inline]
->   __se_sys_bind net/socket.c:1858 [inline]
->   __x64_sys_bind+0x7a/0x90 net/socket.c:1858
->   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7fa90faa64f9
-> Code: 48 83 c4 28 c3 e8 17 19 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffc6a6f17b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-> RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007fa90faa64f9
-> RDX: 0000000000000006 RSI: 0000000020000000 RDI: 0000000000000004
-> RBP: 0000000000000003 R08: 000000ff00ffb650 R09: 000000ff00ffb650
-> R10: 0000000000000000 R11: 0000000000000246 R12: 000055555604a370
-> R13: 0000000000000072 R14: 00007fa90fb2a5b0 R15: 0000000000000001
->   </TASK>
-> 
-> Allocated by task 5038:
->   kasan_save_stack mm/kasan/common.c:45 [inline]
->   kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
->   ____kasan_kmalloc mm/kasan/common.c:374 [inline]
->   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:383
->   kasan_kmalloc include/linux/kasan.h:198 [inline]
->   __do_kmalloc_node mm/slab_common.c:1023 [inline]
->   __kmalloc_node_track_caller+0xb6/0x230 mm/slab_common.c:1043
->   kvasprintf+0xdf/0x190 lib/kasprintf.c:25
->   kobject_set_name_vargs+0x61/0x120 lib/kobject.c:272
->   dev_set_name+0xd5/0x120 drivers/base/core.c:3427
->   hci_register_dev+0x153/0xa40 net/bluetooth/hci_core.c:2620
->   __vhci_create_device drivers/bluetooth/hci_vhci.c:434 [inline]
->   vhci_create_device+0x3ba/0x720 drivers/bluetooth/hci_vhci.c:475
->   vhci_get_user drivers/bluetooth/hci_vhci.c:532 [inline]
->   vhci_write+0x3c7/0x480 drivers/bluetooth/hci_vhci.c:612
->   call_write_iter include/linux/fs.h:1956 [inline]
->   new_sync_write fs/read_write.c:491 [inline]
->   vfs_write+0x782/0xaf0 fs/read_write.c:584
->   ksys_write+0x1a0/0x2c0 fs/read_write.c:637
->   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
->   entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> The buggy address belongs to the object at ffff88801e5458c0
->   which belongs to the cache kmalloc-8 of size 8
-> The buggy address is located 2 bytes to the right of
->   allocated 5-byte region [ffff88801e5458c0, ffff88801e5458c5)
-> 
-> The buggy address belongs to the physical page:
-> page:ffffea0000795140 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1e545
-> flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
-> page_type: 0xffffffff()
-> raw: 00fff00000000800 ffff888012841280 ffffea00004db540 dead000000000002
-> raw: 0000000000000000 0000000000660066 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner tracks the page as allocated
-> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12c40(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY), pid 25, tgid 25 (kdevtmpfs), ts 9275165846, free_ts 9274763750
->   set_page_owner include/linux/page_owner.h:31 [inline]
->   post_alloc_hook+0x1e6/0x210 mm/page_alloc.c:1536
->   prep_new_page mm/page_alloc.c:1543 [inline]
->   get_page_from_freelist+0x31db/0x3360 mm/page_alloc.c:3170
->   __alloc_pages+0x255/0x670 mm/page_alloc.c:4426
->   alloc_slab_page+0x6a/0x160 mm/slub.c:1870
->   allocate_slab mm/slub.c:2017 [inline]
->   new_slab+0x84/0x2f0 mm/slub.c:2070
->   ___slab_alloc+0xc85/0x1310 mm/slub.c:3223
->   __slab_alloc mm/slub.c:3322 [inline]
->   __slab_alloc_node mm/slub.c:3375 [inline]
->   slab_alloc_node mm/slub.c:3468 [inline]
->   __kmem_cache_alloc_node+0x1af/0x270 mm/slub.c:3517
->   __do_kmalloc_node mm/slab_common.c:1022 [inline]
->   __kmalloc_node_track_caller+0xa5/0x230 mm/slab_common.c:1043
->   kstrdup+0x3a/0x70 mm/util.c:62
->   smack_inode_init_security+0x5ed/0x740 security/smack/smack_lsm.c:1046
->   security_inode_init_security+0x1a1/0x470 security/security.c:1648
->   shmem_mknod+0xc6/0x1d0 mm/shmem.c:3221
->   vfs_mknod+0x308/0x350 fs/namei.c:3998
->   handle_create drivers/base/devtmpfs.c:219 [inline]
->   handle drivers/base/devtmpfs.c:384 [inline]
->   devtmpfs_work_loop+0x95c/0x1030 drivers/base/devtmpfs.c:399
->   devtmpfsd+0x48/0x50 drivers/base/devtmpfs.c:441
->   kthread+0x2d3/0x370 kernel/kthread.c:388
-> page last free stack trace:
->   reset_page_owner include/linux/page_owner.h:24 [inline]
->   free_pages_prepare mm/page_alloc.c:1136 [inline]
->   free_unref_page_prepare+0x8c3/0x9f0 mm/page_alloc.c:2312
->   free_unref_page+0x37/0x3f0 mm/page_alloc.c:2405
->   mm_free_pgd kernel/fork.c:803 [inline]
->   __mmdrop+0xb8/0x3d0 kernel/fork.c:919
->   free_bprm+0x144/0x330 fs/exec.c:1492
->   kernel_execve+0x8f5/0xa10 fs/exec.c:2026
->   call_usermodehelper_exec_async+0x233/0x370 kernel/umh.c:110
->   ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
->   ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
-> 
-> Memory state around the buggy address:
->   ffff88801e545780: 05 fc fc fc fc 05 fc fc fc fc 05 fc fc fc fc 05
->   ffff88801e545800: fc fc fc fc 05 fc fc fc fc 00 fc fc fc fc 00 fc
->> ffff88801e545880: fc fc fc 00 fc fc fc fc 05 fc fc fc fc 00 fc fc
->                                             ^
->   ffff88801e545900: fc fc 00 fc fc fc fc 00 fc fc fc fc 05 fc fc fc
->   ffff88801e545980: fc 05 fc fc fc fc fa fc fc fc fc 00 fc fc fc fc
-> ==================================================================
-> 
-> 
+> --
+> v1:
+> - targeting -net, without IWL
+> https://lore.kernel.org/netdev/20231006091412.92156-1-mateusz.polchlopek@intel.com/
 > ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-> If the bug is already fixed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
-> If you want to overwrite bug's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the bug is a duplicate of another bug, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
-> 
 >
-The size of the member name in struct hci_mon_new_index is fixed at 8
-bytes. The size of the member name in struct hci_dev is not fixed. When 
-the size of the member name in struct hci_dev is less than 8 bytes,
-out-of-bounds read will occur.
 
-It seems that the member name in struct hci_mon_new_index is no longer
-used and can be removed directly.
+There is a typo (two hyphens instead three), so because of that mistake 
+tomorrow I will send the v3 patch.
 
-Zhengchao Shao
+> Fixes: 7712b3e966ea ("Merge branch 'net-fix-netdev-to-devlink_port-linkage-and-expose-to-user'")
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>   Documentation/networking/representors.rst | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/networking/representors.rst b/Documentation/networking/representors.rst
+> index ee1f5cd54496..2d6b7b493fa6 100644
+> --- a/Documentation/networking/representors.rst
+> +++ b/Documentation/networking/representors.rst
+> @@ -162,9 +162,9 @@ How are representors identified?
+>   The representor netdevice should *not* directly refer to a PCIe device (e.g.
+>   through ``net_dev->dev.parent`` / ``SET_NETDEV_DEV()``), either of the
+>   representee or of the switchdev function.
+> -Instead, it should implement the ``ndo_get_devlink_port()`` netdevice op, which
+> -the kernel uses to provide the ``phys_switch_id`` and ``phys_port_name`` sysfs
+> -nodes.  (Some legacy drivers implement ``ndo_get_port_parent_id()`` and
+> +Instead, driver developers should use ``SET_NETDEV_DEVLINK_PORT`` macro to
+> +assign devlink port instance to a netdevice before it registers the netdevice.
+> +(Some legacy drivers implement ``ndo_get_port_parent_id()`` and
+>   ``ndo_get_phys_port_name()`` directly, but this is deprecated.)  See
+>   :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>` for the
+>   details of this API.
 
