@@ -1,81 +1,77 @@
-Return-Path: <netdev+bounces-39114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0267BE205
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:02:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 735CF7BE20F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB551C208F0
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:02:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 952081C2094B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6CE347C2;
-	Mon,  9 Oct 2023 14:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9087A347C8;
+	Mon,  9 Oct 2023 14:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RYUbBQiq"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dPzqCyNE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64473347BA
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:02:26 +0000 (UTC)
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C392E94
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:02:24 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-d9191f0d94cso4676393276.3
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 07:02:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFDE1774D
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:03:55 +0000 (UTC)
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0555D91
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:03:54 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id 3f1490d57ef6-d8195078f69so4800299276.3
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 07:03:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696860144; x=1697464944; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696860233; x=1697465033; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jr1KrnbRKYhIlUJMB/5uJH8ttam2WYmXtqA/TkqjB8A=;
-        b=RYUbBQiqgrskJ70DQAgMoyIiA4G3AWBMIwjXRgbtk0d6/ZEay3UZv25+P0KtrgiXcI
-         6FgAzLsZVmdkWpfB9XsYXXBV/yySnLWOqSm9aJQ1vxfeX4L1RnAxep2e6J3oUhoqU01k
-         HmBqp6jftVIHEHbMwfrqWiyBB8g3ZPc3F/MjK1PXXuefl3Uj5bX0mKG09t1pOiws6Z9r
-         7zS8p6LoyOajgHdNru6Fxlw3uUdAJXvvH/Rcx5IxfX8wAXHwCsqNZSgD9/wTa5FtGxkT
-         QC48VqGB5ztlvybJnz0q6BbgcwDdFhRIVjg2gQA1h8jLvp13KHSng69qPWqtLmXNiy+q
-         Vdxg==
+        bh=zdD5rNVHdNz46gdQ2ft/0vQLpaR1q5PhHgZq+QkooqU=;
+        b=dPzqCyNEW+vv9xM9n3uLJk58E9jzdKDSs10h3ITjBBPx8fkKTgdIUucy3ETtsvMrqi
+         jQVP2+8UUw8mNOQJ6YRBqMFGyAng7wVP0PCV6H/d7XeJBZqNBXJHE9ZrmxnOuk+uid5w
+         vu7ByMBjwDBcHnIPHgkxiZGSg6/WFbZzfQvLRCJp3RO3RVCJO/2njBheoA8pQQJHF80X
+         e1eDuExNoG9GbWHmjJIk3lmlyURgAISAJ/mdJyEpgGaKM9E9/Y5g2YxmN1Wmqnm+bRSD
+         4227x3Rsb90PbJ7uZnz3xj4OCmfWjijUx/DWQdZ3RWUHDhlf216JT+6xibWy5GY3Qr5l
+         f0iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696860144; x=1697464944;
+        d=1e100.net; s=20230601; t=1696860233; x=1697465033;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jr1KrnbRKYhIlUJMB/5uJH8ttam2WYmXtqA/TkqjB8A=;
-        b=EgiAfzCLjVpQKPf+mO+QfkJA616NYfxavqxRfmMFXRwiFItf5APanrJjPcNaQRqvT3
-         4XBZqihwQDC9nIXmzNOxFqwpbyF+uauj4TsLQ5nMzb8KVx2lQJVjjgQ97e8T+qFXquF4
-         eNa1grIkcW+Qd7Ev56GoOQf7e2XPpoJCCjf5yW1pN8BViW43fTfyeLQgnGChbaBN6r39
-         /KLNRbTQv6owITzGUMoS0b58PCxJzmkBoqUrXOcoNE99K5pcm2whYIZzaV7DgDoRLirz
-         FydizPZ8/KisHdyD2WZgE0IltRIyb3TCRFYvQLh1mhYXJTfrTr6nsb9tZNK82wFqR0zy
-         os7g==
-X-Gm-Message-State: AOJu0YzDurQIxmSN0ulWlf938TI+G7995C0/Q/DU4dSjginh8BTjToE7
-	HXdRUFF5hdoQeNFqRHiw0nZvCDCt49ho7T8QQ2dzAA==
-X-Google-Smtp-Source: AGHT+IG+eXJKUNy4GlFNJnDi2SX3oAKLhi8qwgpNLb45K/KPphyDt8USQgt/C3M6O2X6ohBGa1xMPJdOffVeeKiGluI=
-X-Received: by 2002:a25:c341:0:b0:d86:52d8:bf40 with SMTP id
- t62-20020a25c341000000b00d8652d8bf40mr13333401ybf.17.1696860143942; Mon, 09
- Oct 2023 07:02:23 -0700 (PDT)
+        bh=zdD5rNVHdNz46gdQ2ft/0vQLpaR1q5PhHgZq+QkooqU=;
+        b=Hd1EBWLTlTA5sTYjJj2vW0Wyg/Du4x4mUzLuonOlkW+G3NvqILEfJyGzBpYOqRGEFd
+         pORLnR8LmAAZcDw1hsscVaWwF2IcIDzfZOlOODVq86FkYdL5Xb2WzC+KHFGM5X3X9QLM
+         Fa2WNfzBBB7GywCGmv0u6qAH8JI2gCOG95ZlU0rVcqbvnz0gFA5M3y/RH94yLhhpk8LV
+         qP5E3spbbpAzRpp1kUjlILbIEbF8yUGO9bEQbXCaNUP98rNu0L6j8XSUePWcRwjGw4jC
+         wE1ddmSZXCG/bwHm7zIDYY17BW46aMMtRINNvpjUfZYTCpUzEHhXo3iwro5S1VDT+d+I
+         nCvA==
+X-Gm-Message-State: AOJu0YwM5nnJBltQrA027jrRpJlndVocGoizKcdoE0R5VbCON2d7ca0C
+	VpKn2+3QgEieg0Y38hAHXwRNb1ljisZJ6nmh02GxYni0CPUBHGk3
+X-Google-Smtp-Source: AGHT+IEGhWYcN+6mO0MVBvWirYs7kkBs95dWAC1592thLBxpK6fGFY/rc+nvY00OwULQiUItEACPfzB5fmL7HWuTPtk=
+X-Received: by 2002:a25:2395:0:b0:d7f:f5e:a2bd with SMTP id
+ j143-20020a252395000000b00d7f0f5ea2bdmr14177171ybj.10.1696860233188; Mon, 09
+ Oct 2023 07:03:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230930143542.101000-1-jhs@mojatatu.com> <20230930143542.101000-14-jhs@mojatatu.com>
- <87edi5ysun.fsf@nvidia.com>
-In-Reply-To: <87edi5ysun.fsf@nvidia.com>
+References: <20231009092655.22025-1-daniel@iogearbox.net>
+In-Reply-To: <20231009092655.22025-1-daniel@iogearbox.net>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 9 Oct 2023 10:02:11 -0400
-Message-ID: <CAM0EoM=2ObA1yrasNWRFoSzB+JZ0su2TKrXH-D0k+Pth=aOUxg@mail.gmail.com>
-Subject: Re: [PATCH RFC v6 net-next 13/17] p4tc: add table entry create,
- update, get, delete, flush and dump
-To: Vlad Buslov <vladbu@nvidia.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kernel@mojatatu.com, 
-	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com
+Date: Mon, 9 Oct 2023 10:03:42 -0400
+Message-ID: <CAM0EoMn9tGQ=wiwbXBQAym-D+_ABZer4NpBj3nNamFUwqJhFHw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
+ more flexible
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	victor@mojatatu.com, martin.lau@linux.dev, dxu@dxuuu.xyz, 
+	xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -84,196 +80,235 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Vlad,
-
-On Sun, Oct 8, 2023 at 12:36=E2=80=AFPM Vlad Buslov <vladbu@nvidia.com> wro=
-te:
+On Mon, Oct 9, 2023 at 5:27=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
+t> wrote:
 >
-> On Sat 30 Sep 2023 at 10:35, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-
-[..trimmed...]
-
-> > +/* Invoked from both control and data path  */
-> > +static int __p4tc_table_entry_update(struct p4tc_pipeline *pipeline,
-> > +                                  struct p4tc_table *table,
-> > +                                  struct p4tc_table_entry *entry,
-> > +                                  struct p4tc_table_entry_mask *mask,
-> > +                                  u16 whodunnit, bool from_control)
-> > +__must_hold(RCU)
-> > +{
-> > +     struct p4tc_table_entry_mask *mask_found =3D NULL;
-> > +     struct p4tc_table_entry_work *entry_work;
-> > +     struct p4tc_table_entry_value *value_old;
-> > +     struct p4tc_table_entry_value *value;
-> > +     struct p4tc_table_entry *entry_old;
-> > +     struct p4tc_table_entry_tm *tm_old;
-> > +     struct p4tc_table_entry_tm *tm;
-> > +     int ret;
-> > +
-> > +     value =3D p4tc_table_entry_value(entry);
-> > +     /* We set it to zero on create an update to avoid having entry
-> > +      * deletion in parallel before we report to user space.
-> > +      */
-> > +     refcount_set(&value->entries_ref, 0);
+> Currently, the kfree_skb_reason() in sch_handle_{ingress,egress}() can on=
+ly
+> express a basic SKB_DROP_REASON_TC_INGRESS or SKB_DROP_REASON_TC_EGRESS r=
+eason.
 >
-> TBH I already commented on one of the previous versions of this series
-> that it is very hard to understand and review tons of different atomic
-> reference counters, especially when they are modified with functions
-> like refcount_dec_not_one() or unconditional set like in this place.
+> Victor kicked-off an initial proposal to make this more flexible by disam=
+biguating
+> verdict from return code by moving the verdict into struct tcf_result and
+> letting tcf_classify() return a negative error. If hit, then two new drop
+> reasons were added in the proposal, that is SKB_DROP_REASON_TC_INGRESS_ER=
+ROR
+> as well as SKB_DROP_REASON_TC_EGRESS_ERROR. Further analysis of the actua=
+l
+> error codes would have required to attach to tcf_classify via kprobe/kret=
+probe
+> to more deeply debug skb and the returned error.
 >
-> I chose specifically this function because __must_hold(RCU) makes it
-> look like it can be accessed concurrently from datapath, which is not
-> obvious on multiple previous usages of reference counters in the series.
-
-True, tables can be manipulated from control plane/user space,
-datapath as well as timers (mostly for delete).
-Would using wrappers around these incr/decr help? i mean meaningful
-inlines that will provide clarity as to what an incr/decr is?
-
-> So what happens here if entries_ref was 0 to begin with? Or is possible
-> for this function to be executed concurrently by multiple tasks, in
-> which case all of them set entries_ref to 0, but first one that finishes
-> resets the counter back to 1 at which point I assume it can be deleted
-> in parallel by control path while some concurrent
-> __p4tc_table_entry_update() are still running (at least that is what the
-> comment here indicates)?
-
-It's rtnl-lockless, so you can imagine what would happen there ;->
-Multiple concurent user space, kernel, timers all contending for this.
-Exactly what you said: its zero in this case because some entity could
-delete it in parallel.
-See comment further down which says "In case of parallel update, the
-thread that arrives here first will..."
-Consider it a poor man's lock. Does that help? Perhaps we could have
-more discussion at the monthly tc meetup..
-We have been testing this code a lot for concurrency and wrote some
-user space tooling to catch such issues.
-
+> In order to make the kfree_skb_reason() in sch_handle_{ingress,egress}() =
+more
+> extensible, it can be addressed in a more straight forward way, that is: =
+Instead
+> of placing the verdict into struct tcf_result, we can just put the drop r=
+eason
+> in there, which does not require changes throughout various classful sche=
+dulers
+> given the existing verdict logic can stay as is.
 >
-> > +
-> > +     if (table->tbl_type !=3D P4TC_TABLE_TYPE_EXACT) {
-> > +             mask_found =3D p4tc_table_entry_mask_add(table, entry, ma=
-sk);
-> > +             if (IS_ERR(mask_found)) {
-> > +                     ret =3D PTR_ERR(mask_found);
-> > +                     goto out;
-> > +             }
-> > +     }
-> > +
-> > +     p4tc_table_entry_build_key(table, &entry->key, mask_found);
-> > +
-> > +     entry_old =3D p4tc_entry_lookup(table, &entry->key, value->prio);
-> > +     if (!entry_old) {
-> > +             ret =3D -ENOENT;
-> > +             goto rm_masks_idr;
-> > +     }
-> > +
-> > +     /* In case of parallel update, the thread that arrives here first=
- will
-> > +      * get the right to update.
-> > +      *
-> > +      * In case of a parallel get/update, whoever is second will fail =
-appropriately
-> > +      */
-> > +     value_old =3D p4tc_table_entry_value(entry_old);
-> > +     if (!p4tc_tbl_entry_put(value_old)) {
-> > +             ret =3D -EAGAIN;
-> > +             goto rm_masks_idr;
-> > +     }
-> > +
-> > +     if (from_control) {
-> > +             if (!p4tc_ctrl_update_ok(value_old->permissions)) {
-> > +                     ret =3D -EPERM;
-> > +                     goto set_entries_refcount;
-> > +             }
-> > +     } else {
-> > +             if (!p4tc_data_update_ok(value_old->permissions)) {
-> > +                     ret =3D -EPERM;
-> > +                     goto set_entries_refcount;
-> > +             }
-> > +     }
-> > +
-> > +     tm =3D kzalloc(sizeof(*tm), GFP_ATOMIC);
-> > +     if (unlikely(!tm)) {
-> > +             ret =3D -ENOMEM;
-> > +             goto set_entries_refcount;
-> > +     }
-> > +
-> > +     tm_old =3D rcu_dereference_protected(value_old->tm, 1);
-> > +     *tm =3D *tm_old;
-> > +
-> > +     tm->lastused =3D jiffies;
-> > +     tm->who_updated =3D whodunnit;
-> > +
-> > +     if (value->permissions =3D=3D P4TC_PERMISSIONS_UNINIT)
-> > +             value->permissions =3D value_old->permissions;
-> > +
-> > +     rcu_assign_pointer(value->tm, tm);
-> > +
-> > +     entry_work =3D kzalloc(sizeof(*(entry_work)), GFP_ATOMIC);
-> > +     if (unlikely(!entry_work)) {
-> > +             ret =3D -ENOMEM;
-> > +             goto free_tm;
-> > +     }
-> > +
-> > +     entry_work->pipeline =3D pipeline;
-> > +     entry_work->table =3D table;
-> > +     entry_work->entry =3D entry;
-> > +     value->entry_work =3D entry_work;
-> > +     if (!value->is_dyn)
-> > +             value->is_dyn =3D value_old->is_dyn;
-> > +
-> > +     if (value->is_dyn) {
-> > +             /* Only use old entry value if user didn't specify new on=
-e */
-> > +             value->aging_ms =3D value->aging_ms ?: value_old->aging_m=
-s;
-> > +
-> > +             hrtimer_init(&value->entry_timer, CLOCK_MONOTONIC,
-> > +                          HRTIMER_MODE_REL);
-> > +             value->entry_timer.function =3D &entry_timer_handle;
-> > +
-> > +             hrtimer_start(&value->entry_timer, ms_to_ktime(value->agi=
-ng_ms),
-> > +                           HRTIMER_MODE_REL);
-> > +     }
-> > +
-> > +     INIT_WORK(&entry_work->work, p4tc_table_entry_del_work);
-> > +
-> > +     if (rhltable_insert(&table->tbl_entries, &entry->ht_node,
-> > +                         entry_hlt_params) < 0) {
-> > +             ret =3D -EEXIST;
-> > +             goto free_entry_work;
-> > +     }
-> > +
-> > +     p4tc_table_entry_destroy_noida(table, entry_old);
-> > +
-> > +     if (!from_control)
-> > +             p4tc_tbl_entry_emit_event(entry_work, RTM_P4TC_UPDATE,
-> > +                                       GFP_ATOMIC);
-> > +
-> > +     return 0;
-> > +
-> > +free_entry_work:
-> > +     kfree(entry_work);
-> > +
-> > +free_tm:
-> > +     kfree(tm);
-> > +
-> > +set_entries_refcount:
-> > +     refcount_set(&value_old->entries_ref, 1);
-> > +
-> > +rm_masks_idr:
-> > +     if (table->tbl_type !=3D P4TC_TABLE_TYPE_EXACT)
-> > +             p4tc_table_entry_mask_del(table, entry);
-> > +
-> > +out:
-> > +     return ret;
-> > +}
-> > +
+> Then, SKB_DROP_REASON_TC_ERROR{,_*} can be added to the enum skb_drop_rea=
+son
+> to disambiguate between an error or an intentional drop. New drop reason =
+error
+> codes can be added successively to the tc code base.
+>
+> For internal error locations which have not yet been annotated with a
+> SKB_DROP_REASON_TC_ERROR{,_*}, the fallback is SKB_DROP_REASON_TC_INGRESS=
+ and
+> SKB_DROP_REASON_TC_EGRESS, respectively. Generic errors could be marked w=
+ith a
+> SKB_DROP_REASON_TC_ERROR code until they are converted to more specific o=
+nes
+> if it is found that they would be useful for troubleshooting.
+>
+> While drop reasons have infrastructure for subsystem specific error codes=
+ which
+> are currently used by mac80211 and ovs, Jakub mentioned that it is prefer=
+red
+> for tc to use the enum skb_drop_reason core codes given it is a better fi=
+t and
+> currently the tooling support is better, too.
 
-[..trimmed..]
 
- cheers,
+Daniel - one of us will get to this sometime this week (kind of loaded
+on some other stuff atm).
+
+cheers,
 jamal
+
+> With regards to the latter:
+>
+>   [...] I think Alastair (bpftrace) is working on auto-prettifying enums =
+when
+>   bpftrace outputs maps. So we can do something like:
+>
+>   $ bpftrace -e 'tracepoint:skb:kfree_skb { @[args->reason] =3D count(); =
+}'
+>   Attaching 1 probe...
+>   ^C
+>
+>   @[SKB_DROP_REASON_TC_INGRESS]: 2
+>   @[SKB_CONSUMED]: 34
+>
+>   ^^^^^^^^^^^^ names!!
+>
+>   Auto-magically. [...]
+>
+> Add a small helper tcf_set_drop_reason() which can be used to set the dro=
+p reason
+> into the tcf_result.
+>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> Cc: Victor Nogueira <victor@mojatatu.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Link: https://lore.kernel.org/netdev/20231006063233.74345d36@kernel.org
+> ---
+>  v1 -> v2:
+>    - Renamed tc_set_drop_reason -> tcf_set_drop_reason
+>    - Moved tcf_set_drop_reason into pkt_cls.h (Cong)
+>
+>  include/net/pkt_cls.h     |  6 ++++++
+>  include/net/sch_generic.h |  3 +--
+>  net/core/dev.c            | 15 ++++++++++-----
+>  3 files changed, 17 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index f308e8268651..a76c9171db0e 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -154,6 +154,12 @@ __cls_set_class(unsigned long *clp, unsigned long cl=
+)
+>         return xchg(clp, cl);
+>  }
+>
+> +static inline void tcf_set_drop_reason(struct tcf_result *res,
+> +                                      enum skb_drop_reason reason)
+> +{
+> +       res->drop_reason =3D reason;
+> +}
+> +
+>  static inline void
+>  __tcf_bind_filter(struct Qdisc *q, struct tcf_result *r, unsigned long b=
+ase)
+>  {
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index c7318c73cfd6..dcb9160e6467 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -324,7 +324,6 @@ struct Qdisc_ops {
+>         struct module           *owner;
+>  };
+>
+> -
+>  struct tcf_result {
+>         union {
+>                 struct {
+> @@ -332,8 +331,8 @@ struct tcf_result {
+>                         u32             classid;
+>                 };
+>                 const struct tcf_proto *goto_tp;
+> -
+>         };
+> +       enum skb_drop_reason            drop_reason;
+>  };
+>
+>  struct tcf_chain;
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 606a366cc209..664426285fa3 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3910,7 +3910,8 @@ EXPORT_SYMBOL_GPL(netdev_xmit_skip_txqueue);
+>  #endif /* CONFIG_NET_EGRESS */
+>
+>  #ifdef CONFIG_NET_XGRESS
+> -static int tc_run(struct tcx_entry *entry, struct sk_buff *skb)
+> +static int tc_run(struct tcx_entry *entry, struct sk_buff *skb,
+> +                 enum skb_drop_reason *drop_reason)
+>  {
+>         int ret =3D TC_ACT_UNSPEC;
+>  #ifdef CONFIG_NET_CLS_ACT
+> @@ -3922,12 +3923,14 @@ static int tc_run(struct tcx_entry *entry, struct=
+ sk_buff *skb)
+>
+>         tc_skb_cb(skb)->mru =3D 0;
+>         tc_skb_cb(skb)->post_ct =3D false;
+> +       res.drop_reason =3D *drop_reason;
+>
+>         mini_qdisc_bstats_cpu_update(miniq, skb);
+>         ret =3D tcf_classify(skb, miniq->block, miniq->filter_list, &res,=
+ false);
+>         /* Only tcf related quirks below. */
+>         switch (ret) {
+>         case TC_ACT_SHOT:
+> +               *drop_reason =3D res.drop_reason;
+>                 mini_qdisc_qstats_cpu_drop(miniq);
+>                 break;
+>         case TC_ACT_OK:
+> @@ -3977,6 +3980,7 @@ sch_handle_ingress(struct sk_buff *skb, struct pack=
+et_type **pt_prev, int *ret,
+>                    struct net_device *orig_dev, bool *another)
+>  {
+>         struct bpf_mprog_entry *entry =3D rcu_dereference_bh(skb->dev->tc=
+x_ingress);
+> +       enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_TC_INGRESS;
+>         int sch_ret;
+>
+>         if (!entry)
+> @@ -3994,7 +3998,7 @@ sch_handle_ingress(struct sk_buff *skb, struct pack=
+et_type **pt_prev, int *ret,
+>                 if (sch_ret !=3D TC_ACT_UNSPEC)
+>                         goto ingress_verdict;
+>         }
+> -       sch_ret =3D tc_run(tcx_entry(entry), skb);
+> +       sch_ret =3D tc_run(tcx_entry(entry), skb, &drop_reason);
+>  ingress_verdict:
+>         switch (sch_ret) {
+>         case TC_ACT_REDIRECT:
+> @@ -4011,7 +4015,7 @@ sch_handle_ingress(struct sk_buff *skb, struct pack=
+et_type **pt_prev, int *ret,
+>                 *ret =3D NET_RX_SUCCESS;
+>                 return NULL;
+>         case TC_ACT_SHOT:
+> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_INGRESS);
+> +               kfree_skb_reason(skb, drop_reason);
+>                 *ret =3D NET_RX_DROP;
+>                 return NULL;
+>         /* used by tc_run */
+> @@ -4032,6 +4036,7 @@ static __always_inline struct sk_buff *
+>  sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
+>  {
+>         struct bpf_mprog_entry *entry =3D rcu_dereference_bh(dev->tcx_egr=
+ess);
+> +       enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_TC_EGRESS;
+>         int sch_ret;
+>
+>         if (!entry)
+> @@ -4045,7 +4050,7 @@ sch_handle_egress(struct sk_buff *skb, int *ret, st=
+ruct net_device *dev)
+>                 if (sch_ret !=3D TC_ACT_UNSPEC)
+>                         goto egress_verdict;
+>         }
+> -       sch_ret =3D tc_run(tcx_entry(entry), skb);
+> +       sch_ret =3D tc_run(tcx_entry(entry), skb, &drop_reason);
+>  egress_verdict:
+>         switch (sch_ret) {
+>         case TC_ACT_REDIRECT:
+> @@ -4054,7 +4059,7 @@ sch_handle_egress(struct sk_buff *skb, int *ret, st=
+ruct net_device *dev)
+>                 *ret =3D NET_XMIT_SUCCESS;
+>                 return NULL;
+>         case TC_ACT_SHOT:
+> -               kfree_skb_reason(skb, SKB_DROP_REASON_TC_EGRESS);
+> +               kfree_skb_reason(skb, drop_reason);
+>                 *ret =3D NET_XMIT_DROP;
+>                 return NULL;
+>         /* used by tc_run */
+> --
+> 2.34.1
+>
 
