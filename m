@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-39255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E247BE813
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:31:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 157927BE817
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:31:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CD7328194D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:31:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3212281948
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A524F38BD6;
-	Mon,  9 Oct 2023 17:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D64A38BDB;
+	Mon,  9 Oct 2023 17:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkDhsBMF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKZXKZ6G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8994EBA53
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:31:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63C22C433C7;
-	Mon,  9 Oct 2023 17:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4AB38BD6
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:31:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23FB0C433C8;
+	Mon,  9 Oct 2023 17:31:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696872688;
-	bh=PakgZLNGLzXC+87Hq9LZSbho3Y+2lz8rmGoxLVl+4GE=;
+	s=k20201202; t=1696872705;
+	bh=OhjQeQRnExrpooqKh3gh9c6wU+rd8LzpqzmrgKzmc1o=;
 	h=From:To:Cc:Subject:Date:From;
-	b=KkDhsBMFnsoUmGCrn712KXCDmMDgE1hE5B3lbUE2Fsen4OipNHv/pqBfvM5Fq06lx
-	 Dhj1NFjAtuEYg3IjINbIMpp+663FtqHbjdljWnQ01a+ESBpVvmYxtDhDz78GXjBwqq
-	 f7uvb9WWeVW/ga1laT9sqSsNAvAMCEyzpS9LB+pR8K6lgjMM5kmTybdr1YMw3x1+mt
-	 oYExEqK/pTmng0ahA/9o0QT//A24NcvGWfyjJ9QksjB5dvu/CMb+/wgc+2K0oH5f1h
-	 55d0XL2J27RozOgmnKsjOD+tpO9QmiOBy3MuwmojhhVFl2ofuGJHySvTTvyyH6p5aD
-	 1pNIhjZ7DAOYw==
-Received: (nullmailer pid 2504790 invoked by uid 1000);
-	Mon, 09 Oct 2023 17:31:26 -0000
+	b=kKZXKZ6G5xb7CpuYYHYWBpSUVmVlufI1wRkUJBTC7MaTrnX9pu4RW64/9fhopzTyU
+	 N/kqKCVUtoospBJ9FMM3D4arIyg6JcahLl+0PiJQ2JPJhA6eKVUf0o6X8dC21t+zbM
+	 1Na/83qcJeyJvDxGYHgl0K86pmV8qxGHn89x1kwIRp5thPEBueG8dGKVGIH66LO+uR
+	 mRKR10lUSWIEJ/7WhjQDx3VSvFvSpGIo0vvhOB/vT9UAEf6BLqVEELVVb+xUDuWdR8
+	 Pc5FM+8A5D2Ov9o751mQme1EzDwf3CpIt4UqhAeNtzMm8SexP38NZOTdaHVDgcKFdS
+	 SnMK4KehDfC8w==
+Received: (nullmailer pid 2511395 invoked by uid 1000);
+	Mon, 09 Oct 2023 17:31:43 -0000
 From: Rob Herring <robh@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: ethernet: wiznet: Use spi_get_device_match_data()
-Date: Mon,  9 Oct 2023 12:29:00 -0500
-Message-ID: <20231009172923.2457844-5-robh@kernel.org>
+To: Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Michal Simek <michal.simek@amd.com>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH net-next] net: can: Use device_get_match_data()
+Date: Mon,  9 Oct 2023 12:29:02 -0500
+Message-ID: <20231009172923.2457844-7-robh@kernel.org>
 X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -49,53 +49,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use preferred spi_get_device_match_data() instead of of_match_device() and
-spi_get_device_id() to get the driver match data. With this, adjust the
-includes to explicitly include the correct headers.
+Use preferred device_get_match_data() instead of of_match_device() to
+get the driver match data. With this, adjust the includes to explicitly
+include the correct headers.
 
 Signed-off-by: Rob Herring <robh@kernel.org>
 ---
- drivers/net/ethernet/wiznet/w5100-spi.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+ drivers/net/can/c_can/c_can_platform.c | 9 +++------
+ drivers/net/can/flexcan/flexcan-core.c | 9 +++------
+ drivers/net/can/mscan/mpc5xxx_can.c    | 8 ++++----
+ drivers/net/can/xilinx_can.c           | 7 ++-----
+ 4 files changed, 12 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/wiznet/w5100-spi.c b/drivers/net/ethernet/wiznet/w5100-spi.c
-index 7c52796273a4..990a3cce8c0f 100644
---- a/drivers/net/ethernet/wiznet/w5100-spi.c
-+++ b/drivers/net/ethernet/wiznet/w5100-spi.c
-@@ -14,8 +14,8 @@
- #include <linux/module.h>
- #include <linux/delay.h>
- #include <linux/netdevice.h>
-+#include <linux/of.h>
- #include <linux/of_net.h>
+diff --git a/drivers/net/can/c_can/c_can_platform.c b/drivers/net/can/c_can/c_can_platform.c
+index f44ba2600415..caa781018b09 100644
+--- a/drivers/net/can/c_can/c_can_platform.c
++++ b/drivers/net/can/c_can/c_can_platform.c
+@@ -30,9 +30,9 @@
+ #include <linux/io.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/clk.h>
+ #include <linux/of.h>
 -#include <linux/of_device.h>
- #include <linux/spi/spi.h>
+ #include <linux/mfd/syscon.h>
+ #include <linux/regmap.h>
  
- #include "w5100.h"
-@@ -420,7 +420,6 @@ MODULE_DEVICE_TABLE(of, w5100_of_match);
+@@ -259,17 +259,14 @@ static int c_can_plat_probe(struct platform_device *pdev)
+ 	void __iomem *addr;
+ 	struct net_device *dev;
+ 	struct c_can_priv *priv;
+-	const struct of_device_id *match;
+ 	struct resource *mem;
+ 	int irq;
+ 	struct clk *clk;
+ 	const struct c_can_driver_data *drvdata;
+ 	struct device_node *np = pdev->dev.of_node;
  
- static int w5100_spi_probe(struct spi_device *spi)
+-	match = of_match_device(c_can_of_table, &pdev->dev);
+-	if (match) {
+-		drvdata = match->data;
+-	} else if (pdev->id_entry->driver_data) {
++	drvdata = device_get_match_data(&pdev->dev);
++	if (!drvdata && pdev->id_entry->driver_data) {
+ 		drvdata = (struct c_can_driver_data *)
+ 			platform_get_device_id(pdev)->driver_data;
+ 	} else {
+diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
+index add39e922b89..b9dd9597fc97 100644
+--- a/drivers/net/can/flexcan/flexcan-core.c
++++ b/drivers/net/can/flexcan/flexcan-core.c
+@@ -23,11 +23,11 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/platform_device.h>
+ #include <linux/can/platform/flexcan.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/regmap.h>
+ #include <linux/regulator/consumer.h>
+ 
+@@ -2040,7 +2040,6 @@ MODULE_DEVICE_TABLE(platform, flexcan_id_table);
+ 
+ static int flexcan_probe(struct platform_device *pdev)
  {
 -	const struct of_device_id *of_id;
- 	const struct w5100_ops *ops;
- 	kernel_ulong_t driver_data;
- 	const void *mac = NULL;
-@@ -432,14 +431,7 @@ static int w5100_spi_probe(struct spi_device *spi)
- 	if (!ret)
- 		mac = tmpmac;
+ 	const struct flexcan_devtype_data *devtype_data;
+ 	struct net_device *dev;
+ 	struct flexcan_priv *priv;
+@@ -2096,10 +2095,8 @@ static int flexcan_probe(struct platform_device *pdev)
+ 	if (IS_ERR(regs))
+ 		return PTR_ERR(regs);
  
--	if (spi->dev.of_node) {
--		of_id = of_match_device(w5100_of_match, &spi->dev);
--		if (!of_id)
--			return -ENODEV;
--		driver_data = (kernel_ulong_t)of_id->data;
--	} else {
--		driver_data = spi_get_device_id(spi)->driver_data;
--	}
-+	driver_data = (uintptr_t)spi_get_device_match_data(spi);
+-	of_id = of_match_device(flexcan_of_match, &pdev->dev);
+-	if (of_id)
+-		devtype_data = of_id->data;
+-	else if (platform_get_device_id(pdev)->driver_data)
++	devtype_data = device_get_match_data(&pdev->dev);
++	if (!devtype_data && pdev->id_entry->driver_data)
+ 		devtype_data = (struct flexcan_devtype_data *)
+ 			platform_get_device_id(pdev)->driver_data;
+ 	else
+diff --git a/drivers/net/can/mscan/mpc5xxx_can.c b/drivers/net/can/mscan/mpc5xxx_can.c
+index 4837df6efa92..5b3d69c3b6b6 100644
+--- a/drivers/net/can/mscan/mpc5xxx_can.c
++++ b/drivers/net/can/mscan/mpc5xxx_can.c
+@@ -12,8 +12,10 @@
+ #include <linux/module.h>
+ #include <linux/interrupt.h>
+ #include <linux/platform_device.h>
++#include <linux/property.h>
+ #include <linux/netdevice.h>
+ #include <linux/can/dev.h>
++#include <linux/of.h>
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
+ #include <linux/of_platform.h>
+@@ -290,7 +292,7 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
+ 	int irq, mscan_clksrc = 0;
+ 	int err = -ENOMEM;
  
- 	switch (driver_data) {
- 	case W5100:
+-	data = of_device_get_match_data(&ofdev->dev);
++	data = device_get_match_data(&ofdev->dev);
+ 	if (!data)
+ 		return -EINVAL;
+ 
+@@ -351,13 +353,11 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
+ 
+ static void mpc5xxx_can_remove(struct platform_device *ofdev)
+ {
+-	const struct of_device_id *match;
+ 	const struct mpc5xxx_can_data *data;
+ 	struct net_device *dev = platform_get_drvdata(ofdev);
+ 	struct mscan_priv *priv = netdev_priv(dev);
+ 
+-	match = of_match_device(mpc5xxx_can_table, &ofdev->dev);
+-	data = match ? match->data : NULL;
++	data = device_get_match_data(&ofdev->dev);
+ 
+ 	unregister_mscandev(dev);
+ 	if (data && data->put_clock)
+diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
+index abe58f103043..f17fd43d03c0 100644
+--- a/drivers/net/can/xilinx_can.c
++++ b/drivers/net/can/xilinx_can.c
+@@ -20,8 +20,8 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/platform_device.h>
++#include <linux/property.h>
+ #include <linux/skbuff.h>
+ #include <linux/spinlock.h>
+ #include <linux/string.h>
+@@ -1726,7 +1726,6 @@ static int xcan_probe(struct platform_device *pdev)
+ 	struct net_device *ndev;
+ 	struct xcan_priv *priv;
+ 	struct phy *transceiver;
+-	const struct of_device_id *of_id;
+ 	const struct xcan_devtype_data *devtype = &xcan_axi_data;
+ 	void __iomem *addr;
+ 	int ret;
+@@ -1741,9 +1740,7 @@ static int xcan_probe(struct platform_device *pdev)
+ 		goto err;
+ 	}
+ 
+-	of_id = of_match_device(xcan_of_match, &pdev->dev);
+-	if (of_id && of_id->data)
+-		devtype = of_id->data;
++	devtype = device_get_match_data(&pdev->dev);
+ 
+ 	hw_tx_max_property = devtype->flags & XCAN_FLAG_TX_MAILBOXES ?
+ 			     "tx-mailbox-count" : "tx-fifo-depth";
 -- 
 2.42.0
 
