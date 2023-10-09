@@ -1,69 +1,61 @@
-Return-Path: <netdev+bounces-39146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8DE7BE379
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:49:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BEC37BE38F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9C21C2093D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:49:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33B352815AF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA0E18C34;
-	Mon,  9 Oct 2023 14:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FA318E35;
+	Mon,  9 Oct 2023 14:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hJ6zUXy9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1wVwgSze"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fpibxk1D";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="9PirVOG9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532E81FD8
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FE018056
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:52:36 +0000 (UTC)
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4F7AC;
-	Mon,  9 Oct 2023 07:48:58 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E568F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:52:34 -0700 (PDT)
 From: Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1696862937;
+	s=2020; t=1696863153;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XGxzYbViuLT+KjbnCIr8b+GOy6d8U/BxcG6sWQXRcpQ=;
-	b=hJ6zUXy9y3Uy8vXAPRTUbYIcxL4U8ppbEpeNWPjl/+fBMBbSyUldQoPVHkYlwznvj2f7aL
-	Ci6aVT88LzPEsKicU3iZgPrjFBaW7+7yoEFF6eeNVWb6/CZD9230Z1EzMZ+zryQB+Z4DgO
-	EeVZZ4x4D6clgFM3KSE53eV3DDe6huKwaz+rTQLb0Uvz+CriLRDtGeF/SV+jaE3jU4NXS/
-	KHJBZXHPh8wleE7+dVDnx5MZZ2uJoU9yXU+oAW7wP/xAbTPed+c1QIs9Ht8uhGK9B/TYjG
-	iSkxpWJoTcJbHrYJIi0f09Jkby0RWby80jYgM81QKjs1amBaUGYBSnKlEVtbbQ==
+	bh=UOeWQs9FLdGQo25V9gooBhGER+hpkh0PkA9Q2FoKocw=;
+	b=fpibxk1DyYsA06cWfZOb51bUySp2L2lcXkU0Uftj8Dm9eYURx/OlVqZpz6fs3xtha1xQaU
+	frpyUjt4m/n206GapXWzBaYd3ypUcW4zIy/yGIhV5doKOhF8GhwHgLe9mbV2D5SNrxRYYg
+	Xn39j74AeFIWPYSfw4KTMfJoDbuKjihn102J/Rmx23WzUvSxm6qtawPjwCI2w+EJN/mzO4
+	3BArH584vlHs/RnIh9DOo/HWR7pU4QoWLSgWk26h2mZFVy1mBW/bFclpmoUtaIkOUNqzh6
+	9JHfaZxGRAmkeBY0TGVHCHLipi5/y714JIHDggrVwdT7MNp1FfGBLwullLbqEw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1696862937;
+	s=2020e; t=1696863153;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XGxzYbViuLT+KjbnCIr8b+GOy6d8U/BxcG6sWQXRcpQ=;
-	b=1wVwgSzenBvoDOxvUMkRgbpNWU3QEC6JIfSpqjbdJQtHEeR1FobUXAvZnWAXFHgNzOVdcA
-	1TNcijX6xKzK4AAw==
-To: Richard Cochran <richardcochran@gmail.com>, John Stultz
- <jstultz@google.com>
-Cc: =?utf-8?B?TWFoZXNoIEJhbmRld2FyICAgICAgICAgKOCkruCkueClh+CktiDgpKzgpII=?=
- =?utf-8?B?4KSh4KWH4KS14KS+?= <maheshb@google.com>, Netdev
- <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, David
- Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Don Hatchett <hatch@google.com>, Yuliang Li
- <yuliangli@google.com>, Mahesh Bandewar <mahesh@bandewar.net>, Stephen
- Boyd <sboyd@kernel.org>
-Subject: Re: [PATCH 1/4] time: add ktime_get_cycles64() api
-In-Reply-To: <ZRiP9mgFjLpKHj8N@hoboy.vegasvil.org>
-References: <20230929023737.1610865-1-maheshb@google.com>
- <CANDhNCqb5JzEDOdAnocanR2KFbokrpMOL=iNwY3fTxcn_ftuZQ@mail.gmail.com>
- <CAF2d9jgeGLCzbFZhptGzpUnmMgLaRysyzBmpZ+dK4sxWdmR5ZQ@mail.gmail.com>
- <CANDhNCro+AQum3eSmKK5OTNik2E0cFxV_reCQg0+_uTubHaDsA@mail.gmail.com>
- <CANDhNCryn8TjJZRdCvVUj88pakHSUvtyN53byjmAcyowKj5mcA@mail.gmail.com>
- <ZRiP9mgFjLpKHj8N@hoboy.vegasvil.org>
-Date: Mon, 09 Oct 2023 16:48:56 +0200
-Message-ID: <87o7h7q2av.ffs@tglx>
+	bh=UOeWQs9FLdGQo25V9gooBhGER+hpkh0PkA9Q2FoKocw=;
+	b=9PirVOG9i1YnWwCzVGjhMMbKpEUDr6SHNu5rU6hxz91IAyG/etQ7m7KxoyIUx11WOmRBMP
+	SdF7ZyOgO1MIbADw==
+To: Xabier Marquiegui <reibax@gmail.com>, netdev@vger.kernel.org
+Cc: richardcochran@gmail.com, jstultz@google.com, horms@kernel.org,
+ chrony-dev@chrony.tuxfamily.org, mlichvar@redhat.com, reibax@gmail.com,
+ ntp-lists@mattcorallo.com, vinicius.gomes@intel.com, davem@davemloft.net,
+ rrameshbabu@nvidia.com, shuah@kernel.org
+Subject: Re: [PATCH net-next v5 1/6] posix-clock: introduce
+ posix_clock_context concept
+In-Reply-To: <992c76f8570de9e0549c4d2446d17cae0a959b77.1696804243.git.reibax@gmail.com>
+References: <cover.1696804243.git.reibax@gmail.com>
+ <992c76f8570de9e0549c4d2446d17cae0a959b77.1696804243.git.reibax@gmail.com>
+Date: Mon, 09 Oct 2023 16:52:32 +0200
+Message-ID: <87lecbq24v.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,20 +69,35 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Sep 30 2023 at 14:15, Richard Cochran wrote:
-> On Fri, Sep 29, 2023 at 12:06:46AM -0700, John Stultz wrote:
->> But I still think we should avoid exporting the raw cycle values
->> unless there is some extremely strong argument for it
->
-> Looks like the argument was based on a misunderstanding of what
-> CLOCK_MONOTONIC_RAW actually is.  So, please, let's not expose the raw
-> cycle counter value.
+On Mon, Oct 09 2023 at 00:49, Xabier Marquiegui wrote:
 
-Correct. Exposing the raw counter value is broken if the counter wraps
-around on a regular base.
+> Add the necessary structure to support custom private-data per
+> posix-clock user.
+>
+> The previous implementation of posix-clock assumed all file open
+> instances need access to the same clock structure on private_data.
+>
+> The need for individual data structures per file open instance has been
+> identified when developing support for multiple timestamp event queue
+> users for ptp_clock.
+>
+> This patch introduces a generic posix_clock_context data structure as a
+
+"This patch .."
+
+We already know that this is a patch.
+
+https://www.kernel.org/doc/html/latest/process/submitting-patches.html#describe-your-changes
+
+>  
+> +struct posix_clock_context {
+> +	struct posix_clock *clk;
+> +	void *private_clkdata;
+> +};
+
+https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#struct-declarations-and-initializers
 
 Thanks,
 
         tglx
-
 
