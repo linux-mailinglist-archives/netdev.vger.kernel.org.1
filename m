@@ -1,126 +1,157 @@
-Return-Path: <netdev+bounces-39008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFAD57BD721
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:35:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1098B7BD731
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFE111C2093D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:35:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AF681C208E3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAFE156D3;
-	Mon,  9 Oct 2023 09:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B21156CB;
+	Mon,  9 Oct 2023 09:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67AD8F57
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:35:12 +0000 (UTC)
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3976ED;
-	Mon,  9 Oct 2023 02:35:10 -0700 (PDT)
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-59f7f46b326so51486207b3.0;
-        Mon, 09 Oct 2023 02:35:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696844110; x=1697448910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xr8BhwyyAKTpcM9iiIvbHN9gtfLY84lyd2lf3mY1OqM=;
-        b=Mbinxml7zyVjkCQuqBa/QE+pAhUXFpbxxcJXopuqB910G681RADeEYDETh6Z4cQxds
-         1uiI7sCd4XUll5cW1AeFCaXe0FcA6vx2Jqr3CCQqNo+m3bTUGOJP5oOVwimlOqMsRqa2
-         VFuihfbh+SqVYL8Rbs3oFwY78N4+HQwx9v4sahGMIfmrG+IZN6RqATIYbzNKj1ggsnor
-         f4A/YJiEH/HkZNPdzkQRMmythQ3FJsAtRscaBWc+I25p1yYdEGncXbbmh8hjxwhPOit2
-         jPWxnfKCFd1U8bl7CXm+snLTwj+vZjlIh2ynf0rdsRw72+BhCH5i0z0QC4hO+g5nUZvd
-         sP2w==
-X-Gm-Message-State: AOJu0YylUBCygfzAnjE1D9emudKZdLW52NLt1RK0FIoXJUPksUEb4M8I
-	ICW1OUfhC2U6B+GebC8ILV28CEXUGVqcwg==
-X-Google-Smtp-Source: AGHT+IHFttZ4hFjBnwgCdzGbKR9zUR/6BFNdhwQakJmPN5exLeCPEPhE68PnDYUyq5q9+JhDW8iUbA==
-X-Received: by 2002:a81:5244:0:b0:589:f4ec:4d51 with SMTP id g65-20020a815244000000b00589f4ec4d51mr15081885ywb.3.1696844109871;
-        Mon, 09 Oct 2023 02:35:09 -0700 (PDT)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
-        by smtp.gmail.com with ESMTPSA id d184-20020a0ddbc1000000b00586108dd8f5sm3532544ywe.18.2023.10.09.02.35.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 02:35:09 -0700 (PDT)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-59f6e6b7600so51131587b3.3;
-        Mon, 09 Oct 2023 02:35:08 -0700 (PDT)
-X-Received: by 2002:a81:8246:0:b0:58d:f1fe:5954 with SMTP id
- s67-20020a818246000000b0058df1fe5954mr15164085ywf.32.1696844108593; Mon, 09
- Oct 2023 02:35:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A399328ED
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:36:08 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65FA98E;
+	Mon,  9 Oct 2023 02:36:06 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S3v1D3bLvztTHl;
+	Mon,  9 Oct 2023 17:31:28 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 9 Oct
+ 2023 17:36:03 +0800
+Subject: Re: [PATCH net v2] octeontx2-pf: Fix page pool frag allocation
+ failure.
+To: Ratheesh Kannoth <rkannoth@marvell.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+	<hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <hawk@kernel.org>,
+	<alexander.duyck@gmail.com>, <ilias.apalodimas@linaro.org>,
+	<bigeasy@linutronix.de>
+References: <20231009032512.3777271-1-rkannoth@marvell.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <e3a86c32-0142-2b80-975c-9c32f6c16bb0@huawei.com>
+Date: Mon, 9 Oct 2023 17:36:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-2-hch@lst.de>
- <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com> <20231009091625.GB22463@lst.de>
-In-Reply-To: <20231009091625.GB22463@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 9 Oct 2023 11:34:55 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdUZNewD-QC8J7MWSBP197Vc169meOjjK6=b7M11kVjUzg@mail.gmail.com>
-Message-ID: <CAMuHMdUZNewD-QC8J7MWSBP197Vc169meOjjK6=b7M11kVjUzg@mail.gmail.com>
-Subject: Re: [PATCH 1/6] dma-direct: add depdenencies to CONFIG_DMA_GLOBAL_POOL
-To: Christoph Hellwig <hch@lst.de>
-Cc: iommu@lists.linux.dev, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>, 
-	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20231009032512.3777271-1-rkannoth@marvell.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Christoph,
+On 2023/10/9 11:25, Ratheesh Kannoth wrote:
+> Since page pool param's "order" is set to 0, will result
+> in below warn message if interface is configured higher
 
-On Mon, Oct 9, 2023 at 11:16=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> On Mon, Oct 09, 2023 at 10:43:57AM +0200, Geert Uytterhoeven wrote:
-> > >  config DMA_DIRECT_REMAP
-> >
-> > riscv defconfig + CONFIG_NONPORTABLE=3Dy + CONFIG_ARCH_R9A07G043=3Dy:
-> >
-> > WARNING: unmet direct dependencies detected for DMA_GLOBAL_POOL
-> >   Depends on [n]: !ARCH_HAS_DMA_SET_UNCACHED [=3Dn] && !DMA_DIRECT_REMA=
-P [=3Dy]
-> >   Selected by [y]:
-> >   - ARCH_R9A07G043 [=3Dy] && SOC_RENESAS [=3Dy] && RISCV [=3Dy] && NONP=
-ORTABLE [=3Dy]
->
-> And that's exactly what this patch is supposed to show.  RISCV must not
-> select DMA_DIRECT_REMAP at the same time as DMA_GLOBAL_POOL.  I though
-> the fix for that just went upstream?
+interface is configured with higher rx buffer size?
+                        ^^^^
 
-The fix you are referring too is probably commit c1ec4b450ab729e3
-("soc: renesas: Make ARCH_R9A07G043 (riscv version) depend
-on NONPORTABLE") in next-20231006 and later.  It is not yet upstream.
+> rx buffer size.
+> 
+> Steps to reproduce the issue.
+> 1. devlink dev param set pci/0002:04:00.0 name receive_buffer_size \
+>    value 8196 cmode runtime
+> 2. ifconfig eth0 up
+> 
+> [   19.901356] ------------[ cut here ]------------
+> [   19.901361] WARNING: CPU: 11 PID: 12331 at net/core/page_pool.c:567 page_pool_alloc_frag+0x3c/0x230
+> [   19.901449] pstate: 82401009 (Nzcv daif +PAN -UAO +TCO -DIT +SSBS BTYPE=--)
+> [   19.901451] pc : page_pool_alloc_frag+0x3c/0x230
+> [   19.901453] lr : __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
+> [   19.901460] sp : ffff80000f66b970
+> [   19.901461] x29: ffff80000f66b970 x28: 0000000000000000 x27: 0000000000000000
+> [   19.901464] x26: ffff800000d15b68 x25: ffff000195b5c080 x24: ffff0002a5a32dc0
+> [   19.901467] x23: ffff0001063c0878 x22: 0000000000000100 x21: 0000000000000000
+> [   19.901469] x20: 0000000000000000 x19: ffff00016f781000 x18: 0000000000000000
+> [   19.901472] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> [   19.901474] x14: 0000000000000000 x13: ffff0005ffdc9c80 x12: 0000000000000000
+> [   19.901477] x11: ffff800009119a38 x10: 4c6ef2e3ba300519 x9 : ffff800000d13844
+> [   19.901479] x8 : ffff0002a5a33cc8 x7 : 0000000000000030 x6 : 0000000000000030
+> [   19.901482] x5 : 0000000000000005 x4 : 0000000000000000 x3 : 0000000000000a20
+> [   19.901484] x2 : 0000000000001080 x1 : ffff80000f66b9d4 x0 : 0000000000001000
+> [   19.901487] Call trace:
+> [   19.901488]  page_pool_alloc_frag+0x3c/0x230
+> [   19.901490]  __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
+> [   19.901494]  otx2_rq_aura_pool_init+0x1c4/0x240 [rvu_nicpf]
+> [   19.901498]  otx2_open+0x228/0xa70 [rvu_nicpf]
+> [   19.901501]  otx2vf_open+0x20/0xd0 [rvu_nicvf]
+> [   19.901504]  __dev_open+0x114/0x1d0
+> [   19.901507]  __dev_change_flags+0x194/0x210
+> [   19.901510]  dev_change_flags+0x2c/0x70
+> [   19.901512]  devinet_ioctl+0x3a4/0x6c4
+> [   19.901515]  inet_ioctl+0x228/0x240
+> [   19.901518]  sock_ioctl+0x2ac/0x480
+> [   19.901522]  __arm64_sys_ioctl+0x564/0xe50
+> [   19.901525]  invoke_syscall.constprop.0+0x58/0xf0
+> [   19.901529]  do_el0_svc+0x58/0x150
+> [   19.901531]  el0_svc+0x30/0x140
+> [   19.901533]  el0t_64_sync_handler+0xe8/0x114
+> [   19.901535]  el0t_64_sync+0x1a0/0x1a4
+> [   19.901537] ---[ end trace 678c0bf660ad8116 ]---
+> 
+> Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> 
+> ---
+> ChangeLog
+> 
+> v1 -> v2: Removed PAGE_ALIGN.
+> v0 -> v1: Used get_order() and PAGE_ALIGN. Fixed commit message
+> ---
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 997fedac3a98..83a1a460caed 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -1357,7 +1357,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+>  	struct page_pool_params pp_params = { 0 };
+>  	struct npa_aq_enq_req *aq;
+>  	struct otx2_pool *pool;
+> -	int err;
+> +	int err, sz;
+>  
+>  	pool = &pfvf->qset.pool[pool_id];
+>  	/* Alloc memory for stack which is used to store buffer pointers */
+> @@ -1403,6 +1403,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
+>  		return 0;
+>  	}
+>  
+> +	sz = ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN);
 
-Still, it merely makes ARCH_R9A07G043 (which selects DMA_GLOBAL_POOL)
-depend on ARCH_R9A07G043.
-RISCV_DMA_NONCOHERENT still selects DMA_DIRECT_REMAP, so both can end
-up being enabled.
+Is the above really needed if PAGE_SIZE is bigger than SMP_CACHE_BYTES
+or OTX2_ALIGN? Doesn't get_order() already ensure that the alignment is bigger
+than SMP_CACHE_BYTES or OTX2_ALIGN?
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+> +	pp_params.order = get_order(sz);
+>  	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
+>  	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
+>  	pp_params.nid = NUMA_NO_NODE;
+> 
 
