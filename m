@@ -1,414 +1,257 @@
-Return-Path: <netdev+bounces-39061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8966B7BD975
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:22:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DF4F7BD9ED
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73B4D1C2093D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:22:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CADB02815C0
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47782C8CA;
-	Mon,  9 Oct 2023 11:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="W2YdgVYV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3092C18655;
+	Mon,  9 Oct 2023 11:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0324691
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:22:34 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2134.outbound.protection.outlook.com [40.107.237.134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969E6C6;
-	Mon,  9 Oct 2023 04:22:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nNa+r3W46ccRGY9PL+PHfRdLAx1qrE43MiqE5bYqZBy4bcjxc6POtlCXE/+4wJuaVJ9SN3++zbclAJgDQqWsU/lh92gthjf38DChClK5DUJtfFzmeVm18ecRYp177dZg+lEIFprWEe5vjDCJsd4FsHvMY7hcrT8qElZJRD+cKNJbI/R2E9aL6ydyLKitiBflKWhDErgvKkkm+52trEHFAGa6BOjzxD8K1Da+dfdCTzWZQUe767MeHjirK6meUCOEUA/c90Ocy0wwKmEgtCDVzCAY7jpIz+g7v1WdK28rnvxlPakrLem3ltVsYCva+XNQKdrrsiJP7rRoDSyJrAkF1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PGv5Md6qqx8skK75Hio+sgI3jm7k3uXXrO4Ub8hZ0D4=;
- b=Mkt8K6yit1sTD5VHdO1lHpH1QhgYQ/onOQu9J5/BCAuJiHH8TaEzofUEVZm/OPOa2ZrtKXzfA1AO9oFtM9MU6kSHFFmQEh0Ah/2DocH3p+Dms9dWEhisqDyhkGwqLyErrAxy7sKN8r/q+BfjqRp/jWhYxDQMbntBt2IWWVSGv/+ic0YygqiVvOhxJZKe9MNyXD5NLe8DDbeiRxQLs56bLRD89ZbGRhS3HDh1NQOZ6m7C2gEUDjv2MIT/Ba/yWKrblbSBZuDZ0G1IHnUTyf/FsUH17hawYutP5Xt6dyJW/ztZGFufSWkxxfmbVQ1Gy+3FRyUFlLy9jF3wCCHkmmCqzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PGv5Md6qqx8skK75Hio+sgI3jm7k3uXXrO4Ub8hZ0D4=;
- b=W2YdgVYVfclFxbGkNzxlAxI1ECNMgiM+DjEP36lbsINNQaC5ZawYAusQAh2Ac6oOmDDxOKSr0VCjCrFiBV65wrv7Zs2FfzJki2P8s+mXjeFNDqsKBl6TDigQc/g4QcdSrwHMeeCP7Nuc6BpyHkfd29V34kgYLRmpxXIg8Zw++ZE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
- BN0PR13MB5181.namprd13.prod.outlook.com (2603:10b6:408:154::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Mon, 9 Oct
- 2023 11:22:28 +0000
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3]) by DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3%6]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
- 11:22:28 +0000
-From: Louis Peens <louis.peens@corigine.com>
-To: David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Yanguo Li <yanguo.li@corigine.com>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: [PATCH net] nfp: flower: avoid rmmod nfp crash issues
-Date: Mon,  9 Oct 2023 13:21:55 +0200
-Message-Id: <20231009112155.13269-1-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: JNXP275CA0044.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:18::32)
- To DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19630156C3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:32:43 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4417FAB;
+	Mon,  9 Oct 2023 04:32:40 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S3xcV6WgTzNpC0;
+	Mon,  9 Oct 2023 19:28:42 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Mon, 9 Oct 2023 19:32:37 +0800
+Message-ID: <1a3c2bf5-1984-be4e-79d3-edbe702d5a14@huawei.com>
+Date: Mon, 9 Oct 2023 19:32:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|BN0PR13MB5181:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08d6d75f-55eb-4f43-3d47-08dbc8ba057a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	M1jGKGX5tr/xJ2WNVeIHt4eSn/v117MnBNjgfpAfcGHuN+4kbK/XObRXODClCVQ02C/8nuOu6QGApJiy1OICyvLCn2Cw2syTDIOZUSZUIRrQMKkw1idXVxYn1vRXrY7xxEPXmXfAZuHeg/ZnTNPkB2xSeBxjInyJP7/NDdP9nwUhfYd7fWzAZq1yCOnXsgPq6FgEY5+LNBreBktpRQcq4FSqyGGGMk0AhaPbuYFm1DUKegs6DEiP4C8wAdn2eh9jfuS/uykVl2m3KTqSwtbYeS+pnY69n2phUPRWb3gF2SZMgUgy4mKUg2pyZPKyBWqJb16+OssI2IdNpJ59eN+JMWW4z1y9/gtFoYdDFsnsCMU6dyL1Mev5ruJZhNjx0fB6xdq705UU/uAdN2Ab7gxvW8GADOiaED6bbOXb2uKidBBbbbx0WJ6K66zW9Tz8bOgJtZSleeJKFKlzeTOlpmJrJfZCCQXPELTFKZdk5VIxrnbimWpkpVAkmoMNYCNG2TFUZFw5/YRjiKjACqpChJJJXQSki+Ga3ziYH9EJSxqH5RtEZDBw9+0LkuQ0E5jENYqQtqpUafePNTaw2o14LbLwTS4Pl9zvm94Wne/vc1Cs2HKCX4gsxXzF429MjXw4wsaOYd1+/0vItYQoxN36OGt7lrGZZ9RidW28dyaAiAECMKw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(39840400004)(376002)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(36756003)(86362001)(1076003)(107886003)(2616005)(6512007)(52116002)(6486002)(5660300002)(2906002)(44832011)(110136005)(478600001)(66476007)(66556008)(66946007)(316002)(41300700001)(54906003)(6506007)(6666004)(26005)(8936002)(4326008)(8676002)(83380400001)(38350700002)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bFdqb1hHLzZqc2xKTUx4R1FmUHlCNjlMOFA3V1VrY0N1TWZYaE1lWjVOREJ1?=
- =?utf-8?B?RW5LNVNJYVNVRTNabC9Hd3k3aVZvYlRMVlZ5c3AxUnI0MFk1ajJHSTJoWmFE?=
- =?utf-8?B?di9lcjF3L3N6YWVya0JOVFgxMGtBOURNUzRYSlBOaVBSUGwzb01naGVxaDdL?=
- =?utf-8?B?VEYxc3MyTmZRbmhWRXJjQzNwYVJXT2NSamNMbStMbElFQm82bW13MDVGaTN4?=
- =?utf-8?B?V1gxMXZ4ckxMYTFQSlVJckpDVlRidFpBS0FCRHRQVys5aHlIaFhKMDNCdWkw?=
- =?utf-8?B?SkxkeExOZDVHRjRjTEo0ajVnN3VVZU1wTStrdzkvdU1sdnZYTlIwMEtaSkN1?=
- =?utf-8?B?SHVoeW16dUxRSlUwem91cHE2TDhZKytBQ1dtRGVOUG9JdTRWd0hEb3BRSE9J?=
- =?utf-8?B?WmZJQ0Ywdzcrc2YwN04yTmVSRk1iTmt6aDVkOVNnRlRzVG1RenQzalBBZDZv?=
- =?utf-8?B?bDlscUt1aE5NVEhvRkRUbXZreUk2SUhlc05NVWg0WFJwSkJ0ZUh1TzVTZVhL?=
- =?utf-8?B?N0RlNGdERVkvWWZTelJHdklQM3oyNlZackU2QkhCZEpQT1Jtb3NNZjhqYkJD?=
- =?utf-8?B?WFl6N01UM0xXZmRablo2a1hOcjFCVE9JMk8wZWtxd0RrL0UrWW5WM2NkRnJv?=
- =?utf-8?B?dy9LbnZvdllWV05CcUlTYUtFVmpNcUk2aEtwWnliNWhKcG91bDFQVEVIN1ps?=
- =?utf-8?B?eGxaeFQzVG5qOWVBejVXU0YwbDVmNnBJdWFGblFlVDkvcWIvOEszckJXbzVH?=
- =?utf-8?B?N29NKzlXc0JKdm84VW4zRUYyb29FUzlHODY2dVB6RzFUVG1ZKzR6dXRvaTlS?=
- =?utf-8?B?N21aeXZ0aVE1YWIxaTQxVjZPQklXcnA2VjczTEpYWEdkVEgwNDdxTVNDdnhQ?=
- =?utf-8?B?UW9Kamx3Sno4Zy9Ebjh4VEV2c2NoZ3E0WUdURVR1MHFzTm5kODRBbzYzOUVI?=
- =?utf-8?B?TEZsMHU5dkZOSjBGeVFRSlloQ1pQaHBEKzlta2ExbVhUbCtKK2l3aW5TTkR0?=
- =?utf-8?B?cXZDTEpxU3BLenlyREkwSDJZZFRrVEFEci9RWURsQzlvRDd5emtBVDIwaHA0?=
- =?utf-8?B?ZU0wd2JEcW5BRlliNytvNlpZazJ1L3dsYWRGQm45SnJTM003MXp6NDA0UDNo?=
- =?utf-8?B?RWxvSUVZZ1J2Z2JRM3ZCc3pWcFNLRWNSUUt1aWdPd0R3Umx0aE9mMG9NZHlu?=
- =?utf-8?B?ajhsRW1Ga2d6dzIwMkhpajk2S2N4SS82Wk0zdlRYM3hjdTZ4eVhZVmMzV0FG?=
- =?utf-8?B?dXBNUjR2a0taVkwwbEtJQkNmaWJ6MGZQY0FXM204T0hOTGlSblJOWmNiWEJ1?=
- =?utf-8?B?MjdJR0JrWWIvYjlxZlBrYmJ0T1dyTlV4d3VoL0x4UDV6U3ZjS0t6ZXFOcG9k?=
- =?utf-8?B?d1B4TkdsSHJlUFkyUjVvNExxR3ZNR3l5ZkF1QVFmc1dmZTFWQTN5NVdqWm5N?=
- =?utf-8?B?UTVRcjZDVTdBU3VLQjA2QkxrR204NEhrMERnL3pTck1HR3h5THBmVnVhSkZk?=
- =?utf-8?B?OWFWbXp5c05LREp4eHE3aFg4am9YNVpNY2drKzB2M0VyTnVGaTV1ZGJDMGox?=
- =?utf-8?B?eWhqSGVpbG5zK1JjakloSU1Mczk0dnlnOE1ZcndjVjZrRXhILzJhSUpPRU5S?=
- =?utf-8?B?RmtkN0dydmR3YUhKbDE3K3hFbDJrK0Urd2RkWkNtMzJlbmZQSGFtcmFEQm5E?=
- =?utf-8?B?cnRjZGx5Yzk0amxwSklvVFJnZ05QV2hZelZXZWdCZmZzMTgrMU82aFJkSzNi?=
- =?utf-8?B?OEZsUmp0eHdoWUp1a1YxTmZkekE2bjNWVnNFNGxkclM0eElTUC9mdngwRGRs?=
- =?utf-8?B?ZUlzYnlVWFZOa1MwczVkTDJoRUFJOGd6N1hla1Nha3ZMTEU3TzZCMm5KUE9B?=
- =?utf-8?B?MnhXTGRPMHdXLzZ5cXJkYkVVWVNnOTdJbGtNNnZHMHRNU0ZqVWY2a1QxRzBi?=
- =?utf-8?B?SnovSmJyaElqZ3JkWnVNSEFORmRPUXBaZWhCeGlQcE9mTkRLT2F3NS9QVFF1?=
- =?utf-8?B?THRvZFU5UjkzN2Q4bEoxZlpyL244UFdrY0p0cEpDRTdtcjV2aGdaV3JBTmJG?=
- =?utf-8?B?dDdLZmtJRWZyeURCQVVDd3c3WFFHU2VJYUZTNG92dERhSEhrWUtnQ3NKaytN?=
- =?utf-8?B?TEVnMkd3UDV5QUl2aHE2VHFtUGhuTlZCNjBKL1pUOHl6ZXpqZzJ0YVpJWlUr?=
- =?utf-8?B?UlE9PQ==?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08d6d75f-55eb-4f43-3d47-08dbc8ba057a
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 11:22:28.5746
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KmRh0m0wD5aI8QJCfrrbrQ7pXSke3TGVw6BP9ZmTk0eGckjYK9NC+6oUtMK9DXLZcw/7Lb2+3fuCRg5D50+3kmoScsZOpO+2S5+NAf1t60M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB5181
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-out-of-bounds Read in
+ create_monitor_event
+To: syzbot <syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <johan.hedberg@gmail.com>,
+	<kuba@kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
+	<luiz.von.dentz@intel.com>, <marcel@holtmann.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
+References: <000000000000ae9ff70607461186@google.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <000000000000ae9ff70607461186@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Yanguo Li <yanguo.li@corigine.com>
 
-When there are CT table entries, and you rmmod nfp, the following
-events can happen:
 
-task1：
-    nfp_net_pci_remove
-          ↓
-    nfp_flower_stop->(asynchronous)tcf_ct_flow_table_cleanup_work(3)
-          ↓
-    nfp_zone_table_entry_destroy(1)
+On 2023/10/9 18:29, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f291209eca5e Merge tag 'net-6.6-rc5' of git://git.kernel.o..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11011862680000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7a5682d32a74b423
+> dashboard link: https://syzkaller.appspot.com/bug?extid=c90849c50ed209d77689
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d8746e680000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1388dbae680000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/c35c46fb9748/disk-f291209e.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/f0cdf2349ddb/vmlinux-f291209e.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/2f4c7b7ed7c4/bzImage-f291209e.xz
+> 
+> The issue was bisected to:
+> 
+> commit dcda165706b9fbfd685898d46a6749d7d397e0c0
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Fri Sep 15 21:42:27 2023 +0000
+> 
+>      Bluetooth: hci_core: Fix build warnings
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1279df95680000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1179df95680000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1679df95680000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
+> Fixes: dcda165706b9 ("Bluetooth: hci_core: Fix build warnings")
+> 
+> ==================================================================
+> BUG: KASAN: slab-out-of-bounds in create_monitor_event+0x88d/0x930 net/bluetooth/hci_sock.c:491
+> Read of size 8 at addr ffff88801e5458c7 by task syz-executor191/5038
+> 
+> CPU: 0 PID: 5038 Comm: syz-executor191 Not tainted 6.6.0-rc4-syzkaller-00158-gf291209eca5e #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+> Call Trace:
+>   <TASK>
+>   __dump_stack lib/dump_stack.c:88 [inline]
+>   dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
+>   print_address_description mm/kasan/report.c:364 [inline]
+>   print_report+0x163/0x540 mm/kasan/report.c:475
+>   kasan_report+0x175/0x1b0 mm/kasan/report.c:588
+>   create_monitor_event+0x88d/0x930 net/bluetooth/hci_sock.c:491
+>   send_monitor_replay+0x7a/0x5d0 net/bluetooth/hci_sock.c:723
+>   hci_sock_bind+0x85c/0x1140 net/bluetooth/hci_sock.c:1387
+>   __sys_bind+0x23a/0x2e0 net/socket.c:1849
+>   __do_sys_bind net/socket.c:1860 [inline]
+>   __se_sys_bind net/socket.c:1858 [inline]
+>   __x64_sys_bind+0x7a/0x90 net/socket.c:1858
+>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7fa90faa64f9
+> Code: 48 83 c4 28 c3 e8 17 19 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffc6a6f17b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+> RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007fa90faa64f9
+> RDX: 0000000000000006 RSI: 0000000020000000 RDI: 0000000000000004
+> RBP: 0000000000000003 R08: 000000ff00ffb650 R09: 000000ff00ffb650
+> R10: 0000000000000000 R11: 0000000000000246 R12: 000055555604a370
+> R13: 0000000000000072 R14: 00007fa90fb2a5b0 R15: 0000000000000001
+>   </TASK>
+> 
+> Allocated by task 5038:
+>   kasan_save_stack mm/kasan/common.c:45 [inline]
+>   kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
+>   ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+>   __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:383
+>   kasan_kmalloc include/linux/kasan.h:198 [inline]
+>   __do_kmalloc_node mm/slab_common.c:1023 [inline]
+>   __kmalloc_node_track_caller+0xb6/0x230 mm/slab_common.c:1043
+>   kvasprintf+0xdf/0x190 lib/kasprintf.c:25
+>   kobject_set_name_vargs+0x61/0x120 lib/kobject.c:272
+>   dev_set_name+0xd5/0x120 drivers/base/core.c:3427
+>   hci_register_dev+0x153/0xa40 net/bluetooth/hci_core.c:2620
+>   __vhci_create_device drivers/bluetooth/hci_vhci.c:434 [inline]
+>   vhci_create_device+0x3ba/0x720 drivers/bluetooth/hci_vhci.c:475
+>   vhci_get_user drivers/bluetooth/hci_vhci.c:532 [inline]
+>   vhci_write+0x3c7/0x480 drivers/bluetooth/hci_vhci.c:612
+>   call_write_iter include/linux/fs.h:1956 [inline]
+>   new_sync_write fs/read_write.c:491 [inline]
+>   vfs_write+0x782/0xaf0 fs/read_write.c:584
+>   ksys_write+0x1a0/0x2c0 fs/read_write.c:637
+>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>   do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> The buggy address belongs to the object at ffff88801e5458c0
+>   which belongs to the cache kmalloc-8 of size 8
+> The buggy address is located 2 bytes to the right of
+>   allocated 5-byte region [ffff88801e5458c0, ffff88801e5458c5)
+> 
+> The buggy address belongs to the physical page:
+> page:ffffea0000795140 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1e545
+> flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
+> page_type: 0xffffffff()
+> raw: 00fff00000000800 ffff888012841280 ffffea00004db540 dead000000000002
+> raw: 0000000000000000 0000000000660066 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner tracks the page as allocated
+> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12c40(GFP_NOFS|__GFP_NOWARN|__GFP_NORETRY), pid 25, tgid 25 (kdevtmpfs), ts 9275165846, free_ts 9274763750
+>   set_page_owner include/linux/page_owner.h:31 [inline]
+>   post_alloc_hook+0x1e6/0x210 mm/page_alloc.c:1536
+>   prep_new_page mm/page_alloc.c:1543 [inline]
+>   get_page_from_freelist+0x31db/0x3360 mm/page_alloc.c:3170
+>   __alloc_pages+0x255/0x670 mm/page_alloc.c:4426
+>   alloc_slab_page+0x6a/0x160 mm/slub.c:1870
+>   allocate_slab mm/slub.c:2017 [inline]
+>   new_slab+0x84/0x2f0 mm/slub.c:2070
+>   ___slab_alloc+0xc85/0x1310 mm/slub.c:3223
+>   __slab_alloc mm/slub.c:3322 [inline]
+>   __slab_alloc_node mm/slub.c:3375 [inline]
+>   slab_alloc_node mm/slub.c:3468 [inline]
+>   __kmem_cache_alloc_node+0x1af/0x270 mm/slub.c:3517
+>   __do_kmalloc_node mm/slab_common.c:1022 [inline]
+>   __kmalloc_node_track_caller+0xa5/0x230 mm/slab_common.c:1043
+>   kstrdup+0x3a/0x70 mm/util.c:62
+>   smack_inode_init_security+0x5ed/0x740 security/smack/smack_lsm.c:1046
+>   security_inode_init_security+0x1a1/0x470 security/security.c:1648
+>   shmem_mknod+0xc6/0x1d0 mm/shmem.c:3221
+>   vfs_mknod+0x308/0x350 fs/namei.c:3998
+>   handle_create drivers/base/devtmpfs.c:219 [inline]
+>   handle drivers/base/devtmpfs.c:384 [inline]
+>   devtmpfs_work_loop+0x95c/0x1030 drivers/base/devtmpfs.c:399
+>   devtmpfsd+0x48/0x50 drivers/base/devtmpfs.c:441
+>   kthread+0x2d3/0x370 kernel/kthread.c:388
+> page last free stack trace:
+>   reset_page_owner include/linux/page_owner.h:24 [inline]
+>   free_pages_prepare mm/page_alloc.c:1136 [inline]
+>   free_unref_page_prepare+0x8c3/0x9f0 mm/page_alloc.c:2312
+>   free_unref_page+0x37/0x3f0 mm/page_alloc.c:2405
+>   mm_free_pgd kernel/fork.c:803 [inline]
+>   __mmdrop+0xb8/0x3d0 kernel/fork.c:919
+>   free_bprm+0x144/0x330 fs/exec.c:1492
+>   kernel_execve+0x8f5/0xa10 fs/exec.c:2026
+>   call_usermodehelper_exec_async+0x233/0x370 kernel/umh.c:110
+>   ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+>   ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+> 
+> Memory state around the buggy address:
+>   ffff88801e545780: 05 fc fc fc fc 05 fc fc fc fc 05 fc fc fc fc 05
+>   ffff88801e545800: fc fc fc fc 05 fc fc fc fc 00 fc fc fc fc 00 fc
+>> ffff88801e545880: fc fc fc 00 fc fc fc fc 05 fc fc fc fc 00 fc fc
+>                                             ^
+>   ffff88801e545900: fc fc 00 fc fc fc fc 00 fc fc fc fc 05 fc fc fc
+>   ffff88801e545980: fc 05 fc fc fc fc fa fc fc fc fc 00 fc fc fc fc
+> ==================================================================
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> 
+> If the bug is already fixed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite bug's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the bug is a duplicate of another bug, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
+>
+The size of the member name in struct hci_mon_new_index is fixed at 8
+bytes. The size of the member name in struct hci_dev is not fixed. When 
+the size of the member name in struct hci_dev is less than 8 bytes,
+out-of-bounds read will occur.
 
-task2：
-    nfp_fl_ct_handle_nft_flow(2)
+It seems that the member name in struct hci_mon_new_index is no longer
+used and can be removed directly.
 
-When the execution order is (1)->(2)->(3), it will crash. Therefore, in
-the function nfp_fl_ct_del_flow, nf_flow_table_offload_del_cb needs to
-be executed synchronously.
-
-At the same time, in order to solve the deadlock problem and the problem
-of rtnl_lock sometimes failing, replace rtnl_lock with the private
-nfp_fl_lock.
-
-Fixes: 7cc93d888df7 ("nfp: flower-ct: remove callback delete deadlock")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yanguo Li <yanguo.li@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
----
- .../net/ethernet/netronome/nfp/flower/cmsg.c  | 10 ++++----
- .../ethernet/netronome/nfp/flower/conntrack.c | 19 ++++++++++-----
- .../net/ethernet/netronome/nfp/flower/main.h  |  2 ++
- .../ethernet/netronome/nfp/flower/metadata.c  |  2 ++
- .../ethernet/netronome/nfp/flower/offload.c   | 24 ++++++++++++++-----
- .../ethernet/netronome/nfp/flower/qos_conf.c  | 20 ++++++++++------
- 6 files changed, 54 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/cmsg.c b/drivers/net/ethernet/netronome/nfp/flower/cmsg.c
-index f21cf1f40f98..153533cd8f08 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/cmsg.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/cmsg.c
-@@ -210,6 +210,7 @@ nfp_flower_cmsg_merge_hint_rx(struct nfp_app *app, struct sk_buff *skb)
- 	unsigned int msg_len = nfp_flower_cmsg_get_data_len(skb);
- 	struct nfp_flower_cmsg_merge_hint *msg;
- 	struct nfp_fl_payload *sub_flows[2];
-+	struct nfp_flower_priv *priv;
- 	int err, i, flow_cnt;
- 
- 	msg = nfp_flower_cmsg_get_data(skb);
-@@ -228,14 +229,15 @@ nfp_flower_cmsg_merge_hint_rx(struct nfp_app *app, struct sk_buff *skb)
- 		return;
- 	}
- 
--	rtnl_lock();
-+	priv = app->priv;
-+	mutex_lock(&priv->nfp_fl_lock);
- 	for (i = 0; i < flow_cnt; i++) {
- 		u32 ctx = be32_to_cpu(msg->flow[i].host_ctx);
- 
- 		sub_flows[i] = nfp_flower_get_fl_payload_from_ctx(app, ctx);
- 		if (!sub_flows[i]) {
- 			nfp_flower_cmsg_warn(app, "Invalid flow in merge hint\n");
--			goto err_rtnl_unlock;
-+			goto err_mutex_unlock;
- 		}
- 	}
- 
-@@ -244,8 +246,8 @@ nfp_flower_cmsg_merge_hint_rx(struct nfp_app *app, struct sk_buff *skb)
- 	if (err == -ENOMEM)
- 		nfp_flower_cmsg_warn(app, "Flow merge memory fail.\n");
- 
--err_rtnl_unlock:
--	rtnl_unlock();
-+err_mutex_unlock:
-+	mutex_unlock(&priv->nfp_fl_lock);
- }
- 
- static void
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/conntrack.c b/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
-index 2643c4b3ff1f..2967bab72505 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/conntrack.c
-@@ -2131,8 +2131,6 @@ nfp_fl_ct_offload_nft_flow(struct nfp_fl_ct_zone_entry *zt, struct flow_cls_offl
- 	struct nfp_fl_ct_flow_entry *ct_entry;
- 	struct netlink_ext_ack *extack = NULL;
- 
--	ASSERT_RTNL();
--
- 	extack = flow->common.extack;
- 	switch (flow->command) {
- 	case FLOW_CLS_REPLACE:
-@@ -2178,9 +2176,13 @@ int nfp_fl_ct_handle_nft_flow(enum tc_setup_type type, void *type_data, void *cb
- 
- 	switch (type) {
- 	case TC_SETUP_CLSFLOWER:
--		rtnl_lock();
-+		while (!mutex_trylock(&zt->priv->nfp_fl_lock)) {
-+			if (!zt->nft) /* avoid deadlock */
-+				return err;
-+			msleep(20);
-+		}
- 		err = nfp_fl_ct_offload_nft_flow(zt, flow);
--		rtnl_unlock();
-+		mutex_unlock(&zt->priv->nfp_fl_lock);
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -2208,6 +2210,7 @@ int nfp_fl_ct_del_flow(struct nfp_fl_ct_map_entry *ct_map_ent)
- 	struct nfp_fl_ct_flow_entry *ct_entry;
- 	struct nfp_fl_ct_zone_entry *zt;
- 	struct rhashtable *m_table;
-+	struct nf_flowtable *nft;
- 
- 	if (!ct_map_ent)
- 		return -ENOENT;
-@@ -2226,8 +2229,12 @@ int nfp_fl_ct_del_flow(struct nfp_fl_ct_map_entry *ct_map_ent)
- 		if (ct_map_ent->cookie > 0)
- 			kfree(ct_map_ent);
- 
--		if (!zt->pre_ct_count) {
--			zt->nft = NULL;
-+		if (!zt->pre_ct_count && zt->nft) {
-+			nft = zt->nft;
-+			zt->nft = NULL; /* avoid deadlock */
-+			nf_flow_table_offload_del_cb(nft,
-+						     nfp_fl_ct_handle_nft_flow,
-+						     zt);
- 			nfp_fl_ct_clean_nft_entries(zt);
- 		}
- 		break;
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/main.h b/drivers/net/ethernet/netronome/nfp/flower/main.h
-index 40372545148e..2b7c947ff4f2 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/main.h
-+++ b/drivers/net/ethernet/netronome/nfp/flower/main.h
-@@ -297,6 +297,7 @@ struct nfp_fl_internal_ports {
-  * @predt_list:		List to keep track of decap pretun flows
-  * @neigh_table:	Table to keep track of neighbor entries
-  * @predt_lock:		Lock to serialise predt/neigh table updates
-+ * @nfp_fl_lock:	Lock to protect the flow offload operation
-  */
- struct nfp_flower_priv {
- 	struct nfp_app *app;
-@@ -339,6 +340,7 @@ struct nfp_flower_priv {
- 	struct list_head predt_list;
- 	struct rhashtable neigh_table;
- 	spinlock_t predt_lock; /* Lock to serialise predt/neigh table updates */
-+	struct mutex nfp_fl_lock; /* Protect the flow operation */
- };
- 
- /**
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/metadata.c b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
-index 0f06ef6e24bf..80e4675582bf 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/metadata.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/metadata.c
-@@ -528,6 +528,8 @@ int nfp_flower_metadata_init(struct nfp_app *app, u64 host_ctx_count,
- 	if (err)
- 		goto err_free_stats_ctx_table;
- 
-+	mutex_init(&priv->nfp_fl_lock);
-+
- 	err = rhashtable_init(&priv->ct_zone_table, &nfp_zone_table_params);
- 	if (err)
- 		goto err_free_merge_table;
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/offload.c b/drivers/net/ethernet/netronome/nfp/flower/offload.c
-index c153f0575b92..0aceef9fe582 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/offload.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/offload.c
-@@ -1009,8 +1009,6 @@ int nfp_flower_merge_offloaded_flows(struct nfp_app *app,
- 	u64 parent_ctx = 0;
- 	int err;
- 
--	ASSERT_RTNL();
--
- 	if (sub_flow1 == sub_flow2 ||
- 	    nfp_flower_is_merge_flow(sub_flow1) ||
- 	    nfp_flower_is_merge_flow(sub_flow2))
-@@ -1727,19 +1725,30 @@ static int
- nfp_flower_repr_offload(struct nfp_app *app, struct net_device *netdev,
- 			struct flow_cls_offload *flower)
- {
-+	struct nfp_flower_priv *priv = app->priv;
-+	int ret;
-+
- 	if (!eth_proto_is_802_3(flower->common.protocol))
- 		return -EOPNOTSUPP;
- 
-+	mutex_lock(&priv->nfp_fl_lock);
- 	switch (flower->command) {
- 	case FLOW_CLS_REPLACE:
--		return nfp_flower_add_offload(app, netdev, flower);
-+		ret = nfp_flower_add_offload(app, netdev, flower);
-+		break;
- 	case FLOW_CLS_DESTROY:
--		return nfp_flower_del_offload(app, netdev, flower);
-+		ret = nfp_flower_del_offload(app, netdev, flower);
-+		break;
- 	case FLOW_CLS_STATS:
--		return nfp_flower_get_stats(app, netdev, flower);
-+		ret = nfp_flower_get_stats(app, netdev, flower);
-+		break;
- 	default:
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		break;
- 	}
-+	mutex_unlock(&priv->nfp_fl_lock);
-+
-+	return ret;
- }
- 
- static int nfp_flower_setup_tc_block_cb(enum tc_setup_type type,
-@@ -1778,6 +1787,7 @@ static int nfp_flower_setup_tc_block(struct net_device *netdev,
- 	repr_priv = repr->app_priv;
- 	repr_priv->block_shared = f->block_shared;
- 	f->driver_block_list = &nfp_block_cb_list;
-+	f->unlocked_driver_cb = true;
- 
- 	switch (f->command) {
- 	case FLOW_BLOCK_BIND:
-@@ -1876,6 +1886,8 @@ nfp_flower_setup_indr_tc_block(struct net_device *netdev, struct Qdisc *sch, str
- 	     nfp_flower_internal_port_can_offload(app, netdev)))
- 		return -EOPNOTSUPP;
- 
-+	f->unlocked_driver_cb = true;
-+
- 	switch (f->command) {
- 	case FLOW_BLOCK_BIND:
- 		cb_priv = nfp_flower_indr_block_cb_priv_lookup(app, netdev);
-diff --git a/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c b/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
-index 99052a925d9e..e7180b4793c7 100644
---- a/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
-+++ b/drivers/net/ethernet/netronome/nfp/flower/qos_conf.c
-@@ -523,25 +523,31 @@ int nfp_flower_setup_qos_offload(struct nfp_app *app, struct net_device *netdev,
- {
- 	struct netlink_ext_ack *extack = flow->common.extack;
- 	struct nfp_flower_priv *fl_priv = app->priv;
-+	int ret;
- 
- 	if (!(fl_priv->flower_ext_feats & NFP_FL_FEATS_VF_RLIM)) {
- 		NL_SET_ERR_MSG_MOD(extack, "unsupported offload: loaded firmware does not support qos rate limit offload");
- 		return -EOPNOTSUPP;
- 	}
- 
-+	mutex_lock(&fl_priv->nfp_fl_lock);
- 	switch (flow->command) {
- 	case TC_CLSMATCHALL_REPLACE:
--		return nfp_flower_install_rate_limiter(app, netdev, flow,
--						       extack);
-+		ret = nfp_flower_install_rate_limiter(app, netdev, flow, extack);
-+		break;
- 	case TC_CLSMATCHALL_DESTROY:
--		return nfp_flower_remove_rate_limiter(app, netdev, flow,
--						      extack);
-+		ret = nfp_flower_remove_rate_limiter(app, netdev, flow, extack);
-+		break;
- 	case TC_CLSMATCHALL_STATS:
--		return nfp_flower_stats_rate_limiter(app, netdev, flow,
--						     extack);
-+		ret = nfp_flower_stats_rate_limiter(app, netdev, flow, extack);
-+		break;
- 	default:
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		break;
- 	}
-+	mutex_unlock(&fl_priv->nfp_fl_lock);
-+
-+	return ret;
- }
- 
- /* Offload tc action, currently only for tc police */
--- 
-2.34.1
-
+Zhengchao Shao
 
