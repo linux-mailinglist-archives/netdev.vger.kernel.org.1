@@ -1,107 +1,85 @@
-Return-Path: <netdev+bounces-39087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CDDA7BDE3D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:17:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3B457BDEFA
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:25:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E0AF2815F8
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:17:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7F71C20A5A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2141A5A3;
-	Mon,  9 Oct 2023 13:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D951A71D;
+	Mon,  9 Oct 2023 13:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUk7j7g8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EnoUjvw3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598BD199B1;
-	Mon,  9 Oct 2023 13:17:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25774C433C7;
-	Mon,  9 Oct 2023 13:17:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696857443;
-	bh=fb9+S+IdbqXmmVRZq9TTSPJ4lFpZS+G3qg2LrBeKI90=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IUk7j7g8cl6hCmae1KMe30hi13L17mfcIS9n6OseiyZ7CxMUtL+E645vsFKUsr8Be
-	 cLyzMwOsvtEIHwZkfLsK2ADlxSNMF8dI0Yi/90po45aTe3Qi1762zcaVmZzLPdg+Cj
-	 IBEQ9zNXeCIQCXJco201EXDXx+L/Y26We6Ch0JYlKfitDaHKZu/RQ/C3AL9XqVr2+8
-	 C6RHCjqVCxyLoDfAP3ZqsjtBXvGgCxLKP0VU0jaT3SgJRDWZ1ppdUJwx+uNrl4dcO2
-	 UJJV5ncECfeKdvVF7PxsJP4gYiefZ3x40jPvDjGWrNJ3u0Jd4WH8/fCwC/eE+xjqiq
-	 PJbnfcKFMKgFQ==
-Date: Mon, 9 Oct 2023 15:17:18 +0200
-From: Simon Horman <horms@kernel.org>
-To: Ricardo Lopes <ricardoapl.dev@gmail.com>
-Cc: manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
-	gregkh@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH v2] staging: qlge: Replace strncpy with strscpy
-Message-ID: <ZSP9XspeNznHzlA6@kernel.org>
-References: <20231006161240.28048-1-ricardoapl.dev@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA1F1A5A4;
+	Mon,  9 Oct 2023 13:25:02 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548ECB9;
+	Mon,  9 Oct 2023 06:25:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Rtpu33a85jklnpGWW4R512/Kxg9ofCgvrA/q+Q+LQ7c=; b=En
+	oUjvw3k7t25sfZfxG/SbLqJNx/4sNRdVVYWCqzPLrlI8k7prMJAzrlEX+VhO9Z3bwLVcpwG3VaLUX
+	ncC10hbzgelAK4CcQa7KI9CDypq6qTsH47f6GYF+Kt/RtKfUKSFBpDHBdoICZu+5Vy9B/UkiXqFBK
+	J4dnLd3UjRa1xU4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qpqFn-000t1x-0H; Mon, 09 Oct 2023 15:24:59 +0200
+Date: Mon, 9 Oct 2023 15:24:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, greg@kroah.com, tmgross@umich.edu,
+	Andrea Righi <andrea.righi@canonical.com>
+Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
+Message-ID: <9a23f2da-8f98-4ca2-8ca7-bb264ea676dd@lunn.ch>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
+ <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231006161240.28048-1-ricardoapl.dev@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Oct 06, 2023 at 05:12:24PM +0100, Ricardo Lopes wrote:
-> Reported by checkpatch:
+On Mon, Oct 09, 2023 at 02:53:00PM +0200, Miguel Ojeda wrote:
+> On Mon, Oct 9, 2023 at 2:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > Any ideas?
 > 
-> WARNING: Prefer strscpy, strscpy_pad, or __nonstring over strncpy
+> That is `RETHUNK` and `X86_KERNEL_IBT`.
 > 
-> Signed-off-by: Ricardo Lopes <ricardoapl.dev@gmail.com>
-> ---
-> v2: Redo changelog text
+> Since this will keep confusing people, I will make it a `depends on !`
+> as discussed in the past. I hope it is OK for e.g. Andrea.
 
-Kees,
+I really do suggest you work on your kconfig. The expectation is any
+configuration that kconfig is happy with will build. People like Arnd
+Bergmann do lots of randconfig builds. We don't want his work upset by
+Rust code.
 
-could you find a moment to look over this one?
+And as a Rust beginning, i find this pretty unfriendly, in that i
+followed https://docs.kernel.org/rust/quick-start.html but did not get
+a working build.
 
-> 
->  drivers/staging/qlge/qlge_dbg.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/staging/qlge/qlge_dbg.c b/drivers/staging/qlge/qlge_dbg.c
-> index c7e865f51..5f08a8492 100644
-> --- a/drivers/staging/qlge/qlge_dbg.c
-> +++ b/drivers/staging/qlge/qlge_dbg.c
-> @@ -696,7 +696,7 @@ static void qlge_build_coredump_seg_header(struct mpi_coredump_segment_header *s
->  	seg_hdr->cookie = MPI_COREDUMP_COOKIE;
->  	seg_hdr->seg_num = seg_number;
->  	seg_hdr->seg_size = seg_size;
-> -	strncpy(seg_hdr->description, desc, (sizeof(seg_hdr->description)) - 1);
-> +	strscpy(seg_hdr->description, desc, sizeof(seg_hdr->description));
->  }
->  
->  /*
-> @@ -737,7 +737,7 @@ int qlge_core_dump(struct qlge_adapter *qdev, struct qlge_mpi_coredump *mpi_core
->  		sizeof(struct mpi_coredump_global_header);
->  	mpi_coredump->mpi_global_header.image_size =
->  		sizeof(struct qlge_mpi_coredump);
-> -	strncpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
-> +	strscpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
->  		sizeof(mpi_coredump->mpi_global_header.id_string));
->  
->  	/* Get generic NIC reg dump */
-> @@ -1225,7 +1225,7 @@ static void qlge_gen_reg_dump(struct qlge_adapter *qdev,
->  		sizeof(struct mpi_coredump_global_header);
->  	mpi_coredump->mpi_global_header.image_size =
->  		sizeof(struct qlge_reg_dump);
-> -	strncpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
-> +	strscpy(mpi_coredump->mpi_global_header.id_string, "MPI Coredump",
->  		sizeof(mpi_coredump->mpi_global_header.id_string));
->  
->  	/* segment 16 */
-> -- 
-> 2.41.0
-> 
-> 
+    Andrew
 
