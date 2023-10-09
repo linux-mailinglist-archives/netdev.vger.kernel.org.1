@@ -1,116 +1,94 @@
-Return-Path: <netdev+bounces-39175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E207BE441
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:14:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F7AA7BE43F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF9E51C209CE
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:14:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0491C20BAF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D6437151;
-	Mon,  9 Oct 2023 15:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25D9E36AE4;
+	Mon,  9 Oct 2023 15:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7jOXPSY"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="BM1W6Df9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0D336AF4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:14:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69E28C433D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69A737151;
 	Mon,  9 Oct 2023 15:14:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696864461;
-	bh=dYZyvyjbPzz0Sh38l6AbqWtQEJnCq7Uc5Gq2MBzud8U=;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 105ABC433CA;
+	Mon,  9 Oct 2023 15:14:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696864459;
+	bh=4rdIhdsejVNb8ZKMss+WiZZRfIt8DvPE82Y1gqQEaWg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n7jOXPSY2heYrKBcd03xe+B5ngd4iyYxSo10d7RFg3QdVLaPLWo6MoBCSIJQBNr+W
-	 BFoLiqD06Iui/ym2XwgnyAEowuwUd8mohgm1Z7SDjyRzqK/bKm/mKOo0gW5dJg/NBn
-	 EPeqDgJAABdaJUpG0KxwwuARGpWyZ7MuZInM7WIRQqtapNxtp8OZ4B3wMcuQK8M3q1
-	 WXEvmPqiC99jsmEMom9WcGySgPb46nQdkEsVAoS7gbcLBYddZFf4mAVe/2nUB1lehd
-	 wppLeYkz9T6+PW+x/XYhmsxFEJ82YX8axeUi8ExBs2erl1RniSP09+YFHtDb02xrFG
-	 k9GlyRnH/ZTHg==
+	b=BM1W6Df9YODKz59EtphEFNNw3EjvEXbdaQqpjZsTzxixuXxEqlbRTbcExAvbYkCXC
+	 0/ZqbEclsUazFvYyvuaZn9V8FCGSmeGpEwEocfDYNDFlxRl7H64+Kj+M4Oa2DyQ7Xw
+	 jTtWJNrbrtz3FOqb8QzO9j6ZDOSFg/t4bANhB7zU=
 Date: Mon, 9 Oct 2023 17:14:16 +0200
-From: Simon Horman <horms@kernel.org>
-To: zhailiansen <zhailiansen@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yuwang@kuaishou.com,
-	wushukun@kuaishou.com, zhailiansen <zhailiansen@kuaishou.com>
-Subject: Re: [PATCH] netclassid: on modifying netclassid, only consider the
- main process.
-Message-ID: <ZSQYyO9JW/9HEjPM@kernel.org>
-References: <20231008030442.35196-1-zhailiansen@kuaishou.com>
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	Andrea Righi <andrea.righi@canonical.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
+Message-ID: <2023100926-polygon-robin-8327@gregkh>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
+ <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+ <2023100916-crushing-sprawl-30a4@gregkh>
+ <CANiq72nfN2e8oWtFDQ1ey0CJaTZ+W=g10k5YKukaWqckxH7Rmg@mail.gmail.com>
+ <2023100907-liable-uplifted-568d@gregkh>
+ <CANiq72=A_HMc3nwxk-EGzuDGRBSCfdzKGj=M-snbd8cidQLfuQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20231008030442.35196-1-zhailiansen@kuaishou.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANiq72=A_HMc3nwxk-EGzuDGRBSCfdzKGj=M-snbd8cidQLfuQ@mail.gmail.com>
 
-On Sun, Oct 08, 2023 at 11:04:42AM +0800, zhailiansen wrote:
-
-Hi,
-
-thanks for your patch.
-Some minor comments from my side.
-
-> When modifying netclassid, the command("echo 0x100001 > net_cls.classid") will
-> take more time on muti threads of one process, because the process create many
-
-nit: muti -> multiple ?
-
-> fds.
-> for example, one process exists 28000 fds and 60000 threads, echo command will
-> task 45 seconds.
-> Now, we only consider the main process when exec "iterate_fd", and the time is
-> 52 milliseconds.
-
-Please consider line-wrapping the patch description at 75 bytes.
-
-This patch seems best targeted at net-next, this information should be
-included in the patch. So if post a v2 please consider using:
-
-	Subject: [PATCH v2] ...
-
-> Signed-off-by: zhailiansen <zhailiansen@kuaishou.com>
-
-Please consider signing off using your real name.
-
-e.g. Signed-off-by: Firstname Lastname <...>
-
-> ---
->  net/core/netclassid_cgroup.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+On Mon, Oct 09, 2023 at 05:06:45PM +0200, Miguel Ojeda wrote:
+> On Mon, Oct 9, 2023 at 4:52 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+> >
+> > Then the main CONFIG_HAVE_RUST should have that dependency, don't force
+> > it on each individual driver.
 > 
-> diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
-> index d6a70ae..78c903c 100644
-> --- a/net/core/netclassid_cgroup.c
-> +++ b/net/core/netclassid_cgroup.c
-> @@ -88,6 +88,12 @@ static void update_classid_task(struct task_struct *p, u32 classid)
->  	};
->  	unsigned int fd = 0;
->  
-> +	/* Only update the leader task, when multi threads in this task,
-> +	 * so it can avoid the useless traversal.
-> +	 */
-> +	if (p && p != p->group_leader)
-> +		return;
+> Yes, that is what I meant (well, `CONFIG_RUST` is where we have the
+> other restrictions).
 
-Can p ever be NULL?
-It is dereferenced unconditionally by the existing call to task_lock() below.
+Oops, yes, add it there please.
 
-> +
->  	do {
->  		task_lock(p);
->  		fd = iterate_fd(p->files, fd, update_classid_sock, &ctx);
-> -- 
-> 1.8.3.1
+> > But note, that is probably not a good marketing statement as you are
+> > forced to make your system more insecure in order to use the "secure"
+> > language :(
 > 
-> 
+> Indeed, but until we catch up on that, it is what it is; i.e. it is
+> not something that we want to keep there, it has to go away to make it
+> viable.
+
+Is anyone working on the needed compiler changes for this to work
+properly on x86?
+
+> The other option we discussed back then was to print a big banner or
+> something at runtime, but that is also not great (and people would
+> still see warnings at build time -- for good reason).
+
+No, please don't do that, you would be making systems insecure and the
+mix of a kernel image with, and without, RET statements in it is going
+to be a huge mess.  Just disable CONFIG_RUST for now until proper
+retbleed support is added to the compiler.
+
+thanks,
+
+greg k-h
 
