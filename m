@@ -1,105 +1,186 @@
-Return-Path: <netdev+bounces-39211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 122397BE55F
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:50:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5DEF7BE565
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:51:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118561C2093B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:50:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02BE21C209A9
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4865374DE;
-	Mon,  9 Oct 2023 15:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09036374DE;
+	Mon,  9 Oct 2023 15:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQGaN16G"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FNpZC8N6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37834374D7;
-	Mon,  9 Oct 2023 15:50:11 +0000 (UTC)
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0554A6;
-	Mon,  9 Oct 2023 08:50:09 -0700 (PDT)
-Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-57de3096e25so1087841eaf.1;
-        Mon, 09 Oct 2023 08:50:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696866609; x=1697471409; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=COApHFeIGdnnYzT4V3aJXAqhzZeFgW33VcQEneabOhk=;
-        b=bQGaN16GE1HqBGq5Fhzt9x+SkFDgTE9DVfjs06HBX7nBnPVZeJs9yPgXl4KbWhq6YR
-         qSXLmN8JkinJnLM9EqGFrAj3qCg/jcVtQiv4wOwC6VvqcOPnRYJ0bcRL+Gx9bqrKqTLv
-         7NErwhdILQ9qtA7Nd9kL5ETQqww//Az8yS3t2VJFYXk9suP3GQbHgXd3IeAt2G1oD6Bj
-         c/otoLefahoFtKCVCsutuPzwwJzr5VC/BueRg6IlAEO/HqlcN5ylr54ETlERx1/fDEsV
-         odue+AJBNqVlAGExzdptSGOwd3kr1hhbjW0yQNg8DFnCOrCg9Ro8Y/GlU5T/tQAXcByK
-         B0SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696866609; x=1697471409;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=COApHFeIGdnnYzT4V3aJXAqhzZeFgW33VcQEneabOhk=;
-        b=G+PiDdjz6czbkSjGUbzIZkWKGhxKnjurSWi44LmsCSF9viLZ9rTBGN8fzkU82pmI/W
-         20S2Ro9PhdjpQhqTgf0wRwTHgeKiy9J7x2pVMh6vyR+xrd6brK1PUpPw5i9Ku+z5PVmw
-         B53X/F1CoCC9U+YMSG5Pk2xDI2cE138tXnktkkw7ytHsCfCKx40DbjUKybP5feaewI2G
-         mIV4PruJII2GG3JjxQrho14C5jmbHS/sIm+gsmqSq68duQV86feQdirS+wmwBWJkzX96
-         Z/5hDMCr6Bwf7kUY3gyiPlc2VrXqHc8dKlgGW8Yoti8U9YQrvewWCyup6MKdomoOTdqg
-         VVWg==
-X-Gm-Message-State: AOJu0YzbrbJC6fYvRsHbbiRbNNlbwe3HjDYspcB4OGBxvHstDv9kH50W
-	4mwZUg/gvPwyeRKyje9lTr0LJggvV3uGdBzj
-X-Google-Smtp-Source: AGHT+IH4XtUQXTDjkJgQxiu+5ZI6MWupMaN0S+KVTfATYkBZJU2pkZX+UWBHWwR7Adg15Y20znyvhA==
-X-Received: by 2002:a05:6358:c10a:b0:14a:cca4:55d7 with SMTP id fh10-20020a056358c10a00b0014acca455d7mr12316786rwb.3.1696866609072;
-        Mon, 09 Oct 2023 08:50:09 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id e28-20020a63371c000000b0057401997c22sm8416591pga.11.2023.10.09.08.50.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 08:50:08 -0700 (PDT)
-Date: Tue, 10 Oct 2023 00:50:08 +0900 (JST)
-Message-Id: <20231010.005008.2269883065591704918.fujita.tomonori@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- tmgross@umich.edu, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CANiq72nj_04U82Kb4DfMx72NPgHzDCd-xbosc83xgF19nCqSfQ@mail.gmail.com>
-References: <2023100926-ambulance-mammal-8354@gregkh>
-	<20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
-	<CANiq72nj_04U82Kb4DfMx72NPgHzDCd-xbosc83xgF19nCqSfQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106F2199CC
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:51:48 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C525D6;
+	Mon,  9 Oct 2023 08:51:46 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 55EF11C0003;
+	Mon,  9 Oct 2023 15:51:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1696866705;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d+vplipnnIWIzmNSzthBNOqx4T8NoqkpkC2gykdesK8=;
+	b=FNpZC8N6MIxp3OfN4IJMd1lHXfjnF2RXmlnDiH3Lx6GEdspNWJYG84yxHvA4GBA+AHeyOF
+	kaU+5AM3NDtGR1Ew+fpdjwD7Vhtp5bv+ZrDNk7PcHAXR8cxdYRyaVac4llbF4BsOgPf9dA
+	Lukykm3s1ERmcXdIff/lBjWYXtLSUH6cU0trifpPLlqOAXcOe6/y+x+UO4lyOaY5S7SmNV
+	cD3VX09c3pmNC2zdX0PVBAeiu7HmGZU/1S3gZ6XGsLC/daCTLoVrOCD++KuI4oJxtiCIeD
+	IV7GhOJ4aovV1tjG70sSYLaANw8hJOrHJMN0kAAXlzopIeiyZ7A77uqp1bl2EQ==
+From: =?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Walle <michael@walle.cc>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v5 00/16] net: Make timestamping selectable
+Date: Mon,  9 Oct 2023 17:51:22 +0200
+Message-Id: <20231009155138.86458-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gTW9uLCA5IE9jdCAyMDIzIDE3OjM5OjI3ICswMjAwDQpNaWd1ZWwgT2plZGEgPG1pZ3VlbC5v
-amVkYS5zYW5kb25pc0BnbWFpbC5jb20+IHdyb3RlOg0KDQo+IE9uIE1vbiwgT2N0IDksIDIwMjMg
-YXQgNToyNOKAr1BNIEZVSklUQSBUb21vbm9yaQ0KPiA8ZnVqaXRhLnRvbW9ub3JpQGdtYWlsLmNv
-bT4gd3JvdGU6DQo+Pg0KPj4gVHJldm9yIGdhdmUgUmV2aWV3ZWQtYnkuIE5vdCBwZXJmZWN0IGJ1
-dCByZWFzb25hYmxlIHNoYXBlLCBJTUhPLiBTZWVtcw0KPj4gdGhhdCB3ZSBoYXZlIGJlZW4gZGlz
-Y3Vzc2luZyB0aGUgc2FtZSB0b3BpY3MgbGlrZSBsb2NraW5nLCBuYW1pbmcsIGV0Yw0KPj4gYWdh
-aW4gYW5kIGFnYWluLg0KPiANCj4gV2VsbCwgdGhlcmUgd2FzIG90aGVyIGZlZWRiYWNrIHRvbywg
-d2hpY2ggaXNuJ3QgYWRkcmVzc2VkIHNvIGZhci4gU28NCj4gbWVyZ2luZyB0aGlzIGluIDIgd2Vl
-a3MgZG9lcyBzZWVtIGEgYml0IHJ1c2hlZCB0byBtZS4NCg0KV2hhdCBmZWVkYmFjaz8gZW51bSBz
-dHVmZj8gSSB0aGluayB0aGF0IGl0J3MgYSBsb25nLXRlcm0gaXNzdWUuIA0KDQo+IEFuZCwgeWVz
-LCB0aGUgZGlzY3Vzc2lvbiBvbiB0aGlzIGhhcyBiZWVuIGdvaW5nIGFyb3VuZCBmb3IgYSB3aGls
-ZSwNCj4gYnV0IHRoYXQgaXMgcHJlY2lzZWx5IHdoeSB3ZSByZWNvbW1lbmRlZCB0byBpdGVyYXRl
-IG1vcmUgb24gb3VyIHNpZGUNCj4gZmlyc3QsIGJlY2F1c2UgaXQgd2FzIG5vdCByZWFkeS4NCg0K
-SSdtIG5vdCBzdXJlIGFib3V0IGl0LiBGb3IgZXhhbXBsZSwgd2UgcmV2aWV3ZWQgdGhlIGxvY2tp
-bmcgaXNzdWUNCnRocmVlIHRpbWVzLiBJdCBjYW4ndCBiZSByZXZpZXdlZCBvbmx5IG9uIFJ1c3Qg
-c2lkZS4gSXQncyBtYWlubHkgYWJvdXQNCmhvdyB0aGUgQyBzaWRlIHdvcmtzLg0K
+From: Kory Maincent <kory.maincent@bootlin.com>
+
+Up until now, there was no way to let the user select the layer at
+which time stamping occurs. The stack assumed that PHY time stamping
+is always preferred, but some MAC/PHY combinations were buggy.
+
+This series updates the default MAC/PHY default timestamping and aims to
+allow the user to select the desired layer administratively.
+
+Changes in v2:
+- Move selected_timestamping_layer variable of the concerned patch.
+- Use sysfs_streq instead of strmcmp.
+- Use the PHY timestamp only if available.
+
+Changes in v3:
+- Expose the PTP choice to ethtool instead of sysfs.
+  You can test it with the ethtool source on branch feature_ptp of:
+  https://github.com/kmaincent/ethtool
+- Added a devicetree binding to select the preferred timestamp.
+
+Changes in v4:
+- Move on to ethtool netlink instead of ioctl.
+- Add a netdev notifier to allow packet trapping by the MAC in case of PHY
+  time stamping.
+- Add a PHY whitelist to not break the old PHY default time-stamping
+  preference API.
+
+Change in v5:
+- Update to ndo_hwstamp_get/set. This bring several new patches.
+- Add few patches to make the glue.
+- Convert macb to ndo_hwstamp_get/set.
+- Add netlink specs description of new ethtool commands.
+- Removed netdev notifier.
+- Split the patches that expose the timestamping to userspace to separate
+  the core and ethtool development.
+- Add description of software timestamping.
+- Convert PHYs hwtstamp callback to use kernel_hwtstamp_config.
+
+Kory Maincent (15):
+  net: Convert PHYs hwtstamp callback to use kernel_hwtstamp_config
+  net: phy: Remove the call to phy_mii_ioctl in phy_hwstamp_get/set
+  net: macb: Convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+  net: Make dev_set_hwtstamp_phylib accessible
+  net_tstamp: Add TIMESTAMPING SOFTWARE and HARDWARE mask
+  net: phy: micrel: fix ts_info value in case of no phc
+  net: ethtool: Add a command to expose current time stamping layer
+  netlink: specs: Introduce new netlink command to get current timestamp
+  net: ethtool: Add a command to list available time stamping layers
+  netlink: specs: Introduce new netlink command to list available time
+    stamping layers
+  net: Replace hwtstamp_source by timestamping layer
+  net: Change the API of PHY default timestamp to MAC
+  net: ethtool: ts: Update GET_TS to reply the current selected
+    timestamp
+  net ethtool: net: Let the active time stamping layer be selectable
+  netlink: specs: Introduce time stamping set command
+
+Richard Cochran (1):
+  net: ethtool: Refactor identical get_ts_info implementations.
+
+ Documentation/netlink/specs/ethtool.yaml      |  57 +++++
+ Documentation/networking/ethtool-netlink.rst  |  63 ++++++
+ drivers/net/bonding/bond_main.c               |  27 +--
+ drivers/net/ethernet/cadence/macb.h           |  15 +-
+ drivers/net/ethernet/cadence/macb_main.c      |  42 +++-
+ drivers/net/ethernet/cadence/macb_ptp.c       |  28 +--
+ .../ethernet/microchip/lan966x/lan966x_main.c |   6 +-
+ drivers/net/macvlan.c                         |  14 +-
+ drivers/net/phy/bcm-phy-ptp.c                 |  15 +-
+ drivers/net/phy/dp83640.c                     |  24 +-
+ drivers/net/phy/micrel.c                      |  44 ++--
+ drivers/net/phy/mscc/mscc_ptp.c               |  18 +-
+ drivers/net/phy/nxp-c45-tja11xx.c             |  17 +-
+ drivers/net/phy/phy.c                         |  28 ++-
+ drivers/net/phy/phy_device.c                  |  68 ++++++
+ drivers/ptp/ptp_ines.c                        |  16 +-
+ include/linux/ethtool.h                       |   8 +
+ include/linux/mii_timestamper.h               |   4 +-
+ include/linux/net_tstamp.h                    |  11 +-
+ include/linux/netdevice.h                     |   8 +
+ include/linux/phy.h                           |   6 +-
+ include/uapi/linux/ethtool_netlink.h          |  29 +++
+ include/uapi/linux/net_tstamp.h               |  22 ++
+ net/8021q/vlan_dev.c                          |  15 +-
+ net/core/dev.c                                |   3 +
+ net/core/dev_ioctl.c                          |  42 ++--
+ net/core/timestamping.c                       |   9 +
+ net/ethtool/Makefile                          |   2 +-
+ net/ethtool/common.c                          |  22 +-
+ net/ethtool/common.h                          |   1 +
+ net/ethtool/netlink.c                         |  28 +++
+ net/ethtool/netlink.h                         |   4 +
+ net/ethtool/ts.c                              | 210 ++++++++++++++++++
+ 33 files changed, 707 insertions(+), 199 deletions(-)
+ create mode 100644 net/ethtool/ts.c
+
+-- 
+2.25.1
+
 
