@@ -1,88 +1,144 @@
-Return-Path: <netdev+bounces-39204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97307BE4FE
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:36:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615F57BE503
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6449D2816E4
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:36:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B7AE281725
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B503717C;
-	Mon,  9 Oct 2023 15:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5105B374C8;
+	Mon,  9 Oct 2023 15:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ESHYUKQG"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="A9UkaYTI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VD2mSF2n"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793623717F
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:36:43 +0000 (UTC)
-Received: from smtp-8faf.mail.infomaniak.ch (smtp-8faf.mail.infomaniak.ch [IPv6:2001:1600:3:17::8faf])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 634EFD6D
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:36:33 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S436Q2zgVzMqDhj;
-	Mon,  9 Oct 2023 15:36:30 +0000 (UTC)
-Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4S436P6ywXzMpnPc;
-	Mon,  9 Oct 2023 17:36:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1696865790;
-	bh=BJqZcTfNbCj0R22YsFOtc6MUhionL6VnJo/5ED1Q1KA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ESHYUKQGz5ESQZslyPoQ8hV+1Vgjw30+yBsbFzwEKZ0Z0/wt6+K2uCxV4ci1E3GOP
-	 ohJiSW2yU+ZPaDixYZuGzyfV2swjlfxsTKOzAh21K9eQiY1WpJNCf+OHbFZZmISfsM
-	 Tj4un9AiOdrBihzbjEtPox761tbxdn5dNsh0mZjQ=
-Date: Mon, 9 Oct 2023 17:36:24 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com
-Subject: Re: [PATCH v12 08/12] landlock: Add network rules and TCP hooks
- support
-Message-ID: <20231009.Aej2eequoodi@digikod.net>
-References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
- <20230920092641.832134-9-konstantin.meskhidze@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D128D358BF
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:37:21 +0000 (UTC)
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB99E138;
+	Mon,  9 Oct 2023 08:37:19 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 9FE615C037D;
+	Mon,  9 Oct 2023 11:37:16 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute5.internal (MEProxy); Mon, 09 Oct 2023 11:37:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1696865836; x=1696952236; bh=n/
+	RImUrhGUlSskecpFuZth4nSILi0fI4B8WAhPM6nNA=; b=A9UkaYTIxgEdYlaJyp
+	nwZTqRq27xI1szesIvtaBAOxsr932PXgwVWE5jTi9alLFy3tRdCrT8ciibCKEWwJ
+	mvGjiDah1kbGXiziKzDBazmeewTbzLmScvzAS/OvOHTgmqKvY2+Z5cynvF9M+gJJ
+	Tn2ueSiWnw0s0o/cqRt0TsHDIMFrSSDIc/Dhg2ptiBHaUmuO5Zxklha7U60viMBQ
+	tU4tKhqHKbBL2PktZ0h/WgaXiN+mPtVFVJQelgeh5ldEhFAL5dMc/qUHtnLdhedo
+	nuDcHsqykgFwcIqcWxZaBwKcHGOoBsHF0zIbjpWz6PnETjhIzVzdV6EnKTIjBVV2
+	xctQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696865836; x=1696952236; bh=n/RImUrhGUlSs
+	kecpFuZth4nSILi0fI4B8WAhPM6nNA=; b=VD2mSF2nDLWkTNwmu8uZYUut8IUwx
+	US5Vx1q2Yvrt2+kmFUmkTTuLrk14KUvESIfT/oiARe7bFaIFkLq+uc6bRUf5oklN
+	GUC6uNCFXFrLzItmbdPNJFN5oDKxUKgsnzIwKslfitt4mOrsg2Dku+tXY411Bhqg
+	o7SKVlt6CbBK49g/LnT1BOJzxQmkN2TFSlEXnhkuUxOKwudmvDWUNl5tidvecJ9C
+	o7mPACrHKy0Heig9rR72bRURA3fc9PLVauEQ6HdWEeRSSIZr9gB/Andv4gYPAvrz
+	GKcONUveG+aI2szGWjUQ8VJhZvTfg+VGFAO3rU+C8g5VJR6AI6+bvQAyQ==
+X-ME-Sender: <xms:Kx4kZcV_NHPm4hqtovSwgAcPaVip2ImLvMHSlq_P0U2vM8Q6C9T3Dg>
+    <xme:Kx4kZQmBtx9P7xy8sGi9mv6Ngys8qFbvMn7wx8vWkRXpU8LtevbtcEUr5WY0TS071
+    diy0k_5VP7mDhBatMs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgdeludcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
+    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
+    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
+    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    hnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:Kx4kZQZfvBhMIMLbpU1SiI-8B57HzvBnU8g5fBaUbpyPrDY24LljKA>
+    <xmx:Kx4kZbVF_9d4wLj7tFiWSGLk2IlsjO6hJF04avwkRry3_BtkInez6A>
+    <xmx:Kx4kZWkQccWNZA8xEK9fWUdnhdwf5gl0GGowbssJ1oP0T5r4FsWQyg>
+    <xmx:LB4kZb_KjUPlyDUU1g5xBskN6fDz3P3FXQVJUbVQcvuo0cjbJ0FEPQ>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id C45B91700089; Mon,  9 Oct 2023 11:37:15 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230920092641.832134-9-konstantin.meskhidze@huawei.com>
-X-Infomaniak-Routing: alpha
+Message-Id: <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
+In-Reply-To: <20231009134826.1063869-1-arnd@kernel.org>
+References: <20231009134826.1063869-1-arnd@kernel.org>
+Date: Mon, 09 Oct 2023 17:36:55 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Arnd Bergmann" <arnd@kernel.org>,
+ "Marcel Holtmann" <marcel@holtmann.org>,
+ "Johan Hedberg" <johan.hedberg@gmail.com>,
+ "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Lee, Chun-Yi" <jlee@suse.com>
+Cc: "Kees Cook" <keescook@chromium.org>,
+ "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>, stable@vger.kernel.org,
+ "Iulia Tanasescu" <iulia.tanasescu@nxp.com>,
+ "Wenjia Zhang" <wenjia@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 20, 2023 at 05:26:36PM +0800, Konstantin Meskhidze wrote:
-> This commit adds network rules support in the ruleset management
-> helpers and the landlock_create_ruleset syscall.
-> Refactor user space API to support network actions. Add new network
-> access flags, network rule and network attributes. Increment Landlock
-> ABI version. Expand access_masks_t to u32 to be sure network access
-> rights can be stored. Implement socket_bind() and socket_connect()
-> LSM hooks, which enables to restrict TCP socket binding and connection
-> to specific ports.
-> The new landlock_net_port_attr structure has two fields. The allowed_access
-> field contains the LANDLOCK_ACCESS_NET_* rights. The port field contains
-> the port value according to the allowed protocol. This field can
-> take up to a 64-bit value [1] but the maximum value depends on the related
-> protocol (e.g. 16-bit for TCP).
-> 
-> [1]
-> https://lore.kernel.org/r/278ab07f-7583-a4e0-3d37-1bacd091531d@digikod.net
+On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> These functions are simple wrappers around memcmp() and memcpy(), which
+> contain compile-time checks for buffer overflow. Something in gcc-13 and
+> likely other versions makes this trigger a warning when the functions
+> are not inlined and the compiler misunderstands the buffer length:
+>
+> In file included from net/bluetooth/hci_event.c:32:
+> In function 'bacmp',
+>     inlined from 'hci_conn_request_evt' at 
+> net/bluetooth/hci_event.c:3276:7:
+> include/net/bluetooth/bluetooth.h:364:16: error: 'memcmp' specified 
+> bound 6 exceeds source size 0 [-Werror=stringop-overread]
+>   364 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+>       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> Use the __always_inline annotation to ensure that the helpers are
+> correctly checked. This has no effect on the actual correctness
+> of the code, but avoids the warning. Since the patch that introduced
+> the warning is marked for stable backports, this one should also
+> go that way to avoid introducing build regressions.
+>
+> Fixes: d70e44fef8621 ("Bluetooth: Reject connection with the device 
+> which has same BD_ADDR")
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Lee, Chun-Yi <jlee@suse.com>
+> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Could you please include here the rationale to not tie access rights to
-sockets' file descriptor, and link [2]?
+Sorry, I have to retract this, something went wrong on my
+testing and I now see the same problem in some configs regardless
+of whether the patch is applied or not.
 
-[2] https://lore.kernel.org/r/263c1eb3-602f-57fe-8450-3f138581bee7@digikod.net
+     Arnd
 
