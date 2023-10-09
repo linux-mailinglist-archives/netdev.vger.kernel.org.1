@@ -1,93 +1,137 @@
-Return-Path: <netdev+bounces-39243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626687BE6DC
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:46:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27AE67BE6FA
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C5492812D7
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:46:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582E01C20A11
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:50:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A096B1CFBD;
-	Mon,  9 Oct 2023 16:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B07B1A726;
+	Mon,  9 Oct 2023 16:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="iAIWShWt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D168737CA4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:46:08 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39D4F9C;
-	Mon,  9 Oct 2023 09:46:06 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A27161FB;
-	Mon,  9 Oct 2023 09:46:46 -0700 (PDT)
-Received: from [10.1.196.40] (e121345-lin.cambridge.arm.com [10.1.196.40])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 29A853F762;
-	Mon,  9 Oct 2023 09:46:04 -0700 (PDT)
-Message-ID: <74e81490-1765-4f13-9fee-04b58696bbde@arm.com>
-Date: Mon, 9 Oct 2023 17:45:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8200D18B11
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:50:52 +0000 (UTC)
+X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 09 Oct 2023 09:50:48 PDT
+Received: from smtpdh19-su.aruba.it (smtpdh19-su.aruba.it [62.149.155.160])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B20E9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:50:48 -0700 (PDT)
+Received: from smtpclient.apple ([77.57.21.113])
+	by Aruba Outgoing Smtp  with ESMTPA
+	id ptRwqOnrzNaf2ptRwqgl68; Mon, 09 Oct 2023 18:49:45 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1696870185; bh=gmcCaRK3zDFXeLHvSaSXDPxPLsTm44LPT6qMmASM9QQ=;
+	h=Content-Type:Mime-Version:Subject:From:Date:To;
+	b=iAIWShWt4QASYU9NnYUWrqJ5HQc/MIbcxe5IRAPB/egNTBRXaJXVIH01aO3EEq40b
+	 GVQ65kc13GZGVyVsc89CzFerDWMOOWZTRVUjZw6LhbaqDiy79O28SVb0cVgsnbbFJ2
+	 DmOWr3hY0Mk0NIIgz2DSx48419qhUfJl5duznYAofDm/X9Wcd6FuUqE1Idbka2QriM
+	 DfigWBCT2u6BW41hz6mUzz6ZZcDPOlOk6yDdkNzu1CbgvVg2yWoVYoc34Y1QirpIae
+	 ZgPw/cTNmYOXsiZZ1MbL9Kjw7Omt4428jpHnNslJKp3a0oKiHxy7/+BnSS6jWPJ6NP
+	 7zur3nvs1Ww3A==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Robin Murphy <robin.murphy@arm.com>
-Subject: Re: [PATCH 1/6] dma-direct: add depdenencies to
- CONFIG_DMA_GLOBAL_POOL
-To: Christoph Hellwig <hch@lst.de>, Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: iommu@lists.linux.dev, Marek Szyprowski <m.szyprowski@samsung.com>,
- Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
- Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>,
- linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org,
- Jim Quinlan <james.quinlan@broadcom.com>,
- linux-riscv <linux-riscv@lists.infradead.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- "Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
- arm-soc <soc@kernel.org>
-References: <20231009074121.219686-1-hch@lst.de>
- <20231009074121.219686-2-hch@lst.de>
- <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
- <20231009091625.GB22463@lst.de>
- <CAMuHMdUZNewD-QC8J7MWSBP197Vc169meOjjK6=b7M11kVjUzg@mail.gmail.com>
- <20231009094330.GA24836@lst.de>
- <CAMuHMdV2FXdUHtjYW8JyXGBgHhR8De0vp3Ee77e6G8Vbs3gG8Q@mail.gmail.com>
- <1cd44af1-10ac-465a-8d20-e0aa268e036f@arm.com>
- <CAMuHMdXNX7+VLnSYhj=M9dTSTWLJqjS_WaT0ceMRUYoa5_MSeA@mail.gmail.com>
- <20231009124805.GA7042@lst.de>
-Content-Language: en-GB
-In-Reply-To: <20231009124805.GA7042@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+From: Rodolfo Zitellini <rwz@xhero.org>
+In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+Date: Mon, 9 Oct 2023 18:49:43 +0200
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-wireless@vger.kernel.org,
+ Johannes Berg <johannes@sipsolutions.net>,
+ linux-wpan@vger.kernel.org,
+ Michael Hennerich <michael.hennerich@analog.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org,
+ Doug Brown <doug@schmorgal.com>,
+ Arnd Bergmann <arnd@arndb.de>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+X-Mailer: Apple Mail (2.3654.120.0.1.15)
+X-CMAE-Envelope: MS4xfP3cw6wZrPwgQ30qHpmEsEsj4aHRoEDgqsT7xAtkoVvLa14Scx/RmfCls41lLYVVOrlQq3GGKzZp1O6ho5NhC428DACm/3N31Io5eYUM5y9NZgfv5W6U
+ PM8IzaHFQOhlV5kMwOWLB0MPpXWChaAm3dDgBT2FB1ahfAiuKg76E1B6eDmDf3Z5OtBDQafhkOf7fxee5sQDUdeZmzrQL1F60cWQNAZvOcp+wSeISEMVXcTM
+ z8F6yEH6rcfYxQ+WAoXV1Vu8gYCtseFg9II3cWNkOdzyaQ4+YXcRCgF3Y9bZO4yAFMl+MbErKqjnlZYqF79f7GOG4P5ZwcVqbNutAMZUkZoD5j5puMI126LQ
+ AmcL6HI21sXY5LCEQmgCsYxWOj73Y2LQrPneA7WA8Z4L21Onk2MAMjqXbRytM7VC5uoIGoYmnslCSgsji8evzX6pSl3YJ35Qyd0ojapk49u/8vHqQ6IJtq9g
+ 4nPods51ya2y07z2HOQTPZPWa7pET1YoV+nyw8rfuhH3DBN+5r9J8Cfw0RYYGhGANyLlsDI5zaUsZLmoW2poH9/O4h3ISuaeSX5TriVpnZV93J3mJLoHMssH
+ G9+e1sjF5+iLpakXDy+ik6atGWAMJ7CP9dEBBs4uWLbvKQ==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 09/10/2023 1:48 pm, Christoph Hellwig wrote:
-> On Mon, Oct 09, 2023 at 01:10:26PM +0200, Geert Uytterhoeven wrote:
->> RISCV_DMA_NONCOHERENT does not select DMA_GLOBAL_POOL,
->> ARCH_R9A07G043 selects DMA_GLOBAL_POOL.
->> RISCV_DMA_NONCOHERENT does select DMA_DIRECT_REMAP if MMU.
 
-Bleh, guess I should have known better than to trust my Monday morning 
-memory without double-checking the code :)
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> The last localtalk driver is gone now, and ppp support was never fully
+> merged, so clean up the appletalk code by removing the obvious dead
+> code paths.
+>=20
+> Notably, this removes one of the two callers of the old =
+.ndo_do_ioctl()
+> callback that was abused for getting device addresses and is now
+> only used in the ieee802154 subsystem, which still uses the same =
+trick.
+>=20
+> The include/uapi/linux/if_ltalk.h header might still be required
+> for building userspace programs, but I made sure that debian code
+> search and the netatalk upstream have no references it it, so it
+> should be fine to remove.
+>=20
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-> Yeah, and we'll basically need to split RISCV_DMA_NONCOHERENT into
-> an option for each type of non-coherent support.  This is why we
-> should never have added support for any of the non-standard versions,
-> as it's turning into a giant mess.
+Hi!
+I=E2=80=99ve been working on a new LocalTalk interface driver for the =
+last couple months, do you think it would be possible to at least =
+postpone the removal of LT a bit?
 
-Indeed the main point I was trying to get at is for ARCH_R9A07G043 (or 
-rather possibly ERRATA_ANDES_CMO) to not select RISCV_DMA_NONCOHERENT in 
-its current form, since that ending up selecting DMA_DIRECT_REMAP on a 
-platform which can't support it is the thing that's most obviously wrong.
+It is a driver for an open source device called TashTalk =
+(https://github.com/lampmerchant/tashtalk), which runs on a PIC micro =
+that does all the LT interfacing, and communicates back via serial to =
+the host system. My driver is relatively simple and works very well with =
+netatalk 2.2 (which is still maintained and still has support for =
+AppleTalk). The driver is basically complete and trsted and I was =
+preparing to submit a patch.
 
-Thanks,
-Robin.
+Still having LocalTalk in my view has many advantages for us enthusiasts =
+that still want to bridge old machines to the current world without =
+modifications, for example for printing on modern printers, netbooting, =
+sharing files and even tcp/ip. All this basically works out of the box =
+via the driver, Linux and available userspace tools (netatalk, macipgw).
+
+The old ISA cards supported by COPS were basically unobtanium even 20 =
+years ago, but the solution of using a PIC and a serial port is very =
+robust and much more furure-proof. We also already have a device that =
+can interface a modern machine directly via USB to LocalTalk.
+
+The development of the TashTalk has been also extensively discussed on =
+thr 68KMLA forum =
+(https://68kmla.org/bb/index.php?threads/modtashtalk-lt0-driver-for-linux.=
+45031/)
+
+I hope the decision to remove LocalTalk can be reconsidered at least for =
+the time being so there is a chance to submit a new, modern device =
+making use of this stack.
+
+Many Thanks,
+Rodolfo Zitellini=
 
