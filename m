@@ -1,107 +1,138 @@
-Return-Path: <netdev+bounces-39276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 240FA7BEA29
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:54:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F607BEA2E
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 548351C20B7E
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACE02281947
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9E33B297;
-	Mon,  9 Oct 2023 18:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D255C3B2A6;
+	Mon,  9 Oct 2023 18:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJNfrGWs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="QoVQcJR/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758D038DF8;
-	Mon,  9 Oct 2023 18:54:14 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9189C;
-	Mon,  9 Oct 2023 11:54:12 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3248ac76acbso4416270f8f.1;
-        Mon, 09 Oct 2023 11:54:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A7338BD9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:56:38 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D8FEB0
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:56:36 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-690ce3c55f1so3562326b3a.0
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 11:56:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696877651; x=1697482451; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1696877796; x=1697482596; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PFPc0uDXo5Wb2b6XuvLtE8BhMkgpBeAovPcZyNFbQqI=;
-        b=NJNfrGWsv921V/KjW1Nq6ALfuNk3BMQiZ6pmYDNNZYatc0i1mKiAkvo5dGWyx+DMun
-         64DcLPc1EE/Jo4nYtsu0KmabIdkdWpONDgfZ2N/aFl49AC6ZR1tllu10KIvxa18ICNJP
-         BvwFHq2txa3KFWr9U6Bq2U2YZCCDpW5SNMSxVy8ILsO9JKEbTvh6uLKRobUQUr+s+KGy
-         4pUO9FLwXmw5cZM5NbwnWsKpN83Eb1Nx520Yfz677IAXE8RNf2RW7fwBjgujKxNZtuK/
-         n9z032oKz4ffiwOgovJctb7XvHyGdMdtwCYdfECbMk2sV6EqLFNCzf9sVXuB9qyIGPE5
-         eq8A==
+        bh=3MsTR/cGryQq7rM7HxcuS1zRjm3nltuO+eDU9+kch7k=;
+        b=QoVQcJR/1pcjpu45m1k4UZu/cDfvLCeUm4NHZ8etsBRlON2NUCosa4RTj2TvrcAscN
+         SNhO0CvK+kvlg0gOfa7t1ZpW6JipZk3mj/hl8jU+0Hj04AxzUG/eWgGI+PSdr+BZirY4
+         ANfFuGTt7etyT1BSiYt6vCarGiZns4AcIU2N0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696877651; x=1697482451;
+        d=1e100.net; s=20230601; t=1696877796; x=1697482596;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PFPc0uDXo5Wb2b6XuvLtE8BhMkgpBeAovPcZyNFbQqI=;
-        b=fJwG8uTCPdbdLvhe7552ALLPqYFtKy5y1FdTNsbuU9eJuoAVVdEIozEByUmx8pHwaf
-         Y2qvoDjergEl1dHYt4DptgpfunWZ9JcmBEor7qwSLhUcr1dUFG15esbd/516jniKNpcP
-         FqwBEU6e7ALzbQGHMMNO6poksdx+OGzMGzv6SOKHtdNscYbV/ihRIWqGYaRXmD6AaSxa
-         FAqch6y2BxSlt8mzmHY2QQvte6XsW9KRBYQ6U7kffjhCiH/LWo0Nh3o2yDLMNpGkb2MQ
-         n1qVgY7banNneXJtZgOp81FQpQ74Jm59FGwPi5VphAmCqvMQ0rE/6jngOULuZ3XHXO0+
-         ew9A==
-X-Gm-Message-State: AOJu0YyKBsZVUvHgGiJ9+b1QczgGx8WA8AM9ekmbgegg/OkdgYGS661M
-	xkJEcitDGgN27+zddWZDj+0=
-X-Google-Smtp-Source: AGHT+IHUvUjkgwvvBP8mDLjDZze4cyt0X5T9Jyj1BK5Iqzj3ttrBpuuN+DlmHRw/gGROplZOUaGwGw==
-X-Received: by 2002:a5d:4d12:0:b0:323:16c0:9531 with SMTP id z18-20020a5d4d12000000b0032316c09531mr13946871wrt.13.1696877650868;
-        Mon, 09 Oct 2023 11:54:10 -0700 (PDT)
-Received: from babbage ([2001:818:e906:400:b2bc:40c:b83d:9c16])
-        by smtp.gmail.com with ESMTPSA id o14-20020a5d4a8e000000b003197b85bad2sm10439348wrq.79.2023.10.09.11.54.09
+        bh=3MsTR/cGryQq7rM7HxcuS1zRjm3nltuO+eDU9+kch7k=;
+        b=bIJbm0JpA14HFJamkqG6Ofg1coyB2GtuMW5KOfZP0OmVCWtyiFwGK21I44MKoRC2rY
+         kMMhQFr5WlJJqKKyzRDm5nK3Uhng9Jum+tCjj/Dq/+69XhYWfTzHwZz8V/jsNQgQSN2d
+         PszAPuF09+2tUb/+3mgvZIjPVjzcsbwnNBHoGIoIQCiHIRLZhj+sNjbyDI0On/WWsV7d
+         YzAOk45AkLCOJvVZ3gqEYtyM81Ufq+cG4YyRl/ATcgUElryOjlQCQwW97D+OerXSvzzs
+         ZOudFfECeVUNgRTV1w3pS+TtWTgZqubBPZRnKCD0iztckZznDi3L2YjS2Tfwrnn5Ry5K
+         9rPg==
+X-Gm-Message-State: AOJu0Yzfbs4tAy+/cJyGRl1rHZmW7XtUUpANTM1GGCsxYNqchBPCwZqr
+	AWfxUeRp6lIqHb0IxOyg04nYTw==
+X-Google-Smtp-Source: AGHT+IFqDuEFo+tIspVB6znFMkQC780hS1yhuBuvVg/TNH3PNioqeOxCygG+fs+D639q6fNE6/nUDA==
+X-Received: by 2002:a05:6a00:2450:b0:693:4108:1eb7 with SMTP id d16-20020a056a00245000b0069341081eb7mr15271604pfj.30.1696877795997;
+        Mon, 09 Oct 2023 11:56:35 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id ey5-20020a056a0038c500b0068fe9c7b199sm6820919pfb.105.2023.10.09.11.56.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 11:54:10 -0700 (PDT)
-Date: Mon, 9 Oct 2023 19:53:30 +0100
-From: Ricardo Lopes <ricardoapl.dev@gmail.com>
-To: Kees Cook <keescook@chromium.org>
-Cc: manishc@marvell.com, GR-Linux-NIC-Dev@marvell.com, coiby.xu@gmail.com,
-	justinstitt@google.com, linux-hardening@vger.kernel.org,
-	gregkh@linuxfoundation.org, netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] staging: qlge: Replace strncpy with strscpy
-Message-ID: <ZSRMKoL1ljRM01Hq@babbage>
-References: <20231006161240.28048-1-ricardoapl.dev@gmail.com>
- <202310090921.622A22FF8@keescook>
+        Mon, 09 Oct 2023 11:56:35 -0700 (PDT)
+Date: Mon, 9 Oct 2023 11:56:33 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: mt7530: replace deprecated strncpy with
+ ethtool_sprintf
+Message-ID: <202310091155.3E4328DC1B@keescook>
+References: <20231009-strncpy-drivers-net-dsa-mt7530-c-v1-1-ec6677a6436a@google.com>
+ <202310091131.550C9CD8@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202310090921.622A22FF8@keescook>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <202310091131.550C9CD8@keescook>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 09:44:37AM -0700, Kees Cook wrote:
-> Thanks for working on this! Doing these replacements needs analysis of
-> several issues that should be described in the commit log:
+On Mon, Oct 09, 2023 at 11:31:46AM -0700, Kees Cook wrote:
+> On Mon, Oct 09, 2023 at 06:29:19PM +0000, Justin Stitt wrote:
+> > `strncpy` is deprecated for use on NUL-terminated destination strings
+> > [1] and as such we should prefer more robust and less ambiguous string
+> > interfaces.
+> > 
+> > ethtool_sprintf() is designed specifically for get_strings() usage.
+> > Let's replace strncpy in favor of this more robust and easier to
+> > understand interface.
+> > 
+> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> > Link: https://github.com/KSPP/linux/issues/90
+> > Cc: linux-hardening@vger.kernel.org
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> > ---
+> > Note: build-tested only.
+> > ---
+> >  drivers/net/dsa/mt7530.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> > index 035a34b50f31..e00126af8318 100644
+> > --- a/drivers/net/dsa/mt7530.c
+> > +++ b/drivers/net/dsa/mt7530.c
+> > @@ -836,8 +836,7 @@ mt7530_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+> >  		return;
+> >  
+> >  	for (i = 0; i < ARRAY_SIZE(mt7530_mib); i++)
+> > -		strncpy(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
+> > -			ETH_GSTRING_LEN);
+> > +		ethtool_sprintf(&data, "%s", mt7530_mib[i].name);
 > 
-> - is the destination an %NUL-terminated string? (strncpy can produce
->   non-%NUL-terminated strings and sometimes this is intentional.)
-> 
-> - is the source %NUL-terminated? (Sometimes strncpy is used when memcpy,
->   kmemdup_nul, or other things should be used.)
-> 
-> - does the destination need to be %NUL padded? (strncpy does this
->   padding, but it isn't always obvious if it's needed.) When padding is
->   needed, strscpy_pad() should be used.
+> Err, wait, I spoke too soon. Shouldn't this be "data" and not "&data"?
 
-Thank you for the feedback Kees, I really appreciate it
+Ugh, ignore me. I keep forgetting that ethtool_sprintf() updates the
+"data" pointer. My original Reviewed-by is fine. :)
 
-Regards,
+-Kees
 
-Ricardo Lopes
-
+-- 
+Kees Cook
 
