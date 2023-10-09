@@ -1,110 +1,140 @@
-Return-Path: <netdev+bounces-39383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D618B7BEEFB
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:14:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F337BEF04
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3FF31C20B52
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:14:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31883282224
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4166545F7B;
-	Mon,  9 Oct 2023 23:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC4247357;
+	Mon,  9 Oct 2023 23:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwOdykwl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rGgDo/H5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91805374FC;
-	Mon,  9 Oct 2023 23:14:16 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504CB2D69;
-	Mon,  9 Oct 2023 16:12:34 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-77412b91c41so292090985a.1;
-        Mon, 09 Oct 2023 16:12:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10AC947360
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 23:20:00 +0000 (UTC)
+Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC27AC
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:19:58 -0700 (PDT)
+Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-1c8f14ed485so7490633fac.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 16:19:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696893148; x=1697497948; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LkeLMCni1HNBHZQn/gCPq7DkQ4+vPia3kJm12hspXig=;
-        b=NwOdykwl8kPTTDWmdnuF+rtCyb8ISYykAhIgGVLP48K44ZMUlWuNHUbwHWYTfO+Noi
-         HcRVl/VLpvGIPbfqGl/aYLRSxFkTtlG0Le/E+GyqpcqUzqSkhmPPJkFfRUi+S1JpM2ht
-         MJfy5tEOUp76pTWcEp1P4KQtaQmNFcJ3tu3PyOfUArC24r1JT22B5ruBPSZbF80n8hIH
-         TYCcybY9469LmE9/Zif004pEgS+lIfYGISWlk8Phl7Or6c30ruAwkxhEIbyEbzQ6Nzr6
-         pautwjD7vB2Bm1GEQB4TjAYfzVDi1wZ8P5Ken7xmmR/sCVlIz4bnW8muDoCbeJc9HfBI
-         dxNA==
+        d=google.com; s=20230601; t=1696893598; x=1697498398; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zjHQyvadONVOud3v/rE/Az+3J92aB2vK1iZQZ/OYRLE=;
+        b=rGgDo/H5T9gZYLPmFpOQGJVZ4k6OAoKrpALI+biAf+tM24a13+h8KfK3Z04ysSZ92P
+         lcuIFq/S4RgiZPrxJP7OmlhmlRU3lP3uCwsV0FXtlKSSIHlYV9rW8AeQO3Xm0MbOsnWP
+         J3wfoKZSiXvl/Hq9nzVcR+F5zG1k6TXmEy+eIfQ27mzRP0ueLKEl4shn+W5X9EvW4aF4
+         rg8v2ZjME3f2/4jTY7OaPnHOV5IXd6IHVti0q8gKE/J+MLPpVjCSoghcTIQ5Ce8UWkSs
+         kcWyqBJ5YQeYo7503/Vv8QxoJTQHr48OQFlXT7ZjBY/SFK8w+WEGP8WlqQyDgLV4KPFj
+         +H4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696893148; x=1697497948;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LkeLMCni1HNBHZQn/gCPq7DkQ4+vPia3kJm12hspXig=;
-        b=xKHEWMpgNmiLfyvdfzdYDNrzfA2V7/lJY/nNRkQed0Xtc6PTTfdgjaJDCB2MkLNXdM
-         c1F/d6j576ZQkZtBOyZafxglZm4PPpyP1P1bjOqoUoIQRYi4TeVNe9ex3UC9LUTQMCdh
-         rLxzB0cEcF/YEw00tPMWAm8PYVXQuKx8R7gkaeUa/2nKwUx/Kr1TFipz45aDmTCKE/2K
-         By/Cg11MV/+wVTBAZwCxeIWKpMidneUbFZdbJr/j9uoUVVe//dI1pIkH+8yeo6vllaP4
-         j3kO8F8/o+HioJp38M9vUYPjnygFrmRMC/ppW+Ca1gdwyWxX8ErwEWvTYr7OITpldHJe
-         Er8Q==
-X-Gm-Message-State: AOJu0YzLB9gp7yu3ekCTn7EMe/pj0AJDMNY7p2q41i+LTcfF8nc4cPrr
-	SDM3AOdgGxfaKEjCIv0sPf0=
-X-Google-Smtp-Source: AGHT+IGc2aMNQFQLpboYasVnQkU2PgIhkqo9/vLEFaIJRpQrgURxpDUvwvg4Q6XR11bC+jPnJFPtkA==
-X-Received: by 2002:a05:620a:51cb:b0:775:7be2:8c8 with SMTP id cx11-20020a05620a51cb00b007757be208c8mr15282943qkb.61.1696893148588;
-        Mon, 09 Oct 2023 16:12:28 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id s27-20020a05620a031b00b00767d572d651sm3874915qkm.87.2023.10.09.16.12.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 16:12:27 -0700 (PDT)
-Message-ID: <cfce3793-3e96-4b3b-a9b5-9dbdb32725c2@gmail.com>
-Date: Mon, 9 Oct 2023 16:12:26 -0700
+        d=1e100.net; s=20230601; t=1696893598; x=1697498398;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zjHQyvadONVOud3v/rE/Az+3J92aB2vK1iZQZ/OYRLE=;
+        b=SE3R+27osqgGELJ46eSMKEG1zMurM7AX/UAqJCcMVUrpD8s0QGse7FRWCFkj7hKDJw
+         ZZ9pHaEQA9CpYPeX6cqhbe/694pCTHt4TVJk5KyawpzH5WTzuz4bd4HM8o12IIszmXlx
+         Ouv35jH22kF5uir8lHNLKFJvpQBhQJJKvrMc9etE/8w8txrbUYWxYcet0+38W/ilx33w
+         V6o7p/kYaMs5ovSjncySmh6Q6/47jQplyXK/TBz224NIywaUHS8AROL2c32Hdj4wUcJz
+         AkXRQZoh0bFliXynXGxR8R/pGONcuhT0uBmPoMsrDQq7fZ6IkagTxvjjSb1e0O+8jXFj
+         KMqQ==
+X-Gm-Message-State: AOJu0YxrSUJa4+YTqwxZc+JraSrkZlFYoKfhC6KOpAFc6lXtdl+arc2g
+	z/JQO+1mOcCjRazgYqgK/8vEolGf463JU/6c5Q==
+X-Google-Smtp-Source: AGHT+IEJoSw0wb7t9m20c6ZpjKDlOmD783PHpu5vdHPvTTgfWAZC5cRf21JJzRLNwBCQUCa+9r2jjqVtgVy/1uiCHQ==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6870:3a10:b0:1d5:95fc:2a65 with
+ SMTP id du16-20020a0568703a1000b001d595fc2a65mr6733088oab.0.1696893598255;
+ Mon, 09 Oct 2023 16:19:58 -0700 (PDT)
+Date: Mon, 09 Oct 2023 23:19:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: dsa: vsc73xx: replace deprecated strncpy with
- ethtool_sprintf
-Content-Language: en-US
-To: Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAJyKJGUC/x2NQQrCMBBFr1Jm7cCkohCvIi7a9GtnYSwzIVRK7
+ 27q4sF/m/82cpjC6dZtZKjq+slNwqmjNA/5BdapOfXSn4NIZC+W0/LlybTCnDMKo8ywY+j4Pqh ZEyeGRJFxCBGXK7XDxfDU9R+7P/b9B+1asIF8AAAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696893597; l=1913;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=IQPojGhMm0FWYkhisYrQ00VPkfbCrbcIeRucK9CSAtU=; b=lqQitRgTvDQrS2yNAdU1MwFFmxI/TImPYzq1XkAQrajgWQGjpKNWCOFzZ6AGd8vHFb8Xj4b88
+ UcPIIFUP2hSCCsgd+ycewkMTnHNJ1UB2BTMpZXFag89Q1wnWwAwYyer
+X-Mailer: b4 0.12.3
+Message-ID: <20231009-strncpy-drivers-net-ethernet-ibm-ibmvnic-c-v1-1-712866f16754@google.com>
+Subject: [PATCH] ibmvnic: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Haren Myneni <haren@linux.ibm.com>, 
+	Rick Lindsley <ricklind@linux.ibm.com>, Nick Child <nnac123@linux.ibm.com>, 
+	Dany Madden <danymadden@us.ibm.com>, Thomas Falcon <tlfalcon@linux.ibm.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/9/23 15:54, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> ethtool_sprintf() is designed specifically for get_strings() usage.
-> Let's replace strncpy in favor of this more robust and easier to
-> understand interface.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+NUL-padding is not required as the buffer is already memset to 0:
+|       memset(adapter->fw_version, 0, 32);
+
+Note that another usage of strscpy exists on the same buffer:
+|       strscpy((char *)adapter->fw_version, "N/A", sizeof(adapter->fw_version));
+
+Considering the above, a suitable replacement is `strscpy` [2] due to
+the fact that it guarantees NUL-termination on the destination buffer
+without unnecessarily NUL-padding.
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index cdf5251e5679..ac15dcadf4c1 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -5247,7 +5247,8 @@ static void handle_vpd_rsp(union ibmvnic_crq *crq,
+ 	/* copy firmware version string from vpd into adapter */
+ 	if ((substr + 3 + fw_level_len) <
+ 	    (adapter->vpd->buff + adapter->vpd->len)) {
+-		strncpy((char *)adapter->fw_version, substr + 3, fw_level_len);
++		strscpy(adapter->fw_version, substr + 3,
++			sizeof(adapter->fw_version));
+ 	} else {
+ 		dev_info(dev, "FW substr extrapolated VPD buff\n");
+ 	}
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231009-strncpy-drivers-net-ethernet-ibm-ibmvnic-c-e0900ba19e56
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
