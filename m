@@ -1,266 +1,155 @@
-Return-Path: <netdev+bounces-38969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3B37BD4D4
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:05:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E72857BD4E5
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:10:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 986721C2095F
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:05:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 240F01C208E3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0530114A8E;
-	Mon,  9 Oct 2023 08:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C7E14A9C;
+	Mon,  9 Oct 2023 08:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GQC7c5zb"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="mmL4iEMf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C41C1173D;
-	Mon,  9 Oct 2023 08:05:17 +0000 (UTC)
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDBE8BA;
-	Mon,  9 Oct 2023 01:05:15 -0700 (PDT)
-Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-7b102a6565eso1371980241.0;
-        Mon, 09 Oct 2023 01:05:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F40F13FF4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:10:23 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2138.outbound.protection.outlook.com [40.107.243.138])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE3DA9F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 01:10:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R8N0BbbaYquwe9NR+MjyZuWK/tA8QiBKgL6K1m72JE7P6WIEjXtKWttuy5zwFNa6yw9j4pHTvUDYowq2TJ5lPMAnEWhEAwv7KzqYndFzn4DGePWu++KsYwMKhz51IQEgiZmz7LpcRybXSNh0mAlGxChORJbRhuG9iJz/UVH5xl+JkB7PJreLYw0+K/dYMdfdMlnkjmr+ZtNPBMWtZqmc23fOXMXTZh1AMxtpyeit+Nv4HMUT+17efyA8N4VzBEtQxGZ1UqDrXItm/GQBS0sSMKW6DsRLFGG/ktgdq5os0f54bcEsmzhAoq+kC5jxE6+QQ3w43EB8n2WCPjtfj2+IgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yQCSnCWKNsuF4iOgwBC8P21CrxEelzYtVEndjwnO34I=;
+ b=Pp/Ef/dzr+dqqElJHEIyg5VYR79islOeT1mtv+cWCfLDp1FduN28WBruCC3KMb98rwXYSdzXgkyAWO6v4ECCJCzkLEJUYBkbnEy9ANLd+242Sn0nk70oQntqpBr42+sCTbN8fiwQZ5+Uvh+LjGTz4a1bBE4nNwVc2gCuxFvjVaKaZQD/zl7JbluTTYrAfgLBOfsrHeqe7DdVs8TL0txK8c7PbMeaHmWH4ZjSS65J1hKooXWlKrGns5FcyV2Thnj9WnJj5n16EGmVPkIj8b7zN6RK8ezUx26IdVe14oeE5LVrSVeGzbC+9POqHsjua3MOxbjsVxU0F7jLOivdcyemDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696838715; x=1697443515; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7ti/HWPE0cWzwTmuERRmavIjosKwcUVbmnHFfLYzgBc=;
-        b=GQC7c5zbtVdpihkWjgWQEiKc1SXEzeGO89ZZeIwDCHr7hgKoTK/ziZnAyZ7Iaiw6ts
-         txbGQQoyeJ+3GHaQMzN4VAO+21Yl0Z0AAvNI2+PadF3zkqVtTJt/+vY/tlsKLQRRSUOa
-         z+3IMJE771O7jMdyzL1sqbtsEgPmTrzfwZrsvgl1NRHvYB4szqJlgD5onGBJHcBij1CW
-         x/KFMwjONFIbcPz2ona1LLfSgqeBp5VxQqUARUFCmipJNmYFU32EDFNai0LvPXNUwfMv
-         Pvs154Zg4YuIvkKmFlnXD/Al0XhwNu4UFVhUMY/1zSpwvIRSW3iMnQU6ezkgaOtkvq1N
-         372Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696838715; x=1697443515;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7ti/HWPE0cWzwTmuERRmavIjosKwcUVbmnHFfLYzgBc=;
-        b=sZbMOD/kDT152a2CXGMa7wJfdGiP1MB0MPD0hMW8lJ3UdaJ/nMbO58abhTfEUEOzeU
-         wP6GoPoUrx5ZUpmOyBGjR3p7muyaEZfZle56eVNBcVhRpr9YMqoq5Y1/ObDxTxuJAtzF
-         faiN68MXl5pkIjr2mkoz+AceqEwnZ92qi+XlCrdq+WPYplcOqGMws5Bow2bpS15I+cJB
-         E5mJpLF1mpXFAO78/xj/Cc0ED6FDuXfxrgrMx56G4DzLfZYLWjo72U6zx64V/wKv5TpK
-         FFGo9HmAdmwrDeY2YlNY5WSG92mvN4kb9oTa5SWxJ6+WeiojVh0uMlDadUJr/SLNVW7U
-         sbaw==
-X-Gm-Message-State: AOJu0YyWm9jjLFeajsKXIBiixQ35tBWdSq0N2Pl2hDwofn1oxb7LCfS/
-	XK7Evg8t6uUS3TBF9tUCDNHztstAH56IfV3BXUU=
-X-Google-Smtp-Source: AGHT+IH9+0duN/DwJjTcz6PvfXQkVycNSPtz3xjugo2P/Xn5/hpapbonbt+oqUiI8Gfbij3OwxzuDU9Lm7C6lPyTWNg=
-X-Received: by 2002:a67:bb06:0:b0:44e:9674:7781 with SMTP id
- m6-20020a67bb06000000b0044e96747781mr13044529vsn.15.1696838714812; Mon, 09
- Oct 2023 01:05:14 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yQCSnCWKNsuF4iOgwBC8P21CrxEelzYtVEndjwnO34I=;
+ b=mmL4iEMf/0PeGBw3IMG7Fbf5qz5izXkpstTWjzwNOyT1aMcJKHW3TqZMY2V/tBJ6aTmIQM1VfZItqdPRdLR3L5PedhWzqdAZGr8M0cyNjkDHeuueXLc6ciJxB1+/Mm06786cRla/IkoFjG960uKLFrUasxVixR6lDkS19njd3PA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
+ CH3PR13MB6438.namprd13.prod.outlook.com (2603:10b6:610:19c::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Mon, 9 Oct
+ 2023 08:10:19 +0000
+Received: from DM6PR13MB4249.namprd13.prod.outlook.com
+ ([fe80::6287:b0d7:3d05:a8b3]) by DM6PR13MB4249.namprd13.prod.outlook.com
+ ([fe80::6287:b0d7:3d05:a8b3%6]) with mapi id 15.20.6838.040; Mon, 9 Oct 2023
+ 08:10:19 +0000
+From: Louis Peens <louis.peens@corigine.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Leon Romanovsky <leon@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Shihong Wang <shihong.wang@corigine.com>,
+	netdev@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: [PATCH net-next v2 0/1] net: add offload support for CHACHA20-POLY1305
+Date: Mon,  9 Oct 2023 10:09:45 +0200
+Message-Id: <20231009080946.7655-1-louis.peens@corigine.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: JN2P275CA0036.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::24)
+ To DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
- <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
- <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com>
-In-Reply-To: <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 9 Oct 2023 03:04:37 -0500
-Message-ID: <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
-	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
-	pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com, 
-	elver@google.com, pabeni@redhat.com, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|CH3PR13MB6438:EE_
+X-MS-Office365-Filtering-Correlation-Id: 653037a2-c827-40f4-bc94-08dbc89f2d5c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TQQw1R0N75ggwjjhokgpo1VGoXM2UzmXtK+IKgEidV49nh6nPR3LKU2AyNMhk4RlIabiTvT1HYPg4YXqfmbgeMuSQBVI9Elk9jaiHbyPg0m7yMbim/RN08uz6csF/xYjl6pp4sMtwr9+UFbDwEuRndgUS3KIGrXJaa9QYJTPUgjtLvuqPLML2xE+S8M64cdIJ9JCDiJ7rxUVRnmae+I6GgxtaMlUxFoSQ+tpi1vn24DcV0JBRdPfpSIjKk8Dkerki/cKhn+uZPqEJCRsreiCZThPw/2Xgxqp4blV8uqfwe4t4vUjecHCnnb0LNDMGeLXpQ3G0DS2LTRxA1qhJd7ibAmBEhoh8nBkWLWp/R2UdTyxfEeKaUTfPO9LGie2LLJNxvpRCy/2tsI20tpXiIreBSIHp67YH8czs7phtao7SFoxLxa5l97GdoRo4jyefb4l9XOYcqEXE1NxNMVrvAZt9RO3OaqKwSI/IB/OZfdvWj/e/3ToYJtEth75XQWnpblRRu4TKlrIU6/KAdoN25pdIMpvJpnnOTf4VuHjLgXDqOP86m1FKWDt80g5Bgj39jBIYd8xEF/4f5kqogASGZX+og8y+QsW6k6CSDliItpSD6UyNemRiEo+rc84xvfV/ea/LXj5V1ivvL0oCP9pmfYUz6+0az9/7D3c9RIXaScmrp0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39830400003)(376002)(136003)(346002)(366004)(396003)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(83380400001)(107886003)(1076003)(2616005)(6506007)(52116002)(26005)(66476007)(110136005)(66946007)(54906003)(316002)(66556008)(8676002)(8936002)(5660300002)(4326008)(41300700001)(44832011)(6666004)(2906002)(6512007)(4744005)(6486002)(478600001)(36756003)(38100700002)(38350700002)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?eHgkJaEnGI/SbnSQq9PqdGf93mO6AgOsag2zDdj2NFZI1EOlM3bb8uJYHMXX?=
+ =?us-ascii?Q?/iIWjFL/FxU1jK5sZ6jsElxoO4TWurRDDyW0KJiR+C2edRX3bRsJiLrkpatx?=
+ =?us-ascii?Q?fKzgGmI58uBXiKLanazJnWH84vPDHN1LEwAlO8usTwpDfYj1qJ4fn6I1b9y2?=
+ =?us-ascii?Q?wrFQcQ1hwxMk+LQDkEJ4bVfDt3xbxQc83w4LqmlQTwXPaQJm3SRLesdD8nwc?=
+ =?us-ascii?Q?PgfWOPEtLcKLHPZSXCuZbGbTj1J7QcHsw+u+vO93ZBW/UwyHPO8WrTWuVLdf?=
+ =?us-ascii?Q?BQ80fvsa1+eubbL+Z6dJHGB963XVKMWLCaLHHfEYe/UzA93LEjNTfN+Rroej?=
+ =?us-ascii?Q?Fz/zAPCDKPqYwNhzZhdRAuEQMAIl2rD/kw70RdeqW1qkUwYvEXUYVoQpKgdC?=
+ =?us-ascii?Q?5DOLSg1z8Ji+cBzk80rPZEC2YxTUhOu3HSrM5MNn/XeG12JovYpKodRr7h7L?=
+ =?us-ascii?Q?rl7eDL3RvKLh2U5NQMHnPC6dJNX3uySqjk6TWWRYhXkCECGufFJPxdy/Sb3c?=
+ =?us-ascii?Q?cGfFDuL+Co3zGcloQIXS7ulbxVNwTdcS+bWGO1uw1vqcstL02A+bXKDa5uw5?=
+ =?us-ascii?Q?gnN6CNdTFupKC00eAHo4bP4Jd0pb+yLZhJlW2xu8c/+4RmsJJ8UXxH/JEj56?=
+ =?us-ascii?Q?g8aLR0uZRmfMbZsSm/M9eHEY17+1X8U0sd3tW0L01b60HXPtvClgIF/XXMk9?=
+ =?us-ascii?Q?nbYLrM99AAMrXmv6n+/m+yEyw9mWxinbDc16J1JShwj22eUFvQ4uAgANztjD?=
+ =?us-ascii?Q?NXBla1rrEliD32KGRezsUan9xhBqj/Ab9DnHsF+VxuYLM54yJhxo+LYtX+ue?=
+ =?us-ascii?Q?QnNPQZ13Jr5nLL877QyCsx3IbSX12UztqMelRHz7l3i7bIqvF4CXiDwiV8fA?=
+ =?us-ascii?Q?4HjRUwRN5Pz6Wzf0pHHPaAJ/qxcUmJYJ+7fsGQmF8O0ghzLOjYxWv3j8jotZ?=
+ =?us-ascii?Q?zMhJZf+NGzv/aT+DPuK/GyBrijd76ZpmyYr0FjWvRPLNwixLwZX3l0ET8tDC?=
+ =?us-ascii?Q?blyQcHQP1Ow2d45TuNEWy6Ldq5QNPlj0v7RQkRrV/YstxlvB9ikFOBAHqhh4?=
+ =?us-ascii?Q?4jPFgkH4uEOlrxnOniRI/gPmtLEegcHRpf0VzYxPaBNcGFosC4knEgI+Z9f0?=
+ =?us-ascii?Q?mMBvjV7Cx6wm7Ik6ztZwxpwmNpqAxBcs4lKcfEiTdfvMPVh5FpT9aVX+aR9S?=
+ =?us-ascii?Q?jCSDPmDIvDOLwn0fAPCxKMKSSa9A9ivINAIu9auvg4Ya9yjKK48o2wCX6OhX?=
+ =?us-ascii?Q?bCsMVO97HBWJWIieT2dDMJuAmGuqc3c/UFb3i883yfbFJX9QgAd73UruOwNm?=
+ =?us-ascii?Q?l+tXR5aaAVfhehZX5t0F61fSmCBYLDLfA8u77677uU+RT9yuvvFeajkgLXS8?=
+ =?us-ascii?Q?hrlt6dcVbNlhZp6s9JQ7KdF3/l98oPAeqOoBwWhX242/RO/y/VkxqLCk/WTY?=
+ =?us-ascii?Q?9lg4uRegtGTLpUYmddq3GIPUsl1RkChHScoBGv18y5Sk0jV8ILVMIxjTV9sS?=
+ =?us-ascii?Q?xKY5u+6AGIdHnpu/rJ+HKo/RDP7hdSsz8SaHSh28OWiWgDuP+XLQkgMc/rp9?=
+ =?us-ascii?Q?rltPe5htTb6WX46l6F7Q7jOCZZgBy8VJVgRsa/jU7UiCuLoGMSWv8ezOJ57C?=
+ =?us-ascii?Q?zg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 653037a2-c827-40f4-bc94-08dbc89f2d5c
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 08:10:19.5740
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O0JYd9DBSpsIFt36d1VqilpHPBUzOJHviMDI/eW854r315oaEyGsVNE58V75bwttJCtA6zGEg0Y7DWcKF4isQFtyvYPsEEc08rzhf+o57TQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6438
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> On 2023/10/09 5:08, Willem de Bruijn wrote:
-> > On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> On 2023/10/09 4:07, Willem de Bruijn wrote:
-> >>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
-aynix.com> wrote:
-> >>>>
-> >>>> virtio-net have two usage of hashes: one is RSS and another is hash
-> >>>> reporting. Conventionally the hash calculation was done by the VMM.
-> >>>> However, computing the hash after the queue was chosen defeats the
-> >>>> purpose of RSS.
-> >>>>
-> >>>> Another approach is to use eBPF steering program. This approach has
-> >>>> another downside: it cannot report the calculated hash due to the
-> >>>> restrictive nature of eBPF.
-> >>>>
-> >>>> Introduce the code to compute hashes to the kernel in order to overc=
-ome
-> >>>> thse challenges. An alternative solution is to extend the eBPF steer=
-ing
-> >>>> program so that it will be able to report to the userspace, but it m=
-akes
-> >>>> little sense to allow to implement different hashing algorithms with
-> >>>> eBPF since the hash value reported by virtio-net is strictly defined=
- by
-> >>>> the specification.
-> >>>>
-> >>>> The hash value already stored in sk_buff is not used and computed
-> >>>> independently since it may have been computed in a way not conforman=
-t
-> >>>> with the specification.
-> >>>>
-> >>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>> ---
-> >>>
-> >>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D {
-> >>>> +       .max_indirection_table_length =3D
-> >>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
-> >>>> +
-> >>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
-> >>>> +};
-> >>>
-> >>> No need to have explicit capabilities exchange like this? Tun either
-> >>> supports all or none.
-> >>
-> >> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
-> >> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
-> >>
-> >> It is because the flow dissector does not support IPv6 extensions. The
-> >> specification is also vague, and does not tell how many TLVs should be
-> >> consumed at most when interpreting destination option header so I chos=
-e
-> >> to avoid adding code for these hash types to the flow dissector. I dou=
-bt
-> >> anyone will complain about it since nobody complains for Linux.
-> >>
-> >> I'm also adding this so that we can extend it later.
-> >> max_indirection_table_length may grow for systems with 128+ CPUs, or
-> >> types may have other bits for new protocols in the future.
-> >>
-> >>>
-> >>>>           case TUNSETSTEERINGEBPF:
-> >>>> -               ret =3D tun_set_ebpf(tun, &tun->steering_prog, argp)=
-;
-> >>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering_prog, a=
-rgp);
-> >>>> +               if (IS_ERR(bpf_ret))
-> >>>> +                       ret =3D PTR_ERR(bpf_ret);
-> >>>> +               else if (bpf_ret)
-> >>>> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_HASH_RSS=
-;
-> >>>
-> >>> Don't make one feature disable another.
-> >>>
-> >>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
-> >>> functions. If one is enabled the other call should fail, with EBUSY
-> >>> for instance.
-> >>>
-> >>>> +       case TUNSETVNETHASH:
-> >>>> +               len =3D sizeof(vnet_hash);
-> >>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
-> >>>> +                       ret =3D -EFAULT;
-> >>>> +                       break;
-> >>>> +               }
-> >>>> +
-> >>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
-> >>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hd=
-r_v1_hash) ||
-> >>>> +                     !tun_is_little_endian(tun))) ||
-> >>>> +                    vnet_hash.indirection_table_mask >=3D
-> >>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
-> >>>> +                       ret =3D -EINVAL;
-> >>>> +                       break;
-> >>>> +               }
-> >>>> +
-> >>>> +               argp =3D (u8 __user *)argp + len;
-> >>>> +               len =3D (vnet_hash.indirection_table_mask + 1) * 2;
-> >>>> +               if (copy_from_user(vnet_hash_indirection_table, argp=
-, len)) {
-> >>>> +                       ret =3D -EFAULT;
-> >>>> +                       break;
-> >>>> +               }
-> >>>> +
-> >>>> +               argp =3D (u8 __user *)argp + len;
-> >>>> +               len =3D virtio_net_hash_key_length(vnet_hash.types);
-> >>>> +
-> >>>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
-> >>>> +                       ret =3D -EFAULT;
-> >>>> +                       break;
-> >>>> +               }
-> >>>
-> >>> Probably easier and less error-prone to define a fixed size control
-> >>> struct with the max indirection table size.
-> >>
-> >> I made its size variable because the indirection table and key may gro=
-w
-> >> in the future as I wrote above.
-> >>
-> >>>
-> >>> Btw: please trim the CC: list considerably on future patches.
-> >>
-> >> I'll do so in the next version with the TUNSETSTEERINGEBPF change you
-> >> proposed.
-> >
-> > To be clear: please don't just resubmit with that one change.
-> >
-> > The skb and cb issues are quite fundamental issues that need to be reso=
-lved.
-> >
-> > I'd like to understand why adjusting the existing BPF feature for this
-> > exact purpose cannot be amended to return the key it produced.
->
-> eBPF steering program is not designed for this particular problem in my
-> understanding. It was introduced to derive hash values with an
-> understanding of application-specific semantics of packets instead of
-> generic IP/TCP/UDP semantics.
->
-> This problem is rather different in terms that the hash derivation is
-> strictly defined by virtio-net. I don't think it makes sense to
-> introduce the complexity of BPF when you always run the same code.
->
-> It can utilize the existing flow dissector and also make it easier to
-> use for the userspace by implementing this in the kernel.
+This patch adds support for offloading the CHACHA20-POLY1305 ipsec
+algorithm to nfp hardware. When the SADB_EALG_NONE path is hit use the
+algorithm name to identify CHACHA20-POLY1305, and offload to the nfp.
 
-Ok. There does appear to be overlap in functionality. But it might be
-easier to deploy to just have standard Toeplitz available without
-having to compile and load an eBPF program.
+Changes since v1:
 
-As for the sk_buff and cb[] changes. The first is really not needed.
-sk_buff simply would not scale if every edge case needs a few bits.
+Remove modification to pfkey
+    The first version of this series modified xfrm itself to add new
+    things in pfkey. We were informed that this was deprecated, so in
+    this version the name is parsed directly as suggesting during
+    review of v1.
 
-For the control block, generally it is not safe to use that across
-layers. In this case, between qdisc enqueue of a given device and
-ndo_start_xmit of that device, I suppose it is. Though uncommon. I
-wonder if there is any precedent.
+Shihong Wang (1):
+  nfp: add support CHACHA20-POLY1305 offload for ipsec
 
-The data will have to be stored in the skb somewhere. A simpler option
-is just skb->hash? This code would use skb_get_hash, if it would
-always produce a Toeplitz hash, anyway.
+ .../net/ethernet/netronome/nfp/crypto/ipsec.c | 45 +++++++++++++++++--
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
-> >
-> > As you point out, the C flow dissector is insufficient. The BPF flow
-> > dissector does not have this problem. The same argument would go for
-> > the pre-existing BPF steering program.
-> It is possible to extend the C flow dissector just as it is possible to
-> implement a BPF flow dissector. The more serious problem is that
-> virtio-net specification (and Microsoft RSS it follows) does not tell
-> how to implement IPv6 extension support.
+-- 
+2.34.1
+
 
