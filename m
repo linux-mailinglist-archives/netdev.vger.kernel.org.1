@@ -1,253 +1,99 @@
-Return-Path: <netdev+bounces-39168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F497BE42B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:13:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BD957BE3FB
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:10:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F92B281612
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9F952817D2
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF321358BE;
-	Mon,  9 Oct 2023 15:13:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68217358A6;
+	Mon,  9 Oct 2023 15:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="THTiN5Xz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLcOIB/A"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F6F35892
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:13:52 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C66CC13D;
-	Mon,  9 Oct 2023 08:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696864421; x=1728400421;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dtFAZzUApLP9AYi7ZmvY2WLxR5mdEeY5EJ0egiuP32g=;
-  b=THTiN5XzjbVzM9Mzr1dYIEBjz+Us9cRlGtZafpu3z1H3vyoPsNCU5oCf
-   ExxKAbdVNgDtlxhrlFbwNqT8Jl2ClpxENflv1hnTzDBUm/IR6JIReitbr
-   PD38cbbth8LyfdreXQ1gweho9LIpEdLE1uhHJcEBM+0W1fzr/kdWv5/1x
-   Lz0zN8cADPl4wTcBqPufj2jhJxiqG5GI9AUCCmWwLu0nasmfOPBnhW9Iz
-   tV3dLqoRvevWyafGbn7CTO4hUfqtVWVIfagmeNkm9PRgyzbh+jS736eYt
-   YPY3V13aZj8AbV0Ba8lVlYP+xsQ6W8V2kc71EKvHlmorja2RLRwUaQz+P
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369232281"
-X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="369232281"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 08:13:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="869288045"
-X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="869288045"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Oct 2023 08:13:29 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org,
-	dm-devel@redhat.com,
-	ntfs3@lists.linux.dev,
-	linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 08/14] bitmap: introduce generic optimized bitmap_size()
-Date: Mon,  9 Oct 2023 17:10:20 +0200
-Message-ID: <20231009151026.66145-9-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231009151026.66145-1-aleksander.lobakin@intel.com>
-References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C1C3589F;
+	Mon,  9 Oct 2023 15:10:36 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5A92B7;
+	Mon,  9 Oct 2023 08:10:34 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-59f57ad6126so53889647b3.3;
+        Mon, 09 Oct 2023 08:10:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696864233; x=1697469033; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FMC88S0qrfafC1vEN5gaaHAmtL09HThTcq7GEvuJAPE=;
+        b=YLcOIB/Az+5L/+/0oXXLXDy9Knje3UqxIzmTz8jv78vciL0nUegBeWB4r7/D6jPesW
+         U4kbxK6q80QGgfxBMFIwXFPSp0ONcy87lSqLOeMyJNMv74iHJ1yRMmhLHIhLEg76OUd+
+         6A689bKyEYrQ8be/tbEDDDKd33WteKJA/EtdxWg76InOEtUFSMpYI7OdnKcw7ryrYOVq
+         HCt0g/L92/vIY+IdzRFZt7UgsrCWlX0tK5W5uBlDvCJnYRlhrwECO+1oJqMncNNT7oTK
+         L7M3kxUOu9mtZFaQveY6+dcS7N1vYOVTrqSCkslPqqjOH8NtB4DGVdjQKkWAt1engBTu
+         W6Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696864233; x=1697469033;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FMC88S0qrfafC1vEN5gaaHAmtL09HThTcq7GEvuJAPE=;
+        b=fN6GsOL5wZx+AG0FCkBZ+ymqjywg0byTDv88AjpUXufeJ4nL8qlIWJ+HtpXPDLYOTZ
+         RGRlqGL6E2ubkPylESrb9iO5SMMQkctQokU5ztzHL4kHG7fIpT8MZYxGrUe06+i/zfka
+         hiS+2R1N8YohI9OwwshMFaRW/h9It1o0Uq9pex7zfq8+0n5HS+trY0hxL1XURN8YyTBw
+         AJnaw8cfgoCv/eBGmy6h8VtYxq1GGsY8GXyxp5dnO67Im+rHOxXUNVaSYFR+nCHgw3nZ
+         sBi+KZFfhIzQx74PFM6lQN471gVB/azvryPLSLsmPrYJ/zHnrHFQC0GSnCCPpVd+4NQ1
+         ZAMg==
+X-Gm-Message-State: AOJu0YxglY4fZtsFusHscMKGA9Fetn0xlojcwsofxPDkfRADwmoJQlBS
+	J1clMV3lagMwI48n1Y/KSIbmnnol+UBuFxbEVKs=
+X-Google-Smtp-Source: AGHT+IEdEuB7xC+WUjlCyKLk9t5Ed59FyH/tK2PMhwif/tn2St2Ody7LWF8HzSES0hkEi1+Cwe2D4TfJNE8mGR+PsC8=
+X-Received: by 2002:a0d:c787:0:b0:583:b186:d817 with SMTP id
+ j129-20020a0dc787000000b00583b186d817mr15342503ywd.27.1696864233434; Mon, 09
+ Oct 2023 08:10:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch> <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+ <ZSQMVc19Tq6MyXJT@gpd> <a3412fbc-0b32-4402-a3c8-6ccaf42a2ee4@lunn.ch> <2023100902-tactful-april-559f@gregkh>
+In-Reply-To: <2023100902-tactful-april-559f@gregkh>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 9 Oct 2023 17:10:21 +0200
+Message-ID: <CANiq72mDKVKv805n7zQ6SOLhtrp_P2Gi_C89Kis8SGgT1JhT6w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrea Righi <andrea.righi@canonical.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The number of times yet another open coded
-`BITS_TO_LONGS(nbits) * sizeof(long)` can be spotted is huge.
-Some generic helper is long overdue.
+On Mon, Oct 9, 2023 at 5:04=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org>=
+ wrote:
+>
+> Is MIPS a proper target for rust yet?
 
-Add one, bitmap_size(), but with one detail.
-BITS_TO_LONGS() uses DIV_ROUND_UP(). The latter works well when both
-divident and divisor are compile-time constants or when the divisor
-is not a pow-of-2. When it is however, the compilers sometimes tend
-to generate suboptimal code (GCC 13):
+The compiler has support for it
+(https://github.com/Rust-for-Linux/linux/issues/107), but I didn't do
+mips pre-merge.
 
-48 83 c0 3f          	add    $0x3f,%rax
-48 c1 e8 06          	shr    $0x6,%rax
-48 8d 14 c5 00 00 00 00	lea    0x0(,%rax,8),%rdx
+The ones I tried (and that we had in the CI back then pre-merge) were:
+arm, arm64, ppc64le, riscv64 and x86_64.
 
-%BITS_PER_LONG is always a pow-2 (either 32 or 64), but GCC still does
-full division of `nbits + 63` by it and then multiplication by 8.
-Instead of BITS_TO_LONGS(), use ALIGN() and then divide by 8. GCC:
-
-8d 50 3f             	lea    0x3f(%rax),%edx
-c1 ea 03             	shr    $0x3,%edx
-81 e2 f8 ff ff 1f    	and    $0x1ffffff8,%edx
-
-Now it divides `nbits + 63` by 8 and then masks bits[2:0].
-bloat-o-meter:
-
-add/remove: 0/0 grow/shrink: 20/133 up/down: 156/-773 (-617)
-
-Clang does it better and generates the same code before/after starting
-from -O1, except that with the ALIGN() approach it uses %edx and thus
-still saves some bytes:
-
-add/remove: 0/0 grow/shrink: 9/133 up/down: 18/-538 (-520)
-
-Note that we can't expand DIV_ROUND_UP() by adding a check and using
-this approach there, as it's used in array declarations where
-expressions are not allowed.
-Add this helper to tools/ as well.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- drivers/md/dm-clone-metadata.c | 5 -----
- include/linux/bitmap.h         | 8 +++++---
- include/linux/cpumask.h        | 2 +-
- lib/math/prime_numbers.c       | 2 --
- tools/include/linux/bitmap.h   | 8 +++++---
- 5 files changed, 11 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/md/dm-clone-metadata.c b/drivers/md/dm-clone-metadata.c
-index c43d55672bce..47c1fa7aad8b 100644
---- a/drivers/md/dm-clone-metadata.c
-+++ b/drivers/md/dm-clone-metadata.c
-@@ -465,11 +465,6 @@ static void __destroy_persistent_data_structures(struct dm_clone_metadata *cmd)
- 
- /*---------------------------------------------------------------------------*/
- 
--static size_t bitmap_size(unsigned long nr_bits)
--{
--	return BITS_TO_LONGS(nr_bits) * sizeof(long);
--}
--
- static int __dirty_map_init(struct dirty_map *dmap, unsigned long nr_words,
- 			    unsigned long nr_regions)
- {
-diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-index 03644237e1ef..63e422f8ba3d 100644
---- a/include/linux/bitmap.h
-+++ b/include/linux/bitmap.h
-@@ -237,9 +237,11 @@ extern int bitmap_print_list_to_buf(char *buf, const unsigned long *maskp,
- #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
- #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
- 
-+#define bitmap_size(nbits)	(ALIGN(nbits, BITS_PER_LONG) / BITS_PER_BYTE)
-+
- static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
- {
--	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-+	unsigned int len = bitmap_size(nbits);
- 
- 	if (small_const_nbits(nbits))
- 		*dst = 0;
-@@ -249,7 +251,7 @@ static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
- 
- static inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
- {
--	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-+	unsigned int len = bitmap_size(nbits);
- 
- 	if (small_const_nbits(nbits))
- 		*dst = ~0UL;
-@@ -260,7 +262,7 @@ static inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
- static inline void bitmap_copy(unsigned long *dst, const unsigned long *src,
- 			unsigned int nbits)
- {
--	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-+	unsigned int len = bitmap_size(nbits);
- 
- 	if (small_const_nbits(nbits))
- 		*dst = *src;
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index f10fb87d49db..dbdbf1451cad 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -821,7 +821,7 @@ static inline int cpulist_parse(const char *buf, struct cpumask *dstp)
-  */
- static inline unsigned int cpumask_size(void)
- {
--	return BITS_TO_LONGS(large_cpumask_bits) * sizeof(long);
-+	return bitmap_size(large_cpumask_bits);
- }
- 
- /*
-diff --git a/lib/math/prime_numbers.c b/lib/math/prime_numbers.c
-index d42cebf7407f..d3b64b10da1c 100644
---- a/lib/math/prime_numbers.c
-+++ b/lib/math/prime_numbers.c
-@@ -6,8 +6,6 @@
- #include <linux/prime_numbers.h>
- #include <linux/slab.h>
- 
--#define bitmap_size(nbits) (BITS_TO_LONGS(nbits) * sizeof(unsigned long))
--
- struct primes {
- 	struct rcu_head rcu;
- 	unsigned long last, sz;
-diff --git a/tools/include/linux/bitmap.h b/tools/include/linux/bitmap.h
-index f3566ea0f932..81a2299ace15 100644
---- a/tools/include/linux/bitmap.h
-+++ b/tools/include/linux/bitmap.h
-@@ -2,6 +2,7 @@
- #ifndef _TOOLS_LINUX_BITMAP_H
- #define _TOOLS_LINUX_BITMAP_H
- 
-+#include <linux/align.h>
- #include <string.h>
- #include <linux/bitops.h>
- #include <linux/find.h>
-@@ -25,13 +26,14 @@ bool __bitmap_intersects(const unsigned long *bitmap1,
- #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
- #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
- 
-+#define bitmap_size(nbits)	(ALIGN(nbits, BITS_PER_LONG) / BITS_PER_BYTE)
-+
- static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
- {
- 	if (small_const_nbits(nbits))
- 		*dst = 0UL;
- 	else {
--		int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
--		memset(dst, 0, len);
-+		memset(dst, 0, bitmap_size(nbits));
- 	}
- }
- 
-@@ -83,7 +85,7 @@ static inline void bitmap_or(unsigned long *dst, const unsigned long *src1,
-  */
- static inline unsigned long *bitmap_zalloc(int nbits)
- {
--	return calloc(1, BITS_TO_LONGS(nbits) * sizeof(unsigned long));
-+	return calloc(1, bitmap_size(nbits));
- }
- 
- /*
--- 
-2.41.0
-
+Cheers,
+Miguel
 
