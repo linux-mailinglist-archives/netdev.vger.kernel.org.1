@@ -1,163 +1,116 @@
-Return-Path: <netdev+bounces-38950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FAC77BD259
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 05:26:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8914D7BD27A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 06:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BB97281481
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 03:26:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07924281446
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 04:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3DC4423;
-	Mon,  9 Oct 2023 03:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4791E8F77;
+	Mon,  9 Oct 2023 04:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YIWQlRxO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gVW0u9W3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC005185D
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 03:26:04 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7D4A3;
-	Sun,  8 Oct 2023 20:26:02 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 398NU40u010336;
-	Sun, 8 Oct 2023 20:25:21 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=FcJMZbm7KFTy7D3wNDvufSLyjCDVbTE5yKoIsPQLXHM=;
- b=YIWQlRxO9pC/PqFNrgwxZBTYN9HOEOGouCKqaxhDHLaQsqye1T3tBddDcJKBZLH8cIWY
- pDawC6NPFynmbBmj5HKK++8RlMRV4iQ3hqLz3JWhzAhKQwm44r7rawhpha8jUH2IpzX1
- 4uu6HqnLtp/lLIAWAOixGaCtvO5oOvQ3re4dpryYEQ7L5JVjaTxBagNVMIx6caxAk3ch
- GNvIt97auHCSN6dnZVZ50pw3JOqRt2wpOVfRV3kTyA9HW8EUR3ko0yCRXY/m9uEdwLy1
- ad+Yz/ASdFM9M5YhmGvvxBj6NZAqdIqrkS4GwiCvXLh592m6OuTY9tnK+ftrkrbBKmDz qg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tkh9sjm34-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Sun, 08 Oct 2023 20:25:21 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 8 Oct
- 2023 20:25:19 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Sun, 8 Oct 2023 20:25:19 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id C75823F70A0;
-	Sun,  8 Oct 2023 20:25:14 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
-        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
-        <bigeasy@linutronix.de>
-Subject: [PATCH net v2] octeontx2-pf: Fix page pool frag allocation failure.
-Date: Mon, 9 Oct 2023 08:55:12 +0530
-Message-ID: <20231009032512.3777271-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B5E2F39
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 04:02:39 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7D2A3
+	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 21:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696824158; x=1728360158;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DVJYAAVrUFElS08ip355YEmMBb7NLcoYt75fK/Nr8oI=;
+  b=gVW0u9W3cKsN+rSXD+59qdMjuWBY2wLbOVihFz7Xo9tZxde4ZcY5Dano
+   HDO0UcAovw6DvDt2lGQZotEp9T6/n9GS5N+oMwLaSAd5ErGtKGVxEnN6r
+   Bd6hCBhKb7zhwvD0jfTBxQbrYm+hEH/evy98tZMeXUSeQrYK54Ch7jYnJ
+   leDcO2E6D7lvtDi36tFdjUuIoet7PpFzKech3abl19sn7Ow/hgUAKbE05
+   QOfQ4cRDn1Gn4FZ8ZdC1CWMJeMhgZTBukhqn5HTb5gssDBygdghVS9aCK
+   4UbIZdOWb11L4+VvInOC3zYX+yxk3lcKM1HnnyKBf9wO1ClJfu9eHmzHE
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="415054679"
+X-IronPort-AV: E=Sophos;i="6.03,209,1694761200"; 
+   d="scan'208";a="415054679"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2023 21:02:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="729525843"
+X-IronPort-AV: E=Sophos;i="6.03,209,1694761200"; 
+   d="scan'208";a="729525843"
+Received: from lkp-server01.sh.intel.com (HELO 8a3a91ad4240) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 08 Oct 2023 21:02:34 -0700
+Received: from kbuild by 8a3a91ad4240 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qphTU-00061B-1d;
+	Mon, 09 Oct 2023 04:02:32 +0000
+Date: Mon, 9 Oct 2023 12:01:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, alexander.duyck@gmail.com,
+	fw@strlen.de, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next v2 1/3] net: add skb_segment kunit test
+Message-ID: <202310091154.3StA08FY-lkp@intel.com>
+References: <20231008201244.3700784-2-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: q0p4qRafq48_YKGIiBBg51FdCtsSIIYp
-X-Proofpoint-ORIG-GUID: q0p4qRafq48_YKGIiBBg51FdCtsSIIYp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-09_01,2023-10-06_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231008201244.3700784-2-willemdebruijn.kernel@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since page pool param's "order" is set to 0, will result
-in below warn message if interface is configured higher
-rx buffer size.
+Hi Willem,
 
-Steps to reproduce the issue.
-1. devlink dev param set pci/0002:04:00.0 name receive_buffer_size \
-   value 8196 cmode runtime
-2. ifconfig eth0 up
+kernel test robot noticed the following build errors:
 
-[   19.901356] ------------[ cut here ]------------
-[   19.901361] WARNING: CPU: 11 PID: 12331 at net/core/page_pool.c:567 page_pool_alloc_frag+0x3c/0x230
-[   19.901449] pstate: 82401009 (Nzcv daif +PAN -UAO +TCO -DIT +SSBS BTYPE=--)
-[   19.901451] pc : page_pool_alloc_frag+0x3c/0x230
-[   19.901453] lr : __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901460] sp : ffff80000f66b970
-[   19.901461] x29: ffff80000f66b970 x28: 0000000000000000 x27: 0000000000000000
-[   19.901464] x26: ffff800000d15b68 x25: ffff000195b5c080 x24: ffff0002a5a32dc0
-[   19.901467] x23: ffff0001063c0878 x22: 0000000000000100 x21: 0000000000000000
-[   19.901469] x20: 0000000000000000 x19: ffff00016f781000 x18: 0000000000000000
-[   19.901472] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[   19.901474] x14: 0000000000000000 x13: ffff0005ffdc9c80 x12: 0000000000000000
-[   19.901477] x11: ffff800009119a38 x10: 4c6ef2e3ba300519 x9 : ffff800000d13844
-[   19.901479] x8 : ffff0002a5a33cc8 x7 : 0000000000000030 x6 : 0000000000000030
-[   19.901482] x5 : 0000000000000005 x4 : 0000000000000000 x3 : 0000000000000a20
-[   19.901484] x2 : 0000000000001080 x1 : ffff80000f66b9d4 x0 : 0000000000001000
-[   19.901487] Call trace:
-[   19.901488]  page_pool_alloc_frag+0x3c/0x230
-[   19.901490]  __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901494]  otx2_rq_aura_pool_init+0x1c4/0x240 [rvu_nicpf]
-[   19.901498]  otx2_open+0x228/0xa70 [rvu_nicpf]
-[   19.901501]  otx2vf_open+0x20/0xd0 [rvu_nicvf]
-[   19.901504]  __dev_open+0x114/0x1d0
-[   19.901507]  __dev_change_flags+0x194/0x210
-[   19.901510]  dev_change_flags+0x2c/0x70
-[   19.901512]  devinet_ioctl+0x3a4/0x6c4
-[   19.901515]  inet_ioctl+0x228/0x240
-[   19.901518]  sock_ioctl+0x2ac/0x480
-[   19.901522]  __arm64_sys_ioctl+0x564/0xe50
-[   19.901525]  invoke_syscall.constprop.0+0x58/0xf0
-[   19.901529]  do_el0_svc+0x58/0x150
-[   19.901531]  el0_svc+0x30/0x140
-[   19.901533]  el0t_64_sync_handler+0xe8/0x114
-[   19.901535]  el0t_64_sync+0x1a0/0x1a4
-[   19.901537] ---[ end trace 678c0bf660ad8116 ]---
+[auto build test ERROR on net-next/main]
 
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Willem-de-Bruijn/net-add-skb_segment-kunit-test/20231009-041424
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231008201244.3700784-2-willemdebruijn.kernel%40gmail.com
+patch subject: [PATCH net-next v2 1/3] net: add skb_segment kunit test
+config: i386-randconfig-001-20231009 (https://download.01.org/0day-ci/archive/20231009/202310091154.3StA08FY-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231009/202310091154.3StA08FY-lkp@intel.com/reproduce)
 
----
-ChangeLog
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310091154.3StA08FY-lkp@intel.com/
 
-v1 -> v2: Removed PAGE_ALIGN.
-v0 -> v1: Used get_order() and PAGE_ALIGN. Fixed commit message
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+All errors (new ones prefixed by >>):
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 997fedac3a98..83a1a460caed 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1357,7 +1357,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 	struct page_pool_params pp_params = { 0 };
- 	struct npa_aq_enq_req *aq;
- 	struct otx2_pool *pool;
--	int err;
-+	int err, sz;
- 
- 	pool = &pfvf->qset.pool[pool_id];
- 	/* Alloc memory for stack which is used to store buffer pointers */
-@@ -1403,6 +1403,8 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 		return 0;
- 	}
- 
-+	sz = ALIGN(SKB_DATA_ALIGN(buf_size), OTX2_ALIGN);
-+	pp_params.order = get_order(sz);
- 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
- 	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
- 	pp_params.nid = NUMA_NO_NODE;
+>> net/core/gso_test.c:10:32: error: initializer element is not constant
+    static const int payload_len = (2 * gso_size) + last_seg_size;
+                                   ^
+
+
+vim +10 net/core/gso_test.c
+
+     8	
+     9	/* default: create 3 segment gso packet */
+  > 10	static const int payload_len = (2 * gso_size) + last_seg_size;
+    11	
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
