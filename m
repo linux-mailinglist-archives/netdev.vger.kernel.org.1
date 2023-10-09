@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-39348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0514E7BEE6A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:44:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE73F7BEE70
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4107281B48
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:44:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E696C2818F3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF5E14AA0;
-	Mon,  9 Oct 2023 22:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B9E18B1F;
+	Mon,  9 Oct 2023 22:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rwa4I42W"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DmPAehzv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685511173D
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 22:44:04 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F709A6
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:44:01 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a538026d1so267856276.0
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 15:44:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8FB1173D
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 22:47:40 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0379F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:47:38 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-59f7d109926so77245937b3.2
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 15:47:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696891440; x=1697496240; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696891657; x=1697496457; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=lcEkRtI6p90rXcCOvkouPghb3M9m0aVLP4AHp4xDips=;
-        b=Rwa4I42WxiXXdptfUjSOUyqNZhDMOnOI1l+KC1YWHpvGJDOs3o17zdVc5WqhTsapfk
-         ao99ZcqBhVR5+QVPTGcaozDvyDqEh6/C6nExnGFY7MsqUwj85VcrnAjJH6bqxqkqChTi
-         OGEfpoPmbqez+38JL6xq9RUSrraHwKJ8Tjwjql/ODJt1/4k7SsCp15mL0vTJfjB+GSDZ
-         x/1Lkklz3prHhrjlvsOU03vL9XpiMvnUbApv8zCyqIqwrtZWRECR7xQpRMN/FtCJauPL
-         iZn3VqmxtIDxDbJ49LmpkiWZ/vpjWsQdbFETqwKWFpKZAKOm72JMTW8FXtg0j79iQUkw
-         SD3Q==
+        bh=2JxJfBT4mqTTWnkuNgqYZhhygki461FFicbWyOS8kMU=;
+        b=DmPAehzvoTwkKdspLj51IBwSEzAFLp6fjnm20o3YJ/KuILkutjMKDgPEHiJ2qpCrAh
+         wO7ncqUy8274bSTlhusCsAnGQ70FtjMznmruxDj7lWKaQBbMnSOkaKXO/pl44IiqAhsP
+         XsvIcI+2d1uLlLLrUqdoQ4Gqdx5bTe3xL4ZcLCLaVVWTITDVqXgUouLG0vopNvSBhc8a
+         kDWUynDXQamaethdZsg5I592cMmLhEu6FHLe9QFCuljCYHlp7jB0aJ31DP4OqTfbhgxa
+         tgMLcDS4V/luRjx7R8pfkZ5/gw1TfmkqVO+e/5hSKGDeZxeTQ9f1x0y/PjDIwH9C6xOh
+         Mtbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696891440; x=1697496240;
+        d=1e100.net; s=20230601; t=1696891657; x=1697496457;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lcEkRtI6p90rXcCOvkouPghb3M9m0aVLP4AHp4xDips=;
-        b=P80GT2zkLLtG60oQexXEYRXSBf+yzCTjdCG/wcuquvHygUO9ixsvpV9EaTit6Kl/SQ
-         Rjc3tcGZU4Ulmpb6VFnNg9KPB1ectom//0LhmbWBcH5Fdjr4qA9MwxAVsiDRS8jo5AT3
-         nLWJ3QnzeCjygPqpx77o0FxfpqhWskYMd+JwT2bSjfItV4fAOXhtMrW86yXNJNOTLbdA
-         G6zM9ncyB/lHjfiZ8MaeYqrwlRHtCzM83xtY+nz5ERV0VMYap9CpsCkmvOhQexTsK5aL
-         rAy3+AkmUl5NyaF+UdLL0OmC2oaw6Hwszf5/09frl0WWXy50XdY8Njw/XfTrSl5WixlD
-         DgvQ==
-X-Gm-Message-State: AOJu0Yz3WRNWigq+fnUQVkX0/EnZsn2MIj3ftnGUlKEdZQKq8f0Zro6D
-	Fbf4VS1N4nhYASuyaz961s/0m63yJn0KIbmJDw==
-X-Google-Smtp-Source: AGHT+IHkpV1hHXIfuxQJyt7g8E/CbFYu+6ckAULhpEVyGObpkH0MlWXRLpGSIDfzr9abk8U0Q+VRPJuFdqHSOOF6Ug==
+        bh=2JxJfBT4mqTTWnkuNgqYZhhygki461FFicbWyOS8kMU=;
+        b=hs2aib5f5PYobpjoE2MhXMTy85jlhV/pYBJWlFsJRIr8mE+mxptKIz21otwsyowN0X
+         uhsdWJpaNFKgYEMS+FiSl56xnk76aRQm5+y2fFCiQ8rJ9KKM0C7f/RaucaWKN1ZWIVJO
+         wqGUleGEAPE8s0Ou5CVl9IsJZse/V7SwHSgi4BGi17cEKPooB3GUvTk+fOLyHSUTGnCY
+         UjrGZoyeAiMwrU6v1Q4XldMgh1KlFwqcBNq059tXIcEXOKzTuWPK/erWGIGT1p2mh7JJ
+         HEJ7GKRk+TCLF7gnrizcJ/M8kNEfHygBr0bLaiq3ZgI108YUJC/Xc8dHw6A64y4EekIh
+         2XKA==
+X-Gm-Message-State: AOJu0Yzqm6gXA4vj0589wN9AMNTeRS8+BEy9bu9X24RmZQD5XmJQkVlM
+	eF9QaW1ImtINpYFYzHXzZXYzN+JMqbwcYC9ObA==
+X-Google-Smtp-Source: AGHT+IElN9GkpT3U2xvrH7+kjhlHlG+bmfY+dBqb/0nsReSoHqtmIJ/Qqs5nM/0N4BjpBVaPpbPj2pXTmOviCVtSrQ==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:c3:0:b0:d9a:45e7:b8bc with SMTP id
- 186-20020a2500c3000000b00d9a45e7b8bcmr25189yba.4.1696891440537; Mon, 09 Oct
- 2023 15:44:00 -0700 (PDT)
-Date: Mon, 09 Oct 2023 22:43:59 +0000
+ (user=justinstitt job=sendgmr) by 2002:a05:690c:2a0f:b0:5a7:aa51:c08e with
+ SMTP id ei15-20020a05690c2a0f00b005a7aa51c08emr38184ywb.1.1696891657694; Mon,
+ 09 Oct 2023 15:47:37 -0700 (PDT)
+Date: Mon, 09 Oct 2023 22:47:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAC6CJGUC/x3NTQrCQAxA4auUrA0krRb1KuJifqIG61iSoSild
- 3dw+W3eW8HFVBzO3Qomi7q+SwPvOkiPUO6Cmpuhp35gohN6tZLmL2bTRcyxSMXsAU3CVOWJVqf jMB5eERPGyDTKPjFTglacTW76+d8u1237AVexKdp9AAAA
+X-B4-Tracking: v=1; b=H4sIAAiDJGUC/x3NQQrCQAxA0auUrA2kLQ7qVcTFkKQaLNOSDEUpv
+ buDy7f5f4dQNw24dTu4bha2lIb+1AG/cnkqmjTDQMPYE10xqhdevyhum3pg0YoSGV3zXPWNXuf LmBLy4oqMiTJNJMJnZmjR1XWyz394fxzHDzHi6qqAAAAA
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696891439; l=1543;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696891656; l=1743;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=t6ppbaGIRSBsCeLAwhf3icSi3QggQapCJpuQhPkWhCk=; b=FWHhhun5aGED0QoILNdMciMZW3HTaYxCbuwQE2GB9YVe3/t5D443MOnBAm6QN6t6igpdopFpI
- UblLVj3B+mDBhtxxWYA5eMKhHFTTQGn4GjNgywTjOiej/yfypbDcEFq
+ bh=wtw1m2N4k6i9bXVmmrVL0qb6WJmJ01VqahgGi3xl8qU=; b=KSLRqEm2ZqeXXCS1E3PZL8ukrOE9+X+1GQ0FA+gBqwC/r+hSaMsJlHCmEWNAH5+mcSDLOMho1
+ qP2UVgg2jHxC9Qn+PsWDNqkGJi73jv5FRKqRIWkKFdYvO/bGMOrfOqe
 X-Mailer: b4 0.12.3
-Message-ID: <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
-Subject: [PATCH] net: dsa: realtek: rtl8365mb: replace deprecated strncpy with ethtool_sprintf
+Message-ID: <20231009-strncpy-drivers-net-dsa-realtek-rtl8366-core-c-v1-1-74e1b5190778@google.com>
+Subject: [PATCH] net: dsa: realtek: replace deprecated strncpy with ethtool_sprintf
 From: Justin Stitt <justinstitt@google.com>
 To: Linus Walleij <linus.walleij@linaro.org>, 
 	"=?utf-8?q?Alvin_=C5=A0ipraga?=" <alsi@bang-olufsen.dk>, Andrew Lunn <andrew@lunn.ch>, 
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -103,27 +103,35 @@ Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
 Note: build-tested only.
 ---
- drivers/net/dsa/realtek/rtl8365mb.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/dsa/realtek/rtl8366-core.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index 41ea3b5a42b1..d171c18dd354 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -1303,8 +1303,7 @@ static void rtl8365mb_get_strings(struct dsa_switch *ds, int port, u32 stringset
+diff --git a/drivers/net/dsa/realtek/rtl8366-core.c b/drivers/net/dsa/realtek/rtl8366-core.c
+index dc5f75be3017..b13766a3acbb 100644
+--- a/drivers/net/dsa/realtek/rtl8366-core.c
++++ b/drivers/net/dsa/realtek/rtl8366-core.c
+@@ -395,16 +395,13 @@ void rtl8366_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 			 uint8_t *data)
+ {
+ 	struct realtek_priv *priv = ds->priv;
+-	struct rtl8366_mib_counter *mib;
+ 	int i;
  
- 	for (i = 0; i < RTL8365MB_MIB_END; i++) {
- 		struct rtl8365mb_mib_counter *mib = &rtl8365mb_mib_counters[i];
--
--		strncpy(data + i * ETH_GSTRING_LEN, mib->name, ETH_GSTRING_LEN);
-+		ethtool_sprintf(&data, "%s", mib->name);
+ 	if (port >= priv->num_ports)
+ 		return;
+ 
+ 	for (i = 0; i < priv->num_mib_counters; i++) {
+-		mib = &priv->mib_counters[i];
+-		strncpy(data + i * ETH_GSTRING_LEN,
+-			mib->name, ETH_GSTRING_LEN);
++		ethtool_sprintf(&data, "%s", priv->mib_counters[i].name);
  	}
  }
- 
+ EXPORT_SYMBOL_GPL(rtl8366_get_strings);
 
 ---
 base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-bb106e4c110c
+change-id: 20231009-strncpy-drivers-net-dsa-realtek-rtl8366-core-c-60a0f0ddc5cc
 
 Best regards,
 --
