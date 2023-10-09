@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-39266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB197BE93B
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06EAA7BE93A
 	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:28:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7331C20B8B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:28:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0A67281DB4
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F01CE3AC31;
-	Mon,  9 Oct 2023 18:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395903B78A;
+	Mon,  9 Oct 2023 18:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/RTM4dz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T0KtZr6r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172EA38BBD
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389303AC2E
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:28:06 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7549C9C
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:28:12 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1F2B4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:28:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696876091;
+	s=mimecast20190719; t=1696876083;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GTQXYJd8i3E7CzEfytGs5GOKAgtU9bg1Astb3Kifl9o=;
-	b=B/RTM4dziSEtFgM+pf9Y7DBx3DqaY8rScpefUOpZIPs38sDCKKsCu7ujfJUov/QeSk9oKG
-	e81Be4/eDNWSQaiR5hrjUskz5SOANAuZg8WAPhAjZVT/2EaprbRNC0oHE8H4EIGGGBfRL1
-	pxXN2ZQUi797mRSXMJT7dNsxjjfaxQQ=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=orRdjx9+852xXN15Pq+UxCnXmyKpm9bkQ+d1p7lpjng=;
+	b=T0KtZr6r/S0IrG/9660ELnmdzSaSGgSTAnPvd6mIlW62behyTpbQpQhDHTkJhL1ENe5QPM
+	yTpoRZgX0ef2FlPpO7ZfbeuhdbplNSua7i5HpTU+LYxwr2vMx5USdBCa+/x6SPWmQk5yXf
+	SDcFKrFeiFYRsti3ovSIja3C+3liul8=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-GYV4EpolP1-mXu8iW8vWtw-1; Mon, 09 Oct 2023 14:28:00 -0400
-X-MC-Unique: GYV4EpolP1-mXu8iW8vWtw-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-59e8ebc0376so72488587b3.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 11:28:00 -0700 (PDT)
+ us-mta-614-aZSMa4bjPs6wyfcDQrlO3g-1; Mon, 09 Oct 2023 14:28:01 -0400
+X-MC-Unique: aZSMa4bjPs6wyfcDQrlO3g-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-5a7b3ae01c0so5348097b3.3
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 11:28:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696876080; x=1697480880;
+        d=1e100.net; s=20230601; t=1696876081; x=1697480881;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GTQXYJd8i3E7CzEfytGs5GOKAgtU9bg1Astb3Kifl9o=;
-        b=TGmlCZHMKIxpXVc5BWUD2KtsgVjoQ6qQ+sVI+o217rMbtGkQjmVEgbU3UvmL2/uREr
-         uGQN4UOLOD9F7mdlakt77HE7bhTbLht77BDa4nG6wP6+ZbSuLBgiVFPHbVZAM1nX5Euu
-         nvp3Gx4dLEtDZxe1CJ1j+XTTpqTXLaxkb3aIVRucQWpkr3HA8Tx0wrvBC/VTiqzt+x8W
-         q1v5FtTwKdV2+bj5wE5EfPFslG4SSrEXrKtVstH4cX2fof2kXOrIwGc9BTnB39eJaE4/
-         9EfDfulfVI4vHCMqujX82HJuyIE1ln2IA8NCKS0qpV/7qyR61tK8xox+ZkedTkZEzkLM
-         GL8w==
-X-Gm-Message-State: AOJu0Yz1LXOKS/e/1qczbJ2Wi4qVearXUG5fcFFUHsaEIkW2Bz0nEe4W
-	sxQ2Q/0X2F2WnnTzqgUf2VJ+usEkzLTpAl4cRLH4lOA9BbyBVZ9642KXU4KtrKLj86sDMh60+8F
-	IhIaw2PLRbRPsFN0M
-X-Received: by 2002:a0d:d808:0:b0:59b:d796:2a55 with SMTP id a8-20020a0dd808000000b0059bd7962a55mr19175708ywe.1.1696876079984;
-        Mon, 09 Oct 2023 11:27:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTNj0AbK9ekwU00cCwK6y/Lj3Gh+lW9brvWZW0cVRJ/uvWejhGnnRItros79pLhQKtpdlApA==
-X-Received: by 2002:a0d:d808:0:b0:59b:d796:2a55 with SMTP id a8-20020a0dd808000000b0059bd7962a55mr19175699ywe.1.1696876079736;
-        Mon, 09 Oct 2023 11:27:59 -0700 (PDT)
+        bh=orRdjx9+852xXN15Pq+UxCnXmyKpm9bkQ+d1p7lpjng=;
+        b=eAYq4USABUzxAa4KSCz1ZyXxUCfr/KTzRh3f2exeS2hP1ccR1NOCoA4WcuzxukEc4R
+         eJ5xUNaaIZJNP7gGhgTafU7/Ib6m9o03S/vfLcG93RtsjMXaC4Zf6feJqX5lPNkxhIfn
+         mvCt+xFxRyrpmBWRfBHBcHyKXgPiq5/uIcOoHzoS2AYruXVusC2mfG4JEsF+EI86kBYd
+         KXdFZCo/fox/fozAbd9GOxy57dXJHI0PA3874y+2moxbfHkhXlxy2Ysv1dfjKm9bvFxL
+         /O8BjllQdHCHEfmRw2yDOcHrfBSLScX6OSXYZHLqoGigqD17wXN2tq77oEiF9hq68bca
+         zRZQ==
+X-Gm-Message-State: AOJu0YwedvmulS5KExMdMSnTzthyunXBMYrwWRvuyEfu3TIMqMsXB4W2
+	+FcciYMiIqk4Jh13tXxngcIpzakzRsqh6G9iRc+y4Po9pURFS8+k/o7UvJJpDL/VC72h7cE6tnY
+	PkVUBvaD0PWw8f5uy
+X-Received: by 2002:a81:af45:0:b0:5a7:af72:ad6a with SMTP id x5-20020a81af45000000b005a7af72ad6amr1206458ywj.43.1696876080706;
+        Mon, 09 Oct 2023 11:28:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGqQkRil3E/g24y0JCveVG3AFiR7tPLbgTXUf2PC6SmFpxG5LDDJCmsMZWiLrqDuZykceEHnw==
+X-Received: by 2002:a81:af45:0:b0:5a7:af72:ad6a with SMTP id x5-20020a81af45000000b005a7af72ad6amr1206445ywj.43.1696876080450;
+        Mon, 09 Oct 2023 11:28:00 -0700 (PDT)
 Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id k7-20020a0dc807000000b0057736c436f1sm3789582ywd.141.2023.10.09.11.27.58
+        by smtp.gmail.com with ESMTPSA id u206-20020a8147d7000000b0059b4e981fe6sm3796511ywa.102.2023.10.09.11.27.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 09 Oct 2023 11:27:58 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 358F6E58211; Mon,  9 Oct 2023 20:27:57 +0200 (CEST)
+	id 385A0E58213; Mon,  9 Oct 2023 20:27:57 +0200 (CEST)
 From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 To: David Ahern <dsahern@gmail.com>,
 	Stephen Hemminger <stephen@networkplumber.org>
@@ -75,9 +75,9 @@ Cc: netdev@vger.kernel.org,
 	Christian Brauner <brauner@kernel.org>,
 	"Eric W . Biederman" <ebiederm@xmission.com>,
 	David Laight <David.Laight@ACULAB.COM>
-Subject: [RFC PATCH iproute2-next 3/5] lib/namespace: Factor out code for reuse
-Date: Mon,  9 Oct 2023 20:27:51 +0200
-Message-ID: <20231009182753.851551-4-toke@redhat.com>
+Subject: [RFC PATCH iproute2-next 4/5] ip: Also create and persist mount namespace when creating netns
+Date: Mon,  9 Oct 2023 20:27:52 +0200
+Message-ID: <20231009182753.851551-5-toke@redhat.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231009182753.851551-1-toke@redhat.com>
 References: <20231009182753.851551-1-toke@redhat.com>
@@ -96,132 +96,199 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Factor out the code that switches namespaces and the code that sets up a new
-mount namespace into utility functions that can be reused when we add mount
-namespace pinning.
+When creating a new network namespace, persist not only the network namespace
+reference itself, but also create and persist a new mount namespace that is
+paired with the network namespace. This means that multiple subsequent
+invocations of 'ip netns exec' will reuse the same mount namespace instead of
+creating a new namespace on every entry, as was the behaviour before this patch.
 
-No functional change is intended with this patch.
+The persistent mount namespace has the benefit that any new mounts created
+inside the namespace will persist. Most notably, this is useful when using bpffs
+instances along with 'ip netns', as these were previously transient to a single
+'ip netns' invocation.
+
+To preserve backwards compatibility, when changing namespaces we will fall back
+to the old behaviour of creating a new mount namespace when switching netns, if
+we can't find a persisted namespace to enter. This can happen if the netns
+instance was created with a previous version of iproute2 that doesn't persist
+the mount namespace.
+
+One caveat of the mount namespace persistence is that we can't make the
+containing directory mount shared, the way we do with the netns mounts. This
+means that if 'ip netns del' is invoked *inside* a namespace created with 'ip
+netns', the mount namespace reference will not be deleted and will stick around
+in the original mount namespace where it was created. This is unavoidable
+because it is not possible to create a bind-mounted reference to a mount
+namespace inside that same mount namespace (as that would create a circular
+reference).
+
+In such a situation, we may end up with the network namespace reference being
+removed but the mount namespace reference sticking around (the same thing can
+happen if 'ip netns del' is executed with an older version of iproute2). In this
+situation, a subsequent 'ip netns add' with the same namespace name will end up
+reusing the old mount namespace reference.
 
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- include/namespace.h |  1 +
- lib/namespace.c     | 73 ++++++++++++++++++++++++++++++++-------------
- 2 files changed, 54 insertions(+), 20 deletions(-)
+ Makefile        |  2 ++
+ ip/ipnetns.c    | 64 +++++++++++++++++++++++++++++++++++++++++++------
+ lib/namespace.c |  8 ++++++-
+ 3 files changed, 66 insertions(+), 8 deletions(-)
 
-diff --git a/include/namespace.h b/include/namespace.h
-index e47f9b5d49d1..b694a12e8397 100644
---- a/include/namespace.h
-+++ b/include/namespace.h
-@@ -49,6 +49,7 @@ static inline int setns(int fd, int nstype)
- }
- #endif /* HAVE_SETNS */
+diff --git a/Makefile b/Makefile
+index 5c559c8dc805..aeb1ddc53c6a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -19,6 +19,7 @@ SBINDIR?=/sbin
+ CONF_ETC_DIR?=/etc/iproute2
+ CONF_USR_DIR?=$(LIBDIR)/iproute2
+ NETNS_RUN_DIR?=/var/run/netns
++MNTNS_RUN_DIR?=/var/run/netns-mnt
+ NETNS_ETC_DIR?=/etc/netns
+ DATADIR?=$(PREFIX)/share
+ HDRDIR?=$(PREFIX)/include/iproute2
+@@ -41,6 +42,7 @@ endif
+ DEFINES+=-DCONF_USR_DIR=\"$(CONF_USR_DIR)\" \
+          -DCONF_ETC_DIR=\"$(CONF_ETC_DIR)\" \
+          -DNETNS_RUN_DIR=\"$(NETNS_RUN_DIR)\" \
++         -DMNTNS_RUN_DIR=\"$(MNTNS_RUN_DIR)\" \
+          -DNETNS_ETC_DIR=\"$(NETNS_ETC_DIR)\" \
+          -DCONF_COLOR=$(CONF_COLOR)
  
-+int prepare_mountns(const char *name, bool do_unshare);
- int netns_switch(char *netns);
- int netns_get_fd(const char *netns);
- int netns_foreach(int (*func)(char *nsname, void *arg), void *arg);
-diff --git a/lib/namespace.c b/lib/namespace.c
-index 1202fa85f97d..5e310762f34b 100644
---- a/lib/namespace.c
-+++ b/lib/namespace.c
-@@ -11,6 +11,25 @@
- #include "utils.h"
- #include "namespace.h"
+diff --git a/ip/ipnetns.c b/ip/ipnetns.c
+index 529790482683..551819577755 100644
+--- a/ip/ipnetns.c
++++ b/ip/ipnetns.c
+@@ -733,13 +733,24 @@ static int netns_identify(int argc, char **argv)
  
-+static struct namespace_typename {
-+	int		type;		/* CLONE_NEW* */
-+	const char	*name;		/* <type> */
-+} namespace_names[] = {
-+	{ .type = CLONE_NEWNET,   .name = "network"  },
-+	{ .type = CLONE_NEWNS,    .name = "mount"  },
-+	{ .name = NULL }
-+};
-+
-+static const char *ns_typename(int nstype)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(namespace_names); i++)
-+		if (namespace_names[i].type == nstype)
-+			return namespace_names[i].name;
-+	return NULL;
-+}
-+
- static void bind_etc(const char *name)
+ static int on_netns_del(char *nsname, void *arg)
  {
- 	char etc_netns_path[sizeof(NETNS_ETC_DIR) + NAME_MAX];
-@@ -42,30 +61,12 @@ static void bind_etc(const char *name)
- 	closedir(dir);
- }
+-	char netns_path[PATH_MAX];
++	char ns_path[PATH_MAX];
++	struct stat st;
++
++	snprintf(ns_path, sizeof(ns_path), "%s/%s", MNTNS_RUN_DIR, nsname);
++	if (!stat(ns_path, &st)) { /* may not exist if created by old iproute2 */
++		umount2(ns_path, MNT_DETACH);
++		if (unlink(ns_path) < 0) {
++			fprintf(stderr, "Cannot remove namespace file \"%s\": %s\n",
++				ns_path, strerror(errno));
++			return -1;
++		}
++	}
  
--int netns_switch(char *name)
-+int prepare_mountns(const char *name, bool do_unshare)
- {
--	char net_path[PATH_MAX];
--	int netns;
- 	unsigned long mountflags = 0;
- 	struct statvfs fsstat;
- 
--	snprintf(net_path, sizeof(net_path), "%s/%s", NETNS_RUN_DIR, name);
--	netns = open(net_path, O_RDONLY | O_CLOEXEC);
--	if (netns < 0) {
--		fprintf(stderr, "Cannot open network namespace \"%s\": %s\n",
--			name, strerror(errno));
--		return -1;
--	}
--
--	if (setns(netns, CLONE_NEWNET) < 0) {
--		fprintf(stderr, "setting the network namespace \"%s\" failed: %s\n",
--			name, strerror(errno));
--		close(netns);
--		return -1;
--	}
--	close(netns);
--
--	if (unshare(CLONE_NEWNS) < 0) {
-+	if (do_unshare && unshare(CLONE_NEWNS) < 0) {
- 		fprintf(stderr, "unshare failed: %s\n", strerror(errno));
+-	snprintf(netns_path, sizeof(netns_path), "%s/%s", NETNS_RUN_DIR, nsname);
+-	umount2(netns_path, MNT_DETACH);
+-	if (unlink(netns_path) < 0) {
++	snprintf(ns_path, sizeof(ns_path), "%s/%s", NETNS_RUN_DIR, nsname);
++	umount2(ns_path, MNT_DETACH);
++	if (unlink(ns_path) < 0) {
+ 		fprintf(stderr, "Cannot remove namespace file \"%s\": %s\n",
+-			netns_path, strerror(errno));
++			ns_path, strerror(errno));
  		return -1;
  	}
-@@ -97,6 +98,38 @@ int netns_switch(char *name)
+ 	return 0;
+@@ -885,17 +896,46 @@ static int bind_ns_file(const char *parent, const char *nsfile,
  	return 0;
  }
  
-+static int switch_ns(const char *parent_dir, const char *name, int nstype)
++static ino_t get_mnt_ino(pid_t pid)
 +{
-+	char ns_path[PATH_MAX];
-+	int ns_fd;
++	char path[PATH_MAX];
++	struct stat st;
 +
-+	snprintf(ns_path, sizeof(ns_path), "%s/%s", parent_dir, name);
-+	ns_fd = open(ns_path, O_RDONLY | O_CLOEXEC);
-+	if (ns_fd < 0) {
-+		fprintf(stderr, "Cannot open %s namespace \"%s\": %s\n",
-+			ns_typename(nstype), name, strerror(errno));
-+		return -1;
-+	}
++	snprintf(path, sizeof(path), "/proc/%u/ns/mnt", (unsigned) pid);
 +
-+	if (setns(ns_fd, nstype) < 0) {
-+		fprintf(stderr, "setting the %s namespace \"%s\" failed: %s\n",
-+			ns_typename(nstype), name, strerror(errno));
-+		close(ns_fd);
-+		return -1;
++	if (stat(path, &st) != 0) {
++		fprintf(stderr, "stat of %s failed: %s\n",
++			path, strerror(errno));
++		exit(EXIT_FAILURE);
 +	}
-+	close(ns_fd);
-+	return 0;
++	return st.st_ino;
 +}
 +
-+int netns_switch(char *name)
-+{
-+
-+	if (switch_ns(NETNS_RUN_DIR, name, CLONE_NEWNET))
-+		return -1;
-+
-+	return prepare_mountns(name, true);
-+}
-+
- int netns_get_fd(const char *name)
+ static pid_t bind_ns_files_from_child(const char *ns_name, pid_t target_pid,
+ 				      int *fd)
  {
- 	char pathbuf[PATH_MAX];
++	ino_t mnt_ino;
+ 	pid_t child;
+ 
++	mnt_ino = get_mnt_ino(getpid());
++
+ 	child = fork_and_wait(fd);
+ 	if (child)
+ 		return child;
+ 
+ 	if (bind_ns_file(NETNS_RUN_DIR, "net", ns_name, target_pid))
+ 		exit(EXIT_FAILURE);
++
++	/* We can only bind the mount namespace reference if the target pid is
++	 * actually in a different mount namespace than ourselves. We ignore any
++	 * errors in creating the mount namespace reference because an old
++	 * namespace mount may be present if a network namespace with the same
++	 * name was previously removed by an older version of iproute2; in this
++	 * case that old reference will just be reused.
++	 */
++	if (mnt_ino != get_mnt_ino(target_pid))
++		bind_ns_file(MNTNS_RUN_DIR, "mnt", ns_name, target_pid);
++
+ 	exit(EXIT_SUCCESS);
+ }
+ 
+@@ -1003,8 +1043,13 @@ static int netns_add(int argc, char **argv, bool create)
+ 	 * unmounting a network namespace file in one namespace will unmount the
+ 	 * network namespace file in all namespaces allowing the network
+ 	 * namespace to be freed sooner.
++	 *
++	 * The mount namespace directory cannot be shared because it's not
++	 * possible to mount references to a mount namespace inside that
++	 * namespace itself.
+ 	 */
+-	if (prepare_ns_mount_dir(NETNS_RUN_DIR, MS_SHARED))
++	if (prepare_ns_mount_dir(NETNS_RUN_DIR, MS_SHARED) ||
++	    prepare_ns_mount_dir(MNTNS_RUN_DIR, MS_SLAVE))
+ 		return -1;
+ 
+ 	child = bind_ns_files_from_child(name, pid, &event_fd);
+@@ -1012,12 +1057,17 @@ static int netns_add(int argc, char **argv, bool create)
+ 		exit(EXIT_FAILURE);
+ 
+ 	if (create) {
+-		if (unshare(CLONE_NEWNET) < 0) {
++		if (unshare(CLONE_NEWNET | CLONE_NEWNS) < 0) {
+ 			fprintf(stderr, "Failed to create a new network namespace \"%s\": %s\n",
+ 				name, strerror(errno));
+ 			close(event_fd);
+ 			exit(EXIT_FAILURE);
+ 		}
++
++		if (prepare_mountns(name, false)) {
++			close(event_fd);
++			exit(EXIT_FAILURE);
++		}
+ 	}
+ 
+ 	return sync_with_child(child, event_fd);
+diff --git a/lib/namespace.c b/lib/namespace.c
+index 5e310762f34b..5f2449fb0003 100644
+--- a/lib/namespace.c
++++ b/lib/namespace.c
+@@ -127,7 +127,13 @@ int netns_switch(char *name)
+ 	if (switch_ns(NETNS_RUN_DIR, name, CLONE_NEWNET))
+ 		return -1;
+ 
+-	return prepare_mountns(name, true);
++	/* Try to enter an existing persisted mount namespace. If this fails,
++	 * preserve the old behaviour of creating a new namespace on entry.
++	 */
++	if (switch_ns(MNTNS_RUN_DIR, name, CLONE_NEWNS))
++		return prepare_mountns(name, true);
++
++	return 0;
+ }
+ 
+ int netns_get_fd(const char *name)
 -- 
 2.42.0
 
