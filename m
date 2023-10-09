@@ -1,202 +1,154 @@
-Return-Path: <netdev+bounces-39049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0237BD8AD
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:33:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141217BD8DD
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:39:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F4B628165A
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:33:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45DF11C20949
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0541567E;
-	Mon,  9 Oct 2023 10:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E2F63A7;
+	Mon,  9 Oct 2023 10:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVJBx33l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TRpwqayF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A534F18637;
-	Mon,  9 Oct 2023 10:33:16 +0000 (UTC)
-Received: from mail-vk1-xa30.google.com (mail-vk1-xa30.google.com [IPv6:2607:f8b0:4864:20::a30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE60C9C;
-	Mon,  9 Oct 2023 03:33:12 -0700 (PDT)
-Received: by mail-vk1-xa30.google.com with SMTP id 71dfb90a1353d-49e15724283so901733e0c.1;
-        Mon, 09 Oct 2023 03:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696847592; x=1697452392; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rT1rH97yMTf0notAyuO1uE+7xlHDEM8gJWBeBFRun/4=;
-        b=fVJBx33lvVIec7BPRSSeE1O1koYZKiO+/Cr6z5bLUzgCreyYXGO+x8B2SShUHfyJ4j
-         k5GC9oY+TcT2fOCQI3pupWdXhW6EP4hkM4UgbPJjBd28xc3lhSeaEhOHFUXWZUiwdT+L
-         vOxDoiIBYvQ2IdGoGqSD6ie0+dr/OGfYtKzkipAWvDXM0koqeftnk9iLFBJwiNAjhL2v
-         SeTfVGGmiV7UZoVwlqi7XmRqfip0GLVdUXOgdZ650E6EDzkjjwIlAMemJKH+XFvbXUgI
-         LCr6AvrmfYv9AeeqQKhI8VXfw61s3oCDaNJ8OfNlHM7NkvXViyoEzLKHPcSeewvCFV4Q
-         fJQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696847592; x=1697452392;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rT1rH97yMTf0notAyuO1uE+7xlHDEM8gJWBeBFRun/4=;
-        b=gwaCu5w5srJag2kxxKlhJqhVSfLN7u00nqBgx2BsKFAVzerrbGBdFLyWbDJMct3xy3
-         bJqnNgtqXTwn0506AGjdX5nFmtM14urzYbiAgVkeQfoedY8s3WYt10qCRU3ThB2EhCFr
-         s8fdmBUVUOyO3iDiq8HotjsECOC0mRhWLWIO4bvPQp3/A9S/ZV0YzRfBkxV3IyLZon0e
-         gNTVy5fEB/btbklRPR2fgjDfsj6PDaQcA8M7j3SGYMIwcdcaEHHTAKE59wwkAnkkVSsS
-         dOrHCv7M31FoW29pCZ31pugOSqQBmBT3qjUE+ji4s3JCcXSyZrbMwD/Mtte/Pi9EQOVE
-         iyHQ==
-X-Gm-Message-State: AOJu0YwbB5bZljxngf8xczZca1ExEhMa5UgI9C9oQ5jJ+S5MIWFG4Pfe
-	EOAhEAc9PaY837qUFR2mYYGYX/bHcmKJQNTmc4c=
-X-Google-Smtp-Source: AGHT+IHE+bLXnKSnxxU/KTXcPWxDAmkZwBaU9nQyxeRMxaOL1S5mD7d5OmMEdKfRaLaQMD1aS0xEm5VGTb84Y71ZDqI=
-X-Received: by 2002:a05:6122:7c9:b0:49d:c216:873d with SMTP id
- l9-20020a05612207c900b0049dc216873dmr13801907vkr.8.1696847591769; Mon, 09 Oct
- 2023 03:33:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9571863C
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:39:51 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB8299
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 03:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=y3s/FIPfy9ha3pi4l4DqdhSktniQNQ+h1CyMx8WRa1U=; b=TRpwqayFpQz/EVeR1B4tr+VFeX
+	GL0plgBxjLr2RDEKjWCU2aUOnoKk3arzgf8QC6p8fDATDtNreqpR6JRuJ08NHRbhpSAFhUTmDrNQW
+	hvH06e3g/t9vFA4oHHsrJFDPiw/QcgA0FC1pYFDyn7wCe0d2VkG+uM7ErMWQWTX5e6PILr0Tnq4BJ
+	zyDxg+napZigpfh/Fou0byipR1jJ7hHKu6Z0ushEyohP4C1YvXdT3rIjN8m8iZKUhIKV4Bd6Sdk4Y
+	ahwD5s8hY0rwtjty+Le2JQ0Ol7xWD92Bk0Aa2qinxj9AbA2i5+NlkNxl5hIlUBt7ctoaQq6vDssot
+	5tTNHPqQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54114 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1qpnfr-0008M4-38;
+	Mon, 09 Oct 2023 11:39:44 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1qpnft-009Ncg-3o; Mon, 09 Oct 2023 11:39:45 +0100
+In-Reply-To: <ZSPOV+GhEQkwhoz9@shell.armlinux.org.uk>
+References: <ZSPOV+GhEQkwhoz9@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	 Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net-next 1/3] net: dsa: vsc73xx: add phylink capabilities
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
- <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com> <CAF=yD-K4bCBpUVtDR_cv=bagRL+vM4Rusez+uHFTb4_kR8XkpA@mail.gmail.com>
- <6a698c99-6f02-4cfb-a709-ba02296a05f7@daynix.com> <CAF=yD-+WFy8us0wUWo-0KpZUKHx2Q82cJ8teO0qRkK-_R1e0cA@mail.gmail.com>
- <eab359ec-3bb9-4245-8ac3-097d66ef30a9@daynix.com>
-In-Reply-To: <eab359ec-3bb9-4245-8ac3-097d66ef30a9@daynix.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 9 Oct 2023 03:32:33 -0700
-Message-ID: <CAF=yD-LPMK4eOTABU5EPOOnSCBo=jQNPuNXLLa6qZy_jHSxyMg@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
-	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
-	pablo@netfilter.org, decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, 
-	elver@google.com, pabeni@redhat.com, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1qpnft-009Ncg-3o@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Mon, 09 Oct 2023 11:39:45 +0100
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 3:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> On 2023/10/09 19:07, Willem de Bruijn wrote:
-> > On Mon, Oct 9, 2023 at 3:05=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
-nix.com> wrote:
-> >>
-> >>
-> >>
-> >> On 2023/10/09 18:54, Willem de Bruijn wrote:
-> >>> On Mon, Oct 9, 2023 at 3:44=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
-aynix.com> wrote:
-> >>>>
-> >>>> On 2023/10/09 17:13, Willem de Bruijn wrote:
-> >>>>> On Sun, Oct 8, 2023 at 12:22=E2=80=AFAM Akihiko Odaki <akihiko.odak=
-i@daynix.com> wrote:
-> >>>>>>
-> >>>>>> virtio-net have two usage of hashes: one is RSS and another is has=
-h
-> >>>>>> reporting. Conventionally the hash calculation was done by the VMM=
-.
-> >>>>>> However, computing the hash after the queue was chosen defeats the
-> >>>>>> purpose of RSS.
-> >>>>>>
-> >>>>>> Another approach is to use eBPF steering program. This approach ha=
-s
-> >>>>>> another downside: it cannot report the calculated hash due to the
-> >>>>>> restrictive nature of eBPF.
-> >>>>>>
-> >>>>>> Introduce the code to compute hashes to the kernel in order to ove=
-rcome
-> >>>>>> thse challenges. An alternative solution is to extend the eBPF ste=
-ering
-> >>>>>> program so that it will be able to report to the userspace, but it=
- makes
-> >>>>>> little sense to allow to implement different hashing algorithms wi=
-th
-> >>>>>> eBPF since the hash value reported by virtio-net is strictly defin=
-ed by
-> >>>>>> the specification.
-> >>>>>>
-> >>>>>> The hash value already stored in sk_buff is not used and computed
-> >>>>>> independently since it may have been computed in a way not conform=
-ant
-> >>>>>> with the specification.
-> >>>>>>
-> >>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>>>
-> >>>>>> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_str=
-uct *tun,
-> >>>>>>            }
-> >>>>>>
-> >>>>>>            if (vnet_hdr_sz) {
-> >>>>>> -               struct virtio_net_hdr gso;
-> >>>>>> +               union {
-> >>>>>> +                       struct virtio_net_hdr hdr;
-> >>>>>> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
-> >>>>>> +               } hdr;
-> >>>>>> +               int ret;
-> >>>>>>
-> >>>>>>                    if (iov_iter_count(iter) < vnet_hdr_sz)
-> >>>>>>                            return -EINVAL;
-> >>>>>>
-> >>>>>> -               if (virtio_net_hdr_from_skb(skb, &gso,
-> >>>>>> -                                           tun_is_little_endian(t=
-un), true,
-> >>>>>> -                                           vlan_hlen)) {
-> >>>>>> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HA=
-SH_REPORT) &&
-> >>>>>> +                   vnet_hdr_sz >=3D sizeof(hdr.v1_hash_hdr) &&
-> >>>>>> +                   skb->tun_vnet_hash) {
-> >>>>>
-> >>>>> Isn't vnet_hdr_sz guaranteed to be >=3D hdr.v1_hash_hdr, by virtue =
-of
-> >>>>> the set hash ioctl failing otherwise?
-> >>>>>
-> >>>>> Such checks should be limited to control path where possible
-> >>>>
-> >>>> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz=
- are
-> >>>> not read at once.
-> >>>
-> >>> It should not be possible to downgrade the hdr_sz once v1 is selected=
-.
-> >>
-> >> I see nothing that prevents shrinking the header size.
-> >>
-> >> tun->vnet_hash.flags is read after vnet_hdr_sz so the race can happen
-> >> even for the case the header size grows though this can be fixed by
-> >> reordering the two reads.
-> >
-> > One option is to fail any control path that tries to re-negotiate
-> > header size once this hash option is enabled?
-> >
-> > There is no practical reason to allow feature re-negotiation at any
-> > arbitrary time.
->
-> I think it's a bit awkward interface design since tun allows to
-> reconfigure any of its parameters, but it's certainly possible.
+Add phylink capabilities for vsc73xx. Although this switch driver does
+populates the .adjust_link method, dsa_slave_phy_setup() will still be
+used to create phylink instances for the LAN ports, although phylink
+won't be used for shared links.
 
-If this would be the only exception to that rule, and this is the only
-place that needs a datapath check, then it's fine to leave as is.
+There are two different classes of switch - 5+1 and 8 port. The 5+1
+port switches uses port indicies 0-4 for the user interfaces and 6 for
+the CPU port. The 8 port is confusing - some comments in the driver
+imply that port index 7 is used, but the driver actually still uses 6,
+so that is what we go with. Also, there appear to be no DTs in the
+kernel tree that are using the 8 port variety.
 
-In general, this runtime configurability serves little purpose but to
-help syzbot exercise code paths no real application would attempt. But
-I won't ask to diverge from whatever tun already does. We just have to
-be more careful about the possible races it brings.
+It also looks like port 5 is always skipped.
+
+The switch supports 10M, 100M and 1G speeds. It is not clear whether
+all these speeds are supported on the CPU interface. It also looks like
+symmetric pause is supported, whether asymmetric pause is as well is
+unclear. However, it looks like the pause configuration is entirely
+static, and doesn't depend on negotiation results.
+
+So, let's do the best effort we can based on the information found in
+the driver when creating vsc73xx_phylink_get_caps().
+
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+index 4f09e7438f3b..35a846d7e13f 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx-core.c
++++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+@@ -1037,6 +1037,31 @@ static int vsc73xx_get_max_mtu(struct dsa_switch *ds, int port)
+ 	return 9600 - ETH_HLEN - ETH_FCS_LEN;
+ }
+ 
++static void vsc73xx_phylink_get_caps(struct dsa_switch *dsa, int port,
++				     struct phylink_config *config)
++{
++	unsigned long *interfaces = config->supported_interfaces;
++
++	if (port == 5)
++		return;
++
++	if (port == CPU_PORT) {
++		__set_bit(PHY_INTERFACE_MODE_MII, interfaces);
++		__set_bit(PHY_INTERFACE_MODE_REVMII, interfaces);
++		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
++		__set_bit(PHY_INTERFACE_MODE_RGMII, interfaces);
++	}
++
++	if (port <= 4) {
++		/* Internal PHYs */
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL, interfaces);
++		/* phylib default */
++		__set_bit(PHY_INTERFACE_MODE_GMII, interfaces);
++	}
++
++	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000;
++}
++
+ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+ 	.get_tag_protocol = vsc73xx_get_tag_protocol,
+ 	.setup = vsc73xx_setup,
+@@ -1050,6 +1075,7 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+ 	.port_disable = vsc73xx_port_disable,
+ 	.port_change_mtu = vsc73xx_change_mtu,
+ 	.port_max_mtu = vsc73xx_get_max_mtu,
++	.phylink_get_caps = vsc73xx_phylink_get_caps,
+ };
+ 
+ static int vsc73xx_gpio_get(struct gpio_chip *chip, unsigned int offset)
+-- 
+2.30.2
+
 
