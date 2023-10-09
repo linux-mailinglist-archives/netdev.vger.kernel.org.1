@@ -1,89 +1,84 @@
-Return-Path: <netdev+bounces-39136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3314F7BE2B5
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:27:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2C9F7BE2D4
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63A811C20960
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:27:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 204791C20A6B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942523589F;
-	Mon,  9 Oct 2023 14:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D1A613E;
+	Mon,  9 Oct 2023 14:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dE2EEucG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D1435887;
-	Mon,  9 Oct 2023 14:27:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66577C433C7;
-	Mon,  9 Oct 2023 14:27:16 +0000 (UTC)
-Date: Mon, 9 Oct 2023 10:28:33 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: Eric Dumazet <edumazet@google.com>, mhiramat@kernel.org,
- dennis@kernel.org, tj@kernel.org, cl@linux.com, mark.rutland@arm.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Lobakin
- <aleksander.lobakin@intel.com>, linux-trace-kernel@vger.kernel.org,
- linux-mm@kvack.org
-Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
-Message-ID: <20231009102833.1b0d35e3@gandalf.local.home>
-In-Reply-To: <078f662d-a73f-766b-3a07-c82cd37026c5@linux.dev>
-References: <20231007050621.1706331-1-yajun.deng@linux.dev>
-	<CANn89i+navyRe8-AV=ehM3qFce2hmnOEKBqvK5Xnev7KTaS5Lg@mail.gmail.com>
-	<a53a3ff6-8c66-07c4-0163-e582d88843dd@linux.dev>
-	<CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
-	<9f4fb613-d63f-9b86-fe92-11bf4dfb7275@linux.dev>
-	<CANn89iK7bvQtGD=p+fHaWiiaNn=u8vWrt0YQ26pGQY=kZTdfJw@mail.gmail.com>
-	<4a747fda-2bb9-4231-66d6-31306184eec2@linux.dev>
-	<814b5598-5284-9558-8f56-12a6f7a67187@linux.dev>
-	<CANn89iJCTgWTu0mzwj-8_-HiWm4uErY=VASDHoYaod9Nq-ayPA@mail.gmail.com>
-	<508b33f7-3dc0-4536-21f6-4a5e7ade2b5c@linux.dev>
-	<CANn89i+r-pQGpen1mUhybmj+6ybhxSsuoaB07NFzOWyHUMFDNw@mail.gmail.com>
-	<296ca17d-cff0-2d19-f620-eedab004ddde@linux.dev>
-	<CANn89iL=W3fyuH_KawfhKvLyw2Cw=qhHbEZtbKgQEYhHJChy3Q@mail.gmail.com>
-	<68eb65c5-1870-0776-0878-694a8b002a6d@linux.dev>
-	<CANn89iJHtYJjp6zPc2PVLAWuN88BQc5OntjrAf7f6QOcqP+B=g@mail.gmail.com>
-	<078f662d-a73f-766b-3a07-c82cd37026c5@linux.dev>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A454C358A5;
+	Mon,  9 Oct 2023 14:31:11 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072CB9D;
+	Mon,  9 Oct 2023 07:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mAnlk2VscIAHKLvNs6CIvKgd0sNcormmavzwsv8+jTE=; b=dE2EEucGHja60SDqQFrUE0GAmj
+	bzyo0/+SuOx70vebNEvSuR43B2JfaTP7rer8jpY8JTEi8cKwx5UkRB1xGEy5MihpKdyTOjOi+hBSj
+	5g9j8pm4kbY1kencOE2Y1/qqqeKq5A+WOcAlWKk9EYLklZ+dGy5/3O54nXL2KXaAR83g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qprHk-000u8u-Pn; Mon, 09 Oct 2023 16:31:04 +0200
+Date: Mon, 9 Oct 2023 16:31:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, greg@kroah.com, tmgross@umich.edu,
+	Wedson Almeida Filho <wedsonaf@gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] net: phy: add Rust Asix PHY driver
+Message-ID: <fd715b79-3ae2-44cb-8f51-7a903778274f@lunn.ch>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <20231009013912.4048593-4-fujita.tomonori@gmail.com>
+ <ZSOqWMqm/JQOieAd@nanopsycho>
+ <bdfac30f-364f-4625-a808-fcffab2f75b4@lunn.ch>
+ <CANiq72k4F4EY-cLYMsRFsAnjd9=xyMN_4eHS9T7G1s=eW7kHjw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANiq72k4F4EY-cLYMsRFsAnjd9=xyMN_4eHS9T7G1s=eW7kHjw@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 9 Oct 2023 18:58:27 +0800
-Yajun Deng <yajun.deng@linux.dev> wrote:
-
-> > C compiler decides to inline or not, depending on various factors.
-> >
-> > The most efficient (and small) code is generated by this_cpu_inc()
-> > version, allowing the compiler to inline it.
-> >
-> > If you copy/paste this_cpu_inc()  twenty times, then the compiler
-> > would  not inline the function anymore.  
-
-Yes, if you want something to be visible by ftrace, it must not be inlined
-(as inlined functions are not function calls by definition). And as Eric
-stated, the compiler is perfectly allowed to inline something if it
-believes it will be more efficient. i.e. There may be code around the function
-call that could be more efficient if it wasn't change to parameters. If you
-want to make sure a function stays out of line, you must explicitly tell
-the compiler you want the function not to ever be inlined (hence the
-"noinline" attribute).
-
+> > I hope some sort of lessons learned, best practices and TODO list can
+> > be distilled from the experience, to help guide the Rust Experiment.
 > 
-> 
-> Got it. Thank you.
+> I appreciate that you are taking the time to have a look at the Rust
+> support, but please note that most things you are mentioning are not
+> really "lessons learned" -- they were things that were already known
+> and/or worked on.
 
-Great.
+We are at the intersect of two worlds here. Maybe these issues are
+well known in the linux for rust world, but they are not really known
+to the netdev world, and to some extend the kernel developers /
+maintainers world. We need to spread knowledge between each world.
 
--- Steve
+So maybe this "lessons learned" is not really for the Rust people, but
+for the netdev community, and kernel developers and Maintainers in
+general?
+
+	Andrew
 
