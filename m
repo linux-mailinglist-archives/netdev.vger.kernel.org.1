@@ -1,145 +1,94 @@
-Return-Path: <netdev+bounces-38929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2110F7BD10D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 00:52:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90CC07BD16F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 02:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52AE91C208BC
-	for <lists+netdev@lfdr.de>; Sun,  8 Oct 2023 22:52:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A49BB2814D3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 00:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B993419B;
-	Sun,  8 Oct 2023 22:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3155681A;
+	Mon,  9 Oct 2023 00:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBZJ513G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N4FY5kIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA628C0F
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 22:52:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA8FCC433C7;
-	Sun,  8 Oct 2023 22:52:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696805556;
-	bh=eKS1i915uOytgVyPyZfVPV7EGaZhyzS4h+fgE36YdyY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UBZJ513Gz2UKSE91FymXKbDk+0Zp2QA67Y7muqdCmn7I8gdrZcqT1N6IHZzeQmzvS
-	 /lcIVKC7o3YR2207TPwELu4AzgjDr3vFkeU7f61e2STtXiYFvA1nUcGIg3g7OAuYkM
-	 K5+OabDsr8d/78g2gw0lS8oXAwKA+iGyQnE0ztL1+sy6ZUwGp70MduSR+y5UFzfjXF
-	 pD7S9bya6v2R37VS9fN8YrMT0V9WmXAE+9ZVobjS1BiKl/Lq6VQ+hnq7ZuscDP4MMv
-	 pVyHplqKTvLK/uVww7rKcYRpPhHkeeQEgAzL+SLw9AGDuHX47ATtVbTvDu1Wz7CTK5
-	 JtIKAAN2yjmFQ==
-Date: Mon, 9 Oct 2023 00:52:33 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yannik Sembritzki <yannik@sembritzki.org>
-Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] Correct list of flags returned by SIOCGIFFLAGS in
- netdevice.7
-Message-ID: <ZSMysfPBxTs8QCKD@debian>
-References: <78adf50c-e8f9-d1ce-e933-418a850b6a44@sembritzki.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76CF63E;
+	Mon,  9 Oct 2023 00:34:44 +0000 (UTC)
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281EFAB;
+	Sun,  8 Oct 2023 17:34:41 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id 5614622812f47-3af608eb34bso2812244b6e.1;
+        Sun, 08 Oct 2023 17:34:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696811678; x=1697416478; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cDy6tPfpqj3KR3HrKDaQ7tUSHnBT+iyGC2DxosxlRHw=;
+        b=N4FY5kIvBp6l58FSOLotVAeIMXvR/ByUazZ7a1PLOV8DraQ4TMm6FY2vaEyQdusWz2
+         4Jufrtul7eFb7O92Xm5bJEf5t7MeD1GIepVnzrLNaNPBBrL1cfnMhA96IMvqJYKrBexC
+         dUevpOpeWwa3215urJRyAswAS8Gmka+SeIE/vuT5bHh65AVEmtx479hwF+Sar2HsTzkS
+         tgo7NBW+vExhRJZrZ7HXH5FLxmg7Vetc6XHb4UfqIwbxM+L7TS3SEb1Y7tq/ZWO5RWFA
+         62q1AfTTyewjDVW7WlcEdSu9+21RjVe0ssKNAMAcbhF8qnw/5jBUBG8im3gvn3y4HHH0
+         F1DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696811678; x=1697416478;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cDy6tPfpqj3KR3HrKDaQ7tUSHnBT+iyGC2DxosxlRHw=;
+        b=A67aVVJqH6csm0EW7A10FaDDGrnUp6FBrufqWl4NDnejfymk2juEvo7i28ZUDQG1BZ
+         DxYPnMSFrIFR/ye4ozaCsOsNL1oVMAWqLwKGOLMMKzbIQqO7/Rj7I0SLtRqYVACbDFXA
+         +lI9p16kjdbFvRfCDFkFfEC73a+UlqIS3CRVuglGUbOtTKCUFf+Re7vaskD3x33vjRK2
+         E/0xymCAC882jFb1DQxKv2Iywsjoy02qhrPaKB0rae1o3MYyJUwzt6iDVSneepdwaBOB
+         Iqjf24YOmVbrjZN1CHYy4L8usaXY78vJtnCIaWBtzem3xjrQL9kNYc212oe8KqXjN2IO
+         nU9Q==
+X-Gm-Message-State: AOJu0Yx4hl4wuuFOWrxs5QtxYMLxjPaYBg6c3Yx+ZJrnCDtOnoWAb4XH
+	s2gvX2N5knitrL8UxlEKY3Z37d7mF6ct1S6jq0URkhQhXBI=
+X-Google-Smtp-Source: AGHT+IF1lHwAdPSIz68BEqoIzPlJiCE+dBbnohGiqjnajvLPkqdx+GXK2l1vV+xZP96LZI3Q6QBolT4Cx3G546JTHO8=
+X-Received: by 2002:a05:6358:7296:b0:164:953b:35a9 with SMTP id
+ w22-20020a056358729600b00164953b35a9mr3669149rwf.23.1696811678244; Sun, 08
+ Oct 2023 17:34:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qVaTCG8zGF7ndl3e"
-Content-Disposition: inline
-In-Reply-To: <78adf50c-e8f9-d1ce-e933-418a850b6a44@sembritzki.org>
+From: Forest Crossman <cyrozap@gmail.com>
+Date: Sun, 8 Oct 2023 19:33:00 -0500
+Message-ID: <CAO3ALPxXSkRVu4UO+TXse47FCFimfN+dYjvssocmaRQ3zdMDpg@mail.gmail.com>
+Subject: r8152: "ram code speedup mode fail" error with latest RTL8156B firmware
+To: hayeswang@realtek.com, davem@davemloft.net, kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+Hi, all,
 
---qVaTCG8zGF7ndl3e
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 9 Oct 2023 00:52:33 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yannik Sembritzki <yannik@sembritzki.org>
-Cc: linux-man@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] Correct list of flags returned by SIOCGIFFLAGS in
- netdevice.7
+While looking at my kernel log today I noticed the following error:
 
-Hello Yannik,
+> r8152 6-1:1.0: ram code speedup mode fail
 
-On Sat, Oct 07, 2023 at 06:30:52PM +0200, Yannik Sembritzki wrote:
-> As per https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
-/commit/?id=3D746e6ad23cd6fec2edce056e014a0eabeffa838c
-> and https://lkml.org/lkml/2009/5/28/224
->=20
-> Signed-off-by: Yannik Sembritzki <yannik@sembritzki.org>
+The error appears when using the latest RTL8156B firmware (04/27/23),
+but not when using the previous version of the firmware (04/15/21).
 
-I couldn't apply the patch:
-
-warning: Patch sent with format=3Dflowed; space at the end of lines might b=
-e lost.
-Applying: Correct list of flags returned by SIOCGIFFLAGS in netdevice.7
-error: corrupt patch at line 10
-Patch failed at 0001 Correct list of flags returned by SIOCGIFFLAGS in netd=
-evice.7
-hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
-
-Can you please check?
-
-Also, please CC
-"Fredrik Arnerup" <fredrik.arnerup@edgeware.tv>
-John Dykstra <john.dykstra1@gmail.com>
-David S. Miller <davem@davemloft.net>
+I haven't really noticed any malfunction or degradation in the
+performance of my RTL8156B device, but I figured I'd bring this to
+your attention anyways just in case either something really is wrong
+with the firmware or the driver is simply printing the error by
+mistake.
 
 Thanks,
-Alex
 
-> ---
-> =C2=A0man7/netdevice.7 | 3 ---
-> =C2=A01 file changed, 3 deletions(-)
->=20
-> diff --git a/man7/netdevice.7 b/man7/netdevice.7
-> index 0087a8115..01356476d 100644
-> --- a/man7/netdevice.7
-> +++ b/man7/netdevice.7
-> @@ -127,9 +127,6 @@ IFF_AUTOMEDIA:Auto media selection active.
-> =C2=A0IFF_DYNAMIC:T{
-> =C2=A0The addresses are lost when the interface goes down.
-> =C2=A0T}
-> -IFF_LOWER_UP:Driver signals L1 up (since Linux 2.6.17)
-> -IFF_DORMANT:Driver signals dormant (since Linux 2.6.17)
-> -IFF_ECHO:Echo sent packets (since Linux 2.6.25)
-> =C2=A0.TE
-> =C2=A0.ad
-> =C2=A0.PP
-> --=20
-> 2.41.0
->=20
-
-
---=20
-<https://www.alejandro-colomar.es/>
-
---qVaTCG8zGF7ndl3e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmUjMrEACgkQnowa+77/
-2zLIWg//R7m8v6IBWNyWEURmDBymQ4AvD0XCQPJV4zsPcePkvXYtk4EsKmUf1x3T
-D7tKxBc1/cqoPDAYIxkmiC1FMEXEc/5ArBvkFr4u8nU4YsNM6RPJlW6oJbkhhmVc
-QhJFRZfO0SaHdzigkJ8G09V61PHsynpkEHyOpcYGkOMIZw7EpMDFkTvWwX33pmN/
-3eLcj9soNvZnAj1yaAE9hTemMCc1UDXQxcoRo8WJdRS5jYxSV0Gwt5KBDRiO2JLK
-DsFB4gaqgUjZMc6D5Q+H9g1YLVXrhwKg/QZeamITpifkqxGvoTJNWnG8PaI9FTs0
-RfsvKB/uOP8QSmKTYWL0gkTyhgKnruN/5r6y8fKmiGoMHXL80Y5CadsWGmw8Gf0d
-oMW71ykhdmAPlSZetBddbGEAqqMziWZ+d0XzBFEaccpigzBwno+OoqQzobLbVjK3
-PsVXBgKkO08v0JW+YU9tlLT4tDXBtSg/2O/WY7eBEjwdWBnFd0CS8NJ9IXHJca+2
-82oKvCGhlAVOMRytoUqvQZwP+GgIsF1TvL+RCdtoYOK0JWx3pZQSsW1Ca+LvXj6o
-twZhoux9POryS+LoRd/dL8DXZwsBp5GfqsQ48K4MBzPc5qA5jvCKYp5mynxVjJO3
-J/Lv97oAUfq+D1j/iaom2G8d+ovE+IZWVpMnyhRVFGuXshizutg=
-=relc
------END PGP SIGNATURE-----
-
---qVaTCG8zGF7ndl3e--
+Forest
 
