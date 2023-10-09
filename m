@@ -1,315 +1,532 @@
-Return-Path: <netdev+bounces-39121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13D67BE240
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:14:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D887BE25B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:19:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 447A1281649
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:14:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7580B1C2090B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F71534CC8;
-	Mon,  9 Oct 2023 14:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CAD34CD1;
+	Mon,  9 Oct 2023 14:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="YubBQxj4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4aAdXDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3C6347D4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:14:08 +0000 (UTC)
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc08])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167F7B6
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:14:05 -0700 (PDT)
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S41HG1GJ4zMq7Qt;
-	Mon,  9 Oct 2023 14:14:02 +0000 (UTC)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4S41HF5RRBz3k;
-	Mon,  9 Oct 2023 16:14:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1696860842;
-	bh=IpkqxOB2PQijQ0MhdC+/SKI85AnJq82Q9hXvQV0Df10=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YubBQxj4xcmXT/HMoHP4tMwVzqzd1JcUguChbtiUWK01dA8LvjVjWO6YAxUvclJ7B
-	 6JF7ckmdvSSJjsuKB1M/hwOu7YvrbRUiE0bt0RwfO+hYRGKpGpxuiWziFlj0fUiM9p
-	 iD+OtaLc9sSQBd+Mp9tM4E33Nkt+UFst8ZEcWgU0=
-Date: Mon, 9 Oct 2023 16:13:56 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com
-Subject: Re: [PATCH v12 08/12] landlock: Add network rules and TCP hooks
- support
-Message-ID: <20231009.ja3iephoG7ie@digikod.net>
-References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
- <20230920092641.832134-9-konstantin.meskhidze@huawei.com>
- <20231001.oobeez8AeYae@digikod.net>
- <20231009.meet7uTaeghu@digikod.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B81918043
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:19:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EE53C433C7;
+	Mon,  9 Oct 2023 14:19:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696861165;
+	bh=FuIQJadP9OG6oQv5hRHn7DaK4+yQYHcylPGcT3nyG9s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=X4aAdXDtS1sOYR/ZLyyg1dFbsjs0fE7IexCu+7+YnkAljZr5XrUr7H9InNHWP6z7s
+	 BS/gvEnHpaYjDYpiZKy1s8LmNGnaOMoyivMb2j39RF5mShmXs/wUlF9UzWZF1hpXy6
+	 S7N7KDJY7Zp6H9jn5hCxN2lLK7GkTPiffMqzaZ0+rwZbiB//+3ZssFdnyEP3yrqsmr
+	 SLVR4T/a8DJGDA6JVxfXQh3WBP/Y4RZpCalU4Bp+N412WJQcxR9xC98zG/FOBsb6xp
+	 IfHRcl+R/I4syM4HLZiZh/U9AjsAjsZRpIKIUTXXUn+xGaDhxWHQ1trhGhyulXZesV
+	 MD8ZuaHp1Bb/g==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wpan@vger.kernel.org,
+	Michael Hennerich <michael.hennerich@analog.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	Doug Brown <doug@schmorgal.com>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
+Date: Mon,  9 Oct 2023 16:18:59 +0200
+Message-Id: <20231009141908.1767241-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231009.meet7uTaeghu@digikod.net>
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 04:12:42PM +0200, Mickaël Salaün wrote:
-> On Mon, Oct 02, 2023 at 10:26:36PM +0200, Mickaël Salaün wrote:
-> > Thanks for this new version Konstantin. I pushed this series, with minor
-> > changes, to -next. So far, no warning. But it needs some changes, mostly
-> > kernel-only, but also one with the handling of port 0 with bind (see my
-> > review below).
-> > 
-> > On Wed, Sep 20, 2023 at 05:26:36PM +0800, Konstantin Meskhidze wrote:
-> > > This commit adds network rules support in the ruleset management
-> > > helpers and the landlock_create_ruleset syscall.
-> > > Refactor user space API to support network actions. Add new network
-> > > access flags, network rule and network attributes. Increment Landlock
-> > > ABI version. Expand access_masks_t to u32 to be sure network access
-> > > rights can be stored. Implement socket_bind() and socket_connect()
-> > > LSM hooks, which enables to restrict TCP socket binding and connection
-> > > to specific ports.
-> > > The new landlock_net_port_attr structure has two fields. The allowed_access
-> > > field contains the LANDLOCK_ACCESS_NET_* rights. The port field contains
-> > > the port value according to the allowed protocol. This field can
-> > > take up to a 64-bit value [1] but the maximum value depends on the related
-> > > protocol (e.g. 16-bit for TCP).
-> > > 
-> > > [1]
-> > > https://lore.kernel.org/r/278ab07f-7583-a4e0-3d37-1bacd091531d@digikod.net
-> > > 
-> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > > Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > > ---
-> > > 
-> > > Changes since v11:
-> > > * Replace dates with "2022-2023" in net.c/h files headers.
-> > > * Removes WARN_ON_ONCE(!domain) in check_socket_access().
-> > > * Using "typeof(*address)" instead of offsetofend(struct sockaddr, sa_family).
-> > > * Renames LANDLOCK_RULE_NET_SERVICE to LANDLOCK_RULE_NET_PORT.
-> > > * Renames landlock_net_service_attr to landlock_net_port_attr.
-> > > * Defines two add_rule_net_service() functions according to
-> > >   IS_ENABLED(CONFIG_INET) instead of changing the body of the only
-> > >   function.
-> > > * Adds af_family consistency check while handling AF_UNSPEC specifically.
-> > > * Adds bind_access_mask in add_rule_net_service() to deny all rules with bind
-> > >   action on port zero.
-> > > * Minor fixes.
-> > > * Refactors commit message.
-> > > 
-> > > Changes since v10:
-> > > * Removes "packed" attribute.
-> > > * Applies Mickaёl's patch with some refactoring.
-> > > * Deletes get_port() and check_addrlen() helpers.
-> > > * Refactors check_socket_access() by squashing get_port() and
-> > >   check_addrlen() helpers into it.
-> > > * Fixes commit message.
-> > > 
-> > > Changes since v9:
-> > > * Changes UAPI port field to __u64.
-> > > * Moves shared code into check_socket_access().
-> > > * Adds get_raw_handled_net_accesses() and
-> > >   get_current_net_domain() helpers.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v8:
-> > > * Squashes commits.
-> > > * Refactors commit message.
-> > > * Changes UAPI port field to __be16.
-> > > * Changes logic of bind/connect hooks with AF_UNSPEC families.
-> > > * Adds address length checking.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v7:
-> > > * Squashes commits.
-> > > * Increments ABI version to 4.
-> > > * Refactors commit message.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v6:
-> > > * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
-> > >   because it OR values.
-> > > * Makes landlock_add_net_access_mask() more resilient incorrect values.
-> > > * Refactors landlock_get_net_access_mask().
-> > > * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
-> > >   LANDLOCK_NUM_ACCESS_FS as value.
-> > > * Updates access_masks_t to u32 to support network access actions.
-> > > * Refactors landlock internal functions to support network actions with
-> > >   landlock_key/key_type/id types.
-> > > 
-> > > Changes since v5:
-> > > * Gets rid of partial revert from landlock_add_rule
-> > > syscall.
-> > > * Formats code with clang-format-14.
-> > > 
-> > > Changes since v4:
-> > > * Refactors landlock_create_ruleset() - splits ruleset and
-> > > masks checks.
-> > > * Refactors landlock_create_ruleset() and landlock mask
-> > > setters/getters to support two rule types.
-> > > * Refactors landlock_add_rule syscall add_rule_path_beneath
-> > > function by factoring out get_ruleset_from_fd() and
-> > > landlock_put_ruleset().
-> > > 
-> > > Changes since v3:
-> > > * Splits commit.
-> > > * Adds network rule support for internal landlock functions.
-> > > * Adds set_mask and get_mask for network.
-> > > * Adds rb_root root_net_port.
-> > > 
-> > > ---
-> > >  include/uapi/linux/landlock.h                |  47 ++++
-> > >  security/landlock/Kconfig                    |   3 +-
-> > >  security/landlock/Makefile                   |   2 +
-> > >  security/landlock/limits.h                   |   5 +
-> > >  security/landlock/net.c                      | 241 +++++++++++++++++++
-> > >  security/landlock/net.h                      |  35 +++
-> > >  security/landlock/ruleset.c                  |  62 ++++-
-> > >  security/landlock/ruleset.h                  |  59 ++++-
-> > >  security/landlock/setup.c                    |   2 +
-> > >  security/landlock/syscalls.c                 |  33 ++-
-> > >  tools/testing/selftests/landlock/base_test.c |   2 +-
-> > >  11 files changed, 467 insertions(+), 24 deletions(-)
-> > >  create mode 100644 security/landlock/net.c
-> > >  create mode 100644 security/landlock/net.h
-> > > 
-> 
-> > > diff --git a/security/landlock/net.c b/security/landlock/net.c
-> > > new file mode 100644
-> > > index 000000000000..62b830653e25
-> > > --- /dev/null
-> > > +++ b/security/landlock/net.c
-> > > @@ -0,0 +1,241 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * Landlock LSM - Network management and hooks
-> > > + *
-> > > + * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
-> > > + * Copyright © 2022-2023 Microsoft Corporation
-> > > + */
-> > > +
-> > > +#include <linux/in.h>
-> > > +#include <linux/net.h>
-> > > +#include <linux/socket.h>
-> > > +#include <net/ipv6.h>
-> > > +
-> > > +#include "common.h"
-> > > +#include "cred.h"
-> > > +#include "limits.h"
-> > > +#include "net.h"
-> > > +#include "ruleset.h"
-> > > +
-> > > +int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
-> > > +			     const u16 port, access_mask_t access_rights)
-> > 
-> > This function is only used in add_rule_net_service(), so it should not
-> > be exported, and we can merge it (into landlock_add_rule_net_port).
-> > 
-> > > +{
-> > > +	int err;
-> > > +	const struct landlock_id id = {
-> > > +		.key.data = (__force uintptr_t)htons(port),
-> > > +		.type = LANDLOCK_KEY_NET_PORT,
-> > > +	};
-> > > +
-> > > +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
-> > > +
-> > > +	/* Transforms relative access rights to absolute ones. */
-> > > +	access_rights |= LANDLOCK_MASK_ACCESS_NET &
-> > > +			 ~landlock_get_net_access_mask(ruleset, 0);
-> > > +
-> > > +	mutex_lock(&ruleset->lock);
-> > > +	err = landlock_insert_rule(ruleset, id, access_rights);
-> > > +	mutex_unlock(&ruleset->lock);
-> > > +
-> > > +	return err;
-> > > +}
-> > > +
-> > > +int add_rule_net_service(struct landlock_ruleset *ruleset,
-> > 
-> > We should only export functions with a "landlock_" prefix, and "service"
-> > is now replaced with "port", which gives landlock_add_rule_net_port().
-> > 
-> > For consistency, we should also rename add_rule_path_beneath() into
-> > landlock_add_rule_path_beneath(), move it into fs.c, and merge
-> > landlock_append_fs_rule() into it (being careful to not move the related
-> > code to ease review). This change should be part of the "landlock:
-> > Refactor landlock_add_rule() syscall" patch. Please be careful to keep
-> > the other changes happening in other patches.
-> > 
-> > 
-> > > +			 const void __user *const rule_attr)
-> > > +{
-> > > +	struct landlock_net_port_attr net_port_attr;
-> > > +	int res;
-> > > +	access_mask_t mask, bind_access_mask;
-> > > +
-> > > +	/* Copies raw user space buffer. */
-> > > +	res = copy_from_user(&net_port_attr, rule_attr, sizeof(net_port_attr));
-> > 
-> > We should include <linux/uaccess.h> because of copy_from_user().
-> > 
-> > Same for landlock_add_rule_path_beneath().
-> > 
-> > > +	if (res)
-> > > +		return -EFAULT;
-> > > +
-> > > +	/*
-> > > +	 * Informs about useless rule: empty allowed_access (i.e. deny rules)
-> > > +	 * are ignored by network actions.
-> > > +	 */
-> > > +	if (!net_port_attr.allowed_access)
-> > > +		return -ENOMSG;
-> > > +
-> > > +	/*
-> > > +	 * Checks that allowed_access matches the @ruleset constraints
-> > > +	 * (ruleset->access_masks[0] is automatically upgraded to 64-bits).
-> > > +	 */
-> > > +	mask = landlock_get_net_access_mask(ruleset, 0);
-> > > +	if ((net_port_attr.allowed_access | mask) != mask)
-> > > +		return -EINVAL;
-> > > +
-> > > +	/*
-> > > +	 * Denies inserting a rule with port 0 (for bind action) or
-> > > +	 * higher than 65535.
-> > > +	 */
-> > > +	bind_access_mask = net_port_attr.allowed_access &
-> > > +			   LANDLOCK_ACCESS_NET_BIND_TCP;
-> > > +	if (((net_port_attr.port == 0) &&
-> > > +	     (bind_access_mask == LANDLOCK_ACCESS_NET_BIND_TCP)) ||
-> > > +	    (net_port_attr.port > U16_MAX))
-> > > +		return -EINVAL;
-> > > +
-> > > +	/* Imports the new rule. */
-> > > +	return landlock_append_net_rule(ruleset, net_port_attr.port,
-> > > +					net_port_attr.allowed_access);
-> > > +}
-> 
-> Please ignore the above suggestions. Thinking more about this, let's
-> keep the static add_rule_net_service() in syscalls.c, and only make the
-> inline landlock_add_rule_net_service() return -EAFNOSUPPORT (which is
+From: Arnd Bergmann <arnd@arndb.de>
 
-"inline landlock_append_net_rule()" of course
+The last localtalk driver is gone now, and ppp support was never fully
+merged, so clean up the appletalk code by removing the obvious dead
+code paths.
 
-> already the case with this patch when CONFIG_INET is not set). This will
-> slightly change the current semantic but enable to check all the
-> syscalls arguments even if CONFIG_INET is not set, which is a good thing
-> (and should be reflected in tests). It is better to group all the code
-> handling user space memory copying and ABI specificities in the
-> syscalls.c file. This approach is simpler, it will avoid the exported
-> function issues (e.g. add_rule_net_service), and it will not require
-> more changes to the fs.[ch] files.
+Notably, this removes one of the two callers of the old .ndo_do_ioctl()
+callback that was abused for getting device addresses and is now
+only used in the ieee802154 subsystem, which still uses the same trick.
+
+The include/uapi/linux/if_ltalk.h header might still be required
+for building userspace programs, but I made sure that debian code
+search and the netatalk upstream have no references it it, so it
+should be fine to remove.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/tun.c             |   3 -
+ include/linux/atalk.h         |   1 -
+ include/linux/if_ltalk.h      |   8 ---
+ include/uapi/linux/if_ltalk.h |  10 ----
+ net/appletalk/Makefile        |   2 +-
+ net/appletalk/aarp.c          | 108 +++-------------------------------
+ net/appletalk/ddp.c           |  97 +-----------------------------
+ net/appletalk/dev.c           |  46 ---------------
+ 8 files changed, 11 insertions(+), 264 deletions(-)
+ delete mode 100644 include/linux/if_ltalk.h
+ delete mode 100644 include/uapi/linux/if_ltalk.h
+ delete mode 100644 net/appletalk/dev.c
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 89ab9efe522c3..e11476296e253 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -70,7 +70,6 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/mutex.h>
+ #include <linux/ieee802154.h>
+-#include <linux/if_ltalk.h>
+ #include <uapi/linux/if_fddi.h>
+ #include <uapi/linux/if_hippi.h>
+ #include <uapi/linux/if_fc.h>
+@@ -3059,8 +3058,6 @@ static unsigned char tun_get_addr_len(unsigned short type)
+ 		return ROSE_ADDR_LEN;
+ 	case ARPHRD_NETROM:
+ 		return AX25_ADDR_LEN;
+-	case ARPHRD_LOCALTLK:
+-		return LTALK_ALEN;
+ 	default:
+ 		return 0;
+ 	}
+diff --git a/include/linux/atalk.h b/include/linux/atalk.h
+index a55bfc6567d01..2896f2ac9568e 100644
+--- a/include/linux/atalk.h
++++ b/include/linux/atalk.h
+@@ -121,7 +121,6 @@ static inline struct atalk_iface *atalk_find_dev(struct net_device *dev)
+ #endif
+ 
+ extern struct atalk_addr *atalk_find_dev_addr(struct net_device *dev);
+-extern struct net_device *atrtr_get_dev(struct atalk_addr *sa);
+ extern int		 aarp_send_ddp(struct net_device *dev,
+ 				       struct sk_buff *skb,
+ 				       struct atalk_addr *sa, void *hwaddr);
+diff --git a/include/linux/if_ltalk.h b/include/linux/if_ltalk.h
+deleted file mode 100644
+index 4cc1c0b778700..0000000000000
+--- a/include/linux/if_ltalk.h
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __LINUX_LTALK_H
+-#define __LINUX_LTALK_H
+-
+-#include <uapi/linux/if_ltalk.h>
+-
+-extern struct net_device *alloc_ltalkdev(int sizeof_priv);
+-#endif
+diff --git a/include/uapi/linux/if_ltalk.h b/include/uapi/linux/if_ltalk.h
+deleted file mode 100644
+index fa61e776f598d..0000000000000
+--- a/include/uapi/linux/if_ltalk.h
++++ /dev/null
+@@ -1,10 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+-#ifndef _UAPI__LINUX_LTALK_H
+-#define _UAPI__LINUX_LTALK_H
+-
+-#define LTALK_HLEN		1
+-#define LTALK_MTU		600
+-#define LTALK_ALEN		1
+-
+-
+-#endif /* _UAPI__LINUX_LTALK_H */
+diff --git a/net/appletalk/Makefile b/net/appletalk/Makefile
+index 33164d972d379..152312a151800 100644
+--- a/net/appletalk/Makefile
++++ b/net/appletalk/Makefile
+@@ -5,6 +5,6 @@
+ 
+ obj-$(CONFIG_ATALK) += appletalk.o
+ 
+-appletalk-y			:= aarp.o ddp.o dev.o
++appletalk-y			:= aarp.o ddp.o
+ appletalk-$(CONFIG_PROC_FS)	+= atalk_proc.o
+ appletalk-$(CONFIG_SYSCTL)	+= sysctl_net_atalk.o
+diff --git a/net/appletalk/aarp.c b/net/appletalk/aarp.c
+index 9fa0b246902be..dfcd9f46cb3a6 100644
+--- a/net/appletalk/aarp.c
++++ b/net/appletalk/aarp.c
+@@ -432,49 +432,18 @@ static struct atalk_addr *__aarp_proxy_find(struct net_device *dev,
+ 	return a ? sa : NULL;
+ }
+ 
+-/*
+- * Probe a Phase 1 device or a device that requires its Net:Node to
+- * be set via an ioctl.
+- */
+-static void aarp_send_probe_phase1(struct atalk_iface *iface)
+-{
+-	struct ifreq atreq;
+-	struct sockaddr_at *sa = (struct sockaddr_at *)&atreq.ifr_addr;
+-	const struct net_device_ops *ops = iface->dev->netdev_ops;
+-
+-	sa->sat_addr.s_node = iface->address.s_node;
+-	sa->sat_addr.s_net = ntohs(iface->address.s_net);
+-
+-	/* We pass the Net:Node to the drivers/cards by a Device ioctl. */
+-	if (!(ops->ndo_do_ioctl(iface->dev, &atreq, SIOCSIFADDR))) {
+-		ops->ndo_do_ioctl(iface->dev, &atreq, SIOCGIFADDR);
+-		if (iface->address.s_net != htons(sa->sat_addr.s_net) ||
+-		    iface->address.s_node != sa->sat_addr.s_node)
+-			iface->status |= ATIF_PROBE_FAIL;
+-
+-		iface->address.s_net  = htons(sa->sat_addr.s_net);
+-		iface->address.s_node = sa->sat_addr.s_node;
+-	}
+-}
+-
+-
+ void aarp_probe_network(struct atalk_iface *atif)
+ {
+-	if (atif->dev->type == ARPHRD_LOCALTLK ||
+-	    atif->dev->type == ARPHRD_PPP)
+-		aarp_send_probe_phase1(atif);
+-	else {
+-		unsigned int count;
++	unsigned int count;
+ 
+-		for (count = 0; count < AARP_RETRANSMIT_LIMIT; count++) {
+-			aarp_send_probe(atif->dev, &atif->address);
++	for (count = 0; count < AARP_RETRANSMIT_LIMIT; count++) {
++		aarp_send_probe(atif->dev, &atif->address);
+ 
+-			/* Defer 1/10th */
+-			msleep(100);
++		/* Defer 1/10th */
++		msleep(100);
+ 
+-			if (atif->status & ATIF_PROBE_FAIL)
+-				break;
+-		}
++		if (atif->status & ATIF_PROBE_FAIL)
++			break;
+ 	}
+ }
+ 
+@@ -484,14 +453,6 @@ int aarp_proxy_probe_network(struct atalk_iface *atif, struct atalk_addr *sa)
+ 	struct aarp_entry *entry;
+ 	unsigned int count;
+ 
+-	/*
+-	 * we don't currently support LocalTalk or PPP for proxy AARP;
+-	 * if someone wants to try and add it, have fun
+-	 */
+-	if (atif->dev->type == ARPHRD_LOCALTLK ||
+-	    atif->dev->type == ARPHRD_PPP)
+-		goto out;
+-
+ 	/*
+ 	 * create a new AARP entry with the flags set to be published --
+ 	 * we need this one to hang around even if it's in use
+@@ -549,51 +510,6 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
+ 
+ 	skb_reset_network_header(skb);
+ 
+-	/* Check for LocalTalk first */
+-	if (dev->type == ARPHRD_LOCALTLK) {
+-		struct atalk_addr *at = atalk_find_dev_addr(dev);
+-		struct ddpehdr *ddp = (struct ddpehdr *)skb->data;
+-		int ft = 2;
+-
+-		/*
+-		 * Compressible ?
+-		 *
+-		 * IFF: src_net == dest_net == device_net
+-		 * (zero matches anything)
+-		 */
+-
+-		if ((!ddp->deh_snet || at->s_net == ddp->deh_snet) &&
+-		    (!ddp->deh_dnet || at->s_net == ddp->deh_dnet)) {
+-			skb_pull(skb, sizeof(*ddp) - 4);
+-
+-			/*
+-			 *	The upper two remaining bytes are the port
+-			 *	numbers	we just happen to need. Now put the
+-			 *	length in the lower two.
+-			 */
+-			*((__be16 *)skb->data) = htons(skb->len);
+-			ft = 1;
+-		}
+-		/*
+-		 * Nice and easy. No AARP type protocols occur here so we can
+-		 * just shovel it out with a 3 byte LLAP header
+-		 */
+-
+-		skb_push(skb, 3);
+-		skb->data[0] = sa->s_node;
+-		skb->data[1] = at->s_node;
+-		skb->data[2] = ft;
+-		skb->dev     = dev;
+-		goto sendit;
+-	}
+-
+-	/* On a PPP link we neither compress nor aarp.  */
+-	if (dev->type == ARPHRD_PPP) {
+-		skb->protocol = htons(ETH_P_PPPTALK);
+-		skb->dev = dev;
+-		goto sendit;
+-	}
+-
+ 	/* Non ELAP we cannot do. */
+ 	if (dev->type != ARPHRD_ETHER)
+ 		goto free_it;
+@@ -659,22 +575,12 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
+ out_unlock:
+ 	write_unlock_bh(&aarp_lock);
+ 
+-	/* Tell the ddp layer we have taken over for this frame. */
+-	goto sent;
+-
+-sendit:
+-	if (skb->sk)
+-		skb->priority = READ_ONCE(skb->sk->sk_priority);
+-	if (dev_queue_xmit(skb))
+-		goto drop;
+ sent:
+ 	return NET_XMIT_SUCCESS;
+ free_it:
+ 	kfree_skb(skb);
+-drop:
+ 	return NET_XMIT_DROP;
+ }
+-EXPORT_SYMBOL(aarp_send_ddp);
+ 
+ /*
+  *	An entry in the aarp unresolved queue has become resolved. Send
+diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
+index 8978fb6212ffb..9fe344b08dc8b 100644
+--- a/net/appletalk/ddp.c
++++ b/net/appletalk/ddp.c
+@@ -473,7 +473,7 @@ static struct atalk_route *atrtr_find(struct atalk_addr *target)
+  * Given an AppleTalk network, find the device to use. This can be
+  * a simple lookup.
+  */
+-struct net_device *atrtr_get_dev(struct atalk_addr *sa)
++static struct net_device *atrtr_get_dev(struct atalk_addr *sa)
+ {
+ 	struct atalk_route *atr = atrtr_find(sa);
+ 	return atr ? atr->dev : NULL;
+@@ -683,9 +683,7 @@ static int atif_ioctl(int cmd, void __user *arg)
+ 		if (sa->sat_family != AF_APPLETALK)
+ 			return -EINVAL;
+ 		if (dev->type != ARPHRD_ETHER &&
+-		    dev->type != ARPHRD_LOOPBACK &&
+-		    dev->type != ARPHRD_LOCALTLK &&
+-		    dev->type != ARPHRD_PPP)
++		    dev->type != ARPHRD_LOOPBACK)
+ 			return -EPROTONOSUPPORT;
+ 
+ 		nr = (struct atalk_netrange *)&sa->sat_zero[0];
+@@ -1327,18 +1325,8 @@ static int atalk_route_packet(struct sk_buff *skb, struct net_device *dev,
+ 	 * Don't route multicast, etc., packets, or packets sent to "this
+ 	 * network"
+ 	 */
+-	if (skb->pkt_type != PACKET_HOST || !ddp->deh_dnet) {
+-		/*
+-		 * FIXME:
+-		 *
+-		 * Can it ever happen that a packet is from a PPP iface and
+-		 * needs to be broadcast onto the default network?
+-		 */
+-		if (dev->type == ARPHRD_PPP)
+-			printk(KERN_DEBUG "AppleTalk: didn't forward broadcast "
+-					  "packet received from PPP iface\n");
++	if (skb->pkt_type != PACKET_HOST || !ddp->deh_dnet)
+ 		goto free_it;
+-	}
+ 
+ 	ta.s_net  = ddp->deh_dnet;
+ 	ta.s_node = ddp->deh_dnode;
+@@ -1508,64 +1496,6 @@ static int atalk_rcv(struct sk_buff *skb, struct net_device *dev,
+ 
+ }
+ 
+-/*
+- * Receive a LocalTalk frame. We make some demands on the caller here.
+- * Caller must provide enough headroom on the packet to pull the short
+- * header and append a long one.
+- */
+-static int ltalk_rcv(struct sk_buff *skb, struct net_device *dev,
+-		     struct packet_type *pt, struct net_device *orig_dev)
+-{
+-	if (!net_eq(dev_net(dev), &init_net))
+-		goto freeit;
+-
+-	/* Expand any short form frames */
+-	if (skb_mac_header(skb)[2] == 1) {
+-		struct ddpehdr *ddp;
+-		/* Find our address */
+-		struct atalk_addr *ap = atalk_find_dev_addr(dev);
+-
+-		if (!ap || skb->len < sizeof(__be16) || skb->len > 1023)
+-			goto freeit;
+-
+-		/* Don't mangle buffer if shared */
+-		if (!(skb = skb_share_check(skb, GFP_ATOMIC)))
+-			return 0;
+-
+-		/*
+-		 * The push leaves us with a ddephdr not an shdr, and
+-		 * handily the port bytes in the right place preset.
+-		 */
+-		ddp = skb_push(skb, sizeof(*ddp) - 4);
+-
+-		/* Now fill in the long header */
+-
+-		/*
+-		 * These two first. The mac overlays the new source/dest
+-		 * network information so we MUST copy these before
+-		 * we write the network numbers !
+-		 */
+-
+-		ddp->deh_dnode = skb_mac_header(skb)[0];     /* From physical header */
+-		ddp->deh_snode = skb_mac_header(skb)[1];     /* From physical header */
+-
+-		ddp->deh_dnet  = ap->s_net;	/* Network number */
+-		ddp->deh_snet  = ap->s_net;
+-		ddp->deh_sum   = 0;		/* No checksum */
+-		/*
+-		 * Not sure about this bit...
+-		 */
+-		/* Non routable, so force a drop if we slip up later */
+-		ddp->deh_len_hops = htons(skb->len + (DDP_MAXHOPS << 10));
+-	}
+-	skb_reset_transport_header(skb);
+-
+-	return atalk_rcv(skb, dev, pt, orig_dev);
+-freeit:
+-	kfree_skb(skb);
+-	return 0;
+-}
+-
+ static int atalk_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -1935,22 +1865,8 @@ static struct notifier_block ddp_notifier = {
+ 	.notifier_call	= ddp_device_event,
+ };
+ 
+-static struct packet_type ltalk_packet_type __read_mostly = {
+-	.type		= cpu_to_be16(ETH_P_LOCALTALK),
+-	.func		= ltalk_rcv,
+-};
+-
+-static struct packet_type ppptalk_packet_type __read_mostly = {
+-	.type		= cpu_to_be16(ETH_P_PPPTALK),
+-	.func		= atalk_rcv,
+-};
+-
+ static unsigned char ddp_snap_id[] = { 0x08, 0x00, 0x07, 0x80, 0x9B };
+ 
+-/* Export symbols for use by drivers when AppleTalk is a module */
+-EXPORT_SYMBOL(atrtr_get_dev);
+-EXPORT_SYMBOL(atalk_find_dev_addr);
+-
+ /* Called by proto.c on kernel start up */
+ static int __init atalk_init(void)
+ {
+@@ -1971,9 +1887,6 @@ static int __init atalk_init(void)
+ 		goto out_sock;
+ 	}
+ 
+-	dev_add_pack(&ltalk_packet_type);
+-	dev_add_pack(&ppptalk_packet_type);
+-
+ 	rc = register_netdevice_notifier(&ddp_notifier);
+ 	if (rc)
+ 		goto out_snap;
+@@ -1998,8 +1911,6 @@ static int __init atalk_init(void)
+ out_dev:
+ 	unregister_netdevice_notifier(&ddp_notifier);
+ out_snap:
+-	dev_remove_pack(&ppptalk_packet_type);
+-	dev_remove_pack(&ltalk_packet_type);
+ 	unregister_snap_client(ddp_dl);
+ out_sock:
+ 	sock_unregister(PF_APPLETALK);
+@@ -2026,8 +1937,6 @@ static void __exit atalk_exit(void)
+ 	atalk_proc_exit();
+ 	aarp_cleanup_module();	/* General aarp clean-up. */
+ 	unregister_netdevice_notifier(&ddp_notifier);
+-	dev_remove_pack(&ltalk_packet_type);
+-	dev_remove_pack(&ppptalk_packet_type);
+ 	unregister_snap_client(ddp_dl);
+ 	sock_unregister(PF_APPLETALK);
+ 	proto_unregister(&ddp_proto);
+diff --git a/net/appletalk/dev.c b/net/appletalk/dev.c
+deleted file mode 100644
+index 284c8e585533a..0000000000000
+--- a/net/appletalk/dev.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * Moved here from drivers/net/net_init.c, which is:
+- *	Written 1993,1994,1995 by Donald Becker.
+- */
+-
+-#include <linux/errno.h>
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/if_arp.h>
+-#include <linux/if_ltalk.h>
+-
+-static void ltalk_setup(struct net_device *dev)
+-{
+-	/* Fill in the fields of the device structure with localtalk-generic values. */
+-
+-	dev->type		= ARPHRD_LOCALTLK;
+-	dev->hard_header_len 	= LTALK_HLEN;
+-	dev->mtu		= LTALK_MTU;
+-	dev->addr_len		= LTALK_ALEN;
+-	dev->tx_queue_len	= 10;
+-
+-	dev->broadcast[0]	= 0xFF;
+-
+-	dev->flags		= IFF_BROADCAST|IFF_MULTICAST|IFF_NOARP;
+-}
+-
+-/**
+- * alloc_ltalkdev - Allocates and sets up an localtalk device
+- * @sizeof_priv: Size of additional driver-private structure to be allocated
+- *	for this localtalk device
+- *
+- * Fill in the fields of the device structure with localtalk-generic
+- * values. Basically does everything except registering the device.
+- *
+- * Constructs a new net device, complete with a private data area of
+- * size @sizeof_priv.  A 32-byte (not bit) alignment is enforced for
+- * this private data area.
+- */
+-
+-struct net_device *alloc_ltalkdev(int sizeof_priv)
+-{
+-	return alloc_netdev(sizeof_priv, "lt%d", NET_NAME_UNKNOWN,
+-			    ltalk_setup);
+-}
+-EXPORT_SYMBOL(alloc_ltalkdev);
+-- 
+2.39.2
+
 
