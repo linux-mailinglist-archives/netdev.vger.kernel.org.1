@@ -1,75 +1,76 @@
-Return-Path: <netdev+bounces-38988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E93487BD55B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:39:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 623D17BD574
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A392B281566
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:39:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 215C81C20BAA
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404D91C05;
-	Mon,  9 Oct 2023 08:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E45800;
+	Mon,  9 Oct 2023 08:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E8617D1
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:39:35 +0000 (UTC)
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08BC9F
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 01:39:31 -0700 (PDT)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-59e77e4f707so51823477b3.0
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 01:39:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1682569
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:44:12 +0000 (UTC)
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D511A9F;
+	Mon,  9 Oct 2023 01:44:10 -0700 (PDT)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-5a24b03e22eso51936107b3.0;
+        Mon, 09 Oct 2023 01:44:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696840770; x=1697445570;
+        d=1e100.net; s=20230601; t=1696841050; x=1697445850;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XCa60SJYenNTin9ORA6mgu5HPNBKWXiBobv0OFeXlBg=;
-        b=u4WK83eu7MWra8cOsdEnL6EpNn4X5bV+t/yNg3sqTcwyWhHLlPIv8h/ejB9dHiaJEL
-         ARZU5VfCiDVid2xuej3NkUnqGAqca6nYrtAwggFvpHTcsW56qau9zOLwzbK8q5v80ggM
-         kONskClwPcT/ANDahajPuzDqv/xG+clF9yi7Euv53R3KIz2qF5SZ3nj/VlnscFJEPvaP
-         6052C81DS4uDfEChx2UpeEjQqQzvrrDBJwGT0vQ2kphowe7FV0xLGLbc9tmEg8uO58Ze
-         4aYir5bRBhUqTKupuVEzYtgwwBOfcflfhkY9VozAXJWjmCdHfi9mX93sekZ6bV/D5BQh
-         jlzw==
-X-Gm-Message-State: AOJu0Yz/Fbhre6zjFEIPhQmk8wTTx7WcN5k40yVLTWYup1p9pu4MNh80
-	WyIMFvIkkpw3fAy0r5Q2qTjBPmLVUp7cfw==
-X-Google-Smtp-Source: AGHT+IH/3sVVL9wClH2FXxcNUZmScKisC42yZA6rBHo9GprEuATpWF9LKOpcfT08lH76BfBlZ1gE6w==
-X-Received: by 2002:a05:690c:2c8a:b0:5a5:756:44f4 with SMTP id ep10-20020a05690c2c8a00b005a5075644f4mr10564325ywb.22.1696840770694;
-        Mon, 09 Oct 2023 01:39:30 -0700 (PDT)
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com. [209.85.128.182])
-        by smtp.gmail.com with ESMTPSA id w205-20020a817bd6000000b00565271801b6sm3563819ywc.59.2023.10.09.01.39.29
-        for <netdev@vger.kernel.org>
+        bh=dqNLFjHn3fj/AL0iMyf/yawddLiaq23Wu30A3Gzqckk=;
+        b=VldaOQR2KU1z5rwLoL5pL0p8YtloH1Pdnj0mceiTSwWnJ3CI6EQfL5szgXgaFbA7Rw
+         4XXbZ/AZtaUN+dDFhYE/ny1pD2COcKpxRG6ji/nmSj9Uf5Fpkntc0Pi5T8z6ovbts8t3
+         mJBCrwVkhAcCi5Moh/4s0AaayEZVwioNLnsbPPuLnmUkEfdv3nM9qFvnGYsBVdEyBppZ
+         Reunls63fC4EBw3ccwgQit15jTxM26XPY8Fw1CwZ9RLL+qlRx70OdopgwzQq5US8/Asj
+         nhFhYT5VXUJm+zlbk9PDgqhcntV0y4JHTHS2BIOY7dcrod4qh0xbvdFZrmlmn0CfzeSX
+         1U5A==
+X-Gm-Message-State: AOJu0YykNubSyb4opUJkMU/IOgNCUai0xT5SrpVijvZOF4zKe+DdQcAP
+	K2d/B/61zl9zW6Zo52eGr4SlmYv1NGavwQ==
+X-Google-Smtp-Source: AGHT+IGs4YBv6PzYrO+Rg9N2PtnM6DnTq+DL8LuBqkf+/JrAHBEJf5ZNe3F461oa96k1Chk2MuPjsA==
+X-Received: by 2002:a81:4fc9:0:b0:599:da80:e1eb with SMTP id d192-20020a814fc9000000b00599da80e1ebmr16645135ywb.24.1696841049848;
+        Mon, 09 Oct 2023 01:44:09 -0700 (PDT)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
+        by smtp.gmail.com with ESMTPSA id z204-20020a0dd7d5000000b0058c8b1ddcc1sm3533084ywd.15.2023.10.09.01.44.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 01:39:30 -0700 (PDT)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5a2536adaf3so51601977b3.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 01:39:29 -0700 (PDT)
-X-Received: by 2002:a0d:d443:0:b0:5a2:3734:507 with SMTP id
- w64-20020a0dd443000000b005a237340507mr16135074ywd.21.1696840769802; Mon, 09
- Oct 2023 01:39:29 -0700 (PDT)
+        Mon, 09 Oct 2023 01:44:09 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-59c215f2f4aso51865307b3.1;
+        Mon, 09 Oct 2023 01:44:09 -0700 (PDT)
+X-Received: by 2002:a0d:d808:0:b0:59b:d796:2a55 with SMTP id
+ a8-20020a0dd808000000b0059bd7962a55mr17521321ywe.1.1696841049412; Mon, 09 Oct
+ 2023 01:44:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009074121.219686-1-hch@lst.de>
-In-Reply-To: <20231009074121.219686-1-hch@lst.de>
+References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-2-hch@lst.de>
+In-Reply-To: <20231009074121.219686-2-hch@lst.de>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 9 Oct 2023 10:39:18 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdU281a+=9SApaCRy5os3k73HGZhQ=Fsv58OD4C430iDDg@mail.gmail.com>
-Message-ID: <CAMuHMdU281a+=9SApaCRy5os3k73HGZhQ=Fsv58OD4C430iDDg@mail.gmail.com>
-Subject: Re: fix the non-coherent coldfire dma_alloc_coherent
+Date: Mon, 9 Oct 2023 10:43:57 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
+Message-ID: <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] dma-direct: add depdenencies to CONFIG_DMA_GLOBAL_POOL
 To: Christoph Hellwig <hch@lst.de>
 Cc: iommu@lists.linux.dev, Robin Murphy <robin.murphy@arm.com>, 
 	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
 	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
 	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>, Greg Ungerer <gerg@linux-m68k.org>
+	Jim Quinlan <james.quinlan@broadcom.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
+	Linux-Renesas <linux-renesas-soc@vger.kernel.org>, 
+	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
@@ -79,24 +80,45 @@ X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-CC Greg
+Hi Christoph,
 
 On Mon, Oct 9, 2023 at 9:41=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrote=
 :
-> this is the next attempt to not return memory that is not DMA coherent
-> on coldfire/m68knommu.  The last one needed more fixups in the fec
-> driver, which this versions includes.  On top of that I've also added
-> a few more cleanups to the core dma allocation code.
+> CONFIG_DMA_GLOBAL_POOL can't be combined with other dma-coherent
+> allocators.  Add dependencies to Kconfig to document this, and make
+> kconfig complain about unment dependencies if someone tries.
 >
-> Jim: any work to support the set_uncached and remap method for arm32
-> should probably be based on this, and patch 3 should make that
-> selection a little easier.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+Thanks for your patch!
+
+> --- a/kernel/dma/Kconfig
+> +++ b/kernel/dma/Kconfig
+> @@ -135,6 +135,8 @@ config DMA_COHERENT_POOL
+>
+>  config DMA_GLOBAL_POOL
+>         select DMA_DECLARE_COHERENT
+> +       depends on !ARCH_HAS_DMA_SET_UNCACHED
+> +       depends on !DMA_DIRECT_REMAP
+>         bool
+>
+>  config DMA_DIRECT_REMAP
+
+riscv defconfig + CONFIG_NONPORTABLE=3Dy + CONFIG_ARCH_R9A07G043=3Dy:
+
+WARNING: unmet direct dependencies detected for DMA_GLOBAL_POOL
+  Depends on [n]: !ARCH_HAS_DMA_SET_UNCACHED [=3Dn] && !DMA_DIRECT_REMAP [=
+=3Dy]
+  Selected by [y]:
+  - ARCH_R9A07G043 [=3Dy] && SOC_RENESAS [=3Dy] && RISCV [=3Dy] && NONPORTA=
+BLE [=3Dy]
 
 Gr{oetje,eeting}s,
 
                         Geert
 
---=20
+
+--
 Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
 .org
 
