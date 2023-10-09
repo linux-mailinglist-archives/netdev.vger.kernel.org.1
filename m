@@ -1,103 +1,114 @@
-Return-Path: <netdev+bounces-39104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B787BE0F9
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:46:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA30D7BE140
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E0D12816AF
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:46:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 711C52816CC
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9D73419F;
-	Mon,  9 Oct 2023 13:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D1B341AC;
+	Mon,  9 Oct 2023 13:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="AzOPLoio"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUT2ZZjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF90328DB;
-	Mon,  9 Oct 2023 13:45:59 +0000 (UTC)
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BCD18C;
-	Mon,  9 Oct 2023 06:45:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1696859154; x=1697118354;
-	bh=dMqUwSLa3SeTGCAa8eakRnHMOOm1x+jefSWxaCHBezk=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=AzOPLoioSLo6ddt3m++0elqtw7Jr2zWtsUel59v4aY3w1XOzmZ+fwmuAR2P2wf9pX
-	 2WZrUiD7qM7MwLuNXhzUQLnzASUBu2nE9tG9XfbIBI1Yhgt1ssSsPSBVgWDllqmbjd
-	 aVmvCyATXMIBOqgbXzETn49HBleO2A1ypTeNS9ozvupzQpCxd+TL+Lw+X26A0vbuMj
-	 ZF2GDYECNluuOH/9LCgW3mEuUUIxK1O/qkelzDTfDrXLAYqB0TJaon1AOOFXrzLBdM
-	 LjN92vk2XnBo751Qs3+QtQKop588hro4LVrB6z2P2bzId6WaMzmaWl/hgfyAYaQ4KC
-	 I8IslWA7/5Sew==
-Date: Mon, 09 Oct 2023 13:45:49 +0000
-To: Andrew Lunn <andrew@lunn.ch>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com, greg@kroah.com, tmgross@umich.edu
-Subject: Re: [PATCH net-next v3 3/3] net: phy: add Rust Asix PHY driver
-Message-ID: <803e270b-7123-0ebd-439a-6eb0cece1373@proton.me>
-In-Reply-To: <97058377-fd92-4315-9094-d1a4179d43fa@lunn.ch>
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com> <20231009013912.4048593-4-fujita.tomonori@gmail.com> <3dafc9f4-f371-a3d8-1d11-1b452b1c227e@proton.me> <97058377-fd92-4315-9094-d1a4179d43fa@lunn.ch>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA78F341A4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:48:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8CECC433C8;
+	Mon,  9 Oct 2023 13:48:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696859314;
+	bh=+HSuQE4uwcv/S7v9Nu+yPUKMpHFCIut7bedSD0CoE+8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tUT2ZZjjoyKrHy9spdRqLkKumZ59dlMndP1ekBAykHym+I9g1k39CRcqUXSeoVTqo
+	 Z3xuUbY7mXsnOwgIi7yBQdMycUPRHFK35wzu94NkC9wXqe/ov4uMJ3UABP+2vXkI9y
+	 UgteuuzSZhHsyo0DlcXKeFIzGGvj/2vjsvHXPD0PwUMqWZvXMU8qPTz9T5yoCbeEDu
+	 R1dUaGDrRW5kAPCebPaeAyyc3t1SX9N6IF0/VFFSi5q/r7GjWPMHOv9zDuGbTtPEas
+	 H4u/mTKT2CY5C6k5UY61G0i73TUhMGHtV5AmPgywk6CReOKL866HVwmyoAJWy+ZG2L
+	 S4CgJoKX+MF3A==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Lee, Chun-Yi" <jlee@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
+	Lee@web.codeaurora.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	stable@vger.kernel.org, Iulia Tanasescu <iulia.tanasescu@nxp.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Date: Mon,  9 Oct 2023 15:48:19 +0200
+Message-Id: <20231009134826.1063869-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On 09.10.23 15:15, Andrew Lunn wrote:
->>> +        if ret as u32 & uapi::BMCR_SPEED100 !=3D 0 {
->>> +            dev.set_speed(uapi::SPEED_100);
->>> +        } else {
->>> +            dev.set_speed(uapi::SPEED_10);
->>> +        }
->>
->> Maybe refactor to only have one `dev.set_speed` call?
->=20
-> This is a common pattern in the C code. This is basically a
-> re-implementation of
->=20
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/phy_device=
-.c#L2432
->=20
-> because this PHY is broken. Being one of the maintainers of the PHY
-> subsystem, it helps me review this code if it happens to look like the
-> existing code it is adding a workaround to.
->=20
-> Is there a Rust reason to only have one call?
+From: Arnd Bergmann <arnd@arndb.de>
 
-My reason was consistency, since the call to `set_duplex`
-below that was changed to only have one call:
+These functions are simple wrappers around memcmp() and memcpy(), which
+contain compile-time checks for buffer overflow. Something in gcc-13 and
+likely other versions makes this trigger a warning when the functions
+are not inlined and the compiler misunderstands the buffer length:
 
-+        let duplex =3D if ret as u32 & uapi::BMCR_FULLDPLX !=3D 0 {
-+            phy::DuplexMode::Full
-+        } else {
-+            phy::DuplexMode::Half
-+        };
-+        dev.set_duplex(duplex);
+In file included from net/bluetooth/hci_event.c:32:
+In function 'bacmp',
+    inlined from 'hci_conn_request_evt' at net/bluetooth/hci_event.c:3276:7:
+include/net/bluetooth/bluetooth.h:364:16: error: 'memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+  364 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-I think it should be consistent, I chose to reduce the number of
-function calls, since it is immediately obvious that only the argument
-is depending on the condition. But if you think it should mirror the C
-side, then maybe change the duplex back to calling twice?
+Use the __always_inline annotation to ensure that the helpers are
+correctly checked. This has no effect on the actual correctness
+of the code, but avoids the warning. Since the patch that introduced
+the warning is marked for stable backports, this one should also
+go that way to avoid introducing build regressions.
 
---=20
-Cheers,
-Benno
+Fixes: d70e44fef8621 ("Bluetooth: Reject connection with the device which has same BD_ADDR")
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Lee, Chun-Yi <jlee@suse.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ include/net/bluetooth/bluetooth.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 7ffa8c192c3f2..27ee1bf51c235 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -359,11 +359,11 @@ static inline bool bdaddr_type_is_le(u8 type)
+ #define BDADDR_NONE (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
+ 
+ /* Copy, swap, convert BD Address */
+-static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
++static __always_inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
+ {
+ 	return memcmp(ba1, ba2, sizeof(bdaddr_t));
+ }
+-static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
++static __always_inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
+ {
+ 	memcpy(dst, src, sizeof(bdaddr_t));
+ }
+-- 
+2.39.2
 
 
