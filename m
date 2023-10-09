@@ -1,79 +1,157 @@
-Return-Path: <netdev+bounces-39238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C1E7BE66E
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:31:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F125F7BE67F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6120281591
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56AE281747
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EA81FC6;
-	Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3866A10A1E;
+	Mon,  9 Oct 2023 16:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fz2BZs33"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ExJqmyPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DC0A93D
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95873C433CB;
-	Mon,  9 Oct 2023 16:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696869090;
-	bh=oyRfyginZSVS30jDs8Ex2jwGfxU5fIbT3YRXKcD3Db0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fz2BZs33QzBXnkWSiMf9nL1iT0mhaBzsO35T411awbBw3kM50b/xHY1gtyz3NJnqY
-	 97Fb78tfD67Sl+Ptpx16OqAmrfNBKOoffec0UgI7H2rWj299+sZx/6HHPZpKFOAWy/
-	 8kzqFk4l8fG8Lbp5xws9YxilheDZgKUFkDIKYgm4Qgc/5zODLgEiu1I3w1DXBx5NC8
-	 Z4D9oN8Syo4kSmMbmefl5dbgGFWN+iMeWxuNblJOuHlW6YVu0bno3VfQhbdy0Ya1GI
-	 Is8BdWWky+a1sDPsvl53TkM3Y43nULvlpPhHX4vE9IAbfrkS55GDgX7x06Ceu29EpZ
-	 r8nq4ok/2cuzw==
-Date: Mon, 9 Oct 2023 09:31:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, gal@nvidia.com
-Subject: Re: [patch net-next] devlink: don't take instance lock for nested
- handle put
-Message-ID: <20231009093129.377167bb@kernel.org>
-In-Reply-To: <ZSQeNxmoual7ewcl@nanopsycho>
-References: <20231003074349.1435667-1-jiri@resnulli.us>
-	<20231005183029.32987349@kernel.org>
-	<ZR+1mc/BEDjNQy9A@nanopsycho>
-	<20231006074842.4908ead4@kernel.org>
-	<ZSA+1qA6gNVOKP67@nanopsycho>
-	<20231006151446.491b5965@kernel.org>
-	<ZSEwO+1pLuV6F6K/@nanopsycho>
-	<20231009081532.07e902d4@kernel.org>
-	<ZSQeNxmoual7ewcl@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDD11A733
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:35:24 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC55199;
+	Mon,  9 Oct 2023 09:35:22 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-59f6492b415so40738947b3.0;
+        Mon, 09 Oct 2023 09:35:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696869322; x=1697474122; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RsC4B5mELowhLCBdNvaIf+LwPDrz+keu3BL55c6ZynM=;
+        b=ExJqmyPw90udlhP9ASCiGzsxkcH1bmj/pFkmFimTNIWolKEOyNgnO/qXv0eV8+4R7z
+         iqyUl0kMrGbZTYcKpIpF2g4heBKnctCerXdpJxAv8pjL494Ot2gkpHQViTCeZt86tzE9
+         W4hN9db0w+WEJqet2eJSXwiT9Tjd65XtUkV1mRKRSDle/mRWSf913iGF3Rn3Yvi+exJp
+         qip12KbjRfgwYzRYk2lqYO+TatV89d2eds7K85kBTUUA+YcDtN399zBxcMrWIbuUioi5
+         KFhyVw03c4xGGOA5WL1icXbnIauewBLB4zy2LIQNlAXZQAlnDSsJcrQeYntJUnmjOWUg
+         YeBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696869322; x=1697474122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RsC4B5mELowhLCBdNvaIf+LwPDrz+keu3BL55c6ZynM=;
+        b=irDJwMC+muHoPJ4CKoWycFO9hnMoyOqEyVj4gDY7VkEGSJsf8c5xgs8l74R1AXGA3c
+         vYT3zL1pWKuNIfLdoxsNyyKH0vKSdaUThADTgmAuuaOHPmKkqRogF+RlpB4m4nriCyab
+         8/62Z//8MpIJuAsKC5RKXJE3xVNWOwpIPrUToR7TGTMwgoTse7u1eBs2zVJNwHQnGewI
+         SWb4Xi1PvEjuwu0sJguetHVVB4BT9+beZ6HXfiyqBpbbqj/Tx7sZsN5yqQ5A9Xrnv54n
+         U9Mc91SFhvnormMfrxoW+HUun5cH00QT1BFEFlTv6w7pQ6eLhdv/QSnjlQcKiG9ozqfK
+         7qyQ==
+X-Gm-Message-State: AOJu0YygAEwQd6Mq8M5bdikXutV1oggZzFDj2+gs8+lf7EYzUEg1NHDo
+	dX4axM0iylMf5Kal1HLNP4U=
+X-Google-Smtp-Source: AGHT+IFsvzJ6MeZI8r2v1L+4g/jHEVPfPdzddzGB/p3atEyZSUf9/4/r7GGX68WKl3pdJXGPfRRxWA==
+X-Received: by 2002:a81:a1c2:0:b0:5a4:dde3:6db5 with SMTP id y185-20020a81a1c2000000b005a4dde36db5mr8226753ywg.10.1696869321805;
+        Mon, 09 Oct 2023 09:35:21 -0700 (PDT)
+Received: from localhost ([2607:fb90:be22:da0:a050:8c3a:c782:514b])
+        by smtp.gmail.com with ESMTPSA id s7-20020a817707000000b005707fb5110bsm3798669ywc.58.2023.10.09.09.35.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 09:35:21 -0700 (PDT)
+Date: Mon, 9 Oct 2023 09:35:20 -0700
+From: Yury Norov <yury.norov@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Alexander Potapenko <glider@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
+	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/14] s390/cio: rename bitmap_size() ->
+ idset_bitmap_size()
+Message-ID: <ZSQryML6+uySSQ55@yury-ThinkPad>
+References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
+ <20231009151026.66145-6-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009151026.66145-6-aleksander.lobakin@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 9 Oct 2023 17:37:27 +0200 Jiri Pirko wrote:
-> >I think kernel assuming that this should not happen and requiring 
-> >the PF driver to work around potentially stupid FW designs should
-> >be entirely without our rights.  
+On Mon, Oct 09, 2023 at 05:10:17PM +0200, Alexander Lobakin wrote:
+> bitmap_size() is a pretty generic name and one may want to use it for
+> a generic bitmap API function. At the same time, its logic is not
+> "generic", i.e. it's not just `nbits -> size of bitmap in bytes`
+> converter as it would be expected from its name.
+> Add the prefix 'idset_' used throughout the file where the function
+> resides.
+
+At the first glance, this custom implementation just duplicates the
+generic one that you introduce in the following patch. If so, why
+don't you switch idset to just use generic bitmap_size()?
+
 > 
-> But why is it stupid? The SF may be spawned on the same host, but it
-> could be spawned on another one. The FW creates SF internally and shows
-> that to the kernel. Symetrically, the FW is asked to remove SF and it
-> tells to the host that the SF is going away. Flows have to go
-> through FW.
-
-In Linux the PF is what controls the SFs, right?
-Privileges, configuration/admin, resource control.
-How can the parent disappear and children still exist.
-
-You can make it work with putting the proprietary FW in the center.
-But Linux as a project has its own objectives.
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+> idset_new() really wants its vmalloc() + memset() pair to be replaced
+> with vzalloc().
+> ---
+>  drivers/s390/cio/idset.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/idset.c b/drivers/s390/cio/idset.c
+> index 45f9c0736be4..0a1105a483bf 100644
+> --- a/drivers/s390/cio/idset.c
+> +++ b/drivers/s390/cio/idset.c
+> @@ -16,7 +16,7 @@ struct idset {
+>  	unsigned long bitmap[];
+>  };
+>  
+> -static inline unsigned long bitmap_size(int num_ssid, int num_id)
+> +static inline unsigned long idset_bitmap_size(int num_ssid, int num_id)
+>  {
+>  	return BITS_TO_LONGS(num_ssid * num_id) * sizeof(unsigned long);
+>  }
+> @@ -25,11 +25,12 @@ static struct idset *idset_new(int num_ssid, int num_id)
+>  {
+>  	struct idset *set;
+>  
+> -	set = vmalloc(sizeof(struct idset) + bitmap_size(num_ssid, num_id));
+> +	set = vmalloc(sizeof(struct idset) +
+> +		      idset_bitmap_size(num_ssid, num_id));
+>  	if (set) {
+>  		set->num_ssid = num_ssid;
+>  		set->num_id = num_id;
+> -		memset(set->bitmap, 0, bitmap_size(num_ssid, num_id));
+> +		memset(set->bitmap, 0, idset_bitmap_size(num_ssid, num_id));
+>  	}
+>  	return set;
+>  }
+> @@ -41,7 +42,8 @@ void idset_free(struct idset *set)
+>  
+>  void idset_fill(struct idset *set)
+>  {
+> -	memset(set->bitmap, 0xff, bitmap_size(set->num_ssid, set->num_id));
+> +	memset(set->bitmap, 0xff,
+> +	       idset_bitmap_size(set->num_ssid, set->num_id));
+>  }
+>  
+>  static inline void idset_add(struct idset *set, int ssid, int id)
+> -- 
+> 2.41.0
 
