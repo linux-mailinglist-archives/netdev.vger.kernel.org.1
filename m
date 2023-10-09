@@ -1,265 +1,194 @@
-Return-Path: <netdev+bounces-39248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA5C7BE753
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:04:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 493247BE779
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:12:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB06A1C20919
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:04:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D210F2818BD
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCCE347D0;
-	Mon,  9 Oct 2023 17:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E0C347D0;
+	Mon,  9 Oct 2023 17:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6jLv5cd"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UdBaLU12"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380EA347A1
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:04:21 +0000 (UTC)
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96E2AE0;
-	Mon,  9 Oct 2023 10:04:19 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5a200028437so59285467b3.1;
-        Mon, 09 Oct 2023 10:04:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66CA518E28
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:12:47 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8750094
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:12:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696871059; x=1697475859; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GrtA6lKuYWUe++j58BXstURMH0ObpUyX8a0STO/sotc=;
-        b=K6jLv5cdIQU+SaHszFfqY1VFnxkSC3nwghT0YoNrHAE0NRDR7mpix5d+HXaQU17Lk0
-         06BDVP47MPdCpLivJciHNdpJKrJU+3UgNY+ZaFDYEsX7t0S/lHAgmAJbjzVYdxPosgdc
-         jDXGgrtorFpN8Xuft8/7ZFP0PRqXhmCSWw35z60A+BB6l+zfr2iUjQIOxNfsGLFMv6Dl
-         bE2czH9gv2BbpuB/2tQCH1UyxC9BhVA+XVM0dcRiIY8NZtK3MepgiTQO8Bm5divKxVbT
-         UgMtWE4PnqoKIyh45djGZ2OsvPavSS9u3eP6lW6HMoz8y3xpiurw4S76YKuhmcxr4AsR
-         BIlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696871059; x=1697475859;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GrtA6lKuYWUe++j58BXstURMH0ObpUyX8a0STO/sotc=;
-        b=vDEYQ7xDJksEXZmSEP2IsSjXR68hzcNxTEt305bPOCqk83aCsLmvP+PHcsWaOY0Gys
-         M3XIFBY6lgcSAjQawBpEEDZxlJNejE2Mpv10V3BU/rsXpo6Af9pVe3/m+ukX77xfpqL1
-         yDsz0koSygjyC7EzU/qXNak5CqXXBf0IB3OfKMGUwaZaXl2/1izw+0tPEUmixOmopPOB
-         XL/ZGZSEBaemI8RDgLfZxYrLU8YTqv5LpZidh88gWPozD15wfFqF/gdveOhdkzeOKWsL
-         yZAvH/JFJ9mEu4KmnD4l4r1cmzjRpnYGdFkjd6g9Ch7WYwfwTH7xa1r9cK0fm1xHLvN4
-         E6hg==
-X-Gm-Message-State: AOJu0Yyzb0HR1tIwalnFmUcTKyipL53GOgHOkSXjx7Nu309gaxcj+EOF
-	Y4v8MOuwqpDI+WpakKn4iOk=
-X-Google-Smtp-Source: AGHT+IFCaKLUIQtaVFO6RZQ7mzNkB38jHP0WXbG7WaO+K53JI2BYGR30cn9swjnv1mxH93LfVRqHVw==
-X-Received: by 2002:a0d:f542:0:b0:59f:5361:d18c with SMTP id e63-20020a0df542000000b0059f5361d18cmr15848023ywf.41.1696871058634;
-        Mon, 09 Oct 2023 10:04:18 -0700 (PDT)
-Received: from localhost ([2607:fb90:be22:da0:a050:8c3a:c782:514b])
-        by smtp.gmail.com with ESMTPSA id g192-20020a0dddc9000000b0054bfc94a10dsm3799789ywe.47.2023.10.09.10.04.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 10:04:18 -0700 (PDT)
-Date: Mon, 9 Oct 2023 10:04:16 -0700
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
-	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 08/14] bitmap: introduce generic optimized bitmap_size()
-Message-ID: <ZSQykJtkemZTiYHP@yury-ThinkPad>
-References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
- <20231009151026.66145-9-aleksander.lobakin@intel.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1696871565; x=1728407565;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=uwpDOZOpfYsuww61p0m2L1qVRCOH3Jii+8Qxzvp20ZE=;
+  b=UdBaLU120t575kQC4mRMtuHodw2/E2zBSpYFkN9vN+con32pmvVT/WPo
+   P7+65mBWYiCe2N2t4YTLwoBhZV5L7GlBhvYTJTqyEJHpCvtlp+8gNxwg3
+   yK2EOHMQHL3UFRSRsZlzkXckzc3yYqDMzLfjupCl7upukJx1EKH2PCeQh
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.03,210,1694736000"; 
+   d="scan'208";a="360903781"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 17:12:42 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id D7261806F1;
+	Mon,  9 Oct 2023 17:12:40 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 9 Oct 2023 17:12:39 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.170.12) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Mon, 9 Oct 2023 17:12:36 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <keescook@chromium.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <slyich@gmail.com>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 net] af_packet: Fix fortified memcpy() without flex array.
+Date: Mon, 9 Oct 2023 10:12:28 -0700
+Message-ID: <20231009171228.89827-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <202310090852.E9A6558@keescook>
+References: <202310090852.E9A6558@keescook>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009151026.66145-9-aleksander.lobakin@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.12]
+X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 05:10:20PM +0200, Alexander Lobakin wrote:
-> The number of times yet another open coded
-> `BITS_TO_LONGS(nbits) * sizeof(long)` can be spotted is huge.
-> Some generic helper is long overdue.
+From: Kees Cook <keescook@chromium.org>
+Date: Mon, 9 Oct 2023 09:01:34 -0700
+> On Mon, Oct 09, 2023 at 08:31:52AM -0700, Kuniyuki Iwashima wrote:
+> > Sergei Trofimovich reported a regression [0] caused by commit a0ade8404c3b
+> > ("af_packet: Fix warning of fortified memcpy() in packet_getname().").
+> > 
+> > It introduced a flex array sll_addr_flex in struct sockaddr_ll as a
+> > union-ed member with sll_addr to work around the fortified memcpy() check.
+> > 
+> > However, a userspace program uses a struct that has struct sockaddr_ll in
+> > the middle, where a flex array is illegal to exist.
+> > 
+> >   include/linux/if_packet.h:24:17: error: flexible array member 'sockaddr_ll::<unnamed union>::<unnamed struct>::sll_addr_flex' not at end of 'struct packet_info_t'
+> >      24 |                 __DECLARE_FLEX_ARRAY(unsigned char, sll_addr_flex);
+> >         |                 ^~~~~~~~~~~~~~~~~~~~
+> > To fix the regression, let's go back to the first attempt [1] telling
+> > memcpy() the actual size of the array.
+> > 
+> > Reported-by: Sergei Trofimovich <slyich@gmail.com>
+> > Closes: https://github.com/NixOS/nixpkgs/pull/252587#issuecomment-1741733002 [0]
+> 
+> Eww. That's a buggy definition -- it could get overflowed.
 
-OK, I see your point. Indeed, opencoding this again and again may be
-annoying. 
+Only if they pass sizeof(struct sockaddr_storage) to getsockname().
 
-Acked-by: Yury Norov <yury.norov@gmail.com>
- 
-> Add one, bitmap_size(), but with one detail.
-> BITS_TO_LONGS() uses DIV_ROUND_UP(). The latter works well when both
-> divident and divisor are compile-time constants or when the divisor
-> is not a pow-of-2. When it is however, the compilers sometimes tend
-> to generate suboptimal code (GCC 13):
+
 > 
-> 48 83 c0 3f          	add    $0x3f,%rax
-> 48 c1 e8 06          	shr    $0x6,%rax
-> 48 8d 14 c5 00 00 00 00	lea    0x0(,%rax,8),%rdx
+> But okay, we don't break userspace.
 > 
-> %BITS_PER_LONG is always a pow-2 (either 32 or 64), but GCC still does
-> full division of `nbits + 63` by it and then multiplication by 8.
-> Instead of BITS_TO_LONGS(), use ALIGN() and then divide by 8. GCC:
+> > Link: https://lore.kernel.org/netdev/20230720004410.87588-3-kuniyu@amazon.com/ [1]
+> > Fixes: a0ade8404c3b ("af_packet: Fix warning of fortified memcpy() in packet_getname().")
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >  include/uapi/linux/if_packet.h | 6 +-----
+> >  net/packet/af_packet.c         | 7 ++++++-
+> >  2 files changed, 7 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
+> > index 4d0ad22f83b5..9efc42382fdb 100644
+> > --- a/include/uapi/linux/if_packet.h
+> > +++ b/include/uapi/linux/if_packet.h
+> > @@ -18,11 +18,7 @@ struct sockaddr_ll {
+> >  	unsigned short	sll_hatype;
+> >  	unsigned char	sll_pkttype;
+> >  	unsigned char	sll_halen;
+> > -	union {
+> > -		unsigned char	sll_addr[8];
+> > -		/* Actual length is in sll_halen. */
+> > -		__DECLARE_FLEX_ARRAY(unsigned char, sll_addr_flex);
+> > -	};
+> > +	unsigned char	sll_addr[8];
+> >  };
 > 
-> 8d 50 3f             	lea    0x3f(%rax),%edx
-> c1 ea 03             	shr    $0x3,%edx
-> 81 e2 f8 ff ff 1f    	and    $0x1ffffff8,%edx
+> Yup, we need to do at least this.
 > 
-> Now it divides `nbits + 63` by 8 and then masks bits[2:0].
-> bloat-o-meter:
+> >  
+> >  /* Packet types */
+> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > index 8f97648d652f..a84e00b5904b 100644
+> > --- a/net/packet/af_packet.c
+> > +++ b/net/packet/af_packet.c
+> > @@ -3607,7 +3607,12 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
+> >  	if (dev) {
+> >  		sll->sll_hatype = dev->type;
+> >  		sll->sll_halen = dev->addr_len;
+> > -		memcpy(sll->sll_addr_flex, dev->dev_addr, dev->addr_len);
+> > +
+> > +		/* Let __fortify_memcpy_chk() know the actual buffer size. */
+> > +		memcpy(((struct sockaddr_storage *)sll)->__data +
+> > +		       offsetof(struct sockaddr_ll, sll_addr) -
+> > +		       offsetofend(struct sockaddr_ll, sll_family),
+> > +		       dev->dev_addr, dev->addr_len);
+> >  	} else {
+> >  		sll->sll_hatype = 0;	/* Bad: we have no ARPHRD_UNSPEC */
+> >  		sll->sll_halen = 0;
 > 
-> add/remove: 0/0 grow/shrink: 20/133 up/down: 156/-773 (-617)
+> I still think this is a mistake. We're papering over so many lies to the
+> compiler. :P If "uaddr" is actually "struct sockaddr_storage", then we
+> should update the callers...
+
+We could update all callers to pass sockaddr_storage but it seems too much
+for net.git.. :/  I think the conversion should be done later for net-next.
+
+  $ grep -rn -E "\.getname.*?=" | cut -f 2 -d"=" | sort | uniq | wc -l
+  40
+
+
+> and if "struct sockaddr_ll" doesn't have a
+> fixed size trailing array, we should make a new struct that is telling
+> the truth. ;)
 > 
-> Clang does it better and generates the same code before/after starting
-> from -O1, except that with the ALIGN() approach it uses %edx and thus
-> still saves some bytes:
+> Perhaps add this to the UAPI:
 > 
-> add/remove: 0/0 grow/shrink: 9/133 up/down: 18/-538 (-520)
+> +struct sockaddr_ll_flex {
+> +       unsigned short  sll_family;
+> +       __be16          sll_protocol;
+> +       int             sll_ifindex;
+> +       unsigned short  sll_hatype;
+> +       unsigned char   sll_pkttype;
+> +       unsigned char   sll_halen;
+> +       unsigned char   sll_addr[] __counted_by(sll_halen);
+> +};
 > 
-> Note that we can't expand DIV_ROUND_UP() by adding a check and using
-> this approach there, as it's used in array declarations where
-> expressions are not allowed.
-> Add this helper to tools/ as well.
+> And update the memcpy():
 > 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  drivers/md/dm-clone-metadata.c | 5 -----
->  include/linux/bitmap.h         | 8 +++++---
->  include/linux/cpumask.h        | 2 +-
->  lib/math/prime_numbers.c       | 2 --
->  tools/include/linux/bitmap.h   | 8 +++++---
->  5 files changed, 11 insertions(+), 14 deletions(-)
+> -       DECLARE_SOCKADDR(struct sockaddr_ll *, sll, uaddr);
+> +       struct sockaddr_ll_flex * sll = (struct sockaddr_ll_flex *)uaddr;
 > 
-> diff --git a/drivers/md/dm-clone-metadata.c b/drivers/md/dm-clone-metadata.c
-> index c43d55672bce..47c1fa7aad8b 100644
-> --- a/drivers/md/dm-clone-metadata.c
-> +++ b/drivers/md/dm-clone-metadata.c
-> @@ -465,11 +465,6 @@ static void __destroy_persistent_data_structures(struct dm_clone_metadata *cmd)
->  
->  /*---------------------------------------------------------------------------*/
->  
-> -static size_t bitmap_size(unsigned long nr_bits)
-> -{
-> -	return BITS_TO_LONGS(nr_bits) * sizeof(long);
-> -}
-> -
->  static int __dirty_map_init(struct dirty_map *dmap, unsigned long nr_words,
->  			    unsigned long nr_regions)
->  {
-> diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-> index 03644237e1ef..63e422f8ba3d 100644
-> --- a/include/linux/bitmap.h
-> +++ b/include/linux/bitmap.h
-> @@ -237,9 +237,11 @@ extern int bitmap_print_list_to_buf(char *buf, const unsigned long *maskp,
->  #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
->  #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
->  
-> +#define bitmap_size(nbits)	(ALIGN(nbits, BITS_PER_LONG) / BITS_PER_BYTE)
-> +
->  static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
->  {
-> -	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-> +	unsigned int len = bitmap_size(nbits);
->  
->  	if (small_const_nbits(nbits))
->  		*dst = 0;
-> @@ -249,7 +251,7 @@ static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
->  
->  static inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
->  {
-> -	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-> +	unsigned int len = bitmap_size(nbits);
->  
->  	if (small_const_nbits(nbits))
->  		*dst = ~0UL;
-> @@ -260,7 +262,7 @@ static inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
->  static inline void bitmap_copy(unsigned long *dst, const unsigned long *src,
->  			unsigned int nbits)
->  {
-> -	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-> +	unsigned int len = bitmap_size(nbits);
->  
->  	if (small_const_nbits(nbits))
->  		*dst = *src;
-> diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-> index f10fb87d49db..dbdbf1451cad 100644
-> --- a/include/linux/cpumask.h
-> +++ b/include/linux/cpumask.h
-> @@ -821,7 +821,7 @@ static inline int cpulist_parse(const char *buf, struct cpumask *dstp)
->   */
->  static inline unsigned int cpumask_size(void)
->  {
-> -	return BITS_TO_LONGS(large_cpumask_bits) * sizeof(long);
-> +	return bitmap_size(large_cpumask_bits);
->  }
->  
->  /*
-> diff --git a/lib/math/prime_numbers.c b/lib/math/prime_numbers.c
-> index d42cebf7407f..d3b64b10da1c 100644
-> --- a/lib/math/prime_numbers.c
-> +++ b/lib/math/prime_numbers.c
-> @@ -6,8 +6,6 @@
->  #include <linux/prime_numbers.h>
->  #include <linux/slab.h>
->  
-> -#define bitmap_size(nbits) (BITS_TO_LONGS(nbits) * sizeof(unsigned long))
-> -
->  struct primes {
->  	struct rcu_head rcu;
->  	unsigned long last, sz;
-> diff --git a/tools/include/linux/bitmap.h b/tools/include/linux/bitmap.h
-> index f3566ea0f932..81a2299ace15 100644
-> --- a/tools/include/linux/bitmap.h
-> +++ b/tools/include/linux/bitmap.h
-> @@ -2,6 +2,7 @@
->  #ifndef _TOOLS_LINUX_BITMAP_H
->  #define _TOOLS_LINUX_BITMAP_H
->  
-> +#include <linux/align.h>
->  #include <string.h>
->  #include <linux/bitops.h>
->  #include <linux/find.h>
-> @@ -25,13 +26,14 @@ bool __bitmap_intersects(const unsigned long *bitmap1,
->  #define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
->  #define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
->  
-> +#define bitmap_size(nbits)	(ALIGN(nbits, BITS_PER_LONG) / BITS_PER_BYTE)
-> +
->  static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
->  {
->  	if (small_const_nbits(nbits))
->  		*dst = 0UL;
->  	else {
-> -		int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-> -		memset(dst, 0, len);
-> +		memset(dst, 0, bitmap_size(nbits));
->  	}
->  }
->  
-> @@ -83,7 +85,7 @@ static inline void bitmap_or(unsigned long *dst, const unsigned long *src1,
->   */
->  static inline unsigned long *bitmap_zalloc(int nbits)
->  {
-> -	return calloc(1, BITS_TO_LONGS(nbits) * sizeof(unsigned long));
-> +	return calloc(1, bitmap_size(nbits));
->  }
->  
->  /*
+> ?
+> 
 > -- 
-> 2.41.0
+> Kees Cook
 
