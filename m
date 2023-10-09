@@ -1,158 +1,70 @@
-Return-Path: <netdev+bounces-39082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEBDD7BDD5E
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:09:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A7B7BDDD8
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4DA71C208E1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0029F1C20949
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B71417990;
-	Mon,  9 Oct 2023 13:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490961946D;
+	Mon,  9 Oct 2023 13:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GkWa8HbB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1s1ld40"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C4F182DF
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:09:44 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F72D9C
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 06:09:40 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-50325ce89e9so5786696e87.0
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 06:09:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1696856979; x=1697461779; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nw4CwT+K1/M7WOlVzMo7SQbSIXhaKD5l338u+OQoaKE=;
-        b=GkWa8HbBcZD8c0GKaq5rGp4Mb9Zbd4jIaWa0z3jnRXc6aZ7MLRfgqrNVs3XCEfAr7o
-         oYCWwe3IDt2E68XJQbBqGsVPaQKZF3eXH/ttq7rO9BPzseqnsY6V3HxmEGfzNAGFPtQc
-         eJL8N89OElhQ+fZsu7XyIIzS5VUw4qcgR9b1N5ZiqMDDdXdV2axM6fDXs0huHR/kZPeN
-         relxTYzu9SXihEFPfX1K1xrdeFZ/hM7BSPH5t3PqqmPzz0sMJ86Q44H1NLQ12cgicdWU
-         R/twsG3cn9RuvvGG74t87c+V3SyrLJ458mGl5c6GKTtgUmn35CL6L8JIiQPgH5IfDngo
-         q7pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696856979; x=1697461779;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nw4CwT+K1/M7WOlVzMo7SQbSIXhaKD5l338u+OQoaKE=;
-        b=gKzPETlBrU64uNo2w7yGQ4c1FwNgWWLTKtoLaymvhffvCf6dailrLinarUVaoOxkLG
-         XsfQwM+ooE4rAi23HsLYzoYX9vP9QGWaQwzzSKVxHDcDKIjF05qe1g8SITQOXDEqhDJ4
-         GrQcy+j7YMPvtajLhb4kEVwymI/Ca+r9CN0FoQ1gT0Jk2M54NjJevzPf1RNYcrdOTBws
-         ylXuGA3kAyRD8J1JDN/NcgfTFW7t+NgO6GNtXrikZFiXymI3fOc5HhKkQLk87ftQwFgT
-         XiS1FTZeS44Wka3d7xec97E4mMCKZ+Imn8Fz0uOgg6V7Y7zHIl7/Og4A/bTQab6QR7Tk
-         omWQ==
-X-Gm-Message-State: AOJu0YwsnXYl0vsrS2SpjHYjkaSbgRwCyYFA33vtw8lU7r8VnHECrWb1
-	qvsXA5Ow+53DM/gkTYWlIf0oP98vYv2IZkHIs7A=
-X-Google-Smtp-Source: AGHT+IHFLSf86KjCG8EDDQqALLyLIZlwzfFf0RLQ6yTqajW5Q+kcHa9kjlJSe0+Nd93vAKxCceZlEA==
-X-Received: by 2002:adf:e911:0:b0:31f:fb7f:d701 with SMTP id f17-20020adfe911000000b0031ffb7fd701mr11717125wrm.9.1696856940390;
-        Mon, 09 Oct 2023 06:09:00 -0700 (PDT)
-Received: from [192.168.1.197] (5-157-101-10.dyn.eolo.it. [5.157.101.10])
-        by smtp.gmail.com with ESMTPSA id m15-20020adfe94f000000b0031984b370f2sm9602044wrn.47.2023.10.09.06.08.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 06:08:59 -0700 (PDT)
-Message-ID: <0a28ef00-f498-4fa0-bc2b-10a460e1a88c@linaro.org>
-Date: Mon, 9 Oct 2023 15:08:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2497E19464
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:13:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6D33C433C9;
+	Mon,  9 Oct 2023 13:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696857223;
+	bh=LKHwPe31kWon9Rwjc97tFZkPtm2/8aB5Mh5don3lBPk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q1s1ld40p5RgJPzabs1hrNV3D/sRHtWaqMNF1Da4ircj0KXYuIogoISIzihL/ZknS
+	 pFGrf9Gc5/v7psrcI8cTCYG1xfKbTTBr7rf0vd5UR4OPr8HlTgKFu8cYFIoi+pR8gt
+	 UZccyUDy9+ZslEb/iL25VDSu96NEW1Cf2e8VcKpXTbp2ZMB0R00uPjTFR9xpMmblry
+	 xJkcEGyqDdLpRwZLQTmg4UDaKSYYBi4989c7af9+tnVK9b91O/s4iFf6vU3XBIZlRe
+	 NUZZkkKenIwtSUn/bePfhltXDJi7aYILx46dDj/Kdc3PEe1YY/GLch+ixFL1eiIjIa
+	 GKZPfA4N5tXsg==
+Date: Mon, 9 Oct 2023 15:13:40 +0200
+From: Simon Horman <horms@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Chas Williams <3chas3@gmail.com>,
+	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] atm: fore200e: Drop unnecessary of_match_device()
+Message-ID: <ZSP8hDuWuJg7qUSf@kernel.org>
+References: <20231006214421.339445-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: nfc: fix races in nfc_llcp_sock_get() and
- nfc_llcp_sock_get_sn()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
- Sili Luo <rootlab@huawei.com>, Willy Tarreau <w@1wt.eu>
-References: <20231009123110.3735515-1-edumazet@google.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231009123110.3735515-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231006214421.339445-1-robh@kernel.org>
 
-On 09/10/2023 14:31, Eric Dumazet wrote:
-> Sili Luo reported a race in nfc_llcp_sock_get(), leading to UAF.
+On Fri, Oct 06, 2023 at 04:44:21PM -0500, Rob Herring wrote:
+> It is not necessary to call of_match_device() in probe. If we made it to
+> probe, then we've already successfully matched.
 > 
-> Getting a reference on the socket found in a lookup while
-> holding a lock should happen before releasing the lock.
-> 
-> nfc_llcp_sock_get_sn() has a similar problem.
-> 
-> Finally nfc_llcp_recv_snl() needs to make sure the socket
-> found by nfc_llcp_sock_from_sn() does not disappear.
-> 
-> Fixes: 8f50020ed9b8 ("NFC: LLCP late binding")
-> Reported-by: Sili Luo <rootlab@huawei.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Cc: Willy Tarreau <w@1wt.eu>
-> ---
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
+I agree that the check is redundant.
+And that with it removed, the forward declaration of fore200e_sba_match
+is no longer needed.
 
+Minor nit: I assume the target tree is net-next.
+           Ideally that would be specified.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+	Subject: [PATCH net-net] ...
 
-Best regards,
-Krzysztof
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
