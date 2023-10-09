@@ -1,114 +1,105 @@
-Return-Path: <netdev+bounces-39106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA30D7BE140
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:48:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B38E7BE146
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:49:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 711C52816CC
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:48:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A8C31C208E8
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D1B341AC;
-	Mon,  9 Oct 2023 13:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FA8341B7;
+	Mon,  9 Oct 2023 13:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tUT2ZZjj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m34aq4oR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA78F341A4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:48:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8CECC433C8;
-	Mon,  9 Oct 2023 13:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696859314;
-	bh=+HSuQE4uwcv/S7v9Nu+yPUKMpHFCIut7bedSD0CoE+8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tUT2ZZjjoyKrHy9spdRqLkKumZ59dlMndP1ekBAykHym+I9g1k39CRcqUXSeoVTqo
-	 Z3xuUbY7mXsnOwgIi7yBQdMycUPRHFK35wzu94NkC9wXqe/ov4uMJ3UABP+2vXkI9y
-	 UgteuuzSZhHsyo0DlcXKeFIzGGvj/2vjsvHXPD0PwUMqWZvXMU8qPTz9T5yoCbeEDu
-	 R1dUaGDrRW5kAPCebPaeAyyc3t1SX9N6IF0/VFFSi5q/r7GjWPMHOv9zDuGbTtPEas
-	 H4u/mTKT2CY5C6k5UY61G0i73TUhMGHtV5AmPgywk6CReOKL866HVwmyoAJWy+ZG2L
-	 S4CgJoKX+MF3A==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Lee, Chun-Yi" <jlee@suse.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Kees Cook <keescook@chromium.org>,
-	Lee@web.codeaurora.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	stable@vger.kernel.org, Iulia Tanasescu <iulia.tanasescu@nxp.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
-Date: Mon,  9 Oct 2023 15:48:19 +0200
-Message-Id: <20231009134826.1063869-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B8B341A5;
+	Mon,  9 Oct 2023 13:49:10 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CACD94;
+	Mon,  9 Oct 2023 06:49:09 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1c76ef40e84so8268305ad.0;
+        Mon, 09 Oct 2023 06:49:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696859349; x=1697464149; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iKANcfwhuAsvODwCPEx1W1hg3921aPpUJ7FkFgREVkI=;
+        b=m34aq4oRt3hQ2kuYrKDsfINTBYNIvZipU7hAivQW2l3vT9cvAK1zgW2DYFobfSDdC+
+         fTadisMbxv2F5XJo7qtc9vuK3MGo8TLBINfOt9mN/FEw2nGouk1b5N999OADOnLNBRZl
+         ora0UklgKmoz4YaRPSL1YBgwk63X0Mm0uuQpqQuTHmFud1/eGJaz9zeS7SjYV62f+9Kf
+         OI7wTexiow47+PIPiox9lWlja04PooTj8LWpKRfDw+ucGP8fp678oP9d8H+JYlQ4+qXc
+         Zc8n2iUzYNaSd1Gb/Lh8jXzr9i1hy3M94Kt26TDQBMEkGKcdryoFAjc/nEM6GOBJOWPj
+         h9yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696859349; x=1697464149;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iKANcfwhuAsvODwCPEx1W1hg3921aPpUJ7FkFgREVkI=;
+        b=N3lbC1sxaGn5sSOcSGob/BRaFpnms3sJR31bDqMy1SXX+cL11GLk92ffM4LVY52nmL
+         MaaTxeBU/73nG2pk9eCZHBYKfBm/iinrnoZNtHrzcYbIO52iAqtTBo69sLwn5XpXV8cq
+         3K4hhl4pzsdanS59H5xZpsaMjizSvKrUYMGLv21eD8QMfREdpIOm+8s06B2lkh0rGzPD
+         iy3NU4cf5LKHpCDrdYKnf81r2OU6kVubstbvLwLBqhw5WyWkXSU//qa2E7/yyqmfBtSZ
+         rmh56UOu7pNBiUDGMAZwzGcbFaJvWUKgBURp8KgRD2o67TNCuKH8yJEwHjOcneRxhhIy
+         FG4w==
+X-Gm-Message-State: AOJu0YyCJw1Zwh+urWkwV5SA4lSwoeerTgOijuEoeDWDQG4d8DqlQLTh
+	wWwcwb+OezmmqLLyPPeslr8=
+X-Google-Smtp-Source: AGHT+IGJp5yse3wRcoWdGhJTLX7cv3X55zx6fgB5j6J+XDbJDr/GEVOdTUj4SxQ5hGM5qeKbOXnWfQ==
+X-Received: by 2002:a17:903:22ce:b0:1bb:83ec:832 with SMTP id y14-20020a17090322ce00b001bb83ec0832mr17663270plg.2.1696859348544;
+        Mon, 09 Oct 2023 06:49:08 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id p5-20020a170902bd0500b001b9e86e05b7sm9559475pls.0.2023.10.09.06.49.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 06:49:08 -0700 (PDT)
+Date: Mon, 09 Oct 2023 22:49:07 +0900 (JST)
+Message-Id: <20231009.224907.206866439495105936.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, greg@kroah.com,
+ tmgross@umich.edu, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+	<20231009013912.4048593-2-fujita.tomonori@gmail.com>
+	<CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 9 Oct 2023 14:59:19 +0200
+Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> wrote:
 
-These functions are simple wrappers around memcmp() and memcpy(), which
-contain compile-time checks for buffer overflow. Something in gcc-13 and
-likely other versions makes this trigger a warning when the functions
-are not inlined and the compiler misunderstands the buffer length:
+> A few nits I noticed. Please note that this is not really a full
+> review, and that I recommend that other people like Wedson should take
+> a look again and OK these abstractions before this is merged.
 
-In file included from net/bluetooth/hci_event.c:32:
-In function 'bacmp',
-    inlined from 'hci_conn_request_evt' at net/bluetooth/hci_event.c:3276:7:
-include/net/bluetooth/bluetooth.h:364:16: error: 'memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
-  364 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
-      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We have about two weeks before the merge window opens? It would great
+if other people could review really soon.
 
-Use the __always_inline annotation to ensure that the helpers are
-correctly checked. This has no effect on the actual correctness
-of the code, but avoids the warning. Since the patch that introduced
-the warning is marked for stable backports, this one should also
-go that way to avoid introducing build regressions.
+We can improve the abstractions after it's merged. This patchset
+doesn't add anything exported to users. This adds only one driver so
+the APIs can be fixed anytime.
 
-Fixes: d70e44fef8621 ("Bluetooth: Reject connection with the device which has same BD_ADDR")
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Lee, Chun-Yi <jlee@suse.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- include/net/bluetooth/bluetooth.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 7ffa8c192c3f2..27ee1bf51c235 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -359,11 +359,11 @@ static inline bool bdaddr_type_is_le(u8 type)
- #define BDADDR_NONE (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
- 
- /* Copy, swap, convert BD Address */
--static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
-+static __always_inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
- {
- 	return memcmp(ba1, ba2, sizeof(bdaddr_t));
- }
--static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
-+static __always_inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
- {
- 	memcpy(dst, src, sizeof(bdaddr_t));
- }
--- 
-2.39.2
-
+Once it's merged, multiple people can send patches easily, so more
+scalable.
 
