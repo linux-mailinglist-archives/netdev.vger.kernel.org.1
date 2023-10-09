@@ -1,100 +1,119 @@
-Return-Path: <netdev+bounces-39132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 728837BE285
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A8B7BE296
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE71D281793
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A5F1C20949
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5322135887;
-	Mon,  9 Oct 2023 14:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE8C35894;
+	Mon,  9 Oct 2023 14:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XV8vwGnW"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="h3hdiZeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3319E347DF;
-	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A7763C433D9;
-	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696861223;
-	bh=16U5YsvVXq5mHf2wc80nLuyb9WsMzTKLY8C5x5/BRsc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XV8vwGnW65YlZ2bz5W61tx/7iEkczeYNyZKLTADVKLZOfKmF14tNjl/Nxmkl+6qMf
-	 RG/L8mvRT3gY+4U0DlmjCTqaZbuKuOco3apnnPYd6T41znvviBN74Zc0Iuds37h8pZ
-	 Y5/xI43Zz28WYSytkNpJ7+iEXg1oJqPkzAbR6z9Jd1RLanFzGQT0BQjUWuiwUZKhu5
-	 aEE6vylKr3rb/2LyslogVUKhQQ48O90uB7min8T++dn0CJ4r9Bh15p8Jdyyvh6Ux/L
-	 5RgG4tUTLDNxn/8cIdtP2DANSnxr4WtX1wOfnCkpxkQUx9Xsv+FsrMME+oJ12XL77L
-	 LGRUHMowAaeBQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9031EE0009B;
-	Mon,  9 Oct 2023 14:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CCE35891
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:21:35 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEEC810C9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:21:13 -0700 (PDT)
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id DFA573F670
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1696861271;
+	bh=B96PVjO/dQ3gfVlhgj+phv5BjtntXKadFzqOCRy8X5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:In-Reply-To;
+	b=h3hdiZeII0LB8f/oWDM33KTfcqb9kx2qEGi3quzNU/yT+cDb+5XN4slRW5WfCHni0
+	 L4/222k+kyxNTqt8f6qwB8XKQR/yLqBC5odh9ExJbzzls+V00mEhHo6v1xa1W80mb1
+	 r43ovMYGxKfNjOW5I7t/eosA4D13ziYm+jKFIxFmbggqHtTPNYN26Ru19lS/XJQEQs
+	 8FRgYFcB1YF/oJACOP9Z1qifMWsvxYt1r5Ry9Y17YhExo9hr6riFDL1nF0VaEdNmFJ
+	 POQY/YBJtv15bijyVu/DLlAybOQnQTL8wsPd8sRf0a33Zx8N7jkmw5HDM+6vFwTl5b
+	 c0vR8/J9gnX5g==
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-533ddb3cb28so3732734a12.0
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 07:21:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696861271; x=1697466071;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B96PVjO/dQ3gfVlhgj+phv5BjtntXKadFzqOCRy8X5o=;
+        b=dches8sWZeb8H4xJX5OcBX3knzlBMl9nrD10UYvS55leZpXHkjMHuD9VwVpZGw2Bxj
+         nat7Xjg59lweA8yuu9zoKKo/Ayg74T1FPIqTE5FP9pq4QVo1XUscdbfZonTocEtueojo
+         M5wJqL3Dx9hZhgx6jbHSZ6gHRDdIEPVn/WuqMitVNZWoeFlNFle+9+VBis+oEVywYL9b
+         gP23lB4GI38Fqda8geDUCukWEFl7JJdW9+Hu+LZ7W82XT7Cyvf7uUPDBMG6usajShJW/
+         0t23B42nJ/Mk0kw8FrsAbyXkESmC8P/0zk5aHpIk8D/JTbMMqny/PmkdkbPj/W98jVnG
+         17Pw==
+X-Gm-Message-State: AOJu0YyVghqIsSwgaVEFlcsegY8qaAutG5uYpQqmCDgduRqdO6AIxpCM
+	eqdZJ/Fr9EeSr0083CVo1yz+PvkC6j+oet9y68QQ17VE4hjcOeoKVR3ivoMPmaXCCcNbWnr4qgF
+	2Apo9WiWnqt2jYeDUvPjQGh9olox5Jq82aA==
+X-Received: by 2002:aa7:de0b:0:b0:52f:fa53:9fb6 with SMTP id h11-20020aa7de0b000000b0052ffa539fb6mr13592183edv.10.1696861271602;
+        Mon, 09 Oct 2023 07:21:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGN5uHW2mQbyZfXtLTo4TlVZ+BI37A+D7RKCe90j3APgcSY4/uXNoFPWjpcwltgcTAQgtkoOA==
+X-Received: by 2002:aa7:de0b:0:b0:52f:fa53:9fb6 with SMTP id h11-20020aa7de0b000000b0052ffa539fb6mr13592151edv.10.1696861271298;
+        Mon, 09 Oct 2023 07:21:11 -0700 (PDT)
+Received: from localhost (host-79-19-77-113.retail.telecomitalia.it. [79.19.77.113])
+        by smtp.gmail.com with ESMTPSA id j13-20020aa7ca4d000000b00536275c28dbsm6058070edt.94.2023.10.09.07.21.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 07:21:10 -0700 (PDT)
+Date: Mon, 9 Oct 2023 16:21:09 +0200
+From: Andrea Righi <andrea.righi@canonical.com>
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
+Message-ID: <ZSQMVc19Tq6MyXJT@gpd>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
+ <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf v4] net/xdp: fix zero-size allocation warning in
- xskq_create()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169686122358.13891.1040766174680237802.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Oct 2023 14:20:23 +0000
-References: <20231007075148.1759-1-andrew.kanner@gmail.com>
-In-Reply-To: <20231007075148.1759-1-andrew.kanner@gmail.com>
-To: Andrew Kanner <andrew.kanner@gmail.com>
-Cc: martin.lau@linux.dev, bjorn@kernel.org, magnus.karlsson@intel.com,
- maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- aleksander.lobakin@intel.com, xuanzhuo@linux.alibaba.com, ast@kernel.org,
- hawk@kernel.org, john.fastabend@gmail.com, daniel@iogearbox.net,
- linux-kernel-mentees@lists.linuxfoundation.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com,
- syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
+In-Reply-To: <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
-
-This patch was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Sat,  7 Oct 2023 10:51:49 +0300 you wrote:
-> Syzkaller reported the following issue:
->  ------------[ cut here ]------------
->  WARNING: CPU: 0 PID: 2807 at mm/vmalloc.c:3247 __vmalloc_node_range (mm/vmalloc.c:3361)
->  Modules linked in:
->  CPU: 0 PID: 2807 Comm: repro Not tainted 6.6.0-rc2+ #12
->  Hardware name: Generic DT based system
->  unwind_backtrace from show_stack (arch/arm/kernel/traps.c:258)
->  show_stack from dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
->  dump_stack_lvl from __warn (kernel/panic.c:633 kernel/panic.c:680)
->  __warn from warn_slowpath_fmt (./include/linux/context_tracking.h:153 kernel/panic.c:700)
->  warn_slowpath_fmt from __vmalloc_node_range (mm/vmalloc.c:3361 (discriminator 3))
->  __vmalloc_node_range from vmalloc_user (mm/vmalloc.c:3478)
->  vmalloc_user from xskq_create (net/xdp/xsk_queue.c:40)
->  xskq_create from xsk_setsockopt (net/xdp/xsk.c:953 net/xdp/xsk.c:1286)
->  xsk_setsockopt from __sys_setsockopt (net/socket.c:2308)
->  __sys_setsockopt from ret_fast_syscall (arch/arm/kernel/entry-common.S:68)
+On Mon, Oct 09, 2023 at 02:53:00PM +0200, Miguel Ojeda wrote:
+> On Mon, Oct 9, 2023 at 2:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > Any ideas?
 > 
-> [...]
+> That is `RETHUNK` and `X86_KERNEL_IBT`.
+> 
+> Since this will keep confusing people, I will make it a `depends on !`
+> as discussed in the past. I hope it is OK for e.g. Andrea.
 
-Here is the summary with links:
-  - [bpf,v4] net/xdp: fix zero-size allocation warning in xskq_create()
-    https://git.kernel.org/bpf/bpf/c/a12bbb3cccf0
+Disabling RETHUNK or IBT is not acceptable for a general-purpose kernel.
+If that constraint is introduced we either need to revert that patch
+in the Ubuntu kernel or disable Rust support.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+It would be nice to have a least something like
+CONFIG_RUST_IS_BROKEN_BUT_IM_HAPPY, off by default, and have
+`RUST_IS_BROKEN_BUT_IM_HAPPY || depends on !`.
 
+-Andrea
 
+> 
+> Cheers,
+> Miguel
 
