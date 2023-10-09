@@ -1,110 +1,147 @@
-Return-Path: <netdev+bounces-38936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51007BD1D9
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 04:04:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F787BD1E2
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 04:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 212F3281454
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 02:04:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88BA51C2084A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 02:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C9F185D;
-	Mon,  9 Oct 2023 02:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpcP2f78"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E4B185D;
+	Mon,  9 Oct 2023 02:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35AF17E9
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 02:04:07 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4027FA4
-	for <netdev@vger.kernel.org>; Sun,  8 Oct 2023 19:04:06 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-690f8e63777so1130112b3a.0
-        for <netdev@vger.kernel.org>; Sun, 08 Oct 2023 19:04:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696817046; x=1697421846; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QJjD5QyZA+VqQAyCuhSlTazKHGZ4ew607TLuXU6RNfc=;
-        b=DpcP2f78BQaw7lvxpfh9trhiZa56/7uwhqvJC5R+KbcAsZ54McVVVeXW9I1e441iaK
-         JDayvG2NJlg4CpkXPXLsuQS4HWHlEcIp9o3Od8HR/pgD96TD3uzMGHlq5QOAlPcj9dai
-         fp1UWLfAkDnybu0Asoyo2PEd8Adf73DZa1ZisI4HH/rFAmN8TX6LOLseM1XP4a0pWZQM
-         PpiuBAtvtB7TvyytAdlCyTIhwfDZDWEc1I/53F13Fd6yzB/y2BDSjt4qtnjXbJn5v+z6
-         gtOuF07RPZXq/fTEtarLHuYePwzjjyk+rZKmxyaZCkalMIfe8khRhtIszHftOqhoSIOU
-         ldyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696817046; x=1697421846;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QJjD5QyZA+VqQAyCuhSlTazKHGZ4ew607TLuXU6RNfc=;
-        b=Aa0oBMiYXn9euWGb4W6Lry2yXtK0m8VEzC8rsFGL64LnnW/Q+F46lWaNnFh/i6B7Fr
-         AsscDvgFmARzpCgVlA74RXSS06zTIJ632lYyUje0TkB5b9EWL45/9anD7VxgTpRa6Rnx
-         HkkISVNIAa0pZ2SRjb/rHFuJxNMAQV0V4U0CC/N1UAQToBFPy0d2/IgWvfhfZ8HgieYr
-         IIQkA+VKjLnGyVnywFp4+FxOP2IwrKGw6eHwima6goTKwg+37tnbfgW/oJS4VZLy00ho
-         h3lpoDVp3gp8l2lqApGFjps4CcWM8Ks4ZG2tZIhkyUGDR9FU2/UBtcUBzTfZs8L/Kx5P
-         X20g==
-X-Gm-Message-State: AOJu0YyRkSMSRYxhfwmnVVtbGbnLh1U9bsEXPGbTufntVSuK5JCmMLMr
-	etNmt4Laq5/wA5pe8WmORDs=
-X-Google-Smtp-Source: AGHT+IFqHw3k1/Iixkf7lUNn3AK0GOcATuw86alrHPxaP1t/VF7DykhR5SLcsjJtONJCYPDdDhUhOA==
-X-Received: by 2002:a05:6a00:391c:b0:690:d0d4:6fb0 with SMTP id fh28-20020a056a00391c00b00690d0d46fb0mr15528288pfb.3.1696817045570;
-        Sun, 08 Oct 2023 19:04:05 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id y4-20020aa78544000000b006878cc942f1sm5181143pfn.54.2023.10.08.19.04.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Oct 2023 19:04:04 -0700 (PDT)
-Date: Sun, 8 Oct 2023 19:04:02 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: netdev@vger.kernel.org, tglx@linutronix.de, jstultz@google.com,
-	horms@kernel.org, chrony-dev@chrony.tuxfamily.org,
-	mlichvar@redhat.com, ntp-lists@mattcorallo.com,
-	vinicius.gomes@intel.com, davem@davemloft.net,
-	rrameshbabu@nvidia.com, shuah@kernel.org
-Subject: Re: [PATCH net-next v5 1/6] posix-clock: introduce
- posix_clock_context concept
-Message-ID: <ZSNfkkibqP2Q3Psh@hoboy.vegasvil.org>
-References: <cover.1696804243.git.reibax@gmail.com>
- <992c76f8570de9e0549c4d2446d17cae0a959b77.1696804243.git.reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7209CA7D
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 02:09:51 +0000 (UTC)
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CD08A4;
+	Sun,  8 Oct 2023 19:09:49 -0700 (PDT)
+X-UUID: 28fed6466eed4b1790d911464d79c826-20231009
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:6dfe2cf6-c1da-45e0-bbd1-da03b007062d,IP:-15
+	,URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-24
+X-CID-INFO: VERSION:1.1.32,REQID:6dfe2cf6-c1da-45e0-bbd1-da03b007062d,IP:-15,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-24
+X-CID-META: VersionHash:5f78ec9,CLOUDID:636fb8bf-14cc-44ca-b657-2d2783296e72,B
+	ulkID:2310091009398OGIRJL5,BulkQuantity:0,Recheck:0,SF:24|17|19|43|102,TC:
+	nil,Content:0,EDM:-3,IP:nil,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,O
+	SI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 28fed6466eed4b1790d911464d79c826-20231009
+X-User: guodongtai@kylinos.cn
+Received: from localhost.localdomain [(39.156.73.14)] by mailgw
+	(envelope-from <guodongtai@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1526781071; Mon, 09 Oct 2023 10:09:37 +0800
+From: George Guo <guodongtai@kylinos.cn>
+To: fw@strlen.de
+Cc: davem@davemloft.net,
+	dongtai.guo@linux.dev,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	guodongtai@kylinos.cn,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH v2] tcp: cleanup secure_{tcp, tcpv6}_ts_off
+Date: Mon,  9 Oct 2023 10:11:08 +0800
+Message-Id: <20231009021108.3203928-1-guodongtai@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20231007105019.GA20662@breakpoint.cc>
+References: <20231007105019.GA20662@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <992c76f8570de9e0549c4d2446d17cae0a959b77.1696804243.git.reibax@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 12:49:16AM +0200, Xabier Marquiegui wrote:
+Correct secure_tcp_ts_off and secure_tcpv6_ts_off call parameter order
 
-> -int ptp_open(struct posix_clock *pc, fmode_t fmode)
-> +int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
->  {
->  	return 0;
->  }
+Signed-off-by: George Guo <guodongtai@kylinos.cn>
+---
+ net/ipv4/syncookies.c | 4 ++--
+ net/ipv4/tcp_ipv4.c   | 2 +-
+ net/ipv6/syncookies.c | 4 ++--
+ net/ipv6/tcp_ipv6.c   | 4 ++--
+ 4 files changed, 7 insertions(+), 7 deletions(-)
 
-You are changing the functional interface, as needed, but I wonder
-whether drivers/ptp/ptp_chardev.c is the only driver that implements
-open/read/ioctl.
-
-Did you audit the callers of posix_clock_register(), or maybe do a
-`make allyesconfig` ?
-
-Thanks,
-Richard
-
-
-
+diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
+index dc478a0574cb..537f368a0b66 100644
+--- a/net/ipv4/syncookies.c
++++ b/net/ipv4/syncookies.c
+@@ -360,8 +360,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+ 		tsoff = secure_tcp_ts_off(sock_net(sk),
+-					  ip_hdr(skb)->daddr,
+-					  ip_hdr(skb)->saddr);
++					  ip_hdr(skb)->saddr,
++					  ip_hdr(skb)->daddr);
+ 		tcp_opt.rcv_tsecr -= tsoff;
+ 	}
+ 
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index a441740616d7..54717d261693 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -104,7 +104,7 @@ static u32 tcp_v4_init_seq(const struct sk_buff *skb)
+ 
+ static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
+ {
+-	return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
++	return secure_tcp_ts_off(net, ip_hdr(skb)->saddr, ip_hdr(skb)->daddr);
+ }
+ 
+ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
+diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
+index 5014aa663452..9af484a4d518 100644
+--- a/net/ipv6/syncookies.c
++++ b/net/ipv6/syncookies.c
+@@ -162,8 +162,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
+ 
+ 	if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
+ 		tsoff = secure_tcpv6_ts_off(sock_net(sk),
+-					    ipv6_hdr(skb)->daddr.s6_addr32,
+-					    ipv6_hdr(skb)->saddr.s6_addr32);
++					    ipv6_hdr(skb)->saddr.s6_addr32,
++					    ipv6_hdr(skb)->daddr.s6_addr32);
+ 		tcp_opt.rcv_tsecr -= tsoff;
+ 	}
+ 
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index bfe7d19ff4fd..7e2f924725c6 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -119,8 +119,8 @@ static u32 tcp_v6_init_seq(const struct sk_buff *skb)
+ 
+ static u32 tcp_v6_init_ts_off(const struct net *net, const struct sk_buff *skb)
+ {
+-	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->daddr.s6_addr32,
+-				   ipv6_hdr(skb)->saddr.s6_addr32);
++	return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->saddr.s6_addr32,
++				   ipv6_hdr(skb)->daddr.s6_addr32);
+ }
+ 
+ static int tcp_v6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
+-- 
+2.34.1
 
 
