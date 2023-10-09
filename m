@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-39077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 203127BDCE5
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:53:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C3557BDCF0
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:58:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E00C81C208E1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:53:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9418328150F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEC5179A4;
-	Mon,  9 Oct 2023 12:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qj+3v/rD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D191803A;
+	Mon,  9 Oct 2023 12:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBB2C8F8;
-	Mon,  9 Oct 2023 12:53:15 +0000 (UTC)
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA13C9D;
-	Mon,  9 Oct 2023 05:53:12 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5a21ea6baccso54650617b3.1;
-        Mon, 09 Oct 2023 05:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696855992; x=1697460792; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XsH+1QX7hsku5ET4BmlWuuWtr+U2Xh27ghsMF+v5n9c=;
-        b=Qj+3v/rDefinMDB+HmlmkCS/Cbemmz+6WH+zxwKtOn+0veSoQn+eyUfWSSTcUgeKwg
-         Uefr9MQUVcz/w3O5LOLDGnvKaNSBvJbSFFMn9ydNE8ozbJp7YFp5z/9sjsOfEZIxdE04
-         jHAuViahn76q+HqYUS9h2+KRmSZ08Mz7lWBA/8VY4m7/29lB+mFHdxBg8gJHqBR2j6aa
-         TvuCfPg3gItd+c/PV5Bq3Uo6FSulHQ6nUYfE/IJ448S0JRxmDDRkgJ74cqgnbqpClqvr
-         HPUH+qQyzP7ySF6Dif5zRzatvKX3DDn+YjY+zhi8eGYNnKP5BhgZ+5nysxHKjh5+avem
-         cG9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696855992; x=1697460792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XsH+1QX7hsku5ET4BmlWuuWtr+U2Xh27ghsMF+v5n9c=;
-        b=p7v14Hr4jNRDzb9LZzTJf3TlHJ8h/by5TGiiutMXKEkSTHSbvJa6RDYZwzHn9oRSDa
-         KFp8H87oRLYDG+pX6LtRrouSHZk0UQxFmb8YqC0Al9jOphLnPuY9Tep96yGWyKXFdteD
-         UQXno34Uvvjpq9tvuJUMBIkZw7vkW2Q4ymBF7nnCUNe+Je/rG2AJlWWfg+XRHaGnxYS8
-         poT165H1dky7sIVCX3DWDtDsA0qgXJza4YwtJkF6iQrIBX7N2dnMunj0KO/NtiYxNKCW
-         E9nEYej7uQTpsqUviP3OmiQynsVnRmOssrzTb56ueDpyAOPSzCUms03OB70Ox1/aiexe
-         wyyg==
-X-Gm-Message-State: AOJu0Yz5WLY+/xTTuj7fZe4DdFbYPVYv63nT6gAks0dWZofqifpqWj7U
-	r0FIXpVVrrYd0fpwZjJ7+Up+bwbGRisWjMPhYeQ=
-X-Google-Smtp-Source: AGHT+IGOPofh50OtRMO6gOE7TN3Wrw+Ctm2WnKWzL3gBLVfAT0ZVl+vOa/ZIJ+Vo+Yam0sPwIdK+d/lzuLx2L/S5kRo=
-X-Received: by 2002:a0d:f182:0:b0:5a4:3e67:35a3 with SMTP id
- a124-20020a0df182000000b005a43e6735a3mr14879274ywf.49.1696855992056; Mon, 09
- Oct 2023 05:53:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E52FE555
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 12:58:51 +0000 (UTC)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62F458F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 05:58:50 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id C183A68CFE; Mon,  9 Oct 2023 14:58:44 +0200 (CEST)
+Date: Mon, 9 Oct 2023 14:58:44 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: Christoph Hellwig <hch@lst.de>, iommu@lists.linux.dev,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>,
+	Greg Ungerer <gerg@linux-m68k.org>
+Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
+Message-ID: <20231009125843.GA7272@lst.de>
+References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-6-hch@lst.de> <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com> <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
-In-Reply-To: <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 9 Oct 2023 14:53:00 +0200
-Message-ID: <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, greg@kroah.com, tmgross@umich.edu, 
-	Andrea Righi <andrea.righi@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 2:48=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Mon, Oct 09, 2023 at 11:29:12AM +0100, Robin Murphy wrote:
+> It looks a bit odd that this ends up applying to all of Coldfire, while the 
+> associated cache flush only applies to the M532x platform, which implies 
+> that we'd now be relying on the non-coherent allocation actually being 
+> coherent on other Coldfire platforms.
 >
-> Any ideas?
+> Would it work to do something like this to make sure dma-direct does the 
+> right thing on such platforms (which presumably don't have caches?), and 
+> then reduce the scope of this FEC hack accordingly, to clean things up even 
+> better?
 
-That is `RETHUNK` and `X86_KERNEL_IBT`.
+Probably.  Actually Greg comment something along the lines last
+time, and mentioned something about just instruction vs instruction
+and data cache.
 
-Since this will keep confusing people, I will make it a `depends on !`
-as discussed in the past. I hope it is OK for e.g. Andrea.
+>
+> diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+> index b826e9c677b2..1851fa3fe077 100644
+> --- a/arch/m68k/Kconfig.cpu
+> +++ b/arch/m68k/Kconfig.cpu
+> @@ -27,6 +27,7 @@ config COLDFIRE
+>  	select CPU_HAS_NO_BITFIELDS
+>  	select CPU_HAS_NO_CAS
+>  	select CPU_HAS_NO_MULDIV64
+> +	select DMA_DEFAULT_COHERENT if !MMU && !M523x
 
-Cheers,
-Miguel
+Although it would probably make more sense to simply not select
+CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE and
+CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU for these platforms and not
+build the non-coherent code at all.  This should also include
+all coldfire platforms with mmu (M54xx/M548x/M5441x).  Then
+again for many of the coldfire platforms the Kconfig allows
+to select CACHE_WRITETHRU/CACHE_COPYBACK which looks related.
+
+Greg, any chance you could help out with the caching modes on
+coldfire and legacy m68knommu?
+
 
