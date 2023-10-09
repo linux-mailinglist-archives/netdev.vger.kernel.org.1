@@ -1,74 +1,99 @@
-Return-Path: <netdev+bounces-39003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B597BD690
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:16:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4029E7BD6E6
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8127A1C20864
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:16:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 727BD1C2086A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D1F154A7;
-	Mon,  9 Oct 2023 09:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B68154B7;
+	Mon,  9 Oct 2023 09:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF228F43
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:16:31 +0000 (UTC)
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68113A2;
-	Mon,  9 Oct 2023 02:16:30 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 4AA1468CFE; Mon,  9 Oct 2023 11:16:26 +0200 (CEST)
-Date: Mon, 9 Oct 2023 11:16:25 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Christoph Hellwig <hch@lst.de>, iommu@lists.linux.dev,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
-	netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH 1/6] dma-direct: add depdenencies to
- CONFIG_DMA_GLOBAL_POOL
-Message-ID: <20231009091625.GB22463@lst.de>
-References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-2-hch@lst.de> <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997A5FC04
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:25:17 +0000 (UTC)
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com [209.85.167.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EEAD2683
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 02:23:53 -0700 (PDT)
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3ae65e9d394so6244606b6e.2
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 02:23:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696843432; x=1697448232;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hPujDRn6mquV4gNuBOn8UaHjz6kc/QET8wVwYt94UoE=;
+        b=IMWdfdpbFCsaQtQeJB/X5zDOWGoRmjkRIkI/qBwVSSv/cCCJVgSrSUOpQHdekVzO1X
+         rs+66JecIkoXL+bZG1FEq+Vh4NSPAvLY0x7qTwlhuk6flJbJZPU6Gemq5/LIhH7QPYdy
+         5XjeZzn6IsxR46eR/FHRS1rqJGXlAk3yoiZubuKK6IsdkXbD84sOxUCQWMyTMnLgARg4
+         WMUsH7IBdTqX1oD5D9Ys8IfUlcX/KJzPHRQfzjV/iFrN5X/mipDwBZM8U5kKMfey8AL5
+         f1D+Hrs3BoFy/zxwYKgyQcKhyXpDjqIUjlC8mlQ2N3YIsCILvhsQN7vsU6cS9PaDPNDe
+         Imdw==
+X-Gm-Message-State: AOJu0YwDlh26w8olu7q7zuSEVRI13JreUw1TPNCVspTPO5P1zYNXZDK2
+	gVzuWkivRJ0ePkboNUIPOqhtl9m6KW44VsvSGaKqvVFVK75H
+X-Google-Smtp-Source: AGHT+IFn7BeMZbPq9UpSpWnsypz/Ixh2f8OpofsNTYYDSsEp2wb+6MTEBCLN8FYolbTDp8eOnaZ9OquBpDLdbMsmtCwRk8qgsSPj
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Received: by 2002:a05:6808:2025:b0:3ad:fe71:10cd with SMTP id
+ q37-20020a056808202500b003adfe7110cdmr7702930oiw.11.1696843432454; Mon, 09
+ Oct 2023 02:23:52 -0700 (PDT)
+Date: Mon, 09 Oct 2023 02:23:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000007f0d90607452652@google.com>
+Subject: [syzbot] Monthly batman report (Oct 2023)
+From: syzbot <syzbot+listbc635e7898634771116b@syzkaller.appspotmail.com>
+To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, 
+	linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
+	netdev@vger.kernel.org, sven@narfation.org, sw@simonwunderlich.de, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_DIGITS,
+	FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H2,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 10:43:57AM +0200, Geert Uytterhoeven wrote:
-> >  config DMA_DIRECT_REMAP
-> 
-> riscv defconfig + CONFIG_NONPORTABLE=y + CONFIG_ARCH_R9A07G043=y:
-> 
-> WARNING: unmet direct dependencies detected for DMA_GLOBAL_POOL
->   Depends on [n]: !ARCH_HAS_DMA_SET_UNCACHED [=n] && !DMA_DIRECT_REMAP [=y]
->   Selected by [y]:
->   - ARCH_R9A07G043 [=y] && SOC_RENESAS [=y] && RISCV [=y] && NONPORTABLE [=y]
+Hello batman maintainers/developers,
 
-And that's exactly what this patch is supposed to show.  RISCV must not
-select DMA_DIRECT_REMAP at the same time as DMA_GLOBAL_POOL.  I though
-the fix for that just went upstream?
+This is a 31-day syzbot report for the batman subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/batman
 
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 7 issues are still open and 22 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 167     Yes   INFO: rcu detected stall in batadv_nc_worker (3)
+                  https://syzkaller.appspot.com/bug?extid=69904c3b4a09e8fa2e1b
+<2> 150     No    KMSAN: uninit-value in bpf_prog_run_generic_xdp
+                  https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
+<3> 2       Yes   memory leak in skb_clone (2)
+                  https://syzkaller.appspot.com/bug?extid=92f9b5fba2df252a3569
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
