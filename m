@@ -1,106 +1,106 @@
-Return-Path: <netdev+bounces-39290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DE5A7BEB25
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:01:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CABB67BEB47
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E3D280E3A
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8CEE1C209DD
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160143D3A6;
-	Mon,  9 Oct 2023 20:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889A83D982;
+	Mon,  9 Oct 2023 20:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jcline.org header.i=@jcline.org header.b="mfumQgKC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="JlZ2nr6c"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mqCFhRXp";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="f0ypCYly"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E319D3B7A6
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903403B7B3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:08:26 +0000 (UTC)
 Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEBDB94;
-	Mon,  9 Oct 2023 13:01:01 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 67DF65C032E;
-	Mon,  9 Oct 2023 16:00:59 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Mon, 09 Oct 2023 16:00:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jcline.org; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm2; t=1696881659; x=
-	1696968059; bh=KFJlfLmUur1TF6+IynsFY6BXUkOLslkI1mlBrnqgyjA=; b=m
-	fumQgKCR+oxJg/K2hWo1Dy5kKTXmalj5XZ2hMDLUEIjjASlqc1xvOvgm0e9n83fI
-	kQw4FV2jid8N9TfrbN41ry0i8P20hWeBwIS21gwfYBu/xyeFBbVyyTrCibzB/6Xk
-	S2Oz/IwZh9s2TUEtyWk/RaqZ9wz9/7PRK4zuWO5dj0KTFp1uWb3XA99c+9jQ3lz7
-	fs2Sl/AVlZAaLmA+FdAITgPKPapc5VwEVvfIBB3ivHFUpU0Y835A5tTJcu3V3sh7
-	7YKC9xTE9mEsewjc5T32nQmHHulp2qJHvhJ496qBlNePIlh62dnlH8qP2b2Cad0x
-	uxLP60wP52VbAx/pNyh4Q==
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE46FBA;
+	Mon,  9 Oct 2023 13:08:23 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 24AEF5C032A;
+	Mon,  9 Oct 2023 16:08:23 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Mon, 09 Oct 2023 16:08:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1696882103; x=1696968503; bh=Qn
+	k/hYJGt8vMGvwYuS7TovawYU4FITkdWpH78jnqJOs=; b=mqCFhRXpOKbM3+gzw6
+	p5PhWXSGZc4ogwVsdkuo+A43m0smOPhhYMz78yJvgnl3rvP/0KP/Yyz47bWfbLI5
+	hACl6ENILilhp63gtNoE5sEtTvbwNsWX/LXMcHpkz0wzqkQE8Ndlz+z4YS7AQUAf
+	GljZGp1E/6Pjf+6/oSfGUGj03jNY8coKUztcfYu6K6U7LoTipcfr2cXV0LybV0HE
+	ehUr7BFFu5YfclBwoo7jtAeBLE7wuQUYAW5JBxqOd8miccBlDvavQBA9jw44/zt/
+	Ge4jceNUA6w2jbKSIJ1YxQ0vJUesse+nKNVZfS7xAecqP9LaZE21UO2MfTUxCKeS
+	2mjw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1696881659; x=
-	1696968059; bh=KFJlfLmUur1TF6+IynsFY6BXUkOLslkI1mlBrnqgyjA=; b=J
-	lZ2nr6c2vc2qNb1TkWyfTzUluHlH4j8pfh63WBXulVmmiKyNrw/ZILmjzFgvel37
-	IEnomApgmIFE7XA/Hdj2YQ+574vLvzHQJv4VkK7XRkk5tTkoNyLsuWUKepk7rcB5
-	pHAU4dxo6YAKPUUlv93QSk9PZRDiKw7AWthXZ3Ssau2qmsCLQ+NXbGcNunU2YIVD
-	U6BzfFrfRU56sW5kXT3bwuDQv+xUixobTThoyQ3aFExVmM4g7yI7w2/F0/3vqFKx
-	6PFrTr7HR8CE3uKz03oZArxPXBNrAkQO8KQbMc4L6zt5xqMG2r7tVyKR5SiO0KIv
-	IJH8+OJAh1p32MTs5VxcA==
-X-ME-Sender: <xms:-lskZRKfpKBNHkwLGAXRkm6NLZk-O6zl4urEqURtgU8Fp3ulNNLtcw>
-    <xme:-lskZdICkNUR1Lgqcu3E9FOQyJwmBBa5YT43OBySakdy65K4dFnzIbsnZwjfFmHD4
-    Gl1pKv6a3bY-9vW0pg>
-X-ME-Received: <xmr:-lskZZs30v2jYbN3AKginJzMtbToNItl-SOHb4CB8qi-DUpvyncc8-N9tN725cKLdevthMfcvbRVgoY56pNN7sLVIEadTJJkUp7w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgddugeefucetufdoteggodetrfdotf
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696882103; x=1696968503; bh=Qnk/hYJGt8vMG
+	vwYuS7TovawYU4FITkdWpH78jnqJOs=; b=f0ypCYly03Y1wuHi2Z6wYewa6ofwr
+	rXHCSBaMW1h7QfTvDtRJwi8rU0it8is84Gbt/RLmh+5rwaZC2VGVfi5QImFok+Ag
+	mEIIlgBptd4PLeaTwBDVRgIEVsFrDPX7L0GvXn9/qZu+uEHyu99V5qODgUkk7gvX
+	75yD99Q0SXtM8SsEcJQK80aqK8WE+t0TR5LWxJiesFQx07hgjT26Qcgso1mdmUof
+	MW7qKZq/6nH8plFrjV+oJqp0ma9r4r4s0Zu2Thn5TCQyecftNC2Di+ozRCGJBgYY
+	DdWoVysC07AELOwJjOIO5+j0ZErv0f0ymPN+5W2vU8YmpSwGAXc5CpOEA==
+X-ME-Sender: <xms:tl0kZdUSxlakiUfO9FFK6SiHegcIpgCKv9_8DB2jz6N7Ce5qQd6XsQ>
+    <xme:tl0kZdl-k0Gh-TP5vBbEgYcrhYQ9TI38AIMhAo5a87f4OvK-4oDw6kC7dg5nOvlda
+    c1_Z4IB_NosQCBIXCE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgddugeehucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomheplfgvrhgv
-    mhihucevlhhinhgvuceojhgvrhgvmhihsehjtghlihhnvgdrohhrgheqnecuggftrfgrth
-    htvghrnhepheevffeftedvfeeuffetjeevkeefheefjeegheffveekgeeujeehgfevvdfg
-    udeknecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhgvrhgvmhih
-    sehjtghlihhnvgdrohhrgh
-X-ME-Proxy: <xmx:-lskZSZbPuIcvi7WkQdNbRM666eIkOktEq-vZaKWG7gnQb8aKHCwBw>
-    <xmx:-lskZYa3vJF73TX5GFmCnPIgvSFShfC7WMb2hwCc5l0uzMa-4GhMXg>
-    <xmx:-lskZWAkq376C7FATJM8eu11VRN0RZFf3hnSkgvfzXv2nk5i8aq2Bw>
-    <xmx:-1skZUS0vtjYZoGM9L0LJHFW1Vh4UFQc_3-DM_pK9Zv9AoBxB5TOLw>
-Feedback-ID: i7a7146c5:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 9 Oct 2023 16:00:57 -0400 (EDT)
-From: Jeremy Cline <jeremy@jcline.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Lin Ma <linma@zju.edu.cn>,
-	Ilan Elias <ilane@ti.com>,
-	"John W . Linville" <linville@tuxdriver.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Jeremy Cline <jeremy@jcline.org>,
-	syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-Subject: [PATCH v2 net] nfc: nci: assert requested protocol is valid
-Date: Mon,  9 Oct 2023 16:00:54 -0400
-Message-ID: <20231009200054.82557-1-jeremy@jcline.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230906233347.823171-1-jeremy@jcline.org>
-References: <20230906233347.823171-1-jeremy@jcline.org>
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepgeetiefhjedvhfeffffhvddvvdffgfetvdetiefghefhheduffeljeeuuddv
+    lefgnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:tl0kZZZQMIW6RWr3x42jPiC9drCxlxSK_g0DBgg366ugaUZmIf503Q>
+    <xmx:tl0kZQWAJMHf0U76paad2iB94pRNxUuvsC97CJzBbRGAvmI7kBWHQA>
+    <xmx:tl0kZXnEbp7Cmwm4JV61eNkY4JfK-CK2f_h4efCjSNyZWPOCFncH3A>
+    <xmx:t10kZc8TvDBWITpAna4SSGxoS4f2tvuQm5AzRcXvQPuQLe_ssVA10A>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 18E3BB60089; Mon,  9 Oct 2023 16:08:22 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <15f6b85f-b1ce-409a-a728-38a7223a7c6c@app.fastmail.com>
+In-Reply-To: <202310091246.ED5A2AFB21@keescook>
+References: <20231009134826.1063869-1-arnd@kernel.org>
+ <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
+ <202310090902.10ED782652@keescook>
+ <73f552a4-4ff5-441a-a624-ddc34365742f@app.fastmail.com>
+ <202310091246.ED5A2AFB21@keescook>
+Date: Mon, 09 Oct 2023 22:08:01 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Kees Cook" <keescook@chromium.org>
+Cc: "Arnd Bergmann" <arnd@kernel.org>,
+ "Marcel Holtmann" <marcel@holtmann.org>,
+ "Johan Hedberg" <johan.hedberg@gmail.com>,
+ "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Chun-Yi Lee" <jlee@suse.com>,
+ "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>, stable@vger.kernel.org,
+ "Iulia Tanasescu" <iulia.tanasescu@nxp.com>,
+ "Wenjia Zhang" <wenjia@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Content-Type: text/plain
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
 	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
@@ -108,39 +108,66 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The protocol is used in a bit mask to determine if the protocol is
-supported. Assert the provided protocol is less than the maximum
-defined so it doesn't potentially perform a shift-out-of-bounds and
-provide a clearer error for undefined protocols vs unsupported ones.
+On Mon, Oct 9, 2023, at 21:48, Kees Cook wrote:
+> On Mon, Oct 09, 2023 at 08:23:08PM +0200, Arnd Bergmann wrote:
+>> On Mon, Oct 9, 2023, at 18:02, Kees Cook wrote:
+>> > On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
+>> >> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
+>> >> 
+>> >> Sorry, I have to retract this, something went wrong on my
+>> >> testing and I now see the same problem in some configs regardless
+>> >> of whether the patch is applied or not.
+>> >
+>> > Perhaps turn them into macros instead?
+>> 
+>> I just tried that and still see the problem even with the macro,
+>> so whatever gcc is doing must be a different issue. Maybe it
+>> has correctly found a codepath that triggers this?
+>> 
+>> If you are able to help debug the issue better,
+>> see these defconfigs for examples:
+>> 
+>> https://pastebin.com/raw/pC8Lnrn2
+>> https://pastebin.com/raw/yb965unC
+>
+> This seems like a GCC bug. It is complaining about &hdev->bdaddr for
+> some reason. This silences it:
+>
+> -	if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
+> +	a = hdev->bdaddr;
+> +	if (!bacmp(&a, &ev->bdaddr)) {
 
-Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
-Signed-off-by: Jeremy Cline <jeremy@jcline.org>
----
-Changes from v1:
-    - Target the correct tree (net)
+Right, I see this addresses all instances. I tried another thing
+and this also seems to address them for me:
 
- net/nfc/nci/core.c | 5 +++++
- 1 file changed, 5 insertions(+)
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3273,7 +3273,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
+        /* Reject incoming connection from device with same BD ADDR against
+         * CVE-2020-26555
+         */
+-       if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
++       if (hdev && !bacmp(&hdev->bdaddr, &ev->bdaddr)) {
+                bt_dev_dbg(hdev, "Reject connection with same BD_ADDR %pMR\n",
+                           &ev->bdaddr);
+                hci_reject_conn(hdev, &ev->bdaddr);
 
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index fff755dde30d..6c9592d05120 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -909,6 +909,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
- 		return -EINVAL;
- 	}
+and also this one does the trick:
+
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -266,7 +266,7 @@ void bt_err_ratelimited(const char *fmt, ...);
+ #define BT_DBG(fmt, ...)       pr_debug(fmt "\n", ##__VA_ARGS__)
+ #endif
  
-+	if (protocol >= NFC_PROTO_MAX) {
-+		pr_err("the requested nfc protocol is invalid\n");
-+		return -EINVAL;
-+	}
-+
- 	if (!(nci_target->supported_protocols & (1 << protocol))) {
- 		pr_err("target does not support the requested protocol 0x%x\n",
- 		       protocol);
--- 
-2.41.0
+-#define bt_dev_name(hdev) ((hdev) ? (hdev)->name : "null")
++#define bt_dev_name(hdev) ((hdev)->name)
+ 
+ #define bt_dev_info(hdev, fmt, ...)                            \
+        BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
 
+So what is actually going on is that the bt_dev_dbg() introduces
+the idea that hdev might be NULL because of the check.
+
+     Arnd
 
