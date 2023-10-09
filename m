@@ -1,175 +1,299 @@
-Return-Path: <netdev+bounces-39034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDA47BD816
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:07:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4377BD7FF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFE571C20A4C
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53FD72814A3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A75179B2;
-	Mon,  9 Oct 2023 10:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F6F1775B;
+	Mon,  9 Oct 2023 10:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rqQ537MT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8+1A5NU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30021171B
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:07:27 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52CF5CF;
-	Mon,  9 Oct 2023 03:07:25 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mkXS6jkYGiMHxgtY4dpmbY9caToPesRpVHorUaH/S0t9b1zPLtj/3LkwZdET1qd1T3CRdMpiQMgSb+H4udzcKgy8Xe+v9L2/TQ/sJI475jxS3Qewy0D8rvWgDrIHL85db+0brGjzQzacU137W+zz1+ah37erBTqp5B0+LfnWzVlc/RFs53zR4vnTVr5n+6co24mUfJ1I5ad/mx1cRAXFdcSjkmQzN3jYEKmM834SWSJDiiDpLJVoP+fO0WBuMNMVckXUBiQn/lCCgqKIM8jNVsZaT5tPIoryXlxJ1bCG+aV3UCWD1LGvhWP9nUPlg1e9QpriBFiN6aqPf3F/xDwuCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pt/wU6WZ7GRXHaUbxO4XGUjytCIUM1CTzE/+Q9sHSjs=;
- b=gMaFKdg3pA76oySDD19sn/fIoLHsKABz8NOgB0yWkD7g/X0mlWcROT/Lm6+xdhY6qRCee+rolYt1oeubF5dErIouDQnG0avhfcOBw2YKvGBnmWpT0cru9OEU3SN6sRSt1S2zNZ58I4k/iSc+vk32WYkr/TWdWi73BrJqk9FFQucOQ9qTiwGKQbOIFwxExR1+k+Cy1p1Rvh4yRdkCJm4pERm8aHoDAZceTorFWlW382MFmPytn3xENlH+4wZsbX/V2Jkti2lbdcGbMjcT+OmWvTLO6d+mDI2qSVvOyH8Oc/ng1g6+Q0TueGB/9zX79EaKardsWGo19FMvc7xyS7DR9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pt/wU6WZ7GRXHaUbxO4XGUjytCIUM1CTzE/+Q9sHSjs=;
- b=rqQ537MTTePZo23+PRGN1cX/bhrswaiLYMG8gJXEZx8MyUZdVVqMYRS7YcH0nPApvh9wFrYYShiQfy1g24LrhXcFfi6+v+mQNzumFwDOJ0+lon/SX/+m6bT98xTmnwyMa/hg2QIdzpZpGIToFx5U41yi3NQR483gwmtDWkWaEKjX0F7UVnFppCIITWOXjS16gsmSeqmkUaYAofGhx0SIhOoR+FxgJDrSDNplsNjCUTWo6ksEVuD/CZHdCmv2hvPGD4W3fK/bqHwCEWvsgXtg+cRVHXLO3WtN6CjBB966ixpRdTkTXf2GNDgLHXX0+ok+CXR/7lJzIvtGmFcDNO2Hhw==
-Received: from MWH0EPF00056D13.namprd21.prod.outlook.com
- (2603:10b6:30f:fff2:0:1:0:16) by PH7PR12MB7258.namprd12.prod.outlook.com
- (2603:10b6:510:206::5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Mon, 9 Oct
- 2023 10:07:21 +0000
-Received: from MWH0EPF000989EB.namprd02.prod.outlook.com
- (2a01:111:f403:f805::) by MWH0EPF00056D13.outlook.office365.com
- (2603:1036:d20::b) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6838.14 via Frontend
- Transport; Mon, 9 Oct 2023 10:07:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000989EB.mail.protection.outlook.com (10.167.241.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6838.14 via Frontend Transport; Mon, 9 Oct 2023 10:07:21 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 9 Oct 2023
- 03:07:10 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Mon, 9 Oct 2023 03:07:06 -0700
-From: Amit Cohen <amcohen@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <mlxsw@nvidia.com>, <idosch@nvidia.com>, <kuba@kernel.org>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <roopa@nvidia.com>,
-	<razor@blackwall.org>, <shuah@kernel.org>, <pabeni@redhat.com>,
-	<bridge@lists.linux-foundation.org>, <linux-kselftest@vger.kernel.org>, "Amit
- Cohen" <amcohen@nvidia.com>, Petr Machata <petrm@nvidia.com>
-Subject: [PATCH net-next 05/11] vxlan: vxlan_core: Support FDB flushing by source VNI
-Date: Mon, 9 Oct 2023 13:06:12 +0300
-Message-ID: <20231009100618.2911374-6-amcohen@nvidia.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231009100618.2911374-1-amcohen@nvidia.com>
-References: <20231009100618.2911374-1-amcohen@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47D4DF44;
+	Mon,  9 Oct 2023 10:06:53 +0000 (UTC)
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8CC97;
+	Mon,  9 Oct 2023 03:06:51 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id ada2fe7eead31-4526b9404b0so3687960137.0;
+        Mon, 09 Oct 2023 03:06:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696846010; x=1697450810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KUulTN1h38HfKtLoczTxDqQh9DCfOrCmaxardUNW3tA=;
+        b=H8+1A5NUj1Ns4BMSQGYNeq07qjAqcHTNxBt2ckfSYv131nmJwQU0lX71MSvTdB2eJF
+         MQDV5gC5JGyHzIOKin3dulQko8S6JI9q/LGtEd4m6lcYJUY02aWh5xQx9MJXbNMkPztp
+         wYQZW8exDLzUj75XJJQSdZtxuXEPAS0LCP9w3arENQ84PScxD3pshlvPhZcijt5XW2P/
+         iefTErOow0/loEF2fB84xzrkC4jzG+KXxFvwhP/zWJNNCX2zFkh8GhtBix1+PVpK38NG
+         GXqsOMNMdFMI+iz1uW6picVTsSovnlVvAhR46XGJghIrRJHkfosOMdmqa3mq87nRVDSo
+         4sVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696846010; x=1697450810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KUulTN1h38HfKtLoczTxDqQh9DCfOrCmaxardUNW3tA=;
+        b=Wz0WzgPoo3WTK9BuHbFqrpk2uuDE5Y0hcoddFmFMYM0QvIUBUNE0azjeI4o53AKuZE
+         s6NpVOhd7zEYaZ9pQRUEqKXBQkOj6ZZHzZLsdtBgxliOj823sH+tUPSwS1KnXGg/bAup
+         /KES58ypSzzVO/98Qsl5/O+PFK+xNPO0/f3UvAcIY2zIGmulOR03fgs8RZ/H8kfzVoK4
+         b9WqaSefTrICfIIzuaybj62mN2Kj6jwUWPNVZy9slG2gS8qlwMN0W+9PJru67Jz/4P75
+         Lhjz5h4hUHFk/i7HaNdZnak8V5ir52vq8o+kwbBVqG3LtnkG+mHEaKX9/irOzKALn4o+
+         bLJw==
+X-Gm-Message-State: AOJu0YxxnL+gAzbG6vEQbhSDRKwljPLoMNphnydw66bz7n7ZLWI6LWQQ
+	fIaxLWpOBk1JGCTfW2fV0N1AnbltBmJUkSld6ks=
+X-Google-Smtp-Source: AGHT+IGeiHftpvohpaihVWI8j4pdDM3FdFbyTLW7xo376tPGFfTL1jLnkf6qSqJR0XyB8zSyHHRzZVF0eAddRpMqimY=
+X-Received: by 2002:a67:ee49:0:b0:452:d5cb:a211 with SMTP id
+ g9-20020a67ee49000000b00452d5cba211mr6160893vsp.15.1696846010494; Mon, 09 Oct
+ 2023 03:06:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989EB:EE_|PH7PR12MB7258:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c39c77f-0f3f-4ac3-f7f5-08dbc8af874c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	chqF84LtRMbHLNhnXlPCxERigf8pkNiHAoGYyYIUh1GXQ9HmoKgWZK9Wtp1yU41diLvmAWVJQlheWlyrYFCCYz/rUoPa1J540UPa4TosarP9Gsem/jyl/Zf/Enmo+ng9lr1oKDwtFZdL3rHvOrO6+1RmEenIgnSymeLyMC8qLpycJ7+SSqXyHnh+mTwTP1KYMzyCLWQAg8B28H6YfN6ye7Z4fgVLBZ/zh/DM1pMqmk5AGfyWkbipB503oM8P8YDuIosajpnUgiI0OPIwr1k7l5IDHh2UcxchviC9kK2EOZG5n3ete0gQ7bp1LuJe32QnlwBM22WBFpxEZy3nLPQfEKHXk4rjP3JMKtDUt7OLTbwpePbXYYZAWnOFuk4++GdAQq2BS6j2rCFweKslAgwX0wbghd6JX+xm+yI/ct42z4mpl5NwIBgF3XHK91A7iGqCHnYPlYLw8KAzo4j7MnoS+UhtW2y3smc5tVcB67nJCOPUKLA0VVt5sYeyIdJmgjkfQod/MkIk3E1f//HSCLx1fHqN5UECiq/gcVzOAIkSyXlUSdjpa9ySOgdAVqKizmhLSDyWDCDdwi1tfIPnFj6SLwCrUReH4qnGxvBzo7lOGHxSIvZg/+BPzea2vOgUTeXP+Oqr2quiEWJALIrAmiWTNC+HSWyEilz3gKbx3Yh1NdqXP7gQt/qDgosE7A5rewRZDrueLJ5UzJ6m0ga2cFH82J4/I98IkL/vUuFEcCJpCdw=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(396003)(346002)(39860400002)(376002)(230922051799003)(451199024)(64100799003)(82310400011)(186009)(1800799009)(46966006)(40470700004)(36840700001)(40480700001)(40460700003)(83380400001)(1076003)(107886003)(2616005)(336012)(426003)(16526019)(26005)(47076005)(36860700001)(316002)(54906003)(70206006)(70586007)(6916009)(8936002)(8676002)(4326008)(5660300002)(41300700001)(6666004)(2906002)(82740400003)(478600001)(36756003)(356005)(7636003)(86362001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2023 10:07:21.6763
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c39c77f-0f3f-4ac3-f7f5-08dbc8af874c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989EB.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7258
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+ <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+ <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com> <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
+ <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com> <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
+ <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com>
+In-Reply-To: <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 9 Oct 2023 03:06:13 -0700
+Message-ID: <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
+	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
+	pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com, 
+	elver@google.com, pabeni@redhat.com, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add support for flush VXLAN FDB entries by source VNI.
+On Mon, Oct 9, 2023 at 3:02=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> On 2023/10/09 18:57, Willem de Bruijn wrote:
+> > On Mon, Oct 9, 2023 at 3:57=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
+nix.com> wrote:
+> >>
+> >> On 2023/10/09 17:04, Willem de Bruijn wrote:
+> >>> On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> >>>>
+> >>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
+> >>>>> On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.odak=
+i@daynix.com> wrote:
+> >>>>>>
+> >>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
+> >>>>>>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko.oda=
+ki@daynix.com> wrote:
+> >>>>>>>>
+> >>>>>>>> virtio-net have two usage of hashes: one is RSS and another is h=
+ash
+> >>>>>>>> reporting. Conventionally the hash calculation was done by the V=
+MM.
+> >>>>>>>> However, computing the hash after the queue was chosen defeats t=
+he
+> >>>>>>>> purpose of RSS.
+> >>>>>>>>
+> >>>>>>>> Another approach is to use eBPF steering program. This approach =
+has
+> >>>>>>>> another downside: it cannot report the calculated hash due to th=
+e
+> >>>>>>>> restrictive nature of eBPF.
+> >>>>>>>>
+> >>>>>>>> Introduce the code to compute hashes to the kernel in order to o=
+vercome
+> >>>>>>>> thse challenges. An alternative solution is to extend the eBPF s=
+teering
+> >>>>>>>> program so that it will be able to report to the userspace, but =
+it makes
+> >>>>>>>> little sense to allow to implement different hashing algorithms =
+with
+> >>>>>>>> eBPF since the hash value reported by virtio-net is strictly def=
+ined by
+> >>>>>>>> the specification.
+> >>>>>>>>
+> >>>>>>>> The hash value already stored in sk_buff is not used and compute=
+d
+> >>>>>>>> independently since it may have been computed in a way not confo=
+rmant
+> >>>>>>>> with the specification.
+> >>>>>>>>
+> >>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>>>>>> ---
+> >>>>>>>
+> >>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D {
+> >>>>>>>> +       .max_indirection_table_length =3D
+> >>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+> >>>>>>>> +
+> >>>>>>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
+> >>>>>>>> +};
+> >>>>>>>
+> >>>>>>> No need to have explicit capabilities exchange like this? Tun eit=
+her
+> >>>>>>> supports all or none.
+> >>>>>>
+> >>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
+> >>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_=
+EX.
+> >>>>>>
+> >>>>>> It is because the flow dissector does not support IPv6 extensions.=
+ The
+> >>>>>> specification is also vague, and does not tell how many TLVs shoul=
+d be
+> >>>>>> consumed at most when interpreting destination option header so I =
+chose
+> >>>>>> to avoid adding code for these hash types to the flow dissector. I=
+ doubt
+> >>>>>> anyone will complain about it since nobody complains for Linux.
+> >>>>>>
+> >>>>>> I'm also adding this so that we can extend it later.
+> >>>>>> max_indirection_table_length may grow for systems with 128+ CPUs, =
+or
+> >>>>>> types may have other bits for new protocols in the future.
+> >>>>>>
+> >>>>>>>
+> >>>>>>>>             case TUNSETSTEERINGEBPF:
+> >>>>>>>> -               ret =3D tun_set_ebpf(tun, &tun->steering_prog, a=
+rgp);
+> >>>>>>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering_pro=
+g, argp);
+> >>>>>>>> +               if (IS_ERR(bpf_ret))
+> >>>>>>>> +                       ret =3D PTR_ERR(bpf_ret);
+> >>>>>>>> +               else if (bpf_ret)
+> >>>>>>>> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_HASH=
+_RSS;
+> >>>>>>>
+> >>>>>>> Don't make one feature disable another.
+> >>>>>>>
+> >>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+> >>>>>>> functions. If one is enabled the other call should fail, with EBU=
+SY
+> >>>>>>> for instance.
+> >>>>>>>
+> >>>>>>>> +       case TUNSETVNETHASH:
+> >>>>>>>> +               len =3D sizeof(vnet_hash);
+> >>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+> >>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>> +                       break;
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
+> >>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_ne=
+t_hdr_v1_hash) ||
+> >>>>>>>> +                     !tun_is_little_endian(tun))) ||
+> >>>>>>>> +                    vnet_hash.indirection_table_mask >=3D
+> >>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH)=
+ {
+> >>>>>>>> +                       ret =3D -EINVAL;
+> >>>>>>>> +                       break;
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>> +               len =3D (vnet_hash.indirection_table_mask + 1) *=
+ 2;
+> >>>>>>>> +               if (copy_from_user(vnet_hash_indirection_table, =
+argp, len)) {
+> >>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>> +                       break;
+> >>>>>>>> +               }
+> >>>>>>>> +
+> >>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>> +               len =3D virtio_net_hash_key_length(vnet_hash.typ=
+es);
+> >>>>>>>> +
+> >>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
+> >>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>> +                       break;
+> >>>>>>>> +               }
+> >>>>>>>
+> >>>>>>> Probably easier and less error-prone to define a fixed size contr=
+ol
+> >>>>>>> struct with the max indirection table size.
+> >>>>>>
+> >>>>>> I made its size variable because the indirection table and key may=
+ grow
+> >>>>>> in the future as I wrote above.
+> >>>>>>
+> >>>>>>>
+> >>>>>>> Btw: please trim the CC: list considerably on future patches.
+> >>>>>>
+> >>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF change =
+you
+> >>>>>> proposed.
+> >>>>>
+> >>>>> To be clear: please don't just resubmit with that one change.
+> >>>>>
+> >>>>> The skb and cb issues are quite fundamental issues that need to be =
+resolved.
+> >>>>>
+> >>>>> I'd like to understand why adjusting the existing BPF feature for t=
+his
+> >>>>> exact purpose cannot be amended to return the key it produced.
+> >>>>
+> >>>> eBPF steering program is not designed for this particular problem in=
+ my
+> >>>> understanding. It was introduced to derive hash values with an
+> >>>> understanding of application-specific semantics of packets instead o=
+f
+> >>>> generic IP/TCP/UDP semantics.
+> >>>>
+> >>>> This problem is rather different in terms that the hash derivation i=
+s
+> >>>> strictly defined by virtio-net. I don't think it makes sense to
+> >>>> introduce the complexity of BPF when you always run the same code.
+> >>>>
+> >>>> It can utilize the existing flow dissector and also make it easier t=
+o
+> >>>> use for the userspace by implementing this in the kernel.
+> >>>
+> >>> Ok. There does appear to be overlap in functionality. But it might be
+> >>> easier to deploy to just have standard Toeplitz available without
+> >>> having to compile and load an eBPF program.
+> >>>
+> >>> As for the sk_buff and cb[] changes. The first is really not needed.
+> >>> sk_buff simply would not scale if every edge case needs a few bits.
+> >>
+> >> An alternative is to move the bit to cb[] and clear it for every code
+> >> paths that lead to ndo_start_xmit(), but I'm worried that it is error-=
+prone.
+> >>
+> >> I think we can put the bit in sk_buff for now. We can implement the
+> >> alternative when we are short of bits.
+> >
+> > I disagree. sk_buff fields add a cost to every code path. They cannot
+> > be added for every edge case.
+>
+> It only takes an unused bit and does not grow the sk_buff size so I
+> think it has practically no cost for now.
 
-Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
- drivers/net/vxlan/vxlan_core.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+The problem is that that thinking leads to death by a thousand cuts.
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 0aeb973e3da7..8214db56989d 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3028,6 +3028,7 @@ struct vxlan_fdb_flush_desc {
- 	unsigned long			state_mask;
- 	unsigned long                   flags;
- 	unsigned long			flags_mask;
-+	__be32				src_vni;
- };
- 
- static bool vxlan_fdb_is_default_entry(const struct vxlan_fdb *f,
-@@ -3049,6 +3050,9 @@ static bool vxlan_fdb_flush_matches(const struct vxlan_fdb *f,
- 	if (desc->ignore_default_entry && vxlan_fdb_is_default_entry(f, vxlan))
- 		return false;
- 
-+	if (desc->src_vni && f->vni != desc->src_vni)
-+		return false;
-+
- 	return true;
- }
- 
-@@ -3076,6 +3080,7 @@ static void vxlan_flush(struct vxlan_dev *vxlan,
- }
- 
- static const struct nla_policy vxlan_del_bulk_policy[NDA_MAX + 1] = {
-+	[NDA_SRC_VNI]   = { .type = NLA_U32 },
- 	[NDA_NDM_STATE_MASK]	= { .type = NLA_U16 },
- 	[NDA_NDM_FLAGS_MASK]	= { .type = NLA_U8 },
- };
-@@ -3120,6 +3125,9 @@ static int vxlan_fdb_delete_bulk(struct nlmsghdr *nlh, struct net_device *dev,
- 	if (tb[NDA_NDM_FLAGS_MASK])
- 		desc.flags_mask = nla_get_u8(tb[NDA_NDM_FLAGS_MASK]);
- 
-+	if (tb[NDA_SRC_VNI])
-+		desc.src_vni = cpu_to_be32(nla_get_u32(tb[NDA_SRC_VNI]));
-+
- 	vxlan_flush(vxlan, &desc);
- 
- 	return 0;
--- 
-2.40.1
-
+"for now" forces the cost of having to think hard how to avoid growing
+sk_buff onto the next person. Let's do it right from the start.
 
