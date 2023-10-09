@@ -1,105 +1,130 @@
-Return-Path: <netdev+bounces-39259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598487BE8CA
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:59:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334107BE929
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:23:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1392A2819D2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:59:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ABDC1C20975
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:23:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE90738DFA;
-	Mon,  9 Oct 2023 17:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8E138FB6;
+	Mon,  9 Oct 2023 18:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hj1WIpj0"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="XV7aUMVw";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bFwMxcn/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908CD35880;
-	Mon,  9 Oct 2023 17:59:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40B45C433C9;
-	Mon,  9 Oct 2023 17:59:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696874387;
-	bh=cb2RlVIw4noXeBlWpyiD4YYjxMG+5cCZ+39utZ6p6gM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Hj1WIpj0zzjAsMsi1dvVoxdhsRzyggk+NaQPbeJZVWQApNUzsElvGiepI5DBDgPdP
-	 B2Zifh4pmohGQKkl0aCwoOd9U+hWq2Ykynm6Y/Z+7j8hcOwXIaPoweQU0pRwicOtfI
-	 QCT+lKR/6/ad2somVn9EedoZEuUE3R5/orMp4Vy6lEeUf721HtK5Y1Ru0EXfDJBoke
-	 efwg9yl7C/PoVK35hMsgBB3+pqzjvIhJWA0s0T5lbsm0VyRcEVlM+29OPVSG1e37JC
-	 iem45Bx8weBz/dhHtOZlqinJvMsLxHqf5nRKO12XALOar/3Fyy0ydx8YMpTK6MTa5h
-	 sKmCrJRNObpkw==
-Date: Mon, 9 Oct 2023 11:59:41 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] wifi: mac80211: Add __counted_by for struct
- ieee802_11_elems and use struct_size()
-Message-ID: <ZSQ/jcmTAf/PKHg/@work>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D4B3714F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:23:31 +0000 (UTC)
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 137129C;
+	Mon,  9 Oct 2023 11:23:30 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.nyi.internal (Postfix) with ESMTP id 7A83B5C02A5;
+	Mon,  9 Oct 2023 14:23:29 -0400 (EDT)
+Received: from imap50 ([10.202.2.100])
+  by compute5.internal (MEProxy); Mon, 09 Oct 2023 14:23:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm2; t=1696875809; x=1696962209; bh=Wc
+	d9Ij4JYV1E+nR/hpGySlpt2XMckRY/pSxHN2nuT44=; b=XV7aUMVw6tBmZF3184
+	benoVGAqBsGo6v+7HlonfIiZ2GxFf+B7g/2BoXMSSxJxX1Yvb88PYiXT5YaD4yod
+	wjnvP9vFBgO/REAxQc3h84AdLI351ANAvIlM59fYsk+8uLEAWze3aXTwUVZdJJQw
+	FHJCONrZSeQnPABoXquUds7I+7OlWSnHjUetjPQNgIKT7vAjDuLO9oryuRtqpzDX
+	gKX296v1suXSoXehtKhgs1JV7H0t6WVMbz4PRAwoSp/zSxmFhdps3nb/UsbY0xTC
+	q8WRta6MXRTD/tO9huHomZj4jCa2Ig8YAIIy/c5h2F0lyoYTHMN9Z916aPjQhH/T
+	AFZg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1696875809; x=1696962209; bh=Wcd9Ij4JYV1E+
+	nR/hpGySlpt2XMckRY/pSxHN2nuT44=; b=bFwMxcn/u/mOSCI/OoRvcCkh7yPnT
+	PEUWerddl5JyuFUlZuj8wKEfufOjYZXmVZBzpXnkP7aqabXUS/UnyIgO9oA9iwJJ
+	wVYnUNF8EIReb2/VPhqb8S3iHcjMVXkMxK/laoO/ajSFqTyU1fJFbpTTfPvVbj1T
+	ZsLwdBcafWXJ7vFw3/Yfy8rBieGi9JOrBZ7KIiVGdo8uVNhmczmuWsB0ZxYOFu9B
+	MSJB5a1QhfioUudWn7yybpmgV3bPZRPcop8arFqsmN1JmwYNiAav/NnjthnvE1Uq
+	3uBjUds8dHkIU+Fw/i2GBKjWB8oHlFhRijfP6ZLqiRsLQwTYOagopq5Sw==
+X-ME-Sender: <xms:IUUkZfx61kLuqlmo_Xzt6mxU03h4sdJtBGdE6bwdxFtLLUDD82MeYg>
+    <xme:IUUkZXThFlhaKZOfEz0udhCU2YQmizYf74jZHxbMRWlkaUUIR4ju_EsIxKixDVrp5
+    7rB5ttvswOf0wmuXPk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgdduvdegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepgeetiefhjedvhfeffffhvddvvdffgfetvdetiefghefhheduffeljeeuuddv
+    lefgnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:IUUkZZWOnHZ6D_AxNeVCRq48W-cLG71GQCa-yh5fcIdqIfw_-TupmA>
+    <xmx:IUUkZZj_ARXhwR4BgEavEGWjgVSLRNF2IFmBYPV6E7RXcBc8zwvDLA>
+    <xmx:IUUkZRAo4Gl-XuQUUf5XAr51WrvBtD0DYn9pqbHwCZf_ZN6C3UU0pA>
+    <xmx:IUUkZZZJzi5o-nTsyjt6CK0RtWwN_XVrxH_wbLntoKHmaGTZ_IknIg>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id E93751700089; Mon,  9 Oct 2023 14:23:28 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-Id: <73f552a4-4ff5-441a-a624-ddc34365742f@app.fastmail.com>
+In-Reply-To: <202310090902.10ED782652@keescook>
+References: <20231009134826.1063869-1-arnd@kernel.org>
+ <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
+ <202310090902.10ED782652@keescook>
+Date: Mon, 09 Oct 2023 20:23:08 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Kees Cook" <keescook@chromium.org>
+Cc: "Arnd Bergmann" <arnd@kernel.org>,
+ "Marcel Holtmann" <marcel@holtmann.org>,
+ "Johan Hedberg" <johan.hedberg@gmail.com>,
+ "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Chun-Yi Lee" <jlee@suse.com>,
+ "Luiz Augusto von Dentz" <luiz.von.dentz@intel.com>, stable@vger.kernel.org,
+ "Iulia Tanasescu" <iulia.tanasescu@nxp.com>,
+ "Wenjia Zhang" <wenjia@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Prepare for the coming implementation by GCC and Clang of the __counted_by
-attribute. Flexible array members annotated with __counted_by can have
-their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
-array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
-functions).
+On Mon, Oct 9, 2023, at 18:02, Kees Cook wrote:
+> On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
+>> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
+>> 
+>> Sorry, I have to retract this, something went wrong on my
+>> testing and I now see the same problem in some configs regardless
+>> of whether the patch is applied or not.
+>
+> Perhaps turn them into macros instead?
 
-While there, use struct_size() helper, instead of the open-coded
-version, to calculate the size for the allocation of the whole
-flexible structure including, of course, the flexible-array member.
+I just tried that and still see the problem even with the macro,
+so whatever gcc is doing must be a different issue. Maybe it
+has correctly found a codepath that triggers this?
 
-This code was found with the help of Coccinelle, and audited and
-fixed manually.
+If you are able to help debug the issue better,
+see these defconfigs for examples:
 
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- net/mac80211/ieee80211_i.h | 2 +-
- net/mac80211/util.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+https://pastebin.com/raw/pC8Lnrn2
+https://pastebin.com/raw/yb965unC
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index e92eaf835ee0..0d3d386445c5 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -1746,7 +1746,7 @@ struct ieee802_11_elems {
- 	 */
- 	size_t scratch_len;
- 	u8 *scratch_pos;
--	u8 scratch[];
-+	u8 scratch[] __counted_by(scratch_len);
- };
- 
- static inline struct ieee80211_local *hw_to_local(
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index 98a3bffc6991..a91b0e7795a4 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -1612,7 +1612,7 @@ ieee802_11_parse_elems_full(struct ieee80211_elems_parse_params *params)
- 	int nontransmitted_profile_len = 0;
- 	size_t scratch_len = 3 * params->len;
- 
--	elems = kzalloc(sizeof(*elems) + scratch_len, GFP_ATOMIC);
-+	elems = kzalloc(struct_size(elems, scratch, scratch_len), GFP_ATOMIC);
- 	if (!elems)
- 		return NULL;
- 	elems->ie_start = params->start;
--- 
-2.34.1
-
+     Arnd
 
