@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-39217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0967F7BE572
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:52:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 960907BE574
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7E7A2818D5
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:52:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2778B281947
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCE0374EB;
-	Mon,  9 Oct 2023 15:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BD0374F2;
+	Mon,  9 Oct 2023 15:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="i+wsxQ6m"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lg9DUJE9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D24535897
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:52:08 +0000 (UTC)
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A88D6;
-	Mon,  9 Oct 2023 08:52:04 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CFDBC1C0014;
-	Mon,  9 Oct 2023 15:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B41C339BC
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:52:15 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0BE125;
+	Mon,  9 Oct 2023 08:52:09 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 813401C0002;
+	Mon,  9 Oct 2023 15:52:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1696866723;
+	t=1696866728;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Dwoe6lOlx1E2/77Mocwc9aHtLkZweaYfyFKWpCGQ1gQ=;
-	b=i+wsxQ6m1upWCYyo7u+e+YHrmJciyPcLnTSLp3AXxC5O/qfjJvoyHivghNry0Hg5lsJGhn
-	OeMCox2R+6ZYcD/SJe8U7ZUy4fsvchMdbFd2zkq5UDdVVvxEe9h2ZCyRAvEbAeFZDhARq+
-	6RZAourwHRPBrrqPuVJeKFIfaaB8nlI0J5QxyT73jQ1ibb+3jlHkBvsqX8gTZxqNA/BsBx
-	Kke6HnWtyeg63AcPh/XEHDYAevc/GQpiVGCh4PfY8n9vty4kdOmS/s6ERI3zPYvURANlw3
-	VBCOx3+DKO7oGk9GDqhhCr4zkaUYsZaZtcir1+Jzd4E+Bbcv5JL19cy8OHPD8w==
+	bh=a9F7BlsKWH7/jew3pkCvEwzC+iFPlgmNxIBdYB/M5ek=;
+	b=lg9DUJE9ubus5wrIC3pe2hFr91vs756EqASADzULyFowPfiMbq2S4435QUiT8hhJqNeKfy
+	3+hyzRJ8h1ZMKx5twtPj4RgODw/dGd5bOz+FfZnK5O2ON1CdtHsJ4oQIOe6CmFf1/qKPjh
+	51wxMQ2pAyLaN1yiX/JVuf6cHkE4hINWHe37Sf624PA9+W9rs1ybPIWwMzvlKdWwfLWYdv
+	du3NEm/lRqqAOfPGCOHFhDMvRHybGhQp3sAHFjDAVCpAeCVWRptgFEepJozHpTh44Po2WI
+	iVfkOVoIDLbH9v2MQWQwZLdS50JK56sMnQ6HMEudvfkczYK6z1XcHLZqv64vVQ==
 From: =?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -66,9 +66,9 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Kory Maincent <kory.maincent@bootlin.com>
-Subject: [PATCH net-next v5 05/16] net: Make dev_set_hwtstamp_phylib accessible
-Date: Mon,  9 Oct 2023 17:51:27 +0200
-Message-Id: <20231009155138.86458-6-kory.maincent@bootlin.com>
+Subject: [PATCH net-next v5 06/16] net_tstamp: Add TIMESTAMPING SOFTWARE and HARDWARE mask
+Date: Mon,  9 Oct 2023 17:51:28 +0200
+Message-Id: <20231009155138.86458-7-kory.maincent@bootlin.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20231009155138.86458-1-kory.maincent@bootlin.com>
 References: <20231009155138.86458-1-kory.maincent@bootlin.com>
@@ -80,54 +80,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 From: Kory Maincent <kory.maincent@bootlin.com>
 
-Make the dev_set_hwtstamp_phylib function accessible in prevision to use
-it from ethtool to reset the tstamp current configuration.
+Timestamping software or hardware flags are often used as a group,
+therefore adding these masks will easier future use.
+
+I did not use SOF_TIMESTAMPING_SYS_HARDWARE flag as it is deprecated and
+not use at all.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- include/linux/netdevice.h | 3 +++
- net/core/dev_ioctl.c      | 6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/uapi/linux/net_tstamp.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fba..b9d0411836db 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3922,6 +3922,9 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
- int generic_hwtstamp_set_lower(struct net_device *dev,
- 			       struct kernel_hwtstamp_config *kernel_cfg,
- 			       struct netlink_ext_ack *extack);
-+int dev_set_hwtstamp_phylib(struct net_device *dev,
-+			    struct kernel_hwtstamp_config *cfg,
-+			    struct netlink_ext_ack *extack);
- int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *userdata);
- unsigned int dev_get_flags(const struct net_device *);
- int __dev_change_flags(struct net_device *dev, unsigned int flags,
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index b46aedc36939..342a667858ac 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -322,9 +322,9 @@ static int dev_get_hwtstamp(struct net_device *dev, struct ifreq *ifr)
-  * frames and not forward them), it must set IFF_SEE_ALL_HWTSTAMP_REQUESTS in
-  * dev->priv_flags.
-  */
--static int dev_set_hwtstamp_phylib(struct net_device *dev,
--				   struct kernel_hwtstamp_config *cfg,
--				   struct netlink_ext_ack *extack)
-+int dev_set_hwtstamp_phylib(struct net_device *dev,
-+			    struct kernel_hwtstamp_config *cfg,
-+			    struct netlink_ext_ack *extack)
- {
- 	const struct net_device_ops *ops = dev->netdev_ops;
- 	bool phy_ts = phy_has_hwtstamp(dev->phydev);
+diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+index a2c66b3d7f0f..df8091998c8d 100644
+--- a/include/uapi/linux/net_tstamp.h
++++ b/include/uapi/linux/net_tstamp.h
+@@ -48,6 +48,14 @@ enum {
+ 					 SOF_TIMESTAMPING_TX_SCHED | \
+ 					 SOF_TIMESTAMPING_TX_ACK)
+ 
++#define SOF_TIMESTAMPING_SOFTWARE_MASK	(SOF_TIMESTAMPING_RX_SOFTWARE | \
++					 SOF_TIMESTAMPING_TX_SOFTWARE | \
++					 SOF_TIMESTAMPING_SOFTWARE)
++
++#define SOF_TIMESTAMPING_HARDWARE_MASK	(SOF_TIMESTAMPING_RX_HARDWARE | \
++					 SOF_TIMESTAMPING_TX_HARDWARE | \
++					 SOF_TIMESTAMPING_RAW_HARDWARE)
++
+ /**
+  * struct so_timestamping - SO_TIMESTAMPING parameter
+  *
 -- 
 2.25.1
 
