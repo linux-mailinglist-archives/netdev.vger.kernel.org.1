@@ -1,202 +1,365 @@
-Return-Path: <netdev+bounces-39101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F2EE7BE040
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:38:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D77B7BE0A6
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EE741C20CB2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:38:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB0A1C2093A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B231339B5;
-	Mon,  9 Oct 2023 13:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A58328DB;
+	Mon,  9 Oct 2023 13:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UxJZQwAr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kaSwIE9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D43A328DB
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:38:19 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1FBBD6;
-	Mon,  9 Oct 2023 06:38:16 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3231dff4343so2704816f8f.0;
-        Mon, 09 Oct 2023 06:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696858695; x=1697463495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6V3Yp/K15xx7ev3Qhf5+/0w5en07kzL7Wskfo0+HBPw=;
-        b=UxJZQwArtVkHQzamLIPvEe663j4D0jo6HtE9vQh/LrnJzFcFYtU25Nzxnob6pOk3Gk
-         4egl3DLrDqiQSyDw2NUjwXey9kUzWurxQw4ks+PKbEAToL0sIcOsylh5xkN+24s+zAjd
-         2WQ5ORcBJSIWOSRKFrbOtkBqewXNcU783ZmgaKvjyXkGntmn8Gy/iQaYLG/UnKOg2ZuO
-         hoyVDMvD0afeA3o42fgIwwyCfsvzCCGuLoOzTjChqU/RQUm4D5icsDl1wCbDjiyyk6In
-         6ZYSHcU/wZxYs79vcaBF0tVZsFXKrq76LsyAm8WwW8ho4fVZBJmvet6INXHv+ABtasnu
-         7OZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696858695; x=1697463495;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6V3Yp/K15xx7ev3Qhf5+/0w5en07kzL7Wskfo0+HBPw=;
-        b=nWrMomLpGlV5saC422/KqrGKZ+7bNYEoq+ZwpjK+2Wlwo8VGXqGYnrmjYzSEt/w7eY
-         5JELrUKwk2ozHDvZY0XUPijUpzGGVE2jCLUrsiu6ZfNWb7XYXrS+rP6OrTys9yXshSXO
-         SubQt99LTd2zigiBQ+j3Ebn43pkcT74RU7oU47b0Z+PwyhBV3s4ShuN6aUtuLH0hWP1/
-         6D2ZAR7riDF07ucXw1ISU09l3v2tomblcZTIhsVbKKUCuPVhVcwqtVSI07zkWhxflU7N
-         ow1hEmm05qB10SJk3Uge+xUCEk7kr7I9geE1x/Uhle03lCEDKEvCD9JPTNwA8KrGuDVk
-         KHCA==
-X-Gm-Message-State: AOJu0YzThK7Scl28FPBO/nFbmnovPL82Fp+3hMPvYCRFWZCtRaQ1Lpqx
-	vi+HKgGfWjhcBgT1HaZbAIg=
-X-Google-Smtp-Source: AGHT+IEg5HTR+xDE3IzwD0pbfXpmjGlWQO4VcUmgAYjzp1NHs11O05PimyYF9rp+Ru7+he92h2hBgA==
-X-Received: by 2002:a05:6000:1112:b0:317:6734:c2ae with SMTP id z18-20020a056000111200b003176734c2aemr9423512wrw.11.1696858695077;
-        Mon, 09 Oct 2023 06:38:15 -0700 (PDT)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id t4-20020a0560001a4400b0032763287473sm9746160wry.75.2023.10.09.06.38.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 06:38:14 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Chris Snook <chris.snook@gmail.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Douglas Miller <dougmill@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Dany Madden <danymadden@us.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Krzysztof Halasa <khalasa@piap.pl>,
-	Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-	Intel Corporation <linuxwwan@intel.com>,
-	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-	Liu Haijun <haijun.liu@mediatek.com>,
-	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Yuanjun Gong <ruc_gongyuanjun@163.com>,
-	Alex Elder <elder@linaro.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Bailey Forrest <bcf@google.com>,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Ziwei Xiao <ziweixiao@google.com>,
-	Rushil Gupta <rushilg@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Yuri Karpov <YKarpov@ispras.ru>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Zheng Zengkai <zhengzengkai@huawei.com>,
-	Dawei Li <set_pte_at@outlook.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org
-Subject: [net-next v3 5/5] netdev: use napi_schedule bool instead of napi_schedule_prep/__napi_schedule
-Date: Mon,  9 Oct 2023 15:37:54 +0200
-Message-Id: <20231009133754.9834-5-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231009133754.9834-1-ansuelsmth@gmail.com>
-References: <20231009133754.9834-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4AD339B4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:42:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94081C433CC;
+	Mon,  9 Oct 2023 13:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696858951;
+	bh=jxAyKleb6zm6TJN0EHQvMhr1MxPI2j6kig5knsdipQc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kaSwIE9ug6X6WuObEk1WUSUcgKgXVAvj9Ugz8ljTC6MTERFy9dnNc+aQ5cS4hiAOD
+	 rQOpby9ykGJ3tM5XZH3hxqnj0G92U/aypGi6CKVW3px3MfcXRRYKhkOwl0XzU6p9eA
+	 e7dYkQMb2nYx3KCrVI+Hhc4oT2mEYkAK0lndSXgqPxTlzQFkyq+05Gudt3h+QZ9KjK
+	 0hZ5bzIQjWDUpZWxPAUme1YJJx9s4vUoxd5QAH0ACwe46UpdQT6b0Nw4QDAuhxRlFI
+	 6WZsJuoM5jsIcXDpE55ieyKXBIIU894kZ0pO+4N2Gxj9AAunCQ4jTz21GiOVEbf5kl
+	 4MrzbPxiY/nuw==
+Date: Mon, 9 Oct 2023 15:42:26 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>
+Subject: Re: [PATCH V2 net-next 2/2] net: hns3: add vf fault detect support
+Message-ID: <ZSQDQll8rwbucNpP@kernel.org>
+References: <20231007031215.1067758-1-shaojijie@huawei.com>
+ <20231007031215.1067758-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231007031215.1067758-3-shaojijie@huawei.com>
 
-Replace if condition of napi_schedule_prep/__napi_schedule and use bool
-from napi_schedule directly where possible.
++ Leon
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
-Changes v3:
-- Drop toshiba change and rework in separate patch
----
- drivers/net/ethernet/atheros/atlx/atl1.c     | 4 +---
- drivers/net/wireless/intel/iwlwifi/pcie/rx.c | 4 +---
- 2 files changed, 2 insertions(+), 6 deletions(-)
+On Sat, Oct 07, 2023 at 11:12:15AM +0800, Jijie Shao wrote:
+> From: Jie Wang <wangjie125@huawei.com>
+> 
+> Currently hns3 driver supports vf fault detect feature. Several ras caused
+> by VF resources don't need to do PF function reset for recovery. The driver
+> only needs to reset the specified VF.
+> 
+> So this patch adds process in ras module. New process will get detailed
+> information about ras and do the most correct measures based on these
+> accurate information.
+> 
+> Signed-off-by: Jie Wang <wangjie125@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+> changeLog:
+> v1 -> v2:
+>   - fix the wrong use of vf recovery notify interface
+>   - add BUILD_BUG_ON to gurantee macros
+>   - optimise hclge_handle_vf_queue_err_ras for unsupported firmware
+>   v1: https://lore.kernel.org/netdev/20230113020829.48451-1-lanhao@huawei.com/ 
 
-diff --git a/drivers/net/ethernet/atheros/atlx/atl1.c b/drivers/net/ethernet/atheros/atlx/atl1.c
-index 02aa6fd8ebc2..a9014d7932db 100644
---- a/drivers/net/ethernet/atheros/atlx/atl1.c
-+++ b/drivers/net/ethernet/atheros/atlx/atl1.c
-@@ -2446,7 +2446,7 @@ static int atl1_rings_clean(struct napi_struct *napi, int budget)
- 
- static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
- {
--	if (!napi_schedule_prep(&adapter->napi))
-+	if (!napi_schedule(&adapter->napi))
- 		/* It is possible in case even the RX/TX ints are disabled via IMR
- 		 * register the ISR bits are set anyway (but do not produce IRQ).
- 		 * To handle such situation the napi functions used to check is
-@@ -2454,8 +2454,6 @@ static inline int atl1_sched_rings_clean(struct atl1_adapter* adapter)
- 		 */
- 		return 0;
- 
--	__napi_schedule(&adapter->napi);
--
- 	/*
- 	 * Disable RX/TX ints via IMR register if it is
- 	 * allowed. NAPI handler must reenable them in same
-diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-index 23b5a0adcbd6..146bc7bd14fb 100644
---- a/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-+++ b/drivers/net/wireless/intel/iwlwifi/pcie/rx.c
-@@ -1660,9 +1660,7 @@ irqreturn_t iwl_pcie_irq_rx_msix_handler(int irq, void *dev_id)
- 	IWL_DEBUG_ISR(trans, "[%d] Got interrupt\n", entry->entry);
- 
- 	local_bh_disable();
--	if (napi_schedule_prep(&rxq->napi))
--		__napi_schedule(&rxq->napi);
--	else
-+	if (!napi_schedule(&rxq->napi))
- 		iwl_pcie_clear_irq(trans, entry->entry);
- 	local_bh_enable();
- 
--- 
-2.40.1
+Hi Leon,
 
+I believe you reviewed v1 of this back in January and February.
+Could you find some time to look at v2?
+
+> ---
+>  drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   1 +
+>  .../hns3/hns3_common/hclge_comm_cmd.h         |   1 +
+>  .../hisilicon/hns3/hns3pf/hclge_err.c         | 116 +++++++++++++++++-
+>  .../hisilicon/hns3/hns3pf/hclge_err.h         |   2 +
+>  .../hisilicon/hns3/hns3pf/hclge_main.c        |   3 +-
+>  .../hisilicon/hns3/hns3pf/hclge_main.h        |   2 +
+>  .../hisilicon/hns3/hns3pf/hclge_mbx.c         |   2 +-
+>  7 files changed, 120 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> index 46062106fc6a..d7e175a9cb49 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> @@ -275,6 +275,7 @@ enum hnae3_reset_type {
+>  	HNAE3_GLOBAL_RESET,
+>  	HNAE3_IMP_RESET,
+>  	HNAE3_NONE_RESET,
+> +	HNAE3_VF_EXP_RESET,
+>  	HNAE3_MAX_RESET,
+>  };
+>  
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> index 92e73d44f0e5..533c19d25e4f 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> @@ -93,6 +93,7 @@ enum hclge_opcode_type {
+>  	HCLGE_OPC_DFX_SSU_REG_2		= 0x004F,
+>  
+>  	HCLGE_OPC_QUERY_DEV_SPECS	= 0x0050,
+> +	HCLGE_OPC_GET_QUEUE_ERR_VF      = 0x0067,
+>  
+>  	/* MAC command */
+>  	HCLGE_OPC_CONFIG_MAC_MODE	= 0x0301,
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> index 3f35227ef1fa..d63e114f93d0 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> @@ -1301,10 +1301,12 @@ static const struct hclge_hw_type_id hclge_hw_type_id_st[] = {
+>  		.msg = "tqp_int_ecc_error"
+>  	}, {
+>  		.type_id = PF_ABNORMAL_INT_ERROR,
+> -		.msg = "pf_abnormal_int_error"
+> +		.msg = "pf_abnormal_int_error",
+> +		.cause_by_vf = true
+>  	}, {
+>  		.type_id = MPF_ABNORMAL_INT_ERROR,
+> -		.msg = "mpf_abnormal_int_error"
+> +		.msg = "mpf_abnormal_int_error",
+> +		.cause_by_vf = true
+>  	}, {
+>  		.type_id = COMMON_ERROR,
+>  		.msg = "common_error"
+> @@ -2759,7 +2761,7 @@ void hclge_handle_occurred_error(struct hclge_dev *hdev)
+>  		hclge_handle_error_info_log(ae_dev);
+>  }
+>  
+> -static void
+> +static bool
+>  hclge_handle_error_type_reg_log(struct device *dev,
+>  				struct hclge_mod_err_info *mod_info,
+>  				struct hclge_type_reg_err_info *type_reg_info)
+> @@ -2770,6 +2772,7 @@ hclge_handle_error_type_reg_log(struct device *dev,
+>  	u8 mod_id, total_module, type_id, total_type, i, is_ras;
+>  	u8 index_module = MODULE_NONE;
+>  	u8 index_type = NONE_ERROR;
+> +	bool cause_by_vf = false;
+>  
+>  	mod_id = mod_info->mod_id;
+>  	type_id = type_reg_info->type_id & HCLGE_ERR_TYPE_MASK;
+> @@ -2788,6 +2791,7 @@ hclge_handle_error_type_reg_log(struct device *dev,
+>  	for (i = 0; i < total_type; i++) {
+>  		if (type_id == hclge_hw_type_id_st[i].type_id) {
+>  			index_type = i;
+> +			cause_by_vf = hclge_hw_type_id_st[i].cause_by_vf;
+>  			break;
+>  		}
+>  	}
+> @@ -2805,6 +2809,8 @@ hclge_handle_error_type_reg_log(struct device *dev,
+>  	dev_err(dev, "reg_value:\n");
+>  	for (i = 0; i < type_reg_info->reg_num; i++)
+>  		dev_err(dev, "0x%08x\n", type_reg_info->hclge_reg[i]);
+> +
+> +	return cause_by_vf;
+>  }
+>  
+>  static void hclge_handle_error_module_log(struct hnae3_ae_dev *ae_dev,
+> @@ -2815,6 +2821,7 @@ static void hclge_handle_error_module_log(struct hnae3_ae_dev *ae_dev,
+>  	struct device *dev = &hdev->pdev->dev;
+>  	struct hclge_mod_err_info *mod_info;
+>  	struct hclge_sum_err_info *sum_info;
+> +	bool cause_by_vf = false;
+>  	u8 mod_num, err_num, i;
+>  	u32 offset = 0;
+>  
+> @@ -2843,12 +2850,16 @@ static void hclge_handle_error_module_log(struct hnae3_ae_dev *ae_dev,
+>  
+>  			type_reg_info = (struct hclge_type_reg_err_info *)
+>  					    &buf[offset++];
+> -			hclge_handle_error_type_reg_log(dev, mod_info,
+> -							type_reg_info);
+> +			if (hclge_handle_error_type_reg_log(dev, mod_info,
+> +							    type_reg_info))
+> +				cause_by_vf = true;
+>  
+>  			offset += type_reg_info->reg_num;
+>  		}
+>  	}
+> +
+> +	if (hnae3_ae_dev_vf_fault_supported(hdev->ae_dev) && cause_by_vf)
+> +		set_bit(HNAE3_VF_EXP_RESET, &ae_dev->hw_err_reset_req);
+>  }
+>  
+>  static int hclge_query_all_err_bd_num(struct hclge_dev *hdev, u32 *bd_num)
+> @@ -2940,3 +2951,98 @@ int hclge_handle_error_info_log(struct hnae3_ae_dev *ae_dev)
+>  out:
+>  	return ret;
+>  }
+> +
+> +static bool hclge_reset_vf_in_bitmap(struct hclge_dev *hdev,
+> +				     unsigned long *bitmap)
+> +{
+> +	struct hclge_vport *vport;
+> +	bool exist_set = false;
+> +	int func_id;
+> +	int ret;
+> +
+> +	func_id = find_first_bit(bitmap, HCLGE_VPORT_NUM);
+> +	if (func_id == PF_VPORT_ID)
+> +		return false;
+> +
+> +	while (func_id != HCLGE_VPORT_NUM) {
+> +		vport = hclge_get_vf_vport(hdev,
+> +					   func_id - HCLGE_VF_VPORT_START_NUM);
+> +		if (!vport) {
+> +			dev_err(&hdev->pdev->dev, "invalid func id(%d)\n",
+> +				func_id);
+> +			return false;
+> +		}
+> +
+> +		dev_info(&hdev->pdev->dev, "do function %d recovery.", func_id);
+> +
+> +		ret = hclge_reset_tqp(&vport->nic);
+> +		if (ret) {
+> +			dev_err(&hdev->pdev->dev,
+> +				"failed to reset tqp, ret = %d.", ret);
+> +			return false;
+> +		}
+> +
+> +		ret = hclge_inform_vf_reset(vport, HNAE3_VF_FUNC_RESET);
+> +		if (ret) {
+> +			dev_err(&hdev->pdev->dev,
+> +				"failed to reset func %d, ret = %d.",
+> +				func_id, ret);
+> +			return false;
+> +		}
+> +
+> +		exist_set = true;
+> +		clear_bit(func_id, bitmap);
+> +		func_id = find_first_bit(bitmap, HCLGE_VPORT_NUM);
+> +	}
+> +
+> +	return exist_set;
+> +}
+> +
+> +static void hclge_get_vf_fault_bitmap(struct hclge_desc *desc,
+> +				      unsigned long *bitmap)
+> +{
+> +#define HCLGE_FIR_FAULT_BYTES	24
+> +#define HCLGE_SEC_FAULT_BYTES	8
+> +
+> +	u8 *buff;
+> +
+> +	BUILD_BUG_ON(HCLGE_FIR_FAULT_BYTES + HCLGE_SEC_FAULT_BYTES !=
+> +		     BITS_TO_BYTES(HCLGE_VPORT_NUM));
+> +
+> +	memcpy(bitmap, desc[0].data, HCLGE_FIR_FAULT_BYTES);
+> +	buff = (u8 *)bitmap + HCLGE_FIR_FAULT_BYTES;
+> +	memcpy(buff, desc[1].data, HCLGE_SEC_FAULT_BYTES);
+> +}
+> +
+> +int hclge_handle_vf_queue_err_ras(struct hclge_dev *hdev)
+> +{
+> +	unsigned long vf_fault_bitmap[BITS_TO_LONGS(HCLGE_VPORT_NUM)];
+> +	struct hclge_desc desc[2];
+> +	bool cause_by_vf = false;
+> +	int ret;
+> +
+> +	if (!test_and_clear_bit(HNAE3_VF_EXP_RESET,
+> +				&hdev->ae_dev->hw_err_reset_req) ||
+> +	    !hnae3_ae_dev_vf_fault_supported(hdev->ae_dev))
+> +		return 0;
+> +
+> +	hclge_comm_cmd_setup_basic_desc(&desc[0], HCLGE_OPC_GET_QUEUE_ERR_VF,
+> +					true);
+> +	desc[0].flag |= cpu_to_le16(HCLGE_COMM_CMD_FLAG_NEXT);
+> +	hclge_comm_cmd_setup_basic_desc(&desc[1], HCLGE_OPC_GET_QUEUE_ERR_VF,
+> +					true);
+> +
+> +	ret = hclge_comm_cmd_send(&hdev->hw.hw, desc, 2);
+> +	if (ret) {
+> +		dev_err(&hdev->pdev->dev,
+> +			"failed to get vf bitmap, ret = %d.\n", ret);
+> +		return ret;
+> +	}
+> +	hclge_get_vf_fault_bitmap(desc, vf_fault_bitmap);
+> +
+> +	cause_by_vf = hclge_reset_vf_in_bitmap(hdev, vf_fault_bitmap);
+> +	if (cause_by_vf)
+> +		hdev->ae_dev->hw_err_reset_req = 0;
+> +
+> +	return 0;
+> +}
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> index 86be6fb32990..68b738affa66 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> @@ -196,6 +196,7 @@ struct hclge_hw_module_id {
+>  struct hclge_hw_type_id {
+>  	enum hclge_err_type_list type_id;
+>  	const char *msg;
+> +	bool cause_by_vf; /* indicate the error may from vf exception */
+>  };
+>  
+>  struct hclge_sum_err_info {
+> @@ -228,4 +229,5 @@ int hclge_handle_hw_msix_error(struct hclge_dev *hdev,
+>  			       unsigned long *reset_requests);
+>  int hclge_handle_error_info_log(struct hnae3_ae_dev *ae_dev);
+>  int hclge_handle_mac_tnl(struct hclge_dev *hdev);
+> +int hclge_handle_vf_queue_err_ras(struct hclge_dev *hdev);
+>  #endif
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index c42574e29747..99c0576e6383 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -3424,7 +3424,7 @@ static int hclge_get_status(struct hnae3_handle *handle)
+>  	return hdev->hw.mac.link;
+>  }
+>  
+> -static struct hclge_vport *hclge_get_vf_vport(struct hclge_dev *hdev, int vf)
+> +struct hclge_vport *hclge_get_vf_vport(struct hclge_dev *hdev, int vf)
+>  {
+>  	if (!pci_num_vf(hdev->pdev)) {
+>  		dev_err(&hdev->pdev->dev,
+> @@ -4468,6 +4468,7 @@ static void hclge_handle_err_recovery(struct hclge_dev *hdev)
+>  	if (hclge_find_error_source(hdev)) {
+>  		hclge_handle_error_info_log(ae_dev);
+>  		hclge_handle_mac_tnl(hdev);
+> +		hclge_handle_vf_queue_err_ras(hdev);
+>  	}
+>  
+>  	hclge_handle_err_reset_request(hdev);
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> index 7bc2049b723d..02c7aab3546e 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
+> @@ -1146,4 +1146,6 @@ int hclge_dbg_dump_rst_info(struct hclge_dev *hdev, char *buf, int len);
+>  int hclge_push_vf_link_status(struct hclge_vport *vport);
+>  int hclge_enable_vport_vlan_filter(struct hclge_vport *vport, bool request_en);
+>  int hclge_mac_update_stats(struct hclge_dev *hdev);
+> +struct hclge_vport *hclge_get_vf_vport(struct hclge_dev *hdev, int vf);
+> +int hclge_inform_vf_reset(struct hclge_vport *vport, u16 reset_type);
+>  #endif
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
+> index 04ff9bf12185..4b0d07ca2505 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c
+> @@ -124,7 +124,7 @@ static int hclge_send_mbx_msg(struct hclge_vport *vport, u8 *msg, u16 msg_len,
+>  	return status;
+>  }
+>  
+> -static int hclge_inform_vf_reset(struct hclge_vport *vport, u16 reset_type)
+> +int hclge_inform_vf_reset(struct hclge_vport *vport, u16 reset_type)
+>  {
+>  	__le16 msg_data;
+>  	u8 dest_vfid;
+> -- 
+> 2.30.0
+> 
+> 
 
