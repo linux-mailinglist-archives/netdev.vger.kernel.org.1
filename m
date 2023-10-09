@@ -1,124 +1,119 @@
-Return-Path: <netdev+bounces-38987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9116F7BD552
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:37:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD037BD55E
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:40:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46A73281558
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:37:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 653AA28156B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1551C06;
-	Mon,  9 Oct 2023 08:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GbWjQuZI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF02417D1;
+	Mon,  9 Oct 2023 08:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00511C05
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:36:56 +0000 (UTC)
-Received: from out-199.mta0.migadu.com (out-199.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB54EA4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 01:36:54 -0700 (PDT)
-Message-ID: <296ca17d-cff0-2d19-f620-eedab004ddde@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1696840611;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DrSh1nM/Lpug064dq0hv1YAXloNKtayvuIcAjhME+k0=;
-	b=GbWjQuZIiYqJ4jFuvhXGOHtVC+1X3aaqwG24lKNHJCR6jygYHsfImnWpOcKayGmMKSVB13
-	pRMmKcq4FUEMYCLfrwl1VGD1p/SWEtVHNDnS6suRlS7Un9WuQ1E3RLbuZxcqj3OxYk/J0N
-	dWir1cILFvyNVczegMMvcD3Ajuqujc0=
-Date: Mon, 9 Oct 2023 16:36:42 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5076B800
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:39:58 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1646BA
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 01:39:55 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S3snB2k7HzNpCP;
+	Mon,  9 Oct 2023 16:35:58 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Mon, 9 Oct
+ 2023 16:39:53 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <netdev@vger.kernel.org>, Florian Fainelli
+	<florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Vivien Didelot <vivien.didelot@gmail.com>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH v2] net: dsa: bcm_sf2: Fix possible memory leak in bcm_sf2_mdio_register()
+Date: Mon, 9 Oct 2023 16:39:06 +0800
+Message-ID: <20231009083906.1212900-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: rostedt@goodmis.org, mhiramat@kernel.org, dennis@kernel.org,
- tj@kernel.org, cl@linux.com, mark.rutland@arm.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- linux-trace-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20231007050621.1706331-1-yajun.deng@linux.dev>
- <CANn89iL-zUw1FqjYRSC7BGB0hfQ5uKpJzUba3YFd--c=GdOoGg@mail.gmail.com>
- <917708b5-cb86-f233-e878-9233c4e6c707@linux.dev>
- <CANn89i+navyRe8-AV=ehM3qFce2hmnOEKBqvK5Xnev7KTaS5Lg@mail.gmail.com>
- <a53a3ff6-8c66-07c4-0163-e582d88843dd@linux.dev>
- <CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
- <9f4fb613-d63f-9b86-fe92-11bf4dfb7275@linux.dev>
- <CANn89iK7bvQtGD=p+fHaWiiaNn=u8vWrt0YQ26pGQY=kZTdfJw@mail.gmail.com>
- <4a747fda-2bb9-4231-66d6-31306184eec2@linux.dev>
- <814b5598-5284-9558-8f56-12a6f7a67187@linux.dev>
- <CANn89iJCTgWTu0mzwj-8_-HiWm4uErY=VASDHoYaod9Nq-ayPA@mail.gmail.com>
- <508b33f7-3dc0-4536-21f6-4a5e7ade2b5c@linux.dev>
- <CANn89i+r-pQGpen1mUhybmj+6ybhxSsuoaB07NFzOWyHUMFDNw@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yajun Deng <yajun.deng@linux.dev>
-In-Reply-To: <CANn89i+r-pQGpen1mUhybmj+6ybhxSsuoaB07NFzOWyHUMFDNw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+In bcm_sf2_mdio_register(), the class_find_device() will call get_device()
+to increment reference count for priv->master_mii_bus->dev if
+of_mdio_find_bus() succeeds. If mdiobus_alloc() or mdiobus_register()
+fails, it will call get_device() twice without decrement reference count
+for the device. And it is the same if bcm_sf2_mdio_register() succeeds but
+fails in bcm_sf2_sw_probe(), or if bcm_sf2_sw_probe() succeeds. If the
+reference count has not decremented to zero, the dev related resource will
+not be freed.
 
-On 2023/10/9 16:20, Eric Dumazet wrote:
-> On Mon, Oct 9, 2023 at 10:14 AM Yajun Deng <yajun.deng@linux.dev> wrote:
->>
->> On 2023/10/9 15:53, Eric Dumazet wrote:
->>> On Mon, Oct 9, 2023 at 5:07 AM Yajun Deng <yajun.deng@linux.dev> wrote:
->>>
->>>> 'this_cpu_read + this_cpu_write' and 'pr_info + this_cpu_inc' will make
->>>> the trace work well.
->>>>
->>>> They all have 'pop' instructions in them. This may be the key to making
->>>> the trace work well.
->>>>
->>>> Hi all,
->>>>
->>>> I need your help on percpu and ftrace.
->>>>
->>> I do not think you made sure netdev_core_stats_inc() was never inlined.
->>>
->>> Adding more code in it is simply changing how the compiler decides to
->>> inline or not.
->>
->> Yes, you are right. It needs to add the 'noinline' prefix. The
->> disassembly code will have 'pop'
->>
->> instruction.
->>
-> The function was fine, you do not need anything like push or pop.
->
-> The only needed stuff was the call __fentry__.
->
-> The fact that the function was inlined for some invocations was the
-> issue, because the trace point
-> is only planted in the out of line function.
+So remove the get_device() in bcm_sf2_mdio_register(), and call
+put_device() if mdiobus_alloc() or mdiobus_register() fails and in
+bcm_sf2_mdio_unregister() to solve the issue.
 
+Fixes: 461cd1b03e32 ("net: dsa: bcm_sf2: Register our slave MDIO bus")
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+v2:
+- Update the commit message.
+---
+ drivers/net/dsa/bcm_sf2.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-But somehow the following code isn't inline? They didn't need to add the 
-'noinline' prefix.
-
-+		field = (unsigned long *)((void *)this_cpu_ptr(p) + offset);
-+		WRITE_ONCE(*field, READ_ONCE(*field) + 1);
-
-Or
-+               (*(unsigned long *)((void *)this_cpu_ptr(p) + offset))++;
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index 72374b066f64..f2b14bd7c38b 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -621,11 +621,11 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 		return -EPROBE_DEFER;
+ 	}
+ 
+-	get_device(&priv->master_mii_bus->dev);
+ 	priv->master_mii_dn = dn;
+ 
+ 	priv->slave_mii_bus = mdiobus_alloc();
+ 	if (!priv->slave_mii_bus) {
++		put_device(&priv->master_mii_bus->dev);
+ 		of_node_put(dn);
+ 		return -ENOMEM;
+ 	}
+@@ -686,6 +686,7 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 	err = mdiobus_register(priv->slave_mii_bus);
+ 	if (err && dn) {
+ 		mdiobus_free(priv->slave_mii_bus);
++		put_device(&priv->master_mii_bus->dev);
+ 		of_node_put(dn);
+ 	}
+ 
+@@ -696,6 +697,7 @@ static void bcm_sf2_mdio_unregister(struct bcm_sf2_priv *priv)
+ {
+ 	mdiobus_unregister(priv->slave_mii_bus);
+ 	mdiobus_free(priv->slave_mii_bus);
++	put_device(&priv->master_mii_bus->dev);
+ 	of_node_put(priv->master_mii_dn);
+ }
+ 
+-- 
+2.34.1
 
 
