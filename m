@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-39319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD417BEBFA
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:51:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DF17BEBF5
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77A8A281E37
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:51:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CB9C1C20CF1
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD1E405F1;
-	Mon,  9 Oct 2023 20:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604573C6A6;
+	Mon,  9 Oct 2023 20:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC86405C5
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DDB1F5E4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:51:27 +0000 (UTC)
 Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F83C5
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:51:37 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-541-6M0Uj3i3Oj29qNS6dbLYrA-1; Mon, 09 Oct 2023 16:51:08 -0400
-X-MC-Unique: 6M0Uj3i3Oj29qNS6dbLYrA-1
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5CF39E
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:51:25 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-73-Vvd8oqyVOaq5b0AH4VHkhw-1; Mon, 09 Oct 2023 16:51:09 -0400
+X-MC-Unique: Vvd8oqyVOaq5b0AH4VHkhw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1045F802C1A;
-	Mon,  9 Oct 2023 20:51:08 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 53B693806735;
+	Mon,  9 Oct 2023 20:51:09 +0000 (UTC)
 Received: from hog.localdomain (unknown [10.45.225.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 100FE36E1;
-	Mon,  9 Oct 2023 20:51:06 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 52F8336E1;
+	Mon,  9 Oct 2023 20:51:08 +0000 (UTC)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: borisp@nvidia.com,
 	john.fastabend@gmail.com,
 	kuba@kernel.org,
 	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH net-next 08/14] tls: also use init_prot_info in tls_set_device_offload
-Date: Mon,  9 Oct 2023 22:50:48 +0200
-Message-ID: <6da95c0d469415ee62cc23ce72227f8d058400bc.1696596130.git.sd@queasysnail.net>
+Subject: [PATCH net-next 09/14] tls: add a helper to allocate/initialize offload_ctx_tx
+Date: Mon,  9 Oct 2023 22:50:49 +0200
+Message-ID: <a8b0d7431e6f74eaba081b5598f1ece2b2336dd5.1696596130.git.sd@queasysnail.net>
 In-Reply-To: <cover.1696596130.git.sd@queasysnail.net>
 References: <cover.1696596130.git.sd@queasysnail.net>
 Precedence: bulk
@@ -58,110 +58,98 @@ X-Mimecast-Originator: queasysnail.net
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
 X-Spam-Status: No, score=0.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE autolearn=no
-	autolearn_force=no version=3.4.6
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
+	TVD_PH_BODY_ACCOUNTS_PRE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Most values are shared. Nonce size turns out to be equal to IV size
-for all offloadable ciphers.
+Simplify tls_set_device_offload a bit.
 
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
- net/tls/tls.h        |  4 ++++
- net/tls/tls_device.c | 14 ++++----------
- net/tls/tls_sw.c     | 14 ++++++++++----
- 3 files changed, 18 insertions(+), 14 deletions(-)
+ net/tls/tls_device.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/net/tls/tls.h b/net/tls/tls.h
-index 16830aa2d6ec..756ed6cbc3df 100644
---- a/net/tls/tls.h
-+++ b/net/tls/tls.h
-@@ -142,6 +142,10 @@ void update_sk_prot(struct sock *sk, struct tls_contex=
-t *ctx);
- int wait_on_pending_writer(struct sock *sk, long *timeo);
- void tls_err_abort(struct sock *sk, int err);
-=20
-+int init_prot_info(struct tls_prot_info *prot,
-+=09=09   const struct tls_crypto_info *crypto_info,
-+=09=09   const struct tls_cipher_desc *cipher_desc,
-+=09=09   int mode);
- int tls_set_sw_offload(struct sock *sk, struct tls_context *ctx, int tx);
- void tls_update_rx_zc_capable(struct tls_context *tls_ctx);
- void tls_sw_strparser_arm(struct sock *sk, struct tls_context *ctx);
 diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 0981496c6294..3d73dd97e903 100644
+index 3d73dd97e903..0184426251b0 100644
 --- a/net/tls/tls_device.c
 +++ b/net/tls/tls_device.c
-@@ -1076,20 +1076,14 @@ int tls_set_device_offload(struct sock *sk, struct =
-tls_context *ctx)
+@@ -1033,6 +1033,30 @@ static void tls_device_attach(struct tls_context *ct=
+x, struct sock *sk,
+ =09}
+ }
+=20
++static struct tls_offload_context_tx *alloc_offload_ctx_tx(struct tls_cont=
+ext *ctx)
++{
++=09struct tls_offload_context_tx *offload_ctx;
++=09__be64 rcd_sn;
++
++=09offload_ctx =3D kzalloc(TLS_OFFLOAD_CONTEXT_SIZE_TX, GFP_KERNEL);
++=09if (!offload_ctx)
++=09=09return NULL;
++
++=09INIT_WORK(&offload_ctx->destruct_work, tls_device_tx_del_task);
++=09INIT_LIST_HEAD(&offload_ctx->records_list);
++=09spin_lock_init(&offload_ctx->lock);
++=09sg_init_table(offload_ctx->sg_tx_data,
++=09=09      ARRAY_SIZE(offload_ctx->sg_tx_data));
++
++=09/* start at rec_seq - 1 to account for the start marker record */
++=09memcpy(&rcd_sn, ctx->tx.rec_seq, sizeof(rcd_sn));
++=09offload_ctx->unacked_record_sn =3D be64_to_cpu(rcd_sn) - 1;
++
++=09offload_ctx->ctx =3D ctx;
++
++=09return offload_ctx;
++}
++
+ int tls_set_device_offload(struct sock *sk, struct tls_context *ctx)
+ {
+ =09struct tls_context *tls_ctx =3D tls_get_ctx(sk);
+@@ -1044,7 +1068,6 @@ int tls_set_device_offload(struct sock *sk, struct tl=
+s_context *ctx)
+ =09struct net_device *netdev;
+ =09char *iv, *rec_seq;
+ =09struct sk_buff *skb;
+-=09__be64 rcd_sn;
+ =09int rc;
+=20
+ =09if (!ctx)
+@@ -1092,7 +1115,7 @@ int tls_set_device_offload(struct sock *sk, struct tl=
+s_context *ctx)
  =09=09goto release_netdev;
  =09}
 =20
-+=09rc =3D init_prot_info(prot, crypto_info, cipher_desc, TLS_HW);
-+=09if (rc)
-+=09=09goto release_netdev;
-+
- =09iv =3D crypto_info_iv(crypto_info, cipher_desc);
- =09rec_seq =3D crypto_info_rec_seq(crypto_info, cipher_desc);
-=20
--=09prot->version =3D crypto_info->version;
--=09prot->cipher_type =3D crypto_info->cipher_type;
--=09prot->prepend_size =3D TLS_HEADER_SIZE + cipher_desc->iv;
--=09prot->tag_size =3D cipher_desc->tag;
--=09prot->overhead_size =3D prot->prepend_size + prot->tag_size;
--=09prot->iv_size =3D cipher_desc->iv;
--=09prot->salt_size =3D cipher_desc->salt;
--
- =09memcpy(ctx->tx.iv + cipher_desc->salt, iv, cipher_desc->iv);
--
--=09prot->rec_seq_size =3D cipher_desc->rec_seq;
- =09memcpy(ctx->tx.rec_seq, rec_seq, cipher_desc->rec_seq);
-=20
- =09start_marker_record =3D kmalloc(sizeof(*start_marker_record), GFP_KERNE=
-L);
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index b8e89bbb4a49..0995d3d14f4b 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2620,9 +2620,10 @@ static struct tls_sw_context_rx *init_ctx_rx(struct =
+-=09offload_ctx =3D kzalloc(TLS_OFFLOAD_CONTEXT_SIZE_TX, GFP_KERNEL);
++=09offload_ctx =3D alloc_offload_ctx_tx(ctx);
+ =09if (!offload_ctx) {
+ =09=09rc =3D -ENOMEM;
+ =09=09goto free_marker_record;
+@@ -1102,22 +1125,10 @@ int tls_set_device_offload(struct sock *sk, struct =
 tls_context *ctx)
- =09return sw_ctx_rx;
- }
-=20
--static int init_prot_info(struct tls_prot_info *prot,
--=09=09=09  const struct tls_crypto_info *crypto_info,
--=09=09=09  const struct tls_cipher_desc *cipher_desc)
-+int init_prot_info(struct tls_prot_info *prot,
-+=09=09   const struct tls_crypto_info *crypto_info,
-+=09=09   const struct tls_cipher_desc *cipher_desc,
-+=09=09   int mode)
- {
- =09u16 nonce_size =3D cipher_desc->nonce;
-=20
-@@ -2635,6 +2636,11 @@ static int init_prot_info(struct tls_prot_info *prot=
-,
- =09=09prot->tail_size =3D 0;
- =09}
-=20
-+=09if (mode =3D=3D TLS_HW) {
-+=09=09prot->aad_size =3D 0;
-+=09=09prot->tail_size =3D 0;
-+=09}
-+
- =09/* Sanity-check the sizes for stack allocations. */
- =09if (nonce_size > TLS_MAX_IV_SIZE || prot->aad_size > TLS_MAX_AAD_SIZE)
- =09=09return -EINVAL;
-@@ -2696,7 +2702,7 @@ int tls_set_sw_offload(struct sock *sk, struct tls_co=
-ntext *ctx, int tx)
- =09=09goto free_priv;
- =09}
-=20
--=09rc =3D init_prot_info(prot, crypto_info, cipher_desc);
-+=09rc =3D init_prot_info(prot, crypto_info, cipher_desc, TLS_SW);
  =09if (rc)
- =09=09goto free_priv;
+ =09=09goto free_offload_ctx;
 =20
+-=09/* start at rec_seq - 1 to account for the start marker record */
+-=09memcpy(&rcd_sn, ctx->tx.rec_seq, sizeof(rcd_sn));
+-=09offload_ctx->unacked_record_sn =3D be64_to_cpu(rcd_sn) - 1;
+-
+ =09start_marker_record->end_seq =3D tcp_sk(sk)->write_seq;
+ =09start_marker_record->len =3D 0;
+ =09start_marker_record->num_frags =3D 0;
+-
+-=09INIT_WORK(&offload_ctx->destruct_work, tls_device_tx_del_task);
+-=09offload_ctx->ctx =3D ctx;
+-
+-=09INIT_LIST_HEAD(&offload_ctx->records_list);
+ =09list_add_tail(&start_marker_record->list, &offload_ctx->records_list);
+-=09spin_lock_init(&offload_ctx->lock);
+-=09sg_init_table(offload_ctx->sg_tx_data,
+-=09=09      ARRAY_SIZE(offload_ctx->sg_tx_data));
+=20
+ =09clean_acked_data_enable(inet_csk(sk), &tls_icsk_clean_acked);
+ =09ctx->push_pending_record =3D tls_device_push_pending_record;
 --=20
 2.42.0
 
