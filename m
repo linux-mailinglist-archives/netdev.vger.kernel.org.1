@@ -1,200 +1,165 @@
-Return-Path: <netdev+bounces-39292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C05D77BEB4E
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:09:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D20DD7BEB63
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7460E28182D
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:09:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F20F31C20A45
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC0C3D995;
-	Mon,  9 Oct 2023 20:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33063FB00;
+	Mon,  9 Oct 2023 20:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="St5eDxRC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408F83C692
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:09:48 +0000 (UTC)
-Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25082A4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:09:46 -0700 (PDT)
-Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-6c64edaa361so6833135a34.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 13:09:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC29210B
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:15:38 +0000 (UTC)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD4DAC
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:15:36 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1c88b46710bso23775415ad.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 13:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1696882536; x=1697487336; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KDFbaSwdbSiZRdRTlwqK2IxJqwEgX2EDTqDwpd1TSYQ=;
+        b=St5eDxRCX6O+tz2OOkDeq4l0ftdhO5hCp8dYhPEIIUPkv6Zi9R828WiwUgKujVEXfS
+         86SfoQUAo/tIXfHLWMc8pF5AAH4gmHMikDe/2qGSOHc1pVPmM9WiOH6br9C/kG5QpIOP
+         ZR0/wHV/Ikp4iOs3IUbgW9jtNpyQQQGkJ8GBI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696882185; x=1697486985;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vdk/s0cRW1gT3irTEZ17OEvDFCD/HvOZqWIKEfeeFxk=;
-        b=X7P2EBR6cz4ze8yTt7p3AGcKfk+0GLBWZXNQ29WmKqIDxoy3ibKuj8hDGEtHb5SKAl
-         6m5o9O/W5Sd4g1OjzccPM6wG3FsJFTYPcGXULwQrH+VjWHJmy7k3g/A+0Xnx0N9T8mpe
-         cb12JF1LNB9nM5LLJ1UINnG7/8xDtI88hApDfzm+1WpnBIRnaHucIinnkkBSDpvL9VBh
-         4p6oK42LtpiOWbSpNjLXrNcyLv3YhGFvu61T0AsSNIZfyCKdEZieXM+XiTOYE/q+NAS1
-         8Zqe/VlhXU/mdry26rQAyX6EGoAaKPptp17ohjnnIHx6SiN1xeNs5riCEO4OaZuCPIt/
-         jLPA==
-X-Gm-Message-State: AOJu0Yx44AynKORhYSKtNYZsH7aRMqmF8d2v+iA88SUoaVfndFUZmEbU
-	KcfTVCfOaCJMv5o6HP1JiNzRLHPgjn+ma3XxIz7x4zEgmyw6
-X-Google-Smtp-Source: AGHT+IFIG1BHSYIUplQLFd/iGd96P8h7DQ4/qzR45dskjrKAVrNZRIDWumuU7+lVTrCTVkhYxwHSAvLT0zINvQLstXsa6ATzOVKF
+        d=1e100.net; s=20230601; t=1696882536; x=1697487336;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KDFbaSwdbSiZRdRTlwqK2IxJqwEgX2EDTqDwpd1TSYQ=;
+        b=U4Usg7+YQ39ei9Zxwstmm3M6D3FkLtYawOtMIYGQFEwLMsAbcLLLIXx8azCXu8bAad
+         owscti+5wp4u4C7BAGMqOzKmg6UB8KI4dzqfJg4hzwBZHgZmHy9zOvKBZA5mt27xDx9G
+         eNwfHDRzuY+izjiznY3SPSSkv10z3ewa/pOO+iVCgJiPHcOakeyLEWKE0ZXgBR81pbnb
+         k5KWrQlFdmFWp265IDjM4sPEnsc3260UVTEot4tAwnTekCuq0SmUYRoEZPUa1Ft/Jk22
+         FiCLGGpR580yurtNWVbio6izGny4Fd2Uhe2exMy9+0GoMi7kjgLDE+eiK+iPpMpghL2B
+         z8Nw==
+X-Gm-Message-State: AOJu0YyIm49AVnnmFAxI8Cg6ygJzKIZsBHod2L1YaIeDThDJ+bEWXOTy
+	pmy42tarYefAC+OjzIhRl9ysmg==
+X-Google-Smtp-Source: AGHT+IHYYI/O+fK0SIGugLT8JGNaNBnCAefJgj5X+jc7ltNG/YWo68rvsHnAI1Y2XfQe6ujeIHx3gw==
+X-Received: by 2002:a17:902:e847:b0:1bd:d92d:6b2 with SMTP id t7-20020a170902e84700b001bdd92d06b2mr16471450plg.10.1696882535935;
+        Mon, 09 Oct 2023 13:15:35 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id b19-20020a170902ed1300b001c737950e4dsm10038137pld.2.2023.10.09.13.15.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 13:15:34 -0700 (PDT)
+Date: Mon, 9 Oct 2023 13:15:32 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chun-Yi Lee <jlee@suse.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	stable@vger.kernel.org, Iulia Tanasescu <iulia.tanasescu@nxp.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	linux-bluetooth@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Message-ID: <202310091310.F560494@keescook>
+References: <20231009134826.1063869-1-arnd@kernel.org>
+ <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
+ <202310090902.10ED782652@keescook>
+ <73f552a4-4ff5-441a-a624-ddc34365742f@app.fastmail.com>
+ <202310091246.ED5A2AFB21@keescook>
+ <15f6b85f-b1ce-409a-a728-38a7223a7c6c@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:769b:b0:1e1:1e68:ba3d with SMTP id
- dx27-20020a056870769b00b001e11e68ba3dmr6212784oab.7.1696882185433; Mon, 09
- Oct 2023 13:09:45 -0700 (PDT)
-Date: Mon, 09 Oct 2023 13:09:45 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e3788c06074e2b84@google.com>
-Subject: [syzbot] [net?] [wireless?] possible deadlock in rfkill_send_events
-From: syzbot <syzbot+509238e523e032442b80@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes.berg@intel.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15f6b85f-b1ce-409a-a728-38a7223a7c6c@app.fastmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Mon, Oct 09, 2023 at 10:08:01PM +0200, Arnd Bergmann wrote:
+> On Mon, Oct 9, 2023, at 21:48, Kees Cook wrote:
+> > On Mon, Oct 09, 2023 at 08:23:08PM +0200, Arnd Bergmann wrote:
+> >> On Mon, Oct 9, 2023, at 18:02, Kees Cook wrote:
+> >> > On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
+> >> >> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
+> >> >> 
+> >> >> Sorry, I have to retract this, something went wrong on my
+> >> >> testing and I now see the same problem in some configs regardless
+> >> >> of whether the patch is applied or not.
+> >> >
+> >> > Perhaps turn them into macros instead?
+> >> 
+> >> I just tried that and still see the problem even with the macro,
+> >> so whatever gcc is doing must be a different issue. Maybe it
+> >> has correctly found a codepath that triggers this?
+> >> 
+> >> If you are able to help debug the issue better,
+> >> see these defconfigs for examples:
+> >> 
+> >> https://pastebin.com/raw/pC8Lnrn2
+> >> https://pastebin.com/raw/yb965unC
+> >
+> > This seems like a GCC bug. It is complaining about &hdev->bdaddr for
+> > some reason. This silences it:
+> >
+> > -	if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
+> > +	a = hdev->bdaddr;
+> > +	if (!bacmp(&a, &ev->bdaddr)) {
+> 
+> Right, I see this addresses all instances. I tried another thing
+> and this also seems to address them for me:
+> 
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3273,7 +3273,7 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
+>         /* Reject incoming connection from device with same BD ADDR against
+>          * CVE-2020-26555
+>          */
+> -       if (!bacmp(&hdev->bdaddr, &ev->bdaddr)) {
+> +       if (hdev && !bacmp(&hdev->bdaddr, &ev->bdaddr)) {
+>                 bt_dev_dbg(hdev, "Reject connection with same BD_ADDR %pMR\n",
+>                            &ev->bdaddr);
+>                 hci_reject_conn(hdev, &ev->bdaddr);
+> 
+> and also this one does the trick:
+> 
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -266,7 +266,7 @@ void bt_err_ratelimited(const char *fmt, ...);
+>  #define BT_DBG(fmt, ...)       pr_debug(fmt "\n", ##__VA_ARGS__)
+>  #endif
+>  
+> -#define bt_dev_name(hdev) ((hdev) ? (hdev)->name : "null")
+> +#define bt_dev_name(hdev) ((hdev)->name)
+>  
+>  #define bt_dev_info(hdev, fmt, ...)                            \
+>         BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+> 
+> So what is actually going on is that the bt_dev_dbg() introduces
+> the idea that hdev might be NULL because of the check.
 
-syzbot found the following issue on:
+Oh thank you for finding that. Yeah, it looked to me like it thought
+hdev was NULL, but I couldn't find where. :)
 
-HEAD commit:    f291209eca5e Merge tag 'net-6.6-rc5' of git://git.kernel.o..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1139f1be680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b89b61abf7449972
-dashboard link: https://syzkaller.appspot.com/bug?extid=509238e523e032442b80
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1103ec86680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=118b6bda680000
+I think the best work-around here is your "hdev && " addition.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7b2add3a29c7/disk-f291209e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7a15a9498899/vmlinux-f291209e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f39062509f32/bzImage-f291209e.xz
-
-The issue was bisected to:
-
-commit 2c3dfba4cf84ac4f306cc6653b37b6dd6859ae9d
-Author: Johannes Berg <johannes.berg@intel.com>
-Date:   Thu Sep 14 13:45:17 2023 +0000
-
-    rfkill: sync before userspace visibility/changes
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13967b3a680000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10567b3a680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17967b3a680000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+509238e523e032442b80@syzkaller.appspotmail.com
-Fixes: 2c3dfba4cf84 ("rfkill: sync before userspace visibility/changes")
-
-============================================
-WARNING: possible recursive locking detected
-6.6.0-rc4-syzkaller-00158-gf291209eca5e #0 Not tainted
---------------------------------------------
-syz-executor675/5132 is trying to acquire lock:
-ffff8880297ee088 (&data->mtx){+.+.}-{3:3}, at: rfkill_send_events+0x226/0x3f0 net/rfkill/core.c:286
-
-but task is already holding lock:
-ffff88801bfc0088 (&data->mtx){+.+.}-{3:3}, at: rfkill_fop_open+0x146/0x750 net/rfkill/core.c:1183
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&data->mtx);
-  lock(&data->mtx);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-3 locks held by syz-executor675/5132:
- #0: ffffffff8d6f39e8 (misc_mtx){+.+.}-{3:3}, at: misc_open+0x59/0x4c0 drivers/char/misc.c:129
- #1: ffffffff8ea7fa68 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_open+0x13c/0x750 net/rfkill/core.c:1182
- #2: ffff88801bfc0088 (&data->mtx){+.+.}-{3:3}, at: rfkill_fop_open+0x146/0x750 net/rfkill/core.c:1183
-
-stack backtrace:
-CPU: 1 PID: 5132 Comm: syz-executor675 Not tainted 6.6.0-rc4-syzkaller-00158-gf291209eca5e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain kernel/locking/lockdep.c:3855 [inline]
- __lock_acquire+0x2971/0x5de0 kernel/locking/lockdep.c:5136
- lock_acquire kernel/locking/lockdep.c:5753 [inline]
- lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5718
- __mutex_lock_common kernel/locking/mutex.c:603 [inline]
- __mutex_lock+0x181/0x1340 kernel/locking/mutex.c:747
- rfkill_send_events+0x226/0x3f0 net/rfkill/core.c:286
- rfkill_event net/rfkill/core.c:301 [inline]
- rfkill_event net/rfkill/core.c:293 [inline]
- rfkill_set_block+0x3d0/0x550 net/rfkill/core.c:369
- rfkill_sync net/rfkill/core.c:379 [inline]
- rfkill_sync+0x10a/0x1c0 net/rfkill/core.c:372
- rfkill_fop_open+0x1d6/0x750 net/rfkill/core.c:1193
- misc_open+0x3da/0x4c0 drivers/char/misc.c:165
- chrdev_open+0x277/0x700 fs/char_dev.c:414
- do_dentry_open+0x88b/0x1730 fs/open.c:929
- do_open fs/namei.c:3639 [inline]
- path_openat+0x19af/0x29c0 fs/namei.c:3796
- do_filp_open+0x1de/0x430 fs/namei.c:3823
- do_sys_openat2+0x176/0x1e0 fs/open.c:1422
- do_sys_open fs/open.c:1437 [inline]
- __do_sys_openat fs/open.c:1453 [inline]
- __se_sys_openat fs/open.c:1448 [inline]
- __x64_sys_openat+0x175/0x210 fs/open.c:1448
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f8b31dbc989
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 41 1e 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8b31f5ccc8 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 00007f8b31e3c4c8 RCX: 00007f8b31dbc989
-RDX: 0000000000000801 RSI: 0000000020000040 RDI: ffffffffffffff9c
-RBP: 0000000000000000 R08: 0000000000000000 R09: 00007f8b31f5c7f0
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007f8b31f5cd00 R14: 00007f8b31f5cd40 R15: 0000000000000000
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Kees Cook
 
