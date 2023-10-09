@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-39161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB7867BE419
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:13:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4B67BE41B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCC6D1C20ACB
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926C11C20A45
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E1A358A8;
-	Mon,  9 Oct 2023 15:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD781358AA;
+	Mon,  9 Oct 2023 15:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CAhezGn1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBkZzbeZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD94358BE
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8504358B7
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:13:26 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3616B9;
-	Mon,  9 Oct 2023 08:13:12 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A13121;
+	Mon,  9 Oct 2023 08:13:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696864394; x=1728400394;
+  t=1696864395; x=1728400395;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7i3ajq8w9Jvfj033rvnxtzh/FOZ1MH5dwoazmxDInTE=;
-  b=CAhezGn1+QNcpDY0mCMeCA7YpmrzouL/MYnGd9VCw0t/6+DwQkQ9u+CN
-   6vGXinjoctNkFZeF6ia+y7LzcqEvWf+YEYq9UIr+EHEirRoa0hqGPNnCc
-   SU2duPw8M8t7wVIo7saGUfJKpXZOnu9CknbM1KOqBgoA2RidghzWMOMf4
-   sX5fgfAlieUwLzFiz2ckDqFehRQE97Dxz6aALEG0PTBwh2yGKG3vVCc6O
-   0YN3wRb4Q1jX4ybvd5cH6GHkgFyNIVWhxZjD4r3W+3TLTynTJAgkf/bxC
-   Gdq5UV11YCYBdBRK2gN3Iddg2U0+JT8mDzdHKLmnGmJGs1QF7lGM4t3Gq
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369231996"
+  bh=zgE2DVjnrK9Ua23Mm6yXXtMfOQugvJtkZv+vhYbFMW0=;
+  b=OBkZzbeZWd7+BYULv4X66lVfu+7SX0/O53agb0yAlNbYKaof04zQ3Q45
+   mBr9PWGvcArWgrgNr3bapz4sOCFhkBOa5RSg9xjYHbvbDrK3G80elmJCO
+   joNbUpRcdEHyklEAGlFziBNdQyvWM6EDf/zlQzYQoOfBvnvYzPaYp4M/Q
+   BOeX9ZCYr0R4KQ98lpEfJSy+NK35sGwvkynKj+f2PIfi1mA7HWosZzF6F
+   NmpRujhQhEi4RQkCn+yqpO7wxaFH2Oc77TlZAV7j7a3MMuonxWXmwAAXF
+   QTda1B6DyXlUua2FL6JYUUU4kTw0j+uxPEGwm0uyhkTGKfxDBR3nmo+N2
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369232032"
 X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="369231996"
+   d="scan'208";a="369232032"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 08:13:07 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 08:13:11 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="869287938"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="869287947"
 X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="869287938"
+   d="scan'208";a="869287947"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Oct 2023 08:13:04 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 09 Oct 2023 08:13:07 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: Yury Norov <yury.norov@gmail.com>
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -64,9 +64,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	ntfs3@lists.linux.dev,
 	linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 01/14] bitops: add missing prototype check
-Date: Mon,  9 Oct 2023 17:10:13 +0200
-Message-ID: <20231009151026.66145-2-aleksander.lobakin@intel.com>
+Subject: [PATCH 02/14] bitops: make BYTES_TO_BITS() treewide-available
+Date: Mon,  9 Oct 2023 17:10:14 +0200
+Message-ID: <20231009151026.66145-3-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231009151026.66145-1-aleksander.lobakin@intel.com>
 References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
@@ -84,32 +84,76 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Commit 8238b4579866 ("wait_on_bit: add an acquire memory barrier") added
-a new bitop, test_bit_acquire(), with proper wrapping to try optimize it
-at compile-time, but missed the list of bitops used for checking their
-prototypes a bit below.
-The functions added have consistent prototypes, so that no more changes
-are required and no functional changes take place.
+Avoid open-coding that simple expression each time by moving
+BYTES_TO_BITS() from the probes code to <linux/bitops.h> to export
+it to the rest of the kernel.
+Simplify the macro while at it. `BITS_PER_LONG / sizeof(long)` always
+equals to %BITS_PER_BYTE, regardless of the target architecture.
+Do the same for the tools ecosystem as well (incl. its version of
+bitops.h).
 
-Fixes: 8238b4579866 ("wait_on_bit: add an acquire memory barrier")
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- include/linux/bitops.h | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/bitops.h         | 2 ++
+ kernel/trace/trace_probe.c     | 2 --
+ tools/include/linux/bitops.h   | 2 ++
+ tools/perf/util/probe-finder.c | 2 --
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index 2ba557e067fe..f7f5a783da2a 100644
+index f7f5a783da2a..e0cd09eb91cd 100644
 --- a/include/linux/bitops.h
 +++ b/include/linux/bitops.h
-@@ -80,6 +80,7 @@ __check_bitop_pr(__test_and_set_bit);
- __check_bitop_pr(__test_and_clear_bit);
- __check_bitop_pr(__test_and_change_bit);
- __check_bitop_pr(test_bit);
-+__check_bitop_pr(test_bit_acquire);
+@@ -21,6 +21,8 @@
+ #define BITS_TO_U32(nr)		__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(u32))
+ #define BITS_TO_BYTES(nr)	__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(char))
  
- #undef __check_bitop_pr
++#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_BYTE)
++
+ extern unsigned int __sw_hweight8(unsigned int w);
+ extern unsigned int __sw_hweight16(unsigned int w);
+ extern unsigned int __sw_hweight32(unsigned int w);
+diff --git a/kernel/trace/trace_probe.c b/kernel/trace/trace_probe.c
+index 4dc74d73fc1d..2b743c1e37db 100644
+--- a/kernel/trace/trace_probe.c
++++ b/kernel/trace/trace_probe.c
+@@ -1053,8 +1053,6 @@ parse_probe_arg(char *arg, const struct fetch_type *type,
+ 	return ret;
+ }
  
+-#define BYTES_TO_BITS(nb)	((BITS_PER_LONG * (nb)) / sizeof(long))
+-
+ /* Bitfield type needs to be parsed into a fetch function */
+ static int __parse_bitfield_probe_arg(const char *bf,
+ 				      const struct fetch_type *t,
+diff --git a/tools/include/linux/bitops.h b/tools/include/linux/bitops.h
+index f18683b95ea6..bc6600466e7b 100644
+--- a/tools/include/linux/bitops.h
++++ b/tools/include/linux/bitops.h
+@@ -20,6 +20,8 @@
+ #define BITS_TO_U32(nr)		DIV_ROUND_UP(nr, BITS_PER_TYPE(u32))
+ #define BITS_TO_BYTES(nr)	DIV_ROUND_UP(nr, BITS_PER_TYPE(char))
+ 
++#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_BYTE)
++
+ extern unsigned int __sw_hweight8(unsigned int w);
+ extern unsigned int __sw_hweight16(unsigned int w);
+ extern unsigned int __sw_hweight32(unsigned int w);
+diff --git a/tools/perf/util/probe-finder.c b/tools/perf/util/probe-finder.c
+index f171360b0ef4..35f66c12ad8a 100644
+--- a/tools/perf/util/probe-finder.c
++++ b/tools/perf/util/probe-finder.c
+@@ -304,8 +304,6 @@ static int convert_variable_location(Dwarf_Die *vr_die, Dwarf_Addr addr,
+ 	return ret2;
+ }
+ 
+-#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_LONG / sizeof(long))
+-
+ static int convert_variable_type(Dwarf_Die *vr_die,
+ 				 struct probe_trace_arg *tvar,
+ 				 const char *cast, bool user_access)
 -- 
 2.41.0
 
