@@ -1,73 +1,78 @@
-Return-Path: <netdev+bounces-39230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C657BE5BC
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:01:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EC6E7BE5C9
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A6972818F4
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:01:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED8782818FB
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA40537C9C;
-	Mon,  9 Oct 2023 16:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED3437CA0;
+	Mon,  9 Oct 2023 16:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="D6leI24v"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gL6h0k5V"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B49374F0
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:01:38 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56251B7
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:01:37 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-690bf8fdd1aso3375557b3a.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 09:01:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 878C9339BC
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:02:34 +0000 (UTC)
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F309E
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:02:31 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1c7373cff01so41703185ad.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 09:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696867297; x=1697472097; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1696867351; x=1697472151; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fIq4Z5Y2KCiwFjSNvRCcRrRGWFulfAYmkI5Tl6YV8HY=;
-        b=D6leI24vqLEOAn243F2jarb07Fa5no+OEmqLI+jsm7APEM85NtiL6Wjq61JeneHWJL
-         SOdmBVHeqmruX8hTNsJXqZ12Rkwqj4dIDDMBZqtAofFT5Ht5fOqTgrLXyL2/qm0IbYcW
-         duzUhu9xUJeySDjBvIeXCEREkkwulTX6rCQwc=
+        bh=VBo7/M8weK7GqJKgsmfZy4H/ddypVZXezIGNc/laBIM=;
+        b=gL6h0k5VVMBjDMJOPDCAChakBz/wXsEo6uNJ4kH0G/X0fAPjMgZ9W4v89lzqTRPAmV
+         OFjEgn/K7ii/k9/uUnCvyiROzS6spfyytS20e92g13MKOth1lGpSsDdmoayzKpCOfGCR
+         J9jf/PzmIKYBEbbFeaQ4jCzerQrff3DRdxWCY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696867297; x=1697472097;
+        d=1e100.net; s=20230601; t=1696867351; x=1697472151;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fIq4Z5Y2KCiwFjSNvRCcRrRGWFulfAYmkI5Tl6YV8HY=;
-        b=cVpdu6pDlEOyaC+00VVGEhx/Aj9EFhaKev6Hl4yL0A+wSUsAQQnumvK1nJbU41nm2J
-         PnwmHCwJG8enY05cHskz8O3mv4OlQCdMMIde1ZkUxKhroa9E9ljafma1YFYyroXS8oRF
-         tbqRz2bNUrYB5y8dMydKK+NUcu4hPaNA0ylRZK6AJPQvEpjgpilgp74ESLE9HOSjIGaP
-         14XTQokJr8ZbomdTv1CR6evrY1wckO5TEs8modsO0xsb2YPlX/ArSpsD7iGxsTUP8AzD
-         UwH8FmqSDE9ALbtYvZkJe6aRlzQO1RzmferD/F8gt3ebhY5y5Su27C+XDf0lRjEudGPR
-         tY5w==
-X-Gm-Message-State: AOJu0YxUAj/ESp3qsJkZIKBWy9LwbR7Fl5LJHQlaOu/FnveGr1HLIvJX
-	jdawaY+k/fkKxgV6BS228IpuKg==
-X-Google-Smtp-Source: AGHT+IGzWMhg2YBxKZpnPCicy+u6EYSsmxQ4VBOiMQgc178btuiuE2aejaE6C1t+/qa5G4gqgzNYNw==
-X-Received: by 2002:a05:6a00:99c:b0:68f:cc67:e723 with SMTP id u28-20020a056a00099c00b0068fcc67e723mr16129844pfg.17.1696867296723;
-        Mon, 09 Oct 2023 09:01:36 -0700 (PDT)
+        bh=VBo7/M8weK7GqJKgsmfZy4H/ddypVZXezIGNc/laBIM=;
+        b=IeN8pUYtHuT5D7bEbxr+gVjQvkydf0tmvTmXOMSiq0KjCz+fPSev4VtEOyGP/Isc1D
+         x2qQPe/knUTBVALDcZ8C9FVNAm1ReRlRsMbjf7X8p6mw98fXljJYTcT0YpD3omJMJG1u
+         1rzNhAf7D5K1qhY/+aCpfQpCL4vn56LGOLuk8BKMhShfzgrYEA7SLqDFyCaQ1PJxwuSh
+         jlrhzzNxThO6UmUCu4hKc9M2Ve1y7C/uToar5lIXIMhL9NSFRdIpBx76Cu5kbHstbHKN
+         Y32ur3hHC/rDQfZn6xkc+puck+FxqVL2wFbfdruHv/INV6UUgnuS3G5fEUqQs7PQgW8G
+         90jQ==
+X-Gm-Message-State: AOJu0Yz+DGf/T8cQ8iXLgd7mmOgxLm0u1gcgHVUXBZ2RZMlrQuG1AJP9
+	ofm/YSgIKoeq1GXAsa+eGqZKAT2gu5BU+hAOXO0=
+X-Google-Smtp-Source: AGHT+IHzup/xAx1ifpxmi3UryQvmiHkOx8P4Nc2On1Fyx56aKemvsYmRNFsp4H4ofYMWZ2mFLT5hmQ==
+X-Received: by 2002:a17:902:cecb:b0:1c0:cbaf:6954 with SMTP id d11-20020a170902cecb00b001c0cbaf6954mr21386914plg.25.1696867351114;
+        Mon, 09 Oct 2023 09:02:31 -0700 (PDT)
 Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id r19-20020aa78453000000b00688965c5227sm6574028pfn.120.2023.10.09.09.01.36
+        by smtp.gmail.com with ESMTPSA id f7-20020a17090274c700b001bc445e2497sm9742768plt.79.2023.10.09.09.02.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 09:01:36 -0700 (PDT)
-Date: Mon, 9 Oct 2023 09:01:34 -0700
+        Mon, 09 Oct 2023 09:02:30 -0700 (PDT)
+Date: Mon, 9 Oct 2023 09:02:27 -0700
 From: Kees Cook <keescook@chromium.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	Sergei Trofimovich <slyich@gmail.com>
-Subject: Re: [PATCH v1 net] af_packet: Fix fortified memcpy() without flex
- array.
-Message-ID: <202310090852.E9A6558@keescook>
-References: <20231009153151.75688-1-kuniyu@amazon.com>
+	"Lee, Chun-Yi" <jlee@suse.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	stable@vger.kernel.org, Iulia Tanasescu <iulia.tanasescu@nxp.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	linux-bluetooth@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: mark bacmp() and bacpy() as __always_inline
+Message-ID: <202310090902.10ED782652@keescook>
+References: <20231009134826.1063869-1-arnd@kernel.org>
+ <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,108 +81,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231009153151.75688-1-kuniyu@amazon.com>
+In-Reply-To: <2abaad09-b6e0-4dd5-9796-939f20804865@app.fastmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 08:31:52AM -0700, Kuniyuki Iwashima wrote:
-> Sergei Trofimovich reported a regression [0] caused by commit a0ade8404c3b
-> ("af_packet: Fix warning of fortified memcpy() in packet_getname().").
+On Mon, Oct 09, 2023 at 05:36:55PM +0200, Arnd Bergmann wrote:
+> On Mon, Oct 9, 2023, at 15:48, Arnd Bergmann wrote:
+> > From: Arnd Bergmann <arnd@arndb.de>
+> >
+> > These functions are simple wrappers around memcmp() and memcpy(), which
+> > contain compile-time checks for buffer overflow. Something in gcc-13 and
+> > likely other versions makes this trigger a warning when the functions
+> > are not inlined and the compiler misunderstands the buffer length:
+> >
+> > In file included from net/bluetooth/hci_event.c:32:
+> > In function 'bacmp',
+> >     inlined from 'hci_conn_request_evt' at 
+> > net/bluetooth/hci_event.c:3276:7:
+> > include/net/bluetooth/bluetooth.h:364:16: error: 'memcmp' specified 
+> > bound 6 exceeds source size 0 [-Werror=stringop-overread]
+> >   364 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+> >       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > Use the __always_inline annotation to ensure that the helpers are
+> > correctly checked. This has no effect on the actual correctness
+> > of the code, but avoids the warning. Since the patch that introduced
+> > the warning is marked for stable backports, this one should also
+> > go that way to avoid introducing build regressions.
+> >
+> > Fixes: d70e44fef8621 ("Bluetooth: Reject connection with the device 
+> > which has same BD_ADDR")
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: Lee, Chun-Yi <jlee@suse.com>
+> > Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > Cc: Marcel Holtmann <marcel@holtmann.org>
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > 
-> It introduced a flex array sll_addr_flex in struct sockaddr_ll as a
-> union-ed member with sll_addr to work around the fortified memcpy() check.
-> 
-> However, a userspace program uses a struct that has struct sockaddr_ll in
-> the middle, where a flex array is illegal to exist.
-> 
->   include/linux/if_packet.h:24:17: error: flexible array member 'sockaddr_ll::<unnamed union>::<unnamed struct>::sll_addr_flex' not at end of 'struct packet_info_t'
->      24 |                 __DECLARE_FLEX_ARRAY(unsigned char, sll_addr_flex);
->         |                 ^~~~~~~~~~~~~~~~~~~~
-> To fix the regression, let's go back to the first attempt [1] telling
-> memcpy() the actual size of the array.
-> 
-> Reported-by: Sergei Trofimovich <slyich@gmail.com>
-> Closes: https://github.com/NixOS/nixpkgs/pull/252587#issuecomment-1741733002 [0]
+> Sorry, I have to retract this, something went wrong on my
+> testing and I now see the same problem in some configs regardless
+> of whether the patch is applied or not.
 
-Eww. That's a buggy definition -- it could get overflowed.
-
-But okay, we don't break userspace.
-
-> Link: https://lore.kernel.org/netdev/20230720004410.87588-3-kuniyu@amazon.com/ [1]
-> Fixes: a0ade8404c3b ("af_packet: Fix warning of fortified memcpy() in packet_getname().")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  include/uapi/linux/if_packet.h | 6 +-----
->  net/packet/af_packet.c         | 7 ++++++-
->  2 files changed, 7 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/uapi/linux/if_packet.h b/include/uapi/linux/if_packet.h
-> index 4d0ad22f83b5..9efc42382fdb 100644
-> --- a/include/uapi/linux/if_packet.h
-> +++ b/include/uapi/linux/if_packet.h
-> @@ -18,11 +18,7 @@ struct sockaddr_ll {
->  	unsigned short	sll_hatype;
->  	unsigned char	sll_pkttype;
->  	unsigned char	sll_halen;
-> -	union {
-> -		unsigned char	sll_addr[8];
-> -		/* Actual length is in sll_halen. */
-> -		__DECLARE_FLEX_ARRAY(unsigned char, sll_addr_flex);
-> -	};
-> +	unsigned char	sll_addr[8];
->  };
-
-Yup, we need to do at least this.
-
->  
->  /* Packet types */
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index 8f97648d652f..a84e00b5904b 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -3607,7 +3607,12 @@ static int packet_getname(struct socket *sock, struct sockaddr *uaddr,
->  	if (dev) {
->  		sll->sll_hatype = dev->type;
->  		sll->sll_halen = dev->addr_len;
-> -		memcpy(sll->sll_addr_flex, dev->dev_addr, dev->addr_len);
-> +
-> +		/* Let __fortify_memcpy_chk() know the actual buffer size. */
-> +		memcpy(((struct sockaddr_storage *)sll)->__data +
-> +		       offsetof(struct sockaddr_ll, sll_addr) -
-> +		       offsetofend(struct sockaddr_ll, sll_family),
-> +		       dev->dev_addr, dev->addr_len);
->  	} else {
->  		sll->sll_hatype = 0;	/* Bad: we have no ARPHRD_UNSPEC */
->  		sll->sll_halen = 0;
-
-I still think this is a mistake. We're papering over so many lies to the
-compiler. :P If "uaddr" is actually "struct sockaddr_storage", then we
-should update the callers... and if "struct sockaddr_ll" doesn't have a
-fixed size trailing array, we should make a new struct that is telling
-the truth. ;)
-
-Perhaps add this to the UAPI:
-
-+struct sockaddr_ll_flex {
-+       unsigned short  sll_family;
-+       __be16          sll_protocol;
-+       int             sll_ifindex;
-+       unsigned short  sll_hatype;
-+       unsigned char   sll_pkttype;
-+       unsigned char   sll_halen;
-+       unsigned char   sll_addr[] __counted_by(sll_halen);
-+};
-
-And update the memcpy():
-
--       DECLARE_SOCKADDR(struct sockaddr_ll *, sll, uaddr);
-+       struct sockaddr_ll_flex * sll = (struct sockaddr_ll_flex *)uaddr;
-
-?
+Perhaps turn them into macros instead?
 
 -- 
 Kees Cook
