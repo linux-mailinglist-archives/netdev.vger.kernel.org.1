@@ -1,190 +1,294 @@
-Return-Path: <netdev+bounces-38956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26B337BD42B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:19:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF317BD433
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8351C208C1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 07:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92A0E2813CB
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 07:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682FDFBF9;
-	Mon,  9 Oct 2023 07:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F4DFC06;
+	Mon,  9 Oct 2023 07:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wZQwOMnT"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="AsyGse47"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6647C13D
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:19:15 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C4E94
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 00:19:13 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so11738a12.0
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 00:19:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ADC8C1A
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:23:11 +0000 (UTC)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B228B9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 00:23:08 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-313e742a787so2416057f8f.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 00:23:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696835952; x=1697440752; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0G4lnIm/L/2jfjUpl8BGvD5ApP4hc/7MaXZs13qmiX4=;
-        b=wZQwOMnT3SVMeaeyCon8U4P6CWLcCmxgvIYd/DazndX/EgQFSfV9uOTikaOSOEhHGM
-         +BgxW7oorkWQR/ocPjEMwqQwpIrj8sDyTT/vLXiOHnaQgQUyfelrz6KxTmtiL5oO9O0r
-         h43YIPeBTvyb8qHoiyKz9n/qqKy5IGlHb1IzKhmnr7KYy6s980EHL0M03GrJfCaRE7px
-         JQ+18sD+Lj/60Cue5LnRJOXaFJnZQgngF/QymwS33cVlOJAePn8Vj8gMgosQO6ydK8wE
-         OsRcp5OkrWyGBaJcQ0MuLt41XSKe3B41ev35y+tDFZBfjp19UqkOotAf2rb+PgjPuDE6
-         rasQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696836186; x=1697440986; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=L+wjv6ohQ/J1gbmZuOpM8GZ58jf+gpRKYWWWE53GrKA=;
+        b=AsyGse47WG70dGP7/3KAN2UlOzGb0JUOjsvrqS7arnuIIGOK3Hn5Vj7XbAWf+dPlmV
+         /xz5y5fa8CCypr3se/UVj7P6l9o+bCKvwgGciBqALPC8AYM8Z/Jxpy7f+hApiWkC8V2G
+         vAAKXGwYjQOjm6W/WncBewEDEwcSZ0sLTIXeJs73kO7dG32KNUMNK5kSmArTxMtCCyNQ
+         IoPvAWAKD+RFNEVueyAVsg/+ELmBRelHpBZpUAUao+QAmK1IT6+/BkVijY00Jced854i
+         EG7ChQQNi1XiGtK/ZMHHscwvkahmoMxI3tb09ry0RxrEZXhADHMpDticRhQy5YlCV51f
+         sTUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696835952; x=1697440752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0G4lnIm/L/2jfjUpl8BGvD5ApP4hc/7MaXZs13qmiX4=;
-        b=Ff4f9mam+cuEJbCiITA9DY/+gKgSLBnXh+27dyTVuiYtT+sUYalSVj4yhrRLlTb+Tk
-         4iQdgeUMqi7N6dN8o+YhB4515p4innr2XcjrxK27bsPtjPRnM6CzuyYhVD+YkugVDINC
-         SogKwwvHwQzTTne8z6PbBP+jWqErFEl38WfsW4attG/p/eXJt3ukwn1FWZLQOYY3evBZ
-         L9yVFHTrL4OQ2EvTDZjZx+Xlmd1f/5f0ohOKE3wZqYAlEvNBpHLWBhe2E3l5jySCA0kS
-         Nj5KRBq+eWwl1puSK8C0fppXG6MfFetk19jEup2c13bECQpnBkJqKGBuufE+1SAp7/K/
-         WHgg==
-X-Gm-Message-State: AOJu0YzKDVs4hX7O2vmJwC/TvG6GuIwbBulTaZmKWy2J7UJ2x0JDKUmy
-	pzS72oY5/DMlU9keezu7bV8pLcaokJlAT/A4cXD3kw==
-X-Google-Smtp-Source: AGHT+IE+jq9PyYLsYHpsrvCUuH0lJPTbZB/gGk8VPqkFRBMyIAGs6DNDsRIAtLDoPdM/SUAadTJzmjrpa3ookyfrHnU=
-X-Received: by 2002:a50:cd5c:0:b0:538:47bb:3e88 with SMTP id
- d28-20020a50cd5c000000b0053847bb3e88mr350456edj.6.1696835952079; Mon, 09 Oct
- 2023 00:19:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696836186; x=1697440986;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L+wjv6ohQ/J1gbmZuOpM8GZ58jf+gpRKYWWWE53GrKA=;
+        b=cILXiFZWUmhe/QNhXY3PV/g6nikbVeFLWsRRQun4pf5XeeQWbID+ozzHkidoD0lOOk
+         atcYCTJVBlJj9XEMRqIQF21JL59uwl4P5TUn22EFGcBkUrg8MdusoZdE+c4WsUavvAmq
+         7EfWA5fA3GUOd9WDoZi0XgB7pZyd3zjXqHFAgLn3W5sCeCd0K5FAnxeD4VUtJI0/5FFl
+         JGq3tzVaR+LHYXugCG96i6lrjWYxvnjJDtSz40meoCr/Ct/+qlnO4+fXWM6PyRsGAK3z
+         H9d4Cv7//5OF3sN19x9YkWOMjrGrFjZiVmezrFP1nDEfZ0RehHwAJx/09kChqWxbwFHV
+         SPJQ==
+X-Gm-Message-State: AOJu0YyO45rjn+GPZMcBfrrFetMfF8Rk+D/jiXMgs97YND8tvSYYYqwY
+	jMgYH4cD48X619OiXUAw50rpkrIOzE71xa9Ld3A=
+X-Google-Smtp-Source: AGHT+IEUygX5opuJW2F+JCB3/zU7jnizPS3p5041jzj7UKSO4c3lv2UFBqyCiKcd9fI7rDAD1Nd2fg==
+X-Received: by 2002:adf:f78a:0:b0:316:fc03:3c66 with SMTP id q10-20020adff78a000000b00316fc033c66mr9648125wrp.3.1696836186224;
+        Mon, 09 Oct 2023 00:23:06 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id k21-20020adfb355000000b003296b913bbesm8163520wrd.12.2023.10.09.00.23.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 00:23:05 -0700 (PDT)
+Date: Mon, 9 Oct 2023 09:23:04 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+	miguel.ojeda.sandonis@gmail.com, greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 3/3] net: phy: add Rust Asix PHY driver
+Message-ID: <ZSOqWMqm/JQOieAd@nanopsycho>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <20231009013912.4048593-4-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231007105019.GA20662@breakpoint.cc> <20231009021108.3203928-1-guodongtai@kylinos.cn>
-In-Reply-To: <20231009021108.3203928-1-guodongtai@kylinos.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Oct 2023 09:18:58 +0200
-Message-ID: <CANn89i+OL_kPwmHEW-KBGdd-prAGC3NaQG4MNq4ZEvWpw7Q-7A@mail.gmail.com>
-Subject: Re: [PATCH v2] tcp: cleanup secure_{tcp, tcpv6}_ts_off
-To: George Guo <guodongtai@kylinos.cn>
-Cc: fw@strlen.de, davem@davemloft.net, dongtai.guo@linux.dev, 
-	dsahern@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009013912.4048593-4-fujita.tomonori@gmail.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 5:12=E2=80=AFAM George Guo <guodongtai@kylinos.cn> w=
-rote:
+Mon, Oct 09, 2023 at 03:39:12AM CEST, fujita.tomonori@gmail.com wrote:
+>This is the Rust implementation of drivers/net/phy/ax88796b.c. The
+>features are equivalent. You can choose C or Rust versionon kernel
+>configuration.
 >
-> Correct secure_tcp_ts_off and secure_tcpv6_ts_off call parameter order
+>Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>---
+> drivers/net/phy/Kconfig          |   7 ++
+> drivers/net/phy/Makefile         |   6 +-
+> drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
+> rust/uapi/uapi_helper.h          |   2 +
+> 4 files changed, 143 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/net/phy/ax88796b_rust.rs
 >
+>diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+>index 421d2b62918f..0317be180ac2 100644
+>--- a/drivers/net/phy/Kconfig
+>+++ b/drivers/net/phy/Kconfig
+>@@ -107,6 +107,13 @@ config AX88796B_PHY
+> 	  Currently supports the Asix Electronics PHY found in the X-Surf 100
+> 	  AX88796B package.
+> 
+>+config AX88796B_RUST_PHY
+>+	bool "Rust version driver for Asix PHYs"
+>+	depends on RUST_PHYLIB_BINDINGS && AX88796B_PHY
+>+	help
+>+	  Uses the Rust version driver for Asix PHYs (ax88796b_rust.ko)
+>+	  instead of the C version.
+>+
+> config BROADCOM_PHY
+> 	tristate "Broadcom 54XX PHYs"
+> 	select BCM_NET_PHYLIB
+>diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+>index c945ed9bd14b..58d7dfb095ab 100644
+>--- a/drivers/net/phy/Makefile
+>+++ b/drivers/net/phy/Makefile
+>@@ -41,7 +41,11 @@ aquantia-objs			+= aquantia_hwmon.o
+> endif
+> obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
+> obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+>-obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+>+ifdef CONFIG_AX88796B_RUST_PHY
+>+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
+>+else
+>+  obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+>+endif
+> obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
+> obj-$(CONFIG_BCM63XX_PHY)	+= bcm63xx.o
+> obj-$(CONFIG_BCM7XXX_PHY)	+= bcm7xxx.o
+>diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
+>new file mode 100644
+>index 000000000000..017f817f6f8d
+>--- /dev/null
+>+++ b/drivers/net/phy/ax88796b_rust.rs
+>@@ -0,0 +1,129 @@
+>+// SPDX-License-Identifier: GPL-2.0
+>+// Copyright (C) 2023 FUJITA Tomonori <fujita.tomonori@gmail.com>
+>+
+>+//! Rust Asix PHYs driver
+>+//!
+>+//! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
 
-I do not think this patch is correct.
-
-We have to exchange saddr/daddr from an incoming packet in order to compute
-a hash if the function expects saddr to be the local host address, and
-daddr being the remote peer address.
-
-For instance, tcp_v4_connect() uses :
-
-WRITE_ONCE(tp->tsoffset,
-                          secure_tcp_ts_off(net, inet->inet_saddr,
-                                                        inet->inet_daddr));
-
-While when receiving a packet from the other peer, it correctly swaps
-saddr/daddr
-
-tcp_v4_init_ts_off(const struct net *net, const struct sk_buff *skb)
-{
- return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->saddr);
-}
+Wait. So you just add rust driver as a duplicate of existing c driver?
+What's the point exactly to have 2 drivers for the same thing?
 
 
-> Signed-off-by: George Guo <guodongtai@kylinos.cn>
-> ---
->  net/ipv4/syncookies.c | 4 ++--
->  net/ipv4/tcp_ipv4.c   | 2 +-
->  net/ipv6/syncookies.c | 4 ++--
->  net/ipv6/tcp_ipv6.c   | 4 ++--
->  4 files changed, 7 insertions(+), 7 deletions(-)
+
+>+use kernel::c_str;
+>+use kernel::net::phy::{self, DeviceId, Driver};
+>+use kernel::prelude::*;
+>+use kernel::uapi;
+>+
+>+kernel::module_phy_driver! {
+>+    drivers: [PhyAX88772A, PhyAX88772C, PhyAX88796B],
+>+    device_table: [
+>+        DeviceId::new_with_driver::<PhyAX88772A>(),
+>+        DeviceId::new_with_driver::<PhyAX88772C>(),
+>+        DeviceId::new_with_driver::<PhyAX88796B>()
+>+    ],
+>+    name: "rust_asix_phy",
+>+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
+>+    description: "Rust Asix PHYs driver",
+>+    license: "GPL",
+>+}
+>+
+>+// Performs a software PHY reset using the standard
+>+// BMCR_RESET bit and poll for the reset bit to be cleared.
+>+// Toggle BMCR_RESET bit off to accommodate broken AX8796B PHY implementation
+>+// such as used on the Individual Computers' X-Surf 100 Zorro card.
+>+fn asix_soft_reset(dev: &mut phy::Device) -> Result {
+>+    dev.write(uapi::MII_BMCR as u16, 0)?;
+>+    dev.genphy_soft_reset()
+>+}
+>+
+>+struct PhyAX88772A;
+>+
+>+#[vtable]
+>+impl phy::Driver for PhyAX88772A {
+>+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
+>+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
+>+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
+>+
+>+    // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
+>+    // after autoneg is done and the link status is reported as active, the MII_LPA
+>+    // register is 0. This issue is not reproducible on AX88772C.
+>+    fn read_status(dev: &mut phy::Device) -> Result<u16> {
+>+        dev.genphy_update_link()?;
+>+        if !dev.get_link() {
+>+            return Ok(0);
+>+        }
+>+        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
+>+        // linkmode so use MII_BMCR as default values.
+>+        let ret = dev.read(uapi::MII_BMCR as u16)?;
+>+
+>+        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
+>+            dev.set_speed(uapi::SPEED_100);
+>+        } else {
+>+            dev.set_speed(uapi::SPEED_10);
+>+        }
+>+
+>+        let duplex = if ret as u32 & uapi::BMCR_FULLDPLX != 0 {
+>+            phy::DuplexMode::Full
+>+        } else {
+>+            phy::DuplexMode::Half
+>+        };
+>+        dev.set_duplex(duplex);
+>+
+>+        dev.genphy_read_lpa()?;
+>+
+>+        if dev.is_autoneg_enabled() && dev.is_autoneg_completed() {
+>+            dev.resolve_aneg_linkmode();
+>+        }
+>+
+>+        Ok(0)
+>+    }
+>+
+>+    fn suspend(dev: &mut phy::Device) -> Result {
+>+        dev.genphy_suspend()
+>+    }
+>+
+>+    fn resume(dev: &mut phy::Device) -> Result {
+>+        dev.genphy_resume()
+>+    }
+>+
+>+    fn soft_reset(dev: &mut phy::Device) -> Result {
+>+        asix_soft_reset(dev)
+>+    }
+>+
+>+    fn link_change_notify(dev: &mut phy::Device) {
+>+        // Reset PHY, otherwise MII_LPA will provide outdated information.
+>+        // This issue is reproducible only with some link partner PHYs.
+>+        if dev.state() == phy::DeviceState::NoLink {
+>+            let _ = dev.init_hw();
+>+            let _ = dev.start_aneg();
+>+        }
+>+    }
+>+}
+>+
+>+struct PhyAX88772C;
+>+
+>+#[vtable]
+>+impl Driver for PhyAX88772C {
+>+    const FLAGS: u32 = phy::flags::IS_INTERNAL;
+>+    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
+>+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1881);
+>+
+>+    fn suspend(dev: &mut phy::Device) -> Result {
+>+        dev.genphy_suspend()
+>+    }
+>+
+>+    fn resume(dev: &mut phy::Device) -> Result {
+>+        dev.genphy_resume()
+>+    }
+>+
+>+    fn soft_reset(dev: &mut phy::Device) -> Result {
+>+        asix_soft_reset(dev)
+>+    }
+>+}
+>+
+>+struct PhyAX88796B;
+>+
+>+#[vtable]
+>+impl Driver for PhyAX88796B {
+>+    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
+>+    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_model_mask(0x003b1841);
+>+
+>+    fn soft_reset(dev: &mut phy::Device) -> Result {
+>+        asix_soft_reset(dev)
+>+    }
+>+}
+>diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
+>index 301f5207f023..08f5e9334c9e 100644
+>--- a/rust/uapi/uapi_helper.h
+>+++ b/rust/uapi/uapi_helper.h
+>@@ -7,3 +7,5 @@
+>  */
+> 
+> #include <uapi/asm-generic/ioctl.h>
+>+#include <uapi/linux/mii.h>
+>+#include <uapi/linux/ethtool.h>
+
+What is exactly the reason to change anything in uapi for phy driver?
+Should be just kernel api implementation, no?
+
+
+
+>-- 
+>2.34.1
 >
-> diff --git a/net/ipv4/syncookies.c b/net/ipv4/syncookies.c
-> index dc478a0574cb..537f368a0b66 100644
-> --- a/net/ipv4/syncookies.c
-> +++ b/net/ipv4/syncookies.c
-> @@ -360,8 +360,8 @@ struct sock *cookie_v4_check(struct sock *sk, struct =
-sk_buff *skb)
->
->         if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
->                 tsoff =3D secure_tcp_ts_off(sock_net(sk),
-> -                                         ip_hdr(skb)->daddr,
-> -                                         ip_hdr(skb)->saddr);
-> +                                         ip_hdr(skb)->saddr,
-> +                                         ip_hdr(skb)->daddr);
->                 tcp_opt.rcv_tsecr -=3D tsoff;
->         }
->
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index a441740616d7..54717d261693 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -104,7 +104,7 @@ static u32 tcp_v4_init_seq(const struct sk_buff *skb)
->
->  static u32 tcp_v4_init_ts_off(const struct net *net, const struct sk_buf=
-f *skb)
->  {
-> -       return secure_tcp_ts_off(net, ip_hdr(skb)->daddr, ip_hdr(skb)->sa=
-ddr);
-> +       return secure_tcp_ts_off(net, ip_hdr(skb)->saddr, ip_hdr(skb)->da=
-ddr);
->  }
->
->  int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
-> diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-> index 5014aa663452..9af484a4d518 100644
-> --- a/net/ipv6/syncookies.c
-> +++ b/net/ipv6/syncookies.c
-> @@ -162,8 +162,8 @@ struct sock *cookie_v6_check(struct sock *sk, struct =
-sk_buff *skb)
->
->         if (tcp_opt.saw_tstamp && tcp_opt.rcv_tsecr) {
->                 tsoff =3D secure_tcpv6_ts_off(sock_net(sk),
-> -                                           ipv6_hdr(skb)->daddr.s6_addr3=
-2,
-> -                                           ipv6_hdr(skb)->saddr.s6_addr3=
-2);
-> +                                           ipv6_hdr(skb)->saddr.s6_addr3=
-2,
-> +                                           ipv6_hdr(skb)->daddr.s6_addr3=
-2);
->                 tcp_opt.rcv_tsecr -=3D tsoff;
->         }
->
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> index bfe7d19ff4fd..7e2f924725c6 100644
-> --- a/net/ipv6/tcp_ipv6.c
-> +++ b/net/ipv6/tcp_ipv6.c
-> @@ -119,8 +119,8 @@ static u32 tcp_v6_init_seq(const struct sk_buff *skb)
->
->  static u32 tcp_v6_init_ts_off(const struct net *net, const struct sk_buf=
-f *skb)
->  {
-> -       return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->daddr.s6_addr32,
-> -                                  ipv6_hdr(skb)->saddr.s6_addr32);
-> +       return secure_tcpv6_ts_off(net, ipv6_hdr(skb)->saddr.s6_addr32,
-> +                                  ipv6_hdr(skb)->daddr.s6_addr32);
->  }
->
->  static int tcp_v6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
-> --
-> 2.34.1
 >
 
