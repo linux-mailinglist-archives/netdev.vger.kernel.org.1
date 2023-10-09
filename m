@@ -1,111 +1,161 @@
-Return-Path: <netdev+bounces-38974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BF0B7BD4F1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:13:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B4907BD4F6
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:14:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C9521C208F1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:13:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CEA01C20A04
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 08:14:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0FC14AB2;
-	Mon,  9 Oct 2023 08:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2995614F98;
+	Mon,  9 Oct 2023 08:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="edj7kbWB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPBbaLWw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D38A14F7A
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:13:18 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F028F
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 01:13:16 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-536ef8a7dcdso12197a12.0
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 01:13:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B059011737;
+	Mon,  9 Oct 2023 08:13:58 +0000 (UTC)
+Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB33C94;
+	Mon,  9 Oct 2023 01:13:53 -0700 (PDT)
+Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-4527d65354bso1803136137.0;
+        Mon, 09 Oct 2023 01:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696839195; x=1697443995; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696839232; x=1697444032; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RrQH2umOsfloZIlYa52ZdXA/6E97E3SVvBabAKsxLhk=;
-        b=edj7kbWBwOqtecyb6sKWYwQqa6IlamXXE1nVaJGzlu3ZvjXaYoZS2mirp3IoGMVdxF
-         aZYh/CVsf9RxYv3MFlHkSofOAPT8QuFDJPv4v3LsallQJRKwTEudcrJN/CogkiAK8NFZ
-         eRqX6gXclw3fC6NDUiN/TjZs2yxBFPiwmk7rYq98V359KNOnV/My4S1mR5CK8+9JWnfx
-         ac0V4IZlRcjrJNPRfXwHkN4G8q741OmzHFMH5M15xldpemkcX0fVBRXGZ4iXDof+jA5K
-         XWw7408MlS2uqO+jMwbi/1x43DglM2ltkZsL+8l+3OhipTOsYT3St+nmMT7cFRHICJii
-         CbRw==
+        bh=g97708SLPpUQGaeNPBhyGUaVogHGb5gBagyPdjwmXiM=;
+        b=CPBbaLWwNkHDb8dQP4ygjl4E59xeMq0QU27H1CtXMYwmNFHX2qdkzZG1dTjHU8vNqY
+         vXCjNzBRi5Nq9cfz3M9c9gd2kZIqIufYQBPC6oM9azBCJ8HVkB+5zcrKOIO2FBwrahAA
+         ivr6mG5XrQZeiN8awN7iUkRG0mUOZdkqqVNNYr+Z7bDa2jzWK94jiY2tm5FlFWvP4910
+         my2FLZUuqlzHoZmidaJFNsuYFB3NfMtTGD8VonOuCP231RSN0sLItxNGtSFwQ0kK42W4
+         Xo5vd2ptmgJhDBIoYN8plWGUTOQ8bPzT8Wc93K/HSLVY5TbxbD9OrDdQtY9l7F3aXK+i
+         995w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696839195; x=1697443995;
+        d=1e100.net; s=20230601; t=1696839233; x=1697444033;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RrQH2umOsfloZIlYa52ZdXA/6E97E3SVvBabAKsxLhk=;
-        b=EdhTT/N7+s32SNi3ugg8pRAOhHoAzpY777PPzNwQUuf1V7kTASJndd9xASm7GgtdBY
-         a4aRO/Rl5CSN/XMWojc9xE8kd7R0AA9XfmtKofaQ9irn5e50NJ6xxf/EycGcOkO+XS5V
-         NIdWJOXiFqTKTP/EiJSYthHQmhw8uqwUi+5nig/Ot5axy1DYHNzXsYrx1ILHUyF524R9
-         P/HvEsP7NZXu2yX9gMS1cklARxFtvJ5T1nxQwzkEsF+0TvjptEd/ZVXYV4xVbl0+Pr0W
-         7Dac0RmKDGWA78GrDAp+iKRTcexjF4J44oNPHDGPkt1R5+eb8bsEWoYp3+T+NzTsHXgT
-         Ue1g==
-X-Gm-Message-State: AOJu0YwHHTOjLLUJuw76C7no2AXOBTLqIgLpNEq0jOtpMLGHCdEI8oKt
-	pVJaMFMhTmUfWt/kJ9NjWKT2JJpB2ToEyznyOAWLsA==
-X-Google-Smtp-Source: AGHT+IEv25SUagBUFABpuy2Mwr+UEIQdTi718GmwSCOW+Vw9IW955LVtVvKZiDIPV8BnYjEg0aR5LOV9ksJ5xJK9pzk=
-X-Received: by 2002:a50:d0d7:0:b0:538:1d3b:172f with SMTP id
- g23-20020a50d0d7000000b005381d3b172fmr340882edf.3.1696839194850; Mon, 09 Oct
- 2023 01:13:14 -0700 (PDT)
+        bh=g97708SLPpUQGaeNPBhyGUaVogHGb5gBagyPdjwmXiM=;
+        b=kqlti5EC4f//7Lpu7oLsEWtDMaGHkRZIj7Mrm+cUl5pPqdziE+O5DgJf5/m4gUJRDT
+         yYvc0wYh9Q5tA1Nm+wKWdVysqzOtb3auvwhcpYiB/LSAMrBFchs/pAXg/9WHDwdXjLi1
+         9fmR9t3ajVwEL0hnhYnbqMc4Q65p5C/uDJyGC21BITu3Dk9x4eqU2XrZOo5SKGxsyGWU
+         P7tK9sLNTiZS4nEbC0x44EphAr0yoaNIhfWoWYHdSpeVhsXBUyER37Hqgj6QBbbzLzAl
+         2FoW0+Y2TSyCI3Ykl0PavuPqZUQgbxdhOj6fbzJ8gdaaoaPFn2u/wa9BrjHal0fxgHd6
+         RqUA==
+X-Gm-Message-State: AOJu0Yz7AceqltKfbvzM5z+Vbk6OkV6eW+xx4gqKUVlKCgJ20gWh13r1
+	Ra/nutxPkUl2NCp8YRu2zCNxhkeQjz3NVhAySDk=
+X-Google-Smtp-Source: AGHT+IFADylaHVxGSdb1Oqn5UxNB9rtGxlVAuFq0a1ZtipvFhWLBvdaHsXsXzXMCgag4xO0u48yu7pmMnXOLi+XLyn8=
+X-Received: by 2002:a67:f7c1:0:b0:44e:d6c3:51d4 with SMTP id
+ a1-20020a67f7c1000000b0044ed6c351d4mr12138747vsp.18.1696839232644; Mon, 09
+ Oct 2023 01:13:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <29c4b0e67dc1bf3571df3982de87df90cae9b631.1696837310.git.jk@codeconstruct.com.au>
-In-Reply-To: <29c4b0e67dc1bf3571df3982de87df90cae9b631.1696837310.git.jk@codeconstruct.com.au>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Oct 2023 10:13:03 +0200
-Message-ID: <CANn89iKgw+z6RhXr6eJF0aGOzgC69NJCbZvaf3=EkxmPnL4MEw@mail.gmail.com>
-Subject: Re: [PATCH net] mctp: perform route lookups under a RCU read-side lock
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: netdev@vger.kernel.org, rootlab@huawei.com, 
-	Matt Johnston <matt@codeconstruct.com.au>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com> <20231008052101.144422-6-akihiko.odaki@daynix.com>
+In-Reply-To: <20231008052101.144422-6-akihiko.odaki@daynix.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 9 Oct 2023 03:13:15 -0500
+Message-ID: <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
+	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
+	pablo@netfilter.org, decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, 
+	elver@google.com, pabeni@redhat.com, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 9:57=E2=80=AFAM Jeremy Kerr <jk@codeconstruct.com.au=
-> wrote:
+On Sun, Oct 8, 2023 at 12:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
 >
-> Our current route lookups (mctp_route_lookup and mctp_route_lookup_null)
-> traverse the net's route list without the RCU read lock held. This means
-> the route lookup is subject to preemption, resulting in an potential
-> grace period expiry, and so an eventual kfree() while we still have the
-> route pointer.
+> virtio-net have two usage of hashes: one is RSS and another is hash
+> reporting. Conventionally the hash calculation was done by the VMM.
+> However, computing the hash after the queue was chosen defeats the
+> purpose of RSS.
 >
-> Add the proper read-side critical section locks around the route
-> lookups, preventing premption and a possible parallel kfree.
+> Another approach is to use eBPF steering program. This approach has
+> another downside: it cannot report the calculated hash due to the
+> restrictive nature of eBPF.
 >
-> The remaining net->mctp.routes accesses are already under a
-> rcu_read_lock, or protected by the RTNL for updates.
+> Introduce the code to compute hashes to the kernel in order to overcome
+> thse challenges. An alternative solution is to extend the eBPF steering
+> program so that it will be able to report to the userspace, but it makes
+> little sense to allow to implement different hashing algorithms with
+> eBPF since the hash value reported by virtio-net is strictly defined by
+> the specification.
 >
-> Based on an analysis from Sili Luo <rootlab@huawei.com>, where
-> introducing a delay in the route lookup could cause a UAF on
-> simultaneous sendmsg() and route deletion.
+> The hash value already stored in sk_buff is not used and computed
+> independently since it may have been computed in a way not conformant
+> with the specification.
 >
-> Reported-by: Sili Luo <rootlab@huawei.com>
-> Fixes: 889b7da23abf ("mctp: Add initial routing framework")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> ---
->
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct *tu=
+n,
+>         }
+>
+>         if (vnet_hdr_sz) {
+> -               struct virtio_net_hdr gso;
+> +               union {
+> +                       struct virtio_net_hdr hdr;
+> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
+> +               } hdr;
+> +               int ret;
+>
+>                 if (iov_iter_count(iter) < vnet_hdr_sz)
+>                         return -EINVAL;
+>
+> -               if (virtio_net_hdr_from_skb(skb, &gso,
+> -                                           tun_is_little_endian(tun), tr=
+ue,
+> -                                           vlan_hlen)) {
+> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_REPO=
+RT) &&
+> +                   vnet_hdr_sz >=3D sizeof(hdr.v1_hash_hdr) &&
+> +                   skb->tun_vnet_hash) {
+
+Isn't vnet_hdr_sz guaranteed to be >=3D hdr.v1_hash_hdr, by virtue of
+the set hash ioctl failing otherwise?
+
+Such checks should be limited to control path where possible
+
+> +                       vnet_hdr_content_sz =3D sizeof(hdr.v1_hash_hdr);
+> +                       ret =3D virtio_net_hdr_v1_hash_from_skb(skb,
+> +                                                             &hdr.v1_has=
+h_hdr,
+> +                                                             true,
+> +                                                             vlan_hlen,
+> +                                                             &vnet_hash)=
+;
+> +               } else {
+> +                       vnet_hdr_content_sz =3D sizeof(hdr.hdr);
+> +                       ret =3D virtio_net_hdr_from_skb(skb, &hdr.hdr,
+> +                                                     tun_is_little_endia=
+n(tun),
+> +                                                     true, vlan_hlen);
+> +               }
+> +
 
