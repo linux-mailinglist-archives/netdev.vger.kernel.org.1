@@ -1,153 +1,324 @@
-Return-Path: <netdev+bounces-39341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FF757BEE43
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:26:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66D07BEE4F
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D092818F2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:26:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C8F11C20AA2
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3CD450D7;
-	Mon,  9 Oct 2023 22:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16299450DB;
+	Mon,  9 Oct 2023 22:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iht0jWIn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HtAZqh+T"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F05200B2;
-	Mon,  9 Oct 2023 22:26:19 +0000 (UTC)
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC9279D;
-	Mon,  9 Oct 2023 15:26:17 -0700 (PDT)
-Received: by mail-ej1-x642.google.com with SMTP id a640c23a62f3a-98377c5d53eso861535066b.0;
-        Mon, 09 Oct 2023 15:26:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696890376; x=1697495176; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gNp5QN+Wa5gSGqFJs+wkBFIMdPrKF+F1qBOYA4/HLBM=;
-        b=Iht0jWInlER29aQNJaZ0jnftDItjzIrOTTfQ7pdAxNara2YFqslY3Sfq9uAie8hqf1
-         xpJcvhEq7t29Ck00AcT6tIEyHY2PZa53e7VMzhEYVRus9vP76szsCESQWO+e3bR2TpYZ
-         ghPJvmbOVyY2y86+kj6UhVyREf2wCuTUCFm2lXpVmPzA9tSSTGgkQAQhjG/JQYFPXqDZ
-         qv3JxZlDcUKwws5extxsrGsprJrrrViPoc1zxJo9P19ECvs3pdqy0O9JB7OZmyOWc6Ov
-         0RftRtwD/VtBcvtYhohh0euLv/dTTl9nu5exXxWn7Ndhz/Zo3EZJz4s90IdoDnBpEmHc
-         fVBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696890376; x=1697495176;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gNp5QN+Wa5gSGqFJs+wkBFIMdPrKF+F1qBOYA4/HLBM=;
-        b=pDv0u3xAMTPV6AR1QeckVcBgBGVPSWASgWnjPLCCCQhlnTrrHHljyRPPuqysshjAUj
-         Q1kRxRx7qpmM3hbimg22jlqR75h1vZgWbov6X3rfBj9xUHUpIxvNH/cNjagSFWQdyG83
-         RhH4/C8lUbFW/hx6P+MLU9qISR1r8IrSYkPt3kSBxnGxEdVOvTNjVzM/8MlIWKwxrp3G
-         YSLkTPKrJsCz+iTvGMNuIOt9rTi0N0jhq9y4440a8v2p2bXbzpexrYzevc6WzGpYxWEl
-         OFAdRcFNR529xNmz59Q3OZfmneD22kJALm8L3EC1Nvgv1p9MuVmXz4X+r01SvSgC7gXV
-         k9tQ==
-X-Gm-Message-State: AOJu0YzhXkX9C/FzGI0iGj27r4bferakuukxuIP0rpmUt/+m7cDZvv6L
-	AYW4p9XpF6lUl+ooEWTWX9E=
-X-Google-Smtp-Source: AGHT+IEXBZp6MNn5Iz0ZdFKMXIs3oPFYXzJVz9SzxV9sEy1dPEadJNRGycTF+Pwpu4r1dnqq7/zVSQ==
-X-Received: by 2002:a17:907:78d1:b0:9b3:264:446 with SMTP id kv17-20020a17090778d100b009b302640446mr15240204ejc.0.1696890376063;
-        Mon, 09 Oct 2023 15:26:16 -0700 (PDT)
-Received: from [127.0.1.1] (2a02-8389-41cf-e200-0d7c-652f-4e74-10b8.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:d7c:652f:4e74:10b8])
-        by smtp.gmail.com with ESMTPSA id t24-20020a1709066bd800b0099ddc81903asm7311487ejs.221.2023.10.09.15.26.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 15:26:15 -0700 (PDT)
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340AC450DD
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 22:29:40 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A509D;
+	Mon,  9 Oct 2023 15:29:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696890577; x=1728426577;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6il3hD0J2C6Jv58oQ5d+XknTFtdnPTX0OAm+UTkXwgI=;
+  b=HtAZqh+TE4L6PT5QDdnHyWT97bfSiG8bCX2l6o7UFzgJOV09PaYNVigJ
+   J5m+r9btExW0jEeyYz1KPRjeTOgfDLnykjYagb1H3FrFMP603Qh0X9lXc
+   OP8xvf2k5EDfCmOcyHTxNIragBmhHxD5H6oZNR3ug0HsdT4CM0c08LCEq
+   llEDZi/MtaeF6vWd8DsXmooWfitgn/jE9zVY0FvnxPundgSCvRxjQdLTn
+   q/14e237L3ublDsl198kCUMRkWvUDhHy1SFsFut8O+HXY13BbE1KT917J
+   6nHmx/AM+rTlwETLfEIDaYRi3812me+LN3YRsnwrgqjtShY5Hszlv0dwk
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="2849410"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="2849410"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 15:28:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="843876590"
+X-IronPort-AV: E=Sophos;i="6.03,211,1694761200"; 
+   d="scan'208";a="843876590"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by FMSMGA003.fm.intel.com with ESMTP; 09 Oct 2023 15:28:56 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: netdev@vger.kernel.org
+Cc: vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	corbet@lwn.net,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	linux-doc@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v4 3/5] dpll: netlink/core: add support for pin-dpll signal phase offset/adjust
 Date: Tue, 10 Oct 2023 00:26:14 +0200
-Subject: [PATCH v2] net: usb: dm9601: fix uninitialized variable use in
- dm9601_mdio_read
+Message-Id: <20231009222616.12163-4-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
+In-Reply-To: <20231009222616.12163-1-arkadiusz.kubalewski@intel.com>
+References: <20231009222616.12163-1-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231009-topic-dm9601_uninit_mdio_read-v2-1-f2fe39739b6c@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAAV+JGUC/42OWw6DIBREt2L4Lg3gq/ar+2iMAbnoTQoYoKaNc
- e9FV9DPM5OcmY1ECAiR3IuNBFgxoncZxKUg4yzdBBR1ZiKYKDljHU1+wZFq2zWMD2+HDtNgNfo
- hgNRU8rrjN2OUbgzJDiUjUBWkG+fDYmVMEI5iCWDwcw4/+8wzxuTD9/yx8iP9d3LllFNd6batQ
- VRQqsdkJb6uo7ek3/f9B61zopHjAAAA
-To: Peter Korsgaard <peter@korsgaard.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Javier Carrasco <javier.carrasco.cruz@gmail.com>
-X-Mailer: b4 0.12.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696890374; l=1805;
- i=javier.carrasco.cruz@gmail.com; s=20230509; h=from:subject:message-id;
- bh=tuSpdfIOLwv7wtHY5W9nhbDUxC1QdO8MYoXpwOuuSqE=;
- b=Ai7OsMH7iPyecSWDeP+Mdw3y4XBpnq183Zav9G1vJ1tx14o4CErwsZh5oPsgU6MM4uM3Zq+Fo
- AHoFWK1Pkm7BUwyCk4C68GAbXkn6nw2mH1+29wwNde4BnUVQk0MxV5j
-X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
- pk=tIGJV7M+tCizagNijF0eGMBGcOsPD+0cWGfKjl4h6K8=
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot has found an uninit-value bug triggered by the dm9601 driver [1].
+Add callback ops for pin-dpll phase measurement.
+Add callback for pin signal phase adjustment.
+Add min and max phase adjustment values to pin proprties.
+Invoke callbacks in dpll_netlink.c when filling the pin details to
+provide user with phase related attribute values.
 
-This error happens because the variable res is not updated if the call
-to dm_read_shared_word returns an error. In this particular case -EPROTO
-was returned and res stayed uninitialized.
-
-This can be avoided by checking the return value of dm_read_shared_word
-and propagating the error if the read operation failed.
-
-[1] https://syzkaller.appspot.com/bug?extid=1f53a30781af65d2c955
-
-Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Reported-and-tested-by: syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 ---
-Changes in v2:
-- Remove unnecessary 'err == 0' case
-- Link to v1: https://lore.kernel.org/r/20231009-topic-dm9601_uninit_mdio_read-v1-1-d4d775e24e3b@gmail.com
----
- drivers/net/usb/dm9601.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/dpll/dpll_netlink.c | 138 +++++++++++++++++++++++++++++++++++-
+ include/linux/dpll.h        |  18 +++++
+ 2 files changed, 155 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/usb/dm9601.c b/drivers/net/usb/dm9601.c
-index 48d7d278631e..99ec1d4a972d 100644
---- a/drivers/net/usb/dm9601.c
-+++ b/drivers/net/usb/dm9601.c
-@@ -222,13 +222,18 @@ static int dm9601_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 	struct usbnet *dev = netdev_priv(netdev);
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index e20daba6896a..09a6c2a1ea92 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -212,6 +212,53 @@ dpll_msg_add_pin_direction(struct sk_buff *msg, struct dpll_pin *pin,
+ 	return 0;
+ }
  
- 	__le16 res;
-+	int err;
++static int
++dpll_msg_add_pin_phase_adjust(struct sk_buff *msg, struct dpll_pin *pin,
++			      struct dpll_pin_ref *ref,
++			      struct netlink_ext_ack *extack)
++{
++	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
++	struct dpll_device *dpll = ref->dpll;
++	s32 phase_adjust;
++	int ret;
++
++	if (!ops->phase_adjust_get)
++		return 0;
++	ret = ops->phase_adjust_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
++				    dpll, dpll_priv(dpll),
++				    &phase_adjust, extack);
++	if (ret)
++		return ret;
++	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST, phase_adjust))
++		return -EMSGSIZE;
++
++	return 0;
++}
++
++static int
++dpll_msg_add_phase_offset(struct sk_buff *msg, struct dpll_pin *pin,
++			  struct dpll_pin_ref *ref,
++			  struct netlink_ext_ack *extack)
++{
++	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
++	struct dpll_device *dpll = ref->dpll;
++	s64 phase_offset;
++	int ret;
++
++	if (!ops->phase_offset_get)
++		return 0;
++	ret = ops->phase_offset_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
++				    dpll, dpll_priv(dpll), &phase_offset,
++				    extack);
++	if (ret)
++		return ret;
++	if (nla_put_64bit(msg, DPLL_A_PIN_PHASE_OFFSET, sizeof(phase_offset),
++			  &phase_offset, DPLL_A_PIN_PAD))
++		return -EMSGSIZE;
++
++	return 0;
++}
++
+ static int
+ dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
+ 		      struct dpll_pin_ref *ref, struct netlink_ext_ack *extack)
+@@ -330,6 +377,9 @@ dpll_msg_add_pin_dplls(struct sk_buff *msg, struct dpll_pin *pin,
+ 		if (ret)
+ 			goto nest_cancel;
+ 		ret = dpll_msg_add_pin_direction(msg, pin, ref, extack);
++		if (ret)
++			goto nest_cancel;
++		ret = dpll_msg_add_phase_offset(msg, pin, ref, extack);
+ 		if (ret)
+ 			goto nest_cancel;
+ 		nla_nest_end(msg, attr);
+@@ -377,6 +427,15 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+ 	if (nla_put_u32(msg, DPLL_A_PIN_CAPABILITIES, prop->capabilities))
+ 		return -EMSGSIZE;
+ 	ret = dpll_msg_add_pin_freq(msg, pin, ref, extack);
++	if (ret)
++		return ret;
++	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_MIN,
++			prop->phase_range.min))
++		return -EMSGSIZE;
++	if (nla_put_s32(msg, DPLL_A_PIN_PHASE_ADJUST_MAX,
++			prop->phase_range.max))
++		return -EMSGSIZE;
++	ret = dpll_msg_add_pin_phase_adjust(msg, pin, ref, extack);
+ 	if (ret)
+ 		return ret;
+ 	if (xa_empty(&pin->parent_refs))
+@@ -416,7 +475,7 @@ dpll_device_get_one(struct dpll_device *dpll, struct sk_buff *msg,
+ 	if (nla_put_u32(msg, DPLL_A_TYPE, dpll->type))
+ 		return -EMSGSIZE;
  
- 	if (phy_id) {
- 		netdev_dbg(dev->net, "Only internal phy supported\n");
- 		return 0;
- 	}
+-	return ret;
++	return 0;
+ }
  
--	dm_read_shared_word(dev, 1, loc, &res);
-+	err = dm_read_shared_word(dev, 1, loc, &res);
-+	if (err < 0) {
-+		netdev_err(dev->net, "MDIO read error: %d\n", err);
-+		return err;
+ static int
+@@ -705,6 +764,78 @@ dpll_pin_direction_set(struct dpll_pin *pin, struct dpll_device *dpll,
+ 	return 0;
+ }
+ 
++static int
++dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
++		       struct netlink_ext_ack *extack)
++{
++	struct dpll_pin_ref *ref, *failed;
++	const struct dpll_pin_ops *ops;
++	s32 phase_adj, old_phase_adj;
++	struct dpll_device *dpll;
++	unsigned long i;
++	int ret;
++
++	phase_adj = nla_get_s32(phase_adj_attr);
++	if (phase_adj > pin->prop->phase_range.max ||
++	    phase_adj < pin->prop->phase_range.min) {
++		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
++				    "phase adjust value not supported");
++		return -EINVAL;
 +	}
++
++	xa_for_each(&pin->dpll_refs, i, ref) {
++		ops = dpll_pin_ops(ref);
++		if (!ops->phase_adjust_set || !ops->phase_adjust_get) {
++			NL_SET_ERR_MSG(extack, "phase adjust not supported");
++			return -EOPNOTSUPP;
++		}
++	}
++	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
++	ops = dpll_pin_ops(ref);
++	dpll = ref->dpll;
++	ret = ops->phase_adjust_get(pin, dpll_pin_on_dpll_priv(dpll, pin),
++				    dpll, dpll_priv(dpll), &old_phase_adj,
++				    extack);
++	if (ret) {
++		NL_SET_ERR_MSG(extack, "unable to get old phase adjust value");
++		return ret;
++	}
++	if (phase_adj == old_phase_adj)
++		return 0;
++
++	xa_for_each(&pin->dpll_refs, i, ref) {
++		ops = dpll_pin_ops(ref);
++		dpll = ref->dpll;
++		ret = ops->phase_adjust_set(pin,
++					    dpll_pin_on_dpll_priv(dpll, pin),
++					    dpll, dpll_priv(dpll), phase_adj,
++					    extack);
++		if (ret) {
++			failed = ref;
++			NL_SET_ERR_MSG_FMT(extack,
++					   "phase adjust set failed for dpll_id:%u",
++					   dpll->id);
++			goto rollback;
++		}
++	}
++	__dpll_pin_change_ntf(pin);
++
++	return 0;
++
++rollback:
++	xa_for_each(&pin->dpll_refs, i, ref) {
++		if (ref == failed)
++			break;
++		ops = dpll_pin_ops(ref);
++		dpll = ref->dpll;
++		if (ops->phase_adjust_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
++					  dpll, dpll_priv(dpll), old_phase_adj,
++					  extack))
++			NL_SET_ERR_MSG(extack, "set phase adjust rollback failed");
++	}
++	return ret;
++}
++
+ static int
+ dpll_pin_parent_device_set(struct dpll_pin *pin, struct nlattr *parent_nest,
+ 			   struct netlink_ext_ack *extack)
+@@ -793,6 +924,11 @@ dpll_pin_set_from_nlattr(struct dpll_pin *pin, struct genl_info *info)
+ 			if (ret)
+ 				return ret;
+ 			break;
++		case DPLL_A_PIN_PHASE_ADJUST:
++			ret = dpll_pin_phase_adj_set(pin, a, info->extack);
++			if (ret)
++				return ret;
++			break;
+ 		case DPLL_A_PIN_PARENT_DEVICE:
+ 			ret = dpll_pin_parent_device_set(pin, a, info->extack);
+ 			if (ret)
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index bbc480cd2932..578fc5fa3750 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -68,6 +68,18 @@ struct dpll_pin_ops {
+ 	int (*prio_set)(const struct dpll_pin *pin, void *pin_priv,
+ 			const struct dpll_device *dpll, void *dpll_priv,
+ 			const u32 prio, struct netlink_ext_ack *extack);
++	int (*phase_offset_get)(const struct dpll_pin *pin, void *pin_priv,
++				const struct dpll_device *dpll, void *dpll_priv,
++				s64 *phase_offset,
++				struct netlink_ext_ack *extack);
++	int (*phase_adjust_get)(const struct dpll_pin *pin, void *pin_priv,
++				const struct dpll_device *dpll, void *dpll_priv,
++				s32 *phase_adjust,
++				struct netlink_ext_ack *extack);
++	int (*phase_adjust_set)(const struct dpll_pin *pin, void *pin_priv,
++				const struct dpll_device *dpll, void *dpll_priv,
++				const s32 phase_adjust,
++				struct netlink_ext_ack *extack);
+ };
  
- 	netdev_dbg(dev->net,
- 		   "dm9601_mdio_read() phy_id=0x%02x, loc=0x%02x, returns=0x%04x\n",
-
----
-base-commit: 94f6f0550c625fab1f373bb86a6669b45e9748b3
-change-id: 20231009-topic-dm9601_uninit_mdio_read-a15918ffbd6f
-
-Best regards,
+ struct dpll_pin_frequency {
+@@ -91,6 +103,11 @@ struct dpll_pin_frequency {
+ #define DPLL_PIN_FREQUENCY_DCF77 \
+ 	DPLL_PIN_FREQUENCY(DPLL_PIN_FREQUENCY_77_5_KHZ)
+ 
++struct dpll_pin_phase_adjust_range {
++	s32 min;
++	s32 max;
++};
++
+ struct dpll_pin_properties {
+ 	const char *board_label;
+ 	const char *panel_label;
+@@ -99,6 +116,7 @@ struct dpll_pin_properties {
+ 	unsigned long capabilities;
+ 	u32 freq_supported_num;
+ 	struct dpll_pin_frequency *freq_supported;
++	struct dpll_pin_phase_adjust_range phase_range;
+ };
+ 
+ #if IS_ENABLED(CONFIG_DPLL)
 -- 
-Javier Carrasco <javier.carrasco.cruz@gmail.com>
+2.38.1
 
 
