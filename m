@@ -1,135 +1,109 @@
-Return-Path: <netdev+bounces-38965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B3D7BD483
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:41:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5993A7BD4BF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 936462816CE
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 07:41:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 867A41C2084A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 07:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55FD14269;
-	Mon,  9 Oct 2023 07:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F27D13FE4;
+	Mon,  9 Oct 2023 07:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bi4nkMlX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J6sWnabb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04D0134BE
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:41:49 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15CE08F;
-	Mon,  9 Oct 2023 00:41:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=J0N33buiHeappg+m+Dq08xJB46xuxlX8SMtn/y29oQQ=; b=bi4nkMlX1sEIWe8AWc45AGSIF7
-	AEkSsS6pt1TsxqOXMseRQdPnQTmbR6v5Jeuaiguhx0knPIU/tn9nMdZz94UP5eWWpTRtnhKp9tQN7
-	HfsoaPEGnMzG53bko4vPHw4LZhJx9w2yYO4wCZf80KQbi856wX6nNLpBwhbFbSbkf8Qzw4imJVor3
-	oer5ztdx1IAocg6Fxtbqo7paappgzw/bn6Fob9gWln2LHLBRsXXP++7vChe1s+hBnbbHOKENzv6k+
-	19wEs3F6gK3o546x5/W9FiuIwagCn3d6bcSBs85elqPGduZ9KFXhBGked64J8b/ZErWzoGLBZ0dYt
-	ndWgQZww==;
-Received: from [2001:4bb8:182:6657:e5a9:584c:4324:b228] (helo=localhost)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qpktb-009ukC-17;
-	Mon, 09 Oct 2023 07:41:43 +0000
-From: Christoph Hellwig <hch@lst.de>
-To: iommu@lists.linux.dev
-Cc: Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	linux-m68k@lists.linux-m68k.org,
-	netdev@vger.kernel.org,
-	Jim Quinlan <james.quinlan@broadcom.com>
-Subject: [PATCH 6/6] m68k: don't provide arch_dma_alloc for nommu/coldfire
-Date: Mon,  9 Oct 2023 09:41:21 +0200
-Message-Id: <20231009074121.219686-7-hch@lst.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231009074121.219686-1-hch@lst.de>
-References: <20231009074121.219686-1-hch@lst.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A31C8ED
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:54:08 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FA1F9F
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 00:54:06 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so11987a12.0
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 00:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696838045; x=1697442845; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h352FGx59vcioNapcninHN6AK5Dc534x0lC4Q9q6E4Q=;
+        b=J6sWnabbfhIfnvC9Y0di8LroKCpamvLD1hZiq2r7M7wczIaaoXJpCF8GLQFtp23FhF
+         LqT02YiTzd7amFELoJS+bgMdWGSigHwfITw24gVzw9hmPlsGQ2IHvXGA2X3su+pq9lOy
+         U8PUn1ifJYG8JfwgZ296jnPERQ7MOB4J6BPyYx/kp4Hwz7UgnQKv/6lLB1XCZAG1yD4v
+         6vPK5MH5Kh0MuY/HgCS8fPbm7WELF1jtF9E3953fwWlaJnOiF9t/jsMPdLlmOjXC3Uul
+         ye7V0SnXbmTzsYJJR2SL80+1vxJfE8LkwU7HujahiMRBPEshUbRBgq9Go3boNXz+lyy7
+         SyvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696838045; x=1697442845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h352FGx59vcioNapcninHN6AK5Dc534x0lC4Q9q6E4Q=;
+        b=JNZ8HY8OeCWzUv/qnGIP7kwPmPK+haRmn9ZgKRb1Fj0kwEkDdmzZ+BMEpAwVuZS7zg
+         xotIoQyzCvH2OyPC4IrDV6SilHV99ddlj/37ry+kZ09w9BC+LYpDeJ1QZC2XeSXyAKia
+         3VDb9FNtQbKTRLagKFhi7vSsMtuzLLfb5xVY89FmaE4EK4lqWMPZVu6UKXhdC3Sy6ILO
+         Th5XQsOS7RH77l9N+wZjI29OO61pk7dJJ9b2hB1Mi7fsV1OuvWjnBkJN29qciq1hM41J
+         IyQK5LieHOMDJPsMYu2jhSg8qOWCnScClKyJEuHIB8A4ovhWObxCYJQtE/paZeLL591o
+         4Egg==
+X-Gm-Message-State: AOJu0YyDza38BidZIcJ3d6oa9NWltdp32l+3zIp1g31DUpxd/1NODft+
+	dL5Z4r1R+bVYM1NILNL4xSTL7oYt3tLlafNteLwHHg==
+X-Google-Smtp-Source: AGHT+IHsQHtiO+HFnDwGdTsCR/yEkTk+9iKWYFkj3SIWhzqIW+ImmjZj3Dee+Bbo+8oUayPw878DHRaxoahjxKWxo2k=
+X-Received: by 2002:a05:6402:d4b:b0:53a:ff83:6123 with SMTP id
+ ec11-20020a0564020d4b00b0053aff836123mr195876edb.3.1696838044799; Mon, 09 Oct
+ 2023 00:54:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
+References: <20231007050621.1706331-1-yajun.deng@linux.dev>
+ <CANn89iL-zUw1FqjYRSC7BGB0hfQ5uKpJzUba3YFd--c=GdOoGg@mail.gmail.com>
+ <917708b5-cb86-f233-e878-9233c4e6c707@linux.dev> <CANn89i+navyRe8-AV=ehM3qFce2hmnOEKBqvK5Xnev7KTaS5Lg@mail.gmail.com>
+ <a53a3ff6-8c66-07c4-0163-e582d88843dd@linux.dev> <CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
+ <9f4fb613-d63f-9b86-fe92-11bf4dfb7275@linux.dev> <CANn89iK7bvQtGD=p+fHaWiiaNn=u8vWrt0YQ26pGQY=kZTdfJw@mail.gmail.com>
+ <4a747fda-2bb9-4231-66d6-31306184eec2@linux.dev> <814b5598-5284-9558-8f56-12a6f7a67187@linux.dev>
+In-Reply-To: <814b5598-5284-9558-8f56-12a6f7a67187@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 9 Oct 2023 09:53:51 +0200
+Message-ID: <CANn89iJCTgWTu0mzwj-8_-HiWm4uErY=VASDHoYaod9Nq-ayPA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: rostedt@goodmis.org, mhiramat@kernel.org, dennis@kernel.org, tj@kernel.org, 
+	cl@linux.com, mark.rutland@arm.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, linux-trace-kernel@vger.kernel.org, 
+	linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-m68knommu and coldfire can't provide coherent DMA allocations at all.
-Currently they simply return normal kernel memory from
-dma_alloc_coherent, which is broken and breaks the API contract.  Now
-that the only DMA capable driver on these systems has been switched
-to use explicitly non-coherent allocations we can drop this hack and
-return NULL from dma_alloc_coherent.
+On Mon, Oct 9, 2023 at 5:07=E2=80=AFAM Yajun Deng <yajun.deng@linux.dev> wr=
+ote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- arch/m68k/Kconfig      |  1 -
- arch/m68k/kernel/dma.c | 23 -----------------------
- 2 files changed, 24 deletions(-)
+> 'this_cpu_read + this_cpu_write' and 'pr_info + this_cpu_inc' will make
+> the trace work well.
+>
+> They all have 'pop' instructions in them. This may be the key to making
+> the trace work well.
+>
+> Hi all,
+>
+> I need your help on percpu and ftrace.
+>
 
-diff --git a/arch/m68k/Kconfig b/arch/m68k/Kconfig
-index 0430b8ba6b5cc6..3e318bf9504c5b 100644
---- a/arch/m68k/Kconfig
-+++ b/arch/m68k/Kconfig
-@@ -3,7 +3,6 @@ config M68K
- 	bool
- 	default y
- 	select ARCH_32BIT_OFF_T
--	select ARCH_DMA_ALLOC if !MMU || COLDFIRE
- 	select ARCH_HAS_BINFMT_FLAT
- 	select ARCH_HAS_CPU_FINALIZE_INIT if MMU
- 	select ARCH_HAS_CURRENT_STACK_POINTER
-diff --git a/arch/m68k/kernel/dma.c b/arch/m68k/kernel/dma.c
-index 2e192a5df949bb..eb164ef1a45ebd 100644
---- a/arch/m68k/kernel/dma.c
-+++ b/arch/m68k/kernel/dma.c
-@@ -33,29 +33,6 @@ pgprot_t pgprot_dmacoherent(pgprot_t prot)
- 	}
- 	return prot;
- }
--#else
--void *arch_dma_alloc(struct device *dev, size_t size, dma_addr_t *dma_handle,
--		gfp_t gfp, unsigned long attrs)
--{
--	void *ret;
--
--	if (dev == NULL || (*dev->dma_mask < 0xffffffff))
--		gfp |= GFP_DMA;
--	ret = (void *)__get_free_pages(gfp, get_order(size));
--
--	if (ret != NULL) {
--		memset(ret, 0, size);
--		*dma_handle = virt_to_phys(ret);
--	}
--	return ret;
--}
--
--void arch_dma_free(struct device *dev, size_t size, void *vaddr,
--		dma_addr_t dma_handle, unsigned long attrs)
--{
--	free_pages((unsigned long)vaddr, get_order(size));
--}
--
- #endif /* CONFIG_MMU && !CONFIG_COLDFIRE */
- 
- void arch_sync_dma_for_device(phys_addr_t handle, size_t size,
--- 
-2.39.2
+I do not think you made sure netdev_core_stats_inc() was never inlined.
 
+Adding more code in it is simply changing how the compiler decides to
+inline or not.
 
