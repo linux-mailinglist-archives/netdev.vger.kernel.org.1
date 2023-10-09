@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-39123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B887BE25F
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:19:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DF37BE261
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:19:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B17121C20BB2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:19:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0D42816F3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EF834CD8;
-	Mon,  9 Oct 2023 14:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E35F34CDC;
+	Mon,  9 Oct 2023 14:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O/34+P3S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kceedgEg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8D1C18043
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:19:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3450C433CB;
-	Mon,  9 Oct 2023 14:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8174018043
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:19:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 254CEC433C9;
+	Mon,  9 Oct 2023 14:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696861168;
-	bh=6P2D1vI9Dnx/ifqCfwETYJ6jqhZEF5cp8roWi8kBEW0=;
+	s=k20201202; t=1696861172;
+	bh=5o5h5CgRG4H4Z5qjk2eknSticE7hPec++pW0EBNapec=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O/34+P3SkBRKau8RaapU8XRh6Q8bNB32+IeJaejY/E6pfXsIx7O54aloUAhzju69S
-	 Y91+N4M+O24lO3x8KCe2FzTZUxEbH90NHbSXreR2Xprshc3qbt+rRB3DqwXK/0DUnq
-	 3sBfm2bzkwYpQc4ppQMIIS0E17FcTdD/pounFBR66l8HWjaue5r4K8pKfcyuF+Pyu4
-	 YMMJxUlJoLDa09d4+yaghMNgjm0VG/QQBu+ZUwkslodUn9vdxXCXBIBrYhQ0zIpSBW
-	 vcHtV5qHj/DC78HqsLBjfdquC25u8f42g5pxI023bkbdglOznFG0qjyPvhuyT9N+a0
-	 xfsuGlZQ0gyFA==
+	b=kceedgEgxB0UHzObI+BxpbPFb2TW/hw2iIrUfxd4PzxqAKsk4kc7/5bgS/m2df2Rr
+	 pFCHqRphEgn++36GwJAYtuus7JFWLWIczkpZmO8ULOzfpcOVbVhhfU0WeE+bEmKgUj
+	 elp7YAJXXhDCrh5P1qYP/SY0B0I0eXuzwXab3UJLZ2WiVyhmSZWiZyoU0gEjYGaiNL
+	 uAOk52d9TRaOqrwFHkm/9F2NHv+gZflDypnBwDFLQixvpwGwC3+rJthjdWPqhOu5y5
+	 rLgnWgWUFXVO4Zoz7gNUUz03rsxjzwx+3MI9kAKzvMBPsvR4vtVlKnxGnF9VmkM35K
+	 dL4YZseD/J+Jg==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Doug Brown <doug@schmorgal.com>,
 	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 02/10] ieee802154: avoid deprecated .ndo_do_ioctl callback
-Date: Mon,  9 Oct 2023 16:19:00 +0200
-Message-Id: <20231009141908.1767241-2-arnd@kernel.org>
+Subject: [PATCH 03/10] ethernet: sp7021: fix ioctl callback pointer
+Date: Mon,  9 Oct 2023 16:19:01 +0200
+Message-Id: <20231009141908.1767241-3-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
 References: <20231009141908.1767241-1-arnd@kernel.org>
@@ -62,113 +62,27 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The ieee802154 socket implementation is the last remaining caller of the
-netdevice ioctl callback. In order to completely remove this, add a custom
-pointer to the existing wpan_dev specific operations structure. Since that
-structure is currently only used to wrap the 'create' header operation,
-adjust the naming slightly to make this more generic.
+The old .ndo_do_ioctl() callback is never called any more, instead the
+driver should set .ndo_eth_ioctl() for the phy operations.
 
-It would be a good idea to adjust the calling conventions and split the
-get/set operations into separate functions, but that can be a follow-up
-cleanup. For the moment, I kept the actual changes to a minimum to
-avoid regressions.
-
+Fixes: fd3040b9394c5 ("net: ethernet: Add driver for Sunplus SP7021")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- include/net/cfg802154.h | 9 +++++----
- net/ieee802154/socket.c | 5 +++--
- net/mac802154/iface.c   | 8 ++++----
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/cfg802154.h b/include/net/cfg802154.h
-index f79ce133e51a7..e604df98e2ee9 100644
---- a/include/net/cfg802154.h
-+++ b/include/net/cfg802154.h
-@@ -433,15 +433,16 @@ struct ieee802154_llsec_device_key {
- 	u32 frame_counter;
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+index 391a1bc7f4463..bb4514f4e8157 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+@@ -199,7 +199,7 @@ static const struct net_device_ops netdev_ops = {
+ 	.ndo_start_xmit = spl2sw_ethernet_start_xmit,
+ 	.ndo_set_rx_mode = spl2sw_ethernet_set_rx_mode,
+ 	.ndo_set_mac_address = spl2sw_ethernet_set_mac_address,
+-	.ndo_do_ioctl = phy_do_ioctl,
++	.ndo_eth_ioctl = phy_do_ioctl,
+ 	.ndo_tx_timeout = spl2sw_ethernet_tx_timeout,
  };
- 
--struct wpan_dev_header_ops {
-+struct wpan_dev_ops {
- 	/* TODO create callback currently assumes ieee802154_mac_cb inside
- 	 * skb->cb. This should be changed to give these information as
- 	 * parameter.
- 	 */
--	int	(*create)(struct sk_buff *skb, struct net_device *dev,
-+	int	(*header_create)(struct sk_buff *skb, struct net_device *dev,
- 			  const struct ieee802154_addr *daddr,
- 			  const struct ieee802154_addr *saddr,
- 			  unsigned int len);
-+	int	(*ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
- };
- 
- struct wpan_dev {
-@@ -452,7 +453,7 @@ struct wpan_dev {
- 	struct list_head list;
- 	struct net_device *netdev;
- 
--	const struct wpan_dev_header_ops *header_ops;
-+	const struct wpan_dev_ops *ops;
- 
- 	/* lowpan interface, set when the wpan_dev belongs to one lowpan_dev */
- 	struct net_device *lowpan_dev;
-@@ -491,7 +492,7 @@ wpan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
- {
- 	struct wpan_dev *wpan_dev = dev->ieee802154_ptr;
- 
--	return wpan_dev->header_ops->create(skb, dev, daddr, saddr, len);
-+	return wpan_dev->ops->header_create(skb, dev, daddr, saddr, len);
- }
- #endif
- 
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 00302e8b9615b..27e58237091ca 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -139,8 +139,9 @@ static int ieee802154_dev_ioctl(struct sock *sk, struct ifreq __user *arg,
- 	if (!dev)
- 		return -ENODEV;
- 
--	if (dev->type == ARPHRD_IEEE802154 && dev->netdev_ops->ndo_do_ioctl)
--		ret = dev->netdev_ops->ndo_do_ioctl(dev, &ifr, cmd);
-+	if (dev->type == ARPHRD_IEEE802154 && dev->ieee802154_ptr &&
-+	    dev->ieee802154_ptr->ops)
-+		ret = dev->ieee802154_ptr->ops->ioctl(dev, &ifr, cmd);
- 
- 	if (!ret && put_user_ifreq(&ifr, arg))
- 		ret = -EFAULT;
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index c0e2da5072bea..4937f8c2fb4cc 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -406,8 +406,9 @@ static int ieee802154_header_create(struct sk_buff *skb,
- 	return hlen;
- }
- 
--static const struct wpan_dev_header_ops ieee802154_header_ops = {
--	.create		= ieee802154_header_create,
-+static const struct wpan_dev_ops ieee802154_ops = {
-+	.header_create	= ieee802154_header_create,
-+	.ioctl		= mac802154_wpan_ioctl,
- };
- 
- /* This header create functionality assumes a 8 byte array for
-@@ -495,7 +496,6 @@ static const struct net_device_ops mac802154_wpan_ops = {
- 	.ndo_open		= mac802154_wpan_open,
- 	.ndo_stop		= mac802154_slave_close,
- 	.ndo_start_xmit		= ieee802154_subif_start_xmit,
--	.ndo_do_ioctl		= mac802154_wpan_ioctl,
- 	.ndo_set_mac_address	= mac802154_wpan_mac_addr,
- };
- 
-@@ -581,7 +581,7 @@ ieee802154_setup_sdata(struct ieee802154_sub_if_data *sdata,
- 		sdata->dev->netdev_ops = &mac802154_wpan_ops;
- 		sdata->dev->ml_priv = &mac802154_mlme_wpan;
- 		sdata->iface_default_filtering = IEEE802154_FILTERING_4_FRAME_FIELDS;
--		wpan_dev->header_ops = &ieee802154_header_ops;
-+		wpan_dev->ops = &ieee802154_ops;
- 
- 		mutex_init(&sdata->sec_mtx);
  
 -- 
 2.39.2
