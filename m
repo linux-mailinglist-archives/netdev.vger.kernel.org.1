@@ -1,185 +1,146 @@
-Return-Path: <netdev+bounces-39253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73F77BE7F5
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:29:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0EC7BE88C
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 19:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E80B51C20AA3
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:29:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C70B2819E7
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070F638BCB;
-	Mon,  9 Oct 2023 17:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D5138DE1;
+	Mon,  9 Oct 2023 17:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="D1qWebS2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="W2zg/we/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KT+JLvte"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090D71B264
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:29:49 +0000 (UTC)
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2CAB7;
-	Mon,  9 Oct 2023 10:29:47 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 3FF023200ABF;
-	Mon,  9 Oct 2023 13:29:45 -0400 (EDT)
-Received: from imap50 ([10.202.2.100])
-  by compute5.internal (MEProxy); Mon, 09 Oct 2023 13:29:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-	1696872584; x=1696958984; bh=mejXcwGQfT0tpAi1CMxM8a6dSz769zVrDpR
-	e3Zv3jeE=; b=D1qWebS2k2U0evCYpdOgzBxFJcBKj9MfLvAJApIs9ldsFhjik2i
-	vCBJIdon8Eqs3+n+PgdL+vqoj6lTAslaHVkX3iw28Kd1TwcU3K4uQSPZy9NLA4Ob
-	bhQONNm98J79XmvvzKtZOMRzGsPrv1+PIEAWgBwvGWcq6M4oBb8XhaRdc89hJ5+7
-	5c6LCFYBMwvsMU6w7xCE4uvrLl0+Z3pjW2dqjgdD+Wnen5unkF+K/KOYm1vBkwSj
-	+kpbWNW5qeA5rsuRm1+ArQxZy0ambewEHHJurLPzxRXL2wQLusN8CBF5OWOdWO8v
-	J/i1vmRhoLc6mfa7dGPpTM341FYs7ZbpxCQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1696872584; x=1696958984; bh=mejXcwGQfT0tpAi1CMxM8a6dSz769zVrDpR
-	e3Zv3jeE=; b=W2zg/we/GTtRla9/22r+oZdLK3P6WruYsuSir3Ov2b2Ksug34mC
-	5tcc1k+n1N1ATSRKqZiQr1qjS3hcg0p8S+giTt/xIOAUaApGh3UixMnD7ZiQpOSI
-	3CO150X2VrCq0ndXVCUAXBS9AY+KXakjRFV+3otjy+TwiCdgcuaeoy22suq0R9VZ
-	Q4TNLEfAYaRKBt4BerPe4RYCTaTrXeGvYmkZkapTd/Fguuh254eLY/RD3U/vF8d8
-	1iTGd50Zh0mR2MMrT/JnoiDeQQZAg7p5qTOQSwNVJTpB6Xd7l4cb0XeGH1oxrNr/
-	nlnaES6AtNpR8RtJ0McNY+8LrLwFDsNnb7Q==
-X-ME-Sender: <xms:iDgkZaPNZSHDLM8_134cNEVQ-Z3Fog3zfTvt6FSh3Ur8OnCMlkYWNw>
-    <xme:iDgkZY8cU-MalAbmr5EbwPiqdrZLtldVW78CL7cG_I7U2W9HyKViCLnn2o7AJVGwG
-    lP_bkjScwwpXc6nFWU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheefgdduudefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpedtffdvueffffehudekgfdvveegvedvhffgffdviefggffhveeihffhveeu
-    ueetueenucffohhmrghinhepghhithhhuhgsrdgtohhmpdeikehkmhhlrgdrohhrghenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnuges
-    rghrnhgusgdruggv
-X-ME-Proxy: <xmx:iDgkZRT7P8PRwXrYNv9245jXyb3bBpGxq9KRaREWPSqnfvq3-iw22g>
-    <xmx:iDgkZatLJbH4cDh2e3uarsZoxAtlC8eBqkcP2JR7hPUlWcyAX9F2tQ>
-    <xmx:iDgkZSeexDbwHmwwVz22vNfzbtJl7WOvnJ9XSvh8Ppg7NVjowcdj6w>
-    <xmx:iDgkZe0k3MzSqMIt-_8ayCnVR4kmDkcEtlVOjAh3DD0Av4lM6frBUg>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 4E15C1700089; Mon,  9 Oct 2023 13:29:44 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054D838BBD
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 17:45:36 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E184A3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:45:35 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d8153284d6eso6431910276.3
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 10:45:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696873534; x=1697478334; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TJMcbXJ00xamkrBTzx3uHhqhQOKa6l6LGEaEK6gyhss=;
+        b=KT+JLvtewnJlVx6OvCmKEA4L4q4pZMBpxbZ5bWzJJ+d0KoCUK9OFXYGqzs6N6uB9bw
+         nLzQhLLIACr+UiTRwAsQ2exQ7cOmYKaDC1K4SqcWohJ37Djq8yhwTxDYxuaXzfEegBT5
+         BT77cwyfVO32xjMahyf4P+aRMZwmTjkkZogYVRADWyjuDKFc7YOfcsSONslVNkK/boz3
+         NKWj67Kon4tFohtbn8FRoTxo4RsebK7flcdQB0Z1nQX+oft23DSsjnEp2Pa70Cipekgu
+         V2p0vumlHZR5Raal+1QL9MYZdiPi+DBZ3l0iF4Np/YPXhImCWSyjd0Y1dFlD0GnqCcRU
+         drjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696873534; x=1697478334;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TJMcbXJ00xamkrBTzx3uHhqhQOKa6l6LGEaEK6gyhss=;
+        b=FXl2Sv/cOEvdp7927f2XLDcfSkCgL1GdVsklx3xPEAi3w8llenOyqlskoM4pQ1wZQ6
+         P0Nx/aLzm/NWrTHXcpwTneaXv8Hqb1aVMivsFM0pU0TJeyynASpgllJjNQN9zpwjldIr
+         +EgrfZfkxK+6odyp07j0SBR+NsHykuwktnH03tjXm1QXG2/k1VP7LtZtnM0ng47+mces
+         S9XQp11sRuNsOc3WypGiajIhUyzf4itJadmJFmx1Fr/uCHu2qK2CZ9nGdz1y66G4MYfd
+         xzL3cuRiJzc4uRPF4qvk28A+3F8jihmMBTLgMM53q2pC9w4F9z/A9ZdYsN015Yd48pgO
+         OIPw==
+X-Gm-Message-State: AOJu0YzoP8W3YVznTnfiPNpk1pv66tWETxywk/8vL/TZcBeHSPnZHTIB
+	jvN0vxi6aLLvq13i6EgXM75UWiiRUFc0UGf24w==
+X-Google-Smtp-Source: AGHT+IE7tymghJNtFEP71xug6O+7lVPRG/C/uX+9/uLwO7gBurZa8Tx5PJcoZPGZvI6LvbYRAVT1+k6vnPTSDu2QdQ==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:870c:0:b0:d9a:3a25:36df with SMTP
+ id a12-20020a25870c000000b00d9a3a2536dfmr30004ybl.8.1696873534723; Mon, 09
+ Oct 2023 10:45:34 -0700 (PDT)
+Date: Mon, 09 Oct 2023 17:45:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Message-Id: <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
-In-Reply-To: <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
-References: <20231009141908.1767241-1-arnd@kernel.org>
- <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
-Date: Mon, 09 Oct 2023 19:29:11 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Rodolfo Zitellini" <rwz@xhero.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Jakub Kicinski" <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- linux-wireless@vger.kernel.org, "Johannes Berg" <johannes@sipsolutions.net>,
- linux-wpan@vger.kernel.org,
- "Michael Hennerich" <michael.hennerich@analog.com>,
- "Paolo Abeni" <pabeni@redhat.com>, "Eric Dumazet" <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- "Doug Brown" <doug@schmorgal.com>
-Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIADw8JGUC/6WOTQrCMBSEryJZ+yQ/WKIr7yFF0uSlDWhSXkKwl
+ N7dtFdwN98s5puVZaSAmd1PKyOsIYcUG8jzidnJxBEhuMZMcqkE51fIhaKdF3AUKlKGiAWwTEh
+ 7GChZ4xCGaGDw5hWSBQud9kLdus4rrVkbngl9+B7SZ994CrkkWo4PVeztX7oqQIB23ikupDLeP saUxjdebPqwftu2H8zbCaf1AAAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696873533; l=2189;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=rM6KAt4nKSyIu5CIGMNGinHf3GlvjCeWH2JRJ+yYScw=; b=ya5WEHsKhKCZkEYwZpdgLyCPQhj6xLpDZPA5Qoa8ZjOcAvJXnXWyQJeSdlHbEnKh5PRgBQqhc
+ LK7JbgGgbHhA8Za1Q1yBDoVGJwxeVsoaMSXxxhjeEN/x057SZY0u9ui
+X-Mailer: b4 0.12.3
+Message-ID: <20231009-strncpy-drivers-net-ethernet-brocade-bna-bfa_ioc-c-v2-1-78e0f47985d3@google.com>
+Subject: [PATCH v2] bna: replace deprecated strncpy with strscpy_pad
+From: Justin Stitt <justinstitt@google.com>
+To: Rasesh Mody <rmody@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
+	GR-Linux-NIC-Dev@marvell.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->>=20
->> The last localtalk driver is gone now, and ppp support was never fully
->> merged, so clean up the appletalk code by removing the obvious dead
->> code paths.
->>=20
->> Notably, this removes one of the two callers of the old .ndo_do_ioctl=
-()
->> callback that was abused for getting device addresses and is now
->> only used in the ieee802154 subsystem, which still uses the same tric=
-k.
->>=20
->> The include/uapi/linux/if_ltalk.h header might still be required
->> for building userspace programs, but I made sure that debian code
->> search and the netatalk upstream have no references it it, so it
->> should be fine to remove.
->>=20
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->
-> Hi!
-> I=E2=80=99ve been working on a new LocalTalk interface driver for the =
-last=20
-> couple months, do you think it would be possible to at least postpone=20
-> the removal of LT a bit?
->
-> It is a driver for an open source device called TashTalk=20
-> (https://github.com/lampmerchant/tashtalk), which runs on a PIC micro=20
-> that does all the LT interfacing, and communicates back via serial to=20
-> the host system. My driver is relatively simple and works very well=20
-> with netatalk 2.2 (which is still maintained and still has support for=20
-> AppleTalk). The driver is basically complete and trsted and I was=20
-> preparing to submit a patch.
->
-> Still having LocalTalk in my view has many advantages for us=20
-> enthusiasts that still want to bridge old machines to the current worl=
-d=20
-> without modifications, for example for printing on modern printers,=20
-> netbooting, sharing files and even tcp/ip. All this basically works ou=
-t=20
-> of the box via the driver, Linux and available userspace tools=20
-> (netatalk, macipgw).
->
-> The old ISA cards supported by COPS were basically unobtanium even 20=20
-> years ago, but the solution of using a PIC and a serial port is very=20
-> robust and much more furure-proof. We also already have a device that=20
-> can interface a modern machine directly via USB to LocalTalk.
->
-> The development of the TashTalk has been also extensively discussed on=20
-> thr 68KMLA forum=20
-> (https://68kmla.org/bb/index.php?threads/modtashtalk-lt0-driver-for-li=
-nux.45031/)
->
-> I hope the decision to remove LocalTalk can be reconsidered at least=20
-> for the time being so there is a chance to submit a new, modern device=20
-> making use of this stack.
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Nothing is decided, I'm just proposing my patch as a cleanup
-for now. It would be nice to still drop the ndo_do_ioctl function
-though, at least in some form. When your driver actually makes
-it into the kernel, you can find a different method of communicating
-the address between the socket interface and the device driver.
+bfa_ioc_get_adapter_manufacturer() simply copies a string literal into
+`manufacturer`.
 
-I can see a few ways this could work out:
+Another implementation of bfa_ioc_get_adapter_manufacturer() from
+drivers/scsi/bfa/bfa_ioc.c uses memset + strscpy:
+|	void
+|	bfa_ioc_get_adapter_manufacturer(struct bfa_ioc_s *ioc, char *manufacturer)
+|	{
+|		memset((void *)manufacturer, 0, BFA_ADAPTER_MFG_NAME_LEN);
+|			strscpy(manufacturer, BFA_MFG_NAME, BFA_ADAPTER_MFG_NAME_LEN);
+|	}
 
-- add a custom callback pointer to struct atalk_iface to
-  get and set the address for phase1 probing instead of going
-  through the ioctl
+Let's use `strscpy_pad` to eliminate some redundant work while still
+NUL-terminating and NUL-padding the destination buffer.
 
-- rewrite the probing logic in aarp.c more widely, and improve
-  the userspace interface in the process by introducing a netlink
-  interface
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Changes in v2:
+- don't use sizeof on ptr (thanks Kees)
+- strscpy -> strscpy_pad (thanks Kees)
+- change subject line + commit msg to reflect above
+- Link to v1: https://lore.kernel.org/r/20231005-strncpy-drivers-net-ethernet-brocade-bna-bfa_ioc-c-v1-1-8dfd30123afc@google.com
+---
+Note: build-tested only.
+---
+ drivers/net/ethernet/brocade/bna/bfa_ioc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-- Move your entire driver into userspace and go to the kernel
-  using tun/tap. This has the added benefit of avoiding a lot
-  of the complexity of the tty line discipline code you have.
+diff --git a/drivers/net/ethernet/brocade/bna/bfa_ioc.c b/drivers/net/ethernet/brocade/bna/bfa_ioc.c
+index b07522ac3e74..9c80ab07a735 100644
+--- a/drivers/net/ethernet/brocade/bna/bfa_ioc.c
++++ b/drivers/net/ethernet/brocade/bna/bfa_ioc.c
+@@ -2839,7 +2839,7 @@ bfa_ioc_get_adapter_optrom_ver(struct bfa_ioc *ioc, char *optrom_ver)
+ static void
+ bfa_ioc_get_adapter_manufacturer(struct bfa_ioc *ioc, char *manufacturer)
+ {
+-	strncpy(manufacturer, BFA_MFG_NAME, BFA_ADAPTER_MFG_NAME_LEN);
++	strscpy_pad(manufacturer, BFA_MFG_NAME, BFA_ADAPTER_MFG_NAME_LEN);
+ }
+ 
+ static void
 
-      Arnd
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231005-strncpy-drivers-net-ethernet-brocade-bna-bfa_ioc-c-68f13966f388
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
