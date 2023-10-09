@@ -1,363 +1,101 @@
-Return-Path: <netdev+bounces-39207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D177B7BE523
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:39:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C600B7BE526
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:39:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 877FF281841
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:39:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46FAD281839
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB21A374CA;
-	Mon,  9 Oct 2023 15:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD91374CC;
+	Mon,  9 Oct 2023 15:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="x2z+ie+x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OEJdpZtd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E31358BF
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:39:19 +0000 (UTC)
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378D394
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 08:39:17 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-d818d65f23cso5009669276.3
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 08:39:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09491358BF;
+	Mon,  9 Oct 2023 15:39:40 +0000 (UTC)
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39F35A6;
+	Mon,  9 Oct 2023 08:39:39 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a200028437so58201267b3.1;
+        Mon, 09 Oct 2023 08:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1696865956; x=1697470756; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696865978; x=1697470778; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=49sXWwCpY3c6MIYr6iCN5rSvTFeDCbixTIPgahWaUM4=;
-        b=x2z+ie+xNeoAZtM5pb6u2XPeAa5khx5q0Qu79hKZF6LW1pC/V5LLAqbAyi/TL1B4Ui
-         HPeLIAP5CPdqSYm5ZYNfUpV93hRxmwmK8Pf2ZmtOMA2OMkEDFirPuadTQBkfaGNxddY5
-         7q6ZTFCuFdZGTGcmyrcry2P8uKc/1ad6cvbSGw+zZMB+JONJIIx1Mx8nSCrw77riPRwW
-         A9/2f499XH+2fS7GB8uc+WVdzZnXLqUtS20YbM7vmHOT1xMNBIalujc2nKc+S7sVfblm
-         WlZDgBB30RRxwtyL9y+1MYuNDrPrfEOKSG0VZjtRyB/Jf7uyv1w5D8L54n7qpl/0E9OJ
-         IZCg==
+        bh=GIrZZ5xskHIRXAYoS59oyB3yKN0uOXhp3znwgdcK4V4=;
+        b=OEJdpZtdhyTWEqJKnuCNUxyU3lRPDpEuXloAZxvhj1xjnf9dLIyZCGyM0CGJWlp82t
+         X2Iy1ZP2X8VjGkoyMaYZJfpMVFHlRaMpTjwZ3iEN2A3EoqPV7gR69gVurly/mMouDUTn
+         nubcJo3zz42n9TPfhfIZY728DGAf3cLoRt4YuvSRN/aRpFRhNm+utZTwnk+D6600fX3V
+         yyw/NKDf93vGry7oiwdP+7gTzWdD9vSkQ5NlghlRMN0xPWfwssjtzGxIfwNHbnZD/Yhv
+         halZqhyDPrI5PnweGrvZr/uQRZ5BS+f/B3ZBX5hutQJUWPtC/Mc6R4Q0Xl9Wq3KNCtez
+         KaJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696865956; x=1697470756;
+        d=1e100.net; s=20230601; t=1696865978; x=1697470778;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=49sXWwCpY3c6MIYr6iCN5rSvTFeDCbixTIPgahWaUM4=;
-        b=NqfjetomPGHLGo0S9T4JFepdgljUozlB+sAJIDiPc89TPDUeNLnZvYw0GRiQoDUVTK
-         BdBZFPfW9G2dM60Ae2Ufaabq2lLJpNpm9BR2u3/ZUY0ae69AWbPDKyMiDAPOZzk010tO
-         VqSOto5HZWmKfQC/Gd7kJy+fBYAyWjZNiFIpYa6b8Xh/k8SQzOeBDtiaDKWIxCkN2mwJ
-         zBixZl8ax1AqphGcV2ep3wBMCM4yefP3oNSz3WZGSkg7143/UtiCV4s7A89BzmPHSip9
-         zJ4Vshs/Ybpoo6ssOZcCcIVkitmI0S3ORCdtC9u+KWlnbmKJakhtY2xeUtpvJdtkIR4h
-         nq+g==
-X-Gm-Message-State: AOJu0Yx+oAqHDDVZOhsRHJxEdL3Ko20afXweXnTY5Csra4cckR5te+82
-	GqDfxGb41Uh7u2q1XYp7HoFzzTOCP94NHe6brE7nFQ==
-X-Google-Smtp-Source: AGHT+IEnfHX0GXzABqTn6QEsAqgtEttlwfCnSUWxgjIC2cg5VWanR+lwAcWqXsp83r5j1m8CRwpcXKspOFJn7KIIJ0s=
-X-Received: by 2002:a25:1102:0:b0:d62:a199:fb18 with SMTP id
- 2-20020a251102000000b00d62a199fb18mr13005886ybr.60.1696865956332; Mon, 09 Oct
- 2023 08:39:16 -0700 (PDT)
+        bh=GIrZZ5xskHIRXAYoS59oyB3yKN0uOXhp3znwgdcK4V4=;
+        b=Lu4bn5ChNNLG8+1UeGx0fRh6fZXbTCtsCvjcyrhwXXBeHjo+7+vLySe9FKgc/CS44m
+         XIfX+Y6Z1xdmyOWqn1hsgM+btO0Xz1NJnz7tbu7EsDNocVvVx1aBi6DL5ylRTa0JxXG6
+         +BE9ZibZZpjgEDda93CGVM01C40Uk/Gdz9UitYJgwFQGvN2uofLD1Pzw3dv15eNk6pzY
+         6Ysju8wn5kyV9A8bxlH5bO611ab2CJr8XZLRqXtaM2RKqavH6VMb9iYuTAPsBp3ettGr
+         vMP/xzUg97vEp66ksIgEX5zUhFAFDLBgPFDuzP/FLpOHlBy/MiSuHFhICLD73ObQKknZ
+         LGnw==
+X-Gm-Message-State: AOJu0YxEN9MfbnrxZ7ZN/h/7pwjchB9TME7JjKorzCg5LSiTYSZ/GYL+
+	15p903fs2KbNgRVPeSu+82QRFxY5U6WKxwLJ/T0=
+X-Google-Smtp-Source: AGHT+IG+hNAxB41K6zt2iBZ+P7RjCi3ZaCke4t0MD5yK/4gxwRuPXrkrfCSNCpCJmfTE/ePBe194WQVg3NFfuZV4btI=
+X-Received: by 2002:a81:47c4:0:b0:5a0:ae01:803c with SMTP id
+ u187-20020a8147c4000000b005a0ae01803cmr16012564ywa.38.1696865978432; Mon, 09
+ Oct 2023 08:39:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230930143542.101000-1-jhs@mojatatu.com> <20230930143542.101000-14-jhs@mojatatu.com>
- <87edi5ysun.fsf@nvidia.com> <CAM0EoM=2ObA1yrasNWRFoSzB+JZ0su2TKrXH-D0k+Pth=aOUxg@mail.gmail.com>
- <8734yjzvsq.fsf@nvidia.com>
-In-Reply-To: <8734yjzvsq.fsf@nvidia.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 9 Oct 2023 11:39:04 -0400
-Message-ID: <CAM0EoMnz-vFOizxqwgRocqiQtzwJ_6uk1fDvGHZce0yDpnRAGA@mail.gmail.com>
-Subject: Re: [PATCH RFC v6 net-next 13/17] p4tc: add table entry create,
- update, get, delete, flush and dump
-To: Vlad Buslov <vladbu@nvidia.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kernel@mojatatu.com, 
-	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com
+References: <CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
+ <20231009.224907.206866439495105936.fujita.tomonori@gmail.com>
+ <2023100926-ambulance-mammal-8354@gregkh> <20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
+In-Reply-To: <20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Mon, 9 Oct 2023 17:39:27 +0200
+Message-ID: <CANiq72nj_04U82Kb4DfMx72NPgHzDCd-xbosc83xgF19nCqSfQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: gregkh@linuxfoundation.org, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu, 
+	wedsonaf@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 10:59=E2=80=AFAM Vlad Buslov <vladbu@nvidia.com> wro=
-te:
+On Mon, Oct 9, 2023 at 5:24=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
->
-> On Mon 09 Oct 2023 at 10:02, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> > Hi Vlad,
-> >
-> > On Sun, Oct 8, 2023 at 12:36=E2=80=AFPM Vlad Buslov <vladbu@nvidia.com>=
- wrote:
-> >>
-> >> On Sat 30 Sep 2023 at 10:35, Jamal Hadi Salim <jhs@mojatatu.com> wrote=
-:
-> >
-> > [..trimmed...]
-> >
-> >> > +/* Invoked from both control and data path  */
-> >> > +static int __p4tc_table_entry_update(struct p4tc_pipeline *pipeline=
-,
-> >> > +                                  struct p4tc_table *table,
-> >> > +                                  struct p4tc_table_entry *entry,
-> >> > +                                  struct p4tc_table_entry_mask *mas=
-k,
-> >> > +                                  u16 whodunnit, bool from_control)
-> >> > +__must_hold(RCU)
+> Trevor gave Reviewed-by. Not perfect but reasonable shape, IMHO. Seems
+> that we have been discussing the same topics like locking, naming, etc
+> again and again.
 
-Mark B - comment further down.
+Well, there was other feedback too, which isn't addressed so far. So
+merging this in 2 weeks does seem a bit rushed to me.
 
-> >> > +{
-> >> > +     struct p4tc_table_entry_mask *mask_found =3D NULL;
-> >> > +     struct p4tc_table_entry_work *entry_work;
-> >> > +     struct p4tc_table_entry_value *value_old;
-> >> > +     struct p4tc_table_entry_value *value;
-> >> > +     struct p4tc_table_entry *entry_old;
-> >> > +     struct p4tc_table_entry_tm *tm_old;
-> >> > +     struct p4tc_table_entry_tm *tm;
-> >> > +     int ret;
-> >> > +
-> >> > +     value =3D p4tc_table_entry_value(entry);
-> >> > +     /* We set it to zero on create an update to avoid having entry
-> >> > +      * deletion in parallel before we report to user space.
-> >> > +      */
-> >> > +     refcount_set(&value->entries_ref, 0);
-> >>
-> >> TBH I already commented on one of the previous versions of this series
-> >> that it is very hard to understand and review tons of different atomic
-> >> reference counters, especially when they are modified with functions
-> >> like refcount_dec_not_one() or unconditional set like in this place.
-> >>
-> >> I chose specifically this function because __must_hold(RCU) makes it
-> >> look like it can be accessed concurrently from datapath, which is not
-> >> obvious on multiple previous usages of reference counters in the serie=
-s.
-> >
-> > True, tables can be manipulated from control plane/user space,
-> > datapath as well as timers (mostly for delete).
-> > Would using wrappers around these incr/decr help? i mean meaningful
-> > inlines that will provide clarity as to what an incr/decr is?
->
-> Considering existing wrappers I don't believe adding more would help.
-> Looking at wrappers for entries_ref:
->
-> static inline int p4tc_tbl_entry_get(struct p4tc_table_entry_value *value=
-)
-> {
->         return refcount_inc_not_zero(&value->entries_ref);
-> }
->
-> static inline bool p4tc_tbl_entry_put(struct p4tc_table_entry_value *valu=
-e)
-> {
->         return refcount_dec_if_one(&value->entries_ref);
-> }
->
-> static inline bool p4tc_tbl_entry_put_ref(struct p4tc_table_entry_value *=
-value)
-> {
->         return refcount_dec_not_one(&value->entries_ref);
-> }
->
-> it isn't obvious to me why 'put' is dec_if_one and put_ref is dec_not
-> one.
->
+And, yes, the discussion on this has been going around for a while,
+but that is precisely why we recommended to iterate more on our side
+first, because it was not ready.
 
-Ok, so maybe answers to your questions below will help to clarify.
-Also: Would it help if we also put comments in the data structs to say
-what each refcnt, atomic and ref is for (they are clear to us but
-we've been staring at this for too long).
-
-> >> So what happens here if entries_ref was 0 to begin with? Or is possibl=
-e
-> >> for this function to be executed concurrently by multiple tasks, in
-> >> which case all of them set entries_ref to 0, but first one that finish=
-es
-> >> resets the counter back to 1 at which point I assume it can be deleted
-> >> in parallel by control path while some concurrent
-> >> __p4tc_table_entry_update() are still running (at least that is what t=
-he
-> >> comment here indicates)?
-> >
-> > It's rtnl-lockless, so you can imagine what would happen there ;->
-> > Multiple concurent user space, kernel, timers all contending for this.
-> > Exactly what you said: its zero in this case because some entity could
-> > delete it in parallel.
-> > See comment further down which says "In case of parallel update, the
-> > thread that arrives here first will..."
->
-> See below.
->
-> > Consider it a poor man's lock. Does that help? Perhaps we could have
-> > more discussion at the monthly tc meetup..
-> > We have been testing this code a lot for concurrency and wrote some
-> > user space tooling to catch such issues.
->
-> I'm not arguing that it is somehow broken or not well-tested, just
-> saying I read this and previous versions several times and still have no
-> idea what is going on here.
-
-Fair enough - hopefully we can rectify this.
-
-> >
-> >>
-> >> > +
-> >> > +     if (table->tbl_type !=3D P4TC_TABLE_TYPE_EXACT) {
-> >> > +             mask_found =3D p4tc_table_entry_mask_add(table, entry,=
- mask);
-> >> > +             if (IS_ERR(mask_found)) {
-> >> > +                     ret =3D PTR_ERR(mask_found);
-> >> > +                     goto out;
-> >> > +             }
-> >> > +     }
-> >> > +
->
-> Mark A, see next comment.
->
-> >> > +     p4tc_table_entry_build_key(table, &entry->key, mask_found);
-> >> > +
-> >> > +     entry_old =3D p4tc_entry_lookup(table, &entry->key, value->pri=
-o);
-> >> > +     if (!entry_old) {
-> >> > +             ret =3D -ENOENT;
-> >> > +             goto rm_masks_idr;
-> >> > +     }
-> >> > +
-> >> > +     /* In case of parallel update, the thread that arrives here fi=
-rst will
-> >> > +      * get the right to update.
-> >> > +      *
-> >> > +      * In case of a parallel get/update, whoever is second will fa=
-il appropriately
-> >> > +      */
-> >> > +     value_old =3D p4tc_table_entry_value(entry_old);
-> >> > +     if (!p4tc_tbl_entry_put(value_old)) {
-> >> > +             ret =3D -EAGAIN;
->
-> I get that this prevents you from updating the old entry in parallel,
-> but I was asking what would happen if concurrent update already finished
-> by this time, set value->entries_ref to 1 and concurrent delete
-> deallocated the new entry? Isn't use after free possible when calling
-> p4tc_table_entry_build_key() and p4tc_entry_lookup() if all those events
-> happen before mark A? (for example, if task spent a lot of time
-> allocating new mask in p4tc_table_entry_mask_add())
-
-
-The table entry is RCU and this function can only be called with RCU
-read lock(See "Mark B" above), so a use-after-free scenario shouldn't
-be possible.
-I think we actually have a test case for the scenario you are
-describing - but sometimes with these things it is based on luck to
-hit the exact scenario; we could add delays at strategic code paths to
-make it more deterministic to hit the scenario. Code review always
-helps as you are doing right now (if you cant find issues in this
-area, noone else could ;->).
-
-cheers,
-jamal
-
-> >> > +             goto rm_masks_idr;
-> >> > +     }
-> >> > +
-> >> > +     if (from_control) {
-> >> > +             if (!p4tc_ctrl_update_ok(value_old->permissions)) {
-> >> > +                     ret =3D -EPERM;
-> >> > +                     goto set_entries_refcount;
-> >> > +             }
-> >> > +     } else {
-> >> > +             if (!p4tc_data_update_ok(value_old->permissions)) {
-> >> > +                     ret =3D -EPERM;
-> >> > +                     goto set_entries_refcount;
-> >> > +             }
-> >> > +     }
-> >> > +
-> >> > +     tm =3D kzalloc(sizeof(*tm), GFP_ATOMIC);
-> >> > +     if (unlikely(!tm)) {
-> >> > +             ret =3D -ENOMEM;
-> >> > +             goto set_entries_refcount;
-> >> > +     }
-> >> > +
-> >> > +     tm_old =3D rcu_dereference_protected(value_old->tm, 1);
-> >> > +     *tm =3D *tm_old;
-> >> > +
-> >> > +     tm->lastused =3D jiffies;
-> >> > +     tm->who_updated =3D whodunnit;
-> >> > +
-> >> > +     if (value->permissions =3D=3D P4TC_PERMISSIONS_UNINIT)
-> >> > +             value->permissions =3D value_old->permissions;
-> >> > +
-> >> > +     rcu_assign_pointer(value->tm, tm);
-> >> > +
-> >> > +     entry_work =3D kzalloc(sizeof(*(entry_work)), GFP_ATOMIC);
-> >> > +     if (unlikely(!entry_work)) {
-> >> > +             ret =3D -ENOMEM;
-> >> > +             goto free_tm;
-> >> > +     }
-> >> > +
-> >> > +     entry_work->pipeline =3D pipeline;
-> >> > +     entry_work->table =3D table;
-> >> > +     entry_work->entry =3D entry;
-> >> > +     value->entry_work =3D entry_work;
-> >> > +     if (!value->is_dyn)
-> >> > +             value->is_dyn =3D value_old->is_dyn;
-> >> > +
-> >> > +     if (value->is_dyn) {
-> >> > +             /* Only use old entry value if user didn't specify new=
- one */
-> >> > +             value->aging_ms =3D value->aging_ms ?: value_old->agin=
-g_ms;
-> >> > +
-> >> > +             hrtimer_init(&value->entry_timer, CLOCK_MONOTONIC,
-> >> > +                          HRTIMER_MODE_REL);
-> >> > +             value->entry_timer.function =3D &entry_timer_handle;
-> >> > +
-> >> > +             hrtimer_start(&value->entry_timer, ms_to_ktime(value->=
-aging_ms),
-> >> > +                           HRTIMER_MODE_REL);
-> >> > +     }
-> >> > +
-> >> > +     INIT_WORK(&entry_work->work, p4tc_table_entry_del_work);
-> >> > +
-> >> > +     if (rhltable_insert(&table->tbl_entries, &entry->ht_node,
-> >> > +                         entry_hlt_params) < 0) {
-> >> > +             ret =3D -EEXIST;
-> >> > +             goto free_entry_work;
-> >> > +     }
-> >> > +
-> >> > +     p4tc_table_entry_destroy_noida(table, entry_old);
-> >> > +
-> >> > +     if (!from_control)
-> >> > +             p4tc_tbl_entry_emit_event(entry_work, RTM_P4TC_UPDATE,
-> >> > +                                       GFP_ATOMIC);
-> >> > +
-> >> > +     return 0;
-> >> > +
-> >> > +free_entry_work:
-> >> > +     kfree(entry_work);
-> >> > +
-> >> > +free_tm:
-> >> > +     kfree(tm);
-> >> > +
-> >> > +set_entries_refcount:
-> >> > +     refcount_set(&value_old->entries_ref, 1);
-> >> > +
-> >> > +rm_masks_idr:
-> >> > +     if (table->tbl_type !=3D P4TC_TABLE_TYPE_EXACT)
-> >> > +             p4tc_table_entry_mask_del(table, entry);
-> >> > +
-> >> > +out:
-> >> > +     return ret;
-> >> > +}
-> >> > +
-> >
-> > [..trimmed..]
-> >
-> >  cheers,
-> > jamal
->
+Cheers,
+Miguel
 
