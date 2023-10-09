@@ -1,57 +1,134 @@
-Return-Path: <netdev+bounces-39096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C3D7BE00A
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:36:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2487BE030
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:38:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A9CE1C20979
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:36:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4EC1C20958
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B442E63E;
-	Mon,  9 Oct 2023 13:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B6228DD9;
+	Mon,  9 Oct 2023 13:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mV5Xpggp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYO3nvCb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28721182A4
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:36:54 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BABE0;
-	Mon,  9 Oct 2023 06:36:49 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 699C0FF805;
-	Mon,  9 Oct 2023 13:36:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1696858608;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ecp+PzDuojrF4dVn0YXTODlKCvKpXLTXA6CoVDUgfhU=;
-	b=mV5XpggpxwV309tZ+u4iSdRAQN+OqPXFAuLCjisPIGfNJ8DmhxJl1H869NCu75zzo8uC0T
-	bXu+/A/NZ66wzxM97X1EPXCi8iXKv/m1z9BKDUM2Zg1XOEAjJL3JEO/IMxe8CsQScXozj6
-	83jXpfepGYkCvIDGXXQBmb9x1qNCtjL35Vlqkduc4Z24MnjR099sMqUmYN9OhNP2yPgESk
-	08yhPDf2mJU+GrwT2ZPJeXDCaGBgbjtoPC7Ljj9Mk3SIOarRvt7GfkCXPQ3M+Aq83NsAed
-	uho0IF2jtm/AfAVH4z/Gmx5m9+MXOJD9dN7RlZL1UFriyObgxKhtUheIRMiNbw==
-From: =?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>
-To: Michal Kubecek <mkubecek@suse.cz>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223C2328A4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 13:38:08 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4925B6;
+	Mon,  9 Oct 2023 06:38:05 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-317c3ac7339so4129354f8f.0;
+        Mon, 09 Oct 2023 06:38:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696858684; x=1697463484; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u6KCxFngvX9I/hwQrj7ymkXhwkpFmhe1Y7OW2VCan1I=;
+        b=ZYO3nvCbTBqkAi4X2pYJ6OWeQ9hxhUZ92YkkB2YHdsDfujYkaf/OVX+SB/KGZu3JUD
+         b+1p6MDssuzcdK6PnVNVrO5hQXe/0jDSw4uj5ZQscR5LhF6sHoeXvW5UbRFF/7zGqk8f
+         A1ncNhRzXR0lZ4gRZ5eDaFyYXTaiGYhXraQ1IEG+OOqowovcSemCcDSZvD6wRKhi1uqC
+         i/ACFeUTKaZkYGHtEbMopT0joim5rrT4oDkOS/7F1zqGToT0xME09xq4pgb6Bv0L977w
+         4J5HBnLnhZ8P01uNFlZcin31dASH/S2D9fx5P2vu9AZk0jowOrXSa7NYmzLoWZX0ybD7
+         MGkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696858684; x=1697463484;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u6KCxFngvX9I/hwQrj7ymkXhwkpFmhe1Y7OW2VCan1I=;
+        b=PuMlZScRtdFPBrOHgax2x6Z+z+dhn5pB0TeUH4aHMVzn9KdnN/7YVAmNTm+x/leiI+
+         UDIofIbqiP2x9rooVG1O7Un7E3259s3qW3sTTI95qpw4Du37kCKwiTIQtYfMeIPEr3qP
+         +qaHBsdKyBg9fZIaZypW7DJgH5IKevV6GvZ4dNLUrMJLa+U22j91B81DLFbUWPHUkDTq
+         DE0sTyleCBsbgoWsrQ5zoi/tBGNaCz0B0w56rc0LuxpkRUaCowLica/tP0HHGBsy2yd3
+         3OPAAf8y5dwCtHPBzQIncH0lwT8Ne4ghkgaf3J1Vgz4WxlF7EgRzJz6uYmbNJ8n73ccJ
+         q9Ww==
+X-Gm-Message-State: AOJu0Yw5tsozulMudCfC0HN+OkQP93q70n9fajuv71geHT2ksKeC3d2a
+	z6+uNmxe0nS4O09k3RohLpg=
+X-Google-Smtp-Source: AGHT+IEMzVE5102E/rR+PKbFb4Y1qJpv3S+lyAIEK40sgvEz//IRItxHur9Z7ZsOHs5xcO/iYCxqbg==
+X-Received: by 2002:adf:f78d:0:b0:320:926:26d5 with SMTP id q13-20020adff78d000000b00320092626d5mr13881386wrp.30.1696858683739;
+        Mon, 09 Oct 2023 06:38:03 -0700 (PDT)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id t4-20020a0560001a4400b0032763287473sm9746160wry.75.2023.10.09.06.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 06:38:03 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	thomas.petazzoni@bootlin.com,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net v3 1/1] ethtool: Fix mod state of verbose no_mask bitset
-Date: Mon,  9 Oct 2023 15:36:45 +0200
-Message-Id: <20231009133645.44503-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.25.1
+	Paolo Abeni <pabeni@redhat.com>,
+	Chris Snook <chris.snook@gmail.com>,
+	Raju Rangoju <rajur@chelsio.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	Douglas Miller <dougmill@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Dany Madden <danymadden@us.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Krzysztof Halasa <khalasa@piap.pl>,
+	Kalle Valo <kvalo@kernel.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Intel Corporation <linuxwwan@intel.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	Liu Haijun <haijun.liu@mediatek.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Yuanjun Gong <ruc_gongyuanjun@163.com>,
+	Alex Elder <elder@linaro.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Bailey Forrest <bcf@google.com>,
+	Junfeng Guo <junfeng.guo@intel.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	Rushil Gupta <rushilg@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Yuri Karpov <YKarpov@ispras.ru>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Zheng Zengkai <zhengzengkai@huawei.com>,
+	Dawei Li <set_pte_at@outlook.com>,
+	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org
+Subject: [net-next v3 1/5] netdev: replace simple napi_schedule_prep/__napi_schedule to napi_schedule
+Date: Mon,  9 Oct 2023 15:37:50 +0200
+Message-Id: <20231009133754.9834-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,114 +136,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kory Maincent <kory.maincent@bootlin.com>
+Replace drivers that still use napi_schedule_prep/__napi_schedule
+with napi_schedule helper as it does the same exact check and call.
 
-A bitset without mask in a _SET request means we want exactly the bits in
-the bitset to be set. This works correctly for compact format but when
-verbose format is parsed, ethnl_update_bitset32_verbose() only sets the
-bits present in the request bitset but does not clear the rest. The commit
-6699170376ab fixes this issue by clearing the whole target bitmap before we
-start iterating. The solution proposed brought an issue with the behavior
-of the mod variable. As the bitset is always cleared the old val will
-always differ to the new val.
-
-Fix it by adding a new temporary variable which save the state of the old
-bitmap.
-
-Fixes: 6699170376ab ("ethtool: fix application of verbose no_mask bitset")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
-
-Changes in v2:
-- Fix the allocated size.
-
-Changes in v3:
-- Add comment.
-- Updated variable naming.
-- Add orig_bitmap variable to avoid n_mask condition in the
-  nla_for_each_nested() loop.
+Changes v3:
+- Add Reviewed-by tag
+Changes v2:
+- Add missing semicolon
 ---
- net/ethtool/bitset.c | 32 ++++++++++++++++++++++++++------
- 1 file changed, 26 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/ni/nixge.c     | 3 +--
+ drivers/net/ethernet/wiznet/w5100.c | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/net/ethtool/bitset.c b/net/ethtool/bitset.c
-index 0515d6604b3b..883ed9be81f9 100644
---- a/net/ethtool/bitset.c
-+++ b/net/ethtool/bitset.c
-@@ -431,8 +431,10 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 			      ethnl_string_array_t names,
- 			      struct netlink_ext_ack *extack, bool *mod)
- {
-+	u32 *orig_bitmap, *saved_bitmap = NULL;
- 	struct nlattr *bit_attr;
- 	bool no_mask;
-+	bool dummy;
- 	int rem;
- 	int ret;
+diff --git a/drivers/net/ethernet/ni/nixge.c b/drivers/net/ethernet/ni/nixge.c
+index 97f4798f4b42..f71a4f8bbb89 100644
+--- a/drivers/net/ethernet/ni/nixge.c
++++ b/drivers/net/ethernet/ni/nixge.c
+@@ -755,8 +755,7 @@ static irqreturn_t nixge_rx_irq(int irq, void *_ndev)
+ 		cr &= ~(XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_DELAY_MASK);
+ 		nixge_dma_write_reg(priv, XAXIDMA_RX_CR_OFFSET, cr);
  
-@@ -448,8 +450,22 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
+-		if (napi_schedule_prep(&priv->napi))
+-			__napi_schedule(&priv->napi);
++		napi_schedule(&priv->napi);
+ 		goto out;
+ 	}
+ 	if (!(status & XAXIDMA_IRQ_ALL_MASK)) {
+diff --git a/drivers/net/ethernet/wiznet/w5100.c b/drivers/net/ethernet/wiznet/w5100.c
+index 341ee2f249fd..b26fd15c25ae 100644
+--- a/drivers/net/ethernet/wiznet/w5100.c
++++ b/drivers/net/ethernet/wiznet/w5100.c
+@@ -930,8 +930,8 @@ static irqreturn_t w5100_interrupt(int irq, void *ndev_instance)
+ 
+ 		if (priv->ops->may_sleep)
+ 			queue_work(priv->xfer_wq, &priv->rx_work);
+-		else if (napi_schedule_prep(&priv->napi))
+-			__napi_schedule(&priv->napi);
++		else
++			napi_schedule(&priv->napi);
  	}
  
- 	no_mask = tb[ETHTOOL_A_BITSET_NOMASK];
--	if (no_mask)
--		ethnl_bitmap32_clear(bitmap, 0, nbits, mod);
-+	if (no_mask) {
-+		unsigned int nwords = DIV_ROUND_UP(nbits, 32);
-+		unsigned int nbytes = nwords * sizeof(u32);
-+
-+		/* The bitmap size is only the size of the map part without
-+		 * its mask part.
-+		 */
-+		saved_bitmap = kcalloc(nwords, sizeof(u32), GFP_KERNEL);
-+		if (!saved_bitmap)
-+			return -ENOMEM;
-+		memcpy(saved_bitmap, bitmap, nbytes);
-+		ethnl_bitmap32_clear(bitmap, 0, nbits, &dummy);
-+		orig_bitmap = saved_bitmap;
-+	} else {
-+		orig_bitmap = bitmap;
-+	}
- 
- 	nla_for_each_nested(bit_attr, tb[ETHTOOL_A_BITSET_BITS], rem) {
- 		bool old_val, new_val;
-@@ -458,13 +474,14 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 		if (nla_type(bit_attr) != ETHTOOL_A_BITSET_BITS_BIT) {
- 			NL_SET_ERR_MSG_ATTR(extack, bit_attr,
- 					    "only ETHTOOL_A_BITSET_BITS_BIT allowed in ETHTOOL_A_BITSET_BITS");
--			return -EINVAL;
-+			ret = -EINVAL;
-+			goto out;
- 		}
- 		ret = ethnl_parse_bit(&idx, &new_val, nbits, bit_attr, no_mask,
- 				      names, extack);
- 		if (ret < 0)
--			return ret;
--		old_val = bitmap[idx / 32] & ((u32)1 << (idx % 32));
-+			goto out;
-+		old_val = orig_bitmap[idx / 32] & ((u32)1 << (idx % 32));
- 		if (new_val != old_val) {
- 			if (new_val)
- 				bitmap[idx / 32] |= ((u32)1 << (idx % 32));
-@@ -474,7 +491,10 @@ ethnl_update_bitset32_verbose(u32 *bitmap, unsigned int nbits,
- 		}
- 	}
- 
--	return 0;
-+	ret = 0;
-+out:
-+	kfree(saved_bitmap);
-+	return ret;
- }
- 
- static int ethnl_compact_sanity_checks(unsigned int nbits,
+ 	return IRQ_HANDLED;
 -- 
-2.25.1
+2.40.1
 
 
