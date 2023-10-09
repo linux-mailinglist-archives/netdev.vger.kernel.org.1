@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-39162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4B67BE41B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:13:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB717BE420
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:13:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926C11C20A45
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDFED1C2094B
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD781358AA;
-	Mon,  9 Oct 2023 15:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB37B358AD;
+	Mon,  9 Oct 2023 15:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBkZzbeZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GrifmPVf"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8504358B7
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B435358AA
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 15:13:32 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A13121;
-	Mon,  9 Oct 2023 08:13:15 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40881124;
+	Mon,  9 Oct 2023 08:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696864395; x=1728400395;
+  t=1696864400; x=1728400400;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zgE2DVjnrK9Ua23Mm6yXXtMfOQugvJtkZv+vhYbFMW0=;
-  b=OBkZzbeZWd7+BYULv4X66lVfu+7SX0/O53agb0yAlNbYKaof04zQ3Q45
-   mBr9PWGvcArWgrgNr3bapz4sOCFhkBOa5RSg9xjYHbvbDrK3G80elmJCO
-   joNbUpRcdEHyklEAGlFziBNdQyvWM6EDf/zlQzYQoOfBvnvYzPaYp4M/Q
-   BOeX9ZCYr0R4KQ98lpEfJSy+NK35sGwvkynKj+f2PIfi1mA7HWosZzF6F
-   NmpRujhQhEi4RQkCn+yqpO7wxaFH2Oc77TlZAV7j7a3MMuonxWXmwAAXF
-   QTda1B6DyXlUua2FL6JYUUU4kTw0j+uxPEGwm0uyhkTGKfxDBR3nmo+N2
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369232032"
+  bh=mAuoN5CYARcVqA0dlQJabm7qQGV1vBT1FJZYTn4rWfo=;
+  b=GrifmPVf90mrQcTzAw1CEVqAJCz2G63Zlra1aZTwbufmOeMQ6vP5v47Q
+   O5ojZ6AJA2mPXW8K3m//ZBiQmOU/KfTv2qBTJpX3eH91MuOP2T5c81gkY
+   mtEcmdhp23vJ2p7ugmQ5FTVHtVpvJNi7u5iZZsXuPlZCk6YjWy5z+pxGQ
+   xrIq/6b2pm0JXtvLSioVU6F+967lHgl6FszOrOMgq4HzzkBnxTPXRKbq4
+   HgGDfs96rdyyDcSafjbU4UYWot6x2064Pg0lNX2Jghttv89RpmEdw/XsT
+   LXVrvwN/q7Pu42A/YlOQv/25A81JDM7G1QxyGnhOJdEd0HIHBbs4L32SA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369232065"
 X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="369232032"
+   d="scan'208";a="369232065"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 08:13:11 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 08:13:14 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="869287947"
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="869287957"
 X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="869287947"
+   d="scan'208";a="869287957"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Oct 2023 08:13:07 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 09 Oct 2023 08:13:11 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: Yury Norov <yury.norov@gmail.com>
 Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -64,9 +64,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	ntfs3@lists.linux.dev,
 	linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 02/14] bitops: make BYTES_TO_BITS() treewide-available
-Date: Mon,  9 Oct 2023 17:10:14 +0200
-Message-ID: <20231009151026.66145-3-aleksander.lobakin@intel.com>
+Subject: [PATCH 03/14] bitops: let the compiler optimize __assign_bit()
+Date: Mon,  9 Oct 2023 17:10:15 +0200
+Message-ID: <20231009151026.66145-4-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231009151026.66145-1-aleksander.lobakin@intel.com>
 References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
@@ -84,76 +84,69 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Avoid open-coding that simple expression each time by moving
-BYTES_TO_BITS() from the probes code to <linux/bitops.h> to export
-it to the rest of the kernel.
-Simplify the macro while at it. `BITS_PER_LONG / sizeof(long)` always
-equals to %BITS_PER_BYTE, regardless of the target architecture.
-Do the same for the tools ecosystem as well (incl. its version of
-bitops.h).
+Since commit b03fc1173c0c ("bitops: let optimize out non-atomic bitops
+on compile-time constants"), the compilers are able to expand inline
+bitmap operations to compile-time initializers when possible.
+However, during the round of replacement if-__set-else-__clear with
+__assign_bit() as per Andy's advice, bloat-o-meter showed +1024 bytes
+difference in object code size for one module (even one function),
+where the pattern:
 
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+	DECLARE_BITMAP(foo) = { }; // on the stack, zeroed
+
+	if (a)
+		__set_bit(const_bit_num, foo);
+	if (b)
+		__set_bit(another_const_bit_num, foo);
+	...
+
+is heavily used, although there should be no difference: the bitmap is
+zeroed, so the second half of __assign_bit() should be compiled-out as
+a no-op.
+I either missed the fact that __assign_bit() has bitmap pointer marked
+as `volatile` (as we usually do for bitmaps) or was hoping that the
+compilers would at least try to look past the `volatile` for
+__always_inline functions. Anyhow, due to that attribute, the compilers
+were always compiling the whole expression and no mentioned compile-time
+optimizations were working.
+
+Convert __assign_bit() to a macro since it's a very simple if-else and
+all of the checks are performed inside __set_bit() and __clear_bit(),
+thus that wrapper has to be as transparent as possible. After that
+change, despite it showing only -20 bytes change for vmlinux (due to
+that it's still relatively unpopular), no drastic code size changes
+happen when replacing if-set-else-clear for onstack bitmaps with
+__assign_bit(), meaning the compiler now expands them to the actual
+operations will all the expected optimizations.
+
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- include/linux/bitops.h         | 2 ++
- kernel/trace/trace_probe.c     | 2 --
- tools/include/linux/bitops.h   | 2 ++
- tools/perf/util/probe-finder.c | 2 --
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ include/linux/bitops.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index f7f5a783da2a..e0cd09eb91cd 100644
+index e0cd09eb91cd..f98f4fd1047f 100644
 --- a/include/linux/bitops.h
 +++ b/include/linux/bitops.h
-@@ -21,6 +21,8 @@
- #define BITS_TO_U32(nr)		__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(u32))
- #define BITS_TO_BYTES(nr)	__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(char))
- 
-+#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_BYTE)
-+
- extern unsigned int __sw_hweight8(unsigned int w);
- extern unsigned int __sw_hweight16(unsigned int w);
- extern unsigned int __sw_hweight32(unsigned int w);
-diff --git a/kernel/trace/trace_probe.c b/kernel/trace/trace_probe.c
-index 4dc74d73fc1d..2b743c1e37db 100644
---- a/kernel/trace/trace_probe.c
-+++ b/kernel/trace/trace_probe.c
-@@ -1053,8 +1053,6 @@ parse_probe_arg(char *arg, const struct fetch_type *type,
- 	return ret;
+@@ -284,14 +284,8 @@ static __always_inline void assign_bit(long nr, volatile unsigned long *addr,
+ 		clear_bit(nr, addr);
  }
  
--#define BYTES_TO_BITS(nb)	((BITS_PER_LONG * (nb)) / sizeof(long))
--
- /* Bitfield type needs to be parsed into a fetch function */
- static int __parse_bitfield_probe_arg(const char *bf,
- 				      const struct fetch_type *t,
-diff --git a/tools/include/linux/bitops.h b/tools/include/linux/bitops.h
-index f18683b95ea6..bc6600466e7b 100644
---- a/tools/include/linux/bitops.h
-+++ b/tools/include/linux/bitops.h
-@@ -20,6 +20,8 @@
- #define BITS_TO_U32(nr)		DIV_ROUND_UP(nr, BITS_PER_TYPE(u32))
- #define BITS_TO_BYTES(nr)	DIV_ROUND_UP(nr, BITS_PER_TYPE(char))
+-static __always_inline void __assign_bit(long nr, volatile unsigned long *addr,
+-					 bool value)
+-{
+-	if (value)
+-		__set_bit(nr, addr);
+-	else
+-		__clear_bit(nr, addr);
+-}
++#define __assign_bit(nr, addr, value)				\
++	((value) ? __set_bit(nr, addr) : __clear_bit(nr, addr))
  
-+#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_BYTE)
-+
- extern unsigned int __sw_hweight8(unsigned int w);
- extern unsigned int __sw_hweight16(unsigned int w);
- extern unsigned int __sw_hweight32(unsigned int w);
-diff --git a/tools/perf/util/probe-finder.c b/tools/perf/util/probe-finder.c
-index f171360b0ef4..35f66c12ad8a 100644
---- a/tools/perf/util/probe-finder.c
-+++ b/tools/perf/util/probe-finder.c
-@@ -304,8 +304,6 @@ static int convert_variable_location(Dwarf_Die *vr_die, Dwarf_Addr addr,
- 	return ret2;
- }
- 
--#define BYTES_TO_BITS(nb)	((nb) * BITS_PER_LONG / sizeof(long))
--
- static int convert_variable_type(Dwarf_Die *vr_die,
- 				 struct probe_trace_arg *tvar,
- 				 const char *cast, bool user_access)
+ /**
+  * __ptr_set_bit - Set bit in a pointer's value
 -- 
 2.41.0
 
