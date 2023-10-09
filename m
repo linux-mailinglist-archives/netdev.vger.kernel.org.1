@@ -1,248 +1,183 @@
-Return-Path: <netdev+bounces-39054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4AF7BD8F9
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:50:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651B07BD902
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 12:52:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3DD1C20940
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E9D52815A5
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 10:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE430E546;
-	Mon,  9 Oct 2023 10:50:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73006156C3;
+	Mon,  9 Oct 2023 10:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nxLy7Cj1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JFynx6CO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A9B14F72
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:50:52 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A1CA3
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 03:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1696848650; x=1728384650;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IFeha2ufu9FVGbo6lhZVhg9URe4PyVdjOZB8fK9r8PI=;
-  b=nxLy7Cj1bv5C8I1oOWiIvVqk0BrG0mMgky31jz//xI+1x7d4tkHP1V6D
-   eKh1PjIZLhshu7q7S9ZpOYbQze1z0xaM6qNPYQVxHsExDaZ+jRToO/8eR
-   fP1BWKbLhu+bTWRxKt0LFo3y3nquaRrQFpj92PvWrPjUdF+bnGeXaT/Om
-   K6/ygEkl4cTmOXh7rPcuj40JtrXC9FUssG1TRikVpjg+pndypq4D8B+XV
-   Rc8mHw1/ihV+z+a+33HVtsOrLNN3U+DPXGwAp2V54fJ3Ze+eTlwBV10Ad
-   CZ+ywpC4pMxj9j3Q0d2XGJGbdGfl3MbqkfOpBxaH+IIyq1aPrPk2kWQLQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="369179976"
-X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="369179976"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2023 03:50:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10857"; a="1084289631"
-X-IronPort-AV: E=Sophos;i="6.03,210,1694761200"; 
-   d="scan'208";a="1084289631"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Oct 2023 03:50:47 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Mon, 9 Oct 2023 03:50:46 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Mon, 9 Oct 2023 03:50:46 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Mon, 9 Oct 2023 03:50:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HFbHw9UVjJ34d2GqCCbGl1qzdnukZ+CoDuKYDaBiKerWkpm05m2rSx3Ow3TQUueK5XYxNnHfVBs7Gjm6YCiiCxtzEsiiGOxVGzCc5/rBV2N+yrH/CHEJ0nPIzQ6Wsx0RePn4q+qLbWE8oTrkuE57Lyeg/nXtR+0gA7k0Kbt8ojL6vZUWiqjjd+FdsCdNa3Hus76HucX9A+/DZtMthcOih3yO4Wu7KEvEsKif1Jt0Nt0iekDFKj3sebg0UkGfVB9iRq0JZGfDsiNVMzPG4XPfQxb/DzmPG4RmBR44TUPVWlOnCCfangad/U6eZZW3jQzYRtY0kwufuWNf40Sz4Ry9xw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HYkK6Fob/8LE+KgxqZI9XRUwPyxrrBZjKxkIytT8V6Y=;
- b=mUBlebrPRSIS6G+HVNoxcNTKaMsi+6+xp/cBPomj21xIDGHSB9la/4IqM3mRlLS5e/RCPS7h+sQDr5SD6Vr5fNmuvky21W0op7qgPB1ZVxj2/XasMAvG1z4qW58XNc8Rq96fm9K/UtztSTq2fDzZjBgS34w8zl/zby50xY7+Sl0nl7Iq1xikGnbanZXpHolC8JrySmiAMWnDhZUHJY7JXcKFw1fo5O0xPWmzz8xX4fIJN1hAbBkTl1qp5no9EXDocQ/Moy45nQQ29I7sWjBWqIS+nRXc/Fmn7nhOVVjURKp3X6NFs06VLYA9V5nDYZf8vs8UITZNZo+VB27Kv2Ce8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
- by CYXPR11MB8709.namprd11.prod.outlook.com (2603:10b6:930:dd::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Mon, 9 Oct
- 2023 10:50:44 +0000
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::a2bc:136a:3f41:c858]) by BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::a2bc:136a:3f41:c858%6]) with mapi id 15.20.6863.032; Mon, 9 Oct 2023
- 10:50:44 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Romanowski, Rafal" <rafal.romanowski@intel.com>, Simon Horman
-	<horms@kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format specifier
- cleanups
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format
- specifier cleanups
-Thread-Index: AQHZ9imUBhsgBp8lu0qqiq68v2AWE7A5pd8AgAM9zoCABGzLsA==
-Date: Mon, 9 Oct 2023 10:50:44 +0000
-Message-ID: <BL0PR11MB3521934056BC22A7C4C943648FCEA@BL0PR11MB3521.namprd11.prod.outlook.com>
-References: <20231003183603.3887546-1-jesse.brandeburg@intel.com>
- <ZR1slAb0AQ3ayARW@kernel.org>
- <BL0PR11MB3521CB784A9F8B8265C45F108FC9A@BL0PR11MB3521.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB3521CB784A9F8B8265C45F108FC9A@BL0PR11MB3521.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|CYXPR11MB8709:EE_
-x-ms-office365-filtering-correlation-id: 880322da-3cf2-4181-0f8d-08dbc8b59695
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: B2hW5zbyqYaa1CGFbwOI4JVsLR4qdg4OtEwRUKCSoKEQSQY0vr02jqe/oULFSMZGse5S+cBoPqWGXPUYf7x3RYI3ezPw5azgmsPsXxP2LH1yPyn8yc6rXxPDKh+54UkJAasCIWuPwyvDAV1xiJKfwZ3d8gyGQ0dWl0Bk80j6t5hSvF6eWXvYwwqaxxZUdNztNbbWnyVBGrzNX++Gjc5hPqYgY/Gioa9pC7pWYvkB2SQXxU3ZpoU6GWJy+6r258K89MqAIBzesNoW3PQFwKr6qWYhjQROnNKyMyUJ+Pe8XkNxAZ2jX1uvxgyxSoVKD84nm45HwyZYZbMMWf6KyrcXY0TWpHH9VaWL7Ms8ZQvQzWvEyDY4kEHhTN8sh5wICrSiJRnaGMzMSI/2RIuqNB9oA4YONvFnCnX0kKjUA+SZlqFghVXz7mFJm04j7QjK50RJJmsQjRHS/mLjW4WEskZa+VeIlEvYdiCnoDVMNbfhNU5QGTgsd0mUUfhbLuib6LYEz5INSJsiwXDbi+T7+2rAH69HZofV6/52kwje0jRkt/ZI/t613o1/hLCPw/nTX2bclxzER6A1SYYpTs/FiwQPvCOpho526p7D3Cmm4B+b1KE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(376002)(396003)(346002)(136003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(55016003)(83380400001)(107886003)(26005)(66946007)(66476007)(66556008)(316002)(6636002)(110136005)(66446008)(54906003)(76116006)(64756008)(8936002)(8676002)(4326008)(5660300002)(52536014)(41300700001)(7696005)(6506007)(53546011)(71200400001)(9686003)(2906002)(966005)(478600001)(33656002)(38070700005)(38100700002)(82960400001)(122000001)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?kbMiPNM2TCFCC1rLh790afeOs2tc8EQppXz4YYw575erjxrhtawI9Ezagn5a?=
- =?us-ascii?Q?3MUP/ZDbKUTHzsJGjSynw/tt4PqRAaQxPoCfp5R4+ouoipCWDqaeLcsddOvD?=
- =?us-ascii?Q?BVGh7DyJyPfpI1ZEtbPFXriwT7l2jCjd9j0jpjvqaJmPn+Ww1ok8TBns7SpX?=
- =?us-ascii?Q?ZIjXyZXIwSONHlRBD9qcmDMBNVUEigRFvp4QGD+EJ/gb/Dop7fzHfVZjx4gu?=
- =?us-ascii?Q?MYZOmy1dj1ST7+P9GHBX7ob08ko4B2nfO+l5wyA4pdY6qAnWIFXTxDCyWuvw?=
- =?us-ascii?Q?rZo7+lqZg61sYKu8ZzaDWpvEniBSfPYGAEYdJSCRXyUCvN+zVZgY0BxcDAOv?=
- =?us-ascii?Q?KpFBAFw7eTxLEroW7hcpiTvYbZarqTq65qFM1onzLuNGUN5rhlRf/4k8t5QY?=
- =?us-ascii?Q?QDxQPlbP6JUrKNpyueaOPzpqXcjBCMimmy14XziGX848YEPo2em/9BnjFtHl?=
- =?us-ascii?Q?H4jhxBqhRQuhNevb5JdUJV8iUGo8BR5wndWSBU81KMEUBcpm/yphBB+WBsyF?=
- =?us-ascii?Q?NB+rXMJS98iQwwMJGoWKuAOWDh2FBDZqGAzaqFMb1o6urZEankImN+Br0HbT?=
- =?us-ascii?Q?rQNeooGjiiTI2m1HxgSzpXdjmsO1y34g/NFmZPNQvxmAloD1dOvObVodVaDV?=
- =?us-ascii?Q?WoesvzDMyQzHhVfAAWyCPy7Oe/xd2AxkTM9T27mesmwDuEGYaaIAU0FRKwiS?=
- =?us-ascii?Q?jCRwmTIeqdvKcJZ4C9IbzggNfQoe8HL9nerGnrPVWmCBcaM1YHlb6+jFOOiu?=
- =?us-ascii?Q?NCFacCavzlLnbLJt+XlzUmAQ4s9JW5War0V3/qS4HscpO4Mfi66nwBZBlcCa?=
- =?us-ascii?Q?G3rnVNYfK1AhujOVJqkV+BqI313IPfia7tL/iWPjKl/KFPiAcjr9DLGx77Gm?=
- =?us-ascii?Q?+QQQiyLUmyrlsBma6vQO79/jopK9oAJC8xcVDiEtDMCVh+uqLqPFxPxbZwyG?=
- =?us-ascii?Q?zqf8/RUlgfZZBB0AbfijrWt/3sNkvlMb20wxxjHRMxBwEtOd+rRlGMcxJNa/?=
- =?us-ascii?Q?jlGCNUdodYFyDaWoTs0Z+43wh0FQ8aqnMvzW/awXKdYB+Vyw70skyQbdEjZ6?=
- =?us-ascii?Q?5k+UvMPg38I5NfmdjoY2i0IGl2hPy9k2aa/aaQS0VoW9/CUA6/H3eXPxEvod?=
- =?us-ascii?Q?n0TnH3Kn7kIX5r7c0dwYV14kSirM7y6OSGlKDqVsL5lwzDYq8/RPe0kMENIq?=
- =?us-ascii?Q?qjqX0XYn0hJxwO5oQKWNAAmiL8Cp/fLN39Ci989vU9NFk4DJXN8X0fBi5vjN?=
- =?us-ascii?Q?nsZ4H3K/7LjYWlt8gAArN1zNEYcLQfgD1VsOAVLLsBt85fNZOmNcxVZbf3sQ?=
- =?us-ascii?Q?uy5YrTFUNG4M0Ds4TPsLXMBQzFk2qshwBRbHKdGOW8bZqoSQNt1hlkv/8PEX?=
- =?us-ascii?Q?ubE5M3uAXTmjwqcQ8/g7WUf55+Nv8bOJMCqOuASeAV0JQx3jc3HP0jyd7RPI?=
- =?us-ascii?Q?MrpEtXlOBTNmWNRFMyaDe8XYPOWa7RpBdE2oNZQOUZb7Bvpv4AB4k3ISQ1Mh?=
- =?us-ascii?Q?Mka5VCtWomfTsk74qsi/ztd+ICLladGW0Zt8GRPH37piCTsnp0vyEX3HICER?=
- =?us-ascii?Q?uNX/FeFxHX04Nz+OZPlN/mf2AMLfePdFtiBtoyWrt/DzVZ+XFZK2FQA1LH2s?=
- =?us-ascii?Q?Zg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CD014F72
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 10:52:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15C4C5
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 03:52:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696848770;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HjiO4Hvw+fsOPZZWLwNP0lglpX+bcklExOuRO6AMksY=;
+	b=JFynx6CO6viz4BkPLqrmfKmFKwTHa8/F1Wmj54WQagA7/HS62W5TfSmlRNX3QyMEkwyg+A
+	zYJbASUPrxRk21B3W7pAxQ0NhkxUrGJa50roGhzwNrlLkx6elzzUAsbcs8mZVS0xDygqbY
+	vy1gQt3F5QS1tSbiZTl3aBWsUp9Dav4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-523-gBxPj3CiMg-LcSuFLR_yNQ-1; Mon, 09 Oct 2023 06:52:39 -0400
+X-MC-Unique: gBxPj3CiMg-LcSuFLR_yNQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-405917470e8so33430745e9.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 03:52:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696848758; x=1697453558;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HjiO4Hvw+fsOPZZWLwNP0lglpX+bcklExOuRO6AMksY=;
+        b=lJn35oabiTDM3QEtTdpM7Y03M+poTuF9r2JAqxvdnI8F2k60pREF1FNm7xRsLPg+q/
+         SFoiFU/w3aVkEKOmMTD9WFAiyAZ8PlMZeFxLZHjPm0VY1tUmHViEyv3cHYBzvZknzIF0
+         ABj/Yy2iuLSh/4R+nNhrYXDm6+apkITqAPbH6NODfAmqkXcIz3fIh4CnlX9XCzFAMbyT
+         TUE3NVQH/5RsXoD4MiM4NywpBkCfCdUp9+i3yUWRHEjXz4o83NEqc2m7GATUANMNY7S2
+         Ivi519kGTw5yFuaxUudYD0b3JeSGh/KwT3vICyiBIS2HL0kWx1gN/8+ZeAbextrYcEtG
+         uK+g==
+X-Gm-Message-State: AOJu0YwGJ3Jcm7Dy/XzMtK2LJ5+XKw/Z5BHikACRoyN55qtELW7bDjWP
+	SFWjsNUpdSRUS5c2bWg683FRI0qFrGXl2bcLFfHQFHluYWRQc7tYhTUlMd6AhY8dskt2z+ikc8n
+	1Ii+OraoUoDR0w193
+X-Received: by 2002:a7b:cd8e:0:b0:405:3a3d:6f53 with SMTP id y14-20020a7bcd8e000000b004053a3d6f53mr12910443wmj.3.1696848758033;
+        Mon, 09 Oct 2023 03:52:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgWahkpsmLf/aOwZysFtiHkjovc5aRAyJtzXWyUzsNyUbJBrMocRm41ehhlwu8cg3xsXBpvA==
+X-Received: by 2002:a7b:cd8e:0:b0:405:3a3d:6f53 with SMTP id y14-20020a7bcd8e000000b004053a3d6f53mr12910428wmj.3.1696848757617;
+        Mon, 09 Oct 2023 03:52:37 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:16f:5caf:857a:f352:c1fc:cf50])
+        by smtp.gmail.com with ESMTPSA id z3-20020a056000110300b0031c6581d55esm9224958wrw.91.2023.10.09.03.52.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 03:52:36 -0700 (PDT)
+Date: Mon, 9 Oct 2023 06:52:32 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liming Wu <liming.wu@jaguarmicro.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"398776277@qq.com" <398776277@qq.com>
+Subject: Re: [PATCH 2/2] tools/virtio: Add hints when module is not installed
+Message-ID: <20231009063735-mutt-send-email-mst@kernel.org>
+References: <20230926050021.717-1-liming.wu@jaguarmicro.com>
+ <20230926050021.717-2-liming.wu@jaguarmicro.com>
+ <CACGkMEujvBtAx=1eTqSrzyjBde=0xpC9D0sRVC7wHHf_aqfqwg@mail.gmail.com>
+ <PSAPR06MB3942238B1D7218934A2BB8B4E1CEA@PSAPR06MB3942.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 880322da-3cf2-4181-0f8d-08dbc8b59695
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2023 10:50:44.3784
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 18N+w2BYjNaNe3yruVEapZdV3kPIgoDMUwxSttgshC1S/ICINUsPVTg/N7z5Lv13ONrpPz7lpis0cnN7hdXLp5x2hj8OCLNM0ItjXCSfkwU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8709
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PSAPR06MB3942238B1D7218934A2BB8B4E1CEA@PSAPR06MB3942.apcprd06.prod.outlook.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Romanowski, Rafal
-> Sent: Friday, October 6, 2023 5:16 PM
-> To: Simon Horman <horms@kernel.org>; Brandeburg, Jesse
-> <jesse.brandeburg@intel.com>
-> Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; Christophe
-> JAILLET <christophe.jaillet@wanadoo.fr>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format spec=
-ifier
-> cleanups
->=20
+On Mon, Oct 09, 2023 at 02:44:55AM +0000, Liming Wu wrote:
+> 
+> 
 > > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > Of Simon Horman
-> > Sent: Wednesday, October 4, 2023 3:46 PM
-> > To: Brandeburg, Jesse <jesse.brandeburg@intel.com>
-> > Cc: netdev@vger.kernel.org; Christophe JAILLET
-> > <christophe.jaillet@wanadoo.fr>; intel-wired-lan@lists.osuosl.org;
-> > Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> > Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 0/2] intel: format
-> > specifier cleanups
-> >
-> > On Tue, Oct 03, 2023 at 11:36:01AM -0700, Jesse Brandeburg wrote:
-> > > Clean up some warnings from the W=3D1 build which moves the intel
-> > > directory back to "clean" state. This mostly involved converting to
-> > > using ethtool_sprintf where appropriate and kasprintf in other places=
-.
+> > From: Jason Wang <jasowang@redhat.com>
+> > Sent: Sunday, October 8, 2023 12:36 PM
+> > To: Liming Wu <liming.wu@jaguarmicro.com>
+> > Cc: Michael S . Tsirkin <mst@redhat.com>; kvm@vger.kernel.org;
+> > virtualization@lists.linux-foundation.org; netdev@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; 398776277@qq.com
+> > Subject: Re: [PATCH 2/2] tools/virtio: Add hints when module is not installed
+> > 
+> > On Tue, Sep 26, 2023 at 1:00 PM <liming.wu@jaguarmicro.com> wrote:
 > > >
-> > > The second patch goes the extra mile and cleans up -Wformat=3D2
-> > > warnings as suggested by Alex Lobakin, since those flags will likely
-> > > be turned on as well.
+> > > From: Liming Wu <liming.wu@jaguarmicro.com>
 > > >
-> > > gcc-12 runs clean after these changes, and clang-15 still has some
-> > > minor complaints as mentioned in patch-2.
+> > > Need to insmod vhost_test.ko before run virtio_test.
+> > > Give some hints to users.
 > > >
-> > > Jesse Brandeburg (2):
-> > >   intel: fix string truncation warnings
-> > >   intel: fix format warnings
+> > > Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> > > ---
+> > >  tools/virtio/virtio_test.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
 > > >
-> > >  .../net/ethernet/intel/i40e/i40e_ethtool.c    |  6 ++-
-> > >  .../net/ethernet/intel/iavf/iavf_ethtool.c    |  8 ++--
-> > >  .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 22 ++++-------
-> > >  drivers/net/ethernet/intel/ice/ice_ethtool.c  |  7 ++--
-> > >  drivers/net/ethernet/intel/ice/ice_ptp.c      |  4 +-
-> > >  drivers/net/ethernet/intel/igb/igb_ethtool.c  |  4 +-
-> > >  drivers/net/ethernet/intel/igb/igb_main.c     | 37 +++++++++--------=
---
-> > >  drivers/net/ethernet/intel/igc/igc_ethtool.c  |  5 ++-
-> > > .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  4 +-
-> > >  9 files changed, 46 insertions(+), 51 deletions(-)
-> >
-> > For series,
-> >
-> >
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > Tested-by: Simon Horman <horms@kernel.org> # build-tested
-> >
-> > _______________________________________________
-> > Intel-wired-lan mailing list
-> > Intel-wired-lan@osuosl.org
-> > https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
->=20
->=20
-> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
->=20
->=20
->=20
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+> > > diff --git a/tools/virtio/virtio_test.c b/tools/virtio/virtio_test.c
+> > > index 028f54e6854a..ce2c4d93d735 100644
+> > > --- a/tools/virtio/virtio_test.c
+> > > +++ b/tools/virtio/virtio_test.c
+> > > @@ -135,6 +135,10 @@ static void vdev_info_init(struct vdev_info* dev,
+> > unsigned long long features)
+> > >         dev->buf = malloc(dev->buf_size);
+> > >         assert(dev->buf);
+> > >         dev->control = open("/dev/vhost-test", O_RDWR);
+> > > +
+> > > +       if (dev->control < 0)
+> > > +               fprintf(stderr, "Install vhost_test module" \
+> > > +               "(./vhost_test/vhost_test.ko) firstly\n");
+> > 
+> > There should be many other reasons to fail for open().
+> > 
+> > Let's use strerror()?
+> Yes,  Thanks for the review. 
+> Please rechecked the code as follow:
+> --- a/tools/virtio/virtio_test.c
+> +++ b/tools/virtio/virtio_test.c
+> @@ -135,6 +135,11 @@ static void vdev_info_init(struct vdev_info* dev, unsigned long long features)
+>         dev->buf = malloc(dev->buf_size);
+>         assert(dev->buf);
+>         dev->control = open("/dev/vhost-test", O_RDWR);
+> +
+> +       if (dev->control == NULL)
 
 
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+???
+Why are you comparing a file descriptor to NULL?
+
+> +               fprintf(stderr,
+> +                       "%s: Check whether vhost_test.ko is installed.\n",
+> +                       strerror(errno));
 
 
+No, do not suggest checking unconditionally this is just wasting user's
+time.  You would have to check the exact errno value. You will either
+get ENOENT or ENODEV if module is not loaded. Other errors indicate
+other problems.  And what matters is whether it's loaded, not installed
+- vhost_test.ko will not get auto-loaded even if installed.
 
+
+>         assert(dev->control >= 0);
+>         r = ioctl(dev->control, VHOST_SET_OWNER, NULL);
+>         assert(r >= 0);
+>  
+> Thanks
+> 
+
+In short, I am not applying this patch. If you really want to make
+things a bit easier in case of errors, replace all assert r >= 0 with
+a macro that prints out strerror(errno), that should be enough.
+Maybe print file/line number too while we are at it.
+
+-- 
+MST
 
 
