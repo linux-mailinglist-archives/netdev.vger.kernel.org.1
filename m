@@ -1,109 +1,69 @@
-Return-Path: <netdev+bounces-39156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346157BE3E4
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:07:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32CFC7BE3DF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:06:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 656801C209E4
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:07:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 638601C209DD
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB36C34CD6;
-	Mon,  9 Oct 2023 15:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795BD35892;
+	Mon,  9 Oct 2023 15:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TrvO5mnp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="quXvC67a"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DBA835892;
-	Mon,  9 Oct 2023 15:07:00 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD82B7;
-	Mon,  9 Oct 2023 08:06:57 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a7a77e736dso5329017b3.1;
-        Mon, 09 Oct 2023 08:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696864016; x=1697468816; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=at8XvbeGP+LBevEkXqeDdKBAJUttMOlbFq0O+X3ZHGg=;
-        b=TrvO5mnppXiAIMGqw07SVcOYiuvAtAQBKDRjD23q84x6pSx1S3HkrmwSSQjGy93Ska
-         6RJOZWJo4YsZfqQYZd0wDHN9euZ++ISAnqh7GPEbDJnHIXMN8+I0/IvgpAom4pxrJuUu
-         2l0cVIlF6slP3NBzbz8nTvJMh7nCnc/pU3IUTAoyrzE/wsNrNg71Ug2pehY3nd2PzeG7
-         mbMTXY2fK6842uHo17dej83Jk3nxqgPAiNs2fYEfefSHqsy1qkg/zVgZxmRNI+no7USu
-         zHd+SP6mirExJyLoI49lsrFmadnIsMUrfFTqtdRhjSqhEM+jIQBY1hFAtOEs8e7gaub7
-         drug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696864016; x=1697468816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=at8XvbeGP+LBevEkXqeDdKBAJUttMOlbFq0O+X3ZHGg=;
-        b=Vh8QPx3uZEroMYedagbPPVoz8z13cl3Acke6dj0qIZ6vXnHGQMPR4Q6/YtWJyFsEsw
-         kViIu0eAFND2CTX5ymntovzQ5OKV2x0/imVnhyGBWQ41X+YSsDSnBiv5vj/4aScQH/Kv
-         oCRmk3OeM3otw89Iet9bWp3Tb/EMqrE9ZH7a+8Ri2enPICXA0fG3y5Ph+zc4xEh/79E3
-         C5StSe5QNKsxcA/y3aNzh7yEggil37iQ0Ky3BIsmQBvNbk8qpwG/9khN0g7dBhgCQ/LK
-         zMLRvp8eaTOTd7ZvzOeliBX07lQSucsBgTtGg2dEhwXN0lqtXW+Wk/QPmXlTzx6G/2pR
-         gY4Q==
-X-Gm-Message-State: AOJu0YwIOwQVOeyV+n2DyyUetcIKNseOtbv29BK/dld9TKmzhekC7SG6
-	ldL/n90/9UVSdD9PVQSl/t8prig3pfuUZobG7hc=
-X-Google-Smtp-Source: AGHT+IGScsGpsvAeIFYWSiddhIk6NNx7oaCZd6BoqPQ3tizhHgkivqIRaEbqXcxvGDQy7TPJ9qN6dOs1Zo+hcoES1E0=
-X-Received: by 2002:a81:de01:0:b0:5a4:f92b:3a44 with SMTP id
- k1-20020a81de01000000b005a4f92b3a44mr14556728ywj.25.1696864016465; Mon, 09
- Oct 2023 08:06:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528E77493;
+	Mon,  9 Oct 2023 15:06:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F1B9C433C7;
+	Mon,  9 Oct 2023 15:06:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696864007;
+	bh=Mvl8gmMUGBGCZa2+BmF3BHc0Ktp7URfkGdtj2C5AfQg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=quXvC67axl7GtJTGnQ+A38R+W+N0CdCyMvV+QOKYW6YMMjK8eHvjtnJIIkDljGNDZ
+	 jNHSvIrlT+ZDsxEUo+Lv8y1fTNYDDD5XGgOmkLrSUdfXSx7QbFNXpmVF5E3kQycapg
+	 qHq1GxUvMMFur9nqe/rTweSWIHQeN6UQhkMmaWfA6sX976l4A/txWbMg3FjcXvL3qE
+	 YVPFdT2sfNdQ1SyiWj0E3/NY48pM8yg+D7V3FFechGbU6gKx2+UX9BjkKRzF2zPyCN
+	 sbb3qG2GjnB6qc2Hx3OYDOZs/Gyt88in4KNipyZw1GSQyBPsM3bNkotUi9xgEhudJj
+	 CbOoV3aErUiEQ==
+Date: Mon, 9 Oct 2023 08:06:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>, markovicbudimir@gmail.com
+Cc: Christian Theune <ct@flyingcircus.io>, stable@vger.kernel.org,
+ netdev@vger.kernel.org, Linux regressions mailing list
+ <regressions@lists.linux.dev>, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
+ requirement
+Message-ID: <20231009080646.60ce9920@kernel.org>
+In-Reply-To: <0BC2C22C-F9AA-4B13-905D-FE32F41BDA8A@flyingcircus.io>
+References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
+	<065a0dac-499f-7375-ddb4-1800e8ef61d1@mojatatu.com>
+	<0BC2C22C-F9AA-4B13-905D-FE32F41BDA8A@flyingcircus.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
- <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch> <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
- <2023100916-crushing-sprawl-30a4@gregkh> <CANiq72nfN2e8oWtFDQ1ey0CJaTZ+W=g10k5YKukaWqckxH7Rmg@mail.gmail.com>
- <2023100907-liable-uplifted-568d@gregkh>
-In-Reply-To: <2023100907-liable-uplifted-568d@gregkh>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 9 Oct 2023 17:06:45 +0200
-Message-ID: <CANiq72=A_HMc3nwxk-EGzuDGRBSCfdzKGj=M-snbd8cidQLfuQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	Andrea Righi <andrea.righi@canonical.com>, Peter Zijlstra <peterz@infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 4:52=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org>=
- wrote:
->
-> Then the main CONFIG_HAVE_RUST should have that dependency, don't force
-> it on each individual driver.
+On Sat, 7 Oct 2023 06:10:42 +0200 Christian Theune wrote:
+> The idea of not bricking your system by upgrading the Linux kernel
+> seems to apply here. IMHO the change could maybe done in a way that
+> keeps the system running but informs the user that something isn=E2=80=99t
+> working as intended?
 
-Yes, that is what I meant (well, `CONFIG_RUST` is where we have the
-other restrictions).
+Herm, how did we get this far without CCing the author of the patch.
+Adding Budimir.
 
-> But note, that is probably not a good marketing statement as you are
-> forced to make your system more insecure in order to use the "secure"
-> language :(
-
-Indeed, but until we catch up on that, it is what it is; i.e. it is
-not something that we want to keep there, it has to go away to make it
-viable.
-
-The other option we discussed back then was to print a big banner or
-something at runtime, but that is also not great (and people would
-still see warnings at build time -- for good reason).
-
-Cheers,
-Miguel
+Pedro, Budimir, any idea what the original bug was? There isn't much
+info in the commit message.
 
