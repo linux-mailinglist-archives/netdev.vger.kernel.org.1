@@ -1,147 +1,137 @@
-Return-Path: <netdev+bounces-39094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565B07BDFD9
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:34:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F4D7BDD05
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E0391C20A18
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E3092815D3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956BC28DD9;
-	Mon,  9 Oct 2023 13:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE827168BF;
+	Mon,  9 Oct 2023 13:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="tVcaGUST"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gQhO9tdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654E822F00;
-	Mon,  9 Oct 2023 13:34:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BF7C433CB;
-	Mon,  9 Oct 2023 13:34:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696858484;
-	bh=FD71MXNE4Wz/Pp50h5ejVr61xAzfvkGYkyvHePURUa8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tVcaGUSTkF0g5Wca1pvKfeVKPLivwLhoXqWPnQTCmwvHOnjX10PN68tl9FAjx6V3h
-	 kGTuV/zrk7m9aC6uKUedegybXzzLFLxqoHf+azmCii7v5JTdgPBqzXzSpgV2w1Y5Js
-	 44ipkhUTlXOLQb4u+0pQJiGQXj0QiDsZtjp+dkvU=
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: stable@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	patches@lists.linux.dev,
-	syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Howells <dhowells@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4 110/131] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
-Date: Mon,  9 Oct 2023 15:02:30 +0200
-Message-ID: <20231009130119.801313012@linuxfoundation.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231009130116.329529591@linuxfoundation.org>
-References: <20231009130116.329529591@linuxfoundation.org>
-User-Agent: quilt/0.67
-X-stable: review
-X-Patchwork-Hint: ignore
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D345223D1;
+	Mon,  9 Oct 2023 13:02:36 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F5FB93;
+	Mon,  9 Oct 2023 06:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/5E9rk86SkBzj7gGnWXgvIfDu+9xk0bucuVGeHyZeZQ=; b=gQhO9tdvdQmNLUqqGHkEU/Chdc
+	dFXjgXu0tGUdbbLWC0Wtj8yO/yBk6IuNsF0DA5T0GZJHtXU7m6FHC42DNiqHhpjyya5tqTJ9URK9i
+	xHv/7niQ0QdcoRWuV1CkQqmntDO1q0e2gX4Xm5Keo2S6oS/3QZLy29Agbwh2zwCtZksA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qppu3-000scv-Pb; Mon, 09 Oct 2023 15:02:31 +0200
+Date: Mon, 9 Oct 2023 15:02:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com,
+	greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY
+ drivers
+Message-ID: <4ced711a-009c-4e57-a758-1d13d97e18d2@lunn.ch>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <20231009013912.4048593-2-fujita.tomonori@gmail.com>
+ <1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-5.4-stable review patch.  If anyone has any objections, please let me know.
+On Mon, Oct 09, 2023 at 12:19:54PM +0000, Benno Lossin wrote:
+> > +impl Device {
+> > +    /// Creates a new [`Device`] instance from a raw pointer.
+> > +    ///
+> > +    /// # Safety
+> > +    ///
+> > +    /// For the duration of the lifetime 'a, the pointer must be valid for writing and nobody else
+> > +    /// may read or write to the `phy_device` object.
+> > +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+> > +        unsafe { &mut *ptr.cast() }
+> 
+> Missing `SAFETY` comment.
 
-------------------
+Hi Benno
 
-From: David Howells <dhowells@redhat.com>
+It is normal on Linux kernel mailing lists to trim the text to what is
+just relevant to the reply. Comments don't get lost that way.
 
-[ Upstream commit 9d4c75800f61e5d75c1659ba201b6c0c7ead3070 ]
+> > +    /// Returns true if the link is up.
+> > +    pub fn get_link(&mut self) -> bool {
+> 
+> I would call this function `is_link_up`.
 
-Including the transhdrlen in length is a problem when the packet is
-partially filled (e.g. something like send(MSG_MORE) happened previously)
-when appending to an IPv4 or IPv6 packet as we don't want to repeat the
-transport header or account for it twice.  This can happen under some
-circumstances, such as splicing into an L2TP socket.
+Please read the discussion on the previous versions of this patch. If
+you still want to change the name, please give a justification.
 
-The symptom observed is a warning in __ip6_append_data():
+> > +    /// Reads a given C22 PHY register.
+> > +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
+> > +        let phydev = self.0.get();
+> > +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+> > +        // So an FFI call with a valid pointer.
+> > +        let ret = unsafe {
+> > +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.addr, regnum.into())
+> > +        };
+> 
+> Just a general question, all of these unsafe calls do not have
+> additional requirements? So aside from the pointers being
+> valid, there are no timing/locking/other safety requirements
+> for calling the functions?
 
-    WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+Locking has been discussed a number of times already. What do you mean
+by timing?
 
-that occurs when MSG_SPLICE_PAGES is used to append more data to an already
-partially occupied skbuff.  The warning occurs when 'copy' is larger than
-the amount of data in the message iterator.  This is because the requested
-length includes the transport header length when it shouldn't.  This can be
-triggered by, for example:
+> > +// SAFETY: `Registration` does not expose any of its state across threads.
+> > +unsafe impl Send for Registration {}
+> 
+> Question: is it ok for two different threads to call `phy_drivers_register`
+> and `phy_drivers_unregister`? If no, then `Send` must not be implemented.
 
-        sfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
-        bind(sfd, ...); // ::1
-        connect(sfd, ...); // ::1 port 7
-        send(sfd, buffer, 4100, MSG_MORE);
-        sendfile(sfd, dfd, NULL, 1024);
+The core phy_drivers_register() is thread safe. It boils down to a
+driver_register() which gets hammered every kernel boot, so locking
+issues would soon be found there.
 
-Fix this by only adding transhdrlen into the length if the write queue is
-empty in l2tp_ip6_sendmsg(), analogously to how UDP does things.
+> > +macro_rules! module_phy_driver {
+> > +    (@replace_expr $_t:tt $sub:expr) => {$sub};
+> > +
+> > +    (@count_devices $($x:expr),*) => {
+> > +        0usize $(+ $crate::module_phy_driver!(@replace_expr $x 1usize))*
+> > +    };
+> > +
+> > +    (@device_table [$($dev:expr),+]) => {
+> > +        #[no_mangle]
+> > +        static __mod_mdio__phydev_device_table: [
+> 
+> Shouldn't this have a unique name? If we define two different
+> phy drivers with this macro we would have a symbol collision?
 
-l2tp_ip_sendmsg() looks like it won't suffer from this problem as it builds
-the UDP packet itself.
+I assume these are the equivalent of C static. It is not visible
+outside the scope of this object file. The kernel has lots of tables
+and they are mostly of very limited visibility scope, because only the
+method registering/unregistering the table needs to see it.
 
-Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support for IPv6")
-Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
-Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: David Ahern <dsahern@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: netdev@vger.kernel.org
-cc: bpf@vger.kernel.org
-cc: syzkaller-bugs@googlegroups.com
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/l2tp/l2tp_ip6.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
-index 307cf20b66491..f91542e2f6793 100644
---- a/net/l2tp/l2tp_ip6.c
-+++ b/net/l2tp/l2tp_ip6.c
-@@ -521,7 +521,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 	 */
- 	if (len > INT_MAX - transhdrlen)
- 		return -EMSGSIZE;
--	ulen = len + transhdrlen;
- 
- 	/* Mirror BSD error message compatibility */
- 	if (msg->msg_flags & MSG_OOB)
-@@ -645,6 +644,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- back_from_confirm:
- 	lock_sock(sk);
-+	ulen = len + skb_queue_empty(&sk->sk_write_queue) ? transhdrlen : 0;
- 	err = ip6_append_data(sk, ip_generic_getfrag, msg,
- 			      ulen, transhdrlen, &ipc6,
- 			      &fl6, (struct rt6_info *)dst,
--- 
-2.40.1
-
-
-
+       Andrew
 
