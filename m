@@ -1,123 +1,105 @@
-Return-Path: <netdev+bounces-39323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3E67BEC4F
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:06:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E24827BEC55
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BA4B1C20A17
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 21:06:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C55B281B67
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 21:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388413FB39;
-	Mon,  9 Oct 2023 21:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A334D41210;
+	Mon,  9 Oct 2023 21:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cecKdaEh"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="f7fK7oYW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4E62030B
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 21:06:39 +0000 (UTC)
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13AE411D;
-	Mon,  9 Oct 2023 14:06:38 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-d81d09d883dso5411434276.0;
-        Mon, 09 Oct 2023 14:06:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DD33FB3A
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 21:07:31 +0000 (UTC)
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE73A3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:07:30 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-59b5484fbe6so60920547b3.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 14:07:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696885597; x=1697490397; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ITwY1+60N27SoGiBJsSRzVwQV1xQDhrN46gSRIvwyk0=;
-        b=cecKdaEhQZdgWLH0h1gw8jjMdZTKFOOQdhOXJvXeLMu5NKEHqubWIKWP7PHFN5IZ9m
-         SQ0o5oIy3h8/YFFDCZRnlS2fw+FlXnjNkqp0//OOe/E6rB/C5g7y2d1CvUECrrb62Zzy
-         aY4rpKlA+Hr/HJMWwTDNM3ioqspFwEeDq1FXy9hQVfoNuKvQB/FE0EyYu0uAahssLV2f
-         nFG/howmCj95f24H7+qeeM/XYu+mECPPB3Yv6TdnGEbth91o01h1e+T2BaOLxSsB2Odw
-         UFO2ble9765RZ0ZG05QIqg8vTGctaop4OzKXyU3QJA7AY2fiHNcinDdpIgKeiYmwodpn
-         kjNA==
+        d=umich.edu; s=google-2016-06-03; t=1696885649; x=1697490449; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qhHHmnMpAVB3xgxYZZEuhrUO5GUtsjcq6PiX2il6rXk=;
+        b=f7fK7oYWJlJftB0XL1nTp0ZYAEpgw7JNQDxX9sRzoEpDY0j67r2T26bcKEZlnf/TnI
+         CQ3iRbSpAsCbALPA38LqJY2SMd3mhHXW7vIXqb906+NFwZECykCJoes4lGugQF01BSmk
+         LukzsK2A45EYYjJZuGcHiY5N4VWb/MZzgxI7rXQqyAE7q9WUwVLVaYVuWEtyv0rfK58W
+         jb+zJvcQSSEahFicMDcR/U/niXMWFNMgC4vyOGNV1KTL6ws4iVq1tfNjLPaC/SiQpCYS
+         wKoq5IHOU+m8ztNnSNfkSbLEcjCAbvn3pSIhI5KZQIV/39DPLyka6D4z6U5qWSHQGLZa
+         StOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696885597; x=1697490397;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ITwY1+60N27SoGiBJsSRzVwQV1xQDhrN46gSRIvwyk0=;
-        b=TWaAtWc8AqbQZly2zJC+kVlQWZrrSPIu6aMcUMF58Z27ifykg9SkG8sdTRkWQ5hyZ1
-         skPh5k1S33lMckaxhGgF3003bXwOKEmd/66xpPupOJd0sDy8FcETSErs+4r+ZdZYIa0N
-         Azaqot2q5LGOdt706F1BX6erQB9T/fUfUIlpYPmO/NciiawvMl0CAI7mwifT3ehRqtL1
-         imnSzP3sBDwtOaETpgd/AlbxJWKxbUHHYcrVCoQlmFLJi1coiMT/wEhmt93x14hjDHma
-         FfbIO+lIqyAri2bQLaiT+ouQgOT4V3VBcFN4Mcy4beLrH/RJh9wolinIft8YzKNTH4cN
-         yVKw==
-X-Gm-Message-State: AOJu0Yx16u4mWykzRibXdYS3nLqgjrwGnUPTCVG050JdaIoEo9LW4TBz
-	+67VAPiypdtrwcItJV0vM0GTLIjSXl8=
-X-Google-Smtp-Source: AGHT+IFaJDaAGHtMEHwv5EejutsBIXGBLRDO0b20KC79WiR2pV97VjXxTZDwC96oGjOu9ujlIShedg==
-X-Received: by 2002:a25:418a:0:b0:d7b:97e0:14ab with SMTP id o132-20020a25418a000000b00d7b97e014abmr14017865yba.57.1696885596942;
-        Mon, 09 Oct 2023 14:06:36 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id x8-20020a0ce0c8000000b00658266be23fsm4148838qvk.41.2023.10.09.14.06.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 14:06:36 -0700 (PDT)
-Message-ID: <58832d45-9bd5-467d-9810-e7e209ad3fbc@gmail.com>
-Date: Mon, 9 Oct 2023 14:06:32 -0700
+        d=1e100.net; s=20230601; t=1696885649; x=1697490449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qhHHmnMpAVB3xgxYZZEuhrUO5GUtsjcq6PiX2il6rXk=;
+        b=vKsoNZpZkJhlqrR4Vl3K4YOAZSOeC4HR4PiVw6+l+ccfjVxACExGZtOQMI1fZe7Ghp
+         Qy/HT0ungVgbwgzlAvIseagcNUdUIDQacjrmQCBQ5SU8TEtgfeGld9JafBRPnP9ApW99
+         rSJuVaPa1s1PE2saepCVvC64bMgphMQbGgIFzE7vqsXwWENOySKt6lnvDi7wuumA98kI
+         m6ecqtiuac6v37UCJDxxe7rSFTZjbySSXwMO7wNow3ZW/4Cnl8irs+8c5Ydku1uzOHsV
+         r/w09IughhJyH0gybploH6idZncPd9//C1P9ilBJlAONx26CPuLX3L8e2q0s1e68+0bl
+         2xoA==
+X-Gm-Message-State: AOJu0Yww0Qjj9W7ufkGZDF+8+Ah2AnC62j0T7MBWntYN5OB8EFhY+5Di
+	0qDL7lVtsREtvFJuOtMhFds268p/VMLobk+F7jBngQ==
+X-Google-Smtp-Source: AGHT+IFOyJSwDK4Gvh2QH+SIfWKit9G2xxBqdIDWi4IwiYePhqViFWyKFTSML3UW7GWqxckhJ4dflsCHMK+5nqmTZyU=
+X-Received: by 2002:a81:778b:0:b0:59b:ca2f:6eff with SMTP id
+ s133-20020a81778b000000b0059bca2f6effmr17595885ywc.40.1696885649746; Mon, 09
+ Oct 2023 14:07:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 03/16] net: ethtool: Refactor identical
- get_ts_info implementations.
-Content-Language: en-US
-To: =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Richard Cochran <richardcochran@gmail.com>,
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>,
- Jacob Keller <jacob.e.keller@intel.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-References: <20231009155138.86458-1-kory.maincent@bootlin.com>
- <20231009155138.86458-4-kory.maincent@bootlin.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20231009155138.86458-4-kory.maincent@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
+ <20231009.224907.206866439495105936.fujita.tomonori@gmail.com>
+ <2023100926-ambulance-mammal-8354@gregkh> <20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
+In-Reply-To: <20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Mon, 9 Oct 2023 17:07:18 -0400
+Message-ID: <CALNs47unEPkVtRVBZfqYJ_-tgf3HJ6mxz_pybL+y3=AXgX2o8g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: gregkh@linuxfoundation.org, miguel.ojeda.sandonis@gmail.com, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	wedsonaf@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/9/23 08:51, Köry Maincent wrote:
-> From: Richard Cochran <richardcochran@gmail.com>
-> 
-> The vlan, macvlan and the bonding drivers call their "real" device driver
-> in order to report the time stamping capabilities.  Provide a core
-> ethtool helper function to avoid copy/paste in the stack.
-> 
-> Signed-off-by: Richard Cochran <richardcochran@gmail.com>
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+On Mon, Oct 9, 2023 at 11:24=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+> Trevor gave Reviewed-by. Not perfect but reasonable shape, IMHO. Seems
+> that we have been discussing the same topics like locking, naming, etc
+> again and again.
 
-With the unused variables spotted by the kbuild test robot fixed:
+To be clear: this is ONLY for the rust design, I am not at all
+qualified to review the build system integration. I provided a review
+with the known caveats that:
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+1. The current enum handling is fragile, but only to the extent that
+we do not handle values not specified in the C-side enum. I am not
+sure what we can do better here until bindgen provides better
+solutions.
+2. Types for #define are not ideal
+https://lore.kernel.org/rust-for-linux/CALNs47tnXWM3aVpeNMkuVZAJKc=3DseWxLA=
+oLgSwqP0Jms+Mfc_A@mail.gmail.com/
 
+These seem to me to be reasonable concessions at this time, but of
+course the other reviewers will request further changes or perhaps
+have suggestions for these items.
 
