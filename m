@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-38941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-38942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 636837BD22B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 04:55:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DBD07BD22D
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 04:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F9DA1C20919
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 02:55:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E30E28158F
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 02:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FB58C06;
-	Mon,  9 Oct 2023 02:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E0D8F6F;
+	Mon,  9 Oct 2023 02:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="N1H3h/0E"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="ihFimo5Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662C21FB8;
-	Mon,  9 Oct 2023 02:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288247484;
+	Mon,  9 Oct 2023 02:55:04 +0000 (UTC)
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17671AC;
-	Sun,  8 Oct 2023 19:55:01 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE1BAB;
+	Sun,  8 Oct 2023 19:55:02 -0700 (PDT)
 Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 6525F20232; Mon,  9 Oct 2023 10:54:59 +0800 (AWST)
+	id 8475720247; Mon,  9 Oct 2023 10:55:00 +0800 (AWST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1696820099;
-	bh=7sMUa1sObnQgRvW7PGlm0vTqpN700RfSw+k2erhxzhw=;
+	d=codeconstruct.com.au; s=2022a; t=1696820100;
+	bh=AHRUZZcraD//KWp+AcjnjEbH/2xeH9mWu6Z11R4R42E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=N1H3h/0EMczow2y7YzXR5GC/wrMJ8+XfRjRXTZPnAIWxBegaNi5a8wWVNhtRd3kZn
-	 6rXjZXEk5omP34PIHIjEP2vywbRBAC17LGSHcsGmOc5EPuoOPcZGrKwf32ONSYOogh
-	 Vc5BQzDqBOQuywNt1F9aRMfdUpKDwDzIWzI/HQ7feiUgLgmk6Kvme/Henvl5Q9dRTQ
-	 VrRwVG1WP+HKUp2aTzZ6reVMmPVioVsimGbd5RbZncjeaX6chHhf/GLTTmH62Rpdrs
-	 XfnCmCcGyGb3scuDgvuPbMQnHLOywuHHGX3M43Lxrbk05r9Y/cFC7oh8Jvi6jMc4nh
-	 lysL7o65Cf86g==
+	b=ihFimo5Y4FQb3VUtTwxqPz9CLkRC5mT5sOj8IPwIkpevpFpqq+7zPYdLURQYOcme2
+	 dK5ERrz+F8WsXVCdJHct2TD6I9tSoYZWSDyu178RbGuZlU/4hcy0k1QJsqWaXiKo00
+	 ULPB7brSLt7pkzZJXdMRDM4972VAAGXHVCBTn05XOWXc/02oS4OG6Jdl0dTLCJqb2Q
+	 M9/Bakvs7eVRyPUcurYxfS7833W0LcC7z8KOOzw2T/62HaP694RnlFB1hg4jw7FLuY
+	 RIsWHGoZRyXmUrfQrPRJWN1HVz/MbrWSW8H4SGRgrxUOlR9wop5WEqPQzWQ1GMD/3G
+	 rWH3KZtiMCcqw==
 From: Matt Johnston <matt@codeconstruct.com.au>
 To: linux-i3c@lists.infradead.org,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	miquel.raynal@bootlin.com,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next v5 1/3] dt-bindings: i3c: Add mctp-controller property
-Date: Mon,  9 Oct 2023 10:54:47 +0800
-Message-ID: <20231009025451.490374-2-matt@codeconstruct.com.au>
+	miquel.raynal@bootlin.com
+Subject: [PATCH net-next v5 2/3] i3c: Add support for bus enumeration & notification
+Date: Mon,  9 Oct 2023 10:54:48 +0800
+Message-ID: <20231009025451.490374-3-matt@codeconstruct.com.au>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231009025451.490374-1-matt@codeconstruct.com.au>
 References: <20231009025451.490374-1-matt@codeconstruct.com.au>
@@ -69,38 +68,114 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This property is used to describe a I3C bus with attached MCTP I3C
-target devices.
+From: Jeremy Kerr <jk@codeconstruct.com.au>
 
+This allows other drivers to be notified when new i3c busses are
+attached, referring to a whole i3c bus as opposed to individual
+devices.
+
+Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
 ---
+ drivers/i3c/master.c       | 35 +++++++++++++++++++++++++++++++++++
+ include/linux/i3c/master.h | 11 +++++++++++
+ 2 files changed, 46 insertions(+)
 
-v2:
-
-- Reworded DT property description to match I2C
-
- Documentation/devicetree/bindings/i3c/i3c.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/i3c/i3c.yaml b/Documentation/devicetree/bindings/i3c/i3c.yaml
-index ab69f4115de4..d9483fbd2454 100644
---- a/Documentation/devicetree/bindings/i3c/i3c.yaml
-+++ b/Documentation/devicetree/bindings/i3c/i3c.yaml
-@@ -55,6 +55,12 @@ properties:
+diff --git a/drivers/i3c/master.c b/drivers/i3c/master.c
+index 87283e4a4607..959ec5269376 100644
+--- a/drivers/i3c/master.c
++++ b/drivers/i3c/master.c
+@@ -22,6 +22,7 @@
+ static DEFINE_IDR(i3c_bus_idr);
+ static DEFINE_MUTEX(i3c_core_lock);
+ static int __i3c_first_dynamic_bus_num;
++static BLOCKING_NOTIFIER_HEAD(i3c_bus_notifier);
  
-       May not be supported by all controllers.
+ /**
+  * i3c_bus_maintenance_lock - Lock the bus for a maintenance operation
+@@ -453,6 +454,36 @@ static int i3c_bus_init(struct i3c_bus *i3cbus, struct device_node *np)
+ 	return 0;
+ }
  
-+  mctp-controller:
-+    type: boolean
-+    description: |
-+      Indicates that the system is accessible via this bus as an endpoint for
-+      MCTP over I3C transport.
++void i3c_for_each_bus_locked(int (*fn)(struct i3c_bus *bus, void *data),
++			     void *data)
++{
++	struct i3c_bus *bus;
++	int id;
 +
- required:
-   - "#address-cells"
-   - "#size-cells"
++	mutex_lock(&i3c_core_lock);
++	idr_for_each_entry(&i3c_bus_idr, bus, id)
++		fn(bus, data);
++	mutex_unlock(&i3c_core_lock);
++}
++EXPORT_SYMBOL_GPL(i3c_for_each_bus_locked);
++
++int i3c_register_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_register(&i3c_bus_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(i3c_register_notifier);
++
++int i3c_unregister_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_unregister(&i3c_bus_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(i3c_unregister_notifier);
++
++static void i3c_bus_notify(struct i3c_bus *bus, unsigned int action)
++{
++	blocking_notifier_call_chain(&i3c_bus_notifier, action, bus);
++}
++
+ static const char * const i3c_bus_mode_strings[] = {
+ 	[I3C_BUS_MODE_PURE] = "pure",
+ 	[I3C_BUS_MODE_MIXED_FAST] = "mixed-fast",
+@@ -2682,6 +2713,8 @@ int i3c_master_register(struct i3c_master_controller *master,
+ 	if (ret)
+ 		goto err_del_dev;
+ 
++	i3c_bus_notify(i3cbus, I3C_NOTIFY_BUS_ADD);
++
+ 	/*
+ 	 * We're done initializing the bus and the controller, we can now
+ 	 * register I3C devices discovered during the initial DAA.
+@@ -2714,6 +2747,8 @@ EXPORT_SYMBOL_GPL(i3c_master_register);
+  */
+ void i3c_master_unregister(struct i3c_master_controller *master)
+ {
++	i3c_bus_notify(&master->bus, I3C_NOTIFY_BUS_REMOVE);
++
+ 	i3c_master_i2c_adapter_cleanup(master);
+ 	i3c_master_unregister_i3c_devs(master);
+ 	i3c_master_bus_cleanup(master);
+diff --git a/include/linux/i3c/master.h b/include/linux/i3c/master.h
+index 0b52da4f2346..db909ef79be4 100644
+--- a/include/linux/i3c/master.h
++++ b/include/linux/i3c/master.h
+@@ -24,6 +24,12 @@
+ 
+ struct i2c_client;
+ 
++/* notifier actions. notifier call data is the struct i3c_bus */
++enum {
++	I3C_NOTIFY_BUS_ADD,
++	I3C_NOTIFY_BUS_REMOVE,
++};
++
+ struct i3c_master_controller;
+ struct i3c_bus;
+ struct i3c_device;
+@@ -652,4 +658,9 @@ void i3c_master_queue_ibi(struct i3c_dev_desc *dev, struct i3c_ibi_slot *slot);
+ 
+ struct i3c_ibi_slot *i3c_master_get_free_ibi_slot(struct i3c_dev_desc *dev);
+ 
++void i3c_for_each_bus_locked(int (*fn)(struct i3c_bus *bus, void *data),
++			     void *data);
++int i3c_register_notifier(struct notifier_block *nb);
++int i3c_unregister_notifier(struct notifier_block *nb);
++
+ #endif /* I3C_MASTER_H */
 -- 
 2.42.0
 
