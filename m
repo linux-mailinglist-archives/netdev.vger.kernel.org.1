@@ -1,85 +1,96 @@
-Return-Path: <netdev+bounces-39089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B457BDEFA
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:25:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5708D7BDF3D
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7F71C20A5A
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C991028169E
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D951A71D;
-	Mon,  9 Oct 2023 13:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B321A71F;
+	Mon,  9 Oct 2023 13:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EnoUjvw3"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="mXBfR6M9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA1F1A5A4;
-	Mon,  9 Oct 2023 13:25:02 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548ECB9;
-	Mon,  9 Oct 2023 06:25:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=Rtpu33a85jklnpGWW4R512/Kxg9ofCgvrA/q+Q+LQ7c=; b=En
-	oUjvw3k7t25sfZfxG/SbLqJNx/4sNRdVVYWCqzPLrlI8k7prMJAzrlEX+VhO9Z3bwLVcpwG3VaLUX
-	ncC10hbzgelAK4CcQa7KI9CDypq6qTsH47f6GYF+Kt/RtKfUKSFBpDHBdoICZu+5Vy9B/UkiXqFBK
-	J4dnLd3UjRa1xU4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qpqFn-000t1x-0H; Mon, 09 Oct 2023 15:24:59 +0200
-Date: Mon, 9 Oct 2023 15:24:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, greg@kroah.com, tmgross@umich.edu,
-	Andrea Righi <andrea.righi@canonical.com>
-Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
-Message-ID: <9a23f2da-8f98-4ca2-8ca7-bb264ea676dd@lunn.ch>
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
- <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
- <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF2E1A5BA;
+	Mon,  9 Oct 2023 13:27:57 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F615A3;
+	Mon,  9 Oct 2023 06:27:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=Upzz23gM7CFVJCcFBQEZrdbmDiHFsFQK+Y+xE1IddiY=; b=mXBfR6M937X0CooRhB5p1qQeET
+	EpoVcaViV4YWfVL4jbUHqF4GhcQybjC4HJhD34LkZsM/yhGwaWaKbfOZ6/le5fvdVo1xE8YC9o0lN
+	isHZXwpnl11W+AbBQ4JHPX7BTHDpvBlEqj8XbXBvmVuI3x9q6uO1Vaq/Oqx37EfbV//TEL5BjhTki
+	s1Xe7UAYUBOn+gTzC9ey4jUNUJtRQfYMbN8EgnR5UZm/h7649fzmaHwqTl+BsO15nrB7aSzb/rP+w
+	pW1UdujmrRQ+q04MI4kLxftupV3zerRcQEzU3qBAS6Z0SQOIoIsfWPjZ8e72g5nE7kT044vtqAi0F
+	6njg/gUQ==;
+Received: from sslproxy06.your-server.de ([78.46.172.3])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qpqIa-000PVk-3i; Mon, 09 Oct 2023 15:27:52 +0200
+Received: from [178.197.249.27] (helo=linux.home)
+	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qpqIZ-000SIq-Ka; Mon, 09 Oct 2023 15:27:51 +0200
+Subject: Re: [PATCH bpf 0/2] riscv, bpf: Properly sign-extend return values
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, Pu Lehui <pulehui@huawei.com>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+ linux-kernel@vger.kernel.org, Luke Nelson <luke.r.nels@gmail.com>,
+ Xi Wang <xi.wang@gmail.com>, linux-riscv@lists.infradead.org
+References: <20231004120706.52848-1-bjorn@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <6dbba8a3-b07c-5247-f2c1-c6b484e9a16e@iogearbox.net>
+Date: Mon, 9 Oct 2023 15:27:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <20231004120706.52848-1-bjorn@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27056/Mon Oct  9 09:40:11 2023)
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 09, 2023 at 02:53:00PM +0200, Miguel Ojeda wrote:
-> On Mon, Oct 9, 2023 at 2:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > Any ideas?
+On 10/4/23 2:07 PM, Björn Töpel wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
+[...]
+> The following test_progs now pass, which were previously broken:
 > 
-> That is `RETHUNK` and `X86_KERNEL_IBT`.
-> 
-> Since this will keep confusing people, I will make it a `depends on !`
-> as discussed in the past. I hope it is OK for e.g. Andrea.
+>    | 13      bpf_cookie
+>    | 19      bpf_mod_race
+>    | 68      deny_namespace
+>    | 119     libbpf_get_fd_by_id_opts
+>    | 135     lookup_key
+>    | 137     lsm_cgroup
+>    | 284     test_lsm
 
-I really do suggest you work on your kconfig. The expectation is any
-configuration that kconfig is happy with will build. People like Arnd
-Bergmann do lots of randconfig builds. We don't want his work upset by
-Rust code.
+Thanks for the fixes, took them into bpf tree. I was wondering whether this could be
+backed by specific tests, but looks like the above list already takes care of it.
 
-And as a Rust beginning, i find this pretty unfriendly, in that i
-followed https://docs.kernel.org/rust/quick-start.html but did not get
-a working build.
-
-    Andrew
+Thanks,
+Daniel
 
