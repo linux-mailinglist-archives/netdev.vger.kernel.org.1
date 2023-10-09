@@ -1,91 +1,88 @@
-Return-Path: <netdev+bounces-39385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F337BEF04
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:20:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 907517BEF44
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:41:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31883282224
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE9F41C20B65
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC4247357;
-	Mon,  9 Oct 2023 23:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F303C4736A;
+	Mon,  9 Oct 2023 23:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rGgDo/H5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pPS45aZW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10AC947360
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 23:20:00 +0000 (UTC)
-Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECC27AC
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:19:58 -0700 (PDT)
-Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-1c8f14ed485so7490633fac.1
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 16:19:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F90347365
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 23:41:08 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726E4A4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:41:02 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7bfec0a6eso1206217b3.3
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 16:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696893598; x=1697498398; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696894861; x=1697499661; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=zjHQyvadONVOud3v/rE/Az+3J92aB2vK1iZQZ/OYRLE=;
-        b=rGgDo/H5T9gZYLPmFpOQGJVZ4k6OAoKrpALI+biAf+tM24a13+h8KfK3Z04ysSZ92P
-         lcuIFq/S4RgiZPrxJP7OmlhmlRU3lP3uCwsV0FXtlKSSIHlYV9rW8AeQO3Xm0MbOsnWP
-         J3wfoKZSiXvl/Hq9nzVcR+F5zG1k6TXmEy+eIfQ27mzRP0ueLKEl4shn+W5X9EvW4aF4
-         rg8v2ZjME3f2/4jTY7OaPnHOV5IXd6IHVti0q8gKE/J+MLPpVjCSoghcTIQ5Ce8UWkSs
-         kcWyqBJ5YQeYo7503/Vv8QxoJTQHr48OQFlXT7ZjBY/SFK8w+WEGP8WlqQyDgLV4KPFj
-         +H4Q==
+        bh=A6Z4evA91RaB6pmH2A/2rhvKNwl4+C0QTWWpQbLxwWQ=;
+        b=pPS45aZWuCpT+9Vxvmefh1MC6ASGGp2VC21qWmQj9/NFN9nNymBl308rBS+uUQFQjz
+         7yuC/YuBQ6zKGtKi0ShV3ZrL29M9gJqvSLT/FsFcQa9lotH0oS8io+MlGD7lNlP8Rnv5
+         hZ4dMOUK6H3Sh3S5X01KeFELb5QLg/lg/8k0Z3jr5+HgeBopmsWNIKb2p3R32HdZiMpk
+         5f4Jw+dvRtizWqoKybrHukV1wOWfEQq0v+N0nwPccy5CdePS8v6YDAQNv1255bk8I+L6
+         +qYgCGGclp7dBTmRejrn4ZErrqvS4p+3a7/thmaBLwcWgYOBCjnlfo6tDJF5M1SISco7
+         yLuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696893598; x=1697498398;
+        d=1e100.net; s=20230601; t=1696894861; x=1697499661;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=zjHQyvadONVOud3v/rE/Az+3J92aB2vK1iZQZ/OYRLE=;
-        b=SE3R+27osqgGELJ46eSMKEG1zMurM7AX/UAqJCcMVUrpD8s0QGse7FRWCFkj7hKDJw
-         ZZ9pHaEQA9CpYPeX6cqhbe/694pCTHt4TVJk5KyawpzH5WTzuz4bd4HM8o12IIszmXlx
-         Ouv35jH22kF5uir8lHNLKFJvpQBhQJJKvrMc9etE/8w8txrbUYWxYcet0+38W/ilx33w
-         V6o7p/kYaMs5ovSjncySmh6Q6/47jQplyXK/TBz224NIywaUHS8AROL2c32Hdj4wUcJz
-         AkXRQZoh0bFliXynXGxR8R/pGONcuhT0uBmPoMsrDQq7fZ6IkagTxvjjSb1e0O+8jXFj
-         KMqQ==
-X-Gm-Message-State: AOJu0YxrSUJa4+YTqwxZc+JraSrkZlFYoKfhC6KOpAFc6lXtdl+arc2g
-	z/JQO+1mOcCjRazgYqgK/8vEolGf463JU/6c5Q==
-X-Google-Smtp-Source: AGHT+IEJoSw0wb7t9m20c6ZpjKDlOmD783PHpu5vdHPvTTgfWAZC5cRf21JJzRLNwBCQUCa+9r2jjqVtgVy/1uiCHQ==
+        bh=A6Z4evA91RaB6pmH2A/2rhvKNwl4+C0QTWWpQbLxwWQ=;
+        b=C8mN2ixtI+eV+M9reFRAcHdlEjymlBCzasqTfkduRxHY0wm5tF2jfj/dQgdAa0HHPi
+         HfjUmpuWEGwbXwGVcvIvQMa+dRJ0K52RajltOWAZTdTfNXQ6FjZI8TdSEaJvsUUlBVva
+         DN8y9mZ6k7u2UuZrtOCszNYrvNek7NV7G0ND6np5CxMf5dU9JAciz7PECHlGAY6wLlyZ
+         5HsoqZC4rRkzHru4jyShyABb3kz6PlIq058H48q8P5/azjxpZ/rC99bVj2INCRm+5uRD
+         PrJGXlk19Bb3RzIACJ8tTRaGEAVSL3PBlaHwav4poZ19tFUJ/8Ar2rwgBxpqRNoNY5bW
+         VCfg==
+X-Gm-Message-State: AOJu0YxNdv3biIYBE5aj9iSpa0ZshwmhDV8unhXfIHIO7zbKjMjEmEg+
+	twzpNHljhhRCL0pFI0CGrw2hRfRhJf+5lprBag==
+X-Google-Smtp-Source: AGHT+IGx5bzH8i9gi0scN1ZcZer1Nz83kHCbQMDLy4zOwOK19tSyG5kJ8Zj40xQk1LSh/8UqMGwUUOHA3V/a7HBHtg==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a05:6870:3a10:b0:1d5:95fc:2a65 with
- SMTP id du16-20020a0568703a1000b001d595fc2a65mr6733088oab.0.1696893598255;
- Mon, 09 Oct 2023 16:19:58 -0700 (PDT)
-Date: Mon, 09 Oct 2023 23:19:57 +0000
+ (user=justinstitt job=sendgmr) by 2002:a05:690c:2c8c:b0:5a7:afd5:1cb1 with
+ SMTP id ep12-20020a05690c2c8c00b005a7afd51cb1mr31543ywb.1.1696894861758; Mon,
+ 09 Oct 2023 16:41:01 -0700 (PDT)
+Date: Mon, 09 Oct 2023 23:41:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJyKJGUC/x2NQQrCMBBFr1Jm7cCkohCvIi7a9GtnYSwzIVRK7
- 27q4sF/m/82cpjC6dZtZKjq+slNwqmjNA/5BdapOfXSn4NIZC+W0/LlybTCnDMKo8ywY+j4Pqh ZEyeGRJFxCBGXK7XDxfDU9R+7P/b9B+1asIF8AAAA
+X-B4-Tracking: v=1; b=H4sIAIyPJGUC/x2N0QqDMBAEf0XuuQdJtEj6K6UPJVnrQUnlLohF/
+ HfTvs3AsLuTQQVGt24nxSomn9LEXzpK87O8wJKbU3Ch985FtqolLV/OKivUuKAy6gz9gZSKN6O FnHi4DqMfY45TSNT2FsUk2//r/jiOExbB7zl7AAAA
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696893597; l=1913;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696894860; l=2207;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=IQPojGhMm0FWYkhisYrQ00VPkfbCrbcIeRucK9CSAtU=; b=lqQitRgTvDQrS2yNAdU1MwFFmxI/TImPYzq1XkAQrajgWQGjpKNWCOFzZ6AGd8vHFb8Xj4b88
- UcPIIFUP2hSCCsgd+ycewkMTnHNJ1UB2BTMpZXFag89Q1wnWwAwYyer
+ bh=XvVTVgj9L3pc35eYMTZ+RVyQ6ZuyIqHrJFw3fZ6pxVo=; b=fGuGaHWljs9MXvOhbcaaNDiRGNceZqYhpBDPSUvVWleANuYMUnmCNkLdx8nZcCsE77WqOQfIg
+ p/9Sahdrv55DWIKFkxJFDo8Y7ZNIJJkS44FJROIsdggDIJ5wbfN7Rmv
 X-Mailer: b4 0.12.3
-Message-ID: <20231009-strncpy-drivers-net-ethernet-ibm-ibmvnic-c-v1-1-712866f16754@google.com>
-Subject: [PATCH] ibmvnic: replace deprecated strncpy with strscpy
+Message-ID: <20231009-strncpy-drivers-net-ethernet-intel-e100-c-v1-1-ca0ff96868a3@google.com>
+Subject: [PATCH] e100: replace deprecated strncpy with strscpy
 From: Justin Stitt <justinstitt@google.com>
-To: Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Haren Myneni <haren@linux.ibm.com>, 
-	Rick Lindsley <ricklind@linux.ibm.com>, Nick Child <nnac123@linux.ibm.com>, 
-	Dany Madden <danymadden@us.ibm.com>, Thomas Falcon <tlfalcon@linux.ibm.com>, 
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org, 
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
 	Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -93,15 +90,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 [1] and as such we should prefer more robust and less ambiguous string
 interfaces.
 
-NUL-padding is not required as the buffer is already memset to 0:
-|       memset(adapter->fw_version, 0, 32);
+The "...-1" pattern makes it evident that netdev->name is expected to be
+NUL-terminated.
 
-Note that another usage of strscpy exists on the same buffer:
-|       strscpy((char *)adapter->fw_version, "N/A", sizeof(adapter->fw_version));
+Meanwhile, it seems NUL-padding is not required due to alloc_etherdev
+zero-allocating the buffer.
 
 Considering the above, a suitable replacement is `strscpy` [2] due to
 the fact that it guarantees NUL-termination on the destination buffer
 without unnecessarily NUL-padding.
+
+This is in line with other uses of strscpy on netdev->name:
+$ rg "strscpy\(netdev\->name.*pci.*"
+
+drivers/net/ethernet/intel/e1000e/netdev.c
+7455:   strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+
+drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+10839:  strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
 
 Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
 Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
@@ -111,27 +117,26 @@ Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
 Note: build-tested only.
 ---
- drivers/net/ethernet/ibm/ibmvnic.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e100.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index cdf5251e5679..ac15dcadf4c1 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -5247,7 +5247,8 @@ static void handle_vpd_rsp(union ibmvnic_crq *crq,
- 	/* copy firmware version string from vpd into adapter */
- 	if ((substr + 3 + fw_level_len) <
- 	    (adapter->vpd->buff + adapter->vpd->len)) {
--		strncpy((char *)adapter->fw_version, substr + 3, fw_level_len);
-+		strscpy(adapter->fw_version, substr + 3,
-+			sizeof(adapter->fw_version));
- 	} else {
- 		dev_info(dev, "FW substr extrapolated VPD buff\n");
- 	}
+diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+index d3fdc290937f..01f0f12035ca 100644
+--- a/drivers/net/ethernet/intel/e100.c
++++ b/drivers/net/ethernet/intel/e100.c
+@@ -2841,7 +2841,7 @@ static int e100_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	netdev->netdev_ops = &e100_netdev_ops;
+ 	netdev->ethtool_ops = &e100_ethtool_ops;
+ 	netdev->watchdog_timeo = E100_WATCHDOG_PERIOD;
+-	strncpy(netdev->name, pci_name(pdev), sizeof(netdev->name) - 1);
++	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+ 
+ 	nic = netdev_priv(netdev);
+ 	netif_napi_add_weight(netdev, &nic->napi, e100_poll, E100_NAPI_WEIGHT);
 
 ---
 base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231009-strncpy-drivers-net-ethernet-ibm-ibmvnic-c-e0900ba19e56
+change-id: 20231009-strncpy-drivers-net-ethernet-intel-e100-c-4547179d9f2c
 
 Best regards,
 --
