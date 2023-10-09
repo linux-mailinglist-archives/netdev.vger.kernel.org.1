@@ -1,220 +1,79 @@
-Return-Path: <netdev+bounces-39237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5A27BE66B
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:31:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C1E7BE66E
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7106D2815FD
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:31:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6120281591
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26691FC6;
-	Mon,  9 Oct 2023 16:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EA81FC6;
+	Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqxmU5te"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fz2BZs33"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090531A701
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:31:19 +0000 (UTC)
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2BDAF;
-	Mon,  9 Oct 2023 09:31:18 -0700 (PDT)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-59f6e6b7600so56280237b3.3;
-        Mon, 09 Oct 2023 09:31:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696869077; x=1697473877; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwJG0ZcdADOiEPsRD1fp8I+0b5ih4BdS68Cgas4xJ7g=;
-        b=EqxmU5teWNdEaPpgJA2o0T/ghM9GXOlFNUNJfBtVW+EkVpiHlbHLrk6DA+G34wrXgb
-         S0Ya1gnzffYaUlgmMmISDNE4Y94p6um02EvxSCH0ehuoXbzOd3+AGMHvXPgBsAQ9Z/16
-         VfBiLvyUlLSEJPTAV4+g8ZkBVv4Z1j/W+5rexg6e0bwrwLT+dEjMlkzJr/2oS2Hx445S
-         SUOE90cx3RpyFEtw4on25mInxVgQWqBmLRg6j0JXpeu5mJcCV1XxdLBcFnZzrbSMUxuj
-         HPsgLK1VsS1Agh4j1ZI2Qw0cEgN7mZC1IZdxz8KAstenN9zaVRofYkie8UAq+7kKdSs6
-         9f5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696869077; x=1697473877;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZwJG0ZcdADOiEPsRD1fp8I+0b5ih4BdS68Cgas4xJ7g=;
-        b=ODW7BE7YRdT1e0HRXZHKIJqVyCPP5zMcpm/h+iiYkt7KdQ50NKoRhX1VbASH44bZiK
-         esBfrVSi6dEPT7/G4BVPcTSOGyV/eTae9QR0qV1AlPTAwBTOfWfmf2wegUDJs9yGGRHI
-         T8egPnFN8F70irQBMjW4Y++lmOFGvOzDZ1YGUEig/u4qMEYGvgpHfVadISyIifGwgRSK
-         NyEbL6X7s9ETfsvHjpDHZeLLLB2gZRW9woJ/6HkQRTERQiEnzLzfWRI+0Yk1va63gY4T
-         tFwy4y9eEYRNOVL3HAURDPzslImf+pjzGBy1eOHN9wweyNzWsgdxyUTsLu7SqbgcPQCT
-         N3zw==
-X-Gm-Message-State: AOJu0YxPyAyU5I4liXL3Op0egXAb/m86haIYzV8gUPUySuCo0QEGgGBF
-	kfNBJ37CeDgn8Da0EzvEilnp3+DMTa4WIg==
-X-Google-Smtp-Source: AGHT+IEXYlVGR26h67lZ0CQFtDdopC6qPtwRiCX8u/eS0Le2sSi4IxhnE11TM3OyRpNoFH8rv8Esgw==
-X-Received: by 2002:a81:7b8a:0:b0:59b:c805:de60 with SMTP id w132-20020a817b8a000000b0059bc805de60mr15386292ywc.45.1696869076997;
-        Mon, 09 Oct 2023 09:31:16 -0700 (PDT)
-Received: from localhost ([2607:fb90:be22:da0:a050:8c3a:c782:514b])
-        by smtp.gmail.com with ESMTPSA id g139-20020a0ddd91000000b00589a999038asm3797246ywe.77.2023.10.09.09.31.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 09:31:16 -0700 (PDT)
-Date: Mon, 9 Oct 2023 09:31:15 -0700
-From: Yury Norov <yury.norov@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
-	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/14] bitmap: extend bitmap_{get,set}_value8() to
- bitmap_{get,set}_bits()
-Message-ID: <ZSQq02A9mTireK71@yury-ThinkPad>
-References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
- <20231009151026.66145-10-aleksander.lobakin@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DC0A93D
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:31:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95873C433CB;
+	Mon,  9 Oct 2023 16:31:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696869090;
+	bh=oyRfyginZSVS30jDs8Ex2jwGfxU5fIbT3YRXKcD3Db0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fz2BZs33QzBXnkWSiMf9nL1iT0mhaBzsO35T411awbBw3kM50b/xHY1gtyz3NJnqY
+	 97Fb78tfD67Sl+Ptpx16OqAmrfNBKOoffec0UgI7H2rWj299+sZx/6HHPZpKFOAWy/
+	 8kzqFk4l8fG8Lbp5xws9YxilheDZgKUFkDIKYgm4Qgc/5zODLgEiu1I3w1DXBx5NC8
+	 Z4D9oN8Syo4kSmMbmefl5dbgGFWN+iMeWxuNblJOuHlW6YVu0bno3VfQhbdy0Ya1GI
+	 Is8BdWWky+a1sDPsvl53TkM3Y43nULvlpPhHX4vE9IAbfrkS55GDgX7x06Ceu29EpZ
+	 r8nq4ok/2cuzw==
+Date: Mon, 9 Oct 2023 09:31:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, gal@nvidia.com
+Subject: Re: [patch net-next] devlink: don't take instance lock for nested
+ handle put
+Message-ID: <20231009093129.377167bb@kernel.org>
+In-Reply-To: <ZSQeNxmoual7ewcl@nanopsycho>
+References: <20231003074349.1435667-1-jiri@resnulli.us>
+	<20231005183029.32987349@kernel.org>
+	<ZR+1mc/BEDjNQy9A@nanopsycho>
+	<20231006074842.4908ead4@kernel.org>
+	<ZSA+1qA6gNVOKP67@nanopsycho>
+	<20231006151446.491b5965@kernel.org>
+	<ZSEwO+1pLuV6F6K/@nanopsycho>
+	<20231009081532.07e902d4@kernel.org>
+	<ZSQeNxmoual7ewcl@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009151026.66145-10-aleksander.lobakin@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-+ Alexander Potapenko <glider@google.com>
-
-On Mon, Oct 09, 2023 at 05:10:21PM +0200, Alexander Lobakin wrote:
-> Sometimes there's need to get a 8/16/...-bit piece of a bitmap at a
-> particular offset. Currently, there are only bitmap_{get,set}_value8()
-> to do that for 8 bits and that's it.
-
-And also a series from Alexander Potapenko, which I really hope will
-get into the -next really soon. It introduces bitmap_read/write which
-can set up to BITS_PER_LONG at once, with no limitations on alignment
-of position and length:
-
-https://lore.kernel.org/linux-arm-kernel/ZRXbOoKHHafCWQCW@yury-ThinkPad/T/#mc311037494229647088b3a84b9f0d9b50bf227cb
-
-Can you consider building your series on top of it?
-
-> Instead of introducing a separate pair for u16 and so on, which doesn't
-> scale well, extend the existing functions to be able to pass the wanted
-> value width. Make both offset and width arbitrary, but in order to not
-> over complicate the current logic and keep the helpers as optimized as
-> the current ones, require the width to be a pow-2 value and the offset
-> to be a multiple of the width, while the target piece should not cross
-> a %BITS_PER_LONG boundary and stay within one long.
-> Avoid adjusting all the already existing callsites by defining oneliner
-> wrapper macros named after the former functions. bloat-o-meter shows
-> almost no difference (+1-2 bytes in a couple of places), meaning the
-> new helpers get optimized just nicely.
+On Mon, 9 Oct 2023 17:37:27 +0200 Jiri Pirko wrote:
+> >I think kernel assuming that this should not happen and requiring 
+> >the PF driver to work around potentially stupid FW designs should
+> >be entirely without our rights.  
 > 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/linux/bitmap.h | 51 ++++++++++++++++++++++++++++++------------
->  1 file changed, 37 insertions(+), 14 deletions(-)
-> 
-> diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-> index 63e422f8ba3d..9c010a7fa331 100644
-> --- a/include/linux/bitmap.h
-> +++ b/include/linux/bitmap.h
-> @@ -6,8 +6,10 @@
->  
->  #include <linux/align.h>
->  #include <linux/bitops.h>
-> +#include <linux/bug.h>
->  #include <linux/find.h>
->  #include <linux/limits.h>
-> +#include <linux/log2.h>
->  #include <linux/string.h>
->  #include <linux/types.h>
->  
-> @@ -569,38 +571,59 @@ static inline void bitmap_from_u64(unsigned long *dst, u64 mask)
->  }
->  
->  /**
-> - * bitmap_get_value8 - get an 8-bit value within a memory region
-> + * bitmap_get_bits - get a 8/16/32/64-bit value within a memory region
->   * @map: address to the bitmap memory region
-> - * @start: bit offset of the 8-bit value; must be a multiple of 8
-> + * @start: bit offset of the value; must be a multiple of @len
-> + * @len: bit width of the value; must be a power of two
->   *
-> - * Returns the 8-bit value located at the @start bit offset within the @src
-> - * memory region.
-> + * Return: the 8/16/32/64-bit value located at the @start bit offset within
-> + * the @src memory region. Its position (@start + @len) can't cross
-> + * a ``BITS_PER_LONG`` boundary.
->   */
-> -static inline unsigned long bitmap_get_value8(const unsigned long *map,
-> -					      unsigned long start)
-> +static inline unsigned long bitmap_get_bits(const unsigned long *map,
-> +					    unsigned long start, size_t len)
->  {
->  	const size_t index = BIT_WORD(start);
->  	const unsigned long offset = start % BITS_PER_LONG;
->  
-> -	return (map[index] >> offset) & 0xFF;
-> +	if (WARN_ON_ONCE(!is_power_of_2(len) || offset % len ||
-> +			 offset + len > BITS_PER_LONG))
-> +		return 0;
-> +
-> +	return (map[index] >> offset) & GENMASK(len - 1, 0);
->  }
->  
->  /**
-> - * bitmap_set_value8 - set an 8-bit value within a memory region
-> + * bitmap_set_bits - set a 8/16/32/64-bit value within a memory region
->   * @map: address to the bitmap memory region
-> - * @value: the 8-bit value; values wider than 8 bits may clobber bitmap
-> - * @start: bit offset of the 8-bit value; must be a multiple of 8
-> + * @start: bit offset of the value; must be a multiple of @len
-> + * @value: new value to set
-> + * @len: bit width of the value; must be a power of two
-> + *
-> + * Replaces the 8/16/32/64-bit value located at the @start bit offset within
-> + * the @src memory region with the new @value. Its position (@start + @len)
-> + * can't cross a ``BITS_PER_LONG`` boundary.
->   */
-> -static inline void bitmap_set_value8(unsigned long *map, unsigned long value,
-> -				     unsigned long start)
-> +static inline void bitmap_set_bits(unsigned long *map, unsigned long start,
-> +				   unsigned long value, size_t len)
->  {
->  	const size_t index = BIT_WORD(start);
->  	const unsigned long offset = start % BITS_PER_LONG;
-> +	unsigned long mask = GENMASK(len - 1, 0);
->  
-> -	map[index] &= ~(0xFFUL << offset);
-> -	map[index] |= value << offset;
-> +	if (WARN_ON_ONCE(!is_power_of_2(len) || offset % len ||
-> +			 offset + len > BITS_PER_LONG))
-> +		return;
-> +
-> +	map[index] &= ~(mask << offset);
-> +	map[index] |= (value & mask) << offset;
->  }
->  
-> +#define bitmap_get_value8(map, start)				\
-> +	bitmap_get_bits(map, start, BITS_PER_BYTE)
-> +#define bitmap_set_value8(map, value, start)			\
-> +	bitmap_set_bits(map, start, value, BITS_PER_BYTE)
-> +
->  #endif /* __ASSEMBLY__ */
->  
->  #endif /* __LINUX_BITMAP_H */
-> -- 
-> 2.41.0
+> But why is it stupid? The SF may be spawned on the same host, but it
+> could be spawned on another one. The FW creates SF internally and shows
+> that to the kernel. Symetrically, the FW is asked to remove SF and it
+> tells to the host that the SF is going away. Flows have to go
+> through FW.
+
+In Linux the PF is what controls the SFs, right?
+Privileges, configuration/admin, resource control.
+How can the parent disappear and children still exist.
+
+You can make it work with putting the proprietary FW in the center.
+But Linux as a project has its own objectives.
 
