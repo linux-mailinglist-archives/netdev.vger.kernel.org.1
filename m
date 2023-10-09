@@ -1,129 +1,136 @@
-Return-Path: <netdev+bounces-39267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505307BE93C
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:28:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C6D7BE943
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 20:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C7C0281DE1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:28:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CB4A1C20A17
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 18:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5CE3AC3D;
-	Mon,  9 Oct 2023 18:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FBF93AC31;
+	Mon,  9 Oct 2023 18:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Flw54V43"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4MWOpEQa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C897D3AC1A
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:28:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0DDBA
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696876094;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cJCshGXBIhUp5eoSJv8BhgcaclTM7hneWJVXPfRd5Oo=;
-	b=Flw54V434TJb4spMHJMuMu2S4Rpwtiqt00wA9Ct95Qktitc2G1m2TNpUUceQIT2wchQ4D8
-	6mLt32ozoJxGmssjy/AFJG9pW85aTY8Qvx0f/uqjCoQYg248TGUe1eYGQYB4yJnhGoUOyf
-	dPsi7TjzJJtC3C1AJG1NT2zQ+dBvIGA=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-XbtrnyiwN5aeE2flfErYNg-1; Mon, 09 Oct 2023 14:28:03 -0400
-X-MC-Unique: XbtrnyiwN5aeE2flfErYNg-1
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-59f7d109926so74118387b3.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 11:28:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C1A38DE9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:29:21 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92ADAA3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 11:29:20 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d85fc108f0eso6476838276.2
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 11:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696876160; x=1697480960; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XDBK5Er15QvjGUwykMjw01laGvht+dhKObLHHzorKRg=;
+        b=4MWOpEQarFiFDsKFVaQ3aoc0aWArpmmCr7Ejvi4R/zOtf5bc8UbGT44Rrg0MGMt3Oz
+         hyIVziMJ0YlKpmUSit0Pyf/82m/G8SER7+pvfPLFs7u23uW4ENwws2JaUtFHvWihoUtR
+         GCh0MZSyIlnxKstdd1EUdkYUV9wkB2UZSWZ0P+EvekUJspb9SpD0emiBSYa1oINLj1t5
+         vEZMkasLTdNMBgkjyWVfE0og4PRW+zTmWuqSu2pdi3yn/9WIVc3zo0KHZ8i/nnGyUBu+
+         OxHrqFra5yltxWydL1Lhc5Zt+evYp6nNniS3gWKvbS0QltS5Xdr33rifFmUXRyWLVQJg
+         tOKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696876083; x=1697480883;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cJCshGXBIhUp5eoSJv8BhgcaclTM7hneWJVXPfRd5Oo=;
-        b=pee2SFrKDDQSGrFZeDO2V3FkbWIQE/6lTseQMH5o4aYa8v6gX/rAc6+9JnUKubV4Rb
-         pAukvBE0i9qPejbH175UlN/An+KAGkT1muKtzCOsYx570w0m4jTOIDKs6B1BQ7zBo5Ti
-         g58G8piq1VSTbwPOGF9Bf7uvfxtUX0P+XVbsK+jgiXTtG3+Ynw9fr5h8z0DELGGgEO3h
-         dKFXQqR9xqYhj2CWd0Gsas/fH9eIPGdccpq/JfV9VDVH2319VSD8zi+683cW0siacXKJ
-         esZrdMb9h/x2f0JbvcosavBsNDFBY8kn5v3FL65uep0BUDq/z/OiVeHfAbIk8oYXTQEP
-         vqoQ==
-X-Gm-Message-State: AOJu0Yys4JGQYW0bv966Z/I5oaBiWoxcRsBMdOnbfeh7/hzr2DcSyPqK
-	xn8d4txzgaVqRJT7xFB4823+cryD20fE9XrgtlpOBLnaHBv+gBsT6DTaU83i1xgx/V6zF5OCGIE
-	wQaZKU5W2r2aXHItu
-X-Received: by 2002:a0d:e28f:0:b0:5a7:a792:a5d7 with SMTP id l137-20020a0de28f000000b005a7a792a5d7mr1541040ywe.15.1696876083054;
-        Mon, 09 Oct 2023 11:28:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPxjr/qAaN0GdyTNJWfdAvn+wK2SMrRy2Rcuv/q0h7zt+3+ulHphaw2l3L43J7ftORjeFpyA==
-X-Received: by 2002:a0d:e28f:0:b0:5a7:a792:a5d7 with SMTP id l137-20020a0de28f000000b005a7a792a5d7mr1541027ywe.15.1696876082841;
-        Mon, 09 Oct 2023 11:28:02 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id m2-20020a814042000000b005a7b8fddfedsm121032ywn.41.2023.10.09.11.28.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 11:28:01 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 3B27AE58215; Mon,  9 Oct 2023 20:27:57 +0200 (CEST)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: David Ahern <dsahern@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Christian Brauner <brauner@kernel.org>,
-	"Eric W . Biederman" <ebiederm@xmission.com>,
-	David Laight <David.Laight@ACULAB.COM>
-Subject: [RFC PATCH iproute2-next 5/5] lib/namespace: Also mount a bpffs instance inside new mount namespaces
-Date: Mon,  9 Oct 2023 20:27:53 +0200
-Message-ID: <20231009182753.851551-6-toke@redhat.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231009182753.851551-1-toke@redhat.com>
-References: <20231009182753.851551-1-toke@redhat.com>
+        d=1e100.net; s=20230601; t=1696876160; x=1697480960;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XDBK5Er15QvjGUwykMjw01laGvht+dhKObLHHzorKRg=;
+        b=w1HAJe8vX0+o6bAv2Ep/77gKy5CDeAZqm2KM3A0daMfZcGj+s3R4yK7MgQ6AlVTVEk
+         xJ/KS28Bk+d5tUrLdW6HwxLkwj9NXEOsxL+Nxm0HpL3wdIuDVTSel20PFrS3AE3B3uY3
+         gwgEfqlXaDXkajHTjZLzVZq7QxNwWoDrD8pClvPru2Ie5xzQUpZk0hv8C4LPLvci1aZE
+         6Eq7hxjHy/PCOZI1nWqNezIsgMO09bGXlVZ1bb+vTYE6XNdnvPWpywqZfbOJu9ZIqYzm
+         kSfrxKYmiPJkpHNreY2J4HBPRGXLJ7fbeVjXOu1nHmMooZ/gWQpII8sIjN8RW9lIcbgY
+         MH6w==
+X-Gm-Message-State: AOJu0Yxtc2q0ltLx9LAnL/vml1NnS+smJop0x8MCL7t0GuC0tUqRGPFg
+	GhRxcTlxWgjGxrnC7mLjlZM+FCuvPpXwIr1RLA==
+X-Google-Smtp-Source: AGHT+IFEYT/za4QVR6fR/MF5JyjgO5M3AWWvhyO5pPz0UrgbgMOrmr3zJveczQ1Hka+kDj8XsImbs1hJdUTnEIDEMA==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:ad50:0:b0:d78:2c3:e633 with SMTP
+ id l16-20020a25ad50000000b00d7802c3e633mr230976ybe.2.1696876159847; Mon, 09
+ Oct 2023 11:29:19 -0700 (PDT)
+Date: Mon, 09 Oct 2023 18:29:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAH5GJGUC/x3NPQ6DMAxA4asgz7VkCNCfq6AOUexSD02RHSEQ4
+ u6NOn7Lewe4mIrDoznAZFXXb65oLw2kd8yzoHI1dNSFluiOXiynZUc2XcUcsxRkj/gp1yEQJuw pRQ63MA49Q80sJi/d/ovpeZ4/gDTkfnIAAAA=
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696876158; l=1437;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=njDv3GAGmhVrExshk0hx5o9AbY/WD0+6gqoo2bn4Yhg=; b=1J2L7iU0ES7zC7vWFtN9NFGtdF0F81pv/JVQhRo8NZAZIpsJ+gGWhuCDrgOKhESE8tZUUsU3U
+ d4Z2vnQKmFuD4VoXPdHgoaiP7YfJE2TD1dTaO5uvm7QNv0tFHL7+jAu
+X-Mailer: b4 0.12.3
+Message-ID: <20231009-strncpy-drivers-net-dsa-mt7530-c-v1-1-ec6677a6436a@google.com>
+Subject: [PATCH] net: dsa: mt7530: replace deprecated strncpy with ethtool_sprintf
+From: Justin Stitt <justinstitt@google.com>
+To: "=?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?=" <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
+	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When creating a new mount namespace, we remount /sys inside that namespace,
-which means there is no bpffs available unless it is manually remounted later.
-To make it easier to work with BPF in combination with 'ip netns', make sure we
-always mount a bpffs instance to /sys/fs/bpf after creating a new namespace.
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Since bpffs may not always be available, we only warn if the mounting fails, but
-carry on regardless.
+ethtool_sprintf() is designed specifically for get_strings() usage.
+Let's replace strncpy in favor of this more robust and easier to
+understand interface.
 
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- lib/namespace.c | 3 +++
- 1 file changed, 3 insertions(+)
+Note: build-tested only.
+---
+ drivers/net/dsa/mt7530.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/lib/namespace.c b/lib/namespace.c
-index 5f2449fb0003..62456ab24e4f 100644
---- a/lib/namespace.c
-+++ b/lib/namespace.c
-@@ -93,6 +93,9 @@ int prepare_mountns(const char *name, bool do_unshare)
- 		return -1;
- 	}
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 035a34b50f31..e00126af8318 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -836,8 +836,7 @@ mt7530_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+ 		return;
  
-+	if (mount("bpf", "/sys/fs/bpf", "bpf", mountflags, NULL) < 0)
-+		fprintf(stderr, "could not mount /sys/fs/bpf inside namespace: %s. continuing anyway\n",strerror(errno));
-+
- 	/* Setup bind mounts for config files in /etc */
- 	bind_etc(name);
- 	return 0;
--- 
-2.42.0
+ 	for (i = 0; i < ARRAY_SIZE(mt7530_mib); i++)
+-		strncpy(data + i * ETH_GSTRING_LEN, mt7530_mib[i].name,
+-			ETH_GSTRING_LEN);
++		ethtool_sprintf(&data, "%s", mt7530_mib[i].name);
+ }
+ 
+ static void
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231009-strncpy-drivers-net-dsa-mt7530-c-40cad383654d
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
