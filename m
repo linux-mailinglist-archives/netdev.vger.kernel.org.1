@@ -1,72 +1,147 @@
-Return-Path: <netdev+bounces-39105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034D87BE113
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:47:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF5347BE153
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2D4E2817DD
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:46:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7CE1C20A48
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D201F341A5;
-	Mon,  9 Oct 2023 13:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B42347A8;
+	Mon,  9 Oct 2023 13:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IO0bwW6S"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="sa0AABrS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B199BDF59;
-	Mon,  9 Oct 2023 13:46:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CC06C433C7;
-	Mon,  9 Oct 2023 13:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8F4341AF;
+	Mon,  9 Oct 2023 13:49:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A31C0C433C7;
+	Mon,  9 Oct 2023 13:49:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1696859216;
-	bh=Ew1XbL9SrrnXVmkQDxu2ljVL3wze4KKK3L5OJe2bKuk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IO0bwW6Ssa2ncFH5bBQSd+iCyZ/G/GDcVGP+xkL34MRALkLpJSNuVqSPIL+lqtDnu
-	 uidXjg2zGPP2xs1mcclBdCoRGrL0NkIsDdMXVEUa54XYN+IqzK06W5K6ysoqpnTOpy
-	 MEPjr2Y0iciyeDOmvvTvqmEClE0KIfSdtsqomndw=
-Date: Mon, 9 Oct 2023 15:06:30 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	Andrea Righi <andrea.righi@canonical.com>
-Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
-Message-ID: <2023100916-crushing-sprawl-30a4@gregkh>
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
- <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
- <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+	s=korg; t=1696859369;
+	bh=tHNdYnkLaupkJupYc5yp15hugFR+KY43UdPxvq7yPN0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=sa0AABrSbFKeKB+G+UKAgvhlQeH3/nF955As26aspALkhARH0avMIo7VDaV6tOCn6
+	 /lyRZDTbLS3xAz/gQq8pwwtCIGAN3a2u9T3/4Pnkikt70nadsIVzVJOpjf7mtaEmVs
+	 dECf2oCbnaZncpVVhErjuZ4x7dAxGpiyDSL133VU=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 4.14 45/55] ipv4, ipv6: Fix handling of transhdrlen in __ip{,6}_append_data()
+Date: Mon,  9 Oct 2023 15:06:44 +0200
+Message-ID: <20231009130109.423956294@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231009130107.717692466@linuxfoundation.org>
+References: <20231009130107.717692466@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
 
-On Mon, Oct 09, 2023 at 02:53:00PM +0200, Miguel Ojeda wrote:
-> On Mon, Oct 9, 2023 at 2:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > Any ideas?
-> 
-> That is `RETHUNK` and `X86_KERNEL_IBT`.
-> 
-> Since this will keep confusing people, I will make it a `depends on !`
-> as discussed in the past. I hope it is OK for e.g. Andrea.
+4.14-stable review patch.  If anyone has any objections, please let me know.
 
-That's not ok as you want that option enabled on systems that have those
-broken processors which need this option for proper security.  You would
-be forcing people to disable this to enable Rust support?
+------------------
 
-confused,
+From: David Howells <dhowells@redhat.com>
 
-greg k-h
+[ Upstream commit 9d4c75800f61e5d75c1659ba201b6c0c7ead3070 ]
+
+Including the transhdrlen in length is a problem when the packet is
+partially filled (e.g. something like send(MSG_MORE) happened previously)
+when appending to an IPv4 or IPv6 packet as we don't want to repeat the
+transport header or account for it twice.  This can happen under some
+circumstances, such as splicing into an L2TP socket.
+
+The symptom observed is a warning in __ip6_append_data():
+
+    WARNING: CPU: 1 PID: 5042 at net/ipv6/ip6_output.c:1800 __ip6_append_data.isra.0+0x1be8/0x47f0 net/ipv6/ip6_output.c:1800
+
+that occurs when MSG_SPLICE_PAGES is used to append more data to an already
+partially occupied skbuff.  The warning occurs when 'copy' is larger than
+the amount of data in the message iterator.  This is because the requested
+length includes the transport header length when it shouldn't.  This can be
+triggered by, for example:
+
+        sfd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_L2TP);
+        bind(sfd, ...); // ::1
+        connect(sfd, ...); // ::1 port 7
+        send(sfd, buffer, 4100, MSG_MORE);
+        sendfile(sfd, dfd, NULL, 1024);
+
+Fix this by only adding transhdrlen into the length if the write queue is
+empty in l2tp_ip6_sendmsg(), analogously to how UDP does things.
+
+l2tp_ip_sendmsg() looks like it won't suffer from this problem as it builds
+the UDP packet itself.
+
+Fixes: a32e0eec7042 ("l2tp: introduce L2TPv3 IP encapsulation support for IPv6")
+Reported-by: syzbot+62cbf263225ae13ff153@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/r/0000000000001c12b30605378ce8@google.com/
+Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: David Ahern <dsahern@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: netdev@vger.kernel.org
+cc: bpf@vger.kernel.org
+cc: syzkaller-bugs@googlegroups.com
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/l2tp/l2tp_ip6.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
+index a241ead3dd921..d797708a1a5ef 100644
+--- a/net/l2tp/l2tp_ip6.c
++++ b/net/l2tp/l2tp_ip6.c
+@@ -532,7 +532,6 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 	 */
+ 	if (len > INT_MAX - transhdrlen)
+ 		return -EMSGSIZE;
+-	ulen = len + transhdrlen;
+ 
+ 	/* Mirror BSD error message compatibility */
+ 	if (msg->msg_flags & MSG_OOB)
+@@ -659,6 +658,7 @@ static int l2tp_ip6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ 
+ back_from_confirm:
+ 	lock_sock(sk);
++	ulen = len + skb_queue_empty(&sk->sk_write_queue) ? transhdrlen : 0;
+ 	err = ip6_append_data(sk, ip_generic_getfrag, msg,
+ 			      ulen, transhdrlen, &ipc6,
+ 			      &fl6, (struct rt6_info *)dst,
+-- 
+2.40.1
+
+
+
 
