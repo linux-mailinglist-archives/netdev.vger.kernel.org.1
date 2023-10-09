@@ -1,126 +1,159 @@
-Return-Path: <netdev+bounces-39020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45DE17BD7A8
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:51:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C35147BD7BA
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F8BF1C209AE
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:51:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA851C208CC
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D78E171B8;
-	Mon,  9 Oct 2023 09:51:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3484D171CF;
+	Mon,  9 Oct 2023 09:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAmcXbBy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2A5156D3
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:51:41 +0000 (UTC)
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D468E94;
-	Mon,  9 Oct 2023 02:51:39 -0700 (PDT)
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-5a7a7e9357eso1010397b3.0;
-        Mon, 09 Oct 2023 02:51:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7255567D;
+	Mon,  9 Oct 2023 09:55:35 +0000 (UTC)
+Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDA297;
+	Mon,  9 Oct 2023 02:55:34 -0700 (PDT)
+Received: by mail-vk1-xa34.google.com with SMTP id 71dfb90a1353d-4a06fb5331bso609678e0c.0;
+        Mon, 09 Oct 2023 02:55:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696845333; x=1697450133; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
+        b=IAmcXbBygL+PxCxXp4KzQD86973j00dsrHlNxupCd2IOMxPSuAc1E2AET9A7JlAqEH
+         tRlE+6BTYXzg7mXZsHv78dbiY4EpasjFQjzT8du9oc2KRg2vtVvBWYgiDrw2D6Nq2xub
+         M7n+I2hgUaVszuErZWWECuyr49UPs0oJg/rPe8fcZAIDsk/ro7brfl3uBpZShX1xznvx
+         R5FJlfEw6orJ9trF8LPPyfXYYsFyJ9Wefk0WrhyKpoeDmcRrWAh0M8T1glePPVCIabsT
+         Pka+mKOJX1dUuBdDANDtlrT15aufPtFZ0DvdVmkJ2CsLzdLXiF+SRFV4YQN2AmdK6epv
+         nVbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696845099; x=1697449899;
+        d=1e100.net; s=20230601; t=1696845333; x=1697450133;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EcpLpgd1f1+Ipojmn8r+iB3J9d+aLm5CFxyQ8kyrL4E=;
-        b=KQBggB6UWJsnOxeYnKG5kXuAZomvSrKdbL/7ezdwtOb4KdEA6ttgMmhGBa4ny5DTpy
-         g0ev9DCIHs7b6j9D5DKer9GXuMYled7rNDbBn1iCYj/1QeK9AsMIHe6C2DGJtWEuwJf9
-         hXeLTLmvFXIUiRNTioRINpumbKxNigRDTa6MRr8xRydlINyAzxD9F0ao39QE/3wAb5zz
-         Kqpg6ESyWsPRrp1uT7+2Wvm3nB67z/UZlNBTVVVke6dSAdZmON/yhw5X5Onr2h5WLOk3
-         LW4oygmUX1dGzmvmChidwEhTT7KLhWSwyhoUqKVPLP8EM2DDWT+pRrkHv1kpgGcoIs6M
-         +a6A==
-X-Gm-Message-State: AOJu0Yy6LkKUtEPmH34PNRCaVqH6iSMAX3mjmr/r8UGn4j5zMqNXL49q
-	1mLODnGFqXNkXIR1J9hFYJC6bCxuDa/cWw==
-X-Google-Smtp-Source: AGHT+IEtLwH5kG6+OQ826XHsoxVKcbPtC8Btu4cfakt3LUdz4h4A35b/97NhQFD0i7g1KD3wPBuNhQ==
-X-Received: by 2002:a81:9283:0:b0:59a:ef7f:5c67 with SMTP id j125-20020a819283000000b0059aef7f5c67mr13811929ywg.31.1696845098703;
-        Mon, 09 Oct 2023 02:51:38 -0700 (PDT)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
-        by smtp.gmail.com with ESMTPSA id k132-20020a816f8a000000b00598d67585d7sm3608909ywc.117.2023.10.09.02.51.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 02:51:38 -0700 (PDT)
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-5a505762c9dso53189907b3.2;
-        Mon, 09 Oct 2023 02:51:38 -0700 (PDT)
-X-Received: by 2002:a25:18c1:0:b0:d81:61fd:ef5d with SMTP id
- 184-20020a2518c1000000b00d8161fdef5dmr11643273yby.27.1696845098183; Mon, 09
- Oct 2023 02:51:38 -0700 (PDT)
+        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
+        b=tQedT06intOKGnRD/HPXz+Xw1Bdr2Hh0aZ+YVImhSXSerAfDRQtXSMtJtDVZTr/7Hn
+         SCGJoE/gWjBwiDleN9Yd6lAD+vN+5r6NHElyUlo5R5a5qMaEGxwRhjgDrR40dJIWRvr+
+         hiXomPgx1FbiyFkqN8P2KfK5Z0WY5W85AQwrIL11UDqDl3y2oGRv6pbehpQTF++COZx5
+         6EmNlG267MTPcXJD/N8UyaPA11Cc0QzWEsrfvGyi3LsV9KE7LTfZga1TGFtYHsFIrFE0
+         g4vBaCUQrqPz9KMhcvGaUaNz4OQlPx7KAp67gBYWZF4NwQVNJd6q02jczaCwhndUp3hK
+         aFxA==
+X-Gm-Message-State: AOJu0Yzl2CZC4bWGRKeFQEagGbGd2og3l7k4b2Qvck/Cxq5Pg3Bh9Fgc
+	NbjhrDVaHK6XBUcksJ8Z2gYhWdzdkmtweeUEfME=
+X-Google-Smtp-Source: AGHT+IEreKMizCCNFcpEhH5iXSdei2Vqfm7cxxdu5FLzU7oTPyhiYyKY1JIs9eh8s4CbyXRR0j34a2PGChoyRSIntTA=
+X-Received: by 2002:a1f:4f86:0:b0:495:c10c:ec39 with SMTP id
+ d128-20020a1f4f86000000b00495c10cec39mr10736648vkb.2.1696845333308; Mon, 09
+ Oct 2023 02:55:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-2-hch@lst.de>
- <CAMuHMdWiYDQ5J7R7hPaVAYgXqJvpjdksoF6X-zHrJ_80Ly4XfQ@mail.gmail.com>
- <20231009091625.GB22463@lst.de> <CAMuHMdUZNewD-QC8J7MWSBP197Vc169meOjjK6=b7M11kVjUzg@mail.gmail.com>
- <20231009094330.GA24836@lst.de>
-In-Reply-To: <20231009094330.GA24836@lst.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 9 Oct 2023 11:51:25 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdV2FXdUHtjYW8JyXGBgHhR8De0vp3Ee77e6G8Vbs3gG8Q@mail.gmail.com>
-Message-ID: <CAMuHMdV2FXdUHtjYW8JyXGBgHhR8De0vp3Ee77e6G8Vbs3gG8Q@mail.gmail.com>
-Subject: Re: [PATCH 1/6] dma-direct: add depdenencies to CONFIG_DMA_GLOBAL_POOL
-To: Christoph Hellwig <hch@lst.de>
-Cc: iommu@lists.linux.dev, Robin Murphy <robin.murphy@arm.com>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Wei Fang <wei.fang@nxp.com>, 
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org, netdev@vger.kernel.org, 
-	Jim Quinlan <james.quinlan@broadcom.com>, linux-riscv <linux-riscv@lists.infradead.org>, 
-	Linux-Renesas <linux-renesas-soc@vger.kernel.org>, 
-	"Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>, arm-soc <soc@kernel.org>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
+ <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
+In-Reply-To: <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 9 Oct 2023 04:54:56 -0500
+Message-ID: <CAF=yD-K4bCBpUVtDR_cv=bagRL+vM4Rusez+uHFTb4_kR8XkpA@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
+	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
+	pablo@netfilter.org, decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, 
+	elver@google.com, pabeni@redhat.com, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Christoph,
-
-CC soc
-
-On Mon, Oct 9, 2023 at 11:43=E2=80=AFAM Christoph Hellwig <hch@lst.de> wrot=
-e:
-> On Mon, Oct 09, 2023 at 11:34:55AM +0200, Geert Uytterhoeven wrote:
-> > The fix you are referring too is probably commit c1ec4b450ab729e3
-> > ("soc: renesas: Make ARCH_R9A07G043 (riscv version) depend
-> > on NONPORTABLE") in next-20231006 and later.  It is not yet upstream.
-> >
-> > Still, it merely makes ARCH_R9A07G043 (which selects DMA_GLOBAL_POOL)
-> > depend on ARCH_R9A07G043.
-> > RISCV_DMA_NONCOHERENT still selects DMA_DIRECT_REMAP, so both can end
-> > up being enabled.
+On Mon, Oct 9, 2023 at 3:44=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
 >
-> Ok, so we need to actually fix this properly.  Lad, can you respin
-> the fix to not select DMA_DIRECT_REMAP, for ARCH_R9A07G043?
+> On 2023/10/09 17:13, Willem de Bruijn wrote:
+> > On Sun, Oct 8, 2023 at 12:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@da=
+ynix.com> wrote:
+> >>
+> >> virtio-net have two usage of hashes: one is RSS and another is hash
+> >> reporting. Conventionally the hash calculation was done by the VMM.
+> >> However, computing the hash after the queue was chosen defeats the
+> >> purpose of RSS.
+> >>
+> >> Another approach is to use eBPF steering program. This approach has
+> >> another downside: it cannot report the calculated hash due to the
+> >> restrictive nature of eBPF.
+> >>
+> >> Introduce the code to compute hashes to the kernel in order to overcom=
+e
+> >> thse challenges. An alternative solution is to extend the eBPF steerin=
+g
+> >> program so that it will be able to report to the userspace, but it mak=
+es
+> >> little sense to allow to implement different hashing algorithms with
+> >> eBPF since the hash value reported by virtio-net is strictly defined b=
+y
+> >> the specification.
+> >>
+> >> The hash value already stored in sk_buff is not used and computed
+> >> independently since it may have been computed in a way not conformant
+> >> with the specification.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >
+> >> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct =
+*tun,
+> >>          }
+> >>
+> >>          if (vnet_hdr_sz) {
+> >> -               struct virtio_net_hdr gso;
+> >> +               union {
+> >> +                       struct virtio_net_hdr hdr;
+> >> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
+> >> +               } hdr;
+> >> +               int ret;
+> >>
+> >>                  if (iov_iter_count(iter) < vnet_hdr_sz)
+> >>                          return -EINVAL;
+> >>
+> >> -               if (virtio_net_hdr_from_skb(skb, &gso,
+> >> -                                           tun_is_little_endian(tun),=
+ true,
+> >> -                                           vlan_hlen)) {
+> >> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_R=
+EPORT) &&
+> >> +                   vnet_hdr_sz >=3D sizeof(hdr.v1_hash_hdr) &&
+> >> +                   skb->tun_vnet_hash) {
+> >
+> > Isn't vnet_hdr_sz guaranteed to be >=3D hdr.v1_hash_hdr, by virtue of
+> > the set hash ioctl failing otherwise?
+> >
+> > Such checks should be limited to control path where possible
+>
+> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz are
+> not read at once.
 
-ARCH_R9A07G043 does not select DMA_DIRECT_REMAP directly,
-RISCV_DMA_NONCOHERENT does.  And there are other users of
-RISCV_DMA_NONCOHERENT (RISCV_ISA_ZICBOM and ERRATA_THEAD_CMO).
-Should the selection of DMA_DIRECT_REMAP moved to their users?
-
-Note that the fix is already in soc/for-next, so we need coordination
-with the soc people.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+It should not be possible to downgrade the hdr_sz once v1 is selected.
 
