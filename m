@@ -1,204 +1,159 @@
-Return-Path: <netdev+bounces-39111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6814E7BE1F1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:57:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7305F7BE1F3
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98BF21C208F0
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2FB31C2084A
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 13:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D607B347BA;
-	Mon,  9 Oct 2023 13:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA4F347BC;
+	Mon,  9 Oct 2023 13:57:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SpcnGmaG"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="gaLin2YS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24021339B4;
-	Mon,  9 Oct 2023 13:56:56 +0000 (UTC)
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB31FF;
-	Mon,  9 Oct 2023 06:56:49 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5a2244e06c3so8553497b3.1;
-        Mon, 09 Oct 2023 06:56:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696859809; x=1697464609; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7R+Ed3OVoVGJyxMBNphIrCQkroRIbnjibwGDxMcagv4=;
-        b=SpcnGmaGoqeo3xlZQPFEA608gDNt0hkPZIiQvAI4N7jBruw2B256U9bIAmhUZBVh2J
-         yrow0IeFmx7wcpnqest4EqwGurm9uUXDqswsO9/JOD7Jsqxw9/WpJYlX6ff5imMB5Vv0
-         wSjyVr5ddSNMsGIm2kFVTpwde4CKPuOPb2g1IgntX3Pz+h2LNWLVP7N3oSs8m/J632e+
-         QnPeuIOQyF2v56+83HIAeD2DXTCXE5beI61HLtvfMrKxUz69b/JRYBktgHcqYiOfnHTO
-         93IqaJdUavMAmNoZWdoHQvZuvkEaOHq6Q5Y9nBl/i3IrD3PaRPYgTcF3R6d4I7p3NpMS
-         Dk1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696859809; x=1697464609;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7R+Ed3OVoVGJyxMBNphIrCQkroRIbnjibwGDxMcagv4=;
-        b=L6R9f2Eo5atH/sVP/HkZps6dxk1XRm+KdbGRYa33eX0QXaRt3SNxNHVCZ2IqLzTPhg
-         NmqTXlKTLpe83lC00laJdJ7RKNKCT19jnzhqAB+oBKwE1Lj+mD7KUOTPYR+/ZLQh9rpp
-         duIJuTXnL5rSlFMY9IshKvtz1zqbyzbv90nMYK0aLogZoeDLqZgSudtrzwdvNuMNC9EN
-         RqbB4LKtBKsrYlG0laz4TH5ix+/k/ZkSrffLEaHbEuVodS+sWXJMcKrNKRIIw2RiZQTM
-         uYwoiWTLXdBaafEXmYuqOMXJ2HZjgJEsudRHD8jblv2UZMUZ0+GygZPVMtvDUTawPNYY
-         GyTA==
-X-Gm-Message-State: AOJu0YxyQzqjtDitBRH3PLRT5VH2Efyk4BMSsm8y5/JNkKkip3TFFK7p
-	7jBg/bq/5vF1LVMwxpTl5njjOtn9yRWTCJ2iMTA=
-X-Google-Smtp-Source: AGHT+IEu5gcpHJZ81LmqyGwxblojiM/y116gIKH4I7qOS/xlUVmyIFarciyB7EASKhQWdTNoirmWT2vqnZibHQs+aOc=
-X-Received: by 2002:a25:aba8:0:b0:d43:a0d8:8daf with SMTP id
- v37-20020a25aba8000000b00d43a0d88dafmr10377767ybi.6.1696859807950; Mon, 09
- Oct 2023 06:56:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8BC0341A4;
+	Mon,  9 Oct 2023 13:57:15 +0000 (UTC)
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE67D8;
+	Mon,  9 Oct 2023 06:57:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1696859832; x=1697119032;
+	bh=FwSGHcrVnSSYolYJQcNNUOZ78iLldMRaS9quJsHI12o=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=gaLin2YScPe+VHS37wm8ClKR2fuMw6e8cGbYdvwsmMwCWGMxwxmywjtFEzgBJghjr
+	 byaqTKLv5v/fXjj8p1lqxMT17N+BVmOjal1hUwQCmg2LVNd40tTULU2d+eJINth0th
+	 cmDAYc4a/0pRbpvJeoU8MM8MyJM0WMc/m14KaK6vzj86Zvt43uu52YEITuEB4NQJvZ
+	 arF1Ro9e4+4tw6SBye2nbPKdm5v5Ds4KtYOQPVT15amr4gHOhATxs/hoEcXDyDnx04
+	 MAgLj3aligWdyjvNxcQKgL/9I4sU5xZOFhPWhWgQMV93DI82i5Sw6gkns1+3hD6xed
+	 eFCVBGyr/UUTA==
+Date: Mon, 09 Oct 2023 13:56:58 +0000
+To: Andrew Lunn <andrew@lunn.ch>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, miguel.ojeda.sandonis@gmail.com, greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+Message-ID: <f5878806-5ba2-d932-858d-dda3f55ceb67@proton.me>
+In-Reply-To: <4ced711a-009c-4e57-a758-1d13d97e18d2@lunn.ch>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com> <20231009013912.4048593-2-fujita.tomonori@gmail.com> <1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me> <4ced711a-009c-4e57-a758-1d13d97e18d2@lunn.ch>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231007075148.1759-1-andrew.kanner@gmail.com>
-In-Reply-To: <20231007075148.1759-1-andrew.kanner@gmail.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Mon, 9 Oct 2023 15:56:36 +0200
-Message-ID: <CAJ8uoz2VL0mtQxG6DdUFEK7FWN+MWXUtrEFEsYue4DLBO-WNtw@mail.gmail.com>
-Subject: Re: [PATCH bpf v4] net/xdp: fix zero-size allocation warning in xskq_create()
-To: Andrew Kanner <andrew.kanner@gmail.com>
-Cc: martin.lau@linux.dev, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	aleksander.lobakin@intel.com, xuanzhuo@linux.alibaba.com, ast@kernel.org, 
-	hawk@kernel.org, john.fastabend@gmail.com, daniel@iogearbox.net, 
-	linux-kernel-mentees@lists.linuxfoundation.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com, 
-	syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, 7 Oct 2023 at 09:52, Andrew Kanner <andrew.kanner@gmail.com> wrote:
->
-> Syzkaller reported the following issue:
->  ------------[ cut here ]------------
->  WARNING: CPU: 0 PID: 2807 at mm/vmalloc.c:3247 __vmalloc_node_range (mm/vmalloc.c:3361)
->  Modules linked in:
->  CPU: 0 PID: 2807 Comm: repro Not tainted 6.6.0-rc2+ #12
->  Hardware name: Generic DT based system
->  unwind_backtrace from show_stack (arch/arm/kernel/traps.c:258)
->  show_stack from dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
->  dump_stack_lvl from __warn (kernel/panic.c:633 kernel/panic.c:680)
->  __warn from warn_slowpath_fmt (./include/linux/context_tracking.h:153 kernel/panic.c:700)
->  warn_slowpath_fmt from __vmalloc_node_range (mm/vmalloc.c:3361 (discriminator 3))
->  __vmalloc_node_range from vmalloc_user (mm/vmalloc.c:3478)
->  vmalloc_user from xskq_create (net/xdp/xsk_queue.c:40)
->  xskq_create from xsk_setsockopt (net/xdp/xsk.c:953 net/xdp/xsk.c:1286)
->  xsk_setsockopt from __sys_setsockopt (net/socket.c:2308)
->  __sys_setsockopt from ret_fast_syscall (arch/arm/kernel/entry-common.S:68)
->
-> xskq_get_ring_size() uses struct_size() macro to safely calculate the
-> size of struct xsk_queue and q->nentries of desc members. But the
-> syzkaller repro was able to set q->nentries with the value initially
-> taken from copy_from_sockptr() high enough to return SIZE_MAX by
-> struct_size(). The next PAGE_ALIGN(size) is such case will overflow
-> the size_t value and set it to 0. This will trigger WARN_ON_ONCE in
-> vmalloc_user() -> __vmalloc_node_range().
->
-> The issue is reproducible on 32-bit arm kernel.
->
-> Reported-and-tested-by: syzbot+fae676d3cf469331fc89@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/000000000000c84b4705fb31741e@google.com/T/
-> Link: https://syzkaller.appspot.com/bug?extid=fae676d3cf469331fc89
-> Reported-by: syzbot+b132693e925cbbd89e26@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/000000000000e20df20606ebab4f@google.com/T/
-> Fixes: 9f78bf330a66 ("xsk: support use vaddr as ring")
-> Signed-off-by: Andrew Kanner <andrew.kanner@gmail.com>
+On 09.10.23 15:02, Andrew Lunn wrote:
+> On Mon, Oct 09, 2023 at 12:19:54PM +0000, Benno Lossin wrote:
+>>> +impl Device {
+>>> +    /// Creates a new [`Device`] instance from a raw pointer.
+>>> +    ///
+>>> +    /// # Safety
+>>> +    ///
+>>> +    /// For the duration of the lifetime 'a, the pointer must be valid=
+ for writing and nobody else
+>>> +    /// may read or write to the `phy_device` object.
+>>> +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a =
+mut Self {
+>>> +        unsafe { &mut *ptr.cast() }
+>>
+>> Missing `SAFETY` comment.
+>=20
+> Hi Benno
+>=20
+> It is normal on Linux kernel mailing lists to trim the text to what is
+> just relevant to the reply. Comments don't get lost that way.
 
-Thanks Andrew for fixing this.
+Sure, I will keep it in mind.
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+>=20
+>>> +    /// Returns true if the link is up.
+>>> +    pub fn get_link(&mut self) -> bool {
+>>
+>> I would call this function `is_link_up`.
+>=20
+> Please read the discussion on the previous versions of this patch. If
+> you still want to change the name, please give a justification.
 
-> ---
->
-> Notes (akanner):
->     v4:
->       - add explanation about SIZE_MAX, suggested by Martin KaFai Lau
->         <martin.lau@linux.dev>
->     v3: https://lore.kernel.org/all/20231005193548.515-1-andrew.kanner@gmail.com/T/
->       - free kzalloc-ed memory before return, the leak was noticed by
->         Daniel Borkmann <daniel@iogearbox.net>
->     v2: https://lore.kernel.org/all/20231002222939.1519-1-andrew.kanner@gmail.com/raw
->       - use unlikely() optimization for the case with SIZE_MAX return from
->         struct_size(), suggested by Alexander Lobakin
->         <aleksander.lobakin@intel.com>
->       - cc-ed 4 more maintainers, mentioned by cc_maintainers patchwork
->         test
->
->     v1: https://lore.kernel.org/all/20230928204440.543-1-andrew.kanner@gmail.com/T/
->       - RFC notes:
->         It was found that net/xdp/xsk.c:xsk_setsockopt() uses
->         copy_from_sockptr() to get the number of entries (int) for cases
->         with XDP_RX_RING / XDP_TX_RING and XDP_UMEM_FILL_RING /
->         XDP_UMEM_COMPLETION_RING.
->
->         Next in xsk_init_queue() there're 2 sanity checks (entries == 0)
->         and (!is_power_of_2(entries)) for which -EINVAL will be returned.
->
->         After that net/xdp/xsk_queue.c:xskq_create() will calculate the
->         size multipling the number of entries (int) with the size of u64,
->         at least.
->
->         I wonder if there should be the upper bound (e.g. the 3rd sanity
->         check inside xsk_init_queue()). It seems that without the upper
->         limit it's quiet easy to overflow the allocated size (SIZE_MAX),
->         especially for 32-bit architectures, for example arm nodes which
->         were used by the syzkaller.
->
->         In this patch I added a naive check for SIZE_MAX which helped to
->         skip zero-size allocation after overflow, but maybe it's not quite
->         right. Please, suggest if you have any thoughts about the
->         appropriate limit for the size of these xdp rings.
->
->         PS: the initial number of entries is 0x20000000 in syzkaller
->         repro: syscall(__NR_setsockopt, (intptr_t)r[0], 0x11b, 3,
->         0x20000040, 0x20);
->
->         Link:
->         https://syzkaller.appspot.com/text?tag=ReproC&x=10910f18280000
->
->  net/xdp/xsk_queue.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/net/xdp/xsk_queue.c b/net/xdp/xsk_queue.c
-> index f8905400ee07..d2c264030017 100644
-> --- a/net/xdp/xsk_queue.c
-> +++ b/net/xdp/xsk_queue.c
-> @@ -34,6 +34,16 @@ struct xsk_queue *xskq_create(u32 nentries, bool umem_queue)
->         q->ring_mask = nentries - 1;
->
->         size = xskq_get_ring_size(q, umem_queue);
-> +
-> +       /* size which is overflowing or close to SIZE_MAX will become 0 in
-> +        * PAGE_ALIGN(), checking SIZE_MAX is enough due to the previous
-> +        * is_power_of_2(), the rest will be handled by vmalloc_user()
-> +        */
-> +       if (unlikely(size == SIZE_MAX)) {
-> +               kfree(q);
-> +               return NULL;
-> +       }
-> +
->         size = PAGE_ALIGN(size);
->
->         q->ring = vmalloc_user(size);
-> --
-> 2.39.3
->
->
+As Fujita wrote in [1], `get_foo` is not really common in Rust.
+And here it seems weird to, since the return type is a bool. To
+me `get_foo` means "fetch me a foo" and that is not what this
+function is doing. Also given the documentation explicitly states
+"Returns true if the link is up", I think that `is_link_up` or similar
+fits very well.
+
+>>> +    /// Reads a given C22 PHY register.
+>>> +    pub fn read(&mut self, regnum: u16) -> Result<u16> {
+>>> +        let phydev =3D self.0.get();
+>>> +        // SAFETY: `phydev` is pointing to a valid object by the type =
+invariant of `Self`.
+>>> +        // So an FFI call with a valid pointer.
+>>> +        let ret =3D unsafe {
+>>> +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.=
+addr, regnum.into())
+>>> +        };
+>>
+>> Just a general question, all of these unsafe calls do not have
+>> additional requirements? So aside from the pointers being
+>> valid, there are no timing/locking/other safety requirements
+>> for calling the functions?
+>=20
+> Locking has been discussed a number of times already. What do you mean
+> by timing?
+
+A few different things:
+- atomic/raw atomic context
+- another function has to be called prior
+
+I have limited knowledge of the C side and have cannot sift through
+the C code for every `unsafe` function call. Just wanted to ensure
+that someone has checked that these safety requirements are exhaustive.
+
+>>> +macro_rules! module_phy_driver {
+>>> +    (@replace_expr $_t:tt $sub:expr) =3D> {$sub};
+>>> +
+>>> +    (@count_devices $($x:expr),*) =3D> {
+>>> +        0usize $(+ $crate::module_phy_driver!(@replace_expr $x 1usize)=
+)*
+>>> +    };
+>>> +
+>>> +    (@device_table [$($dev:expr),+]) =3D> {
+>>> +        #[no_mangle]
+>>> +        static __mod_mdio__phydev_device_table: [
+>>
+>> Shouldn't this have a unique name? If we define two different
+>> phy drivers with this macro we would have a symbol collision?
+>=20
+> I assume these are the equivalent of C static. It is not visible
+> outside the scope of this object file. The kernel has lots of tables
+> and they are mostly of very limited visibility scope, because only the
+> method registering/unregistering the table needs to see it.
+The `#[no_mangle]` attribute in Rust disables standard symbol name
+mangling, see [2]. So if this macro is invoked twice, it will result
+in a compile error.
+
+[1]: https://lore.kernel.org/rust-for-linux/20231004.084644.507845339593987=
+55.fujita.tomonori@gmail.com/
+[2]: https://doc.rust-lang.org/reference/abi.html#the-no_mangle-attribute
+
+--
+Cheers,
+Benno
+
 
