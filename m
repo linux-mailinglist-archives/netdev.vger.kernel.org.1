@@ -1,159 +1,88 @@
-Return-Path: <netdev+bounces-39021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C35147BD7BA
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:55:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF087BD7BE
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 11:56:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA851C208CC
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:55:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECB862814C8
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 09:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3484D171CF;
-	Mon,  9 Oct 2023 09:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA86171D1;
+	Mon,  9 Oct 2023 09:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAmcXbBy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DYvK21L7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7255567D;
-	Mon,  9 Oct 2023 09:55:35 +0000 (UTC)
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDA297;
-	Mon,  9 Oct 2023 02:55:34 -0700 (PDT)
-Received: by mail-vk1-xa34.google.com with SMTP id 71dfb90a1353d-4a06fb5331bso609678e0c.0;
-        Mon, 09 Oct 2023 02:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696845333; x=1697450133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
-        b=IAmcXbBygL+PxCxXp4KzQD86973j00dsrHlNxupCd2IOMxPSuAc1E2AET9A7JlAqEH
-         tRlE+6BTYXzg7mXZsHv78dbiY4EpasjFQjzT8du9oc2KRg2vtVvBWYgiDrw2D6Nq2xub
-         M7n+I2hgUaVszuErZWWECuyr49UPs0oJg/rPe8fcZAIDsk/ro7brfl3uBpZShX1xznvx
-         R5FJlfEw6orJ9trF8LPPyfXYYsFyJ9Wefk0WrhyKpoeDmcRrWAh0M8T1glePPVCIabsT
-         Pka+mKOJX1dUuBdDANDtlrT15aufPtFZ0DvdVmkJ2CsLzdLXiF+SRFV4YQN2AmdK6epv
-         nVbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696845333; x=1697450133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BJUF31J0PbZtxav7G88aAg0axEBg2ZH8ruSnLMC/BFU=;
-        b=tQedT06intOKGnRD/HPXz+Xw1Bdr2Hh0aZ+YVImhSXSerAfDRQtXSMtJtDVZTr/7Hn
-         SCGJoE/gWjBwiDleN9Yd6lAD+vN+5r6NHElyUlo5R5a5qMaEGxwRhjgDrR40dJIWRvr+
-         hiXomPgx1FbiyFkqN8P2KfK5Z0WY5W85AQwrIL11UDqDl3y2oGRv6pbehpQTF++COZx5
-         6EmNlG267MTPcXJD/N8UyaPA11Cc0QzWEsrfvGyi3LsV9KE7LTfZga1TGFtYHsFIrFE0
-         g4vBaCUQrqPz9KMhcvGaUaNz4OQlPx7KAp67gBYWZF4NwQVNJd6q02jczaCwhndUp3hK
-         aFxA==
-X-Gm-Message-State: AOJu0Yzl2CZC4bWGRKeFQEagGbGd2og3l7k4b2Qvck/Cxq5Pg3Bh9Fgc
-	NbjhrDVaHK6XBUcksJ8Z2gYhWdzdkmtweeUEfME=
-X-Google-Smtp-Source: AGHT+IEreKMizCCNFcpEhH5iXSdei2Vqfm7cxxdu5FLzU7oTPyhiYyKY1JIs9eh8s4CbyXRR0j34a2PGChoyRSIntTA=
-X-Received: by 2002:a1f:4f86:0:b0:495:c10c:ec39 with SMTP id
- d128-20020a1f4f86000000b00495c10cec39mr10736648vkb.2.1696845333308; Mon, 09
- Oct 2023 02:55:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD67C28ED
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 09:56:51 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C7F94
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 02:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PSeuNVU/Fsoca3dlhrBlUcILtXx5DzZHkg/NQuL00cU=; b=DYvK21L7h1IOfuQllaWZ1Wf260
+	g87V13ZtmQQENkU7BfV7m9Bzl+FTy8bZxhe4iJsRk7U6wF6G4u0+u7MVluC/Kf+AVUkFNydyZszTA
+	pIAnYDKnLXGqhEbD1pbgzulwyzygJ8Osaj7PdUJk4kUobAIRP8vW8EF9Eujm+hsxni2CK5bDVcIJM
+	qdOhAcR2PjIeHF5umHdLGxk1/HOCczNQoiIKNq+o6uJWQV9nLn58uyt60cIkiM4LkXDcAabrj6Tis
+	189GzlrWAQZZl7gllLKdLI2uPMG47/QeRP1RDqMn2+X6kYIc4TqDrsSHxJKCVA2Odu/xL5N8Ewo5g
+	79Fq/Ysw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43498)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qpn0B-0008Hd-1q;
+	Mon, 09 Oct 2023 10:56:39 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qpn0B-0006IE-7v; Mon, 09 Oct 2023 10:56:39 +0100
+Date: Mon, 9 Oct 2023 10:56:39 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net-next 0/3] net: dsa: remove validate method
+Message-ID: <ZSPOV+GhEQkwhoz9@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
- <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
-In-Reply-To: <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 9 Oct 2023 04:54:56 -0500
-Message-ID: <CAF=yD-K4bCBpUVtDR_cv=bagRL+vM4Rusez+uHFTb4_kR8XkpA@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
-	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
-	pablo@netfilter.org, decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, 
-	elver@google.com, pabeni@redhat.com, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Oct 9, 2023 at 3:44=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> On 2023/10/09 17:13, Willem de Bruijn wrote:
-> > On Sun, Oct 8, 2023 at 12:22=E2=80=AFAM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> virtio-net have two usage of hashes: one is RSS and another is hash
-> >> reporting. Conventionally the hash calculation was done by the VMM.
-> >> However, computing the hash after the queue was chosen defeats the
-> >> purpose of RSS.
-> >>
-> >> Another approach is to use eBPF steering program. This approach has
-> >> another downside: it cannot report the calculated hash due to the
-> >> restrictive nature of eBPF.
-> >>
-> >> Introduce the code to compute hashes to the kernel in order to overcom=
-e
-> >> thse challenges. An alternative solution is to extend the eBPF steerin=
-g
-> >> program so that it will be able to report to the userspace, but it mak=
-es
-> >> little sense to allow to implement different hashing algorithms with
-> >> eBPF since the hash value reported by virtio-net is strictly defined b=
-y
-> >> the specification.
-> >>
-> >> The hash value already stored in sk_buff is not used and computed
-> >> independently since it may have been computed in a way not conformant
-> >> with the specification.
-> >>
-> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >
-> >> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct =
-*tun,
-> >>          }
-> >>
-> >>          if (vnet_hdr_sz) {
-> >> -               struct virtio_net_hdr gso;
-> >> +               union {
-> >> +                       struct virtio_net_hdr hdr;
-> >> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
-> >> +               } hdr;
-> >> +               int ret;
-> >>
-> >>                  if (iov_iter_count(iter) < vnet_hdr_sz)
-> >>                          return -EINVAL;
-> >>
-> >> -               if (virtio_net_hdr_from_skb(skb, &gso,
-> >> -                                           tun_is_little_endian(tun),=
- true,
-> >> -                                           vlan_hlen)) {
-> >> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_R=
-EPORT) &&
-> >> +                   vnet_hdr_sz >=3D sizeof(hdr.v1_hash_hdr) &&
-> >> +                   skb->tun_vnet_hash) {
-> >
-> > Isn't vnet_hdr_sz guaranteed to be >=3D hdr.v1_hash_hdr, by virtue of
-> > the set hash ioctl failing otherwise?
-> >
-> > Such checks should be limited to control path where possible
->
-> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz are
-> not read at once.
+Hi,
 
-It should not be possible to downgrade the hdr_sz once v1 is selected.
+These three patches remove DSA's phylink .validate method which becomes
+unnecessary once the last two drivers provide phylink capabilities,
+which this patch set adds. Both of these are best guesses.
+
+ drivers/net/dsa/dsa_loop.c             |  9 +++++++++
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 26 ++++++++++++++++++++++++++
+ net/dsa/port.c                         | 15 ---------------
+ 3 files changed, 35 insertions(+), 15 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
