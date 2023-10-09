@@ -1,168 +1,141 @@
-Return-Path: <netdev+bounces-39357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D6D7BEE9A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:56:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A18A7BEEAC
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40C3C280DB1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 22:56:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73EA01C20A06
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 23:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50CB2030D;
-	Mon,  9 Oct 2023 22:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5273B787;
+	Mon,  9 Oct 2023 23:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERGCccyE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LwRVFeYE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AAA1428B
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 22:56:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E97CC433C7;
-	Mon,  9 Oct 2023 22:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696892205;
-	bh=BTlWTB+1l64Oxw8ls3cp8V8J5xa145Pg1B80U2Egz30=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ERGCccyEKO6+Cb8YH5RvW73EZUhN4kLKZlWfBVX6Jfwxs5PzFjwiptbF6JcljpzEi
-	 kQixuG48FZkMWH9f+lN2P5661/EImy/kgFsfvzQNAcVT11c3oubzumZNbBLeGLDXG7
-	 +vjEcqIEz1yNWUPajeApDSJPRVeowBXfA7gyepJ0MzURun1SlwAImgcAdtJqLsZaT4
-	 eROKMdRgk2r3aGLJvoOWWSzSRrK5A7l+700vrA8KnedutQW1GI0y18bz+oBqvEGhxh
-	 b+V8+01f/iDIIGM3CuZNeXxXNu42tVnCoExYjZk0FP07fKG4GYeUikx7clWhcg5HcS
-	 nrjiL0DBqCu7g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	corbet@lwn.net,
-	workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	jesse.brandeburg@intel.com,
-	sd@queasysnail.net,
-	horms@verge.net.au,
-	przemyslaw.kitszel@intel.com,
-	f.fainelli@gmail.com,
-	jiri@resnulli.us,
-	ecree.xilinx@gmail.com
-Subject: [PATCH net-next] docs: try to encourage (netdev?) reviewers
-Date: Mon,  9 Oct 2023 15:56:36 -0700
-Message-ID: <20231009225637.3785359-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA88F7F7
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 23:05:48 +0000 (UTC)
+Received: from mail-ot1-x349.google.com (mail-ot1-x349.google.com [IPv6:2607:f8b0:4864:20::349])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1790CA
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 16:05:42 -0700 (PDT)
+Received: by mail-ot1-x349.google.com with SMTP id 46e09a7af769-6c664c09497so6623705a34.2
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 16:05:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696892742; x=1697497542; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sf7f7SSFEcioOL4lOh7uG5FMec4NdhZBqO0ftggHptY=;
+        b=LwRVFeYE/YD3ecpcJUBp5ofm5vl2PimabMq29CWUZNbuDyrvHWIPBsHUbI4/sfsVFj
+         Dh5f+pAQX10Az7hZzHBgqjaKqpzG33QfypHaxKIbV9J0Iq0p1jsxh0rg95ZQxbfjCHir
+         uggvJjPVkB/5MnVLDLV5UggUbB+CPYZUrKGi+WZjSBE9sXP37Wirymfmh1prk5fdMJQc
+         mFddu5tb80h7pqzOoXu/YjziCpSGd4k9ueqUkoweQRmiiFOrmj2V3Mlao7Vvs8HK7XWC
+         GVqH1aj++MP6bkUcAxiYET6uRD0AqCgiYHlBjGdxQ/SQ18TFm+OILALK42BkXHPfkSX1
+         XI4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696892742; x=1697497542;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sf7f7SSFEcioOL4lOh7uG5FMec4NdhZBqO0ftggHptY=;
+        b=DW4Jtff+9NJvjKds99uMV5XgahX/z4z9pLwEtC9WjZFVHb9qc59edaAEBrs4kvPAp8
+         H3wPBUOhv3CAq99RJtHmJfjUrbJ0XNUUxUK8IoVJShdOezUO7/B3GIhMcmXn/OWn2s/S
+         JrYoLDOkpKl1rQBOzV4hQwL/gpbcuHpj8zWuPOK8NdOhHf8SZ2lzk30NAQS7/akOdPsl
+         auCKur4j9xmFs9LomxaUzXWHay2tNgQD0Cwccg18LdtJoAY0QKB6Zb/BJGmGXmOLvJyH
+         J3GCm35wJWG/pV4uml74aEBToKm90iBiECYKjITRiTJ+nPIUUzeCKbWpheinaqjxByiZ
+         Xo6Q==
+X-Gm-Message-State: AOJu0YyVxGm9iEP6qGXkmyvhr3eLt2oLcSVmSQcfGG40bTygmf7m6rBQ
+	aLr3m4NZT0y1B/AKli8xSkKDl9D5ejWFMq6BLQ==
+X-Google-Smtp-Source: AGHT+IGFgXj6rSXctich+As11kiZfkGnKpf2oXnUdgRc45Epz4XWQpAHX2HulJczcCRybPr4tjMVvrV0XhkuaFFRQw==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6870:5a9a:b0:1e1:82c6:33f9 with
+ SMTP id dt26-20020a0568705a9a00b001e182c633f9mr7399939oab.6.1696892742303;
+ Mon, 09 Oct 2023 16:05:42 -0700 (PDT)
+Date: Mon, 09 Oct 2023 23:05:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAESHJGUC/x2NwQrCMBAFf6Xs2YWk8aD+ioiE9K1d0Fh2S6mU/
+ rvR28xlZiOHKZwu3UaGRV3ftUk8dFTGXB9gHZpTH/oUQzizz1bL9OHBdIE5V8yMeYT9QAzwkp9 gQbm/slYufDpKSCKSQ4rUupNBdP0/r7d9/wLeKqFqgwAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696892741; l=1913;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=b46EvaWEvLxv9FsIZoOXRs8eHWo6xtQQKTHMNok8KSk=; b=I1zIPrcYrC6V+htWsXEMmmSTST/RmDVaCy58n10tqsm8+ntpoa4LnmiS37cPkusLtOQ0/Iumf
+ omEl4t6dkYhAIRCLgVsvvoMW5H1hqfyd88cYBQN9rR7tOLGSn1wrk55
+X-Mailer: b4 0.12.3
+Message-ID: <20231009-strncpy-drivers-net-ethernet-freescale-fec_main-c-v1-1-4166833f1431@google.com>
+Subject: [PATCH] net: fec: replace deprecated strncpy with ethtool_sprintf
+From: Justin Stitt <justinstitt@google.com>
+To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Add a section to netdev maintainer doc encouraging reviewers
-to chime in on the mailing list.
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-The questions about "when is it okay to share feedback"
-keep coming up (most recently at netconf) and the answer
-is "pretty much always".
+ethtool_sprintf() is designed specifically for get_strings() usage.
+Let's replace strncpy in favor of this more robust and easier to
+understand interface.
 
-Extend the section of 7.AdvancedTopics.rst which deals
-with reviews a little bit to add stuff we had been recommending
-locally.
+Also, while we're here, let's change memcpy() over to ethtool_sprintf()
+for consistency.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-RFC -> v1:
- - spelling (compliment)
- - move to common docs:
-   - ask for more opinions
-   - use of tags
-   - compliments
- - ask less experienced reviewers to avoid style comments
-   (using Florian's wording)
-
-CC: andrew@lunn.ch
-CC: jesse.brandeburg@intel.com
-CC: sd@queasysnail.net
-CC: horms@verge.net.au
-CC: przemyslaw.kitszel@intel.com
-CC: f.fainelli@gmail.com
-CC: jiri@resnulli.us
-CC: ecree.xilinx@gmail.com
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
- Documentation/process/7.AdvancedTopics.rst  | 18 ++++++++++++++++++
- Documentation/process/maintainer-netdev.rst | 15 +++++++++++++++
- 2 files changed, 33 insertions(+)
+Note: build-tested only.
+---
+ drivers/net/ethernet/freescale/fec_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/process/7.AdvancedTopics.rst b/Documentation/process/7.AdvancedTopics.rst
-index bf7cbfb4caa5..415749feed17 100644
---- a/Documentation/process/7.AdvancedTopics.rst
-+++ b/Documentation/process/7.AdvancedTopics.rst
-@@ -146,6 +146,7 @@ pull.  The git request-pull command can be helpful in this regard; it will
- format the request as other developers expect, and will also check to be
- sure that you have remembered to push those changes to the public server.
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 77c8e9cfb445..78bddcbfb5d9 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -2907,12 +2907,10 @@ static void fec_enet_get_strings(struct net_device *netdev,
+ 	switch (stringset) {
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < ARRAY_SIZE(fec_stats); i++) {
+-			memcpy(data, fec_stats[i].name, ETH_GSTRING_LEN);
+-			data += ETH_GSTRING_LEN;
++			ethtool_sprintf(&data, "%s", fec_stats[i].name);
+ 		}
+ 		for (i = 0; i < ARRAY_SIZE(fec_xdp_stat_strs); i++) {
+-			strncpy(data, fec_xdp_stat_strs[i], ETH_GSTRING_LEN);
+-			data += ETH_GSTRING_LEN;
++			ethtool_sprintf(&data, "%s", fec_xdp_stat_strs[i]);
+ 		}
+ 		page_pool_ethtool_stats_get_strings(data);
  
-+.. _development_advancedtopics_reviews:
- 
- Reviewing patches
- -----------------
-@@ -167,6 +168,12 @@ comments as questions rather than criticisms.  Asking "how does the lock
- get released in this path?" will always work better than stating "the
- locking here is wrong."
- 
-+Another technique useful in case of a disagreement is to ask for others
-+to chime in. If a discussion reaches a stalemate after a few exchanges,
-+calling for opinions of other reviewers or maintainers. Often those in
-+agreement with a reviewer remain silent unless called upon.
-+Opinion of multiple people carries exponentially more weight.
-+
- Different developers will review code from different points of view.  Some
- are mostly concerned with coding style and whether code lines have trailing
- white space.  Others will focus primarily on whether the change implemented
-@@ -176,3 +183,14 @@ security issues, duplication of code found elsewhere, adequate
- documentation, adverse effects on performance, user-space ABI changes, etc.
- All types of review, if they lead to better code going into the kernel, are
- welcome and worthwhile.
-+
-+There is no strict requirement to use specific tags like ``Reviewed-by``.
-+In fact reviews in plain English are more informative and encouraged
-+even when a tag is provided (e.g. "I looked at aspects A, B and C of this
-+submission and it looks good to me.")
-+Some form of a review message / reply is obviously necessary otherwise
-+maintainers will not know that the reviewer has looked at the patch at all!
-+
-+Last but not least patch review may become a negative process, focused
-+on pointing out problems. Please throw in a compliment once in a while,
-+particularly for newbies!
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 09dcf6377c27..a0cb00e7f579 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -441,6 +441,21 @@ in a way which would break what would normally be considered uAPI.
- new ``netdevsim`` features must be accompanied by selftests under
- ``tools/testing/selftests/``.
- 
-+Reviewer guidance
-+-----------------
-+
-+Reviewing other people's patches on the list is highly encouraged,
-+regardless of the level of expertise. For general guidance and
-+helpful tips please see :ref:`development_advancedtopics_reviews`.
-+
-+It's safe to assume that netdev maintainers know the community and the level
-+of expertise of the reviewers. The reviewers should not be concerned about
-+their comments impeding or derailing the patch flow.
-+
-+Less experienced reviewers are highly encouraged to do more in-depth
-+review of submissions and not focus exclusively on trivial / subject
-+matters like code formatting, tags etc.
-+
- Testimonials / feedback
- -----------------------
- 
--- 
-2.41.0
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231009-strncpy-drivers-net-ethernet-freescale-fec_main-c-84f03fffa031
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
