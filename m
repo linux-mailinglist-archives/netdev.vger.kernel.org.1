@@ -1,336 +1,93 @@
-Return-Path: <netdev+bounces-39152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AEC87BE3C1
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 16:59:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050187BE3CF
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 17:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DF532815C2
-	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 14:59:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE80F281823
+	for <lists+netdev@lfdr.de>; Mon,  9 Oct 2023 15:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B42B339B5;
-	Mon,  9 Oct 2023 14:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF7535887;
+	Mon,  9 Oct 2023 15:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hefring-com.20230601.gappssmtp.com header.i=@hefring-com.20230601.gappssmtp.com header.b="seHY4i9K"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="G3rROSpb"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D4D1FD8
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 14:59:29 +0000 (UTC)
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3883BBA
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 07:59:26 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3af609c3e74so3391293b6e.2
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 07:59:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=hefring-com.20230601.gappssmtp.com; s=20230601; t=1696863565; x=1697468365; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gremNSB3d9SyFHcL1LlmJRtVUMpoQGmg6IJzbQmBl54=;
-        b=seHY4i9KKfpCxSJAJK2e50XT3NwsxB8C0ZuF2/PNl5C1zlFaT/P4iHgHMr+Bwto22Y
-         10Tlr3f0XShEtQgRU5QXvFau9Hw6+zPztCM+YfOvR+kPzpLmzcs8ZTwl3Ms/cgoILfRc
-         b2KGkxLeV7lyhFSDasuGB1S9pxeOyr8bYG1kcbLRoWfQCNlM9THRloaSZhkSpaJ3Q4Br
-         HL5R+NXlsSt3mElioyu2OCdW36k9f/zFdw5xg8IPPXuBR3ExewySSTTLVxkPaLqgF7Y7
-         c7yx5h4gPINSAnqMtCgpppHy0fgHIX3ZEMfgjnsmdxzNYgE28ss70iAXsWbmW4+AW7OH
-         VUmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696863565; x=1697468365;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gremNSB3d9SyFHcL1LlmJRtVUMpoQGmg6IJzbQmBl54=;
-        b=wgJo1dAT1fNybFrNr/MM+6RbNf9g4QsvAAepKefRBJezUUdpV+C8dyEV2srQ0Tcr1+
-         IzIm+cCYsnEZd9Y7NLRRfBNRQbfHaTPsZJjZWHiPOWETi5l+Bj1p2pzCgqv11BtaQwan
-         GxXa/BO4J0KLJGGxmHf5Wr8ZBDAP/FDYxJtBnYsRiGqWlRjEtYIJyfReL4cQ4/cbCjfD
-         rWcOOBx76RlYMk6A5RGdfUFOPJ03/MrKHpI1KYvaGcwjDfNrHlGCJusQ88cbkHPcJSVK
-         N5jxDLfD+T1e+UzCNTdmbsxqdJHukIv8LZVp4BXs8+4Zz3yMWeY3CtZJfYWykFOs2kTO
-         odwg==
-X-Gm-Message-State: AOJu0YyxY38EV7qCCocSkmGtxlhkHh/lRYshlQPnW65wxlbZ3rjUNtvi
-	+pJYu8bMFlNzK7kdWldh7QJvZw==
-X-Google-Smtp-Source: AGHT+IFYy9l29dEpiDaimL5a3XAFRuyoA772ghfVXLzJSXypiGc/Ts/jVpBhpkvrQjwoxhJ+y8jQfA==
-X-Received: by 2002:a05:6870:d187:b0:1b0:60ff:b73f with SMTP id a7-20020a056870d18700b001b060ffb73fmr19038396oac.8.1696863565494;
-        Mon, 09 Oct 2023 07:59:25 -0700 (PDT)
-Received: from localhost.localdomain ([50.212.55.89])
-        by smtp.gmail.com with ESMTPSA id u21-20020ae9c015000000b0076ef29f3429sm3559275qkk.120.2023.10.09.07.59.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 07:59:25 -0700 (PDT)
-From: Ben Wolsieffer <ben.wolsieffer@hefring.com>
-To: linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Christophe Roullier <christophe.roullier@st.com>,
-	Ben Wolsieffer <ben.wolsieffer@hefring.com>
-Subject: [PATCH net-next] net: stmmac: dwmac-stm32: refactor clock config
-Date: Mon,  9 Oct 2023 10:59:04 -0400
-Message-ID: <20231009145904.3776703-1-ben.wolsieffer@hefring.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E68171C0;
+	Mon,  9 Oct 2023 15:04:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AECC8C433C9;
+	Mon,  9 Oct 2023 15:04:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696863848;
+	bh=zkKPQyJWY/bWLSLvlhwqdh1lXsEEe34SJtWArwfDDpE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G3rROSpbq8gLpTMZWFOnj/Fm736okNGFEt7YDiwLJU5UG6/dFbApLN4x4xhDtOHVI
+	 P6xZIebGTAyMB6OBTGosbMSEGcDdfOtlUDD8iiglgP0BQQ+NjvwuXP7iBy0v9UKRMd
+	 JassXp7JuGNAs9WzSaSclE2LjMyqCNsdUjYxyzZY=
+Date: Mon, 9 Oct 2023 17:04:05 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrea Righi <andrea.righi@canonical.com>,
+	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 0/3] Rust abstractions for network PHY drivers
+Message-ID: <2023100902-tactful-april-559f@gregkh>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <5334dc69-1604-4408-9cce-3c89bc5d7688@lunn.ch>
+ <CANiq72n6DMeXQrgOzS_+3VdgNYAmpcnneAHJnZERUQhMExg+0A@mail.gmail.com>
+ <ZSQMVc19Tq6MyXJT@gpd>
+ <a3412fbc-0b32-4402-a3c8-6ccaf42a2ee4@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <a3412fbc-0b32-4402-a3c8-6ccaf42a2ee4@lunn.ch>
 
-Currently, clock configuration is spread throughout the driver and
-partially duplicated for the STM32MP1 and STM32 MCU variants. This makes
-it difficult to keep track of which clocks need to be enabled or disabled
-in various scenarios.
+On Mon, Oct 09, 2023 at 04:56:36PM +0200, Andrew Lunn wrote:
+> On Mon, Oct 09, 2023 at 04:21:09PM +0200, Andrea Righi wrote:
+> > On Mon, Oct 09, 2023 at 02:53:00PM +0200, Miguel Ojeda wrote:
+> > > On Mon, Oct 9, 2023 at 2:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > > >
+> > > > Any ideas?
+> > > 
+> > > That is `RETHUNK` and `X86_KERNEL_IBT`.
+> > > 
+> > > Since this will keep confusing people, I will make it a `depends on !`
+> > > as discussed in the past. I hope it is OK for e.g. Andrea.
+> > 
+> > Disabling RETHUNK or IBT is not acceptable for a general-purpose kernel.
+> > If that constraint is introduced we either need to revert that patch
+> > in the Ubuntu kernel or disable Rust support.
+> > 
+> > It would be nice to have a least something like
+> > CONFIG_RUST_IS_BROKEN_BUT_IM_HAPPY, off by default, and have
+> > `RUST_IS_BROKEN_BUT_IM_HAPPY || depends on !`.
+> 
+> Should this actually be CONFIG_RUST_IS_BROKEN_ON_X86_BUT_IM_HAPPY ?
 
-This patch adds symmetric stm32_dwmac_clk_enable/disable() functions
-that handle all clock configuration, including quirks required while
-suspending or resuming. syscfg_clk and clk_eth_ck are not present on
-STM32 MCUs, but it is fine to try to configure them anyway since NULL
-clocks are ignored.
+Just do the proper dependency on RETHUNK and you should be fine, it will
+be able to be enabled on arches that do not require RETHUNK for proper
+security.
 
-Signed-off-by: Ben Wolsieffer <ben.wolsieffer@hefring.com>
----
-This is a followup to my recent STM32 ethernet resume bug fix [1] that
-tries to address the underlying issues that led to that bug.
+> At lest for networking, the code is architecture independent. For a
+> driver to be useful, it needs to compile for most architectures. So i
+> hope Rust will quickly make it to other architectures. And for PHY
+> drivers, ARM and MIPS are probably more important than x86.
 
-[1] https://lore.kernel.org/all/20230927175749.1419774-1-ben.wolsieffer@hefring.com/ 
+Is MIPS a proper target for rust yet?
 
- .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 113 +++++++-----------
- 1 file changed, 45 insertions(+), 68 deletions(-)
+thanks,
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-index d8d3c729f219..c92dfc4ecf57 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-@@ -98,7 +98,6 @@ struct stm32_dwmac {
- 
- struct stm32_ops {
- 	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
--	int (*clk_prepare)(struct stm32_dwmac *dwmac, bool prepare);
- 	int (*suspend)(struct stm32_dwmac *dwmac);
- 	void (*resume)(struct stm32_dwmac *dwmac);
- 	int (*parse_data)(struct stm32_dwmac *dwmac,
-@@ -107,62 +106,55 @@ struct stm32_ops {
- 	bool clk_rx_enable_in_suspend;
- };
- 
--static int stm32_dwmac_init(struct plat_stmmacenet_data *plat_dat)
-+static int stm32_dwmac_clk_enable(struct stm32_dwmac *dwmac, bool resume)
- {
--	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
- 	int ret;
- 
--	if (dwmac->ops->set_mode) {
--		ret = dwmac->ops->set_mode(plat_dat);
--		if (ret)
--			return ret;
--	}
--
- 	ret = clk_prepare_enable(dwmac->clk_tx);
- 	if (ret)
--		return ret;
-+		goto err_clk_tx;
- 
--	if (!dwmac->ops->clk_rx_enable_in_suspend ||
--	    !dwmac->dev->power.is_suspended) {
-+	if (!dwmac->ops->clk_rx_enable_in_suspend || !resume) {
- 		ret = clk_prepare_enable(dwmac->clk_rx);
--		if (ret) {
--			clk_disable_unprepare(dwmac->clk_tx);
--			return ret;
--		}
-+		if (ret)
-+			goto err_clk_rx;
- 	}
- 
--	if (dwmac->ops->clk_prepare) {
--		ret = dwmac->ops->clk_prepare(dwmac, true);
--		if (ret) {
--			clk_disable_unprepare(dwmac->clk_rx);
--			clk_disable_unprepare(dwmac->clk_tx);
--		}
-+	ret = clk_prepare_enable(dwmac->syscfg_clk);
-+	if (ret)
-+		goto err_syscfg_clk;
-+
-+	if (dwmac->enable_eth_ck) {
-+		ret = clk_prepare_enable(dwmac->clk_eth_ck);
-+		if (ret)
-+			goto err_clk_eth_ck;
- 	}
- 
- 	return ret;
-+
-+err_clk_eth_ck:
-+	clk_disable_unprepare(dwmac->syscfg_clk);
-+err_syscfg_clk:
-+	if (!dwmac->ops->clk_rx_enable_in_suspend || !resume)
-+		clk_disable_unprepare(dwmac->clk_rx);
-+err_clk_rx:
-+	clk_disable_unprepare(dwmac->clk_tx);
-+err_clk_tx:
-+	return ret;
- }
- 
--static int stm32mp1_clk_prepare(struct stm32_dwmac *dwmac, bool prepare)
-+static int stm32_dwmac_init(struct plat_stmmacenet_data *plat_dat, bool resume)
- {
--	int ret = 0;
-+	struct stm32_dwmac *dwmac = plat_dat->bsp_priv;
-+	int ret;
- 
--	if (prepare) {
--		ret = clk_prepare_enable(dwmac->syscfg_clk);
-+	if (dwmac->ops->set_mode) {
-+		ret = dwmac->ops->set_mode(plat_dat);
- 		if (ret)
- 			return ret;
--		if (dwmac->enable_eth_ck) {
--			ret = clk_prepare_enable(dwmac->clk_eth_ck);
--			if (ret) {
--				clk_disable_unprepare(dwmac->syscfg_clk);
--				return ret;
--			}
--		}
--	} else {
--		clk_disable_unprepare(dwmac->syscfg_clk);
--		if (dwmac->enable_eth_ck)
--			clk_disable_unprepare(dwmac->clk_eth_ck);
- 	}
--	return ret;
-+
-+	return stm32_dwmac_clk_enable(dwmac, resume);
- }
- 
- static int stm32mp1_set_mode(struct plat_stmmacenet_data *plat_dat)
-@@ -252,13 +244,15 @@ static int stm32mcu_set_mode(struct plat_stmmacenet_data *plat_dat)
- 				 dwmac->ops->syscfg_eth_mask, val << 23);
- }
- 
--static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac)
-+static void stm32_dwmac_clk_disable(struct stm32_dwmac *dwmac, bool suspend)
- {
- 	clk_disable_unprepare(dwmac->clk_tx);
--	clk_disable_unprepare(dwmac->clk_rx);
-+	if (!dwmac->ops->clk_rx_enable_in_suspend || !suspend)
-+		clk_disable_unprepare(dwmac->clk_rx);
- 
--	if (dwmac->ops->clk_prepare)
--		dwmac->ops->clk_prepare(dwmac, false);
-+	clk_disable_unprepare(dwmac->syscfg_clk);
-+	if (dwmac->enable_eth_ck)
-+		clk_disable_unprepare(dwmac->clk_eth_ck);
- }
- 
- static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
-@@ -397,7 +391,7 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
- 
- 	plat_dat->bsp_priv = dwmac;
- 
--	ret = stm32_dwmac_init(plat_dat);
-+	ret = stm32_dwmac_init(plat_dat, false);
- 	if (ret)
- 		return ret;
- 
-@@ -408,7 +402,7 @@ static int stm32_dwmac_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_clk_disable:
--	stm32_dwmac_clk_disable(dwmac);
-+	stm32_dwmac_clk_disable(dwmac, false);
- 
- 	return ret;
- }
-@@ -421,7 +415,7 @@ static void stm32_dwmac_remove(struct platform_device *pdev)
- 
- 	stmmac_dvr_remove(&pdev->dev);
- 
--	stm32_dwmac_clk_disable(priv->plat->bsp_priv);
-+	stm32_dwmac_clk_disable(dwmac, false);
- 
- 	if (dwmac->irq_pwr_wakeup >= 0) {
- 		dev_pm_clear_wake_irq(&pdev->dev);
-@@ -431,18 +425,7 @@ static void stm32_dwmac_remove(struct platform_device *pdev)
- 
- static int stm32mp1_suspend(struct stm32_dwmac *dwmac)
- {
--	int ret = 0;
--
--	ret = clk_prepare_enable(dwmac->clk_ethstp);
--	if (ret)
--		return ret;
--
--	clk_disable_unprepare(dwmac->clk_tx);
--	clk_disable_unprepare(dwmac->syscfg_clk);
--	if (dwmac->enable_eth_ck)
--		clk_disable_unprepare(dwmac->clk_eth_ck);
--
--	return ret;
-+	return clk_prepare_enable(dwmac->clk_ethstp);
- }
- 
- static void stm32mp1_resume(struct stm32_dwmac *dwmac)
-@@ -450,14 +433,6 @@ static void stm32mp1_resume(struct stm32_dwmac *dwmac)
- 	clk_disable_unprepare(dwmac->clk_ethstp);
- }
- 
--static int stm32mcu_suspend(struct stm32_dwmac *dwmac)
--{
--	clk_disable_unprepare(dwmac->clk_tx);
--	clk_disable_unprepare(dwmac->clk_rx);
--
--	return 0;
--}
--
- #ifdef CONFIG_PM_SLEEP
- static int stm32_dwmac_suspend(struct device *dev)
- {
-@@ -468,6 +443,10 @@ static int stm32_dwmac_suspend(struct device *dev)
- 	int ret;
- 
- 	ret = stmmac_suspend(dev);
-+	if (ret)
-+		return ret;
-+
-+	stm32_dwmac_clk_disable(dwmac, true);
- 
- 	if (dwmac->ops->suspend)
- 		ret = dwmac->ops->suspend(dwmac);
-@@ -485,7 +464,7 @@ static int stm32_dwmac_resume(struct device *dev)
- 	if (dwmac->ops->resume)
- 		dwmac->ops->resume(dwmac);
- 
--	ret = stm32_dwmac_init(priv->plat);
-+	ret = stm32_dwmac_init(priv->plat, true);
- 	if (ret)
- 		return ret;
- 
-@@ -500,13 +479,11 @@ static SIMPLE_DEV_PM_OPS(stm32_dwmac_pm_ops,
- 
- static struct stm32_ops stm32mcu_dwmac_data = {
- 	.set_mode = stm32mcu_set_mode,
--	.suspend = stm32mcu_suspend,
- 	.syscfg_eth_mask = SYSCFG_MCU_ETH_MASK
- };
- 
- static struct stm32_ops stm32mp1_dwmac_data = {
- 	.set_mode = stm32mp1_set_mode,
--	.clk_prepare = stm32mp1_clk_prepare,
- 	.suspend = stm32mp1_suspend,
- 	.resume = stm32mp1_resume,
- 	.parse_data = stm32mp1_parse_data,
--- 
-2.42.0
-
+greg k-h
 
