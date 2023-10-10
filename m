@@ -1,168 +1,154 @@
-Return-Path: <netdev+bounces-39674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E387C04CD
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:40:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0779B7C4069
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E71028123A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:40:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37E6F1C20B86
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B28321A0;
-	Tue, 10 Oct 2023 19:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDA9321B2;
+	Tue, 10 Oct 2023 19:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="UgzsQCQD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aiQQO/ru"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89ECC32188
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:40:50 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B02B6;
-	Tue, 10 Oct 2023 12:40:47 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39AIbeat020001;
-	Tue, 10 Oct 2023 12:40:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=o0VXMIuJ7GsxmOrhDanvGNS6hKQ9z9T+3DPeNsTiG0g=;
- b=UgzsQCQDEfDSpCZaGUF5PhDFn0MypOE/niG3/bn+RbQlpIdBcXmP4xMbwTRM54DO7Hpc
- 8aJW8AMPsIqMT9p7W1fgR8SO3z9wm3JBxrDYobBTjrApd6yzlWuxIno3aTRcWxld7tGu
- sBOcMuD38nmB/7CMmzVkohyG3w3EDarUAPdGcTWqZQbD2ZagMuTREzbWKxc+PudJMU1w
- mvweikzieAiXc8KhVGkdBJ3ZDMfZT+RrBeohKIoI2kWobqtPtgntzvCQ7x5+Tqq33ki7
- R5TenPBg4j8Nz+EXOOr4H7EjHnt/OLOtYDZ4bJxgrR7DV9ZeZojC1+lXe7Lb0h5tXgYM ag== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tnc2ar6fu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 10 Oct 2023 12:40:31 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 10 Oct
- 2023 12:40:30 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 10 Oct 2023 12:40:30 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id B8BF65B6924;
-	Tue, 10 Oct 2023 12:40:29 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <egallen@redhat.com>,
-        <hgani@marvell.com>, <kuba@kernel.org>, <mschmidt@redhat.com>,
-        <netdev@vger.kernel.org>, <srasheed@marvell.com>, <sedara@marvell.com>,
-        <vburru@marvell.com>, <vimleshk@marvell.com>
-Subject: [net-next PATCH v2] octeon_ep: pack hardware structures
-Date: Tue, 10 Oct 2023 12:40:26 -0700
-Message-ID: <20231010194026.2284786-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <PH0PR18MB47341BB93B1CCC7E6E91AC53C7CDA@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <PH0PR18MB47341BB93B1CCC7E6E91AC53C7CDA@PH0PR18MB4734.namprd18.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43E3321AB
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:53:35 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B1693
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 12:53:34 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a581346c4so1550015276.0
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 12:53:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696967613; x=1697572413; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w5E9MxIyYhKzMBpNRM6CeDwnSabl1YmaOv2YrvO7ZwA=;
+        b=aiQQO/rurAS5Lnl/Q2g2+N5y+Yflc4WrKFmJcUT10ZAxVnQYiJayZdAJht6JSma8nn
+         ADTCEnoq9gNSnPa6P/NTVhjeq6U6MhQZQh4ua6XV+6Mqn40K9Hjy4d1+z7vbXNcxRtMT
+         gPEv9zI8NeQ3/5ARcfC9tKSgmTjxCS0+T7whSWFrlPfbv9iJtK9z8i4s8h9e57SOMqHr
+         yt1pxTxt5JKhjkFxvD00vofri7Z7PAjuZhJDc4zwg3os7ak+8c1iYb+KEvY2Xuc5VCvc
+         m2p4u9uH2RkacQHoNobL349x8VxGU0vZiy6DpWxJ7L/Sg4B2AAm0dg7lLhNpJD5ZESeg
+         +RYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696967613; x=1697572413;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=w5E9MxIyYhKzMBpNRM6CeDwnSabl1YmaOv2YrvO7ZwA=;
+        b=o4vHPmqRW4kjcIWIvG9SLryPnqMAN7IZnM7pJxh7F8tg34UgZpzbPlvXkhz6cGifOy
+         hAO2BvnTl7ba94haE9C/ypTSJv5ixram72g0AcERzyqpwacyLVbo36/L6mBmEkjYCnI/
+         /VuAxyk6Pg4oYXrz/Jq0bJSyHJDtbCL7Nu8967ATG6FvftzYWQg2zkpErHttS4mWSFut
+         TuyVCxQME74ilnDl6tAAIAT2TJx4YsMWgGuoYc6nOuPyfMQFb5Bn805iryK7KEuAMCLJ
+         /efiV0WRV0IXIaF39c4lvTofZ2in85LCYMV4GI2EgG1wcjNc4ffJ0WGVJexjNidXSs3F
+         Cjkg==
+X-Gm-Message-State: AOJu0Yza7qkDWfHmco/QK4/H17jO6pOJULjZ1bdSg0Ev6LvGMtftQrJV
+	WLEg2dU/A8FrppQ7jT2s9ZgOIwAgUC0gjarTeQ==
+X-Google-Smtp-Source: AGHT+IFf+EcNSed1EvzahNf05j6H+bR8LMoGehNG9vtR75/usZMZPFVfBU6LyeUKu8sWdgNzGSviQJZCAAOpdfkScA==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6902:85:b0:d86:5644:5d12 with SMTP
+ id h5-20020a056902008500b00d8656445d12mr357348ybs.4.1696967613332; Tue, 10
+ Oct 2023 12:53:33 -0700 (PDT)
+Date: Tue, 10 Oct 2023 19:53:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: _Ve6LXV43AbFyDLYJYCCBBWp-J49Vcmx
-X-Proofpoint-ORIG-GUID: _Ve6LXV43AbFyDLYJYCCBBWp-J49Vcmx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-10_16,2023-10-10_01,2023-05-22_02
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIALurJWUC/yWNUQrCMBBEr1L224VsFRu8ikgp6cYu1qTshqKU3
+ t2oP8M8HsxsYKzCBpdmA+VVTHKqQIcGwjSkO6OMlaF17ZEcObSiKSxvHFVWVsPEBblMrN8iqfC M8Unu8c++qpLzjAE9+RMPXefPFKHOL8pRXr/r623fP2N/8+eKAAAA
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696967612; l=2330;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=Kd8rwBEMi1NtM8y4ozGswyeCAqmu3EbqiQJnq7rYFR0=; b=OC+eT0HLH7q5dOLGigWF8Rx7ymgW1poduMQ2TkjiGHXmUxXOMiXpMWi9S1WtDr2E1QqE/23iD
+ A1dqQ8QKh0RBofrRZ+itXkeKDgltYr22tc53NO8eW+Zm9I7v62Xp+fW
+X-Mailer: b4 0.12.3
+Message-ID: <20231010-strncpy-drivers-net-ethernet-intel-fm10k-fm10k_ethtool-c-v1-1-dbdc4570c5a6@google.com>
+Subject: [PATCH] fm10k: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add packed attribute to structures correlating to hardware
-data, as padding is not allowed by hardware.
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+A suitable replacement is `strscpy` [2] due to the fact that it
+guarantees NUL-termination on the destination buffer without
+unnecessarily NUL-padding.
+
+Other implementations of .*get_drvinfo also use strscpy so this patch
+brings fm10k_get_drvinfo in line as well:
+
+igb/igb_ethtool.c +851
+static void igb_get_drvinfo(struct net_device *netdev,
+
+igbvf/ethtool.c
+167:static void igbvf_get_drvinfo(struct net_device *netdev,
+
+i40e/i40e_ethtool.c
+1999:static void i40e_get_drvinfo(struct net_device *netdev,
+
+e1000/e1000_ethtool.c
+529:static void e1000_get_drvinfo(struct net_device *netdev,
+
+ixgbevf/ethtool.c
+211:static void ixgbevf_get_drvinfo(struct net_device *netdev,
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
-V1 -> V2: Updated changelog
+Note: build-tested only.
+---
+ drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
- drivers/net/ethernet/marvell/octeon_ep/octep_rx.h | 6 +++---
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.h | 8 ++++----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+diff --git a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+index d53369e30040..13a05604dcc0 100644
+--- a/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
++++ b/drivers/net/ethernet/intel/fm10k/fm10k_ethtool.c
+@@ -448,10 +448,10 @@ static void fm10k_get_drvinfo(struct net_device *dev,
+ {
+ 	struct fm10k_intfc *interface = netdev_priv(dev);
+ 
+-	strncpy(info->driver, fm10k_driver_name,
+-		sizeof(info->driver) - 1);
+-	strncpy(info->bus_info, pci_name(interface->pdev),
+-		sizeof(info->bus_info) - 1);
++	strscpy(info->driver, fm10k_driver_name,
++		sizeof(info->driver));
++	strscpy(info->bus_info, pci_name(interface->pdev),
++		sizeof(info->bus_info));
+ }
+ 
+ static void fm10k_get_pauseparam(struct net_device *dev,
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-index 782a24f27f3e..ca42ddb77491 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_rx.h
-@@ -19,7 +19,7 @@
- struct octep_oq_desc_hw {
- 	dma_addr_t buffer_ptr;
- 	u64 info_ptr;
--};
-+} __packed;
- 
- #define OCTEP_OQ_DESC_SIZE    (sizeof(struct octep_oq_desc_hw))
- 
-@@ -38,7 +38,7 @@ struct octep_oq_resp_hw_ext {
- 
- 	/* checksum verified. */
- 	u64 csum_verified:2;
--};
-+} __packed;
- 
- #define  OCTEP_OQ_RESP_HW_EXT_SIZE   (sizeof(struct octep_oq_resp_hw_ext))
- 
-@@ -49,7 +49,7 @@ struct octep_oq_resp_hw_ext {
- struct octep_oq_resp_hw {
- 	/* The Length of the packet. */
- 	__be64 length;
--};
-+} __packed;
- 
- #define OCTEP_OQ_RESP_HW_SIZE   (sizeof(struct octep_oq_resp_hw))
- 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-index 21e75ff9f5e7..74189e5a7d33 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-@@ -35,7 +35,7 @@
- struct octep_tx_sglist_desc {
- 	u16 len[4];
- 	dma_addr_t dma_ptr[4];
--};
-+} __packed;
- 
- /* Each Scatter/Gather entry sent to hardwar hold four pointers.
-  * So, number of entries required is (MAX_SKB_FRAGS + 1)/4, where '+1'
-@@ -238,7 +238,7 @@ struct octep_instr_hdr {
- 
- 	/* Reserved3 */
- 	u64 reserved3:1;
--};
-+} __packed;
- 
- /* Hardware Tx completion response header */
- struct octep_instr_resp_hdr {
-@@ -262,7 +262,7 @@ struct octep_instr_resp_hdr {
- 
- 	/* Opcode for the return packet  */
- 	u64 opcode:16;
--};
-+} __packed;
- 
- /* 64-byte Tx instruction format.
-  * Format of instruction for a 64-byte mode input queue.
-@@ -292,7 +292,7 @@ struct octep_tx_desc_hw {
- 
- 	/* Additional headers available in a 64-byte instruction. */
- 	u64 exhdr[4];
--};
-+} __packed;
- 
- #define OCTEP_IQ_DESC_SIZE (sizeof(struct octep_tx_desc_hw))
- #endif /* _OCTEP_TX_H_ */
--- 
-2.25.1
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231010-strncpy-drivers-net-ethernet-intel-fm10k-fm10k_ethtool-c-8184ea77861f
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
