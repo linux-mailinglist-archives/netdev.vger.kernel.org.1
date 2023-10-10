@@ -1,460 +1,214 @@
-Return-Path: <netdev+bounces-39527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650A27BF984
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383CE7BF989
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:21:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AF78281E03
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:18:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C49A1281E1E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7620018B09;
-	Tue, 10 Oct 2023 11:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6955318B0E;
+	Tue, 10 Oct 2023 11:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="twuRsdWv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrwP2Dr+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFD818AED
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 11:18:42 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92639107
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 04:18:37 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-533c5d10dc7so9705484a12.3
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 04:18:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8218182A7;
+	Tue, 10 Oct 2023 11:20:57 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079A0A4;
+	Tue, 10 Oct 2023 04:20:56 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53b32dca0bfso8487959a12.0;
+        Tue, 10 Oct 2023 04:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696936716; x=1697541516; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5afGkkeJDJQIwueDAOXQKmn2OfT88cQRGV1V2HneC5g=;
-        b=twuRsdWvuuMssR92HO4nPDCX3VpPN68bVmWeUmUD8sz0GbOx8T4QlTbClwD7F4cdun
-         A+spARkcO5VqiFxVekcmzLWLfOd6b6QeKsGTfs5brxP3fKOw5IyQeIhMOjbK9YX5HIWv
-         QrDZVG9XxfaxXDaYwNM1q6NJpyychkk32FNd1GjL+bLU1EffM4YbLfJ5VhxflmOpE9y/
-         hYXwPpori33284UyST4vLdhHLAkGXSA7hNCzQTImti8nixY20BhFNUstycCAofNdj9wo
-         jaLG5C6JAztfHXjMaxHnTmbkIhARD6NZl02VZ881Zi7D4nWWAwjrKW9ANQKs0jvpOMIf
-         n5ug==
+        d=gmail.com; s=20230601; t=1696936854; x=1697541654; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sQsOgeceEIsXhp0lkWDt2Tm0RKONRcHVaKqhgdrpmWA=;
+        b=SrwP2Dr+nbYMbywpyMpPVXsAA1CiPs/F+/1HdiuOTSpyxrcnq1dI72tWpnTJ61QFrO
+         BSOEG6k8hwpaE59h5fV7OGpU9BH5VUv+T+68zw8k0gySQJVDYA5Ed7IL1GCC+JIc4Q6P
+         ZUwjAyxLA5kHO47CHNcO/a/6Y/KQg+RfH87AovJcIHxnRwp8zKGUz/sl7bPkRE00T+Py
+         +EeOTRVFcYZtEnzcx/37cv+61E3PVWcJ4MYN8u0RWH7bxzHZtw6Ix/M9WpBTvzvkHho7
+         tMfCRtlUDmvwTwN38/qb670gS7Tf3rYd37GuUM1Omw1+CU3+XkoppZSTCE9IOocYbreU
+         ta1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696936716; x=1697541516;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5afGkkeJDJQIwueDAOXQKmn2OfT88cQRGV1V2HneC5g=;
-        b=CQDT+Sb0mD5uLGkRAAdm664Yl3Nklw2OiUuABbnrs2dSNTGN9CmZEpYpkD0MpZALIC
-         VuQLGmr/W8dp+CuOkymMhu24sIqnIV2i6c1bDSllMxzV+vPi1/xa9GHIJoSKQhD6M/wq
-         CgmNnyFwhNP1CvkrwOsiVhc/RRd4La398qfyJ22+J9YsI6pR/yiqctrBSoOVK3G8hU/h
-         D5WLi8XVcesaij351jmiPxP13Dlrh4D0M+Y2GnSOf5M38/II4aHzwoplXAHCnvEO840t
-         C7ZVZswV3C2Opr79I4QHPWfZKn+1WVpkaNvD0l0YZIUCg81jPkEPlL5/NEdCOfX9pwNm
-         ZNdg==
-X-Gm-Message-State: AOJu0YyGTGvaCqH4sV6mcj9y2scyM/zoKxzFavftQXkmWlBIxAaGXYgu
-	YHIVSYeV/PaTs9c6wFPLdVSvjTUaDlp9/eiN9v8=
-X-Google-Smtp-Source: AGHT+IG6y034tv7eLZbMDk/x/B3l3OvBY5lp1kwnYXPR4EvyHbEvFs3acaEJG5AtRI1Ni5Rz+/aFdg==
-X-Received: by 2002:a17:906:1d7:b0:9ba:2fa1:a893 with SMTP id 23-20020a17090601d700b009ba2fa1a893mr3663151ejj.76.1696936715780;
-        Tue, 10 Oct 2023 04:18:35 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o12-20020a17090637cc00b0099bc80d5575sm8171135ejc.200.2023.10.10.04.18.34
+        d=1e100.net; s=20230601; t=1696936854; x=1697541654;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sQsOgeceEIsXhp0lkWDt2Tm0RKONRcHVaKqhgdrpmWA=;
+        b=CGgmqooMh0q8XLTN+vsjQTY8gH3tT81HZcoYp2zps6qIZDqmQPwmXDhv5LX9vxHCPh
+         a0td6doGrFJ401eppygBvzmVIx+VPut3peC/R+cfxli/Db8HdbxKGDDXay1hWEoDXSqp
+         6IaMLrJhRkcGI+BCK/OVzogjUtr/r01xgKGQ5/t+g8RV+RQQpvmWArKAcmf57XgRsKxX
+         dwaMp7W9zhPv2kTnNJ+/xMYPxxW7hLz2lYHDB9T++D0FTACDidU8jgwZw3NrtdLu/rno
+         AZbcXS1Sc9646IHSVh1xUPvwD+J8hk1jTaCJhIjQwpc+G9aDy9dcS3bqZ6moLA7Xfoja
+         +IEg==
+X-Gm-Message-State: AOJu0YzHgtmh4iYOEG2rKNgTl8QVyCgGcY17nToS1FPGDyZ3cAZjrWLt
+	HAvht7bAhkrS6c+1zNor8Ls=
+X-Google-Smtp-Source: AGHT+IHQg5XnMxa+WG+1BhKXXbSTRxIr71eh+hShfTQmwO35pOdo02/EP4obh3cA9lf1wm2F7dDO/A==
+X-Received: by 2002:a05:6402:5190:b0:534:6b86:eda2 with SMTP id q16-20020a056402519000b005346b86eda2mr10776212edd.21.1696936854308;
+        Tue, 10 Oct 2023 04:20:54 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id r14-20020a05640251ce00b0053da777f7d1sm281611edd.10.2023.10.10.04.20.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 04:18:35 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jacob.e.keller@intel.com,
-	johannes@sipsolutions.net
-Subject: [patch net-next 10/10] devlink: remove netlink small_ops
-Date: Tue, 10 Oct 2023 13:18:34 +0200
-Message-ID: <20231010111834.201467-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231010110828.200709-1-jiri@resnulli.us>
-References: <20231010110828.200709-1-jiri@resnulli.us>
+        Tue, 10 Oct 2023 04:20:54 -0700 (PDT)
+Date: Tue, 10 Oct 2023 14:20:51 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH] net: dsa: vsc73xx: replace deprecated strncpy with
+ ethtool_sprintf
+Message-ID: <20231010112051.zgefbx2c3tjneudz@skbuf>
+References: <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
+ <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	UPPERCASE_50_75 autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
+ <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Mon, Oct 09, 2023 at 10:54:37PM +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> ethtool_sprintf() is designed specifically for get_strings() usage.
+> Let's replace strncpy in favor of this more robust and easier to
+> understand interface.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+> Note: build-tested only.
+> ---
+>  drivers/net/dsa/vitesse-vsc73xx-core.c | 20 ++++++--------------
+>  1 file changed, 6 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> index 4f09e7438f3b..09955fdea2ff 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> @@ -928,7 +928,8 @@ static void vsc73xx_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+>  	const struct vsc73xx_counter *cnt;
+>  	struct vsc73xx *vsc = ds->priv;
+>  	u8 indices[6];
+> -	int i, j;
+> +	u8 *buf = data;
+> +	int i;
+>  	u32 val;
+>  	int ret;
+>  
+> @@ -948,10 +949,7 @@ static void vsc73xx_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+>  	indices[5] = ((val >> 26) & 0x1f); /* TX counter 2 */
+>  
+>  	/* The first counters is the RX octets */
+> -	j = 0;
+> -	strncpy(data + j * ETH_GSTRING_LEN,
+> -		"RxEtherStatsOctets", ETH_GSTRING_LEN);
+> -	j++;
+> +	ethtool_sprintf(&buf, "RxEtherStatsOctets");
 
-All commands are now covered by generated split_ops. Remove the
-small_ops entirely alongside with unified devlink netlink policy array.
+Here you don't use "%s", but everywhere else you do. Can't you just pass
+the counter name everywhere, without "%s"?
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/netlink.c | 328 +-----------------------------------------
- 1 file changed, 1 insertion(+), 327 deletions(-)
+>  
+>  	/* Each port supports recording 3 RX counters and 3 TX counters,
+>  	 * figure out what counters we use in this set-up and return the
+> @@ -962,22 +960,16 @@ static void vsc73xx_get_strings(struct dsa_switch *ds, int port, u32 stringset,
+>  	for (i = 0; i < 3; i++) {
+>  		cnt = vsc73xx_find_counter(vsc, indices[i], false);
+>  		if (cnt)
+> -			strncpy(data + j * ETH_GSTRING_LEN,
+> -				cnt->name, ETH_GSTRING_LEN);
+> -		j++;
+> +			ethtool_sprintf(&buf, "%s", cnt->name);
 
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index ca63e59a5e92..d0b90ebc8b15 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -13,75 +13,6 @@ static const struct genl_multicast_group devlink_nl_mcgrps[] = {
- 	[DEVLINK_MCGRP_CONFIG] = { .name = DEVLINK_GENL_MCGRP_CONFIG_NAME },
- };
- 
--static const struct nla_policy devlink_nl_policy[DEVLINK_ATTR_MAX + 1] = {
--	[DEVLINK_ATTR_UNSPEC] = { .strict_start_type =
--		DEVLINK_ATTR_TRAP_POLICER_ID },
--	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_PORT_TYPE] = NLA_POLICY_RANGE(NLA_U16, DEVLINK_PORT_TYPE_AUTO,
--						    DEVLINK_PORT_TYPE_IB),
--	[DEVLINK_ATTR_PORT_SPLIT_COUNT] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_POOL_INDEX] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_SB_POOL_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_SB_POOL_SIZE] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_POOL_THRESHOLD_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_SB_THRESHOLD] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_SB_TC_INDEX] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_RANGE(NLA_U16, DEVLINK_ESWITCH_MODE_LEGACY,
--						       DEVLINK_ESWITCH_MODE_SWITCHDEV),
--	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_DPIPE_TABLE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_DPIPE_TABLE_COUNTERS_ENABLED] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_RESOURCE_ID] = { .type = NLA_U64},
--	[DEVLINK_ATTR_RESOURCE_SIZE] = { .type = NLA_U64},
--	[DEVLINK_ATTR_PARAM_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_PARAM_TYPE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_REGION_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_REGION_SNAPSHOT_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_REGION_CHUNK_ADDR] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_REGION_CHUNK_LEN] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_HEALTH_REPORTER_GRACEFUL_PERIOD] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_RECOVER] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_FLASH_UPDATE_FILE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_FLASH_UPDATE_COMPONENT] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_FLASH_UPDATE_OVERWRITE_MASK] =
--		NLA_POLICY_BITFIELD32(DEVLINK_SUPPORTED_FLASH_OVERWRITE_SECTIONS),
--	[DEVLINK_ATTR_TRAP_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_TRAP_ACTION] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_TRAP_GROUP_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_NETNS_PID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_NETNS_FD] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_NETNS_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_HEALTH_REPORTER_AUTO_DUMP] = { .type = NLA_U8 },
--	[DEVLINK_ATTR_TRAP_POLICER_ID] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_TRAP_POLICER_RATE] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_TRAP_POLICER_BURST] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_PORT_FUNCTION] = { .type = NLA_NESTED },
--	[DEVLINK_ATTR_RELOAD_ACTION] = NLA_POLICY_RANGE(NLA_U8, DEVLINK_RELOAD_ACTION_DRIVER_REINIT,
--							DEVLINK_RELOAD_ACTION_MAX),
--	[DEVLINK_ATTR_RELOAD_LIMITS] = NLA_POLICY_BITFIELD32(DEVLINK_RELOAD_LIMITS_VALID_MASK),
--	[DEVLINK_ATTR_PORT_FLAVOUR] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_PORT_PCI_PF_NUMBER] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_PORT_PCI_SF_NUMBER] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_PORT_CONTROLLER_NUMBER] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_RATE_TYPE] = { .type = NLA_U16 },
--	[DEVLINK_ATTR_RATE_TX_SHARE] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_RATE_TX_MAX] = { .type = NLA_U64 },
--	[DEVLINK_ATTR_RATE_NODE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_RATE_PARENT_NODE_NAME] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_LINECARD_INDEX] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_LINECARD_TYPE] = { .type = NLA_NUL_STRING },
--	[DEVLINK_ATTR_SELFTESTS] = { .type = NLA_NESTED },
--	[DEVLINK_ATTR_RATE_TX_PRIORITY] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_RATE_TX_WEIGHT] = { .type = NLA_U32 },
--	[DEVLINK_ATTR_REGION_DIRECT] = { .type = NLA_FLAG },
--};
--
- int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
- 				 struct devlink *devlink, int attrtype)
- {
-@@ -191,7 +122,7 @@ static int __devlink_nl_pre_doit(struct sk_buff *skb, struct genl_info *info,
- int devlink_nl_pre_doit(const struct genl_split_ops *ops,
- 			struct sk_buff *skb, struct genl_info *info)
- {
--	return __devlink_nl_pre_doit(skb, info, ops->internal_flags);
-+	return __devlink_nl_pre_doit(skb, info, 0);
- }
- 
- int devlink_nl_pre_doit_port(const struct genl_split_ops *ops,
-@@ -287,269 +218,12 @@ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
- 		return devlink_nl_inst_iter_dumpit(msg, cb, flags, dump_one);
- }
- 
--static const struct genl_small_ops devlink_nl_small_ops[40] = {
--	{
--		.cmd = DEVLINK_CMD_PORT_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_SET,
--		.doit = devlink_nl_rate_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_NEW,
--		.doit = devlink_nl_rate_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RATE_DEL,
--		.doit = devlink_nl_rate_del_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_SPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_split_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_UNSPLIT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_unsplit_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_NEW,
--		.doit = devlink_nl_port_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_DEL,
--		.doit = devlink_nl_port_del_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--
--	{
--		.cmd = DEVLINK_CMD_LINECARD_SET,
--		.doit = devlink_nl_linecard_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_PORT_POOL_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_port_pool_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_TC_POOL_BIND_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_tc_pool_bind_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_SNAPSHOT,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_occ_snapshot_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SB_OCC_MAX_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_sb_occ_max_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_eswitch_get_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_ESWITCH_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_eswitch_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_table_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_ENTRIES_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_entries_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_HEADERS_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_headers_get_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_DPIPE_TABLE_COUNTERS_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_dpipe_table_counters_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_resource_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_RESOURCE_DUMP,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_resource_dump_doit,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_RELOAD,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_reload_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_param_get_doit,
--		.dumpit = devlink_nl_port_param_get_dumpit,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--		/* can be retrieved by unprivileged users */
--	},
--	{
--		.cmd = DEVLINK_CMD_PORT_PARAM_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_port_param_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_NEW,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_region_new_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_DEL,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_region_del_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_REGION_READ,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_region_read_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_set_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_RECOVER,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_recover_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DIAGNOSE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_diagnose_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT |
--			    GENL_DONT_VALIDATE_DUMP_STRICT,
--		.dumpit = devlink_nl_health_reporter_dump_get_dumpit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_DUMP_CLEAR,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_dump_clear_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_HEALTH_REPORTER_TEST,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_health_reporter_test_doit,
--		.flags = GENL_ADMIN_PERM,
--		.internal_flags = DEVLINK_NL_FLAG_NEED_DEVLINK_OR_PORT,
--	},
--	{
--		.cmd = DEVLINK_CMD_FLASH_UPDATE,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = devlink_nl_flash_update_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_SET,
--		.doit = devlink_nl_trap_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_GROUP_SET,
--		.doit = devlink_nl_trap_group_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_TRAP_POLICER_SET,
--		.doit = devlink_nl_trap_policer_set_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = DEVLINK_CMD_SELFTESTS_RUN,
--		.doit = devlink_nl_selftests_run_doit,
--		.flags = GENL_ADMIN_PERM,
--	},
--	/* -- No new ops here! Use split ops going forward! -- */
--};
--
- struct genl_family devlink_nl_family __ro_after_init = {
- 	.name		= DEVLINK_GENL_NAME,
- 	.version	= DEVLINK_GENL_VERSION,
--	.maxattr	= DEVLINK_ATTR_MAX,
--	.policy		= devlink_nl_policy,
- 	.netnsok	= true,
- 	.parallel_ops	= true,
--	.pre_doit	= devlink_nl_pre_doit,
--	.post_doit	= devlink_nl_post_doit,
- 	.module		= THIS_MODULE,
--	.small_ops	= devlink_nl_small_ops,
--	.n_small_ops	= ARRAY_SIZE(devlink_nl_small_ops),
- 	.split_ops	= devlink_nl_ops,
- 	.n_split_ops	= ARRAY_SIZE(devlink_nl_ops),
- 	.resv_start_op	= DEVLINK_CMD_SELFTESTS_RUN + 1,
--- 
-2.41.0
+The code conversion is not functionally identical, and I think it's a
+bit hard to make it identical.
+
+The VSC7395 has 45 port counters, but it seems that it can only monitor
+and display 8 of them at a time - 2 fixed and 6 configurable through
+some windows.
+
+vsc73xx_get_strings() detects which counter is each window configured
+for, based on the value of the CNT_CTRL_CFG hardware register (VSC73XX_C_CFG
+in the code). It displays a different string depending on the hardware
+value.
+
+The code must deal with the case where vsc73xx_find_counter() returns
+NULL, aka the hardware window is configured for a value that vsc73xx_tx_counters[]
+and vsc73xx_rx_counters[] don't know about.
+
+Currently, the way that this is treated is by skipping the strncpy()
+(and thus leaving an empty string), and incrementing j to get to the
+next ethtool counter, and next window.
+
+The order of the strings in vsc73xx_get_strings() needs to be strongly
+correlated to the order of the counters from vsc73xx_get_ethtool_stats().
+So, the driver would still print counter values for the unknown windows,
+it will just not provide a string for them.
+
+In your proposal, the increment of j basically goes into the "if (cnt)"
+block because it's embedded within ethtool_sprintf(), which means that
+if a hardware counter is unknown, the total number of reported strings
+will be less than 8. Which is very problematic, because vsc73xx_get_sset_count()
+says that 8 strings are reported. Also, all the counter strings after
+the unknown one will be shifted to the left.
+
+I suggest that "if (!cnt)", you should call ethtool_sprintf() with an
+empty string, to preserve the original behavior.
+
+>  	}
+>  
+>  	/* TX stats begins with the number of TX octets */
+> -	strncpy(data + j * ETH_GSTRING_LEN,
+> -		"TxEtherStatsOctets", ETH_GSTRING_LEN);
+> -	j++;
+> +	ethtool_sprintf(&buf, "TxEtherStatsOctets");
+>  
+>  	for (i = 3; i < 6; i++) {
+>  		cnt = vsc73xx_find_counter(vsc, indices[i], true);
+>  		if (cnt)
+> -			strncpy(data + j * ETH_GSTRING_LEN,
+> -				cnt->name, ETH_GSTRING_LEN);
+> -		j++;
+> +			ethtool_sprintf(&buf, "%s", cnt->name);
+>  	}
+>  }
+>  
+> 
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-1cfd0ac2d81b
+> 
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+> 
 
 
