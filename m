@@ -1,55 +1,84 @@
-Return-Path: <netdev+bounces-39729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DAD07C43C0
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6017C43E4
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:26:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 569811C20BBD
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E031C20C26
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8520F32C7F;
-	Tue, 10 Oct 2023 22:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0356332C7B;
+	Tue, 10 Oct 2023 22:26:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fr.zoreil.com header.i=@fr.zoreil.com header.b="hDxAk9JB"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="1PL/j3Yl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F2B315A6
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:24:38 +0000 (UTC)
-X-Greylist: delayed 148 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 15:24:35 PDT
-Received: from violet.fr.zoreil.com (violet.fr.zoreil.com [IPv6:2001:4b98:dc0:41:216:3eff:fe56:8398])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4A19D;
-	Tue, 10 Oct 2023 15:24:35 -0700 (PDT)
-Received: from violet.fr.zoreil.com ([127.0.0.1])
-	by violet.fr.zoreil.com (8.17.1/8.17.1) with ESMTP id 39AMLW2b3324422;
-	Wed, 11 Oct 2023 00:21:32 +0200
-DKIM-Filter: OpenDKIM Filter v2.11.0 violet.fr.zoreil.com 39AMLW2b3324422
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fr.zoreil.com;
-	s=v20220413; t=1696976492;
-	bh=1jk5idWYaUQ5kRihQ+KrfsDVP7GFGMxbdcsWlzUtJfU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hDxAk9JBiB7JU7Z9LUTw0rkaRXwa9cK5JMEX/p5lhBnHQBM9VBy3NV7/dZBruL1Zt
-	 eQTZXNYQh4nLFsv3d2kLyeLbbL737AdcGt2Jtl3dm2Zw1cnlYi/yyK+LcejDaDfAw1
-	 c09IgvzXVJlq3AxH00Jurn6lBMWNL3JSPVm57Q7I=
-Received: (from romieu@localhost)
-	by violet.fr.zoreil.com (8.17.1/8.17.1/Submit) id 39AMLVg93324421;
-	Wed, 11 Oct 2023 00:21:31 +0200
-Date: Wed, 11 Oct 2023 00:21:31 +0200
-From: Francois Romieu <romieu@fr.zoreil.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Kalle Valo <kvalo@kernel.org>,
-        Wei Fang <wei.fang@nxp.com>, kernel@pengutronix.de,
-        stable@vger.kernel.org
-Subject: Re: [PATCH net] net: davicom: dm9000: dm9000_phy_write(): fix
- deadlock during netdev watchdog handling
-Message-ID: <20231010222131.GA3324403@electric-eye.fr.zoreil.com>
-References: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD45932C64;
+	Tue, 10 Oct 2023 22:26:42 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F8C0195;
+	Tue, 10 Oct 2023 15:26:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Jt7zMqKrLNJ4K7VS3w7XNGV+SpqUurU0PXBkkxalgKc=; b=1PL/j3Yl0CuSo7Wvorcy1SBbas
+	I+6DqkyUbYtUIZ9pkGSDQa8ByQS3UkqTwbfjdaotfSES7NdqYqgxx29fk4+tzLW3FRROafO4ZtsvZ
+	l+W8U6dorpda5yasc9Kqeau3Zz3sh/qCL49nsyxtkbllVRGWd6OzS9TccFLxGNwC4uVawQz8L4W7d
+	AcCH9bEiJX5jVmwx9rhI9AetmVYQ337XpotHrDcgLYa0oedh5OhdR8LhKPPVwrBxYyGTxqsN2NJUq
+	t3JisqYnKbp3RUciBZn8l5IbE1O6D3K7GhlblXGtYAWbn3INUlqHRA26oYGxooXJSmeyHUHhjfGWo
+	wvcm+phA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qqLAv-00EFvQ-2z;
+	Tue, 10 Oct 2023 22:26:01 +0000
+Date: Tue, 10 Oct 2023 15:26:01 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: j.granados@samsung.com
+Cc: willy@infradead.org, josh@joshtriplett.org,
+	Kees Cook <keescook@chromium.org>,
+	Phillip Potter <phil@philpotter.co.uk>,
+	Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Juergen Gross <jgross@suse.com>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	"James E.J. Bottomley" <jejb@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Doug Gilbert <dgilbert@interlog.com>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Corey Minyard <minyard@acm.org>, Theodore Ts'o <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Robin Holt <robinmholt@gmail.com>, Steve Wahl <steve.wahl@hpe.com>,
+	Russ Weight <russell.h.weight@intel.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Song Liu <song@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tvrtko.ursulin@linux.intel.com>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	linux-kernel@vger.kernel.org, xen-devel@lists.xenproject.org,
+	linux-serial@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+	linux-raid@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org
+Subject: Re: [PATCH v2 00/15] sysctl: Remove sentinel elements from drivers
+Message-ID: <ZSXPeVDv6FfKiTp5@bombadil.infradead.org>
+References: <20231002-jag-sysctl_remove_empty_elem_drivers-v2-0-02dd0d46f71e@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,39 +87,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
-X-Organisation: Land of Sunshine Inc.
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_SBL_CSS,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Level: *
+In-Reply-To: <20231002-jag-sysctl_remove_empty_elem_drivers-v2-0-02dd0d46f71e@samsung.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Marc Kleine-Budde <mkl@pengutronix.de> :
-> The dm9000 takes the db->lock spin lock in dm9000_timeout() and calls
-> into dm9000_init_dm9000(). For the DM9000B the PHY is reset with
-> dm9000_phy_write(). That function again takes the db->lock spin lock,
-> which results in a deadlock. For reference the backtrace:
-[...]
-> To workaround similar problem (take mutex inside spin lock ) , a
-> "in_timeout" variable was added in 582379839bbd ("dm9000: avoid
-> sleeping in dm9000_timeout callback"). Use this variable and not take
-> the spin lock inside dm9000_phy_write() if in_timeout is true.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> ---
-> During the netdev watchdog handling the dm9000 driver takes the same
-> spin lock twice. Avoid this by extending an existing workaround.
-> ---
+On Mon, Oct 02, 2023 at 10:55:17AM +0200, Joel Granados via B4 Relay wrote:
+> Changes in v2:
+> - Left the dangling comma in the ctl_table arrays.
+> - Link to v1: https://lore.kernel.org/r/20230928-jag-sysctl_remove_empty_elem_drivers-v1-0-e59120fca9f9@samsung.com
 
-I can review it but I can't really endorse it. :o)
+Thanks! Pushed onto sysctl-next for wider testing.
 
-Extending ugly workaround in pre-2000 style device drivers...
-I'd rather see the thing fixed if there is some real use for it.
-
--- 
-Ueimor
+  Luis
 
