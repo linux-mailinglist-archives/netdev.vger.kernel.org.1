@@ -1,130 +1,150 @@
-Return-Path: <netdev+bounces-39515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C497BF930
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:07:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E16857BF938
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A85BB1C20B53
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:07:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D32D1C20D4B
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9859118042;
-	Tue, 10 Oct 2023 11:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5F3182BE;
+	Tue, 10 Oct 2023 11:08:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eoJf6tFt"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NcU20npk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438E168CD;
-	Tue, 10 Oct 2023 11:07:24 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C08A9;
-	Tue, 10 Oct 2023 04:07:22 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99bdcade7fbso940582766b.1;
-        Tue, 10 Oct 2023 04:07:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE900FBFC
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 11:08:35 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4A4B4
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 04:08:32 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2bff776fe0bso71362541fa.0
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 04:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696936040; x=1697540840; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SxYIKEiG6ukaTBM9h6qF8OGxEw0D7VZs6H4jG50DssU=;
-        b=eoJf6tFtZqhePcDy6q0d4h3tciGtJOmudphCy5GcYPJRDfqYSYdik4Fn+sAcleP+1u
-         aLTBu2QQ0TT79yvsYZZd3mDeeXBpApt4bKFpXe4CyMwCdVXDvIv4a7Mbeo5Dp6JihBsW
-         RBVv6y7LTTa741kT0B3Fof/JkQ8GHX7Pk6FswPSQaq4kPZrZKTO5x5nEo6Nc4YLQU40B
-         CSJf3FNB/ydgs8xaUtSo9dpnrho4Aq3sTmF+jXtFVfHwZ295n/CqdjYVRqoru6wUlrSo
-         xC2k+tSrF9gax4VzZZEKwNxy7UK1Kqx34H8xYRItcxZPBuGbEdoCFvFo5KwDaKa1k81s
-         nYSw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696936110; x=1697540910; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+oD5VR/l2G/mJM+GS2eXN6Q/216i6/Lo0wRQz4mDD4w=;
+        b=NcU20npktTplg3WYGMI4LzcbqwH2USnDqQKGemaRiDn/yd0OgrUijaZRmIQLejVidk
+         EcjHbPI5Da/l0uDRej0zmMB53sqZAnRf2aFZWEMBv4BImOjaRe4KCKHkBPUVBw5rURZ3
+         0km3DuDhwCpaWCCdwXVN4L8S8JNzxU1lpTeYflytmL3qpBzv8H+7WgCnQGBxlde4ebUX
+         9xKLIy7VYmIFHpQZ/MSpwLS/tXQtrkf5ODKVHVTF1xPmoxCiKnRKpXk849ibMgd/Q2U8
+         J2huMrP+nTF3a2LUt8wkjBMUUOJRnFFrerceBpFaAj+SS9/5T4hvkFx9GQ6Ka78eT/Yf
+         eeiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696936040; x=1697540840;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SxYIKEiG6ukaTBM9h6qF8OGxEw0D7VZs6H4jG50DssU=;
-        b=Lmlo27cFBZl0pB6qRcuXRlrIo377ToTB1mQ78Qv4omBnRFiVCCXD67qhHeTNcArIP9
-         q95Blqvc1esNh8bDL5zfvoObccPkMbixNgdc6W3mzpcSfa0XH15mhRD4oYmCOgXbzxBC
-         xxj83FYla0bg6i10RWRU+udgVmuA0P3vhhhOM/Nrqc/QgD/whvVeuviOAL7Gh/O39iN2
-         sPZ55o49U+hDHfWY6ruDLdUN474j7GrfTr0l0B7Erhm75jhuLck+5SmakeqzvjkRxkCQ
-         SSx/etOb0JO0RIIiHQQlWcHsZUYitqEH5t/j4BVdC01Rz/BNSDa6GazgkXCKXbfg44Ay
-         hi4Q==
-X-Gm-Message-State: AOJu0YzzvobmPYx9sCxfFIoLORHzaSl0KcV3TOdPEGZ3jzZOzWD5JGrL
-	naSJKpF6LzxyAHUc5D5lq10=
-X-Google-Smtp-Source: AGHT+IEYPZp0tr9ONlPxfhIYkRElPfNwZm0mIx5/NZu6JdaArxgZ8NLCb2OrW2ymI80lISBM+r6xDA==
-X-Received: by 2002:a17:906:156:b0:9a6:4f54:1da6 with SMTP id 22-20020a170906015600b009a64f541da6mr16623638ejh.57.1696936040293;
-        Tue, 10 Oct 2023 04:07:20 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id l12-20020a170906230c00b009920e9a3a73sm8277193eja.115.2023.10.10.04.07.19
+        d=1e100.net; s=20230601; t=1696936110; x=1697540910;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+oD5VR/l2G/mJM+GS2eXN6Q/216i6/Lo0wRQz4mDD4w=;
+        b=JjBXu8csud+9kpxLQJGkDKobNLHxuv+rmvfZaL5jgOoexwyRtyzOFQu9O5bCPrTiNT
+         13p71twSjBhfzljyQ5CTb9bb1wpbUHxofy7cV3coKrbBcpvIFLpt8VLdO7jsCrmpN3v2
+         MMnmSBoYF2/LXwh29t4ULqy5+5O/NdRNq6ehq/p9Cd/OHg7OY2lBHxINqFxE2FjYrqGO
+         C2J9yNqS9R2gowZWfM/cAPWCs82JvdxbStaQ65cSAYG7Mk/BTqyZGppq2D47/zHIrI3E
+         NWsT52FV1Y754/olnRbg/hvpnh1vKHM1TWp2sYq0jqFxw/9gNHTIJqKJOhR50AoBEweM
+         Hj3Q==
+X-Gm-Message-State: AOJu0YzW3F8Moq96gM25Y8PeBGsBKp7yZSArfurhtBbxcIEgCNL1uzp+
+	VdW2RwuovSVb8w9EkP9MGecF1U14Vq5KrHs+09o=
+X-Google-Smtp-Source: AGHT+IG8FtAGMLBu9Ka+9oxeJ/bEol0Ll2S0gNhy9T3XWCA3N8ogJ5oeVBYln/ME5zkEfeysXzClrg==
+X-Received: by 2002:a05:6512:130b:b0:502:ffdf:b098 with SMTP id x11-20020a056512130b00b00502ffdfb098mr19592886lfu.6.1696936110226;
+        Tue, 10 Oct 2023 04:08:30 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id r19-20020a056402035300b00522828d438csm7556345edw.7.2023.10.10.04.08.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 04:07:20 -0700 (PDT)
-Date: Tue, 10 Oct 2023 14:07:17 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: replace deprecated strncpy
- with ethtool_sprintf
-Message-ID: <20231010110717.cw5sqxm5mlzyi2rq@skbuf>
-References: <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
+        Tue, 10 Oct 2023 04:08:29 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jacob.e.keller@intel.com,
+	johannes@sipsolutions.net
+Subject: [patch net-next 00/10] devlink: finish conversion to generated split_ops
+Date: Tue, 10 Oct 2023 13:08:19 +0200
+Message-ID: <20231010110828.200709-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Justin,
+From: Jiri Pirko <jiri@nvidia.com>
 
-On Mon, Oct 09, 2023 at 10:43:59PM +0000, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> ethtool_sprintf() is designed specifically for get_strings() usage.
-> Let's replace strncpy in favor of this more robust and easier to
-> understand interface.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
-> Note: build-tested only.
-> ---
->  drivers/net/dsa/realtek/rtl8365mb.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-> index 41ea3b5a42b1..d171c18dd354 100644
-> --- a/drivers/net/dsa/realtek/rtl8365mb.c
-> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
-> @@ -1303,8 +1303,7 @@ static void rtl8365mb_get_strings(struct dsa_switch *ds, int port, u32 stringset
->  
->  	for (i = 0; i < RTL8365MB_MIB_END; i++) {
->  		struct rtl8365mb_mib_counter *mib = &rtl8365mb_mib_counters[i];
-> -
-> -		strncpy(data + i * ETH_GSTRING_LEN, mib->name, ETH_GSTRING_LEN);
-> +		ethtool_sprintf(&data, "%s", mib->name);
+This patchset converts the remaining genetlink commands to generated
+split_ops and removes the existing small_ops arrays entirely
+alongside with shared netlink attribute policy.
 
-Is there any particular reason why you opted for the "%s" printf format
-specifier when you could have simply given mib->name as the single
-argument? This comment applies to all the ethtool_sprintf() patches
-you've submitted.
+Patches #1-#6 are just small preparations and small fixes on multiple
+              places. Note that couple of patches contain the "Fixes"
+	      tag but no need to put them into -net tree.
+Patch #7 is a simple rename preparation
+Patch #8 is the main one in this set and adds actual definitions of cmds
+         in to yaml file.
+Patches #9-#10 finalize the change removing bits that are no longer in
+               use.
+
+Jiri Pirko (10):
+  genetlink: don't merge dumpit split op for different cmds into single
+    iter
+  tools: ynl-gen: introduce support for bitfield32 attribute type
+  netlink: specs: devlink: remove reload-action from devlink-get cmd
+    reply
+  netlink: specs: devlink: make dont-validate single line
+  netlink: specs: devlink: fix reply command values
+  devlink: make devlink_flash_overwrite enum named one
+  devlink: rename netlink callback to be aligned with the generated ones
+  netlink: specs: devlink: add the remaining command to generate
+    complete split_ops
+  devlink: remove duplicated netlink callback prototypes
+  devlink: remove netlink small_ops
+
+ Documentation/netlink/genetlink-c.yaml      |    2 +-
+ Documentation/netlink/genetlink-legacy.yaml |    4 +-
+ Documentation/netlink/genetlink.yaml        |    2 +-
+ Documentation/netlink/specs/devlink.yaml    | 1607 +++++-
+ include/uapi/linux/devlink.h                |    2 +-
+ net/devlink/dev.c                           |   10 +-
+ net/devlink/devl_internal.h                 |   64 -
+ net/devlink/dpipe.c                         |   14 +-
+ net/devlink/health.c                        |   24 +-
+ net/devlink/linecard.c                      |    3 +-
+ net/devlink/netlink.c                       |  328 +-
+ net/devlink/netlink_gen.c                   |  757 ++-
+ net/devlink/netlink_gen.h                   |   64 +-
+ net/devlink/param.c                         |   14 +-
+ net/devlink/port.c                          |   11 +-
+ net/devlink/rate.c                          |    6 +-
+ net/devlink/region.c                        |    8 +-
+ net/devlink/resource.c                      |    4 +-
+ net/devlink/sb.c                            |   17 +-
+ net/devlink/trap.c                          |    9 +-
+ net/netlink/genetlink.c                     |    4 +-
+ tools/net/ynl/generated/devlink-user.c      | 4920 ++++++++++++++++---
+ tools/net/ynl/generated/devlink-user.h      | 4192 ++++++++++++++--
+ tools/net/ynl/generated/ethtool-user.h      |    1 +
+ tools/net/ynl/generated/fou-user.h          |    1 +
+ tools/net/ynl/generated/handshake-user.h    |    1 +
+ tools/net/ynl/generated/netdev-user.h       |    1 +
+ tools/net/ynl/lib/ynl.c                     |    6 +
+ tools/net/ynl/lib/ynl.h                     |    1 +
+ tools/net/ynl/ynl-gen-c.py                  |   31 +
+ 30 files changed, 10491 insertions(+), 1617 deletions(-)
+
+-- 
+2.41.0
+
 
