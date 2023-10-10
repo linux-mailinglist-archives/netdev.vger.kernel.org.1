@@ -1,66 +1,149 @@
-Return-Path: <netdev+bounces-39397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 778227BEFFF
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B35587BF00E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:08:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A28141C20A5C
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 00:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61FF1C20A06
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B568D37F;
-	Tue, 10 Oct 2023 00:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5C9638E;
+	Tue, 10 Oct 2023 01:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLMaAPpQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zg3n7NW2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D6E377
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:54:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 706DCC433C8;
-	Tue, 10 Oct 2023 00:54:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696899263;
-	bh=kUK2sT/V0xniU7l1mfm7A8ZGocRqD/CTjDCiVYXl8Mc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lLMaAPpQUmzUosar0uT9nw4Jc8IP2s7MHOZbUYBI1gxzHZEHbgmYGI1wIt0hkNFtY
-	 qE5+c6bPlED1Rrer9etn//LLO5Z/jlP3rvQde4Qxy4b0D/mB+LjuWwxs10SOzyc4l2
-	 9ni3pUroFkoi3idi7JR28QT1GhomxN7tgO8dmpajJxysZfd8NX9hwwE9I4sC7FLucd
-	 OGNM2SzvKWPx/xybsbP1B6s+/C+SQhUvhap1eDFd7jGisjC/Xe0B1pyXUfuuIT+LIS
-	 vw9/MiVqGekJNfHVtKqsh3FI0on1qobBj2h7UCFvcRpUxYjdGLw2wLB1++yg+/1DDX
-	 uEavzB5QkX1hA==
-Date: Mon, 9 Oct 2023 17:54:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com, tglx@linutronix.de,
- jstultz@google.com, horms@kernel.org, chrony-dev@chrony.tuxfamily.org,
- mlichvar@redhat.com, ntp-lists@mattcorallo.com, vinicius.gomes@intel.com,
- davem@davemloft.net, rrameshbabu@nvidia.com, shuah@kernel.org
-Subject: Re: [PATCH net-next v5 5/6] ptp: add debugfs interface to see
- applied channel masks
-Message-ID: <20231009175421.57552c62@kernel.org>
-In-Reply-To: <72ae11ff23793730a64cc1a037f9a6d59dbfbeea.1696804243.git.reibax@gmail.com>
-References: <cover.1696804243.git.reibax@gmail.com>
-	<72ae11ff23793730a64cc1a037f9a6d59dbfbeea.1696804243.git.reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C07E377
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 01:08:36 +0000 (UTC)
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD76A9E;
+	Mon,  9 Oct 2023 18:08:23 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-2773f776f49so3718053a91.1;
+        Mon, 09 Oct 2023 18:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696900103; x=1697504903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/NyHLoSVe2VzqxLFtpuVYd0zTrzwtQioN6fcJnEB+68=;
+        b=Zg3n7NW25xQO+Ebzi+0oP6kaw2STOV6fPCUkXTe080xcJaIQ7I/0plThD5oaD4tFzm
+         5Mu+xGBOQUmJKp9+iBU94lIpi9s5UrMIGXJgi9j7fwa6g6yLhzHUZvk6+0JsK9KySs7F
+         jBO32YlnIykNKHtvYYk7lU1h6YYbNg7uu5JzFMwgY50RKzkycP0nJwjazZqQXstD6crC
+         o0ycC4Vu6h9dQoh2F1i/ifsJWOlp+VosbfGVRUdzMXgHcy6zpJwNSYzkrky1Xc2DuVay
+         h0L6fvgo+MrW3WSK87N4WZOWR5lpbjP/JcxZjXbRJ2sP6yHPF8wBDtI0HSN9tJuRqvCA
+         5PEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696900103; x=1697504903;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/NyHLoSVe2VzqxLFtpuVYd0zTrzwtQioN6fcJnEB+68=;
+        b=UbgihKqOnic8L0lYHFxG8LY4Fn4taUQ7oS0gemqrarictrDEj7SUU4iko7Cg/fKVjk
+         Zclb+vHDkhkB/fg3XnHaXrpr1hutCrns3AU3kdmkdWXW5NEb/bOPan5aop4Z2Ak7wEhB
+         akk/oqnDcNp+4iK8UinkNxQEKDWmdVZUmNdwv9nEqFIRa4dPi3PQHsAdFRDjjuioTxru
+         rkfJEB2j0yv1753h2lyxhHy8adp883EWBZ+xPpzhN3jT+c1JSIrw0K4zZAyGYiHpDlSV
+         +iWgIHPOphmxdOc6B9XoH1uHpud0lOKZdCAaEErS1yHS9+/3dfij0awDJNDjDFZEX2tS
+         pvog==
+X-Gm-Message-State: AOJu0Yx1R662Z/PuH+Xr8/ZahVQhI05NIeViVu7tRdAGQzgprOHaFFeJ
+	c5yiFj7wqxHQdcAUq+Mc82Q=
+X-Google-Smtp-Source: AGHT+IFECBKSr0s8fUjcGXDbGeiFvCUGol7oHZ7hXWmqS472RlN1BZp4LPWlMi3ZSAL4Gu7uyUUvTw==
+X-Received: by 2002:a17:90a:dd43:b0:273:83ac:5eb9 with SMTP id u3-20020a17090add4300b0027383ac5eb9mr19693687pjv.4.1696900102964;
+        Mon, 09 Oct 2023 18:08:22 -0700 (PDT)
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+        by smtp.gmail.com with ESMTPSA id l6-20020a633e06000000b00589eb5b1df7sm3723822pga.35.2023.10.09.18.08.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Oct 2023 18:08:22 -0700 (PDT)
+From: Edward AD <twuufnxlz@gmail.com>
+To: syzbot+509238e523e032442b80@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	johannes.berg@intel.com,
+	johannes@sipsolutions.net,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] rfkill: fix deadlock in rfkill_send_events
+Date: Tue, 10 Oct 2023 09:08:15 +0800
+Message-ID: <20231010010814.1799012-2-twuufnxlz@gmail.com>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <000000000000e3788c06074e2b84@google.com>
+References: <000000000000e3788c06074e2b84@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: **
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon,  9 Oct 2023 00:49:20 +0200 Xabier Marquiegui wrote:
-> The mask value can be viewed grouped in 32bit decimal values using cat,
-> or converted to hexadecimal with the included `ptpchmaskfmt.sh` script.
-> 32 bit values are listed from least significant to most significant.
+syzbot report:
+syz-executor675/5132 is trying to acquire lock:
+ffff8880297ee088 (&data->mtx){+.+.}-{3:3}, at: rfkill_send_events+0x226/0x3f0 net/rfkill/core.c:286
 
-If it's a self-test it should probably be included in the Makefile 
-so that bots run it.
+but task is already holding lock:
+ffff88801bfc0088 (&data->mtx){+.+.}-{3:3}, at: rfkill_fop_open+0x146/0x750 net/rfkill/core.c:1183
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&data->mtx);
+  lock(&data->mtx);
+
+ *** DEADLOCK ***
+
+In 2c3dfba4cf84 insert rfkill_sync() to rfkill_fop_open(), it will call
+rfkill_send_events() and then triger this issue.
+
+Fixes: 2c3dfba4cf84 ("rfkill: sync before userspace visibility/changes")
+Reported-and-tested-by: syzbot+509238e523e032442b80@syzkaller.appspotmail.com
+Signed-off-by: Edward AD <twuufnxlz@gmail.com>
+---
+ net/rfkill/core.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/rfkill/core.c b/net/rfkill/core.c
+index 08630896b6c8..a14e0d4a0b00 100644
+--- a/net/rfkill/core.c
++++ b/net/rfkill/core.c
+@@ -1180,7 +1180,6 @@ static int rfkill_fop_open(struct inode *inode, struct file *file)
+ 	init_waitqueue_head(&data->read_wait);
+ 
+ 	mutex_lock(&rfkill_global_mutex);
+-	mutex_lock(&data->mtx);
+ 	/*
+ 	 * start getting events from elsewhere but hold mtx to get
+ 	 * startup events added first
+@@ -1191,9 +1190,12 @@ static int rfkill_fop_open(struct inode *inode, struct file *file)
+ 		if (!ev)
+ 			goto free;
+ 		rfkill_sync(rfkill);
++		mutex_lock(&data->mtx);
+ 		rfkill_fill_event(&ev->ev, rfkill, RFKILL_OP_ADD);
+ 		list_add_tail(&ev->list, &data->events);
++		mutex_unlock(&data->mtx);
+ 	}
++	mutex_lock(&data->mtx);
+ 	list_add(&data->list, &rfkill_fds);
+ 	mutex_unlock(&data->mtx);
+ 	mutex_unlock(&rfkill_global_mutex);
 -- 
-pw-bot: cr
+2.25.1
+
 
