@@ -1,140 +1,118 @@
-Return-Path: <netdev+bounces-39738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F7997C43FB
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:27:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA7B37C4402
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE6BA281E7B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:27:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45D93281C54
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:27:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA635500;
-	Tue, 10 Oct 2023 22:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0C354EB;
+	Tue, 10 Oct 2023 22:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w8ePxtLU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sOLzgyav"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86952354F5
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:27:17 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA066AF
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:15 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a4fb3e096so1941793276.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B692354E5
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:27:50 +0000 (UTC)
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB931A7
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:42 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-77410032cedso408818485a.1
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696976835; x=1697581635; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TlakbgGWTqcDQ2xuVKeK3nhNuDzBfPQq0/+GRmlX5C8=;
-        b=w8ePxtLUgoM/h+NoEz/90TBSsGTZpWch4xp1qa0oYaJh/mhwbSnEw7kITkwz/7cOTE
-         nW9rypZvVYgCTjEjxthXs6MJP8KcmCUnT/vbQOAToegTk/HX5027pKZnhDyh535JVuWL
-         lWGPdpH+xIiT737RglR+ioIoBJx7PiTtVB08gKeMMAkIGPL2S2vDe8YOYWlDhwpweIH5
-         CQRyBz78JB3NcmuLjdYYZPMW92RKetaGcG8pslc9hcd6RkniFvNvZtdfLR0zBZrOKdgp
-         p2OtDXW5Dpb3XcSLxqVO1YX80mlaNBTMozgjI6+sxSHvcG2J2cI2pwidAq5vbwaGIpne
-         OOQA==
+        d=google.com; s=20230601; t=1696976861; x=1697581661; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CkLtTpyq6hhRKA1Cd8NmRte6SMNGKfwrDP5J91+SqxM=;
+        b=sOLzgyavxmNPuIxJT66RHVRJKPM4L7Y9mosU4527HC4w8KJRNktEAYHaiOvOQgSk1W
+         WgDXRkFGo2xLRGU3Eek+jCG4D0655oAzIpaEmUvKLlz9gC4+1srsdf640xGp/hMxnMJB
+         VI6e4mzHz8VGpe7Gibg3n7Nox0eAy4azTsx1/hd74JY/Sh2gbeQnrqmWf0Ug4VMud0gp
+         gEZoVEoqLrmoJQLPyNKJcNMdeMj4uAIYxWDoVlT9WrATIxVQb0axKhX8KXqvTlezx/0T
+         CxZSH2FaCGcV1lUwERDBgx6SFAqdgeW6kzeRn+UnLXDocf6UZXePvumzIzchPf/o7XlC
+         de5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696976835; x=1697581635;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TlakbgGWTqcDQ2xuVKeK3nhNuDzBfPQq0/+GRmlX5C8=;
-        b=N9UN2dZx96+MzpuZ899KvRtEp+tlEQsX086P5MJ8VhCpOrMhh2a48Fa6+bdsSus4pV
-         YSuyY4lyrfpLsgy8cdvG01KEFIGvD966KK/nJHBXhB0b2v5Y+W52rNUCA4iVv1iSyRHi
-         2hbYiYp/id4mFi68UNNv4TdWYdrOYjBDYYzmPUGcQsFxn4g9Lk0sd979a/cc01ZaryyH
-         x606qux/f14qzvgbR/8LEG3vhsvjiOqOF8b8XQqJaNZvvABaCQnpK0qLr6lZ4FJetpR3
-         DTJkG4MfIkBmNtXV3ZuFh1Yy1vBeHSh/G8jUA76O2oGjS593jGnUJTVTMKOysk1XCrHS
-         powg==
-X-Gm-Message-State: AOJu0YzcK02XloLRAxzzUJUGwAoLKcq7pA8BRcgw/ouOVq8r/um1gPFh
-	2bg8AGOtR4DB9jI2PqqB4DnfyOIgkvReerPkwQ==
-X-Google-Smtp-Source: AGHT+IGzYEq54Il7W2YEgs1cfyYc8gNX6HEw1AL6yXL3SCPfuWpHyotzmuT619yMLidQOlA9hNzRlpWN7L1xRgRrQA==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:a162:0:b0:d85:ad61:1591 with SMTP
- id z89-20020a25a162000000b00d85ad611591mr315298ybh.11.1696976835057; Tue, 10
- Oct 2023 15:27:15 -0700 (PDT)
-Date: Tue, 10 Oct 2023 22:27:00 +0000
-In-Reply-To: <20231010-netdev-replace-strncpy-resend-as-series-v1-0-caf9f0f2f021@google.com>
+        d=1e100.net; s=20230601; t=1696976861; x=1697581661;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CkLtTpyq6hhRKA1Cd8NmRte6SMNGKfwrDP5J91+SqxM=;
+        b=LBXEamtXHzCexsuZoRDSXV28Fw3GLQ3AlDc0e8mOzpnZJWvX+c7F1WfJN/AL1sme7V
+         0hp9kJ3duocnVr52Tl2xVRVMhjMcLhhFeA+UX1kaDjsczSbsmQpoZ+Iygwfva92z7xTG
+         dR5uqOr+iECwQScYyP6RUoD4fjY9LQwP+67ik19YIXeeuQWNjRJCErJCWwo7KegJLh55
+         CyNBh+vt1S505/Rlb0V0ljmzKdaSOzYJ1+CRm1QB+pwIuK4EOcVDML/429ATdwnUW2lo
+         3yrHXA5ymF1rHIaBwBPSRWJRkmPr3ioaTbL2SupY5twnxEXsUVhiTB3fBcM6QmzbZ0rO
+         cKow==
+X-Gm-Message-State: AOJu0YxswnwsBi7bQ1mFWk8TqkOqAOSRJxsqcnSSzlbfKW9r9aTrpLDm
+	2RYMeY7iH6Cyo2dGNumAGbX15SLs84pdtH/+LGQ+7Q==
+X-Google-Smtp-Source: AGHT+IFxlqxkA6VpJQ6lG3e6PyJG8lq0tpawjVN6OqIO8lL7DWTY3wjUGELV0v4sDHNRAaW6jqwWvjwYUgNF1SZ5uZw=
+X-Received: by 2002:a0c:8cca:0:b0:656:3317:b926 with SMTP id
+ q10-20020a0c8cca000000b006563317b926mr16022671qvb.17.1696976861005; Tue, 10
+ Oct 2023 15:27:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231010-netdev-replace-strncpy-resend-as-series-v1-0-caf9f0f2f021@google.com>
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696976825; l=1942;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=6jGMK+cCOOSLNNUn0TBt6IBLIOJaTfgy8BwlGd7P468=; b=35oBACPXlL3wg2v3AbE8axFEM9yJJX/Bfv5dcLDCY+rrP7a8HRLOAFEg/ZA8gNWEWwSfT6QVK
- J4O6EmvMtglD6nXKST7OY8ieVbM+DsbZ81c8dF/wyiqDDJWJ1HsPtah
-X-Mailer: b4 0.12.3
-Message-ID: <20231010-netdev-replace-strncpy-resend-as-series-v1-7-caf9f0f2f021@google.com>
-Subject: [PATCH v1 net-next 7/7] igc: replace deprecated strncpy with strscpy
-From: Justin Stitt <justinstitt@google.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-hardening@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+MIME-Version: 1.0
+References: <1696965810-8315-1-git-send-email-haiyangz@microsoft.com> <20231010151404.3f7faa87@hermes.local>
+In-Reply-To: <20231010151404.3f7faa87@hermes.local>
+From: Yuchung Cheng <ycheng@google.com>
+Date: Tue, 10 Oct 2023 15:27:05 -0700
+Message-ID: <CAK6E8=c576Gt=G9Wdk0gQi=2EiL_=6g1SA=mJ3HhzPCsLRk9tw@mail.gmail.com>
+Subject: Re: [PATCH net-next,v2] tcp: Set pingpong threshold via sysctl
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, linux-hyperv@vger.kernel.org, 
+	netdev@vger.kernel.org, kys@microsoft.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net, 
+	dsahern@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
+	morleyd@google.com, mfreemon@cloudflare.com, mubashirq@google.com, 
+	linux-doc@vger.kernel.org, weiwan@google.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-`strncpy` is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
-
-We expect netdev->name to be NUL-terminated based on its use with format
-strings:
-|       if (q_vector->rx.ring && q_vector->tx.ring)
-|               sprintf(q_vector->name, "%s-TxRx-%u", netdev->name,
-
-Furthermore, we do not need NUL-padding as netdev is already
-zero-allocated:
-|       netdev = alloc_etherdev_mq(sizeof(struct igc_adapter),
-|                                  IGC_MAX_TX_QUEUES);
-...
-alloc_etherdev() -> alloc_etherdev_mq() -> alloc_etherdev_mqs() ->
-alloc_netdev_mqs() ...
-|       p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
-
-Considering the above, a suitable replacement is `strscpy` [2] due to
-the fact that it guarantees NUL-termination on the destination buffer
-without unnecessarily NUL-padding.
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
-
----
-Note: build-tested only.
----
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 98de34d0ce07..e9bb403bbacf 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6935,7 +6935,7 @@ static int igc_probe(struct pci_dev *pdev,
- 	 */
- 	igc_get_hw_control(adapter);
- 
--	strncpy(netdev->name, "eth%d", IFNAMSIZ);
-+	strscpy(netdev->name, "eth%d", sizeof(netdev->name));
- 	err = register_netdev(netdev);
- 	if (err)
- 		goto err_register;
-
--- 
-2.42.0.609.gbb76f46606-goog
-
+On Tue, Oct 10, 2023 at 3:14=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> On Tue, 10 Oct 2023 12:23:30 -0700
+> Haiyang Zhang <haiyangz@microsoft.com> wrote:
+>
+> > TCP pingpong threshold is 1 by default. But some applications, like SQL=
+ DB
+> > may prefer a higher pingpong threshold to activate delayed acks in quic=
+k
+> > ack mode for better performance.
+> >
+> > The pingpong threshold and related code were changed to 3 in the year
+> > 2019 in:
+> >   commit 4a41f453bedf ("tcp: change pingpong threshold to 3")
+> > And reverted to 1 in the year 2022 in:
+> >   commit 4d8f24eeedc5 ("Revert "tcp: change pingpong threshold to 3"")
+> >
+> > There is no single value that fits all applications.
+> > Add net.ipv4.tcp_pingpong_thresh sysctl tunable, so it can be tuned for
+> > optimal performance based on the application needs.
+> >
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+>
+> If this an application specific optimization, it should be in a socket op=
+tion
+> rather than system wide via sysctl.
+Initially I had a similar comment but later decided a sysctl could
+still be useful if
+1) the entire host (e.g. virtual machine) is dedicated to that application
+2) that application is difficult to change
 
