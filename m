@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-39490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07D57BF77F
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:38:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A31A7BF781
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB346281AEE
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:38:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4CD8281DB1
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9F91772E;
-	Tue, 10 Oct 2023 09:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF91717754;
+	Tue, 10 Oct 2023 09:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F00168DC
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:38:24 +0000 (UTC)
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D31D8;
-	Tue, 10 Oct 2023 02:38:18 -0700 (PDT)
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso987500666b.1;
-        Tue, 10 Oct 2023 02:38:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A53517733
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:38:26 +0000 (UTC)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79141CC;
+	Tue, 10 Oct 2023 02:38:21 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-53639fb0ba4so9219393a12.0;
+        Tue, 10 Oct 2023 02:38:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696930697; x=1697535497;
+        d=1e100.net; s=20230601; t=1696930700; x=1697535500;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S+S7MtfjpOsax/1um4lfOdbgQCVIBHweerFRoRDaRZc=;
-        b=L2ljgAJuNsDtfv8/4jK7p77KoaGKfxL14qbbnyke/D0CSr/Bg5/JfwB9bEW7RFaS0o
-         IsjHct8GCgNSdBKa/jaUmrkJh+OAOcsUpVcLUtilzb2MQ0y/ifqhAwuT63bw7t3XS/+r
-         xLw8WCkDSNz775pUXPKGGfklKehn4CeveyqRcNmqtfBdETu5DZSs00M6sA9xCs00Qv4m
-         SrFW1V8ZARYfnRbsq2oXs0aZh/O3sFCBMcft0ILlWXeXOIpQ+Cw6DS4vmZ3c+d9AiYjt
-         ZV1RLGsOXhQ7vRQMQXCyKC5ZPZ17KFi//GjB9JWSlitn+NldpQuFf9SAk0fPXSSDsQ11
-         sq9w==
-X-Gm-Message-State: AOJu0YxQYi39PTs+GOkaMgeiIff3PcOs8/QFcpOOJb5Jj6SPt6nnwmxW
-	94hvOxFcXemrPVsUb54u3qcJKhAo880=
-X-Google-Smtp-Source: AGHT+IGhAAUNp2LGsH2fW5ztAMg1kJZ+KajaPgdjM08JddOZltyuWt/okhcCeHUBtSVPpyJntjb13Q==
-X-Received: by 2002:a17:906:31d6:b0:99b:ed44:1a79 with SMTP id f22-20020a17090631d600b0099bed441a79mr15617355ejf.3.1696930696669;
-        Tue, 10 Oct 2023 02:38:16 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-011.fbsv.net. [2a03:2880:31ff:b::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a6-20020a170906468600b009a5f7fb51dcsm8074699ejr.42.2023.10.10.02.38.09
+        bh=afOI7n0O0xBXNXt45jFmttLB+IlVWLekbDfMghG+2eE=;
+        b=c4Jcnsvvrd8xtqkIEHF0/TQQTLPxZ3FE3ruYgs5+n28oijPVTdNW9pXRojOdqYFaUF
+         oACIutyPz2nYYLIrLydh7ejTf2oJv8cEpJwLUe9DOs81GPT5J0scn/f0hwT+tmGYShNF
+         MDehCPgBfE4TBox7vUPJyrW0bhQrQrPBUh71nDlgZIoCLXoa/t8hqGVabQaoIZmgI+B8
+         hQSiRi/2KnKBvefcGrmpvwCROmMP52uLopAQWbPkulwTqCWsQwicxfexY8HDf3a2IEBV
+         gR5hKVl1aOh01eXZcEN7dG1QbcpRuQUeXCDfIcUO9aZCK40ZXvaGGDPZoEIRcQzTfnti
+         9ODw==
+X-Gm-Message-State: AOJu0Yy3tSd3EMwh3YQrIxr4ZGf8qDyd/W5pGOXutPv4ui+mf59pmUWk
+	ea95t6CI1KVTe/9lragLabw=
+X-Google-Smtp-Source: AGHT+IHPF+oZSd3W1X9NGPYTSkvLFuiu1FqauSDYZLA3nNztHC0NnNrCQn6K/4bb6Mdt9O1OlnuXHQ==
+X-Received: by 2002:a05:6402:3c1:b0:533:2449:7a59 with SMTP id t1-20020a05640203c100b0053324497a59mr16174945edw.11.1696930699688;
+        Tue, 10 Oct 2023 02:38:19 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-005.fbsv.net. [2a03:2880:31ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id v4-20020aa7d9c4000000b0052284228e3bsm7404542eds.8.2023.10.10.02.38.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 02:38:10 -0700 (PDT)
+        Tue, 10 Oct 2023 02:38:17 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: jlbec@evilplan.org,
 	kuba@kernel.org,
@@ -55,9 +55,9 @@ Cc: hch@lst.de,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	horms@kernel.org
-Subject: [PATCH net-next v3 2/4] netconsole: Initialize configfs_item for default targets
-Date: Tue, 10 Oct 2023 02:37:49 -0700
-Message-Id: <20231010093751.3878229-3-leitao@debian.org>
+Subject: [PATCH net-next v3 3/4] netconsole: Attach cmdline target to dynamic target
+Date: Tue, 10 Oct 2023 02:37:50 -0700
+Message-Id: <20231010093751.3878229-4-leitao@debian.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231010093751.3878229-1-leitao@debian.org>
 References: <20231010093751.3878229-1-leitao@debian.org>
@@ -70,110 +70,78 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For netconsole targets allocated during the boot time (passing
-netconsole=... argument), netconsole_target->item is not initialized.
-That is not a problem because it is not used inside configfs.
+Enable the attachment of a dynamic target to the target created during
+boot time. The boot-time targets are named as "cmdline\d", where "\d" is
+a number starting at 0.
 
-An upcoming patch will be using it, thus, initialize the targets with
-the name 'cmdline' plus a counter starting from 0.  This name will match
-entries in the configfs later.
+If the user creates a dynamic target named "cmdline0", it will attach to
+the first target created at boot time (as defined in the
+`netconsole=...` command line argument). `cmdline1` will attach to the
+second target and so forth.
+
+If there is no netconsole target created at boot time, then, the target
+name could be reused.
+
+Relevant design discussion:
+https://lore.kernel.org/all/ZRWRal5bW93px4km@gmail.com/
 
 Suggested-by: Joel Becker <jlbec@evilplan.org>
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+ drivers/net/netconsole.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index d609fb59cf99..3d7002af505d 100644
+index 3d7002af505d..519f4d065921 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -53,6 +53,8 @@ static bool oops_only = false;
- module_param(oops_only, bool, 0600);
- MODULE_PARM_DESC(oops_only, "Only log oops messages");
- 
-+#define NETCONSOLE_PARAM_TARGET_NAME "cmdline"
-+
- #ifndef	MODULE
- static int __init option_setup(char *opt)
- {
-@@ -165,6 +167,10 @@ static void netconsole_target_put(struct netconsole_target *nt)
- {
- }
- 
-+static void populate_configfs_item(struct netconsole_target *nt,
-+				   int cmdline_count)
-+{
-+}
- #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
- 
- /* Allocate and initialize with defaults.
-@@ -688,6 +694,17 @@ static struct configfs_subsystem netconsole_subsys = {
- 	},
+@@ -629,6 +629,23 @@ static const struct config_item_type netconsole_target_type = {
+ 	.ct_owner		= THIS_MODULE,
  };
  
-+static void populate_configfs_item(struct netconsole_target *nt,
-+				   int cmdline_count)
++static struct netconsole_target *find_cmdline_target(const char *name)
 +{
-+	char target_name[16];
++	struct netconsole_target *nt, *ret = NULL;
++	unsigned long flags;
 +
-+	snprintf(target_name, sizeof(target_name), "%s%d",
-+		 NETCONSOLE_PARAM_TARGET_NAME, cmdline_count);
-+	config_item_init_type_name(&nt->item, target_name,
-+				   &netconsole_target_type);
++	spin_lock_irqsave(&target_list_lock, flags);
++	list_for_each_entry(nt, &target_list, list) {
++		if (!strcmp(nt->item.ci_name, name)) {
++			ret = nt;
++			break;
++		}
++	}
++	spin_unlock_irqrestore(&target_list_lock, flags);
++
++	return ret;
 +}
 +
- #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
- 
- /* Handle network interface device notifications */
-@@ -887,7 +904,8 @@ static void write_msg(struct console *con, const char *msg, unsigned int len)
- }
- 
- /* Allocate new target (from boot/module param) and setup netpoll for it */
--static struct netconsole_target *alloc_param_target(char *target_config)
-+static struct netconsole_target *alloc_param_target(char *target_config,
-+						    int cmdline_count)
- {
+ /*
+  * Group operations and type for netconsole_subsys.
+  */
+@@ -639,6 +656,17 @@ static struct config_item *make_netconsole_target(struct config_group *group,
  	struct netconsole_target *nt;
- 	int err;
-@@ -922,6 +940,7 @@ static struct netconsole_target *alloc_param_target(char *target_config)
- 	if (err)
- 		goto fail;
- 
-+	populate_configfs_item(nt, cmdline_count);
- 	nt->enabled = true;
- 
- 	return nt;
-@@ -954,6 +973,7 @@ static int __init init_netconsole(void)
- {
- 	int err;
- 	struct netconsole_target *nt, *tmp;
-+	unsigned int count = 0;
- 	bool extended = false;
  	unsigned long flags;
- 	char *target_config;
-@@ -961,7 +981,7 @@ static int __init init_netconsole(void)
  
- 	if (strnlen(input, MAX_PARAM_LENGTH)) {
- 		while ((target_config = strsep(&input, ";"))) {
--			nt = alloc_param_target(target_config);
-+			nt = alloc_param_target(target_config, count);
- 			if (IS_ERR(nt)) {
- 				err = PTR_ERR(nt);
- 				goto fail;
-@@ -977,6 +997,7 @@ static int __init init_netconsole(void)
- 			spin_lock_irqsave(&target_list_lock, flags);
- 			list_add(&nt->list, &target_list);
- 			spin_unlock_irqrestore(&target_list_lock, flags);
-+			count++;
- 		}
- 	}
- 
++	/* Checking if a target by this name was created at boot time.  If so,
++	 * attach a configfs entry to that target.  This enables dynamic
++	 * control.
++	 */
++	if (!strncmp(name, NETCONSOLE_PARAM_TARGET_NAME,
++		     strlen(NETCONSOLE_PARAM_TARGET_NAME))) {
++		nt = find_cmdline_target(name);
++		if (nt)
++			return &nt->item;
++	}
++
+ 	nt = alloc_and_init();
+ 	if (!nt)
+ 		return ERR_PTR(-ENOMEM);
 -- 
 2.34.1
 
