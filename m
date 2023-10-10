@@ -1,79 +1,84 @@
-Return-Path: <netdev+bounces-39569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2734F7BFD5B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 15:26:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D94347BFD80
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 15:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57BE41C20B3A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:26:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 913F72819EA
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79ED947376;
-	Tue, 10 Oct 2023 13:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 228749CA57;
+	Tue, 10 Oct 2023 13:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NViEWgGw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4M/273T"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02C9208C5;
-	Tue, 10 Oct 2023 13:26:00 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDBECB8;
-	Tue, 10 Oct 2023 06:25:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1d0t9/DX7ihU9xZzYfu/yNFR5vfcpE2fujt0UCsJlpQ=; b=NViEWgGwqKk0Q6G6Iy1fwKggkP
-	VNo04O7m/x1T54lUhdrAU0ZTy+QoEWbBNVkNTDB8ejpk3/HprteWqmF0JLUv+g/233E/BwAA+zDe2
-	XD8WFBbhU9VrgiT8w7pLioVUJfi3VIOCyr5z45BvCQMCtviyU9OzKa5Ln9hCC67DsAg4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qqCk4-001F3L-38; Tue, 10 Oct 2023 15:25:44 +0200
-Date: Tue, 10 Oct 2023 15:25:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	marex@denx.de, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document
- microchip,rmii-clk-internal
-Message-ID: <6a366c3a-49e7-42a4-83b2-ef98e7df0896@lunn.ch>
-References: <cover.1693482665.git.ante.knezic@helmholz.de>
- <df8490e3a39a6daa66c5a0dd266d9f4a388dfe7b.1693482665.git.ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0289347376
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:30:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8637AC433CB;
+	Tue, 10 Oct 2023 13:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696944624;
+	bh=wigO+3xOgrzmFjR5/UUzlIPFd7xNBIa7HZmujH1Ioc4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=O4M/273TXoT62rX9G5TRoM0IkrAju1zYqw6DggvTPUG+8Eb/+JWhjQ/47MS9EHKlF
+	 6bkMIbuwPSgue2ZE/EBaEZns+faJcvKnxOl26UU5x5w6oUjn5uhm3GrmwTK4zdsn5e
+	 M0lyV+7RFTq08DQAdYo2/iABp7O8CRshGnCpyIdbeLgnCLoA5DIvKN1XC2oOE02TTm
+	 ugBpST1OJGozMjUZD8a3HfUIFJgciY1u9+9BlQFDwJcB+pUAyqLv8Tdfoe9xot/z6o
+	 rjZXM7KyEjzneeYXrBJprXC6hFgTMVSlY6JHQx+wUiUyHnvOpB60Edi1R5uMorhrje
+	 zG2vZ3BnkEE5A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 66E25C595C4;
+	Tue, 10 Oct 2023 13:30:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df8490e3a39a6daa66c5a0dd266d9f4a388dfe7b.1693482665.git.ante.knezic@helmholz.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net/mlx5e: Again mutually exclude RX-FCS and
+ RX-port-timestamp
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169694462441.9717.9210751082790538556.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Oct 2023 13:30:24 +0000
+References: <20231006053706.514618-1-will@extrahop.com>
+In-Reply-To: <20231006053706.514618-1-will@extrahop.com>
+To: Will Mortensen <will@extrahop.com>
+Cc: netdev@vger.kernel.org, charlotte@extrahop.com, afaris@nvidia.com,
+ ayal@nvidia.com, tariqt@nvidia.com, moshe@nvidia.com, saeedm@nvidia.com
 
-> +  microchip,rmii-clk-internal:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description:
-> +      Set if the RMII reference clock should be provided internally. Applies only
-> +      to KSZ88X3 devices.
+Hello:
 
-It would be good to define what happens when
-microchip,rmii-clk-internal is not present. Looking at the code, you
-leave it unchanged. Is that what we want, or do we want to force it to
-external?
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-	Andrew
+On Thu,  5 Oct 2023 22:37:06 -0700 you wrote:
+> Commit 1e66220948df8 ("net/mlx5e: Update rx ring hw mtu upon each rx-fcs
+> flag change") seems to have accidentally inverted the logic added in
+> commit 0bc73ad46a76 ("net/mlx5e: Mutually exclude RX-FCS and
+> RX-port-timestamp").
+> 
+> The impact of this is a little unclear since it seems the FCS scattered
+> with RX-FCS is (usually?) correct regardless.
+> 
+> [...]
+
+Here is the summary with links:
+  - net/mlx5e: Again mutually exclude RX-FCS and RX-port-timestamp
+    https://git.kernel.org/netdev/net/c/da6192ca72d5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
