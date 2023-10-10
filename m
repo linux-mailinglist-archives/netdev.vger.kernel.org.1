@@ -1,183 +1,102 @@
-Return-Path: <netdev+bounces-39449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC777BF462
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:35:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9951C7BF48E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C201C208CC
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:35:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B299B1C20A45
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD1CD309;
-	Tue, 10 Oct 2023 07:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB66AFBEA;
+	Tue, 10 Oct 2023 07:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kjM9mNev"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03776C2EE
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:35:34 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F689E
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:35:32 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qq7H9-00063m-Bt
-	for netdev@vger.kernel.org; Tue, 10 Oct 2023 09:35:31 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qq7H8-000bfp-VE
-	for netdev@vger.kernel.org; Tue, 10 Oct 2023 09:35:30 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id AA5BC2332CB
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:35:30 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 40D2E2332C1;
-	Tue, 10 Oct 2023 07:35:28 +0000 (UTC)
-Received: from [192.168.178.131] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 78e5d358;
-	Tue, 10 Oct 2023 07:35:27 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Tue, 10 Oct 2023 09:35:19 +0200
-Subject: [PATCH net] net: davicom: dm9000: dm9000_phy_write(): fix deadlock
- during netdev watchdog handling
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAC3D2F2
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:40:39 +0000 (UTC)
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763B192;
+	Tue, 10 Oct 2023 00:40:36 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DD85424000E;
+	Tue, 10 Oct 2023 07:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1696923634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=z5mbSaDFWT4F1pg9/UQXeQubE+UDM5n2XaAROADfaZ8=;
+	b=kjM9mNev2AShbfug3CIC1p9m8VPnj9VN7bck6ZwquYIEqgJR4gpvuw2KTym4bvC8IyW+OK
+	sDxtdebTx/AyoV75d9kTHd7RSZhDV7SBhI6M4U+0Qx3l36ZpW1PSg22etM0QTtyoWqRNom
+	sDrS+jVE/LU8phy9/GEr/0Q/Q1XVyfko1wgpc1AIJ1USRwz1Y5qmNMdOhIL12MC2dFcalb
+	+11WLE8TRR/kgj3agsoSyCrRTMRWY4X2/l74Rc6g8nfo91SrYBhWsrYn580bKwXfpEHI3i
+	1U4ucR8u+igLPRt+X1CruJfne4fZ8pySUkM133/aiQ75wr1PDOJKLmZ0ZvFTug==
+Date: Tue, 10 Oct 2023 09:40:28 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
+ <jacob.e.keller@intel.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v5 05/16] net: Make dev_set_hwtstamp_phylib
+ accessible
+Message-ID: <20231010094028.74185a50@kmaincent-XPS-13-7390>
+In-Reply-To: <57791a7d-04ce-4d02-815d-7f540ea15b89@gmail.com>
+References: <20231009155138.86458-1-kory.maincent@bootlin.com>
+	<20231009155138.86458-6-kory.maincent@bootlin.com>
+	<57791a7d-04ce-4d02-815d-7f540ea15b89@gmail.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIALb+JGUC/x2MwQqDMBAFf0X27MJuigf7K+JBzYsubaMkIgXJv
- zf0OAwzN2UkQ6Znc1PCZdn2WEHbhpZtiivYfGVy4h4qKuw/vYhwsC97TP69Ly8OYVZ0ru8ApVo
- eCdX/rwNFnDSW8gPBJWmzagAAAA==
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Francois Romieu <romieu@fr.zoreil.com>, 
- Kalle Valo <kvalo@kernel.org>, Wei Fang <wei.fang@nxp.com>, 
- kernel@pengutronix.de, stable@vger.kernel.org, 
- Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.13-dev-0438c
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3626; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=Sc3mftr2UYUUpxpiNhGPdSKwphIb/Sb4YKKDRrkV5lY=;
- b=owEBbQGS/pANAwAKAb5QHEoqigToAcsmYgBlJP69zW8mCp5xaHlF81Y9JlWZTPP/4tyQ8283p
- mfgMTQCHnSJATMEAAEKAB0WIQQOzYG9qPI0qV/1MlC+UBxKKooE6AUCZST+vQAKCRC+UBxKKooE
- 6EvpB/94Hgr3DSceqXXj+mXSkxYlpzRYu1ajV/vR2TU3grQAdaSrqHQFRIfE5gjqh5Wq/yFvo3O
- iok9eMK+cW7l8jycBLhysbVDt0HNRNllTuOA8+JI1jN9A62zwqtdKMzhMU7saO33B4rm3BszZh/
- EidFVPW3J4ETxN9vK91M/2JrKwPtWCxFRlpBCYtWZlKgp5t0L77NY0HIERURFEBjBVebIklmBWc
- vpo2Oahw8ZfXdF8c96J+O5SZ8rI9YdbO2QTGkha8liRmJS6onQjvLCMyRMcX5l3bpqDiLIKOga6
- 8SLPMr85LKHVclnEXK14JWwc+51bkibpq1DkgcHGK2cKFArR
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-GND-Sasl: kory.maincent@bootlin.com
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The dm9000 takes the db->lock spin lock in dm9000_timeout() and calls
-into dm9000_init_dm9000(). For the DM9000B the PHY is reset with
-dm9000_phy_write(). That function again takes the db->lock spin lock,
-which results in a deadlock. For reference the backtrace:
+On Mon, 9 Oct 2023 14:09:29 -0700
+Florian Fainelli <f.fainelli@gmail.com> wrote:
 
-| [<c0425050>] (rt_spin_lock_slowlock_locked) from [<c0425100>] (rt_spin_lock_slowlock+0x60/0xc4)
-| [<c0425100>] (rt_spin_lock_slowlock) from [<c02e1174>] (dm9000_phy_write+0x2c/0x1a4)
-| [<c02e1174>] (dm9000_phy_write) from [<c02e16b0>] (dm9000_init_dm9000+0x288/0x2a4)
-| [<c02e16b0>] (dm9000_init_dm9000) from [<c02e1724>] (dm9000_timeout+0x58/0xd4)
-| [<c02e1724>] (dm9000_timeout) from [<c036f298>] (dev_watchdog+0x258/0x2a8)
-| [<c036f298>] (dev_watchdog) from [<c0068168>] (call_timer_fn+0x20/0x88)
-| [<c0068168>] (call_timer_fn) from [<c00687c8>] (expire_timers+0xf0/0x194)
-| [<c00687c8>] (expire_timers) from [<c0068920>] (run_timer_softirq+0xb4/0x25c)
-| [<c0068920>] (run_timer_softirq) from [<c0021a30>] (do_current_softirqs+0x16c/0x228)
-| [<c0021a30>] (do_current_softirqs) from [<c0021b14>] (run_ksoftirqd+0x28/0x4c)
-| [<c0021b14>] (run_ksoftirqd) from [<c0040488>] (smpboot_thread_fn+0x278/0x290)
-| [<c0040488>] (smpboot_thread_fn) from [<c003c28c>] (kthread+0x124/0x164)
-| [<c003c28c>] (kthread) from [<c00090f0>] (ret_from_fork+0x14/0x24)
+> > -static int dev_set_hwtstamp_phylib(struct net_device *dev,
+> > -				   struct kernel_hwtstamp_config *cfg,
+> > -				   struct netlink_ext_ack *extack)
+> > +int dev_set_hwtstamp_phylib(struct net_device *dev,
+> > +			    struct kernel_hwtstamp_config *cfg,
+> > +			    struct netlink_ext_ack *extack)
+> >   {
+> >   	const struct net_device_ops *ops = dev->netdev_ops;
+> >   	bool phy_ts = phy_has_hwtstamp(dev->phydev);  
+> 
+> Missing EXPORT_SYMBOL_GPL() here?
 
-To workaround similar problem (take mutex inside spin lock ) , a
-"in_timeout" variable was added in 582379839bbd ("dm9000: avoid
-sleeping in dm9000_timeout callback"). Use this variable and not take
-the spin lock inside dm9000_phy_write() if in_timeout is true.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
-During the netdev watchdog handling the dm9000 driver takes the same
-spin lock twice. Avoid this by extending an existing workaround.
----
- drivers/net/ethernet/davicom/dm9000.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/davicom/dm9000.c b/drivers/net/ethernet/davicom/dm9000.c
-index 05a89ab6766c..3a056a54aaf9 100644
---- a/drivers/net/ethernet/davicom/dm9000.c
-+++ b/drivers/net/ethernet/davicom/dm9000.c
-@@ -325,10 +325,10 @@ dm9000_phy_write(struct net_device *dev,
- 	unsigned long reg_save;
- 
- 	dm9000_dbg(db, 5, "phy_write[%02x] = %04x\n", reg, value);
--	if (!db->in_timeout)
-+	if (!db->in_timeout) {
- 		mutex_lock(&db->addr_lock);
--
--	spin_lock_irqsave(&db->lock, flags);
-+		spin_lock_irqsave(&db->lock, flags);
-+	}
- 
- 	/* Save previous register address */
- 	reg_save = readb(db->io_addr);
-@@ -344,11 +344,13 @@ dm9000_phy_write(struct net_device *dev,
- 	iow(db, DM9000_EPCR, EPCR_EPOS | EPCR_ERPRW);
- 
- 	writeb(reg_save, db->io_addr);
--	spin_unlock_irqrestore(&db->lock, flags);
-+	if (!db->in_timeout)
-+		spin_unlock_irqrestore(&db->lock, flags);
- 
- 	dm9000_msleep(db, 1);		/* Wait write complete */
- 
--	spin_lock_irqsave(&db->lock, flags);
-+	if (!db->in_timeout)
-+		spin_lock_irqsave(&db->lock, flags);
- 	reg_save = readb(db->io_addr);
- 
- 	iow(db, DM9000_EPCR, 0x0);	/* Clear phyxcer write command */
-@@ -356,9 +358,10 @@ dm9000_phy_write(struct net_device *dev,
- 	/* restore the previous address */
- 	writeb(reg_save, db->io_addr);
- 
--	spin_unlock_irqrestore(&db->lock, flags);
--	if (!db->in_timeout)
-+	if (!db->in_timeout) {
-+		spin_unlock_irqrestore(&db->lock, flags);
- 		mutex_unlock(&db->addr_lock);
-+	}
- }
- 
- /* dm9000_set_io
-
----
-base-commit: 776fe19953b0e0af00399e50fb3b205101d4b3c1
-change-id: 20231010-dm9000-fix-deadlock-ffb1e5295ee1
-
-Best regards,
--- 
-Marc Kleine-Budde <mkl@pengutronix.de>
-
-
+True. Will be fixed in next version.
 
