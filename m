@@ -1,121 +1,112 @@
-Return-Path: <netdev+bounces-39624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4717C02BF
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:32:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0A467C02BB
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:30:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7F57281B9A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B4281C20AF8
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4C228DA6;
-	Tue, 10 Oct 2023 17:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 220752745F;
+	Tue, 10 Oct 2023 17:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=flyingcircus.io header.i=@flyingcircus.io header.b="gpdcauxM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SCPXqWvv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C312FE36
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:32:17 +0000 (UTC)
-Received: from mail.flyingcircus.io (mail.flyingcircus.io [IPv6:2a02:238:f030:102::1064])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 160849D;
-	Tue, 10 Oct 2023 10:32:16 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flyingcircus.io;
-	s=mail; t=1696959133;
-	bh=Vm8UzwARi05LgZyDRSB9WVm5dq28VXyWxvE9pM5Id+Q=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To;
-	b=gpdcauxMq6nWN/5poKNCnYYTQ1bCAjiV2P13JeDU0wT9hQQ8617CWyWH3QLxU3Mz/
-	 ROmRZnanhD680QWZoIqaNrNsCgbjECaP/tUGPK2Zlq5nJ5OtqQGZeuNcVlGjyg1DIK
-	 mS3xIPZ9p2OTSxuoDGMXho5+fSG1g6dg5R2Z/lY4=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C30171C1
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:30:17 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1045694
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 10:30:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696959016; x=1728495016;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=L2n0pBZLx8X5Vmzd2nbtc8v2w1Pf/4OYLxqFj2aYq5M=;
+  b=SCPXqWvvjJsTdU7yNa770OvhSSPqb4jCrScb2dCDBQC6isVhmmITGw21
+   c5FFEGQkb8udueYsLHI+4Nn7+Co6NuBiNXwEpEX+1YAlyLur9n+pg4KnP
+   JZ8Cj0buLW/Zk1RBu03N+cKUpbKPdWXLe0BDlnCuYagF3dMdjw8znDzNI
+   0uV25cncnYCSfsB7+x/GgZJDfllVm4uDVTMb35g6nuL9NBTbSbcRCf0WT
+   817rAp4CFVhYV2BPCsUE/RzhR5zlT+PKWGonA7D5J5tBfpTDFjy6ZI/QB
+   Vrt53yLnPNJmFWfKnOLHNVa+YTFracd9IU7mgnpVBQRTfvQPTwBuxSbEf
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="3051151"
+X-IronPort-AV: E=Sophos;i="6.03,213,1694761200"; 
+   d="scan'208";a="3051151"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 10:30:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="747125117"
+X-IronPort-AV: E=Sophos;i="6.03,213,1694761200"; 
+   d="scan'208";a="747125117"
+Received: from dmert-dev.jf.intel.com ([10.166.241.14])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 10:30:12 -0700
+From: Dave Ertman <david.m.ertman@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-next v2] ice: Fix SRIOV LAG disable on non-compliant aggreagate
+Date: Tue, 10 Oct 2023 10:32:15 -0700
+Message-Id: <20231010173215.1502053-1-david.m.ertman@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
-Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
- requirement
-From: Christian Theune <ct@flyingcircus.io>
-In-Reply-To: <CAM0EoM=mnOdEgHPzbPxCAotoy4C54XyGiisrjwnO_raqVWPryw@mail.gmail.com>
-Date: Tue, 10 Oct 2023 19:31:51 +0200
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Pedro Tammela <pctammela@mojatatu.com>,
- markovicbudimir@gmail.com,
- stable@vger.kernel.org,
- netdev@vger.kernel.org,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- davem@davemloft.net,
- edumazet@google.com,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <7058E983-D543-4C5B-91ED-A8728775260A@flyingcircus.io>
-References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
- <065a0dac-499f-7375-ddb4-1800e8ef61d1@mojatatu.com>
- <0BC2C22C-F9AA-4B13-905D-FE32F41BDA8A@flyingcircus.io>
- <20231009080646.60ce9920@kernel.org>
- <da08ba06-e24c-d2c3-b9a0-8415a83ae791@mojatatu.com>
- <20231009172849.00f4a6c5@kernel.org>
- <CAM0EoM=mnOdEgHPzbPxCAotoy4C54XyGiisrjwnO_raqVWPryw@mail.gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+If an attribute of an aggregate interface disqualifies it from supporting
+SRIOV, the driver will unwind the SRIOV support.  Currently the driver is
+clearing the feature bit for all interfaces in the aggregate, but this is
+not allowing the other interfaces to unwind successfully on driver unload.
 
-> On 10. Oct 2023, at 17:02, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
->=20
-> This is a tough one - as it stands right now we dont see a good way
-> out. It's either "exploitable by root / userns" or break uapi.
-> Christian - can you send your "working" scripts, simplified if
-> possible, and we'll take a look.
+Only clear the feature bit for the interface that is currently unwinding.
 
-Sure, what kind of simplification are we talking about? Something like =
-this?
+Fixes: bf65da2eb279 ("ice: enforce interface eligibility and add messaging for SRIOV LAG")
+Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_lag.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-#### snip
-#!/bin/bash
-modprobe ifb
-modprobe act_mirred
-
-uplink=3Deth0
-uplink_ingress=3Difb0
-
-tc qdisc add dev $uplink handle ffff: ingress
-ifconfig $uplink up
-
-tc filter add dev $uplink parent ffff: protocol all u32 match u32 0 0 =
-action mirred egress redirect dev $uplink_ingress
-
-tc qdisc add dev $uplink_ingress root handle 1: hfsc default 1
-tc class add dev $uplink_ingress parent 1: classid 1:999 hfsc rt m2 =
-2.5gbit
-tc class add dev $uplink_ingress parent 1:999 classid 1:1 hfsc sc rate =
-50mbit
-#### snap
-
-This should provoke the error reliably. You might need to point it at =
-whatever network interface is available but need to be prepared to loose =
-connectivity.
-
-Christian
-
-
-Liebe Gr=C3=BC=C3=9Fe,
-Christian Theune
-
---=20
-Christian Theune =C2=B7 ct@flyingcircus.io =C2=B7 +49 345 219401 0
-Flying Circus Internet Operations GmbH =C2=B7 https://flyingcircus.io
-Leipziger Str. 70/71 =C2=B7 06108 Halle (Saale) =C2=B7 Deutschland
-HR Stendal HRB 21169 =C2=B7 Gesch=C3=A4ftsf=C3=BChrer: Christian Theune, =
-Christian Zagrodnick
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index 2c96d1883e19..f405c07410a7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -1513,18 +1513,12 @@ static void ice_lag_chk_disabled_bond(struct ice_lag *lag, void *ptr)
+  */
+ static void ice_lag_disable_sriov_bond(struct ice_lag *lag)
+ {
+-	struct ice_lag_netdev_list *entry;
+ 	struct ice_netdev_priv *np;
+-	struct net_device *netdev;
+ 	struct ice_pf *pf;
+ 
+-	list_for_each_entry(entry, lag->netdev_head, node) {
+-		netdev = entry->netdev;
+-		np = netdev_priv(netdev);
+-		pf = np->vsi->back;
+-
+-		ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
+-	}
++	np = netdev_priv(lag->netdev);
++	pf = np->vsi->back;
++	ice_clear_feature_support(pf, ICE_F_SRIOV_LAG);
+ }
+ 
+ /**
+-- 
+2.40.1
 
 
