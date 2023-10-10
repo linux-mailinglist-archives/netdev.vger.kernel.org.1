@@ -1,75 +1,96 @@
-Return-Path: <netdev+bounces-39474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4BB57BF6B6
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:04:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BEF37BF6C5
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:05:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E9D281B05
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:04:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DA211C20BD7
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:05:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A237615AF5;
-	Tue, 10 Oct 2023 09:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F5916401;
+	Tue, 10 Oct 2023 09:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="TUOrF1Pi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E3A156C0
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:04:11 +0000 (UTC)
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB098A7;
-	Tue, 10 Oct 2023 02:04:09 -0700 (PDT)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qq8eW-005TST-2G; Tue, 10 Oct 2023 17:03:45 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Oct 2023 17:03:48 +0800
-Date: Tue, 10 Oct 2023 17:03:48 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Ma Ke <make_ruc2021@163.com>, steffen.klassert@secunet.com,
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ipv6: fix return value check in esp_remove_trailer
-Message-ID: <ZSUTdBpSTgNz5CA8@gondor.apana.org.au>
-References: <20231007005953.3994960-1-make_ruc2021@163.com>
- <ZSLh0vtpbP81Vh7G@pop-os.localdomain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B35EAFF;
+	Tue, 10 Oct 2023 09:05:47 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E34B4;
+	Tue, 10 Oct 2023 02:05:42 -0700 (PDT)
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 2298866030BF;
+	Tue, 10 Oct 2023 10:05:40 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1696928741;
+	bh=g5wWTSMfgxfFuNzyWh6JJgEJpm8OKALaOO+HuJaW/TQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=TUOrF1Pi096aYe2AGtryDLFF71aDQ2xiXp5BpMwo+zSlgdfwQzWZuXjk05VvI7x0b
+	 dac2xWlBxFIPRvmpPYTTBcIPUBi/O7R0sFR+p2G4TWrBDQfUD5dwbBCkGKTXK1I3yC
+	 leRiONy6iRef4Z531+Z/jrhYAhvrTEtL8BLUUiX7rK0KDvjBBulsVgoC3BUCJdbC2/
+	 PzutCAsIPjkFUpLVgCjt5awlwanu7L8RN7oqr7/4xHydUkp/yD/12HogXbGjeirFaE
+	 uHOkmQ6sPp9pVQrtJST1NA0TDE9cAA4Hkh3Flam1e+9W9/vtgqhFocjotEnN5CIim4
+	 OYbhr9pp5rEXQ==
+Message-ID: <3eef5dc0-af64-baa9-d760-3b438d491c8a@collabora.com>
+Date: Tue, 10 Oct 2023 11:05:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSLh0vtpbP81Vh7G@pop-os.localdomain>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.0
+Subject: Re: [PATCH] net: dsa: mt7530: replace deprecated strncpy with
+ ethtool_sprintf
+Content-Language: en-US
+To: Justin Stitt <justinstitt@google.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
+ <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-hardening@vger.kernel.org
+References: <20231009-strncpy-drivers-net-dsa-mt7530-c-v1-1-ec6677a6436a@google.com>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <20231009-strncpy-drivers-net-dsa-mt7530-c-v1-1-ec6677a6436a@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Oct 08, 2023 at 10:07:30AM -0700, Cong Wang wrote:
-> On Sat, Oct 07, 2023 at 08:59:53AM +0800, Ma Ke wrote:
-> > In esp_remove_trailer(), to avoid an unexpected result returned by
-> > pskb_trim, we should check the return value of pskb_trim().
-> > 
-> > Signed-off-by: Ma Ke <make_ruc2021@163.com>
-> > ---
-> >  net/ipv6/esp6.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
+Il 09/10/23 20:29, Justin Stitt ha scritto:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
 > 
-> We need the same change for net/ipv4/esp4.c?
+> ethtool_sprintf() is designed specifically for get_strings() usage.
+> Let's replace strncpy in favor of this more robust and easier to
+> understand interface.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Please verify that it can actually fail first.  Note that I'm
-busy right now so I haven't looked at it at all.
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
 
