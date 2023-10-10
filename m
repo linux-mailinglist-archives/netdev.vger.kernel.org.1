@@ -1,92 +1,108 @@
-Return-Path: <netdev+bounces-39445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3B307BF447
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:26:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72FD77BF44D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CDAF281A4F
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:26:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CDAC281A6A
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F95D26D;
-	Tue, 10 Oct 2023 07:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EBED2F2;
+	Tue, 10 Oct 2023 07:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RzQwLWhm"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="i5OxoLlC"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DA0D518
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:26:55 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C27110C9
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:54 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c012232792so65688281fa.0
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696922812; x=1697527612; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=o4Hny8Bp62dXkDYUCnY1VMd74kxsOiw4WrEv/PlhCAw=;
-        b=RzQwLWhmhChCAkyCL9wWsd6nkOo6Aj647TfjTKI7StSc2tKjdC3MbfZMYgFO6CPiS6
-         h0dYFPrLlph1s+06DHl16IBZsCozEscJHWGkMYd7ojrIrAcFAoXtI6cdjm+5hxsmKD0p
-         2ibkyzcaplE6tjm6FV3YUxGGRwVvUGus5ex1KhPQPwOJtYDpU6oj83itKAtYmyfqOZFb
-         /0sM4A52uQllVErC8NLrffnHF18Wkk0/D9j1mc0t4siEF2G5ZjNJ00AqXVuGDZSt/lFR
-         OiMs7HAeJkYwD6unRzaPN2QjCpKrtXtF/qy/s8dkGCx+8a9W2WCkVJeYk/c3H3t2cV8a
-         CQsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696922812; x=1697527612;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o4Hny8Bp62dXkDYUCnY1VMd74kxsOiw4WrEv/PlhCAw=;
-        b=AIJ25pFvKUUb41JjE3RanlXQilM+6rR520srvUHw4YfzaZQCNdw0RpWB23L+dc4lJZ
-         Uem1ywInfPVov1t4aLdGf1SHenEE4b1mHXwHYtqmPWVAhQJZveObn/tD5/tHbQxMoD8v
-         N2/HTjQNXUl2RTR7UJW6nlWY7atoeK1Mbah9OvKytqG7zQUnS/4/ZGeqUs3REtN+3gz1
-         gA3hZ0guECtFDEr0EgVrWmnzDCWcdlHm9W6V+XjpxwD7j2xaM/KkTMt8qotuNDgL1Yiw
-         5uHYcq5mxm6i+TWvf68Ak2HNUSbI50kenXTp4h9nfeOO/6//sbv/vS6iKwTfqd0OBd+t
-         ALRQ==
-X-Gm-Message-State: AOJu0YwRfSoiG1AKmk6SfatcmdE0YVgSpkeD/7vcP8SbHsN/9COQfgIo
-	RV0B0O8AC9GTxS/916ELfjqJEuLZsuyWeWH7/k058FqmSyc=
-X-Google-Smtp-Source: AGHT+IFWEl5v5gLvsVCPrixixuRBbEhoITca87VZwRpu1Yga1nQ/y1/SNlnXJUrtQqrxj1fLncjncUcIXDcmjNjiPPU=
-X-Received: by 2002:a2e:2413:0:b0:2c0:ff6:984f with SMTP id
- k19-20020a2e2413000000b002c00ff6984fmr14019651ljk.49.1696922812124; Tue, 10
- Oct 2023 00:26:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E939D295;
+	Tue, 10 Oct 2023 07:28:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F57CC433C8;
+	Tue, 10 Oct 2023 07:28:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1696922916;
+	bh=gh5hIh6rcBaHimJNcY2gva6GLzaDoxHgSRNJiNo7RBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i5OxoLlCPxFh60ea+ER9v1u+E22jBWcfkzZZqqwa3gVu9IMowq4ekLryPn82LRKXB
+	 RZhtFQor8AeHTqdxwAxC0ogHo42hYBMzZy39xNbWDMUOBaWS62ffUMinogwJTXTC3c
+	 FGJ2/X94dIi9ubf5eFPbn7K98vlgxNGo8C55x2Lc=
+Date: Tue, 10 Oct 2023 09:28:33 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Peter Korsgaard <peter@korsgaard.com>
+Cc: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] net: usb: dm9601: fix uninitialized variable use in
+ dm9601_mdio_read
+Message-ID: <2023101025-sulfur-blurred-93ab@gregkh>
+References: <20231009-topic-dm9601_uninit_mdio_read-v2-1-f2fe39739b6c@gmail.com>
+ <2023101036-fleshy-dude-aec0@gregkh>
+ <87v8bfc83f.fsf@48ers.dk>
+ <2023101018-venomous-uncured-47cf@gregkh>
+ <87r0m3c56e.fsf@48ers.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Francesco Venturi <francesco.venturi1@gmail.com>
-Date: Tue, 10 Oct 2023 09:26:40 +0200
-Message-ID: <CACvgxrHamYWW2oj8CVETvBd79Vuep9Ra0epFnPF+S2am6Xdeaw@mail.gmail.com>
-Subject: Nice to meet you; I'm a Highschool networking teacher
-To: mkubecek@suse.cz
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r0m3c56e.fsf@48ers.dk>
 
-Nice to meet you, my name is Francesco Venturi and I'd need your help...
-I've had a look at a presentation about ethtool and how to run
-ethernet diagnostics.
-I need to show my students these capabilities, but I need to know what
-hardware to buy.
-Can you please kindly provide me with a list of supported NIC models,
-both PCI and USB (and perhaps chipsets) that support most of this
-functionality up to today, including the "--cable-test" ethtool
-command line option?
-Can you also please point me to a Linux distro having access to a
-version compiled with netlink support and provide me with some
-guidance on how to install it without compiling?
+On Tue, Oct 10, 2023 at 09:22:49AM +0200, Peter Korsgaard wrote:
+> >>>>> "Greg" == Greg KH <gregkh@linuxfoundation.org> writes:
+> 
+>  > On Tue, Oct 10, 2023 at 08:19:48AM +0200, Peter Korsgaard wrote:
+>  >> >>>>> "Greg" == Greg KH <gregkh@linuxfoundation.org> writes:
+>  >> 
+>  >> > On Tue, Oct 10, 2023 at 12:26:14AM +0200, Javier Carrasco wrote:
+>  >> >> syzbot has found an uninit-value bug triggered by the dm9601 driver [1].
+>  >> >> 
+>  >> >> This error happens because the variable res is not updated if the call
+>  >> >> to dm_read_shared_word returns an error. In this particular case -EPROTO
+>  >> >> was returned and res stayed uninitialized.
+>  >> >> 
+>  >> >> This can be avoided by checking the return value of dm_read_shared_word
+>  >> >> and propagating the error if the read operation failed.
+>  >> >> 
+>  >> >> [1] https://syzkaller.appspot.com/bug?extid=1f53a30781af65d2c955
+>  >> >> 
+>  >> >> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+>  >> >> Reported-and-tested-by: syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com
+>  >> >> ---
+>  >> >> Changes in v2:
+>  >> >> - Remove unnecessary 'err == 0' case
+>  >> >> - Link to v1: https://lore.kernel.org/r/20231009-topic-dm9601_uninit_mdio_read-v1-1-d4d775e24e3b@gmail.com
+>  >> >> ---
+>  >> >> drivers/net/usb/dm9601.c | 7 ++++++-
+>  >> >> 1 file changed, 6 insertions(+), 1 deletion(-)
+>  >> 
+>  >> > What commit id does this fix?
+>  >> 
+>  >> It has been there since the beginning, so:
+>  >> 
+>  >> Fixes: d0374f4f9c35cdfbee0 ("USB: Davicom DM9601 usbnet driver")
+>  >> 
+>  >> Acked-by: Peter Korsgaard <peter@korsgaard.com>
+> 
+>  > Great, can someone add a cc: stable@ tag for this too please?
+> 
+> Cc: stable@vger.kernel.org
 
-Thank you very much in advance!
+<formletter>
 
-Francesco Venturi
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
+
+</formletter>
 
