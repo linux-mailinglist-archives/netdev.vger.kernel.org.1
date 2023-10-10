@@ -1,111 +1,86 @@
-Return-Path: <netdev+bounces-39465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76AA97BF5E2
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:30:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F01E7BF5E4
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0C8C281BB1
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5671C20BA9
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA554A2C;
-	Tue, 10 Oct 2023 08:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C154C8C;
+	Tue, 10 Oct 2023 08:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="d2/GYvHB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DgqpM3HJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5880AA34;
-	Tue, 10 Oct 2023 08:30:15 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804CFB7;
-	Tue, 10 Oct 2023 01:30:03 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 182D9E0008;
-	Tue, 10 Oct 2023 08:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1696926600;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NaOw8PSc0VULjmhxAa6nnKNT5QXhrjoUDdxFuVyTpCM=;
-	b=d2/GYvHBSkcMRXi9pmcOlLcCOzYlqnrIh22gZ99/gFbL/M7ys56o4fhkMnDPId8GrsjWCC
-	5ouyZmnYSGtztbw5b3KORr9N47KIDYuaBQUiGc3Xf/ZDdUH8+/jT/SFGq05ljDkT54hN13
-	hx19s0wFiBqyB6uDlurPSlGYgMd3j25Og2nZrBv+EZ8JoEtmpYOsJTJFZCGD6qgRxTFCDK
-	FZ/Gn35OaUtNi/MGYMXczmwjExd6qASdYRlrPa0Xtf0BY5UrQHKeqALrbgvp/3zYz4JUyV
-	QEMOADOF32CCiQH10GW8t3f+hFHXxsyHOaUNrGK7QRLSZ6PLjrkZyGoU9RNvDQ==
-Date: Tue, 10 Oct 2023 10:29:45 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Linus Walleij <linus.walleij@linaro.org>, Qiang Zhao <qiang.zhao@nxp.com>,
- Li Yang <leoyang.li@nxp.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark
- Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Shengjiu Wang <shengjiu.wang@gmail.com>, Xiubo Li
- <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>, Nicolin Chen
- <nicoleotsuka@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org, Simon
- Horman <horms@kernel.org>, Christophe JAILLET
- <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v7 26/30] net: wan: framer: Add support for the Lantiq
- PEF2256 framer
-Message-ID: <20231010102945.39c27b1d@bootlin.com>
-In-Reply-To: <20231006150252.6d45be95@kernel.org>
-References: <20230928070652.330429-1-herve.codina@bootlin.com>
-	<20230928070652.330429-27-herve.codina@bootlin.com>
-	<20231006150252.6d45be95@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666AA1FCF
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 08:30:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D81C8C433C8;
+	Tue, 10 Oct 2023 08:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696926627;
+	bh=SXdJHIxqzi/d9veL+aYe51i7O/6le3MLAA2+KuAW7OE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DgqpM3HJyEDvk1XxJrudYCd/5BdP29J7Sc8nH25ctNo+OOvcpU/JI8fdEnzn/qBk1
+	 wG5iPI8dshLW6J5IUDIWhKzvky8J7Ka7oyS4RkOuT6jl/ffmrNpB5ww1SPKVnOImXj
+	 oysALlKUXW70bTkXE/Sx9wMOR2zZLU1uAAKTVvXpxcVMP8v6lziZLxoZcyu1aAIADI
+	 yfkwML0YMEtB/2Csh7Ebw5j1x4ig6JLzBMynFkO1Xwt6SOlzemlSpK5uwvqScM9vcH
+	 Uu1xae2SXgoKsJ7CN7kWp5DuTmaVPh3UpGx1+455cxkOuT0TMXftyvwEDBM7w77OcK
+	 CfFD6WE/wWKrA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1174C595C5;
+	Tue, 10 Oct 2023 08:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next v3 0/2] tcp: save flowlabel and use for receiver
+ repathing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169692662778.15262.2648750491298448747.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Oct 2023 08:30:27 +0000
+References: <20231006011841.3558307-1-morleyd.kernel@gmail.com>
+In-Reply-To: <20231006011841.3558307-1-morleyd.kernel@gmail.com>
+To: David Morley <morleyd.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, morleyd@google.com
 
-Hi Jakub,
+Hello:
 
-On Fri, 6 Oct 2023 15:02:52 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> On Thu, 28 Sep 2023 09:06:44 +0200 Herve Codina wrote:
-> > +	for (i = 0; i < count; i++) {
-> > +		(audio_devs + i)->name = "framer-codec";
-> > +		(audio_devs + i)->of_compatible = compatible;
-> > +		(audio_devs + i)->id = i;  
+On Fri,  6 Oct 2023 01:18:39 +0000 you wrote:
+> From: David Morley <morleyd@google.com>
 > 
-> Why not array notation?
-
-Will be change in the next iteration.
-
+> This patch series stores the last received ipv6 flowlabel. This last
+> received flowlabel is then used to help decide whether a packet is
+> likely an RTO retransmit or the result of a TLP. This new information
+> is used to better inform the flowlabel change decision for data
+> receivers.
 > 
-> > +	}
-> > +
-> > +	ret = mfd_add_devices(pef2256->dev, 0, audio_devs, count, NULL, 0, NULL);  
-> 
-> Should Lee be CCed for the MFD part?
+> [...]
 
-Will be added to the CC list.
+Here is the summary with links:
+  - [net-next,v3,1/2] tcp: record last received ipv6 flowlabel
+    https://git.kernel.org/netdev/net-next/c/95b9a87c6a6b
+  - [net-next,v3,2/2] tcp: change data receiver flowlabel after one dup
+    https://git.kernel.org/netdev/net-next/c/939463016b7a
 
-Best regards,
-Hervé
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
