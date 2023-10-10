@@ -1,166 +1,148 @@
-Return-Path: <netdev+bounces-39744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AC7F7C443D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:36:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF7C7C4441
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:36:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1253D281E7D
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:36:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8508F281E49
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E59E35515;
-	Tue, 10 Oct 2023 22:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3CC225AE;
+	Tue, 10 Oct 2023 22:36:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Qf8mflRi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SHjyVqsB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C158B31599;
-	Tue, 10 Oct 2023 22:36:16 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6115198;
-	Tue, 10 Oct 2023 15:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=+//m0KI4ZPTKPBh3GBzx8/nuQJX7FHzq6yrhqUaHjYg=; b=Qf8mflRi2rWQG+3qJrpL7GqVa1
-	DoXyqQJMgN8c2dyHTgXuJ8NCrnu0hJCW0nx/Y3S1WE1JejPVNHq+0PQA6ucgmUBotQJeaYOlIFo1H
-	QwSVMkWJgfBBrP2Ma0Od5Z3byDfvGR623QtoaqxVP9S7DRI+QTJwhJiDmgR+xl6u8Y8sOKwLJ4Srt
-	imaAdNHVvc/fMoKAMym9njsY+Wn2rlX8ltnfFiokngMkBX3V7rbqoEOTxNbIik/NxTxqhhzGVHgJZ
-	WXcEdMgpBY1WDIGDBY6BU961ixvoqQX42KOaY7VSuo+R4W8zOuJ0/lHydYZDAi2iRizbshW6sS4iG
-	Xs+qZ3dw==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qqLKl-0003H0-2a; Wed, 11 Oct 2023 00:36:11 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-10-11
-Date: Wed, 11 Oct 2023 00:36:10 +0200
-Message-Id: <20231010223610.3984-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79C2E35515
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:36:28 +0000 (UTC)
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E6D0A7
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:36:26 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id ca18e2360f4ac-79faf4210b2so234762139f.2
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:36:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1696977385; x=1697582185; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fp1+19JThVDp5aV8ZmVBXvT9jXnK6YGxCfcTc284ZzQ=;
+        b=SHjyVqsBKPTMwlV0lC4fzUyyQa1JFIIiGfTULar5DkF6EuFdmk9QiqZ5eRvezbU7XU
+         ZHSeAJhzLbwUZwH+T1Vd29I7DlyutJjvfQH60HWr6Q9F+OcF5CvXGxV+EhnHErdG0Zvg
+         qeNH9XvXj46BDGtDNXpFS2jXodRlmSdtKbwSQMLM1T1GScttYsLmgbJ7fJIOw5IW9bWn
+         /O61iO83caXEbswsdwOHlU1OT0xFo4eG5vaygWV7RD5iMKYzW8u51A43hqF36+WSoYCe
+         DpZ2OvVQeIe5aLwwN8wstCf8j+zK4A4wbqOTaEy6w1ZuV4bitGtvnDf7uEVyWJRD+lPZ
+         08Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696977385; x=1697582185;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fp1+19JThVDp5aV8ZmVBXvT9jXnK6YGxCfcTc284ZzQ=;
+        b=Eib/Qo7DBo2+rQxLC2VayEry7zFNFqO8kgtKFqr8/MFEleP+CaKp7Dm6fZWpU7C5/S
+         i17dds6yeq1kTyZrJkcRk3Z0+q5Kz+d/8LSKgVQbpsieORRjsdCwHdWwcb5f5qYqWulC
+         h/l6EEjk2/jIiXl54j5KLVNnhtPvPmZs/71YNvUcZinsh7GKuC3/gvSsKlFeyCeFCE0r
+         cDJaZ94/bHtBOgu3EaxQfSKwYXAWmksY+rihkMwisUSIwvpShMIxtNKUbbojrgSj0jQt
+         gR4FrH6f9EQ8FGmKaKEz/J+SPCEsjhfL9zR4YIx152TI0pm78CcG3plG9Xwzmhnq7CJH
+         H8HA==
+X-Gm-Message-State: AOJu0YwvidjlaDi6UFSGRboE+9f8+1SY9/d5Vsh/ctTbbsyrFXhEbdYw
+	yl/XTesATMGthz8KRnmYlRSKXj3Gr4qjLKV3rmUMvw==
+X-Google-Smtp-Source: AGHT+IEoHPDq/5iygy94KT86qlz3QZwHbRQso0lz7RaMmjKkCunaMgvNTfv7uf58Yir3pWdJMnT3eQ==
+X-Received: by 2002:a6b:e704:0:b0:78b:b892:e334 with SMTP id b4-20020a6be704000000b0078bb892e334mr22796097ioh.11.1696977385502;
+        Tue, 10 Oct 2023 15:36:25 -0700 (PDT)
+Received: from google.com (161.74.123.34.bc.googleusercontent.com. [34.123.74.161])
+        by smtp.gmail.com with ESMTPSA id dp19-20020a0566381c9300b0043a1a45a7b2sm3051398jab.62.2023.10.10.15.36.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 15:36:24 -0700 (PDT)
+Date: Tue, 10 Oct 2023 22:36:22 +0000
+From: Justin Stitt <justinstitt@google.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] e1000: replace deprecated strncpy with strscpy
+Message-ID: <20231010223622.tnurv2ujreo56qwz@google.com>
+References: <20231010-strncpy-drivers-net-ethernet-intel-e1000-e1000_main-c-v1-1-b1d64581f983@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27057/Tue Oct 10 09:39:11 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231010-strncpy-drivers-net-ethernet-intel-e1000-e1000_main-c-v1-1-b1d64581f983@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+On Tue, Oct 10, 2023 at 06:35:59PM +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+>
+> We can see that netdev->name is expected to be NUL-terminated based on
+> it's usage with format strings:
+> |       pr_info("%s NIC Link is Down\n",
+> |               netdev->name);
+>
+> A suitable replacement is `strscpy` [2] due to the fact that it
+> guarantees NUL-termination on the destination buffer without
+> unnecessarily NUL-padding.
+>
+> This is in line with other uses of strscpy on netdev->name:
+> $ rg "strscpy\(netdev\->name.*pci.*"
+>
+> drivers/net/ethernet/intel/e1000e/netdev.c
+> 7455:   strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+>
+> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+> 10839:  strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+>
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+> Note: build-tested only.
+> ---
+>  drivers/net/ethernet/intel/e1000/e1000_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> index da6e303ad99b..1d1e93686af2 100644
+> --- a/drivers/net/ethernet/intel/e1000/e1000_main.c
+> +++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> @@ -1014,7 +1014,7 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	netdev->watchdog_timeo = 5 * HZ;
+>  	netif_napi_add(netdev, &adapter->napi, e1000_clean);
+>
+> -	strncpy(netdev->name, pci_name(pdev), sizeof(netdev->name) - 1);
+> +	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
+>
+>  	adapter->bd_number = cards_found;
+>
+>
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231010-strncpy-drivers-net-ethernet-intel-e1000-e1000_main-c-a45ddd89e0d7
+>
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+>
+Hi, this patch was bundled up with some others. It has a new home:
 
-The following pull-request contains BPF updates for your *net* tree.
-
-We've added 14 non-merge commits during the last 5 day(s) which contain
-a total of 12 files changed, 398 insertions(+), 104 deletions(-).
-
-The main changes are:
-
-1) Fix s390 JIT backchain issues in the trampoline code generation which
-   previously clobbered the caller's backchain, from Ilya Leoshkevich.
-
-2) Fix zero-size allocation warning in xsk sockets when the configured ring
-   size was close to SIZE_MAX, from Andrew Kanner.
-
-3) Fixes for bpf_mprog API that were found when implementing support in the
-   ebpf-go library along with selftests, from Daniel Borkmann and Lorenz Bauer.
-
-4) Fix riscv JIT to properly sign-extend the return register in programs.
-   This fixes various test_progs selftests on riscv, from Björn Töpel.
-
-5) Fix verifier log for async callback return values where the allowed range
-   was displayed incorrectly, from David Vernet.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Lorenz Bauer, Magnus Karlsson, Martin KaFai Lau, Song Liu
-
-----------------------------------------------------------------
-
-The following changes since commit c4d49196ceec80e30e8d981410d73331b49b7850:
-
-  net: sched: cls_u32: Fix allocation size in u32_init() (2023-10-06 11:43:05 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 5356ba1ff4f2417e1aebcf99aab35c1ea94dd6d7:
-
-  s390/bpf: Fix unwinding past the trampoline (2023-10-11 00:08:46 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Andrew Kanner (1):
-      xdp: Fix zero-size allocation warning in xskq_create()
-
-Björn Töpel (2):
-      riscv, bpf: Sign-extend return values
-      riscv, bpf: Track both a0 (RISC-V ABI) and a5 (BPF) return values
-
-Daniel Borkmann (6):
-      bpf: Fix BPF_PROG_QUERY last field check
-      bpf: Handle bpf_mprog_query with NULL entry
-      selftests/bpf: Test bpf_mprog query API via libbpf and raw syscall
-      selftests/bpf: Adapt assert_mprog_count to always expect 0 count
-      selftests/bpf: Test query on empty mprog and pass revision into attach
-      selftests/bpf: Make seen_tc* variable tests more robust
-
-David Vernet (2):
-      bpf: Fix verifier log for async callback return values
-      selftests/bpf: Add testcase for async callback return value failure
-
-Ilya Leoshkevich (2):
-      s390/bpf: Fix clobbering the caller's backchain in the trampoline
-      s390/bpf: Fix unwinding past the trampoline
-
-Lorenz Bauer (1):
-      bpf: Refuse unused attributes in bpf_prog_{attach,detach}
-
- arch/riscv/net/bpf_jit_comp64.c                    |  18 +-
- arch/s390/net/bpf_jit_comp.c                       |  25 +-
- kernel/bpf/mprog.c                                 |  10 +-
- kernel/bpf/syscall.c                               |  21 +-
- kernel/bpf/tcx.c                                   |   8 +-
- kernel/bpf/verifier.c                              |   6 +-
- net/xdp/xsk_queue.c                                |  10 +
- .../testing/selftests/bpf/prog_tests/tc_helpers.h  |  16 +-
- tools/testing/selftests/bpf/prog_tests/tc_links.c  |  64 ++---
- tools/testing/selftests/bpf/prog_tests/tc_opts.c   | 271 +++++++++++++++++++--
- tools/testing/selftests/bpf/prog_tests/timer.c     |   6 +-
- tools/testing/selftests/bpf/progs/timer_failure.c  |  47 ++++
- 12 files changed, 398 insertions(+), 104 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/timer_failure.c
+https://lore.kernel.org/all/20231010-netdev-replace-strncpy-resend-as-series-v1-0-caf9f0f2f021@google.com/
 
