@@ -1,177 +1,206 @@
-Return-Path: <netdev+bounces-39439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2C47BF3CC
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:09:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF227BF3D5
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:11:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FDDF1C20B3C
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:09:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71920281A5D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46712BE47;
-	Tue, 10 Oct 2023 07:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C49BE47;
+	Tue, 10 Oct 2023 07:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="NSm7/M5h"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48389467;
-	Tue, 10 Oct 2023 07:09:05 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF35899;
-	Tue, 10 Oct 2023 00:09:03 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4S4RpH5Y67z4f3jsP;
-	Tue, 10 Oct 2023 15:08:55 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP3 (Coremail) with SMTP id _Ch0CgCn_UyJ+CRlyoq+CQ--.8005S2;
-	Tue, 10 Oct 2023 15:09:00 +0800 (CST)
-Subject: Re: [PATCH v6 bpf-next 02/13] bpf: add BPF token delegation mount
- options to BPF FS
-To: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org,
- keescook@chromium.org, brauner@kernel.org, lennart@poettering.net,
- kernel-team@meta.com, sargun@sargun.me
-References: <20230927225809.2049655-1-andrii@kernel.org>
- <20230927225809.2049655-3-andrii@kernel.org>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <02a63a35-7a0c-503b-eb24-774300e86841@huaweicloud.com>
-Date: Tue, 10 Oct 2023 15:08:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D7C1391
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:11:36 +0000 (UTC)
+X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 00:11:33 PDT
+Received: from smtpcmd0883.aruba.it (smtpcmd0883.aruba.it [62.149.156.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEF19F
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:11:33 -0700 (PDT)
+Received: from smtpclient.apple ([178.197.206.108])
+	by Aruba Outgoing Smtp  with ESMTPA
+	id q6suqxIxki9R4q6svqPMRa; Tue, 10 Oct 2023 09:10:30 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1696921830; bh=gEXjtagqpqyynIWjFMSuP5JkLJk6Z4DuAC3b0cTet3U=;
+	h=Content-Type:Mime-Version:Subject:From:Date:To;
+	b=NSm7/M5hQSK2qsd6hw9qO0u9abrJ+jSzYsPwirRGzfXewecsH08hOwKe1Oo8ucPsJ
+	 y0oyVkraU/Zrf/VeCtoDcL9S9WXWX42STnUqlYvaTcf41TsvqeX3YqjWRHLWc17Aoe
+	 PlfmuDZHldPdW4xa2mKOOoY1qD4Mkr7nM8qT/afm10d+PrKkY8zwNidg2ZbsWi4Sbk
+	 qknfrH/PRefhKd0Ym/TWrYiWlk2NKYvC34p8t3s8N0LYMRas+3ZzCHP3v5NlvdEGMr
+	 YWa8ncNxYRrJJWQBGyC7iwWjUgUpuDXPToPquMrGpRxU/LO7bweTAgsHQPKxJJDPMr
+	 D5ppYk9juahVQ==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20230927225809.2049655-3-andrii@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-CM-TRANSID:_Ch0CgCn_UyJ+CRlyoq+CQ--.8005S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXF48JFWkZFy5KF47Zr4ruFg_yoW5tr4rpF
-	W8Jr4jkr48XF43Z3Wqqan0qF1Sk3yq9a4UG3yv934fCasFgrna9a40krWYvFW3Xry8GryI
-	vw4vy34Uur47AaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IU1zuWJUUUUU==
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+From: Rodolfo Zitellini <rwz@xhero.org>
+In-Reply-To: <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
+Date: Tue, 10 Oct 2023 09:10:28 +0200
+Cc: Arnd Bergmann <arnd@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Netdev <netdev@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-wireless@vger.kernel.org,
+ Johannes Berg <johannes@sipsolutions.net>,
+ linux-wpan@vger.kernel.org,
+ Michael Hennerich <michael.hennerich@analog.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org,
+ Doug Brown <doug@schmorgal.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+ <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
+ <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+X-Mailer: Apple Mail (2.3654.120.0.1.15)
+X-CMAE-Envelope: MS4xfHaXEfCIAhkSs0tsjb+YZNldBBGkq0Qz33d9TLc3sdp/647xEnlcFyPLsWPtHwDgl+ZnrBiZEU4PUgye4kZxtVDhPsFDW0vXeYf7+fioTb/Y1+YHM0+S
+ 4QYs2KC2ur50/kfdPt9XLm4Q9vF06uT32m3oGSwtJqzasFX4TOuiwQmiAdWTtr/rbSJWo/LnZDmzUYpucj/LRQDbXs2e2Cmuou2RB6tBCODnxN4FzycSM2+o
+ j865lcv6ukBr3FB8mg9c7tqJ9vjnKNRsMwujPZR9gkVBKwm+1d4+L5v0NYHAbCTbgMyefVEPjekvnVbMR30K2GXjs/Pi5YAy898ye14B8Fw/cDqnTlcJPyM9
+ CAGSRnWNDcfA/WI9tCF2011rhbEPvAZTiPscfjhS2HGj5+bQMjE/srGP/xoeN/196/4EKvnsvJjpg26zFXjYc7ps1AUQqtXalMlWgHWvrJXDpYNvWzcnm9oC
+ 1E5G26PirT+aduxDVnBQh1aGXGx7WcS28KPKy9bUPqVVMvm6GJ0Gcn3Ysr33ZmlyfgE6doYUoIrwYgmZwBEUWOQ3Imci6z9b3J1FqcdGogdYreeS95iYBVqS
+ SMGBbDSxA4519nsLop0Wo3ppOIjDyODNtIX4eCLTyiXD9g==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 9/28/2023 6:57 AM, Andrii Nakryiko wrote:
-> Add few new mount options to BPF FS that allow to specify that a given
-> BPF FS instance allows creation of BPF token (added in the next patch),
-> and what sort of operations are allowed under BPF token. As such, we get
-> 4 new mount options, each is a bit mask
->   - `delegate_cmds` allow to specify which bpf() syscall commands are
->     allowed with BPF token derived from this BPF FS instance;
->   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
->     a set of allowable BPF map types that could be created with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
->     a set of allowable BPF program types that could be loaded with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
->     a set of allowable BPF program attach types that could be loaded with
->     BPF token; delegate_progs and delegate_attachs are meant to be used
->     together, as full BPF program type is, in general, determined
->     through both program type and program attach type.
->
-> Currently, these mount options accept the following forms of values:
->   - a special value "any", that enables all possible values of a given
->   bit set;
->   - numeric value (decimal or hexadecimal, determined by kernel
->   automatically) that specifies a bit mask value directly;
->   - all the values for a given mount option are combined, if specified
->   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
->   delegate_maps=0x1 -o delegate_maps=0x2` will result in a combined 0x3
->   mask.
->
-SNIP
->  	return 0;
-> @@ -740,10 +786,14 @@ static int populate_bpffs(struct dentry *parent)
->  static int bpf_fill_super(struct super_block *sb, struct fs_context *fc)
->  {
->  	static const struct tree_descr bpf_rfiles[] = { { "" } };
-> -	struct bpf_mount_opts *opts = fc->fs_private;
-> +	struct bpf_mount_opts *opts = sb->s_fs_info;
->  	struct inode *inode;
->  	int ret;
->  
-> +	/* Mounting an instance of BPF FS requires privileges */
-> +	if (fc->user_ns != &init_user_ns && !capable(CAP_SYS_ADMIN))
-> +		return -EPERM;
-> +
->  	ret = simple_fill_super(sb, BPF_FS_MAGIC, bpf_rfiles);
->  	if (ret)
->  		return ret;
-> @@ -765,7 +815,10 @@ static int bpf_get_tree(struct fs_context *fc)
->  
->  static void bpf_free_fc(struct fs_context *fc)
->  {
-> -	kfree(fc->fs_private);
-> +	struct bpf_mount_opts *opts = fc->s_fs_info;
-> +
-> +	if (opts)
-> +		kfree(opts);
->  }
->  
+> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> ha =
+scritto:
+>=20
+> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
+>>> From: Arnd Bergmann <arnd@arndb.de>
+>>>=20
+>>> The last localtalk driver is gone now, and ppp support was never =
+fully
+>>> merged, so clean up the appletalk code by removing the obvious dead
+>>> code paths.
+>>>=20
+>>> Notably, this removes one of the two callers of the old =
+.ndo_do_ioctl()
+>>> callback that was abused for getting device addresses and is now
+>>> only used in the ieee802154 subsystem, which still uses the same =
+trick.
+>>>=20
+>>> The include/uapi/linux/if_ltalk.h header might still be required
+>>> for building userspace programs, but I made sure that debian code
+>>> search and the netatalk upstream have no references it it, so it
+>>> should be fine to remove.
+>>>=20
+>>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>>=20
+>> Hi!
+>> I=E2=80=99ve been working on a new LocalTalk interface driver for the =
+last=20
+>> couple months, do you think it would be possible to at least postpone=20=
 
-The NULL check is not needed here, use kfree(fc->s_fs_info) will be enough.
->  static const struct fs_context_operations bpf_context_ops = {
-> @@ -787,17 +840,32 @@ static int bpf_init_fs_context(struct fs_context *fc)
->  
->  	opts->mode = S_IRWXUGO;
->  
-> -	fc->fs_private = opts;
-> +	/* start out with no BPF token delegation enabled */
-> +	opts->delegate_cmds = 0;
-> +	opts->delegate_maps = 0;
-> +	opts->delegate_progs = 0;
-> +	opts->delegate_attachs = 0;
-> +
-> +	fc->s_fs_info = opts;
->  	fc->ops = &bpf_context_ops;
->  	return 0;
->  }
->  
-> +static void bpf_kill_super(struct super_block *sb)
-> +{
-> +	struct bpf_mount_opts *opts = sb->s_fs_info;
-> +
-> +	kill_litter_super(sb);
-> +	kfree(opts);
-> +}
-> +
->  static struct file_system_type bpf_fs_type = {
->  	.owner		= THIS_MODULE,
->  	.name		= "bpf",
->  	.init_fs_context = bpf_init_fs_context,
->  	.parameters	= bpf_fs_parameters,
-> -	.kill_sb	= kill_litter_super,
-> +	.kill_sb	= bpf_kill_super,
-> +	.fs_flags	= FS_USERNS_MOUNT,
->  };
->  
->  static int __init bpf_init(void)
+>> the removal of LT a bit?
+>>=20
+>> It is a driver for an open source device called TashTalk=20
+>> (https://github.com/lampmerchant/tashtalk), which runs on a PIC micro=20=
+
+>> that does all the LT interfacing, and communicates back via serial to=20=
+
+>> the host system. My driver is relatively simple and works very well=20=
+
+>> with netatalk 2.2 (which is still maintained and still has support =
+for=20
+>> AppleTalk). The driver is basically complete and trsted and I was=20
+>> preparing to submit a patch.
+>>=20
+>> Still having LocalTalk in my view has many advantages for us=20
+>> enthusiasts that still want to bridge old machines to the current =
+world=20
+>> without modifications, for example for printing on modern printers,=20=
+
+>> netbooting, sharing files and even tcp/ip. All this basically works =
+out=20
+>> of the box via the driver, Linux and available userspace tools=20
+>> (netatalk, macipgw).
+>>=20
+>> The old ISA cards supported by COPS were basically unobtanium even 20=20=
+
+>> years ago, but the solution of using a PIC and a serial port is very=20=
+
+>> robust and much more furure-proof. We also already have a device that=20=
+
+>> can interface a modern machine directly via USB to LocalTalk.
+>>=20
+>> The development of the TashTalk has been also extensively discussed =
+on=20
+>> thr 68KMLA forum=20
+>> =
+(https://68kmla.org/bb/index.php?threads/modtashtalk-lt0-driver-for-linux.=
+45031/)
+>>=20
+>> I hope the decision to remove LocalTalk can be reconsidered at least=20=
+
+>> for the time being so there is a chance to submit a new, modern =
+device=20
+>> making use of this stack.
+>=20
+> Nothing is decided, I'm just proposing my patch as a cleanup
+> for now. It would be nice to still drop the ndo_do_ioctl function
+> though, at least in some form. When your driver actually makes
+> it into the kernel, you can find a different method of communicating
+> the address between the socket interface and the device driver.
+
+Yes I too think it is good to remove ndo_do_ioctl, I designed the =
+TashTalk driver to be a drop-in replacement for COPS mostly for =
+compatibility with netatalk 2.2. My plan was to propose it like this (so =
+nothing else needed to be changed) and the propose some patches in the =
+kernel part and userspace part (netatalk).
+
+> I can see a few ways this could work out:
+>=20
+> - add a custom callback pointer to struct atalk_iface to
+>  get and set the address for phase1 probing instead of going
+>  through the ioctl
+
+This was my initial thought, at least for the moment, mostly to keep =
+netatalk happy and make sure I don=E2=80=99t break other stuff that =
+makes assumptions on how the address probing worked. There are other =
+bits I would like to improve, for example tcpdump (which parses =
+correctly appetalk packets!) is broken in the current implementation.
+
+> - rewrite the probing logic in aarp.c more widely, and improve
+>  the userspace interface in the process by introducing a netlink
+>  interface
+
+This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I think =
+the logic for probing could be redesigned and simplified (it also does =
+not work 100% correctly), and it could be a good chance to improve the =
+interface with netatalk too.
+
+> - Move your entire driver into userspace and go to the kernel
+>  using tun/tap. This has the added benefit of avoiding a lot
+>  of the complexity of the tty line discipline code you have.
+
+We had some discussion too if to just make the lt an userspace stack, I =
+personally like how it is currently implemented because existing code =
+can run basically without modification.
+
+I would propose at this stage to change the TashTalk driver to remove =
+ndo_do_ioctl and to use a custom callback, if this ok.
+
+Many thanks,
+Rodolfo
 
 
