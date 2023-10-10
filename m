@@ -1,172 +1,146 @@
-Return-Path: <netdev+bounces-39451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFDF7BF494
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:41:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5087BF4A3
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:43:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60869280CF7
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1D491C20A62
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05CCFBEC;
-	Tue, 10 Oct 2023 07:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hidxkvKY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED4FFBEC;
+	Tue, 10 Oct 2023 07:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD9CD295
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:41:16 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CC992
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:41:15 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53d82bea507so382242a12.2
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:41:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696923673; x=1697528473; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=SvCbRZYcIVKWCnIaqaQ2xIVxQYMHrabU/uflHgvkT2o=;
-        b=hidxkvKYVuAz2QefqKV+v/YFWHvgxYk/nVshiHYdP5R23p34d6q4hhFPhDOn/wD6Vh
-         if9TQpQcf5BrX1Dpr4AIIj13GXYuamvcz4Rz26Br2U/d5kmeSETokDpbhBmJiWknxPOR
-         GRqKvvFegCGeKUK7l2RqKPug1zYNRM3U1PAXkKq2wuhfeJQZykj1ac3wy9BLteM1ds4B
-         e6JG+y4xMnJMFi0Cuy2P3ve/kBUCTKPg7p3dVSNMF/RQEnqgljY6XoZhw8l+dADagCqg
-         EIqclBhUSbHOXZJP8hWYpaD7lhqtrtMjs0NIm42Sv1URPtA5YiDSgWh4AQDi/hzrLwxx
-         huyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696923673; x=1697528473;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SvCbRZYcIVKWCnIaqaQ2xIVxQYMHrabU/uflHgvkT2o=;
-        b=eDzja5hULi6+30rOSGeRukxgvC/4SeA0HEDxPeenm08iThRjZE97ooFZZsuQ+klHl/
-         j03UjsKAvhBW8wdOwdyyvY8YXT1R0j58lxYGZlILYCr7t8AG8Grn7dv69QbVCc+OphR0
-         8RmA7vthpAit+zZract+aU1S3pdXCfYYOVtMPwG+BY5njpU+CrH+g+HYAL5rhQxdh2Vl
-         KarjtVO5C8Q4sTgh5tf5GwZeyzMYbmXWzL/Taj3UIsDRaNmpu3e+o9TVk+OiqqqwNVch
-         1xIDoZXHct0ctgHWPSaNmkOSoA9xS2irPxENG7VFkJc2rnnnvdB/4RsyQyi7DGhD6glw
-         +jVg==
-X-Gm-Message-State: AOJu0Yzm/JtMV9SAkWpArC8fKj29tjl2wO80Uk5HYeckd/gtxU+jcKlj
-	khL+7yed0QqM+Yse6Qu427Jllw==
-X-Google-Smtp-Source: AGHT+IH0HjQv4OA1HGD8kfjpmis3avuFKI5IIE3Hiosm5jLT3mDjDNJtWEXyRmYaU3uwpd21NADHyw==
-X-Received: by 2002:a17:906:2189:b0:9ae:6ad0:f6db with SMTP id 9-20020a170906218900b009ae6ad0f6dbmr14989027eju.71.1696923673669;
-        Tue, 10 Oct 2023 00:41:13 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id u20-20020a17090657d400b009b97aa5a3aesm8015923ejr.34.2023.10.10.00.41.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 00:41:13 -0700 (PDT)
-Date: Tue, 10 Oct 2023 09:41:11 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Marcelo Ricardo Leitner <mleitner@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jakub Kicinski <kuba@kernel.org>,
-	Victor Nogueira <victor@mojatatu.com>, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	vladbu@nvidia.com, simon.horman@corigine.com,
-	pctammela@mojatatu.com, netdev@vger.kernel.org, kernel@mojatatu.com
-Subject: Re: [PATCH net-next v4 0/3] net/sched: Introduce tc block ports
- tracking and use
-Message-ID: <ZSUAF7tzCq+Vwj2I@nanopsycho>
-References: <ZSA60cyLDVw13cLi@nanopsycho>
- <CAM0EoMn1rNX=A3Gd81cZrnutpuch-ZDsSgXdG72uPQ=N2fGoAg@mail.gmail.com>
- <20231006152516.5ff2aeca@kernel.org>
- <CAM0EoM=LMQu5ae53WEE5Giz3z4u87rP+R4skEmUKD5dRFh5q7w@mail.gmail.com>
- <ZSEw32MVPK/qCsyz@nanopsycho>
- <CAM0EoMnJszhTDFuYZHojEZtfNueHe_WDAVXgLVWNSOtoZ2KapQ@mail.gmail.com>
- <ZSFSfPFXuvMC/max@nanopsycho>
- <CAM0EoMmKNEQuV8iRT-+hwm2KVDi5FK0JCNOpiaar90GwqjA-zw@mail.gmail.com>
- <ZSGTdA/5WkVI7lvQ@nanopsycho>
- <CALnP8ZbD_09u+Qqd2N4VcrstuGexh7TiNAtL7n4pyUvLAQ8EOw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7055E4435
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:43:07 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936CA92
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:43:05 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qq7OK-0007AR-Op; Tue, 10 Oct 2023 09:42:56 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qq7OK-000bhI-7R; Tue, 10 Oct 2023 09:42:56 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D04022332F5;
+	Tue, 10 Oct 2023 07:42:55 +0000 (UTC)
+Date: Tue, 10 Oct 2023 09:42:55 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Francois Romieu <romieu@fr.zoreil.com>,
+	Kalle Valo <kvalo@kernel.org>, Wei Fang <wei.fang@nxp.com>,
+	kernel@pengutronix.de, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: davicom: dm9000: dm9000_phy_write(): fix
+ deadlock during netdev watchdog handling
+Message-ID: <20231010-smite-populace-090139229be1-mkl@pengutronix.de>
+References: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2ujovxvoj2fa5hkv"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALnP8ZbD_09u+Qqd2N4VcrstuGexh7TiNAtL7n4pyUvLAQ8EOw@mail.gmail.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Mon, Oct 09, 2023 at 10:54:07PM CEST, mleitner@redhat.com wrote:
->On Sat, Oct 07, 2023 at 07:20:52PM +0200, Jiri Pirko wrote:
->> Sat, Oct 07, 2023 at 04:09:15PM CEST, jhs@mojatatu.com wrote:
->> >On Sat, Oct 7, 2023 at 8:43 AM Jiri Pirko <jiri@resnulli.us> wrote:
->...
->> >> My primary point is, this should be mirred redirect to block instead of
->> >> what we currently have only for dev. That's it.
->> >
->> >Agreed (and such a feature should be added regardless of this action).
->> >The tc block provides a simple abstraction, but do you think it is
->> >enough? Alternative is to use a list of ports given to mirred: it
->> >allows us to group ports from different tc blocks or even just a
->> >subset of what is in a tc block - but it will require a lot more code
->> >to express such functionality.
->>
->> Again, you attach filter to either dev or block. If you extend mirred
->> redirect to accept the same 2 types of target, I think it would be best.
->
->The difference here between filter and action here is that you don't
->really have an option for filters: you either attach it to either dev
->or block, or you create an entire new class of objects, say,
->"blockfilter", all while retaining the same filters, parameters, etc.
->I'm not aware of a single filter that behaves differently over a block
->than a netdev.
 
-Why do you talk about different behaviour? Nobody suggested that. I have
-no idea what you mean by "blockfilter".
+--2ujovxvoj2fa5hkv
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On 10.10.2023 09:35:19, Marc Kleine-Budde wrote:
+> The dm9000 takes the db->lock spin lock in dm9000_timeout() and calls
+> into dm9000_init_dm9000(). For the DM9000B the PHY is reset with
+> dm9000_phy_write(). That function again takes the db->lock spin lock,
+> which results in a deadlock. For reference the backtrace:
+>=20
+> | [<c0425050>] (rt_spin_lock_slowlock_locked) from [<c0425100>] (rt_spin_=
+lock_slowlock+0x60/0xc4)
+> | [<c0425100>] (rt_spin_lock_slowlock) from [<c02e1174>] (dm9000_phy_writ=
+e+0x2c/0x1a4)
+> | [<c02e1174>] (dm9000_phy_write) from [<c02e16b0>] (dm9000_init_dm9000+0=
+x288/0x2a4)
+> | [<c02e16b0>] (dm9000_init_dm9000) from [<c02e1724>] (dm9000_timeout+0x5=
+8/0xd4)
+> | [<c02e1724>] (dm9000_timeout) from [<c036f298>] (dev_watchdog+0x258/0x2=
+a8)
+> | [<c036f298>] (dev_watchdog) from [<c0068168>] (call_timer_fn+0x20/0x88)
+> | [<c0068168>] (call_timer_fn) from [<c00687c8>] (expire_timers+0xf0/0x19=
+4)
+> | [<c00687c8>] (expire_timers) from [<c0068920>] (run_timer_softirq+0xb4/=
+0x25c)
+> | [<c0068920>] (run_timer_softirq) from [<c0021a30>] (do_current_softirqs=
++0x16c/0x228)
+> | [<c0021a30>] (do_current_softirqs) from [<c0021b14>] (run_ksoftirqd+0x2=
+8/0x4c)
+> | [<c0021b14>] (run_ksoftirqd) from [<c0040488>] (smpboot_thread_fn+0x278=
+/0x290)
+> | [<c0040488>] (smpboot_thread_fn) from [<c003c28c>] (kthread+0x124/0x164)
+> | [<c003c28c>] (kthread) from [<c00090f0>] (ret_from_fork+0x14/0x24)
+>=20
+> To workaround similar problem (take mutex inside spin lock ) , a
+> "in_timeout" variable was added in 582379839bbd ("dm9000: avoid
+> sleeping in dm9000_timeout callback"). Use this variable and not take
+> the spin lock inside dm9000_phy_write() if in_timeout is true.
+>=20
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
+Fixes: a1365275e745 ("[PATCH] DM9000 network driver")
 
->
->But for actions, there is the option, and despite the fact that both
+regards,
+Marc
 
-Which option?
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
+--2ujovxvoj2fa5hkv
+Content-Type: application/pgp-signature; name="signature.asc"
 
->"output packets", the semantics are not that close. It actually
->helps with parameter parsing, documentation (man pages), testing (as
->use and test cases can be more easily tracked) and perhaps more
->importantly: if I don't want this feature, I can disable the new
->module.
->
->Later someone will say "hey why not have a hash_dst_selector", so it
->can implement a load balancer through the block output? And mirred,
->once a simple use case (with an already complex implementation),
->becomes a partial implementation of bonding then. :)
->
->In short, I'm not sure if having the user to fiddle through a maze of
->options that only work in mode A or B or work differently is better
->than having more specialized actions (which can and should reuse code).
+-----BEGIN PGP SIGNATURE-----
 
-Sure, you can have "blockmirredredirect" that would only to the
-redirection for block target. No problem. I don't see why it can't be
-just a case of mirred redirect, but if people want that separate, why
-not.
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUlAHwACgkQvlAcSiqK
+BOjNsAf/WenQ7YsHEiBxYftZny6AIRNMWWzyxI4UVTNYDHd8ygrFvirD5fUpRVuM
+7DFpjUs2RDe30UqZ9z4u/mDH6ZK/pXvM2+MSYfJoDJhP62Y3Zp2jaOW24A90ahIb
+U953NIKiuDofWEzKOe/h34TvUvWOMo1FbbWlWF4P0Wd6uIOE76qyRkkjEA7S49Z7
+XH07fXYZxBHYdj4IYgZ21sRDRRIzLtG1xtPWqswhVUmwcfP1DhJaR7Iatg/hpF0c
+npaAlDLgxJw7mggWfr7wEXlIyRm3OqnjCn0z4RMPNJ8ZDzBOMtyHbaSKH9dqo9bX
+sVn2AjxEVOXnlL88yYMDGVIwA9A0XA==
+=uL7L
+-----END PGP SIGNATURE-----
 
-My problem with the action "blockcast" is that it somehow works with
-configuration of an entity the filter is attached to:
-blockX->filterY->blockcastZ
-
-Z goes all the way down to blockX to figure out where to redirect the
-packet. If that is not odd, then I don't know what else is.
-
-Has other consequences, like what happens if the filter is not attached
-to block, but dev directly? What happens is blockcast action is shared
-among filter? Etc.
-
-Configuration should be action property. That is my point.
-
-
-
->
->  Marcelo
->
+--2ujovxvoj2fa5hkv--
 
