@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-39653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D0B17C0454
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:22:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518917C0455
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DB961C20DBD
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D630E281D1E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E59529CE2;
-	Tue, 10 Oct 2023 19:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F8029CE6;
+	Tue, 10 Oct 2023 19:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KX0HvAub"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3GYPoDx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788D129CE1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F57329CE1;
+	Tue, 10 Oct 2023 19:22:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBE33C433CC;
 	Tue, 10 Oct 2023 19:22:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2972C433C7;
-	Tue, 10 Oct 2023 19:22:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696965726;
-	bh=yM7KjXTObWwFAt0kkYCB/fRJosZ7h5UaoJgfYR7hptI=;
+	s=k20201202; t=1696965729;
+	bh=lsUvKMtLsJIj654EciF94nmsNpKkw3JX/6ih3ix4Eu4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KX0HvAubMonj4fEYMAnneanvzGUqUZlt5s/tjo02hIt45ev2Dwbs4BmmoMjlm1Bz9
-	 Z/jHaTSIAKIuiOqK18i29ulpH9ftVd9WpONAqSn/qiQ6ScJQkSYX/gTzLqx0lm1E7n
-	 iwPQT7X5zxh8tvrfhthzcWUnN2WRaom/RaMqyiKvrZOLPCg9XhdLCCSiH171vANKcB
-	 l3hxWepJds8aRSVv54CQQ+03mvSpd26PEdlh+rLV0dRdxWRWG+5OuYtGMPQe3u1kzA
-	 QXIHEhwEr2d5O/H/YSr3VkTAocucpwhRM5EwG3tGFlmYRl0sjdy06rK36ccqjXSaTJ
-	 SU78vYi35eVrw==
+	b=Q3GYPoDx3z0kmpd/zfvvtaNatKmHt6/jTgoVqOTfsb+3Q8MmhefGYz+iRx37TPNn1
+	 5WbaRh01nMbW9pZ3AgCBRqkqjbFUZ3Rntxe1UAG8+25VstWYKlrGlmtz/Vvki3Hpp4
+	 NnuLrlQJx5EdKdv2xCrCSR5mJzbbG9voVexT3XPnJUXNTthj2P14s2LTerVN2wBsaA
+	 mMRLUEnsSgIYvqelO1juikXlju83Ca8J8THXKwzGtCgykjiqOxqMwidOc5I+GYs0ih
+	 pnYEd83xR0vNnEVs6rGlvqC7DPdRQHbLRrr7WOfWda4PFZ8uNBrAHV5yhTDVKTWJjC
+	 wQpmkZF781Rag==
 From: Matthieu Baerts <matttbe@kernel.org>
-Date: Tue, 10 Oct 2023 21:21:43 +0200
-Subject: [PATCH net-next 2/6] net: mptcp: convert netlink from small_ops to
- ops
+Date: Tue, 10 Oct 2023 21:21:44 +0200
+Subject: [PATCH net-next 3/6] Documentation: netlink: add a YAML spec for
+ mptcp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-2-18dd117e8f50@kernel.org>
+Message-Id: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-3-18dd117e8f50@kernel.org>
 References: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-0-18dd117e8f50@kernel.org>
 In-Reply-To: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-0-18dd117e8f50@kernel.org>
 To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
@@ -53,344 +53,449 @@ To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  Davide Caratti <dcaratti@redhat.com>, Matthieu Baerts <matttbe@kernel.org>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11837; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=xJIQUgvyWS794R7SPkEw/jyO1hGLyVubPRydeRZdkVw=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlJaRVaw8Aty37Yvxf6LD8AqCyqv5UFhiJqVPmw
- SGS8Ut+p/6JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZSWkVQAKCRD2t4JPQmmg
- c8MMD/45dq2QnSTNF7YeXnTDSdI37oBC5l4F9Gs5DudPJaFmBmcckRimTtl15un4xZIl+knbYAo
- xpfkTxXNnxgdTjNIuzo1GbzR2VL5UAbS/3Vvor16rDwKiorg6NRhG1hz/uQjXMlxR2MyW92m/h8
- EN5pOEpqWEanmHYqzqfbyRu1DDCPfABVsW0gqtl+Z2jf+zMomyt045mbMfVdHLoqztdZvrIntnV
- CzQkHje17hk1Io7/FNj77bxvk3TfFyU5LsgXG7p1Ly4Lf0Ub4DYgkTYsuRL0+sS+jodN73S9DaY
- smzjsUlA5SYFwu4ojb71arn4J0LvBxzgVpoDJKUPQdpJLFMZA02FUEQyPu/Dvk9LWm/ItGFgkhS
- B1qSzda+lxi4cO0JCd5agjZiXXLTHfk+Tn0dsZUYlYRuxclTjv9ZTb2wmo5SdlGGvpQqS6G8L0G
- H1z0kfm+6sMBhGyyxmPuHa/4JXmPUuAeXq9K9UB1By5EUortt9lZxE/bG1rRtDOm3jDma+dX4P5
- czFfRGoFAIKJxi4c9RbPJvx0d34r01J6PQBrfqJOUu8K4tArZsDuJFpoAuGlP3fSWbyybRzOsJ5
- x0R5EwzYIb6Vyg1+6SmlJVdBb5E8E5q8FZ/mc1DLFp5l7SnweZ+MMsLC5q2PKpzeTG+16ezaaPZ
- hXJo+AddjrXARzA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10437; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=KP6EllSmqpqVAJ5AFwXvlJP9SnekCqaTFAtt+Vf1Fy8=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlJaRVJk0P56bJhZb0UqWCW3B8bwRT8HAI+DAOj
+ 6KDpoA+Em2JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZSWkVQAKCRD2t4JPQmmg
+ c2QTEAC4jc/VvLwVtK6xx5I6z8D42c0HxpD5ko7NbnUDy1N4teYVaV+YPCMPiP78HG8VCm0iQhs
+ Y8O5yHrR/Wvixzude9H2/4JSNvdcd4B3gQ7/VNxkac6eiBNLVR+Gozzg0TWWpsG3L94zHFFCkzi
+ Jtn38nKH3vqinXkw8YbaKvyHkmx60LXBBCvr+b+Gy+MRJeqQClCk1xcLgR3X3hjLKDbN9Ze7n31
+ VknDjyDqsvk6diKCbuKx/QzWBCBlP/sY0d+6EH6blDbjuZKmyyoJ5XG+aLyf8xmuHDVRq1F1yl/
+ oXAxhztMHKs26PqOocYBWwj6zn0fXjwkdwmjShEbCINoRpnjOF+SLOQPRkCZjgxw5yIVPTfwfuO
+ GOvFy8iSgHR1Tyjho0v/v4sMIvcO4xWKQIMdGTKUAzMb6d6pU0dDEhJ0XC5tXB0eqInxha+9aVO
+ bNpRV0NI4kkynnyZhBVYQOiheHf66t2r9ZIvegKXx+JWr5/6iyXUvVtCo+5Zuer61UWnccGIw4U
+ a/QaYlCJYv9b3dmp5Ma8/lOnRzYXPcMj6H0mPVVLP+qu8QiR27yvjUwD0S7V4yvgprHIfrgXtzd
+ wT6MXjqJZcEydfyK/rsSQW+uoq4YAaw2OBXsTxtaqvhJOudhagHwI+GYJco3kScBQDy6OB3rvcL
+ dhiT357SWaJk7Kg==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
 From: Davide Caratti <dcaratti@redhat.com>
 
-in the current MPTCP control plane, all operations use a netlink
-attribute of the same type "MPTCP_PM_ATTR". However, add/del/get/flush
-operations only parse the first element in the message _ the one that
-describes MPTCP endpoints (that was named MPTCP_PM_ATTR_ADDR and
-mostly used in ADD_ADDR operations _ probably the similarity of "attr",
-"addr" and "add" might cause some confusion to human readers).
-Convert MPTCP from 'small_ops' to 'ops', thus allowing different attributes
-for each single operation, hopefully makes all this clearer to human
-readers.
-
-- use a separate attribute set for add/del/get/flush address operation,
-  binary compatible with the existing one, to store the endpoint address.
-  MPTCP_PM_ENDPOINT_ADDR is added to the uAPI (with the same value as
-  MPTCP_PM_ATTR_ADDR) for these operations.
-- convert mptcp_pm_ops[] and add policy files accordingly.
-
-this prepares MPTCP control plane to be described as YAML spec.
+it describes most of the current netlink interface (uAPI definitions,
+doit/dumpit operations and attributes)
 
 Link: https://github.com/multipath-tcp/mptcp_net-next/issues/340
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Davide Caratti <dcaratti@redhat.com>
 Signed-off-by: Matthieu Baerts <matttbe@kernel.org>
 ---
- include/uapi/linux/mptcp.h |   8 ++
- net/mptcp/pm_netlink.c     | 191 ++++++++++++++++++++++++++++++---------------
- 2 files changed, 135 insertions(+), 64 deletions(-)
+ Documentation/netlink/specs/mptcp.yaml | 394 +++++++++++++++++++++++++++++++++
+ MAINTAINERS                            |   1 +
+ 2 files changed, 395 insertions(+)
 
-diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
-index ee9c49f949a2..0e62937ab17c 100644
---- a/include/uapi/linux/mptcp.h
-+++ b/include/uapi/linux/mptcp.h
-@@ -65,6 +65,14 @@ enum {
- 
- #define MPTCP_PM_ATTR_MAX (__MPTCP_PM_ATTR_MAX - 1)
- 
-+enum {
-+	MPTCP_PM_ENDPOINT_ADDR = 1,
+diff --git a/Documentation/netlink/specs/mptcp.yaml b/Documentation/netlink/specs/mptcp.yaml
+new file mode 100644
+index 000000000000..f8ebcd009592
+--- /dev/null
++++ b/Documentation/netlink/specs/mptcp.yaml
+@@ -0,0 +1,394 @@
++# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
 +
-+	__MPTCP_PM_ENDPOINT_MAX
-+};
++name: mptcp_pm
++protocol: genetlink-legacy
++doc: Multipath TCP.
 +
-+#define MPTCP_PM_ENDPOINT_MAX (__MPTCP_PM_ENDPOINT_MAX - 1)
++c-family-name: mptcp_pm_name
++c-version-name: mptcp_pm_ver
++max-by-define: true
++kernel-policy: per-op
 +
- enum {
- 	MPTCP_PM_ADDR_ATTR_UNSPEC,
- 
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 9661f3812682..32976cf7c82b 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -48,6 +48,60 @@ struct pm_nl_pernet {
- #define MPTCP_PM_ADDR_MAX	8
- #define ADD_ADDR_RETRANS_MAX	3
- 
-+static
-+const struct nla_policy mptcp_pm_address_nl_policy[MPTCP_PM_ADDR_ATTR_IF_IDX + 1] = {
-+	[MPTCP_PM_ADDR_ATTR_FAMILY] = { .type = NLA_U16, },
-+	[MPTCP_PM_ADDR_ATTR_ID] = { .type = NLA_U8, },
-+	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_U32, },
-+	[MPTCP_PM_ADDR_ATTR_ADDR6] = { .len = 16, },
-+	[MPTCP_PM_ADDR_ATTR_PORT] = { .type = NLA_U16, },
-+	[MPTCP_PM_ADDR_ATTR_FLAGS] = { .type = NLA_U32, },
-+	[MPTCP_PM_ADDR_ATTR_IF_IDX] = { .type = NLA_S32, },
-+};
++definitions:
++  -
++    type: enum
++    name: event-type
++    enum-name: mptcp_event_type
++    name-prefix: mptcp_event_
++    entries:
++     -
++      name: unspec
++      value: 0
++     -
++      name: created
++      doc:
++        token, family, saddr4 | saddr6, daddr4 | daddr6, sport, dport
++        A new MPTCP connection has been created. It is the good time to
++        allocate memory and send ADD_ADDR if needed. Depending on the
++        traffic-patterns it can take a long time until the
++        MPTCP_EVENT_ESTABLISHED is sent.
++     -
++      name: established
++      doc:
++        token, family, saddr4 | saddr6, daddr4 | daddr6, sport, dport
++        A MPTCP connection is established (can start new subflows).
++     -
++      name: closed
++      doc:
++        token
++        A MPTCP connection has stopped.
++     -
++      name: announced
++      value: 6
++      doc:
++        token, rem_id, family, daddr4 | daddr6 [, dport]
++        A new address has been announced by the peer.
++     -
++      name: removed
++      value: 7
++      doc:
++        token, rem_id
++        An address has been lost by the peer.
++     -
++      name: sub_established
++      value: 10
++      doc:
++        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
++        dport, backup, if_idx [, error]
++        A new subflow has been established. 'error' should not be set.
++     -
++      name: sub_closed
++      value: 11
++      doc:
++        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
++        dport, backup, if_idx [, error]
++        A subflow has been closed. An error (copy of sk_err) could be set if an
++        error has been detected for this subflow.
++     -
++      name: sub_priority
++      value: 13
++      doc:
++        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
++        dport, backup, if_idx [, error]
++        The priority of a subflow has changed. 'error' should not be set.
++     -
++      name: listener_created
++      value: 15
++      doc:
++        family, sport, saddr4 | saddr6
++        A new PM listener is created.
++     -
++      name: listener_closed
++      value: 16
++      doc:
++        family, sport, saddr4 | saddr6
++        A PM listener is closed.
 +
-+/* MPTCP_PM_CMD_ADD_ADDR / DEL / GET / FLUSH - do */
-+static
-+const struct nla_policy mptcp_pm_endpoint_nl_policy[MPTCP_PM_ENDPOINT_ADDR + 1] = {
-+	[MPTCP_PM_ENDPOINT_ADDR] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+};
++attribute-sets:
++  -
++    name: address
++    name-prefix: mptcp_pm_addr_attr_
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: family
++        type: u16
++      -
++        name: id
++        type: u8
++      -
++        name: addr4
++        type: u32
++        byte-order: big-endian
++      -
++        name: addr6
++        type: binary
++        checks:
++          min-len: 16
++      -
++        name: port
++        type: u16
++        byte-order: big-endian
++      -
++        name: flags
++        type: u32
++      -
++        name: if_idx
++        type: s32
++  -
++    name: subflow-attribute
++    name-prefix: mptcp_subflow_attr_
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: token_rem
++        type: u32
++      -
++        name: token_loc
++        type: u32
++      -
++        name: relwrite_seq
++        type: u32
++      -
++        name: map_seq
++        type: u64
++      -
++        name: map_sfseq
++        type: u32
++      -
++        name: ssn_offset
++        type: u32
++      -
++        name: map_datalen
++        type: u16
++      -
++        name: flags
++        type: u32
++      -
++        name: id_rem
++        type: u8
++      -
++        name: id_loc
++        type: u8
++      -
++        name: pad
++        type: pad
++  -
++    name: endpoint
++    name-prefix: mptcp_pm_endpoint_
++    attributes:
++      -
++        name: addr
++        type: nest
++        nested-attributes: address
++  -
++    name: attr
++    name-prefix: mptcp_pm_attr_
++    attributes:
++      -
++        name: unspec
++        type: unused
++        value: 0
++      -
++        name: addr
++        type: nest
++        nested-attributes: address
++      -
++        name: rcv_add_addrs
++        type: u32
++      -
++        name: subflows
++        type: u32
++      -
++        name: token
++        type: u32
++      -
++        name: loc_id
++        type: u8
++      -
++        name: addr_remote
++        type: nest
++        nested-attributes: address
++  -
++    name: event_attr
++    enum-name: mptcp_event_attr
++    name-prefix: mptcp_attr_
++    attributes:
++      -
++        name: UNSPEC
++        type: unused
++        value: 0
++      -
++        name: token
++        type: u32
++      -
++        name: family
++        type: u16
++      -
++        name: loc_id
++        type: u8
++      -
++        name: rem_id
++        type: u8
++      -
++        name: saddr4
++        type: u32
++        byte-order: big-endian
++      -
++        name: saddr6
++        type: binary
++        checks:
++          min-len: 16
++      -
++        name: daddr4
++        type: u32
++        byte-order: big-endian
++      -
++        name: daddr6
++        type: binary
++        checks:
++          min-len: 16
++      -
++        name: sport
++        type: u16
++        byte-order: big-endian
++      -
++        name: dport
++        type: u16
++        byte-order: big-endian
++      -
++        name: backup
++        type: u8
++      -
++        name: error
++        type: u8
++      -
++        name: flags
++        type: u16
++      -
++        name: timeout
++        type: u32
++      -
++        name: if_idx
++        type: u32
++      -
++        name: reset_reason
++        type: u32
++      -
++        name: reset_flags
++        type: u32
++      -
++        name: server_side
++        type: u8
 +
-+/* MPTCP_PM_CMD_SET_LIMITS - do */
-+static
-+const struct nla_policy mptcp_pm_set_limits_nl_policy[MPTCP_PM_ATTR_SUBFLOWS + 1] = {
-+	[MPTCP_PM_ATTR_RCV_ADD_ADDRS] = { .type = NLA_U32, },
-+	[MPTCP_PM_ATTR_SUBFLOWS] = { .type = NLA_U32, },
-+};
-+
-+/* MPTCP_PM_CMD_SET_FLAGS - do */
-+static
-+const struct nla_policy mptcp_pm_set_flags_nl_policy[MPTCP_PM_ATTR_ADDR_REMOTE + 1] = {
-+	[MPTCP_PM_ATTR_ADDR] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+	[MPTCP_PM_ATTR_TOKEN] = { .type = NLA_U32, },
-+	[MPTCP_PM_ATTR_ADDR_REMOTE] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+};
-+
-+/* MPTCP_PM_CMD_ANNOUNCE - do */
-+static
-+const struct nla_policy mptcp_pm_announce_nl_policy[MPTCP_PM_ATTR_TOKEN + 1] = {
-+	[MPTCP_PM_ATTR_ADDR] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+	[MPTCP_PM_ATTR_TOKEN] = { .type = NLA_U32, },
-+};
-+
-+/* MPTCP_PM_CMD_REMOVE - do */
-+static
-+const struct nla_policy mptcp_pm_remove_nl_policy[MPTCP_PM_ATTR_LOC_ID + 1] = {
-+	[MPTCP_PM_ATTR_TOKEN] = { .type = NLA_U32, },
-+	[MPTCP_PM_ATTR_LOC_ID] = { .type = NLA_U8, },
-+};
-+
-+/* MPTCP_PM_CMD_SUBFLOW_CREATE / DESTROY - do */
-+static
-+const struct nla_policy mptcp_pm_subflow_create_nl_policy[MPTCP_PM_ATTR_ADDR_REMOTE + 1] = {
-+	[MPTCP_PM_ATTR_ADDR] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+	[MPTCP_PM_ATTR_TOKEN] = { .type = NLA_U32, },
-+	[MPTCP_PM_ATTR_ADDR_REMOTE] = NLA_POLICY_NESTED(mptcp_pm_address_nl_policy),
-+};
-+
- static struct pm_nl_pernet *pm_nl_get_pernet(const struct net *net)
- {
- 	return net_generic(net, pm_nl_pernet_id);
-@@ -1104,29 +1158,6 @@ static const struct genl_multicast_group mptcp_pm_mcgrps[] = {
- 					  },
- };
- 
--static const struct nla_policy
--mptcp_pm_addr_policy[MPTCP_PM_ADDR_ATTR_MAX + 1] = {
--	[MPTCP_PM_ADDR_ATTR_FAMILY]	= { .type	= NLA_U16,	},
--	[MPTCP_PM_ADDR_ATTR_ID]		= { .type	= NLA_U8,	},
--	[MPTCP_PM_ADDR_ATTR_ADDR4]	= { .type	= NLA_U32,	},
--	[MPTCP_PM_ADDR_ATTR_ADDR6]	=
--		NLA_POLICY_EXACT_LEN(sizeof(struct in6_addr)),
--	[MPTCP_PM_ADDR_ATTR_PORT]	= { .type	= NLA_U16	},
--	[MPTCP_PM_ADDR_ATTR_FLAGS]	= { .type	= NLA_U32	},
--	[MPTCP_PM_ADDR_ATTR_IF_IDX]     = { .type	= NLA_S32	},
--};
--
--static const struct nla_policy mptcp_pm_policy[MPTCP_PM_ATTR_MAX + 1] = {
--	[MPTCP_PM_ATTR_ADDR]		=
--					NLA_POLICY_NESTED(mptcp_pm_addr_policy),
--	[MPTCP_PM_ATTR_RCV_ADD_ADDRS]	= { .type	= NLA_U32,	},
--	[MPTCP_PM_ATTR_SUBFLOWS]	= { .type	= NLA_U32,	},
--	[MPTCP_PM_ATTR_TOKEN]		= { .type	= NLA_U32,	},
--	[MPTCP_PM_ATTR_LOC_ID]		= { .type	= NLA_U8,	},
--	[MPTCP_PM_ATTR_ADDR_REMOTE]	=
--					NLA_POLICY_NESTED(mptcp_pm_addr_policy),
--};
--
- void mptcp_pm_nl_subflow_chk_stale(const struct mptcp_sock *msk, struct sock *ssk)
- {
- 	struct mptcp_subflow_context *iter, *subflow = mptcp_subflow_ctx(ssk);
-@@ -1188,7 +1219,7 @@ static int mptcp_pm_parse_pm_addr_attr(struct nlattr *tb[],
- 
- 	/* no validation needed - was already done via nested policy */
- 	err = nla_parse_nested_deprecated(tb, MPTCP_PM_ADDR_ATTR_MAX, attr,
--					  mptcp_pm_addr_policy, info->extack);
-+					  mptcp_pm_address_nl_policy, info->extack);
- 	if (err)
- 		return err;
- 
-@@ -1305,7 +1336,7 @@ static int mptcp_nl_add_subflow_or_signal_addr(struct net *net)
- 
- static int mptcp_nl_cmd_add_addr(struct sk_buff *skb, struct genl_info *info)
- {
--	struct nlattr *attr = info->attrs[MPTCP_PM_ATTR_ADDR];
-+	struct nlattr *attr = info->attrs[MPTCP_PM_ENDPOINT_ADDR];
- 	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
- 	struct mptcp_pm_addr_entry addr, *entry;
- 	int ret;
-@@ -1486,7 +1517,7 @@ static int mptcp_nl_remove_id_zero_address(struct net *net,
- 
- static int mptcp_nl_cmd_del_addr(struct sk_buff *skb, struct genl_info *info)
- {
--	struct nlattr *attr = info->attrs[MPTCP_PM_ATTR_ADDR];
-+	struct nlattr *attr = info->attrs[MPTCP_PM_ENDPOINT_ADDR];
- 	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
- 	struct mptcp_pm_addr_entry addr, *entry;
- 	unsigned int addr_max;
-@@ -1677,7 +1708,7 @@ static int mptcp_nl_fill_addr(struct sk_buff *skb,
- 
- static int mptcp_nl_cmd_get_addr(struct sk_buff *skb, struct genl_info *info)
- {
--	struct nlattr *attr = info->attrs[MPTCP_PM_ATTR_ADDR];
-+	struct nlattr *attr = info->attrs[MPTCP_PM_ENDPOINT_ADDR];
- 	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
- 	struct mptcp_pm_addr_entry addr, *entry;
- 	struct sk_buff *msg;
-@@ -2283,72 +2314,104 @@ void mptcp_event(enum mptcp_event_type type, const struct mptcp_sock *msk,
- 	nlmsg_free(skb);
- }
- 
--static const struct genl_small_ops mptcp_pm_ops[] = {
-+static const struct genl_ops mptcp_pm_ops[] = {
- 	{
--		.cmd    = MPTCP_PM_CMD_ADD_ADDR,
--		.doit   = mptcp_nl_cmd_add_addr,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_ADD_ADDR,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_add_addr,
-+		.policy		= mptcp_pm_endpoint_nl_policy,
-+		.maxattr	= MPTCP_PM_ENDPOINT_ADDR,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_DEL_ADDR,
--		.doit   = mptcp_nl_cmd_del_addr,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_DEL_ADDR,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_del_addr,
-+		.policy		= mptcp_pm_endpoint_nl_policy,
-+		.maxattr	= MPTCP_PM_ENDPOINT_ADDR,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_FLUSH_ADDRS,
--		.doit   = mptcp_nl_cmd_flush_addrs,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_GET_ADDR,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_get_addr,
-+		.dumpit		= mptcp_nl_cmd_dump_addrs,
-+		.policy		= mptcp_pm_endpoint_nl_policy,
-+		.maxattr	= MPTCP_PM_ENDPOINT_ADDR,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_GET_ADDR,
--		.doit   = mptcp_nl_cmd_get_addr,
--		.dumpit   = mptcp_nl_cmd_dump_addrs,
-+		.cmd		= MPTCP_PM_CMD_FLUSH_ADDRS,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_flush_addrs,
-+		.policy		= mptcp_pm_endpoint_nl_policy,
-+		.maxattr	= MPTCP_PM_ENDPOINT_ADDR,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_SET_LIMITS,
--		.doit   = mptcp_nl_cmd_set_limits,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_SET_LIMITS,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_set_limits,
-+		.policy		= mptcp_pm_set_limits_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_SUBFLOWS,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_GET_LIMITS,
--		.doit   = mptcp_nl_cmd_get_limits,
-+		.cmd		= MPTCP_PM_CMD_GET_LIMITS,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_get_limits,
-+		.policy		= mptcp_pm_set_limits_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_SUBFLOWS,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_SET_FLAGS,
--		.doit   = mptcp_nl_cmd_set_flags,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_SET_FLAGS,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_set_flags,
-+		.policy		= mptcp_pm_set_flags_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_ADDR_REMOTE,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_ANNOUNCE,
--		.doit   = mptcp_nl_cmd_announce,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_ANNOUNCE,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_announce,
-+		.policy		= mptcp_pm_announce_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_TOKEN,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_REMOVE,
--		.doit   = mptcp_nl_cmd_remove,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_REMOVE,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_remove,
-+		.policy		= mptcp_pm_remove_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_LOC_ID,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_SUBFLOW_CREATE,
--		.doit   = mptcp_nl_cmd_sf_create,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_SUBFLOW_CREATE,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_sf_create,
-+		.policy		= mptcp_pm_subflow_create_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_ADDR_REMOTE,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- 	{
--		.cmd    = MPTCP_PM_CMD_SUBFLOW_DESTROY,
--		.doit   = mptcp_nl_cmd_sf_destroy,
--		.flags  = GENL_UNS_ADMIN_PERM,
-+		.cmd		= MPTCP_PM_CMD_SUBFLOW_DESTROY,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= mptcp_nl_cmd_sf_destroy,
-+		.policy		= mptcp_pm_subflow_create_nl_policy,
-+		.maxattr	= MPTCP_PM_ATTR_ADDR_REMOTE,
-+		.flags		= GENL_UNS_ADMIN_PERM,
- 	},
- };
- 
- static struct genl_family mptcp_genl_family __ro_after_init = {
- 	.name		= MPTCP_PM_NAME,
- 	.version	= MPTCP_PM_VER,
--	.maxattr	= MPTCP_PM_ATTR_MAX,
--	.policy		= mptcp_pm_policy,
- 	.netnsok	= true,
- 	.module		= THIS_MODULE,
--	.small_ops	= mptcp_pm_ops,
--	.n_small_ops	= ARRAY_SIZE(mptcp_pm_ops),
-+	.ops		= mptcp_pm_ops,
-+	.n_ops		= ARRAY_SIZE(mptcp_pm_ops),
- 	.resv_start_op	= MPTCP_PM_CMD_SUBFLOW_DESTROY + 1,
- 	.mcgrps		= mptcp_pm_mcgrps,
- 	.n_mcgrps	= ARRAY_SIZE(mptcp_pm_mcgrps),
++operations:
++  list:
++    -
++      name: unspec
++      doc: unused
++      value: 0
++    -
++      name: add_addr
++      doc: Add endpoint
++      attribute-set: endpoint
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &add_addr_attrs
++        request:
++          attributes:
++            - addr
++    -
++      name: del_addr
++      doc: Delete endpoint
++      attribute-set: endpoint
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: *add_addr_attrs
++    -
++      name: get_addr
++      doc: Get endpoint information
++      attribute-set: endpoint
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &get_addr_attrs
++        request:
++          attributes:
++           - addr
++        reply:
++          attributes:
++           - addr
++      dump:
++        reply:
++         attributes:
++           - addr
++    -
++      name:  flush_addrs
++      doc: flush addresses
++      attribute-set: endpoint
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: *add_addr_attrs
++    -
++      name: set_limits
++      doc: Set protocol limits
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &mptcp_limits
++        request:
++          attributes:
++            - rcv_add_addrs
++            - subflows
++    -
++      name: get_limits
++      doc: Get protocol limits
++      attribute-set: attr
++      dont-validate: [ strict ]
++      do: &mptcp_get_limits
++        request:
++           attributes:
++            - rcv_add_addrs
++            - subflows
++        reply:
++          attributes:
++            - rcv_add_addrs
++            - subflows
++    -
++      name: set_flags
++      doc: Change endpoint flags
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &mptcp_set_flags
++        request:
++          attributes:
++            - addr
++            - token
++            - addr_remote
++    -
++      name: announce
++      doc: announce new sf
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &announce_add
++        request:
++          attributes:
++            - addr
++            - token
++    -
++      name: remove
++      doc: announce removal
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do:
++        request:
++         attributes:
++           - token
++           - loc_id
++    -
++      name: subflow_create
++      doc: todo
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: &sf_create
++        request:
++          attributes:
++            - addr
++            - token
++            - addr_remote
++    -
++      name: subflow_destroy
++      doc: todo
++      attribute-set: attr
++      dont-validate: [ strict ]
++      flags: [ uns-admin-perm ]
++      do: *sf_create
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1bd96045beb8..ab699a697616 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14960,6 +14960,7 @@ W:	https://github.com/multipath-tcp/mptcp_net-next/wiki
+ B:	https://github.com/multipath-tcp/mptcp_net-next/issues
+ T:	git https://github.com/multipath-tcp/mptcp_net-next.git export-net
+ T:	git https://github.com/multipath-tcp/mptcp_net-next.git export
++F:	Documentation/netlink/specs/mptcp.yaml
+ F:	Documentation/networking/mptcp-sysctl.rst
+ F:	include/net/mptcp.h
+ F:	include/trace/events/mptcp.h
 
 -- 
 2.40.1
