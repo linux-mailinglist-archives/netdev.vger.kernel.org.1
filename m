@@ -1,164 +1,84 @@
-Return-Path: <netdev+bounces-39408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878E47BF0F7
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:34:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB90B7BF10A
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:42:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42227281741
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE8C1C20A11
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E2738C;
-	Tue, 10 Oct 2023 02:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E7C38C;
+	Tue, 10 Oct 2023 02:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="NZN06aM8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOfweUPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD8A361
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:34:31 +0000 (UTC)
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900EB9E
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 19:34:30 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6c4bf619b57so3553716a34.1
-        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 19:34:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696905270; x=1697510070; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7eyfqJMsAjtR1XTGi5WJSGOZUAbzaEU+L92vGk2MLy8=;
-        b=NZN06aM8AUnsmgvJQy26qFdVqSoD8fJY8Br3ri6MwG0TFBK4RaJ8f9zJNIMDYg31f9
-         zzHJ79Vv+t/GJV/ugm1QMkEVM7IhIzFUxyehxXhZ0TTd5//BbWYnOTMZFmZMqDQW1cRw
-         gbxnxYB4JSffzoLXfc0W3cRNpWF39RgUnHF1kE4dDqhBjT2ID/maRi/5q5Vt50aKntzF
-         +9j8pM5GWUocuTI1tWAPHXiZNoc1XmkOVEYxDepj3ccdg9yuueFXN2VZJ+OvV9VqzLJZ
-         YUQblGXS9L1voCUoueZEKCSQlly/oEpDJybiSKNecq1tBKqubaKnLR2CTYHC4eZBX1OM
-         MkNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696905270; x=1697510070;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eyfqJMsAjtR1XTGi5WJSGOZUAbzaEU+L92vGk2MLy8=;
-        b=YW0ubcwjpPdFzaybPjPKzLMzfFC22MnwoQXeJNDWczyaen9mFTObyz1VkmMDs9nSDl
-         CsNNHoM08TIYJ/jVysIRsnSwcJUwwNdOcYYCzrTMofbymzM1elhNX913NWUW3mH/IqjA
-         uWeknApqVePpQZO+u6y5+ztWzMzWUE0rxZ4XsauyVCdiPaAjbm6ZdR2ItOpY3gqoBp/7
-         JGjKltqq62A2nQ2Ta8wPzlomqWN8ONzI9cIMCOTUfZC/fVD3C/5KRji0PkzjSdpjY2ob
-         v2YI/t3Ia+8WaqsPOKPAnBpi8mvCKgBYkQbpEXGWsLL/wEcjm3hhe/m2vythswAjc3bt
-         Hn+Q==
-X-Gm-Message-State: AOJu0YxIIPoEj1ojTaHGQpmVU2n7YBFVYL4GIsa1fYAJ0mW86iErRyLn
-	NkXAsrOgHWqGTaklgRNpJu7Mog==
-X-Google-Smtp-Source: AGHT+IELXt5RxDd99HhYrJ2ArNSDl8Q/Eg48hdKp68VYC8fzBqBQqbw7nJq8UjoTvhZf2i/opBAQ0A==
-X-Received: by 2002:a05:6358:8812:b0:139:cb15:ecd3 with SMTP id hv18-20020a056358881200b00139cb15ecd3mr16915710rwb.8.1696905269713;
-        Mon, 09 Oct 2023 19:34:29 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
-        by smtp.gmail.com with ESMTPSA id fa9-20020a17090af0c900b0027360359b70sm11068223pjb.48.2023.10.09.19.34.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Oct 2023 19:34:29 -0700 (PDT)
-Message-ID: <14ae9e85-38da-4665-8aea-3ce93e280de2@daynix.com>
-Date: Tue, 10 Oct 2023 11:34:21 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28294361
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:42:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E1ABC433C7;
+	Tue, 10 Oct 2023 02:42:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696905772;
+	bh=WkoJ/Jatt7ehaS0mf0TQB3j7edh/9ZJslhYaC7s63JI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YOfweUPibfP3MB6pfrKxWBwhUTKXgUQ/nOotvbhXBwU0rHoZuuXFklMJdllX0ayKd
+	 Eb2Z7+OZwd/UEGYaqquPYKubvmsyl7MYuaC9bAdEIT1MjeLNPW48c3Aye/B0O1CG3V
+	 iQWOZO2aq61tqD3H0wcHAhn3+Wo/njh6EZ2I7DDC1XP1RiVYE/i1LAGvXWrdceSc2C
+	 6OZ3bx6zSl+SYwcf4AXr/lvZlqUzIyTlelimqDzKW6TWYRluQWzPyKytIHoi1eZn8B
+	 b8IUUEObvrogXDah2NIXpYWq5CFVG6e86itvWPIse9XYf9FRfDIJjE3AuMfvdIIwCT
+	 8thpG5/6S1uww==
+Date: Mon, 9 Oct 2023 19:42:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, vadim.fedorenko@linux.dev, lkp@intel.com,
+ horms@kernel.org, Sean Tranchetti <quic_stranche@quicinc.com>
+Subject: Re: [PATCH net-next v4] net: qualcomm: rmnet: Add side band flow
+ control support
+Message-ID: <20231009194251.641e9134@kernel.org>
+In-Reply-To: <20231006001614.1678782-1-quic_subashab@quicinc.com>
+References: <20231006001614.1678782-1-quic_subashab@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-Content-Language: en-US
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
- songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
- gustavoars@kernel.org, herbert@gondor.apana.org.au,
- steffen.klassert@secunet.com, nogikh@google.com, pablo@netfilter.org,
- decui@microsoft.com, cai@lca.pw, jakub@cloudflare.com, elver@google.com,
- pabeni@redhat.com, Yuri Benditovich <yuri.benditovich@daynix.com>
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <20231008052101.144422-6-akihiko.odaki@daynix.com>
- <CAF=yD-K2MQt4nnfwJrx6h6Nii_rho7j1o6nb_jYaSwcWY45pPw@mail.gmail.com>
- <48e20be1-b658-4117-8856-89ff1df6f48f@daynix.com>
- <20231009074840-mutt-send-email-mst@kernel.org>
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20231009074840-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2023/10/09 20:50, Michael S. Tsirkin wrote:
-> On Mon, Oct 09, 2023 at 05:44:20PM +0900, Akihiko Odaki wrote:
->> On 2023/10/09 17:13, Willem de Bruijn wrote:
->>> On Sun, Oct 8, 2023 at 12:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> virtio-net have two usage of hashes: one is RSS and another is hash
->>>> reporting. Conventionally the hash calculation was done by the VMM.
->>>> However, computing the hash after the queue was chosen defeats the
->>>> purpose of RSS.
->>>>
->>>> Another approach is to use eBPF steering program. This approach has
->>>> another downside: it cannot report the calculated hash due to the
->>>> restrictive nature of eBPF.
->>>>
->>>> Introduce the code to compute hashes to the kernel in order to overcome
->>>> thse challenges. An alternative solution is to extend the eBPF steering
->>>> program so that it will be able to report to the userspace, but it makes
->>>> little sense to allow to implement different hashing algorithms with
->>>> eBPF since the hash value reported by virtio-net is strictly defined by
->>>> the specification.
->>>>
->>>> The hash value already stored in sk_buff is not used and computed
->>>> independently since it may have been computed in a way not conformant
->>>> with the specification.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>
->>>> @@ -2116,31 +2172,49 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->>>>           }
->>>>
->>>>           if (vnet_hdr_sz) {
->>>> -               struct virtio_net_hdr gso;
->>>> +               union {
->>>> +                       struct virtio_net_hdr hdr;
->>>> +                       struct virtio_net_hdr_v1_hash v1_hash_hdr;
->>>> +               } hdr;
->>>> +               int ret;
->>>>
->>>>                   if (iov_iter_count(iter) < vnet_hdr_sz)
->>>>                           return -EINVAL;
->>>>
->>>> -               if (virtio_net_hdr_from_skb(skb, &gso,
->>>> -                                           tun_is_little_endian(tun), true,
->>>> -                                           vlan_hlen)) {
->>>> +               if ((READ_ONCE(tun->vnet_hash.flags) & TUN_VNET_HASH_REPORT) &&
->>>> +                   vnet_hdr_sz >= sizeof(hdr.v1_hash_hdr) &&
->>>> +                   skb->tun_vnet_hash) {
->>>
->>> Isn't vnet_hdr_sz guaranteed to be >= hdr.v1_hash_hdr, by virtue of
->>> the set hash ioctl failing otherwise?
->>>
->>> Such checks should be limited to control path where possible
->>
->> There is a potential race since tun->vnet_hash.flags and vnet_hdr_sz are not
->> read at once.
+On Thu,  5 Oct 2023 17:16:14 -0700 Subash Abhinov Kasiviswanathan wrote:
+> Individual rmnet devices map to specific network types such as internet,
+> multimedia messaging services, IP multimedia subsystem etc. Each of
+> these network types may support varying quality of service for different
+> bearers or traffic types.
 > 
-> And then it's a complete mess and you get inconsistent
-> behaviour with packets getting sent all over the place, right?
-> So maybe keep a pointer to this struct so it can be
-> changed atomically then. Maybe even something with rcu I donnu.
+> The physical device interconnect to radio hardware may support a
+> higher data rate than what is actually supported by the radio network.
+> Any packets transmitted to the radio hardware which exceed the radio
+> network data rate limit maybe dropped. This patch tries to minimize the
+> loss of packets by adding support for bearer level flow control within a
+> rmnet device by ensuring that the packets transmitted do not exceed the
+> limit allowed by the radio network.
+> 
+> In order to support multiple bearers, rmnet must be created as a
+> multiqueue TX netdevice. Radio hardware communicates the supported
+> bearer information for a given network via side band signalling.
+> Consider the following mapping -
+> 
+> IPv4 UDP port 1234 - Mark 0x1001 - Queue 1
+> IPv6 TCP port 2345 - Mark 0x2001 - Queue 2
+> 
+> iptables can be used to install filters which mark packets matching these
+> specific traffic patterns and the RMNET_QUEUE_MAPPING_ADD operation can
+> then be to install the mapping of the mark to the specific txqueue.
 
-I think it's a good idea to use RCU for the vnet_hash members, but 
-vnet_hdr_sz is something not specific to vnet_hash so this check will be 
-still necessary.
+I don't understand why you need driver specific commands to do this.
+It should be easily achievable using existing TC qdisc infra.
+What's the gap?
 
