@@ -1,229 +1,114 @@
-Return-Path: <netdev+bounces-39718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B21507C42F1
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 23:49:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A527C42F9
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 23:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D37A51C20CCB
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:49:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EBCA1C20BF1
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C703E493;
-	Tue, 10 Oct 2023 21:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EagDt8nR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4F43E493;
+	Tue, 10 Oct 2023 21:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6053CCF1
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 21:49:42 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E16B9D
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:49:40 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-53636f98538so10665344a12.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:49:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696974578; x=1697579378; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+7h+lc6NYDkM0aLu7Je52h2iauy5SW2qjtY2wHCOWf8=;
-        b=EagDt8nRbid7anETHcYGvI2OPtfrXkAMwHkGdvtXoAtmjied1o2TLxOKrAq45eEJBP
-         qOMGOzdenOFmSN2YYYY0wydGf1pEO3wDFkArMkPmOvgWWVTs+tSu25btIHDPz5w517CC
-         6k0agE5zUKAmEa641PTELPN42GLffxoOnRMTwphy24Q2ZL8GLFiAHduNli8EfGqSSsXQ
-         tzGRpUf6Kg/qLKYHmkbfT9uAlLUVMM5xzwIH25LyEYpg+SWX/4jBaPCLQo0mCuAJxgtT
-         389vS9kaJ8x5vkJ8LgQo2DyVD8ZuzAK1F6lOE+nvkqww5bA8RHyFGjAKc8Rs/3sFFCFE
-         2O6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696974578; x=1697579378;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+7h+lc6NYDkM0aLu7Je52h2iauy5SW2qjtY2wHCOWf8=;
-        b=Oiq/eS6v8OBmvh0S6K7jiu0g+wyv1gJ+HAo8Duk9WtSQrZOyOZQl5igbuONndlesq3
-         AIIqAI5ojVT5eeOJ6f06/hO7bp3HJ3thli/kGVZb9DHLp06OSmTVowIQQxvw7FDCbcJv
-         +BxiblYQicFTvoy3GF0A/wKnZ1d6iGVAsA5aVvpWJ3PZ2m4TOm2moeKGETinxVE3/vxl
-         7yclJJPGwXjW9f04gSWFD48M4l+U+LC7VGQJIkuuCOEfF+EsOp7NwiadWgnTClFiZDgn
-         XnEmmELsA1Mwi977Ytv+pmZPiGCUyAHju2icZTb/2KRFzfdhuT1aBGVsiGeldm4snbIU
-         p8Ow==
-X-Gm-Message-State: AOJu0YzIotN5GyvLw9KGRi8toiGjYZWHUQfy4kHZR5d8pEn1BnCBSKW3
-	ss2G0fmOpPA+3Me0Tcr/wJtuHA3c92BheaaZ8QdyOg==
-X-Google-Smtp-Source: AGHT+IE6ISNf8cf4dTDXk7X1ataFWg0rtgwPfk3ueBUDDX0QKUVHZqMdCqzfHZ2i3xQflCne3oL89FZN5pgQljLYcS4=
-X-Received: by 2002:aa7:cf87:0:b0:525:570c:566b with SMTP id
- z7-20020aa7cf87000000b00525570c566bmr16299268edx.22.1696974578513; Tue, 10
- Oct 2023 14:49:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E1F315B3
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 21:51:30 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5311099
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:51:28 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-78-tcLreq_3OpmKTMFnNuRD3Q-1; Tue, 10 Oct 2023 22:51:25 +0100
+X-MC-Unique: tcLreq_3OpmKTMFnNuRD3Q-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 10 Oct
+ 2023 22:51:24 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Tue, 10 Oct 2023 22:51:24 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: "'Eric W. Biederman'" <ebiederm@xmission.com>
+CC: =?utf-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, "David
+ Ahern" <dsahern@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Nicolas Dichtel
+	<nicolas.dichtel@6wind.com>, Christian Brauner <brauner@kernel.org>
+Subject: RE: [RFC PATCH iproute2-next 0/5] Persisting of mount namespaces
+ along with network namespaces
+Thread-Topic: [RFC PATCH iproute2-next 0/5] Persisting of mount namespaces
+ along with network namespaces
+Thread-Index: AQHZ+7CCbR3ie7S+G06sCW6DDmmIAbBDir/Q
+Date: Tue, 10 Oct 2023 21:51:24 +0000
+Message-ID: <1a742a86ff7f4b408506bda4de4a9390@AcuMS.aculab.com>
+References: <20231009182753.851551-1-toke@redhat.com>
+	<877cnvtu37.fsf@email.froward.int.ebiederm.org>
+	<6fc0ae94f5554c6ea320dba1d6fe84aa@AcuMS.aculab.com>
+ <87edi2jmsw.fsf@email.froward.int.ebiederm.org>
+In-Reply-To: <87edi2jmsw.fsf@email.froward.int.ebiederm.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-v1-1-e2427e087fad@google.com>
- <20231010112051.zgefbx2c3tjneudz@skbuf>
-In-Reply-To: <20231010112051.zgefbx2c3tjneudz@skbuf>
-From: Justin Stitt <justinstitt@google.com>
-Date: Tue, 10 Oct 2023 14:49:26 -0700
-Message-ID: <CAFhGd8qoAy49FnnsZVn89f-cVgsfivDzhu2PzYZ_UwCvhmrhYw@mail.gmail.com>
-Subject: Re: [PATCH] net: dsa: vsc73xx: replace deprecated strncpy with ethtool_sprintf
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Linus Walleij <linus.walleij@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 4:20=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Mon, Oct 09, 2023 at 10:54:37PM +0000, Justin Stitt wrote:
-> > `strncpy` is deprecated for use on NUL-terminated destination strings
-> > [1] and as such we should prefer more robust and less ambiguous string
-> > interfaces.
-> >
-> > ethtool_sprintf() is designed specifically for get_strings() usage.
-> > Let's replace strncpy in favor of this more robust and easier to
-> > understand interface.
-> >
-> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#st=
-rncpy-on-nul-terminated-strings [1]
-> > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en=
-.html [2]
-> > Link: https://github.com/KSPP/linux/issues/90
-> > Cc: linux-hardening@vger.kernel.org
-> > Signed-off-by: Justin Stitt <justinstitt@google.com>
-> > ---
-> > Note: build-tested only.
-> > ---
-> >  drivers/net/dsa/vitesse-vsc73xx-core.c | 20 ++++++--------------
-> >  1 file changed, 6 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/v=
-itesse-vsc73xx-core.c
-> > index 4f09e7438f3b..09955fdea2ff 100644
-> > --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-> > +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-> > @@ -928,7 +928,8 @@ static void vsc73xx_get_strings(struct dsa_switch *=
-ds, int port, u32 stringset,
-> >       const struct vsc73xx_counter *cnt;
-> >       struct vsc73xx *vsc =3D ds->priv;
-> >       u8 indices[6];
-> > -     int i, j;
-> > +     u8 *buf =3D data;
-> > +     int i;
-> >       u32 val;
-> >       int ret;
-> >
-> > @@ -948,10 +949,7 @@ static void vsc73xx_get_strings(struct dsa_switch =
-*ds, int port, u32 stringset,
-> >       indices[5] =3D ((val >> 26) & 0x1f); /* TX counter 2 */
-> >
-> >       /* The first counters is the RX octets */
-> > -     j =3D 0;
-> > -     strncpy(data + j * ETH_GSTRING_LEN,
-> > -             "RxEtherStatsOctets", ETH_GSTRING_LEN);
-> > -     j++;
-> > +     ethtool_sprintf(&buf, "RxEtherStatsOctets");
->
-> Here you don't use "%s", but everywhere else you do. Can't you just pass
-> the counter name everywhere, without "%s"?
+RnJvbTogRXJpYyBXLiBCaWVkZXJtYW4NCj4gU2VudDogMTAgT2N0b2JlciAyMDIzIDIwOjMzDQo+
+IA0KPiBEYXZpZCBMYWlnaHQgPERhdmlkLkxhaWdodEBBQ1VMQUIuQ09NPiB3cml0ZXM6DQo+IA0K
+PiA+IEZyb206IEVyaWMgVy4gQmllZGVybWFuDQo+ID4+IFNlbnQ6IDA5IE9jdG9iZXIgMjAyMyAy
+MTozMw0KPiA+Pg0KLi4uDQo+ID4gV2hlbiBJIHdhcyBnZXR0aW5nIGEgcHJvZ3JhbSB0byBydW4g
+aW4gbXVsdGlwbGUgbmV0d29yayBuYW1lc3BhY2VzDQo+ID4gKGhhcyBzb2NrZXRzIGluIDIgbmFt
+ZXNwYWNlcykgSSByYXRoZXIgZXhwZWN0ZWQgdGhhdCBuZXRucyhuZXRfbnNfZmQsMCkNCj4gPiB3
+b3VsZCAnbWFnaWNhbGx5JyBjaGFuZ2UgL3Byb2MvbmV0IHRvIHJlZmVyIHRvIHRoZSBuZXcgbmFt
+ZXNwYWNlLg0KPiA+IEkgdGhpbmsgdGhhdCBjb3VsZCBiZSBkb25lIGluIHRoZSBjb2RlIHRoYXQg
+Zm9sbG93cyB0aGUgL3Byb2MvbmV0DQo+ID4gbW91bnRwb2ludCAtIElJUkMgc29tZXRoaW5nIHNp
+bWlsYXIgaXMgZG9uZSBmb3IgL3Byb2Mvc2VsZi4NCj4gDQo+IC9wcm9jL3NlbGYvbmV0IGRvZXMg
+Zm9sbG93IHlvdXIgY3VycmVudCBuZXR3b3JrIG5hbWVzcGFjZSBsYXN0IEkgbG9va2VkLg0KPiAN
+Cj4gT2YgY291cnNlIGlmIHlvdSBhcmUgdGhyZWFkZWQgeW91IG1heSBuZWVkIHRvIGxvb2sgYXQN
+Cj4gL3Byb2MvdGhyZWFkLXNlbGYvbmV0IGFzIHlvdXIgbmV0d29yayBuYW1lc3BhY2UgaXMgcGVy
+IHRocmVhZC4NCg0KWWVzLCBJIHJlbWVtYmVyIHRoYXQgbm93LCBhbmQgL3Byb2MvbmV0IGlzIHRo
+ZSB3cm9uZyBzeW1saW5rLg0KDQoNCj4gSXQgaXMgYWxzbyBxdWl0ZSBldmlsLiAgVGhlIHByb2Js
+ZW0gaXMgdGhhdCBoYXZpbmcgZGlmZmVyZW50IGVudHJpZXMNCj4gY2FjaGVkIHVuZGVyIHRoZSBz
+YW1lIG5hbWUgaXMgYSBtYWpvciBtZXNzLiAgRXZlciBzaW5jZSBJIG1hZGUgdGhhdA0KPiBtaXN0
+YWtlIEkgaGF2ZSBiZWVuIGFpbWluZyBhdCBkZXNpZ25zIHRoYXQgZG9uJ3QgZmlnaHQgdGhlIGRj
+YWNoZS4NCj4gDQo+IEV2ZW4gaW4gdGhhdCBjYXNlIEkgdGhpbmsgSSBsaW1pdGVkIGl0IHRvIGp1
+c3QgYSBlbnRyeSB3aGVyZQ0KPiB1Z2xpbmVzcyBoYXBwZW5zLg0KDQpJdCBpcyBuaWNlIGZyb20g
+YSB1c2VyIHBvaW50IG9mIHZpZXcuLi4NCg0KSSdkIGd1ZXNzIGEgJ21hZ2ljIHN5bWxpbmsnIHRo
+YXQgcG9pbnRzIG9mZiBzb21ld2hlcmUgZml4ZWQNCndvdWxkIGJlIGEgbGl0dGxlIGNsZWFuZXIu
+DQoNCj4gPiBIb3dldmVyIHRoYXQgd291bGQgbmVlZCBmbGFncyB0byBib3RoIHNldG5zKCkgYW5k
+ICdpcCBuZXRucyBleGVjJw0KPiA+IHNpbmNlIHByb2dyYW1zIHdpbGwgcmVseSBvbiB0aGUgZXhp
+c3RpbmcgYmVoYXZpb3VyLg0KPiANCj4gWW91IG1pZ2h0IHdhbnQgdG8gbG9vayBhZ2Fpbi4NCg0K
+VGhlIHByb2JsZW0gd2FzIHdpdGggL3N5cy9jbGFzcy9uZXQNCg0KSSBlbmRlZCB1cCBkb2luZzoN
+CglpcCBuZXRucyBleGVjIGZ1YmFyIHByb2dyYW0gYXJncyAzPC9zeXMvY2xhc3MvbmV0DQoNClNv
+IHRoYXQgb3BlbigiL3N5cy9jbGFzcy9uZXQveHh4Iikgd2FzIGluc2lkZSB0aGUgZnViYXIgbmFt
+ZXNwYWNlDQphbmQgb3BlbmF0KDMsICJ4eHgiKSB3YXMgaW4gdGhlIGRlZmF1bHQgbmFtZXNwYWNl
+Lg0KDQpCdXQgSSB0aGluazoNCj4gT24gImlwIG5ldG5zIGFkZCBOQU1FIg0KPiAtIGNyZWF0ZSB0
+aGUgbmV0d29yayBuYW1lc3BhY2UgYW5kIG1vdW50IGl0IGF0IC9ydW4vbmV0bnMvTkFNRQ0KPiAt
+IG1vdW50IHRoZSBhcHByb3ByaWF0ZSBzeXNmcyBhdCAvcnVuL25ldG5zLW1vdW50cy9OQU1FL3N5
+cw0KPiAtIG1vdW50IHRoZSBhcHByb3ByaWF0ZSBicGZmcyBhdCAvcnVuL25ldG5zLW1vdW50cy9O
+QU1FL3N5cy9mcy9icGYNCg0Kd291bGQgbWFrZSBpdCBwb3NzaWJsZSBmb3IgYSBwcm9ncmFtIHRv
+IHJlYWQgKGVnKQ0KL3N5cy9jbGFzcy9uZXQvaW50ZXJmYWNlL3NwZWVkIGZvciBpbnRlcmZhY2Vz
+IGluIG11bHRpcGxlDQpuZXR3b3JrIG5hbWVzcGFjZXMuDQoNCglEYXZpZA0KDQotDQpSZWdpc3Rl
+cmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtl
+eW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-Because it's a string literal, no warning there. Maybe an argument
-regarding style could be made. I have no style preference here
-so I could send v2 if you feel strongly about it.
-
->
-> >
-> >       /* Each port supports recording 3 RX counters and 3 TX counters,
-> >        * figure out what counters we use in this set-up and return the
-> > @@ -962,22 +960,16 @@ static void vsc73xx_get_strings(struct dsa_switch=
- *ds, int port, u32 stringset,
-> >       for (i =3D 0; i < 3; i++) {
-> >               cnt =3D vsc73xx_find_counter(vsc, indices[i], false);
-> >               if (cnt)
-> > -                     strncpy(data + j * ETH_GSTRING_LEN,
-> > -                             cnt->name, ETH_GSTRING_LEN);
-> > -             j++;
-> > +                     ethtool_sprintf(&buf, "%s", cnt->name);
->
-> The code conversion is not functionally identical, and I think it's a
-> bit hard to make it identical.
->
-> The VSC7395 has 45 port counters, but it seems that it can only monitor
-> and display 8 of them at a time - 2 fixed and 6 configurable through
-> some windows.
->
-> vsc73xx_get_strings() detects which counter is each window configured
-> for, based on the value of the CNT_CTRL_CFG hardware register (VSC73XX_C_=
-CFG
-> in the code). It displays a different string depending on the hardware
-> value.
->
-> The code must deal with the case where vsc73xx_find_counter() returns
-> NULL, aka the hardware window is configured for a value that vsc73xx_tx_c=
-ounters[]
-> and vsc73xx_rx_counters[] don't know about.
->
-> Currently, the way that this is treated is by skipping the strncpy()
-> (and thus leaving an empty string), and incrementing j to get to the
-> next ethtool counter, and next window.
->
-> The order of the strings in vsc73xx_get_strings() needs to be strongly
-> correlated to the order of the counters from vsc73xx_get_ethtool_stats().
-> So, the driver would still print counter values for the unknown windows,
-> it will just not provide a string for them.
->
-> In your proposal, the increment of j basically goes into the "if (cnt)"
-> block because it's embedded within ethtool_sprintf(), which means that
-> if a hardware counter is unknown, the total number of reported strings
-> will be less than 8. Which is very problematic, because vsc73xx_get_sset_=
-count()
-> says that 8 strings are reported. Also, all the counter strings after
-> the unknown one will be shifted to the left.
->
-> I suggest that "if (!cnt)", you should call ethtool_sprintf() with an
-> empty string, to preserve the original behavior.
->
-> >       }
-> >
-> >       /* TX stats begins with the number of TX octets */
-> > -     strncpy(data + j * ETH_GSTRING_LEN,
-> > -             "TxEtherStatsOctets", ETH_GSTRING_LEN);
-> > -     j++;
-> > +     ethtool_sprintf(&buf, "TxEtherStatsOctets");
-> >
-> >       for (i =3D 3; i < 6; i++) {
-> >               cnt =3D vsc73xx_find_counter(vsc, indices[i], true);
-> >               if (cnt)
-> > -                     strncpy(data + j * ETH_GSTRING_LEN,
-> > -                             cnt->name, ETH_GSTRING_LEN);
-> > -             j++;
-> > +                     ethtool_sprintf(&buf, "%s", cnt->name);
-> >       }
-> >  }
-> >
-> >
-> > ---
-> > base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-> > change-id: 20231009-strncpy-drivers-net-dsa-vitesse-vsc73xx-core-c-1cfd=
-0ac2d81b
-> >
-> > Best regards,
-> > --
-> > Justin Stitt <justinstitt@google.com>
-> >
->
-Thanks
-Justin
 
