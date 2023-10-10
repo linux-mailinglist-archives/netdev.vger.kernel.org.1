@@ -1,91 +1,163 @@
-Return-Path: <netdev+bounces-39483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0887BF71B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:20:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF01E7BF733
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EEA21C20A3C
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B6BC281ADF
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE6D171B3;
-	Tue, 10 Oct 2023 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92922171BB;
+	Tue, 10 Oct 2023 09:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ryUbXkqM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bijAnBjh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31649EAF9
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 76611C433C9;
-	Tue, 10 Oct 2023 09:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696929623;
-	bh=NerkXt+rZPAlIupXJbcBKtsX2t6qQ5YjxKM52f99KNo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ryUbXkqMfY8RPPCD9gbx7vuqOtYjaTjR3sUkUgC00poq+dgxfJ+FMgUUZhYaqcffU
-	 h3XQ2eiSDGxC3T/ewHsb4Sw5bjGAklxQho6BdCh80FsN1Ik42KLgJg+wxC+ezyy0BV
-	 25fVHynjmGm+hwkcrxYq1pcioa7dUNQPxi3ra7NirkdGrGwk05eOtVQPIhQK0lqb72
-	 QE+7Jeskx8SWefUSDyEUGMuqMVKiNBa1OTfyp2j85q0c9mhBQ9SVjnVxF0VCWwJAP9
-	 MwiqKqu5lwo+Rz4DCPOJrgDbT6GHejW0soTw1Ilo0MgU8tXi8musx/Ne5iKkfTyVdI
-	 3dnz4wRBEeSbQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54698C595C5;
-	Tue, 10 Oct 2023 09:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F96168D4
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:22:44 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9939310A;
+	Tue, 10 Oct 2023 02:22:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1696929756; x=1728465756;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pe28AkaWQOFbPDoeW0f0UL3u+esQjxzrmxDbQGIXd+k=;
+  b=bijAnBjhFSfwl40qC5elRccbOLCwGz8zb+82bedu8RzMV9OWNm3beuOv
+   4mhCT0zlMURcj15KvsiWkuRv67LGReq/pX0JOiqhKX/SD3zKIKaE5kXsB
+   DJK3G867QD4AIjyFTwHo2HJgA2BsIiPWGpt2blCobg8tFd7tbfpvztsGK
+   75JycjMS81ufYliB2peDgz5KGH4hbrHRznXiVmi3FjdOE3Ays1iEZsHoW
+   D9U/sMpEkICSBQ4rvOmk2H6gaPJv2qdtrXzJ9Jzg42MoD/uXSaZO5uNj2
+   oqdk3PLyuZmuaDWjZ+tgwQNtXVloYd11H5F2CfTMXjF3OB1TAXp+DymWh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="369414287"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="369414287"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 02:22:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10858"; a="788512822"
+X-IronPort-AV: E=Sophos;i="6.03,212,1694761200"; 
+   d="scan'208";a="788512822"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 10 Oct 2023 02:22:32 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qq8wg-0000EE-0A;
+	Tue, 10 Oct 2023 09:22:30 +0000
+Date: Tue, 10 Oct 2023 17:21:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wpan@vger.kernel.org,
+	Michael Hennerich <michael.hennerich@analog.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+Message-ID: <202310101724.iRnAoP3r-lkp@intel.com>
+References: <20231009141908.1767241-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1 1/1] net: dsa: microchip: Fix uninitialized var in
- ksz9477_acl_move_entries()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169692962334.26090.2044433680478545315.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Oct 2023 09:20:23 +0000
-References: <20231006115822.144152-1-o.rempel@pengutronix.de>
-In-Reply-To: <20231006115822.144152-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: davem@davemloft.net, andrew@lunn.ch, edumazet@google.com,
- f.fainelli@gmail.com, kuba@kernel.org, pabeni@redhat.com, olteanv@gmail.com,
- woojung.huh@microchip.com, arun.ramadoss@microchip.com,
- linux@armlinux.org.uk, dan.carpenter@linaro.org, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com, petrm@nvidia.com, lukma@denx.de
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Arnd,
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+kernel test robot noticed the following build errors:
 
-On Fri,  6 Oct 2023 13:58:22 +0200 you wrote:
-> Address an issue in ksz9477_acl_move_entries() where, in the scenario
-> (src_idx == dst_idx), ksz9477_validate_and_get_src_count() returns 0,
-> leading to usage of uninitialized src_count and dst_count variables,
-> which causes undesired behavior as it attempts to move ACL entries
-> around.
-> 
-> Fixes: 002841be134e ("net: dsa: microchip: Add partial ACL support for ksz9477 switches")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> 
-> [...]
+[auto build test ERROR on next-20231009]
+[cannot apply to linus/master v6.6-rc5 v6.6-rc4 v6.6-rc3 v6.6-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - [net-next,v1,1/1] net: dsa: microchip: Fix uninitialized var in ksz9477_acl_move_entries()
-    https://git.kernel.org/netdev/net-next/c/59fe651753fb
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ieee802154-avoid-deprecated-ndo_do_ioctl-callback/20231009-222305
+base:   next-20231009
+patch link:    https://lore.kernel.org/r/20231009141908.1767241-1-arnd%40kernel.org
+patch subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
+config: nios2-randconfig-001-20231010 (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231010/202310101724.iRnAoP3r-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310101724.iRnAoP3r-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/appletalk/ipddp.c: In function 'ipddp_create':
+>> drivers/net/appletalk/ipddp.c:207:24: error: implicit declaration of function 'atrtr_get_dev'; did you mean 'to_net_dev'? [-Werror=implicit-function-declaration]
+     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+         |                        ^~~~~~~~~~~~~
+         |                        to_net_dev
+>> drivers/net/appletalk/ipddp.c:207:22: warning: assignment to 'struct net_device *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     207 |         if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+         |                      ^
+   cc1: some warnings being treated as errors
+
+
+vim +207 drivers/net/appletalk/ipddp.c
+
+^1da177e4c3f41 Linus Torvalds   2005-04-16  192  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  193  /*
+^1da177e4c3f41 Linus Torvalds   2005-04-16  194   * Create a routing entry. We first verify that the
+^1da177e4c3f41 Linus Torvalds   2005-04-16  195   * record does not already exist. If it does we return -EEXIST
+^1da177e4c3f41 Linus Torvalds   2005-04-16  196   */
+^1da177e4c3f41 Linus Torvalds   2005-04-16  197  static int ipddp_create(struct ipddp_route *new_rt)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  198  {
+ce7e40c432ba84 Vlad Tsyrklevich 2017-01-09  199          struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  200  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  201          if (rt == NULL)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  202                  return -ENOMEM;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  203  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  204          rt->ip = new_rt->ip;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  205          rt->at = new_rt->at;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  206          rt->next = NULL;
+^1da177e4c3f41 Linus Torvalds   2005-04-16 @207          if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+^1da177e4c3f41 Linus Torvalds   2005-04-16  208  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  209                  return -ENETUNREACH;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  210          }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  211  
+5615968a708451 David S. Miller  2009-05-27  212  	spin_lock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  213  	if (__ipddp_find_route(rt)) {
+5615968a708451 David S. Miller  2009-05-27  214  		spin_unlock_bh(&ipddp_route_lock);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  215  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  216  		return -EEXIST;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  217  	}
+^1da177e4c3f41 Linus Torvalds   2005-04-16  218  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  219          rt->next = ipddp_route_list;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  220          ipddp_route_list = rt;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  221  
+5615968a708451 David S. Miller  2009-05-27  222  	spin_unlock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  223  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  224          return 0;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  225  }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  226  
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
