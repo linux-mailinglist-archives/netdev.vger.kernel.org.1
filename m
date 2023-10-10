@@ -1,53 +1,93 @@
-Return-Path: <netdev+bounces-39575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D46E7BFE99
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 15:57:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECEC97BFEAC
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 16:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBF4828150E
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D78B81C20BA4
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 14:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86ABB24C66;
-	Tue, 10 Oct 2023 13:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB38424C73;
+	Tue, 10 Oct 2023 14:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ngCOHN8v"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="f344QjA2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12A324C60;
-	Tue, 10 Oct 2023 13:57:44 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E2AF99;
-	Tue, 10 Oct 2023 06:57:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fnkd1aij7Tpc2L+QxXML50n+8ixS5invGoodurLeWlU=; b=ngCOHN8v9MKAiT7mihTGC+tYRD
-	QYIdeaZOHdujS3q+ZWzzSpAAbysLySouhqwNJLonOb0A+VsrjcKoZXXGowyP+vJ2zSzfZq5ZFLx1R
-	nQCk/5liQePtbmDPa16MOpNFgsXN4m+6JduYZfCOTAuzkNtfgX/mt6z3sPYkLJsQzBJE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qqDEs-001Fhr-T4; Tue, 10 Oct 2023 15:57:34 +0200
-Date: Tue, 10 Oct 2023 15:57:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ante Knezic <ante.knezic@helmholz.de>
-Cc: UNGLinuxDriver@microchip.com, conor+dt@kernel.org, davem@davemloft.net,
-	devicetree@vger.kernel.org, edumazet@google.com,
-	f.fainelli@gmail.com, krzysztof.kozlowski+dt@linaro.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
-	netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com,
-	robh+dt@kernel.org, woojung.huh@microchip.com
-Subject: Re: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document
- microchip,rmii-clk-internal
-Message-ID: <5348ffc3-a514-4d61-85f9-56910aa94d44@lunn.ch>
-References: <6a366c3a-49e7-42a4-83b2-ef98e7df0896@lunn.ch>
- <20231010134139.17180-1-ante.knezic@helmholz.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2591824C6E
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:03:18 +0000 (UTC)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3E6A7
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:03:15 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-538575a38ffso9327577a12.1
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696946594; x=1697551394; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aq4TdIo9T5gFsd9CgeMKvS3P4iBONhy3DvX292rVgqc=;
+        b=f344QjA2W5AAqIt6TfnYIQTuDR9H/eBOe/BfO3wzbBrZ9zimVMD4ujDT754OhbCulw
+         Odxbcsg91/iOEow4mCwDcrNUU4R8rXE30OFgvQhyTMMK26tYvyHbReL/thtkhV4m3z9B
+         CronusB7/xcQnUNTXvnqLcZvtSj5Ezb32B4T5smIA4L9s7Klwkf2BtdgW7Ki5Bxda0Jp
+         NjRp/XSJm86AMNfnurJM5XICiVD3uAuHFNmit8nfI/AlTvxvzbK8CX9TsUq8P/ByjGlH
+         aUqka1Dit+hXS9oflrnLoNHKZPm2WUwuT9rriosaQJKanzqRkLR3rpt6tqX+1BNfYnia
+         qx/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696946594; x=1697551394;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aq4TdIo9T5gFsd9CgeMKvS3P4iBONhy3DvX292rVgqc=;
+        b=M37kW8fG9+6iC3iZ/Df2vsN9WAT2RfoDaWHoBeCMLXC2g7G7cEPRsToiqwSCj04/Ia
+         LJqXLpHIQCVq+P6ZUJ6kuVKULmbp4mMwF0AAZiXl6K+0LrzJ892+8e9q/3bhNC1F3D1z
+         4pGxf2IVzzY/ssqLBBhAF3G4V+JYmxj/zind0gFSKauyEpoqPzG0lI12taR/Aj3D7kBF
+         H1e6m60IbgeujINA/ZTUsfa4pj2m0j4J9oQZtKO6ASDEZQkqh8o0hyID5z4iBhSM4RYz
+         v2/EQZhbNIY8RwxLcucsiEQcQQoDX+Lzf4/dF2bq6iUjSRXa/Yo0N/OOuZumZvqx8pmi
+         2/ow==
+X-Gm-Message-State: AOJu0YwDrSiGGdJmHZMK7E2rq5DbabVOEkC9gj0J4AFGPslSaKtLEYVp
+	sSxJmYEx3slHvUb5X/SFOyfO7g==
+X-Google-Smtp-Source: AGHT+IEoETozRY3Jx/aYI3aBH/7qQdktK5WjQm82Y2CnBMXfwOXHA20qvIcABw0w5BuNEJA11H2Now==
+X-Received: by 2002:a05:6402:4495:b0:53d:a6e3:3fd with SMTP id er21-20020a056402449500b0053da6e303fdmr897904edb.2.1696946593657;
+        Tue, 10 Oct 2023 07:03:13 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id f26-20020a50ee9a000000b0052e1783ab25sm7748375edr.70.2023.10.10.07.03.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 07:03:12 -0700 (PDT)
+Date: Tue, 10 Oct 2023 16:03:11 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Edwin Peer <edwin.peer@broadcom.com>,
+	Cai Huoqing <cai.huoqing@linux.dev>,
+	George Cherian <george.cherian@marvell.com>,
+	Danielle Ratson <danieller@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Eran Ben Elisha <eranbe@nvidia.com>, Aya Levin <ayal@mellanox.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [PATCH net-next v1 1/8] devlink: retain error in struct
+ devlink_fmsg
+Message-ID: <ZSVZnyQIzvCP4ZsM@nanopsycho>
+References: <20231010104318.3571791-1-przemyslaw.kitszel@intel.com>
+ <20231010104318.3571791-2-przemyslaw.kitszel@intel.com>
+ <ZSU2vH/As7RIcH7W@nanopsycho>
+ <8193ea5f-7be3-6d21-3d6e-067ec2bc200a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,41 +96,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231010134139.17180-1-ante.knezic@helmholz.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <8193ea5f-7be3-6d21-3d6e-067ec2bc200a@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 03:41:39PM +0200, Ante Knezic wrote:
-> On Tue, 10 Oct 2023 15:25:44 +0200, Andrew Lunn wrote:
-> >> +  microchip,rmii-clk-internal:
-> >> +    $ref: /schemas/types.yaml#/definitions/flag
-> >> +    description:
-> >> +      Set if the RMII reference clock should be provided internally. Applies only
-> >> +      to KSZ88X3 devices.
-> >
-> >It would be good to define what happens when
-> >microchip,rmii-clk-internal is not present. Looking at the code, you
-> >leave it unchanged. Is that what we want, or do we want to force it to
-> >external?
-> >
-> >	Andrew
-> 
-> Default register setting is to use external RMII clock (which is btw only 
-> available option for other KSZ devices - as far as I am aware) so I guess 
-> theres no need to force it to external clock?
+Tue, Oct 10, 2023 at 03:36:48PM CEST, przemyslaw.kitszel@intel.com wrote:
+>On 10/10/23 13:34, Jiri Pirko wrote:
+>> Tue, Oct 10, 2023 at 12:43:11PM CEST, przemyslaw.kitszel@intel.com wrote:
+>> > Retain error value in struct devlink_fmsg, to relieve drivers from
+>> > checking it after each call.
+>> > Note that fmsg is an in-memory builder/buffer of formatted message,
+>> > so it's not the case that half baked message was sent somewhere.
+>> > 
+>> > We could find following scheme in multiple drivers:
+>> >   err = devlink_fmsg_obj_nest_start(fmsg);
+>> >   if (err)
+>> >   	return err;
+>> >   err = devlink_fmsg_string_pair_put(fmsg, "src", src);
+>> >   if (err)
+>> >   	return err;
+>> >   err = devlink_fmsg_something(fmsg, foo, bar);
+>> >   if (err)
+>> > 	return err;
+>> >   // and so on...
+>> >   err = devlink_fmsg_obj_nest_end(fmsg);
+>> > 
+>> > With retaining error API that translates to:
+>> >   devlink_fmsg_obj_nest_start(fmsg);
+>> >   devlink_fmsg_string_pair_put(fmsg, "src", src);
+>> >   devlink_fmsg_something(fmsg, foo, bar);
+>> >   // and so on...
+>> >   err = devlink_fmsg_obj_nest_end(fmsg);
+>> 
+>> I like this approach. But it looks a bit odd that you store error and
+>> return it as well, leaving the caller to decide what to do in his code.
+>> It is not desirable to leave the caller wondering.
+>> 
+>> Also, it is customary to check the return value if the function returns
+>> it. This approach confuses the customs.
+>> 
+>> Also, eventually, the fmsg is getting send. That is the point where the
+>> error could be checked and handled properly, for example by filling nice
+>> extack message.
+>> 
+>> What I'm saying is, please convert them all to return void, store the
+>> error and check that before fmsg send. That makes the approach unified
+>> for all callers, code nicer. Even the custom in-driver put functions
+>> would return void. The callbacks (e. g. dump) would also return void.
+>
+>I was also thinking about that,
+>what about cases that you want to exit early, say inside of some loop?
 
-We just need to watch out for a bootloader setting it. Or is it really
-guaranteed to be false, because the DSA driver always does a device reset,
-removing all existing configuration?
-
-I prefer it is unambiguously documented what not having the property
-means.
-
-	Andrew
+Why would you need that? As you stated yourself, the error might happen
+when driver is buggy or under memory pressure. So in these cases, we
+don't exit early. So? I believe that we don't have to care about this
+corner cases.
 
 
+>add also devlink_fmsg_is_err()?
+>
+>anyway, I like results more with ultimate unification :), only then all the
+>drivers require conversion at the very same time
+>
+>> 
+>> + a small nit below:
+>> 
+>> 
+>> > 
+>> > What means we check error just at the end
+>> > (one could return it directly of course).
+>> > 
+>> > Possible error scenarios are developer error (API misuse) and memory
+>> > exhaustion, both cases are good candidates to choose readability
+>> > over fastest possible exit.
+>> > 
+>> > This commit itself is an illustration of benefits for the dev-user,
+>> > more of it will be in separate commits of the series.
+>> > 
+>> > Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+>> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> > ---
+>> > add/remove: 2/4 grow/shrink: 11/9 up/down: 325/-646 (-321)
+>> > ---
+>> > net/devlink/health.c | 255 ++++++++++++++++---------------------------
+>> > 1 file changed, 92 insertions(+), 163 deletions(-)
+>> > 
+>> > diff --git a/net/devlink/health.c b/net/devlink/health.c
+>> > index 638cad8d5c65..2d26479e9dbe 100644
+>> > --- a/net/devlink/health.c
+>> > +++ b/net/devlink/health.c
+>> > @@ -19,6 +19,7 @@ struct devlink_fmsg_item {
+>> > 
+>> > struct devlink_fmsg {
+>> > 	struct list_head item_list;
+>> > +	int err; /* first error encountered on some devlink_fmsg_XXX() call */
+>> > 	bool putting_binary; /* This flag forces enclosing of binary data
+>> > 			      * in an array brackets. It forces using
+>> > 			      * of designated API:
+>> > @@ -565,10 +566,8 @@ static int devlink_health_do_dump(struct devlink_health_reporter *reporter,
+>> > 		return 0;
+>> > 
+>> > 	reporter->dump_fmsg = devlink_fmsg_alloc();
+>> > -	if (!reporter->dump_fmsg) {
+>> > -		err = -ENOMEM;
+>> > -		return err;
+>> > -	}
+>> > +	if (!reporter->dump_fmsg)
+>> > +		return -ENOMEM;
+>> > 
+>> > 	err = devlink_fmsg_obj_nest_start(reporter->dump_fmsg);
+>> > 	if (err)
+>> > @@ -673,43 +672,59 @@ int devlink_nl_cmd_health_reporter_recover_doit(struct sk_buff *skb,
+>> > 	return devlink_health_reporter_recover(reporter, NULL, info->extack);
+>> > }
+>> > 
+>> > -static int devlink_fmsg_nest_common(struct devlink_fmsg *fmsg,
+>> > -				    int attrtype)
+>> > +static bool _devlink_fmsg_err_or_binary(struct devlink_fmsg *fmsg)
+>> 
+>> No need for "_" here. Drop it.
+>> 
+>> 
+>> > +{
+>> > +	if (!fmsg->err && fmsg->putting_binary)
+>> > +		fmsg->err = -EINVAL;
+>> > +
+>> > +	return fmsg->err;
+>> > +}
+>> > +
+>> 
+>> [...]
+>
 
