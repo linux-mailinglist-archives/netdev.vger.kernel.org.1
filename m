@@ -1,89 +1,119 @@
-Return-Path: <netdev+bounces-39611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA3D7C018E
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 18:26:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72DA57C01D0
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 18:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC5621C20B50
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 16:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF1132813CB
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 16:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CC3347B0;
-	Tue, 10 Oct 2023 16:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE742FE15;
+	Tue, 10 Oct 2023 16:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FplpEcq0"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZVQ3BBOj";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xQs5UgZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FBD27470
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 16:26:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0DD7C433C8;
-	Tue, 10 Oct 2023 16:26:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696955164;
-	bh=6zo37YWaVuaqfFuhVFKXF7CJDGCVGAhXDUBjLQ45+R4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FplpEcq0RzIkOdrmXDOMIhQUbOixntSWXHUyNLnEEexl1M8kwqBqH3ZxVQkMmoGMy
-	 uFoWu1yGzt04A7Cyc+gu4JGgCvQfoyiflK93hN/lPfLh/uHMSTw2fs/ABuIYq7JLOG
-	 r/y47BNzF+ldTibsAdzgq5tVpX9S158swVGEyKqumNAzuFC1pYfi3GuphKBSKf5940
-	 gX02estIu2QIMVviIv+yXeBNVJsLXBXrAjlVqqJeitFkGlUbsOcK0yPFJdP8SX9yvf
-	 9Stg8AalO945SwYAbKJd8zqN0dkHS9UeytXSgSkh6hwpAHnc0k9LASI+VrvOS/DCLD
-	 NJq7TLAbiQEuA==
-Message-ID: <c6f97249-ff76-8078-a9a4-c18658de9f6d@kernel.org>
-Date: Tue, 10 Oct 2023 10:26:03 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C63C72FE07
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 16:39:36 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3656097
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:39:35 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E7B9D21898;
+	Tue, 10 Oct 2023 16:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1696955973; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=SgqwT3S5wOEbVoQaIVfxk6KPJPmK5HYiWFfLOamEpsg=;
+	b=ZVQ3BBOj1ONM4HEvsHWdV4IO7jDWhwMFuP5yV03N9DOn2BsM82mn3oms12QiyJpQ57X6xJ
+	65PTFOGaDBFLHjt+iv1Q/5zBF6wsTiYuILg/ObvnniZCLbh/YhnaiLhQrMR+tzE4SUoVOY
+	0y9BV4onxmn69Q7v3eoiT5tlY4xL1aI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1696955973;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=SgqwT3S5wOEbVoQaIVfxk6KPJPmK5HYiWFfLOamEpsg=;
+	b=xQs5UgZg4PS5fRZaiIrlG6xaTn/63d6klzlyrAA0mste40iymlokiMIQq+Wa3uo/bz/o7O
+	UPntzxkMSW/EMOAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D2BE41348E;
+	Tue, 10 Oct 2023 16:39:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id JVdsM0V+JWWZOgAAMHmgww
+	(envelope-from <jwiesner@suse.de>); Tue, 10 Oct 2023 16:39:33 +0000
+Received: by incl.suse.cz (Postfix, from userid 1000)
+	id 144D1767B1; Tue, 10 Oct 2023 18:39:33 +0200 (CEST)
+Date: Tue, 10 Oct 2023 18:39:33 +0200
+From: Jiri Wiesner <jwiesner@suse.de>
+To: netdev@vger.kernel.org
+Cc: Moshe Tal <moshet@nvidia.com>, Jussi Maki <joamaki@gmail.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net] bonding: Return pointer to data after pull on skb
+Message-ID: <20231010163933.GA534@incl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH 1/1] net-next: fix IPSTATS_MIB_OUTFORWDATAGRAMS increment
- after fragment check
-Content-Language: en-US
-To: Heng Guo <heng.guo@windriver.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, filip.pudak@windriver.com
-References: <20231008005922.24777-1-heng.guo@windriver.com>
- <20231008005922.24777-2-heng.guo@windriver.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231008005922.24777-2-heng.guo@windriver.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 10/7/23 6:59 PM, Heng Guo wrote:
-> According to RFC 4293 "3.2.3. IP Statistics Tables",
->   +-------+------>------+----->-----+----->-----+
->   | InForwDatagrams (6) | OutForwDatagrams (6)  |
->   |                     V                       +->-+ OutFragReqds
->   |                 InNoRoutes                  |   | (packets)
->   / (local packet (3)                           |   |
->   |  IF is that of the address                  |   +--> OutFragFails
->   |  and may not be the receiving IF)           |   |    (packets)
-> the IPSTATS_MIB_OUTFORWDATAGRAMS should be counted before fragment
-> check.
-> 
-> The existing implementation, instead, would incease the counter after
-> fragment check: ip_exceeds_mtu() in ipv4 and ip6_pkt_too_big() in ipv6.
-> 
-> So move IPSTATS_MIB_OUTFORWDATAGRAMS counter to ip_forward() for ipv4 and
-> ip6_forward() for ipv6.
-> 
-> Reviewed-by: Filip Pudak <filip.pudak@windriver.com>
-> Signed-off-by: Heng Guo <heng.guo@windriver.com>
-> ---
->  net/ipv4/ip_forward.c | 4 ++--
->  net/ipv6/ip6_output.c | 6 ++----
->  2 files changed, 4 insertions(+), 6 deletions(-)
-> 
+Since 429e3d123d9a ("bonding: Fix extraction of ports from the packet
+headers"), header offsets used to compute a hash in bond_xmit_hash() are
+relative to skb->data and not skb->head. If the tail of the header buffer
+of an skb really needs to be advanced and the operation is successful, the
+pointer to the data must be returned (and not a pointer to the head of the
+buffer).
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Fixes: 429e3d123d9a ("bonding: Fix extraction of ports from the packet headers")
+Signed-off-by: Jiri Wiesner <jwiesner@suse.de>
+---
+ drivers/net/bonding/bond_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please repost as just a single patch and add in the details from the
-cover letter.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index ed7212e61c54..51d47eda1c87 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -4023,7 +4023,7 @@ static inline const void *bond_pull_data(struct sk_buff *skb,
+ 	if (likely(n <= hlen))
+ 		return data;
+ 	else if (skb && likely(pskb_may_pull(skb, n)))
+-		return skb->head;
++		return skb->data;
+ 
+ 	return NULL;
+ }
+-- 
+2.35.3
 
+
+-- 
+Jiri Wiesner
+SUSE Labs
 
