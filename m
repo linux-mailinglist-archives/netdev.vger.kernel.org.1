@@ -1,104 +1,96 @@
-Return-Path: <netdev+bounces-39443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BCCC7BF410
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:23:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A5DF7BF442
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C85A1C20A06
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:23:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D29281A41
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C76D26D;
-	Tue, 10 Oct 2023 07:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFF0D26D;
+	Tue, 10 Oct 2023 07:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="02s/HCIa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA30C8EE;
-	Tue, 10 Oct 2023 07:23:03 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D684BC4;
-	Tue, 10 Oct 2023 00:22:59 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 124271BF206;
-	Tue, 10 Oct 2023 07:22:55 +0000 (UTC)
-Received: from peko by dell.be.48ers.dk with local (Exim 4.94.2)
-	(envelope-from <peter@korsgaard.com>)
-	id 1qq74r-00GHj6-Tn; Tue, 10 Oct 2023 09:22:49 +0200
-From: Peter Korsgaard <peter@korsgaard.com>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Javier Carrasco <javier.carrasco.cruz@gmail.com>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com,
-  netdev@vger.kernel.org,  linux-usb@vger.kernel.org,
-  linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: usb: dm9601: fix uninitialized variable use in
- dm9601_mdio_read
-References: <20231009-topic-dm9601_uninit_mdio_read-v2-1-f2fe39739b6c@gmail.com>
-	<2023101036-fleshy-dude-aec0@gregkh> <87v8bfc83f.fsf@48ers.dk>
-	<2023101018-venomous-uncured-47cf@gregkh>
-Date: Tue, 10 Oct 2023 09:22:49 +0200
-In-Reply-To: <2023101018-venomous-uncured-47cf@gregkh> (Greg KH's message of
-	"Tue, 10 Oct 2023 08:33:35 +0200")
-Message-ID: <87r0m3c56e.fsf@48ers.dk>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E614BC8CF
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:26:45 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F43D64
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:38 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-405524e6768so51579315e9.2
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696922796; x=1697527596; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mdCECjcQ8yLFY05ydH1cEetfy6fTzHwV8d56+ifpwgI=;
+        b=02s/HCIaxebFheSm+g7k948sl5c2Ki0QX/hNl6Ld18sjnvdrSbpAHTxy3MO2xxRwzv
+         0VVknShx5FITZWT8BP2O9dGpT4zuMG7x7ytvhSoeZAXEAt+q73mGN4lEBwMp5MiA97aY
+         6lOgKYFFgRvm6nny6eMN4HAoG5MWxt15gsdy0I5F62jluCyvlJOhJUEgS+FxID5Tg294
+         OJSRmMR22nyqfenE8vsUUTq5x2XO4jqYQopmXeqStgMZUGN0Tyuw0ktGZ/yTRXcG6CeB
+         cLPSaVjXIRUVhmtBYGc/IEikZzNryBJSLhZl2EH0sCR6tc3i+ywjh2yOszswp8xyUJi1
+         FU0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696922796; x=1697527596;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mdCECjcQ8yLFY05ydH1cEetfy6fTzHwV8d56+ifpwgI=;
+        b=cM1Myyz+2s18nG8neokA3bqoCnfXuRyCKUg2zWmh5cKtW0tbU1Wadmxsxv2rKrfwIg
+         EStss5SL09D6cWqaV59IS2du4w3b2rUM0u+FsbOFaEEVvmSWgtdefGSTMPN8Gj+q5CPB
+         EDszV6WwRZ1xFRTbVGTxmxuNAu7VpIWBaNz27w5r7idGcza5zqDgYMXWdBRyuMDB6cel
+         0Uc2QH+02w5T8LpYanSw078YViPJQF5yDSISPuT/Cx4G+Ce0umlA31PmpDcpoyRbX79f
+         FWbF3ZBMmmaZGcaX/h1cvnCnQ/xos46lb7gDTrsyakid6eYz80kBz9bLbZGqGiEYB45J
+         Hldw==
+X-Gm-Message-State: AOJu0YxwSqTy19rQyTyTZxeubX5/S2PpqQkXmhuc0Z6KWH/0+FKpKWWD
+	0SK+eLMRljHv5c2qLtF5WRlwag==
+X-Google-Smtp-Source: AGHT+IHPsuRIDS+FMzvHoytvW0TbGq5FA5GpCf7AiQpHBFEGmiKWTTrH+SLE668t3FaYvZSQHeDwHw==
+X-Received: by 2002:a1c:f202:0:b0:407:566c:a9e3 with SMTP id s2-20020a1cf202000000b00407566ca9e3mr740404wmc.21.1696922796370;
+        Tue, 10 Oct 2023 00:26:36 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id z18-20020a05600c221200b0040607da271asm15441190wml.31.2023.10.10.00.26.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 00:26:35 -0700 (PDT)
+Date: Tue, 10 Oct 2023 09:26:34 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com
+Subject: Re: [patch net-next] netlink: specs: don't allow version to be
+ specified for genetlink
+Message-ID: <ZST8qgEKFLduNx3X@nanopsycho>
+References: <20231009154907.169117-1-jiri@resnulli.us>
+ <20231009182644.0f614c2f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-GND-Sasl: peter@korsgaard.com
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009182644.0f614c2f@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
->>>>> "Greg" == Greg KH <gregkh@linuxfoundation.org> writes:
+Tue, Oct 10, 2023 at 03:26:44AM CEST, kuba@kernel.org wrote:
+>On Mon,  9 Oct 2023 17:49:07 +0200 Jiri Pirko wrote:
+>>  Documentation/netlink/genetlink-legacy.yaml | 8 ++++----
+>>  Documentation/netlink/genetlink.yaml        | 4 ----
+>
+>You missed genetlink-c
 
- > On Tue, Oct 10, 2023 at 08:19:48AM +0200, Peter Korsgaard wrote:
- >> >>>>> "Greg" == Greg KH <gregkh@linuxfoundation.org> writes:
- >> 
- >> > On Tue, Oct 10, 2023 at 12:26:14AM +0200, Javier Carrasco wrote:
- >> >> syzbot has found an uninit-value bug triggered by the dm9601 driver [1].
- >> >> 
- >> >> This error happens because the variable res is not updated if the call
- >> >> to dm_read_shared_word returns an error. In this particular case -EPROTO
- >> >> was returned and res stayed uninitialized.
- >> >> 
- >> >> This can be avoided by checking the return value of dm_read_shared_word
- >> >> and propagating the error if the read operation failed.
- >> >> 
- >> >> [1] https://syzkaller.appspot.com/bug?extid=1f53a30781af65d2c955
- >> >> 
- >> >> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
- >> >> Reported-and-tested-by: syzbot+1f53a30781af65d2c955@syzkaller.appspotmail.com
- >> >> ---
- >> >> Changes in v2:
- >> >> - Remove unnecessary 'err == 0' case
- >> >> - Link to v1: https://lore.kernel.org/r/20231009-topic-dm9601_uninit_mdio_read-v1-1-d4d775e24e3b@gmail.com
- >> >> ---
- >> >> drivers/net/usb/dm9601.c | 7 ++++++-
- >> >> 1 file changed, 6 insertions(+), 1 deletion(-)
- >> 
- >> > What commit id does this fix?
- >> 
- >> It has been there since the beginning, so:
- >> 
- >> Fixes: d0374f4f9c35cdfbee0 ("USB: Davicom DM9601 usbnet driver")
- >> 
- >> Acked-by: Peter Korsgaard <peter@korsgaard.com>
+Ah, will fix.
 
- > Great, can someone add a cc: stable@ tag for this too please?
-
-Cc: stable@vger.kernel.org
-
--- 
-Bye, Peter Korsgaard
+>-- 
+>pw-bot: cr
 
