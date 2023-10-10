@@ -1,168 +1,99 @@
-Return-Path: <netdev+bounces-39620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E3D17C0282
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:24:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 347D37C0286
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4CFD281B53
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:24:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E851A1C20987
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7699718639;
-	Tue, 10 Oct 2023 17:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fwWO9mZA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354B319454;
+	Tue, 10 Oct 2023 17:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5102FE3E
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:24:28 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E025D6
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 10:24:24 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-4063bfc6c03so6625e9.0
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 10:24:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696958662; x=1697563462; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xB5kNO31ptUSKutse3tWEXjsvhyF99RBWYVjwQ8AbvA=;
-        b=fwWO9mZACXUWMsPudmmRUitg6NtW4nwgl2/14aWMpNJL/wGIXc6xUY3iLwCYKZHi1m
-         svIfxjpMbN/b2gKIfa1RzsAO0HCQZpn4W0sEixY3Y/kBhbWG27atXdkvDdMOeHddoDMJ
-         ZOExHZiZyobwBrbA34W4L/M3qZyjABLOBxqtA6ieOl5UmEWDhUQUA2kFsafwVfXlNY3T
-         7PFHii3IsZa9A4pQ4D9oEkfqIaA5gHT+x0dEtGaU11kqjPYV1ROdYGDTzaWB5XYIeIVj
-         7pLj70EkkWGKROqNRlp29uL4Z5UNNFnn8y7xYuG9maHta+vR+/6f/kjPLLct8eYtdXxC
-         F/qQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696958662; x=1697563462;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xB5kNO31ptUSKutse3tWEXjsvhyF99RBWYVjwQ8AbvA=;
-        b=rgPodJX9vu/qCppNymOOltgt3qWS/d21wlxOrWvpmxcgSCOnZUJIo5mvO/Q1crvBGP
-         X7Ss/ZMfYzC86E+65Yky/Nbm1nUMVlL6w4oTkZbWFrh24KG08aAJt7IxPGjx4MlMbbzs
-         1bDN/M+o0G/Nz4MU5gPMOgP/l/be2duCZyCfYjWT7uJAUMNKsWxyGHZ1KpBi+mtT1rfu
-         jJqi9p/8YXo4hJlABVF7twR3fW1lmmwr3nUmQqExYzZMaYjJKdBQ7qRTsHUzANKOK4Cj
-         9VMX2x/Xehots1SJZsx7LtMkK1SCIJIa/np+3/Npq4ISDSsQXsRIbKU/zgfkce0LY5hE
-         w8YA==
-X-Gm-Message-State: AOJu0YxoOBw4JyhgIA9TDRZ6kEmeAXk7Eo5hUFq7MtwJr2FX2H5uOoOP
-	j2RRXuu+r4hcMUgo/mHE3XKaxNPBKvwXzeDrctO93Q==
-X-Google-Smtp-Source: AGHT+IHW65kerUr2q16h/XQsLBx5TUnAZCGf5RFeYJB83WXwTpqUq0HW6mE0I6kZv/CrMPkjVTR8X6392uJ6yuEKUpU=
-X-Received: by 2002:a05:600c:3c8f:b0:405:35bf:7362 with SMTP id
- bg15-20020a05600c3c8f00b0040535bf7362mr11918wmb.0.1696958662190; Tue, 10 Oct
- 2023 10:24:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2B0182B5
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:24:42 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9D394
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 10:24:41 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qqGT4-0003ji-Fo; Tue, 10 Oct 2023 19:24:26 +0200
+Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qqGT1-000iHu-Uy; Tue, 10 Oct 2023 19:24:23 +0200
+Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
+	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.94.2)
+	(envelope-from <j.zink@pengutronix.de>)
+	id 1qqGT1-002Jna-Hq; Tue, 10 Oct 2023 19:24:23 +0200
+From: Johannes Zink <j.zink@pengutronix.de>
+To: alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com
+Cc: patchwork-jzi@pengutronix.de,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de,
+	Johannes Zink <j.zink@pengutronix.de>
+Subject: [PATCH net-next] net: stmmac: fix typo in comment
+Date: Tue, 10 Oct 2023 19:24:15 +0200
+Message-Id: <20231010172415.552748-1-j.zink@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009130122.946357448@linuxfoundation.org> <CA+G9fYvWCf4fYuQsVLu0NdN+=W73bW1hr1hiokajktNzPFyYtA@mail.gmail.com>
- <6447b32f-abb9-4459-aca5-3d510a66b685@kernel.org>
-In-Reply-To: <6447b32f-abb9-4459-aca5-3d510a66b685@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 10 Oct 2023 19:24:08 +0200
-Message-ID: <CANn89iJ_KMA=dQWPhU8WQBc0_CvUztUBodAf-cW-2F=HMX3HJg@mail.gmail.com>
-Subject: Re: [PATCH 6.1 000/162] 6.1.57-rc1 review
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org, 
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	torvalds@linux-foundation.org, akpm@linux-foundation.org, linux@roeck-us.net, 
-	shuah@kernel.org, patches@kernelci.org, lkft-triage@lists.linaro.org, 
-	pavel@denx.de, jonathanh@nvidia.com, f.fainelli@gmail.com, 
-	sudipm.mukherjee@gmail.com, srw@sladewatkins.net, rwarsow@gmx.de, 
-	conor@kernel.org, "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, MPTCP Upstream <mptcp@lists.linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: j.zink@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 6:51=E2=80=AFPM Matthieu Baerts <matttbe@kernel.org=
-> wrote:
->
-> Hi Naresh,
->
-> On 09/10/2023 22:43, Naresh Kamboju wrote:
-> > On Mon, 9 Oct 2023 at 18:46, Greg Kroah-Hartman
-> > <gregkh@linuxfoundation.org> wrote:
-> >>
-> >> This is the start of the stable review cycle for the 6.1.57 release.
-> >> There are 162 patches in this series, all will be posted as a response
-> >> to this one.  If anyone has any issues with these being applied, pleas=
-e
-> >> let me know.
-> >>
-> >> Responses should be made by Wed, 11 Oct 2023 13:00:55 +0000.
-> >> Anything received after that time might be too late.
-> >>
-> >> The whole patch series can be found in one patch at:
-> >>         https://www.kernel.org/pub/linux/kernel/v6.x/stable-review/pat=
-ch-6.1.57-rc1.gz
-> >> or in the git tree and branch at:
-> >>         git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-sta=
-ble-rc.git linux-6.1.y
-> >> and the diffstat can be found below.
-> >>
-> >> thanks,
-> >>
-> >> greg k-h
-> >
-> >
-> > The following kernel warnings were noticed several times on arm x15 dev=
-ices
-> > running stable-rc 6.1.57-rc1 while running  selftests: net: mptcp_conne=
-ct.sh
-> > and netfilter: nft_fib.sh.
-> >
-> > The possible unsafe locking scenario detected.
-> >
-> > FYI,
-> > Stable-rc/ linux.6.1.y kernel running stable/ linux.6.5.y selftest in t=
-his case.
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > kselftest: Running tests in net/mptcp
->
-> Thank you for having reported the issue and having added MPTCP ML in Cc!
->
-> Just to avoid confusions: the "WARNING" you shared when running
-> 'mptcp_connect.sh' selftest appeared before creating the first MPTCP
-> connection. It looks like there is no reference to MPTCP in the
-> calltraces. Also, because you have the same issue with nft_fib.sh, I
-> would say that this issue is not linked to MPTCP but rather to a recent
-> modification in the IPv6 stack.
->
-> By chance, did you start a "git bisect" to identify the commit causing
-> this issue?
->
->
+This is just a trivial fix for a typo in a comment, no functional
+changes.
 
-I think stable teams missed to backport
+Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-commit c486640aa710ddd06c13a7f7162126e1552e8842
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Mon Mar 13 20:17:32 2023 +0000
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index 60b6b4a180d7..a5320c9556b5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -81,7 +81,7 @@ static int stmmac_adjust_time(struct ptp_clock_info *ptp, s64 delta)
+ 	stmmac_adjust_systime(priv, priv->ptpaddr, sec, nsec, neg_adj, xmac);
+ 	write_unlock_irqrestore(&priv->ptp_lock, flags);
+ 
+-	/* Caculate new basetime and re-configured EST after PTP time adjust. */
++	/* Calculate new basetime and re-configured EST after PTP time adjust. */
+ 	if (est_rst) {
+ 		struct timespec64 current_time, time;
+ 		ktime_t current_time_ns, basetime;
+-- 
+2.39.2
 
-    ipv6: remove one read_lock()/read_unlock() pair in rt6_check_neigh()
-
-    rt6_check_neigh() uses read_lock() to protect n->nud_state reading.
-
-    This seems overkill and causes false sharing.
-
-    Signed-off-by: Eric Dumazet <edumazet@google.com>
-    Reviewed-by: David Ahern <dsahern@kernel.org>
-    Reviewed-by: Martin KaFai Lau <martin.lau@kernel.org>
-    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
