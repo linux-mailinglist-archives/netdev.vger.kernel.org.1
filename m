@@ -1,152 +1,80 @@
-Return-Path: <netdev+bounces-39684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3939E7C40CA
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:07:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E3B7C40D7
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:08:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A15D1C20BD8
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:07:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728AE2821B0
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CC7229D03;
-	Tue, 10 Oct 2023 20:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9258129D0D;
+	Tue, 10 Oct 2023 20:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WT6DisU9"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VT+qGZV0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20E032196
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:07:21 +0000 (UTC)
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F61AB9
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:07:11 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id ada2fe7eead31-45269fe9d6bso2635110137.2
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:07:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696968430; x=1697573230; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vTqGU2u0PCAVxGXohb+XZJghexUD79dSwAsuPfMFR8E=;
-        b=WT6DisU9reUrhgg09rIrN6lwKCebnZ5TT+dDuw+Wrghrt/5/oQ/qeytShnESjgeSgU
-         SeVMavlryvaT/nBhYs4OWzGuLXaJsfm90oKU0k8wmfRIqCLGXURTn/nN2P2gonQ6VFE3
-         BAEYNqP67rrCWwxvnTPNFDQeTAh5AxG5DQSofNM8t7c5ZI91DYuKH+C8SGKjH/8G3Sq2
-         i/GdKjuU87vOraYXamXj0goGyJ8fzIiCQhQM5WCfwEgEb3an34Tr3TlgeBitOEjgpK7y
-         gT5A8U9uFNYHg+HMh2JBFNmZg992QKnMsaCA+MNJWv9PpfvCdlCcgrgQw/dzVdtb/n8g
-         AL2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696968430; x=1697573230;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vTqGU2u0PCAVxGXohb+XZJghexUD79dSwAsuPfMFR8E=;
-        b=TVDd0OZRvJdyW16W22t/ISdluJhJnblWyV4R72d1oOXFoJcu/GtM/UjQDpyNbl3kq9
-         ihe8hFrbKy6o+97BOcqXrjixg6fbEoo+0ox6+RgknWK/vbeQVfRxkdVdtlRTn5RwX82I
-         I4BQKWgVYV15qKyFxPP2UdpBOCuvRWGG24j/dnzVJdxEnIBGDmDLNs2oEMiXwSpLfxXo
-         XwRv23IHoVMCqZp+cmLqxnm0o6kTcBvXCX8CLiVUD2luHZGa8Zpk3JbQ+a+nPWNo8eL/
-         sOIYKjbRpDG+KIrIedvQauAhi8n0/rwRD/U0n27uSMJsslYLrvjuC+OSFhDlW4wXdIZr
-         Upxw==
-X-Gm-Message-State: AOJu0Yzs+ntri3PW0pfzdTNEF1kow4ZVjKdw4NcPbG0P7Xkn7FWka4XL
-	cGb1W6OpuCW8oStwF3VQY5ik3TDN9SmwUe4aPd00NA==
-X-Google-Smtp-Source: AGHT+IE8eKtBDoVkE+8koCfQqQXVQmpp2mVRQw5itaoq6P8ktmWX7lQetZItew800ypsGuJqpDugW+OhjNmTzNnenl8=
-X-Received: by 2002:a05:6102:5e95:b0:457:5f7d:8aec with SMTP id
- ij21-20020a0561025e9500b004575f7d8aecmr10444801vsb.27.1696968429861; Tue, 10
- Oct 2023 13:07:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8563321A0
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:08:09 +0000 (UTC)
+Received: from out-208.mta1.migadu.com (out-208.mta1.migadu.com [IPv6:2001:41d0:203:375::d0])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86661B3
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:08:02 -0700 (PDT)
+Message-ID: <bdffefed-8945-e5ac-052d-0f0b49a30d39@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696968480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=48GnxUJ3JdEqliNp9G7adxZBHIHNpZhS/fW1boEK60M=;
+	b=VT+qGZV0FDeNh7qu7r7D/avhtOK5+1/SxhoJIIr4bJDxTIghGa6L+Vb+9nt5KQyil3UU71
+	JYBA09jpgfXTOIdj0T5BdQq+Jy7N1u5IWZ6WpRFWjHkBC5/J8x2GyQrF8jkyGZPosbrXaw
+	NlVMVOadPNDvwy1g3Ri/J7J0lETTe+Q=
+Date: Tue, 10 Oct 2023 13:07:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1696965810-8315-1-git-send-email-haiyangz@microsoft.com>
-In-Reply-To: <1696965810-8315-1-git-send-email-haiyangz@microsoft.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Tue, 10 Oct 2023 16:06:53 -0400
-Message-ID: <CADVnQy=tPcP+sRRVwvqober3cmi_3=LukzXC3-YcWudbf1e0HA@mail.gmail.com>
-Subject: Re: [PATCH net-next,v2] tcp: Set pingpong threshold via sysctl
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	corbet@lwn.net, dsahern@kernel.org, ycheng@google.com, kuniyu@amazon.com, 
-	morleyd@google.com, mfreemon@cloudflare.com, mubashirq@google.com, 
-	linux-doc@vger.kernel.org, weiwan@google.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Subject: Re: [PATCH bpf-next v9 3/9] bpf: Add bpf_sock_addr_set_unix_addr() to
+ allow writing unix sockaddr from bpf
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, daan.j.demeyer@gmail.com
+Cc: bpf@vger.kernel.org, kernel-team@meta.com, netdev@vger.kernel.org
+References: <20231006074530.892825-4-daan.j.demeyer@gmail.com>
+ <20231010170019.4924-1-kuniyu@amazon.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231010170019.4924-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 3:24=E2=80=AFPM Haiyang Zhang <haiyangz@microsoft.c=
-om> wrote:
->
-> TCP pingpong threshold is 1 by default. But some applications, like SQL D=
-B
-> may prefer a higher pingpong threshold to activate delayed acks in quick
-> ack mode for better performance.
->
-> The pingpong threshold and related code were changed to 3 in the year
-> 2019 in:
->   commit 4a41f453bedf ("tcp: change pingpong threshold to 3")
-> And reverted to 1 in the year 2022 in:
->   commit 4d8f24eeedc5 ("Revert "tcp: change pingpong threshold to 3"")
->
-> There is no single value that fits all applications.
-> Add net.ipv4.tcp_pingpong_thresh sysctl tunable, so it can be tuned for
-> optimal performance based on the application needs.
->
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-> ---
-> v2: Make it per-namesapce setting, and other updates suggested by Neal Ca=
-rdwell,
-> and Kuniyuki Iwashima.
->
-> ---
->  Documentation/networking/ip-sysctl.rst |  8 ++++++++
->  include/net/inet_connection_sock.h     | 16 ++++++++++++----
->  include/net/netns/ipv4.h               |  1 +
->  net/ipv4/sysctl_net_ipv4.c             |  8 ++++++++
->  net/ipv4/tcp_ipv4.c                    |  2 ++
->  net/ipv4/tcp_output.c                  |  4 ++--
->  6 files changed, 33 insertions(+), 6 deletions(-)
->
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
-rking/ip-sysctl.rst
-> index 5bfa1837968c..c0308b65dc2f 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -1183,6 +1183,14 @@ tcp_plb_cong_thresh - INTEGER
->
->         Default: 128
->
-> +tcp_pingpong_thresh - INTEGER
-> +       TCP pingpong threshold is 1 by default, but some application may =
-need a
-> +       higher threshold for optimal performance.
-> +
-> +       Possible Values: 1 - 255
-> +
-> +       Default: 1
-> +
+On 10/10/23 10:00 AM, Kuniyuki Iwashima wrote:
+>> +__bpf_kfunc int bpf_sock_addr_set_unix_addr(struct bpf_sock_addr_kern *sa_kern,
+>> +					    const u8 *addr, u32 addrlen__sz)
+> I'd rename addrlen__sz to sun_path_len or something else because the
+> conventional addrlen for AF_UNIX contains offsetof(struct sockaddr_un,
+> sun_path).
 
-It would be good to document what the meaning of the parameter is.
-Perhaps consider something like:
+The "__sz" suffix is required by the verifier. It is the size of the preceding 
+argument "addr". While at it, addrlen__sz should be just "addr__sz" (or 
+sun_path__sz, depending on what name is decided here) for consistency with other 
+kfunc.
 
-'The number of estimated data replies sent for estimated incoming data
-requests that must happen before TCP estimates that a connection is a
-"ping-pong" (request-response) connection for which delayed
-acknowledgments can provide benefits. This threshold is 1 by default,
-but some applications may need a higher threshold for optimal
-performance.'
-
-Thanks for the patch!
-
-best,
-neal
+I don't have strong preference on the argument name. However, if it is 
+sun_path__sz, then the preceding argument should be renamed to "sun_path" also 
+for consistency reason and then the kfunc should probably be renamed to 
+bpf_sock_addr_set_sun_path.
 
