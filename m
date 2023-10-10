@@ -1,262 +1,130 @@
-Return-Path: <netdev+bounces-39514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDD47BF929
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:05:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C497BF930
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8999281C36
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:05:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A85BB1C20B53
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C3516400;
-	Tue, 10 Oct 2023 11:05:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9859118042;
+	Tue, 10 Oct 2023 11:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eoJf6tFt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C9E28E2
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 11:05:31 +0000 (UTC)
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F00AC;
-	Tue, 10 Oct 2023 04:05:29 -0700 (PDT)
-Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94.2)
-	(envelope-from <n0-1@orbyte.nwl.cc>)
-	id 1qqAYF-0001Ys-Q0; Tue, 10 Oct 2023 13:05:23 +0200
-Date: Tue, 10 Oct 2023 13:05:23 +0200
-From: Phil Sutter <phil@netfilter.org>
-To: netfilter <netfilter@vger.kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>
-Cc: netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
-	lwn@lwn.net
-Subject: [ANNOUNCE] iptables 1.8.10 release
-Message-ID: <ZSUv81gBDQb2kqHs@orbyte.nwl.cc>
-Mail-Followup-To: Phil Sutter <phil@netfilter.org>,
-	netfilter <netfilter@vger.kernel.org>,
-	netfilter-devel <netfilter-devel@vger.kernel.org>,
-	netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
-	lwn@lwn.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3438E168CD;
+	Tue, 10 Oct 2023 11:07:24 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C08A9;
+	Tue, 10 Oct 2023 04:07:22 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99bdcade7fbso940582766b.1;
+        Tue, 10 Oct 2023 04:07:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696936040; x=1697540840; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SxYIKEiG6ukaTBM9h6qF8OGxEw0D7VZs6H4jG50DssU=;
+        b=eoJf6tFtZqhePcDy6q0d4h3tciGtJOmudphCy5GcYPJRDfqYSYdik4Fn+sAcleP+1u
+         aLTBu2QQ0TT79yvsYZZd3mDeeXBpApt4bKFpXe4CyMwCdVXDvIv4a7Mbeo5Dp6JihBsW
+         RBVv6y7LTTa741kT0B3Fof/JkQ8GHX7Pk6FswPSQaq4kPZrZKTO5x5nEo6Nc4YLQU40B
+         CSJf3FNB/ydgs8xaUtSo9dpnrho4Aq3sTmF+jXtFVfHwZ295n/CqdjYVRqoru6wUlrSo
+         xC2k+tSrF9gax4VzZZEKwNxy7UK1Kqx34H8xYRItcxZPBuGbEdoCFvFo5KwDaKa1k81s
+         nYSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696936040; x=1697540840;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SxYIKEiG6ukaTBM9h6qF8OGxEw0D7VZs6H4jG50DssU=;
+        b=Lmlo27cFBZl0pB6qRcuXRlrIo377ToTB1mQ78Qv4omBnRFiVCCXD67qhHeTNcArIP9
+         q95Blqvc1esNh8bDL5zfvoObccPkMbixNgdc6W3mzpcSfa0XH15mhRD4oYmCOgXbzxBC
+         xxj83FYla0bg6i10RWRU+udgVmuA0P3vhhhOM/Nrqc/QgD/whvVeuviOAL7Gh/O39iN2
+         sPZ55o49U+hDHfWY6ruDLdUN474j7GrfTr0l0B7Erhm75jhuLck+5SmakeqzvjkRxkCQ
+         SSx/etOb0JO0RIIiHQQlWcHsZUYitqEH5t/j4BVdC01Rz/BNSDa6GazgkXCKXbfg44Ay
+         hi4Q==
+X-Gm-Message-State: AOJu0YzzvobmPYx9sCxfFIoLORHzaSl0KcV3TOdPEGZ3jzZOzWD5JGrL
+	naSJKpF6LzxyAHUc5D5lq10=
+X-Google-Smtp-Source: AGHT+IEYPZp0tr9ONlPxfhIYkRElPfNwZm0mIx5/NZu6JdaArxgZ8NLCb2OrW2ymI80lISBM+r6xDA==
+X-Received: by 2002:a17:906:156:b0:9a6:4f54:1da6 with SMTP id 22-20020a170906015600b009a64f541da6mr16623638ejh.57.1696936040293;
+        Tue, 10 Oct 2023 04:07:20 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id l12-20020a170906230c00b009920e9a3a73sm8277193eja.115.2023.10.10.04.07.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 04:07:20 -0700 (PDT)
+Date: Tue, 10 Oct 2023 14:07:17 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: replace deprecated strncpy
+ with ethtool_sprintf
+Message-ID: <20231010110717.cw5sqxm5mlzyi2rq@skbuf>
+References: <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="2gznOYqojtGKBm51"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello Justin,
 
---2gznOYqojtGKBm51
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Mon, Oct 09, 2023 at 10:43:59PM +0000, Justin Stitt wrote:
+> `strncpy` is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> ethtool_sprintf() is designed specifically for get_strings() usage.
+> Let's replace strncpy in favor of this more robust and easier to
+> understand interface.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
+> ---
+> Note: build-tested only.
+> ---
+>  drivers/net/dsa/realtek/rtl8365mb.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
+> index 41ea3b5a42b1..d171c18dd354 100644
+> --- a/drivers/net/dsa/realtek/rtl8365mb.c
+> +++ b/drivers/net/dsa/realtek/rtl8365mb.c
+> @@ -1303,8 +1303,7 @@ static void rtl8365mb_get_strings(struct dsa_switch *ds, int port, u32 stringset
+>  
+>  	for (i = 0; i < RTL8365MB_MIB_END; i++) {
+>  		struct rtl8365mb_mib_counter *mib = &rtl8365mb_mib_counters[i];
+> -
+> -		strncpy(data + i * ETH_GSTRING_LEN, mib->name, ETH_GSTRING_LEN);
+> +		ethtool_sprintf(&data, "%s", mib->name);
 
-Hi!
-
-The Netfilter project proudly presents:
-
-        iptables 1.8.10
-
-This release contains new features:
-
-- xtables-translate: Support rule insert with index
-- Broute table support in ebtables-nft
-- nft-variants' debug output (pass multiple '-v' flags) now contains
-  sets if present
-- Add mld-listener type names to icmp6 match
-- Correctly parse meta mark statements in rules even though iptables-nft
-  does not emit those
-
-... and fixes:
-
-- Compiler warnings with -Werror=format-security
-- Needless install of unsupported xtables.conf file
-- Wrong "unknown argument" error message in some corner cases
-- ebtables-nft allowed implicitly calling targets by one of their
-  options, require '-j <target>' first for consistency with legacy
-- Various bugs in ebtables-translate
-- Corner-case bug in iptables-nft-restore when deleting a rule inside
-  the batch file
-- Sloppy rule check command in ip6tables-legacy, producing
-  false-positives
-- Arptables-nft omitted some inverted options when listing rules
-- Parser would not accept long-options with appended argument
-  (in form '--opt=arg')
-- Ip6tables-nft ignored counter argument ('-c')
-- Wrong error message when listing a non-existent chain with
-  iptables-nft
-- Pointless creation of unused anonymous sets when deleting an
-  ebtables-nft rule containing an among match
-- Ineffective among match comparison causing ebtables-nft to potentially
-  delete the wrong rule
-- Sloppy iptables-restore parser accepting junk where chain counters are
-  expected
-- Missing target name validation in chain rename command
-- Icmp match confused type 255 and code 255 with special type "any"
-- NDEBUG compiler flag breaks iptables-nft
-- Non-functional chain policy counters with iptables-nft
-- Zeroing a rule's counters would zero chain policy counters with legacy
-  iptables
-- Reject '-m conntrack --ctproto 0', it will never match
-- Stale meta expression when stripping a match on interface "+" (i.e.,
-  any interface name)
-- Harmless compiler warning with recent Linux headers
-
-... and documentation updates:
-
-- Add missing chunk types to SCTP match help text (use 'iptables -p sctp
-  --help' to see them)
-- Document possible false negatives when using 'string' match's BM
-  algorithm
-- Missing return codes 3 and 4 descriptions in iptables man page
-- Misc minor fixes in man pages
-
-You can download the new release from:
-
-https://netfilter.org/projects/iptables/downloads.html#iptables-1.8.10
-
-To build the code, libnftnl 1.2.6 is required:
-
-* http://netfilter.org/projects/libnftnl/downloads.html#libnftnl-1.2.6
-
-In case of bugs, file them via:
-
-* https://bugzilla.netfilter.org
-
-Happy firewalling!
-
---2gznOYqojtGKBm51
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="changes-iptables-1.8.10.txt"
-
-Alyssa Ross (1):
-  build: use pkg-config for libpcap
-
-Arturo Borrero Gonzalez (1):
-  iptables-test.py: make explicit use of python3
-
-Florian Westphal (6):
-  xtables-eb: fix crash when opts isn't reallocated
-  iptables-nft: make builtin tables static
-  iptables-nft: remove unused function argument
-  include: update nf_tables uapi header
-  ebtables-nft: add broute table emulation
-  nft-ruleparse: parse meta mark set as MARK target
-
-Jacek Tomasiak (2):
-  iptables: Fix setting of ipv6 counters
-  iptables: Fix handling of non-existent chains
-
-Jan Engelhardt (1):
-  xshared: dissolve should_load_proto
-
-Jan Palus (1):
-  nft: move processing logic out of asserts
-
-Jeremy Sowden (1):
-  man: string: document BM false negatives
-
-Markus Boehme (1):
-  ip6tables: Fix checking existence of rule
-
-Pablo Neira Ayuso (3):
-  nft: check for source and destination address in first place
-  nft: use payload matching for layer 4 protocol
-  nft-bridge: pass context structure to ops->add() to improve anonymous
-    set support
-
-Phil Sutter (76):
-  extensions: NAT: Fix for -Werror=format-security
-  etc: Drop xtables.conf
-  Proper fix for "unknown argument" error message
-  ebtables: Refuse unselected targets' options
-  ebtables-translate: Drop exec_style
-  ebtables-translate: Use OPT_* from xshared.h
-  ebtables-translate: Ignore '-j CONTINUE'
-  ebtables-translate: Print flush command after parsing is finished
-  tests: xlate: Support testing multiple individual files
-  tests: CLUSTERIP: Drop test file
-  nft-shared: Lookup matches in iptables_command_state
-  nft-shared: Use nft_create_match() in one more spot
-  nft-shared: Simplify using nft_create_match()
-  tests: xlate: Properly split input in replay mode
-  tests: xlate: Print file names even if specified
-  extensions: libebt_redirect: Fix target translation
-  extensions: libebt_redirect: Fix for wrong syntax in translation
-  extensions: libebt_ip: Do not use 'ip dscp' for translation
-  extensions: libebt_ip: Translation has to match on ether type
-  ebtables: ip and ip6 matches depend on protocol match
-  xtables-translate: Support insert with index
-  include: Add missing linux/netfilter/xt_LOG.h
-  nft-restore: Fix for deletion of new, referenced rule
-  tests: shell: Test for false-positive rule check
-  utils: nfbpf_compile: Replace pcap_compile_nopcap()
-  nft-shared: Drop unused include
-  arptables: Fix parsing of inverted 'arp operation' match
-  arptables: Don't omit standard matches if inverted
-  xshared: Fix parsing of option arguments in same word
-  nft: Introduce nft-ruleparse.{c,h}
-  nft: Extract rule parsing callbacks from nft_family_ops
-  nft: ruleparse: Create family-specific source files
-  tests: shell: Sanitize nft-only/0009-needless-bitwise_0
-  nft: Special casing for among match in compare_matches()
-  nft: More verbose extension comparison debugging
-  nft: Do not pass nft_rule_ctx to add_nft_among()
-  nft: Include sets in debug output
-  *tables-restore: Enforce correct counters syntax if present
-  *tables: Reject invalid chain names when renaming
-  ebtables: Improve invalid chain name detection
-  tests: shell: Fix and extend chain rename test
-  iptables-restore: Drop dead code
-  iptables-apply: Eliminate shellcheck warnings
-  extensions: libipt_icmp: Fix confusion between 255/255 and any
-  tests: libipt_icmp.t: Enable tests with numeric output
-  man: iptables.8: Extend exit code description
-  man: iptables.8: Trivial spelling fixes
-  man: iptables.8: Fix intra page reference
-  man: iptables.8: Clarify --goto description
-  man: Use HTTPS for links to netfilter.org
-  man: iptables.8: Trivial font fixes
-  man: iptables-restore.8: Fix --modprobe description
-  man: iptables-restore.8: Consistently document -w option
-  man: iptables-restore.8: Drop -W option from synopsis
-  man: iptables-restore.8: Put 'file' in italics in synopsis
-  man: iptables-restore.8: Start paragraphs in upper-case
-  man: Trivial: Missing space after comma
-  man: iptables-save.8: Clarify 'available tables'
-  man: iptables-save.8: Fix --modprobe description
-  man: iptables-save.8: Start paragraphs in upper-case
-  extensions: libip6t_icmp: Add names for mld-listener types
-  nft-ruleparse: Introduce nft_create_target()
-  tests: iptables-test: Fix command segfault reports
-  nft: Create builtin chains with counters enabled
-  Revert "libiptc: fix wrong maptype of base chain counters on restore"
-  tests: shell: Test chain policy counter behaviour
-  Use SOCK_CLOEXEC/O_CLOEXEC where available
-  nft: Pass nft_handle to add_{target,action}()
-  nft: Introduce and use bool nft_handle::compat
-  Add --compat option to *tables-nft and *-nft-restore commands
-  tests: Test compat mode
-  Revert --compat option related commits
-  tests: shell: Fix for ineffective 0007-mid-restore-flush_0
-  nft: Fix for useless meta expressions in rule
-  include: linux: Update kernel.h
-  build: Bump dependency on libnftnl
-
-Quentin Armitage (1):
-  extensions: Fix checking of conntrack --ctproto 0
-
-Victor Julien (1):
-  doc: fix example of xt_cpu
-
-Xin Long (1):
-  xt_sctp: add the missing chunk types in sctp_help
-
---2gznOYqojtGKBm51--
+Is there any particular reason why you opted for the "%s" printf format
+specifier when you could have simply given mib->name as the single
+argument? This comment applies to all the ethtool_sprintf() patches
+you've submitted.
 
