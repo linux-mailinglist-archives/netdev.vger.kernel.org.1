@@ -1,173 +1,141 @@
-Return-Path: <netdev+bounces-39695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B91F7C417B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:41:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684917C41EA
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C3861C20CC8
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 991141C20BF1
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88596D309;
-	Tue, 10 Oct 2023 20:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6FD315BE;
+	Tue, 10 Oct 2023 20:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsvKdHW8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1mksrxoa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BFE315A7;
-	Tue, 10 Oct 2023 20:41:22 +0000 (UTC)
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF0BD8;
-	Tue, 10 Oct 2023 13:41:19 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-4527d65354bso2534150137.0;
-        Tue, 10 Oct 2023 13:41:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E05315A6
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:53:06 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C7C892
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:53:05 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d81e9981ff4so8112897276.3
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696970479; x=1697575279; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KTF6MCoYDoeUf+zV7URO5R9YigP5bU5Jr4VwKHYzrPk=;
-        b=TsvKdHW8iwWbkSlnuvcos3CanTbHRoybtAjfVRgLW0ti+IvXYSLK2tmgcYz+/cgdVo
-         SNGLKJ9m61uHJiIyn+rcMcr/KyXSUSyxyDqOntHKyy3KjFZsz8TwH4+9Wb2W3tbQXRB3
-         YjhdL8RAEA626r9om9O6txbWkBdcORhcmFkjiCAYS2VLbRCoGl1iuT3Er1YHJrPKj7OQ
-         pvof19i90S2qQC12SQcoAivEIxPPgqk+p3vzN9iBg8haUa6/LqN8/ohf9EDiENPpLlHz
-         hkYRea/+c/wfeCJu6HEGfHjqorn9jWefA3okbKLLalFCkMHOIMvkSaq6DSTkSAJCU74P
-         piJA==
+        d=google.com; s=20230601; t=1696971185; x=1697575985; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nzrS9yyU7Fxl+rEcRC2xGRsO34stFhcBXCNXeuzJc9Q=;
+        b=1mksrxoazT1pzlHvN6L+lcXmg/Imy21GLAGQ04+Nx8DKk9suu1RKbM57IqXPm6bJqN
+         LeJh1EHuF+9oNubAIcitTqnHQz4UVTNGVLkxkl3eXtEf2vVLShgooYeKnQ/BMeXKvX6a
+         REW2ZGlAjncB+7tWENokHQu7IKN50q+8rPl31kj1KnH9HukCB3lYM6P5YysnroTYgNj8
+         KbC/F6UmUiNn8VFUPyOTbIUpstD8u2aVOpELXPGODR0UpwLD+vbSGNuO5CXnqMHepTkA
+         TUfC3v490losvT/9oeP99f0bZzRcoC0YuzGxeF64lTdwxfgobUVCWEQNUs7zpfxzbpNu
+         bMpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696970479; x=1697575279;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KTF6MCoYDoeUf+zV7URO5R9YigP5bU5Jr4VwKHYzrPk=;
-        b=EMOj9KwKyyLKtNYbQ92zPEjmpACImi/LOyCIRVdUsbSS4YkAtXxBE0UjEPK05YQNvH
-         Vi7BmaVtyy+GC6JuNHxHh6noWunvZlN1v6KYWPQwXgqaUFYzYfwnv52IvG19JowLbc/b
-         2EW/O0H7QOOXpJRFluwiuXiZD72jvB4/a3mVHn7Bnv30aRE/fIxOBDOS+VG0snjf3Vmv
-         z0SAU1q4gzN8FnJvZxYL4OX66WXIPSk5NvnkmAq6ZsjsRmADcJzTSpGoZjaUa9uGllfR
-         aIvqNqQnLYheinUYvsY910+6OrfLZ5p3PR3Fh39wX4aLBlJ1Wg3x+C5cO+UT4/eSfEk7
-         n7LQ==
-X-Gm-Message-State: AOJu0YxbGyTn3mmCCQ4vKs33uVFh3AfSI6a9HxWlHAY9n1QgCNkGAeTN
-	PXTjFVmMtyWmWSWkwNduvtHV3g0jMLQyf4NggDY=
-X-Google-Smtp-Source: AGHT+IH7+jO+GducYPOm5h1Hr2zXIUuhTzMulpkrAYoct2e/rNppCwjjo91sw9oj9ZDZLcJCNwydeSmPJbML/qoiV9A=
-X-Received: by 2002:a05:6102:3169:b0:44d:48bf:591c with SMTP id
- l9-20020a056102316900b0044d48bf591cmr16921661vsm.30.1696970478566; Tue, 10
- Oct 2023 13:41:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1696971185; x=1697575985;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nzrS9yyU7Fxl+rEcRC2xGRsO34stFhcBXCNXeuzJc9Q=;
+        b=SDaLnRzHCG4/+BIfoCHvOmtRj/tf/7avmZaX98ko6k7M+EsKEs61/yaC440lvRC/fH
+         U9HPvS2OxX33N86J1IIw9iAU0AKYL4Q7Pw534VjUCpwZlx0+Oj2Pmbvq2pZU/y9VIKz+
+         CFsrwYJfHRMt8zO5w0WSBRujzcu+iu5cjeWPQCp8XkxAsv1+5b2tcTO6KPf5/HjfkdtD
+         lQ+N2TV9fbqPoELpCw1DmdN+bK4VjDBYZfZ6I38Njpw3npQ/eiGCr2YokHQIzFRYtcTe
+         YserynzgPQphRgU9+AccKhta7/9WMsEl4nXwMflS744+3qaBf/HfNY8cIHtiIEiUw6i4
+         1+Vw==
+X-Gm-Message-State: AOJu0Yw+GaqlggbObR3pQCpO4K1RreQN+uBeqydEKH7o8QpsDJfxwChE
+	ws8MbTSkA/eNZd4G8I66jkCJ1A5Y7FDBRjfP+Q==
+X-Google-Smtp-Source: AGHT+IFEawv3/Q1aVdi1akfbJBKo97xvPPwQmp2OCE1jugDl7DSQ5964VSx1uuZU3vGzMYluwJTj8jYCJu4sipxh6g==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6902:85:b0:d86:5644:5d12 with SMTP
+ id h5-20020a056902008500b00d8656445d12mr360216ybs.4.1696971184847; Tue, 10
+ Oct 2023 13:53:04 -0700 (PDT)
+Date: Tue, 10 Oct 2023 20:53:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231010200437.9794-1-ahmed.zaki@intel.com> <20231010200437.9794-2-ahmed.zaki@intel.com>
-In-Reply-To: <20231010200437.9794-2-ahmed.zaki@intel.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Tue, 10 Oct 2023 16:40:41 -0400
-Message-ID: <CAF=yD-+=3=MqqsHESPsgD0yCQSCA9qBe1mB1OVhSYuB_GhZK6g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/6] net: ethtool: allow symmetric-xor RSS
- hash for any flow type
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, corbet@lwn.net, 
-	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladimir.oltean@nxp.com, andrew@lunn.ch, horms@kernel.org, mkubecek@suse.cz, 
-	linux-doc@vger.kernel.org, Wojciech Drewek <wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAKu5JWUC/x2N0QrCMBAEf6XcswdJqhT8FRGxua09kBguoVRK/
+ 93Yl2HnZWejAlMUunYbGRYt+klN/KmjOD/TC6zSnIILvXfecamWYv6ymC6wwgmVUWfYf2iqeLO eHQ48RDJHFhmm4MYBchFqx9kw6XpEb/d9/wFd1mpihAAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696971183; l=2113;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=2n+/99+B9opeglb9JUPmq/bkJEGJQqpMF0ubyjWVGZk=; b=QW1y3WrgWpVSmEbu1+0vOfFFpmr1+pxJv4LGFzx7Dc1VvHcE4fwNoHfwpAzs/aoR0cBHfUaXB
+ QqdiMRspgFuCva36ud5TV5Qm1njxFennsGdx1/XqmdCR/al80n4nf9s
+X-Mailer: b4 0.12.3
+Message-ID: <20231010-strncpy-drivers-net-ethernet-intel-i40e-i40e_ddp-c-v1-1-f01a23394eab@google.com>
+Subject: [PATCH] i40e: use scnprintf over strncpy+strncat
+From: Justin Stitt <justinstitt@google.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 4:05=E2=80=AFPM Ahmed Zaki <ahmed.zaki@intel.com> w=
-rote:
->
-> Symmetric RSS hash functions are beneficial in applications that monitor
-> both Tx and Rx packets of the same flow (IDS, software firewalls, ..etc).
-> Getting all traffic of the same flow on the same RX queue results in
-> higher CPU cache efficiency.
->
-> A NIC that supports "symmetric-xor" can achieve this RSS hash symmetry
-> by XORing the source and destination fields and pass the values to the
-> RSS hash algorithm.
->
-> Only fields that has counterparts in the other direction can be
-> accepted; IP src/dst and L4 src/dst ports.
->
-> The user may request RSS hash symmetry for a specific flow type, via:
->
->     # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n symmetric-xor
->
-> or turn symmetry off (asymmetric) by:
->
->     # ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
->
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
->  Documentation/networking/scaling.rst |  6 ++++++
->  include/uapi/linux/ethtool.h         | 17 +++++++++--------
->  net/ethtool/ioctl.c                  | 11 +++++++++++
->  3 files changed, 26 insertions(+), 8 deletions(-)
->
-> diff --git a/Documentation/networking/scaling.rst b/Documentation/network=
-ing/scaling.rst
-> index 92c9fb46d6a2..64f3d7566407 100644
-> --- a/Documentation/networking/scaling.rst
-> +++ b/Documentation/networking/scaling.rst
-> @@ -44,6 +44,12 @@ by masking out the low order seven bits of the compute=
-d hash for the
->  packet (usually a Toeplitz hash), taking this number as a key into the
->  indirection table and reading the corresponding value.
->
-> +Some NICs support symmetric RSS hashing where, if the IP (source address=
-,
-> +destination address) and TCP/UDP (source port, destination port) tuples
-> +are swapped, the computed hash is the same. This is beneficial in some
-> +applications that monitor TCP/IP flows (IDS, firewalls, ...etc) and need
-> +both directions of the flow to land on the same Rx queue (and CPU).
-> +
+`strncpy` is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Maybe add a short ethtool example?
+Moreover, `strncat` shouldn't really be used either as per
+fortify-string.h:
+ * Do not use this function. While FORTIFY_SOURCE tries to avoid
+ * read and write overflows, this is only possible when the sizes
+ * of @p and @q are known to the compiler. Prefer building the
+ * string with formatting, via scnprintf() or similar.
 
->  Some advanced NICs allow steering packets to queues based on
->  programmable filters. For example, webserver bound TCP port 80 packets
->  can be directed to their own receive queue. Such =E2=80=9Cn-tuple=E2=80=
-=9D filters can
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index f7fba0dc87e5..b9ee667ad7e5 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -2018,14 +2018,15 @@ static inline int ethtool_validate_duplex(__u8 du=
-plex)
->  #define        FLOW_RSS        0x20000000
->
->  /* L3-L4 network traffic flow hash options */
-> -#define        RXH_L2DA        (1 << 1)
-> -#define        RXH_VLAN        (1 << 2)
-> -#define        RXH_L3_PROTO    (1 << 3)
-> -#define        RXH_IP_SRC      (1 << 4)
-> -#define        RXH_IP_DST      (1 << 5)
-> -#define        RXH_L4_B_0_1    (1 << 6) /* src port in case of TCP/UDP/S=
-CTP */
-> -#define        RXH_L4_B_2_3    (1 << 7) /* dst port in case of TCP/UDP/S=
-CTP */
-> -#define        RXH_DISCARD     (1 << 31)
-> +#define        RXH_L2DA                (1 << 1)
-> +#define        RXH_VLAN                (1 << 2)
-> +#define        RXH_L3_PROTO            (1 << 3)
-> +#define        RXH_IP_SRC              (1 << 4)
-> +#define        RXH_IP_DST              (1 << 5)
-> +#define        RXH_L4_B_0_1            (1 << 6) /* src port in case of T=
-CP/UDP/SCTP */
-> +#define        RXH_L4_B_2_3            (1 << 7) /* dst port in case of T=
-CP/UDP/SCTP */
-> +#define        RXH_SYMMETRIC_XOR       (1 << 30)
-> +#define        RXH_DISCARD             (1 << 31)
+Instead, use `scnprintf` with "%s%s" format string. This code is now
+more readable and robust.
 
-Are these indentation changes intentional?
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
+---
+ drivers/net/ethernet/intel/i40e/i40e_ddp.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ddp.c b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
+index 0e72abd178ae..ec25e4be250f 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ddp.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ddp.c
+@@ -438,10 +438,9 @@ int i40e_ddp_flash(struct net_device *netdev, struct ethtool_flash *flash)
+ 		char profile_name[sizeof(I40E_DDP_PROFILE_PATH)
+ 				  + I40E_DDP_PROFILE_NAME_MAX];
+ 
+-		profile_name[sizeof(profile_name) - 1] = 0;
+-		strncpy(profile_name, I40E_DDP_PROFILE_PATH,
+-			sizeof(profile_name) - 1);
+-		strncat(profile_name, flash->data, I40E_DDP_PROFILE_NAME_MAX);
++		scnprintf(profile_name, sizeof(profile_name), "%s%s",
++			  I40E_DDP_PROFILE_PATH, flash->data);
++
+ 		/* Load DDP recipe. */
+ 		status = request_firmware(&ddp_config, profile_name,
+ 					  &netdev->dev);
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231010-strncpy-drivers-net-ethernet-intel-i40e-i40e_ddp-c-dd7f20b7ed5d
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
