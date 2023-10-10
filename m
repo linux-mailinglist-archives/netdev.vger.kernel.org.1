@@ -1,223 +1,295 @@
-Return-Path: <netdev+bounces-39401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683607BF066
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:38:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14A5A7BF081
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F6791C209F3
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 929E7281857
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 01:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF7B38E;
-	Tue, 10 Oct 2023 01:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCA67F0;
+	Tue, 10 Oct 2023 01:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="K7Ze4QqH"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="X813j2vE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4FD621
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 01:38:31 +0000 (UTC)
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6F4B6
-	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:38:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DC838E
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 01:52:18 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269CBA4
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 18:52:15 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1c9b7c234a7so111525ad.3
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 18:52:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696901910; x=1728437910;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wcI43Cu1sf+bjI2t73oR3IKD0vh1EBzNfOGzYwwBj+o=;
-  b=K7Ze4QqHyaE4OnWuhE0vetIHq7QmSXwEwMNxuUTM13+Dz0XFb2ag5NHp
-   pQLqpsUuCMXR9hU9igU5paGEku03bxP3dAgjAOQhxoVZEp/6HXXqZ0Tfr
-   56Yjbif2cV4Sq0UAAN+fqn3pyT86+vqBE4b3b9L1Hl9KN6fQyKA3vH1mS
-   A=;
-X-IronPort-AV: E=Sophos;i="6.03,211,1694736000"; 
-   d="scan'208";a="244473430"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 01:38:28 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com (Postfix) with ESMTPS id 77E7B40D42;
-	Tue, 10 Oct 2023 01:38:27 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 01:38:26 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.12) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 01:38:23 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
-Subject: [PATCH v1 net] tcp: Fix listen() warning with v4-mapped-v6 address.
-Date: Mon, 9 Oct 2023 18:38:14 -0700
-Message-ID: <20231010013814.70571-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1696902734; x=1697507534; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0N+qtjCdT5KqAaFNfTB2Q9o+cOzK8F08JC506D0GMuU=;
+        b=X813j2vE677apHAbpkPiOpchHKLnTzQy7EBEyufsfSKeGGPLnl+9ED/JYupcnJJtYA
+         j1ZEukQFNU02Gd8ahFQKCQHDYCzH/UQN2CkSQrvUNl8zXDTg9M25QlLJ7gMNtcWpJRBk
+         F463kO56vPi2BDgfOihwf+yVx3nwxngmzOx4P/CGZewUsEwDttQKi7igicA+2a5wx/rt
+         AOx071l/5dT6Uue/uNC8Mm0ellMBRkgRDqa2SYCuZMSYGOEkxUWhPAGkD1BjEmpowICX
+         qur/8AMo9SWtlhrq69zSTWPSfy+yptmtlni1sYRZJXaLJUCWZ1FefpTbRzmCopiiRjnC
+         QiyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696902734; x=1697507534;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0N+qtjCdT5KqAaFNfTB2Q9o+cOzK8F08JC506D0GMuU=;
+        b=K/hY6vXunpBYu5Ql1TiXIaqRtnOEPrtOJoHF7e6eEdQ2fPRZvuqZRSdQyfQTcqsDI3
+         4r7Ls/ALO10u5C9/iFgjRWmmFp+Odeh4SZVXEepIFFqSp4yU4mnfbIAkYdWz9ZytVOQ5
+         zCQ+N7QLlfmMv6ERIzVm47CMDUbPhgppRCeEy48vnox/nWDflRM9Z2uYhAjqFkw2q7ds
+         KofVvdTPB0HrwsQEBI0Myt4EuZaQ2MUSi6tgzbZd1egvcDa4c85sLJk6enZ4eBjGSERH
+         rYFK7AX0vSfh1dJcc1XekncIaqd1O1gR4Cr0GfsaAkCJVy0WHJremEErH53xn98txzF+
+         zLyQ==
+X-Gm-Message-State: AOJu0YzK8snUFiN2u62StMkP/NGweY2iI/Va6DSDxa2ZzeH1PGpjg1VS
+	kEDFPxDs/vx/3WIlQ/g6dzckOQ==
+X-Google-Smtp-Source: AGHT+IFHTkZq+Y4UBZhoqTKNtQa6pvxyQ8XKUDqZz6vogu20gwkBWflb7DlCWFxTEqlYekrh3buMBg==
+X-Received: by 2002:a17:902:c212:b0:1c9:aac5:df0f with SMTP id 18-20020a170902c21200b001c9aac5df0fmr1181969pll.55.1696902734530;
+        Mon, 09 Oct 2023 18:52:14 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:78d2:b862:10a7:d486? ([2400:4050:a840:1e00:78d2:b862:10a7:d486])
+        by smtp.gmail.com with ESMTPSA id x6-20020a170902820600b001c99b3a1e45sm3140229pln.84.2023.10.09.18.52.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Oct 2023 18:52:14 -0700 (PDT)
+Message-ID: <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com>
+Date: Tue, 10 Oct 2023 10:52:06 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com,
+ songliubraving@fb.com, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, rdunlap@infradead.org, willemb@google.com,
+ gustavoars@kernel.org, herbert@gondor.apana.org.au,
+ steffen.klassert@secunet.com, nogikh@google.com, pablo@netfilter.org,
+ decui@microsoft.com, jakub@cloudflare.com, elver@google.com,
+ pabeni@redhat.com, Yuri Benditovich <yuri.benditovich@daynix.com>
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com>
+ <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+ <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com>
+ <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+ <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com>
+ <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
+ <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com>
+ <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
+ <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com>
+ <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
+ <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com>
+ <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.12]
-X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot reported a warning [0] introduced by commit c48ef9c4aed3 ("tcp: Fix
-bind() regression for v4-mapped-v6 non-wildcard address.").
+On 2023/10/09 19:44, Willem de Bruijn wrote:
+> On Mon, Oct 9, 2023 at 3:12 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2023/10/09 19:06, Willem de Bruijn wrote:
+>>> On Mon, Oct 9, 2023 at 3:02 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2023/10/09 18:57, Willem de Bruijn wrote:
+>>>>> On Mon, Oct 9, 2023 at 3:57 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> On 2023/10/09 17:04, Willem de Bruijn wrote:
+>>>>>>> On Sun, Oct 8, 2023 at 3:46 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>>
+>>>>>>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
+>>>>>>>>> On Sun, Oct 8, 2023 at 10:04 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>>>>
+>>>>>>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
+>>>>>>>>>>> On Sun, Oct 8, 2023 at 7:22 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>>>>>>
+>>>>>>>>>>>> virtio-net have two usage of hashes: one is RSS and another is hash
+>>>>>>>>>>>> reporting. Conventionally the hash calculation was done by the VMM.
+>>>>>>>>>>>> However, computing the hash after the queue was chosen defeats the
+>>>>>>>>>>>> purpose of RSS.
+>>>>>>>>>>>>
+>>>>>>>>>>>> Another approach is to use eBPF steering program. This approach has
+>>>>>>>>>>>> another downside: it cannot report the calculated hash due to the
+>>>>>>>>>>>> restrictive nature of eBPF.
+>>>>>>>>>>>>
+>>>>>>>>>>>> Introduce the code to compute hashes to the kernel in order to overcome
+>>>>>>>>>>>> thse challenges. An alternative solution is to extend the eBPF steering
+>>>>>>>>>>>> program so that it will be able to report to the userspace, but it makes
+>>>>>>>>>>>> little sense to allow to implement different hashing algorithms with
+>>>>>>>>>>>> eBPF since the hash value reported by virtio-net is strictly defined by
+>>>>>>>>>>>> the specification.
+>>>>>>>>>>>>
+>>>>>>>>>>>> The hash value already stored in sk_buff is not used and computed
+>>>>>>>>>>>> independently since it may have been computed in a way not conformant
+>>>>>>>>>>>> with the specification.
+>>>>>>>>>>>>
+>>>>>>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>>>>>>>>>> ---
+>>>>>>>>>>>
+>>>>>>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap = {
+>>>>>>>>>>>> +       .max_indirection_table_length =
+>>>>>>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +       .types = VIRTIO_NET_SUPPORTED_HASH_TYPES
+>>>>>>>>>>>> +};
+>>>>>>>>>>>
+>>>>>>>>>>> No need to have explicit capabilities exchange like this? Tun either
+>>>>>>>>>>> supports all or none.
+>>>>>>>>>>
+>>>>>>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
+>>>>>>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_UDP_EX.
+>>>>>>>>>>
+>>>>>>>>>> It is because the flow dissector does not support IPv6 extensions. The
+>>>>>>>>>> specification is also vague, and does not tell how many TLVs should be
+>>>>>>>>>> consumed at most when interpreting destination option header so I chose
+>>>>>>>>>> to avoid adding code for these hash types to the flow dissector. I doubt
+>>>>>>>>>> anyone will complain about it since nobody complains for Linux.
+>>>>>>>>>>
+>>>>>>>>>> I'm also adding this so that we can extend it later.
+>>>>>>>>>> max_indirection_table_length may grow for systems with 128+ CPUs, or
+>>>>>>>>>> types may have other bits for new protocols in the future.
+>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>>>               case TUNSETSTEERINGEBPF:
+>>>>>>>>>>>> -               ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>>>>>>>>>>>> +               bpf_ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>>>>>>>>>>>> +               if (IS_ERR(bpf_ret))
+>>>>>>>>>>>> +                       ret = PTR_ERR(bpf_ret);
+>>>>>>>>>>>> +               else if (bpf_ret)
+>>>>>>>>>>>> +                       tun->vnet_hash.flags &= ~TUN_VNET_HASH_RSS;
+>>>>>>>>>>>
+>>>>>>>>>>> Don't make one feature disable another.
+>>>>>>>>>>>
+>>>>>>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+>>>>>>>>>>> functions. If one is enabled the other call should fail, with EBUSY
+>>>>>>>>>>> for instance.
+>>>>>>>>>>>
+>>>>>>>>>>>> +       case TUNSETVNETHASH:
+>>>>>>>>>>>> +               len = sizeof(vnet_hash);
+>>>>>>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+>>>>>>>>>>>> +                       ret = -EFAULT;
+>>>>>>>>>>>> +                       break;
+>>>>>>>>>>>> +               }
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT) &&
+>>>>>>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virtio_net_hdr_v1_hash) ||
+>>>>>>>>>>>> +                     !tun_is_little_endian(tun))) ||
+>>>>>>>>>>>> +                    vnet_hash.indirection_table_mask >=
+>>>>>>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH) {
+>>>>>>>>>>>> +                       ret = -EINVAL;
+>>>>>>>>>>>> +                       break;
+>>>>>>>>>>>> +               }
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +               argp = (u8 __user *)argp + len;
+>>>>>>>>>>>> +               len = (vnet_hash.indirection_table_mask + 1) * 2;
+>>>>>>>>>>>> +               if (copy_from_user(vnet_hash_indirection_table, argp, len)) {
+>>>>>>>>>>>> +                       ret = -EFAULT;
+>>>>>>>>>>>> +                       break;
+>>>>>>>>>>>> +               }
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +               argp = (u8 __user *)argp + len;
+>>>>>>>>>>>> +               len = virtio_net_hash_key_length(vnet_hash.types);
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)) {
+>>>>>>>>>>>> +                       ret = -EFAULT;
+>>>>>>>>>>>> +                       break;
+>>>>>>>>>>>> +               }
+>>>>>>>>>>>
+>>>>>>>>>>> Probably easier and less error-prone to define a fixed size control
+>>>>>>>>>>> struct with the max indirection table size.
+>>>>>>>>>>
+>>>>>>>>>> I made its size variable because the indirection table and key may grow
+>>>>>>>>>> in the future as I wrote above.
+>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>> Btw: please trim the CC: list considerably on future patches.
+>>>>>>>>>>
+>>>>>>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF change you
+>>>>>>>>>> proposed.
+>>>>>>>>>
+>>>>>>>>> To be clear: please don't just resubmit with that one change.
+>>>>>>>>>
+>>>>>>>>> The skb and cb issues are quite fundamental issues that need to be resolved.
+>>>>>>>>>
+>>>>>>>>> I'd like to understand why adjusting the existing BPF feature for this
+>>>>>>>>> exact purpose cannot be amended to return the key it produced.
+>>>>>>>>
+>>>>>>>> eBPF steering program is not designed for this particular problem in my
+>>>>>>>> understanding. It was introduced to derive hash values with an
+>>>>>>>> understanding of application-specific semantics of packets instead of
+>>>>>>>> generic IP/TCP/UDP semantics.
+>>>>>>>>
+>>>>>>>> This problem is rather different in terms that the hash derivation is
+>>>>>>>> strictly defined by virtio-net. I don't think it makes sense to
+>>>>>>>> introduce the complexity of BPF when you always run the same code.
+>>>>>>>>
+>>>>>>>> It can utilize the existing flow dissector and also make it easier to
+>>>>>>>> use for the userspace by implementing this in the kernel.
+>>>>>>>
+>>>>>>> Ok. There does appear to be overlap in functionality. But it might be
+>>>>>>> easier to deploy to just have standard Toeplitz available without
+>>>>>>> having to compile and load an eBPF program.
+>>>>>>>
+>>>>>>> As for the sk_buff and cb[] changes. The first is really not needed.
+>>>>>>> sk_buff simply would not scale if every edge case needs a few bits.
+>>>>>>
+>>>>>> An alternative is to move the bit to cb[] and clear it for every code
+>>>>>> paths that lead to ndo_start_xmit(), but I'm worried that it is error-prone.
+>>>>>>
+>>>>>> I think we can put the bit in sk_buff for now. We can implement the
+>>>>>> alternative when we are short of bits.
+>>>>>
+>>>>> I disagree. sk_buff fields add a cost to every code path. They cannot
+>>>>> be added for every edge case.
+>>>>
+>>>> It only takes an unused bit and does not grow the sk_buff size so I
+>>>> think it has practically no cost for now.
+>>>
+>>> The problem is that that thinking leads to death by a thousand cuts.
+>>>
+>>> "for now" forces the cost of having to think hard how to avoid growing
+>>> sk_buff onto the next person. Let's do it right from the start.
+>>
+>> I see. I described an alternative to move the bit to cb[] and clear it
+>> in all code paths that leads to ndo_start_xmit() earlier. Does that
+>> sound good to you?
+> 
+> If you use the control block to pass information between
+> __dev_queue_xmit on the tun device and tun_net_xmit, using gso_skb_cb,
+> the field can be left undefined in all non-tun paths. tun_select_queue
+> can initialize.
 
-After the cited commit, a v4 socket's address matches the corresponding
-v4-mapped-v6 tb2 in inet_bind2_bucket_match_addr(), not vice versa.
+The problem is that tun_select_queue() is not always called. 
+netdev_core_pick_tx() ensures dev->real_num_tx_queues != 1 before 
+calling it, but this variable may change later and result in a race 
+condition. Another case is that XDP with predefined queue.
 
-During X.X.X.X -> ::ffff:X.X.X.X order bind()s, the second bind() uses
-bhash and conflicts properly without checking bhash2 so that we need not
-check if a v4-mapped-v6 sk matches the corresponding v4 address tb2 in
-inet_bind2_bucket_match_addr().  However, the repro shows that we need
-to check that in a no-conflict case.
+> 
+> I would still use skb->hash to encode the hash. That hash type of that
+> field is not strictly defined. It can be siphash from ___skb_get_hash
+> or a device hash, which most likely also uses Toeplitz. Then you also
+> don't run into the problem of growing the struct size.
 
-The repro bind()s two sockets to the 2-tuples using SO_REUSEPORT and calls
-listen() for the first socket:
-
-  from socket import *
-
-  s1 = socket()
-  s1.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-  s1.bind(('127.0.0.1', 0))
-
-  s2 = socket(AF_INET6)
-  s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-  s2.bind(('::ffff:127.0.0.1', s1.getsockname()[1]))
-
-  s1.listen()
-
-The second socket should belong to the first socket's tb2, but the second
-bind() creates another tb2 bucket because inet_bind2_bucket_find() returns
-NULL in inet_csk_get_port() as the v4-mapped-v6 sk does not match the
-corresponding v4 address tb2.
-
-  bhash2[] -> tb2(::ffff:X.X.X.X) -> tb2(X.X.X.X)
-
-Then, listen() for the first socket calls inet_csk_get_port(), where the
-v4 address matches the v4-mapped-v6 tb2 and WARN_ON() is triggered.
-
-To avoid that, we need to check if v4-mapped-v6 sk address matches with
-the corresponding v4 address tb2 in inet_bind2_bucket_match().
-
-The same checks are needed in inet_bind2_bucket_addr_match() too, so we
-can move all checks there and call it from inet_bind2_bucket_match().
-
-Note that now tb->family is just an address family of tb->(v6_)?rcv_saddr
-and not of sockets in the bucket.  This could be refactored later by
-defining tb->rcv_saddr as tb->v6_rcv_saddr.s6_addr32[3] and prepending
-::ffff: when creating v4 tb2.
-
-[0]:
-WARNING: CPU: 0 PID: 5049 at net/ipv4/inet_connection_sock.c:587 inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
-Modules linked in:
-CPU: 0 PID: 5049 Comm: syz-executor288 Not tainted 6.6.0-rc2-syzkaller-00018-g2cf0f7156238 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
-RIP: 0010:inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
-Code: 7c 24 08 e8 4c b6 8a 01 31 d2 be 88 01 00 00 48 c7 c7 e0 94 ae 8b e8 59 2e a3 f8 2e 2e 2e 31 c0 e9 04 fe ff ff e8 ca 88 d0 f8 <0f> 0b e9 0f f9 ff ff e8 be 88 d0 f8 49 8d 7e 48 e8 65 ca 5a 00 31
-RSP: 0018:ffffc90003abfbf0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888026429100 RCX: 0000000000000000
-RDX: ffff88807edcbb80 RSI: ffffffff88b73d66 RDI: ffff888026c49f38
-RBP: ffff888026c49f30 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff9260f200
-R13: ffff888026c49880 R14: 0000000000000000 R15: ffff888026429100
-FS:  00005555557d5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 0000000025754000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- inet_csk_listen_start+0x155/0x360 net/ipv4/inet_connection_sock.c:1256
- __inet_listen_sk+0x1b8/0x5c0 net/ipv4/af_inet.c:217
- inet_listen+0x93/0xd0 net/ipv4/af_inet.c:239
- __sys_listen+0x194/0x270 net/socket.c:1866
- __do_sys_listen net/socket.c:1875 [inline]
- __se_sys_listen net/socket.c:1873 [inline]
- __x64_sys_listen+0x53/0x80 net/socket.c:1873
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f3a5bce3af9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc1a1c79e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3a5bce3af9
-RDX: 00007f3a5bce3af9 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007f3a5bd565f0 R08: 0000000000000006 R09: 0000000000000006
-R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
-R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-
-Fixes: c48ef9c4aed3 ("tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.")
-Reported-by: syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=71e724675ba3958edb31
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/inet_hashtables.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
-
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index c32f5e28758b..598c1b114d2c 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -149,8 +149,14 @@ static bool inet_bind2_bucket_addr_match(const struct inet_bind2_bucket *tb2,
- 					 const struct sock *sk)
- {
- #if IS_ENABLED(CONFIG_IPV6)
--	if (sk->sk_family != tb2->family)
--		return false;
-+	if (sk->sk_family != tb2->family) {
-+		if (sk->sk_family == AF_INET)
-+			return ipv6_addr_v4mapped(&tb2->v6_rcv_saddr) &&
-+				tb2->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
-+
-+		return ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr) &&
-+			sk->sk_v6_rcv_saddr.s6_addr32[3] == tb2->rcv_saddr;
-+	}
- 
- 	if (sk->sk_family == AF_INET6)
- 		return ipv6_addr_equal(&tb2->v6_rcv_saddr,
-@@ -819,19 +825,7 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
- 	    tb->l3mdev != l3mdev)
- 		return false;
- 
--#if IS_ENABLED(CONFIG_IPV6)
--	if (sk->sk_family != tb->family) {
--		if (sk->sk_family == AF_INET)
--			return ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
--				tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
--
--		return false;
--	}
--
--	if (sk->sk_family == AF_INET6)
--		return ipv6_addr_equal(&tb->v6_rcv_saddr, &sk->sk_v6_rcv_saddr);
--#endif
--	return tb->rcv_saddr == sk->sk_rcv_saddr;
-+	return inet_bind2_bucket_addr_match(tb, sk);
- }
- 
- bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket *tb, const struct net *net,
--- 
-2.30.2
-
+I'm concerned exactly because it's not strictly defined. Someone may 
+decide to overwrite it later if we are not cautious enough. qdisc_skb_cb 
+also has sufficient space to contain both of the hash value and type.
 
