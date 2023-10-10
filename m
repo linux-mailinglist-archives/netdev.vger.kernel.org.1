@@ -1,98 +1,166 @@
-Return-Path: <netdev+bounces-39462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179A27BF552
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:09:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1CA7BF572
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:16:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 097C41C20AD2
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:09:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A76B280F3E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:16:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18B314F8B;
-	Tue, 10 Oct 2023 08:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506BA154A9;
+	Tue, 10 Oct 2023 08:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="VX5fC4Q/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="h28zTzFX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F793D9F
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 08:09:46 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFFFDB9
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 01:09:44 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-288-qRlSN9UqOC2zM01Za9DlmA-1; Tue, 10 Oct 2023 04:09:32 -0400
-X-MC-Unique: qRlSN9UqOC2zM01Za9DlmA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A86F3185A79B;
-	Tue, 10 Oct 2023 08:09:30 +0000 (UTC)
-Received: from hog (unknown [10.45.225.250])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 83FF8400F36;
-	Tue, 10 Oct 2023 08:09:26 +0000 (UTC)
-Date: Tue, 10 Oct 2023 10:09:24 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: "Radu Pirea (NXP OSS)" <radu-nicolae.pirea@oss.nxp.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, sgoutham@marvell.com,
-	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, borisp@nvidia.com, saeedm@nvidia.com,
-	leon@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, richardcochran@gmail.com,
-	sebastian.tobuschat@oss.nxp.com, phaddad@nvidia.com,
-	ehakim@nvidia.com, raeds@nvidia.com, atenart@kernel.org
-Subject: Re: [PATCH net v7 0/4] Add update_pn flag
-Message-ID: <ZSUGtMn6hl2Ua8qx@hog>
-References: <20231005180636.672791-1-radu-nicolae.pirea@oss.nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA1CBA57
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 08:16:06 +0000 (UTC)
+Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E4197;
+	Tue, 10 Oct 2023 01:16:03 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailout.west.internal (Postfix) with ESMTP id 44FD13200A7A;
+	Tue, 10 Oct 2023 04:15:59 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 10 Oct 2023 04:16:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
+	1696925758; x=1697012158; bh=37O+bLcXHzAtlGTxAl7BM9VidjbxHB5bNg3
+	Khnx7FEY=; b=VX5fC4Q/Fwzp47Fe1GjiddDyNK6GDmgxx9AnAlw4N6tKQ9xxeBk
+	zFlj2nlHzuctJSCQlBv2ocNWNH2aGJ6TkRsuPsCPAmGsEwNdqNQfnfXyjQFdLmC2
+	p20GdS9jwh1UhwKKIhrVXTgpEO66+qw4ocoezSvp+Hk+zWMDywZxkPKfwM8WKWNX
+	30DuzJc7DSxQoCHRrnZAjwPrYfD65PQI/ZzQa/2hVyrj+dEd5bc8MzAN09+K7VOi
+	IMZHBtT2nuMB+UyNtJTp4PVF6VbA+0wPZd6RHDkEoyMSwk3r2sSiyAs5nztOiIQ6
+	ye+LVryb4ZqiKVba2ZACFlsWyGGFjAn3pvg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1696925758; x=1697012158; bh=37O+bLcXHzAtlGTxAl7BM9VidjbxHB5bNg3
+	Khnx7FEY=; b=h28zTzFXfFrEIvsbBtlAfMw0eohC+N8xcl2PZe9Kt3YlxfrZqXG
+	LEBluCJSUym0hj2jGGfiAeqFNWkxjl7aDHJ+X+JYVr4kE3+QAp5EZ+JmY/jd4GHM
+	ydK2HCjCxGdSuhF6dg5YgVhVw3jOis7wUxmVozKbKDcj8OhoEwB1rzuaP3PwYzjs
+	7EY+jFPyrt1HKFHC+EXe16a8K8+vfRk7SdHowKaYYof6YDLEUEXVjzK0VHZG2H+r
+	J18d9S0uNBjcariQVw4gZ2yDZuc6dI2cfR3MAc3wyM+dku8Mt+Nk9iXMD6Q0eGkK
+	Om4hmkiXa5LPS3H4J/Yma2LN7KxrTu0EmXw==
+X-ME-Sender: <xms:PgglZTAGcVIWHAnllWjXsXLzjrKuM5Ia5b6pURc-mYQz2Q4Se0aVBg>
+    <xme:PgglZZje5EFxgF098kwzO0XJE0zxvlw8wplo68kuRsgPo5ZKmIgbbzTw5pXfWSk2t
+    foH45KKGLoglj8-kiE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheehucetufdoteggodetrfdotffvucfrrh
+    hofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdetrhhnugcu
+    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
+    hnpeegfeejhedvledvffeijeeijeeivddvhfeliedvleevheejleetgedukedtgfejveen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
+    esrghrnhgusgdruggv
+X-ME-Proxy: <xmx:PgglZemu76nlIQmFWr9QTNdfapasFxAjU4ddnU8Sq_F_XhYxQNBl0A>
+    <xmx:PgglZVw74kOKcxNCm28y3EDpsrNJ90A1UHaex7izTALL6caigKZOoQ>
+    <xmx:PgglZYSyu-Up5FKPRurAXX-XE-pfpCH4V0bFBhnfJjxnEXKAu3tPiA>
+    <xmx:PgglZcb2rHKW8mgK4EV70Q9Ym7cs5vMZJmjRUQjAuSuoc7zvNhZeqw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 2C21EB60089; Tue, 10 Oct 2023 04:15:58 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-958-g1b1b911df8-fm-20230927.002-g1b1b911d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231005180636.672791-1-radu-nicolae.pirea@oss.nxp.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+Message-Id: <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
+In-Reply-To: <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+ <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
+ <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
+ <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+Date: Tue, 10 Oct 2023 10:15:37 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Rodolfo Zitellini" <rwz@xhero.org>
+Cc: "Arnd Bergmann" <arnd@kernel.org>, "Jakub Kicinski" <kuba@kernel.org>,
+ Netdev <netdev@vger.kernel.org>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ linux-wireless@vger.kernel.org, "Johannes Berg" <johannes@sipsolutions.net>,
+ linux-wpan@vger.kernel.org,
+ "Michael Hennerich" <michael.hennerich@analog.com>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Eric Dumazet" <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
+ "Doug Brown" <doug@schmorgal.com>
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-10-05, 21:06:32 +0300, Radu Pirea (NXP OSS) wrote:
-> Patches extracted from
-> https://lore.kernel.org/all/20230928084430.1882670-1-radu-nicolae.pirea@oss.nxp.com/
-> Update_pn flag will let the offloaded MACsec implementations to know when
-> the PN is updated.
-> 
-> Radu P.
-> 
-> Radu Pirea (NXP OSS) (4):
->   net: macsec: indicate next pn update when offloading
->   octeontx2-pf: mcs: update PN only when update_pn is true
->   net: phy: mscc: macsec: reject PN update requests
->   net/mlx5e: macsec: use update_pn flag instead of PN comparation
+On Tue, Oct 10, 2023, at 09:10, Rodolfo Zitellini wrote:
+>> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> h=
+a scritto:
+>> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
+>> I can see a few ways this could work out:
+>>=20
+>> - add a custom callback pointer to struct atalk_iface to
+>>  get and set the address for phase1 probing instead of going
+>>  through the ioctl
+>
+> This was my initial thought, at least for the moment, mostly to keep=20
+> netatalk happy and make sure I don=E2=80=99t break other stuff that ma=
+kes=20
+> assumptions on how the address probing worked. There are other bits I=20
+> would like to improve, for example tcpdump (which parses correctly=20
+> appetalk packets!) is broken in the current implementation.
+>
+>> - rewrite the probing logic in aarp.c more widely, and improve
+>>  the userspace interface in the process by introducing a netlink
+>>  interface
+>
+> This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I thin=
+k the logic for=20
+> probing could be redesigned and simplified (it also does not work 100%=20
+> correctly), and it could be a good chance to improve the interface wit=
+h=20
+> netatalk too.
 
-Thanks Radu! For the series:
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Ok, I've adapted my patch now to not actually drop the
+localtalk code for now, and sent that out, I hope that works
+for you. Even if we go with the v1 patch that removes it all,
+you could just as well start with a revert of my patch when
+you add your driver, so in the end it shouldn't make much
+of a difference.
 
+>> - Move your entire driver into userspace and go to the kernel
+>>  using tun/tap. This has the added benefit of avoiding a lot
+>>  of the complexity of the tty line discipline code you have.
+>
+> We had some discussion too if to just make the lt an userspace stack, =
+I=20
+> personally like how it is currently implemented because existing code=20
+> can run basically without modification.
+>
+> I would propose at this stage to change the TashTalk driver to remove=20
+> ndo_do_ioctl and to use a custom callback, if this ok.
 
-While reviewing this, I noticed that octeon can leave the HW in an
-inconsistent state during upd_txsa and upd_rxsa: these ops do 2
-separate changes that can both fail, and if the 2nd change fails, we
-don't roll back the first change. This is an older issue (not
-introduced by this patch) and can be looked at later (I don't know
-what happens to the HW and why setting the PN would fail, maybe it's
-not recoverable at that point).
+It looks like you still need a custom userspace tool to set up
+the uart for your new driver, so my feeling would be that having a
+userspace bridge to implement the localtalk/uart to ethertalk/tap
+driver would actually be nicer for both usability and maintenance.
 
--- 
-Sabrina
+It's not something we need to decide now though, and is up to
+you in the end.
 
+      Arnd
 
