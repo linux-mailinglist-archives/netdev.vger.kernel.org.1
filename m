@@ -1,84 +1,116 @@
-Return-Path: <netdev+bounces-39409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB90B7BF10A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:42:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 683967BF110
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE8C1C20A11
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:42:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955A41C20AAF
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E7C38C;
-	Tue, 10 Oct 2023 02:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YOfweUPi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDBC390;
+	Tue, 10 Oct 2023 02:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28294361
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:42:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E1ABC433C7;
-	Tue, 10 Oct 2023 02:42:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696905772;
-	bh=WkoJ/Jatt7ehaS0mf0TQB3j7edh/9ZJslhYaC7s63JI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YOfweUPibfP3MB6pfrKxWBwhUTKXgUQ/nOotvbhXBwU0rHoZuuXFklMJdllX0ayKd
-	 Eb2Z7+OZwd/UEGYaqquPYKubvmsyl7MYuaC9bAdEIT1MjeLNPW48c3Aye/B0O1CG3V
-	 iQWOZO2aq61tqD3H0wcHAhn3+Wo/njh6EZ2I7DDC1XP1RiVYE/i1LAGvXWrdceSc2C
-	 6OZ3bx6zSl+SYwcf4AXr/lvZlqUzIyTlelimqDzKW6TWYRluQWzPyKytIHoi1eZn8B
-	 b8IUUEObvrogXDah2NIXpYWq5CFVG6e86itvWPIse9XYf9FRfDIJjE3AuMfvdIIwCT
-	 8thpG5/6S1uww==
-Date: Mon, 9 Oct 2023 19:42:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, vadim.fedorenko@linux.dev, lkp@intel.com,
- horms@kernel.org, Sean Tranchetti <quic_stranche@quicinc.com>
-Subject: Re: [PATCH net-next v4] net: qualcomm: rmnet: Add side band flow
- control support
-Message-ID: <20231009194251.641e9134@kernel.org>
-In-Reply-To: <20231006001614.1678782-1-quic_subashab@quicinc.com>
-References: <20231006001614.1678782-1-quic_subashab@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28046361
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:47:54 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C89B9E;
+	Mon,  9 Oct 2023 19:47:53 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.201])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S4Kxc1kK7z6D8Zj;
+	Tue, 10 Oct 2023 10:44:52 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 10 Oct 2023 03:47:50 +0100
+Message-ID: <017a5263-13b9-1b07-4bb2-52754585f2ac@huawei.com>
+Date: Tue, 10 Oct 2023 05:47:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v12 09/12] selftests/landlock: Share enforce_ruleset()
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
+ <20230920092641.832134-10-konstantin.meskhidze@huawei.com>
+ <20231001.Aiv7Chaedei0@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <20231001.Aiv7Chaedei0@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu,  5 Oct 2023 17:16:14 -0700 Subash Abhinov Kasiviswanathan wrote:
-> Individual rmnet devices map to specific network types such as internet,
-> multimedia messaging services, IP multimedia subsystem etc. Each of
-> these network types may support varying quality of service for different
-> bearers or traffic types.
-> 
-> The physical device interconnect to radio hardware may support a
-> higher data rate than what is actually supported by the radio network.
-> Any packets transmitted to the radio hardware which exceed the radio
-> network data rate limit maybe dropped. This patch tries to minimize the
-> loss of packets by adding support for bearer level flow control within a
-> rmnet device by ensuring that the packets transmitted do not exceed the
-> limit allowed by the radio network.
-> 
-> In order to support multiple bearers, rmnet must be created as a
-> multiqueue TX netdevice. Radio hardware communicates the supported
-> bearer information for a given network via side band signalling.
-> Consider the following mapping -
-> 
-> IPv4 UDP port 1234 - Mark 0x1001 - Queue 1
-> IPv6 TCP port 2345 - Mark 0x2001 - Queue 2
-> 
-> iptables can be used to install filters which mark packets matching these
-> specific traffic patterns and the RMNET_QUEUE_MAPPING_ADD operation can
-> then be to install the mapping of the mark to the specific txqueue.
 
-I don't understand why you need driver specific commands to do this.
-It should be easily achievable using existing TC qdisc infra.
-What's the gap?
+
+10/2/2023 11:26 PM, Mickaël Salaün пишет:
+> On Wed, Sep 20, 2023 at 05:26:37PM +0800, Konstantin Meskhidze wrote:
+>> This commit moves enforce_ruleset() helper function to common.h so that
+>> it can be used both by filesystem tests and network ones.
+>> 
+>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> ---
+>> 
+>> Changes since v11:
+>> * None.
+>> 
+> 
+>> diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
+>> index 251594306d40..7c94d3933b68 100644
+>> --- a/tools/testing/selftests/landlock/fs_test.c
+>> +++ b/tools/testing/selftests/landlock/fs_test.c
+>> @@ -677,17 +677,7 @@ static int create_ruleset(struct __test_metadata *const _metadata,
+>>  	return ruleset_fd;
+>>  }
+>> 
+>> -static void enforce_ruleset(struct __test_metadata *const _metadata,
+>> -			    const int ruleset_fd)
+>> -{
+>> -	ASSERT_EQ(0, prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0));
+>> -	ASSERT_EQ(0, landlock_restrict_self(ruleset_fd, 0))
+>> -	{
+>> -		TH_LOG("Failed to enforce ruleset: %s", strerror(errno));
+>> -	}
+>> -}
+>> -
+>> -TEST_F_FORK(layout0, proc_nsfs)
+>> +TEST_F_FORK(layout1, proc_nsfs)
+> 
+> Why this change?
+
+  Looks like a bug coming from v11 version.
+  You have added layout0 recently. in V11 version
+  there was TEST_F_FORK(layout1, proc_nsfs), and I missed the changed
+  , resolving conflict with layout1.
+  Will be fixed. Thanks.
+> 
+>>  {
+>>  	const struct rule rules[] = {
+>>  		{
+>> --
+>> 2.25.1
+>> 
+> .
 
