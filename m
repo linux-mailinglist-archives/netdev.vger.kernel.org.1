@@ -1,146 +1,122 @@
-Return-Path: <netdev+bounces-39452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5087BF4A3
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:43:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F747BF4A5
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:44:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1D491C20A62
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:43:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E34E28172D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED4FFBEC;
-	Tue, 10 Oct 2023 07:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC33CFBF6;
+	Tue, 10 Oct 2023 07:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Fv1gD1zv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7055E4435
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:43:07 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 936CA92
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:43:05 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qq7OK-0007AR-Op; Tue, 10 Oct 2023 09:42:56 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qq7OK-000bhI-7R; Tue, 10 Oct 2023 09:42:56 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D04022332F5;
-	Tue, 10 Oct 2023 07:42:55 +0000 (UTC)
-Date: Tue, 10 Oct 2023 09:42:55 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Francois Romieu <romieu@fr.zoreil.com>,
-	Kalle Valo <kvalo@kernel.org>, Wei Fang <wei.fang@nxp.com>,
-	kernel@pengutronix.de, stable@vger.kernel.org
-Subject: Re: [PATCH net] net: davicom: dm9000: dm9000_phy_write(): fix
- deadlock during netdev watchdog handling
-Message-ID: <20231010-smite-populace-090139229be1-mkl@pengutronix.de>
-References: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BE1D2F6
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:44:05 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BBAE9F
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:44:04 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5334f9a56f6so9161285a12.3
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696923843; x=1697528643; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QVEQlE8CCIVwnGqK4YUqVY53iGiWzOI0vN++OTPijXI=;
+        b=Fv1gD1zvbwzj8xqoaspwQSGZfY/xNOAagvhZNyXStLh9LcYD30fCPwI1fgX2HnDV8G
+         YZzkG/fzijPtnQ2eIajXgEsnrxZAowvLnHDDQ3CITSZsLVd8UiUHSWRrMIVDLkufYplz
+         yFQUbrXLioql/QcPkARRgzPURLVTDRy2kDhieLH8hU1Xc0GsbXzqly/INX36zHCgBP+4
+         UAGmGleelIZyiacwYv3v3NIuik5wCd/BEDF9C9+HUbzi/EaMnSktdjcAarneVzzlBa2b
+         vbqQwlzT/CuMI6655GL8Te0lPGDuwD75ujlXZcp4DYHOIRP91YPb7dhs18fdQWWasVN9
+         Gn9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696923843; x=1697528643;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QVEQlE8CCIVwnGqK4YUqVY53iGiWzOI0vN++OTPijXI=;
+        b=SQ3WoEQLotf3jwySJiqEyZ8rdFxq+/v7xdi3dqrC8TPSgeq3EY2My4y/nwRsRK6CsX
+         MHztjcW+3fOoRpUcWWfy6gNfXpumVF75cr/5qLjKyMj5Vu/HoNfajTGoaibBuOVh9Ut2
+         qD0DJdDzU8kmiHdBC2wNMv1NJM/dWO5ONw//hR4poxg/9E4tNf14QTBIVgAqLvlYH+4P
+         CkEEObOKUCKQ2ooflyxiE92vj9vms7wkKo4Ieb5TCYD8G4WUMDfkUTfh3HpQRBncCq+V
+         nld6yjTyFI+DoBXvS1br+6rTj1jFXd/fVVE66KmcbVGwIi5u4oR0SrJJopfMO1KD23wl
+         UIXA==
+X-Gm-Message-State: AOJu0Yw7QjrIumzomkRd9XcqLh0nwzCrsigcJ1rCt7KR49CXQmb2en2s
+	QpRjflqby0CmPh8yyYBHp72kZA==
+X-Google-Smtp-Source: AGHT+IFL1RLTSKOpPDsX7c9Y6kK6SnX0Eigk+JI0p0u06K7LwkxKxcdtMGpejJCVdqaTlJBwab2cTA==
+X-Received: by 2002:a05:6402:1257:b0:530:c363:449c with SMTP id l23-20020a056402125700b00530c363449cmr13150716edw.40.1696923842725;
+        Tue, 10 Oct 2023 00:44:02 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id o14-20020aa7c50e000000b0052595b17fd4sm7153292edq.26.2023.10.10.00.44.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 00:44:02 -0700 (PDT)
+Date: Tue, 10 Oct 2023 09:44:00 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH net-next v4 0/5] dpll: add phase-offset and phase-adjust
+Message-ID: <ZSUAwPOy8HAsB4+8@nanopsycho>
+References: <20231009222616.12163-1-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2ujovxvoj2fa5hkv"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20231009222616.12163-1-arkadiusz.kubalewski@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Tue, Oct 10, 2023 at 12:26:11AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>Improve monitoring and control over dpll devices.
+>Allow user to receive measurement of phase difference between signals
+>on pin and dpll (phase-offset).
+>Allow user to receive and control adjustable value of pin's signal
+>phase (phase-adjust).
+>
+>v3->v4:
+>- do not increase do version of uAPI header as it is not needed (v3 did
+>  not have this change)
+>- fix spelling around commit messages, argument descriptions and docs
+>- add missing extack errors on failure set callbacks for pin phase
+>  adjust and frequency
+>- remove ice check if value is already set, now redundant as checked in
+>  the dpll subsystem
+>
+>v2->v3:
+>- do not increase do version of uAPI header as it is not needed
+>
+>v1->v2:
+>- improve handling for error case of requesting the phase adjust set
+>- align handling for error case of frequency set request with the
+>approach introduced for phase adjust
+>
+>
+>Arkadiusz Kubalewski (5):
+>  dpll: docs: add support for pin signal phase offset/adjust
+>  dpll: spec: add support for pin-dpll signal phase offset/adjust
+>  dpll: netlink/core: add support for pin-dpll signal phase
+>    offset/adjust
+>  ice: dpll: implement phase related callbacks
+>  dpll: netlink/core: change pin frequency set behavior
 
---2ujovxvoj2fa5hkv
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 10.10.2023 09:35:19, Marc Kleine-Budde wrote:
-> The dm9000 takes the db->lock spin lock in dm9000_timeout() and calls
-> into dm9000_init_dm9000(). For the DM9000B the PHY is reset with
-> dm9000_phy_write(). That function again takes the db->lock spin lock,
-> which results in a deadlock. For reference the backtrace:
->=20
-> | [<c0425050>] (rt_spin_lock_slowlock_locked) from [<c0425100>] (rt_spin_=
-lock_slowlock+0x60/0xc4)
-> | [<c0425100>] (rt_spin_lock_slowlock) from [<c02e1174>] (dm9000_phy_writ=
-e+0x2c/0x1a4)
-> | [<c02e1174>] (dm9000_phy_write) from [<c02e16b0>] (dm9000_init_dm9000+0=
-x288/0x2a4)
-> | [<c02e16b0>] (dm9000_init_dm9000) from [<c02e1724>] (dm9000_timeout+0x5=
-8/0xd4)
-> | [<c02e1724>] (dm9000_timeout) from [<c036f298>] (dev_watchdog+0x258/0x2=
-a8)
-> | [<c036f298>] (dev_watchdog) from [<c0068168>] (call_timer_fn+0x20/0x88)
-> | [<c0068168>] (call_timer_fn) from [<c00687c8>] (expire_timers+0xf0/0x19=
-4)
-> | [<c00687c8>] (expire_timers) from [<c0068920>] (run_timer_softirq+0xb4/=
-0x25c)
-> | [<c0068920>] (run_timer_softirq) from [<c0021a30>] (do_current_softirqs=
-+0x16c/0x228)
-> | [<c0021a30>] (do_current_softirqs) from [<c0021b14>] (run_ksoftirqd+0x2=
-8/0x4c)
-> | [<c0021b14>] (run_ksoftirqd) from [<c0040488>] (smpboot_thread_fn+0x278=
-/0x290)
-> | [<c0040488>] (smpboot_thread_fn) from [<c003c28c>] (kthread+0x124/0x164)
-> | [<c003c28c>] (kthread) from [<c00090f0>] (ret_from_fork+0x14/0x24)
->=20
-> To workaround similar problem (take mutex inside spin lock ) , a
-> "in_timeout" variable was added in 582379839bbd ("dm9000: avoid
-> sleeping in dm9000_timeout callback"). Use this variable and not take
-> the spin lock inside dm9000_phy_write() if in_timeout is true.
->=20
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-
-Fixes: a1365275e745 ("[PATCH] DM9000 network driver")
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---2ujovxvoj2fa5hkv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUlAHwACgkQvlAcSiqK
-BOjNsAf/WenQ7YsHEiBxYftZny6AIRNMWWzyxI4UVTNYDHd8ygrFvirD5fUpRVuM
-7DFpjUs2RDe30UqZ9z4u/mDH6ZK/pXvM2+MSYfJoDJhP62Y3Zp2jaOW24A90ahIb
-U953NIKiuDofWEzKOe/h34TvUvWOMo1FbbWlWF4P0Wd6uIOE76qyRkkjEA7S49Z7
-XH07fXYZxBHYdj4IYgZ21sRDRRIzLtG1xtPWqswhVUmwcfP1DhJaR7Iatg/hpF0c
-npaAlDLgxJw7mggWfr7wEXlIyRm3OqnjCn0z4RMPNJ8ZDzBOMtyHbaSKH9dqo9bX
-sVn2AjxEVOXnlL88yYMDGVIwA9A0XA==
-=uL7L
------END PGP SIGNATURE-----
-
---2ujovxvoj2fa5hkv--
+I'm fine with the set at is now. Thanks!
+set-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
