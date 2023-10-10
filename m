@@ -1,509 +1,106 @@
-Return-Path: <netdev+bounces-39485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA9F7BF74B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:28:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4F717BF74C
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9C01C209F3
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:28:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02C5E1C20993
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3FD171D5;
-	Tue, 10 Oct 2023 09:28:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C646171D7;
+	Tue, 10 Oct 2023 09:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Q+s4sXD1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="etcjmszM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2D416429
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:28:17 +0000 (UTC)
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4286D9F
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:28:15 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4S4Vtz202czMpr1s;
-	Tue, 10 Oct 2023 09:28:11 +0000 (UTC)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4S4Vty53SBzMppKY;
-	Tue, 10 Oct 2023 11:28:10 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1696930091;
-	bh=Tm02KWhRuJGPoivUakg/q0pWMKrrvmszjUtSRvhKssQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q+s4sXD1Qr9AGSh9WysGl39h2YqVQ5h4NO48d93TPq6KOMhtv+mbtpZwFEVQPY6NE
-	 CTPF35iHRkeBVRjN89mjFCz5TxTZ2zIFtYFOWzqJj9L6BQDTpju80nPxcGF+D84g4i
-	 q10S7jQVfAjYbhMsl/oO61vVf8J7pqoucz9L6T8U=
-Date: Tue, 10 Oct 2023 11:28:09 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH v12 08/12] landlock: Add network rules and TCP hooks
- support
-Message-ID: <20231010.Queiwi7ohngi@digikod.net>
-References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
- <20230920092641.832134-9-konstantin.meskhidze@huawei.com>
- <20231001.oobeez8AeYae@digikod.net>
- <d549bf7c-bf7a-939a-4aa7-a438abbc2e4d@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC093EAF9
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 09:29:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3134F94
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:29:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696930140;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OxCiYvYV9qvLPGaQcB0kw4NAjm9ttFkbDiaJd+SrBGA=;
+	b=etcjmszMFTmkBJXIXsHS7MxZ/qnOFmUjPlPJyjoW5/VA0wqfNsY97+ZtUdVooifRvRHz3F
+	vb0uvUlCIdnfLi23X2UnKyr3CkVqvE6iVuz2mHItuyB1fAZZuR0+pWsYJqTFj6W+y79SXi
+	5HMRAc5ScRlGKItCNti8H6FjOdJXxFI=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-YJBDyET7NDSCDMG1gbbRiQ-1; Tue, 10 Oct 2023 05:28:57 -0400
+X-MC-Unique: YJBDyET7NDSCDMG1gbbRiQ-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-534c9a316cbso821547a12.1
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:28:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696930136; x=1697534936;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OxCiYvYV9qvLPGaQcB0kw4NAjm9ttFkbDiaJd+SrBGA=;
+        b=qOvi2mX0vUeYAkTGEcnMqrtpPVZrjUNGEamn9NPa0hLxV0/LqKNdPlwMLA5GWmhFUo
+         GGwBakwojSHj3HSosciCEqoXWj5X/yXuWT1CLf8uv2MwB8665ZJeJ6e71xqbU7Ca3uEv
+         YcBOjtwARPtWMUn8ZS0aNH3bEUpkLD0HRmQ5myRJz+dg9ZZKoRqclspkI0zvEhBmzMHd
+         5gS7b1VXEOZGsed04iroaTMXZd3aKxZOwuNQucLC2Qut/ytZuzZqDFxFCumsueNjZYbc
+         ako+a9rqmexHjm/gZLpFPrMSqc0X1hDCKFn+KrolT7lNLPR9w+Y9a+/ndGUopnn7DRNw
+         N2OA==
+X-Gm-Message-State: AOJu0Yxm3TdnHUoXKptIQuweLWZSLtnapMVlYvyrxu4u9ccwrWYT1yay
+	GxC+jBr8um3opuU3yHwpMyczzt59fXwSS+xAcxh3Ac79JU0ia0qrg5Mgaen5LMrbeQ0oGGz8jyL
+	BQjCP5xpgJmZydeZ7b8MxTccd
+X-Received: by 2002:a05:6402:40c2:b0:523:37cf:6f37 with SMTP id z2-20020a05640240c200b0052337cf6f37mr14733549edb.4.1696930136466;
+        Tue, 10 Oct 2023 02:28:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJPAx0QHx22OMargM+EBFoGBj2R+pr1dyTcELronIVBN9Cn975WI9liuJm10euXLGllBG8kw==
+X-Received: by 2002:a05:6402:40c2:b0:523:37cf:6f37 with SMTP id z2-20020a05640240c200b0052337cf6f37mr14733531edb.4.1696930136150;
+        Tue, 10 Oct 2023 02:28:56 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-228-243.dyn.eolo.it. [146.241.228.243])
+        by smtp.gmail.com with ESMTPSA id c6-20020aa7c746000000b00537f5e85ea0sm7326021eds.13.2023.10.10.02.28.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Oct 2023 02:28:55 -0700 (PDT)
+Message-ID: <39546eb7836e577b53a3b403a2bb20ec07010f25.camel@redhat.com>
+Subject: Re: [net-next PATCH] octeon_ep: pack hardware structures
+From: Paolo Abeni <pabeni@redhat.com>
+To: Shinas Rasheed <srasheed@marvell.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, hgani@marvell.com
+Cc: egallen@redhat.com, mschmidt@redhat.com, Veerasenareddy Burru
+ <vburru@marvell.com>, Sathesh Edara <sedara@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Date: Tue, 10 Oct 2023 11:28:54 +0200
+In-Reply-To: <20231006120225.2259533-1-srasheed@marvell.com>
+References: <20231006120225.2259533-1-srasheed@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d549bf7c-bf7a-939a-4aa7-a438abbc2e4d@huawei.com>
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 06:29:56AM +0300, Konstantin Meskhidze (A) wrote:
-> 
-> 
-> 10/2/2023 11:26 PM, Mickaël Salaün пишет:
-> > Thanks for this new version Konstantin. I pushed this series, with minor
-> > changes, to -next. So far, no warning. But it needs some changes, mostly
-> > kernel-only, but also one with the handling of port 0 with bind (see my
-> > review below).
-> > 
-> > On Wed, Sep 20, 2023 at 05:26:36PM +0800, Konstantin Meskhidze wrote:
-> > > This commit adds network rules support in the ruleset management
-> > > helpers and the landlock_create_ruleset syscall.
-> > > Refactor user space API to support network actions. Add new network
-> > > access flags, network rule and network attributes. Increment Landlock
-> > > ABI version. Expand access_masks_t to u32 to be sure network access
-> > > rights can be stored. Implement socket_bind() and socket_connect()
-> > > LSM hooks, which enables to restrict TCP socket binding and connection
-> > > to specific ports.
-> > > The new landlock_net_port_attr structure has two fields. The allowed_access
-> > > field contains the LANDLOCK_ACCESS_NET_* rights. The port field contains
-> > > the port value according to the allowed protocol. This field can
-> > > take up to a 64-bit value [1] but the maximum value depends on the related
-> > > protocol (e.g. 16-bit for TCP).
-> > > 
-> > > [1]
-> > > https://lore.kernel.org/r/278ab07f-7583-a4e0-3d37-1bacd091531d@digikod.net
-> > > 
-> > > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > > Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> > > ---
-> > > 
-> > > Changes since v11:
-> > > * Replace dates with "2022-2023" in net.c/h files headers.
-> > > * Removes WARN_ON_ONCE(!domain) in check_socket_access().
-> > > * Using "typeof(*address)" instead of offsetofend(struct sockaddr, sa_family).
-> > > * Renames LANDLOCK_RULE_NET_SERVICE to LANDLOCK_RULE_NET_PORT.
-> > > * Renames landlock_net_service_attr to landlock_net_port_attr.
-> > > * Defines two add_rule_net_service() functions according to
-> > >   IS_ENABLED(CONFIG_INET) instead of changing the body of the only
-> > >   function.
-> > > * Adds af_family consistency check while handling AF_UNSPEC specifically.
-> > > * Adds bind_access_mask in add_rule_net_service() to deny all rules with bind
-> > >   action on port zero.
-> > > * Minor fixes.
-> > > * Refactors commit message.
-> > > 
-> > > Changes since v10:
-> > > * Removes "packed" attribute.
-> > > * Applies Mickaёl's patch with some refactoring.
-> > > * Deletes get_port() and check_addrlen() helpers.
-> > > * Refactors check_socket_access() by squashing get_port() and
-> > >   check_addrlen() helpers into it.
-> > > * Fixes commit message.
-> > > 
-> > > Changes since v9:
-> > > * Changes UAPI port field to __u64.
-> > > * Moves shared code into check_socket_access().
-> > > * Adds get_raw_handled_net_accesses() and
-> > >   get_current_net_domain() helpers.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v8:
-> > > * Squashes commits.
-> > > * Refactors commit message.
-> > > * Changes UAPI port field to __be16.
-> > > * Changes logic of bind/connect hooks with AF_UNSPEC families.
-> > > * Adds address length checking.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v7:
-> > > * Squashes commits.
-> > > * Increments ABI version to 4.
-> > > * Refactors commit message.
-> > > * Minor fixes.
-> > > 
-> > > Changes since v6:
-> > > * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
-> > >   because it OR values.
-> > > * Makes landlock_add_net_access_mask() more resilient incorrect values.
-> > > * Refactors landlock_get_net_access_mask().
-> > > * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
-> > >   LANDLOCK_NUM_ACCESS_FS as value.
-> > > * Updates access_masks_t to u32 to support network access actions.
-> > > * Refactors landlock internal functions to support network actions with
-> > >   landlock_key/key_type/id types.
-> > > 
-> > > Changes since v5:
-> > > * Gets rid of partial revert from landlock_add_rule
-> > > syscall.
-> > > * Formats code with clang-format-14.
-> > > 
-> > > Changes since v4:
-> > > * Refactors landlock_create_ruleset() - splits ruleset and
-> > > masks checks.
-> > > * Refactors landlock_create_ruleset() and landlock mask
-> > > setters/getters to support two rule types.
-> > > * Refactors landlock_add_rule syscall add_rule_path_beneath
-> > > function by factoring out get_ruleset_from_fd() and
-> > > landlock_put_ruleset().
-> > > 
-> > > Changes since v3:
-> > > * Splits commit.
-> > > * Adds network rule support for internal landlock functions.
-> > > * Adds set_mask and get_mask for network.
-> > > * Adds rb_root root_net_port.
-> > > 
-> > > ---
-> > >  include/uapi/linux/landlock.h                |  47 ++++
-> > >  security/landlock/Kconfig                    |   3 +-
-> > >  security/landlock/Makefile                   |   2 +
-> > >  security/landlock/limits.h                   |   5 +
-> > >  security/landlock/net.c                      | 241 +++++++++++++++++++
-> > >  security/landlock/net.h                      |  35 +++
-> > >  security/landlock/ruleset.c                  |  62 ++++-
-> > >  security/landlock/ruleset.h                  |  59 ++++-
-> > >  security/landlock/setup.c                    |   2 +
-> > >  security/landlock/syscalls.c                 |  33 ++-
-> > >  tools/testing/selftests/landlock/base_test.c |   2 +-
-> > >  11 files changed, 467 insertions(+), 24 deletions(-)
-> > >  create mode 100644 security/landlock/net.c
-> > >  create mode 100644 security/landlock/net.h
-> > > 
-> > > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> > > index 81d09ef9aa50..3b8400e8a4d9 100644
-> > > --- a/include/uapi/linux/landlock.h
-> > > +++ b/include/uapi/linux/landlock.h
-> > > @@ -31,6 +31,12 @@ struct landlock_ruleset_attr {
-> > >  	 * this access right.
-> > >  	 */
-> > >  	__u64 handled_access_fs;
-> > > +	/**
-> > > +	 * @handled_access_net: Bitmask of actions (cf. `Network flags`_)
-> > > +	 * that is handled by this ruleset and should then be forbidden if no
-> > > +	 * rule explicitly allow them.
-> > > +	 */
-> > > +	__u64 handled_access_net;
-> > >  };
-> > > 
-> > >  /*
-> > > @@ -54,6 +60,11 @@ enum landlock_rule_type {
-> > >  	 * landlock_path_beneath_attr .
-> > >  	 */
-> > >  	LANDLOCK_RULE_PATH_BENEATH = 1,
-> > > +	/**
-> > > +	 * @LANDLOCK_RULE_NET_PORT: Type of a &struct
-> > > +	 * landlock_net_port_attr .
-> > > +	 */
-> > > +	LANDLOCK_RULE_NET_PORT = 2,
-> > >  };
-> > > 
-> > >  /**
-> > > @@ -79,6 +90,23 @@ struct landlock_path_beneath_attr {
-> > >  	 */
-> > >  } __attribute__((packed));
-> > > 
-> > > +/**
-> > > + * struct landlock_net_port_attr - Network service definition
-> > 
-> > "Network port definition"
-> 
->    Ok. Thanks.
-> > 
-> > 
-> > > diff --git a/security/landlock/Kconfig b/security/landlock/Kconfig
-> > > index c1e862a38410..10c099097533 100644
-> > > --- a/security/landlock/Kconfig
-> > > +++ b/security/landlock/Kconfig
-> > > @@ -2,7 +2,8 @@
-> > > 
-> > >  config SECURITY_LANDLOCK
-> > >  	bool "Landlock support"
-> > > -	depends on SECURITY
-> > > +	depends on SECURITY && !ARCH_EPHEMERAL_INODES
-> > 
-> > !ARCH_EPHEMERAL_INODES is definitely gone now.
-> 
->   Ok. Got it.
-> > 
-> > > +	select SECURITY_NETWORK
-> > >  	select SECURITY_PATH
-> > >  	help
-> > >  	  Landlock is a sandboxing mechanism that enables processes to restrict
-> > > diff --git a/security/landlock/Makefile b/security/landlock/Makefile
-> > > index 7bbd2f413b3e..53d3c92ae22e 100644
-> > > --- a/security/landlock/Makefile
-> > > +++ b/security/landlock/Makefile
-> > > @@ -2,3 +2,5 @@ obj-$(CONFIG_SECURITY_LANDLOCK) := landlock.o
-> > > 
-> > >  landlock-y := setup.o syscalls.o object.o ruleset.o \
-> > >  	cred.o ptrace.o fs.o
-> > > +
-> > > +landlock-$(CONFIG_INET) += net.o
-> > > \ No newline at end of file
-> > > diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-> > > index bafb3b8dc677..93c9c6f91556 100644
-> > > --- a/security/landlock/limits.h
-> > > +++ b/security/landlock/limits.h
-> > > @@ -23,6 +23,11 @@
-> > >  #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
-> > >  #define LANDLOCK_SHIFT_ACCESS_FS	0
-> > > 
-> > > +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > > +#define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
-> > > +#define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
-> > > +#define LANDLOCK_SHIFT_ACCESS_NET	LANDLOCK_NUM_ACCESS_FS
-> > > +
-> > >  /* clang-format on */
-> > > 
-> > >  #endif /* _SECURITY_LANDLOCK_LIMITS_H */
-> > > diff --git a/security/landlock/net.c b/security/landlock/net.c
-> > > new file mode 100644
-> > > index 000000000000..62b830653e25
-> > > --- /dev/null
-> > > +++ b/security/landlock/net.c
-> > > @@ -0,0 +1,241 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-only
-> > > +/*
-> > > + * Landlock LSM - Network management and hooks
-> > > + *
-> > > + * Copyright © 2022-2023 Huawei Tech. Co., Ltd.
-> > > + * Copyright © 2022-2023 Microsoft Corporation
-> > > + */
-> > > +
-> > > +#include <linux/in.h>
-> > > +#include <linux/net.h>
-> > > +#include <linux/socket.h>
-> > > +#include <net/ipv6.h>
-> > > +
-> > > +#include "common.h"
-> > > +#include "cred.h"
-> > > +#include "limits.h"
-> > > +#include "net.h"
-> > > +#include "ruleset.h"
-> > > +
-> > > +int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
-> > > +			     const u16 port, access_mask_t access_rights)
-> > 
-> > This function is only used in add_rule_net_service(), so it should not
-> > be exported, and we can merge it (into landlock_add_rule_net_port).
-> > 
->  Do I have to ignore it according your next mail thread:
->  https://lore.kernel.org/netdev/20231009.meet7uTaeghu@digikod.net/
-> ????
+On Fri, 2023-10-06 at 05:02 -0700, Shinas Rasheed wrote:
+> Add packed attribute to hardware structures.
 
-Yes please ignore this part, the latest mail prevails. This should be a
-static function.
+Could you please elaborate a bit more why this is needed? Is this a
+bugfix? Or something needed by later changes? Please update the
+changelog accordingly
 
-> > > +{
-> > > +	int err;
-> > > +	const struct landlock_id id = {
-> > > +		.key.data = (__force uintptr_t)htons(port),
-> > > +		.type = LANDLOCK_KEY_NET_PORT,
-> > > +	};
-> > > +
-> > > +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
-> > > +
-> > > +	/* Transforms relative access rights to absolute ones. */
-> > > +	access_rights |= LANDLOCK_MASK_ACCESS_NET &
-> > > +			 ~landlock_get_net_access_mask(ruleset, 0);
-> > > +
-> > > +	mutex_lock(&ruleset->lock);
-> > > +	err = landlock_insert_rule(ruleset, id, access_rights);
-> > > +	mutex_unlock(&ruleset->lock);
-> > > +
-> > > +	return err;
-> > > +}
-> > > +
-> > > +int add_rule_net_service(struct landlock_ruleset *ruleset,
-> > 
-> > We should only export functions with a "landlock_" prefix, and "service"
-> > is now replaced with "port", which gives landlock_add_rule_net_port().
-> > 
-> > For consistency, we should also rename add_rule_path_beneath() into
-> > landlock_add_rule_path_beneath(), move it into fs.c, and merge
-> > landlock_append_fs_rule() into it (being careful to not move the related
-> > code to ease review). This change should be part of the "landlock:
-> > Refactor landlock_add_rule() syscall" patch. Please be careful to keep
-> > the other changes happening in other patches.
-> > 
->   Should I still update prefix according your suggestions (keep
-> add_rule_net_service() in syscalls.c) in the next mail thread or keep it as
-> it is:
->   https://lore.kernel.org/netdev/20231009.meet7uTaeghu@digikod.net/
-> ????
+Thanks!
 
-No, the prefix notation is only useful for exported functions, just
-renamed it to add_rule_net_port() and make it static.
+Paolo
 
-> > 
-> > > +			 const void __user *const rule_attr)
-> > > +{
-> > > +	struct landlock_net_port_attr net_port_attr;
-> > > +	int res;
-> > > +	access_mask_t mask, bind_access_mask;
-> > > +
-> > > +	/* Copies raw user space buffer. */
-> > > +	res = copy_from_user(&net_port_attr, rule_attr, sizeof(net_port_attr));
-> > 
-> > We should include <linux/uaccess.h> because of copy_from_user().
-> > 
-> > Same for landlock_add_rule_path_beneath().
-
-Same as above, this is not relevant anymore.
-
-> > 
-> > > +	if (res)
-> > > +		return -EFAULT;
-> > > +
-> > > +	/*
-> > > +	 * Informs about useless rule: empty allowed_access (i.e. deny rules)
-> > > +	 * are ignored by network actions.
-> > > +	 */
-> > > +	if (!net_port_attr.allowed_access)
-> > > +		return -ENOMSG;
-> > > +
-> > > +	/*
-> > > +	 * Checks that allowed_access matches the @ruleset constraints
-> > > +	 * (ruleset->access_masks[0] is automatically upgraded to 64-bits).
-> > > +	 */
-> > > +	mask = landlock_get_net_access_mask(ruleset, 0);
-> > > +	if ((net_port_attr.allowed_access | mask) != mask)
-> > > +		return -EINVAL;
-> > > +
-> > > +	/*
-> > > +	 * Denies inserting a rule with port 0 (for bind action) or
-> > > +	 * higher than 65535.
-> > > +	 */
-> > > +	bind_access_mask = net_port_attr.allowed_access &
-> > > +			   LANDLOCK_ACCESS_NET_BIND_TCP;
-> > > +	if (((net_port_attr.port == 0) &&
-> > > +	     (bind_access_mask == LANDLOCK_ACCESS_NET_BIND_TCP)) ||
-> > 
-> > For context about "port 0 binding" see
-> > https://lore.kernel.org/all/7cb458f1-7aff-ccf3-abfd-b563bfc65b84@huawei.com/
-> > 
-> > I previously said:
-> > > > > To say it another way, we should not allow to add a rule with port
-> > > > > 0 for
-> > > > > LANDLOCK_ACCESS_NET_BIND_TCP, but return -EINVAL in this case. This
-> > > > > limitation should be explained, documented and tested.
-> > 
-> > Thinking more about this port 0 for bind (and after an interesting
-> > discussion with Eric), it would be a mistake to forbid a rule to bind on
-> > port 0 because this is very useful for some network services, and
-> > because it would not be reasonable to have an LSM hook to control such
-> > "random ports". Instead we should document what using this value means
-> > (i.e. pick a dynamic available port in a range defined by the sysadmin)
-> > and highlight the fact that it is controlled with the
-> > /proc/sys/net/ipv4/ip_local_port_range sysctl, which is also used by
-> > IPv6.
-> > 
-> > We then need to test binding on port zero by getting the binded port
-> > (cf. getsockopt/getsockname) and checking that we can indeed connect to
-> > it.
-> 
->   So like I understand refactoring will be like this:
-> 	1. Allow bind for zero port.
-> 	2. Update tests:
-> 		- add rule with port 0;
-> 		- bind "random" port;
-> 		- using getsockname to get binded port;
-> 		- connect to the socket using binded port;
-> 		
->  Correct??
-
-Yes. You can also extend this test to try binding to a lower port (e.g.
-1024, value of srv0.port), not part of ip_local_port_range, which should
-then be denied.
-
-> > 
-> > > +	    (net_port_attr.port > U16_MAX))
-> > > +		return -EINVAL;
-> > > +
-> > > +	/* Imports the new rule. */
-> > > +	return landlock_append_net_rule(ruleset, net_port_attr.port,
-> > > +					net_port_attr.allowed_access);
-> > > +}
-> > 
-> > > diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
-> > > index 1ede2b9a79b7..9bd0483c64d4 100644
-> > > --- a/security/landlock/ruleset.h
-> > > +++ b/security/landlock/ruleset.h
-> > > @@ -33,13 +33,16 @@
-> > >  typedef u16 access_mask_t;
-> > >  /* Makes sure all filesystem access rights can be stored. */
-> > >  static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_FS);
-> > > +/* Makes sure all network access rights can be stored. */
-> > > +static_assert(BITS_PER_TYPE(access_mask_t) >= LANDLOCK_NUM_ACCESS_NET);
-> > >  /* Makes sure for_each_set_bit() and for_each_clear_bit() calls are OK. */
-> > >  static_assert(sizeof(unsigned long) >= sizeof(access_mask_t));
-> > > 
-> > >  /* Ruleset access masks. */
-> > > -typedef u16 access_masks_t;
-> > > +typedef u32 access_masks_t;
-> > >  /* Makes sure all ruleset access rights can be stored. */
-> > > -static_assert(BITS_PER_TYPE(access_masks_t) >= LANDLOCK_NUM_ACCESS_FS);
-> > > +static_assert(BITS_PER_TYPE(access_masks_t) >=
-> > > +	      LANDLOCK_NUM_ACCESS_FS + LANDLOCK_NUM_ACCESS_NET);
-> > > 
-> > >  typedef u16 layer_mask_t;
-> > >  /* Makes sure all layers can be checked. */
-> > > @@ -84,6 +87,11 @@ enum landlock_key_type {
-> > >  	 * keys.
-> > >  	 */
-> > >  	LANDLOCK_KEY_INODE = 1,
-> > > +	/**
-> > > +	 * @LANDLOCK_KEY_NET_PORT: Type of &landlock_ruleset.root_net_port's
-> > > +	 * node keys.
-> > > +	 */
-> > > +	LANDLOCK_KEY_NET_PORT = 2,
-> > 
-> > You don't need to specify "2".
-> 
->   Ok. thanks.
-> > 
-> > 
-> > > diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-> > > index 8a54e87dbb17..da6cbd0032ca 100644
-> > > --- a/security/landlock/syscalls.c
-> > > +++ b/security/landlock/syscalls.c
-> > > @@ -29,6 +29,7 @@
-> > >  #include "cred.h"
-> > >  #include "fs.h"
-> > >  #include "limits.h"
-> > > +#include "net.h"
-> > >  #include "ruleset.h"
-> > >  #include "setup.h"
-> > > 
-> > > @@ -74,7 +75,8 @@ static void build_check_abi(void)
-> > >  {
-> > >  	struct landlock_ruleset_attr ruleset_attr;
-> > >  	struct landlock_path_beneath_attr path_beneath_attr;
-> > > -	size_t ruleset_size, path_beneath_size;
-> > > +	struct landlock_net_port_attr net_port_attr;
-> > > +	size_t ruleset_size, path_beneath_size, net_service_size;
-> > 
-> > net_port_size
-> 
->   right. will be fixed.
-> > .
 
