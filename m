@@ -1,63 +1,47 @@
-Return-Path: <netdev+bounces-39691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A2537C4109
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:20:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26F2E7C4131
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 460DC2810C3
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:20:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE704281323
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 20:27:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299239CA60;
-	Tue, 10 Oct 2023 20:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D0931592;
+	Tue, 10 Oct 2023 20:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="C491yruG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B14+mq9O"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641F12745F;
-	Tue, 10 Oct 2023 20:20:48 +0000 (UTC)
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BDEB8;
-	Tue, 10 Oct 2023 13:20:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696969247; x=1728505247;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=o4u11zrx7eA11CZzeyTu4a0TO7Mfy7hjPMsW7SqOWgU=;
-  b=C491yruGHLAoAl9Wa6Tqk+xpDVAX0NgDZzvvk38aYKGrxO+8YhafPGBz
-   3iDe3r8mIS5oGHiN8SjlK6NZd+cb+2TzFOS14WiIp2lzELrfFd5HXKW4i
-   qsakhXG/JBYVLNU0QfKQ6f/vXC7gYCCoaSM1gQVehKYKHroN9BYA8EkXO
-   E=;
-X-IronPort-AV: E=Sophos;i="6.03,213,1694736000"; 
-   d="scan'208";a="363425396"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 20:20:43 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2b-m6i4x-ed19f671.us-west-2.amazon.com (Postfix) with ESMTPS id 2FC9B80760;
-	Tue, 10 Oct 2023 20:20:42 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 20:20:40 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.11) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 20:20:37 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <martin.lau@linux.dev>
-CC: <bpf@vger.kernel.org>, <daan.j.demeyer@gmail.com>, <kernel-team@meta.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v9 3/9] bpf: Add bpf_sock_addr_set_unix_addr() to allow writing unix sockaddr from bpf
-Date: Tue, 10 Oct 2023 13:20:30 -0700
-Message-ID: <20231010202030.32676-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <bdffefed-8945-e5ac-052d-0f0b49a30d39@linux.dev>
-References: <bdffefed-8945-e5ac-052d-0f0b49a30d39@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247B73158C
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:27:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61BB8C433C8;
+	Tue, 10 Oct 2023 20:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696969636;
+	bh=XokC6/oYLtqZfJB/YbntCJQILp4syJTZQMWSbm7nnZE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=B14+mq9OIpFbmweG/2ZO1RU5ShLVoRi9fFc9dKL6hM0RJvctWNCz5AKDm7S/48HNb
+	 wfbZPtWNLg12Qb/1pgJ0HuTa7y4dqDpbPGpUrZmE/74BVHsz9xPD0+Hw56LWfdXRIY
+	 4FhPfNqJ0fdb4G0/TuVLzM9ti1gGNKFNla3ew46HroifKsyTDWY83CO7AO/yCfauTi
+	 PJdniVUHDks9y3ILAru8JZwkvpvcLU3cXaF0bt/Yznpk7o423HMULDeENOQI/uZSYq
+	 YpMcKze7EMcLz5PLg8qokYdtS2DvHQAf7j35Rla+kwW2jXtYsbmfW/Td/eF2xwUosH
+	 17KYhgpoa3ISA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] tools: ynl: use ynl-gen -o instead of stdout in Makefile
+Date: Tue, 10 Oct 2023 13:27:14 -0700
+Message-ID: <20231010202714.4045168-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,41 +49,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.11]
-X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Date: Tue, 10 Oct 2023 13:07:54 -0700
-> On 10/10/23 10:00 AM, Kuniyuki Iwashima wrote:
-> >> +__bpf_kfunc int bpf_sock_addr_set_unix_addr(struct bpf_sock_addr_kern *sa_kern,
-> >> +					    const u8 *addr, u32 addrlen__sz)
-> > I'd rename addrlen__sz to sun_path_len or something else because the
-> > conventional addrlen for AF_UNIX contains offsetof(struct sockaddr_un,
-> > sun_path).
-> 
-> The "__sz" suffix is required by the verifier. It is the size of the preceding 
-> argument "addr". While at it, addrlen__sz should be just "addr__sz" (or 
-> sun_path__sz, depending on what name is decided here) for consistency with other 
-> kfunc.
+Jiri added more careful handling of output of the code generator
+to avoid wiping out existing files in
+commit f65f305ae008 ("tools: ynl-gen: use temporary file for rendering")
+Make use of the -o option in the Makefiles, it is already used
+by ynl-regen.sh.
 
-I didn't know that, thank you!
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ tools/net/ynl/generated/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
+index 0f359ee3c46a..2f47b9cac757 100644
+--- a/tools/net/ynl/generated/Makefile
++++ b/tools/net/ynl/generated/Makefile
+@@ -27,11 +27,11 @@ protos.a: $(OBJS)
+ 
+ %-user.h: ../../../../Documentation/netlink/specs/%.yaml $(TOOL)
+ 	@echo -e "\tGEN $@"
+-	@$(TOOL) --mode user --header --spec $< $(YNL_GEN_ARG_$*) > $@
++	@$(TOOL) --mode user --header --spec $< -o $@ $(YNL_GEN_ARG_$*)
+ 
+ %-user.c: ../../../../Documentation/netlink/specs/%.yaml $(TOOL)
+ 	@echo -e "\tGEN $@"
+-	@$(TOOL) --mode user --source --spec $< $(YNL_GEN_ARG_$*) > $@
++	@$(TOOL) --mode user --source --spec $< -o $@ $(YNL_GEN_ARG_$*)
+ 
+ %-user.o: %-user.c %-user.h
+ 	@echo -e "\tCC $@"
+-- 
+2.41.0
 
-> 
-> I don't have strong preference on the argument name. However, if it is 
-> sun_path__sz, then the preceding argument should be renamed to "sun_path" also 
-> for consistency reason and then the kfunc should probably be renamed to 
-> bpf_sock_addr_set_sun_path.
-
-I prefer sun_path, sun_path__sz, and bpf_sock_addr_set_sun_path() that are
-clearer and consistent with uAPI, sockaddr_un.sun_path.
 
