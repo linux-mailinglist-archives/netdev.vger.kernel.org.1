@@ -1,508 +1,268 @@
-Return-Path: <netdev+bounces-39669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAEC27C046E
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:23:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8A1A7C044D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60EB2282658
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:23:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7C4281B45
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E2C321B6;
-	Tue, 10 Oct 2023 19:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="A/VpjCmq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A013B2BA;
+	Tue, 10 Oct 2023 19:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC2929CFB
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:23:11 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C367DCF;
-	Tue, 10 Oct 2023 12:23:02 -0700 (PDT)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 8ABED12000D;
-	Tue, 10 Oct 2023 22:22:48 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 8ABED12000D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1696965768;
-	bh=aFickrMd0GLOI50Jh+DvJsyuCXAH3zgXbHnSidYpMRA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=A/VpjCmqSoYeuQxkKJRTkDNvzZ2TGIo3iTC7RzohDAnb1nK7h3wGWBMHJS5fB3EQ0
-	 iui1UYhCnMht/xQMfo3B9rLFUrAfdcmoSK706/hRWvCL8GpAqkZ32IgSzaEhIdSxQe
-	 0cM9MwNo0cc0DE5U20d39k5mqpSPouSAimDBEUgK27LGgfx/68i5i6eySEIsc5Njlc
-	 3OiUlN1XBWkUPL46n4YBOMp88MpEL6BrD+WE/i5nY0jl9DSbrQgbYgYOY8VWI5rtrF
-	 3pOgKOfqvaXBimr9DbhsqxyD5kNng3zKDi/zwQ8+I4FttfF6Hz66uUIY+fdzBEDAQp
-	 R7mPDEAcBf+xA==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 10 Oct 2023 22:22:48 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 10 Oct 2023 22:22:47 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net-next v4 12/12] test/vsock: io_uring rx/tx tests
-Date: Tue, 10 Oct 2023 22:15:24 +0300
-Message-ID: <20231010191524.1694217-13-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
-References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A932FE0A
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:20:16 +0000 (UTC)
+Received: from out03.mta.xmission.com (out03.mta.xmission.com [166.70.13.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8820F9E
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 12:20:14 -0700 (PDT)
+Received: from in02.mta.xmission.com ([166.70.13.52]:60980)
+	by out03.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qqIH5-00HG8b-Vu; Tue, 10 Oct 2023 13:20:12 -0600
+Received: from ip68-227-168-167.om.om.cox.net ([68.227.168.167]:44510 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1qqIH4-00AMOj-Fc; Tue, 10 Oct 2023 13:20:11 -0600
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: David Ahern <dsahern@gmail.com>,  Stephen Hemminger
+ <stephen@networkplumber.org>,  netdev@vger.kernel.org,  Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>,  Christian Brauner <brauner@kernel.org>,
+  David Laight <David.Laight@ACULAB.COM>
+References: <20231009182753.851551-1-toke@redhat.com>
+	<877cnvtu37.fsf@email.froward.int.ebiederm.org>
+	<87jzrvzc5v.fsf@toke.dk>
+	<87ttqznxjm.fsf@email.froward.int.ebiederm.org>
+	<878r8azjgd.fsf@toke.dk>
+Date: Tue, 10 Oct 2023 14:19:47 -0500
+In-Reply-To: <878r8azjgd.fsf@toke.dk> ("Toke =?utf-8?Q?H=C3=B8iland-J?=
+ =?utf-8?Q?=C3=B8rgensen=22's?= message of
+	"Tue, 10 Oct 2023 15:38:10 +0200")
+Message-ID: <87y1gajne4.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 180515 [Oct 10 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 536 536 1ae19c7800f69da91432b5e67ed4a00b9ade0d03, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/10 16:15:00 #22148151
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-XM-SPF: eid=1qqIH4-00AMOj-Fc;;;mid=<87y1gajne4.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=68.227.168.167;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX18zbDtt0MghQ0OmkuhJVCd9IaRfSlj36po=
+X-SA-Exim-Connect-IP: 68.227.168.167
+X-SA-Exim-Mail-From: ebiederm@xmission.com
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAD_ENC_HEADER,BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-DCC: XMission; sa04 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: =?ISO-8859-1?Q?;Toke H=c3=b8iland-J=c3=b8rgensen <toke@redhat.com>?=
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 881 ms - load_scoreonly_sql: 0.10 (0.0%),
+	signal_user_changed: 14 (1.6%), b_tie_ro: 12 (1.4%), parse: 2.4 (0.3%),
+	 extract_message_metadata: 24 (2.7%), get_uri_detail_list: 7 (0.9%),
+	tests_pri_-2000: 15 (1.7%), tests_pri_-1000: 3.2 (0.4%),
+	tests_pri_-950: 2.7 (0.3%), tests_pri_-900: 10 (1.2%), tests_pri_-200:
+	3.1 (0.3%), tests_pri_-100: 11 (1.3%), tests_pri_-90: 131 (14.8%),
+	check_bayes: 121 (13.7%), b_tokenize: 23 (2.7%), b_tok_get_all: 19
+	(2.2%), b_comp_prob: 7 (0.7%), b_tok_touch_all: 63 (7.1%), b_finish:
+	2.3 (0.3%), tests_pri_0: 628 (71.2%), check_dkim_signature: 1.33
+	(0.2%), check_dkim_adsp: 4.1 (0.5%), poll_dns_idle: 0.98 (0.1%),
+	tests_pri_10: 4.7 (0.5%), tests_pri_500: 26 (3.0%), rewrite_mail: 0.00
+	(0.0%)
+Subject: Re: [RFC PATCH iproute2-next 0/5] Persisting of mount namespaces
+ along with network namespaces
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in02.mta.xmission.com)
 
-This adds set of tests which use io_uring for rx/tx. This test suite is
-implemented as separated util like 'vsock_test' and has the same set of
-input arguments as 'vsock_test'. These tests only cover cases of data
-transmission (no connect/bind/accept etc).
+Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- Changelog:
- v1 -> v2:
-  * Add 'LDLIBS = -luring' to the target 'vsock_uring_test'.
-  * Add 'vsock_uring_test' to the target 'test'.
- v2 -> v3:
-  * Make 'struct vsock_test_data' private by placing it to the .c file.
-    Rename it and add comments to this struct to clarify sense of its
-    fields.
-  * Add 'vsock_uring_test' to the '.gitignore'.
-  * Add receive loop to the server side - this is needed to read entire
-    data sent by client.
- v3 -> v4:
-  * Link with 'msg_zerocopy_common.o'.
-  * Use '#ifndef' around '#define PAGE_SIZE 4096'.
+> "Eric W. Biederman" <ebiederm@xmission.com> writes:
+>
+>> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+>>
+>>> "Eric W. Biederman" <ebiederm@xmission.com> writes:
+>>>
+>>>> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+>>
+>> There are not many places to look so something like this is probably suf=
+ficient:
+>>
+>> # stat all of the possible/probable mount points and see if there is
+>> # something mounted there.  If so recursive bind whatever is there onto
+>> # the new /sys
+>>
+>> for dir in /old/sys/fs/* /old/sys/kernel/*; do
+>> 	if [ $(stat --format '%d' "$dir") =3D $(stat --format '%d' "$dir/") ; t=
+hen
+>
+> What is this comparison supposed to do? I couldn't find any directories
+> in /sys/fs/* where this was *not* true, regardless of whether there's a
+> mount there or not.
 
- tools/testing/vsock/.gitignore         |   1 +
- tools/testing/vsock/Makefile           |   7 +-
- tools/testing/vsock/vsock_uring_test.c | 342 +++++++++++++++++++++++++
- 3 files changed, 348 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/vsock/vsock_uring_test.c
+Bah.  I think I got my logic scrambled.  I can only get it to work
+by comparing the filesystems device on /sys/fs to the device on
+/sys/fs/cgroup etc.
 
-diff --git a/tools/testing/vsock/.gitignore b/tools/testing/vsock/.gitignore
-index a8adcfdc292b..d9f798713cd7 100644
---- a/tools/testing/vsock/.gitignore
-+++ b/tools/testing/vsock/.gitignore
-@@ -3,3 +3,4 @@
- vsock_test
- vsock_diag_test
- vsock_perf
-+vsock_uring_test
-diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
-index 228470ae33c2..a7f56a09ca9f 100644
---- a/tools/testing/vsock/Makefile
-+++ b/tools/testing/vsock/Makefile
-@@ -1,12 +1,15 @@
- # SPDX-License-Identifier: GPL-2.0-only
- all: test vsock_perf
--test: vsock_test vsock_diag_test
-+test: vsock_test vsock_diag_test vsock_uring_test
- vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o msg_zerocopy_common.o
- vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
- vsock_perf: vsock_perf.o msg_zerocopy_common.o
- 
-+vsock_uring_test: LDLIBS = -luring
-+vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o msg_zerocopy_common.o
-+
- CFLAGS += -g -O2 -Werror -Wall -I. -I../../include -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
- .PHONY: all test clean
- clean:
--	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf
-+	${RM} *.o *.d vsock_test vsock_diag_test vsock_perf vsock_uring_test
- -include *.d
-diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
-new file mode 100644
-index 000000000000..d976d35f0ba9
---- /dev/null
-+++ b/tools/testing/vsock/vsock_uring_test.c
-@@ -0,0 +1,342 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* io_uring tests for vsock
-+ *
-+ * Copyright (C) 2023 SberDevices.
-+ *
-+ * Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
-+ */
-+
-+#include <getopt.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <liburing.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <linux/kernel.h>
-+#include <error.h>
-+
-+#include "util.h"
-+#include "control.h"
-+#include "msg_zerocopy_common.h"
-+
-+#ifndef PAGE_SIZE
-+#define PAGE_SIZE		4096
-+#endif
-+
-+#define RING_ENTRIES_NUM	4
-+
-+#define VSOCK_TEST_DATA_MAX_IOV 3
-+
-+struct vsock_io_uring_test {
-+	/* Number of valid elements in 'vecs'. */
-+	int vecs_cnt;
-+	struct iovec vecs[VSOCK_TEST_DATA_MAX_IOV];
-+};
-+
-+static struct vsock_io_uring_test test_data_array[] = {
-+	/* All elements have page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ NULL, 2 * PAGE_SIZE },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	},
-+	/* Middle element has both non-page aligned base and size. */
-+	{
-+		.vecs_cnt = 3,
-+		{
-+			{ NULL, PAGE_SIZE },
-+			{ (void *)1, 200  },
-+			{ NULL, 3 * PAGE_SIZE },
-+		}
-+	}
-+};
-+
-+static void vsock_io_uring_client(const struct test_opts *opts,
-+				  const struct vsock_io_uring_test *test_data,
-+				  bool msg_zerocopy)
-+{
-+	struct io_uring_sqe *sqe;
-+	struct io_uring_cqe *cqe;
-+	struct io_uring ring;
-+	struct iovec *iovec;
-+	struct msghdr msg;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (msg_zerocopy)
-+		enable_so_zerocopy(fd);
-+
-+	iovec = alloc_test_iovec(test_data->vecs, test_data->vecs_cnt);
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
-+		error(1, errno, "io_uring_register_buffers");
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iovec;
-+	msg.msg_iovlen = test_data->vecs_cnt;
-+	sqe = io_uring_get_sqe(&ring);
-+
-+	if (msg_zerocopy)
-+		io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
-+	else
-+		io_uring_prep_sendmsg(sqe, fd, &msg, 0);
-+
-+	if (io_uring_submit(&ring) != 1)
-+		error(1, errno, "io_uring_submit");
-+
-+	if (io_uring_wait_cqe(&ring, &cqe))
-+		error(1, errno, "io_uring_wait_cqe");
-+
-+	io_uring_cqe_seen(&ring, cqe);
-+
-+	control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
-+
-+	control_writeln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free_test_iovec(test_data->vecs, iovec, test_data->vecs_cnt);
-+	close(fd);
-+}
-+
-+static void vsock_io_uring_server(const struct test_opts *opts,
-+				  const struct vsock_io_uring_test *test_data)
-+{
-+	unsigned long remote_hash;
-+	unsigned long local_hash;
-+	struct io_uring ring;
-+	size_t data_len;
-+	size_t recv_len;
-+	void *data;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
-+
-+	data = malloc(data_len);
-+	if (!data) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
-+		error(1, errno, "io_uring_queue_init");
-+
-+	recv_len = 0;
-+
-+	while (recv_len < data_len) {
-+		struct io_uring_sqe *sqe;
-+		struct io_uring_cqe *cqe;
-+		struct iovec iovec;
-+
-+		sqe = io_uring_get_sqe(&ring);
-+		iovec.iov_base = data + recv_len;
-+		iovec.iov_len = data_len;
-+
-+		io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
-+
-+		if (io_uring_submit(&ring) != 1)
-+			error(1, errno, "io_uring_submit");
-+
-+		if (io_uring_wait_cqe(&ring, &cqe))
-+			error(1, errno, "io_uring_wait_cqe");
-+
-+		recv_len += cqe->res;
-+		io_uring_cqe_seen(&ring, cqe);
-+	}
-+
-+	if (recv_len != data_len) {
-+		fprintf(stderr, "expected %zu, got %zu\n", data_len,
-+			recv_len);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	local_hash = hash_djb2(data, data_len);
-+
-+	remote_hash = control_readulong();
-+	if (remote_hash != local_hash) {
-+		fprintf(stderr, "hash mismatch\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("DONE");
-+	io_uring_queue_exit(&ring);
-+	free(data);
-+}
-+
-+void test_stream_uring_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], false);
-+}
-+
-+void test_stream_uring_msg_zc_server(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_server(opts, &test_data_array[i]);
-+}
-+
-+void test_stream_uring_msg_zc_client(const struct test_opts *opts)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
-+		vsock_io_uring_client(opts, &test_data_array[i], true);
-+}
-+
-+static struct test_case test_cases[] = {
-+	{
-+		.name = "SOCK_STREAM io_uring test",
-+		.run_server = test_stream_uring_server,
-+		.run_client = test_stream_uring_client,
-+	},
-+	{
-+		.name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
-+		.run_server = test_stream_uring_msg_zc_server,
-+		.run_client = test_stream_uring_msg_zc_client,
-+	},
-+	{},
-+};
-+
-+static const char optstring[] = "";
-+static const struct option longopts[] = {
-+	{
-+		.name = "control-host",
-+		.has_arg = required_argument,
-+		.val = 'H',
-+	},
-+	{
-+		.name = "control-port",
-+		.has_arg = required_argument,
-+		.val = 'P',
-+	},
-+	{
-+		.name = "mode",
-+		.has_arg = required_argument,
-+		.val = 'm',
-+	},
-+	{
-+		.name = "peer-cid",
-+		.has_arg = required_argument,
-+		.val = 'p',
-+	},
-+	{
-+		.name = "help",
-+		.has_arg = no_argument,
-+		.val = '?',
-+	},
-+	{},
-+};
-+
-+static void usage(void)
-+{
-+	fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
-+		"\n"
-+		"  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
-+		"  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
-+		"\n"
-+		"Run transmission tests using io_uring. Usage is the same as\n"
-+		"in ./vsock_test\n"
-+		"\n"
-+		"Options:\n"
-+		"  --help                 This help message\n"
-+		"  --control-host <host>  Server IP address to connect to\n"
-+		"  --control-port <port>  Server port to listen on/connect to\n"
-+		"  --mode client|server   Server or client mode\n"
-+		"  --peer-cid <cid>       CID of the other side\n"
-+		);
-+	exit(EXIT_FAILURE);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	const char *control_host = NULL;
-+	const char *control_port = NULL;
-+	struct test_opts opts = {
-+		.mode = TEST_MODE_UNSET,
-+		.peer_cid = VMADDR_CID_ANY,
-+	};
-+
-+	init_signals();
-+
-+	for (;;) {
-+		int opt = getopt_long(argc, argv, optstring, longopts, NULL);
-+
-+		if (opt == -1)
-+			break;
-+
-+		switch (opt) {
-+		case 'H':
-+			control_host = optarg;
-+			break;
-+		case 'm':
-+			if (strcmp(optarg, "client") == 0) {
-+				opts.mode = TEST_MODE_CLIENT;
-+			} else if (strcmp(optarg, "server") == 0) {
-+				opts.mode = TEST_MODE_SERVER;
-+			} else {
-+				fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
-+				return EXIT_FAILURE;
-+			}
-+			break;
-+		case 'p':
-+			opts.peer_cid = parse_cid(optarg);
-+			break;
-+		case 'P':
-+			control_port = optarg;
-+			break;
-+		case '?':
-+		default:
-+			usage();
-+		}
-+	}
-+
-+	if (!control_port)
-+		usage();
-+	if (opts.mode == TEST_MODE_UNSET)
-+		usage();
-+	if (opts.peer_cid == VMADDR_CID_ANY)
-+		usage();
-+
-+	if (!control_host) {
-+		if (opts.mode != TEST_MODE_SERVER)
-+			usage();
-+		control_host = "0.0.0.0";
-+	}
-+
-+	control_init(control_host, control_port,
-+		     opts.mode == TEST_MODE_SERVER);
-+
-+	run_tests(test_cases, &opts);
-+
-+	control_cleanup();
-+
-+	return 0;
-+}
--- 
-2.25.1
+The idea is that st_dev changes between filesystems.  So you can detect
+a filesystem change based on st_dev.
 
+I thought the $dir vs $dir/ would have allowed stating the underlying
+directory verses the mount, but apparently my memory go that one wrong.
+
+Which makes my command actually something like:
+
+	sys_dev=3D$(stat --format=3D'%d' /sys)
+
+	for dir in /old/sys/fs/* /old/sys/kernel/*; do
+		if [ $(stat --format '%d' "$dir") -ne $sys_dev ] ; then
+                	echo $dir is a mount point
+                fi
+	done
+
+
+>>>> Or is their a reason that bpffs should be per network namespace?
+>>>
+>>> Well, I first ran into this issue because of a bug report to
+>>> xdp-tools/libxdp about things not working correctly in network
+>>> namespaces:
+>>>
+>>> https://github.com/xdp-project/xdp-tools/issues/364
+>>>
+>>> And libxdp does assume that there's a separate bpffs per network
+>>> namespace: it persists things into the bpffs that is tied to the network
+>>> devices in the current namespace. So if the bpffs is shared, an
+>>> application running inside the network namespace could access XDP
+>>> programs loaded in the root namespace. I don't know, but suspect, that
+>>> such assumptions would be relatively common in networking BPF programs
+>>> that use pinning (the pinning support in libbpf and iproute2 itself at
+>>> least have the same leaking problem if the bpffs is shared).
+>>
+>> Are the names of the values truly network namespace specific?
+>>
+>> I did not see any mention of the things that are persisted in the ticket
+>> you pointed me at, and unfortunately I am not familiar with xdp.
+>>
+>> Last I looked until all of the cpu side channels are closed it is
+>> unfortunately unsafe to load ebpf programs with anything less than
+>> CAP_SYS_ADMIN (aka with permission to see and administer the entire
+>> system).  So from a system point of view I really don't see a
+>> fundamental danger from having a global /sys/fs/bpf.
+>>
+>> If there are name conflicts in /sys/fs/bpf because of duplicate names in
+>> different network namespaces I can see that being a problem.
+>
+> Yeah, you're right that someone loading a BPF program generally has
+> permissions enough that they can break out of any containment if they
+> want, but applications do make assumptions about the contents of the
+> pinning directory that can lead to conflicts.
+>
+> A couple of examples:
+>
+> - libxdp will persist files in /sys/fs/bpf/dispatch-$ifindex-$prog_id
+>
+> - If someone sets the 'pinning' attribute on a map definition in a BPF
+>   file, libbpf will pin those files in /sys/fs/bpf/$map_name
+>
+> The first one leads to obvious conflicts if shared across network
+> namespaces because of ifindex collisions. The second one leads to
+> potential false sharing of state across what are supposed to be
+> independent networking domains (e.g., if the bpffs is shared, loading
+> xdp-filter inside a namespace will share the state with another instance
+> loaded in another namespace, which would no doubt be surprising).
+
+Sigh.  So non-default network namespaces can't use /sys/fs/bpf,
+because of silly userspace assumptions.  So the entries need to be
+namespaced to prevent conflicts.
+
+>> At that point the name conflicts either need to be fixed or we
+>> fundamentally need to have multiple mount points for bpffs.
+>> Probably under something like /run/netns-mounts/NAME/.
+>>
+>> With ip netns updated to mount the appropriate filesystem.
+>
+> I don't think it's feasible to fix the conflicts; they've been around
+> for a while and are part of application API in some cases. Plus, we
+> don't know of all BPF-using applications.
+>
+> We could have 'ip' manage separate bpffs mounts per namespace and
+> bind-mount them into each netns (I think that's what you're suggesting),
+> but that would basically achieve the same thing as the mountns
+> persisting I am proposing in this series, but only as a special case for
+> bpffs. So why not do the more flexible thing and persist the whole
+> mountns (so applications inside the namespace can actually mount
+> additional things and have them stick around)? The current behaviour
+> seems very surprising...
+
+I don't like persisting the entire mount namespace because it is hard
+for a system administrator to see, it is difficult for something outside
+of that mount namespace to access, and it is as easy to persist a
+mistake as it is to persist something deliberate.
+
+My proposal:
+
+On "ip netns add NAME"
+- create the network namespace and mount it at /run/netns/NAME
+- mount the appropriate sysfs at /run/netns-mounts/NAME/sys
+- mount the appropriate bpffs at /run/netns-mounts/NAME/sys/fs/bpf
+
+On "ip netns delete NAME"
+- umount --recursive /run/netns-mounts/NAME
+- unlink /run/netns-mounts/NAME
+- cleanup /run/netns/NAME as we do today.
+
+On "ip netns exec NAME"
+- Walk through /run/netns-mounts/NAME like we do /etc/netns/NAME/
+  and perform bind mounts.
+
+That way everything that needs to persist really and truly persists.
+
+Applications that don't use "ip netns exec" can continue to use the
+network namespace and everything that goes along with it without
+problems.
+
+>> Mount propagation is a way to configure a mount namespace (before
+>> creating a new one) that will cause mounts created in the first mount
+>> namespace to be created in it's children, and cause mounts created in
+>> the children to be created in the parent (depending on how things are
+>> configured).
+>>
+>> It is not my favorite feature (it makes locking of mount namespaces
+>> terrible) and it is probably too clever by half, unfortunately systemd
+>> started enabling mount propagation by default, so we are stuck with it.
+>
+> Right. AFAICT the current iproute2 code explicitly tries to avoid that
+> when creating a mountns (it does a 'mount --make-rslave /'); so you're
+> saying we should change that?
+
+If it makes sense.
+
+I believe I added the 'mount --make-rslave /' because otherwise all
+mount activity was propagating back, and making a mess.  Especially when
+I was unmounting /sys.
+
+I am not a huge fan of mount propagation it has lots of surprising
+little details that need to be set just right, to not cause problems.
+
+With my proposal above I think we could in some carefully chosen
+places enable mount propagation without problem.  But I would really
+like to see an application that is performing mounts inside of
+"ip netns exec" to see how it matters.
+
+Code without concrete real world test use cases tends to get things
+wrong.
+
+Eric
 
