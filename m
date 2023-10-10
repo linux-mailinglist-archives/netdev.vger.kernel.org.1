@@ -1,121 +1,359 @@
-Return-Path: <netdev+bounces-39427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C0417BF246
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:37:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D0077BF25D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:45:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D8CF1C209F3
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 05:37:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9431281980
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 05:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDA65248;
-	Tue, 10 Oct 2023 05:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F3263A4;
+	Tue, 10 Oct 2023 05:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyGXX67r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gdjLTAHT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B298F62
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 05:37:08 +0000 (UTC)
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE37AF;
-	Mon,  9 Oct 2023 22:37:06 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1dd71c0a41fso3550555fac.2;
-        Mon, 09 Oct 2023 22:37:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696916226; x=1697521026; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3+ydGI7sff09G/7JETRhlsl6DkdhesL7wxe7Wc1ipso=;
-        b=NyGXX67rUNDetTjJkPKNiEevjYDyNjEGyGle1kwtvtf86bv3AQ6e8DTE4T8ffIYSNB
-         cRmLJECQVcHhaMP6XjhGKUBpv2Xykds0denH4vAo5xoxEmA5DUXgyqbL4l1yhG3oomKH
-         pT5PRPYw0b9RvRlrqKHEmKp+g3/Kvb609aw0HeCg0S9w088DbPVV+z51gFDCYMwkxdEh
-         xrgCkG28iCASfzbXgnvyupPMXDjYP5lYIFSdzPB2T01x5gmfpyvjYLEiTnChANvr77fB
-         U7CuwUyoxakHQSy/CIM1GHoWVx1DtQ82lnsuDOeLRXC+jEbX9h8l7mNghifU7/zSsbMV
-         4fKw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8D33CF
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 05:45:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26AB3A3
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 22:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1696916733;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P+I2EY4NGx452ATYzw4Kz0XF6aTAAXvBTqSjZlE93qM=;
+	b=gdjLTAHTWNEETbqo6CYPnxiLm05MEVNnDPtqGX81PVKl5g56m/knu8mHlELVyp0ggySTVL
+	fNC6hBhSMIGjMBA/fP0Af8TnJDGwywdgYZU47HYY0QsfZ6z3vYBNyzwHse4qW+GBKVFctq
+	p51ZIzVg1BGKzgx5cA77RekUkzX4zPk=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-416-q3vtYJmFPbmNjCm40TGiHA-1; Tue, 10 Oct 2023 01:45:26 -0400
+X-MC-Unique: q3vtYJmFPbmNjCm40TGiHA-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5042bc93273so4588488e87.1
+        for <netdev@vger.kernel.org>; Mon, 09 Oct 2023 22:45:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696916226; x=1697521026;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1696916725; x=1697521525;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3+ydGI7sff09G/7JETRhlsl6DkdhesL7wxe7Wc1ipso=;
-        b=AYxcDl9YJKXUgxfIWr9lNrhqC79aI/GCp1owJNJcT0atk9AisJyBWr1VB0xoH7kaGi
-         uWXtDnguz9maMCeegMvyqB+P2uYW9t78AHdyEfPtyaX7AnisBOpUUderT5gC2gn0oOfq
-         YzlTvM847E+qAXef3TMNMUtcFx0mNbhOzri4i8yhiSVSp+g9u5BK7pt8iKQCTSpTMro3
-         At2Fbj7lgZyUX2NQVn59yChfaXtGgNkKVrCNi3WpDLE2WgTEDzBqFMQBkuICqId0oV4a
-         QyJcdF41TAQ4tt4leruH1IkURMgp5nlfK5qr/NR7pOqAg072sBgo68i/mLBFPrYoQraw
-         mymw==
-X-Gm-Message-State: AOJu0YybPOoSZoSLqunYtCD3ns/h8+N6a8/AG6Ik5agGl1GAU1p1kZvT
-	EOX/ITer9w92QuiV5eEVQMM=
-X-Google-Smtp-Source: AGHT+IEKsubtOOGHSEohPCYMGjWslsLGkbDHkHKk9Srkm0L4XmEWSyeocHgsc01rhV7A0Rnkjd+ptA==
-X-Received: by 2002:a05:6870:71ce:b0:1d6:51aa:13a2 with SMTP id p14-20020a05687071ce00b001d651aa13a2mr19869311oag.10.1696916225861;
-        Mon, 09 Oct 2023 22:37:05 -0700 (PDT)
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-        by smtp.gmail.com with ESMTPSA id n9-20020aa79049000000b0068fe7c4148fsm7267060pfo.57.2023.10.09.22.37.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Oct 2023 22:37:05 -0700 (PDT)
-From: Edward AD <twuufnxlz@gmail.com>
-To: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	johan.hedberg@gmail.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] Bluetooth: hci_sock: fix slab oob read in create_monitor_event
-Date: Tue, 10 Oct 2023 13:36:57 +0800
-Message-ID: <20231010053656.2034368-2-twuufnxlz@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <000000000000ae9ff70607461186@google.com>
-References: <000000000000ae9ff70607461186@google.com>
+        bh=P+I2EY4NGx452ATYzw4Kz0XF6aTAAXvBTqSjZlE93qM=;
+        b=elYWZiQdDs5Gf2MjtwOCs9shLJZ0clLz1d8VoFl+UF14JF3xxqrU4AQcUw4FSvDrxS
+         aq9TdGGnZRznvKNNJlyjwIrWktbLMgHt2gse0ZZwyNB+a4CivH117bHSmwQrqT5fR8Jg
+         KQtGWxv5QMWuAirk6zZAyrqz5351kRTs5QzG+LBgCMkfZHfAF90IZdm6KIug/GZzJ/dN
+         Qz1XAQoz9ykSsCgpoGxs/at++mTe4zgUZscExJQDSi13pGS4Jwsh2/eMMgx/PilS/zgr
+         ftbSXNc3rKj+mmBq2+fuasBv64drP7rCgIf1i/xoOowV38sT1nW+839ypKPGpiEo4uNR
+         V/+Q==
+X-Gm-Message-State: AOJu0YyyTOLuk2R0p0ITv0BmggLXMH3smQOnmyZXu3v3Tten99g6ZMpJ
+	WV5O8oT1tPf3+k4ouV7pL+mz69UIRrAVta+DlrFysCSLpyrka82ru/b2fScrofyCcPyzYyZDcu6
+	qRf72bTFHkidFhF9UdRjrhY5xx8o9lPFS
+X-Received: by 2002:a05:6512:ea9:b0:500:b2f6:592 with SMTP id bi41-20020a0565120ea900b00500b2f60592mr18281178lfb.50.1696916725098;
+        Mon, 09 Oct 2023 22:45:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+pwNtTVbI2Ms4EjKlIUtAy5k+rLiIL3TUr1dcb8YFsqYJmXGlmcetJxkpWxQ3ditYPytVqKZpNg5+JzyWzwk=
+X-Received: by 2002:a05:6512:ea9:b0:500:b2f6:592 with SMTP id
+ bi41-20020a0565120ea900b00500b2f60592mr18281158lfb.50.1696916724673; Mon, 09
+ Oct 2023 22:45:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,RCVD_IN_DNSWL_BLOCKED,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: **
+References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
+ <20231008052101.144422-6-akihiko.odaki@daynix.com> <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
+ <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
+ <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com> <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
+ <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com> <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
+ <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com> <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
+ <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com> <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
+ <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com>
+In-Reply-To: <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 10 Oct 2023 13:45:11 +0800
+Message-ID: <CACGkMEv0tpn4YsJhXXnoispYx2-VBimFAtFmf85Uo=5=6taVuw@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
+	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
+	pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com, 
+	elver@google.com, pabeni@redhat.com, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When accessing hdev->name, the actual string length should prevail
+On Tue, Oct 10, 2023 at 9:52=E2=80=AFAM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2023/10/09 19:44, Willem de Bruijn wrote:
+> > On Mon, Oct 9, 2023 at 3:12=E2=80=AFAM Akihiko Odaki <akihiko.odaki@day=
+nix.com> wrote:
+> >>
+> >> On 2023/10/09 19:06, Willem de Bruijn wrote:
+> >>> On Mon, Oct 9, 2023 at 3:02=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
+aynix.com> wrote:
+> >>>>
+> >>>> On 2023/10/09 18:57, Willem de Bruijn wrote:
+> >>>>> On Mon, Oct 9, 2023 at 3:57=E2=80=AFAM Akihiko Odaki <akihiko.odaki=
+@daynix.com> wrote:
+> >>>>>>
+> >>>>>> On 2023/10/09 17:04, Willem de Bruijn wrote:
+> >>>>>>> On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko.oda=
+ki@daynix.com> wrote:
+> >>>>>>>>
+> >>>>>>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
+> >>>>>>>>> On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akihiko.=
+odaki@daynix.com> wrote:
+> >>>>>>>>>>
+> >>>>>>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
+> >>>>>>>>>>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <akihiko=
+.odaki@daynix.com> wrote:
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> virtio-net have two usage of hashes: one is RSS and another =
+is hash
+> >>>>>>>>>>>> reporting. Conventionally the hash calculation was done by t=
+he VMM.
+> >>>>>>>>>>>> However, computing the hash after the queue was chosen defea=
+ts the
+> >>>>>>>>>>>> purpose of RSS.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Another approach is to use eBPF steering program. This appro=
+ach has
+> >>>>>>>>>>>> another downside: it cannot report the calculated hash due t=
+o the
+> >>>>>>>>>>>> restrictive nature of eBPF.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Introduce the code to compute hashes to the kernel in order =
+to overcome
+> >>>>>>>>>>>> thse challenges. An alternative solution is to extend the eB=
+PF steering
+> >>>>>>>>>>>> program so that it will be able to report to the userspace, =
+but it makes
+> >>>>>>>>>>>> little sense to allow to implement different hashing algorit=
+hms with
+> >>>>>>>>>>>> eBPF since the hash value reported by virtio-net is strictly=
+ defined by
+> >>>>>>>>>>>> the specification.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> The hash value already stored in sk_buff is not used and com=
+puted
+> >>>>>>>>>>>> independently since it may have been computed in a way not c=
+onformant
+> >>>>>>>>>>>> with the specification.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >>>>>>>>>>>> ---
+> >>>>>>>>>>>
+> >>>>>>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap =3D=
+ {
+> >>>>>>>>>>>> +       .max_indirection_table_length =3D
+> >>>>>>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENGTH,
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
+> >>>>>>>>>>>> +};
+> >>>>>>>>>>>
+> >>>>>>>>>>> No need to have explicit capabilities exchange like this? Tun=
+ either
+> >>>>>>>>>>> supports all or none.
+> >>>>>>>>>>
+> >>>>>>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
+> >>>>>>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_TYPE_=
+UDP_EX.
+> >>>>>>>>>>
+> >>>>>>>>>> It is because the flow dissector does not support IPv6 extensi=
+ons. The
+> >>>>>>>>>> specification is also vague, and does not tell how many TLVs s=
+hould be
+> >>>>>>>>>> consumed at most when interpreting destination option header s=
+o I chose
+> >>>>>>>>>> to avoid adding code for these hash types to the flow dissecto=
+r. I doubt
+> >>>>>>>>>> anyone will complain about it since nobody complains for Linux=
+.
+> >>>>>>>>>>
+> >>>>>>>>>> I'm also adding this so that we can extend it later.
+> >>>>>>>>>> max_indirection_table_length may grow for systems with 128+ CP=
+Us, or
+> >>>>>>>>>> types may have other bits for new protocols in the future.
+> >>>>>>>>>>
+> >>>>>>>>>>>
+> >>>>>>>>>>>>               case TUNSETSTEERINGEBPF:
+> >>>>>>>>>>>> -               ret =3D tun_set_ebpf(tun, &tun->steering_pro=
+g, argp);
+> >>>>>>>>>>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->steering=
+_prog, argp);
+> >>>>>>>>>>>> +               if (IS_ERR(bpf_ret))
+> >>>>>>>>>>>> +                       ret =3D PTR_ERR(bpf_ret);
+> >>>>>>>>>>>> +               else if (bpf_ret)
+> >>>>>>>>>>>> +                       tun->vnet_hash.flags &=3D ~TUN_VNET_=
+HASH_RSS;
+> >>>>>>>>>>>
+> >>>>>>>>>>> Don't make one feature disable another.
+> >>>>>>>>>>>
+> >>>>>>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclusive
+> >>>>>>>>>>> functions. If one is enabled the other call should fail, with=
+ EBUSY
+> >>>>>>>>>>> for instance.
+> >>>>>>>>>>>
+> >>>>>>>>>>>> +       case TUNSETVNETHASH:
+> >>>>>>>>>>>> +               len =3D sizeof(vnet_hash);
+> >>>>>>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len)) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_REPORT=
+) &&
+> >>>>>>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct virti=
+o_net_hdr_v1_hash) ||
+> >>>>>>>>>>>> +                     !tun_is_little_endian(tun))) ||
+> >>>>>>>>>>>> +                    vnet_hash.indirection_table_mask >=3D
+> >>>>>>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LEN=
+GTH) {
+> >>>>>>>>>>>> +                       ret =3D -EINVAL;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>>>>>> +               len =3D (vnet_hash.indirection_table_mask + =
+1) * 2;
+> >>>>>>>>>>>> +               if (copy_from_user(vnet_hash_indirection_tab=
+le, argp, len)) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
+> >>>>>>>>>>>> +               len =3D virtio_net_hash_key_length(vnet_hash=
+.types);
+> >>>>>>>>>>>> +
+> >>>>>>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, len)=
+) {
+> >>>>>>>>>>>> +                       ret =3D -EFAULT;
+> >>>>>>>>>>>> +                       break;
+> >>>>>>>>>>>> +               }
+> >>>>>>>>>>>
+> >>>>>>>>>>> Probably easier and less error-prone to define a fixed size c=
+ontrol
+> >>>>>>>>>>> struct with the max indirection table size.
+> >>>>>>>>>>
+> >>>>>>>>>> I made its size variable because the indirection table and key=
+ may grow
+> >>>>>>>>>> in the future as I wrote above.
+> >>>>>>>>>>
+> >>>>>>>>>>>
+> >>>>>>>>>>> Btw: please trim the CC: list considerably on future patches.
+> >>>>>>>>>>
+> >>>>>>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF cha=
+nge you
+> >>>>>>>>>> proposed.
+> >>>>>>>>>
+> >>>>>>>>> To be clear: please don't just resubmit with that one change.
+> >>>>>>>>>
+> >>>>>>>>> The skb and cb issues are quite fundamental issues that need to=
+ be resolved.
+> >>>>>>>>>
+> >>>>>>>>> I'd like to understand why adjusting the existing BPF feature f=
+or this
+> >>>>>>>>> exact purpose cannot be amended to return the key it produced.
+> >>>>>>>>
+> >>>>>>>> eBPF steering program is not designed for this particular proble=
+m in my
+> >>>>>>>> understanding. It was introduced to derive hash values with an
+> >>>>>>>> understanding of application-specific semantics of packets inste=
+ad of
+> >>>>>>>> generic IP/TCP/UDP semantics.
+> >>>>>>>>
+> >>>>>>>> This problem is rather different in terms that the hash derivati=
+on is
+> >>>>>>>> strictly defined by virtio-net. I don't think it makes sense to
+> >>>>>>>> introduce the complexity of BPF when you always run the same cod=
+e.
+> >>>>>>>>
+> >>>>>>>> It can utilize the existing flow dissector and also make it easi=
+er to
+> >>>>>>>> use for the userspace by implementing this in the kernel.
+> >>>>>>>
+> >>>>>>> Ok. There does appear to be overlap in functionality. But it migh=
+t be
+> >>>>>>> easier to deploy to just have standard Toeplitz available without
+> >>>>>>> having to compile and load an eBPF program.
+> >>>>>>>
+> >>>>>>> As for the sk_buff and cb[] changes. The first is really not need=
+ed.
+> >>>>>>> sk_buff simply would not scale if every edge case needs a few bit=
+s.
+> >>>>>>
+> >>>>>> An alternative is to move the bit to cb[] and clear it for every c=
+ode
+> >>>>>> paths that lead to ndo_start_xmit(), but I'm worried that it is er=
+ror-prone.
+> >>>>>>
+> >>>>>> I think we can put the bit in sk_buff for now. We can implement th=
+e
+> >>>>>> alternative when we are short of bits.
+> >>>>>
+> >>>>> I disagree. sk_buff fields add a cost to every code path. They cann=
+ot
+> >>>>> be added for every edge case.
+> >>>>
+> >>>> It only takes an unused bit and does not grow the sk_buff size so I
+> >>>> think it has practically no cost for now.
+> >>>
+> >>> The problem is that that thinking leads to death by a thousand cuts.
+> >>>
+> >>> "for now" forces the cost of having to think hard how to avoid growin=
+g
+> >>> sk_buff onto the next person. Let's do it right from the start.
+> >>
+> >> I see. I described an alternative to move the bit to cb[] and clear it
+> >> in all code paths that leads to ndo_start_xmit() earlier. Does that
+> >> sound good to you?
+> >
+> > If you use the control block to pass information between
+> > __dev_queue_xmit on the tun device and tun_net_xmit, using gso_skb_cb,
+> > the field can be left undefined in all non-tun paths. tun_select_queue
+> > can initialize.
+>
+> The problem is that tun_select_queue() is not always called.
+> netdev_core_pick_tx() ensures dev->real_num_tx_queues !=3D 1 before
+> calling it, but this variable may change later and result in a race
+> condition. Another case is that XDP with predefined queue.
+>
+> >
+> > I would still use skb->hash to encode the hash. That hash type of that
+> > field is not strictly defined. It can be siphash from ___skb_get_hash
+> > or a device hash, which most likely also uses Toeplitz. Then you also
+> > don't run into the problem of growing the struct size.
+>
+> I'm concerned exactly because it's not strictly defined. Someone may
+> decide to overwrite it later if we are not cautious enough. qdisc_skb_cb
+> also has sufficient space to contain both of the hash value and type.
 
-Reported-by: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
-Fixes: dcda165706b9 ("Bluetooth: hci_core: Fix build warnings")
-Signed-off-by: Edward AD <twuufnxlz@gmail.com>
----
- net/bluetooth/hci_sock.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+How about using skb extensions?
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 5e4f718073b7..72abe54c45dd 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -488,7 +488,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
- 		ni->type = hdev->dev_type;
- 		ni->bus = hdev->bus;
- 		bacpy(&ni->bdaddr, &hdev->bdaddr);
--		memcpy(ni->name, hdev->name, 8);
-+		memcpy(ni->name, hdev->name, strlen(hdev->name));
- 
- 		opcode = cpu_to_le16(HCI_MON_NEW_INDEX);
- 		break;
--- 
-2.25.1
+Thanks
+
+>
 
 
