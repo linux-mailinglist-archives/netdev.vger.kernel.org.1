@@ -1,156 +1,117 @@
-Return-Path: <netdev+bounces-39582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD257BFF83
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 16:44:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025417BFF84
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 16:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B7481C20BAC
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 14:44:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B17AC281ADB
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 14:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A632B1DFC5;
-	Tue, 10 Oct 2023 14:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FCQfx9sU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B7A200DC;
+	Tue, 10 Oct 2023 14:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90B21428E
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:44:07 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF34B6
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:44:04 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9ae2cc4d17eso1033085966b.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:44:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696949042; x=1697553842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8j7Zr/R9tLiQtURg5XOgTT0C5ad2/qZUZc6ItwXYFHY=;
-        b=FCQfx9sUJb54h4CKYTgdTbuBS0kA6nuLypTWtLqx9Wy+CXjm4LGBaP/2T2GN2+uhcA
-         cIRUssD2RTsuWPNeEdI1Hj/IXlmpu5ZI/uxO23kjsccxiDbfFicO/5gNK0KVE806T5tF
-         f1dD4L7P8N9zk4aI1HjLMWTyuIO9VHdEYzziQ3kJDZ3iyUKAKWN5/mHa25VlCEDIKRV4
-         h3yl/8qS8s6uL9/H6ezVG3EvyrVZJgXJLaDU48vb1m117sGxWhUGirQ4x3ha7G4i81IV
-         qXrHx8QvI+5/6zoUvdaRpUhA4x8di+ec8R3I43ZKn+nMUfYy67GNOCLG6a5+Tgu6eixo
-         0DaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696949042; x=1697553842;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8j7Zr/R9tLiQtURg5XOgTT0C5ad2/qZUZc6ItwXYFHY=;
-        b=HmwJRaY7u111/2jue3kL+ezZ8LwgQsABkcuuUXZUNkmfz584siTGd0KLzJRV5iX6x/
-         zTwSa2LsshK5KcefmHA0rKEaWzS8E3r8/ThgAV9lSIUXgrs5bs5UGz4UO17sQmRxfCw6
-         fe58l+obkelofaBUB5ZqoLbBUXpmcNUiylk4JE0fpAS0pbqCbGfa92DLRfbu/q0DsGoV
-         TuHT4X1AXMtoMrMt7UnCTHUnDa2EMAnIprCUOqI0X3P+Xgp13PhjtDW9gEJeCT+k+xwU
-         P4JOXrBFmbKq2YLhrIRcCixr99lCk+A6/Z/F7PQKNtr9Y+3nWJSRLRT+kScaPeTP/eYR
-         fUeA==
-X-Gm-Message-State: AOJu0Yz9PPWLzaiI3iazE7BLVtz6+mVyA4fPfFHk4rPUqojRfa6TtTyn
-	WIeA26BHBcCntKa3W0dv5FtX7lj2gKC2OFKTNu4=
-X-Google-Smtp-Source: AGHT+IFTNQ2fnNorUyp5clsnNygUQyxd0TyIcQb4r+pDJCjJSVzNOWBKpOkGnnY+cQYIZv4ugNcfQA==
-X-Received: by 2002:a17:906:154:b0:9a9:f2fd:2a2b with SMTP id 20-20020a170906015400b009a9f2fd2a2bmr14156360ejh.73.1696949042619;
-        Tue, 10 Oct 2023 07:44:02 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id m14-20020a1709066d0e00b00991d54db2acsm8511033ejr.44.2023.10.10.07.44.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 07:44:01 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	shuah@kernel.org,
-	pavan.chebbi@broadcom.com,
-	linux-kselftest@vger.kernel.org
-Subject: [patch net-next] selftests: netdevsim: use suitable existing dummy file for flash test
-Date: Tue, 10 Oct 2023 16:44:00 +0200
-Message-ID: <20231010144400.211191-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7967F1DFED;
+	Tue, 10 Oct 2023 14:45:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74AE0C433C8;
+	Tue, 10 Oct 2023 14:45:01 +0000 (UTC)
+Message-ID: <eedf951d-901c-40d8-91f2-0f13d33b7d4e@linux-m68k.org>
+Date: Wed, 11 Oct 2023 00:44:58 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>, Robin Murphy <robin.murphy@arm.com>
+Cc: iommu@lists.linux.dev, Marek Szyprowski <m.szyprowski@samsung.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+ netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
+References: <20231009074121.219686-1-hch@lst.de>
+ <20231009074121.219686-6-hch@lst.de>
+ <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com> <20231009125843.GA7272@lst.de>
+From: Greg Ungerer <gerg@linux-m68k.org>
+In-Reply-To: <20231009125843.GA7272@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi Christoph,
 
-The file name used in flash test was "dummy" because at the time test
-was written, drivers were responsible for file request and as netdevsim
-didn't do that, name was unused. However, the file load request is
-now done in devlink code and therefore the file has to exist.
-Use first random file from /lib/firmware for this purpose.
+On 9/10/23 22:58, Christoph Hellwig wrote:
+> On Mon, Oct 09, 2023 at 11:29:12AM +0100, Robin Murphy wrote:
+>> It looks a bit odd that this ends up applying to all of Coldfire, while the
+>> associated cache flush only applies to the M532x platform, which implies
+>> that we'd now be relying on the non-coherent allocation actually being
+>> coherent on other Coldfire platforms.
+>>
+>> Would it work to do something like this to make sure dma-direct does the
+>> right thing on such platforms (which presumably don't have caches?), and
+>> then reduce the scope of this FEC hack accordingly, to clean things up even
+>> better?
+> 
+> Probably.  Actually Greg comment something along the lines last
+> time, and mentioned something about just instruction vs instruction
+> and data cache.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- .../drivers/net/netdevsim/devlink.sh          | 21 ++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+I just elaborated on that point a little in response to Robin's email.
 
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-index 7f7d20f22207..46e20b13473c 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/devlink.sh
-@@ -31,36 +31,43 @@ devlink_wait()
- 
- fw_flash_test()
- {
-+	DUMMYFILE=$(find /lib/firmware -maxdepth 1 -type f  -printf '%f\n' |head -1)
- 	RET=0
- 
--	devlink dev flash $DL_HANDLE file dummy
-+	if [ -z "$DUMMYFILE" ]
-+	then
-+		echo "SKIP: unable to find suitable dummy firmware file"
-+		return
-+	fi
-+
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE
- 	check_err $? "Failed to flash with status updates on"
- 
--	devlink dev flash $DL_HANDLE file dummy component fw.mgmt
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE component fw.mgmt
- 	check_err $? "Failed to flash with component attribute"
- 
--	devlink dev flash $DL_HANDLE file dummy overwrite settings
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE overwrite settings
- 	check_fail $? "Flash with overwrite settings should be rejected"
- 
- 	echo "1"> $DEBUGFS_DIR/fw_update_overwrite_mask
- 	check_err $? "Failed to change allowed overwrite mask"
- 
--	devlink dev flash $DL_HANDLE file dummy overwrite settings
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE overwrite settings
- 	check_err $? "Failed to flash with settings overwrite enabled"
- 
--	devlink dev flash $DL_HANDLE file dummy overwrite identifiers
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE overwrite identifiers
- 	check_fail $? "Flash with overwrite settings should be identifiers"
- 
- 	echo "3"> $DEBUGFS_DIR/fw_update_overwrite_mask
- 	check_err $? "Failed to change allowed overwrite mask"
- 
--	devlink dev flash $DL_HANDLE file dummy overwrite identifiers overwrite settings
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE overwrite identifiers overwrite settings
- 	check_err $? "Failed to flash with settings and identifiers overwrite enabled"
- 
- 	echo "n"> $DEBUGFS_DIR/fw_update_status
- 	check_err $? "Failed to disable status updates"
- 
--	devlink dev flash $DL_HANDLE file dummy
-+	devlink dev flash $DL_HANDLE file $DUMMYFILE
- 	check_err $? "Failed to flash with status updates off"
- 
- 	log_test "fw flash test"
--- 
-2.41.0
+>>
+>> diff --git a/arch/m68k/Kconfig.cpu b/arch/m68k/Kconfig.cpu
+>> index b826e9c677b2..1851fa3fe077 100644
+>> --- a/arch/m68k/Kconfig.cpu
+>> +++ b/arch/m68k/Kconfig.cpu
+>> @@ -27,6 +27,7 @@ config COLDFIRE
+>>   	select CPU_HAS_NO_BITFIELDS
+>>   	select CPU_HAS_NO_CAS
+>>   	select CPU_HAS_NO_MULDIV64
+>> +	select DMA_DEFAULT_COHERENT if !MMU && !M523x
+> 
+> Although it would probably make more sense to simply not select
+> CONFIG_ARCH_HAS_SYNC_DMA_FOR_DEVICE and
+> CONFIG_ARCH_HAS_SYNC_DMA_FOR_CPU for these platforms and not
+> build the non-coherent code at all.  This should also include
+> all coldfire platforms with mmu (M54xx/M548x/M5441x).  Then
+> again for many of the coldfire platforms the Kconfig allows
+> to select CACHE_WRITETHRU/CACHE_COPYBACK which looks related.
+> 
+> Greg, any chance you could help out with the caching modes on
+> coldfire and legacy m68knommu?
+
+Sure, yep. I am not aware that the legacy 68000 or 68328 had any caches
+at all.
+
+The cache modes change a bit through out the various ColdFire family series, but
+can be broken down roughly into 2 groups.
+
+1.  Version 2 cores (so everything named 52xx). Early members (5206, 5206e, 5272)
+     had instruction cache only. Later members (5208, 5271/5275, 523x, etc) had
+     a selectable instruction or data or both cache arrangement. Kconfig lets you
+     select which you want - the default is instruction cache only.
+
+2.  Version 3 and 4 cores (so everything named 53xx and 54xx). They have a unified
+     instruction and data cache. Data caching can be selected to be write-through
+     (the default) or write-back.
+
+Some of the version 4 cores also have an MMU.
+
+The M532x hack in the fec driver is to deal with its unified cache, and it is the
+only ColdFire version 3 or 4 SoC that has the fec hardware module (thus no others
+listed out there). I suspect if you select data cache on the version 2 cores that have
+it would break in the fec driver too.
+
+Regards
+Greg
+
 
 
