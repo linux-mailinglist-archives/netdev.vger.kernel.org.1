@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-39735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189FE7C43F3
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:27:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165C67C43F9
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3265282110
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:27:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 967F3281D87
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF778354E1;
-	Tue, 10 Oct 2023 22:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14570354FB;
+	Tue, 10 Oct 2023 22:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NEO+sMKt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FZRIPoU/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766A032C8D
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:27:14 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 161FBFF
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:13 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d815354ea7fso8231381276.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD5E354E9
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:27:16 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 712C411A
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:14 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a7bcbb95b2so20484287b3.3
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 15:27:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1696976832; x=1697581632; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1696976833; x=1697581633; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtM0w+J9cw3jjb0usGEHfb5iDugSjDgb6JSiT+iZymc=;
-        b=NEO+sMKtDzsP8gxorptIaos+DmHsjIjrhqDxRsy3hTrzvtOtToRkMNPURCeyMENd1m
-         kJxuvWBxzplAlqxue3X7pim5HxPgPjBOX7bWZC5kyW777hvEpFWI5qdchLXSkkn0T3L1
-         EuXt89gNgq56/Qm2LzwzF3zS+9UV0+b7klrofE2cOI9Yr1NJimF7BitT8gRlCk6zC36I
-         J5IOvuIGujn1RsUvZzpt+1cVYPcCR9xRs0XZPIGSpDZNbZ5Mo9SuB7iZnPIn3xhOLnK2
-         8I5ZFTFy3WN0BoJ6IoDf5crQjMsqcxZvfh0EnJIyTykRa7omeVm1fqzK79VrJBd2QO79
-         WoZw==
+        bh=no1ezg/K8vqwwloDW/HES3GQ/s3OFKPTQdEopkcO670=;
+        b=FZRIPoU/5pyurTfWB44iov5PlLXp0nMz2I91ArGg4OatGvo4ZrfNWd07ZzMHqKEh4J
+         UCqkHtmo94DawsR6BVhuBEX3yvm7bt/+4EydQpUuQ6pNLcj91UxGl40WuSvjWM5deAxT
+         rBaTgzWJF5eerWbKNphefA5PZZzImy/GfO2GPsdK/nnOuKPvTBJo/1RnEIhvKKm/r1sP
+         kiIe08mA4Gd49L+mLYCoA4R9rddnFbMW9hAfFLqnAWEWlYlfmUgES6ssQlV9LcJJWvMT
+         3XXb24CdcLv/zetSrjRbZLZiPv60N3r+4Fx/Wys/9xyNS/mUc+AvLPF1eiLhPMP+KIHM
+         +o+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696976832; x=1697581632;
+        d=1e100.net; s=20230601; t=1696976833; x=1697581633;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GtM0w+J9cw3jjb0usGEHfb5iDugSjDgb6JSiT+iZymc=;
-        b=Wh73nLC/4r/jC7kCdXh5erg3zdfYgV5t1zx41JDUd92H4wXJOd7s2PYEc1cEDdyCDC
-         +04rWzH7Dh4OELY8a6UyWs8ylHSx1on6A8zqgpreIIWmc1lXHl81iQAQxieaXj6zkaAE
-         +cy94yE1zMmV9l2uLM84e2svezceu2j1Jwhn1ngOvTBIEc15S3JdkQvrY9L12aiyrAIc
-         hvHR5Izbq5SGfDDGK1qT9/nIj8YZIB3NP3t2RP6YO2M+1SoF3i3i0Assvkr0o2ZcOKDO
-         8GYj4ullAvHKu759q1ciYrQEKDjhhSAkkAFc48RThqRPl+qS/9QNCHVEHTko6cItKqA2
-         C7Ag==
-X-Gm-Message-State: AOJu0YwpahcFXRfZufq6aHKSjIn9T5sMa3rzjHAWSzhYrAx5Oqy3MnNY
-	UAjtZctGScyPQxH6fw1dihQVks2Ho4hGHOnBAA==
-X-Google-Smtp-Source: AGHT+IE90IMRLxbCtK+FWTfBYeHC+U5Cy3qc2KOUif/Mw4hAnclXZq/qXjDbI29Vfn0ZPUuW4ixhfNcK0Pbgbem5bA==
+        bh=no1ezg/K8vqwwloDW/HES3GQ/s3OFKPTQdEopkcO670=;
+        b=FXcArd8Fb5gsmCo5n0prfx1EQKB8aUV+ZmD8KM2RGXcmr6xNb8aAc743AcnvZql/Ny
+         m90jLx4Gr63JuSvVRTGccSppGU5R0rqWUuCLLAEmXDZmMU0jlmdRJTGGL9Vp7pq7EJ3R
+         vTaT39E/2+iD6y5GzjwCYAXlO0KTxdcEnorRn40TOZGfIjODcw94rT0Mwv+Ap6Mzt4l9
+         yldf3ZMp6zLq8Q2EgUDV6/6Y9dCDgmrbyS9aSI8INzU3KKeJ1pbta7CzC/pJytLbz8/b
+         Hoh8j+2sw8Pkir+rOd/+ClhWJBkUCRcXzbtORCWIxetUd+8Or04Pp1rLWid7KIBqz183
+         OXHA==
+X-Gm-Message-State: AOJu0Yx/cycaofM6fB84MFv+s+THaxv3x1kcI6TvXX95MBvNmFOrut6U
+	hs/iKlyCZ5dk3tYZu59gTG5JUVf2CotJNUQ9KQ==
+X-Google-Smtp-Source: AGHT+IGbG6IYsWKztc9eojIXUzVD3Isy/9hlxzBlyjEVNI0A4VM2MItv3Gt9eZ20f/xkZ1g/F2q2V2ckLAz9494wcg==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:ced3:0:b0:d9a:634d:4400 with SMTP
- id x202-20020a25ced3000000b00d9a634d4400mr53292ybe.5.1696976832282; Tue, 10
- Oct 2023 15:27:12 -0700 (PDT)
-Date: Tue, 10 Oct 2023 22:26:58 +0000
+ (user=justinstitt job=sendgmr) by 2002:a25:3290:0:b0:d9a:5b63:a682 with SMTP
+ id y138-20020a253290000000b00d9a5b63a682mr53542yby.13.1696976833634; Tue, 10
+ Oct 2023 15:27:13 -0700 (PDT)
+Date: Tue, 10 Oct 2023 22:26:59 +0000
 In-Reply-To: <20231010-netdev-replace-strncpy-resend-as-series-v1-0-caf9f0f2f021@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -64,13 +64,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231010-netdev-replace-strncpy-resend-as-series-v1-0-caf9f0f2f021@google.com>
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1696976825; l=2053;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1696976825; l=1977;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=tIBhN0dI5KQV25Dn8IjDZp+7IelZH6PsmdLrTBm66Xc=; b=hRT8DAV5FRqqSXsHAHmPSGPSEQbQBGx13G3GU53NmuUbzuZgGmmwVJqw/B2WprCOy7JOSEs7A
- JUBcK+9dOy2Bis775R/QWrp3y4385KpGI7leBfVy2b+aVrSU/y1pH0a
+ bh=l7ud0vzH9yZbaC9lpRM0yEoQEtXO/RLFBqfqu9zutis=; b=jQcCLbxmGWObHnArcKoYj2/zN6/Nnp7Y3bIItQSofJOQ0w5NrEaAgjJZ8R6E+xsT14D0zxpeI
+ a7KQJh8W8O7AWC0AJvaq/NMmrGf75By+asp4Xl/fMav25g/6JTazc+A
 X-Mailer: b4 0.12.3
-Message-ID: <20231010-netdev-replace-strncpy-resend-as-series-v1-5-caf9f0f2f021@google.com>
-Subject: [PATCH v1 net-next 5/7] igb: replace deprecated strncpy with strscpy
+Message-ID: <20231010-netdev-replace-strncpy-resend-as-series-v1-6-caf9f0f2f021@google.com>
+Subject: [PATCH v1 net-next 6/7] igbvf: replace deprecated strncpy with strscpy
 From: Justin Stitt <justinstitt@google.com>
 To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -90,17 +90,17 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 [1] and as such we should prefer more robust and less ambiguous string
 interfaces.
 
-We see that netdev->name is expected to be NUL-terminated based on its
-usage with format strings:
-|       sprintf(q_vector->name, "%s-TxRx-%u", netdev->name,
-|               q_vector->rx.ring->queue_index);
+We expect netdev->name to be NUL-terminated based on its usage with
+`strlen` and format strings:
+|       if (strlen(netdev->name) < (IFNAMSIZ - 5)) {
+|               sprintf(adapter->tx_ring->name, "%s-tx-0", netdev->name);
 
-Furthermore, NUL-padding is not required as netdev is already
+Moreover, we do not need NUL-padding as netdev is already
 zero-allocated:
-|       netdev = alloc_etherdev_mq(sizeof(struct igb_adapter),
-|                                  IGB_MAX_TX_QUEUES);
+|       netdev = alloc_etherdev(sizeof(struct igbvf_adapter));
 ...
-alloc_etherdev_mq() -> alloc_etherdev_mqs() -> alloc_netdev_mqs() ...
+alloc_etherdev() -> alloc_etherdev_mq() -> alloc_etherdev_mqs() ->
+alloc_netdev_mqs() ...
 |       p = kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAYFAIL);
 
 Considering the above, a suitable replacement is `strscpy` [2] due to
@@ -116,22 +116,22 @@ Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
 Note: build-tested only.
 ---
- drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
+ drivers/net/ethernet/intel/igbvf/netdev.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 76b34cee1da3..9de103bd3ad3 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3264,7 +3264,7 @@ static int igb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	igb_set_ethtool_ops(netdev);
- 	netdev->watchdog_timeo = 5 * HZ;
+diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
+index 7ff2752dd763..fd712585af27 100644
+--- a/drivers/net/ethernet/intel/igbvf/netdev.c
++++ b/drivers/net/ethernet/intel/igbvf/netdev.c
+@@ -2785,7 +2785,7 @@ static int igbvf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
  
+ 	igbvf_set_ethtool_ops(netdev);
+ 	netdev->watchdog_timeo = 5 * HZ;
 -	strncpy(netdev->name, pci_name(pdev), sizeof(netdev->name) - 1);
 +	strscpy(netdev->name, pci_name(pdev), sizeof(netdev->name));
  
- 	netdev->mem_start = pci_resource_start(pdev, 0);
- 	netdev->mem_end = pci_resource_end(pdev, 0);
+ 	adapter->bd_number = cards_found++;
+ 
 
 -- 
 2.42.0.609.gbb76f46606-goog
