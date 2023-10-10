@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-39444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A5DF7BF442
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:26:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3B307BF447
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 09:26:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D29281A41
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:26:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CDAF281A4F
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 07:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFF0D26D;
-	Tue, 10 Oct 2023 07:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23F95D26D;
+	Tue, 10 Oct 2023 07:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="02s/HCIa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RzQwLWhm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E614BC8CF
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:26:45 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F43D64
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:38 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-405524e6768so51579315e9.2
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DA0D518
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 07:26:55 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C27110C9
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:54 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c012232792so65688281fa.0
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 00:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1696922796; x=1697527596; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdCECjcQ8yLFY05ydH1cEetfy6fTzHwV8d56+ifpwgI=;
-        b=02s/HCIaxebFheSm+g7k948sl5c2Ki0QX/hNl6Ld18sjnvdrSbpAHTxy3MO2xxRwzv
-         0VVknShx5FITZWT8BP2O9dGpT4zuMG7x7ytvhSoeZAXEAt+q73mGN4lEBwMp5MiA97aY
-         6lOgKYFFgRvm6nny6eMN4HAoG5MWxt15gsdy0I5F62jluCyvlJOhJUEgS+FxID5Tg294
-         OJSRmMR22nyqfenE8vsUUTq5x2XO4jqYQopmXeqStgMZUGN0Tyuw0ktGZ/yTRXcG6CeB
-         cLPSaVjXIRUVhmtBYGc/IEikZzNryBJSLhZl2EH0sCR6tc3i+ywjh2yOszswp8xyUJi1
-         FU0Q==
+        d=gmail.com; s=20230601; t=1696922812; x=1697527612; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o4Hny8Bp62dXkDYUCnY1VMd74kxsOiw4WrEv/PlhCAw=;
+        b=RzQwLWhmhChCAkyCL9wWsd6nkOo6Aj647TfjTKI7StSc2tKjdC3MbfZMYgFO6CPiS6
+         h0dYFPrLlph1s+06DHl16IBZsCozEscJHWGkMYd7ojrIrAcFAoXtI6cdjm+5hxsmKD0p
+         2ibkyzcaplE6tjm6FV3YUxGGRwVvUGus5ex1KhPQPwOJtYDpU6oj83itKAtYmyfqOZFb
+         /0sM4A52uQllVErC8NLrffnHF18Wkk0/D9j1mc0t4siEF2G5ZjNJ00AqXVuGDZSt/lFR
+         OiMs7HAeJkYwD6unRzaPN2QjCpKrtXtF/qy/s8dkGCx+8a9W2WCkVJeYk/c3H3t2cV8a
+         CQsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696922796; x=1697527596;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mdCECjcQ8yLFY05ydH1cEetfy6fTzHwV8d56+ifpwgI=;
-        b=cM1Myyz+2s18nG8neokA3bqoCnfXuRyCKUg2zWmh5cKtW0tbU1Wadmxsxv2rKrfwIg
-         EStss5SL09D6cWqaV59IS2du4w3b2rUM0u+FsbOFaEEVvmSWgtdefGSTMPN8Gj+q5CPB
-         EDszV6WwRZ1xFRTbVGTxmxuNAu7VpIWBaNz27w5r7idGcza5zqDgYMXWdBRyuMDB6cel
-         0Uc2QH+02w5T8LpYanSw078YViPJQF5yDSISPuT/Cx4G+Ce0umlA31PmpDcpoyRbX79f
-         FWbF3ZBMmmaZGcaX/h1cvnCnQ/xos46lb7gDTrsyakid6eYz80kBz9bLbZGqGiEYB45J
-         Hldw==
-X-Gm-Message-State: AOJu0YxwSqTy19rQyTyTZxeubX5/S2PpqQkXmhuc0Z6KWH/0+FKpKWWD
-	0SK+eLMRljHv5c2qLtF5WRlwag==
-X-Google-Smtp-Source: AGHT+IHPsuRIDS+FMzvHoytvW0TbGq5FA5GpCf7AiQpHBFEGmiKWTTrH+SLE668t3FaYvZSQHeDwHw==
-X-Received: by 2002:a1c:f202:0:b0:407:566c:a9e3 with SMTP id s2-20020a1cf202000000b00407566ca9e3mr740404wmc.21.1696922796370;
-        Tue, 10 Oct 2023 00:26:36 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id z18-20020a05600c221200b0040607da271asm15441190wml.31.2023.10.10.00.26.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 00:26:35 -0700 (PDT)
-Date: Tue, 10 Oct 2023 09:26:34 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com
-Subject: Re: [patch net-next] netlink: specs: don't allow version to be
- specified for genetlink
-Message-ID: <ZST8qgEKFLduNx3X@nanopsycho>
-References: <20231009154907.169117-1-jiri@resnulli.us>
- <20231009182644.0f614c2f@kernel.org>
+        d=1e100.net; s=20230601; t=1696922812; x=1697527612;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=o4Hny8Bp62dXkDYUCnY1VMd74kxsOiw4WrEv/PlhCAw=;
+        b=AIJ25pFvKUUb41JjE3RanlXQilM+6rR520srvUHw4YfzaZQCNdw0RpWB23L+dc4lJZ
+         Uem1ywInfPVov1t4aLdGf1SHenEE4b1mHXwHYtqmPWVAhQJZveObn/tD5/tHbQxMoD8v
+         N2/HTjQNXUl2RTR7UJW6nlWY7atoeK1Mbah9OvKytqG7zQUnS/4/ZGeqUs3REtN+3gz1
+         gA3hZ0guECtFDEr0EgVrWmnzDCWcdlHm9W6V+XjpxwD7j2xaM/KkTMt8qotuNDgL1Yiw
+         5uHYcq5mxm6i+TWvf68Ak2HNUSbI50kenXTp4h9nfeOO/6//sbv/vS6iKwTfqd0OBd+t
+         ALRQ==
+X-Gm-Message-State: AOJu0YwRfSoiG1AKmk6SfatcmdE0YVgSpkeD/7vcP8SbHsN/9COQfgIo
+	RV0B0O8AC9GTxS/916ELfjqJEuLZsuyWeWH7/k058FqmSyc=
+X-Google-Smtp-Source: AGHT+IFWEl5v5gLvsVCPrixixuRBbEhoITca87VZwRpu1Yga1nQ/y1/SNlnXJUrtQqrxj1fLncjncUcIXDcmjNjiPPU=
+X-Received: by 2002:a2e:2413:0:b0:2c0:ff6:984f with SMTP id
+ k19-20020a2e2413000000b002c00ff6984fmr14019651ljk.49.1696922812124; Tue, 10
+ Oct 2023 00:26:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231009182644.0f614c2f@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+From: Francesco Venturi <francesco.venturi1@gmail.com>
+Date: Tue, 10 Oct 2023 09:26:40 +0200
+Message-ID: <CACvgxrHamYWW2oj8CVETvBd79Vuep9Ra0epFnPF+S2am6Xdeaw@mail.gmail.com>
+Subject: Nice to meet you; I'm a Highschool networking teacher
+To: mkubecek@suse.cz
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tue, Oct 10, 2023 at 03:26:44AM CEST, kuba@kernel.org wrote:
->On Mon,  9 Oct 2023 17:49:07 +0200 Jiri Pirko wrote:
->>  Documentation/netlink/genetlink-legacy.yaml | 8 ++++----
->>  Documentation/netlink/genetlink.yaml        | 4 ----
->
->You missed genetlink-c
+Nice to meet you, my name is Francesco Venturi and I'd need your help...
+I've had a look at a presentation about ethtool and how to run
+ethernet diagnostics.
+I need to show my students these capabilities, but I need to know what
+hardware to buy.
+Can you please kindly provide me with a list of supported NIC models,
+both PCI and USB (and perhaps chipsets) that support most of this
+functionality up to today, including the "--cable-test" ethtool
+command line option?
+Can you also please point me to a Linux distro having access to a
+version compiled with netlink support and provide me with some
+guidance on how to install it without compiling?
 
-Ah, will fix.
+Thank you very much in advance!
 
->-- 
->pw-bot: cr
+Francesco Venturi
 
