@@ -1,116 +1,82 @@
-Return-Path: <netdev+bounces-39410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 683967BF110
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:48:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F697BF111
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955A41C20AAF
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:47:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0418E1C20B06
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 02:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FDBC390;
-	Tue, 10 Oct 2023 02:47:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40ED390;
+	Tue, 10 Oct 2023 02:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJOVSFrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28046361
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:47:54 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C89B9E;
-	Mon,  9 Oct 2023 19:47:53 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.201])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S4Kxc1kK7z6D8Zj;
-	Tue, 10 Oct 2023 10:44:52 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 10 Oct 2023 03:47:50 +0100
-Message-ID: <017a5263-13b9-1b07-4bb2-52754585f2ac@huawei.com>
-Date: Tue, 10 Oct 2023 05:47:49 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B33361
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 02:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ED6E1C433C7;
+	Tue, 10 Oct 2023 02:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696906224;
+	bh=7fTF8e3VNJFiLx6QzH692U0VqzP6aGLoTLwrm3W0BcU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oJOVSFrfLvl/cn2OkNwjQGgyQJ1I8Od8cgri1RAHSm2zoxi5oCAXmC/oR/eI3coRV
+	 jzUcNP3S59WqPQU/tA+2VK+XVimvDKvduUFo3jsc4FsW0jbMAkXH22GJDAq6Awe4vX
+	 lGfuGC04+66bgYOPt0b4XtuwIH9/jCruzzydyFJDpWpTlid8ma5IPghv3qxL6S22K3
+	 fTtpOJMr+0AWcUL69I6KFUF6HNwelGWICk4GIYcRjyE3BdbiBWyVfGTj8m9xJ8QCPB
+	 fWJTGibrLyYdLJ5/0QxjjL/l4bxb/8uu4HDu1+4PR36j1CDIh1GyQgF5Ki0RxUgJaM
+	 5RAAJreouf1Uw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1D3AE000A8;
+	Tue, 10 Oct 2023 02:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v12 09/12] selftests/landlock: Share enforce_ruleset()
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
- <20230920092641.832134-10-konstantin.meskhidze@huawei.com>
- <20231001.Aiv7Chaedei0@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20231001.Aiv7Chaedei0@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net] net: refine debug info in skb_checksum_help()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169690622385.548.17611363548112393339.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Oct 2023 02:50:23 +0000
+References: <20231006173355.2254983-1-edumazet@google.com>
+In-Reply-To: <20231006173355.2254983-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, willemb@google.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-10/2/2023 11:26 PM, Mickaël Salaün пишет:
-> On Wed, Sep 20, 2023 at 05:26:37PM +0800, Konstantin Meskhidze wrote:
->> This commit moves enforce_ruleset() helper function to common.h so that
->> it can be used both by filesystem tests and network ones.
->> 
->> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> ---
->> 
->> Changes since v11:
->> * None.
->> 
+On Fri,  6 Oct 2023 17:33:54 +0000 you wrote:
+> syzbot uses panic_on_warn.
 > 
->> diff --git a/tools/testing/selftests/landlock/fs_test.c b/tools/testing/selftests/landlock/fs_test.c
->> index 251594306d40..7c94d3933b68 100644
->> --- a/tools/testing/selftests/landlock/fs_test.c
->> +++ b/tools/testing/selftests/landlock/fs_test.c
->> @@ -677,17 +677,7 @@ static int create_ruleset(struct __test_metadata *const _metadata,
->>  	return ruleset_fd;
->>  }
->> 
->> -static void enforce_ruleset(struct __test_metadata *const _metadata,
->> -			    const int ruleset_fd)
->> -{
->> -	ASSERT_EQ(0, prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0));
->> -	ASSERT_EQ(0, landlock_restrict_self(ruleset_fd, 0))
->> -	{
->> -		TH_LOG("Failed to enforce ruleset: %s", strerror(errno));
->> -	}
->> -}
->> -
->> -TEST_F_FORK(layout0, proc_nsfs)
->> +TEST_F_FORK(layout1, proc_nsfs)
+> This means that the skb_dump() I added in the blamed commit are
+> not even called.
 > 
-> Why this change?
+> Rewrite this so that we get the needed skb dump before syzbot crashes.
+> 
+> [...]
 
-  Looks like a bug coming from v11 version.
-  You have added layout0 recently. in V11 version
-  there was TEST_F_FORK(layout1, proc_nsfs), and I missed the changed
-  , resolving conflict with layout1.
-  Will be fixed. Thanks.
-> 
->>  {
->>  	const struct rule rules[] = {
->>  		{
->> --
->> 2.25.1
->> 
-> .
+Here is the summary with links:
+  - [net] net: refine debug info in skb_checksum_help()
+    https://git.kernel.org/netdev/net/c/26c29961b142
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
