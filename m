@@ -1,185 +1,262 @@
-Return-Path: <netdev+bounces-39513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C11567BF927
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:05:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDD47BF929
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA3E1C20C24
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:05:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8999281C36
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 11:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB22F16400;
-	Tue, 10 Oct 2023 11:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="kTP5h0SP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61C3516400;
+	Tue, 10 Oct 2023 11:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A298DEEDF;
-	Tue, 10 Oct 2023 11:05:09 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2139.outbound.protection.outlook.com [40.107.22.139])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017EF94;
-	Tue, 10 Oct 2023 04:05:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OLx4RYEp9c7WlC2lWoQD6g77HbdK5SSAQt+jVNFFh21Ht95nx2VeHWEdcRrfvajjT5XyVUZuAu9I7ZiYrYc8U7WSdH/Lf3ScgX/pen9dhlNDfrmva16C86LHbksuQm41PzGV0ug5lgBe3fRgt8v37QbfBqURjPWsXNBg7onLCcrSp7CrltFOB6nyyKrVn40/0ThRdcrsgnn+XEYWVc9q78aDmrMl/26GixJx562RxiofGEOSz7fMtqI+e4uK6izLt/8X/X0+YY4jQfQxjskAZ3DoD1qEVX/7UwM3MJBtkan90zM+Het/iq4Tslhx98KqzWTXt5BHsuKa2JGERyaNeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3vXhlDOgIjRxJ4spgsnebm0qC+OrG2CknNZx1kLuAPQ=;
- b=dbjHr/uPHuzC2pVcHvSHZ4bzBwRaZG0b6+gj79T0Tgf16gQ46r13+8wCqzcmhXB/IzABjmo9Q+5q60I70LFujS9k1gRZc7wPerlrqmwG7qxGNcw36lhFVTlhlB8FuwRGufm+u+8KchVIPhKAbXwzDFKQ6cIqqGT/qNaig+zDg/C50Y2WfrxIXNnyfwiQh0+a+Jio3228J5gXRm9rJv3HNAYrIF5CG3pyRK7AC6cy3tBcH3S9OBWI+sst3b7Q0s49W5FG6ekgpT0/KQPNLwdtTOxAjHfN0ltXTmRNuJ7t6DjPADIGFq1Bj/fNxMG6Flr9gOHPbgcYnTk+GUJGz9jxfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
- header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3vXhlDOgIjRxJ4spgsnebm0qC+OrG2CknNZx1kLuAPQ=;
- b=kTP5h0SPE8dN0sfeDAxtMy1tWihse3QzvQaK53B3wcmOk416sMrIAjgZttannvYXM6qvFTs2CJGG2U4VvPQ0AKeshZlaB+MmMFvKjLnaZm4xbC1rfPraHgD3e8xaBczJapuXnGdttm5Guo2Jq+Xn8porKWd5H0YAirr34qJnLSg=
-Received: from AM6PR03MB3943.eurprd03.prod.outlook.com (2603:10a6:20b:26::24)
- by AS8PR03MB6728.eurprd03.prod.outlook.com (2603:10a6:20b:29f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Tue, 10 Oct
- 2023 11:05:05 +0000
-Received: from AM6PR03MB3943.eurprd03.prod.outlook.com
- ([fe80::fb3c:4931:e74e:c691]) by AM6PR03MB3943.eurprd03.prod.outlook.com
- ([fe80::fb3c:4931:e74e:c691%3]) with mapi id 15.20.6863.032; Tue, 10 Oct 2023
- 11:05:04 +0000
-From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
-To: Justin Stitt <justinstitt@google.com>
-CC: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-hardening@vger.kernel.org" <linux-hardening@vger.kernel.org>
-Subject: Re: [PATCH] net: dsa: realtek: rtl8365mb: replace deprecated strncpy
- with ethtool_sprintf
-Thread-Topic: [PATCH] net: dsa: realtek: rtl8365mb: replace deprecated strncpy
- with ethtool_sprintf
-Thread-Index: AQHZ+wIbcwTMjUrkiUmY/MMUWpl2xrBC3TkA
-Date: Tue, 10 Oct 2023 11:05:04 +0000
-Message-ID: <gcp232latw2qcszw47fpverzp5bw6jwcc7ktj3y2t3xlnwigff@n4lqte6u5eav>
-References:
- <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
-In-Reply-To:
- <20231009-strncpy-drivers-net-dsa-realtek-rtl8365mb-c-v1-1-0537fe9fb08c@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM6PR03MB3943:EE_|AS8PR03MB6728:EE_
-x-ms-office365-filtering-correlation-id: 156ab21a-41f2-49be-daf5-08dbc980c1c6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- EOTl/xwlf7PnmD7H1M6V0r8JsR+fv8C15RyQsvHb7WR43EFPJuaaiLkFmC+gZSRPbyHvK0Eca8bgp+HqTMivcxwK/lUR7137llaNxL7iqo0Rp2Lkf3wtbUStD9ij9tG1117gUxEyM3Cnck0Is5oe+bJ0Br3ZnLnZpJS8lv/A9nyobtNEFZyXTXXbx/TwsqWAe8UB/EbQ5CqfyIEeAlmnUA9QiUHRJ1oabd/jqatkXGyo/utOjCOthAu8GLMobS05QY/44Fa3xTRuXvnOhKr6HzrAaoaEsTgVB86NLjZVYBjFZTXvW0137Tg22LTaRS20t9lMiK42qwkDHIKIuWChnm1DTPk2A5WfkQmsNB4G1ToaK2Q11C+nnDJQCSW9P6Kn8hUV6Uf9RNx1XeRmc60TqW1vwjyZpixprvePnOUUjBGdjaoeQoa2+4wlKukGX+o3fd8Lxe3oY+la0YtiLVY+jGBzLsw9xkUFUrL4EdKHwH34pPqg2NBBJWuKlh2Xfc883qXdv2aPy1V2TPKm52dRSO+lmPsCQirJryRQZdgn/LSVNs6H4/o4jw6/SkakjKsCRcb3mChb19J7saWOQa4CkVRYHRxx0kMMHu2nDtmfXe4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR03MB3943.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(136003)(39850400004)(376002)(396003)(366004)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(85182001)(85202003)(71200400001)(478600001)(66574015)(33716001)(26005)(83380400001)(38070700005)(9686003)(122000001)(6512007)(6506007)(86362001)(2906002)(6486002)(966005)(38100700002)(41300700001)(5660300002)(66556008)(66446008)(66946007)(91956017)(66476007)(316002)(64756008)(6916009)(54906003)(8676002)(4326008)(8936002)(76116006)(7416002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dDhyVWR2ZVU4TTVrTnhFWGgzeVZJdjRKT0NkZnU0dVlRbjlsYnRxbzRiWEVH?=
- =?utf-8?B?VjdWWk0vRFY2djEwS1NFb2ZXYVluWm5TaEsrdGxSaS9IOWc1SmhDZVNhRDhZ?=
- =?utf-8?B?SEFhZytFVlIrT01IWmFHQVBHdmp1OCtGaHZPakpnVlJ5SjdiOGhzMWJaNnJp?=
- =?utf-8?B?Vy92STJ0cDVzQ2Fjc3FsU29tVlczUFUxajduU0wrRTRMdHAzVVVKVWJ5bTli?=
- =?utf-8?B?MWpuRWRpWEgzLzE0dXRYMkVMeTIzL3FuZmhwME13VzQ1ZU5lWm1WakRYZzJi?=
- =?utf-8?B?RmlDNkVEMTk0Ni83RXdFWlorM2FqZnBaRjVQMTVLRFBUeHlEL3NtMWwyYkRw?=
- =?utf-8?B?U3JMaTVQY2Y1TGdyM2xDZlNiajNEamhPeVo1dUVjR2NEMkp5VUc5bGlJRnlD?=
- =?utf-8?B?Ulh3Rm1acENKbEh2bmJjeTVRRThSWEw2MHVKTVBrbitWMDRVMDg4MEt0Wlpp?=
- =?utf-8?B?UDZWZ1N3Njcxcys5Z202NXlXRC9ONklsMEhkRUxxZUg3b1JJczQwN2UrU1Fa?=
- =?utf-8?B?RzMrNXFOV1FTMlhKSXdyWWxwa1dVT3N2QmtvMjlXT252ei9nMnQ4aXpqSEtt?=
- =?utf-8?B?K0xKWnFWb0xIVUZTRGxXeXp3Qm10Z2ljcFcrckhDOTlLZU9pc2dBUk80M09p?=
- =?utf-8?B?Mk10dCtoYlBEemZGNi9OOHdyZzR0S0IvaTQrVFhhbW53TkZvVjk2OWpLK3RN?=
- =?utf-8?B?L2pSQWNHZW12YmtxYjNiZXQ5NW9vS2ZmZ2JHNVNWeEhLQnd2SGhLUUdqTG1o?=
- =?utf-8?B?USs5VW13RUs3cm53dGhtd1labjJQdXUxYkF1ajU2ME5HVXJkTG5uMDV3bFFS?=
- =?utf-8?B?ZEJWN1duOHZSZ0Y2eVVzSTlHc3JoMmFCT0pHZ1llZXQ5QkpzME9Ybk94amZ6?=
- =?utf-8?B?dHVtNWs2QzRqNWJOWDRCb2NGYWlTL1lUN3o4d3cxQ21rL1VLckNRbURlbTV6?=
- =?utf-8?B?bHdSM0lDd3ZuOFp5MmR1Nnh0MktaZ0JzenlSbklLMmhSRkc1emowY1ExVzJN?=
- =?utf-8?B?aU1RSDNMd24rakZuN2pBbW9mblpvbHRPK2J3YTEyVE1UalBHVWkzU2E5ZzlN?=
- =?utf-8?B?TlFHdzlyUG1wZGgrYTk0bC9XeTkxTllneDBhOTN6WlNiT2pXS1haUWY3alpu?=
- =?utf-8?B?a0VIYUc5clBuemtnTkpkZjBCUjR4T1RLdzhSWjdXekJuWnJaNnlldC9vV0k3?=
- =?utf-8?B?MERPR1JQQ2NPdnpMaEptVVNZZlQ0SXMzNGNGQjZoRER4R0ZWOUhJY2I2a1JU?=
- =?utf-8?B?THRheGlreDBUU1lJUG9QYkZZa0ZJWGhXYUxHTFQvRUxoUDBmYnZUaFluRkEy?=
- =?utf-8?B?NWlkVFBRV1h2dVFNQ3RraFVkb3JqSVpLK1diZFlOU1B2aFp6RzF6amdjN04w?=
- =?utf-8?B?UFhQOWNkSTZBQXlDOGdFYTU5L005a2IxemZkOThNaTBSTXY2RXlqaDk3aDZJ?=
- =?utf-8?B?aGxscXhydFFhS2QxTHozRnltcjdaaWRrWkZIUkxRclZBa00ySzczTDY0dkFj?=
- =?utf-8?B?dU90TGRORnRvL1VIWTFackxvaWJYbG13SlNGbkNIR0NqdDR4UXFYUXpkNWd1?=
- =?utf-8?B?SWxtU3Q0Q3hyZm5kS1ZnZXZreWxDdm9pY3FoUUhTS3ROREZvTi93a3N2Vzhj?=
- =?utf-8?B?dFdIQkMrdmU5M1o5Vk1TY3pYYzJGc3hZSXRTKzc1TE9mcFpZZ0VpT3gyamRw?=
- =?utf-8?B?TUVWRUZ3Zmc3bHZLbEt6dWd6TmZzUUphK25SVUFOYWNiR2hpVVh0ZHk2SGpH?=
- =?utf-8?B?emo2eTFGNlB6YWxtNTdVenZJYTBMdHQveXZHRVB5MU03U1dMUzFEZFQ2WXlK?=
- =?utf-8?B?REJFeE5DclRESmhZZGJvZm9BbytTV0VRZ1dOTGNqYVk0Mjh2NGh0cWVzSkdI?=
- =?utf-8?B?dVJCbmh5Vk9DSjlKbjd2d0hrWUc0LytQaDB6WGFSdUJ2WTBTcEJnZjdzOGtz?=
- =?utf-8?B?clZWYzNKaS9Ic1pveUk2UERUYkhGbGhQY1BINnNPMVFWZXBZYXZ0dGFsck52?=
- =?utf-8?B?OTZSYTEzWUNVc0V5WFlvQWhSL0NwQlRjRDU5QXFOWjZpYmoyNDBPSVk3Z1Rm?=
- =?utf-8?B?VVp4RHRkTzZtRGtlRlYzRkZPbDVvdURBZ0MzTTRwV1dyL1d5aGtWOEhYODkw?=
- =?utf-8?Q?TD5BD8EopbeDtfx8K6vaNhsav?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <36D414BC04F399449DC165FAC2D57080@eurprd03.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C9E28E2
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 11:05:31 +0000 (UTC)
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F00AC;
+	Tue, 10 Oct 2023 04:05:29 -0700 (PDT)
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.94.2)
+	(envelope-from <n0-1@orbyte.nwl.cc>)
+	id 1qqAYF-0001Ys-Q0; Tue, 10 Oct 2023 13:05:23 +0200
+Date: Tue, 10 Oct 2023 13:05:23 +0200
+From: Phil Sutter <phil@netfilter.org>
+To: netfilter <netfilter@vger.kernel.org>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
+	lwn@lwn.net
+Subject: [ANNOUNCE] iptables 1.8.10 release
+Message-ID: <ZSUv81gBDQb2kqHs@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@netfilter.org>,
+	netfilter <netfilter@vger.kernel.org>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
+	lwn@lwn.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bang-olufsen.dk
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB3943.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 156ab21a-41f2-49be-daf5-08dbc980c1c6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2023 11:05:04.6895
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: XQjUf/oNG4bJJwH3JL+hZe8J8sfYwpw8soNgxoxbsyQ79f4rL8RIoEG7j/03VddBdFEIXMrJm/C5e8gjoQKkGA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB6728
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="2gznOYqojtGKBm51"
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gTW9uLCBPY3QgMDksIDIwMjMgYXQgMTA6NDM6NTlQTSArMDAwMCwgSnVzdGluIFN0aXR0IHdy
-b3RlOg0KPiBbWW91IGRvbid0IG9mdGVuIGdldCBlbWFpbCBmcm9tIGp1c3RpbnN0aXR0QGdvb2ds
-ZS5jb20uIExlYXJuIHdoeSB0aGlzIGlzIGltcG9ydGFudCBhdCBodHRwczovL2FrYS5tcy9MZWFy
-bkFib3V0U2VuZGVySWRlbnRpZmljYXRpb24gXQ0KPiANCj4gYHN0cm5jcHlgIGlzIGRlcHJlY2F0
-ZWQgZm9yIHVzZSBvbiBOVUwtdGVybWluYXRlZCBkZXN0aW5hdGlvbiBzdHJpbmdzDQo+IFsxXSBh
-bmQgYXMgc3VjaCB3ZSBzaG91bGQgcHJlZmVyIG1vcmUgcm9idXN0IGFuZCBsZXNzIGFtYmlndW91
-cyBzdHJpbmcNCj4gaW50ZXJmYWNlcy4NCj4gDQo+IGV0aHRvb2xfc3ByaW50ZigpIGlzIGRlc2ln
-bmVkIHNwZWNpZmljYWxseSBmb3IgZ2V0X3N0cmluZ3MoKSB1c2FnZS4NCj4gTGV0J3MgcmVwbGFj
-ZSBzdHJuY3B5IGluIGZhdm9yIG9mIHRoaXMgbW9yZSByb2J1c3QgYW5kIGVhc2llciB0bw0KPiB1
-bmRlcnN0YW5kIGludGVyZmFjZS4NCj4gDQo+IExpbms6IGh0dHBzOi8vd3d3Lmtlcm5lbC5vcmcv
-ZG9jL2h0bWwvbGF0ZXN0L3Byb2Nlc3MvZGVwcmVjYXRlZC5odG1sI3N0cm5jcHktb24tbnVsLXRl
-cm1pbmF0ZWQtc3RyaW5ncyBbMV0NCj4gTGluazogaHR0cHM6Ly9tYW5wYWdlcy5kZWJpYW4ub3Jn
-L3Rlc3RpbmcvbGludXgtbWFudWFsLTQuOC9zdHJzY3B5LjkuZW4uaHRtbCBbMl0NCj4gTGluazog
-aHR0cHM6Ly9naXRodWIuY29tL0tTUFAvbGludXgvaXNzdWVzLzkwDQo+IENjOiBsaW51eC1oYXJk
-ZW5pbmdAdmdlci5rZXJuZWwub3JnDQo+IFNpZ25lZC1vZmYtYnk6IEp1c3RpbiBTdGl0dCA8anVz
-dGluc3RpdHRAZ29vZ2xlLmNvbT4NCg0KUmV2aWV3ZWQtYnk6IEFsdmluIMWgaXByYWdhIDxhbHNp
-QGJhbmctb2x1ZnNlbi5kaz4NCg0KPiAtLS0NCj4gTm90ZTogYnVpbGQtdGVzdGVkIG9ubHkuDQo+
-IC0tLQ0KPiAgZHJpdmVycy9uZXQvZHNhL3JlYWx0ZWsvcnRsODM2NW1iLmMgfCAzICstLQ0KPiAg
-MSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAyIGRlbGV0aW9ucygtKQ0KPiANCj4gZGlm
-ZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2RzYS9yZWFsdGVrL3J0bDgzNjVtYi5jIGIvZHJpdmVycy9u
-ZXQvZHNhL3JlYWx0ZWsvcnRsODM2NW1iLmMNCj4gaW5kZXggNDFlYTNiNWE0MmIxLi5kMTcxYzE4
-ZGQzNTQgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L2RzYS9yZWFsdGVrL3J0bDgzNjVtYi5j
-DQo+ICsrKyBiL2RyaXZlcnMvbmV0L2RzYS9yZWFsdGVrL3J0bDgzNjVtYi5jDQo+IEBAIC0xMzAz
-LDggKzEzMDMsNyBAQCBzdGF0aWMgdm9pZCBydGw4MzY1bWJfZ2V0X3N0cmluZ3Moc3RydWN0IGRz
-YV9zd2l0Y2ggKmRzLCBpbnQgcG9ydCwgdTMyIHN0cmluZ3NldA0KPiANCj4gICAgICAgICBmb3Ig
-KGkgPSAwOyBpIDwgUlRMODM2NU1CX01JQl9FTkQ7IGkrKykgew0KPiAgICAgICAgICAgICAgICAg
-c3RydWN0IHJ0bDgzNjVtYl9taWJfY291bnRlciAqbWliID0gJnJ0bDgzNjVtYl9taWJfY291bnRl
-cnNbaV07DQo+IC0NCj4gLSAgICAgICAgICAgICAgIHN0cm5jcHkoZGF0YSArIGkgKiBFVEhfR1NU
-UklOR19MRU4sIG1pYi0+bmFtZSwgRVRIX0dTVFJJTkdfTEVOKTsNCj4gKyAgICAgICAgICAgICAg
-IGV0aHRvb2xfc3ByaW50ZigmZGF0YSwgIiVzIiwgbWliLT5uYW1lKTsNCj4gICAgICAgICB9DQo+
-ICB9DQo+IA0KPiANCj4gLS0tDQo+IGJhc2UtY29tbWl0OiBjYmYzYTJjYjE1NmEyYzkxMWQ4ZjM4
-ZDgyNDc4MTRiNGMwN2Y0OWEyDQo+IGNoYW5nZS1pZDogMjAyMzEwMDktc3RybmNweS1kcml2ZXJz
-LW5ldC1kc2EtcmVhbHRlay1ydGw4MzY1bWItYy1iYjEwNmU0YzExMGMNCj4gDQo+IEJlc3QgcmVn
-YXJkcywNCj4gLS0NCj4gSnVzdGluIFN0aXR0IDxqdXN0aW5zdGl0dEBnb29nbGUuY29tPg0KPg==
+
+--2gznOYqojtGKBm51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi!
+
+The Netfilter project proudly presents:
+
+        iptables 1.8.10
+
+This release contains new features:
+
+- xtables-translate: Support rule insert with index
+- Broute table support in ebtables-nft
+- nft-variants' debug output (pass multiple '-v' flags) now contains
+  sets if present
+- Add mld-listener type names to icmp6 match
+- Correctly parse meta mark statements in rules even though iptables-nft
+  does not emit those
+
+... and fixes:
+
+- Compiler warnings with -Werror=format-security
+- Needless install of unsupported xtables.conf file
+- Wrong "unknown argument" error message in some corner cases
+- ebtables-nft allowed implicitly calling targets by one of their
+  options, require '-j <target>' first for consistency with legacy
+- Various bugs in ebtables-translate
+- Corner-case bug in iptables-nft-restore when deleting a rule inside
+  the batch file
+- Sloppy rule check command in ip6tables-legacy, producing
+  false-positives
+- Arptables-nft omitted some inverted options when listing rules
+- Parser would not accept long-options with appended argument
+  (in form '--opt=arg')
+- Ip6tables-nft ignored counter argument ('-c')
+- Wrong error message when listing a non-existent chain with
+  iptables-nft
+- Pointless creation of unused anonymous sets when deleting an
+  ebtables-nft rule containing an among match
+- Ineffective among match comparison causing ebtables-nft to potentially
+  delete the wrong rule
+- Sloppy iptables-restore parser accepting junk where chain counters are
+  expected
+- Missing target name validation in chain rename command
+- Icmp match confused type 255 and code 255 with special type "any"
+- NDEBUG compiler flag breaks iptables-nft
+- Non-functional chain policy counters with iptables-nft
+- Zeroing a rule's counters would zero chain policy counters with legacy
+  iptables
+- Reject '-m conntrack --ctproto 0', it will never match
+- Stale meta expression when stripping a match on interface "+" (i.e.,
+  any interface name)
+- Harmless compiler warning with recent Linux headers
+
+... and documentation updates:
+
+- Add missing chunk types to SCTP match help text (use 'iptables -p sctp
+  --help' to see them)
+- Document possible false negatives when using 'string' match's BM
+  algorithm
+- Missing return codes 3 and 4 descriptions in iptables man page
+- Misc minor fixes in man pages
+
+You can download the new release from:
+
+https://netfilter.org/projects/iptables/downloads.html#iptables-1.8.10
+
+To build the code, libnftnl 1.2.6 is required:
+
+* http://netfilter.org/projects/libnftnl/downloads.html#libnftnl-1.2.6
+
+In case of bugs, file them via:
+
+* https://bugzilla.netfilter.org
+
+Happy firewalling!
+
+--2gznOYqojtGKBm51
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="changes-iptables-1.8.10.txt"
+
+Alyssa Ross (1):
+  build: use pkg-config for libpcap
+
+Arturo Borrero Gonzalez (1):
+  iptables-test.py: make explicit use of python3
+
+Florian Westphal (6):
+  xtables-eb: fix crash when opts isn't reallocated
+  iptables-nft: make builtin tables static
+  iptables-nft: remove unused function argument
+  include: update nf_tables uapi header
+  ebtables-nft: add broute table emulation
+  nft-ruleparse: parse meta mark set as MARK target
+
+Jacek Tomasiak (2):
+  iptables: Fix setting of ipv6 counters
+  iptables: Fix handling of non-existent chains
+
+Jan Engelhardt (1):
+  xshared: dissolve should_load_proto
+
+Jan Palus (1):
+  nft: move processing logic out of asserts
+
+Jeremy Sowden (1):
+  man: string: document BM false negatives
+
+Markus Boehme (1):
+  ip6tables: Fix checking existence of rule
+
+Pablo Neira Ayuso (3):
+  nft: check for source and destination address in first place
+  nft: use payload matching for layer 4 protocol
+  nft-bridge: pass context structure to ops->add() to improve anonymous
+    set support
+
+Phil Sutter (76):
+  extensions: NAT: Fix for -Werror=format-security
+  etc: Drop xtables.conf
+  Proper fix for "unknown argument" error message
+  ebtables: Refuse unselected targets' options
+  ebtables-translate: Drop exec_style
+  ebtables-translate: Use OPT_* from xshared.h
+  ebtables-translate: Ignore '-j CONTINUE'
+  ebtables-translate: Print flush command after parsing is finished
+  tests: xlate: Support testing multiple individual files
+  tests: CLUSTERIP: Drop test file
+  nft-shared: Lookup matches in iptables_command_state
+  nft-shared: Use nft_create_match() in one more spot
+  nft-shared: Simplify using nft_create_match()
+  tests: xlate: Properly split input in replay mode
+  tests: xlate: Print file names even if specified
+  extensions: libebt_redirect: Fix target translation
+  extensions: libebt_redirect: Fix for wrong syntax in translation
+  extensions: libebt_ip: Do not use 'ip dscp' for translation
+  extensions: libebt_ip: Translation has to match on ether type
+  ebtables: ip and ip6 matches depend on protocol match
+  xtables-translate: Support insert with index
+  include: Add missing linux/netfilter/xt_LOG.h
+  nft-restore: Fix for deletion of new, referenced rule
+  tests: shell: Test for false-positive rule check
+  utils: nfbpf_compile: Replace pcap_compile_nopcap()
+  nft-shared: Drop unused include
+  arptables: Fix parsing of inverted 'arp operation' match
+  arptables: Don't omit standard matches if inverted
+  xshared: Fix parsing of option arguments in same word
+  nft: Introduce nft-ruleparse.{c,h}
+  nft: Extract rule parsing callbacks from nft_family_ops
+  nft: ruleparse: Create family-specific source files
+  tests: shell: Sanitize nft-only/0009-needless-bitwise_0
+  nft: Special casing for among match in compare_matches()
+  nft: More verbose extension comparison debugging
+  nft: Do not pass nft_rule_ctx to add_nft_among()
+  nft: Include sets in debug output
+  *tables-restore: Enforce correct counters syntax if present
+  *tables: Reject invalid chain names when renaming
+  ebtables: Improve invalid chain name detection
+  tests: shell: Fix and extend chain rename test
+  iptables-restore: Drop dead code
+  iptables-apply: Eliminate shellcheck warnings
+  extensions: libipt_icmp: Fix confusion between 255/255 and any
+  tests: libipt_icmp.t: Enable tests with numeric output
+  man: iptables.8: Extend exit code description
+  man: iptables.8: Trivial spelling fixes
+  man: iptables.8: Fix intra page reference
+  man: iptables.8: Clarify --goto description
+  man: Use HTTPS for links to netfilter.org
+  man: iptables.8: Trivial font fixes
+  man: iptables-restore.8: Fix --modprobe description
+  man: iptables-restore.8: Consistently document -w option
+  man: iptables-restore.8: Drop -W option from synopsis
+  man: iptables-restore.8: Put 'file' in italics in synopsis
+  man: iptables-restore.8: Start paragraphs in upper-case
+  man: Trivial: Missing space after comma
+  man: iptables-save.8: Clarify 'available tables'
+  man: iptables-save.8: Fix --modprobe description
+  man: iptables-save.8: Start paragraphs in upper-case
+  extensions: libip6t_icmp: Add names for mld-listener types
+  nft-ruleparse: Introduce nft_create_target()
+  tests: iptables-test: Fix command segfault reports
+  nft: Create builtin chains with counters enabled
+  Revert "libiptc: fix wrong maptype of base chain counters on restore"
+  tests: shell: Test chain policy counter behaviour
+  Use SOCK_CLOEXEC/O_CLOEXEC where available
+  nft: Pass nft_handle to add_{target,action}()
+  nft: Introduce and use bool nft_handle::compat
+  Add --compat option to *tables-nft and *-nft-restore commands
+  tests: Test compat mode
+  Revert --compat option related commits
+  tests: shell: Fix for ineffective 0007-mid-restore-flush_0
+  nft: Fix for useless meta expressions in rule
+  include: linux: Update kernel.h
+  build: Bump dependency on libnftnl
+
+Quentin Armitage (1):
+  extensions: Fix checking of conntrack --ctproto 0
+
+Victor Julien (1):
+  doc: fix example of xt_cpu
+
+Xin Long (1):
+  xt_sctp: add the missing chunk types in sctp_help
+
+--2gznOYqojtGKBm51--
 
