@@ -1,154 +1,132 @@
-Return-Path: <netdev+bounces-39422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C7FB7BF1AA
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 05:49:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8EE37BF1C7
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 06:01:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E1E1C20A96
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:49:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65EE12819C7
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 04:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BEB441A;
-	Tue, 10 Oct 2023 03:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A157C4422;
+	Tue, 10 Oct 2023 04:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dLz+6ym/"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="icd6RE7x"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2379915AE
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 03:49:26 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A4D9E;
-	Mon,  9 Oct 2023 20:49:25 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39A15RPH023081;
-	Mon, 9 Oct 2023 20:48:52 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=T9FZ6yM8dDtpL6wLz9W9JAwHWcuJhDlosR9PC+8AIeU=;
- b=dLz+6ym/XdmbyMf4LxCiHlM3eItdG3i5nGQrc+aeEUiCM6pDHsnV4qJznxwYE59jG9Xv
- rrYwwZmIjmKkl18VKDijs75F+27Q8xhzMcM0ZYOhjIRQgugBNg5BlF1c1ZCe42j+PYa4
- GrN1QNJd3y2JVtDhq40Aut1nImcxJMgNqEalQey674eXThQg1KJXpLpIoG4f9qjYtgZV
- 2BbpjfU/7TtH5qB8cPa6ne7hK7u4XMwPYXiTHDfXhcfTsNZq5WkWJZnfwErvLAKms0y9
- w4aDWYM7HtHhr9r1JWA2gByR/iF+rdtvzjfsQQBN5/xx4PWHnP8v1ooEW2MZOBEe1Ohe Hg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tkh7cesk7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 09 Oct 2023 20:48:52 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 9 Oct
- 2023 20:48:49 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 9 Oct 2023 20:48:50 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id 2BA4D3F70A7;
-	Mon,  9 Oct 2023 20:48:44 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rkannoth@marvell.com>,
-        <hawk@kernel.org>, <alexander.duyck@gmail.com>,
-        <ilias.apalodimas@linaro.org>, <linyunsheng@huawei.com>,
-        <bigeasy@linutronix.de>
-Subject: [PATCH net v3] octeontx2-pf: Fix page pool frag allocation warning
-Date: Tue, 10 Oct 2023 09:18:42 +0530
-Message-ID: <20231010034842.3807816-1-rkannoth@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D24390
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 04:01:15 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47FEAA9
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 21:01:13 -0700 (PDT)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39A3pqWI012598;
+	Tue, 10 Oct 2023 04:00:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=L9Uy3+IvtE6Ycxz13IBM5KSCqwa4Eib+vVcNbzQctY8=;
+ b=icd6RE7xDCEWUpTkp0oec/AXM1RX5nx4VOgnAHo1k0OlH4dgoLNBtqVIuJhQbTwIZCTj
+ Da2PQMBb4X3fafo0WIRW/OcmIbdM5tlo7/CRpP0jXmEOvAk4Z82D9hV8M1iszOGMT4/i
+ H7KDXMXtbNzV/WR0AjfQIRvlbdD4JanP7Cn48mERy97RYfxa3mZhtxn3OHuCvtQDLXiJ
+ uHblMCXQ0wz/H+86qHBVfMYslyzHVyUsqAlfdqI730HoA0O9v10O9hV9qguEXz3eOw+c
+ ZrqnaQTMO3pp1U02c7czqPIGPfEEmWlRliOIpquyrGVSDvLk6JIL1moyEYs8Frvg6y4n gA== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3tkh6g43xc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Oct 2023 04:00:50 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39A40ndw015526
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Oct 2023 04:00:49 GMT
+Received: from [10.110.115.143] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.36; Mon, 9 Oct
+ 2023 21:00:48 -0700
+Message-ID: <28518005-bb25-caed-1b12-bf12a3ded4bc@quicinc.com>
+Date: Mon, 9 Oct 2023 22:00:40 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: zfDL4ApmshwH_eWornjGODdWvLzDrvoC
-X-Proofpoint-ORIG-GUID: zfDL4ApmshwH_eWornjGODdWvLzDrvoC
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: [PATCH net-next v4] net: qualcomm: rmnet: Add side band flow
+ control support
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <vadim.fedorenko@linux.dev>, <lkp@intel.com>,
+        <horms@kernel.org>, Sean Tranchetti <quic_stranche@quicinc.com>
+References: <20231006001614.1678782-1-quic_subashab@quicinc.com>
+ <20231009194251.641e9134@kernel.org>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <20231009194251.641e9134@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 14-Z-WMg8lDpgu8yBuxFImXllljQ77XN
+X-Proofpoint-ORIG-GUID: 14-Z-WMg8lDpgu8yBuxFImXllljQ77XN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-10-10_01,2023-10-09_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ clxscore=1015 mlxlogscore=588 bulkscore=0 lowpriorityscore=0 phishscore=0
+ mlxscore=0 adultscore=0 priorityscore=1501 malwarescore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310100027
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since page pool param's "order" is set to 0, will result
-in below warn message if interface is configured with higher
-rx buffer size.
 
-Steps to reproduce the issue.
-1. devlink dev param set pci/0002:04:00.0 name receive_buffer_size \
-   value 8196 cmode runtime
-2. ifconfig eth0 up
 
-[   19.901356] ------------[ cut here ]------------
-[   19.901361] WARNING: CPU: 11 PID: 12331 at net/core/page_pool.c:567 page_pool_alloc_frag+0x3c/0x230
-[   19.901449] pstate: 82401009 (Nzcv daif +PAN -UAO +TCO -DIT +SSBS BTYPE=--)
-[   19.901451] pc : page_pool_alloc_frag+0x3c/0x230
-[   19.901453] lr : __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901460] sp : ffff80000f66b970
-[   19.901461] x29: ffff80000f66b970 x28: 0000000000000000 x27: 0000000000000000
-[   19.901464] x26: ffff800000d15b68 x25: ffff000195b5c080 x24: ffff0002a5a32dc0
-[   19.901467] x23: ffff0001063c0878 x22: 0000000000000100 x21: 0000000000000000
-[   19.901469] x20: 0000000000000000 x19: ffff00016f781000 x18: 0000000000000000
-[   19.901472] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-[   19.901474] x14: 0000000000000000 x13: ffff0005ffdc9c80 x12: 0000000000000000
-[   19.901477] x11: ffff800009119a38 x10: 4c6ef2e3ba300519 x9 : ffff800000d13844
-[   19.901479] x8 : ffff0002a5a33cc8 x7 : 0000000000000030 x6 : 0000000000000030
-[   19.901482] x5 : 0000000000000005 x4 : 0000000000000000 x3 : 0000000000000a20
-[   19.901484] x2 : 0000000000001080 x1 : ffff80000f66b9d4 x0 : 0000000000001000
-[   19.901487] Call trace:
-[   19.901488]  page_pool_alloc_frag+0x3c/0x230
-[   19.901490]  __otx2_alloc_rbuf+0x60/0xbc [rvu_nicpf]
-[   19.901494]  otx2_rq_aura_pool_init+0x1c4/0x240 [rvu_nicpf]
-[   19.901498]  otx2_open+0x228/0xa70 [rvu_nicpf]
-[   19.901501]  otx2vf_open+0x20/0xd0 [rvu_nicvf]
-[   19.901504]  __dev_open+0x114/0x1d0
-[   19.901507]  __dev_change_flags+0x194/0x210
-[   19.901510]  dev_change_flags+0x2c/0x70
-[   19.901512]  devinet_ioctl+0x3a4/0x6c4
-[   19.901515]  inet_ioctl+0x228/0x240
-[   19.901518]  sock_ioctl+0x2ac/0x480
-[   19.901522]  __arm64_sys_ioctl+0x564/0xe50
-[   19.901525]  invoke_syscall.constprop.0+0x58/0xf0
-[   19.901529]  do_el0_svc+0x58/0x150
-[   19.901531]  el0_svc+0x30/0x140
-[   19.901533]  el0t_64_sync_handler+0xe8/0x114
-[   19.901535]  el0t_64_sync+0x1a0/0x1a4
-[   19.901537] ---[ end trace 678c0bf660ad8116 ]---
+On 10/9/2023 8:42 PM, Jakub Kicinski wrote:
+> On Thu,  5 Oct 2023 17:16:14 -0700 Subash Abhinov Kasiviswanathan wrote:
+>> Individual rmnet devices map to specific network types such as internet,
+>> multimedia messaging services, IP multimedia subsystem etc. Each of
+>> these network types may support varying quality of service for different
+>> bearers or traffic types.
+>>
+>> The physical device interconnect to radio hardware may support a
+>> higher data rate than what is actually supported by the radio network.
+>> Any packets transmitted to the radio hardware which exceed the radio
+>> network data rate limit maybe dropped. This patch tries to minimize the
+>> loss of packets by adding support for bearer level flow control within a
+>> rmnet device by ensuring that the packets transmitted do not exceed the
+>> limit allowed by the radio network.
+>>
+>> In order to support multiple bearers, rmnet must be created as a
+>> multiqueue TX netdevice. Radio hardware communicates the supported
+>> bearer information for a given network via side band signalling.
+>> Consider the following mapping -
+>>
+>> IPv4 UDP port 1234 - Mark 0x1001 - Queue 1
+>> IPv6 TCP port 2345 - Mark 0x2001 - Queue 2
+>>
+>> iptables can be used to install filters which mark packets matching these
+>> specific traffic patterns and the RMNET_QUEUE_MAPPING_ADD operation can
+>> then be to install the mapping of the mark to the specific txqueue.
+> 
+> I don't understand why you need driver specific commands to do this.
+> It should be easily achievable using existing TC qdisc infra.
+> What's the gap?
 
-Fixes: b2e3406a38f0 ("octeontx2-pf: Add support for page pool")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-
----
-ChangeLog
-
-v2 -> v3: Fixed commit message. Removed ALIGN().
-v1 -> v2: Removed PAGE_ALIGN.
-v0 -> v1: Used get_order() and PAGE_ALIGN. Fixed commit message
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 997fedac3a98..818ce76185b2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1403,6 +1403,7 @@ int otx2_pool_init(struct otx2_nic *pfvf, u16 pool_id,
- 		return 0;
- 	}
- 
-+	pp_params.order = get_order(buf_size);
- 	pp_params.flags = PP_FLAG_PAGE_FRAG | PP_FLAG_DMA_MAP;
- 	pp_params.pool_size = min(OTX2_PAGE_POOL_SZ, numptrs);
- 	pp_params.nid = NUMA_NO_NODE;
--- 
-2.25.1
-
+tc doesn't allow userspace to manipulate the flow state (allow / 
+disallow traffic) on a specific queue. As I understand, the traffic 
+dequeued / queued / dropped on a specific queue of existing qdiscs are 
+controlled by the implementation of the qdisc itself.
 
