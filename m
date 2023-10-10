@@ -1,200 +1,110 @@
-Return-Path: <netdev+bounces-39468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0B427BF606
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:36:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876727BF638
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 10:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D24F51C20B85
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:36:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AAF92819EA
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 08:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2156119;
-	Tue, 10 Oct 2023 08:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB4BD2F2;
+	Tue, 10 Oct 2023 08:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FD7U6M8X"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ivbCgZR6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E5F28EA;
-	Tue, 10 Oct 2023 08:35:58 +0000 (UTC)
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F473B0;
-	Tue, 10 Oct 2023 01:35:53 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53829312d12so13926112a12.0;
-        Tue, 10 Oct 2023 01:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696926951; x=1697531751; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMi8wdVxApb25LjYsbqQ7Zs0KqzUPo1pOmHWaAx78bA=;
-        b=FD7U6M8XqN+Yj1c9oZwfBz+QO7QV/lKsyM6Z0PZLD9bQGR6Wuz3feG/ZK4G86sBDzQ
-         Fr+PRwuF3zFqxaOY/o58hzfxRVnTG+L9WEs4/S5/IFalX6Bjm8mffprvRp6wT8C5wUvU
-         7N9nQRlFqYXx6fkI4fQ99/ARSONVieFevAN4y1uEy9VccRmaTh+JOnfLWbeLr4NwFmfL
-         FqHqwvAbH6/LWRUL/N/3b/IpZjTPmER4O0/ZTeA/YvMvYTt5KNtQB7v/m4JNnLCLbi78
-         IxC99pr6WLFyBgTCI7KfffWmW/fVRlXjqZcK20UaqJS3n8dk1uEA/OF10i0KRUbpOsD4
-         rseQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696926951; x=1697531751;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BMi8wdVxApb25LjYsbqQ7Zs0KqzUPo1pOmHWaAx78bA=;
-        b=Pe2TqSsvN0on/FjHSIIZSWf2IJeRbnwUXPFYfVbPCsdPgQti/Vt+M36hITaPTMduLn
-         NF010Nj6CnmwC24wibRWhz6Hm9yYKuYEOtQ6ARayP3lX1iCu6kX+lXArlHPKQ6Q3CzId
-         AK/4j7ifYtpK91ZHa9SCdgpC/c9Nm0J8QPF51Rj6rpHHYgZ9gBeyQ2aZlhRb66fn0L3i
-         GxcR03EMUQ88TUHdktxyupU4BB+86+rzli+rBjeU0osVLd7YueFhr2zDrjs6y+Hk093E
-         nY6sYt/gLRKBSU2/4ATNUvsp3E+n3eQIbc0uAJV3qZK6kA3esgQlS+n7NBeqZWVnI0tY
-         WsWw==
-X-Gm-Message-State: AOJu0YyAxHpxqyvHzvP3kgWOkMlyLvseIu8tNHw2CZbJw7tU+6P2Fq5q
-	yn7v1m5MT7ZoOzIfb8zWi9EUmDp4S6Q=
-X-Google-Smtp-Source: AGHT+IErGjDETTfbLZBe+IUptE2vO9PBQ0X0ZvVP3jvwOnlcuV4fFhG+shtCF2fNB/No8v3wNNpRIw==
-X-Received: by 2002:a05:6402:1a33:b0:522:582c:f427 with SMTP id be19-20020a0564021a3300b00522582cf427mr13675180edb.14.1696926951033;
-        Tue, 10 Oct 2023 01:35:51 -0700 (PDT)
-Received: from krava (2001-1ae9-1c2-4c00-726e-c10f-8833-ff22.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:726e:c10f:8833:ff22])
-        by smtp.gmail.com with ESMTPSA id u1-20020a05640207c100b005311e934765sm7279443edy.27.2023.10.10.01.35.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 01:35:49 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 10 Oct 2023 10:35:48 +0200
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	brauner@kernel.org, lennart@poettering.net, kernel-team@meta.com,
-	sargun@sargun.me
-Subject: Re: [PATCH v6 bpf-next 04/13] bpf: add BPF token support to
- BPF_MAP_CREATE command
-Message-ID: <ZSUM5A+dJHptbRSx@krava>
-References: <20230927225809.2049655-1-andrii@kernel.org>
- <20230927225809.2049655-5-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C098A34
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 08:40:59 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A8DB0;
+	Tue, 10 Oct 2023 01:40:58 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 566BA60015;
+	Tue, 10 Oct 2023 08:40:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1696927256;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wK4zIFPqfurxMkHf6VB6s+SlOkIyziORUxbFuzfwqTs=;
+	b=ivbCgZR6obEsPfq2D5fylfPAo4F37C9TLOps9qaTjvpHeQZNGrpcx/HYSQiaFRa9xt82T1
+	+fCve+epducw5Df/xmMDoytnpOsW1SyDtog5ZgQIE/y7mLjBtVN22QRwn0DtScTGHhdEV0
+	kabf6eU7KDOEmVjBqMCmo0Mu0tTAZ0VKtb47JEGsBBmn4UV9ywQXjelp7hjKjTHVB5UJ9u
+	6isfpc/N5uNsqwujTpLdia7vf7e//NQP1hFO/AQfcWmBt9Jcg/okkB7l4r2znCnMkIa0kH
+	j16fMxKy7NrsUcLBSCk5MeK7FZel5WYph7OMkEDszWSEvWpdekCxkf/dB6x0bA==
+Date: Tue, 10 Oct 2023 10:40:49 +0200
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
+ <jacob.e.keller@intel.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v5 09/16] netlink: specs: Introduce new netlink
+ command to get current timestamp
+Message-ID: <20231010104049.1cbff3f8@kmaincent-XPS-13-7390>
+In-Reply-To: <dca2c4a8-7805-4cdb-a311-d308057cdd75@broadcom.com>
+References: <20231009155138.86458-1-kory.maincent@bootlin.com>
+	<20231009155138.86458-10-kory.maincent@bootlin.com>
+	<dca2c4a8-7805-4cdb-a311-d308057cdd75@broadcom.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230927225809.2049655-5-andrii@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Sep 27, 2023 at 03:58:00PM -0700, Andrii Nakryiko wrote:
+On Mon, 9 Oct 2023 14:21:42 -0700
+Florian Fainelli <florian.fainelli@broadcom.com> wrote:
 
-SNIP
+> On 10/9/23 08:51, K=C3=B6ry Maincent wrote:
+> > From: Kory Maincent <kory.maincent@bootlin.com>
+> >=20
+> > Add a new commands allowing to get the current time stamping on a
+> > netdevice's link.
+> >=20
+> > Example usage :
+> > ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do ts-get \
+> > 	     --json '{"header":{"dev-name":"eth0"}}'
+> > {'header': {'dev-index': 3, 'dev-name': 'eth0'}, 'ts-layer': 1}
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
+>=20
+> This is small enough you could probably fold this patch into patch 8.
 
-> -#define BPF_MAP_CREATE_LAST_FIELD map_extra
-> +#define BPF_MAP_CREATE_LAST_FIELD map_token_fd
->  /* called via syscall */
->  static int map_create(union bpf_attr *attr)
->  {
->  	const struct bpf_map_ops *ops;
-> +	struct bpf_token *token = NULL;
->  	int numa_node = bpf_map_attr_numa_node(attr);
->  	u32 map_type = attr->map_type;
->  	struct bpf_map *map;
-> @@ -1157,14 +1158,32 @@ static int map_create(union bpf_attr *attr)
->  	if (!ops->map_mem_usage)
->  		return -EINVAL;
->  
-> +	if (attr->map_token_fd) {
-> +		token = bpf_token_get_from_fd(attr->map_token_fd);
-> +		if (IS_ERR(token))
-> +			return PTR_ERR(token);
-> +
-> +		/* if current token doesn't grant map creation permissions,
-> +		 * then we can't use this token, so ignore it and rely on
-> +		 * system-wide capabilities checks
-> +		 */
-> +		if (!bpf_token_allow_cmd(token, BPF_MAP_CREATE) ||
-> +		    !bpf_token_allow_map_type(token, attr->map_type)) {
-> +			bpf_token_put(token);
-> +			token = NULL;
-> +		}
-> +	}
-> +
-> +	err = -EPERM;
-> +
->  	/* Intent here is for unprivileged_bpf_disabled to block BPF map
->  	 * creation for unprivileged users; other actions depend
->  	 * on fd availability and access to bpffs, so are dependent on
->  	 * object creation success. Even with unprivileged BPF disabled,
->  	 * capability checks are still carried out.
->  	 */
-> -	if (sysctl_unprivileged_bpf_disabled && !bpf_capable())
-> -		return -EPERM;
-> +	if (sysctl_unprivileged_bpf_disabled && !bpf_token_capable(token, CAP_BPF))
-> +		goto put_token;
->  
->  	/* check privileged map type permissions */
->  	switch (map_type) {
-> @@ -1197,25 +1216,27 @@ static int map_create(union bpf_attr *attr)
->  	case BPF_MAP_TYPE_LRU_PERCPU_HASH:
->  	case BPF_MAP_TYPE_STRUCT_OPS:
->  	case BPF_MAP_TYPE_CPUMAP:
-> -		if (!bpf_capable())
-> -			return -EPERM;
-> +		if (!bpf_token_capable(token, CAP_BPF))
-> +			goto put_token;
->  		break;
->  	case BPF_MAP_TYPE_SOCKMAP:
->  	case BPF_MAP_TYPE_SOCKHASH:
->  	case BPF_MAP_TYPE_DEVMAP:
->  	case BPF_MAP_TYPE_DEVMAP_HASH:
->  	case BPF_MAP_TYPE_XSKMAP:
-> -		if (!bpf_net_capable())
-> -			return -EPERM;
-> +		if (!bpf_token_capable(token, CAP_NET_ADMIN))
-> +			goto put_token;
->  		break;
->  	default:
->  		WARN(1, "unsupported map type %d", map_type);
-> -		return -EPERM;
-> +		goto put_token;
->  	}
->  
->  	map = ops->map_alloc(attr);
-> -	if (IS_ERR(map))
-> -		return PTR_ERR(map);
-> +	if (IS_ERR(map)) {
-> +		err = PTR_ERR(map);
-> +		goto put_token;
-> +	}
->  	map->ops = ops;
->  	map->map_type = map_type;
->  
-> @@ -1252,7 +1273,7 @@ static int map_create(union bpf_attr *attr)
->  		map->btf = btf;
->  
->  		if (attr->btf_value_type_id) {
-> -			err = map_check_btf(map, btf, attr->btf_key_type_id,
-> +			err = map_check_btf(map, token, btf, attr->btf_key_type_id,
->  					    attr->btf_value_type_id);
->  			if (err)
->  				goto free_map;
-
-I might be missing something, but should we call bpf_token_put(token)
-on non-error path as well? probably after bpf_map_save_memcg call
-
-jirka
-
-> @@ -1293,6 +1314,8 @@ static int map_create(union bpf_attr *attr)
->  free_map:
->  	btf_put(map->btf);
->  	map->ops->map_free(map);
-> +put_token:
-> +	bpf_token_put(token);
->  	return err;
->  }
->  
-
-SNIP
+I like having it separate. Indeed the ynl tool does not have a proper usage
+documentation. I took quite some times to me to understand how use it
+especially with bitset. Using the commit messages to add examples like that
+would have help me a lot in the process.
+I could also squash the example in the previous commit message but then it
+become more noisy.
+What do you think?
 
