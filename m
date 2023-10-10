@@ -1,91 +1,88 @@
-Return-Path: <netdev+bounces-39537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB297BFAD1
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 14:09:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5840C7BFBA8
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 14:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90E611C20B08
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 12:09:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82A791C20B60
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 12:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC1F1945E;
-	Tue, 10 Oct 2023 12:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ktRiMsBy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72554101DA;
+	Tue, 10 Oct 2023 12:43:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ED4524F
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 12:09:32 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6ECAAF
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 05:09:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=5XQTdJjlD+a1vCHi9nLi8eAT2myYJSn9F7XOgWNU1r0=;
-	t=1696939770; x=1698149370; b=ktRiMsByHBO8HSDx2LC8zv8ZZnTQYuzEsj6e8m6IrxmhslA
-	EikY9eDoskypXX/u30T3kUUAsgzujb9+WyZZSHAuaUz9gxexaQ6GQBeQtV9XJ+3Sf/LDX/A9dnNen
-	wJR6UbTVxshHlokrgKVmmKo4+ltRhRsGjyp9uj1fygE1mnFy+f4oE8B4flMvrgHgEcyH80TTMS8JP
-	gzytW672DikhR8eFAB+iuzjOydOLwhTCaPRvTtl2eADZPZYhC06nJOzEqD6waqSMyT/1Eeqtp+SmI
-	0Uuq8Zuo2H2dHn4xy0NovsvIOGh3xHsom0sS05VwOjnBbpJQoVT8e4UQzyePwUqw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97-RC1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qqBYF-00000000MBX-2bh0;
-	Tue, 10 Oct 2023 14:09:28 +0200
-Message-ID: <a2709c29a30e7f80ed37e29dc40d51a067963e39.camel@sipsolutions.net>
-Subject: Re: [patch net-next 01/10] genetlink: don't merge dumpit split op
- for different cmds into single iter
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com
-Date: Tue, 10 Oct 2023 14:09:26 +0200
-In-Reply-To: <ZSU4DExDGm3M9dLY@nanopsycho>
-References: <20231010110828.200709-1-jiri@resnulli.us>
-	 <20231010110828.200709-2-jiri@resnulli.us>
-	 <25c23d3482cb2747ee386543dce53cf212c899c3.camel@sipsolutions.net>
-	 <ZSU4DExDGm3M9dLY@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7F58F58
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 12:43:03 +0000 (UTC)
+X-Greylist: delayed 1952 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 Oct 2023 05:43:01 PDT
+Received: from janet.servers.dxld.at (mail.servers.dxld.at [IPv6:2001:678:4d8:200::1a57])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCFB491
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 05:43:01 -0700 (PDT)
+Received: janet.servers.dxld.at; Tue, 10 Oct 2023 14:10:09 +0200
+Date: Tue, 10 Oct 2023 14:10:03 +0200
+From: Daniel =?utf-8?Q?Gr=C3=B6ber?= <dxld@darkboxed.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Richard Weinberger <richard@nod.at>
+Subject: [BUG] rtnl_newlink: Rogue MOVE event delivered on netns change
+Message-ID: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-10-10 at 13:39 +0200, Jiri Pirko wrote:
-> Apply this patchset w/o this patch and you'll hit it :) Otherwise I
-> would not care...
+Hi netdev,
 
-:)
+Changing a device's netns and renaming it with one RTM_NEWLINK call causes
+a rogue MOVE uevent to be delivered to the new netns in addition to the
+expected ADD uevent.
 
-> The problem is dumpit op of cmd Y with previous doit op of cmd X. They
-> should not be merged, they are not same cmd, yet existing code does
-> that.
+iproute2 reproducer:
 
-Yeah, on second thought, you're right, if you have CMDs X < Y and then
+    $ ip netns add test
+    $ ip link add dev eth0 netns test type dummy
+    $ ip link add dev eth0 type dummy
 
- X/do
- Y/dump
+    $ ip -netns test link set dev eth0 netns 1 name eth123
 
-(and no X/dump, nor Y/do) then indeed this can happen.
+With the last command, which renames the device and moves it out of the
+netns, we get the following:
 
-Sorry for the noise.
+    $ udevadm monitor -k
+    KERNEL[230953.424834] add      /devices/virtual/net/eth0 (net)
+    KERNEL[230953.424914] move     /devices/virtual/net/eth0 (net)
+    KERNEL[230953.425066] move     /devices/virtual/net/eth123 (net)
 
-johannes
+The problem is the MOVE event hooribly confuses userspace. The particular
+symptom we're seing is that systemd will bring down the ifup@eth0.service
+on the host as it handles the MOVE of eth0->eth123 as a stop for the
+BoundTo sys-subsystem-net-devices-eth0.device unit.
 
+I also create a clashing eth0 device on the host in the repro to
+demonstrate that the RTM_NETLINK move+rename call is atomic and so the MOVE
+event is entirely nonsensical.
+
+Looking at the code in __rtnl_newlink I see do_setlink first calls
+__dev_change_net_namespace and then dev_change_name. My guess is the order
+is just wrong here.
+
+Thanks,
+--Daniel
+
+PS: Full debugging log in https://github.com/lxc/incus/issues/146
 
