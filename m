@@ -1,272 +1,145 @@
-Return-Path: <netdev+bounces-39713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC9CC7C42C4
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 23:40:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 847747C42D1
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 23:41:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EA5E281D36
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4CAF1C20D35
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB49D3CCE5;
-	Tue, 10 Oct 2023 21:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18933C6A0;
+	Tue, 10 Oct 2023 21:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ec8uFM0f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YUyb9drG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB51E2FE2B
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 21:40:00 +0000 (UTC)
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7285B9
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:39:54 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-49d0a704ac7so2311702e0c.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:39:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A508C225D5
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 21:41:26 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CB194
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:41:24 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-307d20548adso5626876f8f.0
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 14:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1696973993; x=1697578793; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RhPXLs3HTaTkOS6St/ikmO9zVY5pcNPFYPoqzL1l7GM=;
-        b=Ec8uFM0fZ93YC3rAWmsTmH9E8uVEtAnUSkLLPnH9VMdrWRvabyz+DawZcgH7Z048fK
-         NWKoyVZ8sCU4wdt1ZJ1X6Iq6Xq+xUhVWUyOfMlatdDmZqRDz+tGFvwfJw2/cOzocj0ig
-         knQV0iNh4OsYMAg44Vdq+QWHT6rn9dbzKBrQQ=
+        d=google.com; s=20230601; t=1696974083; x=1697578883; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GMDM/r5CYmcxbaZwoDfjx69JmAy+Zf5G5Pi9db/hUXk=;
+        b=YUyb9drGUbohAEs31d8RuK3255o7ykpc3qKuv3i52j+WsU89zRSz2bKeKQ/essyhhK
+         XEvdG7NTOUmo5spmRybtdQ73Xqtz6b7GjfLyOxMgS+4fS3HT8qzMumAvbZwbOCYURuiv
+         GaThz+x5ZaoeRTpqvu6YRxPWJvrDKtfQ2rpbTDqiWE2JXzhYh6Ma3gSUzfn/9nNz5uVJ
+         d7YGyQGCYyAATi0XXEUex9rAOyfePWrrp29Rn3xTlrdD/XQ5gFxSxikhskhDG27JyR7v
+         dWKfcwaPqEqRyPWOyY81Su0s9Fv47T7Z7hdR85AMH3l/hfmQishQ3Xrmei5tXqxt1YqD
+         2gJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696973993; x=1697578793;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RhPXLs3HTaTkOS6St/ikmO9zVY5pcNPFYPoqzL1l7GM=;
-        b=TJ4olOeJ7zmOvj+YhmpZ41EKHVfOP8pEW7C0xaz/EznTtaiWnjxbUVHGC4iRe1RogZ
-         u1rD5foBP6vJ9mlADbx2b+syOdSKERazXGb0Vmzt2MAQmKVKYL0U2WG8ol0SOgn+EQM2
-         6UIyAPZM0P41WEoLrpALGbvPIdx4G1OrFkF+i18y+P61qt1vQj6WzJynobC48PPSZLLN
-         hWDPl4fAAzKCX+Sg/XNHxZ6MP5GfDYnTxx9UNH4fYPLJVCDcDzvj8S1bAG7SXOm5uuQK
-         hoSuapxppfJ6kOpDQsy1zEo5Y/u7ueCHr9DPsfexwT6Jyv072pZvyrldPGsWG3PN/tY4
-         j2Lw==
-X-Gm-Message-State: AOJu0YwKhy1IvZfRmqMsJyADiDwIWTvH3p/88TMt32NXaxzmtV5T2QbP
-	NBB8Z+kSbt2I76V2yGRsdEA2INFIPNj4PEcPgWNpSwyapU8w5IzfkVHG1Oq3rASC87YD5UuzH8L
-	06VfXkI8KINKNDFgYAXHUdSI+jwxQipGuu2RWMgxm/CAZeon8oYcJ14qh/TaBdHQ9W5h8kEdXWP
-	H80ZH4cF/+kg==
-X-Google-Smtp-Source: AGHT+IFy2yBDp4KDYLQIIoAlwTEPfwN9FrBF5N55wJwFsmLmyZgigmGBt1x70L1JQ1G+aRQR7I9lxA==
-X-Received: by 2002:a05:6122:1d47:b0:49d:eeed:3ed5 with SMTP id gd7-20020a0561221d4700b0049deeed3ed5mr14513658vkb.14.1696973993395;
-        Tue, 10 Oct 2023 14:39:53 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id bb36-20020a05622a1b2400b00403ad6ec2e8sm4804797qtb.26.2023.10.10.14.39.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 14:39:52 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
-	linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
-	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support),
-	linux-mediatek@lists.infradead.org (moderated list:ARM/Mediatek SoC support),
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
-Subject: [PATCH net-next 2/2] net: dsa: Rename IFLA_DSA_MASTER to IFLA_DSA_CONDUIT
-Date: Tue, 10 Oct 2023 14:39:42 -0700
-Message-Id: <20231010213942.3633407-3-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231010213942.3633407-1-florian.fainelli@broadcom.com>
-References: <20231010213942.3633407-1-florian.fainelli@broadcom.com>
+        d=1e100.net; s=20230601; t=1696974083; x=1697578883;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GMDM/r5CYmcxbaZwoDfjx69JmAy+Zf5G5Pi9db/hUXk=;
+        b=E8MlpOfuSVd39mjSTAEkXdPCRxwdIIptdS0ap3j6UJSS4SnnAX4XuZm3VERAJQuLje
+         vtjiKdx3PJPgUsfn3HYQsQ55xIXBrJHRZjDAa/Zta/4jhcKCepdPu3giHmiKgRpZy6Mk
+         q9lIXTExXL5r3ROjs7XQ2Rto39kzJNiva+SJcahWm8xxWn//PG5Ktm8PVwsZucxWM7Qa
+         O+EFIxWNKjbwjACPOXERo9ICSxe9qURxZVafV0ICFWiO90QHQjTMtpuupysXiA0MB8W7
+         v9Hkg+yp9ehlo0SZaLGWrnFSzAgnImxRyfsl7tHpovUU7Fap4fQeHxgIDWCWLpqraHtL
+         QbYg==
+X-Gm-Message-State: AOJu0YwnlqRW61dhhsTAfZ0of1DY3YEWGVj0dn6arhvIn9l7lxGCi/NO
+	E4hlqKCArrw3ekRSN8JWU+jzQRavVffwGx8Ku9zSow==
+X-Google-Smtp-Source: AGHT+IENzJWLhr1WARu69zZqe9X4Db7XpHhpgy9yuJ3Rb/tvLGQ1CJnMjWOpAsfeaHhE6eZOtekV0/eXaI8rq/Zs46I=
+X-Received: by 2002:a5d:4f10:0:b0:316:ee7f:f9bb with SMTP id
+ c16-20020a5d4f10000000b00316ee7ff9bbmr17366404wru.65.1696974082824; Tue, 10
+ Oct 2023 14:41:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001928650607638ca7"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20231010-strncpy-drivers-net-ethernet-intel-igbvf-netdev-c-v1-1-69ccfb2c2aa5@google.com>
+ <5dc78e2f-62c1-083a-387f-9afabac02007@intel.com>
+In-Reply-To: <5dc78e2f-62c1-083a-387f-9afabac02007@intel.com>
+From: Justin Stitt <justinstitt@google.com>
+Date: Tue, 10 Oct 2023 14:41:10 -0700
+Message-ID: <CAFhGd8ppobxMnvrMT4HrRkf0LvHE1P-utErp8Tk22Fb9OO=8Rw@mail.gmail.com>
+Subject: Re: [PATCH] igbvf: replace deprecated strncpy with strscpy
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000001928650607638ca7
-Content-Transfer-Encoding: 8bit
+On Tue, Oct 10, 2023 at 2:20=E2=80=AFPM Jesse Brandeburg
+<jesse.brandeburg@intel.com> wrote:
+>
+> On 10/10/2023 2:12 PM, Justin Stitt wrote:
+> > `strncpy` is deprecated for use on NUL-terminated destination strings
+> > [1] and as such we should prefer more robust and less ambiguous string
+> > interfaces.
+> >
+> > We expect netdev->name to be NUL-terminated based on its usage with
+> > `strlen` and format strings:
+> > |       if (strlen(netdev->name) < (IFNAMSIZ - 5)) {
+> > |               sprintf(adapter->tx_ring->name, "%s-tx-0", netdev->name=
+);
+> >
+> > Moreover, we do not need NUL-padding as netdev is already
+> > zero-allocated:
+> > |       netdev =3D alloc_etherdev(sizeof(struct igbvf_adapter));
+> > ...
+> > alloc_etherdev() -> alloc_etherdev_mq() -> alloc_etherdev_mqs() ->
+> > alloc_netdev_mqs() ...
+> > |       p =3D kvzalloc(alloc_size, GFP_KERNEL_ACCOUNT | __GFP_RETRY_MAY=
+FAIL);
+> >
+> > Considering the above, a suitable replacement is `strscpy` [2] due to
+> > the fact that it guarantees NUL-termination on the destination buffer
+> > without unnecessarily NUL-padding.
+> >
+> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#st=
+rncpy-on-nul-terminated-strings [1]
+> > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en=
+.html [2]
+> > Link: https://github.com/KSPP/linux/issues/90
+> > Cc: linux-hardening@vger.kernel.org
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> > ---
+>
+> Thanks Justin for these patches, please make sure you mark the subject
+> line as per the netdev rules:
+> [PATCH net-next v1] etc etc
 
-This preserves the existing IFLA_DSA_MASTER which is part of the uAPI
-and creates an alias named IFLA_DSA_CONDUIT.
+Sure, I'll resend!
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- Documentation/networking/dsa/configuration.rst |  4 ++--
- include/uapi/linux/if_link.h                   |  3 ++-
- net/dsa/netlink.c                              | 10 +++++-----
- 3 files changed, 9 insertions(+), 8 deletions(-)
+>
+> I'd also prefer they came in as part of one series with a good cover
+> letter, at the very least for the Intel drivers, and you probably could
+> combine any others (netdev) together up to the 15 patch limit.
 
-diff --git a/Documentation/networking/dsa/configuration.rst b/Documentation/networking/dsa/configuration.rst
-index a5a38c31736d..7148fb7c7fe1 100644
---- a/Documentation/networking/dsa/configuration.rst
-+++ b/Documentation/networking/dsa/configuration.rst
-@@ -393,7 +393,7 @@ description which has an ``ethernet`` property. It is up to the user to
- configure the system for the switch to use other conduits.
- 
- DSA uses the ``rtnl_link_ops`` mechanism (with a "dsa" ``kind``) to allow
--changing the DSA conduit of a user port. The ``IFLA_DSA_MASTER`` u32 netlink
-+changing the DSA conduit of a user port. The ``IFLA_DSA_CONDUIT`` u32 netlink
- attribute contains the ifindex of the conduit device that handles each user
- device. The DSA conduit must be a valid candidate based on firmware node
- information, or a LAG interface which contains only users which are valid
-@@ -435,7 +435,7 @@ Using iproute2, the following manipulations are possible:
-         dsa master bond0
- 
- Notice that in the case of CPU ports under a LAG, the use of the
--``IFLA_DSA_MASTER`` netlink attribute is not strictly needed, but rather, DSA
-+``IFLA_DSA_CONDUIT`` netlink attribute is not strictly needed, but rather, DSA
- reacts to the ``IFLA_MASTER`` attribute change of its present conduit (``eth0``)
- and migrates all user ports to the new upper of ``eth0``, ``bond0``. Similarly,
- when ``bond0`` is destroyed using ``RTM_DELLINK``, DSA migrates the user ports
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index fac351a93aed..16f0669e8bdc 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -1392,7 +1392,8 @@ enum {
- 
- enum {
- 	IFLA_DSA_UNSPEC,
--	IFLA_DSA_MASTER,
-+	IFLA_DSA_MASTER,	/* Deprecated, use IFLA_DSA_CONDUIT instead */
-+	IFLA_DSA_CONDUIT = IFLA_DSA_MASTER,
- 	__IFLA_DSA_MAX,
- };
- 
-diff --git a/net/dsa/netlink.c b/net/dsa/netlink.c
-index f56f90a25b99..1332e56349e5 100644
---- a/net/dsa/netlink.c
-+++ b/net/dsa/netlink.c
-@@ -8,7 +8,7 @@
- #include "user.h"
- 
- static const struct nla_policy dsa_policy[IFLA_DSA_MAX + 1] = {
--	[IFLA_DSA_MASTER]	= { .type = NLA_U32 },
-+	[IFLA_DSA_CONDUIT]	= { .type = NLA_U32 },
- };
- 
- static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
-@@ -20,8 +20,8 @@ static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
- 	if (!data)
- 		return 0;
- 
--	if (data[IFLA_DSA_MASTER]) {
--		u32 ifindex = nla_get_u32(data[IFLA_DSA_MASTER]);
-+	if (data[IFLA_DSA_CONDUIT]) {
-+		u32 ifindex = nla_get_u32(data[IFLA_DSA_CONDUIT]);
- 		struct net_device *conduit;
- 
- 		conduit = __dev_get_by_index(dev_net(dev), ifindex);
-@@ -38,7 +38,7 @@ static int dsa_changelink(struct net_device *dev, struct nlattr *tb[],
- 
- static size_t dsa_get_size(const struct net_device *dev)
- {
--	return nla_total_size(sizeof(u32)) +	/* IFLA_DSA_MASTER  */
-+	return nla_total_size(sizeof(u32)) +	/* IFLA_DSA_CONDUIT  */
- 	       0;
- }
- 
-@@ -46,7 +46,7 @@ static int dsa_fill_info(struct sk_buff *skb, const struct net_device *dev)
- {
- 	struct net_device *conduit = dsa_user_to_conduit(dev);
- 
--	if (nla_put_u32(skb, IFLA_DSA_MASTER, conduit->ifindex))
-+	if (nla_put_u32(skb, IFLA_DSA_CONDUIT, conduit->ifindex))
- 		return -EMSGSIZE;
- 
- 	return 0;
--- 
-2.34.1
+Got it :)
 
+>
+> Please mention how you found these issues, via automated tool or via
+> coccinelle script, manual grepping, etc?
 
---0000000000001928650607638ca7
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+rg "strncpy\(" > pain.txt
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIuy9hbAU4OdqTeI
-cZay8UzQBtd0hSWX2Op2jDk+1I4BMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxMDIxMzk1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDeUm2zeaJIb0ymD0EF3GTmbzW8ReWPaXdd
-p7yAUGJyjqjdSPJ9rwaV66ELpS1rO6HqoRSA0NykV4DovtKGTPjnQeOMoLinBcfn5CZuxzqU8sHX
-qBz94QL/3QkkeqoemgJxPum284K4z57e4L//y7f2ES0lI5kJbl3ZTtC0cXSXYgFHspcXNRQIGg21
-IBt7jOitNRtTCVaDhCY0VluUR1KiodUbWR46i++yasbOhMr2z0KeXXdx8ChVs+uTDO+FYT/xkNwA
-+Qywq8fj6XmmdJkOelQAdWlG+FxajREIz+wJEtjMIsQdp+Fd6eDIarvCC0UkBLiaUtN/tKCMdUDe
-8WuY
---0000000000001928650607638ca7--
+>
+> Thanks,
+> Jesse
+>
 
