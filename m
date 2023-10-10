@@ -1,97 +1,112 @@
-Return-Path: <netdev+bounces-39420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 853577BF186
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 05:31:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 174AB7BF1A7
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 05:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF9C3281966
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:31:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF682281A01
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 03:46:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2997115A4;
-	Tue, 10 Oct 2023 03:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B024B23C1;
+	Tue, 10 Oct 2023 03:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RZopyhFg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CF9390
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 03:31:39 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA8059E;
-	Mon,  9 Oct 2023 20:31:37 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S4Lz92qtdz67NNV;
-	Tue, 10 Oct 2023 11:31:17 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Tue, 10 Oct 2023 04:31:35 +0100
-Message-ID: <fe08c515-b5ab-f93a-a7b8-22f48c6b76a5@huawei.com>
-Date: Tue, 10 Oct 2023 06:31:34 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C783A441A
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 03:46:22 +0000 (UTC)
+Received: from out-192.mta0.migadu.com (out-192.mta0.migadu.com [91.218.175.192])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84F599E
+	for <netdev@vger.kernel.org>; Mon,  9 Oct 2023 20:46:20 -0700 (PDT)
+Message-ID: <7fbf47bf-c26c-8eeb-f803-b9f2bafa6364@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1696909578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hZJB97dQv1x5vY0R7LD94UsgnKYKd6vyN/0XXr9hYJc=;
+	b=RZopyhFg1RxT0Rdep5vYxJJ7xzF+Ws3zGcvSAn7BpQ/kou3o3Xdg7a/J7bbR/e/YZWTP8F
+	hpn4l064//3J3Gekd3Vhg+rG6BE31qI51cfsDXgAxxYAnPl0bsJ/tALlQo/u4ixpubQP1V
+	3f1baHkeF1EewyEU73MsCO508ivMyJ0=
+Date: Tue, 10 Oct 2023 11:46:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v12 08/12] landlock: Add network rules and TCP hooks
- support
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20230920092641.832134-1-konstantin.meskhidze@huawei.com>
- <20230920092641.832134-9-konstantin.meskhidze@huawei.com>
- <20231009.Aej2eequoodi@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <20231009.Aej2eequoodi@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Subject: Re: [PATCH net-next v7] net/core: Introduce netdev_core_stats_inc()
+Content-Language: en-US
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Eric Dumazet <edumazet@google.com>, mhiramat@kernel.org,
+ dennis@kernel.org, tj@kernel.org, cl@linux.com, mark.rutland@arm.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ linux-trace-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20231007050621.1706331-1-yajun.deng@linux.dev>
+ <CANn89i+navyRe8-AV=ehM3qFce2hmnOEKBqvK5Xnev7KTaS5Lg@mail.gmail.com>
+ <a53a3ff6-8c66-07c4-0163-e582d88843dd@linux.dev>
+ <CANn89i+u5dXdYm_0_LwhXg5Nw+gHXx+nPUmbYhvT=k9P4+9JRQ@mail.gmail.com>
+ <9f4fb613-d63f-9b86-fe92-11bf4dfb7275@linux.dev>
+ <CANn89iK7bvQtGD=p+fHaWiiaNn=u8vWrt0YQ26pGQY=kZTdfJw@mail.gmail.com>
+ <4a747fda-2bb9-4231-66d6-31306184eec2@linux.dev>
+ <814b5598-5284-9558-8f56-12a6f7a67187@linux.dev>
+ <CANn89iJCTgWTu0mzwj-8_-HiWm4uErY=VASDHoYaod9Nq-ayPA@mail.gmail.com>
+ <508b33f7-3dc0-4536-21f6-4a5e7ade2b5c@linux.dev>
+ <CANn89i+r-pQGpen1mUhybmj+6ybhxSsuoaB07NFzOWyHUMFDNw@mail.gmail.com>
+ <296ca17d-cff0-2d19-f620-eedab004ddde@linux.dev>
+ <CANn89iL=W3fyuH_KawfhKvLyw2Cw=qhHbEZtbKgQEYhHJChy3Q@mail.gmail.com>
+ <68eb65c5-1870-0776-0878-694a8b002a6d@linux.dev>
+ <CANn89iJHtYJjp6zPc2PVLAWuN88BQc5OntjrAf7f6QOcqP+B=g@mail.gmail.com>
+ <078f662d-a73f-766b-3a07-c82cd37026c5@linux.dev>
+ <20231009102833.1b0d35e3@gandalf.local.home>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yajun Deng <yajun.deng@linux.dev>
+In-Reply-To: <20231009102833.1b0d35e3@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+On 2023/10/9 22:28, Steven Rostedt wrote:
+> On Mon, 9 Oct 2023 18:58:27 +0800
+> Yajun Deng <yajun.deng@linux.dev> wrote:
+>
+>>> C compiler decides to inline or not, depending on various factors.
+>>>
+>>> The most efficient (and small) code is generated by this_cpu_inc()
+>>> version, allowing the compiler to inline it.
+>>>
+>>> If you copy/paste this_cpu_inc()  twenty times, then the compiler
+>>> would  not inline the function anymore.
+> Yes, if you want something to be visible by ftrace, it must not be inlined
+> (as inlined functions are not function calls by definition). And as Eric
+> stated, the compiler is perfectly allowed to inline something if it
+> believes it will be more efficient. i.e. There may be code around the function
+> call that could be more efficient if it wasn't change to parameters. If you
+> want to make sure a function stays out of line, you must explicitly tell
+> the compiler you want the function not to ever be inlined (hence the
+> "noinline" attribute).
 
-10/9/2023 6:36 PM, Mickaël Salaün пишет:
-> On Wed, Sep 20, 2023 at 05:26:36PM +0800, Konstantin Meskhidze wrote:
->> This commit adds network rules support in the ruleset management
->> helpers and the landlock_create_ruleset syscall.
->> Refactor user space API to support network actions. Add new network
->> access flags, network rule and network attributes. Increment Landlock
->> ABI version. Expand access_masks_t to u32 to be sure network access
->> rights can be stored. Implement socket_bind() and socket_connect()
->> LSM hooks, which enables to restrict TCP socket binding and connection
->> to specific ports.
->> The new landlock_net_port_attr structure has two fields. The allowed_access
->> field contains the LANDLOCK_ACCESS_NET_* rights. The port field contains
->> the port value according to the allowed protocol. This field can
->> take up to a 64-bit value [1] but the maximum value depends on the related
->> protocol (e.g. 16-bit for TCP).
->> 
->> [1]
->> https://lore.kernel.org/r/278ab07f-7583-a4e0-3d37-1bacd091531d@digikod.net
-> 
-> Could you please include here the rationale to not tie access rights to
-> sockets' file descriptor, and link [2]?
-> 
-> [2] https://lore.kernel.org/r/263c1eb3-602f-57fe-8450-3f138581bee7@digikod.net
 
-   Ok. I will include this description.
-   Thank you.
-> .
+Thanks for the details.
 
+>>
+>> Got it. Thank you.
+> Great.
+>
+> -- Steve
 
