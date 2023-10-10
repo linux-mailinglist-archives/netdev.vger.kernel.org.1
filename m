@@ -1,117 +1,68 @@
-Return-Path: <netdev+bounces-39672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD427C049B
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:28:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94DFA7C04A8
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 21:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97C64281EBD
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:28:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F5B4281EB9
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A7432191;
-	Tue, 10 Oct 2023 19:28:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E7E32195;
+	Tue, 10 Oct 2023 19:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=infradead.org header.i=@infradead.org header.b="TthprqgE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgQRxMcv"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CBC33218B
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:28:09 +0000 (UTC)
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F57AC;
-	Tue, 10 Oct 2023 12:28:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=69FjPbITmy2sRCCem/htKdGvhrh703nzmiPWrI5DS00=; b=TthprqgEUh/KPhKfPOzit+L+qE
-	XrOT5mRHbr1pQq6+p0rNxwcOVDSDReIVxaLaZOQeyHiiK+PlI+wb7gV2k+k2+KklTes/+n6/z8Lhh
-	DuPxKu6KHRGCxiCDq60NFsgugpOke8YZzlIpiYWCl0o0XUq/SZ2SPlK37GEYR7cSqtqa6jCac6t5I
-	NH7FhUyo6Jmibbp/ZM63TYTkupPpdHyGtDmezV6WQIvCZlF7kcahfqfYxZrCJYj/u5gC1utLDMQmp
-	oY9j6Sruo9EFUV1XXtInc1Fj6h0xW4Jbx2wBDW1lgNUgJizRj9DnrMiAuHh6DYTNnoj6/PQUwFeD+
-	Z94YCt5Q==;
-Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qqIOM-0002CZ-2J;
-	Tue, 10 Oct 2023 19:27:42 +0000
-Date: Tue, 10 Oct 2023 12:27:34 -0700
-From: Joel Becker <jlbec@evilplan.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	Eric Dumazet <edumazet@google.com>, hch@lst.de,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: Re: [PATCH net-next v3 2/4] netconsole: Initialize configfs_item for
- default targets
-Message-ID: <ZSWlppHwravDLyZN@google.com>
-Mail-Followup-To: Breno Leitao <leitao@debian.org>, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com,
-	Eric Dumazet <edumazet@google.com>, hch@lst.de,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org
-References: <20231010093751.3878229-1-leitao@debian.org>
- <20231010093751.3878229-3-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6645F32191
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 19:32:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 962F4C433C7;
+	Tue, 10 Oct 2023 19:32:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696966356;
+	bh=GPjua0IjCuMmByKlFL6lkNxV/332at3VwhBzisfdC1A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bgQRxMcvNVVtr9a++yWmtIV8aRE4qIlhES2ie00klEHXAI4mm1LXGCzByBIEv3th6
+	 DbBMK1z1cDlS5GonXRB1Zevzm3uChV8KKdPxdjM2oDpYCILXlIMKy31hatUQWL8R57
+	 RyzhYyLY54XXXY+dYJOW907p91R/NA0H82XkaZm6Wf92w+B9y9BjsL4P9tjK5CkGUO
+	 Mn9EPEgFt0v75/3f6OW2bSN3kus9cLE50edhw8BcDkJO+ALPTGxrxPd15djB7ViAS7
+	 SplqRtSI3pCgyJvf26XuBMHyR6sW+lFwmX6C1P5YzGz/smaclVJKUtvQ9lFiZRL1Mr
+	 q86GKoXJPXBfw==
+Date: Tue, 10 Oct 2023 12:32:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Takeru Hayasaka <hayatake396@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP
+ from ethtool
+Message-ID: <20231010123235.4a6498da@kernel.org>
+In-Reply-To: <20231008075221.61863-1-hayatake396@gmail.com>
+References: <20231008075221.61863-1-hayatake396@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010093751.3878229-3-leitao@debian.org>
-X-Burt-Line: Trees are cool.
-X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
- come to perfection.
-Sender: Joel Becker <jlbec@ftp.linux.org.uk>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 10, 2023 at 02:37:49AM -0700, Breno Leitao wrote:
-> For netconsole targets allocated during the boot time (passing
-> netconsole=... argument), netconsole_target->item is not initialized.
-> That is not a problem because it is not used inside configfs.
-> 
-> An upcoming patch will be using it, thus, initialize the targets with
-> the name 'cmdline' plus a counter starting from 0.  This name will match
-> entries in the configfs later.
-> 
-> Suggested-by: Joel Becker <jlbec@evilplan.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  drivers/net/netconsole.c | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index d609fb59cf99..3d7002af505d 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -53,6 +53,8 @@ static bool oops_only = false;
->  module_param(oops_only, bool, 0600);
->  MODULE_PARM_DESC(oops_only, "Only log oops messages");
->  
-> +#define NETCONSOLE_PARAM_TARGET_NAME "cmdline"
+On Sun,  8 Oct 2023 07:52:22 +0000 Takeru Hayasaka wrote:
+> This is a patch that enables RSS functionality for GTP packets using
+> ethtool.
+> A user can include her TEID and make RSS work for GTP-U over IPv4 by
+> doing the following:
+> `ethtool -N ens3 rx-flow-hash gtpu4 sd`
+> In addition to gtpu(4|6), we now support gtpc(4|6), gtpu(4|6)e,
+> gtpu(4|6)u, and gtpu(4|6)d.
 
-Perhaps `NETCONSOLE_PARAM_TARGET_PREFIX` is better.  Makes it clear this
-is not the whole name.
-
-Thanks,
-Joel
-
-
--- 
-
-"When I am working on a problem I never think about beauty. I
- only think about how to solve the problem. But when I have finished, if
- the solution is not beautiful, I know it is wrong."
-         - Buckminster Fuller
-
-			http://www.jlbec.org/
-			jlbec@evilplan.org
+This is for tunneling, right? IDK much about GTP but we don't have flow
+types for other tunneling protos. What makes this one special?
 
