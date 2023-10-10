@@ -1,160 +1,166 @@
-Return-Path: <netdev+bounces-39742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9CC17C4432
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AC7F7C443D
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D9B21C20D18
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:35:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1253D281E7D
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 22:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4D935512;
-	Tue, 10 Oct 2023 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E59E35515;
+	Tue, 10 Oct 2023 22:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqIUgpWH"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="Qf8mflRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E00431595
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 22:35:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5256CC433C8;
-	Tue, 10 Oct 2023 22:35:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696977332;
-	bh=ssq0zxln5LGIGMEn14IniQ5liilnaehkBxG//1dVx6Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=sqIUgpWHd7XBjB1O2AqFtnyDdA5pJd4VE+4oolqSLLoTlefiP3YHE+dikhcDtJO89
-	 O4slDCwY6wOXHB75bgZR3J1syc4U2WGbfwWAU0sdY+7b7FsQ3KLWNQMChGyUYjRPm+
-	 v5JtaKNlV/36V/Mr6EnXMoniAdQ2MOCETzLGF1I1ZDmplZx6zbEqoW3l9+u0PW+2dA
-	 S+pvBlNx+Crz0kwQwxCSbH6mNn6jZKQzyE/cAM8iFlezlf5FFfjUv8d0tvm0XlzG6y
-	 28ZJFKzYSj963s1mGgJvVw3/FgVLlQWJHh6eo4VCbFF2KQLde/aZYDQnLiTJ8/d4a3
-	 OEQNOyQSatyzQ==
-Date: Tue, 10 Oct 2023 17:35:30 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc: Rob Herring <robh@kernel.org>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, 3chas3@gmail.com, brking@us.ibm.com,
-	dalias@libc.org, glaubitz@physik.fu-berlin.de,
-	ink@jurassic.park.msu.ru, jejb@linux.ibm.com, kw@linux.com,
-	linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-atm-general@lists.sourceforge.net, linux-scsi@vger.kernel.org,
-	linux-sh@vger.kernel.org, lpieralisi@kernel.org,
-	martin.petersen@oracle.com, mattst88@gmail.com,
-	netdev@vger.kernel.org, richard.henderson@linaro.org,
-	toan@os.amperecomputing.com, ysato@users.sourceforge.jp,
-	Tadeusz Struk <tadeusz.struk@intel.com>
-Subject: Re: [PATCH v3 0/6] PCI/treewide: Cleanup/streamline PCI error code
- handling
-Message-ID: <20231010223530.GA1005985@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C158B31599;
+	Tue, 10 Oct 2023 22:36:16 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6115198;
+	Tue, 10 Oct 2023 15:36:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=+//m0KI4ZPTKPBh3GBzx8/nuQJX7FHzq6yrhqUaHjYg=; b=Qf8mflRi2rWQG+3qJrpL7GqVa1
+	DoXyqQJMgN8c2dyHTgXuJ8NCrnu0hJCW0nx/Y3S1WE1JejPVNHq+0PQA6ucgmUBotQJeaYOlIFo1H
+	QwSVMkWJgfBBrP2Ma0Od5Z3byDfvGR623QtoaqxVP9S7DRI+QTJwhJiDmgR+xl6u8Y8sOKwLJ4Srt
+	imaAdNHVvc/fMoKAMym9njsY+Wn2rlX8ltnfFiokngMkBX3V7rbqoEOTxNbIik/NxTxqhhzGVHgJZ
+	WXcEdMgpBY1WDIGDBY6BU961ixvoqQX42KOaY7VSuo+R4W8zOuJ0/lHydYZDAi2iRizbshW6sS4iG
+	Xs+qZ3dw==;
+Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qqLKl-0003H0-2a; Wed, 11 Oct 2023 00:36:11 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2023-10-11
+Date: Wed, 11 Oct 2023 00:36:10 +0200
+Message-Id: <20231010223610.3984-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230911125354.25501-1-ilpo.jarvinen@linux.intel.com>
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27057/Tue Oct 10 09:39:11 2023)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-[+cc Tadeusz; updates to quirk_intel_qat_vf_cap()]
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-On Mon, Sep 11, 2023 at 03:53:48PM +0300, Ilpo Järvinen wrote:
-> As the first step towards converting PCI accessor function return codes
-> into normal errnos this series cleans up related code paths which have
-> complicated multi-line construct to handle the PCI error checking.
-> 
-> I'd prefer these (the remaining ones) to be routed through PCI tree due
-> to PCI accessor function return code conversion being built on top of
-> them.
-> 
-> v3:
-> - Return pci_generic_config_read32()'s error code directly
-> - Removed already accepted patches
-> 
-> v2:
-> - Moved ret local var to the inner block (I2C: ali15x3)
-> - Removed already accepted patches
-> 
-> 
-> Ilpo Järvinen (6):
->   alpha: Streamline convoluted PCI error handling
->   sh: pci: Do PCI error check on own line
->   atm: iphase: Do PCI error checks on own line
->   PCI: Do error check on own line to split long if conditions
->   PCI: xgene: Do PCI error check on own line & keep return value
->   scsi: ipr: Do PCI error checks on own line
-> 
->  arch/alpha/kernel/sys_miata.c      | 17 +++++++++--------
->  arch/sh/drivers/pci/common.c       |  7 ++++---
->  drivers/atm/iphase.c               | 20 +++++++++++---------
->  drivers/pci/controller/pci-xgene.c |  7 ++++---
->  drivers/pci/pci.c                  |  9 ++++++---
->  drivers/pci/probe.c                |  6 +++---
->  drivers/pci/quirks.c               |  6 +++---
->  drivers/scsi/ipr.c                 | 12 ++++++++----
->  8 files changed, 48 insertions(+), 36 deletions(-)
+The following pull-request contains BPF updates for your *net* tree.
 
-Applied all to pci/config-errs for v6.7, thanks!
+We've added 14 non-merge commits during the last 5 day(s) which contain
+a total of 12 files changed, 398 insertions(+), 104 deletions(-).
 
-I made the tweaks below; heads-up to John Paul and Tadeusz.
+The main changes are:
 
-Oh, and weird experience applying these via b4, git am: the
-Signed-off-by was corrupted on these patches:
+1) Fix s390 JIT backchain issues in the trampoline code generation which
+   previously clobbered the caller's backchain, from Ilya Leoshkevich.
 
-  https://lore.kernel.org/r/20230911125354.25501-7-ilpo.jarvinen@linux.intel.com  https://lore.kernel.org/r/20230911125354.25501-6-ilpo.jarvinen@linux.intel.com  https://lore.kernel.org/r/20230911125354.25501-3-ilpo.jarvinen@linux.intel.com
+2) Fix zero-size allocation warning in xsk sockets when the configured ring
+   size was close to SIZE_MAX, from Andrew Kanner.
 
-It looked like this:
+3) Fixes for bpf_mprog API that were found when implementing support in the
+   ebpf-go library along with selftests, from Daniel Borkmann and Lorenz Bauer.
 
-  Signed-off-by: Ilpo JÃ¤rvinen <ilpo.jarvinen@linux.intel.com>
+4) Fix riscv JIT to properly sign-extend the return register in programs.
+   This fixes various test_progs selftests on riscv, from Björn Töpel.
 
-Not sure why this happened; maybe one of the mailing lists screwed it
-up and the order of arrival determines which one b4 uses?  The ones
-from linux-alpha look like:
+5) Fix verifier log for async callback return values where the allowed range
+   was displayed incorrectly, from David Vernet.
 
-  Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
+Please consider pulling these changes from:
 
-which I think corresponds to the bad rendering.  I think I fixed them
-all.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
 
-Bjorn
+Thanks a lot!
 
-diff --git a/arch/sh/drivers/pci/common.c b/arch/sh/drivers/pci/common.c
-index f59e5b9a6a80..ab9e791070b4 100644
---- a/arch/sh/drivers/pci/common.c
-+++ b/arch/sh/drivers/pci/common.c
-@@ -50,7 +50,7 @@ int __init pci_is_66mhz_capable(struct pci_channel *hose,
- 				int top_bus, int current_bus)
- {
- 	u32 pci_devfn;
--	unsigned short vid;
-+	u16 vid;
- 	int cap66 = -1;
- 	u16 stat;
- 	int ret;
-@@ -64,7 +64,7 @@ int __init pci_is_66mhz_capable(struct pci_channel *hose,
- 					     pci_devfn, PCI_VENDOR_ID, &vid);
- 		if (ret != PCIBIOS_SUCCESSFUL)
- 			continue;
--		if (vid == 0xffff)
-+		if (PCI_POSSIBLE_ERROR(vid))
- 			continue;
- 
- 		/* check 66MHz capability */
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index 81f3da536a3c..f5fc92441194 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -5430,7 +5430,7 @@ static void quirk_intel_qat_vf_cap(struct pci_dev *pdev)
- 
- 		pdev->cfg_size = PCI_CFG_SPACE_EXP_SIZE;
- 		ret = pci_read_config_dword(pdev, PCI_CFG_SPACE_SIZE, &status);
--		if ((ret != PCIBIOS_SUCCESSFUL) || (status == 0xffffffff))
-+		if ((ret != PCIBIOS_SUCCESSFUL) || (PCI_POSSIBLE_ERROR(status)))
- 			pdev->cfg_size = PCI_CFG_SPACE_SIZE;
- 
- 		if (pci_find_saved_cap(pdev, PCI_CAP_ID_EXP))
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Lorenz Bauer, Magnus Karlsson, Martin KaFai Lau, Song Liu
+
+----------------------------------------------------------------
+
+The following changes since commit c4d49196ceec80e30e8d981410d73331b49b7850:
+
+  net: sched: cls_u32: Fix allocation size in u32_init() (2023-10-06 11:43:05 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 5356ba1ff4f2417e1aebcf99aab35c1ea94dd6d7:
+
+  s390/bpf: Fix unwinding past the trampoline (2023-10-11 00:08:46 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Andrew Kanner (1):
+      xdp: Fix zero-size allocation warning in xskq_create()
+
+Björn Töpel (2):
+      riscv, bpf: Sign-extend return values
+      riscv, bpf: Track both a0 (RISC-V ABI) and a5 (BPF) return values
+
+Daniel Borkmann (6):
+      bpf: Fix BPF_PROG_QUERY last field check
+      bpf: Handle bpf_mprog_query with NULL entry
+      selftests/bpf: Test bpf_mprog query API via libbpf and raw syscall
+      selftests/bpf: Adapt assert_mprog_count to always expect 0 count
+      selftests/bpf: Test query on empty mprog and pass revision into attach
+      selftests/bpf: Make seen_tc* variable tests more robust
+
+David Vernet (2):
+      bpf: Fix verifier log for async callback return values
+      selftests/bpf: Add testcase for async callback return value failure
+
+Ilya Leoshkevich (2):
+      s390/bpf: Fix clobbering the caller's backchain in the trampoline
+      s390/bpf: Fix unwinding past the trampoline
+
+Lorenz Bauer (1):
+      bpf: Refuse unused attributes in bpf_prog_{attach,detach}
+
+ arch/riscv/net/bpf_jit_comp64.c                    |  18 +-
+ arch/s390/net/bpf_jit_comp.c                       |  25 +-
+ kernel/bpf/mprog.c                                 |  10 +-
+ kernel/bpf/syscall.c                               |  21 +-
+ kernel/bpf/tcx.c                                   |   8 +-
+ kernel/bpf/verifier.c                              |   6 +-
+ net/xdp/xsk_queue.c                                |  10 +
+ .../testing/selftests/bpf/prog_tests/tc_helpers.h  |  16 +-
+ tools/testing/selftests/bpf/prog_tests/tc_links.c  |  64 ++---
+ tools/testing/selftests/bpf/prog_tests/tc_opts.c   | 271 +++++++++++++++++++--
+ tools/testing/selftests/bpf/prog_tests/timer.c     |   6 +-
+ tools/testing/selftests/bpf/progs/timer_failure.c  |  47 ++++
+ 12 files changed, 398 insertions(+), 104 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/timer_failure.c
 
