@@ -1,97 +1,147 @@
-Return-Path: <netdev+bounces-39573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E8887BFE1C
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 15:42:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 873247BFE7E
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 15:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48894282990
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:42:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41DF228137F
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 13:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4061DFE3;
-	Tue, 10 Oct 2023 13:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70041DFFC;
+	Tue, 10 Oct 2023 13:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="P6wZVa0C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6zuLrRo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551371DFDA
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:42:53 +0000 (UTC)
-Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB08D5C
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 06:41:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
-	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
-	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=58ZoqIePQbaXCkZO/D6i1bdEFOArNnMuxoq8m/4TE5s=; b=P6wZVa0CZT+7Ph5clXc6cu77Co
-	uxDDCYAksQLa2SBEO+QZAiy/UFPE2TktGoLTDmXMWaElfstV4fcJY9Lk0XB8jF3jnb2LV9sbqvaFh
-	ALMQstjPe6ie/57P0nJx89xiGS8jLWDIB79Iwv6EWQ7MtWthZuUGvNyR5daY9Ac+aEILfaRAq+Eh9
-	M0u++UEaPkii7if/vgLJ8tJrat0ngNK4nduj1Q8C4Yh94forRIzBJEC04nVLZQooAxtRYwmZH+fTb
-	uY2H7dxxvpQbCVFfkWGLZWsqjqCqYXAwCCuLzCliXEAdXLGVKh2EF8oAhS1Vw156z/ynepBgTq8+q
-	XR9H24tQ==;
-Received: from [192.168.1.4] (port=21629 helo=SH-EX2013.helmholz.local)
-	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
-	(Exim 4.96)
-	(envelope-from <Ante.Knezic@helmholz.de>)
-	id 1qqCzY-0005L7-0P;
-	Tue, 10 Oct 2023 15:41:44 +0200
-Received: from linuxdev.helmholz.local (192.168.6.7) by
- SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 10 Oct 2023 15:41:43 +0200
-From: Ante Knezic <ante.knezic@helmholz.de>
-To: <andrew@lunn.ch>
-CC: <UNGLinuxDriver@microchip.com>, <ante.knezic@helmholz.de>,
-	<conor+dt@kernel.org>, <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-	<edumazet@google.com>, <f.fainelli@gmail.com>,
-	<krzysztof.kozlowski+dt@linaro.org>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <marex@denx.de>, <netdev@vger.kernel.org>,
-	<olteanv@gmail.com>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<woojung.huh@microchip.com>
-Subject: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
-Date: Tue, 10 Oct 2023 15:41:39 +0200
-Message-ID: <20231010134139.17180-1-ante.knezic@helmholz.de>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <6a366c3a-49e7-42a4-83b2-ef98e7df0896@lunn.ch>
-References: <6a366c3a-49e7-42a4-83b2-ef98e7df0896@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF16F1DFEC
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 13:54:08 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585E1C6
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 06:54:06 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32d81864e3fso5302f8f.2
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 06:54:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1696946045; x=1697550845; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eT+vtxAkNGuwbpq6fLuhkyN/bftw+pqMmPrbQNUdcQU=;
+        b=P6zuLrRotEb9fnlcKtmnMraMbDsriExOB4wzFRf3B0CtvpNUJCL/0lLVvFv32Zhkbm
+         h81e5KAZrhfXqFLT14MkJqhfvHHU1d4mJQPlbju+w4e5e9rwlqb6Av/as2v8uULzNPug
+         g6AduRPjxq8qx5KxC9fv3/hZfrK5j+Vqtw0GWUX84gZ0n9WyZqHL337mb2MmyYivigc+
+         NML+Ppt+jZFfr6SxyVaI0by/kjgd+7LSuPhj0GRmg4CxcGwLx4geR2m9HVXmJVvj4LcV
+         LhIewtSmvnYviNAy37fAGJScWM5+q7KgMirpVDA5grC5e35syHpQDv7TPaly6oCd08BF
+         ch2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1696946045; x=1697550845;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eT+vtxAkNGuwbpq6fLuhkyN/bftw+pqMmPrbQNUdcQU=;
+        b=vIuLfgJFIAYg50x9eYZFvcmTOVNnQjha4rrWVNS9NR9nZmSqFl2aZtWxsLWKThNFCU
+         B+wXBtgwn/T4jWnChLQVIO+c6Bl3kfVBC0loirGCGZ3hmYBo3x89YopN0xJ14SMM0KYr
+         NObjFLztq2ZLadWZvKJcXdLt5BA9WoPLwAgipDH9PuliIzP/34konRszR1AFw4Fhe6Y0
+         w+2TUxgdbTW5+59eJsf6uXV42BK5pum8JpIk/lei0TAkipISirsgACiCpY6DerjBYTns
+         vErMf9btOt0itmvuXLyLzhfxT927I5JydZisUA1gbOXXKxYc3SnqEllz78CqlIE1Qti+
+         sxjA==
+X-Gm-Message-State: AOJu0YyLKywQraXTkhXlXMebY2a2JC4nwYwTlquYKbJifNGeTjZYnozV
+	SJtQcRCl3Mo98gbKLrs/RrN2/+uuY88=
+X-Google-Smtp-Source: AGHT+IH1jwkcFFhGKgEH7q5msnQ7C6Ap7897bnBTra0UWS1vz3MO3sQzJDHyx5W4gFKBuj1/H+1GQg==
+X-Received: by 2002:a5d:4d12:0:b0:323:16c0:9531 with SMTP id z18-20020a5d4d12000000b0032316c09531mr15723300wrt.13.1696946044541;
+        Tue, 10 Oct 2023 06:54:04 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id e15-20020adff34f000000b0031c6e1ea4c7sm12814444wrp.90.2023.10.10.06.54.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Oct 2023 06:54:04 -0700 (PDT)
+Subject: Re: [PATCH net v3] docs: fix info about representor identification
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jacob.e.keller@intel.com,
+ Wojciech Drewek <wojciech.drewek@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20231010120845.151531-1-mateusz.polchlopek@intel.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <8c0284fa-2edf-023d-9a28-5824f31e48ed@gmail.com>
+Date: Tue, 10 Oct 2023 14:54:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [192.168.6.7]
-X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
- SH-EX2013.helmholz.local (192.168.1.4)
-X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20231010120845.151531-1-mateusz.polchlopek@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 10 Oct 2023 15:25:44 +0200, Andrew Lunn wrote:
->> +  microchip,rmii-clk-internal:
->> +    $ref: /schemas/types.yaml#/definitions/flag
->> +    description:
->> +      Set if the RMII reference clock should be provided internally. Applies only
->> +      to KSZ88X3 devices.
->
->It would be good to define what happens when
->microchip,rmii-clk-internal is not present. Looking at the code, you
->leave it unchanged. Is that what we want, or do we want to force it to
->external?
->
->	Andrew
+On 10/10/2023 13:08, Mateusz Polchlopek wrote:
+> Update the "How are representors identified?" documentation
+> subchapter. For newer kernels driver developers should use
+> SET_NETDEV_DEVLINK_PORT instead of ndo_get_devlink_port()
+> callback.
+> 
+> ---
+> v3:
+> - fixed the lack of hyphen in changelog
+> 
+> v2:
+> - targeting -net, without IWL
+> https://lore.kernel.org/netdev/20231009111544.143609-1-mateusz.polchlopek@intel.com/
+> 
+> v1:
+> https://lore.kernel.org/netdev/20231006091412.92156-1-mateusz.polchlopek@intel.com/
+> ---
+> 
+> Fixes: 7712b3e966ea ("Merge branch 'net-fix-netdev-to-devlink_port-linkage-and-expose-to-user'")
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
+>  Documentation/networking/representors.rst | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/networking/representors.rst b/Documentation/networking/representors.rst
+> index ee1f5cd54496..2d6b7b493fa6 100644
+> --- a/Documentation/networking/representors.rst
+> +++ b/Documentation/networking/representors.rst
+> @@ -162,9 +162,9 @@ How are representors identified?
+>  The representor netdevice should *not* directly refer to a PCIe device (e.g.
+>  through ``net_dev->dev.parent`` / ``SET_NETDEV_DEV()``), either of the
+>  representee or of the switchdev function.
+> -Instead, it should implement the ``ndo_get_devlink_port()`` netdevice op, which
+> -the kernel uses to provide the ``phys_switch_id`` and ``phys_port_name`` sysfs
+> -nodes.  (Some legacy drivers implement ``ndo_get_port_parent_id()`` and
+> +Instead, driver developers should use ``SET_NETDEV_DEVLINK_PORT`` macro to
+> +assign devlink port instance to a netdevice before it registers the netdevice.
+> +(Some legacy drivers implement ``ndo_get_port_parent_id()`` and
+>  ``ndo_get_phys_port_name()`` directly, but this is deprecated.)  See
+>  :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>` for the
+>  details of this API.
 
-Default register setting is to use external RMII clock (which is btw only 
-available option for other KSZ devices - as far as I am aware) so I guess 
-theres no need to force it to external clock?
+I think the text as a whole would be clearer if you kept in the language
+ about the kernel using the devlink port to provide the sysfs nodes.
+Otherwise the reader will be confused as to why we suddenly start talking
+ about them in the parenthetical.
+How about:
+
+Instead, the driver should use the ``SET_NETDEV_DEVLINK_PORT`` macro to
+assign a devlink port instance to the netdevice before registering the
+netdevice; the kernel uses the devlink port to provide the ``phys_switch_id``
+and ``phys_port_name`` sysfs nodes.
+(Some legacy drivers implement ``ndo_get_port_parent_id()`` and
+
+-ed
 
