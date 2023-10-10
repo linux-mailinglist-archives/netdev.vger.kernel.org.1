@@ -1,197 +1,177 @@
-Return-Path: <netdev+bounces-39617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A04647C021A
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:00:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5675F7C0234
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 19:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAAEB1C20B3C
-	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3CC8281797
+	for <lists+netdev@lfdr.de>; Tue, 10 Oct 2023 17:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80CF2FE35;
-	Tue, 10 Oct 2023 17:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480182FE38;
+	Tue, 10 Oct 2023 17:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="t8YRRgzh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t2QiKjmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B782FE2A;
-	Tue, 10 Oct 2023 17:00:35 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD15A9D;
-	Tue, 10 Oct 2023 10:00:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1696957233; x=1728493233;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ASnzCpkAHajmoJ0lPHWgTC4MMKjh5x49ov8QmLYAQKE=;
-  b=t8YRRgzhJVUTPjjnmKLQc8HYiCRPQYvWawSaqwbYsidkTyx6gGwLkAH3
-   bP76dl9hfIUvTiKu963DL7UGTukQVNBuGSseAJDXNzywTlETzUJ75z47e
-   1SLX/3lwFjt649HMq6pNJGyIYqfA965Bgr+Uuac6aOLGfth7qj+qdYpxF
-   o=;
-X-IronPort-AV: E=Sophos;i="6.03,213,1694736000"; 
-   d="scan'208";a="34793768"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 17:00:31 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 5AD3E60CA7;
-	Tue, 10 Oct 2023 17:00:31 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 17:00:30 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.11) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Tue, 10 Oct 2023 17:00:27 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <daan.j.demeyer@gmail.com>
-CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <martin.lau@linux.dev>,
-	<netdev@vger.kernel.org>, <kuniyu@amazon.com>
-Subject: Re: [PATCH bpf-next v9 3/9] bpf: Add bpf_sock_addr_set_unix_addr() to allow writing unix sockaddr from bpf
-Date: Tue, 10 Oct 2023 10:00:19 -0700
-Message-ID: <20231010170019.4924-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231006074530.892825-4-daan.j.demeyer@gmail.com>
-References: <20231006074530.892825-4-daan.j.demeyer@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289032FE35
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:06:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A6DEC433CA;
+	Tue, 10 Oct 2023 17:06:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696957586;
+	bh=1i6ExLplNYAM/G8lsKYitfhalJFntqMdBelAXa5244Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=t2QiKjmRMeFIXc76/f/4STeK1I/eg8ArMKZuH1SXF53b7Urd/aNlj7G8X5ygJ+koB
+	 5CppGaaQ082VK4z+VHCVeNvnzwF+xhIzFx7n6Y+v9LDcUBR6/DskHPhkLbrIhep7vD
+	 FWhLX5bXSZvluwGkZGGnGc/4OvO4FL9jnoO1858dNgrbBRSJ9J3sETU5dPckHudb4m
+	 dJbzEuvKTMn6xYJrjF7hAcZ1+XDcChXpJ7siddeyXfT1CL6FibcaBqcwbHV0H4jB2A
+	 a4K+grljr3BrYuzJFsZYokosbf29vYvId0HfrvzZxO6OOs3r+sRJH8vu6M+Ya1nCb7
+	 Wt4MgMSerujTQ==
+Message-ID: <5dae1994-cc61-4c4e-bbb0-55511e2fc5dd@kernel.org>
+Date: Tue, 10 Oct 2023 19:06:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] docs: try to encourage (netdev?) reviewers
+Content-Language: en-GB, fr-BE
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ corbet@lwn.net, workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+ andrew@lunn.ch, jesse.brandeburg@intel.com, sd@queasysnail.net,
+ horms@verge.net.au, przemyslaw.kitszel@intel.com, f.fainelli@gmail.com,
+ jiri@resnulli.us, ecree.xilinx@gmail.com
+References: <20231009225637.3785359-1-kuba@kernel.org>
+ <2403fd80-e32c-4e5b-a215-55c7bb88df8d@kernel.org>
+ <CAMuHMdXXO3jHWkry6NNuvF_nQkvfb87b_Ca8E_so=1LWghrV9w@mail.gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
+ YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
+ c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
+ WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
+ CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
+ nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
+ TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
+ nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
+ VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
+ 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
+ YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwY4EEwEIADgWIQToy4X3aHcFem4n93r2t4JP
+ QmmgcwUCZR5+DwIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRD2t4JPQmmgc+ixEACj
+ 5QmhXP+mWcO9HZjmHonVDjcn0nfdqPSVNFDrSycFg12WfrshKy79emnCcJC9I1R/DOR1rjx2
+ vFPmObgGE+mmUzmF3H/FykitLLzVX7FAAbPyBRFuVYR54RJKIpV9R+u+mGYVTvNXrP0bSZkD
+ 6yCP2IOhXC+nm5j+i9V87f1Bb0NP1zENISIZQahY8n4bADdiaW2A3qvFBSNN+4i/oxNBmfFH
+ 9lylP9g9QX4WCno8E1KbwvX/vL2Q+PNDugh6dpnQiMRg/At1J+g8GE3Qc7wnCOKv6bmZfv0n
+ Pj12KqIC/RAUTifdOrW5NS2q7Gcvppw/yRJOfuVv7zKcnLoyuh0cImVGptOi/hq43HNik1nm
+ qamzIyJjjp9+QGtza6dMEwFbnMNbK8AngwfWwVlQ4kcJmmVg/9ee4Bd1bY9GCja7S5GQ741S
+ yRu+EnmyynIFEpSHVYO5wkajFws7A0vx+3R7gsFbqoRz65sD+vLQtaSiZntNN4LBT52K1U3h
+ 9UxUkXEYkacbhjYH8RSfREJUoRLcFIEItRK7ZmHyFptzdBitxJOmG/adwzfkE/APKWErD1OZ
+ o5N1eBeXbBJxOfUI61gwI4V+hmNjyY9ZMVmYL7glfNuQaHxphBlWsXKUVlHBprt3HCmyZk5M
+ T0V8YWIYT0rFkGtfDpGRZpqfheYVNXbcjM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l5SUC
+ P1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp9nWH
+ Dhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM1ey4
+ L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vfmjTs
+ ZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbiKzn3
+ kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IPQox7
+ mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqfXlgw
+ 4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUsx6kQ
+ O5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskGV+OT
+ tB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIvHl7i
+ qPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCrHR1F
+ bMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb6p0W
+ JS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxjXf7D
+ 2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbWvoxb
+ FwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoaKrLf
+ x3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6Uxej
+ X+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7Ivrxx
+ ySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOvmpz0
+ VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0JY6d
+ glzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHazlzVb
+ Fe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: Tessares
+In-Reply-To: <CAMuHMdXXO3jHWkry6NNuvF_nQkvfb87b_Ca8E_so=1LWghrV9w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.11]
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-Date: Fri,  6 Oct 2023 09:44:57 +0200
-> As prep for adding unix socket support to the cgroup sockaddr hooks,
-> let's add a kfunc bpf_sock_addr_set_unix_addr() that allows modifying a
-> sockaddr from bpf. While this is already possible for AF_INET and AF_INET6,
-> we'll need this kfunc when we add unix socket support since modifying the
-> address for those requires modifying both the address and the sockaddr
-> length.
+Hi Geert,
+
+On 10/10/2023 17:52, Geert Uytterhoeven wrote:
+> Hi Matt,
 > 
-> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
-> ---
->  kernel/bpf/btf.c  |  1 +
->  net/core/filter.c | 34 +++++++++++++++++++++++++++++++++-
->  2 files changed, 34 insertions(+), 1 deletion(-)
+> On Tue, Oct 10, 2023 at 5:19 PM Matthieu Baerts <matttbe@kernel.org> wrote:
+>> On 10/10/2023 00:56, Jakub Kicinski wrote:
+>>> Add a section to netdev maintainer doc encouraging reviewers
+>>> to chime in on the mailing list.
+>>>
+>>> The questions about "when is it okay to share feedback"
+>>> keep coming up (most recently at netconf) and the answer
+>>> is "pretty much always".
+>>>
+>>> Extend the section of 7.AdvancedTopics.rst which deals
+>>> with reviews a little bit to add stuff we had been recommending
+>>> locally.
+>>
+>> Good idea to encourage everybody to review, even the less experimented
+>> ones. That might push me to send more reviews, even when I don't know
+>> well the area that is being modified, thanks! :)
+>>
+>> (...)
+>>
+>>> diff --git a/Documentation/process/7.AdvancedTopics.rst b/Documentation/process/7.AdvancedTopics.rst
+>>> index bf7cbfb4caa5..415749feed17 100644
+>>> --- a/Documentation/process/7.AdvancedTopics.rst
+>>> +++ b/Documentation/process/7.AdvancedTopics.rst
+>>> @@ -146,6 +146,7 @@ pull.  The git request-pull command can be helpful in this regard; it will
+>>>  format the request as other developers expect, and will also check to be
+>>>  sure that you have remembered to push those changes to the public server.
+>>>
+>>> +.. _development_advancedtopics_reviews:
+>>>
+>>>  Reviewing patches
+>>>  -----------------
+>>> @@ -167,6 +168,12 @@ comments as questions rather than criticisms.  Asking "how does the lock
+>>>  get released in this path?" will always work better than stating "the
+>>>  locking here is wrong."
+>>
+>> The paragraph just above ("it is OK to question the code") is very nice!
+>> When I'm cced on some patches modifying some code I'm not familiar with
+>> and there are some parts that look "strange" to me, I sometimes feel
+>> like I only have two possibilities: either I spend quite some time
+>> understanding that part or I give up if I don't have such time. I often
+>> feel like I cannot say "I don't know well this part, but this looks
+>> strange to me: are you sure it is OK to do that in such conditions?",
+>> especially when the audience is large and/or the author of the patch is
+>> an experienced developer.
 > 
-> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> index 69101200c124..15d71d2986d3 100644
-> --- a/kernel/bpf/btf.c
-> +++ b/kernel/bpf/btf.c
-> @@ -7850,6 +7850,7 @@ static int bpf_prog_type_to_kfunc_hook(enum bpf_prog_type prog_type)
->  	case BPF_PROG_TYPE_SYSCALL:
->  		return BTF_KFUNC_HOOK_SYSCALL;
->  	case BPF_PROG_TYPE_CGROUP_SKB:
-> +	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
->  		return BTF_KFUNC_HOOK_CGROUP_SKB;
->  	case BPF_PROG_TYPE_SCHED_ACT:
->  		return BTF_KFUNC_HOOK_SCHED_ACT;
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index a094694899c9..bd1c42b28483 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -81,6 +81,7 @@
->  #include <net/xdp.h>
->  #include <net/mptcp.h>
->  #include <net/netfilter/nf_conntrack_bpf.h>
-> +#include <linux/un.h>
->  
->  static const struct bpf_func_proto *
->  bpf_sk_base_func_proto(enum bpf_func_id func_id);
-> @@ -11752,6 +11753,26 @@ __bpf_kfunc int bpf_dynptr_from_xdp(struct xdp_buff *xdp, u64 flags,
->  
->  	return 0;
->  }
-> +
-> +__bpf_kfunc int bpf_sock_addr_set_unix_addr(struct bpf_sock_addr_kern *sa_kern,
-> +					    const u8 *addr, u32 addrlen__sz)
+> Yes you can (even experienced developers can make mistakes ;-)!
 
-I'd rename addrlen__sz to sun_path_len or something else because the
-conventional addrlen for AF_UNIX contains offsetof(struct sockaddr_un,
-sun_path).
+Thank you for your reply!
 
-Also it would be good to document that the length is of sun_path[].
+> If it is not obvious that something is safe, it is better to point it
+> out, so the submitter (or someone else) can give it a (second) thought.
+> In case it is safe, and you didn't miss the ball completely, it probably
+> warrants a comment in the code, or an improved patch description.
 
+Indeed, good point!
 
-> +{
-> +	struct sockaddr *sa = sa_kern->uaddr;
-> +	struct sockaddr_un *un;
-> +
-> +	if (sa_kern->sk->sk_family != AF_UNIX)
-> +		return -EINVAL;
-> +
-> +	/* We do not allow changing the address of unnamed unix sockets. */
+It is good then to have that written in the doc -- I only discovered it
+recently -- because, at least for me, it is easy to think that
+experienced developers never make mistakes ( ;) ) and questioning their
+code can only be done if we have double or triple checked that there is
+likely an issue :)
 
-This comment is slightly confusing as addrlen__sz is a user-specified
-value for destination address of named sockets except for getsockname().
-
-So, probably we can just remove the comment.  (or s/of/to/ ?)
-
-
-> +	if (addrlen__sz == 0 || addrlen__sz > UNIX_PATH_MAX)
-> +		return -EINVAL;
-> +
-> +	un = (struct sockaddr_un *)sa;
-> +	memcpy(un->sun_path, addr, addrlen__sz);
-> +	sa_kern->uaddrlen = offsetof(struct sockaddr_un, sun_path) + addrlen__sz;
-> +
-> +	return 0;
-> +}
->  __diag_pop();
->  
->  int bpf_dynptr_from_skb_rdonly(struct sk_buff *skb, u64 flags,
-> @@ -11776,6 +11797,10 @@ BTF_SET8_START(bpf_kfunc_check_set_xdp)
->  BTF_ID_FLAGS(func, bpf_dynptr_from_xdp)
->  BTF_SET8_END(bpf_kfunc_check_set_xdp)
->  
-> +BTF_SET8_START(bpf_kfunc_check_set_sock_addr)
-> +BTF_ID_FLAGS(func, bpf_sock_addr_set_unix_addr)
-> +BTF_SET8_END(bpf_kfunc_check_set_sock_addr)
-> +
->  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
->  	.owner = THIS_MODULE,
->  	.set = &bpf_kfunc_check_set_skb,
-> @@ -11786,6 +11811,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_xdp = {
->  	.set = &bpf_kfunc_check_set_xdp,
->  };
->  
-> +static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
-> +	.owner = THIS_MODULE,
-> +	.set = &bpf_kfunc_check_set_sock_addr,
-> +};
-> +
->  static int __init bpf_kfunc_init(void)
->  {
->  	int ret;
-> @@ -11800,7 +11830,9 @@ static int __init bpf_kfunc_init(void)
->  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_XMIT, &bpf_kfunc_set_skb);
->  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
->  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
-> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
-> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
-> +	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
-> +						&bpf_kfunc_set_sock_addr);
->  }
->  late_initcall(bpf_kfunc_init);
->  
-> -- 
-> 2.41.0
+Cheers,
+Matt
+-- 
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
 
