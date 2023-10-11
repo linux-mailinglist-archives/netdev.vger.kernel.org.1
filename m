@@ -1,132 +1,165 @@
-Return-Path: <netdev+bounces-39959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C91717C504F
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:37:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA28B7C511E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 068A41C20E68
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:37:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87EBE2821AC
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CF910958;
-	Wed, 11 Oct 2023 10:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05F51DA58;
+	Wed, 11 Oct 2023 11:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UglVFxDZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lqcBP6ln"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAB21095B
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:36:56 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 912BFB7;
-	Wed, 11 Oct 2023 03:36:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F32B1097D
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:09:49 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFDB30EF;
+	Wed, 11 Oct 2023 04:07:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697020615; x=1728556615;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=52YiH9Rm64BW8CkQzXjUhpKwgm4oo9z7eHhxwksiAv4=;
-  b=UglVFxDZiGCyI1bnaBQ4VxS4tOIW5Hp8CO60QnsG+tYHH8Isk3iRwnpc
-   NwHL4gdZeEj5MNzNdofCvtp/3WXbSYK+6NBIhVGQq655fVZr4rKczu0dz
-   PKe/Lfh7nZ9QtX4sKr0b4rhInphagaLr12aJnzAhT14L6hUDwW6wutghx
-   P5hV7jTi3B+AP6/noFqd3FfV3XXcaA8GefjLOl6LEH2DeuHXJq3OVMDWx
-   htVxoB9Vz5eZUR0aXEun8HTzXFe4oVemN84RPocqsrEgBhjU6nszso4MC
-   hhlSjIJiiqo3pzlwW1WMEkiRYdlbtrN5JiNTmk+YAse927WA9nPM/lBbO
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="415675482"
+  t=1697022449; x=1728558449;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version:content-id;
+  bh=ckRPG2JUL38SKDbKOkmm+WWH+26uhzkNuPJSIGu2OfI=;
+  b=lqcBP6lncMJm/+0NWtG8xJFua7MybbFIPUA7pTo1pTef664IZPekJvaz
+   Mw3kb1zjuf0k3q8wuDCB1dTAUimR1X0u75C76ypx7vCsg/el/b3S7OJ21
+   RorMVF0GelwpA1O1+bqPtCEDgjkJ7qLpYbmFS1cJ3OXjneiJhY+p8AWih
+   9PJYdRUNCgE+VApfIIlxJx5FTpTQGFdFi3gSGRMKL2X13Fu6jWtBt214I
+   VTpyRyXf6BGlyegA21Zkx7zTEFZi1yFt9/T3g92cTaMt2XgQa9j4kzmEt
+   xFdsoI4h56Ex8vRicATow4CqsPiMaHZr2WOD7qTfmeHgANFMf0YmxXe71
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="369698095"
 X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="415675482"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 03:36:54 -0700
+   d="scan'208";a="369698095"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 04:07:27 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="824114342"
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="788961825"
 X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="824114342"
-Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.54])
-  by fmsmga004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 03:36:50 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97-RC1)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1qqWa7-00000004azc-2aLH;
-	Wed, 11 Oct 2023 13:36:47 +0300
-Date: Wed, 11 Oct 2023 13:36:47 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Alexander Potapenko <glider@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, dm-devel@redhat.com,
-	ntfs3@lists.linux.dev, linux-s390@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/14] bitmap: extend bitmap_{get,set}_value8() to
- bitmap_{get,set}_bits()
-Message-ID: <ZSZ6v1qgZbqKgKXa@smile.fi.intel.com>
-References: <20231009151026.66145-1-aleksander.lobakin@intel.com>
- <20231009151026.66145-10-aleksander.lobakin@intel.com>
- <ZSQq02A9mTireK71@yury-ThinkPad>
- <a28542e2-4a5b-4c29-9d4a-12a0d2ab5527@intel.com>
+   d="scan'208";a="788961825"
+Received: from opipikin-mobl2.ger.corp.intel.com ([10.252.57.154])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 04:07:20 -0700
+Date: Wed, 11 Oct 2023 14:07:18 +0300 (EEST)
+From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+cc: Rob Herring <robh@kernel.org>, linux-pci@vger.kernel.org, 
+    LKML <linux-kernel@vger.kernel.org>, 3chas3@gmail.com, brking@us.ibm.com, 
+    dalias@libc.org, glaubitz@physik.fu-berlin.de, ink@jurassic.park.msu.ru, 
+    jejb@linux.ibm.com, kw@linux.com, linux-alpha@vger.kernel.org, 
+    linux-arm-kernel@lists.infradead.org, 
+    linux-atm-general@lists.sourceforge.net, linux-scsi@vger.kernel.org, 
+    linux-sh@vger.kernel.org, lpieralisi@kernel.org, 
+    martin.petersen@oracle.com, mattst88@gmail.com, 
+    Netdev <netdev@vger.kernel.org>, richard.henderson@linaro.org, 
+    toan@os.amperecomputing.com, ysato@users.sourceforge.jp, 
+    Tadeusz Struk <tadeusz.struk@intel.com>
+Subject: Re: [PATCH v3 0/6] PCI/treewide: Cleanup/streamline PCI error code
+ handling
+In-Reply-To: <20231010223530.GA1005985@bhelgaas>
+Message-ID: <667e1068-20c3-938f-2d87-fb1d6c44a45e@linux.intel.com>
+References: <20231010223530.GA1005985@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a28542e2-4a5b-4c29-9d4a-12a0d2ab5527@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: multipart/mixed; BOUNDARY="8323329-1666151866-1697020845=:1977"
+Content-ID: <98898f16-3a16-7cb9-26e4-d9e9776916fe@linux.intel.com>
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 11:33:25AM +0200, Alexander Lobakin wrote:
-> From: Yury Norov <yury.norov@gmail.com>
-> Date: Mon, 9 Oct 2023 09:31:15 -0700
-> 
-> > + Alexander Potapenko <glider@google.com>
-> > 
-> > On Mon, Oct 09, 2023 at 05:10:21PM +0200, Alexander Lobakin wrote:
-> >> Sometimes there's need to get a 8/16/...-bit piece of a bitmap at a
-> >> particular offset. Currently, there are only bitmap_{get,set}_value8()
-> >> to do that for 8 bits and that's it.
-> > 
-> > And also a series from Alexander Potapenko, which I really hope will
-> > get into the -next really soon. It introduces bitmap_read/write which
-> > can set up to BITS_PER_LONG at once, with no limitations on alignment
-> > of position and length:
-> > 
-> > https://lore.kernel.org/linux-arm-kernel/ZRXbOoKHHafCWQCW@yury-ThinkPad/T/#mc311037494229647088b3a84b9f0d9b50bf227cb
-> > 
-> > Can you consider building your series on top of it?
-> 
-> Yeah, I mentioned in the cover letter that I'm aware of it and in fact
-> it doesn't conflict much, as the functions I'm adding here get optimized
-> as much as the original bitmap_{get,set}_value8(), while Alexander's
-> generic helpers are heavier.
-> I realize lots of calls will be optimized as well due to the offset and
-> the width being compile-time constants, but not all of them. The idea of
-> keeping two pairs of helpers initially came from Andy if I understood
-> him correctly.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Just a disclaimer: The idea came before I saw the series by Alexander Potapenko.
+--8323329-1666151866-1697020845=:1977
+Content-Type: text/plain; CHARSET=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
+Content-ID: <64336ba8-d7c9-4fae-879-59b88302220@linux.intel.com>
 
-> What do you think? I can provide some bloat-o-meter stats after
-> rebasing. And either way, I see no issue in basing this series on top of
-> Alex' one.
+On Tue, 10 Oct 2023, Bjorn Helgaas wrote:
+
+> [+cc Tadeusz; updates to quirk_intel_qat_vf_cap()]
+> 
+> On Mon, Sep 11, 2023 at 03:53:48PM +0300, Ilpo Järvinen wrote:
+> > As the first step towards converting PCI accessor function return codes
+> > into normal errnos this series cleans up related code paths which have
+> > complicated multi-line construct to handle the PCI error checking.
+> > 
+> > I'd prefer these (the remaining ones) to be routed through PCI tree due
+> > to PCI accessor function return code conversion being built on top of
+> > them.
+> > 
+> > v3:
+> > - Return pci_generic_config_read32()'s error code directly
+> > - Removed already accepted patches
+> > 
+> > v2:
+> > - Moved ret local var to the inner block (I2C: ali15x3)
+> > - Removed already accepted patches
+> > 
+> > 
+> > Ilpo Järvinen (6):
+> >   alpha: Streamline convoluted PCI error handling
+> >   sh: pci: Do PCI error check on own line
+> >   atm: iphase: Do PCI error checks on own line
+> >   PCI: Do error check on own line to split long if conditions
+> >   PCI: xgene: Do PCI error check on own line & keep return value
+> >   scsi: ipr: Do PCI error checks on own line
+> > 
+> >  arch/alpha/kernel/sys_miata.c      | 17 +++++++++--------
+> >  arch/sh/drivers/pci/common.c       |  7 ++++---
+> >  drivers/atm/iphase.c               | 20 +++++++++++---------
+> >  drivers/pci/controller/pci-xgene.c |  7 ++++---
+> >  drivers/pci/pci.c                  |  9 ++++++---
+> >  drivers/pci/probe.c                |  6 +++---
+> >  drivers/pci/quirks.c               |  6 +++---
+> >  drivers/scsi/ipr.c                 | 12 ++++++++----
+> >  8 files changed, 48 insertions(+), 36 deletions(-)
+> 
+> Applied all to pci/config-errs for v6.7, thanks!
+> 
+> I made the tweaks below; heads-up to John Paul and Tadeusz.
+> 
+> Oh, and weird experience applying these via b4, git am: the
+> Signed-off-by was corrupted on these patches:
+> 
+>   https://lore.kernel.org/r/20230911125354.25501-7-ilpo.jarvinen@linux.intel.com  https://lore.kernel.org/r/20230911125354.25501-6-ilpo.jarvinen@linux.intel.com  https://lore.kernel.org/r/20230911125354.25501-3-ilpo.jarvinen@linux.intel.com
+> 
+> It looked like this:
+> 
+>   Signed-off-by: Ilpo JÃ¤rvinen <ilpo.jarvinen@linux.intel.com>
+> 
+> Not sure why this happened; maybe one of the mailing lists screwed it
+> up and the order of arrival determines which one b4 uses?  The ones
+> from linux-alpha look like:
+> 
+>   Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
+> 
+> which I think corresponds to the bad rendering.  I think I fixed them
+> all.
+
+Thanks for letting me know. It seems that copies of the same mail
+
+https://lore.kernel.org/linux-alpha/...
+https://lore.kernel.org/linux-pci/...
+
+do indeed differ for some reason. I'll probably have to experiment to see 
+if I can reproduce problem with the linux-alpha list.
+
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+ i.
+--8323329-1666151866-1697020845=:1977--
 
