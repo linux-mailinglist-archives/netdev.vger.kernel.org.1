@@ -1,168 +1,132 @@
-Return-Path: <netdev+bounces-40176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF087C60F7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 01:15:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B167C60FF
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 01:18:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F2C1C209D6
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 23:15:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A527F282275
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 23:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116C423744;
-	Wed, 11 Oct 2023 23:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BE123755;
+	Wed, 11 Oct 2023 23:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="oN084AUl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gykYWkOS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E4921A09
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:15:16 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970B6AF;
-	Wed, 11 Oct 2023 16:15:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1697066113;
-	bh=Qf1p2gVy4rqI/LsmbKaNjjPoD1EJg71MiJ3nDq8hLn4=;
-	h=Date:From:To:Cc:Subject:From;
-	b=oN084AUlbbXslRvm0WWW2JUyVkSaZRiFxYgiHG4tYgSNAuez+ngdfO+kEPEBtfR1c
-	 UlR7FUEK5rWZPzteTsy1poOrjgrbV09GZSsW3e6iEmgQZLXtGxT0zUwD3FjisC0b6y
-	 JFmc76NI/AFsqQr015nOXI8pgTVQC6KktuL0Z4SsaUwdNnEwWFJt9c8AjqwtiNngBM
-	 ZDl0hMvom7H6KLuiB8fpEQYT13zIr2wELV5sovMzJr1LPHJXWHlMsAOnSM5bkoy8kE
-	 xO5eiiK2//ykgVHoAcavgCqL5BHm2f9a/7nL3D3Ns162A1H3aHwwK/vRBAv3BzSSCK
-	 ORnCX9BT4Fvvw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4S5TBl3TY2z4xVW;
-	Thu, 12 Oct 2023 10:15:11 +1100 (AEDT)
-Date: Thu, 12 Oct 2023 10:14:34 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Shawn Guo <shawnguo@kernel.org>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Frank Li <Frank.Li@nxp.com>, Haibo
- Chen <haibo.chen@nxp.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: linux-next: manual merge of the imx-mxs tree with the net tree
-Message-ID: <20231012101434.1e5e7340@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE3521A09;
+	Wed, 11 Oct 2023 23:18:31 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E8AA9;
+	Wed, 11 Oct 2023 16:18:28 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c9ba72f6a1so781475ad.1;
+        Wed, 11 Oct 2023 16:18:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697066308; x=1697671108; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vtxOWZP+FH/F2zhaIO1LTs7w6wEmWDZirwNVhXFHmho=;
+        b=gykYWkOSQ2+KM0juNllsuOa5tSBI3ejqsQ0JceUXHRDyyaUbkoDUaLTahZ2umVOLMD
+         hDlG/bb+MX+KUVbrckyPPBsOHP1D6rNwk+6z6NGhWZv5VtaOMj0vIk5nWf9ukVhsJfKy
+         oU2gO5i9vH13PYemDW8SGck5kyeomhVWV0CcHHO9UUXtsJBLVhB9Xrs1goRT7X1EG4x3
+         fCetXDhtVHvU993CWJamukdyhEiyzwJXjbjhhvAVe9Q+cEQQ4/LuWE2jkLpNVZp0XhRp
+         Bp6pJzYxvKNnc/rIUnqC6aeZE2ZdDlzOem6v+P2YEVLG/kWtHUB3QkM8hglWzEP1RPXb
+         GCZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697066308; x=1697671108;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vtxOWZP+FH/F2zhaIO1LTs7w6wEmWDZirwNVhXFHmho=;
+        b=YV9Qk3i7+N4T1aGQ9A975XkAr62GibTFeD4NijhLgvGT6nQAPtzabZLcwQ9SaCZoAn
+         UKkYyF1FpS5hKqgI2HR4CzpHN7ZbPSKhk05+H1WErO5/EBqBkkj0y71tJWKEdxnc8lp/
+         JP2X/BlV3BtxJBRMqTn1i23YsPPrHox8xBMeizVIYEeBtvlID4WhxmKb7Ogdr2Sj7zFA
+         IUIFoDVbEmtZ5B+GtPkbD7CxIgBrAr5gh0y5r7lxq/GNKckdMn8IC8ZgiQXKOhrsJDa8
+         mQNwrJ+AoVksbkzKbFtF059suaguH2dzp0b1vdD6eSNSp/V1aGwFDtSaXjB2Y48G3h4f
+         rqNQ==
+X-Gm-Message-State: AOJu0YyidhDsVXP3h04pxczZuqfD34Kt5Rrsvisf4Vh+KMEuI1QEHTT/
+	GyXzNkpkrvkreky7fULCpow=
+X-Google-Smtp-Source: AGHT+IFfMC+Iz/6wCzVY4B196nsqSXsc6kIahvb5lw06VFuDqCF5EkXgbX9yASQwPG4ugxm2zetA8g==
+X-Received: by 2002:a17:902:f149:b0:1c9:d366:8ef5 with SMTP id d9-20020a170902f14900b001c9d3668ef5mr2462267plb.1.1697066307764;
+        Wed, 11 Oct 2023 16:18:27 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id ji10-20020a170903324a00b001c444f185b4sm397352plb.237.2023.10.11.16.18.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 16:18:27 -0700 (PDT)
+Date: Thu, 12 Oct 2023 08:18:26 +0900 (JST)
+Message-Id: <20231012.081826.1846197263913130802.fujita.tomonori@gmail.com>
+To: miguel.ojeda.sandonis@gmail.com
+Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ tmgross@umich.edu, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CANiq72=GAiR-Mps_ZuLtxmma28dJd2xKdXWh6fu1icLBmmaYAw@mail.gmail.com>
+References: <CANiq72nj_04U82Kb4DfMx72NPgHzDCd-xbosc83xgF19nCqSfQ@mail.gmail.com>
+	<20231010.005008.2269883065591704918.fujita.tomonori@gmail.com>
+	<CANiq72=GAiR-Mps_ZuLtxmma28dJd2xKdXWh6fu1icLBmmaYAw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/juvbrqhB/Wpp.Nl2Y1l2rIr";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/juvbrqhB/Wpp.Nl2Y1l2rIr
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-Today's linux-next merge of the imx-mxs tree got a conflict in:
-
-  arch/arm64/boot/dts/freescale/imx93.dtsi
-
-between commit:
-
-  23ed2be5404d ("arm64: dts: imx93: add the Flex-CAN stop mode by GPR")
-
-from the net tree and commit:
-
-  d34d2aa594d0 ("arm64: dts: imx93: add edma1 and edma2")
-
-from the imx-mxs tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc arch/arm64/boot/dts/freescale/imx93.dtsi
-index dcf6e4846ac9,4a0d604fd0db..000000000000
---- a/arch/arm64/boot/dts/freescale/imx93.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx93.dtsi
-@@@ -185,7 -185,47 +185,47 @@@
-  			#size-cells =3D <1>;
-  			ranges;
- =20
-+ 			edma1: dma-controller@44000000 {
-+ 				compatible =3D "fsl,imx93-edma3";
-+ 				reg =3D <0x44000000 0x200000>;
-+ 				#dma-cells =3D <3>;
-+ 				dma-channels =3D <31>;
-+ 				interrupts =3D <GIC_SPI 95 IRQ_TYPE_LEVEL_HIGH>,  //  0: Reserved
-+ 					     <GIC_SPI 96 IRQ_TYPE_LEVEL_HIGH>,  //  1: CANFD1
-+ 					     <GIC_SPI 97 IRQ_TYPE_LEVEL_HIGH>,  //  2: Reserved
-+ 					     <GIC_SPI 98 IRQ_TYPE_LEVEL_HIGH>,  //  3: GPIO1 CH0
-+ 					     <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,  //  4: GPIO1 CH1
-+ 					     <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>, //  5: I3C1 TO Bus
-+ 					     <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>, //  6: I3C1 From Bus
-+ 					     <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>, //  7: LPI2C1 M TX
-+ 					     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>, //  8: LPI2C1 S TX
-+ 					     <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>, //  9: LPI2C2 M RX
-+ 					     <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>, // 10: LPI2C2 S RX
-+ 					     <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>, // 11: LPSPI1 TX
-+ 					     <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>, // 12: LPSPI1 RX
-+ 					     <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>, // 13: LPSPI2 TX
-+ 					     <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>, // 14: LPSPI2 RX
-+ 					     <GIC_SPI 110 IRQ_TYPE_LEVEL_HIGH>, // 15: LPTMR1
-+ 					     <GIC_SPI 111 IRQ_TYPE_LEVEL_HIGH>, // 16: LPUART1 TX
-+ 					     <GIC_SPI 112 IRQ_TYPE_LEVEL_HIGH>, // 17: LPUART1 RX
-+ 					     <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>, // 18: LPUART2 TX
-+ 					     <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>, // 19: LPUART2 RX
-+ 					     <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>, // 20: S400
-+ 					     <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>, // 21: SAI TX
-+ 					     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>, // 22: SAI RX
-+ 					     <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>, // 23: TPM1 CH0/CH2
-+ 					     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>, // 24: TPM1 CH1/CH3
-+ 					     <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>, // 25: TPM1 Overflow
-+ 					     <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>, // 26: TMP2 CH0/CH2
-+ 					     <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>, // 27: TMP2 CH1/CH3
-+ 					     <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>, // 28: TMP2 Overflow
-+ 					     <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>, // 29: PDM
-+ 					     <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>; // 30: ADC1
-+ 				clocks =3D <&clk IMX93_CLK_EDMA1_GATE>;
-+ 				clock-names =3D "dma";
-+ 			};
-+=20
- -			anomix_ns_gpr: syscon@44210000 {
- +			aonmix_ns_gpr: syscon@44210000 {
-  				compatible =3D "fsl,imx93-aonmix-ns-syscfg", "syscon";
-  				reg =3D <0x44210000 0x1000>;
-  			};
-
---Sig_/juvbrqhB/Wpp.Nl2Y1l2rIr
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmUnLFoACgkQAVBC80lX
-0GzwcAf9Hc6mLVpZ5I6YpGr7lYl3q+ZPuE1SvNHRdHt75L0DiFhgP/OKDKrCUlPu
-plsasHbFQvvW5bSxgQHRgLqigMO5kee9ay0tz/WZgBbTkOCUt2eWanclpnuu5ta/
-ZjNBcN9XmVyaPEh/H1g6MNM5U62pHqvPp5W9zxUFDv1wqaADLOSrgDpZU2KW0MjW
-qrMfxXxWFqMwNb3NF7V4b59E6nZvUWsM8+Mz7P8B3ZIiPrcUYS89ZAYwOMHQS8ib
-i3q5ymRgfoJ7VFqh+bOOGU6VzOWErvG6ehFQm8Na/zMTQPn1XMTezmmnZcBjlHt0
-oBXYeJkXI8tGWAQ8KwEzJhEJRCw83w==
-=fLdv
------END PGP SIGNATURE-----
-
---Sig_/juvbrqhB/Wpp.Nl2Y1l2rIr--
+T24gV2VkLCAxMSBPY3QgMjAyMyAxMTo1OTowMSArMDIwMA0KTWlndWVsIE9qZWRhIDxtaWd1ZWwu
+b2plZGEuc2FuZG9uaXNAZ21haWwuY29tPiB3cm90ZToNCg0KPiBPbiBNb24sIE9jdCA5LCAyMDIz
+IGF0IDU6NTDigK9QTSBGVUpJVEEgVG9tb25vcmkNCj4gPGZ1aml0YS50b21vbm9yaUBnbWFpbC5j
+b20+IHdyb3RlOg0KPj4NCj4+IFdoYXQgZmVlZGJhY2s/IGVudW0gc3R1ZmY/IEkgdGhpbmsgdGhh
+dCBpdCdzIGEgbG9uZy10ZXJtIGlzc3VlLg0KPiANCj4gTm90IGp1c3QgdGhhdC4gVGhlcmUgaGFz
+IGJlZW4gb3RoZXIgZmVlZGJhY2ssIGFuZCBzaW5jZSB0aGlzIG1lc3NhZ2UsDQo+IHdlIGdvdCBu
+ZXcgcmV2aWV3cyB0b28uDQo+IA0KPiBCdXQsIHllcywgdGhlIGAtLXJ1c3RpZmllZC1lbnVtYCBp
+cyBvbmUgb2YgdGhvc2UuIEkgYW0gc3RpbGwNCj4gdW5jb21mb3J0YWJsZSB3aXRoIGl0LiBJdCBp
+cyBub3QgYSBodWdlIGRlYWwgZm9yIGEgd2hpbGUsIGFuZCB0aGluZ3MNCj4gd2lsbCB3b3JrLCBh
+bmQgdGhlIHJpc2sgb2YgVUIgaXMgbG93LiBCdXQgd2h5IGRvIHdlIHdhbnQgdG8gcmlzayBpdD8N
+Cj4gVGhlIHBvaW50IG9mIHVzaW5nIFJ1c3QgaXMgcHJlY2lzZWx5IHRvIGF2b2lkIHRoaXMgc29y
+dCBvZiB0aGluZy4NCj4NCj4gV2h5IGNhbm5vdCB3ZSB1c2Ugb25lIG9mIHRoZSBhbHRlcm5hdGl2
+ZXM/IElmIHdlIHJlYWxseSB3YW50IHRvIGNhdGNoLA0KPiByaWdodCBub3csIHRoZSAiYWRkaXRp
+b24gb2YgbmV3IHZhcmlhbnQgaW4gdGhlIEMgZW51bSIgY2FzZSwgY2Fubm90IHdlDQo+IGFkZCBh
+IHRlbXBvcmFyeSBjaGVjayBmb3IgdGhhdD8gZS5nLiBpdCBvY2N1cnMgdG8gbWUgd2UgY291bGQg
+bWFrZQ0KDQpJSVJDLCBBbmRyZXcgcHJlZmVycyB0byBhdm9pZCBjcmVhdGluZyBhIHRlbXBvcmFy
+eSBydXN0IHZhcmlhbnQgKEdyZWcNCmRvZXMgdG9vLCBJIHVuZGVyc3RhbmQpLiBJIGd1ZXNzIHRo
+YXQgb25seSBzb2x1c2lvbiB0aGF0IGJvdGggUnVzdCBhbmQNCkMgZGV2cyB3b3VsZCBiZSBoYXBw
+eSB3aXRoIGlzIGdlbmVyYXRpbmcgc2FmZSBSdXN0IGNvZGUgZnJvbSBDLiBUaGUNCnNvbHV0aW9u
+IGlzIHN0aWxsIGEgcHJvdG90eXBlIGFuZCBJIGRvbid0IGtub3cgd2hlbiBpdCB3aWxsIGJlDQph
+dmFpbGFibGUgKHNvbWVvbmUga25vd3M/KS4NCg0KSSB0aGluayB0aGF0IHVubGlrZWx5IFBIWUxJ
+QidzIHN0YXRlIG1hY2hpbmUgd291bGQgYmUgYnJva2VuLCBzbyBJDQpjaG9zZSB0aGF0IGFwcHJv
+YWNoIHdpdGggdGhlIGNvZGUgY29tbWVudGVkLg0KDQoNCj4+IEknbSBub3Qgc3VyZSBhYm91dCBp
+dC4gRm9yIGV4YW1wbGUsIHdlIHJldmlld2VkIHRoZSBsb2NraW5nIGlzc3VlDQo+PiB0aHJlZSB0
+aW1lcy4gSXQgY2FuJ3QgYmUgcmV2aWV3ZWQgb25seSBvbiBSdXN0IHNpZGUuIEl0J3MgbWFpbmx5
+IGFib3V0DQo+PiBob3cgdGhlIEMgc2lkZSB3b3Jrcy4NCj4gDQo+IFdlIGhhdmUgbmV2ZXIgc2Fp
+ZCBpdCBoYXMgdG8gYmUgcmV2aWV3ZWQgb25seSBvbiB0aGUgUnVzdCBzaWRlLiBJbg0KPiBmYWN0
+LCBvdXIgaW5zdHJ1Y3Rpb25zIGZvciBjb250cmlidXRpbmcgZXhwbGFpbiB2ZXJ5IGNsZWFybHkg
+dGhlDQo+IG9wcG9zaXRlOg0KPiANCj4gICAgIGh0dHBzOi8vcnVzdC1mb3ItbGludXguY29tL2Nv
+bnRyaWJ1dGluZyN0aGUtcnVzdC1zdWJzeXN0ZW0NCj4gDQo+IFRoZSBpbnN0cnVjdGlvbnMgYWxz
+byBzYXkgdGhhdCB0aGUgY29kZSBtdXN0IGJlIHdhcm5pbmctZnJlZSBhbmQgc28NCj4gb24sIGFu
+ZCB5ZXQgYWZ0ZXIgc2V2ZXJhbCBpdGVyYXRpb25zIGFuZCBwdXNoaW5nIGZvciBtZXJnaW5nIHNl
+dmVyYWwNCj4gdGltZXMsIHRoZXJlIGFyZSBzdGlsbCAic3VyZmFjZS1sZXZlbCIgdGhpbmdzIGxp
+a2UgbWlzc2luZyBgLy8gU0FGRVRZYA0KPiBjb21tZW50cyBhbmQgYGJpbmRpbmdzOjpgIGluIHB1
+YmxpYyBBUElzOyB3aGljaCB3ZSBjb25zaWRlciB2ZXJ5DQo+IGltcG9ydGFudCAtLSB3ZSB3YW50
+IHRvIGdldCB0aGVtIGVuZm9yY2VkIGJ5IHRoZSBjb21waWxlciBpbiB0aGUNCj4gZnV0dXJlLg0K
+PiANCj4gTm90IG9ubHkgdGhhdCwgd2hlbiBJIHNhdyBXZWRzb24gbWVudGlvbmluZyB5ZXN0ZXJk
+YXkgdGhlDQo+IGAjW211c3RfdXNlXWAgYml0LCBJIHdvbmRlcmVkIGhvdyB0aGlzIHdhcyBldmVu
+IG5vdCBiZWluZyBub3RpY2VkIGJ5DQo+IHRoZSBjb21waWxlci4NCj4gDQo+IFNvIEkganVzdCB0
+b29rIHRoZSB2MyBwYXRjaGVzIGFuZCBjb21waWxlZCB0aGVtIGFuZCwgaW5kZWVkLCBDbGlwcHkg
+Z2l2ZXMgeW91Og0KDQpTb3JyeSwgdGhlcmUncyBubyBleGN1c2UuIEkgc2hvdWxkIGhhdmUgZG9u
+ZSBiZXR0ZXIuIEknbGwgbWFrZSBzdXJlDQp0aGF0IHRoZSBjb2RlIGlzIHdhcm5pbmctZnJlZS4N
+Cg==
 
