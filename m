@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-39989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562F67C552C
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:23:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D467C555C
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:26:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 906581C20C24
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:23:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02FA8282222
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD931F928;
-	Wed, 11 Oct 2023 13:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CBD01F92F;
+	Wed, 11 Oct 2023 13:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gNXHm2LI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="gyaE1x/h"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B2D1F17E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:23:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD0E690
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:23:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697030601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eGc8izLfBD5+/wCYakOVoKKmqXcUt92UD4LE+c5u8I0=;
-	b=gNXHm2LIrXp7Tmx/rvtmZ1WRigDC3n0suNrzFzt5s9jJD4aI485fY0EJDI0DnyZWc4x4bs
-	HzQuAGnF+YlPbZCZSRv029nItJp21CQoRarqg4PMBfMOHOxqvMR+nTpUdIjs20W4Xu/qTT
-	jxmEawKioHO6hFohWuElGTw8jfOZe18=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-154-2ouwYUh3MC2K-k-eG6enWg-1; Wed, 11 Oct 2023 09:23:19 -0400
-X-MC-Unique: 2ouwYUh3MC2K-k-eG6enWg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 407071C08966;
-	Wed, 11 Oct 2023 13:23:19 +0000 (UTC)
-Received: from RHTPC1VM0NT (unknown [10.22.34.140])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 919A92026D4B;
-	Wed, 11 Oct 2023 13:23:18 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,  Pravin B Shelar
- <pshelar@ovn.org>,  "Eelco Chaudron" <echaudro@redhat.com>,  "Ilya
- Maximets" <imaximet@redhat.com>,  "Flavio Leitner" <fbl@redhat.com>, Paolo
- Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH 0/7] net: openvswitch: Reduce stack usage
-References: <20231011034344.104398-1-npiggin@gmail.com>
-Date: Wed, 11 Oct 2023 09:23:18 -0400
-In-Reply-To: <20231011034344.104398-1-npiggin@gmail.com> (Nicholas Piggin's
-	message of "Wed, 11 Oct 2023 13:43:37 +1000")
-Message-ID: <f7ta5spe1ix.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51531F198
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:26:15 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C5C93
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date
+	:Subject:CC:To:From:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=dA6iqc7NwacsVn2nL/GeV/zrTBiJpTxcisfIb9/f3gE=; b=gyaE1x/h74kkBuGzOxmzcVo6NY
+	Hw9Q+7bIlke/zCrR9Va8tnvzGmZ758PArH/saNPOM49nt42VYoca1gTkUNbmN2vEjwVmNRkVVDp3q
+	bl4FU5LWyb4WVlsSm5WHDmCBTCXL3bPfqw7WeVOl9CJZC+bmiquNvxnwKc1siRsib+mu1cxJUmgcy
+	cajqaMAqV1PONan3xeSXJVGMj+/jPYg1ko9wMkQSunn6ZM+uGThK6xebAZfqOHEueqzSiAOlVlwyT
+	BrkNXu2EpkRG54aU4WzzcfiKjjH+LOkSXguSkJjMueuZr0jsMZX1UTNm4/Nqa1GuZXCr1j8CWfDqh
+	Y0VfYukQ==;
+Received: from [192.168.1.4] (port=11306 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qqZDy-000326-1l;
+	Wed, 11 Oct 2023 15:26:06 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Wed, 11 Oct 2023 15:26:06 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <conor@kernel.org>
+CC: <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>,
+	<ante.knezic@helmholz.de>, <conor+dt@kernel.org>, <davem@davemloft.net>,
+	<devicetree@vger.kernel.org>, <edumazet@google.com>, <f.fainelli@gmail.com>,
+	<krzysztof.kozlowski+dt@linaro.org>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <marex@denx.de>, <netdev@vger.kernel.org>,
+	<olteanv@gmail.com>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<woojung.huh@microchip.com>
+Subject: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
+Date: Wed, 11 Oct 2023 15:26:00 +0200
+Message-ID: <20231011132600.26297-1-ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20231010-unwired-trench-c7a467118879@spud>
+References: <20231010-unwired-trench-c7a467118879@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,69 +66,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Nicholas Piggin <npiggin@gmail.com> writes:
+On Tue, 10 Oct 2023 16:25:55 +0100, Conor Dooley wrote:
+> On Tue, Oct 10, 2023 at 03:18:54PM +0200, Ante Knezic wrote:
+> > Add documentation for selecting reference rmii clock on KSZ88X3 devices
+> > 
+> > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> > ---
+> >  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > index e51be1ac0362..3df5d2e72dba 100644
+> > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > @@ -49,6 +49,12 @@ properties:
+> >        Set if the output SYNCLKO clock should be disabled. Do not mix with
+> >        microchip,synclko-125.
+> >  
+> > +  microchip,rmii-clk-internal:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      Set if the RMII reference clock should be provided internally.
+> 
+> > Applies only
+> > +      to KSZ88X3 devices.
+> 
+> This should be enforced by the schema, the example schema in the docs
+> should show you how to do this.
 
-> Hi,
->
-> I'll post this out again to keep discussion going. Thanks all for the
-> testing and comments so far.
+I am guessing you are refering to limiting the property to ksz88x3 devices?
+Something like:
 
-Thanks for the update - did you mean for this to be tagged RFC as well?
+if:
+  properties:
+    compatible:
+      enum:
+        - microchip,ksz8863
+        - microchip,ksz8873
+then:
+  properties:
+    microchip,rmii-clk-internal:
+      $ref: /schemas/types.yaml#/definitions/flag
+      description:
+        Set if the RMII reference clock is provided internally. Otherwise
+        reference clock should be provided externally.
 
-I don't see any performance data with the deployments on x86_64 and
-ppc64le that cause these stack overflows.  Are you able to provide the
-impact on ppc64le and x86_64?
-
-I guess the change probably should be tagged as -next since it doesn't
-really have a specific set of commits it is "fixing."  It's really like
-a major change and shouldn't really go through stable trees, but I'll
-let the maintainers tell me off if I got it wrong.
-
-> Changes since the RFC
-> https://lore.kernel.org/netdev/20230927001308.749910-1-npiggin@gmail.com/
->
-> - Replace slab allocations for flow keys with expanding the use
->   of the per-CPU key allocator to ovs_vport_receive.
->
-> - Drop patch 1 with Ilya's since they did the same thing (that is
->   added at patch 3).
->
-> - Change push_nsh stack reduction from slab allocation to per-cpu
->   buffer.
->
-> - Drop the ovs_fragment stack usage reduction for now sinc it used
->   slab and was a bit more complicated.
->
-> I posted an initial version of the per-cpu flow allocator patch in
-> the RFC thread. Since then I cleaned up some debug code and increased
-> the allocator size to accommodate the additional user of it.
->
-> Thanks,
-> Nick
->
-> Ilya Maximets (1):
->   openvswitch: reduce stack usage in do_execute_actions
->
-> Nicholas Piggin (6):
->   net: openvswitch: generalise the per-cpu flow key allocation stack
->   net: openvswitch: Use flow key allocator in ovs_vport_receive
->   net: openvswitch: Reduce push_nsh stack usage
->   net: openvswitch: uninline action execution
->   net: openvswitch: uninline ovs_fragment to control stack usage
->   net: openvswitch: Reduce stack usage in ovs_dp_process_packet
->
->  net/openvswitch/actions.c  | 208 +++++++++++++++++++++++--------------
->  net/openvswitch/datapath.c |  56 +++++-----
->  net/openvswitch/flow.h     |   3 +
->  net/openvswitch/vport.c    |  27 +++--
->  4 files changed, 185 insertions(+), 109 deletions(-)
-
+Thanks,
+Ante
 
