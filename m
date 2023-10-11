@@ -1,204 +1,317 @@
-Return-Path: <netdev+bounces-40000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713217C55D1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:46:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 529067C55E3
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:49:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93E9A1C209CF
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:46:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750451C20BAB
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6B3200A4;
-	Wed, 11 Oct 2023 13:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE48200B1;
+	Wed, 11 Oct 2023 13:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jpxjRvG2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ai0CuMO8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3CC1F920
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:46:53 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 003CEC6
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:46:50 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53b962f09e0so6906264a12.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:46:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697032009; x=1697636809; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=anVbIGFD/xQXnVctqs6NiW8ia3JsnxB8kb9F2mCYrvw=;
-        b=jpxjRvG2GJNNcmWJEhsdZf7o2uGKxUdVCjlQnWTG9dQASpmFBlEsGn2iYI22dj8pZ1
-         tGign+y6j0tn7PNOkwIkKMnqppnBaUHCnQRkFM8jNkvuSdLcb1Nb2gdZOEq3Mg/UHRHD
-         PWtJgppUITsPMZzV/l3KzE9wrwx5zaI5dYbgh8Qg/BQPeThKqta9TWpZul0jUmi11q0C
-         l+eVFccSNOZNpYB3zhGa4V8WRUhvE3GI2XqWjWX6+kKJpEaYe5A3eFs8IVw4OQ1T+7zP
-         SFitUcl3ANhwEQf3xQ5uWCUV/H9Rz04VAH6aHMcN+l3TizVb15IAOcwtQLIL62QHqzWW
-         hMog==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DE5200A3
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:49:49 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B9F4B0
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:49:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697032186;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=INw5XogOJcd4veMjumqnQXf6RoJ3YrteHvnOFI2NkLQ=;
+	b=Ai0CuMO8YnkaUgewDSRFiaMrNLxUJX4x3kvx2+GJaMEZ7gr81Al5nSBA9Aw1ItqJjTTReQ
+	VdSqL38RWjlJw1b/Coh1TmoHN8KRruoNoFoN90VavS3fwLLDZJDL8nihKGcINbVXO5bZQK
+	DtG1uvz4DowBJgsb95EoaAovduh+DUA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-78Runx58NGiggBGlQM3v7Q-1; Wed, 11 Oct 2023 09:49:43 -0400
+X-MC-Unique: 78Runx58NGiggBGlQM3v7Q-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9b98d8f6bafso548997866b.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:49:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697032009; x=1697636809;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=anVbIGFD/xQXnVctqs6NiW8ia3JsnxB8kb9F2mCYrvw=;
-        b=N/ie4p7yFrbRLfHWHc7v53F9yInIWP/Fb4D7kSjBxn81sSBgZ/pAY19TgCZIP6/RWV
-         xFGtfD6ixbnIB9B8cBkdJgIj/rlHCtqjHe3anB4FTbYmVLQIdOAUKoPQWPJP3v7BjVnv
-         +NdxJYS9wpIukbyOLHA9gOGxN8mHbVgq+hNXLnq0frp2xarWEpOR81CmZYeOI2didiA9
-         Oob8VajWNkUatJaF1FMoFaMmP82LiPKTaa48HKBdwh9OTphmIWQDM1AKZuusHxEygRGv
-         HSNk8mlPG/4TLqAR7p/oTnCeeclho6HtKeOBnmOeR1iXgv8DzxM25302poBC40MKg2Mi
-         PHVQ==
-X-Gm-Message-State: AOJu0YwgkaOflBss6azyZIZoXRowXg9TAaNSUwENCWtQb4Pg86c2G5aO
-	SHg+h8nv9DrJsb2xUSPIXRCloA==
-X-Google-Smtp-Source: AGHT+IG4jBToGEzxhhb3hbvvtiaESf4CzvX+W82I3M8QxntBFCd78SFqwb0LS4306g/ZyuYAI/NbJQ==
-X-Received: by 2002:a17:906:2101:b0:9b8:8bcf:8732 with SMTP id 1-20020a170906210100b009b88bcf8732mr18626366ejt.43.1697032009320;
-        Wed, 11 Oct 2023 06:46:49 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id y23-20020a1709064b1700b009aa292a2df2sm9720163eju.217.2023.10.11.06.46.48
+        d=1e100.net; s=20230601; t=1697032182; x=1697636982;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=INw5XogOJcd4veMjumqnQXf6RoJ3YrteHvnOFI2NkLQ=;
+        b=N/mpwCeRyuSzxdSiIXGgMN3E41rdmVk8fcrpX01sOAx+uU2GhTDaOugeIJBRePGG/9
+         vUDg+4IlvXMaT++yJHNoVuYhheBpA3gVCxE9sOxvhmgS+Tu7QGe67QI5BASbm41imAPN
+         qQLYZgS48JNkOe43ymB49dQfx3WV1CZnx0SvSfEbduksOikC2k14ZXXMaREWvVJMknZt
+         YucGBRsZQIFSvdkpmeIFpmoQNwjuu/DXqCkpSU8IQqhqkl+lF9HZh1brZiIxqghrfuBg
+         CPMroV4FG7PDCo7UIOywP3rPLiONIvHhz2ocr+ypj33YkgcQfi/sUHWEc9DUqato+Vr7
+         ObqA==
+X-Gm-Message-State: AOJu0YyUEZPt3sRksqJizdJC2X4Qn1XadVpbGYuRoMD4GzNIVh4DGD+9
+	Pm9Qn0dOk8E4ZU9bdclZgSLA4cvenY6Vhyojp8uVHR/DNk55S/4ZuSYxv1SbuQQKRRLTjJXaqH9
+	gbkwnG/SuMYKNIKr/
+X-Received: by 2002:a17:906:cc2:b0:9ae:82b4:e306 with SMTP id l2-20020a1709060cc200b009ae82b4e306mr18748956ejh.62.1697032182010;
+        Wed, 11 Oct 2023 06:49:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBu4En6qZsKj/MxfyUJzvr0GzkkgkYKgW/mhkduSGCGGyHf11PpO65hI2r7MK3H73325Tc5g==
+X-Received: by 2002:a17:906:cc2:b0:9ae:82b4:e306 with SMTP id l2-20020a1709060cc200b009ae82b4e306mr18748931ejh.62.1697032181539;
+        Wed, 11 Oct 2023 06:49:41 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id gh18-20020a170906e09200b009786c8249d6sm9953435ejb.175.2023.10.11.06.49.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 06:46:48 -0700 (PDT)
-Date: Wed, 11 Oct 2023 15:46:47 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, nicolas.dichtel@6wind.com,
-	johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org,
-	mkubecek@suse.cz, aleksander.lobakin@intel.com
-Subject: Re: [RFC] netlink: add variable-length / auto integers
-Message-ID: <ZSanRz7kV1rduMBE@nanopsycho>
-References: <20231011003313.105315-1-kuba@kernel.org>
+        Wed, 11 Oct 2023 06:49:41 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 7B6B3E5866F; Wed, 11 Oct 2023 15:49:40 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: David Ahern <dsahern@gmail.com>, Stephen Hemminger
+ <stephen@networkplumber.org>, netdev@vger.kernel.org, Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>, Christian Brauner <brauner@kernel.org>, David
+ Laight <David.Laight@ACULAB.COM>
+Subject: Re: [RFC PATCH iproute2-next 0/5] Persisting of mount namespaces
+ along with network namespaces
+In-Reply-To: <87y1gajne4.fsf@email.froward.int.ebiederm.org>
+References: <20231009182753.851551-1-toke@redhat.com>
+ <877cnvtu37.fsf@email.froward.int.ebiederm.org> <87jzrvzc5v.fsf@toke.dk>
+ <87ttqznxjm.fsf@email.froward.int.ebiederm.org> <878r8azjgd.fsf@toke.dk>
+ <87y1gajne4.fsf@email.froward.int.ebiederm.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 11 Oct 2023 15:49:40 +0200
+Message-ID: <87r0m1xo97.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011003313.105315-1-kuba@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Oct 11, 2023 at 02:33:13AM CEST, kuba@kernel.org wrote:
->We currently push everyone to use padding to align 64b values in netlink.
->I'm not sure what the story behind this is. I found this:
->https://lore.kernel.org/all/1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com/#t
->but it doesn't go into details WRT the motivation.
->Even for arches which don't have good unaligned access - I'd think
->that access aligned to 4B *is* pretty efficient, and that's all
->we need. Plus kernel deals with unaligned input. Why can't user space?
+"Eric W. Biederman" <ebiederm@xmission.com> writes:
+
+> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
 >
->Padded 64b is quite space-inefficient (64b + pad means at worst 16B
->per attr vs 32b which takes 8B). It is also more typing:
+>> "Eric W. Biederman" <ebiederm@xmission.com> writes:
+>>
+>>> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+>>>
+>>>> "Eric W. Biederman" <ebiederm@xmission.com> writes:
+>>>>
+>>>>> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+>>>
+>>> There are not many places to look so something like this is probably su=
+fficient:
+>>>
+>>> # stat all of the possible/probable mount points and see if there is
+>>> # something mounted there.  If so recursive bind whatever is there onto
+>>> # the new /sys
+>>>
+>>> for dir in /old/sys/fs/* /old/sys/kernel/*; do
+>>> 	if [ $(stat --format '%d' "$dir") =3D $(stat --format '%d' "$dir/") ; =
+then
+>>
+>> What is this comparison supposed to do? I couldn't find any directories
+>> in /sys/fs/* where this was *not* true, regardless of whether there's a
+>> mount there or not.
 >
->    if (nla_put_u64_pad(rsp, NETDEV_A_SOMETHING_SOMETHING,
->                        value, NETDEV_A_SOMETHING_PAD))
+> Bah.  I think I got my logic scrambled.  I can only get it to work
+> by comparing the filesystems device on /sys/fs to the device on
+> /sys/fs/cgroup etc.
 >
->Create a new attribute type which will use 32 bits at netlink
->level if value is small enough (probably most of the time?),
->and (4B-aligned) 64 bits otherwise. Kernel API is just:
+> The idea is that st_dev changes between filesystems.  So you can detect
+> a filesystem change based on st_dev.
 >
->    if (nla_put_uint(rsp, NETDEV_A_SOMETHING_SOMETHING, value))
+> I thought the $dir vs $dir/ would have allowed stating the underlying
+> directory verses the mount, but apparently my memory go that one wrong.
 >
->Calling this new type "just" sint / uint with no specific size
->will hopefully also make people more comfortable with using it.
->Currently telling people "don't use u8, you may need the space,
->and netlink will round up to 4B, anyway" is the #1 comment
->we give to newcomers.
+> Which makes my command actually something like:
 >
->In terms of netlink layout it looks like this:
+> 	sys_dev=3D$(stat --format=3D'%d' /sys)
 >
->         0       4       8       12      16
->32b:     [nlattr][ u32  ]
->64b:     [  pad ][nlattr][     u64      ]
->uint(32) [nlattr][ u32  ]
->uint(64) [nlattr][     u64      ]
+> 	for dir in /old/sys/fs/* /old/sys/kernel/*; do
+> 		if [ $(stat --format '%d' "$dir") -ne $sys_dev ] ; then
+>                 	echo $dir is a mount point
+>                 fi
+> 	done
+
+Ah, right that makes sense! I thought I was missing something when I
+couldn't get your other example to work...
+
+>>>>> Or is their a reason that bpffs should be per network namespace?
+>>>>
+>>>> Well, I first ran into this issue because of a bug report to
+>>>> xdp-tools/libxdp about things not working correctly in network
+>>>> namespaces:
+>>>>
+>>>> https://github.com/xdp-project/xdp-tools/issues/364
+>>>>
+>>>> And libxdp does assume that there's a separate bpffs per network
+>>>> namespace: it persists things into the bpffs that is tied to the netwo=
+rk
+>>>> devices in the current namespace. So if the bpffs is shared, an
+>>>> application running inside the network namespace could access XDP
+>>>> programs loaded in the root namespace. I don't know, but suspect, that
+>>>> such assumptions would be relatively common in networking BPF programs
+>>>> that use pinning (the pinning support in libbpf and iproute2 itself at
+>>>> least have the same leaking problem if the bpffs is shared).
+>>>
+>>> Are the names of the values truly network namespace specific?
+>>>
+>>> I did not see any mention of the things that are persisted in the ticket
+>>> you pointed me at, and unfortunately I am not familiar with xdp.
+>>>
+>>> Last I looked until all of the cpu side channels are closed it is
+>>> unfortunately unsafe to load ebpf programs with anything less than
+>>> CAP_SYS_ADMIN (aka with permission to see and administer the entire
+>>> system).  So from a system point of view I really don't see a
+>>> fundamental danger from having a global /sys/fs/bpf.
+>>>
+>>> If there are name conflicts in /sys/fs/bpf because of duplicate names in
+>>> different network namespaces I can see that being a problem.
+>>
+>> Yeah, you're right that someone loading a BPF program generally has
+>> permissions enough that they can break out of any containment if they
+>> want, but applications do make assumptions about the contents of the
+>> pinning directory that can lead to conflicts.
+>>
+>> A couple of examples:
+>>
+>> - libxdp will persist files in /sys/fs/bpf/dispatch-$ifindex-$prog_id
+>>
+>> - If someone sets the 'pinning' attribute on a map definition in a BPF
+>>   file, libbpf will pin those files in /sys/fs/bpf/$map_name
+>>
+>> The first one leads to obvious conflicts if shared across network
+>> namespaces because of ifindex collisions. The second one leads to
+>> potential false sharing of state across what are supposed to be
+>> independent networking domains (e.g., if the bpffs is shared, loading
+>> xdp-filter inside a namespace will share the state with another instance
+>> loaded in another namespace, which would no doubt be surprising).
 >
->Signed-off-by: Jakub Kicinski <kuba@kernel.org>
->---
->Thoughts?
+> Sigh.  So non-default network namespaces can't use /sys/fs/bpf,
+> because of silly userspace assumptions.  So the entries need to be
+> namespaced to prevent conflicts.
 
-Hmm, I assume that genetlink.yaml schema should only allow uint and sint
-to be defined after this, so new genetlink implementations use just uint
-and sint, correct?
+Yup, basically.
 
-Than we have genetlink.yaml genetlink-legacy.yaml genetlink-legacy2.yaml
-?
-I guess in the future there might be other changes to require new
-implemetation not to use legacy things. How does this scale?
-
-+ 2 nits below
-
-
-
+>>> At that point the name conflicts either need to be fixed or we
+>>> fundamentally need to have multiple mount points for bpffs.
+>>> Probably under something like /run/netns-mounts/NAME/.
+>>>
+>>> With ip netns updated to mount the appropriate filesystem.
+>>
+>> I don't think it's feasible to fix the conflicts; they've been around
+>> for a while and are part of application API in some cases. Plus, we
+>> don't know of all BPF-using applications.
+>>
+>> We could have 'ip' manage separate bpffs mounts per namespace and
+>> bind-mount them into each netns (I think that's what you're suggesting),
+>> but that would basically achieve the same thing as the mountns
+>> persisting I am proposing in this series, but only as a special case for
+>> bpffs. So why not do the more flexible thing and persist the whole
+>> mountns (so applications inside the namespace can actually mount
+>> additional things and have them stick around)? The current behaviour
+>> seems very surprising...
 >
->This is completely untested. YNL to follow.
->---
-> include/net/netlink.h        | 62 ++++++++++++++++++++++++++++++++++--
-> include/uapi/linux/netlink.h |  5 +++
-> lib/nlattr.c                 |  9 ++++++
-> net/netlink/policy.c         | 14 ++++++--
-> 4 files changed, 85 insertions(+), 5 deletions(-)
+> I don't like persisting the entire mount namespace because it is hard
+> for a system administrator to see, it is difficult for something outside
+> of that mount namespace to access, and it is as easy to persist a
+> mistake as it is to persist something deliberate.
 >
->diff --git a/include/net/netlink.h b/include/net/netlink.h
->index 8a7cd1170e1f..523486dfe4f3 100644
->--- a/include/net/netlink.h
->+++ b/include/net/netlink.h
->@@ -183,6 +183,8 @@ enum {
-> 	NLA_REJECT,
-> 	NLA_BE16,
-> 	NLA_BE32,
->+	NLA_SINT,
+> My proposal:
+>
+> On "ip netns add NAME"
+> - create the network namespace and mount it at /run/netns/NAME
+> - mount the appropriate sysfs at /run/netns-mounts/NAME/sys
+> - mount the appropriate bpffs at /run/netns-mounts/NAME/sys/fs/bpf
+>
+> On "ip netns delete NAME"
+> - umount --recursive /run/netns-mounts/NAME
+> - unlink /run/netns-mounts/NAME
+> - cleanup /run/netns/NAME as we do today.
+>
+> On "ip netns exec NAME"
+> - Walk through /run/netns-mounts/NAME like we do /etc/netns/NAME/
+>   and perform bind mounts.
 
-Why not just NLA_INT?
+If we setup the full /sys hierarchy in /run/netns-mounts/NAME this
+basically becomes a single recursive bind mount, doesn't it?
 
+What about if we also include bind mounts from the host namespace into
+that separate /sys instance? Will those be included into a recursive
+bind into /sys inside the mount-ns, or will we have to walk the tree and
+do separate bind mounts for each directory?
 
->+	NLA_UINT,
-> 	__NLA_TYPE_MAX,
-> };
-> 
->@@ -377,9 +379,11 @@ struct nla_policy {
-> 
-> #define __NLA_IS_UINT_TYPE(tp)					\
-> 	(tp == NLA_U8 || tp == NLA_U16 || tp == NLA_U32 ||	\
->-	 tp == NLA_U64 || tp == NLA_BE16 || tp == NLA_BE32)
->+	 tp == NLA_U64 || tp == NLA_UINT ||			\
->+	 tp == NLA_BE16 || tp == NLA_BE32)
-> #define __NLA_IS_SINT_TYPE(tp)						\
->-	(tp == NLA_S8 || tp == NLA_S16 || tp == NLA_S32 || tp == NLA_S64)
->+	(tp == NLA_S8 || tp == NLA_S16 || tp == NLA_S32 || tp == NLA_S64 || \
->+	 tp == NLA_SINT)
-> 
-> #define __NLA_ENSURE(condition) BUILD_BUG_ON_ZERO(!(condition))
-> #define NLA_ENSURE_UINT_TYPE(tp)			\
->@@ -1357,6 +1361,22 @@ static inline int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
-> 	return nla_put(skb, attrtype, sizeof(u32), &tmp);
-> }
-> 
->+/**
->+ * nla_put_uint - Add a variable-size unsigned int to a socket buffer
->+ * @skb: socket buffer to add attribute to
->+ * @attrtype: attribute type
->+ * @value: numeric value
->+ */
->+static inline int nla_put_uint(struct sk_buff *skb, int attrtype, u64 value)
->+{
->+	u64 tmp64 = value;
->+	u32 tmp32 = value;
->+
->+	if (tmp64 == tmp32)
->+		return nla_put_u32(skb, attrtype, tmp32);
+Anyway, this scheme sounds like it'll solve the issue I was trying to
+address so I don't mind doing it this way. I'll try it out and respin
+the patch series.
 
-It's a bit confusing, perheps better just to use nla_put() here as well?
+>>> Mount propagation is a way to configure a mount namespace (before
+>>> creating a new one) that will cause mounts created in the first mount
+>>> namespace to be created in it's children, and cause mounts created in
+>>> the children to be created in the parent (depending on how things are
+>>> configured).
+>>>
+>>> It is not my favorite feature (it makes locking of mount namespaces
+>>> terrible) and it is probably too clever by half, unfortunately systemd
+>>> started enabling mount propagation by default, so we are stuck with it.
+>>
+>> Right. AFAICT the current iproute2 code explicitly tries to avoid that
+>> when creating a mountns (it does a 'mount --make-rslave /'); so you're
+>> saying we should change that?
+>
+> If it makes sense.
+>
+> I believe I added the 'mount --make-rslave /' because otherwise all
+> mount activity was propagating back, and making a mess.  Especially when
+> I was unmounting /sys.
+>
+> I am not a huge fan of mount propagation it has lots of surprising
+> little details that need to be set just right, to not cause problems.
 
->+	return nla_put(skb, attrtype, sizeof(u64), &tmp64);
->+}
->+
-> /**
->  * nla_put_be32 - Add a __be32 netlink attribute to a socket buffer
->  * @skb: socket buffer to add attribute to
+Ah, you were talking about propagation from inside the mountns to
+outside? Didn't catch that at first...
 
-[...]
+> With my proposal above I think we could in some carefully chosen
+> places enable mount propagation without problem.
+
+One thing that comes to mind would be that if we create persistent /sys
+instances in /run/netns-mounts per the above, it would make sense for
+any modifications done inside the netns to be propagated back to the
+mount in /run; is this possible with a bind mount? Not sure I quite
+understand how propagation would work in this case (since it would be a
+separate (bind) mount point inside the namespace).
+
+> But I would really like to see an application that is performing
+> mounts inside of "ip netns exec" to see how it matters.
+
+Two examples come to mind:
+
+- I believe there are some applications that will mount a private bpffs
+  instance for their own use case. Not sure if those applications switch
+  in and out of namespaces, though, and if they do whether they are
+  namespace-aware themselves
+
+- Interactive use ('ip netns exec $SHELL'), which I sometimes use for
+  testing various things. I've mostly had issues with bpffs in this
+  setting, though, so if we solve that as per the above, maybe that's
+  not needed.
+
+> Code without concrete real world test use cases tends to get things
+> wrong.
+
+Heh, amen to that :)
+
+-Toke
+
 
