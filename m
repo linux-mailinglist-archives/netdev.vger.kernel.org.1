@@ -1,41 +1,53 @@
-Return-Path: <netdev+bounces-39917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F4897C4E38
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:10:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 558357C4E31
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD9BB2821A1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EEAE282177
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47C21A729;
-	Wed, 11 Oct 2023 09:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6aamtxb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2223E1A71F;
+	Wed, 11 Oct 2023 09:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B161A718
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC888C433C9;
-	Wed, 11 Oct 2023 09:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697015425;
-	bh=pIQp+LwTNvdQ0PzfE/8yCOe2705OueXQH2dq7DVVotQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q6aamtxbGtUlYMSm9SCZw2QSPP9BDsbf1vS/1Ru5Oa+1zn7Nq+1dr62GR0zyBifEb
-	 BcVS+bCfO8AZIGtJIRZ8xx4hatOyovPM2WWMJPuv2ktcwbyfnx5gsiwIXl7khQYNWn
-	 AaMNTHdwewbqtGi8LX38AsIYVTAG/qZ+xGNXXKh573RxhMGN0kfEUHYuK+3YmIA4PN
-	 fOTDrANmdLemo7ombdlud1ycIDlsPCCtYofuotopih+SZfqey+o7ZW+JYSgifnVIhr
-	 DdZ8+ZzcBht7YbjH7IXZDOoxGzH6hGjlcqMj3o+De9U2k9iLdiVcm71Y2tey1CbTR4
-	 PcMWE1ZqxooIQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1AC8E000BB;
-	Wed, 11 Oct 2023 09:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D71B1A718
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:07:55 +0000 (UTC)
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 806189D
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 02:07:53 -0700 (PDT)
+X-QQ-mid: bizesmtp86t1697015204tmyj44k5
+Received: from wxdbg.localdomain.com ( [115.200.230.47])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 11 Oct 2023 17:06:32 +0800 (CST)
+X-QQ-SSF: 01400000000000K0Z000000A0000000
+X-QQ-FEAT: eSZ1CZgv+JC4eNoHnF/IkOoO8IIQtt6j2qZ1Uo0YfyKC8eFbhUKJ8mCJDDJ73
+	4L4WzdXyoM7dC6VH3pVsYW52R1Msg5v0Wb7vTNhrBi3JejmOotnK3BwKK0eJD8zBUgwyhFC
+	zH7UdAjWAJVIvc0VKa+DKYHPPg/2YjTSpEaGnzFVBrYsPEcXCHwwQNXwlQ9Djvtcs8Fc1iR
+	m1VTWnXu8jiotjjlxf59j1Q+tLYkUqVna9X2MVL3mXq2r/mJUMJwJEOxi7z11YTH9Ct72bD
+	b3C5Nd+F1eYWbVF+nJSADkUMNY1cYnrjQRnGm8oTUPizs0cg0DanblJrvGw5rcnIyMNm1sY
+	Ycya+VXzZJpgkr3igojP6/27C94JRa+JPRo2lgWDM1P0HYa50w=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 12012513055778814548
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v3 0/3] Wangxun ethtool stats
+Date: Wed, 11 Oct 2023 17:19:03 +0800
+Message-Id: <20231011091906.70486-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,41 +55,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8] net/core: Introduce netdev_core_stats_inc()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169701542485.14579.951274482359879368.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Oct 2023 09:10:24 +0000
-References: <20231009111633.2319304-1-yajun.deng@linux.dev>
-In-Reply-To: <20231009111633.2319304-1-yajun.deng@linux.dev>
-To: Yajun Deng <yajun.deng@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- aleksander.lobakin@intel.com
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Support to show ethtool stats for txgbe/ngbe.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+v2 -> v3:
+- remove standard netdev statistics
+- move some stats to the right ethtool_ops
+- remove test strings
 
-On Mon,  9 Oct 2023 19:16:33 +0800 you wrote:
-> Although there is a kfree_skb_reason() helper function that can be used to
-> find the reason why this skb is dropped, but most callers didn't increase
-> one of rx_dropped, tx_dropped, rx_nohandler and rx_otherhost_dropped.
-> 
-> For the users, people are more concerned about why the dropped in ip
-> is increasing.
-> 
-> [...]
+v1 -> v2:
+- change struct wx_stats member types
+- use ethtool_sprintf()
 
-Here is the summary with links:
-  - [net-next,v8] net/core: Introduce netdev_core_stats_inc()
-    https://git.kernel.org/netdev/net-next/c/5247dbf16cee
+Jiawen Wu (3):
+  net: libwx: support hardware statistics
+  net: txgbe: add ethtool stats support
+  net: ngbe: add ethtool stats support
 
-You are awesome, thank you!
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 169 ++++++++++++++++++
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |   8 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  99 ++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   2 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  20 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  81 +++++++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |   5 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_hw.c   |   2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   2 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |   5 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |   2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   2 +
+ 12 files changed, 395 insertions(+), 2 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.27.0
 
 
