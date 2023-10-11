@@ -1,58 +1,41 @@
-Return-Path: <netdev+bounces-39792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845237C47E7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 04:42:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291D87C47F7
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 04:50:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6CC281DE2
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:42:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F73E1C20DC5
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23ACE35501;
-	Wed, 11 Oct 2023 02:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDA16108;
+	Wed, 11 Oct 2023 02:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y+CVE8aS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ulHCjiRC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED596354F7;
-	Wed, 11 Oct 2023 02:42:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B72BBC433C7;
-	Wed, 11 Oct 2023 02:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E6F4688
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 02:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 71A1DC433C8;
+	Wed, 11 Oct 2023 02:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696992160;
-	bh=+feC0UohEV8eNn1xQpSSzuW3QkwRQn5mv5VGWzQsIHo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Y+CVE8aS9FNsIvhoM9yXShjHiN4PU1bw8S7QLAVt1KYkgqRFWKI61wToSADGNyutv
-	 NuKEtNlTQrNPQMeh6g2cCkubu5LH/qsnZEh5X+NjHp1q2BfUdapn6zG1psV4PDxujT
-	 1ZD3lARC1tC+tqrBBW8YgUw665X8/1Z/rPPwyGjjUcJJU4A1INw6nNSmikVr1rKPh8
-	 Wa3JRP8NeBjaKMkOVyNZMBZpVAWZpJFciygqM/tM6iw9SOGOcVClu/9yzDgLL3Ym6n
-	 ZSI0vdNi2Z1Jl3n2CeLT3rGKgEBO5ZZVQdyuMDtcN8E13NsDRFGis6I8kFxG7JqAo7
-	 RN+xzG/embosA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	corbet@lwn.net,
-	workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	jesse.brandeburg@intel.com,
-	sd@queasysnail.net,
-	horms@verge.net.au,
-	przemyslaw.kitszel@intel.com,
-	f.fainelli@gmail.com,
-	jiri@resnulli.us,
-	ecree.xilinx@gmail.com
-Subject: [PATCH net-next v2] docs: try to encourage (netdev?) reviewers
-Date: Tue, 10 Oct 2023 19:42:24 -0700
-Message-ID: <20231011024224.161282-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	s=k20201202; t=1696992625;
+	bh=iH1pXtcYdrJ/QUVNvlYb9UCw+oTKoRBU1SAI2KI7rHE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ulHCjiRCpWSkJk4gmgmTpVeEQJNr9DOCanDdwAtYYxWZvqAMtu3eRAcgH+STXOTNB
+	 5Lgcp8ufFKLFEzorUnJoCV+nQl5a4KarQtr6dY6ygbLJzXWYBcKmCilHXCOLLXUUxZ
+	 aRo7dA0SA4s33Fk4uA0SfB3PIq3xndYutbCOMuLZ8LGeSRLvtUVKRyesjP1iPf0TLI
+	 BZ5lQ0dOtt0kWza9AHKM8TMHeX+B54jJsPiBHlgXfq2U0aWZc76mp6SIr4bv6gyg42
+	 srMmSbyzXaH7ITcabcOnruQmXP4qfv1XhMF8SW7itzblvZeqZxDS0HGwWcno6TXKRO
+	 TZhe9A4oAtdqw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A77EE0009E;
+	Wed, 11 Oct 2023 02:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,112 +43,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/6] can: isotp: isotp_sendmsg(): fix TX state detection
+ and wait behavior
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169699262536.24203.1363184605761421124.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Oct 2023 02:50:25 +0000
+References: <20231009085256.693378-2-mkl@pengutronix.de>
+In-Reply-To: <20231009085256.693378-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, lukas.magel@posteo.net,
+ maxime.jayat@mobile-devices.fr, socketcan@hartkopp.net
 
-Add a section to netdev maintainer doc encouraging reviewers
-to chime in on the mailing list.
+Hello:
 
-The questions about "when is it okay to share feedback"
-keep coming up (most recently at netconf) and the answer
-is "pretty much always".
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-Extend the section of 7.AdvancedTopics.rst which deals
-with reviews a little bit to add stuff we had been recommending
-locally.
+On Mon,  9 Oct 2023 10:50:03 +0200 you wrote:
+> From: Lukas Magel <lukas.magel@posteo.net>
+> 
+> With patch [1], isotp_poll was updated to also queue the poller in the
+> so->wait queue, which is used for send state changes. Since the queue
+> now also contains polling tasks that are not interested in sending, the
+> queue fill state can no longer be used as an indication of send
+> readiness. As a consequence, nonblocking writes can lead to a race and
+> lock-up of the socket if there is a second task polling the socket in
+> parallel.
+> 
+> [...]
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
---
-v2:
- - grammar fixes from Donald
- - remove parenthesis around a quote
-v1: https://lore.kernel.org/all/20231009225637.3785359-1-kuba@kernel.org/
- - spelling (compliment)
- - move to common docs:
-   - ask for more opinions
-   - use of tags
-   - compliments
- - ask less experienced reviewers to avoid style comments
-   (using Florian's wording)
+Here is the summary with links:
+  - [net,1/6] can: isotp: isotp_sendmsg(): fix TX state detection and wait behavior
+    https://git.kernel.org/netdev/net/c/d9c2ba65e651
+  - [net,2/6] can: sun4i_can: Only show Kconfig if ARCH_SUNXI is set
+    https://git.kernel.org/netdev/net/c/1f223208ebde
+  - [net,3/6] arm64: dts: imx93: add the Flex-CAN stop mode by GPR
+    https://git.kernel.org/netdev/net/c/23ed2be5404d
+  - [net,4/6] can: sja1000: Always restart the Tx queue after an overrun
+    https://git.kernel.org/netdev/net/c/b5efb4e6fbb0
+  - [net,5/6] can: flexcan: remove the auto stop mode for IMX93
+    https://git.kernel.org/netdev/net/c/63ead535570f
+  - [net,6/6] can: tcan4x5x: Fix id2_register for tcan4553
+    https://git.kernel.org/netdev/net/c/a9967c9ad290
 
-CC: andrew@lunn.ch
-CC: jesse.brandeburg@intel.com
-CC: sd@queasysnail.net
-CC: horms@verge.net.au
-CC: przemyslaw.kitszel@intel.com
-CC: f.fainelli@gmail.com
-CC: jiri@resnulli.us
-CC: ecree.xilinx@gmail.com
----
- Documentation/process/7.AdvancedTopics.rst  | 18 ++++++++++++++++++
- Documentation/process/maintainer-netdev.rst | 15 +++++++++++++++
- 2 files changed, 33 insertions(+)
-
-diff --git a/Documentation/process/7.AdvancedTopics.rst b/Documentation/process/7.AdvancedTopics.rst
-index bf7cbfb4caa5..43291704338e 100644
---- a/Documentation/process/7.AdvancedTopics.rst
-+++ b/Documentation/process/7.AdvancedTopics.rst
-@@ -146,6 +146,7 @@ pull.  The git request-pull command can be helpful in this regard; it will
- format the request as other developers expect, and will also check to be
- sure that you have remembered to push those changes to the public server.
- 
-+.. _development_advancedtopics_reviews:
- 
- Reviewing patches
- -----------------
-@@ -167,6 +168,12 @@ comments as questions rather than criticisms.  Asking "how does the lock
- get released in this path?" will always work better than stating "the
- locking here is wrong."
- 
-+Another technique that is useful in case of a disagreement is to ask for others
-+to chime in. If a discussion reaches a stalemate after a few exchanges,
-+then call for opinions of other reviewers or maintainers. Often those in
-+agreement with a reviewer remain silent unless called upon.
-+The opinion of multiple people carries exponentially more weight.
-+
- Different developers will review code from different points of view.  Some
- are mostly concerned with coding style and whether code lines have trailing
- white space.  Others will focus primarily on whether the change implemented
-@@ -176,3 +183,14 @@ security issues, duplication of code found elsewhere, adequate
- documentation, adverse effects on performance, user-space ABI changes, etc.
- All types of review, if they lead to better code going into the kernel, are
- welcome and worthwhile.
-+
-+There is no strict requirement to use specific tags like ``Reviewed-by``.
-+In fact reviews in plain English are more informative and encouraged
-+even when a tag is provided, e.g. "I looked at aspects A, B and C of this
-+submission and it looks good to me."
-+Some form of a review message or reply is obviously necessary otherwise
-+maintainers will not know that the reviewer has looked at the patch at all!
-+
-+Last but not least patch review may become a negative process, focused
-+on pointing out problems. Please throw in a compliment once in a while,
-+particularly for newbies!
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 09dcf6377c27..7feacc20835e 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -441,6 +441,21 @@ in a way which would break what would normally be considered uAPI.
- new ``netdevsim`` features must be accompanied by selftests under
- ``tools/testing/selftests/``.
- 
-+Reviewer guidance
-+-----------------
-+
-+Reviewing other people's patches on the list is highly encouraged,
-+regardless of the level of expertise. For general guidance and
-+helpful tips please see :ref:`development_advancedtopics_reviews`.
-+
-+It's safe to assume that netdev maintainers know the community and the level
-+of expertise of the reviewers. The reviewers should not be concerned about
-+their comments impeding or derailing the patch flow.
-+
-+Less experienced reviewers are highly encouraged to do more in-depth
-+review of submissions and not focus exclusively on trivial or subjective
-+matters like code formatting, tags etc.
-+
- Testimonials / feedback
- -----------------------
- 
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
