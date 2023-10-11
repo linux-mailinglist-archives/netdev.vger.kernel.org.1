@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-39982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F10267C54B7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:04:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760A37C54E6
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:09:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CF3D1C20F4E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:04:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EA03281FA0
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60571F191;
-	Wed, 11 Oct 2023 13:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539DC1F19E;
+	Wed, 11 Oct 2023 13:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFD91D6BE
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:04:01 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B20992;
-	Wed, 11 Oct 2023 06:04:00 -0700 (PDT)
-Received: from kwepemm000012.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4S5CYS2Z80zVkdw;
-	Wed, 11 Oct 2023 21:00:28 +0800 (CST)
-Received: from build.huawei.com (10.175.101.6) by
- kwepemm000012.china.huawei.com (7.193.23.142) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Wed, 11 Oct 2023 21:03:57 +0800
-From: Wenchao Hao <haowenchao2@huawei.com>
-To: Hannes Reinecke <hare@suse.de>, "James E . J . Bottomley"
-	<jejb@linux.ibm.com>, "Martin K . Petersen" <martin.petersen@oracle.com>,
-	Richard Cochran <richardcochran@gmail.com>, <linux-scsi@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<louhongxiang@huawei.com>, Wenchao Hao <haowenchao2@huawei.com>
-Subject: [PATCH] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup
-Date: Wed, 11 Oct 2023 21:03:50 +0800
-Message-ID: <20231011130350.819571-1-haowenchao2@huawei.com>
-X-Mailer: git-send-email 2.32.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6481F196;
+	Wed, 11 Oct 2023 13:09:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01B1CC433C8;
+	Wed, 11 Oct 2023 13:09:09 +0000 (UTC)
+Message-ID: <cff2d9f0-4719-4b88-8ed5-68c8093bcebf@linux-m68k.org>
+Date: Wed, 11 Oct 2023 23:09:07 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm000012.china.huawei.com (7.193.23.142)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
+Content-Language: en-US
+To: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+ netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
+References: <20231009074121.219686-1-hch@lst.de>
+ <20231009074121.219686-6-hch@lst.de>
+ <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com>
+ <0299895c-24a5-4bd4-b7a4-dc50cc21e3d8@linux-m68k.org>
+ <20231011055213.GA1131@lst.de>
+From: Greg Ungerer <gerg@linux-m68k.org>
+In-Reply-To: <20231011055213.GA1131@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-fc_lport_ptp_setup() did not check the return value of fc_rport_create()
-which is possible to return NULL which would cause a NULL pointer
-dereference. Address this issue by checking return value of
-fc_rport_create() and log error message on fc_rport_create() failed.
 
-Signed-off-by: Wenchao Hao <haowenchao2@huawei.com>
----
- drivers/scsi/libfc/fc_lport.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+On 11/10/23 15:52, Christoph Hellwig wrote:
+> On Wed, Oct 11, 2023 at 12:20:57AM +1000, Greg Ungerer wrote:
+>> That should be M532x.
+>>
+>> I am pretty sure the code as-is today is broken for the case of using
+>> the split cache arrangement (so both instruction and data cache) for any
+>> of the version 2 cores too (denoted by the HAVE_CACHE_SPLIT option).
+>> But that has probably not been picked up because the default on those
+>> has always been instruction cache only.
+>>
+>> The reason for the special case for the M532x series is that it is a version 3
+>> core and they have a unified instruction and data cache. The 523x series is the
+>> only version 3 core that Linux supports that has the FEC hardware module.
+> 
+> So what config option should we check for supporting coherent allocations
+> and which not having the hack in fec?
+> 
+> Here is my guesses based on the above:
+> 
+> in m68k support coherent allocations with no work if
+> 
+> CONFIG_COLDIFRE is set and neither CONFIG_CACHE_D or CONFIG_CACHE_BOTH
+> is set.
 
-diff --git a/drivers/scsi/libfc/fc_lport.c b/drivers/scsi/libfc/fc_lport.c
-index 9c02c9523c4d..904d66160785 100644
---- a/drivers/scsi/libfc/fc_lport.c
-+++ b/drivers/scsi/libfc/fc_lport.c
-@@ -241,6 +241,12 @@ static void fc_lport_ptp_setup(struct fc_lport *lport,
- 	}
- 	mutex_lock(&lport->disc.disc_mutex);
- 	lport->ptp_rdata = fc_rport_create(lport, remote_fid);
-+	if (!lport->ptp_rdata) {
-+		printk(KERN_WARNING "libfc: Failed to setup lport 0x%x\n",
-+			lport->port_id);
-+		mutex_unlock(&lport->disc.disc_mutex);
-+		return;
-+	}
- 	kref_get(&lport->ptp_rdata->kref);
- 	lport->ptp_rdata->ids.port_name = remote_wwpn;
- 	lport->ptp_rdata->ids.node_name = remote_wwnn;
--- 
-2.32.0
+I think this needs to be CONFIG_COLDFIRE is set and none of CONFIG_HAVE_CACHE_CB or
+CONFIG_CACHE_D or CONFIG_CACHE_BOTH are set.
 
+
+
+> in the fec driver do the alloc_noncoherent and global cache flush
+> hack if:
+> 
+> COMFIG_COLDFIRE && (CONFIG_CACHE_D || CONFIG_CACHE_BOTH)
+
+And then this becomes:
+
+CONFIG_COLDFIRE && (CONFIG_HAVE_CACHE_CB || CONFIG_CACHE_D || CONFIG_CACHE_BOTH)
 
