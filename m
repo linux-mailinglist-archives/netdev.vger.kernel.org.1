@@ -1,186 +1,136 @@
-Return-Path: <netdev+bounces-40151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD2A7C5F88
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 23:53:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7295A7C5F94
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 23:53:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 166AD28243E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E083282534
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BDC354F6;
-	Wed, 11 Oct 2023 21:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261663995B;
+	Wed, 11 Oct 2023 21:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EAwNFrcl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X34h2Y2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD0B1CF8E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:53:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87540C433C9;
-	Wed, 11 Oct 2023 21:53:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697061209;
-	bh=qY9Rp5zkRIt2DsQivgERNNESbVTGEul4kS5s7/dIoho=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=EAwNFrclnTWEuXdB+Z8mt3u3kuEAAoUwY82PbS8J18XDNC6E3OiHHHxAFbbd17IOO
-	 T6KemaFOH4w9WVID23kFc5vCnMeXYebhs7yahyg9gnbxexaaSqR+KOEgoCrxijFWyG
-	 dnCiAysL1ttbyJnzXZGaT8aqz/DwQbEhhDfWR38iscslUEL9bLiDHhVjMYSwKPoaYH
-	 vE7EY6dncxhXQ4FluROOjHz7swY5mrWHaRm0x+YRj0w+mEnls2n/6+o4Mg69zLynhg
-	 wf5HljSZ4OwbmmK2VZKj4KXyrtee/VgZ11v8Vna96PUYyaJ2T6vmKgYUE3ho/7KBKo
-	 bDWaoqyCH5pFQ==
-Date: Wed, 11 Oct 2023 16:53:27 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-pci@vger.kernel.org,
-	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-	ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
-Message-ID: <20231011215327.GA1043654@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12261CF8E
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:53:47 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF739E
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:53:46 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d86dac81f8fso413945276.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:53:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697061225; x=1697666025; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z0mEh2eQbdOiMZkH+CgX68hk8AnM/JOc/WD0lj3h3vo=;
+        b=X34h2Y2P+Q5oHS2+qlEu/nfKIp10yRHS09FNOvi88rGu7EqT8oo+vSeY+8nLAEikoj
+         w3Hs1IuM/aATxMb5GxxI4jS9vGCLEdQwyz8wgCTVsvz8mKNJnE0IzRGcvAKk5Z+Ve6NJ
+         kLolAGeqle0xrOHIEC0OYQNgtiy4syqDeq3d9RybMa7/dHc/uf4PKcRDYFSEVEC7EVGy
+         VVuzW2DtKNhowJ80PlhTEfnNKNF9/QwW+EYyYM47e13lPreGMwMUvN1ahRZA9+e90F8Z
+         CU1FRlvwPqXBPbAvLG1VhuPKSrh5Pyhc7RZbbv9RhBxfDmtqwr6kGKMP9jyvX3zotKTA
+         G2lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697061225; x=1697666025;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z0mEh2eQbdOiMZkH+CgX68hk8AnM/JOc/WD0lj3h3vo=;
+        b=vp+VOgbBVNGZMv463k9JLYM/R9YBr40bkDmOydjMLOWIRBlKIUfVRhAjuaeac6TS7x
+         Ta5jvZsh2ynA6JGG1HbxV1NGe+/nTuX0rwwJ0Ue9g/6OukSUcYGaKeA5spzpDKQKx7mz
+         hZKZnJYkSj9Axi6zYnLZt+wY5kgYfqInvvoEEuq2skZi+lTkReLsom4hOY83AgsLY8po
+         3EvI/JY6Wyyte3djJdlSU6PANrFANaDC6CRuQmm1jIQDzJ+9UyuN79n0XfC0lQUpyPKC
+         NHabbqVM3gN5DxfOSCCklhpic9IGQ1RBNwXk7JlrrzzRMnywYZ3JQkeVe1G1Zx9yzxy6
+         lYNQ==
+X-Gm-Message-State: AOJu0YzHeMuHzRi46N3ngOd06XkqcGppH0i8FD3SkXnFHIV1DQfbDhWK
+	byAyiQnk0PvpU3HjEJgLiB5dgTca44l/cuki1w==
+X-Google-Smtp-Source: AGHT+IEXNxC5u7cyo6EzXWEZxvQryMMMVtV0GnYvMVdnh1TDPLsWmBI2chv/jJx3JlUicFWGPx//4VMX8BWxX8RTxw==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:1f56:0:b0:d7e:7a8a:2159 with SMTP
+ id f83-20020a251f56000000b00d7e7a8a2159mr373076ybf.5.1697061225382; Wed, 11
+ Oct 2023 14:53:45 -0700 (PDT)
+Date: Wed, 11 Oct 2023 21:53:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918131103.24119-6-ilpo.jarvinen@linux.intel.com>
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAGcZJ2UC/yWNSwrDMAwFrxK0rsByFv1cpZRibKXRooqRTGgJu
+ XvddvOY2czbwNmEHS7DBsaruCzahQ4D5Dnpg1FKd4ghjhSI0Jtprm8sJiubo3JDbjPbFyqrJy0 L9ork/96fSRQzHsN5Ok3EaaQIPV+NJ3n9rq+3ff8AtMyfvYoAAAA=
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697061224; l=1801;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=nMuSVOhysev7uUh/Sd/w6qnA6sjV53pd+anm3qSOdWM=; b=YIDWB6LpP36QEb79ACUN9X7xFlKvJc7IleF4p1QG5Yl7uybR9TYv1KHDJInStRLYBNOkkGYBj
+ dIGBBHJSvRSBT/tC28YNnxzt1ZJI6cXmWHQHfQRcbejP0mHLDgv4Y5x
+X-Mailer: b4 0.12.3
+Message-ID: <20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-v1-1-23c62a16ff58@google.com>
+Subject: [PATCH] ionic: replace deprecated strncpy with strscpy
+From: Justin Stitt <justinstitt@google.com>
+To: Shannon Nelson <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
-> pci_disable_link_state() lacks a symmetric pair. Some drivers want to
-> disable ASPM during certain phases of their operation but then
-> re-enable it later on. If pci_disable_link_state() is made for the
-> device, there is currently no way to re-enable the states that were
-> disabled.
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-pci_disable_link_state() gives drivers a way to disable specified ASPM
-states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
-PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
-what changed and can't directly restore the original state, e.g.,
+NUL-padding is not needed due to `ident` being memset'd to 0 just before
+the copy.
 
-  - PCIE_LINK_STATE_L1 enabled initially
-  - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
-  - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
-  - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
+Considering the above, a suitable replacement is `strscpy` [2] due to
+the fact that it guarantees NUL-termination on the destination buffer
+without unnecessarily NUL-padding.
 
-Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
-enabled.  Maybe that's what we want; I dunno.
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
 
-pci_disable_link_state() currently returns success/failure, but only
-r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
-non-trivial reason, so it's conceivable that it could return a bitmask
-instead.
+Found with: $ rg "strncpy\("
+---
+ drivers/net/ethernet/pensando/ionic/ionic_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Add pci_enable_link_state() to remove ASPM states from the state
-> disable mask.
-> 
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
->  include/linux/pci.h     |  2 ++
->  2 files changed, 44 insertions(+)
-> 
-> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> index 91dc95aca90f..f45d18d47c20 100644
-> --- a/drivers/pci/pcie/aspm.c
-> +++ b/drivers/pci/pcie/aspm.c
-> @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
->  }
->  EXPORT_SYMBOL(pci_disable_link_state);
->  
-> +/**
-> + * pci_enable_link_state - Re-enable device's link state
-> + * @pdev: PCI device
-> + * @state: ASPM link states to re-enable
-> + *
-> + * Enable device's link state that were previously disable so the link is
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+index 1dc79cecc5cc..835577392178 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+@@ -554,8 +554,8 @@ int ionic_identify(struct ionic *ionic)
+ 	memset(ident, 0, sizeof(*ident));
+ 
+ 	ident->drv.os_type = cpu_to_le32(IONIC_OS_TYPE_LINUX);
+-	strncpy(ident->drv.driver_ver_str, UTS_RELEASE,
+-		sizeof(ident->drv.driver_ver_str) - 1);
++	strscpy(ident->drv.driver_ver_str, UTS_RELEASE,
++		sizeof(ident->drv.driver_ver_str));
+ 
+ 	mutex_lock(&ionic->dev_cmd_lock);
+ 
 
-"state[s] that were previously disable[d]" alludes to the use case you
-have in mind, but I don't think it describes how this function
-actually works.  This function just makes it possible to enable the
-specified states.  The @state parameter may have nothing to do with
-any previously disabled states.
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-709f8f1ea312
 
-> + * allowed to enter the specific states. Note that if the BIOS didn't grant
-> + * ASPM control to the OS, this does nothing because we can't touch the
-> + * LNKCTL register.
-> + *
-> + * Return: 0 or a negative errno.
-> + */
-> +int pci_enable_link_state(struct pci_dev *pdev, int state)
-> +{
-> +	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
-> +
-> +	if (!link)
-> +		return -EINVAL;
-> +	/*
-> +	 * A driver requested that ASPM be enabled on this device, but
-> +	 * if we don't have permission to manage ASPM (e.g., on ACPI
-> +	 * systems we have to observe the FADT ACPI_FADT_NO_ASPM bit and
-> +	 * the _OSC method), we can't honor that request.
-> +	 */
-> +	if (aspm_disabled) {
-> +		pci_warn(pdev, "can't enable ASPM; OS doesn't have ASPM control\n");
-> +		return -EPERM;
-> +	}
-> +
-> +	mutex_lock(&aspm_lock);
-> +	link->aspm_disable &= ~pci_link_state_mask(state);
-> +	pcie_config_aspm_link(link, policy_to_aspm_state(link));
-> +
-> +	if (state & PCIE_LINK_STATE_CLKPM)
-> +		link->clkpm_disable = 0;
-> +	pcie_set_clkpm(link, policy_to_clkpm_state(link));
-> +	mutex_unlock(&aspm_lock);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(pci_enable_link_state);
-> +
->  /**
->   * pci_set_default_link_state - Set the default device link state
->   * @pdev: PCI device
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 3c24ca164104..844d09230264 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -1776,11 +1776,13 @@ extern bool pcie_ports_native;
->  int pci_disable_link_state(struct pci_dev *pdev, int state);
->  int pci_disable_link_state_locked(struct pci_dev *pdev, int state);
->  #ifdef CONFIG_PCIEASPM
-> +int pci_enable_link_state(struct pci_dev *pdev, int state);
->  int pci_set_default_link_state(struct pci_dev *pdev, int state);
->  void pcie_no_aspm(void);
->  bool pcie_aspm_support_enabled(void);
->  bool pcie_aspm_enabled(struct pci_dev *pdev);
->  #else
-> +static inline int pci_enable_link_state(struct pci_dev *pdev, int state) { return -EOPNOTSUPP; }
->  static inline int pci_set_default_link_state(struct pci_dev *pdev, int state)
->  { return 0; }
->  static inline void pcie_no_aspm(void) { }
-> -- 
-> 2.30.2
-> 
-> 
-> -- 
-> ath12k mailing list
-> ath12k@lists.infradead.org
-> https://lists.infradead.org/mailman/listinfo/ath12k
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
