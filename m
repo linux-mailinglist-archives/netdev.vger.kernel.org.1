@@ -1,53 +1,50 @@
-Return-Path: <netdev+bounces-39772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406087C46E4
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:54:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BBDE7C4705
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BE5A280FC4
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:54:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD51B1C20D02
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 01:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C1239A;
-	Wed, 11 Oct 2023 00:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A8E80D;
+	Wed, 11 Oct 2023 01:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvUFTAbx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1oKeHYL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1109388;
-	Wed, 11 Oct 2023 00:54:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 058DCC433C8;
-	Wed, 11 Oct 2023 00:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552EE39A;
+	Wed, 11 Oct 2023 01:08:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76EA7C433C8;
+	Wed, 11 Oct 2023 01:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696985683;
-	bh=0H4iRVCJQWGz61Tmn2yBFyuOebfIUuGff1Pt5wvl8yQ=;
+	s=k20201202; t=1696986520;
+	bh=q6kCuKw1p9zMOPVBO4PESzKHHtd8rxfLWiEaydvuP8U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cvUFTAbx2/KN98oDPIvh9DGkRgRIbMXADOBHzGo+2U3qjgAozV7EpZSxuBtsc5jZ7
-	 cSqIONfcgAzTs85Ws4XS7bchxVLjz704w0sCbiqMoMSGrlb7Q16kRN2xnWWL3F28a9
-	 fAUwCILxx/NfB0JaudWnkpxCyVITNWn+o2RuBHb9rfc6pqcIGl3LhcFsbUjswN2t+z
-	 eiIIGp1pD6KLueDKpP1iOUT1XMKMHb2sdJN6kd/jWlDCojSfA8ev/KatXJJw4Bkl2S
-	 +iZeldSxJSaIDdZXw1izRBoYF3t4mcoZuy4pMXjAidbrQ3+6sN1Pi563lNPNIV1qNy
-	 jc3OCKhj1svaQ==
-Date: Tue, 10 Oct 2023 17:54:41 -0700
+	b=T1oKeHYLIwOvj57maEkeiU/sXMyjNjKzGbBivTqn4jMWhhrkRgl1WQseQhT+j7T1J
+	 p1bQTwIR7EObse0T5HRmZCu7IRKc/8TRGWMZgFYVeOxyFsfLv0nNpNgl0kjL3h2Q4B
+	 CF2/Z8D8SFqAkRWT1dPQ5z3yptR2sjXGrqMLr5XasZQvfgGCKdgKa1/cmXKpvMenO9
+	 y3tqU+lDsjTfxLgmxnplB3hrrNnZ5dkVKrcQTE/95DYEsE5yG4502IMg6gf7s0Z1YA
+	 PpX04tiF6vebL7346+zM9Zut/sqGj3Zy0M5kksvXP+WYxtTzmORvMsJ4ElYY/VmbmF
+	 UFPC5+0MCdDwg==
+Date: Tue, 10 Oct 2023 18:08:39 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Kees Cook
- <keescook@chromium.org>
-Subject: Re: [PATCH] igbvf: replace deprecated strncpy with strscpy
-Message-ID: <20231010175441.755cb82a@kernel.org>
-In-Reply-To: <20231010174731.3a1d454e@kernel.org>
-References: <20231010-strncpy-drivers-net-ethernet-intel-igbvf-netdev-c-v1-1-69ccfb2c2aa5@google.com>
-	<5dc78e2f-62c1-083a-387f-9afabac02007@intel.com>
-	<CAFhGd8ppobxMnvrMT4HrRkf0LvHE1P-utErp8Tk22Fb9OO=8Rw@mail.gmail.com>
-	<20231010174731.3a1d454e@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Mat
+ Martineau <martineau@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Davide Caratti <dcaratti@redhat.com>
+Subject: Re: [PATCH net-next 3/6] Documentation: netlink: add a YAML spec
+ for mptcp
+Message-ID: <20231010180839.0617d61d@kernel.org>
+In-Reply-To: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-3-18dd117e8f50@kernel.org>
+References: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-0-18dd117e8f50@kernel.org>
+	<20231010-upstream-net-next-20231006-mptcp-ynl-v1-3-18dd117e8f50@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,18 +54,88 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Oct 2023 17:47:31 -0700 Jakub Kicinski wrote:
-> Please do read the netdev rules Jesse pointed you at.
-> Maybe it's the combined flow of strncpy and __counted_by patches
-> but managing the state of the "hardening" patches is getting 
-> a bit tedious :(
-> 
-> Please group them into reasonable series. Do not repost withing 24h.
-> Do not have more than 15 patches for networking pending at any given
-> time. That's basically the gist of our "good citizen" rules.
+On Tue, 10 Oct 2023 21:21:44 +0200 Matthieu Baerts wrote:
+> +definitions:
+> +  -
+> +    type: enum
+> +    name: event-type
+> +    enum-name: mptcp_event_type
+> +    name-prefix: mptcp_event_
 
-FWIW you can see how many pending patches you have pending in netdev
-using this here link:
+I think you can use - instead of _ here.
+For consistency with other families?
 
-https://patchwork.kernel.org/project/netdevbpf/list/?submitter=206354
+> +    entries:
+> +     -
+> +      name: unspec
+> +      value: 0
+
+90% sure enums still start at 0, only attrs and msgs now default to 1.
+
+> +     -
+> +      name: announced
+> +      value: 6
+> +      doc:
+> +        token, rem_id, family, daddr4 | daddr6 [, dport]
+> +        A new address has been announced by the peer.
+> +     -
+> +      name: removed
+> +      value: 7
+
+Follows 6 so no need for value?
+
+> +      doc:
+> +        token, rem_id
+> +        An address has been lost by the peer.
+> +     -
+> +      name: sub_established
+
+Similarly for names we generally recommend - as a separator.
+Looks more natural in places where it's used as a string, eg Python.
+Well, I guess at least to me it does :)
+
+> +      value: 10
+> +      doc:
+> +        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
+> +        dport, backup, if_idx [, error]
+> +        A new subflow has been established. 'error' should not be set.
+> +     -
+> +      name: sub_closed
+> +      value: 11
+
+and here, /value/d, s/_/-/
+
+> +      doc:
+> +        token, family, loc_id, rem_id, saddr4 | saddr6, daddr4 | daddr6, sport,
+> +        dport, backup, if_idx [, error]
+> +        A subflow has been closed. An error (copy of sk_err) could be set if an
+> +        error has been detected for this subflow.
+
+> +attribute-sets:
+> +  -
+> +    name: address
+> +    name-prefix: mptcp_pm_addr_attr_
+> +    attributes:
+> +      -
+> +        name: unspec
+> +        type: unused
+> +        value: 0
+> +      -
+> +        name: family
+> +        type: u16
+> +      -
+> +        name: id
+> +        type: u8
+> +      -
+> +        name: addr4
+> +        type: u32
+> +        byte-order: big-endian
+> +      -
+> +        name: addr6
+> +        type: binary
+> +        checks:
+> +          min-len: 16
+
+Do you not want the exact length for this?
+If YNL doesn't support something just LMK, we add stuff as needed..
 
