@@ -1,213 +1,192 @@
-Return-Path: <netdev+bounces-40007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93AD37C561E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:02:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4145A7C564B
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51A91C20BD8
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:02:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63C5A1C20E0A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E52200B1;
-	Wed, 11 Oct 2023 14:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38237200DD;
+	Wed, 11 Oct 2023 14:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBXwWRKf"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Eauiv2ZW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409B81F944
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:02:49 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5C092
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:02:47 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so14678a12.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:02:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2DD200D7
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:03:38 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 017B5129
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:03:29 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3214cdb4b27so6522725f8f.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:03:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697032965; x=1697637765; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TIpTq4vYeFsQKQrw8jRmaadaayiJcQf9ugdhN22sIQs=;
-        b=qBXwWRKfSt+95nqHc2cd7+dFjpWke393WIvflP1iY7t1B7d9tGFoT84iawZyB3/tiA
-         MKugu1t/FTXCM/ZAMDmTeLXo9tV5khLIRWqWByllwQqXxtjimXM/vRzS+xvwIpQQ3LIx
-         h/r4l0poJD2z31/Lr7TIojkomsh2fG+/vpFPO8nYe3pcUNhRz/PLRSHQg9MWSmT4NkeC
-         D9nZGF7s1H/D5AWPknx4NN81VRZbNg0/XKCo8bglBv8HLs/v4IZCkScZy+BuXtEszahI
-         +awVtUnSBHz7yTjLI/dbg0nav/rpn5IGSaJWxpeHD9FURI8pecBwQ9p7L8qP7K8WQcCl
-         pEVw==
+        d=6wind.com; s=google; t=1697033008; x=1697637808; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I/feldA9vSD69JZ+Q39K0lJKMvtA75LBDVAoVaS21Qk=;
+        b=Eauiv2ZWiDd6y1QaqYQj85UrvHwPtuEedKlSRyfE9orkbsj1L0oRhAmoShJwXHLcDT
+         RCt0ZnTGp+SDN1Shae0bT9zPvfcugsOo0niibLSPTqUWBp7ZmVSaBD8rboi3uBmb/ihd
+         udYJfNfMs5SpTmb4Jpg+DiNUEqtKllsSFPbFm7iEnLQz507K0lTsWnXq/27P5Z0Hc4Fg
+         B8KkjeZ7VMU3ZZGH5bytblZlTnfFaa7/GPaCbI6ozOcHv5aKRA+JNl3TLGMTZq1zqgAe
+         +uNgl+f+dTkJ0Dvab4VhmGGDACKczhcaNzyagJcuSLdgEO5biRWXOgIUhx/WRbGJV61k
+         t5uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697032965; x=1697637765;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TIpTq4vYeFsQKQrw8jRmaadaayiJcQf9ugdhN22sIQs=;
-        b=RjstOLkuYy/fsERc2JI6rEeqTTa1IrVqLh9hroJ9Avm4I9S9a/4+Cxsy01ug/CMTgX
-         pQvBNYCE+iTEuEvfLqff0FD/gxx+E+e6RUihg8EWPyowkdZNtRuV3VcdBTgHfshv/Yed
-         80xZg/SMnfeHQc3mCd3h2NcvIf+kg3b+MJupal8B9gMyyJ/MJ9dS0BgNYE3jcgomE7+j
-         T04uYUjmcPdFQAJICrEzEBxcbBJO6n4LRsz8NNuO+Eqaw91+lRRt62dEhGwehKh2htGo
-         8Mu6WPT0DlwD9ZQNU4ZN/jEvseKeNO9W9SKJg8R+ALEeGBCB26c1bnZyjFnvfGkl7WS5
-         QVbA==
-X-Gm-Message-State: AOJu0Ywo9Z1Mi7iWS7EBuxBFciKS08JasEqUutAC3ma7UEtxzjI2B8j1
-	w/KX9VAZ3uCWRToPzx7KiuSdLg7ht1lRq5Bh+w4fMg==
-X-Google-Smtp-Source: AGHT+IHeu8DtHkVvm7n5JrK7LFyyWhggPIiTEifsJ5lFnDtUwALkNp8Vu24jJDJhAeQBedNdiZsBdCZzcChbuMjaacU=
-X-Received: by 2002:a50:d089:0:b0:52f:5697:8dec with SMTP id
- v9-20020a50d089000000b0052f56978decmr123671edd.4.1697032965276; Wed, 11 Oct
- 2023 07:02:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697033008; x=1697637808;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=I/feldA9vSD69JZ+Q39K0lJKMvtA75LBDVAoVaS21Qk=;
+        b=BGin/KjSlHwtpJjV7VSRFcMJY7o/5pwfZD9jQKflMSxzYgI80coDaRr+YyYn4FHrd1
+         oAiOC5EPVKgoN4UZPHiKWeR/TWb94j2qlBkWurT5UbSXrFtOVSvmF2aHWEIX7qJ7teAB
+         uNDPzU8g9SI8i+xh0XyJxb8P7xI+Ykd3a/TneVw4lPa645kvzRpUgJmOFE5bytJLJ2f5
+         mqcO5LQdLINUVM3SlFLWu8jI2lsxG+Uh0/aqISiNCfOE8ivIfdFzIn25nusb7DSBYbNy
+         p2KN0nqNy9f4Y0A91Qp5HTu94/BRUoL7H8OL07Mr00tObxol7FyKCB2O4TXAWnoRGxuD
+         kfiQ==
+X-Gm-Message-State: AOJu0Yy9Y2yv6c9BLm1LXisIlLwiqhSDlW8CfDf1dynV1JpGB7M6Tlwc
+	y3DT1pq19FzV2HYaCC4EN8T+nw==
+X-Google-Smtp-Source: AGHT+IEkVJMEBsFm2uVLPIDXC4h69rpsrQkUhT4PFf+QqfbAq3d7szT2jcC+xs6E1nAD/mkGyUGKlA==
+X-Received: by 2002:a05:6000:4e1:b0:31f:fdd8:7d56 with SMTP id cr1-20020a05600004e100b0031ffdd87d56mr17877519wrb.12.1697033007796;
+        Wed, 11 Oct 2023 07:03:27 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:d4e7:bb80:b09c:f1a7? ([2a01:e0a:b41:c160:d4e7:bb80:b09c:f1a7])
+        by smtp.gmail.com with ESMTPSA id z7-20020a7bc7c7000000b003fee567235bsm19245835wmk.1.2023.10.11.07.03.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Oct 2023 07:03:27 -0700 (PDT)
+Message-ID: <6ec63a78-b0cc-452e-9946-0acef346cac2@6wind.com>
+Date: Wed, 11 Oct 2023 16:03:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAAvCjhiqtTBYNfgVHtOashJZuArY3mz2=938ip=5i4u_7wd85A@mail.gmail.com>
-In-Reply-To: <CAAvCjhiqtTBYNfgVHtOashJZuArY3mz2=938ip=5i4u_7wd85A@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Oct 2023 16:02:30 +0200
-Message-ID: <CANn89iJkOsrxGaAwhaJxd7xoH6cnSah+nV8rQ1X19U7H8NSkiw@mail.gmail.com>
-Subject: Re: kernel BUG at net/ipv4/tcp_output.c:2642 with kernel 5.19.0-rc2
- and newer
-To: Dmitry Kravkov <dmitryk@qwilt.com>
-Cc: netdev@vger.kernel.org, "Slava (Ice) Sheremet" <slavas@qwilt.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [RFC] netlink: add variable-length / auto integers
+To: Johannes Berg <johannes@sipsolutions.net>,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Cc: fw@strlen.de, pablo@netfilter.org, jiri@resnulli.us, mkubecek@suse.cz,
+ aleksander.lobakin@intel.com, Thomas Haller <thaller@redhat.com>
+References: <20231011003313.105315-1-kuba@kernel.org>
+ <f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
+Content-Language: en-US
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 12:28=E2=80=AFPM Dmitry Kravkov <dmitryk@qwilt.com>=
- wrote:
->
-> Hi,
->
-> In our try to upgrade from 5.10 to 6.1 kernel we noticed stable crash
-> in kernel that bisected to this commit:
->
-> commit 849b425cd091e1804af964b771761cfbefbafb43
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:   Tue Jun 14 10:17:34 2022 -0700
->
->     tcp: fix possible freeze in tx path under memory pressure
->
->     Blamed commit only dealt with applications issuing small writes.
->
->     Issue here is that we allow to force memory schedule for the sk_buff
->     allocation, but we have no guarantee that sendmsg() is able to
->     copy some payload in it.
->
->     In this patch, I make sure the socket can use up to tcp_wmem[0] bytes=
-.
->
->     For example, if we consider tcp_wmem[0] =3D 4096 (default on x86),
->     and initial skb->truesize being 1280, tcp_sendmsg() is able to
->     copy up to 2816 bytes under memory pressure.
->
->     Before this patch a sendmsg() sending more than 2816 bytes
->     would either block forever (if persistent memory pressure),
->     or return -EAGAIN.
->
->     For bigger MTU networks, it is advised to increase tcp_wmem[0]
->     to avoid sending too small packets.
->
->     v2: deal with zero copy paths.
->
->     Fixes: 8e4d980ac215 ("tcp: fix behavior for epoll edge trigger")
->     Signed-off-by: Eric Dumazet <edumazet@google.com>
->     Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
->     Reviewed-by: Wei Wang <weiwan@google.com>
->     Reviewed-by: Shakeel Butt <shakeelb@google.com>
->     Signed-off-by: David S. Miller <davem@davemloft.net>
->
-> This happens in a pretty stressful situation when two 100Gb (E810 or
-> ConnectX6) ports transmit above 150Gbps that most of the data is read
-> from disks. So it appears that the system is constantly in a memory
-> deficit. Apparently reverting the patch in 6.1.38 kernel eliminates
-> the crash and system appears stable at delivering 180Gbps
->
-> [ 2445.532318] ------------[ cut here ]------------
-> [ 2445.532323] kernel BUG at net/ipv4/tcp_output.c:2642!
-> [ 2445.532334] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-> [ 2445.550934] CPU: 61 PID: 109767 Comm: nginx Tainted: G S         OE
->     5.19.0-rc2+ #21
-> [ 2445.560127] ------------[ cut here ]------------
-> [ 2445.560565] Hardware name: Cisco Systems Inc
-> UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
-> 11/21/2021
-> [ 2445.560571] RIP: 0010:tcp_write_xmit+0x70b/0x830
-> [ 2445.561221] kernel BUG at net/ipv4/tcp_output.c:2642!
-> [ 2445.561821] Code: 84 0b fc ff ff 0f b7 43 32 41 39 c6 0f 84 fe fb
-> ff ff 8b 43 70 41 39 c6 0f 82 ff 00 00 00 c7 43 30 01 00 00 00 e9 e6
-> fb ff ff <0f> 0b 8b 74 24 20 8b 85 dc 05 00 00 44 89 ea 01 c8 2b 43 28
-> 41 39
-> [ 2445.561828] RSP: 0000:ffffc110ed647dc0 EFLAGS: 00010246
-> [ 2445.561832] RAX: 0000000000000000 RBX: ffff9fe1f8081a00 RCX: 000000000=
-00005a8
-> [ 2445.561833] RDX: 000000000000043a RSI: 000002389172f8f4 RDI: 000000000=
-000febf
-> [ 2445.561835] RBP: ffff9fe5f864e900 R08: 0000000000000000 R09: 000000000=
-0000100
-> [ 2445.561836] R10: ffffffff9be060d0 R11: 000000000000000e R12: ffff9fe5f=
-864e901
-> [ 2445.561837] R13: 0000000000000001 R14: 00000000000005a8 R15: 000000000=
-0000000
-> [ 2445.561839] FS:  00007f342530c840(0000) GS:ffff9ffa7f940000(0000)
-> knlGS:0000000000000000
-> [ 2445.561842] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [ 2445.561844] CR2: 00007f20ca4ed830 CR3: 00000045d976e005 CR4: 000000000=
-0770ee0
-> [ 2445.561846] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
-0000000
-> [ 2445.561847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
-0000400
-> [ 2445.561849] PKRU: 55555554
-> [ 2445.561853] Call Trace:
-> [ 2445.561858]  <TASK>
-> [ 2445.564202] ------------[ cut here ]------------
-> [ 2445.568007]  ? tcp_tasklet_func+0x120/0x120
-> [ 2445.569107] kernel BUG at net/ipv4/tcp_output.c:2642!
-> [ 2445.569608]  tcp_tsq_handler+0x7c/0xa0
-> [ 2445.569627]  tcp_pace_kick+0x19/0x60
-> [ 2445.569632]  __run_hrtimer+0x5c/0x1d0
-> [ 2445.572264] ------------[ cut here ]------------
-> [ 2445.574287] ------------[ cut here ]------------
-> [ 2445.574292] kernel BUG at net/ipv4/tcp_output.c:2642!
-> [ 2445.582581]  __hrtimer_run_queues+0x7d/0xe0
-> --
-> --
->
-> --
-> --
->
-> Dmitry Kravkov     Software  Engineer
-> Qwilt | Mobile: +972-54-4839923 | dmitryk@qwilt.com
+Le 11/10/2023 à 15:11, Johannes Berg a écrit :
+> +Thomas Haller, if you didn't see it yet.
+> 
+> 
+> On Tue, 2023-10-10 at 17:33 -0700, Jakub Kicinski wrote:
+>> We currently push everyone to use padding to align 64b values in netlink.
+>> I'm not sure what the story behind this is. I found this:
+>> https://lore.kernel.org/all/1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com/#t
+There was some attempts before:
+https://lore.kernel.org/netdev/20121205.125453.1457654258131828976.davem@davemloft.net/
+https://lore.kernel.org/netdev/1355500160.2626.9.camel@bwh-desktop.uk.solarflarecom.com/
+https://lore.kernel.org/netdev/1461142655-5067-1-git-send-email-nicolas.dichtel@6wind.com/
 
-Hi Dmitry, thanks for the report.
+>> but it doesn't go into details WRT the motivation.
+>> Even for arches which don't have good unaligned access - I'd think
+>> that access aligned to 4B *is* pretty efficient, and that's all
+>> we need. Plus kernel deals with unaligned input. Why can't user space?
+> 
+> Hmm. I have a vague recollection that it was related to just not doing
+> it - the kernel will do get_unaligned() or similar, but userspace if it
+> just accesses it might take a trap on some architectures?
+> 
+> But I can't find any record of this in public discussions, so ...
+If I remember well, at this time, we had some (old) architectures that triggered
+traps (in kernel) when a 64-bit field was accessed and unaligned. Maybe a mix
+between 64-bit kernel / 32-bit userspace, I don't remember exactly. The goal was
+to align u64 fields on 8 bytes.
 
-Can you post content of /proc/sys/net/ipv4/tcp_wmem and
-/proc/sys/net/ipv4/tcp_rmem ?
 
-Are you using memcg ?
+Regards,
+Nicolas
 
-Can you try the following patch ?
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 3f66cdeef7decb5b5d2b84212c623781b8ce63db..d74b197e02e94aa2f032f2c3971=
-969e604abc7de
-100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1286,6 +1286,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct
-msghdr *msg, size_t size)
-                continue;
-
- wait_for_space:
-+               tcp_remove_empty_skb(sk);
-                set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-                if (copied)
-                        tcp_push(sk, flags & ~MSG_MORE, mss_now,
+> 
+> 
+> In any case, I think for _new_ attributes it would be perfectly
+> acceptable to do it without padding, as long as userspace is prepared to
+> do unaligned accesses for them, so we might need something in libnl (or
+> similar) to do it correctly.
+> 
+>> Padded 64b is quite space-inefficient (64b + pad means at worst 16B
+>> per attr vs 32b which takes 8B). It is also more typing:
+>>
+>>     if (nla_put_u64_pad(rsp, NETDEV_A_SOMETHING_SOMETHING,
+>>                         value, NETDEV_A_SOMETHING_PAD))
+>>
+>> Create a new attribute type which will use 32 bits at netlink
+>> level if value is small enough (probably most of the time?),
+>> and (4B-aligned) 64 bits otherwise. Kernel API is just:
+>>
+>>     if (nla_put_uint(rsp, NETDEV_A_SOMETHING_SOMETHING, value))
+>>
+>> Calling this new type "just" sint / uint with no specific size
+>> will hopefully also make people more comfortable with using it.
+>> Currently telling people "don't use u8, you may need the space,
+>> and netlink will round up to 4B, anyway" is the #1 comment
+>> we give to newcomers.
+> 
+> Yeah :)
+> 
+>> Thoughts?
+> 
+> Seems reasonable. I thought about endian variants, but with the variable
+> size that doesn't make much sense.
+> 
+> I do think the documentation in the patch could be clearer about the
+> alignment, see below.
+> 
+>> +++ b/include/net/netlink.h
+>> @@ -183,6 +183,8 @@ enum {
+>>  	NLA_REJECT,
+>>  	NLA_BE16,
+>>  	NLA_BE32,
+>> +	NLA_SINT,
+>> +	NLA_UINT,
+> 
+> You should also update the policy-related documentation in this file.
+> 
+>> +++ b/include/uapi/linux/netlink.h
+>> @@ -298,6 +298,8 @@ struct nla_bitfield32 {
+>>   *	entry has attributes again, the policy for those inner ones
+>>   *	and the corresponding maxtype may be specified.
+>>   * @NL_ATTR_TYPE_BITFIELD32: &struct nla_bitfield32 attribute
+>> + * @NL_ATTR_TYPE_SINT: 32-bit or 64-bit signed attribute, aligned to 4B
+>> + * @NL_ATTR_TYPE_UINT: 32-bit or 64-bit unsigned attribute, aligned to 4B
+> 
+> This is only for exposing the policy (policy description), not sure the
+> alignment thing matters here?
+> 
+> OTOH, there's nothing in this file that ever describes *any* of the
+> attributes, yet in pracice all the uapi headers do refer to NLA_U8 and
+> similar - so we should probably have a new comment section here in the
+> UAPI that describes the various types as used by the documentation of
+> other families?
+> 
+> Anyway, I think some kind of bigger "careful with alignment" here would
+> be good, so people do the correct thing and not just "if (big)
+> nla_get_u64()" which would get the alignment thing problematic again.
+> 
+> johannes
 
