@@ -1,212 +1,160 @@
-Return-Path: <netdev+bounces-40024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 376A77C56EE
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:34:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320C57C56F2
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCA9C28247B
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:34:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CEE1C20D86
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7363A11197;
-	Wed, 11 Oct 2023 14:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCF114264;
+	Wed, 11 Oct 2023 14:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RW8a3bAj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FqqUeYLo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A74D2032C
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:34:15 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA2890;
-	Wed, 11 Oct 2023 07:34:13 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39BEVNAa012906;
-	Wed, 11 Oct 2023 14:33:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=IiaYUCjyK9kZwQr3Mcj2XTB6CIc79PEtX61tyNIY+6I=;
- b=RW8a3bAjfHeVMeB4ZapKDM6nW1nFqyR/HiQYXPoSBqfUNi9zPS04g/cCl9Ry985DXhNb
- AhWaaMWqKSIqSbZiLZy3mQDyLitvDi1Zkp4zX42a7bkrrypv9i/wHQy0odIrAbUtpeKH
- VJ3617TLOtByL3K6W7rY3JcQWKU9UncHsBUnOsLKnUNh0pmXH8zngqdRJFK9Jfhf2G0+
- dxGnoOJsTwwLm0YCiYBv9TOhn+BzDk9XRikEjLFOUDTRDvwvcaWptFhw6HBB2iwA8Uem
- gqZeon1KmdScc7ahUHqTGK130r2IPl10NAA5f+p/HK39M3M+7LGW/2EbMKUZRthrVpf3 ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnwba0nhe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 14:33:45 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39BEVNgs012903;
-	Wed, 11 Oct 2023 14:33:44 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnwba0nd8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 14:33:44 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39BCx52l001150;
-	Wed, 11 Oct 2023 14:33:42 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk08p8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 14:33:42 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39BEXf3L26018486
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Oct 2023 14:33:41 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 52D155805B;
-	Wed, 11 Oct 2023 14:33:41 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D8B605804B;
-	Wed, 11 Oct 2023 14:33:38 +0000 (GMT)
-Received: from [9.171.29.13] (unknown [9.171.29.13])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 11 Oct 2023 14:33:38 +0000 (GMT)
-Message-ID: <8403e613-e51e-4c76-a542-3bdd3050cfa9@linux.ibm.com>
-Date: Wed, 11 Oct 2023 16:33:37 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] net/smc: fix smc clc failed issue when netdevice
- not in init_net
-Content-Language: en-GB
-To: Albert Huang <huangjie.albert@bytedance.com>,
-        Karsten Graul <kgraul@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231011074851.95280-1-huangjie.albert@bytedance.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20231011074851.95280-1-huangjie.albert@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XoxWrBBea8b99XYLqJVss4AyPrBPm4Ml
-X-Proofpoint-ORIG-GUID: dylW30NxWSrBwOnlahl3jJp_MgSbvedN
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3FC208A8
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:36:05 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA6579D;
+	Wed, 11 Oct 2023 07:36:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697034963; x=1728570963;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iMysvAu4HmtiroPGPpdiHPdQSFqPeu7h59Zw9qgde50=;
+  b=FqqUeYLoPVYlq3kHHSRA9rZIxGP5TcHBw58t61HD8izTUMgeycfi0wCE
+   waQXrOXCrzziXnpqGgtN7O06nGgpebgCSEA8bfkOdj9xiUuJ/ueCHMa3c
+   MEO8+OhPy+lnp2cFXyQDOaXvLn6VPzqDWvL5e8a7GhwrtitZm5t+4pR9x
+   +u0NyoS/REvbPUdi6jSmg9SdJQ3MCiSs5HQbEFnfZzcx6sbcJ1odAZYpu
+   xkXtw6hmykOY6ExA98e8PIHNrjuBAqRg2yfwQ+AUcooxHHU7Kx6XVrTuD
+   jZKc7VHAWwM/1pGFfe29jl4Ym4tKf0jFYsIH2m5pie6R3xdnqiyLKB6uH
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="383543388"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="383543388"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 07:36:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="757586628"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="757586628"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by fmsmga007.fm.intel.com with ESMTP; 11 Oct 2023 07:35:52 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qqaJQ-0002K3-21;
+	Wed, 11 Oct 2023 14:35:48 +0000
+Date: Wed, 11 Oct 2023 22:35:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v1 2/3] net: dsa: microchip: ksz8: Enable MIIM
+ PHY Control reg access
+Message-ID: <202310112224.iYgvjBUy-lkp@intel.com>
+References: <20231011123856.1443308-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-11_09,2023-10-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 clxscore=1011 spamscore=0 bulkscore=0 phishscore=0
- mlxlogscore=999 suspectscore=0 lowpriorityscore=0 impostorscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310110128
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011123856.1443308-2-o.rempel@pengutronix.de>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Oleksij,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/net-dsa-microchip-ksz8-Enable-MIIM-PHY-Control-reg-access/20231011-204502
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231011123856.1443308-2-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v1 2/3] net: dsa: microchip: ksz8: Enable MIIM PHY Control reg access
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231011/202310112224.iYgvjBUy-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231011/202310112224.iYgvjBUy-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310112224.iYgvjBUy-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/dsa/microchip/ksz8795.c:646: warning: Function parameter or member 'val' not described in 'ksz8_r_phy_ctrl'
 
 
-On 11.10.23 09:48, Albert Huang wrote:
-> If the netdevice is within a container and communicates externally
-> through network technologies such as VxLAN, we won't be able to find
-> routing information in the init_net namespace. To address this issue,
-> we need to add a struct net parameter to the smc_ib_find_route function.
-> This allow us to locate the routing information within the corresponding
-> net namespace, ensuring the correct completion of the SMC CLC interaction.
-> 
-> Fixes: e5c4744cfb59 ("net/smc: add SMC-Rv2 connection establishment")
-> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> ---
->   net/smc/af_smc.c | 3 ++-
->   net/smc/smc_ib.c | 7 ++++---
->   net/smc/smc_ib.h | 2 +-
->   3 files changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index bacdd971615e..7a874da90c7f 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -1201,6 +1201,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->   		(struct smc_clc_msg_accept_confirm_v2 *)aclc;
->   	struct smc_clc_first_contact_ext *fce =
->   		smc_get_clc_first_contact_ext(clc_v2, false);
-> +	struct net *net = sock_net(&smc->sk);
->   	int rc;
->   
->   	if (!ini->first_contact_peer || aclc->hdr.version == SMC_V1)
-> @@ -1210,7 +1211,7 @@ static int smc_connect_rdma_v2_prepare(struct smc_sock *smc,
->   		memcpy(ini->smcrv2.nexthop_mac, &aclc->r0.lcl.mac, ETH_ALEN);
->   		ini->smcrv2.uses_gateway = false;
->   	} else {
-> -		if (smc_ib_find_route(smc->clcsock->sk->sk_rcv_saddr,
-> +		if (smc_ib_find_route(net, smc->clcsock->sk->sk_rcv_saddr,
->   				      smc_ib_gid_to_ipv4(aclc->r0.lcl.gid),
->   				      ini->smcrv2.nexthop_mac,
->   				      &ini->smcrv2.uses_gateway))
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 9b66d6aeeb1a..89981dbe46c9 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -193,7 +193,7 @@ bool smc_ib_port_active(struct smc_ib_device *smcibdev, u8 ibport)
->   	return smcibdev->pattr[ibport - 1].state == IB_PORT_ACTIVE;
->   }
->   
-> -int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> +int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->   		      u8 nexthop_mac[], u8 *uses_gateway)
->   {
->   	struct neighbour *neigh = NULL;
-> @@ -205,7 +205,7 @@ int smc_ib_find_route(__be32 saddr, __be32 daddr,
->   
->   	if (daddr == cpu_to_be32(INADDR_NONE))
->   		goto out;
-> -	rt = ip_route_output_flow(&init_net, &fl4, NULL);
-> +	rt = ip_route_output_flow(net, &fl4, NULL);
->   	if (IS_ERR(rt))
->   		goto out;
->   	if (rt->rt_uses_gateway && rt->rt_gw_family != AF_INET)
-> @@ -235,6 +235,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
->   	if (smcrv2 && attr->gid_type == IB_GID_TYPE_ROCE_UDP_ENCAP &&
->   	    smc_ib_gid_to_ipv4((u8 *)&attr->gid) != cpu_to_be32(INADDR_NONE)) {
->   		struct in_device *in_dev = __in_dev_get_rcu(ndev);
-> +		struct net *net = dev_net(ndev);
->   		const struct in_ifaddr *ifa;
->   		bool subnet_match = false;
->   
-> @@ -248,7 +249,7 @@ static int smc_ib_determine_gid_rcu(const struct net_device *ndev,
->   		}
->   		if (!subnet_match)
->   			goto out;
-> -		if (smcrv2->daddr && smc_ib_find_route(smcrv2->saddr,
-> +		if (smcrv2->daddr && smc_ib_find_route(net, smcrv2->saddr,
->   						       smcrv2->daddr,
->   						       smcrv2->nexthop_mac,
->   						       &smcrv2->uses_gateway))
-> diff --git a/net/smc/smc_ib.h b/net/smc/smc_ib.h
-> index 4df5f8c8a0a1..ef8ac2b7546d 100644
-> --- a/net/smc/smc_ib.h
-> +++ b/net/smc/smc_ib.h
-> @@ -112,7 +112,7 @@ void smc_ib_sync_sg_for_device(struct smc_link *lnk,
->   int smc_ib_determine_gid(struct smc_ib_device *smcibdev, u8 ibport,
->   			 unsigned short vlan_id, u8 gid[], u8 *sgid_index,
->   			 struct smc_init_info_smcrv2 *smcrv2);
-> -int smc_ib_find_route(__be32 saddr, __be32 daddr,
-> +int smc_ib_find_route(struct net *net, __be32 saddr, __be32 daddr,
->   		      u8 nexthop_mac[], u8 *uses_gateway);
->   bool smc_ib_is_valid_local_systemid(void);
->   int smcr_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
+vim +646 drivers/net/dsa/microchip/ksz8795.c
 
-If it works for VXLAN, I'm still wondering why this case doesn't work, 
-could you please answer it?
-https://lore.kernel.org/netdev/00bbbf48440c1889ecd16a590ebb746b820a4f48.camel@linux.ibm.com/
+   634	
+   635	/**
+   636	 * ksz8_r_phy_ctrl - Translates and reads from the SMI interface to a MIIM PHY
+   637	 *		     Control register (Reg. 31).
+   638	 * @dev: The KSZ device instance.
+   639	 * @port: The port number to be read.
+   640	 *
+   641	 * This function reads the SMI interface and translates the hardware register
+   642	 * bit values into their corresponding control settings for a MIIM PHY Control
+   643	 * register.
+   644	 */
+   645	static int ksz8_r_phy_ctrl(struct ksz_device *dev, int port, u16 *val)
+ > 646	{
+   647		const u16 *regs = dev->info->regs;
+   648		u8 reg_val;
+   649		int ret;
+   650	
+   651		*val = 0;
+   652	
+   653		ret = ksz_pread8(dev, port, regs[P_LINK_STATUS], &reg_val);
+   654		if (ret < 0)
+   655			return ret;
+   656	
+   657		if (reg_val & PORT_MDIX_STATUS)
+   658			*val |= KSZ886X_CTRL_MDIX_STAT;
+   659	
+   660		ret = ksz_pread8(dev, port, REG_PORT_LINK_MD_CTRL, &reg_val);
+   661		if (ret < 0)
+   662			return ret;
+   663	
+   664		if (reg_val & PORT_FORCE_LINK)
+   665			*val |= KSZ886X_CTRL_FORCE_LINK;
+   666	
+   667		if (reg_val & PORT_POWER_SAVING)
+   668			*val |= KSZ886X_CTRL_PWRSAVE;
+   669	
+   670		if (reg_val & PORT_PHY_REMOTE_LOOPBACK)
+   671			*val |= KSZ886X_CTRL_REMOTE_LOOPBACK;
+   672	
+   673		return 0;
+   674	}
+   675	
 
-
-Thanks,
-Wenjia
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
