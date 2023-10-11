@@ -1,52 +1,75 @@
-Return-Path: <netdev+bounces-39962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC21C7C51C1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:22:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51DF27C5201
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:27:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85821C208FE
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:22:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81B311C20C24
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60C61DA4C;
-	Wed, 11 Oct 2023 11:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26EA1E51A;
+	Wed, 11 Oct 2023 11:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mzOzmH8D"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837111E504
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:22:10 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50F810E7
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:21:56 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qqXHP-0003tr-62; Wed, 11 Oct 2023 13:21:31 +0200
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qqXHO-000tKA-Hp; Wed, 11 Oct 2023 13:21:30 +0200
-Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1qqXHO-00DuHH-FB; Wed, 11 Oct 2023 13:21:30 +0200
-Date: Wed, 11 Oct 2023 13:21:30 +0200
-From: Sascha Hauer <sha@pengutronix.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel@pengutronix.de,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: Problem with io_uring splice and KTLS
-Message-ID: <20231011112130.GH3114228@pengutronix.de>
-References: <20231010141932.GD3114228@pengutronix.de>
- <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A1F1DA32
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:27:10 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF3B9E
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:27:09 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53829312d12so1788970a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697023627; x=1697628427; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8tx44OmdH8AvzAnmc17r/0+R1TfYuVOlLDwB/vI8elw=;
+        b=mzOzmH8DXiX+CGCC8A/ek5gS++7OpIT+IM4uaH8Dro10rHjg7gBuHeV7EcLpshhf2I
+         23/zOprZhv/jg7SLiu58pLX3c+Now5SatYiaWk2N1owvFbI05cVTkbgZ4zN/kzN0D1Ey
+         KyUodTMP6VYOFOK8MeohbXRS1PgFSkHeyv+U5xONyjMbpZT7rvQLfi8RJ4HuyFX/ONL7
+         JWRZb0T2i5cVHmepYb51zzLwO6nrNzVBcELZ3stHZGZP3yAnBHMuY8vgc/5mzvHhfCl6
+         nv9u/Fzi3HXwlfba+j0XfIhXrp8slra6t24fIpwV3qTVdQLLMN8l0+DcBHEIKgCTVcue
+         5ZNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697023627; x=1697628427;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tx44OmdH8AvzAnmc17r/0+R1TfYuVOlLDwB/vI8elw=;
+        b=EGmnZ1nav8rvWZski+3KRwwQXj2uUMbau4pe6zO3sPDz58rkz1CEwF7yzGLg3Tqcvo
+         F5K/KXKdA5MX3alynQzLdwsHHVUQf0lkSUD6dP6gKhttST53rBpk7oTv/dWEHJs1FbsE
+         NGy01KH+lgJ9jNZECIcagWGBIeSgzBF3XSZPS4GsKh6LRAiILo+379SIvMCNFHRSRffw
+         +KiVhKDG3NbY5TDCEIxx9gOuO3ZezcJzZphB9NU8qpqQi5p4u361d1TjHGPLe82qzM6n
+         CJSRSSI3iscTEW//9yNISnKUtvVhIKTTia+LjoFcUGCzaMLtVhHmhcJ/WsnvQ9NCVJ2u
+         uN6A==
+X-Gm-Message-State: AOJu0YxVEdHbBB/BH7jgA28nyx3MzpqXsycijyj1aWHeUahS2uaTXVbl
+	HY7y6TJxDJ0L5vOzHMSYl9HN0g==
+X-Google-Smtp-Source: AGHT+IF8jo3wwFKAZTk3KcJHRN2x+Cd7hmDJH+TJ+11D6N55qoMsAcUb4rXKfK6SOXUkl4tR3hKpOw==
+X-Received: by 2002:a05:6402:2687:b0:530:8b92:b69d with SMTP id w7-20020a056402268700b005308b92b69dmr16471091edd.10.1697023627580;
+        Wed, 11 Oct 2023 04:27:07 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d9-20020a05640208c900b005256771db39sm8833843edz.58.2023.10.11.04.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 04:27:06 -0700 (PDT)
+Date: Wed, 11 Oct 2023 13:27:05 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com,
+	johannes@sipsolutions.net
+Subject: Re: [patch net-next 01/10] genetlink: don't merge dumpit split op
+ for different cmds into single iter
+Message-ID: <ZSaGiSKL5/ocFYOE@nanopsycho>
+References: <20231010110828.200709-1-jiri@resnulli.us>
+ <20231010110828.200709-2-jiri@resnulli.us>
+ <20231010114845.019c0f78@kernel.org>
+ <ZSY7+b5qQhKgzXo5@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,118 +78,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <ZSY7+b5qQhKgzXo5@nanopsycho>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 08:28:13AM -0600, Jens Axboe wrote:
-> On 10/10/23 8:19 AM, Sascha Hauer wrote:
-> > Hi,
-> > 
-> > I am working with a webserver using io_uring in conjunction with KTLS. The
-> > webserver basically splices static file data from a pipe to a socket which uses
-> > KTLS for encryption. When splice is done the socket is closed. This works fine
-> > when using software encryption in KTLS. Things go awry though when the software
-> > encryption is replaced with the CAAM driver which replaces the synchronous
-> > encryption with a asynchronous queue/interrupt/completion flow.
-> > 
-> > So far I have traced it down to tls_push_sg() calling tcp_sendmsg_locked() to
-> > send the completed encrypted messages. tcp_sendmsg_locked() sometimes waits for
-> > more memory on the socket by calling sk_stream_wait_memory(). This in turn
-> > returns -ERESTARTSYS due to:
-> > 
-> >         if (signal_pending(current))
-> >                 goto do_interrupted;
-> > 
-> > The current task has the TIF_NOTIFY_SIGNAL set due to:
-> > 
-> > io_req_normal_work_add()
-> > {
-> >         ...
-> >         /* This interrupts sk_stream_wait_memory() (notify_method == TWA_SIGNAL) */
-> >         task_work_add(req->task, &tctx->task_work, ctx->notify_method)))
-> > }
-> > 
-> > The call stack when sk_stream_wait_memory() fails is as follows:
-> > 
-> > [ 1385.428816]  dump_backtrace+0xa0/0x128
-> > [ 1385.432568]  show_stack+0x20/0x38
-> > [ 1385.435878]  dump_stack_lvl+0x48/0x60
-> > [ 1385.439539]  dump_stack+0x18/0x28
-> > [ 1385.442850]  tls_push_sg+0x100/0x238
-> > [ 1385.446424]  tls_tx_records+0x118/0x1d8
-> > [ 1385.450257]  tls_sw_release_resources_tx+0x74/0x1a0
-> > [ 1385.455135]  tls_sk_proto_close+0x2f8/0x3f0
-> > [ 1385.459315]  inet_release+0x58/0xb8
-> > [ 1385.462802]  inet6_release+0x3c/0x60
-> > [ 1385.466374]  __sock_release+0x48/0xc8
-> > [ 1385.470035]  sock_close+0x20/0x38
-> > [ 1385.473347]  __fput+0xbc/0x280
-> > [ 1385.476399]  ____fput+0x18/0x30
-> > [ 1385.479537]  task_work_run+0x80/0xe0
-> > [ 1385.483108]  io_run_task_work+0x40/0x108
-> > [ 1385.487029]  __arm64_sys_io_uring_enter+0x164/0xad8
-> > [ 1385.491907]  invoke_syscall+0x50/0x128
-> > [ 1385.495655]  el0_svc_common.constprop.0+0x48/0xf0
-> > [ 1385.500359]  do_el0_svc_compat+0x24/0x40
-> > [ 1385.504279]  el0_svc_compat+0x38/0x108
-> > [ 1385.508026]  el0t_32_sync_handler+0x98/0x140
-> > [ 1385.512294]  el0t_32_sync+0x194/0x198
-> > 
-> > So the socket is being closed and KTLS tries to send out the remaining
-> > completed messages.  From a splice point of view everything has been sent
-> > successfully, but not everything made it through KTLS to the socket and the
-> > remaining data is sent while closing the socket.
-> > 
-> > I vaguely understand what's going on here, but I haven't got the
-> > slightest idea what to do about this. Any ideas?
-> 
-> Two things to try:
-> 
-> 1) Depending on how you use the ring, set it up with
-> IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN. The latter will
-> avoid using signal based task_work notifications, which may be messing
-> you up here.
+Wed, Oct 11, 2023 at 08:08:57AM CEST, jiri@resnulli.us wrote:
+>Tue, Oct 10, 2023 at 08:48:45PM CEST, kuba@kernel.org wrote:
+>>On Tue, 10 Oct 2023 13:08:20 +0200 Jiri Pirko wrote:
+>>> Fixes: b8fd60c36a44 ("genetlink: allow families to use split ops directly")
+>>
+>>Drop Fixes, add "currently no family declares ops which could trigger
+>>this issue".
+>
+>Yeah, we need fixes semantics written down somewhere.
+>I can do it, sure.
 
-These flags do not make a difference unfortunately.
+I found 2 mentions that relate to netdev regarging Fixes:
 
-> 
-> 2) io_uring will hold a reference to the file/socket. I'm unsure if this
-> is a problem in the above case, but sometimes it'll prevent the final
-> flush.
+Quoting Documentation/process/submitting-patches.rst:
+If your patch fixes a bug in a specific commit, e.g. you found an issue using
+``git bisect``, please use the 'Fixes:' tag with the first 12 characters of
+the SHA-1 ID, and the one line summary. 
 
-Not sure what you want me to test here.
+Quoting Documentation/process/maintainer-netdev.rst:
+ - for fixes the ``Fixes:`` tag is required, regardless of the tree
 
-FWIW I tried to do the close() outside of io_uring and just did a
-regular close() in userspace. That didn't make a difference either.
+This patch fixes a bug, sure, bug is not hit by existing code, but still
+it is present.
 
-> 
-> Do you have a reproducer that could be run to test? Sometimes easier to
-> see what's going on when you can experiment, it'll save some time.
+Why it is wrong to put "Fixes" in this case?
+Could you please document this?
 
-I would love to provide a reproducer, but you'll need a device with an
-asynchronous encryption engine providing gcm(aes). I am using the CAAM
-engine on a Layerscape board, but some i.MX6/8 based board should do
-as well. I don't know what other hardware you might have which supports
-that.
-
-Sascha
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>
+>
+>>
+>>>  	if (i + cnt < family->n_split_ops &&
+>>> -	    family->split_ops[i + cnt].flags & GENL_CMD_CAP_DUMP) {
+>>> +	    family->split_ops[i + cnt].flags & GENL_CMD_CAP_DUMP &&
+>>> +	    (!cnt ||
+>>> +	     (cnt && family->split_ops[i + cnt].cmd == iter->doit.cmd))) {
+>>
+>>Why are you checking cnt? if do was not found cmd will be 0, which
+>>cannot mis-match.
+>
+>Correct. Will remove cnt check.
 
