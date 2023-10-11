@@ -1,186 +1,166 @@
-Return-Path: <netdev+bounces-39980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B2F7C549E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:59:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B664F7C54DC
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:08:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26151C20D8A
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:59:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F94B28203A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E531EA94;
-	Wed, 11 Oct 2023 12:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA701F194;
+	Wed, 11 Oct 2023 13:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="bM8Muzgd"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="iDe+rNDd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150C3F4E5
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 12:59:05 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A03698
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 05:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
- t=1697029133; x=1697633933; i=wahrenst@gmx.net;
- bh=1JpjdmbO7279KQF0fV1Ca+ylXOH4hSjx4X2zq7eo0yw=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=bM8Muzgdd4/G0Dj6PvTm6G9qjDmJGR6hwSHeIaZCUs7LEUHr0OQw3gtVZY3rqtr5A8qrVnJVUn2
- 3HyLwBDxB/tP9em04+x87EKX6eV5V49q84/AkCpxLhGoSZushGZmyhrCBVAcHnSaOT7IpFtMxFb8D
- Iqp28A7VhrWJVCe5Nv5QVR5FCmy/VrHV8hp3SL4bHO0WDilB34ot12PgSinahBoVcOLmRP4kNeZTE
- SRjUmBHBkpqg/c2QM9JpV8UgU2iTrHkiouy9wreXeBqWMvmjtIt3hk85Jq+hoY6UBoCsZpIkrSmlP
- njg4QBj3Hgz8GBgp5uBoviVy/RhqYG89kHtg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mq2nA-1rKgtq3mni-00nCpu; Wed, 11
- Oct 2023 14:58:52 +0200
-Message-ID: <e0cfcd37-679c-418c-9f44-529b7c31b437@gmx.net>
-Date: Wed, 11 Oct 2023 14:58:52 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389011EA92
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:08:20 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE407C6;
+	Wed, 11 Oct 2023 06:08:16 -0700 (PDT)
+Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id A355912000B;
+	Wed, 11 Oct 2023 16:08:12 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A355912000B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1697029692;
+	bh=dP/baYZO5kD6Jow1pKoRT0YdQnHaH2Jq7btNsozjlq0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=iDe+rNDdKa3j9IX6E3Yv2hjNmYg7ECISUDPpR6O5xdZbFEPPaHA0YC9MQ2W32oCkJ
+	 /LkRJ5PDlvEeEr5qP1qFH4kkQzKxY1yOrHmwkWDKwdcKBkT1/91iCNCHzB4eGaDlbC
+	 FgoLacwBA0LJLpDoulRg5po//Y8KK4pDddkESGkDKoBXuBTffVE8EpecXuYmTQ8/Dq
+	 eiSHfvNDFVfy3kWXUCVAWmmLbIn0osl4HmAQPCK9iDporZYpdecmb2FZ5mzwpsGltj
+	 Za5UIQ7h7VGXtJiikLYhhdsZVUqfj4IRLHIzuG/zROJawv8ET7zby6Ze8C9doKKFtG
+	 yelUUiD+UuWwA==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed, 11 Oct 2023 16:08:10 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Wed, 11 Oct 2023 16:08:10 +0300
+Message-ID: <a1bcc86e-2f22-89d8-d7e2-f3f6f7663235@salutedevices.com>
+Date: Wed, 11 Oct 2023 16:01:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: iperf performance regression since Linux 5.18
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH net-next v4 00/12] vsock/virtio: continue MSG_ZEROCOPY
+ support
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
- Stefan Wahren <stefan.wahren@chargebyte.com>,
- Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org
-References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
- <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:llGasuI+sRHCH+fP0Oew1+C1FB4cUmywIUEkMW5Y7sWpSUf+jSh
- Ml+DB2CLn8SLQIH3QW5LfAV2N8S2IfWR9TnscaHNz6QIjLRXlrU5ftji8akVjo1u+v+rV2L
- YROzp6DcFKV1Thmy6FMHQKkJ1sCU7OVV/iTt7FbNYBJnU+pnr6nkXAD58kDiYpRS0psEmaC
- BxlaWg/FYc3ljLRigivtA==
-UI-OutboundReport: notjunk:1;M01:P0:g9QLI2GXxwE=;ODcaflKS8NtvZT/9ZG5TuMyY1nl
- Q0zDhAJ25qVCMjIQ4qhIbzoLVCO2wWW+xoACksPfl1TcFFzOyKjzFAC4+EQ988dW9eKuif8wt
- Fo7XZHMCm78fc0kzLeQlVv0rbCOVBqPRuPaIbiEGhReYm3UZwba3XZmON7TbPHYrp/82KYK4o
- m3C7qtAuyy3zf3klmEahGHdjUS2NqSGNGoiC71umXRg0TsMzH+p5ETC30rkvFqO6bGitactid
- 8VcKsV4YNuRPfsPIzIfziUDHpG7cI5DVoB4w8bj5NM5MahnpQrcwcMEJmzvvWqyNlFueWCS4O
- ne3VEVoFFBtIzQmkPWHP4DWXdHTuHbG+xF2tBEZqYK7OiaYQ+z07BpAVEqCC2jElDqit5rgOZ
- 8l9GUkXOAnao+T+jDAJA6TFEf4t7bu+ja0fmkTQXTSOKxn1eTo/s5TxgLoQ5X9w0wy37RFrN9
- fVpZX6VXQiUDYEZXrJqrgUoXLs3fv9VJ8SnJn5P5hcYoXIQhzJ/+y5QUsnsoWpbXQfmlvKFnz
- dbVXjB6uHkEuhVX9+Y3eTrgZ/XSkEDTYWfIOvbgW17wc/ONxxUkFE/UdkP//+Vh8GJQqJzvyi
- V2ioYvYoEwsnOkGN3uqj1L2GwhFzU7wISatZRRNWu7C/sG9sqCuAnim/qu6zqvOZ88/eHznBe
- CI0vHxKCqBqe9L3/KY5XudKKuAgf+/OtS+NQHMWEwI2wOPaMPr7c92vIOh7pmKvVFIMtSKioG
- iS1rkLxjyVTmHpEkiR9GfbLUPJ1v4Ff1HnzaXqvIq4BdgVpY9T+F2QK/QCm6bV2A9Ex17BsSS
- vKA5anm+OM1TIF3mv6E/8dzyR4Dwv+xJh17HgakvjImLzqm/jwewGrgPc3vYxE/dJ4/e0swBn
- /kYgld1XZS3dMLRLvRNJoX7Qvt3g2l40YdfSnFehj0lhKBNC55vfVewer8fCjrDs9lx8DyjNb
- CAQ7lw==
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231010191524.1694217-1-avkrasnov@salutedevices.com>
+ <eey4hfz43popgwlwtheapjefzmxea7dk733y3v6aqsrewhq3mq@lcmmhdpwvvzc>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <eey4hfz43popgwlwtheapjefzmxea7dk733y3v6aqsrewhq3mq@lcmmhdpwvvzc>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 180531 [Oct 11 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 538 538 68c58b60b94be3a031a44c71e306321381fb1d87, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;git.kernel.org:7.1.1;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/10/11 12:28:00
+X-KSMG-LinksScanning: Clean, bases: 2023/10/11 12:28:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/10/11 11:30:00 #22159170
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
 
-Am 09.10.23 um 21:10 schrieb Eric Dumazet:
-> On Mon, Oct 9, 2023 at 8:58=E2=80=AFPM Stefan Wahren <wahrenst@gmx.net> =
-wrote:
->> Hi,
->> we recently switched on our ARM NXP i.MX6ULL based embedded device
->> (Tarragon Master [1]) from an older kernel version to Linux 6.1. After
->> that we noticed a measurable performance regression on the Ethernet
->> interface (driver: fec, 100 Mbit link) while running iperf client on th=
-e
->> device:
->>
->> BAD
->>
->> # iperf -t 10 -i 1 -c 192.168.1.129
->> ------------------------------------------------------------
->> Client connecting to 192.168.1.129, TCP port 5001
->> TCP window size: 96.2 KByte (default)
->> ------------------------------------------------------------
->> [  3] local 192.168.1.12 port 56022 connected with 192.168.1.129 port 5=
-001
->> [ ID] Interval       Transfer     Bandwidth
->> [  3]  0.0- 1.0 sec  9.88 MBytes  82.8 Mbits/sec
->> [  3]  1.0- 2.0 sec  9.62 MBytes  80.7 Mbits/sec
->> [  3]  2.0- 3.0 sec  9.75 MBytes  81.8 Mbits/sec
->> [  3]  3.0- 4.0 sec  9.62 MBytes  80.7 Mbits/sec
->> [  3]  4.0- 5.0 sec  9.62 MBytes  80.7 Mbits/sec
->> [  3]  5.0- 6.0 sec  9.62 MBytes  80.7 Mbits/sec
->> [  3]  6.0- 7.0 sec  9.50 MBytes  79.7 Mbits/sec
->> [  3]  7.0- 8.0 sec  9.75 MBytes  81.8 Mbits/sec
->> [  3]  8.0- 9.0 sec  9.62 MBytes  80.7 Mbits/sec
->> [  3]  9.0-10.0 sec  9.50 MBytes  79.7 Mbits/sec
->> [  3]  0.0-10.0 sec  96.5 MBytes  80.9 Mbits/sec
->>
->> GOOD
->>
->> # iperf -t 10 -i 1 -c 192.168.1.129
->> ------------------------------------------------------------
->> Client connecting to 192.168.1.129, TCP port 5001
->> TCP window size: 96.2 KByte (default)
->> ------------------------------------------------------------
->> [  3] local 192.168.1.12 port 54898 connected with 192.168.1.129 port 5=
-001
->> [ ID] Interval       Transfer     Bandwidth
->> [  3]  0.0- 1.0 sec  11.2 MBytes  94.4 Mbits/sec
->> [  3]  1.0- 2.0 sec  11.0 MBytes  92.3 Mbits/sec
->> [  3]  2.0- 3.0 sec  10.8 MBytes  90.2 Mbits/sec
->> [  3]  3.0- 4.0 sec  11.0 MBytes  92.3 Mbits/sec
->> [  3]  4.0- 5.0 sec  10.9 MBytes  91.2 Mbits/sec
->> [  3]  5.0- 6.0 sec  10.9 MBytes  91.2 Mbits/sec
->> [  3]  6.0- 7.0 sec  10.8 MBytes  90.2 Mbits/sec
->> [  3]  7.0- 8.0 sec  10.9 MBytes  91.2 Mbits/sec
->> [  3]  8.0- 9.0 sec  10.9 MBytes  91.2 Mbits/sec
->> [  3]  9.0-10.0 sec  10.9 MBytes  91.2 Mbits/sec
->> [  3]  0.0-10.0 sec   109 MBytes  91.4 Mbits/sec
->>
->> We were able to bisect this down to this commit:
->>
->> first bad commit: [65466904b015f6eeb9225b51aeb29b01a1d4b59c] tcp: adjus=
-t
->> TSO packet sizes based on min_rtt
->>
->> Disabling this new setting via:
->>
->> echo 0 > /proc/sys/net/ipv4/tcp_tso_rtt_log
->>
->> confirm that this was the cause of the performance regression.
->>
->> Is it expected that the new default setting has such a performance impa=
-ct?
-> Thanks for the report
->
-> Normally no. I guess you need to give us more details.
->
-> qdisc in use, MTU in use, congestion control in use, "ss -temoi dst
-> 192.168.1.129 " output from sender side while the flow is running.
-since ss and nstat are not yet available on my Embedded device this will
-take some time.
 
-But at least the available information:
+On 11.10.2023 15:57, Stefano Garzarella wrote:
+> On Tue, Oct 10, 2023 at 10:15:12PM +0300, Arseniy Krasnov wrote:
+>> Hello,
+>>
+>> this patchset contains second and third parts of another big patchset
+>> for MSG_ZEROCOPY flag support:
+>> https://lore.kernel.org/netdev/20230701063947.3422088-1-AVKrasnov@sberdevices.ru/
+>>
+>> During review of this series, Stefano Garzarella <sgarzare@redhat.com>
+>> suggested to split it for three parts to simplify review and merging:
+>>
+>> 1) virtio and vhost updates (for fragged skbs) (merged to net-next, see
+>>   link below)
+>> 2) AF_VSOCK updates (allows to enable MSG_ZEROCOPY mode and read
+>>   tx completions) and update for Documentation/. <-- this patchset
+>> 3) Updates for tests and utils. <-- this patchset
+>>
+>> Part 1) was merged:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=71b263e79370348349553ecdf46f4a69eb436dc7
+>>
+>> Head for this patchset is:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=19537e125cc7cf2da43a606f5bcebbe0c9aea4cc
+>>
+>> Link to v1:
+>> https://lore.kernel.org/netdev/20230922052428.4005676-1-avkrasnov@salutedevices.com/
+>> Link to v2:
+>> https://lore.kernel.org/netdev/20230930210308.2394919-1-avkrasnov@salutedevices.com/
+>> Link to v3:
+>> https://lore.kernel.org/netdev/20231007172139.1338644-1-avkrasnov@salutedevices.com/
+>>
+>> Changelog:
+>> v1 -> v2:
+>> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>> * See per-patch changelog after ---.
+>> v2 -> v3:
+>> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>> * See per-patch changelog after ---.
+>> v3 -> v4:
+>> * Patchset rebased and tested on new HEAD of net-next (see hash above).
+>> * See per-patch changelog after ---.
+> 
+> I think I fully reviewed the series ;-)
+> 
+> Tests are all passing here, including the new ones. I also added
+> vsock_perf and vsock_uring_test to my test suite!
 
-qdisc: pfifo_fast
-MTU: 1500
-congestion control: cubic
+Thanks for review!
 
-Best regards
->
-> Note that reaching line rate on a TCP flow is always tricky,
-> regardless of what 'line rate' is.
->
-> I suspect an issue on the receiving side with larger GRO packets perhaps=
- ?
->
-> You could try to limit GRO or TSO packet sizes to determine if this is
-> a driver issue.
->
-> (ip link set dev ethX gro_max_size XXXXX  gso_max_size YYYYY)
->
+> 
+> So for vsock point of view everything looks fine.
+> 
+> Let's see if there is anything about net (MSG_ZEROCOPY flags, etc.)
+
+Yes, let's wait for more comments, because whole patchset is R-b now and
+this finally completes MSG_ZEROCOPY support for virtio/vsock.
+
+Thanks, Arseniy
+
+> 
+> Thanks,
+> Stefano
+> 
 
