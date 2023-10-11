@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-40169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD53C7C6072
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A47F7C6073
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C5CA28282F
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29EC71C20F89
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECEB1548A;
-	Wed, 11 Oct 2023 22:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E57D50B;
+	Wed, 11 Oct 2023 22:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUoFEoeE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RHSaZLGs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37715568B
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:40:13 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EFF2A4
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:11 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-4054f790190so4630775e9.2
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD7E12E6C
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:40:15 +0000 (UTC)
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC13998
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:12 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-32d885e97e2so361987f8f.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697064009; x=1697668809; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1697064011; x=1697668811; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5YMt1GOEPRn7/vbYQepJLhccSjuhOt3rZVRvwb+4bRM=;
-        b=DUoFEoeEuVfWhoEfM1fRBtoXGFo8zsfuTDpyDw9i4uK/abNiHdGKq6pcuY/DnHCRJC
-         h2fMQ62JGHR5WLnV22weYr/AELcummTPYbUHyXSmDTlkHYCNdyHm25UgwQzYlH9cuWZo
-         iry21gxCiz4Pa6I3eBR4R4gsSVei3i2BzcxNCp9G8VtlBwHZGRoSf8CCxDZRLPSEWjPg
-         0l/q0WsEOKNuLzxhHaSorUu4bHAOf024fMb6KRx2PPJFoYje8KbnT/LYVJWNvMEWgJI6
-         qisNhYfIcarW486yHQ7Wd8eec/tJVd/O4sGTTCvWzXkLrzRm7JW6ye8tCiXvIbMkT9RX
-         3CYQ==
+        bh=OLTQd5DNz+H30CHpu7or5SoloRi2dpjdPpgBQREzCK4=;
+        b=RHSaZLGse512+5YV+n366/z6w1Ur/+TuysBILeEUzD5w2f7u12HHF4i9OLjUWDqUnV
+         +122LYj6sfPmLwcms0KRDBDPVbbdQvIq4D3D+GbHo3jXlkPYY+/DpHx6azTMpxn/njc/
+         Zrr0/pwfmv6YcHhAIQjsNOXcz+eWT/uJHlsLYTshjqGSpuQc1+9sZqAPX/mA3wG/1Olj
+         53qq8sJwGVOLVavicxQfFhIS+SFACvJa0aqvYg6463+s+w06bSLCHMNiHauO8d/EiQfz
+         PKiVxRZFpePFfHBbUAW6JbntM3azXKpwkY/QZW76eeqngYpP1fEbxCiKJUixzM0GeSx9
+         /+3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697064009; x=1697668809;
+        d=1e100.net; s=20230601; t=1697064011; x=1697668811;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5YMt1GOEPRn7/vbYQepJLhccSjuhOt3rZVRvwb+4bRM=;
-        b=h9vWmQ1uqwRNB3KSuiTRWlTvjYsdCrXVHLaYj35w6SbG4zRbjK8KfbaTjC62XlE8Fu
-         BjUPPLfzD+jnMyYlDHQfwXDCaH7xDAn2x2GtXU0Jo3689hLZvA0CP4Ay7ECyqN3oWsZf
-         RkTWurKo1RTZ/KEMyNeoluIKqtaC1t4MxNrm7SNXBMI0PMpBNpad4U8oHrqBRSCzv25+
-         BD0YmrQ1DatvdDKBX+PxPEtBc8+LjeXv8jj/fNN8ubKjKGWGkaNaYCl7HoRiK9eIeh18
-         prGGBY2831fN63LU2W1BVs/QrIN3nuL6c6OwIB80gHzb7p2udCmTjMxpUUIfE/giV85C
-         agig==
-X-Gm-Message-State: AOJu0YwbBfgcf5aWePv5W5taylSm5tPUDcEBQM4UeECEUDMQrPH0dDgp
-	YYPuTrvWXfGidxsyodJeZtJe+8hCAtvgQQ==
-X-Google-Smtp-Source: AGHT+IFUbYex5/PZD5Gqp3Gng+fDzoY0ooC+vdZWOQji3fj2c3PTH6eeu3sb507jQdhbTyr5S7lW0A==
-X-Received: by 2002:a05:600c:2a4e:b0:405:7b92:4558 with SMTP id x14-20020a05600c2a4e00b004057b924558mr19791626wme.38.1697064008961;
-        Wed, 11 Oct 2023 15:40:08 -0700 (PDT)
+        bh=OLTQd5DNz+H30CHpu7or5SoloRi2dpjdPpgBQREzCK4=;
+        b=BcWfhsfiLc5q4KPSEEmmX/tC/agFoNVcvc4X+WTnxPgmS0kNnyAqSqWCSDDIgL6xVb
+         mmwl49b0cR3Zo7avBZPx7PTu5Lr5bX/gMeZmBLP79SBmE+OhoLHpyH4247p/WpQtgJia
+         SAEEEDTl/2hvdDAaNkEPh2Sd/mEtjvYAxrzga9jrSjyLTBpf+3PXUtAs/map6YIGYDy+
+         bLPooEHxR0HNQ23Sgaaxr1cvRlEV4vKnGs2ubhysranPnEENNd3gUb25eohmDPQgZYT3
+         Szxk3qfZdBEuCGPmlPAwqdO9/uomfRsP2Y/G7XaCZP1tpdcL1292mvjxKwNDMIYfImlm
+         gxWw==
+X-Gm-Message-State: AOJu0YwKbb7MV3So5wmoBbF06ZQF5XLLKzHxLf+QM8Ujqm6iaNs4+151
+	fs53ZD6QxUt75rp0EoxegcwO5yg7MpC/YQ==
+X-Google-Smtp-Source: AGHT+IHhgk4ZhuM1adav84c47oN7kZOEycE4MrtoH067yU/IZvGoXi3COv174vFIbZFsEvA9X+Q82g==
+X-Received: by 2002:a5d:630c:0:b0:31f:fa6a:936e with SMTP id i12-20020a5d630c000000b0031ffa6a936emr19817800wru.17.1697064010807;
+        Wed, 11 Oct 2023 15:40:10 -0700 (PDT)
 Received: from reibax-minipc.lan ([2a0c:5a80:3e06:7600::978])
-        by smtp.gmail.com with ESMTPSA id k1-20020a05600c0b4100b00405442edc69sm19964031wmr.14.2023.10.11.15.40.08
+        by smtp.gmail.com with ESMTPSA id k1-20020a05600c0b4100b00405442edc69sm19964031wmr.14.2023.10.11.15.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 15:40:08 -0700 (PDT)
+        Wed, 11 Oct 2023 15:40:10 -0700 (PDT)
 From: Xabier Marquiegui <reibax@gmail.com>
 To: netdev@vger.kernel.org
 Cc: richardcochran@gmail.com,
@@ -73,9 +73,9 @@ Cc: richardcochran@gmail.com,
 	rrameshbabu@nvidia.com,
 	shuah@kernel.org,
 	kuba@kernel.org
-Subject: [PATCH net-next v6 3/6] ptp: support multiple timestamp event readers
-Date: Thu, 12 Oct 2023 00:39:55 +0200
-Message-Id: <b788540e1f934b912a99e3c3486eea853f62e64c.1697062274.git.reibax@gmail.com>
+Subject: [PATCH net-next v6 4/6] ptp: support event queue reader channel masks
+Date: Thu, 12 Oct 2023 00:39:56 +0200
+Message-Id: <5253a636d9520bbd80ef4e965b9ea7d9a94630d2.1697062274.git.reibax@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <cover.1697062274.git.reibax@gmail.com>
 References: <cover.1697062274.git.reibax@gmail.com>
@@ -93,237 +93,205 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use linked lists to create one event queue per open file. This enables
-simultaneous readers for timestamp event queues.
+On systems with multiple timestamp event channels, some readers might
+want to receive only a subset of those channels.
+
+Add the necessary modifications to support timestamp event channel
+filtering, including two IOCTL operations:
+
+- Clear all channels
+- Enable one channel
+
+The mask modification operations will be applied exclusively on the
+event queue assigned to the file descriptor used on the IOCTL operation,
+so the typical procedure to have a reader receiving only a subset of the
+enabled channels would be:
+
+- Open device file
+- ioctl: clear all channels
+- ioctl: enable one channel
+- start reading
+
+Calling the enable one channel ioctl more than once will result in
+multiple enabled channels.
 
 Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
 Suggested-by: Richard Cochran <richardcochran@gmail.com>
+Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 ---
-v4: https://lore.kernel.org/netdev/32cf9345e1f06f62ad36b54bdd107baea7b079b6.1696511486.git.reibax@gmail.com/
+v6:
+  - correct commit message
+v5: https://lore.kernel.org/netdev/1eada12e90a333860283f1c489ac763fc9df08cc.1696804243.git.reibax@gmail.com/
+  - fix memory leak on ptp_open
+v4: https://lore.kernel.org/netdev/5525d56c5feff9b28c6caa93e03d8f198d7412ce.1696511486.git.reibax@gmail.com/
   - split modifications in different patches for improved organization
-  - simplified release procedures
-  - remove unnecessary checks
-v3: https://lore.kernel.org/netdev/20230928133544.3642650-3-reibax@gmail.com/
-  - fix use of safe and non safe linked lists for loops
-  - introduce new posix_clock private_data and ida object ids for better
-    dicrimination of timestamp consumers
-  - safer resource release procedures
-v2: https://lore.kernel.org/netdev/20230912220217.2008895-2-reibax@gmail.com/
-  - fix ptp_poll() return value
-  - Style changes to comform to checkpatch strict suggestions
-  - more coherent ptp_read error exit routines
-v1: https://lore.kernel.org/netdev/20230906104754.1324412-3-reibax@gmail.com/
+  - filter modifications exclusive to currently open instance for
+    simplicity and security
+  - expand mask to 2048 channels
+  - remove unnecessary tests
+v3: https://lore.kernel.org/netdev/20230928133544.3642650-4-reibax@gmail.com/
+  - filter application by object id, aided by process id
+  - friendlier testptp implementation of event queue channel filters
+v2: https://lore.kernel.org/netdev/20230912220217.2008895-3-reibax@gmail.com/
+  - fix testptp compilation error: unknown type name 'pid_t'
+  - rename mask variable for easier code traceability
+  - more detailed commit message with two examples
+v1: https://lore.kernel.org/netdev/20230906104754.1324412-4-reibax@gmail.com/
 ---
- drivers/ptp/ptp_chardev.c | 68 ++++++++++++++++++++++++++++-----------
- drivers/ptp/ptp_clock.c   |  6 ++--
- drivers/ptp/ptp_private.h |  1 -
- drivers/ptp/ptp_sysfs.c   |  9 +++---
- 4 files changed, 55 insertions(+), 29 deletions(-)
+ drivers/ptp/ptp_chardev.c      | 26 ++++++++++++++++++++++++++
+ drivers/ptp/ptp_clock.c        | 12 ++++++++++--
+ drivers/ptp/ptp_private.h      |  3 +++
+ include/uapi/linux/ptp_clock.h |  2 ++
+ 4 files changed, 41 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index aa1990d2ab46..abe94bb80cf6 100644
+index abe94bb80cf6..ac2f2b5ea0b7 100644
 --- a/drivers/ptp/ptp_chardev.c
 +++ b/drivers/ptp/ptp_chardev.c
-@@ -103,6 +103,31 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
- 
- int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
- {
-+	struct ptp_clock *ptp =
-+		container_of(pccontext->clk, struct ptp_clock, clock);
-+	struct timestamp_event_queue *queue;
-+
-+	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
-+	if (!queue)
-+		return -EINVAL;
-+	spin_lock_init(&queue->lock);
-+	list_add_tail(&queue->qlist, &ptp->tsevqs);
-+	pccontext->private_clkdata = queue;
-+	return 0;
-+}
-+
-+int ptp_release(struct posix_clock_context *pccontext)
-+{
-+	struct timestamp_event_queue *queue = pccontext->private_clkdata;
-+	unsigned long flags;
-+
-+	if (queue) {
-+		pccontext->private_clkdata = NULL;
-+		spin_lock_irqsave(&queue->lock, flags);
-+		list_del(&queue->qlist);
-+		spin_unlock_irqrestore(&queue->lock, flags);
-+		kfree(queue);
-+	}
- 	return 0;
- }
- 
-@@ -441,10 +466,11 @@ __poll_t ptp_poll(struct posix_clock_context *pccontext, struct file *fp,
- 		container_of(pccontext->clk, struct ptp_clock, clock);
- 	struct timestamp_event_queue *queue;
- 
--	poll_wait(fp, &ptp->tsev_wq, wait);
-+	queue = pccontext->private_clkdata;
-+	if (!queue)
-+		return EPOLLERR;
- 
--	/* Extract only the first element in the queue list */
--	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue, qlist);
-+	poll_wait(fp, &ptp->tsev_wq, wait);
- 
- 	return queue_cnt(queue) ? EPOLLIN : 0;
- }
-@@ -462,36 +488,36 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- 	size_t qcnt, i;
- 	int result;
- 
--	/* Extract only the first element in the queue list */
--	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
--				 qlist);
-+	queue = pccontext->private_clkdata;
-+	if (!queue) {
-+		result = -EINVAL;
-+		goto exit;
-+	}
- 
--	if (cnt % sizeof(struct ptp_extts_event) != 0)
--		return -EINVAL;
-+	if (cnt % sizeof(struct ptp_extts_event) != 0) {
-+		result = -EINVAL;
-+		goto exit;
-+	}
- 
- 	if (cnt > EXTTS_BUFSIZE)
- 		cnt = EXTTS_BUFSIZE;
- 
- 	cnt = cnt / sizeof(struct ptp_extts_event);
- 
--	if (mutex_lock_interruptible(&ptp->tsevq_mux))
--		return -ERESTARTSYS;
--
- 	if (wait_event_interruptible(ptp->tsev_wq,
- 				     ptp->defunct || queue_cnt(queue))) {
--		mutex_unlock(&ptp->tsevq_mux);
- 		return -ERESTARTSYS;
- 	}
- 
- 	if (ptp->defunct) {
--		mutex_unlock(&ptp->tsevq_mux);
--		return -ENODEV;
-+		result = -ENODEV;
-+		goto exit;
- 	}
- 
- 	event = kmalloc(EXTTS_BUFSIZE, GFP_KERNEL);
- 	if (!event) {
--		mutex_unlock(&ptp->tsevq_mux);
--		return -ENOMEM;
-+		result = -ENOMEM;
-+		goto exit;
- 	}
- 
- 	spin_lock_irqsave(&queue->lock, flags);
-@@ -510,12 +536,16 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- 
- 	cnt = cnt * sizeof(struct ptp_extts_event);
- 
--	mutex_unlock(&ptp->tsevq_mux);
--
- 	result = cnt;
--	if (copy_to_user(buf, event, cnt))
-+	if (copy_to_user(buf, event, cnt)) {
- 		result = -EFAULT;
-+		goto free_event;
-+	}
- 
-+free_event:
- 	kfree(event);
-+exit:
-+	if (result < 0)
-+		ptp_release(pccontext);
- 	return result;
- }
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index 157ef25bc1b1..74f1ce2dbccb 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -162,6 +162,7 @@ static struct posix_clock_operations ptp_clock_ops = {
- 	.clock_settime	= ptp_clock_settime,
- 	.ioctl		= ptp_ioctl,
- 	.open		= ptp_open,
-+	.release	= ptp_release,
- 	.poll		= ptp_poll,
- 	.read		= ptp_read,
- };
-@@ -174,7 +175,6 @@ static void ptp_clock_release(struct device *dev)
- 
- 	ptp_cleanup_pin_groups(ptp);
- 	kfree(ptp->vclock_index);
--	mutex_destroy(&ptp->tsevq_mux);
- 	mutex_destroy(&ptp->pincfg_mux);
- 	mutex_destroy(&ptp->n_vclocks_mux);
- 	/* Delete first entry */
-@@ -242,9 +242,8 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+@@ -110,6 +110,12 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
  	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
  	if (!queue)
- 		goto no_memory_queue;
--	spin_lock_init(&queue->lock);
+ 		return -EINVAL;
++	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
++	if (!queue->mask) {
++		kfree(queue);
++		return -EINVAL;
++	}
++	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
  	list_add_tail(&queue->qlist, &ptp->tsevqs);
--	mutex_init(&ptp->tsevq_mux);
-+	spin_lock_init(&queue->lock);
+ 	pccontext->private_clkdata = queue;
+@@ -126,6 +132,7 @@ int ptp_release(struct posix_clock_context *pccontext)
+ 		spin_lock_irqsave(&queue->lock, flags);
+ 		list_del(&queue->qlist);
+ 		spin_unlock_irqrestore(&queue->lock, flags);
++		bitmap_free(queue->mask);
+ 		kfree(queue);
+ 	}
+ 	return 0;
+@@ -141,6 +148,7 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 	struct system_device_crosststamp xtstamp;
+ 	struct ptp_clock_info *ops = ptp->info;
+ 	struct ptp_sys_offset *sysoff = NULL;
++	struct timestamp_event_queue *tsevq;
+ 	struct ptp_system_timestamp sts;
+ 	struct ptp_clock_request req;
+ 	struct ptp_clock_caps caps;
+@@ -150,6 +158,8 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 	struct timespec64 ts;
+ 	int enable, err = 0;
+ 
++	tsevq = pccontext->private_clkdata;
++
+ 	switch (cmd) {
+ 
+ 	case PTP_CLOCK_GETCAPS:
+@@ -448,6 +458,22 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 		mutex_unlock(&ptp->pincfg_mux);
+ 		break;
+ 
++	case PTP_MASK_CLEAR_ALL:
++		bitmap_clear(tsevq->mask, 0, PTP_MAX_CHANNELS);
++		break;
++
++	case PTP_MASK_EN_SINGLE:
++		if (copy_from_user(&i, (void __user *)arg, sizeof(i))) {
++			err = -EFAULT;
++			break;
++		}
++		if (i >= PTP_MAX_CHANNELS) {
++			err = -EFAULT;
++			break;
++		}
++		set_bit(i, tsevq->mask);
++		break;
++
+ 	default:
+ 		err = -ENOTTY;
+ 		break;
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 74f1ce2dbccb..ed16d9787ce9 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -183,6 +183,7 @@ static void ptp_clock_release(struct device *dev)
+ 	spin_lock_irqsave(&tsevq->lock, flags);
+ 	list_del(&tsevq->qlist);
+ 	spin_unlock_irqrestore(&tsevq->lock, flags);
++	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	ida_free(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
+@@ -243,6 +244,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (!queue)
+ 		goto no_memory_queue;
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
++	if (!queue->mask)
++		goto no_memory_bitmap;
++	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
  	mutex_init(&ptp->pincfg_mux);
  	mutex_init(&ptp->n_vclocks_mux);
- 	init_waitqueue_head(&ptp->tsev_wq);
-@@ -345,7 +344,6 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	if (ptp->kworker)
- 		kthread_destroy_worker(ptp->kworker);
+@@ -346,6 +351,8 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
  kworker_err:
--	mutex_destroy(&ptp->tsevq_mux);
  	mutex_destroy(&ptp->pincfg_mux);
  	mutex_destroy(&ptp->n_vclocks_mux);
++	bitmap_free(queue->mask);
++no_memory_bitmap:
  	list_del(&queue->qlist);
+ 	kfree(queue);
+ no_memory_queue:
+@@ -400,9 +407,10 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
+-		/* Enqueue timestamp on all queues */
++		/* Enqueue timestamp on selected queues */
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+-			enqueue_external_timestamp(tsevq, event);
++			if (test_bit((unsigned int)event->index, tsevq->mask))
++				enqueue_external_timestamp(tsevq, event);
+ 		}
+ 		wake_up_interruptible(&ptp->tsev_wq);
+ 		break;
 diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
-index cc8186a92eec..9d5f3d95058e 100644
+index 9d5f3d95058e..ad4ce1b25c86 100644
 --- a/drivers/ptp/ptp_private.h
 +++ b/drivers/ptp/ptp_private.h
-@@ -38,7 +38,6 @@ struct ptp_clock {
- 	struct pps_device *pps_source;
- 	long dialed_frequency; /* remembers the frequency adjustment */
- 	struct list_head tsevqs; /* timestamp fifo list */
--	struct mutex tsevq_mux; /* one process at a time reading the fifo */
- 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
- 	wait_queue_head_t tsev_wq;
- 	int defunct; /* tells readers to go away when clock is being removed */
-diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
-index 2675f383cd0a..7d023d9d0acb 100644
---- a/drivers/ptp/ptp_sysfs.c
-+++ b/drivers/ptp/ptp_sysfs.c
-@@ -81,15 +81,15 @@ static ssize_t extts_fifo_show(struct device *dev,
- 	size_t qcnt;
- 	int cnt = 0;
+@@ -16,10 +16,12 @@
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/time.h>
+ #include <linux/list.h>
++#include <linux/bitmap.h>
  
-+	cnt = list_count_nodes(&ptp->tsevqs);
-+	if (cnt <= 0)
-+		goto out;
-+
- 	/* The sysfs fifo will always draw from the fist queue */
- 	queue = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
- 				 qlist);
+ #define PTP_MAX_TIMESTAMPS 128
+ #define PTP_BUF_TIMESTAMPS 30
+ #define PTP_DEFAULT_MAX_VCLOCKS 20
++#define PTP_MAX_CHANNELS 2048
  
- 	memset(&event, 0, sizeof(event));
--
--	if (mutex_lock_interruptible(&ptp->tsevq_mux))
--		return -ERESTARTSYS;
--
- 	spin_lock_irqsave(&queue->lock, flags);
- 	qcnt = queue_cnt(queue);
- 	if (qcnt) {
-@@ -104,7 +104,6 @@ static ssize_t extts_fifo_show(struct device *dev,
- 	cnt = snprintf(page, PAGE_SIZE, "%u %lld %u\n",
- 		       event.index, event.t.sec, event.t.nsec);
- out:
--	mutex_unlock(&ptp->tsevq_mux);
- 	return cnt;
- }
- static DEVICE_ATTR(fifo, 0444, extts_fifo_show, NULL);
+ struct timestamp_event_queue {
+ 	struct ptp_extts_event buf[PTP_MAX_TIMESTAMPS];
+@@ -27,6 +29,7 @@ struct timestamp_event_queue {
+ 	int tail;
+ 	spinlock_t lock;
+ 	struct list_head qlist;
++	unsigned long *mask;
+ };
+ 
+ struct ptp_clock {
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index 05cc35fc94ac..da700999cad4 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -224,6 +224,8 @@ struct ptp_pin_desc {
+ 	_IOWR(PTP_CLK_MAGIC, 17, struct ptp_sys_offset_precise)
+ #define PTP_SYS_OFFSET_EXTENDED2 \
+ 	_IOWR(PTP_CLK_MAGIC, 18, struct ptp_sys_offset_extended)
++#define PTP_MASK_CLEAR_ALL  _IO(PTP_CLK_MAGIC, 19)
++#define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+ 
+ struct ptp_extts_event {
+ 	struct ptp_clock_time t; /* Time event occured. */
 -- 
 2.30.2
 
