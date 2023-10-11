@@ -1,125 +1,111 @@
-Return-Path: <netdev+bounces-39884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 307907C4B10
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:59:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CEE7C4B21
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 613771C20B80
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:59:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913351C20AF1
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD91168CA;
-	Wed, 11 Oct 2023 06:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77967171B1;
+	Wed, 11 Oct 2023 07:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="UWDpGBg1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dr3qP0gN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F79171A0
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:59:12 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEFA9C9;
-	Tue, 10 Oct 2023 23:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=4M6imKxtdJE19FbvYIuupVV35F4/3W3m3pR3DRZhbLQ=;
-	t=1697007550; x=1698217150; b=UWDpGBg1tsJMhyNGX8kCz0x1YNEUguz/lI4Ub5xE1fkfaiF
-	yM2CuujxCdev4q1uyjXHH2YGIK3JAaNJWSm2uUxmssb6gMKe6ruzMiVIejk0p2PwVOzl3kkhM+xRm
-	8Z8YN5+fVwHMM+KhpFtYHqPMhxPZsc2DfqCpkdkayzcrl4tnz5eXbYzOjmyGbZweDx/2JUWHLVEjY
-	fSC4vapGP+0Unkgj2x8wvclwSbvA9kklJeDQP14Ubff7VZWX2C5d7pFvZGvSLuBinE8YR2iHHr3M/
-	aegy5v9RJGndnGZYKi6AKSTbhakiMvmV+WZH0b2IMetzojIGO8UqkE0JJAt+bmkA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97-RC1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qqTBR-00000001d2I-1HSW;
-	Wed, 11 Oct 2023 08:59:05 +0200
-Message-ID: <844b47b618a2ef91f6dcfe2cb88ccd92ad278a6a.camel@sipsolutions.net>
-Subject: Re: [syzbot] [wireless?] [net?] memory leak in ieee80211_add_key
-From: Johannes Berg <johannes@sipsolutions.net>
-To: syzbot <syzbot+c7f9b4282ce793ea2456@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Date: Wed, 11 Oct 2023 08:59:04 +0200
-In-Reply-To: <000000000000230b04060765c8d0@google.com>
-References: <000000000000230b04060765c8d0@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B186AAB;
+	Wed, 11 Oct 2023 07:05:02 +0000 (UTC)
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB208F;
+	Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-690f8e63777so1706495b3a.0;
+        Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697007899; x=1697612699; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SzkXH1LFEzjCCR/7DMEL+wPWEqFwEny0dN9u7sSoZdk=;
+        b=dr3qP0gNrk5VYmdeGG0W0Yi9gvyhrOV9T0se1fDd1JeZDD4zwK2FTBV9ONpff1Rjoe
+         EH3y60Cs0yIS+d95YmC9OLPrnkmAqfa/+mQZioXDOmy6iMxR3aOoBJ7D3/lJgqZpuGgX
+         nefrLGnIwNsidCvW+ycAZaXYk1b9bV/LNz7ZHfz32+TjntPsLkWE0lJciLlfs+2N071g
+         0YEXHa2l424ZmVYV+fH6BLEpcmuhrDl54532j+Qxbl3PSKZlPvUverC0cTZVZWyeWivr
+         1LjCzixly6aF8hz9xdJBphcV9I/uEg/FixaXz0WGpj5xKu6QtF44XuCrTExCmP4+GDfv
+         9N2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697007899; x=1697612699;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SzkXH1LFEzjCCR/7DMEL+wPWEqFwEny0dN9u7sSoZdk=;
+        b=YCYOeAAIOlchIriuvSjU3a62/lOp+081zNAtWNhblA60Ya8pys0qSgZu8BQJMoriQ/
+         d3n/dG1LBjITeSwWT1T7V/0TPlXCG3vaaKeYPxkC5szMXnBJv6lSVQtaa8L6MSK/5Ue/
+         ZmLoejrrvnXzZ4arTuBwBBbNqZX+ikVUWo/UpjSb4mm6aPfi29l+8DmT2hCgLGpkNhYP
+         A7j+sQ6NnjBrWM0d33Zs4lEuZaF8A2C+076auwdFqajbids7936ualn6piG6+n68XqPp
+         Q4UzP3BtPnKHGREVTLe1LPjbsTRfhzmAxFm5kZFB7JI9fSANL4W8lTFYzAbXJEj2HCfi
+         TZww==
+X-Gm-Message-State: AOJu0YxOpfVxy4MBGhHmdlH+SsfPwPQNsTBLzQvWY317I6Dg30jKRSDH
+	qSghjZiPkEWI3vIIvMMV9/U=
+X-Google-Smtp-Source: AGHT+IF5evrM/bmA16l9iFSxJEyYji1X+t1TkeGy3Ix0n/Sk0WpIBK/k6LZ0kaBKnl/6RCpZnTUexQ==
+X-Received: by 2002:a05:6a21:a5a0:b0:15d:a247:d20c with SMTP id gd32-20020a056a21a5a000b0015da247d20cmr26817375pzc.6.1697007899013;
+        Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id ix3-20020a170902f80300b001b06c106844sm13095405plb.151.2023.10.11.00.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 00:04:58 -0700 (PDT)
+Date: Wed, 11 Oct 2023 16:04:58 +0900 (JST)
+Message-Id: <20231011.160458.2187571498289000541.fujita.tomonori@gmail.com>
+To: tmgross@umich.edu
+Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
+ miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CALNs47unEPkVtRVBZfqYJ_-tgf3HJ6mxz_pybL+y3=AXgX2o8g@mail.gmail.com>
+References: <2023100926-ambulance-mammal-8354@gregkh>
+	<20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
+	<CALNs47unEPkVtRVBZfqYJ_-tgf3HJ6mxz_pybL+y3=AXgX2o8g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SORTED_RECIPS,SPF_HELO_PASS,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-10-10 at 17:19 -0700, syzbot wrote:
-> Hello,
->=20
-> syzbot found the following issue on:
->=20
-> HEAD commit:    af95dc6fdc25 Merge tag 'pci-v6.6-fixes-2' of git://git.ke=
-r..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D111f914168000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D92fc678f64486=
-a09
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dc7f9b4282ce793e=
-a2456
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
-ebian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D12874a7e680=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D17eba91168000=
-0
->=20
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/8bc195198bd8/dis=
-k-af95dc6f.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/769216d795c4/vmlinu=
-x-af95dc6f.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/8ceb9e44a618/b=
-zImage-af95dc6f.xz
->=20
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+c7f9b4282ce793ea2456@syzkaller.appspotmail.com
->=20
-> executing program
-> executing program
-> BUG: memory leak
-> unreferenced object 0xffff8881419b3000 (size 1024):
->   comm "syz-executor294", pid 5023, jiffies 4294944772 (age 13.090s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 18 30 9b 41 81 88 ff ff  .........0.A....
->   backtrace:
->     [<ffffffff8157491b>] __do_kmalloc_node mm/slab_common.c:1022 [inline]
->     [<ffffffff8157491b>] __kmalloc+0x4b/0x150 mm/slab_common.c:1036
->     [<ffffffff848575dc>] kmalloc include/linux/slab.h:603 [inline]
->     [<ffffffff848575dc>] kzalloc include/linux/slab.h:720 [inline]
->     [<ffffffff848575dc>] ieee80211_key_alloc+0x5c/0x590 net/mac80211/key.=
-c:603
->     [<ffffffff8482b0d2>] ieee80211_add_key+0x162/0x540 net/mac80211/cfg.c=
-:500
-
-I think already fixed by
-https://patchwork.kernel.org/project/linux-wireless/patch/20231005210917.13=
-977-2-johannes@sipsolutions.net/
-though the patch isn't in the tree yet - will take care of it later
-today (I hope).
-
-johannes
+T24gTW9uLCA5IE9jdCAyMDIzIDE3OjA3OjE4IC0wNDAwDQpUcmV2b3IgR3Jvc3MgPHRtZ3Jvc3NA
+dW1pY2guZWR1PiB3cm90ZToNCg0KPiBPbiBNb24sIE9jdCA5LCAyMDIzIGF0IDExOjI04oCvQU0g
+RlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwuY29tPiB3cm90ZToNCj4+
+IFRyZXZvciBnYXZlIFJldmlld2VkLWJ5LiBOb3QgcGVyZmVjdCBidXQgcmVhc29uYWJsZSBzaGFw
+ZSwgSU1ITy4gU2VlbXMNCj4+IHRoYXQgd2UgaGF2ZSBiZWVuIGRpc2N1c3NpbmcgdGhlIHNhbWUg
+dG9waWNzIGxpa2UgbG9ja2luZywgbmFtaW5nLCBldGMNCj4+IGFnYWluIGFuZCBhZ2Fpbi4NCj4g
+DQo+IFRvIGJlIGNsZWFyOiB0aGlzIGlzIE9OTFkgZm9yIHRoZSBydXN0IGRlc2lnbiwgSSBhbSBu
+b3QgYXQgYWxsDQo+IHF1YWxpZmllZCB0byByZXZpZXcgdGhlIGJ1aWxkIHN5c3RlbSBpbnRlZ3Jh
+dGlvbi4gSSBwcm92aWRlZCBhIHJldmlldw0KPiB3aXRoIHRoZSBrbm93biBjYXZlYXRzIHRoYXQ6
+DQoNCkkgdGhpbmsgdGhhdCBpdCdzIHNhZmUgdG8gYXNzdW1lIHRoYXQgc3Vic3lzdGVtIG1haW50
+YWluZXJzIHVuZGVyc3RhbmQgdGhhdC4NCg0KSSByZWFsbHkgYXBwcmVjYXRlIHlvdXIgZmVlZGJh
+Y2sgb24gdGhlIHBhdGNoc2V0Lg0KDQo+IDEuIFRoZSBjdXJyZW50IGVudW0gaGFuZGxpbmcgaXMg
+ZnJhZ2lsZSwgYnV0IG9ubHkgdG8gdGhlIGV4dGVudCB0aGF0DQo+IHdlIGRvIG5vdCBoYW5kbGUg
+dmFsdWVzIG5vdCBzcGVjaWZpZWQgaW4gdGhlIEMtc2lkZSBlbnVtLiBJIGFtIG5vdA0KPiBzdXJl
+IHdoYXQgd2UgY2FuIGRvIGJldHRlciBoZXJlIHVudGlsIGJpbmRnZW4gcHJvdmlkZXMgYmV0dGVy
+DQo+IHNvbHV0aW9ucy4NCj4gMi4gVHlwZXMgZm9yICNkZWZpbmUgYXJlIG5vdCBpZGVhbA0KPiBo
+dHRwczovL2xvcmUua2VybmVsLm9yZy9ydXN0LWZvci1saW51eC9DQUxOczQ3dG5YV00zYVZwZU5N
+a3VWWkFKS2M9c2VXeExBb0xnU3dxUDBKbXMrTWZjX0FAbWFpbC5nbWFpbC5jb20vDQo+IA0KPiBU
+aGVzZSBzZWVtIHRvIG1lIHRvIGJlIHJlYXNvbmFibGUgY29uY2Vzc2lvbnMgYXQgdGhpcyB0aW1l
+LCBidXQgb2YNCj4gY291cnNlIHRoZSBvdGhlciByZXZpZXdlcnMgd2lsbCByZXF1ZXN0IGZ1cnRo
+ZXIgY2hhbmdlcyBvciBwZXJoYXBzDQo+IGhhdmUgc3VnZ2VzdGlvbnMgZm9yIHRoZXNlIGl0ZW1z
+Lg0KDQpGb3IgbWUsIHRoZXkgYXJlIGFuIGxvbmctdGVybSBpc3N1ZS4NCg==
 
