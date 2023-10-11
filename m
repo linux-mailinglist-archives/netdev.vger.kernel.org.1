@@ -1,77 +1,75 @@
-Return-Path: <netdev+bounces-40037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89D467C5828
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:36:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C7B7C582E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:37:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1AF11C20D88
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D811C20C24
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86DD208BB;
-	Wed, 11 Oct 2023 15:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FB55208C1;
+	Wed, 11 Oct 2023 15:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bcp/JOIA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqMOVbfy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF84519BDF;
-	Wed, 11 Oct 2023 15:36:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8486DC433C7;
-	Wed, 11 Oct 2023 15:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B632031D
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:37:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CB3C433C8;
+	Wed, 11 Oct 2023 15:37:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697038579;
-	bh=lTq1DkG7l+QHbQBfr/sAWfclw9fYk69n6jbHGMTIKvo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Bcp/JOIA9l1V1uVU1FUbmq0Pqf6ndX+uIezQSz1L/ygwBQ1JSnAur/Abq56GCrHgR
-	 wm6Yku1xyZegc67Mp5b1n8rlqPDRplqtPaHXyGo5hj0mGDVr0mpv0VEU7tjiVOyDpy
-	 4iG2/mZTyp9YRmpCiFzGLklBIEqA5locMQH4RRgiBZwLnKLk0qa8LgZyqa2mpNpFSf
-	 xTz2/scGbNti2vmRU2Iju+xBGxQTklEfCaV/yAXr/b522Fn8AkRrbxUflhsRy1Syfc
-	 QOxJtrpbObzH7w37wQNqdz1ct4rbsZ+uxorFZGqMQs9f764duHDqMTwFhSXr4qcs+Q
-	 E9jhx8hXs9Qtw==
-Date: Wed, 11 Oct 2023 08:36:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>,
- <linux-arm-kernel@lists.infradead.org>,
- <linux-mediatek@lists.infradead.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next v10 0/6] introduce page_pool_alloc() related
- API
-Message-ID: <20231011083617.61bba987@kernel.org>
-In-Reply-To: <20230922091138.18014-1-linyunsheng@huawei.com>
-References: <20230922091138.18014-1-linyunsheng@huawei.com>
+	s=k20201202; t=1697038672;
+	bh=sZYMiIgfprtrSPa/YkV0LT+ZOWe7IlPCwKkD47oyPlM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SqMOVbfyTIsQHi9u7DJ5iIe+Ff0gwSpewAuPmDzyYXvqcvJ4F+kiBPbNSqrlJQCRK
+	 tl46k7q4/GIsuM7g4CwYR5gzNQxaknnoWaSotPpEGO/v02gd346PPfYUXzJFP37CeZ
+	 1b8PmDksnZhMFZJciijKOd81d9mD1d5wdrPRzetPswD+VujzyqUgU7uwhKfuQJn5b6
+	 dZ32lmPgn2Gcwb4ezDISUOx2EMgAWCKMPcBIL/8aUDlgnc1ziq+hJv678yteFFpcHP
+	 kihDfRlFKpIHXiE0oRUkMx4q6TEM13lCXeM/lE5TR920UXFBWWVOpeJX98sphVmy3X
+	 80UQuo8FOYC2Q==
+Date: Wed, 11 Oct 2023 17:37:47 +0200
+From: Simon Horman <horms@kernel.org>
+To: Jeremy Cline <jeremy@jcline.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dmitry Vyukov <dvyukov@google.com>, Lin Ma <linma@zju.edu.cn>,
+	Ilan Elias <ilane@ti.com>,
+	"John W . Linville" <linville@tuxdriver.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2 net] nfc: nci: assert requested protocol is valid
+Message-ID: <ZSbBS74m2PmdSmP2@kernel.org>
+References: <20230906233347.823171-1-jeremy@jcline.org>
+ <20231009200054.82557-1-jeremy@jcline.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009200054.82557-1-jeremy@jcline.org>
 
-On Fri, 22 Sep 2023 17:11:32 +0800 Yunsheng Lin wrote:
-> In [1] & [2] & [3], there are usecases for veth and virtio_net
-> to use frag support in page pool to reduce memory usage, and it
-> may request different frag size depending on the head/tail
-> room space for xdp_frame/shinfo and mtu/packet size. When the
-> requested frag size is large enough that a single page can not
-> be split into more than one frag, using frag support only have
-> performance penalty because of the extra frag count handling
-> for frag support.
+On Mon, Oct 09, 2023 at 04:00:54PM -0400, Jeremy Cline wrote:
+> The protocol is used in a bit mask to determine if the protocol is
+> supported. Assert the provided protocol is less than the maximum
+> defined so it doesn't potentially perform a shift-out-of-bounds and
+> provide a clearer error for undefined protocols vs unsupported ones.
 > 
-> So this patchset provides a page pool API for the driver to
-> allocate memory with least memory utilization and performance
-> penalty when it doesn't know the size of memory it need
-> beforehand.
+> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+> Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
+> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
 
-Could you rebase & repost? Patches no longer apply :(
+As per my review of v1, this looks good to me.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
