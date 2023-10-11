@@ -1,350 +1,550 @@
-Return-Path: <netdev+bounces-39888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D04367C4B4F
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:11:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ECED7C4BA1
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F21361C20BD9
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:11:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 479DB1C20C85
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8B717986;
-	Wed, 11 Oct 2023 07:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B48F18E32;
+	Wed, 11 Oct 2023 07:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cZw0+7eU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOQ1MEX0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74379171D6
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:11:24 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98D259E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 00:11:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JeHRX7jbXxgRQtE/6ZGCtNqF/5Bj5szA8RVVlPZmP4LT/24yl5RrZg7GXfIuk9IzxWOJvZLqv8jh4cIMxFjAtr90/Zcx0fRUwTzp0RZTMi3gTXmF9woloWudJvN3Rx3ZIsoj4yzx0MLVSNoDVhfzGtXATVwpLsw2WPtOtkmf/z1F9R+FDw9QQQz1xp2KctVvWcMvP2Cnosbj1u69yRzbuFRuV1/kRcsdyTy4IVzcEiwvlV/PFoKGyJt3P8rZLdxBV5wMMwoE2FVYq03fUsb/pSt1s3IxucA+9M91sP9IeOqaVfoDDvvWlHQhR9szdB6AuYM7ILXULwu7GDPQrUlQEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HkiY7pq79K17jg1l1sTR5Ndekv85AVwYcPpgpApQBEw=;
- b=JfQcen+Uk+zlpHeomO36FZHjpUbUq7il0eJwx32V91U5HKf4Sg3KVJhX2D/cei3hleNKyNAIMfetmX24bJuqoz2EP7JzIGstkqDI/PcO+RcKlvAb03gPDWfaDglqqCE+Idpxtf8dDtRDajhKRwH/kI5L0xk9n/ONUNHXGieI1oCN+s4Sx0gK1GDqsMHXbrdBdhCD/oolyEcdqethguUiKL93tfHY5D/fDekpdgF4AFkvQVZ6cAAv3ZrAAIvtTYD95aePfroPsALT2d+ehqCiEak3s+UlTQQPtfVEKZiEUyV2aMSjy1ntK72ImR4jSo5167l/ZJ3fou4tGNWjQY/ZwA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HkiY7pq79K17jg1l1sTR5Ndekv85AVwYcPpgpApQBEw=;
- b=cZw0+7eUTgGYXd2sxt61S33EoJa2Za7+JHePpILgQxpcKpD6QBPGs/YvhZ5bOtcmN3319R3g6kWixHU7nXFUPpSjsOYBXVoZibhYzml5Pdr8+K3zj84VcmYUr4d3ssAEY3lPb0fYH5kYfbhHAULU7QtbI0foafBNP16OU5UsAjD+xWONM9mUrMwD7gmTHqYMjoBwKlZOtOIHjrtkIe6C5/rLJ76/qpnQ22e0UEhnpo+UQgEzJ5hq8vqAja1scq2hgvNxWPzViv9/8E/9NttIqCeUk5t4aNGYyZju/Ww+bSOrDvnDFYlWYaUaBkymmh4hMUs0x5DfSwpboYuUljzmcg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by DS0PR12MB7726.namprd12.prod.outlook.com (2603:10b6:8:130::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Wed, 11 Oct
- 2023 07:11:18 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::fbb3:a23d:62b0:932]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::fbb3:a23d:62b0:932%4]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
- 07:11:18 +0000
-Date: Wed, 11 Oct 2023 10:11:08 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Alce Lafranque <alce@lafranque.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88B1C14C
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:21:38 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B87B8F
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 00:21:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697008895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N41JNWYX/Pomq5SxJ5nZpshtiEKaKL8hH4wYefsbCLM=;
+	b=aOQ1MEX0RHAh1B9tAprtAtKsjZV+vcPan5aoR8bKlJiCxXpGfXGgfLBUwr2ruPqwvj3ush
+	ofXe4J1eBAySufTQuAJj3S2tuXK73SgDCvsgp9B786MHvO8X72YvzPXZhFn0KM906PMqmz
+	tGm8fsYE7k4sM+9uQkg1spHZ/DcBGI0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-63-4TXPEkrhMeSzJaupWnPjSQ-1; Wed, 11 Oct 2023 03:21:16 -0400
+X-MC-Unique: 4TXPEkrhMeSzJaupWnPjSQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6EF2D2825E98;
+	Wed, 11 Oct 2023 07:21:15 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 960681B94;
+	Wed, 11 Oct 2023 07:21:13 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Ayush Sawal <ayush.sawal@chelsio.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	Vincent Bernat <vincent@bernat.ch>
-Subject: Re: [PATCH net-next v2] vxlan: add support for flowlabel inherit
-Message-ID: <ZSZKjDA2ZBAHn5EH@shredder>
-References: <4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr>
- <20231007142624.739192-1-alce@lafranque.net>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231007142624.739192-1-alce@lafranque.net>
-X-ClientProxiedBy: TL2P290CA0004.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::13) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	mptcp@lists.linux.dev,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tom Deseyn <tdeseyn@redhat.com>
+Subject: [PATCH v2 net] tcp: allow again tcp_disconnect() when threads are waiting
+Date: Wed, 11 Oct 2023 09:20:55 +0200
+Message-ID: <f3b95e47e3dbed840960548aebaa8d954372db41.1697008693.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|DS0PR12MB7726:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6769404d-6f06-4016-24a3-08dbca29439a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Cxb+zcUJu2vpdGqSrA2zJq0nUH6T2iDYlM9Nm1Jd5jF9RiRKnQ2XUN/lZj3aKyv/21PGcZecnza17QTspqI6uHGh7kXxlbP5jzukSmRgtab5Mm/hlPZ9Mh7tNog0zD5jBbvTKVyyPaoQQJzRBi6e9KIgNerd3SVAibSxBBMGbg+dca7T/RoW9fUN6Pi36/bo/E0abTXP5QQhuvNOZDlIbcV3DuTWguYi6QVxLvGRNZV7fNPctLQoswhWnQc+ArmSUzIhg/MQLSGEyoxmC1mMgLBcZc59H69hiZwJY1RaSuIBKHqbZBZgidIfM5dmrz8uKP6sVMcxKRkkYNQJBA7pXTlgySn8mi1tCucFq5a3xD37ULTi+ko6TFcbALLtBbxyFIpqS8B217/ZbMYVKitmVDfwvaY3G4YHSinqhBVgX8JVEHmCM995PBM/YGe0X1QLC82xwWQAyNckhoMsokcNIR8YzXSaV8nrRQFTwWzWXYV1dcJek+dkOvolocK+ingdiSe2eniIB2C2wQLWFndSizuOgmWwvQSsUDnKAh1WblvJKlhx+NE4gAHPyMB+wDS7mKBGlr7VJV6KAnQ1Cb1+qIYL6fmAvyOuunmdX4EDj7U=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(396003)(346002)(39860400002)(366004)(136003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(6512007)(9686003)(86362001)(38100700002)(66574015)(26005)(83380400001)(6506007)(966005)(478600001)(6666004)(6486002)(66556008)(8676002)(8936002)(6916009)(4326008)(41300700001)(2906002)(66476007)(33716001)(316002)(66946007)(54906003)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WYHyaefpx1pk5VG3orz5HGSXupcHSWDz9khTjImCL26XGncc6LJHa/Ow/R8s?=
- =?us-ascii?Q?SJusmQBOcOuJ0b37lD4ncFoToJmAZJgpHGEqtHT10bX3hXUIQ/DlQ4TzGKEF?=
- =?us-ascii?Q?AyUKvBe3Z1iUYUBkXxdumxarykOEzq93M9lOl8yplumI2hKKW7kK5niMQFkM?=
- =?us-ascii?Q?4npt0tTmkDo7unRJuas6gzIXKYJAQ5qm/HKiczwiOB9h1ftwHWVHFjRExQlT?=
- =?us-ascii?Q?TmDvYNMyEnScgVhs5O6SbN8/QmGV1c+P4TAqSZ0JHLuaqqsvPHTGO8I1tqEg?=
- =?us-ascii?Q?tu3PKiEOZ0jMRkP6VGQTBfg1tC99kuDIV/rKnyhwgSMMy/EX8QCaTgqLLpo+?=
- =?us-ascii?Q?LYwXl1ZnQwBBoVrCDETwI3g9wWk/rXNmMidxU5/FGf6kHGrPPh70JFCuS6sg?=
- =?us-ascii?Q?VsdiOOctfH4LMyJlazZCJ99DnFNz4Do4b+4hI0cSW8uDgBWe7SPuH0QMvUqP?=
- =?us-ascii?Q?rMWkQA0EEs+sJQkNrWQfPwwyenIECM5rhUJ7lDa1VwFHPX7XESPzyhu8xDAi?=
- =?us-ascii?Q?T6XkxQ4LHUaJsHorAuZu14QAx4X/5gpsbfKCkVuYCKP+YUZ0UvW7O2R8tpFL?=
- =?us-ascii?Q?CG2BZ5DKRmvwikO2PtD1IlrtVAs+MYkYkl41UyaUOC/s05qlVE9jIUGBSiJs?=
- =?us-ascii?Q?zPAL4rNcasFFx5U8XmQ5JniAGKlCmlpwm0CqA4KgqkCt53Zy6nsraCSgLnze?=
- =?us-ascii?Q?/l1fOsZZgTZmy4poJRg6tPczJ+k9BFXTLGQVojU1mT5S9BFoPdTQ0Mcv/7ia?=
- =?us-ascii?Q?dmG2DyMP7F5T4ZzI9dhVNVPZ2L6hjkLTcYYXIzw6HhOU0Gy+MD7ZUGLVGPAf?=
- =?us-ascii?Q?ggWBPGTM+kDlhB3iFeGXAEXnzQhMASiHT27Wj3CWPzZjMX4SpDg3frfEiE1m?=
- =?us-ascii?Q?lghNhgFrSRYNN2RPBYgBbMRperwCz0aVYf4qNSK/4Wev+sIlK9VGjN5UlHTd?=
- =?us-ascii?Q?iClL7u+8gckgWS6LS7uDJIGCImK9cha80oJeeZjF8Qk6x/HzEiXKLyavRA0L?=
- =?us-ascii?Q?MMBx5LALKjxIM3xmRPjSkJ+pLFRIxu4wTKAz9/psK+4FC9yzvIHDlaMFTLQT?=
- =?us-ascii?Q?VuohpzJZOMXxXM218kvY0NyMpWW6aJVd+C/7YpGuKXWA/5fBoyS16gK+oIS5?=
- =?us-ascii?Q?2OBUMbkYgaDAxVmfxNSYFUdRvGUZPaRlnRZ+q78UttKjBdrZlZvB8blU1/Eh?=
- =?us-ascii?Q?zYK9rn/yjvQzCQ63HiSZbQVaJ/HoWGzN3IR3KaAUq5x5gSW9bkD+CjfO16pc?=
- =?us-ascii?Q?8ujEr3zrS57ZP5eloBlq4ZbCNx82cHM6pEuO3QpW9kNtS2C6pXfnBIFrnPCi?=
- =?us-ascii?Q?73U4QyzJu8OundBt3toVWKX+RJERJBgTSldiI3O+lsFDVudoIZLlOPd0b+1l?=
- =?us-ascii?Q?EhZ3ZSJ+/TWfjON3OT3xj524ItIozU61al+cWa8/w6Wkhrw7yGWlYdL0ukgi?=
- =?us-ascii?Q?Ur8gLuVnGRoZcjGcsLFFu9qqgmojpHiCSoIF1gijaUkzwwJuJ5V5cwDd/HuZ?=
- =?us-ascii?Q?UHXQgziO+oy1OAqBWlCuQ67PLy/bEmhhroPIUqsYWYu+3DId69G/p70NxZUH?=
- =?us-ascii?Q?LQfNDTMplRQM+Jof/FBsnmjorwZeQJOGrIOzAXH3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6769404d-6f06-4016-24a3-08dbca29439a
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2023 07:11:18.1147
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q5G/v8pfeO5EsHTY/riFUxWygs4XZ79T2ciJQNm8qksW67Ngl5txIKrBb23ZmmuUvy56pbstIv3aeG7DpwymdA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7726
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Process note: Please post new versions as a separate thread with a
-changelog:
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#resending-after-review
+As reported by Tom, .NET and applications build on top of it rely
+on connect(AF_UNSPEC) to async cancel pending I/O operations on TCP
+socket.
 
-On Sat, Oct 07, 2023 at 09:26:24AM -0500, Alce Lafranque wrote:
-> By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
-> an option for a fixed value. This commits add the ability to inherit the
-> flow label from the inner packet, like for other tunnel implementations.
-> This enables devices using only L3 headers for ECMP to correctly balance
-> VXLAN-encapsulated IPv6 packets.
-> 
-> ```
-> $ ./ip/ip link add dummy1 type dummy
-> $ ./ip/ip addr add 2001:db8::2/64 dev dummy1
-> $ ./ip/ip link set up dev dummy1
-> $ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
-> $ ./ip/ip link set up dev vxlan1
-> $ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
-> $ ./ip/ip link set arp off dev vxlan1
-> $ ping -q 2001:db8:1::1 &
-> $ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
-> [...]
-> Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
->     0110 .... = Version: 6
->     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
->         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
->         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
->     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-> [...]
-> Virtual eXtensible Local Area Network
->     Flags: 0x0800, VXLAN Network ID (VNI)
->     Group Policy ID: 0
->     VXLAN Network Identifier (VNI): 100
-> [...]
-> Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
->     0110 .... = Version: 6
->     .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
->         .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
->         .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
->     .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
-> ```
-> 
-> Signed-off-by: Alce Lafranque <alce@lafranque.net>
-> Co-developed-by: Vincent Bernat <vincent@bernat.ch>
-> Signed-off-by: Vincent Bernat <vincent@bernat.ch>
-> ---
->  drivers/net/vxlan/vxlan_core.c | 15 ++++++++++++++-
->  include/net/ip_tunnels.h       | 11 +++++++++++
->  include/net/vxlan.h            | 33 +++++++++++++++++----------------
->  include/uapi/linux/if_link.h   |  8 ++++++++
->  4 files changed, 50 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index 5b5597073b00..d1f2376c0c73 100644
-> --- a/drivers/net/vxlan/vxlan_core.c
-> +++ b/drivers/net/vxlan/vxlan_core.c
-> @@ -2475,7 +2475,14 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
->  		else
->  			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
->  #if IS_ENABLED(CONFIG_IPV6)
-> -		label = vxlan->cfg.label;
-> +		switch (vxlan->cfg.label_behavior) {
-> +		case VXLAN_LABEL_FIXED:
-> +			label = vxlan->cfg.label;
-> +			break;
-> +		case VXLAN_LABEL_INHERIT:
-> +			label = ip_tunnel_get_flowlabel(old_iph, skb);
-> +			break;
+The blamed commit below caused a regression, as such cancellation
+can now fail.
 
-I saw the kbuild robot complaining about this. You can add:
+As suggested by Eric, this change addresses the problem explicitly
+causing blocking I/O operation to terminate immediately (with an error)
+when a concurrent disconnect() is executed.
 
-default:
-	DEBUG_NET_WARN_ON_ONCE(1);
-	goto drop;
+Instead of tracking the number of threads blocked on a given socket,
+track the number of disconnect() issued on such socket. If such counter
+changes after a blocking operation releasing and re-acquiring the socket
+lock, error out the current operation.
 
-> +		}
->  #endif
->  	} else {
->  		if (!info) {
-> @@ -3286,6 +3293,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
->  	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
->  	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
->  	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
-> +	[IFLA_VXLAN_LABEL_BEHAVIOR]	= NLA_POLICY_MAX(NLA_U8, VXLAN_LABEL_MAX),
+Fixes: 4faeee0cf8a5 ("tcp: deny tcp_disconnect() when threads are waiting")
+Reported-by: Tom Deseyn <tdeseyn@redhat.com>
+Closes: https://bugzilla.redhat.com/show_bug.cgi?id=1886305
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+v1 -> v2:
+ - move the sk_disconnects increment in __inet_stream_connect() (Eric)
+---
+ .../chelsio/inline_crypto/chtls/chtls_io.c    | 36 +++++++++++++++----
+ include/net/sock.h                            | 10 +++---
+ net/core/stream.c                             | 12 ++++---
+ net/ipv4/af_inet.c                            | 10 ++++--
+ net/ipv4/inet_connection_sock.c               |  1 -
+ net/ipv4/tcp.c                                | 16 ++++-----
+ net/ipv4/tcp_bpf.c                            |  4 +++
+ net/mptcp/protocol.c                          |  7 ----
+ net/tls/tls_main.c                            | 10 ++++--
+ net/tls/tls_sw.c                              | 19 ++++++----
+ 10 files changed, 80 insertions(+), 45 deletions(-)
 
-My preference would be IFLA_VXLAN_LABEL_POLICY.
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
+index 5fc64e47568a..d567e42e1760 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_io.c
+@@ -911,7 +911,7 @@ static int csk_wait_memory(struct chtls_dev *cdev,
+ 			   struct sock *sk, long *timeo_p)
+ {
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+-	int err = 0;
++	int ret, err = 0;
+ 	long current_timeo;
+ 	long vm_wait = 0;
+ 	bool noblock;
+@@ -942,10 +942,13 @@ static int csk_wait_memory(struct chtls_dev *cdev,
+ 
+ 		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+ 		sk->sk_write_pending++;
+-		sk_wait_event(sk, &current_timeo, sk->sk_err ||
+-			      (sk->sk_shutdown & SEND_SHUTDOWN) ||
+-			      (csk_mem_free(cdev, sk) && !vm_wait), &wait);
++		ret = sk_wait_event(sk, &current_timeo, sk->sk_err ||
++				    (sk->sk_shutdown & SEND_SHUTDOWN) ||
++				    (csk_mem_free(cdev, sk) && !vm_wait),
++				    &wait);
+ 		sk->sk_write_pending--;
++		if (ret < 0)
++			goto do_error;
+ 
+ 		if (vm_wait) {
+ 			vm_wait -= current_timeo;
+@@ -1348,6 +1351,7 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	int copied = 0;
+ 	int target;
+ 	long timeo;
++	int ret;
+ 
+ 	buffers_freed = 0;
+ 
+@@ -1423,7 +1427,11 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		if (copied >= target)
+ 			break;
+ 		chtls_cleanup_rbuf(sk, copied);
+-		sk_wait_data(sk, &timeo, NULL);
++		ret = sk_wait_data(sk, &timeo, NULL);
++		if (ret < 0) {
++			copied = copied ? : ret;
++			goto unlock;
++		}
+ 		continue;
+ found_ok_skb:
+ 		if (!skb->len) {
+@@ -1518,6 +1526,8 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 	if (buffers_freed)
+ 		chtls_cleanup_rbuf(sk, copied);
++
++unlock:
+ 	release_sock(sk);
+ 	return copied;
+ }
+@@ -1534,6 +1544,7 @@ static int peekmsg(struct sock *sk, struct msghdr *msg,
+ 	int copied = 0;
+ 	size_t avail;          /* amount of available data in current skb */
+ 	long timeo;
++	int ret;
+ 
+ 	lock_sock(sk);
+ 	timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+@@ -1585,7 +1596,12 @@ static int peekmsg(struct sock *sk, struct msghdr *msg,
+ 			release_sock(sk);
+ 			lock_sock(sk);
+ 		} else {
+-			sk_wait_data(sk, &timeo, NULL);
++			ret = sk_wait_data(sk, &timeo, NULL);
++			if (ret < 0) {
++				/* here 'copied' is 0 due to previous checks */
++				copied = ret;
++				break;
++			}
+ 		}
+ 
+ 		if (unlikely(peek_seq != tp->copied_seq)) {
+@@ -1656,6 +1672,7 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	int copied = 0;
+ 	long timeo;
+ 	int target;             /* Read at least this many bytes */
++	int ret;
+ 
+ 	buffers_freed = 0;
+ 
+@@ -1747,7 +1764,11 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 		if (copied >= target)
+ 			break;
+ 		chtls_cleanup_rbuf(sk, copied);
+-		sk_wait_data(sk, &timeo, NULL);
++		ret = sk_wait_data(sk, &timeo, NULL);
++		if (ret < 0) {
++			copied = copied ? : ret;
++			goto unlock;
++		}
+ 		continue;
+ 
+ found_ok_skb:
+@@ -1816,6 +1837,7 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 	if (buffers_freed)
+ 		chtls_cleanup_rbuf(sk, copied);
+ 
++unlock:
+ 	release_sock(sk);
+ 	return copied;
+ }
+diff --git a/include/net/sock.h b/include/net/sock.h
+index b770261fbdaf..92f7ea62a915 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -336,7 +336,7 @@ struct sk_filter;
+   *	@sk_cgrp_data: cgroup data for this cgroup
+   *	@sk_memcg: this socket's memory cgroup association
+   *	@sk_write_pending: a write to stream socket waits to start
+-  *	@sk_wait_pending: number of threads blocked on this socket
++  *	@sk_disconnects: number of disconnect operations performed on this sock
+   *	@sk_state_change: callback to indicate change in the state of the sock
+   *	@sk_data_ready: callback to indicate there is data to be processed
+   *	@sk_write_space: callback to indicate there is bf sending space available
+@@ -429,7 +429,7 @@ struct sock {
+ 	unsigned int		sk_napi_id;
+ #endif
+ 	int			sk_rcvbuf;
+-	int			sk_wait_pending;
++	int			sk_disconnects;
+ 
+ 	struct sk_filter __rcu	*sk_filter;
+ 	union {
+@@ -1189,8 +1189,7 @@ static inline void sock_rps_reset_rxhash(struct sock *sk)
+ }
+ 
+ #define sk_wait_event(__sk, __timeo, __condition, __wait)		\
+-	({	int __rc;						\
+-		__sk->sk_wait_pending++;				\
++	({	int __rc, __dis = __sk->sk_disconnects;			\
+ 		release_sock(__sk);					\
+ 		__rc = __condition;					\
+ 		if (!__rc) {						\
+@@ -1200,8 +1199,7 @@ static inline void sock_rps_reset_rxhash(struct sock *sk)
+ 		}							\
+ 		sched_annotate_sleep();					\
+ 		lock_sock(__sk);					\
+-		__sk->sk_wait_pending--;				\
+-		__rc = __condition;					\
++		__rc = __dis == __sk->sk_disconnects ? __condition : -EPIPE; \
+ 		__rc;							\
+ 	})
+ 
+diff --git a/net/core/stream.c b/net/core/stream.c
+index f5c4e47df165..96fbcb9bbb30 100644
+--- a/net/core/stream.c
++++ b/net/core/stream.c
+@@ -117,7 +117,7 @@ EXPORT_SYMBOL(sk_stream_wait_close);
+  */
+ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
+ {
+-	int err = 0;
++	int ret, err = 0;
+ 	long vm_wait = 0;
+ 	long current_timeo = *timeo_p;
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+@@ -142,11 +142,13 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
+ 
+ 		set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+ 		sk->sk_write_pending++;
+-		sk_wait_event(sk, &current_timeo, READ_ONCE(sk->sk_err) ||
+-						  (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) ||
+-						  (sk_stream_memory_free(sk) &&
+-						  !vm_wait), &wait);
++		ret = sk_wait_event(sk, &current_timeo, READ_ONCE(sk->sk_err) ||
++				    (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) ||
++				    (sk_stream_memory_free(sk) && !vm_wait),
++				    &wait);
+ 		sk->sk_write_pending--;
++		if (ret < 0)
++			goto do_error;
+ 
+ 		if (vm_wait) {
+ 			vm_wait -= current_timeo;
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 3d2e30e20473..2713c9b06c4c 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -597,7 +597,6 @@ static long inet_wait_for_connect(struct sock *sk, long timeo, int writebias)
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	sk->sk_write_pending += writebias;
+-	sk->sk_wait_pending++;
+ 
+ 	/* Basic assumption: if someone sets sk->sk_err, he _must_
+ 	 * change state of the socket from TCP_SYN_*.
+@@ -613,7 +612,6 @@ static long inet_wait_for_connect(struct sock *sk, long timeo, int writebias)
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 	sk->sk_write_pending -= writebias;
+-	sk->sk_wait_pending--;
+ 	return timeo;
+ }
+ 
+@@ -642,6 +640,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 			return -EINVAL;
+ 
+ 		if (uaddr->sa_family == AF_UNSPEC) {
++			sk->sk_disconnects++;
+ 			err = sk->sk_prot->disconnect(sk, flags);
+ 			sock->state = err ? SS_DISCONNECTING : SS_UNCONNECTED;
+ 			goto out;
+@@ -696,6 +695,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		int writebias = (sk->sk_protocol == IPPROTO_TCP) &&
+ 				tcp_sk(sk)->fastopen_req &&
+ 				tcp_sk(sk)->fastopen_req->data ? 1 : 0;
++		int dis = sk->sk_disconnects;
+ 
+ 		/* Error code is set above */
+ 		if (!timeo || !inet_wait_for_connect(sk, timeo, writebias))
+@@ -704,6 +704,11 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		err = sock_intr_errno(timeo);
+ 		if (signal_pending(current))
+ 			goto out;
++
++		if (dis != sk->sk_disconnects) {
++			err = -EPIPE;
++			goto out;
++		}
+ 	}
+ 
+ 	/* Connection was closed by RST, timeout, ICMP error
+@@ -725,6 +730,7 @@ int __inet_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ sock_error:
+ 	err = sock_error(sk) ? : -ECONNABORTED;
+ 	sock->state = SS_UNCONNECTED;
++	sk->sk_disconnects++;
+ 	if (sk->sk_prot->disconnect(sk, flags))
+ 		sock->state = SS_DISCONNECTING;
+ 	goto out;
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index aeebe8816689..394a498c2823 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1145,7 +1145,6 @@ struct sock *inet_csk_clone_lock(const struct sock *sk,
+ 	if (newsk) {
+ 		struct inet_connection_sock *newicsk = inet_csk(newsk);
+ 
+-		newsk->sk_wait_pending = 0;
+ 		inet_sk_set_state(newsk, TCP_SYN_RECV);
+ 		newicsk->icsk_bind_hash = NULL;
+ 		newicsk->icsk_bind2_hash = NULL;
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 3f66cdeef7de..d3456cf840de 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -831,7 +831,9 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
+ 			 */
+ 			if (!skb_queue_empty(&sk->sk_receive_queue))
+ 				break;
+-			sk_wait_data(sk, &timeo, NULL);
++			ret = sk_wait_data(sk, &timeo, NULL);
++			if (ret < 0)
++				break;
+ 			if (signal_pending(current)) {
+ 				ret = sock_intr_errno(timeo);
+ 				break;
+@@ -2442,7 +2444,11 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 			__sk_flush_backlog(sk);
+ 		} else {
+ 			tcp_cleanup_rbuf(sk, copied);
+-			sk_wait_data(sk, &timeo, last);
++			err = sk_wait_data(sk, &timeo, last);
++			if (err < 0) {
++				err = copied ? : err;
++				goto out;
++			}
+ 		}
+ 
+ 		if ((flags & MSG_PEEK) &&
+@@ -2966,12 +2972,6 @@ int tcp_disconnect(struct sock *sk, int flags)
+ 	int old_state = sk->sk_state;
+ 	u32 seq;
+ 
+-	/* Deny disconnect if other threads are blocked in sk_wait_event()
+-	 * or inet_wait_for_connect().
+-	 */
+-	if (sk->sk_wait_pending)
+-		return -EBUSY;
+-
+ 	if (old_state != TCP_CLOSE)
+ 		tcp_set_state(sk, TCP_CLOSE);
+ 
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index 327268203001..ba2e92188124 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -307,6 +307,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 		}
+ 
+ 		data = tcp_msg_wait_data(sk, psock, timeo);
++		if (data < 0)
++			return data;
+ 		if (data && !sk_psock_queue_empty(psock))
+ 			goto msg_bytes_ready;
+ 		copied = -EAGAIN;
+@@ -351,6 +353,8 @@ static int tcp_bpf_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 		timeo = sock_rcvtimeo(sk, flags & MSG_DONTWAIT);
+ 		data = tcp_msg_wait_data(sk, psock, timeo);
++		if (data < 0)
++			return data;
+ 		if (data) {
+ 			if (!sk_psock_queue_empty(psock))
+ 				goto msg_bytes_ready;
+diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+index c3b83cb390d9..d1902373c974 100644
+--- a/net/mptcp/protocol.c
++++ b/net/mptcp/protocol.c
+@@ -3098,12 +3098,6 @@ static int mptcp_disconnect(struct sock *sk, int flags)
+ {
+ 	struct mptcp_sock *msk = mptcp_sk(sk);
+ 
+-	/* Deny disconnect if other threads are blocked in sk_wait_event()
+-	 * or inet_wait_for_connect().
+-	 */
+-	if (sk->sk_wait_pending)
+-		return -EBUSY;
+-
+ 	/* We are on the fastopen error path. We can't call straight into the
+ 	 * subflows cleanup code due to lock nesting (we are already under
+ 	 * msk->firstsocket lock).
+@@ -3173,7 +3167,6 @@ struct sock *mptcp_sk_clone_init(const struct sock *sk,
+ 		inet_sk(nsk)->pinet6 = mptcp_inet6_sk(nsk);
+ #endif
+ 
+-	nsk->sk_wait_pending = 0;
+ 	__mptcp_init_sock(nsk);
+ 
+ 	msk = mptcp_sk(nsk);
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 02f583ff9239..002483e60c19 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -139,8 +139,8 @@ void update_sk_prot(struct sock *sk, struct tls_context *ctx)
+ 
+ int wait_on_pending_writer(struct sock *sk, long *timeo)
+ {
+-	int rc = 0;
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
++	int ret, rc = 0;
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	while (1) {
+@@ -154,9 +154,13 @@ int wait_on_pending_writer(struct sock *sk, long *timeo)
+ 			break;
+ 		}
+ 
+-		if (sk_wait_event(sk, timeo,
+-				  !READ_ONCE(sk->sk_write_pending), &wait))
++		ret = sk_wait_event(sk, timeo,
++				    !READ_ONCE(sk->sk_write_pending), &wait);
++		if (ret) {
++			if (ret < 0)
++				rc = ret;
+ 			break;
++		}
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+ 	return rc;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index d1fc295b83b5..e9d1e83a859d 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1291,6 +1291,7 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 	struct tls_context *tls_ctx = tls_get_ctx(sk);
+ 	struct tls_sw_context_rx *ctx = tls_sw_ctx_rx(tls_ctx);
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
++	int ret = 0;
+ 	long timeo;
+ 
+ 	timeo = sock_rcvtimeo(sk, nonblock);
+@@ -1302,6 +1303,9 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 		if (sk->sk_err)
+ 			return sock_error(sk);
+ 
++		if (ret < 0)
++			return ret;
++
+ 		if (!skb_queue_empty(&sk->sk_receive_queue)) {
+ 			tls_strp_check_rcv(&ctx->strp);
+ 			if (tls_strp_msg_ready(ctx))
+@@ -1320,10 +1324,10 @@ tls_rx_rec_wait(struct sock *sk, struct sk_psock *psock, bool nonblock,
+ 		released = true;
+ 		add_wait_queue(sk_sleep(sk), &wait);
+ 		sk_set_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+-		sk_wait_event(sk, &timeo,
+-			      tls_strp_msg_ready(ctx) ||
+-			      !sk_psock_queue_empty(psock),
+-			      &wait);
++		ret = sk_wait_event(sk, &timeo,
++				    tls_strp_msg_ready(ctx) ||
++				    !sk_psock_queue_empty(psock),
++				    &wait);
+ 		sk_clear_bit(SOCKWQ_ASYNC_WAITDATA, sk);
+ 		remove_wait_queue(sk_sleep(sk), &wait);
+ 
+@@ -1852,6 +1856,7 @@ static int tls_rx_reader_acquire(struct sock *sk, struct tls_sw_context_rx *ctx,
+ 				 bool nonblock)
+ {
+ 	long timeo;
++	int ret;
+ 
+ 	timeo = sock_rcvtimeo(sk, nonblock);
+ 
+@@ -1861,14 +1866,16 @@ static int tls_rx_reader_acquire(struct sock *sk, struct tls_sw_context_rx *ctx,
+ 		ctx->reader_contended = 1;
+ 
+ 		add_wait_queue(&ctx->wq, &wait);
+-		sk_wait_event(sk, &timeo,
+-			      !READ_ONCE(ctx->reader_present), &wait);
++		ret = sk_wait_event(sk, &timeo,
++				    !READ_ONCE(ctx->reader_present), &wait);
+ 		remove_wait_queue(&ctx->wq, &wait);
+ 
+ 		if (timeo <= 0)
+ 			return -EAGAIN;
+ 		if (signal_pending(current))
+ 			return sock_intr_errno(timeo);
++		if (ret < 0)
++			return ret;
+ 	}
+ 
+ 	WRITE_ONCE(ctx->reader_present, 1);
+-- 
+2.41.0
 
->  };
->  
->  static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
-> @@ -4003,6 +4011,9 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
->  		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
->  			     IPV6_FLOWLABEL_MASK;
->  
-> +	if (data[IFLA_VXLAN_LABEL_BEHAVIOR])
-> +		conf->label_behavior = nla_get_u8(data[IFLA_VXLAN_LABEL_BEHAVIOR]);
-
-There is a check in vxlan_config_validate() that prevents setting a
-non-zero flow label when the VXLAN device encapsulates using IPv4. For
-consistency it would be good to include a similar check regarding the
-flow label policy.
-
-> +
->  	if (data[IFLA_VXLAN_LEARNING]) {
->  		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
->  				    VXLAN_F_LEARN, changelink, true,
-> @@ -4315,6 +4326,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
->  		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
-> +		nla_total_size(sizeof(__u8)) +  /* IFLA_VXLAN_LABEL_BEHAVIOR */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
->  		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
-> @@ -4387,6 +4399,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
->  	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
->  	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
-> +	    nla_put_u8(skb, IFLA_VXLAN_LABEL_BEHAVIOR, vxlan->cfg.label_behavior) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
->  		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
->  	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
-> diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
-> index f346b4efbc30..2d746f4c9a0a 100644
-> --- a/include/net/ip_tunnels.h
-> +++ b/include/net/ip_tunnels.h
-> @@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
->  		return 0;
->  }
->  
-> +static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
-> +					     const struct sk_buff *skb)
-> +{
-> +	__be16 payload_protocol = skb_protocol(skb, true);
-> +
-> +	if (payload_protocol == htons(ETH_P_IPV6))
-> +		return ip6_flowlabel((const struct ipv6hdr *)iph);
-> +	else
-> +		return 0;
-> +}
-> +
->  static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
->  				       const struct sk_buff *skb)
->  {
-> diff --git a/include/net/vxlan.h b/include/net/vxlan.h
-> index 6a9f8a5f387c..9ccbc8b7b8f9 100644
-> --- a/include/net/vxlan.h
-> +++ b/include/net/vxlan.h
-> @@ -210,22 +210,23 @@ struct vxlan_rdst {
->  };
->  
->  struct vxlan_config {
-> -	union vxlan_addr	remote_ip;
-> -	union vxlan_addr	saddr;
-> -	__be32			vni;
-> -	int			remote_ifindex;
-> -	int			mtu;
-> -	__be16			dst_port;
-> -	u16			port_min;
-> -	u16			port_max;
-> -	u8			tos;
-> -	u8			ttl;
-> -	__be32			label;
-> -	u32			flags;
-> -	unsigned long		age_interval;
-> -	unsigned int		addrmax;
-> -	bool			no_share;
-> -	enum ifla_vxlan_df	df;
-> +	union vxlan_addr		remote_ip;
-> +	union vxlan_addr		saddr;
-> +	__be32				vni;
-> +	int				remote_ifindex;
-> +	int				mtu;
-> +	__be16				dst_port;
-> +	u16				port_min;
-> +	u16				port_max;
-> +	u8				tos;
-> +	u8				ttl;
-> +	__be32				label;
-> +	enum ifla_vxlan_label_behavior	label_behavior;
-> +	u32				flags;
-> +	unsigned long			age_interval;
-> +	unsigned int			addrmax;
-> +	bool				no_share;
-> +	enum ifla_vxlan_df		df;
->  };
->  
->  enum {
-> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-> index fac351a93aed..13afc4afcc76 100644
-> --- a/include/uapi/linux/if_link.h
-> +++ b/include/uapi/linux/if_link.h
-> @@ -830,6 +830,7 @@ enum {
->  	IFLA_VXLAN_DF,
->  	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
->  	IFLA_VXLAN_LOCALBYPASS,
-> +	IFLA_VXLAN_LABEL_BEHAVIOR,
->  	__IFLA_VXLAN_MAX
->  };
->  #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
-> @@ -847,6 +848,13 @@ enum ifla_vxlan_df {
->  	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
->  };
->  
-> +enum ifla_vxlan_label_behavior {
-> +	VXLAN_LABEL_FIXED = 0,
-> +	VXLAN_LABEL_INHERIT = 1,
-> +	__VXLAN_LABEL_END,
-> +	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
-> +};
-> +
->  /* GENEVE section */
->  enum {
->  	IFLA_GENEVE_UNSPEC,
-> -- 
-> 2.39.2
-> 
 
