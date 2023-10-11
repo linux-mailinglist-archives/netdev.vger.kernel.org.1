@@ -1,76 +1,120 @@
-Return-Path: <netdev+bounces-39974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB4E7C5433
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:41:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A527C5461
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E92A7281DEE
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:41:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CFF128206F
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3410111CA3;
-	Wed, 11 Oct 2023 12:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D301DA31;
+	Wed, 11 Oct 2023 12:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vhmROl4k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b1Z0nuFn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE83F63B5
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 12:41:34 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDA298;
-	Wed, 11 Oct 2023 05:41:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=10jsCd0D/yud1X3V4ZeOq13dIfU5Nng3hYOVE5ex/Z8=; b=vhmROl4kvWcn2i7OSqV2XejI7k
-	5tzzV66f9OL32F7zw41dIhsVGzhDVx2lfYhHC0+IHeW0IQPD2CabyyOoeNVa3nRX1Ma9PcpEHYerG
-	ywJNw+TRvOZmzwU5iTrRI28yWNp5ff9Yr3oFkefEN34Xwl+TGVPmLWE9PschKKnty2ko=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qqYWk-001Zg4-1L; Wed, 11 Oct 2023 14:41:26 +0200
-Date: Wed, 11 Oct 2023 14:41:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
-Message-ID: <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
-References: <20231011063700.1824093-1-danishanwar@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB6013AC4;
+	Wed, 11 Oct 2023 12:54:08 +0000 (UTC)
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C4892;
+	Wed, 11 Oct 2023 05:54:07 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-2792d70ae25so4602928a91.0;
+        Wed, 11 Oct 2023 05:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697028847; x=1697633647; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ugSH8FJbysw/333UJfT2fX6aDJrXjkX7MBOTQ6zLQaY=;
+        b=b1Z0nuFnUakxVeSaHlcTOsMoEysbLsq2/IhbUql1diY530QI3J0Ta0ASll3AGmwphR
+         1FZSriAftxPE+z4ChLQoMeGkdVm+2NEmYLMiSienDffn5t7AOaJU8yv7DxAOMWKWROjK
+         sinZet94juIkl+U7IuPUWwA9O7IfMrXdWd4F7PYCw6JszW44NTRvMvcprMupIOdtPBI/
+         pNDKKhGHqPXscVJWvINILuh3DB5k72VBnAOVdjN3IURl+YczPOA9oeJ1mpZCG9RiiWkM
+         haj/NQNcG6guijirxhl7YHeoqUzTzffD9ir8UaWHXobFBWPjsVoCecW0DKC2Isl1Ia3p
+         Ydow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697028847; x=1697633647;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ugSH8FJbysw/333UJfT2fX6aDJrXjkX7MBOTQ6zLQaY=;
+        b=geRkanNfc5UCpchVO7msiSs0Y9Acfw9gkGbixn175fv2DEBhWg0bJoTw/EFyZpyFLt
+         w/vnxA2ysJ/BgHOZVYLU1hZf4oJyElmrmr83U+qHQReg2Qkga5mTCuxK/XKVioSNEFrO
+         hrcJX9Y8dVBTAzGuBDV1RbBN1/WL+ykJdw5pfd2KO/qyeLwkFXHD7JRdo5lCOGfuhV4H
+         hmOVdRGJZwOl4Tmc7l8qyR3TzS7H66Gv+kBeb4k3C65ofKBttu2mMkwOT/QPs5hI4+qv
+         hgnT/QrP4joi+VCoDjCiqElDwGuOAQ8+y/mB2w49oti84TKZEkZ8tyAvNLFO75hlv5Es
+         T+9Q==
+X-Gm-Message-State: AOJu0YzFFJnTBbfwp2+MGqXC8ZTXWWnnfR093gOOO+HDpHjk08kHf028
+	X1Ojh73jHI+xf4ptijerwXbSVQ7vHrRPmZcQ1oOW3zZd
+X-Google-Smtp-Source: AGHT+IG45+LupoZQup5ypJxF1tNZKgvqKmwjD6o0mHk2cQIch/yzH1JX9vLwdK72USEMloPr/bS46oBgevyVfPaSOx4=
+X-Received: by 2002:a17:90a:a393:b0:278:fa86:13d8 with SMTP id
+ x19-20020a17090aa39300b00278fa8613d8mr17431628pjp.41.1697028846773; Wed, 11
+ Oct 2023 05:54:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011063700.1824093-1-danishanwar@ti.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230906095143.99806-1-aford173@gmail.com> <8cf5b8d1-5f03-438a-94bb-5691dee8cc86@lunn.ch>
+In-Reply-To: <8cf5b8d1-5f03-438a-94bb-5691dee8cc86@lunn.ch>
+From: Adam Ford <aford173@gmail.com>
+Date: Wed, 11 Oct 2023 07:53:55 -0500
+Message-ID: <CAHCN7xJ_2HjQ8iCYimPG+CiMQuDy7YpG2sf6Vq30VsddaSs8CQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net: ethernet: davinci_emac: Use MAC Address from
+ Device Tree
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-omap@vger.kernel.org, aford@beaconembedded.com, 
+	=?UTF-8?Q?Beno=C3=AEt_Cousson?= <bcousson@baylibre.com>, 
+	Tony Lindgren <tony@atomide.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Grygorii Strashko <grygorii.strashko@ti.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
->  			     base + icssg_all_stats[i].offset,
->  			     val);
->  
-> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
-> +			tx_pkt_cnt = val;
+On Wed, Sep 6, 2023 at 7:39=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Sep 06, 2023 at 04:51:42AM -0500, Adam Ford wrote:
+> > Currently there is a device tree entry called "local-mac-address"
+> > which can be filled by the bootloader or manually set.This is
+> > useful when the user does not want to use the MAC address
+> > programmed into the SoC.
+> >
+> > Currently, the davinci_emac reads the MAC from the DT, copies
+> > it from pdata->mac_addr to priv->mac_addr, then blindly overwrites
+> > it by reading from registers in the SoC, and falls back to a
+> > random MAC if it's still not valid.  This completely ignores any
+> > MAC address in the device tree.
+> >
+> > In order to use the local-mac-address, check to see if the contents
+> > of priv->mac_addr are valid before falling back to reading from the
+> > SoC when the MAC address is not valid.
+> >
+> > Signed-off-by: Adam Ford <aford173@gmail.com>
+>
+> There is the potential for regressions here, since behaviour is being
+> changed. But i do think what you are doing make sense.
+>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Doing a strncmp seems very expensive. Could you make use of
-icssg_stats.offset?
+I don't know who the right person is to ask, but is there any chance
+this can be accepted?
 
-	Andrew
+adam
+>
+>     Andrew
 
