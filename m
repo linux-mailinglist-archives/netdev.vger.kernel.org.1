@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-39997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98657C55A5
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:40:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8DA87C55A6
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:41:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9479E2823E0
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D1871C20A03
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2272F1F956;
-	Wed, 11 Oct 2023 13:40:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA931F94E;
+	Wed, 11 Oct 2023 13:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8oA9V59"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQ0fFCxn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81EF1F955
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:40:49 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC319E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:40:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF6F2CA6
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:41:07 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68BF5A4
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1697031646;
+	s=mimecast20190719; t=1697031663;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kBo1Q9ZZGOScf2Q/foJ7s3ES0s1m6pzlmqueXFx8NSo=;
-	b=U8oA9V59y+6NAzHMW6lgIzsM8evCA0FQRQuyLfC1IpRVgG5KmdNlx3sT8ZaSkzY9yjZRue
-	JOHGEDDvH8OsaXVdbzFQfWgwPqgaQxVs7loIBs9nRUcqTGBS2F/pdVYH2rORcNtmgIW/Yl
-	PEUXNZfwG7Ro2mOjYwOuxLzwbShYu9U=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-410-6ZWT2-lpM6qY3wHIZZ79Tg-1; Wed, 11 Oct 2023 09:40:42 -0400
-X-MC-Unique: 6ZWT2-lpM6qY3wHIZZ79Tg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	bh=MnCtsfSMJ0596JXKTEwqnq/8AJhM3PDAMQhE8KTSUnc=;
+	b=hQ0fFCxnroOVgHxmQCNzdZ2VZefrcP2wpsTmREeONaLrPZdJWMmcLxtby+ZawBTfoqyoZT
+	fEc8QzApo7joDeshqI4bwIsXS2gEI+SqcDh5wc7wjMdjeywttXoZcnSIJV9aNBRRzcggpy
+	wLhdHmf7ohlgJEZLfR3tNBvnUrv4fh4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-53-oQYP-2PfPjuItR49lDfaaQ-1; Wed, 11 Oct 2023 09:40:58 -0400
+X-MC-Unique: oQYP-2PfPjuItR49lDfaaQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 668B7946900;
-	Wed, 11 Oct 2023 13:40:42 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7FF3A1C0759E;
+	Wed, 11 Oct 2023 13:40:57 +0000 (UTC)
 Received: from RHTPC1VM0NT (unknown [10.22.34.140])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id CEA111C060AE;
-	Wed, 11 Oct 2023 13:40:41 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id DD28A21CAC6B;
+	Wed, 11 Oct 2023 13:40:56 +0000 (UTC)
 From: Aaron Conole <aconole@redhat.com>
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
@@ -52,15 +52,15 @@ Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
  Shelar <pshelar@ovn.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
  Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Adrian
  Moreno <amorenoz@redhat.com>,  Eelco Chaudron <echaudro@redhat.com>
-Subject: Re: [PATCH net 1/4] selftests: openvswitch: Add version check for
- pyroute2
+Subject: Re: [PATCH net 3/4] selftests: openvswitch: Skip drop testing on
+ older kernels
 References: <20231006151258.983906-1-aconole@redhat.com>
-	<20231006151258.983906-2-aconole@redhat.com>
-	<96bdb031129cdebfa6e0bdd4342439d9d864518b.camel@redhat.com>
-Date: Wed, 11 Oct 2023 09:40:41 -0400
-In-Reply-To: <96bdb031129cdebfa6e0bdd4342439d9d864518b.camel@redhat.com>
-	(Paolo Abeni's message of "Tue, 10 Oct 2023 12:25:51 +0200")
-Message-ID: <f7tedi1cm5i.fsf@redhat.com>
+	<20231006151258.983906-4-aconole@redhat.com>
+	<2e7ee087b33fba7e907c76e60d9eaed1807714e2.camel@redhat.com>
+Date: Wed, 11 Oct 2023 09:40:56 -0400
+In-Reply-To: <2e7ee087b33fba7e907c76e60d9eaed1807714e2.camel@redhat.com>
+	(Paolo Abeni's message of "Tue, 10 Oct 2023 12:29:01 +0200")
+Message-ID: <f7ta5spcm53.fsf@redhat.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,10 +69,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
 	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -81,70 +81,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 Paolo Abeni <pabeni@redhat.com> writes:
 
 > On Fri, 2023-10-06 at 11:12 -0400, Aaron Conole wrote:
->> Paolo Abeni reports that on some systems the pyroute2 version isn't
->> new enough to run the test suite.  Ensure that we support a minimum
->> version of 0.6 for all cases (which does include the existing ones).
->> The 0.6.1 version was released in May of 2021, so should be
->> propagated to most installations at this point.
+>> Kernels that don't have support for openvswitch drop reasons also
+>> won't have the drop counter reasons, so we should skip the test
+>> completely.  It previously wasn't possible to build a test case
+>> for this without polluting the datapath, so we introduce a mechanism
+>> to clear all the flows from a datapath allowing us to test for
+>> explicit drop actions, and then clear the flows to build the
+>> original test case.
 >> 
->> The alternative that Paolo proposed was to only skip when the
->> add-flow is being run.  This would be okay for most cases, except
->> if a future test case is added that needs to do flow dump without
->> an associated add (just guessing).  In that case, it could also be
->> broken and we would need additional skip logic anyway.  Just draw
->> a line in the sand now.
->> 
->> Fixes: 25f16c873fb1 ("selftests: add openvswitch selftest suite")
->> Reported-by: Paolo Abeni <pabeni@redhat.com>
->> Closes: https://lore.kernel.org/lkml/8470c431e0930d2ea204a9363a60937289b7fdbe.camel@redhat.com/
+>> Fixes: 4242029164d6 ("selftests: openvswitch: add explicit drop testcase")
 >> Signed-off-by: Aaron Conole <aconole@redhat.com>
 >> ---
->>  tools/testing/selftests/net/openvswitch/openvswitch.sh | 2 +-
->>  tools/testing/selftests/net/openvswitch/ovs-dpctl.py   | 8 ++++++++
->>  2 files changed, 9 insertions(+), 1 deletion(-)
+>>  .../selftests/net/openvswitch/openvswitch.sh  | 17 ++++++++++
+>>  .../selftests/net/openvswitch/ovs-dpctl.py    | 34 +++++++++++++++++++
+>>  2 files changed, 51 insertions(+)
 >> 
 >> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> index 9c2012d70b08e..220c3356901ef 100755
+>> index 2a0112be7ead5..ca7090e71bff2 100755
 >> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
 >> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
->> @@ -525,7 +525,7 @@ run_test() {
->>  	fi
+>> @@ -144,6 +144,12 @@ ovs_add_flow () {
+>>  	return 0
+>>  }
 >>  
->>  	if python3 ovs-dpctl.py -h 2>&1 | \
->> -	     grep "Need to install the python" >/dev/null 2>&1; then
->> +	     grep -E "Need to (install|upgrade) the python" >/dev/null 2>&1; then
->>  		stdbuf -o0 printf "TEST: %-60s  [PYLIB]\n" "${tdesc}"
->>  		return $ksft_skip
->>  	fi
->> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> index 912dc8c490858..9686ca30d516d 100644
->> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
->> @@ -28,6 +28,8 @@ try:
->>      from pyroute2.netlink import nlmsg_atoms
->>      from pyroute2.netlink.exceptions import NetlinkError
->>      from pyroute2.netlink.generic import GenericNetlinkSocket
->> +    import pyroute2
->> +
->>  except ModuleNotFoundError:
->>      print("Need to install the python pyroute2 package.")
->>      sys.exit(0)
->> @@ -1998,6 +2000,12 @@ def main(argv):
->>      nlmsg_atoms.ovskey = ovskey
->>      nlmsg_atoms.ovsactions = ovsactions
->>  
->> +    # version check for pyroute2
->> +    prverscheck = pyroute2.__version__.split(".")
->> +    if int(prverscheck[0]) == 0 and int(prverscheck[1]) < 6:
->> +        print("Need to upgrade the python pyroute2 package.")
+>> +ovs_del_flows () {
+>> +	info "Deleting all flows from DP: sbx:$1 br:$2"
+>> +	ovs_sbx "$1" python3 $ovs_base/ovs-dpctl.py del-flows "$2"
+>> +        return 0
 >
-> I think it would be better to propagate/print also the minimum version
-> required, so that the user should not have to resort looking at the
-> self-test sources to learn the required minimum version.
+> The chunk above mixes whitespaces and tabs for indenting, please be
+> consistent.
 
-ACK - makes sense to me.
+Thanks.  Will fix in v2
 
-> Cheers,
+> Thanks!
 >
 > Paolo
 
