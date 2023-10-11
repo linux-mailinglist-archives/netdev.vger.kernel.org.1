@@ -1,156 +1,319 @@
-Return-Path: <netdev+bounces-40084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22F0D7C5A6E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:43:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D0B7C5A8F
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B6211C20BDD
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:43:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1E2D282351
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585D639946;
-	Wed, 11 Oct 2023 17:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000D339946;
+	Wed, 11 Oct 2023 17:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hAmpXNdS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BYta/ZoM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C011939927
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 17:43:40 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CBD9D
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:43:37 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-4053f24c900so4835e9.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:43:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F1222300
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 17:53:25 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D6F8F
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:53:23 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-536ef8a7dcdso1430a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:53:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697046215; x=1697651015; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697046802; x=1697651602; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=POLgW7vGVBgqnLcSHIyA8aTEXOElLRzKVX3eHJN8DXY=;
-        b=hAmpXNdSaz28lqnQBkFSzH9ecccjTCq/JLqZhohzTZj7fWZ/bPX9wJpX2GK7HHntGR
-         eejisLJc8MMvZjnXo2LpxQ2tvQLdS3kf4fyEUyW+KKTJpn8X4FRMTqfXL5NEVElx1bjW
-         wYMlzZGg2ds4Q7h+eS/2luofulgFVkkraX2QRrNC9NgM/p3YPBSg2ZkvAl2kXfk5eufD
-         q9kd/7SXV47ODXYfkZ6TBJbcMnWB56kuZamBk3NSHIo+ZOHYIcJVzYKSS39MP+hjIrUe
-         6/5Cns/yEhdWfGI1WuRvHE8Kn4cxVxD71h/c+0NtEtoSkXXzo9bE3YXSofAW38rBDCuu
-         DahA==
+        bh=egXaxNWVQ5M/aN9LWpBlAHfgD1+JaDM5+YAVt7Ur/wg=;
+        b=BYta/ZoMOzSoiW/V80fEr6LMF33A90zYQJDNv5PDAqK2H/lLnU7dYtFw2ZlQVpBflv
+         TBKp6RMmoo4yJCvRgd3vFrolbFyIgxeUIuPUz7iL/tl2rfTlPPU4Cb8+N0MycEsCPGeJ
+         WhQy9DCcjIWpvaIbRu4cfRrpkMyCOgN4CXfezGz3wwcg4puBBkNvGcvAxtO2lSHOfh3k
+         VK/XeggQKTr8PZFfoWMt7I3U8NEEakVTQ8LrSCZufTz81hot1f49+60Z7nYDcV3Ud8Ia
+         vetCC7xK/pxGIFNAfpJ7WflZG164pRj95SpK8IUmvJNPd/tjJpx/jUwX+rukqd7RUBvn
+         qyng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697046215; x=1697651015;
+        d=1e100.net; s=20230601; t=1697046802; x=1697651602;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=POLgW7vGVBgqnLcSHIyA8aTEXOElLRzKVX3eHJN8DXY=;
-        b=k/ktL/27mx3+t2IwsEWIxe+BF8+huGDpEpZFLzP3u7DqTdbqeACPPNaLCtYlL39cxw
-         bTbAOdgpm2SK0zaSTeaTwjZP4cy3N5ETvOx81Lo36W1bYaLmHDyxVX5W/FYCSeuvMCcv
-         kPNlCDhvJpW6yZFJKXPiUetxPeaBjF7hU1dWSmin2pCkuCE/Yfb1M15/OFqQstMPP/2L
-         wZS3h9y/mKSqQsfwiIWmMVpOooxcekiiBt1gkR1A1dAFM+IGSj3/AusSnKqeJZVBSSxs
-         KeU0KI3w9vQX9ZDfnr+vPWTmUhamA5uu8Tb6drbeiKR+J0Ezg8lprl595mZB1kgdnb5G
-         mrqw==
-X-Gm-Message-State: AOJu0YyXNihYXm7n+IZ/LrjtZM4/tAQWpszJ1WLtEMWGD866IU5JY9q2
-	00xfRZd38setD7bPVX1Ofs1WzIaLgWBxgIeWvWgbiQ==
-X-Google-Smtp-Source: AGHT+IEF+mY6rg7imO16vhwcTa8BR4dYmyLxq+Ihn7VM5Sbft/PIxucsoX8vk+dLEu1yk5jdvUp9xRh+Tk2qO8x2Iuw=
-X-Received: by 2002:a05:600c:4f81:b0:405:38d1:e146 with SMTP id
- n1-20020a05600c4f8100b0040538d1e146mr149083wmq.4.1697046215172; Wed, 11 Oct
- 2023 10:43:35 -0700 (PDT)
+        bh=egXaxNWVQ5M/aN9LWpBlAHfgD1+JaDM5+YAVt7Ur/wg=;
+        b=T1bZcBd4ODzugr2hQbBvA73yUPkClQ/yO3DlU6dFBaqXEYh7wCfu7SEYXXiuZ7dlCN
+         CmMpVLri3t5AZ1r2Jsj0Y1qAteVo+oyEnKt5PQoXMkv2tQFhA0qlVTg4K5meFZLdt7Mv
+         3f1bfZORN0KqddFd3lBhqFq45jmVqzOk81B1aohm8Q6k6COgacxoPSOx94uwXqdIwTHE
+         nrGjy/KgWXt2OlcmRzCOpLjTcSbv5AGOaOhrMVJFylxGeNsK8uOBmWIwnbfjCiZal20d
+         CGNxec1ajL1hNYvCm2CLQENESrTSr8cZgUimHeceSEaSEDv4LYuIoJJxvsiD/ELcCGA/
+         yq6Q==
+X-Gm-Message-State: AOJu0YwmKNw+aStrKRfMkORteGJsImgkSZ+AKSLVpX6hLEUICO8Qy50i
+	G1C/ZxK8KReeCFEPYnIf3Qfp002JGRTZn191tRR5OQ==
+X-Google-Smtp-Source: AGHT+IGIYKVt+6BJ8+OH/a7wvZjQK5sbD32WHmDaiOVRbnYzrbpBZuqca6S0hNBBys5vgrSbSECmXjaoj0rnFPcm2LU=
+X-Received: by 2002:a50:aad8:0:b0:525:573c:643b with SMTP id
+ r24-20020a50aad8000000b00525573c643bmr183452edc.7.1697046801434; Wed, 11 Oct
+ 2023 10:53:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231010224630.238254-1-singhabhinav9051571833@gmail.com>
- <2023101136-irritate-shrine-cde6@gregkh> <3073e9a6-9f10-4326-9734-7e203d509888@gmail.com>
-In-Reply-To: <3073e9a6-9f10-4326-9734-7e203d509888@gmail.com>
+References: <20231009230722.76268-1-dima@arista.com> <20231009230722.76268-17-dima@arista.com>
+In-Reply-To: <20231009230722.76268-17-dima@arista.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Oct 2023 19:43:20 +0200
-Message-ID: <CANn89i+hMbhLqXKCF2P=HVeeRSCxvgH_xY1b=T=udLFJjG3ZwA@mail.gmail.com>
-Subject: Re: [PATCH] Remove extra unlock for the mutex
-To: Abhinav Singh <singhabhinav9051571833@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel-mentees@lists.linuxfoundation.org, linux-kernel@vger.kernel.org
+Date: Wed, 11 Oct 2023 19:53:10 +0200
+Message-ID: <CANn89i+LwYbzNd=mA8Hk0RTTy6siEUpGtJaRw7DdFQju_+4mjA@mail.gmail.com>
+Subject: Re: [PATCH v14 net-next 16/23] net/tcp: Ignore specific ICMPs for
+ TCP-AO connections
+To: Dmitry Safonov <dima@arista.com>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
+	Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>, 
+	Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>, 
+	David Laight <David.Laight@aculab.com>, Dmitry Safonov <0x7f454c46@gmail.com>, 
+	Donald Cassidy <dcassidy@redhat.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Eric W. Biederman" <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
+	"Gaillardetz, Dominik" <dgaillar@ciena.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Ivan Delalande <colona@arista.com>, 
+	Leonard Crestez <cdleonard@gmail.com>, "Nassiri, Mohammad" <mnassiri@ciena.com>, 
+	Salam Noureddine <noureddine@arista.com>, Simon Horman <simon.horman@corigine.com>, 
+	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
 	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 5:50=E2=80=AFPM Abhinav Singh
-<singhabhinav9051571833@gmail.com> wrote:
+On Tue, Oct 10, 2023 at 1:07=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
+ote:
 >
-> On 10/11/23 12:00, Greg KH wrote:
-> > On Wed, Oct 11, 2023 at 04:16:30AM +0530, Abhinav Singh wrote:
-> >> There is a double unlock on mutex. This can cause undefined behaviour.
-> >>
-> >> Signed-off-by: Abhinav Singh <singhabhinav9051571833@gmail.com>
-> >> ---
-> >>   net/ipv4/inet_connection_sock.c | 1 -
-> >>   1 file changed, 1 deletion(-)
-> >>
-> >> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connectio=
-n_sock.c
-> >> index aeebe8816689..f11fe8c727a4 100644
-> >> --- a/net/ipv4/inet_connection_sock.c
-> >> +++ b/net/ipv4/inet_connection_sock.c
-> >> @@ -597,7 +597,6 @@ int inet_csk_get_port(struct sock *sk, unsigned sh=
-ort snum)
-> >>      }
-> >>      if (head2_lock_acquired)
-> >>              spin_unlock(&head2->lock);
-> >> -    spin_unlock_bh(&head->lock);
-> >
-> > How was this tested?
-> >
-> > And where is the now-needed unlock of the head->lock?
-> >
-> > How was this change found?
-> >
-> > And your subject line needs a lot of work...
-> >
-> > thanks,
-> >
-> > greg k-h
-> Hello, I used sparse tool and got it this warning message "warning:
-> context imbalance in 'inet_csk_get_port' - unexpected unlock"
-> Due to my over excitement of sending a good patch to kernel I didnt see
-> correctly and misread `head` as `head2` and thought it was double
-> unlocking the mutex. I m very sorry. But on a different note think we
-> should do a check for `head->lock` as well before unlocking. Unlocking a
-> non locked mutex can also trigger a undefined behaviour.
+> Similarly to IPsec, RFC5925 prescribes:
+>   ">> A TCP-AO implementation MUST default to ignore incoming ICMPv4
+>   messages of Type 3 (destination unreachable), Codes 2-4 (protocol
+>   unreachable, port unreachable, and fragmentation needed -- =E2=80=99har=
+d
+>   errors=E2=80=99), and ICMPv6 Type 1 (destination unreachable), Code 1
+>   (administratively prohibited) and Code 4 (port unreachable) intended
+>   for connections in synchronized states (ESTABLISHED, FIN-WAIT-1, FIN-
+>   WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match MKTs."
 >
+> A selftest (later in patch series) verifies that this attack is not
+> possible in this TCP-AO implementation.
+>
+> Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
+> Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
+> Co-developed-by: Salam Noureddine <noureddine@arista.com>
+> Signed-off-by: Salam Noureddine <noureddine@arista.com>
+> Signed-off-by: Dmitry Safonov <dima@arista.com>
+> Acked-by: David Ahern <dsahern@kernel.org>
+> ---
+>  include/net/tcp_ao.h      | 10 ++++++-
+>  include/uapi/linux/snmp.h |  1 +
+>  include/uapi/linux/tcp.h  |  4 ++-
+>  net/ipv4/proc.c           |  1 +
+>  net/ipv4/tcp_ao.c         | 58 +++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/tcp_ipv4.c       |  7 +++++
+>  net/ipv6/tcp_ipv6.c       |  7 +++++
+>  7 files changed, 86 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+> index 8c315c3f31da..eec38e9e6380 100644
+> --- a/include/net/tcp_ao.h
+> +++ b/include/net/tcp_ao.h
+> @@ -24,6 +24,7 @@ struct tcp_ao_counters {
+>         atomic64_t      pkt_bad;
+>         atomic64_t      key_not_found;
+>         atomic64_t      ao_required;
+> +       atomic64_t      dropped_icmp;
+>  };
+>
+>  struct tcp_ao_key {
+> @@ -92,7 +93,8 @@ struct tcp_ao_info {
+>         struct tcp_ao_key       *rnext_key;
+>         struct tcp_ao_counters  counters;
+>         u32                     ao_required     :1,
+> -                               __unused        :31;
+> +                               accept_icmps    :1,
+> +                               __unused        :30;
+>         __be32                  lisn;
+>         __be32                  risn;
+>         /* Sequence Number Extension (SNE) are upper 4 bytes for SEQ,
+> @@ -191,6 +193,7 @@ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u=
+8 *key, void *ctx,
+>                             unsigned int len, struct tcp_sigpool *hp);
+>  void tcp_ao_destroy_sock(struct sock *sk, bool twsk);
+>  void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *=
+tp);
+> +bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code);
+>  enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
+>                         const struct sk_buff *skb, unsigned short int fam=
+ily,
+>                         const struct request_sock *req,
+> @@ -274,6 +277,11 @@ static inline void tcp_ao_syncookie(struct sock *sk,=
+ const struct sk_buff *skb,
+>  {
+>  }
+>
+> +static inline bool tcp_ao_ignore_icmp(const struct sock *sk, int type, i=
+nt code)
+> +{
+> +       return false;
+> +}
+> +
+>  static inline enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
+>                 const struct sk_buff *skb, unsigned short int family,
+>                 const struct request_sock *req, const struct tcp_ao_hdr *=
+aoh)
+> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+> index 06ddf4cd295c..47a6b47da66f 100644
+> --- a/include/uapi/linux/snmp.h
+> +++ b/include/uapi/linux/snmp.h
+> @@ -300,6 +300,7 @@ enum
+>         LINUX_MIB_TCPAOBAD,                     /* TCPAOBad */
+>         LINUX_MIB_TCPAOKEYNOTFOUND,             /* TCPAOKeyNotFound */
+>         LINUX_MIB_TCPAOGOOD,                    /* TCPAOGood */
+> +       LINUX_MIB_TCPAODROPPEDICMPS,            /* TCPAODroppedIcmps */
+>         __LINUX_MIB_MAX
+>  };
+>
+> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
+> index 62543f7c5523..e4ddca6178ca 100644
+> --- a/include/uapi/linux/tcp.h
+> +++ b/include/uapi/linux/tcp.h
+> @@ -404,7 +404,8 @@ struct tcp_ao_info_opt { /* setsockopt(TCP_AO_INFO) *=
+/
+>                 set_rnext       :1,     /* corresponding ::rnext */
+>                 ao_required     :1,     /* don't accept non-AO connects *=
+/
+>                 set_counters    :1,     /* set/clear ::pkt_* counters */
+> -               reserved        :28;    /* must be 0 */
+> +               accept_icmps    :1,     /* accept incoming ICMPs */
+> +               reserved        :27;    /* must be 0 */
+>         __u16   reserved2;              /* padding, must be 0 */
+>         __u8    current_key;            /* KeyID to set as Current_key */
+>         __u8    rnext;                  /* KeyID to set as Rnext_key */
+> @@ -412,6 +413,7 @@ struct tcp_ao_info_opt { /* setsockopt(TCP_AO_INFO) *=
+/
+>         __u64   pkt_bad;                /* failed verification */
+>         __u64   pkt_key_not_found;      /* could not find a key to verify=
+ */
+>         __u64   pkt_ao_required;        /* segments missing TCP-AO sign *=
+/
+> +       __u64   pkt_dropped_icmp;       /* ICMPs that were ignored */
+>  } __attribute__((aligned(8)));
+>
+>  /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
+> diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
+> index 3f643cd29cfe..5d3c9c96773e 100644
+> --- a/net/ipv4/proc.c
+> +++ b/net/ipv4/proc.c
+> @@ -302,6 +302,7 @@ static const struct snmp_mib snmp4_net_list[] =3D {
+>         SNMP_MIB_ITEM("TCPAOBad", LINUX_MIB_TCPAOBAD),
+>         SNMP_MIB_ITEM("TCPAOKeyNotFound", LINUX_MIB_TCPAOKEYNOTFOUND),
+>         SNMP_MIB_ITEM("TCPAOGood", LINUX_MIB_TCPAOGOOD),
+> +       SNMP_MIB_ITEM("TCPAODroppedIcmps", LINUX_MIB_TCPAODROPPEDICMPS),
+>         SNMP_MIB_SENTINEL
+>  };
+>
+> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+> index 801174c17853..168073cd1c89 100644
+> --- a/net/ipv4/tcp_ao.c
+> +++ b/net/ipv4/tcp_ao.c
+> @@ -15,6 +15,7 @@
+>
+>  #include <net/tcp.h>
+>  #include <net/ipv6.h>
+> +#include <net/icmp.h>
+>
+>  int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
+>                             unsigned int len, struct tcp_sigpool *hp)
+> @@ -44,6 +45,60 @@ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8=
+ *key, void *ctx,
+>         return 1;
+>  }
+>
+> +bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code)
+> +{
+> +       bool ignore_icmp =3D false;
+> +       struct tcp_ao_info *ao;
+> +
+> +       /* RFC5925, 7.8:
+> +        * >> A TCP-AO implementation MUST default to ignore incoming ICM=
+Pv4
+> +        * messages of Type 3 (destination unreachable), Codes 2-4 (proto=
+col
+> +        * unreachable, port unreachable, and fragmentation needed -- =E2=
+=80=99hard
+> +        * errors=E2=80=99), and ICMPv6 Type 1 (destination unreachable),=
+ Code 1
+> +        * (administratively prohibited) and Code 4 (port unreachable) in=
+tended
+> +        * for connections in synchronized states (ESTABLISHED, FIN-WAIT-=
+1, FIN-
+> +        * WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match M=
+KTs.
+> +        */
+> +       if (READ_ONCE(sk->sk_family) =3D=3D AF_INET) {
 
-There is no undefined behavior, only sparse that might be confused a little=
-.
+You can not use sk->sk_family to make this decision.
 
-I do not think we can express in sparse the fact that
-inet_csk_find_open_port() acquires head->lock
+ It could be AF_INET6 and yet the flow could be IPv4.  (dual stack)
 
-(head being the return value of this function...)
+Let the caller pass this information ?
 
-The following does not help.
+ tcp_ao_ignore_icmp(sk, AF_INET, type, code);
 
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_soc=
-k.c
-index aeebe881668996057d1495c84eee0f0b644b7ad0..ed7b3993316cd1ba0b2859b0bd3=
-f447e066bd3b5
-100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -323,6 +323,7 @@ static struct inet_bind_hashbucket *
- inet_csk_find_open_port(const struct sock *sk, struct
-inet_bind_bucket **tb_ret,
-                        struct inet_bind2_bucket **tb2_ret,
-                        struct inet_bind_hashbucket **head2_ret, int *port_=
-ret)
-+       __acquires(head->lock)
- {
-        struct inet_hashinfo *hinfo =3D tcp_or_dccp_get_hashinfo(sk);
-        int i, low, high, attempt_half, port, l3mdev;
+ tcp_ao_ignore_icmp(sk, AF_INET6, type, code);
+
+
+
+> +               if (type !=3D ICMP_DEST_UNREACH)
+> +                       return false;
+> +               if (code < ICMP_PROT_UNREACH || code > ICMP_FRAG_NEEDED)
+> +                       return false;
+> +       } else {
+> +               if (type !=3D ICMPV6_DEST_UNREACH)
+> +                       return false;
+> +               if (code !=3D ICMPV6_ADM_PROHIBITED && code !=3D ICMPV6_P=
+ORT_UNREACH)
+> +                       return false;
+> +       }
+> +
+> +       rcu_read_lock();
+> +       switch (sk->sk_state) {
+> +       case TCP_TIME_WAIT:
+> +               ao =3D rcu_dereference(tcp_twsk(sk)->ao_info);
+> +               break;
+> +       case TCP_SYN_SENT:
+> +       case TCP_SYN_RECV:
+> +       case TCP_LISTEN:
+> +       case TCP_NEW_SYN_RECV:
+> +               /* RFC5925 specifies to ignore ICMPs *only* on connection=
+s
+> +                * in synchronized states.
+> +                */
+> +               rcu_read_unlock();
+> +               return false;
+> +       default:
+> +               ao =3D rcu_dereference(tcp_sk(sk)->ao_info);
+> +       }
+> +
+> +       if (ao && !ao->accept_icmps) {
+> +               ignore_icmp =3D true;
+> +               __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAODROPPEDICMPS=
+);
+> +               atomic64_inc(&ao->counters.dropped_icmp);
+> +       }
+> +       rcu_read_unlock();
+> +
+> +       return ignore_icmp;
+> +}
+>
 
