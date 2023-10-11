@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-40138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748B47C5E8D
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE48C7C5E8E
 	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D6F5282587
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77811282635
 	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBEE18E29;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8981BDF8;
 	Wed, 11 Oct 2023 20:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFeze8RF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tD727yjU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0651BDE9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306CE1BDF0
 	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 20:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6772C433CB;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A705FC433C8;
 	Wed, 11 Oct 2023 20:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697056824;
-	bh=jHEi0Y6xyy53cF6gScEchm6fo51MjVaNLYsLSKHwAyo=;
+	bh=dATi6SPbmsK0LyfUa10RJymcqKJG8ssjHMQLlLmvz9k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jFeze8RF2KedqhitWGxTE5Mkxl5PUoaz2URA4BwCCSoCGe85fg6AnpIjo2oRBp579
-	 rlqbjV6ZVxYIjKHjE7r42PVM5J2PjT6Snp/4Zd4b3pfyQVp+FOd2UCdQDv4hT8ieVC
-	 jhuIisyfd6aVpWehuxTiPzKjvCQi2gvyf2tT7tGo+CWl4LZ4RKSp5RtZzB1BozFupv
-	 IiKwjR1zCSD1tsDW0q+kY5/FftPn+qRuFta7s1zZ3TKTxyB6wV4NsbT/5gU3qmA9e6
-	 9RraZMqLQ+hrjFJyzDakaL7EinJwKps8I9x0EPYRL9r7VZF/AsCFloyddz7Yv8rOoS
-	 Oi9p8yy1NWp1w==
+	b=tD727yjU5klHfhmEJXhbH1ASzu6q1/7D8bRfMrrQPHro+f/qgk1ljYHlJGiVPZ+/Y
+	 EfqDMxJztsfdsBM8yksiGw5r9xOxVfQReJJPJQWVwwqNLnwFT9aSoHGS+dBV3AMywD
+	 x+xMmgCgC3ofnqiezt89raWBNRECSylEdN9W5c/Ykf0ccyrKWd4V3qxyg5lIo/e7bI
+	 vZKSlOfEjy0E8JG2rLWAqKsq7ntx1N+00fGbokwtrq1BohPrE9ag434H4FVCpVrEp1
+	 sQBtLqKdWCIndGPDx70MWqaSt8xt0owGpPJp5OBFYJ5ACc0gPq82/GMRvn9ZZP83EP
+	 VOGiwGMNDkmxg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0726E21EDC;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 929B3C595C5;
 	Wed, 11 Oct 2023 20:40:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,48 +43,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V2 net-next 0/2] add vf fault detect support for HNS3 ethernet
- driver
+Subject: Re: [PATCH net-next] tools: ynl: use ynl-gen -o instead of stdout in
+ Makefile
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169705682465.25671.17446960049901806583.git-patchwork-notify@kernel.org>
+ <169705682459.25671.5732476278583655578.git-patchwork-notify@kernel.org>
 Date: Wed, 11 Oct 2023 20:40:24 +0000
-References: <20231007031215.1067758-1-shaojijie@huawei.com>
-In-Reply-To: <20231007031215.1067758-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shenjian15@huawei.com, wangjie125@huawei.com, liuyonglong@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231010202714.4045168-1-kuba@kernel.org>
+In-Reply-To: <20231010202714.4045168-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 7 Oct 2023 11:12:13 +0800 you wrote:
-> add vf fault detect support for HNS3 ethernet driver
+On Tue, 10 Oct 2023 13:27:14 -0700 you wrote:
+> Jiri added more careful handling of output of the code generator
+> to avoid wiping out existing files in
+> commit f65f305ae008 ("tools: ynl-gen: use temporary file for rendering")
+> Make use of the -o option in the Makefiles, it is already used
+> by ynl-regen.sh.
 > 
-> Jie Wang (2):
->   net: hns3: add hns3 vf fault detect cap bit support
->   net: hns3: add vf fault detect support
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
->  drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   5 +
->  .../hns3/hns3_common/hclge_comm_cmd.c         |   1 +
->  .../hns3/hns3_common/hclge_comm_cmd.h         |   2 +
->  .../ethernet/hisilicon/hns3/hns3_debugfs.c    |   3 +
->  .../hisilicon/hns3/hns3pf/hclge_err.c         | 116 +++++++++++++++++-
->  .../hisilicon/hns3/hns3pf/hclge_err.h         |   2 +
->  .../hisilicon/hns3/hns3pf/hclge_main.c        |   3 +-
->  .../hisilicon/hns3/hns3pf/hclge_main.h        |   2 +
->  .../hisilicon/hns3/hns3pf/hclge_mbx.c         |   2 +-
->  9 files changed, 129 insertions(+), 7 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - [V2,net-next,1/2] net: hns3: add hns3 vf fault detect cap bit support
-    https://git.kernel.org/netdev/net-next/c/f1bc63aa6e11
-  - [V2,net-next,2/2] net: hns3: add vf fault detect support
-    https://git.kernel.org/netdev/net-next/c/8a45c4f9e159
+  - [net-next] tools: ynl: use ynl-gen -o instead of stdout in Makefile
+    https://git.kernel.org/netdev/net-next/c/cb7fb0aa3cd8
 
 You are awesome, thank you!
 -- 
