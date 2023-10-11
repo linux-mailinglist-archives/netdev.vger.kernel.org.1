@@ -1,96 +1,190 @@
-Return-Path: <netdev+bounces-39828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB977C49A1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:10:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A15497C49AF
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:12:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5831C20BDD
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:10:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50B5C281DB0
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:12:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B5EFC09;
-	Wed, 11 Oct 2023 06:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC264101CA;
+	Wed, 11 Oct 2023 06:12:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XRXMBZH6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlz0jb/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCFCD2F0
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:10:35 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD52898
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:10:33 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-99de884ad25so1145517766b.3
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:10:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697004632; x=1697609432; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jm0uZxHMOJmgYhkcGqxg/YI4JPoYQgTRWeNJzX7sTQY=;
-        b=XRXMBZH689s6SE9BSAfEej4SPEKn7R7smWO/dHY7U8z5K1C4xq8qoxSHtYcWF3bRgk
-         ObxAEfuUywsfq9EhjNjmXU7AN3J8FekE9Y0GsSTA0VmMHmsBrsH6+xCIJyDAtosHUIPY
-         8C8oRxRFgpY4DkypRoN82f6rBrTdueUJinEC74ZIJRcMUL62ZItnqvCvTj5BmDfyidRQ
-         P7ZMS4ovZ+MU6abdMR1aNBpdH7fNbV8MBT8sF5IwiRMxRTw2OlOnEWAAtdtJdzUFKslb
-         vIii7VBr4nHxt5dSnaOQBYvGfKJuREZLtFupSG7zJZrD3bkYDGwa3oCw0PZyoTiz4hjh
-         q32Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697004632; x=1697609432;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jm0uZxHMOJmgYhkcGqxg/YI4JPoYQgTRWeNJzX7sTQY=;
-        b=ImTbQLfO7ByaeYjP4RAcSHnkHF0vlbqvKIEmssYi4i2WLSwPuilL7xe29Gyo/w7htI
-         lvdxEBLYhkMAKz2vKZglCXUaPISYMjNNMEPPJk/NKcH/cNpP1VYjAxZwFKBIB+TLkTXR
-         etaKBTRmGQJJdml0Wq4z8HKdNAb8TOyCfXgrr4cW25pQBIwoUwOcBF8SkjGCos7AmRjJ
-         21t/CjMeNm6NJmM3z2rOrXw4Ao9h13S/snCTY9trYyFKnm6vbRyzZng13+1V/fqJI/iY
-         vrSm31LwF6lYHy7HjQa+YHy0GLugqpTXmZC+D6dLs48MVle2KbLd3aGtQIgGXedVT2yL
-         3kfw==
-X-Gm-Message-State: AOJu0YweAt7Wc7DVGqX87xAcycpuUW6AEiCiKyFYLJlPRq+0I5oTLhyN
-	kEFgpGPOV5dSVCqp227Ti7mpDxA6IUzmjgJkcoI=
-X-Google-Smtp-Source: AGHT+IG/5kAacXk8hMU4fXeMHZnvoZcmqwE+ONbjMm0k5toxvvJoE90y7mU2w6p5bHwowmaa18iXKg==
-X-Received: by 2002:a17:906:2249:b0:9ae:5ba3:9d8f with SMTP id 9-20020a170906224900b009ae5ba39d8fmr18593920ejr.17.1697004632136;
-        Tue, 10 Oct 2023 23:10:32 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id lu20-20020a170906fad400b0099bcd1fa5b0sm9347842ejb.192.2023.10.10.23.10.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 23:10:31 -0700 (PDT)
-Date: Wed, 11 Oct 2023 08:10:30 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com
-Subject: Re: [patch net-next v2 0/3] devlink: don't take instance lock for
- nested handle put
-Message-ID: <ZSY8Vg0ztfMN93uV@nanopsycho>
-References: <20231010091323.195451-1-jiri@resnulli.us>
- <20231010121015.5d9bb45d@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC151354F0
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:12:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B8A0C433C8;
+	Wed, 11 Oct 2023 06:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697004753;
+	bh=JE7hCR2HfrbvQd/Ilcjyw7GRVT9mmvqNPuoK98MThj8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dlz0jb/VnThlrqjuDo07lt2NobTPxU66i0IwdhjYuhzQqhUZcpFY5pAPOrHKPtzAy
+	 r8yag7Ajf9Qyrrsa3SY0iShxEi4auwpACgQPXzktYR4dmuHqTiI2cDK4tw5MT0Uqwa
+	 EUGApvaPlEfM7miTCYmH1isjjCXgHwaK7FiA5t62nuDEzZRtWHoZTrp7qsVfZvrEgj
+	 u1hxdaSQwRd24zbHRZ+xDDhhSc0FGeIhq7xwc5xOVRGStktD8hWI4hu1KqgDI2U1hY
+	 ngUCI3vX77q9A5JhIPhDd26sJbXZbquDCUZBOZsEhvk6wVktgeSsv4kuCzh8Mtq5BI
+	 VQXenXntOT3/Q==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: [pull request][net-next 00/15] mlx5 updates 2023-10-10
+Date: Tue, 10 Oct 2023 23:12:15 -0700
+Message-ID: <20231011061230.11530-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010121015.5d9bb45d@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-Tue, Oct 10, 2023 at 09:10:15PM CEST, kuba@kernel.org wrote:
->On Tue, 10 Oct 2023 11:13:20 +0200 Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Lockdep reports following issue:
->
->Weren't you complaining about people posting stuff before discussion
->is over in the past? :)
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Sure, but it isn't? I believe that this fix is needed regardless of the
-A->B objects lifetime. If I'm missing something, sorry about that.
+This series provides misc updates to mlx5 driver.
+For more information please see tag log below.
+
+Please pull and let me know if there is any problem.
+
+Thanks,
+Saeed.
+
+
+The following changes since commit e5f061d5e340fefc663cacfe8f42f149d55bdb53:
+
+  net: dsa: realtek: rtl8365mb: replace deprecated strncpy with ethtool_sprintf (2023-10-10 20:05:23 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2023-10-10
+
+for you to fetch changes up to f1cb181d05116d7791398e1541f0a12376d78c40:
+
+  net/mlx5e: Allow IPsec soft/hard limits in bytes (2023-10-10 23:10:55 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2023-10-10
+
+1) Adham Faris, Increase max supported channels number to 256
+
+2) Leon Romanovsky, Allow IPsec soft/hard limits in bytes
+
+3) Shay Drory, Replace global mlx5_intf_lock with
+   HCA devcom component lock
+
+4) Wei Zhang, Optimize SF creation flow
+
+During SF creation, HCA state gets changed from INVALID to
+IN_USE step by step. Accordingly, FW sends vhca event to
+driver to inform about this state change asynchronously.
+Each vhca event is critical because all related SW/FW
+operations are triggered by it.
+
+Currently there is only a single mlx5 general event handler
+which not only handles vhca event but many other events.
+This incurs huge bottleneck because all events are forced
+to be handled in serial manner.
+
+Moreover, all SFs share same table_lock which inevitably
+impacts each other when they are created in parallel.
+
+This series will solve this issue by:
+
+1. A dedicated vhca event handler is introduced to eliminate
+   the mutual impact with other mlx5 events.
+2. Max FW threads work queues are employed in the vhca event
+   handler to fully utilize FW capability.
+3. Redesign SF active work logic to completely remove
+   table_lock.
+
+With above optimization, SF creation time is reduced by 25%,
+i.e. from 80s to 60s when creating 100 SFs.
+
+Patches summary:
+
+Patch 1 - implement dedicated vhca event handler with max FW
+          cmd threads of work queues.
+Patch 2 - remove table_lock by redesigning SF active work
+          logic.
+
+----------------------------------------------------------------
+Adham Faris (5):
+      net/mlx5e: Refactor rx_res_init() and rx_res_free() APIs
+      net/mlx5e: Refactor mlx5e_rss_set_rxfh() and mlx5e_rss_get_rxfh()
+      net/mlx5e: Refactor mlx5e_rss_init() and mlx5e_rss_free() API's
+      net/mlx5e: Preparations for supporting larger number of channels
+      net/mlx5e: Increase max supported channels number to 256
+
+Jinjie Ruan (1):
+      net/mlx5: Use PTR_ERR_OR_ZERO() to simplify code
+
+Leon Romanovsky (1):
+      net/mlx5e: Allow IPsec soft/hard limits in bytes
+
+Lukas Bulwahn (1):
+      net/mlx5: fix config name in Kconfig parameter documentation
+
+Shay Drory (3):
+      net/mlx5: Avoid false positive lockdep warning by adding lock_class_key
+      net/mlx5: Refactor LAG peer device lookout bus logic to mlx5 devcom
+      net/mlx5: Replace global mlx5_intf_lock with HCA devcom component lock
+
+Wei Zhang (2):
+      net/mlx5: Parallelize vhca event handling
+      net/mlx5: Redesign SF active work to remove table_lock
+
+Yu Liao (1):
+      net/mlx5e: Use PTR_ERR_OR_ZERO() to simplify code
+
+Yue Haibing (1):
+      net/mlx5: Remove unused declaration
+
+ .../ethernet/mellanox/mlx5/kconfig.rst             |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c      | 105 ++-------------
+ drivers/net/ethernet/mellanox/mlx5/core/en.h       |   5 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/fs.h    |   1 -
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   |  32 +++--
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   9 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.c   | 144 ++++++++++++++++-----
+ drivers/net/ethernet/mellanox/mlx5/core/en/rss.h   |  20 ++-
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.c    | 105 ++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/en/rx_res.h    |  12 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  23 ++--
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c         |  24 ++--
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h       |   1 -
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_fs.c    |   8 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |  32 ++---
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  27 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  16 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/events.c   |   5 -
+ .../net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c  |  24 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c  |  47 +++++--
+ drivers/net/ethernet/mellanox/mlx5/core/lag/lag.h  |   1 +
+ .../net/ethernet/mellanox/mlx5/core/lag/mpesw.c    |   9 +-
+ .../net/ethernet/mellanox/mlx5/core/lag/port_sel.c |  10 +-
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.c   |  25 ++++
+ .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   5 +
+ drivers/net/ethernet/mellanox/mlx5/core/lib/eq.h   |   1 -
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  25 ++++
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |  14 +-
+ .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c   |  85 ++++++++----
+ .../ethernet/mellanox/mlx5/core/sf/vhca_event.c    |  69 +++++++++-
+ .../ethernet/mellanox/mlx5/core/sf/vhca_event.h    |   3 +
+ .../mellanox/mlx5/core/steering/dr_types.h         |   4 -
+ include/linux/mlx5/driver.h                        |  16 +--
+ 34 files changed, 544 insertions(+), 367 deletions(-)
 
