@@ -1,122 +1,213 @@
-Return-Path: <netdev+bounces-40017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B170B7C5643
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:03:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93AD37C561E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:02:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA13B1C21218
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:03:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51A91C20BD8
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:02:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AC8200C8;
-	Wed, 11 Oct 2023 14:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E52200B1;
+	Wed, 11 Oct 2023 14:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fv1HVdZC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBXwWRKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0D920321;
-	Wed, 11 Oct 2023 14:03:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17310C433CC;
-	Wed, 11 Oct 2023 14:03:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697033004;
-	bh=zrhlLGL/7VohDIuN/EnFdfDCdV/hjo/fxSU8flcn0tg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fv1HVdZCtl1nJlrYvL4pbAyBWkP5ONV8qajJUP3MxqjnmH7ue9v7qW5IY/d5p+JX0
-	 XzuLDOSvYdqyJqrMue4njz27bUrf3is+UQkG+0Q30EQsfZtTHlO3p+vWGTF9182BkG
-	 UUZPGRKBvYwBTr5nY88nGPXcup+2wbUzlxEAQvEMiapopqvV58MnfdZ/sW10zJPlYl
-	 E70dw4/UxSSM1nf7fdjyNjc8LI/n6v2crN/Rbnix/VMb6o8TlrAZtLo1t6rNB+Yq83
-	 wlti2jF0kEbgmTnPqjaS6F5CjSxANi7pncq0av/3EA5s/UOfO5+eMuDlCeAIB06ZzP
-	 aRvesvlAVww2Q==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wpan@vger.kernel.org,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Rodolfo Zitellini <rwz@xhero.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 10/10] net: remove ndo_do_ioctl handler
-Date: Wed, 11 Oct 2023 16:02:25 +0200
-Message-Id: <20231011140225.253106-10-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231011140225.253106-1-arnd@kernel.org>
-References: <20231011140225.253106-1-arnd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409B81F944
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:02:49 +0000 (UTC)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5C092
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:02:47 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so14678a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:02:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697032965; x=1697637765; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TIpTq4vYeFsQKQrw8jRmaadaayiJcQf9ugdhN22sIQs=;
+        b=qBXwWRKfSt+95nqHc2cd7+dFjpWke393WIvflP1iY7t1B7d9tGFoT84iawZyB3/tiA
+         MKugu1t/FTXCM/ZAMDmTeLXo9tV5khLIRWqWByllwQqXxtjimXM/vRzS+xvwIpQQ3LIx
+         h/r4l0poJD2z31/Lr7TIojkomsh2fG+/vpFPO8nYe3pcUNhRz/PLRSHQg9MWSmT4NkeC
+         D9nZGF7s1H/D5AWPknx4NN81VRZbNg0/XKCo8bglBv8HLs/v4IZCkScZy+BuXtEszahI
+         +awVtUnSBHz7yTjLI/dbg0nav/rpn5IGSaJWxpeHD9FURI8pecBwQ9p7L8qP7K8WQcCl
+         pEVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697032965; x=1697637765;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TIpTq4vYeFsQKQrw8jRmaadaayiJcQf9ugdhN22sIQs=;
+        b=RjstOLkuYy/fsERc2JI6rEeqTTa1IrVqLh9hroJ9Avm4I9S9a/4+Cxsy01ug/CMTgX
+         pQvBNYCE+iTEuEvfLqff0FD/gxx+E+e6RUihg8EWPyowkdZNtRuV3VcdBTgHfshv/Yed
+         80xZg/SMnfeHQc3mCd3h2NcvIf+kg3b+MJupal8B9gMyyJ/MJ9dS0BgNYE3jcgomE7+j
+         T04uYUjmcPdFQAJICrEzEBxcbBJO6n4LRsz8NNuO+Eqaw91+lRRt62dEhGwehKh2htGo
+         8Mu6WPT0DlwD9ZQNU4ZN/jEvseKeNO9W9SKJg8R+ALEeGBCB26c1bnZyjFnvfGkl7WS5
+         QVbA==
+X-Gm-Message-State: AOJu0Ywo9Z1Mi7iWS7EBuxBFciKS08JasEqUutAC3ma7UEtxzjI2B8j1
+	w/KX9VAZ3uCWRToPzx7KiuSdLg7ht1lRq5Bh+w4fMg==
+X-Google-Smtp-Source: AGHT+IHeu8DtHkVvm7n5JrK7LFyyWhggPIiTEifsJ5lFnDtUwALkNp8Vu24jJDJhAeQBedNdiZsBdCZzcChbuMjaacU=
+X-Received: by 2002:a50:d089:0:b0:52f:5697:8dec with SMTP id
+ v9-20020a50d089000000b0052f56978decmr123671edd.4.1697032965276; Wed, 11 Oct
+ 2023 07:02:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAAvCjhiqtTBYNfgVHtOashJZuArY3mz2=938ip=5i4u_7wd85A@mail.gmail.com>
+In-Reply-To: <CAAvCjhiqtTBYNfgVHtOashJZuArY3mz2=938ip=5i4u_7wd85A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 11 Oct 2023 16:02:30 +0200
+Message-ID: <CANn89iJkOsrxGaAwhaJxd7xoH6cnSah+nV8rQ1X19U7H8NSkiw@mail.gmail.com>
+Subject: Re: kernel BUG at net/ipv4/tcp_output.c:2642 with kernel 5.19.0-rc2
+ and newer
+To: Dmitry Kravkov <dmitryk@qwilt.com>
+Cc: netdev@vger.kernel.org, "Slava (Ice) Sheremet" <slavas@qwilt.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Oct 11, 2023 at 12:28=E2=80=AFPM Dmitry Kravkov <dmitryk@qwilt.com>=
+ wrote:
+>
+> Hi,
+>
+> In our try to upgrade from 5.10 to 6.1 kernel we noticed stable crash
+> in kernel that bisected to this commit:
+>
+> commit 849b425cd091e1804af964b771761cfbefbafb43
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Tue Jun 14 10:17:34 2022 -0700
+>
+>     tcp: fix possible freeze in tx path under memory pressure
+>
+>     Blamed commit only dealt with applications issuing small writes.
+>
+>     Issue here is that we allow to force memory schedule for the sk_buff
+>     allocation, but we have no guarantee that sendmsg() is able to
+>     copy some payload in it.
+>
+>     In this patch, I make sure the socket can use up to tcp_wmem[0] bytes=
+.
+>
+>     For example, if we consider tcp_wmem[0] =3D 4096 (default on x86),
+>     and initial skb->truesize being 1280, tcp_sendmsg() is able to
+>     copy up to 2816 bytes under memory pressure.
+>
+>     Before this patch a sendmsg() sending more than 2816 bytes
+>     would either block forever (if persistent memory pressure),
+>     or return -EAGAIN.
+>
+>     For bigger MTU networks, it is advised to increase tcp_wmem[0]
+>     to avoid sending too small packets.
+>
+>     v2: deal with zero copy paths.
+>
+>     Fixes: 8e4d980ac215 ("tcp: fix behavior for epoll edge trigger")
+>     Signed-off-by: Eric Dumazet <edumazet@google.com>
+>     Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+>     Reviewed-by: Wei Wang <weiwan@google.com>
+>     Reviewed-by: Shakeel Butt <shakeelb@google.com>
+>     Signed-off-by: David S. Miller <davem@davemloft.net>
+>
+> This happens in a pretty stressful situation when two 100Gb (E810 or
+> ConnectX6) ports transmit above 150Gbps that most of the data is read
+> from disks. So it appears that the system is constantly in a memory
+> deficit. Apparently reverting the patch in 6.1.38 kernel eliminates
+> the crash and system appears stable at delivering 180Gbps
+>
+> [ 2445.532318] ------------[ cut here ]------------
+> [ 2445.532323] kernel BUG at net/ipv4/tcp_output.c:2642!
+> [ 2445.532334] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> [ 2445.550934] CPU: 61 PID: 109767 Comm: nginx Tainted: G S         OE
+>     5.19.0-rc2+ #21
+> [ 2445.560127] ------------[ cut here ]------------
+> [ 2445.560565] Hardware name: Cisco Systems Inc
+> UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
+> 11/21/2021
+> [ 2445.560571] RIP: 0010:tcp_write_xmit+0x70b/0x830
+> [ 2445.561221] kernel BUG at net/ipv4/tcp_output.c:2642!
+> [ 2445.561821] Code: 84 0b fc ff ff 0f b7 43 32 41 39 c6 0f 84 fe fb
+> ff ff 8b 43 70 41 39 c6 0f 82 ff 00 00 00 c7 43 30 01 00 00 00 e9 e6
+> fb ff ff <0f> 0b 8b 74 24 20 8b 85 dc 05 00 00 44 89 ea 01 c8 2b 43 28
+> 41 39
+> [ 2445.561828] RSP: 0000:ffffc110ed647dc0 EFLAGS: 00010246
+> [ 2445.561832] RAX: 0000000000000000 RBX: ffff9fe1f8081a00 RCX: 000000000=
+00005a8
+> [ 2445.561833] RDX: 000000000000043a RSI: 000002389172f8f4 RDI: 000000000=
+000febf
+> [ 2445.561835] RBP: ffff9fe5f864e900 R08: 0000000000000000 R09: 000000000=
+0000100
+> [ 2445.561836] R10: ffffffff9be060d0 R11: 000000000000000e R12: ffff9fe5f=
+864e901
+> [ 2445.561837] R13: 0000000000000001 R14: 00000000000005a8 R15: 000000000=
+0000000
+> [ 2445.561839] FS:  00007f342530c840(0000) GS:ffff9ffa7f940000(0000)
+> knlGS:0000000000000000
+> [ 2445.561842] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 2445.561844] CR2: 00007f20ca4ed830 CR3: 00000045d976e005 CR4: 000000000=
+0770ee0
+> [ 2445.561846] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000
+> [ 2445.561847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
+0000400
+> [ 2445.561849] PKRU: 55555554
+> [ 2445.561853] Call Trace:
+> [ 2445.561858]  <TASK>
+> [ 2445.564202] ------------[ cut here ]------------
+> [ 2445.568007]  ? tcp_tasklet_func+0x120/0x120
+> [ 2445.569107] kernel BUG at net/ipv4/tcp_output.c:2642!
+> [ 2445.569608]  tcp_tsq_handler+0x7c/0xa0
+> [ 2445.569627]  tcp_pace_kick+0x19/0x60
+> [ 2445.569632]  __run_hrtimer+0x5c/0x1d0
+> [ 2445.572264] ------------[ cut here ]------------
+> [ 2445.574287] ------------[ cut here ]------------
+> [ 2445.574292] kernel BUG at net/ipv4/tcp_output.c:2642!
+> [ 2445.582581]  __hrtimer_run_queues+0x7d/0xe0
+> --
+> --
+>
+> --
+> --
+>
+> Dmitry Kravkov     Software  Engineer
+> Qwilt | Mobile: +972-54-4839923 | dmitryk@qwilt.com
 
-All of the references to the callback pointer are gone, so remove the
-pointer itself before we grow new references to it.
+Hi Dmitry, thanks for the report.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Documentation/networking/netdevices.rst | 8 --------
- include/linux/netdevice.h               | 7 -------
- 2 files changed, 15 deletions(-)
+Can you post content of /proc/sys/net/ipv4/tcp_wmem and
+/proc/sys/net/ipv4/tcp_rmem ?
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 9e4cccb90b870..6f9b71c5d37b8 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -218,14 +218,6 @@ ndo_stop:
- 	Context: process
- 	Note: netif_running() is guaranteed false
- 
--ndo_do_ioctl:
--	Synchronization: rtnl_lock() semaphore.
--	Context: process
--
--        This is only called by network subsystems internally,
--        not by user space calling ioctl as it was in before
--        linux-5.14.
--
- ndo_siocbond:
-         Synchronization: rtnl_lock() semaphore.
-         Context: process
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e070a4540fbaf..8d1cc8f195cb6 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1121,11 +1121,6 @@ struct netdev_net_notifier {
-  * int (*ndo_validate_addr)(struct net_device *dev);
-  *	Test if Media Access Control address is valid for the device.
-  *
-- * int (*ndo_do_ioctl)(struct net_device *dev, struct ifreq *ifr, int cmd);
-- *	Old-style ioctl entry point. This is used internally by the
-- *	appletalk and ieee802154 subsystems but is no longer called by
-- *	the device ioctl handler.
-- *
-  * int (*ndo_siocbond)(struct net_device *dev, struct ifreq *ifr, int cmd);
-  *	Used by the bonding driver for its device specific ioctls:
-  *	SIOCBONDENSLAVE, SIOCBONDRELEASE, SIOCBONDSETHWADDR, SIOCBONDCHANGEACTIVE,
-@@ -1429,8 +1424,6 @@ struct net_device_ops {
- 	int			(*ndo_set_mac_address)(struct net_device *dev,
- 						       void *addr);
- 	int			(*ndo_validate_addr)(struct net_device *dev);
--	int			(*ndo_do_ioctl)(struct net_device *dev,
--					        struct ifreq *ifr, int cmd);
- 	int			(*ndo_eth_ioctl)(struct net_device *dev,
- 						 struct ifreq *ifr, int cmd);
- 	int			(*ndo_siocbond)(struct net_device *dev,
--- 
-2.39.2
+Are you using memcg ?
 
+Can you try the following patch ?
+
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 3f66cdeef7decb5b5d2b84212c623781b8ce63db..d74b197e02e94aa2f032f2c3971=
+969e604abc7de
+100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1286,6 +1286,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct
+msghdr *msg, size_t size)
+                continue;
+
+ wait_for_space:
++               tcp_remove_empty_skb(sk);
+                set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+                if (copied)
+                        tcp_push(sk, flags & ~MSG_MORE, mss_now,
 
