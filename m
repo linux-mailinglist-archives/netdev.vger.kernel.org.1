@@ -1,141 +1,121 @@
-Return-Path: <netdev+bounces-40124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83E97C5DA7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:32:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4467C5DC1
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A031628204A
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:32:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38FAF282256
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3065012E75;
-	Wed, 11 Oct 2023 19:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE4C1C69A;
+	Wed, 11 Oct 2023 19:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkSkfYnd"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UWcdhSUr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1118D12E49
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 19:32:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9236BC433C7;
-	Wed, 11 Oct 2023 19:32:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697052728;
-	bh=4k1m5qmcSDaP+SZOYD02LNDbpXJtj+6QzJq4iZ0fBT4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=PkSkfYndzZuEdhim2WqdUnaFkJa6/ULgDeXVhLamNMtNqjpEjDLFAOpinVDtpOf9t
-	 AUQ8IuXuDRsbGSvvuJcBOkesPKE+B6LOW3w499tPS1H5C+DTTGZEpqDhTJv73Rngtf
-	 R8n/q+wpIprV9354P5kNeMO1/5OdiCJZC921zzltoOp4qhTV4cqy8e0kXbMRCaqp4/
-	 wgSGTdLCtZ0E1cvfJh/3oqFSKgGnYoWCp1qvbc5VbvIvmnclEI+2/Ls3QSTesrpdOn
-	 1i9kPgcJmtJ/9DGNbL1W+mb7/ZJBeiArthYq4x+V47gI24Zx4H0qwEfuzJhfUtgURt
-	 hjOYzB4aN6mlQ==
-Date: Wed, 11 Oct 2023 14:32:06 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-pci@vger.kernel.org,
-	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-	ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 04/13] PCI/ASPM: Move L0S/L1/sub states mask
- calculation into a helper
-Message-ID: <20231011193206.GA1039708@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0213A29A;
+	Wed, 11 Oct 2023 19:45:39 +0000 (UTC)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247CE9D;
+	Wed, 11 Oct 2023 12:45:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697053538; x=1728589538;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=8OmQ7bKmuOJVi2WSBqHt5wslOzQRTduxnqMUB1NAfQE=;
+  b=UWcdhSUr+MgD+6UwOsbzUYsTYFyKf4xTlWG+T6gbjL/Tbmcv/dIogF1W
+   3iOuBdY21OK8ADMcS5W/2aZpLGYKHMyl/8EMQnSwscCvFC4Mbhoju7dn3
+   KUgSMIBfRS5u1omh14TyxqOGRK+XP6uovTA0IqdOEB65tYjLDPWw3EeTn
+   o=;
+X-IronPort-AV: E=Sophos;i="6.03,216,1694736000"; 
+   d="scan'208";a="369281259"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 19:45:32 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com (Postfix) with ESMTPS id A8CD940AEB;
+	Wed, 11 Oct 2023 19:45:31 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 19:45:31 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 19:45:29 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daan.j.demeyer@gmail.com>
+CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <kuniyu@amazon.com>,
+	<martin.lau@linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v10 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+Date: Wed, 11 Oct 2023 12:45:20 -0700
+Message-ID: <20231011194520.60480-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAO8sHcmFHLpk2LfJKxHcA_9y6TyouS0sr=8oj09gLGvGmhYavw@mail.gmail.com>
+References: <CAO8sHcmFHLpk2LfJKxHcA_9y6TyouS0sr=8oj09gLGvGmhYavw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230918131103.24119-5-ilpo.jarvinen@linux.intel.com>
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.62]
+X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Sep 18, 2023 at 04:10:54PM +0300, Ilpo Järvinen wrote:
-> ASPM service driver does the same L0S / L1S / sub states allowed
-> calculation in __pci_disable_link_state() and
-> pci_set_default_link_state().
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 11 Oct 2023 21:09:33 +0200
+> > From: Daan De Meyer <daan.j.demeyer@gmail.com>
+> > Date: Wed, 11 Oct 2023 20:37:49 +0200
+> > > > > @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+> > > > >       if (!ctx.uaddr) {
+> > > > >               memset(&unspec, 0, sizeof(unspec));
+> > > > >               ctx.uaddr = (struct sockaddr *)&unspec;
+> > > > > -     }
+> > > > > +             ctx.uaddrlen = 0;
+> > > > > +     } else
+> > > > > +             ctx.uaddrlen = *uaddrlen;
+> > > > >
+> > > > >       cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+> > > > > -     return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > > -                                  0, flags);
+> > > > > +     ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > > +                                 0, flags);
+> > > > > +
+> > > > > +     if (!ret && uaddrlen)
+> > > >
+> > > > nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
+> > >
+> > > Are you sure? uaddrlen can still be NULL if uaddr is also NULL
+> >
+> > How?  In the patch 2 and 4, it seems uaddrlen always points to an
+> > actual variable.
+> 
+> Right, I was assuming we don't know for sure how callers are calling
+> this function. It is right that right now no caller calls it with uaddrlen set
+> to NULL.
 
-Is there a typo or something here?  This patch only adds a call to
-__pci_disable_link_state(), not to pci_set_default_link_state().
+We need not to be defensive for future in-kernel users who should take
+care of that properly.
 
-> Create a helper to calculate the mask for the allowed states.
+
 > 
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/pci/pcie/aspm.c | 33 +++++++++++++++++++++------------
->  1 file changed, 21 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> index ec6d7a092ac1..91dc95aca90f 100644
-> --- a/drivers/pci/pcie/aspm.c
-> +++ b/drivers/pci/pcie/aspm.c
-> @@ -1034,6 +1034,26 @@ static struct pcie_link_state *pcie_aspm_get_link(struct pci_dev *pdev)
->  	return bridge->link_state;
->  }
->  
-> +static u8 pci_link_state_mask(int state)
-> +{
-> +	u8 result = 0;
-> +
-> +	if (state & PCIE_LINK_STATE_L0S)
-> +		result |= ASPM_STATE_L0S;
-> +	if (state & PCIE_LINK_STATE_L1)
-> +		result |= ASPM_STATE_L1;
-> +	if (state & PCIE_LINK_STATE_L1_1)
-> +		result |= ASPM_STATE_L1_1;
-> +	if (state & PCIE_LINK_STATE_L1_2)
-> +		result |= ASPM_STATE_L1_2;
-> +	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
-> +		result |= ASPM_STATE_L1_1_PCIPM;
-> +	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
-> +		result |= ASPM_STATE_L1_2_PCIPM;
-> +
-> +	return result;
-> +}
-> +
->  static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
->  {
->  	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
-> @@ -1063,18 +1083,7 @@ static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
->  	if (sem)
->  		down_read(&pci_bus_sem);
->  	mutex_lock(&aspm_lock);
-> -	if (state & PCIE_LINK_STATE_L0S)
-> -		link->aspm_disable |= ASPM_STATE_L0S;
-> -	if (state & PCIE_LINK_STATE_L1)
-> -		link->aspm_disable |= ASPM_STATE_L1;
-> -	if (state & PCIE_LINK_STATE_L1_1)
-> -		link->aspm_disable |= ASPM_STATE_L1_1;
-> -	if (state & PCIE_LINK_STATE_L1_2)
-> -		link->aspm_disable |= ASPM_STATE_L1_2;
-> -	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
-> -		link->aspm_disable |= ASPM_STATE_L1_1_PCIPM;
-> -	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
-> -		link->aspm_disable |= ASPM_STATE_L1_2_PCIPM;
-> +	link->aspm_disable |= pci_link_state_mask(state);
->  	pcie_config_aspm_link(link, policy_to_aspm_state(link));
->  
->  	if (state & PCIE_LINK_STATE_CLKPM)
-> -- 
-> 2.30.2
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> It still seems like a good idea to check for uaddr instead of uaddrlen though,
+> to mimic the same check that is done earlier in this function.
+
+Sounds good.
 
