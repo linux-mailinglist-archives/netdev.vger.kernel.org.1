@@ -1,173 +1,149 @@
-Return-Path: <netdev+bounces-39953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7707C4FD7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE3397C4FC9
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 12:13:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA8562821F0
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 155C3281D87
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A2F1DA4B;
-	Wed, 11 Oct 2023 10:15:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EFD1DA41;
+	Wed, 11 Oct 2023 10:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SnTcXD4Q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOyIQ4r+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13441DA49;
-	Wed, 11 Oct 2023 10:15:37 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9981C92;
-	Wed, 11 Oct 2023 03:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697019336; x=1728555336;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=CGI8OCuYRAuMfp/tnwmDEDUqTneEivLAfZlSuk7iWVc=;
-  b=SnTcXD4Q6Hul3893D3CLAQS5g+XIw8Oe7MR4qc0vPFHr02OKTPRO1Jen
-   iDlX1zvsGegnzWhhH7WQpFZ9BMVhRvMqcQqlRCzPVBTX4JhdcO7sHC7WH
-   RFnST+U5ZIIRnKxMfGRVVrLdEmm2kJQfd35UrX53X3qcsrrdS2jZ9wMDv
-   +FPV9KiJjbB6B9F5pUMZEugYVgv+N55Chp6pLCba3+Je64Dw6O/sz3CBD
-   RwMCLy4/7JjqZlIvNP7TCKX8t1z5PnUyT4ru6aEHOgXyuqsmsJ76n+6VC
-   2Y62dkqtZ8FXg2n5PS67uf1QXnosFr4c36mUId2nfnQB1RM0NXcVTzDBu
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="415672231"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="415672231"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 03:15:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="897576455"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="897576455"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by fmsmga001.fm.intel.com with ESMTP; 11 Oct 2023 03:13:48 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org
-Cc: vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH net-next v5 5/5] dpll: netlink/core: change pin frequency set behavior
-Date: Wed, 11 Oct 2023 12:12:36 +0200
-Message-Id: <20231011101236.23160-6-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
-References: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02801CFBE
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:13:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDBAA92
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697019200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RLI+gNG/Ik5TmE6Ss6b86D5IYiR1FClxUP9y17ZJqCA=;
+	b=EOyIQ4r+d4DqbIdUw1cLWbfBRYqYDdHDer+a0wnDqI+/uVpeSWRrk47/shhr9yKKtPEwnS
+	w2hj0/baw3OM/Gu20YCcLXwtTUSrjAQldQfPi551+nYajIVkGw+egw0s2ZsiqVo1UQBrNA
+	DKhQ22nIREL2p3gg0V+pUQmCgvaQO8g=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-22-HkqWGfsGPle0qX1RoxQjVg-1; Wed, 11 Oct 2023 06:13:18 -0400
+X-MC-Unique: HkqWGfsGPle0qX1RoxQjVg-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c296e65035so58465491fa.3
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:13:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697019197; x=1697623997;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RLI+gNG/Ik5TmE6Ss6b86D5IYiR1FClxUP9y17ZJqCA=;
+        b=bbikHl7xWhHp05lLlb4pmKN2Zftgfm5/LNtz2wbX1o9yEDSGtRv+L+TufeMypcD7qw
+         B+0gBnweJoXybOToyT89s0wh4DT550xywvMG+UbvfHGyndNVsaNBxzmkkNk3Xqfsb+ba
+         PlUibxFZNlHL1ZWk6vJck9p2lYgvxEYDDVn5TdRvQKZMV7hXtf7EwsS2yJgWHxeBZtB9
+         3wK2n8wnJrYxqTSSowyvrDIh/OF3CW48/dm5j+M3NZO4wdvyxpnMSDY3cXDcCzNUoaLG
+         4nL3bxhn/8642YnsEjC3A7qzCbj5fleSylvc6/yUVe1rKlnhwAH1gaoi6hiRuAfcOmUo
+         2BSw==
+X-Gm-Message-State: AOJu0Yz8PAxn3UpzFXC8XFG/JANdzB9URglWKwETqsGMVrr1KWbzPS3o
+	nS5sdgin6dJXkqICSAYib7by1c4GeYV9bgentPpYBsJoFpNc4/f/qmYhLx3gfvoLAP7FA9lTjky
+	Et0p60kxOEr3VqxDVDfl5eU9+MSp4xo/1
+X-Received: by 2002:a2e:9001:0:b0:2c1:7df1:14a6 with SMTP id h1-20020a2e9001000000b002c17df114a6mr18885593ljg.9.1697019197156;
+        Wed, 11 Oct 2023 03:13:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzgFBh7dpGZLMqhPmRhYZgbEoyXO+JEnPZeVd6y4j9UPTWyTctRlSWKtNno+D+4ydHwjWMyyV7Txz55onCUho=
+X-Received: by 2002:a2e:9001:0:b0:2c1:7df1:14a6 with SMTP id
+ h1-20020a2e9001000000b002c17df114a6mr18885577ljg.9.1697019196839; Wed, 11 Oct
+ 2023 03:13:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231010-upstream-net-next-20231006-mptcp-ynl-v1-0-18dd117e8f50@kernel.org>
+ <20231010-upstream-net-next-20231006-mptcp-ynl-v1-3-18dd117e8f50@kernel.org> <20231010180839.0617d61d@kernel.org>
+In-Reply-To: <20231010180839.0617d61d@kernel.org>
+From: Davide Caratti <dcaratti@redhat.com>
+Date: Wed, 11 Oct 2023 12:13:04 +0200
+Message-ID: <CAKa-r6sT=WaTFqumYOEzOKWZoUi0KQ8EYpQ753+C5JjjsUb3wA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/6] Documentation: netlink: add a YAML spec for mptcp
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Matthieu Baerts <matttbe@kernel.org>, mptcp@lists.linux.dev, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Mat Martineau <martineau@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Align the approach of pin frequency set behavior with the approach
-introduced with pin phase adjust set.
-Fail the request if any of devices did not registered the callback ops.
-If callback op on any pin's registered device fails, return error and
-rollback the value to previous one.
+hello, Jakub, thanks for looking at this!
 
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
- drivers/dpll/dpll_netlink.c | 50 +++++++++++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 8 deletions(-)
+On Wed, Oct 11, 2023 at 3:08=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 10 Oct 2023 21:21:44 +0200 Matthieu Baerts wrote:
+> > +definitions:
+> > +  -
+> > +    type: enum
+> > +    name: event-type
+> > +    enum-name: mptcp_event_type
+> > +    name-prefix: mptcp_event_
+>
+> I think you can use - instead of _ here.
+> For consistency with other families?
 
-diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-index 09a6c2a1ea92..a6dc3997bf5c 100644
---- a/drivers/dpll/dpll_netlink.c
-+++ b/drivers/dpll/dpll_netlink.c
-@@ -615,8 +615,10 @@ static int
- dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
- 		  struct netlink_ext_ack *extack)
- {
--	u64 freq = nla_get_u64(a);
--	struct dpll_pin_ref *ref;
-+	u64 freq = nla_get_u64(a), old_freq;
-+	struct dpll_pin_ref *ref, *failed;
-+	const struct dpll_pin_ops *ops;
-+	struct dpll_device *dpll;
- 	unsigned long i;
- 	int ret;
- 
-@@ -626,19 +628,51 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
- 	}
- 
- 	xa_for_each(&pin->dpll_refs, i, ref) {
--		const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
--		struct dpll_device *dpll = ref->dpll;
--
--		if (!ops->frequency_set)
-+		ops = dpll_pin_ops(ref);
-+		if (!ops->frequency_set || !ops->frequency_get) {
-+			NL_SET_ERR_MSG(extack, "frequency set not supported by the device");
- 			return -EOPNOTSUPP;
-+		}
-+	}
-+	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
-+	ops = dpll_pin_ops(ref);
-+	dpll = ref->dpll;
-+	ret = ops->frequency_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
-+				 dpll_priv(dpll), &old_freq, extack);
-+	if (ret) {
-+		NL_SET_ERR_MSG(extack, "unable to get old frequency value");
-+		return ret;
-+	}
-+	if (freq == old_freq)
-+		return 0;
-+
-+	xa_for_each(&pin->dpll_refs, i, ref) {
-+		ops = dpll_pin_ops(ref);
-+		dpll = ref->dpll;
- 		ret = ops->frequency_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
- 					 dpll, dpll_priv(dpll), freq, extack);
--		if (ret)
--			return ret;
-+		if (ret) {
-+			failed = ref;
-+			NL_SET_ERR_MSG_FMT(extack, "frequency set failed for dpll_id:%u",
-+					   dpll->id);
-+			goto rollback;
-+		}
- 	}
- 	__dpll_pin_change_ntf(pin);
- 
- 	return 0;
-+
-+rollback:
-+	xa_for_each(&pin->dpll_refs, i, ref) {
-+		if (ref == failed)
-+			break;
-+		ops = dpll_pin_ops(ref);
-+		dpll = ref->dpll;
-+		if (ops->frequency_set(pin, dpll_pin_on_dpll_priv(dpll, pin),
-+				       dpll, dpll_priv(dpll), old_freq, extack))
-+			NL_SET_ERR_MSG(extack, "set frequency rollback failed");
-+	}
-+	return ret;
- }
- 
- static int
--- 
-2.38.1
+right, I will convert the whole spec.
+
+>
+> > +    entries:
+> > +     -
+> > +      name: unspec
+> > +      value: 0
+>
+> 90% sure enums still start at 0, only attrs and msgs now default to 1.
+
+Just checked, value:0 is not needed for enums: I will remove it
+
+> > +     -
+> > +      name: announced
+> > +      value: 6
+> > +      doc:
+> > +        token, rem_id, family, daddr4 | daddr6 [, dport]
+> > +        A new address has been announced by the peer.
+> > +     -
+> > +      name: removed
+> > +      value: 7
+>
+> Follows 6 so no need for value?
+
+correct, will fix this too
+
+> > +      -
+> > +        name: addr6
+> > +        type: binary
+> > +        checks:
+> > +          min-len: 16
+>
+> Do you not want the exact length for this?
+> If YNL doesn't support something just LMK, we add stuff as needed..
+
+ohh yes, we had NLA_POLICY_EXACT_LEN before but ynl doesn't seem to
+support it. I can try to add the support and include another patch at
+the beginning of the series, is that ok?
+
+--=20
+davide
 
 
