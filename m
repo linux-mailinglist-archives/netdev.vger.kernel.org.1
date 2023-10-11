@@ -1,131 +1,163 @@
-Return-Path: <netdev+bounces-40003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F01CC7C5603
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:59:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C92E7C5611
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1D81C20998
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:59:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 004572821B2
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE7C200BE;
-	Wed, 11 Oct 2023 13:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="alJF+gkn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="POeVMESA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D43200BF;
+	Wed, 11 Oct 2023 14:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E431F94E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:58:55 +0000 (UTC)
-Received: from wout4-smtp.messagingengine.com (wout4-smtp.messagingengine.com [64.147.123.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF55A4;
-	Wed, 11 Oct 2023 06:58:53 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 10527320097E;
-	Wed, 11 Oct 2023 09:58:49 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 11 Oct 2023 09:58:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1697032729; x=1697119129; bh=55
-	13x7CGlfvER0v0ogwIOJMgIvkS5URYby8pnUxjHR8=; b=alJF+gknS2t5bXhjAI
-	sHkdyHEbB2MitewZdRAIdFZasn477ImxMwNrXFioAbdM/U416qCeUfcxm9BpHs0R
-	M4bK/poCaK1m8vfq95p64ppRkVYwHdBThVzOoqlDaoatV6H0MTzq0Q/Z+YJBnBxu
-	YDv2opHprMua5t8BGYHezCnyj45pYOUa6JsT4cIPv5BEc2JMq7yRbui/M546V3pc
-	6bOos0XpBCVBtt36Ah2ROhXetL2mxZk5zmL2zExElh0GP9jiX+97YDngBwKnwa3D
-	ZkMh42iadXSCupDijSt9sGgSlyqJM6Y1j58N2r5CONLd6K6pJbsvugGxUBf6TeCr
-	WQ5w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1697032729; x=1697119129; bh=5513x7CGlfvER
-	0v0ogwIOJMgIvkS5URYby8pnUxjHR8=; b=POeVMESARlnmKLJfn8KdtvyPlYTG6
-	rdbHlG0otsElBsUAP6PO/EUIOBpHrZ8kJjxMELYwVJn0l7mhV+ZxwMrZoD2TVOGG
-	W9BOLCQePG/hO54QeCtPGVNj8hmIrcoJq7MgKGUjQvO2Bw8p1cs9efMozPxMylmk
-	RyBox4WkV4QfKj69yjYchYSELECrYu2RxY/AKBoU2+NH1o6AI2BeLcDwI+L3xH5S
-	YM7ttmwmYMxKWU634w9OLqrgsAuB/kaqS6rej5kLeT7JDcMfd+0jUWkMLFG5Ejxb
-	FodyPV1/T2gJPZw8QEOMkhQ9dyy6ow6r/+s9EHLC6O4givhy8YlUNaDRA==
-X-ME-Sender: <xms:GaomZbV6q8RmxQ-S8K9LBD_37CNPSDmx7xYMsq3jygiS8iwY4mkR8A>
-    <xme:GaomZTn5EyqxG0KeWEWTmKosDZheRMiW-zCyd-5-IQ4DueQYUd9FEgq5X7bAmnSEf
-    wWsIYC4XyongdeR7VM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdeikecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:GaomZXarVgL099yr9bZj1XydrRvGNIQO4m8LHvsvLkCWI_ZwZN_cLQ>
-    <xmx:GaomZWVxnobGn3E7dcVdcMlXue6aDZ_YBtwrYxdLsgUICrxM5Bsa4g>
-    <xmx:GaomZVnKtgZSpIPxtAZb4PQGA2hRFkSzTmtWobTkurdjX2sX4Vqbqg>
-    <xmx:GaomZbfIN1j-4OmLC7i9t1_m52NFOc3VoWAWXckXvId4jDJxM-b7YQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 1AA24B60089; Wed, 11 Oct 2023 09:58:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4359A200BE
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 14:00:16 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92EF39E;
+	Wed, 11 Oct 2023 07:00:13 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0Vtx7pyZ_1697032809;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vtx7pyZ_1697032809)
+          by smtp.aliyun-inc.com;
+          Wed, 11 Oct 2023 22:00:09 +0800
+Date: Wed, 11 Oct 2023 22:00:09 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net 1/5] net/smc: fix dangling sock under state
+ SMC_APPFINCLOSEWAIT
+Message-ID: <20231011140009.GK92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <08cfd4d6-d12f-4e63-8f87-12cda83fa7b3@app.fastmail.com>
-In-Reply-To: <87v8bfezcz.fsf@kernel.org>
-References: <20231009141908.1767241-1-arnd@kernel.org>
- <20231009141908.1767241-9-arnd@kernel.org> <87v8bfezcz.fsf@kernel.org>
-Date: Wed, 11 Oct 2023 15:58:27 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Kalle Valo" <kvalo@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Jakub Kicinski" <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- linux-wireless@vger.kernel.org, "Johannes Berg" <johannes@sipsolutions.net>,
- linux-wpan@vger.kernel.org,
- "Michael Hennerich" <michael.hennerich@analog.com>,
- "Paolo Abeni" <pabeni@redhat.com>, "Eric Dumazet" <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- "Doug Brown" <doug@schmorgal.com>
-Subject: Re: [PATCH 09/10] wireless: hostap: remove unused ioctl function
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023, at 09:00, Kalle Valo wrote:
-> Arnd Bergmann <arnd@kernel.org> writes:
+On Wed, Oct 11, 2023 at 03:33:16PM +0800, D. Wythe wrote:
+>From: "D. Wythe" <alibuda@linux.alibaba.com>
 >
->> From: Arnd Bergmann <arnd@arndb.de>
->>
->> The ioctl handler has no actual callers in the kernel and is useless.
->> All the functionality should be reachable through the regualar interfaces.
->>
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>Considering scenario:
 >
-> In the title we prefer "wifi:" over "wireless:" but that's nitpicking. I
-> assume this goes via a net tree so:
+>				smc_cdc_rx_handler_rwwi
+>__smc_release
+>				sock_set_flag
+>smc_close_active()
+>sock_set_flag
+>
+>__set_bit(DEAD)			__set_bit(DONE)
 
-Changed for v2
+If I understand correctly, both operations should hold sock_lock,
+that means thay should not race, have I missed something ?
 
-> Acked-by: Kalle Valo <kvalo@kernel.org>
+>
+>Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+>if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
+>in smc_close_passive_work:
+>
+>if (sock_flag(sk, SOCK_DEAD) &&
+>	smc_close_sent_any_close(conn)) {
+>	sk->sk_state = SMC_CLOSED;
+>} else {
+>	/* just shutdown, but not yet closed locally */
+>	sk->sk_state = SMC_APPFINCLOSEWAIT;
+>}
+>
+>Replace sock_set_flags or __set_bit to set_bit will fix this problem.
+>Since set_bit is atomic.
+>
 
-Thanks
-
-> Let me know if I should take this to wireless-next instead.
-
-I think it's better to keep the series together and merge it
-through net-next directly, since the last patch depends on all
-the ones before it.
-
-     Arnd
+You should add a fixes tag.
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>---
+> net/smc/af_smc.c    | 4 ++--
+> net/smc/smc.h       | 5 +++++
+> net/smc/smc_cdc.c   | 2 +-
+> net/smc/smc_close.c | 2 +-
+> 4 files changed, 9 insertions(+), 4 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index bacdd97..5ad2a9f 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -275,7 +275,7 @@ static int __smc_release(struct smc_sock *smc)
+> 
+> 	if (!smc->use_fallback) {
+> 		rc = smc_close_active(smc);
+>-		sock_set_flag(sk, SOCK_DEAD);
+>+		smc_sock_set_flag(sk, SOCK_DEAD);
+> 		sk->sk_shutdown |= SHUTDOWN_MASK;
+> 	} else {
+> 		if (sk->sk_state != SMC_CLOSED) {
+>@@ -1742,7 +1742,7 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
+> 		if (new_clcsock)
+> 			sock_release(new_clcsock);
+> 		new_sk->sk_state = SMC_CLOSED;
+>-		sock_set_flag(new_sk, SOCK_DEAD);
+>+		smc_sock_set_flag(new_sk, SOCK_DEAD);
+> 		sock_put(new_sk); /* final */
+> 		*new_smc = NULL;
+> 		goto out;
+>diff --git a/net/smc/smc.h b/net/smc/smc.h
+>index 24745fd..e377980 100644
+>--- a/net/smc/smc.h
+>+++ b/net/smc/smc.h
+>@@ -377,4 +377,9 @@ void smc_fill_gid_list(struct smc_link_group *lgr,
+> int smc_nl_enable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+> int smc_nl_disable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+> 
+>+static inline void smc_sock_set_flag(struct sock *sk, enum sock_flags flag)
+>+{
+>+	set_bit(flag, &sk->sk_flags);
+>+}
+>+
+> #endif	/* __SMC_H */
+>diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+>index 89105e9..01bdb79 100644
+>--- a/net/smc/smc_cdc.c
+>+++ b/net/smc/smc_cdc.c
+>@@ -385,7 +385,7 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
+> 		smc->sk.sk_shutdown |= RCV_SHUTDOWN;
+> 		if (smc->clcsock && smc->clcsock->sk)
+> 			smc->clcsock->sk->sk_shutdown |= RCV_SHUTDOWN;
+>-		sock_set_flag(&smc->sk, SOCK_DONE);
+>+		smc_sock_set_flag(&smc->sk, SOCK_DONE);
+> 		sock_hold(&smc->sk); /* sock_put in close_work */
+> 		if (!queue_work(smc_close_wq, &conn->close_work))
+> 			sock_put(&smc->sk);
+>diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+>index dbdf03e..449ef45 100644
+>--- a/net/smc/smc_close.c
+>+++ b/net/smc/smc_close.c
+>@@ -173,7 +173,7 @@ void smc_close_active_abort(struct smc_sock *smc)
+> 		break;
+> 	}
+> 
+>-	sock_set_flag(sk, SOCK_DEAD);
+>+	smc_sock_set_flag(sk, SOCK_DEAD);
+> 	sk->sk_state_change(sk);
+> 
+> 	if (release_clcsock) {
+>-- 
+>1.8.3.1
 
