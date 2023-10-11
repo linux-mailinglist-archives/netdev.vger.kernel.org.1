@@ -1,124 +1,141 @@
-Return-Path: <netdev+bounces-40123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B090D7C5DA1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:26:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E83E97C5DA7
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6C021C20A7D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:26:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A031628204A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDD012E70;
-	Wed, 11 Oct 2023 19:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3065012E75;
+	Wed, 11 Oct 2023 19:32:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="brCOFB3I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkSkfYnd"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019EF3A28B
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 19:26:39 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9659A8F
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 12:26:38 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4065dea9a33so2767485e9.3
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 12:26:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1697052397; x=1697657197; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s+gO0mSqDg4QcIxRFz2gaAfqVGzM5xR2uCtXj7Go17g=;
-        b=brCOFB3IvobTXtT9+5AIdqfaaIn/h8BnwDMZIr4QXkfJYKxzfvpxrhmA38SKqhw39x
-         2g5sE/JbBJpr0MwiYaylm99ZrvP8/JUB0fknE2H3WPwiT432roRwC9xXoxpajkkDX1yR
-         b482KF0NVkFC/Lvr1zQVwebSDafBcRYojiIEwvVHGOCGXVTf2cXcxstB8f4MTslJgF/W
-         /4/eYRQmQURp4/8htFmvBLs70NmTLI4Qq+ILJP3onBKrvhEF+h6AiaA5P0IrADyQHcE5
-         kcAZ2GCG5Eu3/q0GoE7/GhYuF7nSSTIEz+bm5lavjJSWC8Y3+5akh3FTWUGZhZYL2smW
-         WUSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697052397; x=1697657197;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+gO0mSqDg4QcIxRFz2gaAfqVGzM5xR2uCtXj7Go17g=;
-        b=coALW/ZVFHTKZW58Hn+/p1LuX4OcYfdTB3PFygcyARcM33+lBj1IhwAEKo8HcVU9xZ
-         Bt/shkNnjiAvW65W4ufvmAiW9cGY7WOPOuS+bf9dzGxIjSy9WlQ+njtgG6+9h7uUs1FB
-         UaaZ0vILfFxRIuKjLVtG5bzLAbrIV0ZzFACo23+hw8O9Pbk5vyRrWaO5puVFfL8HZkpK
-         nordrdTF+KckZ8cnh2GZ43VmMs5ZDq+6Q9hp7IO/CTM+dMxZQ3Qw1c3rBlRPNNYtFGuf
-         A1ZV8qd7oBHoGe7VEop6cWS0yuVAypXid92UFqS65KF+HbROfqSeNWdPT+FzNjE9Gwyt
-         WgWA==
-X-Gm-Message-State: AOJu0Yx3+e/bj2j2d4B4zZCfOoR/95YKEWMLh4cP8EPMEH1UfeVDo+1K
-	MBYyMJtfcwGV8uCs7TUUTTx7dw==
-X-Google-Smtp-Source: AGHT+IGVTItGcrefYtBoo/699f/08MHZ4RycfQIrEArC8+mialu1KWxKMnQ1J1lh+WVeCHzvIi8Luw==
-X-Received: by 2002:a7b:c5c9:0:b0:403:272:4414 with SMTP id n9-20020a7bc5c9000000b0040302724414mr19441809wmk.0.1697052397010;
-        Wed, 11 Oct 2023 12:26:37 -0700 (PDT)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id k14-20020a05600c0b4e00b003fe1fe56202sm17602323wmr.33.2023.10.11.12.26.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 12:26:36 -0700 (PDT)
-Message-ID: <4bde3c5d-7c58-4e78-a3fa-8f7c5f71a9bb@arista.com>
-Date: Wed, 11 Oct 2023 20:26:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1118D12E49
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 19:32:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9236BC433C7;
+	Wed, 11 Oct 2023 19:32:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697052728;
+	bh=4k1m5qmcSDaP+SZOYD02LNDbpXJtj+6QzJq4iZ0fBT4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=PkSkfYndzZuEdhim2WqdUnaFkJa6/ULgDeXVhLamNMtNqjpEjDLFAOpinVDtpOf9t
+	 AUQ8IuXuDRsbGSvvuJcBOkesPKE+B6LOW3w499tPS1H5C+DTTGZEpqDhTJv73Rngtf
+	 R8n/q+wpIprV9354P5kNeMO1/5OdiCJZC921zzltoOp4qhTV4cqy8e0kXbMRCaqp4/
+	 wgSGTdLCtZ0E1cvfJh/3oqFSKgGnYoWCp1qvbc5VbvIvmnclEI+2/Ls3QSTesrpdOn
+	 1i9kPgcJmtJ/9DGNbL1W+mb7/ZJBeiArthYq4x+V47gI24Zx4H0qwEfuzJhfUtgURt
+	 hjOYzB4aN6mlQ==
+Date: Wed, 11 Oct 2023 14:32:06 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc: linux-pci@vger.kernel.org,
+	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+	ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+	ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 04/13] PCI/ASPM: Move L0S/L1/sub states mask
+ calculation into a helper
+Message-ID: <20231011193206.GA1039708@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v14 net-next 09/23] net/tcp: Add TCP-AO sign to twsk
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- linux-kernel@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>,
- Ard Biesheuvel <ardb@kernel.org>, Bob Gilligan <gilligan@arista.com>,
- Dan Carpenter <error27@gmail.com>, David Laight <David.Laight@aculab.com>,
- Dmitry Safonov <0x7f454c46@gmail.com>, Donald Cassidy <dcassidy@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Eric W. Biederman"
- <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>,
- "Gaillardetz, Dominik" <dgaillar@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- "Nassiri, Mohammad" <mnassiri@ciena.com>,
- Salam Noureddine <noureddine@arista.com>,
- Simon Horman <simon.horman@corigine.com>,
- "Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-References: <20231009230722.76268-1-dima@arista.com>
- <20231009230722.76268-10-dima@arista.com>
- <CANn89iLD=ySFfPYkrb+oN2fuMhimxXfHrhs4Pv9_60f912rzmQ@mail.gmail.com>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <CANn89iLD=ySFfPYkrb+oN2fuMhimxXfHrhs4Pv9_60f912rzmQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20230918131103.24119-5-ilpo.jarvinen@linux.intel.com>
 
-On 10/11/23 19:10, Eric Dumazet wrote:
-> On Tue, Oct 10, 2023 at 1:07 AM Dmitry Safonov <dima@arista.com> wrote:
-[..]
->>  static inline struct tcp_timewait_sock *tcp_twsk(const struct sock *sk)
->> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
->> index 629ab0365b83..af2caf7e76fc 100644
->> --- a/include/net/tcp_ao.h
->> +++ b/include/net/tcp_ao.h
->> @@ -85,6 +85,7 @@ struct tcp_ao_info {
->>                                 __unused        :31;
->>         __be32                  lisn;
->>         __be32                  risn;
->> +       atomic_t                refcnt;         /* Protects twsk destruction */
+On Mon, Sep 18, 2023 at 04:10:54PM +0300, Ilpo Järvinen wrote:
+> ASPM service driver does the same L0S / L1S / sub states allowed
+> calculation in __pci_disable_link_state() and
+> pci_set_default_link_state().
+
+Is there a typo or something here?  This patch only adds a call to
+__pci_disable_link_state(), not to pci_set_default_link_state().
+
+> Create a helper to calculate the mask for the allowed states.
 > 
-> This needs to be a refcount_t
-
-Sure, sounds good.
-
-Thanks,
-           Dmitry
-
+> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> ---
+>  drivers/pci/pcie/aspm.c | 33 +++++++++++++++++++++------------
+>  1 file changed, 21 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> index ec6d7a092ac1..91dc95aca90f 100644
+> --- a/drivers/pci/pcie/aspm.c
+> +++ b/drivers/pci/pcie/aspm.c
+> @@ -1034,6 +1034,26 @@ static struct pcie_link_state *pcie_aspm_get_link(struct pci_dev *pdev)
+>  	return bridge->link_state;
+>  }
+>  
+> +static u8 pci_link_state_mask(int state)
+> +{
+> +	u8 result = 0;
+> +
+> +	if (state & PCIE_LINK_STATE_L0S)
+> +		result |= ASPM_STATE_L0S;
+> +	if (state & PCIE_LINK_STATE_L1)
+> +		result |= ASPM_STATE_L1;
+> +	if (state & PCIE_LINK_STATE_L1_1)
+> +		result |= ASPM_STATE_L1_1;
+> +	if (state & PCIE_LINK_STATE_L1_2)
+> +		result |= ASPM_STATE_L1_2;
+> +	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
+> +		result |= ASPM_STATE_L1_1_PCIPM;
+> +	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
+> +		result |= ASPM_STATE_L1_2_PCIPM;
+> +
+> +	return result;
+> +}
+> +
+>  static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
+>  {
+>  	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
+> @@ -1063,18 +1083,7 @@ static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
+>  	if (sem)
+>  		down_read(&pci_bus_sem);
+>  	mutex_lock(&aspm_lock);
+> -	if (state & PCIE_LINK_STATE_L0S)
+> -		link->aspm_disable |= ASPM_STATE_L0S;
+> -	if (state & PCIE_LINK_STATE_L1)
+> -		link->aspm_disable |= ASPM_STATE_L1;
+> -	if (state & PCIE_LINK_STATE_L1_1)
+> -		link->aspm_disable |= ASPM_STATE_L1_1;
+> -	if (state & PCIE_LINK_STATE_L1_2)
+> -		link->aspm_disable |= ASPM_STATE_L1_2;
+> -	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
+> -		link->aspm_disable |= ASPM_STATE_L1_1_PCIPM;
+> -	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
+> -		link->aspm_disable |= ASPM_STATE_L1_2_PCIPM;
+> +	link->aspm_disable |= pci_link_state_mask(state);
+>  	pcie_config_aspm_link(link, policy_to_aspm_state(link));
+>  
+>  	if (state & PCIE_LINK_STATE_CLKPM)
+> -- 
+> 2.30.2
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 
