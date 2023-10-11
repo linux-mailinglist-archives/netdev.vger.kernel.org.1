@@ -1,124 +1,142 @@
-Return-Path: <netdev+bounces-39907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AE37C4D74
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:44:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD267C4D85
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C5E1C20BAC
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242831C20D41
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CE9171A0;
-	Wed, 11 Oct 2023 08:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641DF199D4;
+	Wed, 11 Oct 2023 08:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dT+tBHk6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E8pWZ2Ag"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD079F2
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 08:44:29 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4A394;
-	Wed, 11 Oct 2023 01:44:27 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39B8RUv5019014;
-	Wed, 11 Oct 2023 08:44:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=CKLbAFMH6LvLAXG8dHAwMBaeUjwDW9MIJWByHMsusBI=;
- b=dT+tBHk6CNe7U86tGoKC9np3s6vIL602iOt11ZzW4bf3TkKG6pvYvo5ZyiNedDzR61Qx
- TZf3qk0nqursWf0jDSPOqU9sxQMxUPbFAz03hLYvCblnF8Vppv+542w2++XHybGVFVog
- L394/egviRXuSn/4wZgYXynrxJSbh2Dm5KpyUuyQKjDsFn71R8tlPpVm2/vL//T+P1FQ
- xZ8t6I16+5cUhqHK6tIVywYy5FzGWupnoEbRCn0AxMwwM4pEaY8c6dK8ANxtwZc2wLQC
- ZwNbjeYrhWZ3LfIbVBTzyauHwybQG1Yde1Si2onHWJqVI5VFkKNEhpE21518oj32cutR bA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnr78gn50-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 08:44:25 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39B8Rtut020491;
-	Wed, 11 Oct 2023 08:44:24 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnr78gn2e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 08:44:24 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39B6bgpi001239;
-	Wed, 11 Oct 2023 08:44:22 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvjxdab-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 08:44:21 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39B8iJHr12911180
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Oct 2023 08:44:19 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0BEBC2004D;
-	Wed, 11 Oct 2023 08:44:19 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BE55A20043;
-	Wed, 11 Oct 2023 08:44:18 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.60])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 11 Oct 2023 08:44:18 +0000 (GMT)
-Date: Wed, 11 Oct 2023 10:44:16 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-        wintera@linux.ibm.com, kuba@kernel.org, davem@davemloft.net,
-        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net 2/5] net/smc: fix incorrect barrier usage
-Message-ID: <20231011084416.6942-A-hca@linux.ibm.com>
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-3-git-send-email-alibuda@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E95156FD;
+	Wed, 11 Oct 2023 08:47:41 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3433C94;
+	Wed, 11 Oct 2023 01:47:39 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-693375d2028so5897665b3a.2;
+        Wed, 11 Oct 2023 01:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697014058; x=1697618858; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5PHd4L11YnGUPoVNdOQWl2i7d9heDpgbDvz1RYjLYGo=;
+        b=E8pWZ2AgZQklRG238cKQVbMARt6w17HVIcabdkMGTcdXdg7N/aD+wpIvfiBJjxG4gM
+         Mj0f3YHZZBcP6Btm+dWcNBeWN4DN3/HdNryEsnmS/upGXVTK9VDO3JWfZOf4X4sTYfIk
+         cNKCnvmthbvcV8SMFfT6polyc9b8a9UaHzA+q7JNIjaIYY/axPsrGs8vAXaZ1GJ/Vckt
+         aHNK7+YpHD/bHTpVnOebg7s4GiEH0gkGfz2lF4kU9AWgyrHRzvbNfUMWC4lU3LzF+dYw
+         JGGjY+543iHL2kneytDSRGmM9B1Fw6ucD3ouSdblO4g/FxPPeFUJK2Y8guzjs5XltUSn
+         +Ljw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697014058; x=1697618858;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5PHd4L11YnGUPoVNdOQWl2i7d9heDpgbDvz1RYjLYGo=;
+        b=cVL/+tQiOzm620BPjkuv+Dgv754OgJoJIZS07xbwHnv2ZX+xVw8/Tsdp6kK0lIEytN
+         h4BWHaCDAdhr2r14PPIz4BbAzKhdxDIKxk9CLTX1p3KHh0PkSjbGK3D9z2fKT7bs7L2i
+         V2sc+Ih0L5wfrBM9yzRmGIaIxjVYov/BUyKajVuXGclZb1f4I2GvZQaoC5gWjtuEw08h
+         ocNWMpOTzAabVkU/EdayNW9tzU52mdoZhAJiwgmlXBH3AW2+M8DMCE5k8dlFSmXP/4Xk
+         ikBE47qFI0j12O7pqzMByho+kFgDuRPW8oOhvlknMJgHHU59BFct06LZL7JWKZfRvwAd
+         HOIg==
+X-Gm-Message-State: AOJu0YyC3ws2jy4EQYaNeCJbjDZ3ISUFG28bQZ9VJ2U58TzmtQcncUiR
+	CwL27qSsG2aC4tFA7E750yU=
+X-Google-Smtp-Source: AGHT+IHKp/lP2UEjdreQ/MNJ3ZVCxCcslScZQgnSOtE2Q68tcxarXWrfg8amvM0SQrX/eavqTPhfmw==
+X-Received: by 2002:a05:6a00:234a:b0:68f:b5a1:12bf with SMTP id j10-20020a056a00234a00b0068fb5a112bfmr24118194pfj.29.1697014058577;
+        Wed, 11 Oct 2023 01:47:38 -0700 (PDT)
+Received: from debian.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id fb15-20020a056a002d8f00b006932657075bsm7797963pfb.82.2023.10.11.01.47.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 01:47:37 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 3F2968222031; Wed, 11 Oct 2023 15:47:34 +0700 (WIB)
+Date: Wed, 11 Oct 2023 15:47:33 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	corbet@lwn.net, workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org, andrew@lunn.ch,
+	jesse.brandeburg@intel.com, sd@queasysnail.net, horms@verge.net.au,
+	przemyslaw.kitszel@intel.com, f.fainelli@gmail.com,
+	jiri@resnulli.us, ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next v2] docs: try to encourage (netdev?) reviewers
+Message-ID: <ZSZhJW92xsLVdtFw@debian.me>
+References: <20231011024224.161282-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="N/jma408R2QpVyun"
 Content-Disposition: inline
-In-Reply-To: <1697009600-22367-3-git-send-email-alibuda@linux.alibaba.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TGVlvUGEnTMcc16Bx-3_7D9l1mGSpslk
-X-Proofpoint-ORIG-GUID: N9KOuIc_ajiHmIrov9IAuuB9NdAT0JMh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-11_06,2023-10-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=295 clxscore=1011
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2309180000 definitions=main-2310110076
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20231011024224.161282-1-kuba@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 03:33:17PM +0800, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> This patch add explicit CPU barrier to ensure memory
-> consistency rather than compiler barrier.
-> 
-> Besides, the atomicity between READ_ONCE and cmpxhcg cannot
-> be guaranteed, so we need to use atomic ops. The simple way
-> is to replace READ_ONCE with xchg.
-> 
-> Fixes: 475f9ff63ee8 ("net/smc: fix application data exception")
-> Co-developed-by: Heiko Carstens <hca@linux.ibm.com>
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 
-^^^
-I did not Co-develop this, nor did I provide an explicit Signed-off-by.
-Please don't add Signed-off-by statements which have not been explicitly
-agreed on.
+--N/jma408R2QpVyun
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Oct 10, 2023 at 07:42:24PM -0700, Jakub Kicinski wrote:
+> +Another technique that is useful in case of a disagreement is to ask for=
+ others
+> +to chime in. If a discussion reaches a stalemate after a few exchanges,
+> +then call for opinions of other reviewers or maintainers. Often those in
+> +agreement with a reviewer remain silent unless called upon.
+> +The opinion of multiple people carries exponentially more weight.
+
+or no conclusing replies?
+
+> +
+> +There is no strict requirement to use specific tags like ``Reviewed-by``.
+> +In fact reviews in plain English are more informative and encouraged
+> +even when a tag is provided, e.g. "I looked at aspects A, B and C of this
+> +submission and it looks good to me."
+> +Some form of a review message or reply is obviously necessary otherwise
+> +maintainers will not know that the reviewer has looked at the patch at a=
+ll!
+> +
+
+So a bare Reviewed-by: tag is enough to be a reviewer, right?
+
+> +Last but not least patch review may become a negative process, focused
+> +on pointing out problems. Please throw in a compliment once in a while,
+> +particularly for newbies!
+
+=2E.. to encourage them contributing more.
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--N/jma408R2QpVyun
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZSZhIQAKCRD2uYlJVVFO
+oymvAP9DmFsyNnwltxdWdQ8mYcBNUcosrEZXiATNE4F9MoPGEwD9HHMb9gqbleNj
+6Pn6Ea3JGk95CyppmVUuy+N53qybgQA=
+=hKvm
+-----END PGP SIGNATURE-----
+
+--N/jma408R2QpVyun--
 
