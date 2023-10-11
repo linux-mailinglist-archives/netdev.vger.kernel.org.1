@@ -1,425 +1,150 @@
-Return-Path: <netdev+bounces-39805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 387507C485C
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 05:18:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B19C7C486E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 05:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF894281DA7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:18:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F4B11C20CAA
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE0563B9;
-	Wed, 11 Oct 2023 03:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zdg1ziml"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9D66AA0;
+	Wed, 11 Oct 2023 03:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CC163A0
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:18:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F3039B
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1696994321;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xijA8OQKKxwJQ4dCZ6kmx4etcCusbkgY4bBpmAh8Dog=;
-	b=Zdg1zimlRuyhBYG40snTVgMKyCfQhoRgEINuhggrLBCSX0vQLJHnezj2MtWkSllq3xKEUZ
-	4Nq279xlPLV5Sjopm6mHbWem8S2G5cNdwJAGUg0jbNP4nPXn+A5+FMagEfE6m53UH0Kjkm
-	Qz+qPMVWuoaGo+XRtPNZPPF1Cddsm7Y=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-bF8HuuibPJyMJ5lKo23WQg-1; Tue, 10 Oct 2023 23:18:39 -0400
-X-MC-Unique: bF8HuuibPJyMJ5lKo23WQg-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5056eada207so5931299e87.1
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:18:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696994318; x=1697599118;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xijA8OQKKxwJQ4dCZ6kmx4etcCusbkgY4bBpmAh8Dog=;
-        b=qBtqy2q0br1cgxgWlcMh9MrX4+ileXKD5Fv73D1t4YFciup2OVegcU9mUBuL40tKvV
-         Q9HcV6whEPg6C1zqN9coK4H+FeWNBMZ2+oj3hDZrbXaLUfoIKF0zqXlzuSn5gNCoS1rf
-         r3UmL3fVhylxHEZR7dfJJTRaaBm5WTF4pE2k/zuPDJNP904MUHfDl6PKvwy3mapgRZV1
-         J1HVXgMVsUjR/nbjasS2o97qVB5va90abIACNj6XR8pwmiizjND6NbJjyQiXOeHyPKMX
-         fpQKXYPIxXgWEzpIabh0QMgJ2FnKkTouvXnjtY85Vs4uqAKK59CFYC5ZDR/ifrADPUvj
-         iWsA==
-X-Gm-Message-State: AOJu0YxDJCAw/Hvacyc0IoxLRHOTU0RSJHo7zanG8VfpyzobQboX8ovV
-	QEac/NPRaydIBuREENFRT3jeUIcZrjnuKEHakxIF9Bb7sjPlOlxHmO9oREyaTI7uunMNxWZUaY6
-	RLKBG1ax93i7Z8o0RfWMcJIXpNsAVVt1i
-X-Received: by 2002:a05:6512:3e28:b0:500:7f51:d129 with SMTP id i40-20020a0565123e2800b005007f51d129mr22781650lfv.34.1696994318336;
-        Tue, 10 Oct 2023 20:18:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFvQG0xak6vXbg2OUneajKAYVOTW2UCAtu6Ci4P/1I2WvNiHfiN5uWCXLmSnOhKn18mKUv2p74JegLwDXPCI6U=
-X-Received: by 2002:a05:6512:3e28:b0:500:7f51:d129 with SMTP id
- i40-20020a0565123e2800b005007f51d129mr22781636lfv.34.1696994317964; Tue, 10
- Oct 2023 20:18:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A236663B5
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:24:59 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E22D192
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:24:56 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4S4yhn3LBKzkY9G;
+	Wed, 11 Oct 2023 11:20:57 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemi500008.china.huawei.com
+ (7.221.188.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 11 Oct
+ 2023 11:24:54 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <netdev@vger.kernel.org>, Florian Fainelli
+	<florian.fainelli@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Vivien Didelot <vivien.didelot@gmail.com>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH v3] net: dsa: bcm_sf2: Fix possible memory leak in bcm_sf2_mdio_register()
+Date: Wed, 11 Oct 2023 11:24:19 +0800
+Message-ID: <20231011032419.2423290-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008052101.144422-1-akihiko.odaki@daynix.com>
- <CAF=yD-LdwcXKK66s5gvJNOH8qCWRt3SvEL-GkkVif=kkOaYGhg@mail.gmail.com>
- <8f4ad5bc-b849-4ef4-ac1f-8d5a796205e9@daynix.com> <CAF=yD-+DjDqE9iBu+PvbeBby=C4CCwG=fMFONQONrsErmps3ww@mail.gmail.com>
- <286508a3-3067-456d-8bbf-176b00dcc0c6@daynix.com> <CAF=yD-+syCSJz_wp25rEaHTXMFRHgLh1M-uTdNWPb4fnrKgpFw@mail.gmail.com>
- <8711b549-094d-4be2-b7af-bd93b7516c05@daynix.com> <CAF=yD-+M75o2=yDy5d03fChuNTeeTRkUU7rPRG1i6O9aZGhLmQ@mail.gmail.com>
- <695a0611-2b19-49f9-8d32-cfea3b7df0b2@daynix.com> <CAF=yD-+_PLPt9qfXy1Ljr=Lou0W8hCJLi6HwPcZYCjJy+SKtbA@mail.gmail.com>
- <5baab0cf-7adf-475d-8968-d46ddd179f9a@daynix.com> <CAF=yD-KjvycgFrfKu5CgGGWU-3HbyXt_APQy4tqZgNtJwAUKzg@mail.gmail.com>
- <8f3ed081-134c-45a0-9208-c1cab29cdf37@daynix.com> <CACGkMEv0tpn4YsJhXXnoispYx2-VBimFAtFmf85Uo=5=6taVuw@mail.gmail.com>
- <8a44e14c-03c4-44e2-8c72-9d751c63dffe@daynix.com> <CACGkMEu8m4SRvuMKrJv9_A_Wh_a1OzWkAr_9-+5CyC1zqK=R3Q@mail.gmail.com>
- <0d491319-8ce9-4922-89c9-a48c4c5c03bc@daynix.com>
-In-Reply-To: <0d491319-8ce9-4922-89c9-a48c4c5c03bc@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 11 Oct 2023 11:18:27 +0800
-Message-ID: <CACGkMEuBbGKssxNv5AfpaPpWQfk2BHR83rM5AHXN-YVMf2NvpQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/7] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, 
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	rdunlap@infradead.org, willemb@google.com, gustavoars@kernel.org, 
-	herbert@gondor.apana.org.au, steffen.klassert@secunet.com, nogikh@google.com, 
-	pablo@netfilter.org, decui@microsoft.com, jakub@cloudflare.com, 
-	elver@google.com, pabeni@redhat.com, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemi500008.china.huawei.com (7.221.188.139)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 2:19=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
->
-> On 2023/10/10 15:00, Jason Wang wrote:
-> > On Tue, Oct 10, 2023 at 1:51=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> On 2023/10/10 14:45, Jason Wang wrote:
-> >>> On Tue, Oct 10, 2023 at 9:52=E2=80=AFAM Akihiko Odaki <akihiko.odaki@=
-daynix.com> wrote:
-> >>>>
-> >>>> On 2023/10/09 19:44, Willem de Bruijn wrote:
-> >>>>> On Mon, Oct 9, 2023 at 3:12=E2=80=AFAM Akihiko Odaki <akihiko.odaki=
-@daynix.com> wrote:
-> >>>>>>
-> >>>>>> On 2023/10/09 19:06, Willem de Bruijn wrote:
-> >>>>>>> On Mon, Oct 9, 2023 at 3:02=E2=80=AFAM Akihiko Odaki <akihiko.oda=
-ki@daynix.com> wrote:
-> >>>>>>>>
-> >>>>>>>> On 2023/10/09 18:57, Willem de Bruijn wrote:
-> >>>>>>>>> On Mon, Oct 9, 2023 at 3:57=E2=80=AFAM Akihiko Odaki <akihiko.o=
-daki@daynix.com> wrote:
-> >>>>>>>>>>
-> >>>>>>>>>> On 2023/10/09 17:04, Willem de Bruijn wrote:
-> >>>>>>>>>>> On Sun, Oct 8, 2023 at 3:46=E2=80=AFPM Akihiko Odaki <akihiko=
-.odaki@daynix.com> wrote:
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> On 2023/10/09 5:08, Willem de Bruijn wrote:
-> >>>>>>>>>>>>> On Sun, Oct 8, 2023 at 10:04=E2=80=AFPM Akihiko Odaki <akih=
-iko.odaki@daynix.com> wrote:
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> On 2023/10/09 4:07, Willem de Bruijn wrote:
-> >>>>>>>>>>>>>>> On Sun, Oct 8, 2023 at 7:22=E2=80=AFAM Akihiko Odaki <aki=
-hiko.odaki@daynix.com> wrote:
-> >>>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> virtio-net have two usage of hashes: one is RSS and anot=
-her is hash
-> >>>>>>>>>>>>>>>> reporting. Conventionally the hash calculation was done =
-by the VMM.
-> >>>>>>>>>>>>>>>> However, computing the hash after the queue was chosen d=
-efeats the
-> >>>>>>>>>>>>>>>> purpose of RSS.
-> >>>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> Another approach is to use eBPF steering program. This a=
-pproach has
-> >>>>>>>>>>>>>>>> another downside: it cannot report the calculated hash d=
-ue to the
-> >>>>>>>>>>>>>>>> restrictive nature of eBPF.
-> >>>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> Introduce the code to compute hashes to the kernel in or=
-der to overcome
-> >>>>>>>>>>>>>>>> thse challenges. An alternative solution is to extend th=
-e eBPF steering
-> >>>>>>>>>>>>>>>> program so that it will be able to report to the userspa=
-ce, but it makes
-> >>>>>>>>>>>>>>>> little sense to allow to implement different hashing alg=
-orithms with
-> >>>>>>>>>>>>>>>> eBPF since the hash value reported by virtio-net is stri=
-ctly defined by
-> >>>>>>>>>>>>>>>> the specification.
-> >>>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> The hash value already stored in sk_buff is not used and=
- computed
-> >>>>>>>>>>>>>>>> independently since it may have been computed in a way n=
-ot conformant
-> >>>>>>>>>>>>>>>> with the specification.
-> >>>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>>>>>>>>>>>>>> ---
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> +static const struct tun_vnet_hash_cap tun_vnet_hash_cap=
- =3D {
-> >>>>>>>>>>>>>>>> +       .max_indirection_table_length =3D
-> >>>>>>>>>>>>>>>> +               TUN_VNET_HASH_MAX_INDIRECTION_TABLE_LENG=
-TH,
-> >>>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>>> +       .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
-> >>>>>>>>>>>>>>>> +};
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>> No need to have explicit capabilities exchange like this?=
- Tun either
-> >>>>>>>>>>>>>>> supports all or none.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> tun does not support VIRTIO_NET_RSS_HASH_TYPE_IP_EX,
-> >>>>>>>>>>>>>> VIRTIO_NET_RSS_HASH_TYPE_TCP_EX, and VIRTIO_NET_RSS_HASH_T=
-YPE_UDP_EX.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> It is because the flow dissector does not support IPv6 ext=
-ensions. The
-> >>>>>>>>>>>>>> specification is also vague, and does not tell how many TL=
-Vs should be
-> >>>>>>>>>>>>>> consumed at most when interpreting destination option head=
-er so I chose
-> >>>>>>>>>>>>>> to avoid adding code for these hash types to the flow diss=
-ector. I doubt
-> >>>>>>>>>>>>>> anyone will complain about it since nobody complains for L=
-inux.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> I'm also adding this so that we can extend it later.
-> >>>>>>>>>>>>>> max_indirection_table_length may grow for systems with 128=
-+ CPUs, or
-> >>>>>>>>>>>>>> types may have other bits for new protocols in the future.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>>                 case TUNSETSTEERINGEBPF:
-> >>>>>>>>>>>>>>>> -               ret =3D tun_set_ebpf(tun, &tun->steering=
-_prog, argp);
-> >>>>>>>>>>>>>>>> +               bpf_ret =3D tun_set_ebpf(tun, &tun->stee=
-ring_prog, argp);
-> >>>>>>>>>>>>>>>> +               if (IS_ERR(bpf_ret))
-> >>>>>>>>>>>>>>>> +                       ret =3D PTR_ERR(bpf_ret);
-> >>>>>>>>>>>>>>>> +               else if (bpf_ret)
-> >>>>>>>>>>>>>>>> +                       tun->vnet_hash.flags &=3D ~TUN_V=
-NET_HASH_RSS;
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>> Don't make one feature disable another.
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>> TUNSETSTEERINGEBPF and TUNSETVNETHASH are mutually exclus=
-ive
-> >>>>>>>>>>>>>>> functions. If one is enabled the other call should fail, =
-with EBUSY
-> >>>>>>>>>>>>>>> for instance.
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>> +       case TUNSETVNETHASH:
-> >>>>>>>>>>>>>>>> +               len =3D sizeof(vnet_hash);
-> >>>>>>>>>>>>>>>> +               if (copy_from_user(&vnet_hash, argp, len=
-)) {
-> >>>>>>>>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>>>>>>>> +                       break;
-> >>>>>>>>>>>>>>>> +               }
-> >>>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>>> +               if (((vnet_hash.flags & TUN_VNET_HASH_RE=
-PORT) &&
-> >>>>>>>>>>>>>>>> +                    (tun->vnet_hdr_sz < sizeof(struct v=
-irtio_net_hdr_v1_hash) ||
-> >>>>>>>>>>>>>>>> +                     !tun_is_little_endian(tun))) ||
-> >>>>>>>>>>>>>>>> +                    vnet_hash.indirection_table_mask >=
-=3D
-> >>>>>>>>>>>>>>>> +                    TUN_VNET_HASH_MAX_INDIRECTION_TABLE=
-_LENGTH) {
-> >>>>>>>>>>>>>>>> +                       ret =3D -EINVAL;
-> >>>>>>>>>>>>>>>> +                       break;
-> >>>>>>>>>>>>>>>> +               }
-> >>>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
-> >>>>>>>>>>>>>>>> +               len =3D (vnet_hash.indirection_table_mas=
-k + 1) * 2;
-> >>>>>>>>>>>>>>>> +               if (copy_from_user(vnet_hash_indirection=
-_table, argp, len)) {
-> >>>>>>>>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>>>>>>>> +                       break;
-> >>>>>>>>>>>>>>>> +               }
-> >>>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>>> +               argp =3D (u8 __user *)argp + len;
-> >>>>>>>>>>>>>>>> +               len =3D virtio_net_hash_key_length(vnet_=
-hash.types);
-> >>>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>>> +               if (copy_from_user(vnet_hash_key, argp, =
-len)) {
-> >>>>>>>>>>>>>>>> +                       ret =3D -EFAULT;
-> >>>>>>>>>>>>>>>> +                       break;
-> >>>>>>>>>>>>>>>> +               }
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>> Probably easier and less error-prone to define a fixed si=
-ze control
-> >>>>>>>>>>>>>>> struct with the max indirection table size.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> I made its size variable because the indirection table and=
- key may grow
-> >>>>>>>>>>>>>> in the future as I wrote above.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>>
-> >>>>>>>>>>>>>>> Btw: please trim the CC: list considerably on future patc=
-hes.
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> I'll do so in the next version with the TUNSETSTEERINGEBPF=
- change you
-> >>>>>>>>>>>>>> proposed.
-> >>>>>>>>>>>>>
-> >>>>>>>>>>>>> To be clear: please don't just resubmit with that one chang=
-e.
-> >>>>>>>>>>>>>
-> >>>>>>>>>>>>> The skb and cb issues are quite fundamental issues that nee=
-d to be resolved.
-> >>>>>>>>>>>>>
-> >>>>>>>>>>>>> I'd like to understand why adjusting the existing BPF featu=
-re for this
-> >>>>>>>>>>>>> exact purpose cannot be amended to return the key it produc=
-ed.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> eBPF steering program is not designed for this particular pr=
-oblem in my
-> >>>>>>>>>>>> understanding. It was introduced to derive hash values with =
-an
-> >>>>>>>>>>>> understanding of application-specific semantics of packets i=
-nstead of
-> >>>>>>>>>>>> generic IP/TCP/UDP semantics.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> This problem is rather different in terms that the hash deri=
-vation is
-> >>>>>>>>>>>> strictly defined by virtio-net. I don't think it makes sense=
- to
-> >>>>>>>>>>>> introduce the complexity of BPF when you always run the same=
- code.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> It can utilize the existing flow dissector and also make it =
-easier to
-> >>>>>>>>>>>> use for the userspace by implementing this in the kernel.
-> >>>>>>>>>>>
-> >>>>>>>>>>> Ok. There does appear to be overlap in functionality. But it =
-might be
-> >>>>>>>>>>> easier to deploy to just have standard Toeplitz available wit=
-hout
-> >>>>>>>>>>> having to compile and load an eBPF program.
-> >>>>>>>>>>>
-> >>>>>>>>>>> As for the sk_buff and cb[] changes. The first is really not =
-needed.
-> >>>>>>>>>>> sk_buff simply would not scale if every edge case needs a few=
- bits.
-> >>>>>>>>>>
-> >>>>>>>>>> An alternative is to move the bit to cb[] and clear it for eve=
-ry code
-> >>>>>>>>>> paths that lead to ndo_start_xmit(), but I'm worried that it i=
-s error-prone.
-> >>>>>>>>>>
-> >>>>>>>>>> I think we can put the bit in sk_buff for now. We can implemen=
-t the
-> >>>>>>>>>> alternative when we are short of bits.
-> >>>>>>>>>
-> >>>>>>>>> I disagree. sk_buff fields add a cost to every code path. They =
-cannot
-> >>>>>>>>> be added for every edge case.
-> >>>>>>>>
-> >>>>>>>> It only takes an unused bit and does not grow the sk_buff size s=
-o I
-> >>>>>>>> think it has practically no cost for now.
-> >>>>>>>
-> >>>>>>> The problem is that that thinking leads to death by a thousand cu=
-ts.
-> >>>>>>>
-> >>>>>>> "for now" forces the cost of having to think hard how to avoid gr=
-owing
-> >>>>>>> sk_buff onto the next person. Let's do it right from the start.
-> >>>>>>
-> >>>>>> I see. I described an alternative to move the bit to cb[] and clea=
-r it
-> >>>>>> in all code paths that leads to ndo_start_xmit() earlier. Does tha=
-t
-> >>>>>> sound good to you?
-> >>>>>
-> >>>>> If you use the control block to pass information between
-> >>>>> __dev_queue_xmit on the tun device and tun_net_xmit, using gso_skb_=
-cb,
-> >>>>> the field can be left undefined in all non-tun paths. tun_select_qu=
-eue
-> >>>>> can initialize.
-> >>>>
-> >>>> The problem is that tun_select_queue() is not always called.
-> >>>> netdev_core_pick_tx() ensures dev->real_num_tx_queues !=3D 1 before
-> >>>> calling it, but this variable may change later and result in a race
-> >>>> condition. Another case is that XDP with predefined queue.
-> >>>>
-> >>>>>
-> >>>>> I would still use skb->hash to encode the hash. That hash type of t=
-hat
-> >>>>> field is not strictly defined. It can be siphash from ___skb_get_ha=
-sh
-> >>>>> or a device hash, which most likely also uses Toeplitz. Then you al=
-so
-> >>>>> don't run into the problem of growing the struct size.
-> >>>>
-> >>>> I'm concerned exactly because it's not strictly defined. Someone may
-> >>>> decide to overwrite it later if we are not cautious enough. qdisc_sk=
-b_cb
-> >>>> also has sufficient space to contain both of the hash value and type=
-.
-> >>>
-> >>> How about using skb extensions?
-> >>
-> >> I think it will work. I'll try it in the next version.
-> >
-> > Btw, I still think using eBPF for hash might be better.
-> >
-> > Though the hashing rule is defined in the spec, it may be extended in
-> > the future. For example, several extensions has been proposed:
-> >
-> > 1) RSS context
-> > 2) encapsulated packet hashing
->
-> Looking at the proposals, I'm now more inclined to extend the BPF
-> steering program.
+In bcm_sf2_mdio_register(), the class_find_device() will call get_device()
+to increment reference count for priv->master_mii_bus->dev if
+of_mdio_find_bus() succeeds. If mdiobus_alloc() or mdiobus_register()
+fails, it will call get_device() twice without decrement reference count
+for the device. And it is the same if bcm_sf2_mdio_register() succeeds but
+fails in bcm_sf2_sw_probe(), or if bcm_sf2_sw_probe() succeeds. If the
+reference count has not decremented to zero, the dev related resource will
+not be freed.
 
-Just to make sure we are at the same page.
+So remove the get_device() in bcm_sf2_mdio_register(), and call
+put_device() if mdiobus_alloc() or mdiobus_register() fails and in
+bcm_sf2_mdio_unregister() to solve the issue.
 
-If the eBPF program needs to access skb extensions, it would not be a
-steering program anymore (not a filter).
+And as Simon suggested, unwind from errors for bcm_sf2_mdio_register() and
+just return 0 if it succeeds to make it cleaner.
 
-Or do you mean it is a dedicated eBPF program that calculates the hash?
+Fixes: 461cd1b03e32 ("net: dsa: bcm_sf2: Register our slave MDIO bus")
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Suggested-by: Simon Horman <horms@kernel.org>
+---
+v3:
+- Unwind from errors for bcm_sf2_mdio_register().
+- Update the commit message.
+- Add Suggested-by.
+v2:
+- Update the commit message.
+---
+ drivers/net/dsa/bcm_sf2.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
 
->
-> Yuri, who wrote the RFC patches to extend the BPF steering program, also
-> raised an concern that it may become hard to implement virtio-net
-> extensions in the future. It is much easier to deploy a new BPF program
-> to support extensions since it will be included in QEMU and can be
-> deployed at once without concerning other kernel stuff.
->
-> I was still not sure how likely such an extension will emerge especially
-> when the hardware RSS capability is not evolving for a decade or so. But
-> those proposals show that there are more demands of new features for
-> virtio-net.
-
-It's not only the RSS, if you track virtio development, flow directors
-are also being proposed.
-
-Thanks
-
->
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index 72374b066f64..cd1f240c90f3 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -617,17 +617,16 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 	dn = of_find_compatible_node(NULL, NULL, "brcm,unimac-mdio");
+ 	priv->master_mii_bus = of_mdio_find_bus(dn);
+ 	if (!priv->master_mii_bus) {
+-		of_node_put(dn);
+-		return -EPROBE_DEFER;
++		err = -EPROBE_DEFER;
++		goto err_of_node_put;
+ 	}
+ 
+-	get_device(&priv->master_mii_bus->dev);
+ 	priv->master_mii_dn = dn;
+ 
+ 	priv->slave_mii_bus = mdiobus_alloc();
+ 	if (!priv->slave_mii_bus) {
+-		of_node_put(dn);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto err_put_master_mii_bus_dev;
+ 	}
+ 
+ 	priv->slave_mii_bus->priv = priv;
+@@ -684,11 +683,17 @@ static int bcm_sf2_mdio_register(struct dsa_switch *ds)
+ 	}
+ 
+ 	err = mdiobus_register(priv->slave_mii_bus);
+-	if (err && dn) {
+-		mdiobus_free(priv->slave_mii_bus);
+-		of_node_put(dn);
+-	}
++	if (err && dn)
++		goto err_free_slave_mii_bus;
+ 
++	return 0;
++
++err_free_slave_mii_bus:
++	mdiobus_free(priv->slave_mii_bus);
++err_put_master_mii_bus_dev:
++	put_device(&priv->master_mii_bus->dev);
++err_of_node_put:
++	of_node_put(dn);
+ 	return err;
+ }
+ 
+@@ -696,6 +701,7 @@ static void bcm_sf2_mdio_unregister(struct bcm_sf2_priv *priv)
+ {
+ 	mdiobus_unregister(priv->slave_mii_bus);
+ 	mdiobus_free(priv->slave_mii_bus);
++	put_device(&priv->master_mii_bus->dev);
+ 	of_node_put(priv->master_mii_dn);
+ }
+ 
+-- 
+2.34.1
 
 
