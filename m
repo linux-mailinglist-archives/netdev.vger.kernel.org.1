@@ -1,63 +1,66 @@
-Return-Path: <netdev+bounces-40125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4467C5DC1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:45:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218BB7C5DD0
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:49:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38FAF282256
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:45:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25B851C20A9F
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE4C1C69A;
-	Wed, 11 Oct 2023 19:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8DA2232E;
+	Wed, 11 Oct 2023 19:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UWcdhSUr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bp8s/K8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0213A29A;
-	Wed, 11 Oct 2023 19:45:39 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247CE9D;
-	Wed, 11 Oct 2023 12:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1697053538; x=1728589538;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8OmQ7bKmuOJVi2WSBqHt5wslOzQRTduxnqMUB1NAfQE=;
-  b=UWcdhSUr+MgD+6UwOsbzUYsTYFyKf4xTlWG+T6gbjL/Tbmcv/dIogF1W
-   3iOuBdY21OK8ADMcS5W/2aZpLGYKHMyl/8EMQnSwscCvFC4Mbhoju7dn3
-   KUgSMIBfRS5u1omh14TyxqOGRK+XP6uovTA0IqdOEB65tYjLDPWw3EeTn
-   o=;
-X-IronPort-AV: E=Sophos;i="6.03,216,1694736000"; 
-   d="scan'208";a="369281259"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 19:45:32 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2c-m6i4x-5eae960a.us-west-2.amazon.com (Postfix) with ESMTPS id A8CD940AEB;
-	Wed, 11 Oct 2023 19:45:31 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 11 Oct 2023 19:45:31 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 11 Oct 2023 19:45:29 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <daan.j.demeyer@gmail.com>
-CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <kuniyu@amazon.com>,
-	<martin.lau@linux.dev>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v10 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
-Date: Wed, 11 Oct 2023 12:45:20 -0700
-Message-ID: <20231011194520.60480-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CAO8sHcmFHLpk2LfJKxHcA_9y6TyouS0sr=8oj09gLGvGmhYavw@mail.gmail.com>
-References: <CAO8sHcmFHLpk2LfJKxHcA_9y6TyouS0sr=8oj09gLGvGmhYavw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A4C3A29C
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 19:49:49 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 030B5A4
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 12:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697053784;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dBw9jQqyC4NTEUrlFCMr+yRaRJ2fHw1SppPxUk03e4k=;
+	b=Bp8s/K8NSGCeeAo5yj6iSEmSY0Z9Y3VDatbQsLxIripknRxIv+v+2lJ5sfy9rDABECC7T6
+	J3M5SNSruBNv07m0dh8BFkP0z29QwKGLnCXy9hTXb2j5+ZX4kCSkfvNixDGYgSZr2jGKD5
+	Ncq5cJc9wuDqFbZVPGDP3dlh05lZIc8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-625-8nc4PH9ONs2n_JXZ4hQRYw-1; Wed, 11 Oct 2023 15:49:41 -0400
+X-MC-Unique: 8nc4PH9ONs2n_JXZ4hQRYw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69BEE832D33;
+	Wed, 11 Oct 2023 19:49:40 +0000 (UTC)
+Received: from RHTPC1VM0NT.lan (unknown [10.22.34.140])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A511A1C060B5;
+	Wed, 11 Oct 2023 19:49:39 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Pravin B Shelar <pshelar@ovn.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Adrian Moreno <amorenoz@redhat.com>,
+	Eelco Chaudron <echaudro@redhat.com>,
+	shuah@kernel.org
+Subject: [PATCH net v2 0/4] selftests: openvswitch: Minor fixes for some systems
+Date: Wed, 11 Oct 2023 15:49:35 -0400
+Message-ID: <20231011194939.704565-1-aconole@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,57 +68,32 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.62]
-X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Daan De Meyer <daan.j.demeyer@gmail.com>
-Date: Wed, 11 Oct 2023 21:09:33 +0200
-> > From: Daan De Meyer <daan.j.demeyer@gmail.com>
-> > Date: Wed, 11 Oct 2023 20:37:49 +0200
-> > > > > @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
-> > > > >       if (!ctx.uaddr) {
-> > > > >               memset(&unspec, 0, sizeof(unspec));
-> > > > >               ctx.uaddr = (struct sockaddr *)&unspec;
-> > > > > -     }
-> > > > > +             ctx.uaddrlen = 0;
-> > > > > +     } else
-> > > > > +             ctx.uaddrlen = *uaddrlen;
-> > > > >
-> > > > >       cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
-> > > > > -     return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
-> > > > > -                                  0, flags);
-> > > > > +     ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
-> > > > > +                                 0, flags);
-> > > > > +
-> > > > > +     if (!ret && uaddrlen)
-> > > >
-> > > > nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
-> > >
-> > > Are you sure? uaddrlen can still be NULL if uaddr is also NULL
-> >
-> > How?  In the patch 2 and 4, it seems uaddrlen always points to an
-> > actual variable.
-> 
-> Right, I was assuming we don't know for sure how callers are calling
-> this function. It is right that right now no caller calls it with uaddrlen set
-> to NULL.
+A number of corner cases were caught when trying to run the selftests on
+older systems.  Missed skip conditions, some error cases, and outdated
+python setups would all report failures but the issue would actually be
+related to some other condition rather than the selftest suite.
 
-We need not to be defensive for future in-kernel users who should take
-care of that properly.
+Address these individual cases.
 
+Aaron Conole (4):
+  selftests: openvswitch: Add version check for pyroute2
+  selftests: openvswitch: Catch cases where the tests are killed
+  selftests: openvswitch: Skip drop testing on older kernels
+  selftests: openvswitch: Fix the ct_tuple for v4
 
-> 
-> It still seems like a good idea to check for uaddr instead of uaddrlen though,
-> to mimic the same check that is done earlier in this function.
+ .../selftests/net/openvswitch/openvswitch.sh  | 21 +++++++-
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 48 ++++++++++++++++++-
+ 2 files changed, 66 insertions(+), 3 deletions(-)
 
-Sounds good.
+-- 
+2.41.0
+
 
