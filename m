@@ -1,160 +1,139 @@
-Return-Path: <netdev+bounces-39909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EBD7C4DA9
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:51:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 886787C4DB3
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5DC928205C
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:51:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B902C1C20B35
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 543E51A29C;
-	Wed, 11 Oct 2023 08:51:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CC01A29B;
+	Wed, 11 Oct 2023 08:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="ZaTlXAtb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OMg+1Lo0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F228199C5;
-	Wed, 11 Oct 2023 08:51:08 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A75798;
-	Wed, 11 Oct 2023 01:51:05 -0700 (PDT)
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 39B5xlfO011115;
-	Wed, 11 Oct 2023 10:50:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=8gYo5goS4DqeD1ldn/WMNS5pR/ViIwg7IylwRkFLbCQ=; b=Za
-	TlXAtbPx+MB2v0D8AaSOiCRr0QWaExzh07Zo/oJZvuCeapBUJIlchy/0wVkKmKEn
-	wF4z0gNW2gVgYd+nm+OoUH3zQARoNUOh9jLOsqhjQPZQakZgQ8UQum8NC5lIu53G
-	J9/i4D9RVwogLLkVq45t8JbhccX58FoBHOkPFG54l4Myu31cTN8/lVAO4VwO3iQ/
-	QVK9wmSpmZQtWB32TwY8Jbg0FQFxf0GPdf5ZAKxNUqJf8bLx+7v473H+0cTRORLN
-	+6OGQsijOBEGjRMLIhQfjAvoAYEoRWr3fmVZBKuazCBrw1XmeMdLs2GuCUkIAx4t
-	D2E7cjGWOwhthrlESwYw==
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3tnp24gtuh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 10:50:08 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 21883100064;
-	Wed, 11 Oct 2023 10:50:05 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B630822FA2E;
-	Wed, 11 Oct 2023 10:50:05 +0200 (CEST)
-Received: from [10.201.20.32] (10.201.20.32) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 11 Oct
- 2023 10:50:03 +0200
-Message-ID: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
-Date: Wed, 11 Oct 2023 10:49:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290B0199D4;
+	Wed, 11 Oct 2023 08:54:12 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA469D;
+	Wed, 11 Oct 2023 01:54:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697014448; x=1728550448;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=714S6mut/9WqubXB7r7ivANIejuGEiLpzLr+etG14No=;
+  b=OMg+1Lo0QWi/rokKLtCKlWKOLsSbKzXptdiAkb3a+8pon0O3oKHdgaXP
+   eCFdWfes/Wvmn6RSgdiKnGR+zMD6IQQX9q5OcMkP2FfueIEfdGhw5nVyL
+   fWJZxhP7WjLvZhXqF2Ia0OrOuRducnbDGbcA//u1bb/IejlNkNzxunFt7
+   JBdqoGfv94Y3VSytxm3PeTW2bc5aGQ5aCuVD02us3zsm6pWjZYEBwWHGp
+   cgyL40rJ6s2BIlb/fh07MnTu7Mogp3OAGjHVeBlnxHvO2gvKZFJMvC3RQ
+   NlgWMtwX0luMLYvI+djoX/RCk+695Hd7WYaEeMxbx98CjqQW7nsGz/GNR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="387455863"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="387455863"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 01:54:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="819610252"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="819610252"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 11 Oct 2023 01:54:05 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qqUyh-000223-2n;
+	Wed, 11 Oct 2023 08:54:03 +0000
+Date: Wed, 11 Oct 2023 16:53:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	netdev@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: dsa: Use conduit and user terms
+Message-ID: <202310111600.FwR1laqR-lkp@intel.com>
+References: <20231010213942.3633407-2-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
- STM32MP15x boards
-To: Rob Herring <robh@kernel.org>
-CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, Frank Rowand <frowand.list@gmail.com>,
-        <peng.fan@oss.nxp.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-p.hy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
- <20231010125719.784627-11-gatien.chevallier@foss.st.com>
- <20231010184212.GA1221641-robh@kernel.org>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20231010184212.GA1221641-robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.20.32]
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-11_06,2023-10-10_01,2023-05-22_02
-X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231010213942.3633407-2-florian.fainelli@broadcom.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Rob,
+Hi Florian,
 
-On 10/10/23 20:42, Rob Herring wrote:
-> On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
->> ETZPC is a firewall controller. Put all peripherals filtered by the
->> ETZPC as ETZPC subnodes and reference ETZPC as an
->> access-control-provider.
->>
->> For more information on which peripheral is securable or supports MCU
->> isolation, please read the STM32MP15 reference manual.
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>
->> Changes in V6:
->>      	- Renamed access-controller to access-controllers
->>      	- Removal of access-control-provider property
->>
->> Changes in V5:
->>      	- Renamed feature-domain* to access-control*
->>
->>   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
->>   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
->>   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
->>   3 files changed, 1450 insertions(+), 1377 deletions(-)
-> 
-> This is not reviewable. Change the indentation and any non-functional
-> change in one patch and then actual changes in another.
+kernel test robot noticed the following build warnings:
 
-Ok, I'll make it easier to read.
+[auto build test WARNING on net-next/main]
 
-> 
-> This is also an ABI break. Though I'm not sure it's avoidable. All the
-> devices below the ETZPC node won't probe on existing kernel. A
-> simple-bus fallback for ETZPC node should solve that.
-> 
+url:    https://github.com/intel-lab-lkp/linux/commits/Florian-Fainelli/net-dsa-Use-conduit-and-user-terms/20231011-054044
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231010213942.3633407-2-florian.fainelli%40broadcom.com
+patch subject: [PATCH net-next 1/2] net: dsa: Use conduit and user terms
+config: sparc-allyesconfig (https://download.01.org/0day-ci/archive/20231011/202310111600.FwR1laqR-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231011/202310111600.FwR1laqR-lkp@intel.com/reproduce)
 
-I had one issue when trying with a simple-bus fallback that was the
-drivers were probing even though the access rights aren't correct.
-Hence the removal of the simple-bus compatible in the STM32MP25 patch.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310111600.FwR1laqR-lkp@intel.com/
 
-Even though a node is tagged with the OF_POPULATED flag when checking
-the access rights with the firewall controller, it seems that when
-simple-bus is probing, there's no check of this flag.
+All warnings (new ones prefixed by >>):
 
-of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
-Maybe that is my error and the firewall bus populate should set
-OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
+   drivers/net/ethernet/mediatek/mtk_ppe_offload.c: In function 'mtk_flow_get_dsa_port':
+   drivers/net/ethernet/mediatek/mtk_ppe_offload.c:178:16: error: implicit declaration of function 'dsa_port_to_master'; did you mean 'dsa_port_is_user'? [-Werror=implicit-function-declaration]
+     178 |         *dev = dsa_port_to_master(dp);
+         |                ^~~~~~~~~~~~~~~~~~
+         |                dsa_port_is_user
+>> drivers/net/ethernet/mediatek/mtk_ppe_offload.c:178:14: warning: assignment to 'struct net_device *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     178 |         *dev = dsa_port_to_master(dp);
+         |              ^
+   cc1: some warnings being treated as errors
 
-Best regards,
-Gatien
 
-> Rob
+vim +178 drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+
+502e84e2382d92 Felix Fietkau   2021-03-24  164  
+502e84e2382d92 Felix Fietkau   2021-03-24  165  static int
+502e84e2382d92 Felix Fietkau   2021-03-24  166  mtk_flow_get_dsa_port(struct net_device **dev)
+502e84e2382d92 Felix Fietkau   2021-03-24  167  {
+502e84e2382d92 Felix Fietkau   2021-03-24  168  #if IS_ENABLED(CONFIG_NET_DSA)
+502e84e2382d92 Felix Fietkau   2021-03-24  169  	struct dsa_port *dp;
+502e84e2382d92 Felix Fietkau   2021-03-24  170  
+502e84e2382d92 Felix Fietkau   2021-03-24  171  	dp = dsa_port_from_netdev(*dev);
+502e84e2382d92 Felix Fietkau   2021-03-24  172  	if (IS_ERR(dp))
+502e84e2382d92 Felix Fietkau   2021-03-24  173  		return -ENODEV;
+502e84e2382d92 Felix Fietkau   2021-03-24  174  
+502e84e2382d92 Felix Fietkau   2021-03-24  175  	if (dp->cpu_dp->tag_ops->proto != DSA_TAG_PROTO_MTK)
+502e84e2382d92 Felix Fietkau   2021-03-24  176  		return -ENODEV;
+502e84e2382d92 Felix Fietkau   2021-03-24  177  
+8f6a19c0316deb Vladimir Oltean 2022-09-11 @178  	*dev = dsa_port_to_master(dp);
+502e84e2382d92 Felix Fietkau   2021-03-24  179  
+502e84e2382d92 Felix Fietkau   2021-03-24  180  	return dp->index;
+502e84e2382d92 Felix Fietkau   2021-03-24  181  #else
+502e84e2382d92 Felix Fietkau   2021-03-24  182  	return -ENODEV;
+502e84e2382d92 Felix Fietkau   2021-03-24  183  #endif
+502e84e2382d92 Felix Fietkau   2021-03-24  184  }
+502e84e2382d92 Felix Fietkau   2021-03-24  185  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
