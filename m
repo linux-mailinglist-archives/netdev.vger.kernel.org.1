@@ -1,319 +1,203 @@
-Return-Path: <netdev+bounces-40085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D0B7C5A8F
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:53:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA807C5AAC
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1E2D282351
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:53:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26A11C20AE0
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000D339946;
-	Wed, 11 Oct 2023 17:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F22839954;
+	Wed, 11 Oct 2023 17:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BYta/ZoM"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TRgBegkH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F1222300
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 17:53:25 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D6F8F
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:53:23 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-536ef8a7dcdso1430a12.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 10:53:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781EC3993F;
+	Wed, 11 Oct 2023 17:58:56 +0000 (UTC)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E17FE1;
+	Wed, 11 Oct 2023 10:58:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697046802; x=1697651602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=egXaxNWVQ5M/aN9LWpBlAHfgD1+JaDM5+YAVt7Ur/wg=;
-        b=BYta/ZoMOzSoiW/V80fEr6LMF33A90zYQJDNv5PDAqK2H/lLnU7dYtFw2ZlQVpBflv
-         TBKp6RMmoo4yJCvRgd3vFrolbFyIgxeUIuPUz7iL/tl2rfTlPPU4Cb8+N0MycEsCPGeJ
-         WhQy9DCcjIWpvaIbRu4cfRrpkMyCOgN4CXfezGz3wwcg4puBBkNvGcvAxtO2lSHOfh3k
-         VK/XeggQKTr8PZFfoWMt7I3U8NEEakVTQ8LrSCZufTz81hot1f49+60Z7nYDcV3Ud8Ia
-         vetCC7xK/pxGIFNAfpJ7WflZG164pRj95SpK8IUmvJNPd/tjJpx/jUwX+rukqd7RUBvn
-         qyng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697046802; x=1697651602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=egXaxNWVQ5M/aN9LWpBlAHfgD1+JaDM5+YAVt7Ur/wg=;
-        b=T1bZcBd4ODzugr2hQbBvA73yUPkClQ/yO3DlU6dFBaqXEYh7wCfu7SEYXXiuZ7dlCN
-         CmMpVLri3t5AZ1r2Jsj0Y1qAteVo+oyEnKt5PQoXMkv2tQFhA0qlVTg4K5meFZLdt7Mv
-         3f1bfZORN0KqddFd3lBhqFq45jmVqzOk81B1aohm8Q6k6COgacxoPSOx94uwXqdIwTHE
-         nrGjy/KgWXt2OlcmRzCOpLjTcSbv5AGOaOhrMVJFylxGeNsK8uOBmWIwnbfjCiZal20d
-         CGNxec1ajL1hNYvCm2CLQENESrTSr8cZgUimHeceSEaSEDv4LYuIoJJxvsiD/ELcCGA/
-         yq6Q==
-X-Gm-Message-State: AOJu0YwmKNw+aStrKRfMkORteGJsImgkSZ+AKSLVpX6hLEUICO8Qy50i
-	G1C/ZxK8KReeCFEPYnIf3Qfp002JGRTZn191tRR5OQ==
-X-Google-Smtp-Source: AGHT+IGIYKVt+6BJ8+OH/a7wvZjQK5sbD32WHmDaiOVRbnYzrbpBZuqca6S0hNBBys5vgrSbSECmXjaoj0rnFPcm2LU=
-X-Received: by 2002:a50:aad8:0:b0:525:573c:643b with SMTP id
- r24-20020a50aad8000000b00525573c643bmr183452edc.7.1697046801434; Wed, 11 Oct
- 2023 10:53:21 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697047135; x=1728583135;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=AOGQWiFnWglSLhNSIIXiCn7OerwS7IFFwVfjw1g+k34=;
+  b=TRgBegkH40n7wLO8oXByTv+wS5x4EdSiV1xgPwYKaaqv0J54pnF1RX4F
+   +UzwEb8/J4SpPV9EPX5Slub7mK/LA1o0V5TbNV4g5AvD1l44F1qKvP+VQ
+   wF0LmrMPLq48auJVEztW4NdW+oLBI4PZZnpGQ6Ow633oXyByyEFSrDmf+
+   I=;
+X-IronPort-AV: E=Sophos;i="6.03,216,1694736000"; 
+   d="scan'208";a="369255882"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 17:58:48 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+	by email-inbound-relay-iad-1a-m6i4x-edda28d4.us-east-1.amazon.com (Postfix) with ESMTPS id 68E4E804DC;
+	Wed, 11 Oct 2023 17:58:45 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 17:58:43 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 17:58:42 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daan.j.demeyer@gmail.com>
+CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH bpf-next v10 3/9] bpf: Add bpf_sock_addr_set_sun_path() to allow writing unix sockaddr from bpf
+Date: Wed, 11 Oct 2023 10:58:33 -0700
+Message-ID: <20231011175833.45358-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231011170321.73950-4-daan.j.demeyer@gmail.com>
+References: <20231011170321.73950-4-daan.j.demeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009230722.76268-1-dima@arista.com> <20231009230722.76268-17-dima@arista.com>
-In-Reply-To: <20231009230722.76268-17-dima@arista.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Oct 2023 19:53:10 +0200
-Message-ID: <CANn89i+LwYbzNd=mA8Hk0RTTy6siEUpGtJaRw7DdFQju_+4mjA@mail.gmail.com>
-Subject: Re: [PATCH v14 net-next 16/23] net/tcp: Ignore specific ICMPs for
- TCP-AO connections
-To: Dmitry Safonov <dima@arista.com>
-Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	Andy Lutomirski <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>, 
-	Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>, 
-	David Laight <David.Laight@aculab.com>, Dmitry Safonov <0x7f454c46@gmail.com>, 
-	Donald Cassidy <dcassidy@redhat.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, Francesco Ruggeri <fruggeri05@gmail.com>, 
-	"Gaillardetz, Dominik" <dgaillar@ciena.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Ivan Delalande <colona@arista.com>, 
-	Leonard Crestez <cdleonard@gmail.com>, "Nassiri, Mohammad" <mnassiri@ciena.com>, 
-	Salam Noureddine <noureddine@arista.com>, Simon Horman <simon.horman@corigine.com>, 
-	"Tetreault, Francois" <ftetreau@ciena.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.62]
+X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 1:07=E2=80=AFAM Dmitry Safonov <dima@arista.com> wr=
-ote:
->
-> Similarly to IPsec, RFC5925 prescribes:
->   ">> A TCP-AO implementation MUST default to ignore incoming ICMPv4
->   messages of Type 3 (destination unreachable), Codes 2-4 (protocol
->   unreachable, port unreachable, and fragmentation needed -- =E2=80=99har=
-d
->   errors=E2=80=99), and ICMPv6 Type 1 (destination unreachable), Code 1
->   (administratively prohibited) and Code 4 (port unreachable) intended
->   for connections in synchronized states (ESTABLISHED, FIN-WAIT-1, FIN-
->   WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match MKTs."
->
-> A selftest (later in patch series) verifies that this attack is not
-> possible in this TCP-AO implementation.
->
-> Co-developed-by: Francesco Ruggeri <fruggeri@arista.com>
-> Signed-off-by: Francesco Ruggeri <fruggeri@arista.com>
-> Co-developed-by: Salam Noureddine <noureddine@arista.com>
-> Signed-off-by: Salam Noureddine <noureddine@arista.com>
-> Signed-off-by: Dmitry Safonov <dima@arista.com>
-> Acked-by: David Ahern <dsahern@kernel.org>
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 11 Oct 2023 19:03:12 +0200
+> As prep for adding unix socket support to the cgroup sockaddr hooks,
+> let's add a kfunc bpf_sock_addr_set_sun_path() that allows modifying a unix
+> sockaddr from bpf. While this is already possible for AF_INET and AF_INET6,
+> we'll need this kfunc when we add unix socket support since modifying the
+> address for those requires modifying both the address and the sockaddr
+> length.
+> 
+> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
 > ---
->  include/net/tcp_ao.h      | 10 ++++++-
->  include/uapi/linux/snmp.h |  1 +
->  include/uapi/linux/tcp.h  |  4 ++-
->  net/ipv4/proc.c           |  1 +
->  net/ipv4/tcp_ao.c         | 58 +++++++++++++++++++++++++++++++++++++++
->  net/ipv4/tcp_ipv4.c       |  7 +++++
->  net/ipv6/tcp_ipv6.c       |  7 +++++
->  7 files changed, 86 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-> index 8c315c3f31da..eec38e9e6380 100644
-> --- a/include/net/tcp_ao.h
-> +++ b/include/net/tcp_ao.h
-> @@ -24,6 +24,7 @@ struct tcp_ao_counters {
->         atomic64_t      pkt_bad;
->         atomic64_t      key_not_found;
->         atomic64_t      ao_required;
-> +       atomic64_t      dropped_icmp;
+>  kernel/bpf/btf.c  |  1 +
+>  net/core/filter.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 40 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 69101200c124..15d71d2986d3 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -7850,6 +7850,7 @@ static int bpf_prog_type_to_kfunc_hook(enum bpf_prog_type prog_type)
+>  	case BPF_PROG_TYPE_SYSCALL:
+>  		return BTF_KFUNC_HOOK_SYSCALL;
+>  	case BPF_PROG_TYPE_CGROUP_SKB:
+> +	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
+>  		return BTF_KFUNC_HOOK_CGROUP_SKB;
+>  	case BPF_PROG_TYPE_SCHED_ACT:
+>  		return BTF_KFUNC_HOOK_SCHED_ACT;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index a094694899c9..12fbd8a560c8 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -81,6 +81,7 @@
+>  #include <net/xdp.h>
+>  #include <net/mptcp.h>
+>  #include <net/netfilter/nf_conntrack_bpf.h>
+> +#include <linux/un.h>
+>  
+>  static const struct bpf_func_proto *
+>  bpf_sk_base_func_proto(enum bpf_func_id func_id);
+> @@ -11752,6 +11753,32 @@ __bpf_kfunc int bpf_dynptr_from_xdp(struct xdp_buff *xdp, u64 flags,
+>  
+>  	return 0;
+>  }
+> +
+> +__bpf_kfunc int bpf_sock_addr_set_sun_path(struct bpf_sock_addr_kern *sa_kern,
+> +					   const u8 *sun_path, u32 sun_path__sz)
+> +{
+> +	struct sockaddr *sa = sa_kern->uaddr;
+> +	struct sockaddr_un *un;
+> +
+> +	if (sa_kern->sk->sk_family != AF_UNIX)
+> +		return -EINVAL;
+> +
+> +	/* We do not allow changing the address of unnamed unix sockets. */
+> +	if (sa_kern->uaddrlen == 0)
+> +		return -EINVAL;
+
+Instead of adding this check, you can call the hooks after
+unix_validate_addr() in connect() and sendmsg().
+
+In unix_getname(), you can move up the bpf hooks into the else
+branch below.
+
+    if (!addr) {
+        ...
+    } else {
+        ...
+        <-- here
+    }
+
+
+> +
+> +	/* We do not allow changing the address to unnamed or larger than the
+> +	 * maximum allowed address size for a unix sockaddr.
+> +	 */
+> +	if (sun_path__sz == 0 || sun_path__sz > UNIX_PATH_MAX)
+> +		return -EINVAL;
+> +
+> +	un = (struct sockaddr_un *)sa;
+> +	memcpy(un->sun_path, sun_path, sun_path__sz);
+> +	sa_kern->uaddrlen = offsetof(struct sockaddr_un, sun_path) + sun_path__sz;
+> +
+> +	return 0;
+> +}
+>  __diag_pop();
+>  
+>  int bpf_dynptr_from_skb_rdonly(struct sk_buff *skb, u64 flags,
+> @@ -11776,6 +11803,10 @@ BTF_SET8_START(bpf_kfunc_check_set_xdp)
+>  BTF_ID_FLAGS(func, bpf_dynptr_from_xdp)
+>  BTF_SET8_END(bpf_kfunc_check_set_xdp)
+>  
+> +BTF_SET8_START(bpf_kfunc_check_set_sock_addr)
+> +BTF_ID_FLAGS(func, bpf_sock_addr_set_sun_path)
+> +BTF_SET8_END(bpf_kfunc_check_set_sock_addr)
+> +
+>  static const struct btf_kfunc_id_set bpf_kfunc_set_skb = {
+>  	.owner = THIS_MODULE,
+>  	.set = &bpf_kfunc_check_set_skb,
+> @@ -11786,6 +11817,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_set_xdp = {
+>  	.set = &bpf_kfunc_check_set_xdp,
 >  };
->
->  struct tcp_ao_key {
-> @@ -92,7 +93,8 @@ struct tcp_ao_info {
->         struct tcp_ao_key       *rnext_key;
->         struct tcp_ao_counters  counters;
->         u32                     ao_required     :1,
-> -                               __unused        :31;
-> +                               accept_icmps    :1,
-> +                               __unused        :30;
->         __be32                  lisn;
->         __be32                  risn;
->         /* Sequence Number Extension (SNE) are upper 4 bytes for SEQ,
-> @@ -191,6 +193,7 @@ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u=
-8 *key, void *ctx,
->                             unsigned int len, struct tcp_sigpool *hp);
->  void tcp_ao_destroy_sock(struct sock *sk, bool twsk);
->  void tcp_ao_time_wait(struct tcp_timewait_sock *tcptw, struct tcp_sock *=
-tp);
-> +bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code);
->  enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
->                         const struct sk_buff *skb, unsigned short int fam=
-ily,
->                         const struct request_sock *req,
-> @@ -274,6 +277,11 @@ static inline void tcp_ao_syncookie(struct sock *sk,=
- const struct sk_buff *skb,
+>  
+> +static const struct btf_kfunc_id_set bpf_kfunc_set_sock_addr = {
+> +	.owner = THIS_MODULE,
+> +	.set = &bpf_kfunc_check_set_sock_addr,
+> +};
+> +
+>  static int __init bpf_kfunc_init(void)
 >  {
+>  	int ret;
+> @@ -11800,7 +11836,9 @@ static int __init bpf_kfunc_init(void)
+>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_XMIT, &bpf_kfunc_set_skb);
+>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_LWT_SEG6LOCAL, &bpf_kfunc_set_skb);
+>  	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_NETFILTER, &bpf_kfunc_set_skb);
+> -	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
+> +	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_kfunc_set_xdp);
+> +	return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOCK_ADDR,
+> +						&bpf_kfunc_set_sock_addr);
 >  }
->
-> +static inline bool tcp_ao_ignore_icmp(const struct sock *sk, int type, i=
-nt code)
-> +{
-> +       return false;
-> +}
-> +
->  static inline enum skb_drop_reason tcp_inbound_ao_hash(struct sock *sk,
->                 const struct sk_buff *skb, unsigned short int family,
->                 const struct request_sock *req, const struct tcp_ao_hdr *=
-aoh)
-> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-> index 06ddf4cd295c..47a6b47da66f 100644
-> --- a/include/uapi/linux/snmp.h
-> +++ b/include/uapi/linux/snmp.h
-> @@ -300,6 +300,7 @@ enum
->         LINUX_MIB_TCPAOBAD,                     /* TCPAOBad */
->         LINUX_MIB_TCPAOKEYNOTFOUND,             /* TCPAOKeyNotFound */
->         LINUX_MIB_TCPAOGOOD,                    /* TCPAOGood */
-> +       LINUX_MIB_TCPAODROPPEDICMPS,            /* TCPAODroppedIcmps */
->         __LINUX_MIB_MAX
->  };
->
-> diff --git a/include/uapi/linux/tcp.h b/include/uapi/linux/tcp.h
-> index 62543f7c5523..e4ddca6178ca 100644
-> --- a/include/uapi/linux/tcp.h
-> +++ b/include/uapi/linux/tcp.h
-> @@ -404,7 +404,8 @@ struct tcp_ao_info_opt { /* setsockopt(TCP_AO_INFO) *=
-/
->                 set_rnext       :1,     /* corresponding ::rnext */
->                 ao_required     :1,     /* don't accept non-AO connects *=
-/
->                 set_counters    :1,     /* set/clear ::pkt_* counters */
-> -               reserved        :28;    /* must be 0 */
-> +               accept_icmps    :1,     /* accept incoming ICMPs */
-> +               reserved        :27;    /* must be 0 */
->         __u16   reserved2;              /* padding, must be 0 */
->         __u8    current_key;            /* KeyID to set as Current_key */
->         __u8    rnext;                  /* KeyID to set as Rnext_key */
-> @@ -412,6 +413,7 @@ struct tcp_ao_info_opt { /* setsockopt(TCP_AO_INFO) *=
-/
->         __u64   pkt_bad;                /* failed verification */
->         __u64   pkt_key_not_found;      /* could not find a key to verify=
- */
->         __u64   pkt_ao_required;        /* segments missing TCP-AO sign *=
-/
-> +       __u64   pkt_dropped_icmp;       /* ICMPs that were ignored */
->  } __attribute__((aligned(8)));
->
->  /* setsockopt(fd, IPPROTO_TCP, TCP_ZEROCOPY_RECEIVE, ...) */
-> diff --git a/net/ipv4/proc.c b/net/ipv4/proc.c
-> index 3f643cd29cfe..5d3c9c96773e 100644
-> --- a/net/ipv4/proc.c
-> +++ b/net/ipv4/proc.c
-> @@ -302,6 +302,7 @@ static const struct snmp_mib snmp4_net_list[] =3D {
->         SNMP_MIB_ITEM("TCPAOBad", LINUX_MIB_TCPAOBAD),
->         SNMP_MIB_ITEM("TCPAOKeyNotFound", LINUX_MIB_TCPAOKEYNOTFOUND),
->         SNMP_MIB_ITEM("TCPAOGood", LINUX_MIB_TCPAOGOOD),
-> +       SNMP_MIB_ITEM("TCPAODroppedIcmps", LINUX_MIB_TCPAODROPPEDICMPS),
->         SNMP_MIB_SENTINEL
->  };
->
-> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-> index 801174c17853..168073cd1c89 100644
-> --- a/net/ipv4/tcp_ao.c
-> +++ b/net/ipv4/tcp_ao.c
-> @@ -15,6 +15,7 @@
->
->  #include <net/tcp.h>
->  #include <net/ipv6.h>
-> +#include <net/icmp.h>
->
->  int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8 *key, void *ctx,
->                             unsigned int len, struct tcp_sigpool *hp)
-> @@ -44,6 +45,60 @@ int tcp_ao_calc_traffic_key(struct tcp_ao_key *mkt, u8=
- *key, void *ctx,
->         return 1;
->  }
->
-> +bool tcp_ao_ignore_icmp(const struct sock *sk, int type, int code)
-> +{
-> +       bool ignore_icmp =3D false;
-> +       struct tcp_ao_info *ao;
-> +
-> +       /* RFC5925, 7.8:
-> +        * >> A TCP-AO implementation MUST default to ignore incoming ICM=
-Pv4
-> +        * messages of Type 3 (destination unreachable), Codes 2-4 (proto=
-col
-> +        * unreachable, port unreachable, and fragmentation needed -- =E2=
-=80=99hard
-> +        * errors=E2=80=99), and ICMPv6 Type 1 (destination unreachable),=
- Code 1
-> +        * (administratively prohibited) and Code 4 (port unreachable) in=
-tended
-> +        * for connections in synchronized states (ESTABLISHED, FIN-WAIT-=
-1, FIN-
-> +        * WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT) that match M=
-KTs.
-> +        */
-> +       if (READ_ONCE(sk->sk_family) =3D=3D AF_INET) {
-
-You can not use sk->sk_family to make this decision.
-
- It could be AF_INET6 and yet the flow could be IPv4.  (dual stack)
-
-Let the caller pass this information ?
-
- tcp_ao_ignore_icmp(sk, AF_INET, type, code);
-
- tcp_ao_ignore_icmp(sk, AF_INET6, type, code);
-
-
-
-> +               if (type !=3D ICMP_DEST_UNREACH)
-> +                       return false;
-> +               if (code < ICMP_PROT_UNREACH || code > ICMP_FRAG_NEEDED)
-> +                       return false;
-> +       } else {
-> +               if (type !=3D ICMPV6_DEST_UNREACH)
-> +                       return false;
-> +               if (code !=3D ICMPV6_ADM_PROHIBITED && code !=3D ICMPV6_P=
-ORT_UNREACH)
-> +                       return false;
-> +       }
-> +
-> +       rcu_read_lock();
-> +       switch (sk->sk_state) {
-> +       case TCP_TIME_WAIT:
-> +               ao =3D rcu_dereference(tcp_twsk(sk)->ao_info);
-> +               break;
-> +       case TCP_SYN_SENT:
-> +       case TCP_SYN_RECV:
-> +       case TCP_LISTEN:
-> +       case TCP_NEW_SYN_RECV:
-> +               /* RFC5925 specifies to ignore ICMPs *only* on connection=
-s
-> +                * in synchronized states.
-> +                */
-> +               rcu_read_unlock();
-> +               return false;
-> +       default:
-> +               ao =3D rcu_dereference(tcp_sk(sk)->ao_info);
-> +       }
-> +
-> +       if (ao && !ao->accept_icmps) {
-> +               ignore_icmp =3D true;
-> +               __NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPAODROPPEDICMPS=
-);
-> +               atomic64_inc(&ao->counters.dropped_icmp);
-> +       }
-> +       rcu_read_unlock();
-> +
-> +       return ignore_icmp;
-> +}
->
+>  late_initcall(bpf_kfunc_init);
+>  
+> -- 
+> 2.41.0
 
