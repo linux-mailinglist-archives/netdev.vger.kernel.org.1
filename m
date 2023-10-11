@@ -1,458 +1,225 @@
-Return-Path: <netdev+bounces-39877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DD0C7C4A27
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:17:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8B17C4A26
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875381C211DA
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:17:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C381C28439B
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110981947D;
-	Wed, 11 Oct 2023 06:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9B4199C9;
+	Wed, 11 Oct 2023 06:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZQzKdFnt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m6DA3h82"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6BB199B9;
-	Wed, 11 Oct 2023 06:17:00 +0000 (UTC)
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::224])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7DF10F;
-	Tue, 10 Oct 2023 23:16:37 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 54909E0004;
-	Wed, 11 Oct 2023 06:16:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697004995;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7Ysg7h1PUHm7UOv27Tdv/l4knAulSkq2gkBV+9dzYtw=;
-	b=ZQzKdFntbooKH5sk7W3djs1iMRusF0WRsHNViEiDqGIt1KdGggQDg1mNfWwguJULuS+h0Q
-	7ku44iRWyRmWE38CAIaK2uy6hQjRVG11po9rCepZECItSGDsJo9bHOjbWnwwaGRIDrSnYV
-	VCxMVXQJK+27xYT574ZE8qbjsFEI4vnh++UMsMq9zxjtTMuH1p9kny705g66whKKeKFtRY
-	2LRP3rMIJmrUODqRUk3DOGSAfu5eBo4h7EDsxGtEmySEUK9xqOzaBq5AeBJOs4PS+yX+fh
-	t843K65zLNT3RarAwXIWSEuZEJquKaGVaxYenVnah7XkBTDmO2181F/jm7M2IA==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v8 30/30] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Wed, 11 Oct 2023 08:14:34 +0200
-Message-ID: <20231011061437.64213-31-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231011061437.64213-1-herve.codina@bootlin.com>
-References: <20231011061437.64213-1-herve.codina@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B3318E19
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:16:59 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B5FED
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697004998; x=1728540998;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=przElFPghngL5Bn4qJWiHxAB6NzmkSXDKRSMCJVlmIo=;
+  b=m6DA3h829UYFrj48MtiQ0/T7TBjJQV61gB/sjf1OMR14XSq2iPa1iqTl
+   RTUsrT2tEO9S3ZRh7cjOQGpNmVwZO1/+hghbMiQUax+0ARR4cca1uNNV2
+   ohn4xRTUEfLHu7ni0YX/HyIn8PzTETD/j9JpGf3MsZZWykIbillVraBQd
+   0V/k+wS/M2e4caDoc52KyABk0TL/j9WyXiZEtJOp4USq4DqczjHj2K0/G
+   2xzF9/klWJqfT9afxRJctnvI3y3VeS5TC0oTywK9ABOOcBi/kMTooqUdr
+   gEDExMQyizMlpmXnB5Rhcl4/oswdmEc6UmeooE2I7kFqCSCLQuXrcTPN+
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="448790351"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="448790351"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 23:16:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="927442145"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="927442145"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Oct 2023 23:16:37 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 10 Oct 2023 23:16:37 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Tue, 10 Oct 2023 23:16:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32 via Frontend Transport; Tue, 10 Oct 2023 23:16:36 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.32; Tue, 10 Oct 2023 23:16:36 -0700
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by CYYPR11MB8385.namprd11.prod.outlook.com (2603:10b6:930:c1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Wed, 11 Oct
+ 2023 06:16:32 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
+ 06:16:32 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, Vishal Agrawal
+	<vagrawal@redhat.com>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "jkc@redhat.com" <jkc@redhat.com>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash
+ dump kernels
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash
+ dump kernels
+Thread-Index: AQHZ9uU6c+T080bqgkOCqYNNHdK3T7BEJqZA
+Date: Wed, 11 Oct 2023 06:16:32 +0000
+Message-ID: <BL0PR11MB312214E63F486ECFDE49E2B2BDCCA@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231004170214.474792-1-jesse.brandeburg@intel.com>
+In-Reply-To: <20231004170214.474792-1-jesse.brandeburg@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|CYYPR11MB8385:EE_
+x-ms-office365-filtering-correlation-id: 2116e959-4200-47ba-017a-08dbca219d24
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UtOE3dW89eH3Q8mD+gPdBhbRVzQIBY18VcCHYaIcs75NyZ4ogA4KHXTQiw5kR47pArezUnchfv841Aa/UlsM8oc5Kznd3QIMy/AUjUAx6YvNit+Q93fV9mLC5B0NIKpPqqNnuj6ZGL9khtxyJijZIXftKSFYq+U2xKUN7LUXqH+1TONl9BVMn8aDv0hiB00YkoDCj9CeBs5wSAlf6N6PpFd0+do04csTQbRGHC1H3AFU9VUeLg60ND1Y9CbPZ+tyjYFk6dxpSBGjzF3nMc2QHexnEvG4tAjvTdt2Ebk6d5ZPh2CqpawzOLqvGNwWHiDs7P/0jsnnOHyPwLyOsX4Eqh2F7LivDCstpi+OXaQwpSJmgp+un8MoGgQZKy/1P2erXS2AaTT2ih30npObb7Wp+xXhs62T/iMMd6ls9Z4ua37xRbnIBSrfu+jzjRSmvxefYS/xzJX3KxUAgwOOuEK8JWGr6oyNg/DDOQqBYZj5ygNWy5e5GujzfCTvg2gFvo9f92YSSdC1ajJp53wrOZpVuTaYU1kmt6lKPTb8uzu/uMr4yXT2DxCv9cnGggOraAiIWiz3C1bnlW8dvAZebjfyjUzkebq+aP+eBxGd8n/qsJtrecUKq28el7xUoP4TW16x
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(71200400001)(53546011)(55236004)(26005)(38070700005)(7696005)(107886003)(8676002)(5660300002)(8936002)(66446008)(2906002)(4326008)(478600001)(66476007)(66946007)(64756008)(316002)(52536014)(54906003)(6506007)(110136005)(41300700001)(66556008)(55016003)(122000001)(38100700002)(82960400001)(76116006)(86362001)(33656002)(83380400001)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LFTPPh2WCyWhTvbKedPtSl7CogWQJisUByb71a+vGMyFMJwktPxjJVtHPh2k?=
+ =?us-ascii?Q?pzehBD1SF3klusJHbejOVfrMSeniMNertU0VccrGLXToMAmV0fgBB4IM76bh?=
+ =?us-ascii?Q?osXKnPiSHwTS5HnMSSsi/XrBm6fVnrKgi08LP9xNL63l3UZYNPvIk54oOf6g?=
+ =?us-ascii?Q?HuqO/dipVQQXqHR+qNEt1bloqr9Ao+m2uLguJ1xsnK4MFc9S6tufSlOoWaCH?=
+ =?us-ascii?Q?2e8EEdGUezggp4ERE+CPQHSa1TRkFffS4SnEajPyTrqc+bOm6XTL7SfNsXTr?=
+ =?us-ascii?Q?BXhAKmFCzD5T3q4tA4xLEHKtBQUrPqonofIQu0V556VuzAO3+nd5+Ei8SGsx?=
+ =?us-ascii?Q?Jk+FPwhqQVs89dngqaY/aN7TY/LjUDpfcAeqnJz44QEGzF4eSTYNglXKmBTC?=
+ =?us-ascii?Q?jwvcX59yBkCcr+4mee4mRQhfIOg2E6EfwhZuzCXskpFhhMSnPRi1zv20T1uW?=
+ =?us-ascii?Q?2PRDzaU8ZhaPmY2PbN1R6JlWkIU9KlHGAQZGqmOszlfgcOyzGg0sNg98MTnL?=
+ =?us-ascii?Q?R7+/jtpADnQ1pwcBrYV5OU0KibORp4w6IdNN1u098g344WZSc69zmN0bRTja?=
+ =?us-ascii?Q?jwmpelWyZNxoBAmtEZBjzOzOFL0LyFYHe0oHyzzXj9dm+O/KoatD58xc4kpd?=
+ =?us-ascii?Q?NJdnPwsK/RG+2wQFjumMK56kw23UOkUmRL4yyIM0CNJFSf1oDG4bFSc+HavW?=
+ =?us-ascii?Q?EtcNMIlSGeWBnUrdNIuLiiZAFhET62WqRd7OOjwpsqIseX6tHvwwbHJlc/WC?=
+ =?us-ascii?Q?n8pEw9JOajZ5mK6sP8Rn6ZZODMgan1zgQL9k0ZkotKK+GZpKbX73rnEwSMt8?=
+ =?us-ascii?Q?ZtsEB8dzF+EBU5gtDgzlJ1Ui2s0OkBssSEDnEhUVrcs/Le5eaHvKa5bSXLDP?=
+ =?us-ascii?Q?oLu3wvm1A5QaI4d79+86+Kx5XpQ2322w+vgYjkqaYmlpXeuMc1kh24HLeMvo?=
+ =?us-ascii?Q?wWJOOOQazY9XwN4bC2SzDPO/9JH4Cbsn5O34oX1ZRj2U1dCGb5X95XFPLd0G?=
+ =?us-ascii?Q?ECyryeD4NCBQs2TjXvhp2YsE2wYJk+eo18qWcjYrsQJAZXAoalMfk64uxO8z?=
+ =?us-ascii?Q?s82pbu3LBz2bY1grdA/qgqU16Exp1fyqGqowSUPOcQHGs0VjrbsuADMoroze?=
+ =?us-ascii?Q?MM7j1YzVAqkcxs3KQVlYmnfO410G8iLsnLoodQW+S7X+8Y5/11qIG5l7gXPV?=
+ =?us-ascii?Q?V6wXcc5NYAUJlR3DKUajFX0GKmlz5yz4kbbWJLUXc8md55UhKVj10L76oUjd?=
+ =?us-ascii?Q?Xs/FGNkb/bGRsKwdE8kGYzEcysylciHZkvjVuuxdWd0yN4lqpPrNlGGxwFF7?=
+ =?us-ascii?Q?kpPy+2+UN276igW2W3gpGmUS1NlXZe9ehmu/LUARzq0kY7ynDesDzcQPS/i2?=
+ =?us-ascii?Q?RQMdq/VBqj+X0hLJ6MomwBGshiWiSZghF137CPD89LTtHv8Dc9wQnqR39kIv?=
+ =?us-ascii?Q?BjrLFFSkLMN1SpaeUy6xTFq1JZgPdgMg+vs5wRXuwlm4sDmqmBJFMGgJgnXj?=
+ =?us-ascii?Q?zLS9wacImZahz+h494VQf1qgkqrIchzC18t42xjma09C6MDEZcC1CI/0wzTT?=
+ =?us-ascii?Q?lr16bKcUWB2buOUM4deqYbSq1In1njCqq7P9HJDZNZ1osxPSyxz+o2AHL/ct?=
+ =?us-ascii?Q?eQ=3D=3D?=
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ctaOq3SHmhHCXNgTfO6gdlB9VlMMrbblmOlg4Un+0zJTmOchDmOtCB0iQomnS3mjXCjvHbAOx5wl03b0fqJ1HPEZ03RWAq0X7dHmIjQzRp3/v4bisP00hmPv8hjIpy3+GQzCRe2TXjJ9V9crb75vY5dOl0RDbys6eTgPOZJZkkCFbcoThydzo2S3e8uUeOSpYkGb6Z8q9KvU2pUneK6Xpo6zmGkfR4jJzYX3UHx0OIX76vTEqi3WRhM5eXRKWtQm+hsVwLftSqmdcEnVg5chjZ8pGhl6zcSMTgQa7L8+ZKoG7d3jIeJZyqk6iIqdNlr6ZrkQp9eyHsypn45PBfd5gw==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A42/nuaNTpC+oaUJngYoZ8a8f5c9npTBKwNHCf8uAus=;
+ b=KM0yweY4Nk0d/0I/zVqXyWorW0+Hl0ik75nZ37SOS0jE8OaLN0FkH7Ez4BxITNIVHSuoZBt3PETIGUpj63rshgnW8bCtqzcMJzFDn0s+9tZptUFW6/6F+rDalI4FZsuBh0XBFG7OkqSwh1v/jHGsM1n8LwO92izEy2WeEUq9V2fcsRMy0YJd7tqy92HvGrUtG9Gk8GBmy2Znvn+8NgkSrxGBGOsbIwRA/u5I9KnOoRp3IXDV5Z+WCAlJAx/0ONbDxbiJMEbMr9prlHzO2x0JYzzJYve/4UobJpncjCl5vIDdJrwc5u2bjjLqwcVnbsRlyjuVZTms4qIUvr8YGGDFFg==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+x-ms-exchange-crosstenant-authas: Internal
+x-ms-exchange-crosstenant-authsource: BL0PR11MB3122.namprd11.prod.outlook.com
+x-ms-exchange-crosstenant-network-message-id: 2116e959-4200-47ba-017a-08dbca219d24
+x-ms-exchange-crosstenant-originalarrivaltime: 11 Oct 2023 06:16:32.1614 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: RIGGkorEIKt9azb33+poHvmLmtBoyU3Jmd8GlRl96D1RCy9AXDUYKqjsLfnWydO/hJlqHyRXj3BFCmxQhSxbkh3Kxz3wsWlXZ4Sg0NY8g/UUSGokyWSCPA6t9bseEcxS
+x-ms-exchange-transport-crosstenantheadersstamped: CYYPR11MB8385
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
+esse Brandeburg
+> Sent: Wednesday, October 4, 2023 10:32 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: pmenzel@molgen.mpg.de; Vishal Agrawal <vagrawal@redhat.com>; linux-pc=
+i@vger.kernel.org; Brandeburg, Jesse <jesse.brandeburg@intel.com>; netdev@v=
+ger.kernel.org; jkc@redhat.com; Kitszel, Przemyslaw <przemyslaw.kitszel@int=
+el.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash d=
+ump kernels
+>
+> When the system boots into the crash dump kernel after a panic, the ice
+> networking device may still have pending transactions that can cause erro=
+rs
+> or machine checks when the device is re-enabled. This can prevent the cra=
+sh
+> dump kernel from loading the driver or collecting the crash data.
+>
+> To avoid this issue, perform a function level reset (FLR) on the ice devi=
+ce
+> via PCIe config space before enabling it on the crash kernel. This will
+> clear any outstanding transactions and stop all queues and interrupts.
+> Restore the config space after the FLR, otherwise it was found in testing
+> that the driver wouldn't load successfully.
+>
+> The following sequence causes the original issue:
+> - Load the ice driver with modprobe ice
+> - Enable SR-IOV with 2 VFs: echo 2 > /sys/class/net/eth0/device/sriov_num=
+_vfs
+> - Trigger a crash with echo c > /proc/sysrq-trigger
+> - Load the ice driver again (or let it load automatically) with modprobe =
+ice
+> - The system crashes again during pcim_enable_device()
+>
+> Fixes: 837f08fdecbe ("ice: Add basic driver framework for Intel(R) E800 S=
+eries")
+>
+> Reported-by: Vishal Agrawal <vagrawal@redhat.com>
+> Reviewed-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> ---
+> v3: add Fixes tag as approximate, added Jay's RB tag
+> v2: respond to list comments and update commit message
+> v1: initial version
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+>
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 235 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 82019cd96365..9bfb506a90cd 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -27,6 +28,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -40,6 +44,195 @@ static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	unsigned long flags;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	spin_lock_irqsave(&qmc_hdlc->carrier_lock, flags);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto end;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+end:
-+	spin_unlock_irqrestore(&qmc_hdlc->carrier_lock, flags);
-+	return ret;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
-@@ -313,6 +506,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -320,11 +519,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -334,6 +538,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -367,10 +576,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -420,6 +636,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -455,6 +673,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -503,6 +722,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = &pdev->dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(qmc_hdlc->dev, np);
- 	if (IS_ERR(qmc_hdlc->qmc_chan)) {
-@@ -531,10 +751,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(qmc_hdlc->dev, "fsl,framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
- 	if (!qmc_hdlc->netdev) {
- 		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto framer_exit;
- 	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
-@@ -550,11 +779,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -564,6 +794,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
--- 
-2.41.0
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
