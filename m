@@ -1,136 +1,112 @@
-Return-Path: <netdev+bounces-39776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FEC7C471D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:17:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25977C4727
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:18:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8978828193C
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 01:17:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BF01C20D57
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 01:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC136A5D;
-	Wed, 11 Oct 2023 01:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CB16814;
+	Wed, 11 Oct 2023 01:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="LP1jYPry"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epGL/J0b"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18565810
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 01:17:42 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BAC2B0
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 18:17:41 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-4195fddd6d7so4216151cf.0
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 18:17:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1696987060; x=1697591860; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8hWLrD7SZl7TcacLOoTzuq06tk7AIygH3knhMFZNLVY=;
-        b=LP1jYPrySdmcYIqz24G/z7HiNmPRF8cmS0U/6KreUKDy9RJVarN4ypctVgY090bW6q
-         fhpfuGNfDgfeovb7gAFFBZdlh8R9AbNYShl5we7SshmvTGlEgLg1acHUe1MiV2kjaLlV
-         0VZwP9PIFauZn4nFaKWYccQAL1cuIX924g7VIP3ps/lqDRp0r13Mbknv0dP1i7ACZud1
-         0B9Omw8ZnH2dpr31MuIlXcIcPJ+1AeKxBcTTeUTD9mZ8s6TRKBNKjubGFW0/Q/eA9uUv
-         AMVbQYgBfVa0uZ2q16BpfkPStm/ziDEw1/V/AuYxJ/aWZOsPYkeL/o5gDWpzhehCYTjx
-         0dCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696987060; x=1697591860;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8hWLrD7SZl7TcacLOoTzuq06tk7AIygH3knhMFZNLVY=;
-        b=WFRY2tPeHgTC8QoMieLTBNLSvGnWSOQoIXnJuvrX+20GkyX44Arofy6iG0Z/ZAVpGK
-         I/CsiHuPxx/abrJIFCS2MGTN0f/xRdo2/1kzyy+35IF4aI81bKyam9iTk8qGk7vvjcpV
-         1Atw0JddgfTlj1czfIOyx3h+kZquBnrNC2ckW44FmX4WJJLtutdqeYYHxhzcT3B140el
-         i3Hyxxkq81o31gPI4KTsFOo/bq6R0XE3zcvpTYDDQE6sj1DLCqORhOus7bpwXugVYG9A
-         wq/IO0KixTHTSZiGqaLxIt31NaB+aADrSvZuQnt24575BwtejIwAuHk2YiguDxkvFzvA
-         yUnw==
-X-Gm-Message-State: AOJu0YybGhDSJ0RaUGFspDA6OOdmCMNmEc45T1H8r7lMvfuxpGHhjTs/
-	A72o+3Zhh9DS42KXE1HYnucr
-X-Google-Smtp-Source: AGHT+IFMjRoxd6M6UkenLBrMtcmhXpeM+27NBW05bCx4rgaZT2JbFycWyJjjBn8NtpEiwf7yP+QXbA==
-X-Received: by 2002:ac8:5bc8:0:b0:418:11c9:ddb5 with SMTP id b8-20020ac85bc8000000b0041811c9ddb5mr23034732qtb.25.1696987060155;
-        Tue, 10 Oct 2023 18:17:40 -0700 (PDT)
-Received: from localhost ([70.22.175.108])
-        by smtp.gmail.com with ESMTPSA id v2-20020ac873c2000000b00419576c7b75sm4898801qtp.23.2023.10.10.18.17.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 18:17:39 -0700 (PDT)
-Date: Tue, 10 Oct 2023 21:17:39 -0400
-Message-ID: <9fe88aef7deabbe87d3fc38c4aea3c69.paul@paul-moore.com>
-From: Paul Moore <paul@paul-moore.com>
-To: Andrii Nakryiko <andrii@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-Cc: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>, <keescook@chromium.org>, <brauner@kernel.org>, <lennart@poettering.net>, <kernel-team@meta.com>, <sargun@sargun.me>, selinux@vger.kernel.org
-Subject: Re: [PATCH v6 6/13] bpf: add BPF token support to BPF_PROG_LOAD  command
-References: <20230927225809.2049655-7-andrii@kernel.org>
-In-Reply-To: <20230927225809.2049655-7-andrii@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E763580D;
+	Wed, 11 Oct 2023 01:18:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961D7C433C8;
+	Wed, 11 Oct 2023 01:18:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696987114;
+	bh=MVgS0pN9w8AckyfTLTkMpsiuBuE5xCRBX+y812EyspE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=epGL/J0bt6eA1/yO21fN39dbQ7HfIYfLw52pFv6Am4gAhIOb4gEgvEmkCwxYkYTbC
+	 L2pD395SVfEjw216Gce3/neA+uTZDKuqM6OVE+Ikb/1gGxWslw+fmczXlTtS63Y2qt
+	 9e9ubbOqObzqEGpCkvbxLwE5UweafzjRCXoJ/QrK4tp6GHE6ietR/BYS2jaAjPN9O/
+	 oztsNdIVMnJuMo2SpvgW3/RR4fK6qkaRvtZUpRhRlYoZz/5XEyxKrlsR4wFqWIhf9i
+	 a8g8YNh2RML3LFNipb7+DsAFaBWXWOkmL2Lgg8LDzQls0nfL7Q4g1Y4NScbMttZFay
+	 2bu2z/RAV0JmA==
+Date: Tue, 10 Oct 2023 18:18:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <jacob.e.keller@intel.com>, <vaishnavi.tipireddy@intel.com>,
+ <horms@kernel.org>, <leon@kernel.org>, <corbet@lwn.net>,
+ <linux-doc@vger.kernel.org>, <rdunlap@infradead.org>
+Subject: Re: [PATCH net-next v4 5/5] ice: add documentation for FW logging
+Message-ID: <20231010181832.176d9e2b@kernel.org>
+In-Reply-To: <bc8fe848-b590-fa4c-cc6b-5ccdf89ce0fa@intel.com>
+References: <20231005170110.3221306-1-anthony.l.nguyen@intel.com>
+	<20231005170110.3221306-6-anthony.l.nguyen@intel.com>
+	<20231006164623.6c09c4e5@kernel.org>
+	<bc8fe848-b590-fa4c-cc6b-5ccdf89ce0fa@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sep 27, 2023 Andrii Nakryiko <andrii@kernel.org> wrote:
+On Tue, 10 Oct 2023 16:00:13 -0700 Paul M Stillwell Jr wrote:
+> >> +Retrieving FW log data
+> >> +~~~~~~~~~~~~~~~~~~~~~~
+> >> +The FW log data can be retrieved by reading from 'fwlog/data'. The user can
+> >> +write to 'fwlog/data' to clear the data. The data can only be cleared when FW
+> >> +logging is disabled.  
+> > 
+> > Oh, now it sounds like only one thing can be enabled at a time.
+> > Can you clarify?
+> >   
 > 
-> Add basic support of BPF token to BPF_PROG_LOAD. Wire through a set of
-> allowed BPF program types and attach types, derived from BPF FS at BPF
-> token creation time. Then make sure we perform bpf_token_capable()
-> checks everywhere where it's relevant.
+> What I'm trying to describe here is a mechanism to read all the data 
+> (whatever modules have been enabled) as it's coming in and to also be 
+> able to clear the data in case the user wants to start fresh (by writing 
+> 0 to the file). Does that make sense?
+
+Yes that part does.
+
+> I probably wasn't clear in the 
+> previous section that the user can enable many modules at the same time.
+
+Probably best if you describe enabling of multiple modules in the
+example. I'm not sure how one disables a module with the current API.
+
+> > Why 4K? The number of buffers is irrelevant to the user, why not let
+> > the user configure the size in bytes (which his how much DRAM the
+> > driver will hold hostage)?  
 > 
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->  include/linux/bpf.h                           |  6 ++
->  include/uapi/linux/bpf.h                      |  2 +
->  kernel/bpf/core.c                             |  1 +
->  kernel/bpf/inode.c                            |  6 +-
->  kernel/bpf/syscall.c                          | 87 ++++++++++++++-----
->  kernel/bpf/token.c                            | 25 ++++++
->  tools/include/uapi/linux/bpf.h                |  2 +
->  .../selftests/bpf/prog_tests/libbpf_probes.c  |  2 +
->  .../selftests/bpf/prog_tests/libbpf_str.c     |  3 +
->  9 files changed, 108 insertions(+), 26 deletions(-)
+> I'm trying to keep the numbers small for the user :). I could say 
+> 1048576 bytes (256 x 4096), but those kinds of numbers get unwieldy to a 
+> user (IMO).
 
-...
+echo $((256 * 4096)) >> $the_file
 
-> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-> index 5c5c2b6648b2..d0b219f09bcc 100644
-> --- a/kernel/bpf/syscall.c
-> +++ b/kernel/bpf/syscall.c
-> @@ -2685,6 +2718,10 @@ static int bpf_prog_load(union bpf_attr *attr, bpfptr_t uattr, u32 uattr_size)
->  	prog->aux->sleepable = attr->prog_flags & BPF_F_SLEEPABLE;
->  	prog->aux->xdp_has_frags = attr->prog_flags & BPF_F_XDP_HAS_FRAGS;
->  
-> +	/* move token into prog->aux, reuse taken refcnt */
-> +	prog->aux->token = token;
-> +	token = NULL;
-> +
->  	err = security_bpf_prog_alloc(prog->aux);
->  	if (err)
->  		goto free_prog;
+But also...
 
-As we discussed in the earlier thread, let's tweak/rename/move the
-security_bpf_prog_alloc() call down to just before the bpf_check() call
-so it looks something like this:
+> The FW logs generate a LOT of data depending on what modules are enabled 
+> so we typically need a lot of buffers to handle them.
+> 
+> In the past we have tried to use the syslog mechanism, but we generate 
+> SO much data that we overwhelm that and lose data. That's why the idea 
+> of using static buffers is appealing to us. We could still overrun the 
+> buffers, but at least we will have contiguous data. The problem then 
+> becomes one of allocating enough space for what the user is trying to 
+> catch instead of trying to start/stop logging and hoping you get all the 
+> events in the log.
+> 
+> I can drop the mention of 4K buffers in the documentation. Or we could 
+> use terms like 1M, 2M, 512K, et al. That would require string parsing in 
+> the driver though and I'm trying to avoid that if possible. What do you 
+> think?
 
-  err = security_bpf_prog_load(prog, &attr, token);
-  if (err)
-    goto proper_jump_label;
-  
-  err = bpf_check(...);
-
-With the idea being that LSMs which implement the token hooks would
-skip any BPF_PROG_LOAD access controls in security_bpf() and instead
-implement them in security_bpf_prog_load().
-
-We should also do something similar for map_create() and
-security_bpf_map_alloc() in patch 4/13.
-
---
-paul-moore.com
+.. I thought such helpers already existed.
 
