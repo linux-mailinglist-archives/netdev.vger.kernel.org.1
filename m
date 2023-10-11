@@ -1,125 +1,138 @@
-Return-Path: <netdev+bounces-39881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D54F7C4ABE
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:37:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 111D37C4AE2
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:43:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAC1D281E99
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:37:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF061C20D0F
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8604C6AAB;
-	Wed, 11 Oct 2023 06:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="s8naaFuY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7666C6132;
+	Wed, 11 Oct 2023 06:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDCC179B9
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:37:27 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6092C9B;
-	Tue, 10 Oct 2023 23:37:24 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39B6bA1p113973;
-	Wed, 11 Oct 2023 01:37:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697006230;
-	bh=ibJxl3VqApgkwXcPcBAZdilAPVeZ+ZobbrYoKmgyyBU=;
-	h=From:To:CC:Subject:Date;
-	b=s8naaFuYdAU+pPhK26H3cr/k2QuGyMYXKafJA97M2iSkBzh/Lj368qfPhBRDFv/4V
-	 JJVp2RQy2OoBBDdOcTVLgRUtP7CiWGw7XLpeAJhcUXJCSYeGH7dTmq5BzSModAnc0d
-	 /W+PAT4Fsbm1FlCq9uhyvDa8cUDSgiW9YAgKYf/k=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39B6bAnf121517
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 11 Oct 2023 01:37:10 -0500
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 11
- Oct 2023 01:37:10 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 11 Oct 2023 01:37:10 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39B6bAUS003485;
-	Wed, 11 Oct 2023 01:37:10 -0500
-Received: from localhost (dhcp-10-24-69-31.dhcp.ti.com [10.24.69.31])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 39B6b9tg008250;
-	Wed, 11 Oct 2023 01:37:09 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David
- S. Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>
-Subject: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
-Date: Wed, 11 Oct 2023 12:07:00 +0530
-Message-ID: <20231011063700.1824093-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D040B29B0
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:43:52 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25EF98
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:43:50 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qqSwP-0005Ho-KH; Wed, 11 Oct 2023 08:43:33 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qqSwO-000pu1-7x; Wed, 11 Oct 2023 08:43:32 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D5B9E233EAF;
+	Wed, 11 Oct 2023 06:43:31 +0000 (UTC)
+Date: Wed, 11 Oct 2023 08:43:31 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Francois Romieu <romieu@fr.zoreil.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>, Wei Fang <wei.fang@nxp.com>,
+	kernel@pengutronix.de, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: davicom: dm9000: dm9000_phy_write(): fix
+ deadlock during netdev watchdog handling
+Message-ID: <20231011-said-hemlock-834e5698a7a3-mkl@pengutronix.de>
+References: <20231010-dm9000-fix-deadlock-v1-1-b1f4396f83dd@pengutronix.de>
+ <20231010222131.GA3324403@electric-eye.fr.zoreil.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="a4km77vwpmqilo6v"
+Content-Disposition: inline
+In-Reply-To: <20231010222131.GA3324403@electric-eye.fr.zoreil.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-ICSSG HW stats on TX side considers 8 preamble bytes as data bytes. Due
-to this the tx_total_bytes of one interface doesn't match the
-rx_total_bytes of other interface when two ICSSG interfaces are
-connected with each other. There is no public errata available yet.
 
-As a workaround to fix this, decrease tx_total_bytes by 8 bytes for every
-tx frame.
+--a4km77vwpmqilo6v
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fixes: c1e10d5dc7a1 ("net: ti: icssg-prueth: Add ICSSG Stats")
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_stats.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+On 11.10.2023 00:21:31, Francois Romieu wrote:
+> Marc Kleine-Budde <mkl@pengutronix.de> :
+> > The dm9000 takes the db->lock spin lock in dm9000_timeout() and calls
+> > into dm9000_init_dm9000(). For the DM9000B the PHY is reset with
+> > dm9000_phy_write(). That function again takes the db->lock spin lock,
+> > which results in a deadlock. For reference the backtrace:
+> [...]
+> > To workaround similar problem (take mutex inside spin lock ) , a
+> > "in_timeout" variable was added in 582379839bbd ("dm9000: avoid
+> > sleeping in dm9000_timeout callback"). Use this variable and not take
+> > the spin lock inside dm9000_phy_write() if in_timeout is true.
+> >=20
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> > ---
+> > During the netdev watchdog handling the dm9000 driver takes the same
+> > spin lock twice. Avoid this by extending an existing workaround.
+> > ---
+>=20
+> I can review it but I can't really endorse it. :o)
+>=20
+> Extending ugly workaround in pre-2000 style device drivers...
+> I'd rather see the thing fixed if there is some real use for it.
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index bb0b33927e3b..dc12edcbac02 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -18,6 +18,7 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 	struct prueth *prueth = emac->prueth;
- 	int slice = prueth_emac_slice(emac);
- 	u32 base = stats_base[slice];
-+	u32 tx_pkt_cnt = 0;
- 	u32 val;
- 	int i;
- 
-@@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 			     base + icssg_all_stats[i].offset,
- 			     val);
- 
-+		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
-+			tx_pkt_cnt = val;
-+
- 		emac->stats[i] += val;
-+		if (!strncmp(icssg_ethtool_stats[i].name, "tx_total_bytes", ETH_GSTRING_LEN))
-+			emac->stats[i] -= tx_pkt_cnt * 8;
- 	}
- }
- 
--- 
-2.34.1
+There definitely are still users of this drivers on modern kernels out
+there.
 
+I too don't like the feeling of wrapping more and more duct tape
+around existing drivers. How about moving the functionality to
+dm9000_phy_write_locked() and leave the locking in dm9000_phy_write().
+I will prepare a patch.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--a4km77vwpmqilo6v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmUmRBAACgkQvlAcSiqK
+BOgEvAf/TShGqtUnCHTnvK9SdY7OpIB8DRrs2C74RY1u7SZ+3H85vhaKkDtOfk30
+LKv1esaCPgWSm6R9P0NMVHZXfnoP6o0EzsY2MofK6p49RJeJplVQodM3NhKmM9Ac
+MtJ2bccrI1Uo15WmI8P4X0AdrSc/Hd+cmhpiDjpKBqL3/MME91mro8n7DbwAtC9F
+q0tmlz5VWw2c56la0UiZGT075UZTsSlQnFXqceX/HzEDpCWAD9As7aqmH7DjsxOd
+q4pQrJWdSTLlTsNqPe7FhiS5Ir37kHKilVRj7sRZJ4/AJ2IKAU1W+mExcPX6tS0v
+yNpKFDtodb0G/J0LsihRxFSFpKn0ag==
+=T8KV
+-----END PGP SIGNATURE-----
+
+--a4km77vwpmqilo6v--
 
