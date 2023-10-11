@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-39813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17577C4893
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 05:44:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A38E7C4894
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 05:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58EE4281E8A
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6D84281F1E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5740CA5F;
-	Wed, 11 Oct 2023 03:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF9ACA68;
+	Wed, 11 Oct 2023 03:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axGWzn8h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCp/9yGs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584B5D2E3
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:44:30 +0000 (UTC)
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E6D394
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:44:29 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id 5614622812f47-3ae2896974bso4385541b6e.0
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:44:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D79E2D2E2
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 03:44:35 +0000 (UTC)
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22EBF92
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:44:34 -0700 (PDT)
+Received: by mail-oi1-x235.google.com with SMTP id 5614622812f47-3af608eb34bso4376314b6e.1
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 20:44:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696995868; x=1697600668; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1696995873; x=1697600673; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BG0lTECjijmEFm9e9LYjeMTQQ21OTNTMYQZ13fnzpuM=;
-        b=axGWzn8hiUh+VppaJb9gJp8LfGPRDN9YmF4pNUE8l9zQO2RbauZLxlP9V9DUjH1FZM
-         tiapdNpFstjlAGu/zlrzIZJ/zilkQMzaNzyOOGUMWaj/nSvib+PmHfVIpW8t+2HFV5N7
-         bdYtar/9RtShmQ4Gn/c54hgRPInun9QhyIMjBrpa+1kTxmqEUeCU92kNuh4+xV5N4HI+
-         FourD7bjQbwB91vPnE2lY6SDJqB8A7UN0VtiyOH7Yj7Sn4TDm+0S0HtT5mBUc3U+XdF8
-         qFTMHXwkhJkTIgtKj6+t4nFtjMy6PgSA8EiSdGAtvBd8O+on6koj8jZYYJkyLfsIHbad
-         VlXg==
+        bh=icbcgm9xSygTZ84fa5AdWx/TaKno2CPM52PibGcRS+M=;
+        b=CCp/9yGsdONTVBL+uzChuAmaWwuTbJHsNQn6bbHOoWuzy8BdmKGva11/wA2DJ6CPET
+         q0pLUAWFW9skrMzJlYKnh7WbtVWKyJOgSALvagihAaRun/28eUa7SFhN/y0wPzgPH7k2
+         YLI8aoeA19t6a4OgYGfIZ56vL0fgYhKxHX6hVSl+WIZpen+j0XxSqde0B5AC7B5zOYk9
+         chBfLWXbGAw1lLUXAFT2jrwLPA08sE5UCPwJJDsuPpB2nNCp16AOE/HVH1I4YOEPdVba
+         txarfkCjYn8gERsXMqZR6X7KuEoS73moB+bz/ERmsrLLQpds6V0qcpXbWsO9dJqvtKKP
+         4T7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696995868; x=1697600668;
+        d=1e100.net; s=20230601; t=1696995873; x=1697600673;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BG0lTECjijmEFm9e9LYjeMTQQ21OTNTMYQZ13fnzpuM=;
-        b=DNNfSEi4lU12NVv4EzicRHiAwlH+v9JC0z0tsY8I46qZ1awYp2ANbg/YZdHD0lW+iV
-         uhr315rGge2r94zRnXiaSJ3Vx+p6ubM7ThYMEYpBSRbMOevZp493FKnDi1Y7bSFDjqTQ
-         JBq4ODgdEqn46XrpbGXqcy4mSxd0YC7AqUUqNEPqPzu72+2iUi5OkeWco9OtMkV0Ogh8
-         7eXsJYfbdROgePnRlIMfcgamS3amoCSeu3fucVifjQarbczI5tkpcdAEjKurTIh9cCBb
-         yL82ZDttXSo0XLd1apyreaoQWrNQcOSmwqQIbenTyciydrrdrDiQteeI+Y1ANCKepYe+
-         Ektw==
-X-Gm-Message-State: AOJu0Yxzxne164/cuELMbvyTvLbhWlFw7xc3sT2mqXsa/0+fLwVBiTP6
-	FEweKSCWZAfRxQVUHsq2TBhU0RRPcpBELg==
-X-Google-Smtp-Source: AGHT+IFB+t2SmAwSL29E78ppnJwERh8c1+2v+39QdJb3/4uEQO7vQ9u/QRkvikRsqeYPhd8K3UL+sA==
-X-Received: by 2002:a05:6808:152a:b0:3a8:6a03:c0c with SMTP id u42-20020a056808152a00b003a86a030c0cmr27307955oiw.27.1696995868320;
-        Tue, 10 Oct 2023 20:44:28 -0700 (PDT)
+        bh=icbcgm9xSygTZ84fa5AdWx/TaKno2CPM52PibGcRS+M=;
+        b=c2+78R+7NEuROYRySegArggAw0nRE/UhM8i7+RvZa5FvgcNkdVtpx9OogQ7FQts5ib
+         PSZYG6z4vtibzOOdLpcRuA6T7ygewRE5UvFjtz58QxtdKIo757V8uHftgt3rLNlHqH8B
+         CjH811xd3EzQ5FT4+z8s1Y0kEI5ON0zTn76hzXEYPhoPxqLpnWaIeq4/b4UHdF2DkHvg
+         UkjcidOH1pkWcWWEEWffvbIPiVPLII1TySvNpAAoqsHDQxEwhJBM5jlr+PF4k1yNXmkU
+         ZkRM0pEFgNISx2fD26oeSjXgyc3y0QHf7pmYtVAKfh+cU7X2TnH5p3cjenn2Ae6OiQSy
+         W8zA==
+X-Gm-Message-State: AOJu0YwXPcIZLIB7cINU3X6M05eIvfxJeiTsst7R3GmtVPW/0xnZJiz8
+	WDombB0M6gWK3gAj3m4SusJG3pCPoC6SVw==
+X-Google-Smtp-Source: AGHT+IG2DT+GotU2rg/r7ctBPCz3Th6AsDi1xYW5tdM63vjMkGpdFmMl0iu8DNjNiZBKSjfK7EVXKQ==
+X-Received: by 2002:a05:6808:19a6:b0:3a4:4b42:612b with SMTP id bj38-20020a05680819a600b003a44b42612bmr27095344oib.42.1696995873209;
+        Tue, 10 Oct 2023 20:44:33 -0700 (PDT)
 Received: from wheely.local0.net ([1.128.220.51])
-        by smtp.gmail.com with ESMTPSA id q30-20020a638c5e000000b0058a9621f583sm7873656pgn.44.2023.10.10.20.44.23
+        by smtp.gmail.com with ESMTPSA id q30-20020a638c5e000000b0058a9621f583sm7873656pgn.44.2023.10.10.20.44.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 20:44:28 -0700 (PDT)
+        Tue, 10 Oct 2023 20:44:32 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -67,9 +67,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	"Eelco Chaudron" <echaudro@redhat.com>,
 	"Ilya Maximets" <imaximet@redhat.com>,
 	"Flavio Leitner" <fbl@redhat.com>
-Subject: [PATCH 6/7] net: openvswitch: uninline ovs_fragment to control stack usage
-Date: Wed, 11 Oct 2023 13:43:43 +1000
-Message-ID: <20231011034344.104398-7-npiggin@gmail.com>
+Subject: [PATCH 7/7] net: openvswitch: Reduce stack usage in ovs_dp_process_packet
+Date: Wed, 11 Oct 2023 13:43:44 +1000
+Message-ID: <20231011034344.104398-8-npiggin@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231011034344.104398-1-npiggin@gmail.com>
 References: <20231011034344.104398-1-npiggin@gmail.com>
@@ -87,36 +87,89 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-ovs_fragment uses a lot of stack, 400 bytes. It is a leaf function
-but its caller do_output is involved in openvswitch recursion.
-GCC 13.2 for powerpc64le is not inlining it, but it only has a single
-call site, so it is liable to being inlined.
-
-Mark it noinline_for_stack, to ensure it doesn't bloat stack use in
-the recursive path.
+The upcall in ovs_dp_process_packet some stack and is not involved in
+the recursive call. Move it out of line, reducing stack overhead of
+ovs_dp_process_packet from 144 to 96 bytes.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- net/openvswitch/actions.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/openvswitch/datapath.c | 56 ++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 24 deletions(-)
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 87ec668d5556..ef3a59012d26 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -900,9 +900,9 @@ static void prepare_frag(struct vport *vport, struct sk_buff *skb,
- 	skb_pull(skb, hlen);
+diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
+index 11c69415c605..fdc24b1e9bbc 100644
+--- a/net/openvswitch/datapath.c
++++ b/net/openvswitch/datapath.c
+@@ -242,6 +242,37 @@ void ovs_dp_detach_port(struct vport *p)
+ 	ovs_vport_del(p);
  }
  
--static void ovs_fragment(struct net *net, struct vport *vport,
--			 struct sk_buff *skb, u16 mru,
--			 struct sw_flow_key *key)
 +static noinline_for_stack
-+void ovs_fragment(struct net *net, struct vport *vport, struct sk_buff *skb,
-+		  u16 mru, struct sw_flow_key *key)
++void do_packet_upcall(struct sk_buff *skb, struct sw_flow_key *key,
++		      const struct vport *p, struct datapath *dp)
++{
++	struct dp_upcall_info upcall;
++	int error;
++
++	memset(&upcall, 0, sizeof(upcall));
++	upcall.cmd = OVS_PACKET_CMD_MISS;
++
++	if (dp->user_features & OVS_DP_F_DISPATCH_UPCALL_PER_CPU)
++		upcall.portid =
++		    ovs_dp_get_upcall_portid(dp, smp_processor_id());
++	else
++		upcall.portid = ovs_vport_find_upcall_portid(p, skb);
++
++	upcall.mru = OVS_CB(skb)->mru;
++	error = ovs_dp_upcall(dp, skb, key, &upcall, 0);
++	switch (error) {
++	case 0:
++	case -EAGAIN:
++	case -ERESTARTSYS:
++	case -EINTR:
++		consume_skb(skb);
++		break;
++	default:
++		kfree_skb(skb);
++		break;
++	}
++}
++
+ /* Must be called with rcu_read_lock. */
+ void ovs_dp_process_packet(struct sk_buff *skb, struct sw_flow_key *key)
  {
- 	enum ovs_drop_reason reason;
- 	u16 orig_network_offset = 0;
+@@ -261,30 +292,7 @@ void ovs_dp_process_packet(struct sk_buff *skb, struct sw_flow_key *key)
+ 	flow = ovs_flow_tbl_lookup_stats(&dp->table, key, skb_get_hash(skb),
+ 					 &n_mask_hit, &n_cache_hit);
+ 	if (unlikely(!flow)) {
+-		struct dp_upcall_info upcall;
+-
+-		memset(&upcall, 0, sizeof(upcall));
+-		upcall.cmd = OVS_PACKET_CMD_MISS;
+-
+-		if (dp->user_features & OVS_DP_F_DISPATCH_UPCALL_PER_CPU)
+-			upcall.portid =
+-			    ovs_dp_get_upcall_portid(dp, smp_processor_id());
+-		else
+-			upcall.portid = ovs_vport_find_upcall_portid(p, skb);
+-
+-		upcall.mru = OVS_CB(skb)->mru;
+-		error = ovs_dp_upcall(dp, skb, key, &upcall, 0);
+-		switch (error) {
+-		case 0:
+-		case -EAGAIN:
+-		case -ERESTARTSYS:
+-		case -EINTR:
+-			consume_skb(skb);
+-			break;
+-		default:
+-			kfree_skb(skb);
+-			break;
+-		}
++		do_packet_upcall(skb, key, p, dp);
+ 		stats_counter = &stats->n_missed;
+ 		goto out;
+ 	}
 -- 
 2.42.0
 
