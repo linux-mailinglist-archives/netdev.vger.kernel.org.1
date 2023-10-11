@@ -1,152 +1,180 @@
-Return-Path: <netdev+bounces-39764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D247C45CB
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:01:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B64B7C45F9
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A5371C20B85
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:01:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B1682815AB
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 00:19:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC2B20E0;
-	Wed, 11 Oct 2023 00:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="C7d/yRC5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63C719D;
+	Wed, 11 Oct 2023 00:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB10B1C02
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 00:01:25 +0000 (UTC)
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AF8391
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:01:24 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-578b407045bso5027940a12.0
-        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1696982483; x=1697587283; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zXwHFTTSHqHksZHyWZ3bFkL07EMOlYzNsZg2rCsLLcM=;
-        b=C7d/yRC5Raip0nMfFJljMYPZuVOwrxYCRUe4z9sSsoYFSsYqcS2kS0sUXwh5r8TxEU
-         LQnikAzpaJOvdDZDRbVIeUFUS8fZSlviJTGP/SJnQKoAkLUysfm/xq9HTYN1Inai9hNA
-         9oHroh9cjqDL0M3UEJNqIxP+fOMIkbxuH1kcM=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD01198
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 00:19:53 +0000 (UTC)
+Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B743591
+	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:19:51 -0700 (PDT)
+Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-57b74fbbd6eso518974eaf.0
+        for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 17:19:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696982483; x=1697587283;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zXwHFTTSHqHksZHyWZ3bFkL07EMOlYzNsZg2rCsLLcM=;
-        b=SYQBBJzkFqDzLz9yYmOaQV4iewAO4tqKW4fOw1uRo2WmDwdbg35+Fa5fpYs+y4xPuu
-         TX+paGIrBUIWDeiQA/5v9423VLUcBpq5ZGoLODIco8A4lDrnV9yLBMX/qqKM7JAKqKuh
-         IdyNq4+V7fqrFEmOw5UtjglDpCh0MmDdK6z57nbKp3RdqA3OcqXb0MqmUaiBH+oL6wDk
-         Df7QUVXvhQsz94gkpN2NyJrr+yNTuf9ukVpmYMmhTRPWdyT0jCvZkU55cZeL9tjqTY0G
-         hUNN4REcLbmBVOYSo6yDaYGTwwm1b7JLk9Dz6MyNYE2A3LQEPE1C5JSde2hUrsYUJNNx
-         jjow==
-X-Gm-Message-State: AOJu0YyXRiqS60zaqLUYD1qfde9AzFsZIBAXa002uzEfbKKeEc/Ock8u
-	vi9zVE3/j9gADDU0u/eSUj5e4w==
-X-Google-Smtp-Source: AGHT+IHvnF1NY14+x1atCUXgwzdFEk0ZaADVkWvm44vtZyO7tNcwIEv+y9XR2Sh6iJ6MxunGIbRJhw==
-X-Received: by 2002:a05:6a20:2590:b0:151:577:32d1 with SMTP id k16-20020a056a20259000b00151057732d1mr23567638pzd.22.1696982483550;
-        Tue, 10 Oct 2023 17:01:23 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id g12-20020a170902868c00b001c625acfed0sm12371984plo.44.2023.10.10.17.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Oct 2023 17:01:23 -0700 (PDT)
-Date: Tue, 10 Oct 2023 17:01:19 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] octeontx2-af: replace deprecated strncpy with strscpy
-Message-ID: <202310101700.1BE3455BE6@keescook>
-References: <20231010-strncpy-drivers-net-ethernet-marvell-octeontx2-af-cgx-c-v1-1-a443e18f9de8@google.com>
+        d=1e100.net; s=20230601; t=1696983591; x=1697588391;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gNj+IC7+eBa0Nr500LxCGZt1jLSuBIDY8+33et+uWbQ=;
+        b=JP1+cSFcJTx5RDqOyXEzcUAAvHTpRfPbdNSDS9ITFeZ6mgbk6x6cqMuud1G5SLiRgw
+         VBbaOugkXOwEmM0YrlCciUrpRLm2HaEFEBXKutSul3lxUxwcZ8RcwXQ0zVEmtU7FdPHQ
+         B2zimY4DqIHHCjwvqrSerlJ6OUFBOYYjML6VxtKkkCvTIN5vQdKCiua84/qaEF2CVnTE
+         CHznEC+kYOJ2oiw7BtgRaRRtXac+c6D4Es13QgBSZgLNx5KPV/OQ06Y9TC7ojZg9+0fR
+         LCP+1LMlAaSDYhXJ7EWHlz82ckUkbMpp0BLKsxf0X0uvevabJkc5TaIgYqFh6oTkH/eh
+         LT4g==
+X-Gm-Message-State: AOJu0YwcN8cAxJucL6LeKr6KkAvOSswkVW08vhZ0deFgzzrikWRqndEE
+	M+SoJyKGbVnxx6o899LeZr3It1yYXUwFj5zibZSjvVr7ROc0
+X-Google-Smtp-Source: AGHT+IHgTvs0kAh83CYpwK+Qt4QqGbbn+G3n2RUJfYngVP6YVN7vzhAZalWdsifqT0A4ttWTc3qatwv3dYUFc781bo029n1sWwF/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010-strncpy-drivers-net-ethernet-marvell-octeontx2-af-cgx-c-v1-1-a443e18f9de8@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a05:6820:612:b0:56d:72ca:c4dc with SMTP id
+ e18-20020a056820061200b0056d72cac4dcmr8103734oow.0.1696983591092; Tue, 10 Oct
+ 2023 17:19:51 -0700 (PDT)
+Date: Tue, 10 Oct 2023 17:19:51 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000230b04060765c8d0@google.com>
+Subject: [syzbot] [wireless?] [net?] memory leak in ieee80211_add_key
+From: syzbot <syzbot+c7f9b4282ce793ea2456@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 09:38:11PM +0000, Justin Stitt wrote:
-> `strncpy` is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> We can see that linfo->lmac_type is expected to be NUL-terminated based
-> on the `... - 1`'s present in the current code. Presumably making room
-> for a NUL-byte at the end of the buffer.
-> 
-> Considering the above, a suitable replacement is `strscpy` [2] due to
-> the fact that it guarantees NUL-termination on the destination buffer
-> without unnecessarily NUL-padding.
-> 
-> Let's also prefer the more idiomatic strscpy usage of (dest, src,
-> sizeof(dest)) rather than (dest, src, SOME_LEN).
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
-> Note: build-tested only.
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> index e06f77ad6106..6c70c8498690 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-> @@ -1218,8 +1218,6 @@ static inline void link_status_user_format(u64 lstat,
->  					   struct cgx_link_user_info *linfo,
->  					   struct cgx *cgx, u8 lmac_id)
->  {
-> -	const char *lmac_string;
-> -
->  	linfo->link_up = FIELD_GET(RESP_LINKSTAT_UP, lstat);
->  	linfo->full_duplex = FIELD_GET(RESP_LINKSTAT_FDUPLEX, lstat);
->  	linfo->speed = cgx_speed_mbps[FIELD_GET(RESP_LINKSTAT_SPEED, lstat)];
-> @@ -1230,12 +1228,12 @@ static inline void link_status_user_format(u64 lstat,
->  	if (linfo->lmac_type_id >= LMAC_MODE_MAX) {
->  		dev_err(&cgx->pdev->dev, "Unknown lmac_type_id %d reported by firmware on cgx port%d:%d",
->  			linfo->lmac_type_id, cgx->cgx_id, lmac_id);
-> -		strncpy(linfo->lmac_type, "Unknown", LMACTYPE_STR_LEN - 1);
-> +		strscpy(linfo->lmac_type, "Unknown", sizeof(linfo->lmac_type));
->  		return;
->  	}
->  
-> -	lmac_string = cgx_lmactype_string[linfo->lmac_type_id];
-> -	strncpy(linfo->lmac_type, lmac_string, LMACTYPE_STR_LEN - 1);
-> +	strscpy(linfo->lmac_type, cgx_lmactype_string[linfo->lmac_type_id],
-> +		sizeof(linfo->lmac_type));
+Hello,
 
-Yup, sizes match. Good replacement and simplification.
+syzbot found the following issue on:
 
-drivers/net/ethernet/marvell/octeontx2/af/mbox.h:565:#define LMACTYPE_STR_LEN 16
-drivers/net/ethernet/marvell/octeontx2/af/mbox.h:566:   char lmac_type[LMACTYPE_STR_LEN];
+HEAD commit:    af95dc6fdc25 Merge tag 'pci-v6.6-fixes-2' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=111f9141680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=92fc678f64486a09
+dashboard link: https://syzkaller.appspot.com/bug?extid=c7f9b4282ce793ea2456
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12874a7e680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17eba911680000
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8bc195198bd8/disk-af95dc6f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/769216d795c4/vmlinux-af95dc6f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8ceb9e44a618/bzImage-af95dc6f.xz
 
--- 
-Kees Cook
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c7f9b4282ce793ea2456@syzkaller.appspotmail.com
+
+executing program
+executing program
+BUG: memory leak
+unreferenced object 0xffff8881419b3000 (size 1024):
+  comm "syz-executor294", pid 5023, jiffies 4294944772 (age 13.090s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 18 30 9b 41 81 88 ff ff  .........0.A....
+  backtrace:
+    [<ffffffff8157491b>] __do_kmalloc_node mm/slab_common.c:1022 [inline]
+    [<ffffffff8157491b>] __kmalloc+0x4b/0x150 mm/slab_common.c:1036
+    [<ffffffff848575dc>] kmalloc include/linux/slab.h:603 [inline]
+    [<ffffffff848575dc>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff848575dc>] ieee80211_key_alloc+0x5c/0x590 net/mac80211/key.c:603
+    [<ffffffff8482b0d2>] ieee80211_add_key+0x162/0x540 net/mac80211/cfg.c:500
+    [<ffffffff8477c375>] rdev_add_key net/wireless/rdev-ops.h:87 [inline]
+    [<ffffffff8477c375>] nl80211_new_key+0x315/0x540 net/wireless/nl80211.c:4764
+    [<ffffffff84033bb6>] genl_family_rcv_msg_doit+0x116/0x180 net/netlink/genetlink.c:971
+    [<ffffffff840347dd>] genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+    [<ffffffff840347dd>] genl_rcv_msg+0x2fd/0x440 net/netlink/genetlink.c:1066
+    [<ffffffff84032191>] netlink_rcv_skb+0x91/0x1d0 net/netlink/af_netlink.c:2545
+    [<ffffffff840335f8>] genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
+    [<ffffffff84031092>] netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+    [<ffffffff84031092>] netlink_unicast+0x2c2/0x440 net/netlink/af_netlink.c:1368
+    [<ffffffff840315b5>] netlink_sendmsg+0x3a5/0x740 net/netlink/af_netlink.c:1910
+    [<ffffffff83e96c12>] sock_sendmsg_nosec net/socket.c:730 [inline]
+    [<ffffffff83e96c12>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
+    [<ffffffff83e97265>] ____sys_sendmsg+0x365/0x470 net/socket.c:2558
+    [<ffffffff83e9b6d9>] ___sys_sendmsg+0xc9/0x130 net/socket.c:2612
+    [<ffffffff83e9b886>] __sys_sendmsg+0xa6/0x120 net/socket.c:2641
+    [<ffffffff84b38548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b38548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+BUG: memory leak
+unreferenced object 0xffff8881419b3400 (size 1024):
+  comm "syz-executor294", pid 5025, jiffies 4294945317 (age 7.640s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 18 34 9b 41 81 88 ff ff  .........4.A....
+  backtrace:
+    [<ffffffff8157491b>] __do_kmalloc_node mm/slab_common.c:1022 [inline]
+    [<ffffffff8157491b>] __kmalloc+0x4b/0x150 mm/slab_common.c:1036
+    [<ffffffff848575dc>] kmalloc include/linux/slab.h:603 [inline]
+    [<ffffffff848575dc>] kzalloc include/linux/slab.h:720 [inline]
+    [<ffffffff848575dc>] ieee80211_key_alloc+0x5c/0x590 net/mac80211/key.c:603
+    [<ffffffff8482b0d2>] ieee80211_add_key+0x162/0x540 net/mac80211/cfg.c:500
+    [<ffffffff8477c375>] rdev_add_key net/wireless/rdev-ops.h:87 [inline]
+    [<ffffffff8477c375>] nl80211_new_key+0x315/0x540 net/wireless/nl80211.c:4764
+    [<ffffffff84033bb6>] genl_family_rcv_msg_doit+0x116/0x180 net/netlink/genetlink.c:971
+    [<ffffffff840347dd>] genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+    [<ffffffff840347dd>] genl_rcv_msg+0x2fd/0x440 net/netlink/genetlink.c:1066
+    [<ffffffff84032191>] netlink_rcv_skb+0x91/0x1d0 net/netlink/af_netlink.c:2545
+    [<ffffffff840335f8>] genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
+    [<ffffffff84031092>] netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+    [<ffffffff84031092>] netlink_unicast+0x2c2/0x440 net/netlink/af_netlink.c:1368
+    [<ffffffff840315b5>] netlink_sendmsg+0x3a5/0x740 net/netlink/af_netlink.c:1910
+    [<ffffffff83e96c12>] sock_sendmsg_nosec net/socket.c:730 [inline]
+    [<ffffffff83e96c12>] __sock_sendmsg+0x52/0xa0 net/socket.c:745
+    [<ffffffff83e97265>] ____sys_sendmsg+0x365/0x470 net/socket.c:2558
+    [<ffffffff83e9b6d9>] ___sys_sendmsg+0xc9/0x130 net/socket.c:2612
+    [<ffffffff83e9b886>] __sys_sendmsg+0xa6/0x120 net/socket.c:2641
+    [<ffffffff84b38548>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+    [<ffffffff84b38548>] do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+    [<ffffffff84c0008b>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
