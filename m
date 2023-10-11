@@ -1,133 +1,131 @@
-Return-Path: <netdev+bounces-40042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACF407C58B2
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:58:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC437C58B9
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C79B41C20DAC
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:58:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87FEE1C20BBF
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE992FE06;
-	Wed, 11 Oct 2023 15:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7894430F88;
+	Wed, 11 Oct 2023 16:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="UVrZGTUI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DuqgHXuR"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OL+keEpE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D59224E8;
-	Wed, 11 Oct 2023 15:58:07 +0000 (UTC)
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90DFD8F;
-	Wed, 11 Oct 2023 08:58:05 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.west.internal (Postfix) with ESMTP id 4DD8C3200945;
-	Wed, 11 Oct 2023 11:58:01 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 11 Oct 2023 11:58:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm2; t=1697039880; x=1697126280; bh=7H
-	Jkg/z8yMK6BHAYpmQDPyFjBK9Xn+ituvuEwAuZ1sU=; b=UVrZGTUIN/c+wOrjog
-	V4H1MycpdvOstYDdYmz6kQvmlXMauPc9wG4HupXP9G/ReLiXafAkUjS+sZEbRN0f
-	jZYR39UNK2581JykJ0XJeyTsMpe/huU9w18VgyyKp6JwnNi7Tx9B8QhovC0NlI81
-	hYf/r/qoMxEMTUwWznAh7j7NCxugCnHq860yJk4U81Uqq0qSgQAFlWeMiCdTsRe4
-	WeS1otq5untWkPF34AdO27vX/Y62ovQR1+O6n/lg7bjQYE+pazHxI3k6c6Os0RcD
-	MHn1EWGlZMobVxq/d1A7+fB+wdL8DkYfmj6MwSDv1b+SMvxPWxV9DwV4Y3P1NuRV
-	P6sw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1697039880; x=1697126280; bh=7HJkg/z8yMK6B
-	HAYpmQDPyFjBK9Xn+ituvuEwAuZ1sU=; b=DuqgHXuRkjGzv+sTVQXosPn4qx3IG
-	pp0FiLiqn0YzKA4Exz530ss62tkJ0JcrBK7OWeQz14oG3MEAAtZGcqzI0V+21941
-	xFof5XUuSDb+0m4kwAzSKruypnuL188xCt70zp7dvyoLhT45IbrhJz/q3ySNn4cK
-	/An+FzaHKbvg1iE9uK02O9ejiEjUBdoYHEdcXb00bzzjHaIx3foxvoQhSv3a8EIH
-	TsguJLzeGl9vRBq1hT+9ugqXZvc6SGrPf8K7TqHwZQ4RO+oaoaS3TIS46KHel7rW
-	oyoBMWFuQvAqQd7G1hLQ/j4P1h4zZwATDfcwwJGKZZ0/rDyGwt4dBPDAQ==
-X-ME-Sender: <xms:CMYmZV0XE_EsNbv0M22Xjk7OczozGwze6bo3NRK15HHwsRKTwUu2Iw>
-    <xme:CMYmZcGc0ENyppHryqZhpcyV0hOOcxjuTXA42bBoLODDCTcQEtXH2PAr1RIuPrqTi
-    IB0IEPFtpOKWSCOL60>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrheekgdelvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeevhfffledtgeehfeffhfdtgedvheejtdfgkeeuvefgudffteettdekkeeufeeh
-    udenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:CMYmZV589CMQPoU21g8abAl3zQiB30Rq5SFLxdDrBC0XlvrFP_5y5A>
-    <xmx:CMYmZS3UYGaaj_dDsRqeO5bwzM73qo2MfAiY8fjWT39O9vFI2ikiCA>
-    <xmx:CMYmZYGJmnHAdwzedxXPSUko0KfLjLOGgtM7CAl8R2UN-HOCj08sgg>
-    <xmx:CMYmZfcEwbKy8YlJQgLXNdgzXoi3YSodyaYkJuapJr-ijNW9VXkIoQ>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id E845BB60089; Wed, 11 Oct 2023 11:57:59 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1019-ged83ad8595-fm-20231002.001-ged83ad85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A64101F6
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 16:01:55 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 295B191
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=ukvrUioNWbMdieGVVP0yXPp3At+mvG2IEJQ6NoeN2r0=;
+	t=1697040114; x=1698249714; b=OL+keEpEjd8oppm48yxgK5SlpSldY0AChXIAkwG+uXP74+i
+	+MmyvwlCHIsZvx3j5pXf/kxmqpnQUuryAIy+r1QdJyuRYZdOX9ZIfsup0YHmHJm+7Ut+stLfIdxzL
+	wnMIoJ4NxwScXryABOLPdE5YPQtpjMJZ459XFkZXr72VfyGcoaVrVSyaxJ7SPCWzLUTSgZKc2F1Mh
+	jAzWkOjZIlrkoOD8Te63hvAL1Orh2JysAgIMzF64ugn5PKVwcR7CYMUYCxzu3Dp2K4jBbjr0JdFfi
+	8Vb4ph2mfka1y7ySohTcRut9c+PAr0Uho2drX1BqNu6WaWx+TbLRKiVaypshAxFQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97-RC1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qqbeg-00000001yUI-1CIF;
+	Wed, 11 Oct 2023 18:01:50 +0200
+Message-ID: <30be757c7a0bbe50b37e9f2e6f93c8cf4219bbc1.camel@sipsolutions.net>
+Subject: Re: [RFC] netlink: add variable-length / auto integers
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Nicolas Dichtel
+	 <nicolas.dichtel@6wind.com>
+Cc: netdev@vger.kernel.org, fw@strlen.de, pablo@netfilter.org,
+ jiri@resnulli.us,  mkubecek@suse.cz, aleksander.lobakin@intel.com, Thomas
+ Haller <thaller@redhat.com>
+Date: Wed, 11 Oct 2023 18:01:49 +0200
+In-Reply-To: <20231011085230.2d3dc1ab@kernel.org>
+References: <20231011003313.105315-1-kuba@kernel.org>
+	 <f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
+	 <6ec63a78-b0cc-452e-9946-0acef346cac2@6wind.com>
+	 <20231011085230.2d3dc1ab@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
-In-Reply-To: <ZSa5bIcISlvW3zo5@nanopsycho>
-References: <20231011140225.253106-1-arnd@kernel.org>
- <ZSa5bIcISlvW3zo5@nanopsycho>
-Date: Wed, 11 Oct 2023 17:57:38 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Jiri Pirko" <jiri@resnulli.us>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Jakub Kicinski" <kuba@kernel.org>, Netdev <netdev@vger.kernel.org>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- linux-wireless@vger.kernel.org, "Johannes Berg" <johannes@sipsolutions.net>,
- linux-wpan@vger.kernel.org,
- "Michael Hennerich" <michael.hennerich@analog.com>,
- "Paolo Abeni" <pabeni@redhat.com>, "Eric Dumazet" <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Rodolfo Zitellini" <rwz@xhero.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support conditional
-Content-Type: text/plain
+X-malware-bazaar: not-scanned
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023, at 17:04, Jiri Pirko wrote:
-> Could you provide a cover letter for the set please?
+On Wed, 2023-10-11 at 08:52 -0700, Jakub Kicinski wrote:
 
-Subject: [PATCH v2 00/10] remove final .ndo_do_ioctl references
+> > > > Even for arches which don't have good unaligned access - I'd think
+> > > > that access aligned to 4B *is* pretty efficient, and that's all
+> > > > we need. Plus kernel deals with unaligned input. Why can't user spa=
+ce? =20
+> > >=20
+> > > Hmm. I have a vague recollection that it was related to just not doin=
+g
+> > > it - the kernel will do get_unaligned() or similar, but userspace if =
+it
+> > > just accesses it might take a trap on some architectures?
+> > >=20
+> > > But I can't find any record of this in public discussions, so ... =
+=20
+> > If I remember well, at this time, we had some (old) architectures that =
+triggered
+> > traps (in kernel) when a 64-bit field was accessed and unaligned. Maybe=
+ a mix
+> > between 64-bit kernel / 32-bit userspace, I don't remember exactly. The=
+ goal was
+> > to align u64 fields on 8 bytes.
+>=20
+> Reading the discussions I think we can chalk the alignment up=20
+> to "old way of doing things". Discussion was about stats64,=20
+> if someone wants to access stats directly in the message then yes,=20
+> they care a lot about alignment.
+>=20
+> Today we try to steer people towards attr-per-field, rather than
+> dumping structs. Instead of doing:
+>=20
+> 	struct stats *stats =3D nla_data(attr);
+> 	print("A: %llu", stats->a);
+>=20
+> We will do:
+>=20
+> 	print("A: %llu", nla_get_u64(attrs[NLA_BLA_STAT_A]));
 
-The .ndo_do_ioctl() netdev operation used to be how one communicates
-with a network driver from userspace, but since my previous cleanup [1],
-it is purely internal to the kernel.
+Well, yes, although the "struct stats" part _still_ even exists in the
+kernel, we never fixed that with the nla_put_u64_64bit() stuff, that was
+only for something that does
 
-Removing the cops appletalk/localtalk driver made me revisit the
-missing pieces from that older series, removing all the unused
-implementations in wireless drivers as well as the two kernel-internal
-callers in the ieee802154 and appletalk stacks.
+	print("A: %" PRIu64, *(uint64_t *)nla_data(attrs[NLA_BLA_STAT_A]));
 
-One ethernet driver was already merged in the meantime that should
-have used .ndo_eth_ioctl instead of .ndo_do_ioctl, so fix that as well.
-With the complete removal, any future drivers making this mistake
-cause build failures that are easier to spot.
+> Assuming nla_get_u64() is unalign-ready the problem doesn't exist.
 
-[1] https://lore.kernel.org/netdev/20201106221743.3271965-1-arnd@kernel.org/
+Depends on the library, but at least for libnl that's true since ever.
+Same for libmnl and libnl-tiny. So I guess it only ever hit hand-coded
+implementations.
 
-----
-Hope that helps, I had commented on the cops removal about sending
-this but of course not everyone here saw that. Let me know if I should
-resend the patches together with the cover letter.
+For the record, I'm pretty sure (and was at the time) that for wifi
+(nl80211) this was never an issue, but ...
 
-    Arnd
+> Does the above sounds like a fair summary? If so I'll use it in=20
+> the commit message?
+
+As I said above, not sure about the whole struct thing - that's still
+kind of broken and was never addressed by this, but otherwise yes.
+
+johannes
 
