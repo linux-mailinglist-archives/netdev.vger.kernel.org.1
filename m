@@ -1,72 +1,52 @@
-Return-Path: <netdev+bounces-39961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092567C5134
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:11:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC21C7C51C1
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:22:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6AAB2822E8
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:11:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85821C208FE
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33F11DDC8;
-	Wed, 11 Oct 2023 11:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="hVsCDzN0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60C61DA4C;
+	Wed, 11 Oct 2023 11:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB43199D2
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:11:19 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A448CD3
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:11:16 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32483535e51so6450711f8f.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:11:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697022675; x=1697627475; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S5GNKoDzJaHuzKJxlYhSGC/WySAPDC162s7razYkn5c=;
-        b=hVsCDzN0YRLfpJ/2mKRa0JptbW02H7uwsNgSN4i7J4fO8v8Gmd6w/OYWFyv8WqwoGv
-         fjuyaoSWI3dFodb0NOi3gELhxKON4D+y9yi3oo10xM07RXEqsfdDt7pn2i7n3o2ZBIVU
-         Ot22K+hAZYKUvBkxDcY6sRHXJJkq2RmrX6AcZlawZYOTdeVmGtO5mXCiJE5wN6w7DNR1
-         wbbAnqDveayy4LkKYvE7RvfxQaM+jTb6CPqYkSOir7xoW3lxyxClCRqqX3LdevL3WvU6
-         0mLiogdLIeelDSJ+f2vtfl4djG+3BWyKPaaBla7cR8TGDAl2ZxFu/E6GADaX0+4SJWOq
-         s2cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697022675; x=1697627475;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S5GNKoDzJaHuzKJxlYhSGC/WySAPDC162s7razYkn5c=;
-        b=c4pU2YVERY3h6rkp5z21Ke/u6WydDgtn0M4a4GPWnaWd5iPyMzBjlKQ5uIeeFr60BJ
-         XObf39IzUVwtwUVaKqE2l19dh8ErnM7Ms1PV4+XxaEb9c9TaaNQAOtJNTITfsQMRuxa4
-         X4n9U+62TdLS66PCgNMI/h/CEwuIz8vX4Nk5TwibK073XgdesFBf/kwv44dYr+H/Qd8i
-         SfgRbQwWgIUNWLkhAuG3tspHud8oJfRfTEn3ROMT6KOwxGsxxdkx5ZOCYMHiLdfWOSTI
-         02eD4P7f0qArLmNBTV88F3H3bXBrLSMFEthhIvnWBVTSVp+o2z0ZrBPajde/OJZIO0nU
-         8J0Q==
-X-Gm-Message-State: AOJu0Yxy5fstUbC26dyCiFMwi/Zk3OYqCUruGPDCvAnejVWr3ocjhxT0
-	YJfHWcUKQgUU0wjt/FIaCGuJHw==
-X-Google-Smtp-Source: AGHT+IFMWdRjvrgTbr57qIWQAFPotfX/2bryYCgBf8xJCd9HLat6ps/im4EniVGCVudDPL3jp6V+BQ==
-X-Received: by 2002:adf:a152:0:b0:32d:8942:9ff5 with SMTP id r18-20020adfa152000000b0032d89429ff5mr720660wrr.14.1697022674877;
-        Wed, 11 Oct 2023 04:11:14 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id g10-20020a5d698a000000b00327297abe31sm15135858wru.68.2023.10.11.04.11.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 04:11:14 -0700 (PDT)
-Date: Wed, 11 Oct 2023 13:11:13 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH net-next v5 0/5] dpll: add phase-offset and phase-adjust
-Message-ID: <ZSaC0Qg0UwHveMcz@nanopsycho>
-References: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837111E504
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:22:10 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50F810E7
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:21:56 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qqXHP-0003tr-62; Wed, 11 Oct 2023 13:21:31 +0200
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qqXHO-000tKA-Hp; Wed, 11 Oct 2023 13:21:30 +0200
+Received: from sha by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1qqXHO-00DuHH-FB; Wed, 11 Oct 2023 13:21:30 +0200
+Date: Wed, 11 Oct 2023 13:21:30 +0200
+From: Sascha Hauer <sha@pengutronix.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel@pengutronix.de,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: Problem with io_uring splice and KTLS
+Message-ID: <20231011112130.GH3114228@pengutronix.de>
+References: <20231010141932.GD3114228@pengutronix.de>
+ <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,42 +55,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231011101236.23160-1-arkadiusz.kubalewski@intel.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <d729781a-3d12-423b-973e-c16fdbcbb60b@kernel.dk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Oct 11, 2023 at 12:12:31PM CEST, arkadiusz.kubalewski@intel.com wrote:
->Improve monitoring and control over dpll devices.
->Allow user to receive measurement of phase difference between signals
->on pin and dpll (phase-offset).
->Allow user to receive and control adjustable value of pin's signal
->phase (phase-adjust).
->
->v4->v5:
->- rebase series on top of net-next/main, fix conflict - remove redundant
->  attribute type definition in subset definition
->
->v3->v4:
->- do not increase do version of uAPI header as it is not needed (v3 did
->  not have this change)
->- fix spelling around commit messages, argument descriptions and docs
->- add missing extack errors on failure set callbacks for pin phase
->  adjust and frequency
->- remove ice check if value is already set, now redundant as checked in
->  the dpll subsystem
->
->v2->v3:
->- do not increase do version of uAPI header as it is not needed
->
->v1->v2:
->- improve handling for error case of requesting the phase adjust set
->- align handling for error case of frequency set request with the
->approach introduced for phase adjust
+On Tue, Oct 10, 2023 at 08:28:13AM -0600, Jens Axboe wrote:
+> On 10/10/23 8:19 AM, Sascha Hauer wrote:
+> > Hi,
+> > 
+> > I am working with a webserver using io_uring in conjunction with KTLS. The
+> > webserver basically splices static file data from a pipe to a socket which uses
+> > KTLS for encryption. When splice is done the socket is closed. This works fine
+> > when using software encryption in KTLS. Things go awry though when the software
+> > encryption is replaced with the CAAM driver which replaces the synchronous
+> > encryption with a asynchronous queue/interrupt/completion flow.
+> > 
+> > So far I have traced it down to tls_push_sg() calling tcp_sendmsg_locked() to
+> > send the completed encrypted messages. tcp_sendmsg_locked() sometimes waits for
+> > more memory on the socket by calling sk_stream_wait_memory(). This in turn
+> > returns -ERESTARTSYS due to:
+> > 
+> >         if (signal_pending(current))
+> >                 goto do_interrupted;
+> > 
+> > The current task has the TIF_NOTIFY_SIGNAL set due to:
+> > 
+> > io_req_normal_work_add()
+> > {
+> >         ...
+> >         /* This interrupts sk_stream_wait_memory() (notify_method == TWA_SIGNAL) */
+> >         task_work_add(req->task, &tctx->task_work, ctx->notify_method)))
+> > }
+> > 
+> > The call stack when sk_stream_wait_memory() fails is as follows:
+> > 
+> > [ 1385.428816]  dump_backtrace+0xa0/0x128
+> > [ 1385.432568]  show_stack+0x20/0x38
+> > [ 1385.435878]  dump_stack_lvl+0x48/0x60
+> > [ 1385.439539]  dump_stack+0x18/0x28
+> > [ 1385.442850]  tls_push_sg+0x100/0x238
+> > [ 1385.446424]  tls_tx_records+0x118/0x1d8
+> > [ 1385.450257]  tls_sw_release_resources_tx+0x74/0x1a0
+> > [ 1385.455135]  tls_sk_proto_close+0x2f8/0x3f0
+> > [ 1385.459315]  inet_release+0x58/0xb8
+> > [ 1385.462802]  inet6_release+0x3c/0x60
+> > [ 1385.466374]  __sock_release+0x48/0xc8
+> > [ 1385.470035]  sock_close+0x20/0x38
+> > [ 1385.473347]  __fput+0xbc/0x280
+> > [ 1385.476399]  ____fput+0x18/0x30
+> > [ 1385.479537]  task_work_run+0x80/0xe0
+> > [ 1385.483108]  io_run_task_work+0x40/0x108
+> > [ 1385.487029]  __arm64_sys_io_uring_enter+0x164/0xad8
+> > [ 1385.491907]  invoke_syscall+0x50/0x128
+> > [ 1385.495655]  el0_svc_common.constprop.0+0x48/0xf0
+> > [ 1385.500359]  do_el0_svc_compat+0x24/0x40
+> > [ 1385.504279]  el0_svc_compat+0x38/0x108
+> > [ 1385.508026]  el0t_32_sync_handler+0x98/0x140
+> > [ 1385.512294]  el0t_32_sync+0x194/0x198
+> > 
+> > So the socket is being closed and KTLS tries to send out the remaining
+> > completed messages.  From a splice point of view everything has been sent
+> > successfully, but not everything made it through KTLS to the socket and the
+> > remaining data is sent while closing the socket.
+> > 
+> > I vaguely understand what's going on here, but I haven't got the
+> > slightest idea what to do about this. Any ideas?
+> 
+> Two things to try:
+> 
+> 1) Depending on how you use the ring, set it up with
+> IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN. The latter will
+> avoid using signal based task_work notifications, which may be messing
+> you up here.
 
-Again,
-set-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+These flags do not make a difference unfortunately.
+
+> 
+> 2) io_uring will hold a reference to the file/socket. I'm unsure if this
+> is a problem in the above case, but sometimes it'll prevent the final
+> flush.
+
+Not sure what you want me to test here.
+
+FWIW I tried to do the close() outside of io_uring and just did a
+regular close() in userspace. That didn't make a difference either.
+
+> 
+> Do you have a reproducer that could be run to test? Sometimes easier to
+> see what's going on when you can experiment, it'll save some time.
+
+I would love to provide a reproducer, but you'll need a device with an
+asynchronous encryption engine providing gcm(aes). I am using the CAAM
+engine on a Layerscape board, but some i.MX6/8 based board should do
+as well. I don't know what other hardware you might have which supports
+that.
+
+Sascha
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
