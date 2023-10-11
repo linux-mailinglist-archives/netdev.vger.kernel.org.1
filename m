@@ -1,122 +1,71 @@
-Return-Path: <netdev+bounces-39782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC6877C478E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 03:56:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2897C479A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 04:01:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47BB128220B
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 01:56:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883FC1C20C59
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FCC80D;
-	Wed, 11 Oct 2023 01:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64881A5D;
+	Wed, 11 Oct 2023 02:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZS1pCZZb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+SAnBzA"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9502117
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 01:56:31 +0000 (UTC)
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1F1692;
-	Tue, 10 Oct 2023 18:56:28 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id 3f1490d57ef6-d9a6b21d1daso1361093276.3;
-        Tue, 10 Oct 2023 18:56:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1696989388; x=1697594188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XC8PueYOq+Wqn3z5e3szqjiYXCBBwjuhKP8Z06nA7jo=;
-        b=ZS1pCZZbUzmq8Sbt5G4nuLpxVTWnF4KMDYUV7fYXgawEpxooqBmOL95xISiTvSIDM0
-         wury6fKjKOngzFzs9nKjomUE7gzOhUbgvjKS1/grUiI8CgOiEyE4ESTIeb9Q+Dudf+Kd
-         SYwNI5+YkYfAtjAy1fGZVtHf/bMFQRj811WUWS+uDFsiFEsLW+fdWBGYbytyP3O5lROk
-         5bMO/dVx9XvlsWNiKhngrQ5EQMazOxw/nCMKyhh3dWRy1HBTQdGiJyTjhURSRqsd5gFQ
-         IKuDRr8C7E8pPGUxRQlXYE7K5W6KkyA0WW4XOUmf32A7VhByHFroyrbNwlwyKEDiqXjg
-         AReQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1696989388; x=1697594188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XC8PueYOq+Wqn3z5e3szqjiYXCBBwjuhKP8Z06nA7jo=;
-        b=kpyyRRpaPRmxLGIFPBC3c+CKhTygwmtLF8dJFmqH61PFNNgYwuIV7mCGvrzeE7T9v2
-         LKP87hTbVUEo0x1BSmejd5zJ2rPf0buuDdkWIx/eDypmoPCU+AgbyRfY/4gNR7PcM/Sx
-         e38KP+DFDzoaT0hxplexEZ1e8+qTR1Kpfp1BfOS54sEI5J7FMUOiGM0bCAHjxa0ivK6n
-         1UhXrbxB+j5gnOf/Ukt0NZ9IL/qLn0/X3zr8uxxpLyZ9RyTl8REZ6VTxpb5YsKKBfd6F
-         BKN2Z+KSmu+Av803YSuSgp4d/WVzdzyL2dWY7Evikvyo64rmO3e7Rg0Uez4asKHRuN4A
-         DPPg==
-X-Gm-Message-State: AOJu0YyxjoWGJGEiYf5kaD5vV83ASdAvtFLyisRBzj9qpKDhPWi9vIKG
-	sQivUGVNuk71BIXF5tg6K7lg7DPgHC9zwEr2/1A=
-X-Google-Smtp-Source: AGHT+IFBPmknZnGhZ1ErD5xVPYQ4SLsQM4mNULHR3goKFPrtKDGF7axQoNhjZX5Ssec1Ue983aiMxqGLy8KoXKHYAvI=
-X-Received: by 2002:a5b:151:0:b0:d81:8da3:348e with SMTP id
- c17-20020a5b0151000000b00d818da3348emr17706213ybp.41.1696989388082; Tue, 10
- Oct 2023 18:56:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44941819
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 02:01:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84727C433C8;
+	Wed, 11 Oct 2023 02:01:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1696989672;
+	bh=kbWICzSB4IKAHMv/+9GW4UxQ64X13NVNXGJ6Mchx14I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O+SAnBzAZxt2yAxcJcTnlGbrGefRa0Z8GYgs6FBiVcPoA2wZsrpaGtub8Bxzg6U1N
+	 Wzk+kiA8MCKEimqgMGgRQssGOhrretwKPtfneBFvfNp9kfrf2Y7Trx+0pCkx6POhMH
+	 icegletrzbTJiD4YY+a3l3uUQatPHVIOQBi74h7AxkEPKlJ1CnNGC+iRZTq4yo0L4N
+	 0QvuEdM6RVw4RsgZRW/PzLP+WN3DqWa2bcakIcXmNY2/Jsckj7roGcvc/lusopzZtk
+	 jaNk56SrSKNEEzHKS2uB6uDZGB7Ica11cpr25DgFuRuhZ+RsaHTSJbwPFWNsCQrcKH
+	 wnv2oJ3WdxTXQ==
+Date: Tue, 10 Oct 2023 19:01:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <jacob.e.keller@intel.com>, <vaishnavi.tipireddy@intel.com>,
+ <horms@kernel.org>, <leon@kernel.org>, Pucha Himasekhar Reddy
+ <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net-next v4 2/5] ice: configure FW logging
+Message-ID: <20231010190110.4181ce87@kernel.org>
+In-Reply-To: <835b8308-c2b1-097b-8b1c-e020647b5a33@intel.com>
+References: <20231005170110.3221306-1-anthony.l.nguyen@intel.com>
+	<20231005170110.3221306-3-anthony.l.nguyen@intel.com>
+	<20231006170206.297687e2@kernel.org>
+	<835b8308-c2b1-097b-8b1c-e020647b5a33@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231008075221.61863-1-hayatake396@gmail.com> <20231010123235.4a6498da@kernel.org>
-In-Reply-To: <20231010123235.4a6498da@kernel.org>
-From: takeru hayasaka <hayatake396@gmail.com>
-Date: Wed, 11 Oct 2023 10:56:17 +0900
-Message-ID: <CADFiAcKF08osdvd4EiXSR1YJ22TXrMu3b7ujkMTwAsEE8jzgOw@mail.gmail.com>
-Subject: Re: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP
- from ethtool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub san
-Thank you for your reply!
+On Tue, 10 Oct 2023 16:26:15 -0700 Paul M Stillwell Jr wrote:
+> I'm probably missing something here, but I don't know if this will do 
+> what I need or not. What I have is a user passing a module name and a 
+> log level and I'm trying to match those strings and create integer 
+> values from them so I can configure the FW log for that module. I'm not 
+> seeing how the above gets me there...
+> 
+> I was trying to not use strncmp and instead use the built in kernel 
+> string matching functions so that's how I ended up with the code I have
 
-GTP generates a flow that includes an ID called TEID to identify the
-tunnel. This tunnel is created for each UE (User Equipment).
-By performing RSS based on this flow, it is possible to apply RSS for
-each communication unit from the UE.
-Without this, RSS would only be effective within the range of IP addresses.
-For instance, the PGW can only perform RSS within the IP range of the SGW.
-What I'm trying to say is that RSS based solely on IP addresses can be
-problematic from a load distribution perspective, especially if
-there's a bias in the terminals connected to a particular base
-station.
-As a reference that discusses a similar topic, please see the link
-below(is not RSS, is TEID Flow):
-https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-56/Layer=
--3/Routing/Equal-Cost-Multipath-Load-Sharing/#gtp-hashing
-
-Thank you for your understanding.
----
-Sorry! My email was blocked because it wasn't sent in plain text mode.
-I've made the necessary changes and will resend it.
-
-2023=E5=B9=B410=E6=9C=8811=E6=97=A5(=E6=B0=B4) 4:32 Jakub Kicinski <kuba@ke=
-rnel.org>:
->
-> On Sun,  8 Oct 2023 07:52:22 +0000 Takeru Hayasaka wrote:
-> > This is a patch that enables RSS functionality for GTP packets using
-> > ethtool.
-> > A user can include her TEID and make RSS work for GTP-U over IPv4 by
-> > doing the following:
-> > `ethtool -N ens3 rx-flow-hash gtpu4 sd`
-> > In addition to gtpu(4|6), we now support gtpc(4|6), gtpu(4|6)e,
-> > gtpu(4|6)u, and gtpu(4|6)d.
->
-> This is for tunneling, right? IDK much about GTP but we don't have flow
-> types for other tunneling protos. What makes this one special?
+You're supposed to do very simple and targeted matching here.
+The cmdline parsing makes the code harder to follow.
 
