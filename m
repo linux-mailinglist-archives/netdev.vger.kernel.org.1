@@ -1,209 +1,457 @@
-Return-Path: <netdev+bounces-39845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A117C49C2
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:14:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3E47C49C6
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:14:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0094F1C20A71
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:14:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB6FF1C20DB3
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EDC10956;
-	Wed, 11 Oct 2023 06:14:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630D310A12;
+	Wed, 11 Oct 2023 06:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DVCpB8so"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="avBkfA+7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFE1101CF
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:14:35 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D37029B
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:14:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697004873; x=1728540873;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qSYlffos6gN1M/T+1y5CIwomo7fCAwxf/0p8oRe2tA8=;
-  b=DVCpB8soDPpkopMBkWygZCIwt5wKGgoybt18sXmYEIIDD5h1xAuJQSPU
-   wGani4z7fRFGciEC5hNQX8ZBsp7WOdeCWWQGI2sDK39HagXLhCYXCyo8Z
-   YBHe7+qWeWTbM1a8v+VjJSyKE9uZfPsYIhNUFlYozKRHwXB4m0SJUSNuL
-   3UuXAvaZeQYBrC9TRtlyBDxoKkAndc60MwjCK5sbB/mNugWMDlujnKx2V
-   wQfiOpF43YaaSrmWNYGT1Oi5Clh0tu/mE2QF6K9qpnsTWlwLuTYPy5CQ9
-   IATOGV3PcjcTUs+rXUBUSBOh+vUj6OLT9LuqJn7oqBR0GlnUKFRxYC3rn
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="387431307"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="387431307"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 23:14:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="844436289"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="844436289"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Oct 2023 23:13:59 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:13:57 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:13:56 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 10 Oct 2023 23:13:56 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:13:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HWSxMchSDHn8yLFxaPor5M+2ZFFW8m+MajS7n5EVY7jhvlYNQ14geUFtbDi4AY2gQqNRzmZcIjG7kt7xsqu0S9xj2njwomlvDzFu53Je7lv3FTyKksfjPmPmw9uRkJYkmzVDtUeL6NdN8Vj3JzerukX5ay0zNJ7yHnAKPuJmyJ15MZ7tMg94AbrQcmpvSPGo79vvXDSDeE7UJ1s4hOBUH7EFdbMP31Dr1Wcl4vLN5MOirVJwr4Sw5Zv9tzAcc6HaNHZIfBjmV9HA0ZYlPZivWWVAJGOhu9vHbFoAL4hMjgy7r9zW/9GVGXe148Z3hx/00UuzTFRQlT05I2VDYkyIAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W+/kqGITcWM1iA2/Tety9uDhsi+4J9Le7wHKx6bXprs=;
- b=m/pvjVO5xVNjpTT1FKIIX6q6Aghlao6VaWWa6xZxIkYtBlIn2P170xspW+a4pcC1uRGX5LWdjLooBXb0grg8RavqXyFTwmB7O4FUKNaG6frFQluJYw4lPHEk5DqnCRky7FPT5JCmc3My4T1ogjQhvLsPrg7gIQBvMgOPj91u53WqEQzGdJJ4Hp737mgAqw0KUI5e7xTIGLNrHWuNoIZB2l2tXUnkXJtnDsX8VitskmCk6H6xaKp+uVHK4MC2WgwcnTg0yF7xuKQZY0iImEKP4JkAboVXQsKj153Vz86Yr5roHM6zRAkABW6DAflMFfAeo+OC2uJLRX+rU8/213O/Jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by CYYPR11MB8385.namprd11.prod.outlook.com (2603:10b6:930:c1::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Wed, 11 Oct
- 2023 06:13:54 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
- 06:13:54 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: mschmidt <mschmidt@redhat.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>
-CC: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>, Shannon Nelson
-	<shannon.nelson@amd.com>
-Subject: RE: [Intel-wired-lan] [PATCH net] i40e: prevent crash on probe if hw
- registers have invalid values
-Thread-Topic: [Intel-wired-lan] [PATCH net] i40e: prevent crash on probe if hw
- registers have invalid values
-Thread-Index: AQHZ+EYgMhqHjmSenE+DeU8LNJioj7BEIxHQ
-Date: Wed, 11 Oct 2023 06:13:53 +0000
-Message-ID: <BL0PR11MB31226FBCF4DC31E9DB149701BDCCA@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20231006111139.1560132-1-mschmidt@redhat.com>
-In-Reply-To: <20231006111139.1560132-1-mschmidt@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|CYYPR11MB8385:EE_
-x-ms-office365-filtering-correlation-id: 61ff29c0-e172-46ed-923b-08dbca213e9c
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Row5qaY8d5EIkknJvq3rz0gLS+QV7HkiXcrv91tBmB+xD88d8XQgeMLqTIxV/BOD0MjcV27VeCF2G1g4n7ZNSm6tRa8iSK+sbAwxwkJZMEgkfvEQRpfTx80yItzQOf4jOv9yRwvok/O/F41ZmanIoBPDn4uuQy135U3ISdkSu8yO/O8C8uaHRw1F9s9uwEJfke2oNZhO4h/qiCqnLbFH6wRKXvd1yjj7g63PSjNllQeGsyJI+BytXo/XrIIlTK0mVkzWsvZN/S7xOmny8giSUGvWNcWvqbvilKpTYUSzBCZZaZft/3HshamC1Ie8sgV87T/ruNYjRIaf6Q7gRktFQJi6oUeTBwgJf/NMdOtrMjpVhGw7J9wvzwa4WSt7f++r9SHdG0yrQxRPUVRnQxYE/d/YPCw+QEsItc73ug/Egq0tRlF2XRxORMgjO52ASfZ1BnwSY5xTdeleVwCk0GTscxNcNVzzq/Eip8WSxlmMLvffEUuk7R4MXWkBvVPsZImPZGfi/odgEExFSTB9Zebx/hnGsdpOSGeO6LoizIeZ5ROzhNjPYi4cRF/tHQA7J0wyoa76LrwvXFCNigdRI53kVqzcHA35LVh2UquNzE7X+zI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(71200400001)(53546011)(55236004)(26005)(38070700005)(7696005)(8676002)(5660300002)(8936002)(66446008)(2906002)(4326008)(478600001)(66476007)(66946007)(64756008)(316002)(52536014)(54906003)(6506007)(110136005)(41300700001)(66556008)(55016003)(122000001)(38100700002)(82960400001)(76116006)(86362001)(33656002)(83380400001)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YsO/i+yJqt5z0lXNUPyeQtrSrbpr783GJwStbKIKHmVQRfhLmoETfze7LfrH?=
- =?us-ascii?Q?CxcqfnUa3FrDyR2Q5+43X7NR13z/1wyTknRrytcr4+tP4/InasAXwUsttwI5?=
- =?us-ascii?Q?9L08fOL0JTQ8J5g7z2jeprGgKHmy5aw+GQ87fplz4qzafDa4ZNsS5g19+Clc?=
- =?us-ascii?Q?hLSwXlmfLlpAGxQZ9t0dVk81rk9reQQWpAcRaXPwuz4CNcj2bimmDC1jBBk5?=
- =?us-ascii?Q?nQMpDczk9cbnU4pNkOdA9SsEjNnocgefIO9Z/ejb3n88a5eYiDCMBcDPXTpB?=
- =?us-ascii?Q?BY9eQKNZodDGFXmZtpffxnugS1JZOHmi0ZMF8n9uEaZlmp+uEz2qPyQ2nBVb?=
- =?us-ascii?Q?sFrLk8y7FUuYO4MVeTsqroklENbA9yu1ypgnZUSqzCxddt8B6yMaVvyGJr/q?=
- =?us-ascii?Q?1iIA3uZwROddpj0ASOKFNi15sfQHzGi2lanX3OVAgJgsOFPK5nfc5RLk1P/I?=
- =?us-ascii?Q?AXEEeoYzlg2Usng63CatjjGLvqzn0X0mA1rBNixuI4vFX/1F7714eYNxYDeH?=
- =?us-ascii?Q?yDil57ZSUOFEqG0si23EDJUzd49geIwGcoPSH2/L0HQEaYaAm2PMl6j3YVDf?=
- =?us-ascii?Q?Eif+DrgFphzwJJrc2I5kuIh1aLppDLOrvzH6nRaWMPT2czDwKYG2b+G4a79k?=
- =?us-ascii?Q?q9Bfb3J0fLU0coD+l7puJNZcy31q4p7EcAQREXMwW11sZVRSA68MeugUAi+t?=
- =?us-ascii?Q?Zex5x76Tyh592JXVM5er9CDDabM1+g9xHj2x6Nhz2KUf1D1iAesXj2ImUhTL?=
- =?us-ascii?Q?tg9Y2dlqltiCt7uTsNMvauZBTTMHn/zItYcliFYs80Lxs/fBqF7QLZKxqQFT?=
- =?us-ascii?Q?D5qrRLbr0CjR/++2NnjliyesWmqA8u98SCbNLjDbKSw2ERTzwn2P1rVyrz1t?=
- =?us-ascii?Q?4YcPxTQeYetMtA0vV2b+ITSMwRvdd5MXTvz/Ch6tmfmzrdljpPV2vpa1pxuO?=
- =?us-ascii?Q?TosO5m44C05iMsI5Sp+9ASWgs392vBK5rBxxuKeAQUoeDGiMbwpLnmBXL/hR?=
- =?us-ascii?Q?qkYb1EWAY2G5sSmGUNI0nwGCX6FxLbhWD4XGNDS6bTiEc3UCq9vAlJ/R1w9u?=
- =?us-ascii?Q?8y/rGywDtnNEAvt0guHhraQESH9Ig4iBAfPBSqN7NUckIbGHfwQYaZWi0Q63?=
- =?us-ascii?Q?HzLFzvNo4+CcgyYBJxFFqxmz24v9rKUiFR2DPRGpiRQouP9dvUxiw1nAyxeV?=
- =?us-ascii?Q?Dn67YdO4AuBNQIg0otD3Eqc82gWDJLeTBr4HrAcJRf5ztd5gZjKbaqMRyK3p?=
- =?us-ascii?Q?ts5S8VMr5dNfA68W83OLnDXDuJrK+cet9CYW7X/XTbhUhI43OioFmpPzc5Zh?=
- =?us-ascii?Q?VwCJ8V3/k88fV5OeeqBiYONU4CjW+sTjrAGSIFIegudBwn/0/jtsebterkwq?=
- =?us-ascii?Q?gVRDd6EVV3gbuvE+Vy4wLvEfVLnl1lCO92f0IJ0BWzxDS5NVNmR/Be4YM1io?=
- =?us-ascii?Q?gb4O8cTR+tKTi8rr1YYiDOOdUoyn4VJUM9bAy4mFAt++Ay1jAy3YH/xRrSaq?=
- =?us-ascii?Q?xVehcHyZPeSRPntC+BvL38ea42mbYmkmS7Pw039ti9YdQ3VMHzDicr8Oh7lZ?=
- =?us-ascii?Q?KRZzLJPAZ0sZ9EB92KyPKFPVXvGJwedCMMHq2awLW0v+tUrdZqOQ6JEOO7oD?=
- =?us-ascii?Q?ng=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383D8D2F0;
+	Wed, 11 Oct 2023 06:14:52 +0000 (UTC)
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E279698;
+	Tue, 10 Oct 2023 23:14:48 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPA id 71997E0004;
+	Wed, 11 Oct 2023 06:14:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697004886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=23eMn1F0tQykS1taFU6lIQ4tydp+M8foL6ysbaE8qB4=;
+	b=avBkfA+72QjYMhbHdiefziQOa9i3hwdzKBJL6OgFW3vu48D2Qj/kQhHQLXmUG9kc3QeZeX
+	TR+8Q40IMAA4IWq1kW9wVMJVyqVF6Y5CRD1mNY+6T995HubuMYR4usynXTOVpU0+3ltYFP
+	7RcsdvRS3YVjDgERwMkgiF3WFtp1TICv4czLDNM1vVYnqC4iOaR7KcJu+tD3msDKhBrFLo
+	vb4W0yBseBUir3mBReG86mKIgXX3YmV1ERyJfgvxtVEc0FAmCJVJRwFQAvXIeh3TYw/bAa
+	i7yIF4tvCO9qnXdZp1l+ufwk31NBaQtCLIU6n4cJTHiCimkrpiRWVW7eto7kkA==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Herve Codina <herve.codina@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Qiang Zhao <qiang.zhao@nxp.com>,
+	Li Yang <leoyang.li@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Xiubo Li <Xiubo.Lee@gmail.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Nicolin Chen <nicoleotsuka@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	alsa-devel@alsa-project.org,
+	Simon Horman <horms@kernel.org>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v8 00/30] Add support for QMC HDLC, framer infrastructure and PEF2256 framer
+Date: Wed, 11 Oct 2023 08:14:04 +0200
+Message-ID: <20231011061437.64213-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61ff29c0-e172-46ed-923b-08dbca213e9c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Oct 2023 06:13:53.5975
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 5XKyaGHWljqGyTuevk3iQSp3152RjQVAPzfPEt5j/1bAIw5QSYk2fRZkJKMB/kxOY/Y1JrNohHJbWZ0Mwq3rz89/+io4ckaXhYr7A7lLkNx9h1VxE6LUO/nO7OP0LY++
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8385
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
-ichal Schmidt
-> Sent: Friday, October 6, 2023 4:42 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Brandeburg, Jesse <jesse.brandeburg@intel.com>; netdev@vger.kernel.or=
-g; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Jeff Kirsher <jeffrey.t.=
-kirsher@intel.com>; Shannon Nelson <shannon.nelson@amd.com>
-> Subject: [Intel-wired-lan] [PATCH net] i40e: prevent crash on probe if hw=
- registers have invalid values
->
-> The hardware provides the indexes of the first and the last available
-> queue and VF. From the indexes, the driver calculates the numbers of
-> queues and VFs. In theory, a faulty device might say the last index is
-> smaller than the first index. In that case, the driver's calculation
-> would underflow, it would attempt to write to non-existent registers
-> outside of the ioremapped range and crash.
->
-> I ran into this not by having a faulty device, but by an operator error.
-> I accidentally ran a QE test meant for i40e devices on an ice device.
-> The test used 'echo i40e > /sys/...ice PCI device.../driver_override',
-> bound the driver to the device and crashed in one of the wr32 calls in
-> i40e_clear_hw.
->
-> Add checks to prevent underflows in the calculations of num_queues and
-> num_vfs. With this fix, the wrong device probing reports errors and
-> returns a failure without crashing.
->
-> Fixes: 838d41d92a90 ("i40e: clear all queues and interrupts")
-> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_common.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
+Hi,
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+I have a system where I need to handle an HDLC interface and some audio
+data.
+
+The HDLC data are transferred using a TDM bus on which a PEF2256
+(E1/T1 framer) is present. The PEF2256 transfers data from/to the TDM
+bus to/from the E1 line. This PEF2256 is connected to a PowerQUICC SoC
+for the control path and the TDM is connected to the SoC (QMC component)
+for the data path.
+
+From the QMC HDLC driver, I need to handle HDLC data using the QMC,
+carrier detection using the PEF2256 (E1 line carrier) and set/get some
+PEF2256 configuration.
+
+The QMC HDLC driver considers the PEF2256 as a generic framer.
+It performs operations that involve the PEF2256 through the generic
+framer API.
+
+The audio data are exchanged with the PEF2256 using a CPU DAI connected
+to the TDM bus through the QMC and the PEF2256 needs to be seen as a
+codec in order to be linked to the CPU DAI.
+The codec handles the carrier detection using the PEF2256 and reports
+the carrier state to the ALSA subsystem using the ASoC jack detection.
+
+The codec, even if instantiated by the PEF2256 driver, considers the
+PEF2256 as a generic framer.
+
+The generic framer has:
+ - 2 consumers (QMC HDLC drv and codec)
+ - 1 provider (PEF2256)
+
+So, the design is the following:
+                        +------------------+           +---------+
+                        | QMC              | <- TDM -> | PEF2256 | <-> E1
+     +---------+        |  +-------------+ |           |         |
+     | CPU DAI | <-data--> | QMC channel | |           |         |
+     +---------+        |  +-------------+ |           |         |
++--------------+        |  +-------------+ |           |         |
+| QMC HDLC drv | <-data--> | QMC channel | |           |         |
++--------------+        |  +-------------+ |           |         |
+     ^                  +------------------+           |         |
+     |   +--------+     +-------------+                |         |
+     +-> | framer | <-> | PEF2256 drv | <- local bus ->|         |
+         |        |     |             |                +---------+
+     +-> |        |     |             |
+     |   +--------+     |  +-------+  |
+     +-------------------> | codec |  |
+                        |  +-------+  |
+                        +-------------+
+
+Further more, the TDM timeslots used by the QMC HDLC driver need to be
+configured at runtime (QMC dynamic timeslots).
+
+Several weeks ago, I sent two series related to this topic:
+ - Add the Lantiq PEF2256 audio support [1]
+ - RFC Add support for QMC HDLC and PHY [2]
+This current series is a rework of these two series taking into account
+feedbacks previously received.
+
+In order to implement all of this, I do the following:
+ 1) Perform some fixes (patches 1, 2, 3, 4, 5, 6, 7)
+ 2) Introduce the QMC HDLC driver (patches 8, 9, 10, 11)
+ 3) Add QMC dynamic timeslot support (patches 12 - 22)
+ 4) Add timeslots change support in QMC HDLC (patch 23)
+ 5) Introduce framer infrastructure (patch 24)
+ 6) Add PEF2256 framer provider (patches 25, 26, 27, 28)
+ 7) Add framer codec as a framer consumer (patch 29)
+ 8) Add framer support as a framer consumer in QMC HDLC (patch 30)
+
+The series contains the full story and detailed modifications.
+If needed, the series can be split and/or commits can be squashed.
+Let me know.
+
+Compare to the previous iteration
+  https://lore.kernel.org/linux-kernel/20230928070652.330429-1-herve.codina@bootlin.com/
+This v8 series:
+ - Fixes a race condition
+ - Uses menuconfig instead of menu and hides CONFIG_GENERIC_FRAMER
+ - Performs minor changes
+
+Best regards,
+Hervé
+
+[1]: https://lore.kernel.org/all/20230417171601.74656-1-herve.codina@bootlin.com/
+[2]: https://lore.kernel.org/all/20230323103154.264546-1-herve.codina@bootlin.com/
+
+Changes v7 -> v8
+
+  - Patch 10
+    Fix a race condition when stopping the queue in qmc_hdlc_close()
+
+  - Patch 24
+    Move to menuconfig and hide CONFIG_GENERIC_FRAMER
+    Remove unneeded check (defensive programming)
+    Remove unneeded variable assignment
+
+  - Patch 25
+    Add 'Reviewed-by: Rob Herring <robh@kernel.org>'
+
+  - Patch 26
+    Use array notation for 'audio_devs'
+
+Changes v6 -> v7
+
+  - Patch 8
+    Move the 'compatible' property to the first property.
+    Add device/SoC specific compatible strings.
+    Add 'Reviewed-by: Rob Herring <robh@kernel.org>'
+
+  - Patch 25
+    Remove '$ref' from the lantiq,data-rate-bps property. '-bps' is now
+    a standard suffix.
+
+Changes v5 -> v6
+
+  - All patches
+    Remove 'Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+    These Sob were added by Christophe when he sent the v4 while I was
+    on vacation.
+    https://lore.kernel.org/linux-kernel/992a2b31-e21f-eee3-8bfc-a65b69fe5bd7@csgroup.eu/
+
+  - Patch 6, 7
+    Add 'Acked-by: Conor Dooley <conor.dooley@microchip.com>'
+    Add 'Acked-by: Rob Herring <robh@kernel.org>'
+
+  - Patch 8
+    Add a constraint on fsl,framer.
+
+  - Patch 25
+    Fix clocks description (inconsistent capitalisation)
+    Use '8-bit' instead of '8bit'
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Removed patch 26 (patch applied)
+
+  - Patch 26 (patch 27 in v5)
+    Add 'Reviewed-by: Linus Walleij <linus.walleij@linaro.org>'
+
+  - Patch 27 (patch 28 in v5)
+    Move registers definition to .c file and remove .h file
+    Add 'select PINCONF' in Kconfig
+    Use dev_err_probe()
+    Add 'Reviewed-by: Linus Walleij <linus.walleij@linaro.org>'
+
+  - Patch 28 (patch 29 in v5)
+    Remove .h file
+
+Changes v4 -> v5
+
+  - Patches 1 to 5
+    No changes
+
+  - Patch 6 (new in v5)
+    Fix QMC binding example
+
+  - Patch 7 (new in v5)
+    Add missing 'additionalProperties: false'
+
+  - Patch 8 (new in v5, replace v4 patch 6)
+    Add QMC HDLC properties in the QMC channel node
+    Renamed the 'framer' property to 'fsl,framer'
+
+  - Patch 9 (new in v5)
+    Add support for QMC child devices
+
+  - Patch 10 (patch 7 in v4)
+    No changes
+
+  - Patch 11 (patch 8 in v4)
+    Remove fsl,qmc-hdlc.yaml (no more existing file)
+
+  - Patches 12 to 22 (patches 9 to 19 in v4)
+    No changes
+
+  - Patch 23 (patch 20 in v4)
+    Remove unused variable initializations
+    Remove extra space
+
+  - Patch 24 (patch 21 in v4)
+    Improve Kconfig help text
+    Fix variable declaration (reverse xmas tree)
+    Fix typos and extra spaces
+    Fix documentation issues raised by 'kernel-doc -none'
+    Move of_node_put() and kfree() out of the mutex
+    Replace ida_simple_{get,remove}() by ida_{alloc,free}()
+    Support framer device-tree nodes without '#framer-cells' property
+
+  - Patch 25 (patch 22 in v4)
+    Fix $ref in the pinctrl subnode
+    Remove '#framer-cells' property
+    Add needed '|'
+
+  - Patch 26 (patch 23 in v4)
+    Fix a typo in the commit subject
+
+  - Patches 27, 28, 29 (patch 24, 25, 26 in v4)
+    No changes
+
+  - Patch 30 (patch 27 in v4)
+    Fix a typo in the commit log
+
+  - Patch 31 (patch 28 in v4)
+    Used 'fsl,framer' property name instead of 'framer'
+
+Changes v3 -> v4
+
+  - Patch 21
+    Fixes build failure with CONFIG_MODULES
+
+Changes v2 -> v3
+
+  - Patches 1, 2, 3, 4
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - New patch
+    Remove inline keyword from the existing registers accessors helpers
+
+  - Patch 6 (patches 5, 27 in v2)
+    Update the binding title
+    Squash patch 27
+
+  - Patch 7 (patch 6 in v2)
+    Remove the cast in netdev_to_qmc_hdlc()
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 8 (patch 7 in v2): No change
+
+  - Patches 9, 10 (patches 8, 9 in v2)
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 11 (patch 10 in v2)
+    Remove inline keyword from the introduced qmc_clrsetbits16() helper
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patches 12, 13, 14, 15, 16, 17, 18, 19, 20
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 21 (patch 20 in v2)
+    Remove unneeded framer NULL pointer check
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 22 (patch 21 in v2)
+    Change sclkr and sclkx clocks description
+    Remove the framer phandle property from the framer subnodes
+    (ie. from framer-codec nodes)
+
+  - Patch 23 (patch 22 in v2)
+    Initialize 'disabled' variable at declaration
+    Fix commit log
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 24 (patch 23 in v2)
+    Remove inline keyword from the existing registers accessors helpers
+    Use dev_warn_ratelimited() in default interrupt handler
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 25 (patch 24 in v2)
+    Replace #include "linux/bitfield.h" by #include <linux/bitfield.h>
+    Fold the pinctrl anonymous struct into the struct pef2256_pinctrl
+    Update commit log
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 26 (patch 25 in v2)
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 27 (patch 26 in v2)
+    Fix error message
+    Changed the ch.max computation in framer_dai_hw_rule_channels_by_format()
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+  - Patch 28
+    Add 'Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>'
+
+Changes v1 -> v2
+  - Patches 1, 2 (New in v2)
+    Fix __iomem addresses declaration
+
+  - Patch 19 (17 in v1)
+    Fix a compilation warning
+
+  - Patch 26 (24 in v1)
+    Fix a typo in Kconfig file
+    Fix issues raised by sparse (make C=1)
+
+Herve Codina (30):
+  soc: fsl: cpm1: tsa: Fix __iomem addresses declaration
+  soc: fsl: cpm1: qmc: Fix __iomem addresses declaration
+  soc: fsl: cpm1: qmc: Fix rx channel reset
+  soc: fsl: cpm1: qmc: Extend the API to provide Rx status
+  soc: fsl: cpm1: qmc: Remove inline function specifiers
+  dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Fix example property name
+  dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add
+    'additionalProperties: false' in child nodes
+  dt-bindings: soc: fsl: cpm_qe: cpm1-scc-qmc: Add support for QMC HDLC
+  soc: fsl: cpm1: qmc: Add support for child devices
+  net: wan: Add support for QMC HDLC
+  MAINTAINERS: Add the Freescale QMC HDLC driver entry
+  soc: fsl: cpm1: qmc: Introduce available timeslots masks
+  soc: fsl: cpm1: qmc: Rename qmc_setup_tsa* to qmc_init_tsa*
+  soc: fsl: cpm1: qmc: Introduce qmc_chan_setup_tsa*
+  soc: fsl: cpm1: qmc: Remove no more needed checks from
+    qmc_check_chans()
+  soc: fsl: cpm1: qmc: Check available timeslots in qmc_check_chans()
+  soc: fsl: cpm1: qmc: Add support for disabling channel TSA entries
+  soc: fsl: cpm1: qmc: Split Tx and Rx TSA entries setup
+  soc: fsl: cpm1: qmc: Introduce is_tsa_64rxtx flag
+  soc: fsl: cpm1: qmc: Handle timeslot entries at channel start() and
+    stop()
+  soc: fsl: cpm1: qmc: Remove timeslots handling from setup_chan()
+  soc: fsl: cpm1: qmc: Introduce functions to change timeslots at
+    runtime
+  wan: qmc_hdlc: Add runtime timeslots changes support
+  net: wan: Add framer framework support
+  dt-bindings: net: Add the Lantiq PEF2256 E1/T1/J1 framer
+  net: wan: framer: Add support for the Lantiq PEF2256 framer
+  pinctrl: Add support for the Lantic PEF2256 pinmux
+  MAINTAINERS: Add the Lantiq PEF2256 driver entry
+  ASoC: codecs: Add support for the framer codec
+  net: wan: fsl_qmc_hdlc: Add framer support
+
+ .../bindings/net/lantiq,pef2256.yaml          | 213 +++++
+ .../soc/fsl/cpm_qe/fsl,cpm1-scc-qmc.yaml      |  37 +-
+ MAINTAINERS                                   |  15 +
+ drivers/net/wan/Kconfig                       |  14 +
+ drivers/net/wan/Makefile                      |   3 +
+ drivers/net/wan/framer/Kconfig                |  41 +
+ drivers/net/wan/framer/Makefile               |   7 +
+ drivers/net/wan/framer/framer-core.c          | 882 ++++++++++++++++++
+ drivers/net/wan/framer/pef2256/Makefile       |   8 +
+ drivers/net/wan/framer/pef2256/pef2256-regs.h | 250 +++++
+ drivers/net/wan/framer/pef2256/pef2256.c      | 880 +++++++++++++++++
+ drivers/net/wan/fsl_qmc_hdlc.c                | 820 ++++++++++++++++
+ drivers/pinctrl/Kconfig                       |  15 +
+ drivers/pinctrl/Makefile                      |   1 +
+ drivers/pinctrl/pinctrl-pef2256.c             | 358 +++++++
+ drivers/soc/fsl/qe/qmc.c                      | 592 +++++++++---
+ drivers/soc/fsl/qe/tsa.c                      |  22 +-
+ include/linux/framer/framer-provider.h        | 194 ++++
+ include/linux/framer/framer.h                 | 205 ++++
+ include/linux/framer/pef2256.h                |  31 +
+ include/soc/fsl/qe/qmc.h                      |  27 +-
+ sound/soc/codecs/Kconfig                      |  15 +
+ sound/soc/codecs/Makefile                     |   2 +
+ sound/soc/codecs/framer-codec.c               | 413 ++++++++
+ sound/soc/fsl/fsl_qmc_audio.c                 |   2 +-
+ 25 files changed, 4907 insertions(+), 140 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/lantiq,pef2256.yaml
+ create mode 100644 drivers/net/wan/framer/Kconfig
+ create mode 100644 drivers/net/wan/framer/Makefile
+ create mode 100644 drivers/net/wan/framer/framer-core.c
+ create mode 100644 drivers/net/wan/framer/pef2256/Makefile
+ create mode 100644 drivers/net/wan/framer/pef2256/pef2256-regs.h
+ create mode 100644 drivers/net/wan/framer/pef2256/pef2256.c
+ create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
+ create mode 100644 drivers/pinctrl/pinctrl-pef2256.c
+ create mode 100644 include/linux/framer/framer-provider.h
+ create mode 100644 include/linux/framer/framer.h
+ create mode 100644 include/linux/framer/pef2256.h
+ create mode 100644 sound/soc/codecs/framer-codec.c
+
+-- 
+2.41.0
 
 
