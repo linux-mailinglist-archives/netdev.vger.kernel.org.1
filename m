@@ -1,84 +1,81 @@
-Return-Path: <netdev+bounces-40165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E107C605D
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:36:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6407E7C606F
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:40:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A6C1C20A08
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:36:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1904E2823EC
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDD439C;
-	Wed, 11 Oct 2023 22:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD00568B;
+	Wed, 11 Oct 2023 22:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ebrywsAg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAXP5J1D"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2904F13ACE
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:36:09 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 519C398
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:36:07 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4056ce55e7eso3979935e9.2
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:36:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF8738F
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:40:06 +0000 (UTC)
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6280A4
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:04 -0700 (PDT)
+Received: by mail-wr1-x42c.google.com with SMTP id ffacd0b85a97d-32d80ae19f8so287592f8f.2
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:40:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697063766; x=1697668566; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D+GlgrsmEnE9z+xDAG5EqtzaoXNDmXFCWhu74BKduvc=;
-        b=ebrywsAgtCw4V8081mp616bFY34k6KP97rbcT1op2ZAb8dFccM3iHn/3e3CRCVuLt6
-         8jyCRdn6as3lJN9Q2qcvPOqBbwI1gKc3LmJn5jytvMy6wAsKQJVG8zlLmAlzCUypKV8p
-         KF7ehpoxxi57K1cP+iEDHa0i6fk+9dF1Vdfria2qP5d0up64Q/qMC3+TGnPhCLsB+D8g
-         5ITQ2Ar3lOT5MbxFAKyy+SkJJF6dynrU4d2KHCEa34hy42EkNBXi9dN0+T9SQ3ZxnGnG
-         6XNGFqyB4SOEBP8rtIWVpzME+8Mb6FXOUk/CxS0RFNeXjMls+iLOPAH3AF6eG2Qdxq6G
-         l4bg==
+        d=gmail.com; s=20230601; t=1697064003; x=1697668803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7RUNYzwgsHK/Q5d254XGIOMv4U+ayJUxl25n4pac7Yk=;
+        b=iAXP5J1DFA8SteLpFvHe0Dv4EG6UZzPfLNc0Ltx/jsuTa20Yr1AgFhpsD8o8GcpXY6
+         xgNCgncNEvdBshnnVIjtb3wlSnsJBR0IEuf3QHFjq301of8lSpPtJxXWTxq0JrySxwJF
+         xPUsVemS8Yv+xaan5wVMZ1EW8cdtURBnqkxB8weVWBThnvLeBNqWn0WFqpC5iJR3kmPI
+         rRuP7RskkophWh4IiysUvXG/yMWbKNdQbty+aXrdyAQmFEh1kEY5q0jiNEpqSbzxsD4+
+         CqpjzYkJKCIMyjF8d4VU4ooGC2uvSAZG7U78hqyw+8idzTcAvSKgH8NX8DxqLzVjZ76q
+         FFlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697063766; x=1697668566;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D+GlgrsmEnE9z+xDAG5EqtzaoXNDmXFCWhu74BKduvc=;
-        b=MyDaLiUYIPXc0AF+WG9p5eBOK9lL3XOL0nsoDkUR0gXKeJT/mg7q13NbITqN7MqS6j
-         7bRedq0SyQiiTs3JuoQeMBJm1Mgo+T85vLTbb4StEg4sHkT+MBY8ShG2EHEAHSpVnFcW
-         JYgrMwRljs3w1jDfHdJ9mReLgN1VN7gBZ+yUXmd+jcq6teozvnNHJCrnuJSJJPXKHiol
-         RWvlkj1qMVWITCt16EECWZ3S9s69Jw8tr0VuOrSAsvJOJ1emi3QrWlUVyr+VbIKyiqF1
-         NKSDuDZgyLZhVrtWfsxQ2SPoHh2JrxsRorLtUbt7UUYYMcde7oKayN/1A/bbSQxb1yMy
-         vJkg==
-X-Gm-Message-State: AOJu0YzlMETIF3o5wUzXO4vXG/r0Eos8RKO+iMcji/WDh+XINY4/ndZL
-	r4hrdxQISG39YQiAh2VJYHU=
-X-Google-Smtp-Source: AGHT+IF8sC2K8/8sXXCyfR8NYAur10GjvX5rodOMW4VX3nPm0/XledjapnC5fGIfB7GtkKWlxwJEBw==
-X-Received: by 2002:a05:600c:2050:b0:405:40c6:2ba4 with SMTP id p16-20020a05600c205000b0040540c62ba4mr18959992wmg.5.1697063765561;
-        Wed, 11 Oct 2023 15:36:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1697064003; x=1697668803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7RUNYzwgsHK/Q5d254XGIOMv4U+ayJUxl25n4pac7Yk=;
+        b=WrP8kIaar5DP8MFG/Ed0xvFTj94nZEabfa9JiTpF1mYSZ/UJmMZgzHVgQpB6TOkCTU
+         v8OSKzrJ9ZJEctxBd4nu0lBkQhl/nWO5/RQZi1s2FpiUWm04qLJjAa/+i4JTFJn4TqLn
+         lXdX5CIWinnZqAC2Sf6M3EQvQseOoEoHexIs3qFcMl6cOLKUiuzYVpZsw1ENLrKaV6Vk
+         3ZPXsdlJD4ybe6mfVQM6HMqcif0zcXfohcIulJGlumQIxIi8g3F4C3aMo6UFICfu190V
+         M51OB0jNTPwwPpruo0MFFyif0QEzNjQBfVKx4Hssv+nqSZ5rgUTX/ANzBFa/HeUjCkCo
+         gUaA==
+X-Gm-Message-State: AOJu0YxeLP4ublzJnGEJRn8SezcvK71t40A0kDc68n7sXyFD2GmCwn+c
+	dnpzKZECfI7mdk5RyeD80B72MP/+/cfPGg==
+X-Google-Smtp-Source: AGHT+IHxii/g6ey0dPoALP+pVvkQLVnrZDS2ufZGbMZgIykwOROp4ydtx75ANnuDICyE97+/p6i7IQ==
+X-Received: by 2002:a5d:5f04:0:b0:32d:8872:aacb with SMTP id cl4-20020a5d5f04000000b0032d8872aacbmr2609937wrb.53.1697064002676;
+        Wed, 11 Oct 2023 15:40:02 -0700 (PDT)
 Received: from reibax-minipc.lan ([2a0c:5a80:3e06:7600::978])
-        by smtp.gmail.com with ESMTPSA id n5-20020a05600c294500b003fc02e8ea68sm19932986wmd.13.2023.10.11.15.36.04
+        by smtp.gmail.com with ESMTPSA id k1-20020a05600c0b4100b00405442edc69sm19964031wmr.14.2023.10.11.15.40.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 15:36:05 -0700 (PDT)
+        Wed, 11 Oct 2023 15:40:02 -0700 (PDT)
 From: Xabier Marquiegui <reibax@gmail.com>
-To: kuba@kernel.org
-Cc: chrony-dev@chrony.tuxfamily.org,
-	davem@davemloft.net,
-	horms@kernel.org,
+To: netdev@vger.kernel.org
+Cc: richardcochran@gmail.com,
+	tglx@linutronix.de,
 	jstultz@google.com,
+	horms@kernel.org,
+	chrony-dev@chrony.tuxfamily.org,
 	mlichvar@redhat.com,
-	netdev@vger.kernel.org,
-	ntp-lists@mattcorallo.com,
 	reibax@gmail.com,
-	richardcochran@gmail.com,
+	ntp-lists@mattcorallo.com,
+	vinicius.gomes@intel.com,
+	davem@davemloft.net,
 	rrameshbabu@nvidia.com,
 	shuah@kernel.org,
-	tglx@linutronix.de,
-	vinicius.gomes@intel.com
-Subject: Re: [PATCH net-next v5 5/6] ptp: add debugfs interface to see applied channel masks
-Date: Thu, 12 Oct 2023 00:36:04 +0200
-Message-Id: <20231011223604.4570-1-reibax@gmail.com>
+	kuba@kernel.org
+Subject: [PATCH net-next v6 0/6] ptp: Support for multiple filtered timestamp event queue readers
+Date: Thu, 12 Oct 2023 00:39:52 +0200
+Message-Id: <cover.1697062274.git.reibax@gmail.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231009175421.57552c62@kernel.org>
-References: <20231009175421.57552c62@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,21 +85,86 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Jakub Kicinski said:
-> If it's a self-test it should probably be included in the Makefile 
-> so that bots run it.
-> -- 
-> pw-bot: cr
+On systems with multiple timestamp event channels, there can be scenarios
+where multiple userspace readers want to access the timestamping data for
+various purposes.
 
-Thank you for your input Jakub. It's actually designed as a debug tool for
-humans. I wasn't thinking about self-tests, and I can't really think of how
-that could be pulled of in this specific case. I hope that's ok. If not we
-can try to throw a few ideas around and see if we find a way.
+One such example is wanting to use a pps out for time synchronization, and
+wanting to timestamp external events with the synchronized time base 
+simultaneously.
 
-Cheers.
+Timestmp event consumers on the other hand, are often interested in a
+subset of the available timestamp channels. linuxptp ts2phc, for example,
+is not happy if more than one timestamping channel is active on the device
+it is reading from.
+
+Linked lists are introduced to support multiple timestamp event queue
+consumers, and timestamp event channel filters through IOCTLs, as well as
+a debugfs interface to do some simple verifications.
+
+Xabier Marquiegui (6):
+  posix-clock: introduce posix_clock_context concept
+  ptp: Replace timestamp event queue with linked list
+  ptp: support multiple timestamp event readers
+  ptp: support event queue reader channel masks
+  ptp: add debugfs interface to see applied channel masks
+  ptp: add testptp mask test
+
+ drivers/ptp/ptp_chardev.c                   | 129 ++++++++++++++++----
+ drivers/ptp/ptp_clock.c                     |  45 ++++++-
+ drivers/ptp/ptp_private.h                   |  28 +++--
+ drivers/ptp/ptp_sysfs.c                     |  13 +-
+ include/linux/posix-clock.h                 |  35 ++++--
+ include/uapi/linux/ptp_clock.h              |   2 +
+ kernel/time/posix-clock.c                   |  36 ++++--
+ tools/testing/selftests/ptp/ptpchmaskfmt.sh |  14 +++
+ tools/testing/selftests/ptp/testptp.c       |  19 ++-
+ 9 files changed, 261 insertions(+), 60 deletions(-)
+ create mode 100644 tools/testing/selftests/ptp/ptpchmaskfmt.sh
+
+Signed-off-by: Xabier Marquiegui <reibax@gmail.com>
+Suggested-by: Richard Cochran <richardcochran@gmail.com>
+Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+---
+v6:
+  - correct commit message
+  - correct coding style
+v5: https://lore.kernel.org/netdev/cover.1696804243.git.reibax@gmail.com/
+  - fix spelling on commit message
+  - fix memory leak on ptp_open
+v4: https://lore.kernel.org/netdev/cover.1696511486.git.reibax@gmail.com/
+  - split modifications in different patches for improved organization
+  - rename posix_clock_user to posix_clock_context
+  - remove unnecessary flush_users clock operation
+  - remove unnecessary tests
+  - simpler queue clean procedure
+  - fix/clean comment lines
+  - simplified release procedures
+  - filter modifications exclusive to currently open instance for
+    simplicity and security
+  - expand mask to 2048 channels
+  - make more secure and simple: mask is only applied to the testptp
+    instance. Use debugfs to verify effects.
+v3: https://lore.kernel.org/netdev/20230928133544.3642650-1-reibax@gmail.com/
+  - add this patchset overview file
+  - fix use of safe and non safe linked lists for loops
+  - introduce new posix_clock private_data and ida object ids for better
+    dicrimination of timestamp consumers
+  - safer resource release procedures
+  - filter application by object id, aided by process id
+  - friendlier testptp implementation of event queue channel filters
+v2: https://lore.kernel.org/netdev/20230912220217.2008895-1-reibax@gmail.com/
+  - fix ptp_poll() return value
+  - Style changes to comform to checkpatch strict suggestions
+  - more coherent ptp_read error exit routines
+  - fix testptp compilation error: unknown type name 'pid_t'
+  - rename mask variable for easier code traceability
+  - more detailed commit message with two examples
+v1: https://lore.kernel.org/netdev/20230906104754.1324412-2-reibax@gmail.com/
+---
 
