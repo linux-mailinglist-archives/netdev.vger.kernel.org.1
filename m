@@ -1,473 +1,197 @@
-Return-Path: <netdev+bounces-40157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8A37C6034
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:13:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F4E7C6039
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:17:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C03491C20CD5
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:13:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC371C20966
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2456249E1;
-	Wed, 11 Oct 2023 22:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6DB249EA;
+	Wed, 11 Oct 2023 22:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KcHd3z+6"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V6d33GKV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAB2249EA
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:13:18 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0510691
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:17 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-7740cedd4baso20621785a.2
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697062396; x=1697667196; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QMXs2ZjdP060taxzGMradMjobe3Z68DmqtrSkLKr6f8=;
-        b=KcHd3z+6wK33Y+w9uHSpwOjleX8U7At4jCNqEpxwQTpJth/NJCEWEDxFrU286MSa26
-         CtxHbTcbwbXpPRacx6ZxamIT7zWz1TB83vJcaAGDQyIXe19TPuImfiMzjvVrnXgP+hEk
-         Dxx+arZslaFTbM74V6ndJ/3PVFugaHMpY6Buc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697062396; x=1697667196;
-        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QMXs2ZjdP060taxzGMradMjobe3Z68DmqtrSkLKr6f8=;
-        b=M7KIBLX7C/eelYTxGWyj/rCShSEuTu3+WRkGUya7BKuWoX+1yf1BZJCZUi0LNsWjLc
-         Rc45U7LKfvGnIlSYnD1sSkDyVzpRfAMGbpKZJVg33QIB++DiHPzuGUWSmtf7RJU8Ux3g
-         xJTOp0+rq16lat1dQLrddpsw3bzKI++ELTcHVLjArQF052A6vFxnWft7wmdmJxwE+nd3
-         4WB/RjYXP8WZUeum7q4CCHwk8MgYIfwzGFZVFZiXya9RpVNoy8T5dJB+Vdl8RK63t7pc
-         o07js+HBJiSqEKcy2d+DFI6XKGwfdKLPZ1NqLuFQqEe8itKVnI2nObrm4kER739ZEFtU
-         E4hA==
-X-Gm-Message-State: AOJu0YzwmqqNPP0dKIOwMFl18YPEfeGf9JX3PieSIIijuR+AM7Hi+Q0E
-	VWa3aZt0e7DBokVuibCU+5MuOHjZJIAzgIh5Fxc3/wm5sCfXF50zQJNUs+zdi9SpGohdPsi/AOu
-	UnSUHrm/EAmvNEVy2MvR2mccCWMB3Y6KSv1Sjig/kGUdO+LShF4Mhvv0uFfkBUHhoLkNiRDdMBu
-	1hCsO2RSUQMg==
-X-Google-Smtp-Source: AGHT+IFh6a4ASUnCVQKjMFdtZB9oDTb2zRgY09MeWCeKP04VRZH9EuZ5OzTOemMaqpPr+qdKRIYcDg==
-X-Received: by 2002:a05:620a:47ae:b0:775:967e:3307 with SMTP id dt46-20020a05620a47ae00b00775967e3307mr22715640qkb.1.1697062395628;
-        Wed, 11 Oct 2023 15:13:15 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a12-20020a05620a102c00b007759a81d88esm5505705qkk.50.2023.10.11.15.13.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 15:13:15 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	opendmb@gmail.com,
-	justin.chen@broadcom.com,
-	Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH ethtool 2/2] wol: Add support for WAKE_MDA
-Date: Wed, 11 Oct 2023 15:12:42 -0700
-Message-Id: <20231011221242.4180589-5-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
-References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAC9249E2;
+	Wed, 11 Oct 2023 22:17:12 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93FA91;
+	Wed, 11 Oct 2023 15:17:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JAe1Pi3KRsm83jZZlX7cXn1pxi4TaUy+eDWvSFfONQSX/LdT2gS/U2UqCgWn5b8qXiXeF3gMzLDWCZv6maYJwz6U9lboEvzFnSTPj6BKVwBw9+znL3Lo0P5dKSqL5u2PxjOp/pxeaJlHLTpvvv+7AW0zyCYd/+k4nTMTmPB3FBH3yNllsIykxfZzvGIZI/C1QItgueFCV9S+U3DQYa1yrAYgKvTfqSF8YxiL40g7N1GX5VRmCXb+8yW3f0yXuxmTHIo+D6T2Tam38mmF1Dwk2C9AkM7g8kriRvL6FUyHzDSTWF7uEGgfIl4fIaU7NFqXXMy16UTU0q7JnYYVcUl3Uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KYz03LnvIU8O44jtQpAHEdb2+oSXbdgks8YK03sGt4A=;
+ b=CU23BxDwFQPcwwtP3UV5m7EC0fFgMs7afZvmcw2oAmWyKfjBJl3TJ2f6gtanRh2VgCQnIuDEZ11DQT3Dv9a8I+TXcZSUN/p8df2AX+UkwfSH3TuW1uN6SlW8aw/BKHxLolKvHtCmY2WJLEPWHaRka9dOV9rnO31/ZjzNCuQTZ9/I8JHLedU3rfs3BrA0A2IM/WEEbIZX26q8CN8AQStFog9rXPqjB3COQdn9IpdTPI5rfeNFTXWrZT3hBI+Rb8BffcSZO4HWa/7F9SaI0FVKMCOTSC8H2maX4pKHMwRXweMDNN8Kn86iDwKfFtBxP98D2G7s4ncbYQLGCicPBOoAVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KYz03LnvIU8O44jtQpAHEdb2+oSXbdgks8YK03sGt4A=;
+ b=V6d33GKVb+nZJD/2wSUBWdIzKlk01iGKesl9z4A3ntvFS0zGe6sWvxSYuKxxyeUE2NQjvwvobxA7Xv7oFHwZbttMfP0oxL+7hLgMZ8s7K/qghC5tZoH4o02CpEiT5hSOY0+Tm5XRAf5LX8mNTR0kl5lnO/C3EZc+ZbfSbbn1EUU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ SA1PR12MB8886.namprd12.prod.outlook.com (2603:10b6:806:375::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6863.38; Wed, 11 Oct 2023 22:17:09 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::e31c:de3c:af9d:cd2c%5]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
+ 22:17:09 +0000
+Message-ID: <cadf72fc-2c0b-428a-b445-0f6a34c18d9b@amd.com>
+Date: Wed, 11 Oct 2023 15:17:06 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ionic: replace deprecated strncpy with strscpy
+To: Justin Stitt <justinstitt@google.com>,
+ Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-v1-1-23c62a16ff58@google.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-v1-1-23c62a16ff58@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR13CA0025.namprd13.prod.outlook.com
+ (2603:10b6:a03:180::38) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000004690270607782129"
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	MIME_BOUND_DIGITS_15,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SA1PR12MB8886:EE_
+X-MS-Office365-Filtering-Correlation-Id: c2b047a1-9380-4531-6cc3-08dbcaa7cf60
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7cq3DKr7ttAtQwJktn7NMNU+R6H3wCK/vER2qDmfj1atGvRxb9P/TcGSPk8YAFpGyb3VmHuhMLfvRSmHx/71v8WhF40nE+f4vfuNZWvR7W8IrnEJfubYO4vqDgAyqpsJK11QiHMnlS6Yivls2gX/2YiKiq0en5omzaoPHXU/SH1KnUQOy51yZq3MlSEGXQ7fQincf+M2vlyY2WvUuWlrkAVqb1gp96tW4rhFukplkKaML3mOnk8iJ7UlFuCJrMn7oWf9tgo5iCEqFKXL0433JLukX86aoYORMpQivYL698oClCddmrmGrapaRmslBaMqZ7w25Iq7yJUAj8Rj6RZbAShVcK3lCSd/nmTzwxkp3ha6pQ7blA/YEUu97pPtC0qJG/BA6Aawj12YxhSi1FF52M+80h5HSJXef5AycT1wxLH/cxiFGG8DUa5vF2TRjFmz95YYhOWMKrUNkBDcKk9e8MdpksmZtsuTF21O/EygQu3ayVgtWIUzG4E7zb7hGefoU0wb2zYsPYdfICVp5kMHkZVskweSqQfKkmyLdolyrRmTjlix6GTqKv43cr7xfjwijhWxjMWWiSYzlmk8J6CHnYH8HqPk7d2juW9kOq5y42tGDrhH9vBqH2/45e3YB/7CWXVE5TjtMsu+x4xtkNUVLhbIzz9zJBguPjipa4wpoFDpIC1n/7fg+H6NeiG1saloTmWc0Mf5NsP9iWQANv9gnQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(366004)(396003)(39860400002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(6512007)(53546011)(478600001)(6486002)(966005)(6666004)(2616005)(2906002)(26005)(83380400001)(110136005)(66946007)(5660300002)(66476007)(316002)(4326008)(8676002)(8936002)(41300700001)(31696002)(6506007)(36756003)(38100700002)(86362001)(66556008)(31686004)(156123004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MVd0QjhSbTdieExGLzdYeXM3VFd3alQzVHEvM2tjRFBvMkNJcWtKNVkyL0lY?=
+ =?utf-8?B?N3NYSUVpcHZwNkxGcmcrOUNUSHdLb1RubC9JYm56czN3NHFPUHN6ZFkvVElS?=
+ =?utf-8?B?NkMxOUJiZTdBZ09XN3N6MC91NkZJeDBVNGkvRkNLNk4rUXZSWDRUbE8vYm1W?=
+ =?utf-8?B?UDlycUhHV1hmb1VrWFF1RHZhQUdpVFRsK29rbEd2Vk5RUzVBRDJ5c1ZZbHNy?=
+ =?utf-8?B?RUk0SVV6aHJ6UloyS0U3a3c3QXVYSDNrTU4vMkVFanlBNHZncGZoZzBweC9j?=
+ =?utf-8?B?alVLd3EvcFZGYVAzdEpyRVFxaHcyMlc0b0ZZMVBUL3dEM3F5SHhCL0p2UmxY?=
+ =?utf-8?B?YjNTNXRHODIyU29HTi9jNFVhbkZDdFdQMGNQRUxwV0RuTVVvbTJpQUg3bjRi?=
+ =?utf-8?B?QW4vTlp1QkM2MWN1ZkpsR1U1R2J2SkM1aGZTQk1YR2NsVGp0VHlJcFlkeXpw?=
+ =?utf-8?B?aUozUEhHNExFN2RBWmk1U3BtaG9OaS8yV0RrZHl3MlFxc2J4c2NWd3FpMDhw?=
+ =?utf-8?B?SXZML0R4VElGUHhiaFI4RER6TlpPRE1JdDFwenVucWVldkRFdXQvcXVsZC9o?=
+ =?utf-8?B?Y0FyTjdzcEdQZmpQejdERGhRL0hWYXJ2NTdGQUN6OE1nYUxIaVFzUnQwNFlL?=
+ =?utf-8?B?SG8yK0wrTnZ2YTVtQTVhNXlzSHJZOUJYOUdlSDFZandXdEpzbEFQRDNPYWQ4?=
+ =?utf-8?B?MEdFMzBOTCt3MUhFU1hIQnh1UFMranhJK3VUTExNdll6Rk5ReGJncVNsZ0Ru?=
+ =?utf-8?B?WFdQbjhrWWpMdU1rbmNtMzNLT3UvU216UkM0UDQyN1JrY0JmL1ZNdlBRRE43?=
+ =?utf-8?B?cWcxKzVLYnNsQi9zdW9lbXJDcnYxN3hRQkxrc1BQR0NWL1pGWGlXUml6MUxi?=
+ =?utf-8?B?eFdTMjJTeEx0Qm1qVVRSQ2JReUFJdkxCSVpHOXV2RUgxNXBQRHhtQVByVzNq?=
+ =?utf-8?B?WSttaHUvK21zcjAzelVsRTRBRzlCOXM0Q0tPLzY5U0VFSk9EdzBHN3R5RmtM?=
+ =?utf-8?B?dG14L1VUWUg2dkR5ZHlIc2Iwb3NpakNrZ25oSFQ2alFxZ1BXaGdwWkpHSU9t?=
+ =?utf-8?B?VHFDeVlHTnFETGpjeGxCcWthQ2FraC9MSGRRZnpFTytXM3VUUnhiTTYrYlE2?=
+ =?utf-8?B?YXpLQ294ZXBoUmRNWW9iR1VYT3J2Y0xEQTE1Y3laME1IN015RWVKT3haaThj?=
+ =?utf-8?B?UytYNXhEMkJ4R2VXVGFWanU4bU5wOWlBM3E1dTUyaGhNSmNpQzU0bGFKbVlB?=
+ =?utf-8?B?UklycHFMY05mOHB4TDNFOGJUTlk5Q3E5RzZHQ084dXlMNkZQcGFPNithT29h?=
+ =?utf-8?B?MXNhcWV6TlVGMVdMbmRiRHNMOHVXa0psOG43czBqQ1czV1BZQlZEaGJ6Tkhw?=
+ =?utf-8?B?NnBvME9WY1hiejNLUHBxZnNlWXF1YmFKelI3cFQzbmp4M0lxZnJKZDRmTWc1?=
+ =?utf-8?B?ZVhaYlRQdG9aS0hRRlU2M0d1NUFrMHVOdTVyeXZXMnFnL20wcXd3d2xIcXA3?=
+ =?utf-8?B?K1hKaGRQL1JESkJVbUd2MEFQaSsvN214YytrZ0xjcXhwRlpKVm5uV2VLU3Vm?=
+ =?utf-8?B?L2NjZXQxajJSb3I4S2tqbC80QjJ6MkZENU9xa2RyTDY2LzR3WXRNalNjY3VQ?=
+ =?utf-8?B?WlliMzRjaWJSMVcxWTZKS0IvMnVyVXVIM2dWcGRBR3BISktSS0Y1Y244RzZF?=
+ =?utf-8?B?Y3c5em0xMHUvNDQvZ1o0S0EyNVUrekgyckM2VHBVeWU2NEZiYXJQY1UrWjFR?=
+ =?utf-8?B?ck5qbGVVVThpUXdRanNtT3lJZUl6N0JXck1GaThVVm1CRkJibDBWdXhrVHIv?=
+ =?utf-8?B?Q2FHZTQvQWZmZVBOL3Y3STV3dlkwaEx6em5BRFY0NHBwcTFESVBNYkhCbmIz?=
+ =?utf-8?B?NG9CVWRBVnFSOC90SHVzZnkzV2hwQzFnakNGQnpnNzZxY3kzNjR1S1ZTWG1R?=
+ =?utf-8?B?NStmYzcwTmUrOTR0RlNHQ0lwNytFcXFwUmY2T2xuZlRkd0NtcjhUdUcydzVa?=
+ =?utf-8?B?UjlNVEhMY0MyQzNxV2FqMWwwTDlOVXRJaDEvTmo4cFpkZStJZDJVK2hMbXZQ?=
+ =?utf-8?B?dnNLRE9nem9aTUVpUnFNbi80MXRvOWVyKzkvRGZhYm9nbEVLaVB4MWFlMStG?=
+ =?utf-8?Q?nJ/v5lQYIyN0TKSsr/QClL+Wu?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2b047a1-9380-4531-6cc3-08dbcaa7cf60
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2023 22:17:09.1856
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xxiod5hcEYVRPA/r92GrlEjlpqKBglHu6taWYOYAkdDs9huIsxXf6Vr1K2KIx/cUc2XUSmbi0zVfGu/IYKwrlg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8886
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---0000000000004690270607782129
-Content-Transfer-Encoding: 8bit
+On 10/11/2023 2:53 PM, 'Justin Stitt' via Pensando Drivers wrote:
+> 
+> strncpy() is deprecated for use on NUL-terminated destination strings
+> [1] and as such we should prefer more robust and less ambiguous string
+> interfaces.
+> 
+> NUL-padding is not needed due to `ident` being memset'd to 0 just before
+> the copy.
+> 
+> Considering the above, a suitable replacement is `strscpy` [2] due to
+> the fact that it guarantees NUL-termination on the destination buffer
+> without unnecessarily NUL-padding.
+> 
+> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+> Link: https://github.com/KSPP/linux/issues/90
+> Cc: linux-hardening@vger.kernel.org
+> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Allow waking-up from a specific MAC destination address, this is
-particularly useful with a number of Ethernet PHYs that have limited
-buffering and packet matching abilities.
+Thanks, I suspected this was coming soon :-)
 
-Example:
-
-ethtool -s eth0 wol e mac-da 01:00:5e:00:00:fb
-
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- common.c               | 16 ++++++++++++++--
- ethtool.8.in           | 15 +++++++++++----
- ethtool.c              | 26 +++++++++++++++++++++-----
- netlink/desc-ethtool.c |  1 +
- netlink/settings.c     | 25 ++++++++++++++++++++++---
- test-cmdline.c         |  4 ++++
- 6 files changed, 73 insertions(+), 14 deletions(-)
-
-diff --git a/common.c b/common.c
-index b8fd4d5bc0f4..a42d00fe3c0c 100644
---- a/common.c
-+++ b/common.c
-@@ -120,6 +120,8 @@ static char *unparse_wolopts(int wolopts)
- 			*p++ = 's';
- 		if (wolopts & WAKE_FILTER)
- 			*p++ = 'f';
-+		if (wolopts & WAKE_MDA)
-+			*p++ = 'e';
- 	} else {
- 		*p = 'd';
- 	}
-@@ -129,13 +131,13 @@ static char *unparse_wolopts(int wolopts)
- 
- int dump_wol(struct ethtool_wolinfo *wol)
- {
-+	int i;
-+	int delim = 0;
- 	fprintf(stdout, "	Supports Wake-on: %s\n",
- 		unparse_wolopts(wol->supported));
- 	fprintf(stdout, "	Wake-on: %s\n",
- 		unparse_wolopts(wol->wolopts));
- 	if (wol->supported & WAKE_MAGICSECURE) {
--		int i;
--		int delim = 0;
- 
- 		fprintf(stdout, "        SecureOn password: ");
- 		for (i = 0; i < SOPASS_MAX; i++) {
-@@ -145,6 +147,16 @@ int dump_wol(struct ethtool_wolinfo *wol)
- 		}
- 		fprintf(stdout, "\n");
- 	}
-+	delim = 0;
-+	if (wol->supported & WAKE_MDA) {
-+		fprintf(stdout, "        Destination MAC: ");
-+		for (i = 0; i < ETH_ALEN; i++) {
-+			fprintf(stdout, "%s%02x", delim ? ":" : "",
-+				wol->mac_da[i]);
-+			delim = 1;
-+		}
-+		fprintf(stdout, "\n");
-+	}
- 
- 	return 0;
- }
-diff --git a/ethtool.8.in b/ethtool.8.in
-index c0c37a427715..c7f457b9b739 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -62,7 +62,7 @@
- .\"
- .\"	\(*WO - wol flags
- .\"
--.ds WO \fBp\fP|\fBu\fP|\fBm\fP|\fBb\fP|\fBa\fP|\fBg\fP|\fBs\fP|\fBf|\fBd\fP...
-+.ds WO \fBp\fP|\fBu\fP|\fBm\fP|\fBb\fP|\fBa\fP|\fBg\fP|\fBs\fP|\fBf|\fBe|\fBd\fP...
- .\"
- .\"	\(*FL - flow type values
- .\"
-@@ -281,7 +281,7 @@ ethtool \- query or control network driver and hardware settings
- .B2 xcvr internal external
- .RB [ wol \ \fIN\fP[\fB/\fP\fIM\fP]
- .RB | \ wol \ \*(WO]
--.RB [ sopass \ \*(MA]
-+.RB [ sopass \ \*(MA | mac-da \ \*(MA ]
- .RB [ master-slave \ \*(MS]
- .RB [ msglvl
- .IR N\fP[/\fIM\fP] \ |
-@@ -949,14 +949,21 @@ a	Wake on ARP
- g	Wake on MagicPacket\[tm]
- s	Enable SecureOn\[tm] password for MagicPacket\[tm]
- f	Wake on filter(s)
-+e	Wake on specific MAC destination address
- d	T{
- Disable (wake on nothing).  This option clears all previous options.
- T}
- .TE
- .TP
- .B sopass \*(MA
--Sets the SecureOn\[tm] password.  The argument to this option must be 6
--bytes in Ethernet MAC hex format (\*(MA).
-+Sets the secureon\[tm] password.  The argument to this option must be 6
-+bytes in ethernet mac hex format (\*(MA).
-+.PP
-+.TE
-+.TP
-+.B mac-da \*(MA
-+Sets the destination MAC address to match against.  The argument to this option
-+must be 6 bytes in ethernet mac hex format (\*(MA).
- .PP
- .BI msglvl \ N
- .br
-diff --git a/ethtool.c b/ethtool.c
-index af51220b63cc..513b4ed11623 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -973,6 +973,9 @@ static int parse_wolopts(char *optstr, u32 *data)
- 		case 'f':
- 			*data |= WAKE_FILTER;
- 			break;
-+		case 'e':
-+			*data |= WAKE_MDA;
-+			break;
- 		case 'd':
- 			*data = 0;
- 			break;
-@@ -2971,8 +2974,8 @@ static int do_sset(struct cmd_context *ctx)
- 	int gset_changed = 0; /* did anything in GSET change? */
- 	u32 wol_wanted = 0;
- 	int wol_change = 0;
--	u8 sopass_wanted[SOPASS_MAX];
--	int sopass_change = 0;
-+	u8 sopass_wanted[SOPASS_MAX], mda_wanted[ETH_ALEN];
-+	int sopass_change = 0, mda_change = 0;
- 	int gwol_changed = 0; /* did anything in GWOL change? */
- 	int msglvl_changed = 0;
- 	u32 msglvl_wanted = 0;
-@@ -3093,6 +3096,13 @@ static int do_sset(struct cmd_context *ctx)
- 				exit_bad_args();
- 			get_mac_addr(argp[i], sopass_wanted);
- 			sopass_change = 1;
-+		} else if (!strcmp(argp[i], "mac-da")) {
-+			gwol_changed = 1;
-+			i++;
-+			if (i >= argc)
-+				exit_bad_args();
-+			get_mac_addr(argp[i], mda_wanted);
-+			mda_change = 1;
- 		} else if (!strcmp(argp[i], "msglvl")) {
- 			i++;
- 			if (i >= argc)
-@@ -3295,14 +3305,18 @@ static int do_sset(struct cmd_context *ctx)
- 		if (err < 0) {
- 			perror("Cannot get current wake-on-lan settings");
- 		} else {
-+			int i;
- 			/* Change everything the user specified. */
- 			if (wol_change)
- 				wol.wolopts = wol_wanted;
- 			if (sopass_change) {
--				int i;
- 				for (i = 0; i < SOPASS_MAX; i++)
- 					wol.sopass[i] = sopass_wanted[i];
- 			}
-+			if (mda_change) {
-+				for (i = 0; i < ETH_ALEN; i++)
-+					wol.mac_da[i] = mda_wanted[i];
-+			}
- 
- 			/* Try to perform the update. */
- 			wol.cmd = ETHTOOL_SWOL;
-@@ -3315,6 +3329,8 @@ static int do_sset(struct cmd_context *ctx)
- 				fprintf(stderr, "  not setting wol\n");
- 			if (sopass_change)
- 				fprintf(stderr, "  not setting sopass\n");
-+			if (mda_change)
-+				fprintf(stderr, "  not setting mac-da\n");
- 		}
- 	}
- 
-@@ -5669,8 +5685,8 @@ static const struct option args[] = {
- 			  "		[ advertise %x[/%x] | mode on|off ... [--] ]\n"
- 			  "		[ phyad %d ]\n"
- 			  "		[ xcvr internal|external ]\n"
--			  "		[ wol %d[/%d] | p|u|m|b|a|g|s|f|d... ]\n"
--			  "		[ sopass %x:%x:%x:%x:%x:%x ]\n"
-+			  "		[ wol %d[/%d] | p|u|m|b|a|g|s|f|e|d... ]\n"
-+			  "		[ sopass %x:%x:%x:%x:%x:%x | mac-da %x:%x:%x:%x:%x:%x ]\n"
- 			  "		[ msglvl %d[/%d] | type on|off ... [--] ]\n"
- 			  "		[ master-slave preferred-master|preferred-slave|forced-master|forced-slave ]\n"
- 	},
-diff --git a/netlink/desc-ethtool.c b/netlink/desc-ethtool.c
-index 661de267262f..78732bc2719c 100644
---- a/netlink/desc-ethtool.c
-+++ b/netlink/desc-ethtool.c
-@@ -120,6 +120,7 @@ static const struct pretty_nla_desc __wol_desc[] = {
- 	NLATTR_DESC_NESTED(ETHTOOL_A_WOL_HEADER, header),
- 	NLATTR_DESC_NESTED(ETHTOOL_A_WOL_MODES, bitset),
- 	NLATTR_DESC_BINARY(ETHTOOL_A_WOL_SOPASS),
-+	NLATTR_DESC_BINARY(ETHTOOL_A_WOL_MAC_DA),
- };
- 
- static const struct pretty_nla_desc __features_desc[] = {
-diff --git a/netlink/settings.c b/netlink/settings.c
-index a506618ba0a4..a13251863af1 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -810,6 +810,7 @@ int wol_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	DECLARE_ATTR_TB_INFO(tb);
- 	struct nl_context *nlctx = data;
- 	struct ethtool_wolinfo wol = {};
-+	unsigned int len;
- 	int ret;
- 
- 	if (nlctx->is_dump || nlctx->is_monitor)
-@@ -824,8 +825,6 @@ int wol_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	if (tb[ETHTOOL_A_WOL_MODES])
- 		walk_bitset(tb[ETHTOOL_A_WOL_MODES], NULL, wol_modes_cb, &wol);
- 	if (tb[ETHTOOL_A_WOL_SOPASS]) {
--		unsigned int len;
--
- 		len = mnl_attr_get_payload_len(tb[ETHTOOL_A_WOL_SOPASS]);
- 		if (len != SOPASS_MAX)
- 			fprintf(stderr, "invalid SecureOn password length %u (should be %u)\n",
-@@ -835,6 +834,16 @@ int wol_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 			       mnl_attr_get_payload(tb[ETHTOOL_A_WOL_SOPASS]),
- 			       SOPASS_MAX);
- 	}
-+	if (tb[ETHTOOL_A_WOL_MAC_DA]) {
-+		len = mnl_attr_get_payload_len(tb[ETHTOOL_A_WOL_SOPASS]);
-+		if (len != ETH_ALEN)
-+			fprintf(stderr, "invalid destinatino MAC address length %u (should be %u)\n",
-+				len, ETH_ALEN);
-+		else
-+			memcpy(wol.mac_da,
-+			       mnl_attr_get_payload(tb[ETHTOOL_A_WOL_MAC_DA]),
-+			       ETH_ALEN);
-+	}
- 	print_banner(nlctx);
- 	dump_wol(&wol);
- 
-@@ -1050,10 +1059,11 @@ enum {
- 	WAKE_MAGIC_BIT		= 5,
- 	WAKE_MAGICSECURE_BIT	= 6,
- 	WAKE_FILTER_BIT		= 7,
-+	WAKE_MDA_BIT		= 8,
- };
- 
- #define WAKE_ALL (WAKE_PHY | WAKE_UCAST | WAKE_MCAST | WAKE_BCAST | WAKE_ARP | \
--		  WAKE_MAGIC | WAKE_MAGICSECURE)
-+		  WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_MDA)
- 
- static const struct lookup_entry_u8 port_values[] = {
- 	{ .arg = "tp",		.val = PORT_TP },
-@@ -1112,6 +1122,7 @@ char wol_bit_chars[WOL_MODE_COUNT] = {
- 	[WAKE_MAGIC_BIT]	= 'g',
- 	[WAKE_MAGICSECURE_BIT]	= 's',
- 	[WAKE_FILTER_BIT]	= 'f',
-+	[WAKE_MDA_BIT]		= 'e',
- };
- 
- const struct char_bitset_parser_data wol_parser_data = {
-@@ -1224,6 +1235,14 @@ static const struct param_parser sset_params[] = {
- 		.handler_data	= &sopass_parser_data,
- 		.min_argc	= 1,
- 	},
-+	{
-+		.arg		= "mac-da",
-+		.group		= ETHTOOL_MSG_WOL_SET,
-+		.type		= ETHTOOL_A_WOL_MAC_DA,
-+		.handler	= nl_parse_byte_str,
-+		.handler_data	= &sopass_parser_data,
-+		.min_argc	= 1,
-+	},
- 	{
- 		.arg		= "msglvl",
- 		.group		= ETHTOOL_MSG_DEBUG_SET,
-diff --git a/test-cmdline.c b/test-cmdline.c
-index cb803ed1a93d..cfe7d24c065f 100644
---- a/test-cmdline.c
-+++ b/test-cmdline.c
-@@ -74,6 +74,10 @@ static struct test_case {
- 	{ 1, "--change devname sopass 01:23:45:67:89:" },
- 	{ 1, "-s devname sopass 01:23:45:67:89" },
- 	{ 1, "--change devname sopass" },
-+	{ 0, "-s devname mac-da 01:23:45:67:89:ab" },
-+	{ 1, "--change devname mac-da 01:23:45:67:89:" },
-+	{ 1, "-s devname mac-da 01:23:45:67:89" },
-+	{ 1, "--change devname mac-da" },
- 	{ 0, "-s devname msglvl 1" },
- 	{ 1, "--change devname msglvl" },
- 	{ 0, "-s devname msglvl hw on rx_status off" },
--- 
-2.34.1
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
 
---0000000000004690270607782129
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIEejazUuG5wGXogh
-+k6SggK4OJMYKve9ivrGU71QFS76MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxMTIyMTMxNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCjqMfIp9yfrpDGIvAt0MAajGT2Ha8Jz/jn
-d0PmDsUeftVq7Ib0vTVpwqqKG9btNa1dc1Je2ZkPDA5r/eT/AabiF4vsv9F/Teh0g0RXeLydfE2v
-IZ5+plffcQMHQKahRaiNxr5w+9o02ZbOYVz118r4U3PGN/550dXUOVbqx25H8R3FJpnMMjNBpMMk
-vMGm9pAzvkOhotZaPKyhGfSscRvHrfvlz3xw6/xYMhKISzjPlq6IrQt6o0n+ezqHuBYnt0v7OtmL
-FuPQNV3Dx28WUz26dlKY1PKmvQUvlBPom0lg0i8CWTglHPpPBSedBpbT3EXXSDH/jdJx3HQtv27X
-cj/u
---0000000000004690270607782129--
+> ---
+> Note: build-tested only.
+> 
+> Found with: $ rg "strncpy\("
+> ---
+>   drivers/net/ethernet/pensando/ionic/ionic_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> index 1dc79cecc5cc..835577392178 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
+> @@ -554,8 +554,8 @@ int ionic_identify(struct ionic *ionic)
+>          memset(ident, 0, sizeof(*ident));
+> 
+>          ident->drv.os_type = cpu_to_le32(IONIC_OS_TYPE_LINUX);
+> -       strncpy(ident->drv.driver_ver_str, UTS_RELEASE,
+> -               sizeof(ident->drv.driver_ver_str) - 1);
+> +       strscpy(ident->drv.driver_ver_str, UTS_RELEASE,
+> +               sizeof(ident->drv.driver_ver_str));
+> 
+>          mutex_lock(&ionic->dev_cmd_lock);
+> 
+> 
+> ---
+> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+> change-id: 20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-709f8f1ea312
+> 
+> Best regards,
+> --
+> Justin Stitt <justinstitt@google.com>
+> 
 
