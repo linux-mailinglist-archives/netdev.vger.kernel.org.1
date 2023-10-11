@@ -1,156 +1,164 @@
-Return-Path: <netdev+bounces-39928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 307847C4EC2
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:28:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 534377C4EE8
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:29:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621891C20EF3
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 090FD2829B2
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64CB1DA42;
-	Wed, 11 Oct 2023 09:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE261CFA3;
+	Wed, 11 Oct 2023 09:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LWVdQJYo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B4B1DDC5;
-	Wed, 11 Oct 2023 09:27:45 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9DB9C;
-	Wed, 11 Oct 2023 02:27:42 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VtwJVdl_1697016460;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VtwJVdl_1697016460)
-          by smtp.aliyun-inc.com;
-          Wed, 11 Oct 2023 17:27:40 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: virtualization@lists.linux-foundation.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH vhost 10/22] virtio_net: separate virtnet_tx_resize()
-Date: Wed, 11 Oct 2023 17:27:16 +0800
-Message-Id: <20231011092728.105904-11-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E361CF85
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:29:00 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6CD391;
+	Wed, 11 Oct 2023 02:28:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697016538; x=1728552538;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ZpC0uCRDOByLh94gi2iX/h5gJtZPBcvba+Hl6b4tHOk=;
+  b=LWVdQJYofk4Z0UI4JkWRiZbhT7p5bifxD57zSuAqyBDltgUyAT/HCRB/
+   tNgLoeZb8V7UEU6E2Pk9JxZhmkSiLvoUyhPVWSyAtJ5/g6acZHRBrPm8p
+   rQFMY0wjVw5YdwDyOsT2GU5xbCYeyyiZAdTeXjayjtxAfMYUEtGDY0e8M
+   V/jWuOUDmE6chgX+75+hm1i0fjp2yLqibtjAEOvWnzGfpiPX082RRkrd5
+   qDqbCABa6/B0ZYhPJYhHq77Uym+LVVk+NCdDB/It76SNNQ9jcRHBAnrlf
+   ZHufT028/GB9HtlYBlDfH9tBD5muUKrdJGiUR8ybcpKCK7ZBm5wFXkkzr
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="387463709"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="387463709"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 02:28:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="788936139"
+X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
+   d="scan'208";a="788936139"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 11 Oct 2023 02:28:52 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qqVVv-00024D-1z;
+	Wed, 11 Oct 2023 09:28:25 +0000
+Date: Wed, 11 Oct 2023 17:27:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-wireless@vger.kernel.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wpan@vger.kernel.org,
+	Michael Hennerich <michael.hennerich@analog.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, Doug Brown <doug@schmorgal.com>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+Message-ID: <202310111736.4mh6Cf5C-lkp@intel.com>
+References: <20231009141908.1767241-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 7e791d85ef9e
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231009141908.1767241-1-arnd@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch separates two sub-functions from virtnet_tx_resize():
+Hi Arnd,
 
-* virtnet_tx_pause
-* virtnet_tx_resume
+kernel test robot noticed the following build warnings:
 
-Then the subsequent virtnet_tx_reset() can share these two functions.
+[auto build test WARNING on next-20231009]
+[cannot apply to linus/master v6.6-rc5 v6.6-rc4 v6.6-rc3 v6.6-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/virtio/main.c       | 35 +++++++++++++++++++++++++++------
- drivers/net/virtio/virtio_net.h |  2 ++
- 2 files changed, 31 insertions(+), 6 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Arnd-Bergmann/ieee802154-avoid-deprecated-ndo_do_ioctl-callback/20231009-222305
+base:   next-20231009
+patch link:    https://lore.kernel.org/r/20231009141908.1767241-1-arnd%40kernel.org
+patch subject: [PATCH 01/10] appletalk: remove localtalk and ppp support
+config: x86_64-randconfig-002-20231011 (https://download.01.org/0day-ci/archive/20231011/202310111736.4mh6Cf5C-lkp@intel.com/config)
+compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231011/202310111736.4mh6Cf5C-lkp@intel.com/reproduce)
 
-diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-index ffab59da8506..fb4a9cd98e0c 100644
---- a/drivers/net/virtio/main.c
-+++ b/drivers/net/virtio/main.c
-@@ -2162,12 +2162,11 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 	return err;
- }
- 
--static int virtnet_tx_resize(struct virtnet_info *vi,
--			     struct virtnet_sq *sq, u32 ring_num)
-+void virtnet_tx_pause(struct virtnet_info *vi, struct virtnet_sq *sq)
- {
- 	bool running = netif_running(vi->dev);
- 	struct netdev_queue *txq;
--	int err, qindex;
-+	int qindex;
- 
- 	qindex = sq - vi->sq;
- 
-@@ -2188,10 +2187,17 @@ static int virtnet_tx_resize(struct virtnet_info *vi,
- 	netif_stop_subqueue(vi->dev, qindex);
- 
- 	__netif_tx_unlock_bh(txq);
-+}
- 
--	err = virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_unused_buf);
--	if (err)
--		netdev_err(vi->dev, "resize tx fail: tx queue index: %d err: %d\n", qindex, err);
-+void virtnet_tx_resume(struct virtnet_info *vi, struct virtnet_sq *sq)
-+{
-+	bool running = netif_running(vi->dev);
-+	struct netdev_queue *txq;
-+	int qindex;
-+
-+	qindex = sq - vi->sq;
-+
-+	txq = netdev_get_tx_queue(vi->dev, qindex);
- 
- 	__netif_tx_lock_bh(txq);
- 	sq->reset = false;
-@@ -2200,6 +2206,23 @@ static int virtnet_tx_resize(struct virtnet_info *vi,
- 
- 	if (running)
- 		virtnet_napi_tx_enable(vi, sq->vq, &sq->napi);
-+}
-+
-+static int virtnet_tx_resize(struct virtnet_info *vi, struct virtnet_sq *sq,
-+			     u32 ring_num)
-+{
-+	int qindex, err;
-+
-+	qindex = sq - vi->sq;
-+
-+	virtnet_tx_pause(vi, sq);
-+
-+	err = virtqueue_resize(sq->vq, ring_num, virtnet_sq_free_unused_buf);
-+	if (err)
-+		netdev_err(vi->dev, "resize tx fail: tx queue index: %d err: %d\n", qindex, err);
-+
-+	virtnet_tx_resume(vi, sq);
-+
- 	return err;
- }
- 
-diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
-index 70eea23adba6..2f930af35364 100644
---- a/drivers/net/virtio/virtio_net.h
-+++ b/drivers/net/virtio/virtio_net.h
-@@ -256,4 +256,6 @@ static inline bool virtnet_is_xdp_raw_buffer_queue(struct virtnet_info *vi, int
- 
- void virtnet_rx_pause(struct virtnet_info *vi, struct virtnet_rq *rq);
- void virtnet_rx_resume(struct virtnet_info *vi, struct virtnet_rq *rq);
-+void virtnet_tx_pause(struct virtnet_info *vi, struct virtnet_sq *sq);
-+void virtnet_tx_resume(struct virtnet_info *vi, struct virtnet_sq *sq);
- #endif
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310111736.4mh6Cf5C-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/appletalk/ipddp.c: In function 'ipddp_create':
+   drivers/net/appletalk/ipddp.c:207:24: error: implicit declaration of function 'atrtr_get_dev'; did you mean 'to_net_dev'? [-Werror=implicit-function-declaration]
+            if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+                           ^~~~~~~~~~~~~
+                           to_net_dev
+>> drivers/net/appletalk/ipddp.c:207:22: warning: assignment makes pointer from integer without a cast [-Wint-conversion]
+            if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+                         ^
+   cc1: some warnings being treated as errors
+
+
+vim +207 drivers/net/appletalk/ipddp.c
+
+^1da177e4c3f41 Linus Torvalds   2005-04-16  192  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  193  /*
+^1da177e4c3f41 Linus Torvalds   2005-04-16  194   * Create a routing entry. We first verify that the
+^1da177e4c3f41 Linus Torvalds   2005-04-16  195   * record does not already exist. If it does we return -EEXIST
+^1da177e4c3f41 Linus Torvalds   2005-04-16  196   */
+^1da177e4c3f41 Linus Torvalds   2005-04-16  197  static int ipddp_create(struct ipddp_route *new_rt)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  198  {
+ce7e40c432ba84 Vlad Tsyrklevich 2017-01-09  199          struct ipddp_route *rt = kzalloc(sizeof(*rt), GFP_KERNEL);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  200  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  201          if (rt == NULL)
+^1da177e4c3f41 Linus Torvalds   2005-04-16  202                  return -ENOMEM;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  203  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  204          rt->ip = new_rt->ip;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  205          rt->at = new_rt->at;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  206          rt->next = NULL;
+^1da177e4c3f41 Linus Torvalds   2005-04-16 @207          if ((rt->dev = atrtr_get_dev(&rt->at)) == NULL) {
+^1da177e4c3f41 Linus Torvalds   2005-04-16  208  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  209                  return -ENETUNREACH;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  210          }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  211  
+5615968a708451 David S. Miller  2009-05-27  212  	spin_lock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  213  	if (__ipddp_find_route(rt)) {
+5615968a708451 David S. Miller  2009-05-27  214  		spin_unlock_bh(&ipddp_route_lock);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  215  		kfree(rt);
+^1da177e4c3f41 Linus Torvalds   2005-04-16  216  		return -EEXIST;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  217  	}
+^1da177e4c3f41 Linus Torvalds   2005-04-16  218  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  219          rt->next = ipddp_route_list;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  220          ipddp_route_list = rt;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  221  
+5615968a708451 David S. Miller  2009-05-27  222  	spin_unlock_bh(&ipddp_route_lock);
+5615968a708451 David S. Miller  2009-05-27  223  
+^1da177e4c3f41 Linus Torvalds   2005-04-16  224          return 0;
+^1da177e4c3f41 Linus Torvalds   2005-04-16  225  }
+^1da177e4c3f41 Linus Torvalds   2005-04-16  226  
+
 -- 
-2.32.0.3.g01195cf9f
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
