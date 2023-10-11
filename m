@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-40154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD8887C6031
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:13:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B91FE7C6032
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:13:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 998521C20993
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:13:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6602828ED
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEAC03FB2B;
-	Wed, 11 Oct 2023 22:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E20B9CA61;
+	Wed, 11 Oct 2023 22:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cDKtwPei"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xvyqnpsh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006721BDE9
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:13:12 +0000 (UTC)
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D7EB9E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:10 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-66d12b3b479so1333886d6.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EC73E47B
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:13:14 +0000 (UTC)
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745A5AF
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:12 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-775751c35d4so20909385a.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697062389; x=1697667189; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1697062391; x=1697667191; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuQT+hGCez7jADGaOaH4ry97NpRylWXT5puGO0C1Kl0=;
-        b=cDKtwPeipob11dRpu8ELJEkOXP7/ji1eqpMkWOPdpl+ciKk37nHDEKaQ1w2Ylxh6I5
-         W79NnT2qeIV3MZbq1dq6Nx3TuN05aDxZJNCVyTQ7SWnLAgjfUGR8TEkkvQwtoZ2EAcpn
-         KbGQ1eEXbOE3nmUV5+0zYZl/9quIFdh9lR2dI=
+        bh=o2Bh9gNnh3A0IybhaZX53wHaJJr5epn3uPcTBo/IM8Q=;
+        b=XvyqnpshoVNDpCtMVbXh83Vv5mFEsUG9gskTXqgyB2ueyq1HqPm8wAzBN+rdGNYRd9
+         Ps39cnVgltj9wnHq3KF5+N3Duy8InvrVUC52uMrfWpQK4egz/ZVBS7/g6W8Lewg8549W
+         71CCQ4a6UIDkypXu8FCW5TQ9T6y2IK+DquW5I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697062389; x=1697667189;
+        d=1e100.net; s=20230601; t=1697062391; x=1697667191;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TuQT+hGCez7jADGaOaH4ry97NpRylWXT5puGO0C1Kl0=;
-        b=Fft++eKtwjuNdKWK38xln0hY15iXb3pSqk/qCr8eGQG1dv8j7HIIE2ng++VzUAJMR8
-         /Dee+QkquI0lfY5GOuiv9nrANMS4gB4nqVXs+SblwIrsBYz0fNeH1z/q6/37G1IWHC/B
-         /8gZmrs+B0t61W0zE3rImQF0vMjC3ySJV1x+7PiJPiDaPN07j4zykqw6pe2Dt76T6A3X
-         tF2Oqj9Y0U5/K9/9z5OLQGOiXfSkK11O5Up1trDczG5EbX59yaA566IiHN3WXfG0M7mN
-         3RUY8xLOF3gZLfCHlT4HHxu7hdVR7iqvjkdGEXkvjAzUdINL4x1FBxknBTtiEeS/7HGg
-         ZLEQ==
-X-Gm-Message-State: AOJu0YwuaXdbz5Oc0sX03pEMbBBPCqwmrymWC8nkmHq9jh+w+NFQYBHn
-	iW3QmGA300TFsg8ku7ZYjsWWYpDAbA5qI2Ru51b+DHIGl/jGmW09RIz8k7mbNNvb9jOM6tkMaXS
-	g3kosymEll4WxXvAnj5ezIgS/2mYzOSf+JbpT6t5R1Rr9o2V/iTua4PxVmY+4sz/w8fetXPEVL5
-	Pq46K0Z837xQ==
-X-Google-Smtp-Source: AGHT+IEleTCIrSHNHiOtDYMF1Y9WlcRYPdTrmfR8RQgHptKrIMCtm5TMGmexSbcYJOcgxHvgGiZhwQ==
-X-Received: by 2002:a0c:f250:0:b0:656:528f:4f00 with SMTP id z16-20020a0cf250000000b00656528f4f00mr23517804qvl.49.1697062388907;
-        Wed, 11 Oct 2023 15:13:08 -0700 (PDT)
+        bh=o2Bh9gNnh3A0IybhaZX53wHaJJr5epn3uPcTBo/IM8Q=;
+        b=SmUrL1a+oesiNbZrUJtk5il6oQ8HcoyLsgddrvPm9beUFLbVbdUTFLLNuz7ffst1n1
+         5IVR8JFlSoTji3D2qinyXODQAnrlAwoZ74YKdvTgIUXev3BOy30HdJB0Npugak+V+IEy
+         5UGUD+KpCe15zlzUjeahCNPvjo6UuBHFE50VXBh122eVlmUx756KxO69XDT9rlWCGOlH
+         09fMmK25mVDyTJaMiyLIcjBpn2l9MbNhqlQniHJSNpcftyFaElOYQxgalJku9wEHEYnq
+         PWAg8hbIaRSEfkGCKohAm2Sl3A4ROVI9h/MYNgn/IM2Ti3LT1lwh9dCwpHWTiniGS91M
+         /LEQ==
+X-Gm-Message-State: AOJu0YywUicGy/gR5gnmBD726YS0j0ebqD9Pjih9H1Or58QYmfsZeREz
+	RHzepipCXY49SsFQUYsQ2T5SBQgQrcObfl2Sy5TzCAotKKzrKV0eNnuH4+K7WeEnnnmlYjmskQO
+	xvUHr7tfRTTJBHw6LT6hVflo5fxSqgP9Mvo2UrnlEX/NSCHMItu3xyOWxdoTOs7u7Xte4kWOBoU
+	hMgmpzLKemzw==
+X-Google-Smtp-Source: AGHT+IFQ7rVYihdm5ov2ofoywW3yR40k8HlUPajh4MrjweNC5l5BdJZ0cx+WSHEn6g/PhmS//jilJQ==
+X-Received: by 2002:a05:620a:24c1:b0:76d:aa93:2e3c with SMTP id m1-20020a05620a24c100b0076daa932e3cmr26636543qkn.24.1697062391185;
+        Wed, 11 Oct 2023 15:13:11 -0700 (PDT)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a12-20020a05620a102c00b007759a81d88esm5505705qkk.50.2023.10.11.15.13.06
+        by smtp.gmail.com with ESMTPSA id a12-20020a05620a102c00b007759a81d88esm5505705qkk.50.2023.10.11.15.13.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 15:13:08 -0700 (PDT)
+        Wed, 11 Oct 2023 15:13:10 -0700 (PDT)
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -70,9 +70,9 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	opendmb@gmail.com,
 	justin.chen@broadcom.com,
 	Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH net-next 1/2] ethtool: Introduce WAKE_MDA
-Date: Wed, 11 Oct 2023 15:12:39 -0700
-Message-Id: <20231011221242.4180589-2-florian.fainelli@broadcom.com>
+Subject: [PATCH ethtool 1/2] update UAPI header copies for WAKE_MDA support
+Date: Wed, 11 Oct 2023 15:12:40 -0700
+Message-Id: <20231011221242.4180589-3-florian.fainelli@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
 References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000e0cce506077820e4"
+	boundary="00000000000002c7a406077821d7"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
@@ -91,69 +91,20 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000e0cce506077820e4
+--00000000000002c7a406077821d7
 Content-Transfer-Encoding: 8bit
-
-Allow Ethernet PHY and MAC drivers with simplified matching logic to be
-waking-up on a custom MAC destination address. This is particularly
-useful for Ethernet PHYs which have limited amounts of buffering but can
-still wake-up on a custom MAC destination address.
-
-When WAKE_MDA is specified, the "sopass" field in the existing struct
-ethtool_wolinfo is re-purposed to hold a custom MAC destination address
-to match against.
-
-Example:
-	ethtool -s eth0 wol e mac-da 01:00:5e:00:00:fb
 
 Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- Documentation/networking/ethtool-netlink.rst |  7 ++++++-
- include/uapi/linux/ethtool.h                 | 10 ++++++++--
- include/uapi/linux/ethtool_netlink.h         |  1 +
- net/ethtool/common.c                         |  1 +
- net/ethtool/netlink.h                        |  2 +-
- net/ethtool/wol.c                            | 21 ++++++++++++++++++++
- 6 files changed, 38 insertions(+), 4 deletions(-)
+ uapi/linux/ethtool.h         | 10 ++++++++--
+ uapi/linux/ethtool_netlink.h |  1 +
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index 2540c70952ff..b2b1191d5cec 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -708,11 +708,13 @@ Kernel response contents:
-   ``ETHTOOL_A_WOL_HEADER``              nested  reply header
-   ``ETHTOOL_A_WOL_MODES``               bitset  mask of enabled WoL modes
-   ``ETHTOOL_A_WOL_SOPASS``              binary  SecureOn(tm) password
-+  ``ETHTOOL_A_WOL_MAC_DA``              binary  Destination matching MAC address
-   ====================================  ======  ==========================
- 
- In reply, ``ETHTOOL_A_WOL_MODES`` mask consists of modes supported by the
- device, value of modes which are enabled. ``ETHTOOL_A_WOL_SOPASS`` is only
--included in reply if ``WAKE_MAGICSECURE`` mode is supported.
-+included in reply if ``WAKE_MAGICSECURE`` mode is supported. ``ETHTOOL_A_WOL_MAC_DA``
-+is only included in reply if ``WAKE_MDA`` mode is supported.
- 
- 
- WOL_SET
-@@ -726,10 +728,13 @@ Request contents:
-   ``ETHTOOL_A_WOL_HEADER``              nested  request header
-   ``ETHTOOL_A_WOL_MODES``               bitset  enabled WoL modes
-   ``ETHTOOL_A_WOL_SOPASS``              binary  SecureOn(tm) password
-+  ``ETHTOOL_A_WOL_MAC_DA``              binary  Destination matching MAC address
-   ====================================  ======  ==========================
- 
- ``ETHTOOL_A_WOL_SOPASS`` is only allowed for devices supporting
- ``WAKE_MAGICSECURE`` mode.
-+``ETHTOOL_A_WOL_MAC_DA`` is only allowed for devices supporting
-+``WAKE_MDA`` mode.
- 
- 
- FEATURES_GET
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index f7fba0dc87e5..8134ac8870bd 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -207,12 +207,17 @@ struct ethtool_drvinfo {
+diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
+index 1d0731b3d289..32eb2aac542c 100644
+--- a/uapi/linux/ethtool.h
++++ b/uapi/linux/ethtool.h
+@@ -205,12 +205,17 @@ struct ethtool_drvinfo {
   * @wolopts: Bitmask of %WAKE_* flags for enabled Wake-On-Lan modes.
   * @sopass: SecureOn(tm) password; meaningful only if %WAKE_MAGICSECURE
   *	is set in @wolopts.
@@ -172,7 +123,7 @@ index f7fba0dc87e5..8134ac8870bd 100644
  };
  
  /* for passing single values */
-@@ -1989,8 +1994,9 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+@@ -1987,8 +1992,9 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
  #define WAKE_MAGIC		(1 << 5)
  #define WAKE_MAGICSECURE	(1 << 6) /* only meaningful if WAKE_MAGIC */
  #define WAKE_FILTER		(1 << 7)
@@ -183,10 +134,10 @@ index f7fba0dc87e5..8134ac8870bd 100644
  
  /* L2-L4 network traffic flow types */
  #define	TCP_V4_FLOW	0x01	/* hash or spec (tcp_ip4_spec) */
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index 73e2c10dc2cc..237a0fc68997 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
+diff --git a/uapi/linux/ethtool_netlink.h b/uapi/linux/ethtool_netlink.h
+index a8b0d79dad95..6e168dd7eb1c 100644
+--- a/uapi/linux/ethtool_netlink.h
++++ b/uapi/linux/ethtool_netlink.h
 @@ -300,6 +300,7 @@ enum {
  	ETHTOOL_A_WOL_HEADER,			/* nest - _A_HEADER_* */
  	ETHTOOL_A_WOL_MODES,			/* bitset */
@@ -195,103 +146,11 @@ index 73e2c10dc2cc..237a0fc68997 100644
  
  	/* add new constants above here */
  	__ETHTOOL_A_WOL_CNT,
-diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index f5598c5f50de..d1c837f6094c 100644
---- a/net/ethtool/common.c
-+++ b/net/ethtool/common.c
-@@ -405,6 +405,7 @@ const char wol_mode_names[][ETH_GSTRING_LEN] = {
- 	[const_ilog2(WAKE_MAGIC)]	= "magic",
- 	[const_ilog2(WAKE_MAGICSECURE)]	= "magicsecure",
- 	[const_ilog2(WAKE_FILTER)]	= "filter",
-+	[const_ilog2(WAKE_MDA)]		= "mac-da",
- };
- static_assert(ARRAY_SIZE(wol_mode_names) == WOL_MODE_COUNT);
- 
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 9a333a8d04c1..5958e4483ced 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -407,7 +407,7 @@ extern const struct nla_policy ethnl_linkstate_get_policy[ETHTOOL_A_LINKSTATE_HE
- extern const struct nla_policy ethnl_debug_get_policy[ETHTOOL_A_DEBUG_HEADER + 1];
- extern const struct nla_policy ethnl_debug_set_policy[ETHTOOL_A_DEBUG_MSGMASK + 1];
- extern const struct nla_policy ethnl_wol_get_policy[ETHTOOL_A_WOL_HEADER + 1];
--extern const struct nla_policy ethnl_wol_set_policy[ETHTOOL_A_WOL_SOPASS + 1];
-+extern const struct nla_policy ethnl_wol_set_policy[ETHTOOL_A_WOL_MAC_DA + 1];
- extern const struct nla_policy ethnl_features_get_policy[ETHTOOL_A_FEATURES_HEADER + 1];
- extern const struct nla_policy ethnl_features_set_policy[ETHTOOL_A_FEATURES_WANTED + 1];
- extern const struct nla_policy ethnl_privflags_get_policy[ETHTOOL_A_PRIVFLAGS_HEADER + 1];
-diff --git a/net/ethtool/wol.c b/net/ethtool/wol.c
-index 0ed56c9ac1bc..13dfcc9bb1e5 100644
---- a/net/ethtool/wol.c
-+++ b/net/ethtool/wol.c
-@@ -12,6 +12,7 @@ struct wol_reply_data {
- 	struct ethnl_reply_data		base;
- 	struct ethtool_wolinfo		wol;
- 	bool				show_sopass;
-+	bool				show_mac_da;
- };
- 
- #define WOL_REPDATA(__reply_base) \
-@@ -41,6 +42,8 @@ static int wol_prepare_data(const struct ethnl_req_info *req_base,
- 	/* do not include password in notifications */
- 	data->show_sopass = !genl_info_is_ntf(info) &&
- 		(data->wol.supported & WAKE_MAGICSECURE);
-+	data->show_mac_da = !genl_info_is_ntf(info) &&
-+		(data->wol.supported & WAKE_MDA);
- 
- 	return 0;
- }
-@@ -58,6 +61,8 @@ static int wol_reply_size(const struct ethnl_req_info *req_base,
- 		return len;
- 	if (data->show_sopass)
- 		len += nla_total_size(sizeof(data->wol.sopass));
-+	if (data->show_mac_da)
-+		len += nla_total_size(sizeof(data->wol.mac_da));
- 
- 	return len;
- }
-@@ -79,6 +84,10 @@ static int wol_fill_reply(struct sk_buff *skb,
- 	    nla_put(skb, ETHTOOL_A_WOL_SOPASS, sizeof(data->wol.sopass),
- 		    data->wol.sopass))
- 		return -EMSGSIZE;
-+	if (data->show_mac_da &&
-+	    nla_put(skb, ETHTOOL_A_WOL_MAC_DA, sizeof(data->wol.mac_da),
-+		    data->wol.mac_da))
-+		return -EMSGSIZE;
- 
- 	return 0;
- }
-@@ -91,6 +100,8 @@ const struct nla_policy ethnl_wol_set_policy[] = {
- 	[ETHTOOL_A_WOL_MODES]		= { .type = NLA_NESTED },
- 	[ETHTOOL_A_WOL_SOPASS]		= { .type = NLA_BINARY,
- 					    .len = SOPASS_MAX },
-+	[ETHTOOL_A_WOL_MAC_DA]		= { .type = NLA_BINARY,
-+					    .len = ETH_ALEN }
- };
- 
- static int
-@@ -131,6 +142,16 @@ ethnl_set_wol(struct ethnl_req_info *req_info, struct genl_info *info)
- 		ethnl_update_binary(wol.sopass, sizeof(wol.sopass),
- 				    tb[ETHTOOL_A_WOL_SOPASS], &mod);
- 	}
-+	if (tb[ETHTOOL_A_WOL_MAC_DA]) {
-+		if (!(wol.supported & WAKE_MDA)) {
-+			NL_SET_ERR_MSG_ATTR(info->extack,
-+					    tb[ETHTOOL_A_WOL_MAC_DA],
-+					    "mac-da not supported, cannot set MAC");
-+			return -EINVAL;
-+		}
-+		ethnl_update_binary(wol.mac_da, sizeof(wol.mac_da),
-+				    tb[ETHTOOL_A_WOL_MAC_DA], &mod);
-+	}
- 
- 	if (!mod)
- 		return 0;
 -- 
 2.34.1
 
 
---000000000000e0cce506077820e4
+--00000000000002c7a406077821d7
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -362,15 +221,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPD2U8veSxhysJrQ
-+1Q7Gwfu8M3LmQSPQDrH06FMqfudMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxMTIyMTMwOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILyEFIXJ/feKZGNf
+oopjkdRfoveOxPjY+u39J+Rd6L4LMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAxMTIyMTMxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQD1rSmGBRx7ab0iV6KN30SB9S9xP+0Twefg
-aF7Fc6aRZqnu06G1UlSOc2tMt1wRhyd4VExLgy4ANQ0T9LigvFK8KLziNXGRgl6IGu5c9HsYlhA4
-rAHfOt3Ne1xkgiFqip01mEjgh6+Io57P9qUQyG++lXzTl3f1CfihPobQtUkcXMIm0qzJ0FQxwgYK
-VHYH9p+Rq6bRHKRlsPlRkJXrjL4aVMqXlYK1yAGmjVeSYgwgrUjwpgZcB2GUoKr8GcNvq3jBytGs
-2YB0rOcnNm/snVoSjlE7xR0y0YqOQbcvngObVA9w0sz2eUcaCimfzpduNV9d+nsJJnES/SQWsqjs
-9tLC
---000000000000e0cce506077820e4--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAPbceK8UY6KoP75+Kw9o2zKKmqXG/HxPgf
+dEnJVcHg5dTR5IH7kQeYUZE3VSV0DtdJ5y8pOd++B55jB928LJGMxMR7MFUIKWgt0OJ0irpVUIWw
+GE5j+Bhu4P5PZzUzdtUOK9PKv80gf4LmCHe6neUxwU2VdWJA1Lk+szYmyK/qWbukcuBWlBC/XX5B
+TzEh6Xi2WqvFZkkbzSeCVeTJf6sBUO3+kCNtK+dVZuElsHmiOBRZ7XizANMZ7ZrxexZYroxrrTpj
+bGr3ErJd60Br9lNHwWAycKWp1GD32sQu/zWSpsbcWM4qUqqjCw47b5tW1Yfl33vx4aNmQcgbi3WZ
+E3Bu
+--00000000000002c7a406077821d7--
 
