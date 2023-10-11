@@ -1,123 +1,124 @@
-Return-Path: <netdev+bounces-39906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335CF7C4D1E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:28:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2AE37C4D74
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C5491C20D4D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:28:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3C5E1C20BAC
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4CA1A27A;
-	Wed, 11 Oct 2023 08:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CE9171A0;
+	Wed, 11 Oct 2023 08:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IbJagmVN"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="dT+tBHk6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88442F2E;
-	Wed, 11 Oct 2023 08:27:58 +0000 (UTC)
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 176129D;
-	Wed, 11 Oct 2023 01:27:56 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1169360002;
-	Wed, 11 Oct 2023 08:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697012875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tAl6wI267mdYSd5CG5718M4Naq5umv5wPjrfbzBjjTk=;
-	b=IbJagmVNv9BmJV/Bk5syT4UgbLmG1Ihv1V1/9IA1g+O/kgec2Yzou3NA4q82G6/O0bPfqL
-	xVQztLWHj8nR4DWyH5VNhPjzE2cU8IcXfgiOmsXDBuGCbaGWU7anPlCosMDsZ8Uxr5O8Kz
-	H6Ni4o4uLsD7ufzPQPz0tCHET50qIAIvvCpP8J775sZw2K+cWpKcfiRq6ube9+1EGtYPy3
-	gw69qKXhzHaYi8VdYp/0wlmtgnVeRDUPwSJeqSykjTdEgXXrYF25A4Tdc5gqPxUd2xuavv
-	3l3qbN2cniCHyPCGa3CwzldrfbPV3MMAEDWC33vPl0BzqimYKM0nl8XCTPTwtA==
-Date: Wed, 11 Oct 2023 10:27:49 +0200
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Richard Cochran <richardcochran@gmail.com>, Radu
- Pirea <radu-nicolae.pirea@oss.nxp.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Michael Walle <michael@walle.cc>, Jacob Keller
- <jacob.e.keller@intel.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v5 01/16] net: Convert PHYs hwtstamp callback
- to use kernel_hwtstamp_config
-Message-ID: <20231011102749.6fb29adb@kmaincent-XPS-13-7390>
-In-Reply-To: <ZSVvywM8OLG12OhR@kernel.org>
-References: <20231009155138.86458-1-kory.maincent@bootlin.com>
-	<20231009155138.86458-2-kory.maincent@bootlin.com>
-	<ZSVvywM8OLG12OhR@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CD079F2
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 08:44:29 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4A394;
+	Wed, 11 Oct 2023 01:44:27 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39B8RUv5019014;
+	Wed, 11 Oct 2023 08:44:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=CKLbAFMH6LvLAXG8dHAwMBaeUjwDW9MIJWByHMsusBI=;
+ b=dT+tBHk6CNe7U86tGoKC9np3s6vIL602iOt11ZzW4bf3TkKG6pvYvo5ZyiNedDzR61Qx
+ TZf3qk0nqursWf0jDSPOqU9sxQMxUPbFAz03hLYvCblnF8Vppv+542w2++XHybGVFVog
+ L394/egviRXuSn/4wZgYXynrxJSbh2Dm5KpyUuyQKjDsFn71R8tlPpVm2/vL//T+P1FQ
+ xZ8t6I16+5cUhqHK6tIVywYy5FzGWupnoEbRCn0AxMwwM4pEaY8c6dK8ANxtwZc2wLQC
+ ZwNbjeYrhWZ3LfIbVBTzyauHwybQG1Yde1Si2onHWJqVI5VFkKNEhpE21518oj32cutR bA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnr78gn50-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Oct 2023 08:44:25 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39B8Rtut020491;
+	Wed, 11 Oct 2023 08:44:24 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnr78gn2e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Oct 2023 08:44:24 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39B6bgpi001239;
+	Wed, 11 Oct 2023 08:44:22 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvjxdab-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 11 Oct 2023 08:44:21 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39B8iJHr12911180
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 11 Oct 2023 08:44:19 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0BEBC2004D;
+	Wed, 11 Oct 2023 08:44:19 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BE55A20043;
+	Wed, 11 Oct 2023 08:44:18 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed, 11 Oct 2023 08:44:18 +0000 (GMT)
+Date: Wed, 11 Oct 2023 10:44:16 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        wintera@linux.ibm.com, kuba@kernel.org, davem@davemloft.net,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net 2/5] net/smc: fix incorrect barrier usage
+Message-ID: <20231011084416.6942-A-hca@linux.ibm.com>
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-3-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1697009600-22367-3-git-send-email-alibuda@linux.alibaba.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: TGVlvUGEnTMcc16Bx-3_7D9l1mGSpslk
+X-Proofpoint-ORIG-GUID: N9KOuIc_ajiHmIrov9IAuuB9NdAT0JMh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-11_06,2023-10-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 spamscore=0 mlxlogscore=295 clxscore=1011
+ suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2309180000 definitions=main-2310110076
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 10 Oct 2023 17:37:47 +0200
-Simon Horman <horms@kernel.org> wrote:
+On Wed, Oct 11, 2023 at 03:33:17PM +0800, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This patch add explicit CPU barrier to ensure memory
+> consistency rather than compiler barrier.
+> 
+> Besides, the atomicity between READ_ONCE and cmpxhcg cannot
+> be guaranteed, so we need to use atomic ops. The simple way
+> is to replace READ_ONCE with xchg.
+> 
+> Fixes: 475f9ff63ee8 ("net/smc: fix application data exception")
+> Co-developed-by: Heiko Carstens <hca@linux.ibm.com>
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 
-> ...
->=20
-> > diff --git a/drivers/net/phy/nxp-c45-tja11xx.c
-> > b/drivers/net/phy/nxp-c45-tja11xx.c index 7ab080ff02df..416484ea6eb3 10=
-0644
-> > --- a/drivers/net/phy/nxp-c45-tja11xx.c
-> > +++ b/drivers/net/phy/nxp-c45-tja11xx.c
-> > @@ -1022,24 +1022,21 @@ static bool nxp_c45_rxtstamp(struct mii_timesta=
-mper
-> > *mii_ts, }
-> > =20
-> >  static int nxp_c45_hwtstamp(struct mii_timestamper *mii_ts,
-> > -			    struct ifreq *ifreq)
-> > +			    struct kernel_hwtstamp_config *config,
-> > +			    struct netlink_ext_ack *extack)
-> >  {
-> >  	struct nxp_c45_phy *priv =3D container_of(mii_ts, struct nxp_c45_phy,
-> >  						mii_ts);
-> >  	struct phy_device *phydev =3D priv->phydev;
-> >  	const struct nxp_c45_phy_data *data;
-> > -	struct hwtstamp_config cfg;
-> > =20
-> > -	if (copy_from_user(&cfg, ifreq->ifr_data, sizeof(cfg)))
-> > -		return -EFAULT;
-> > -
-> > -	if (cfg.tx_type < 0 || cfg.tx_type > HWTSTAMP_TX_ON)
-> > +	if (cfg->tx_type < 0 || cfg->tx_type > HWTSTAMP_TX_ON) =20
->=20
-> Hi K=C3=B6ry,
->=20
-> cfg is removed from this function by this patch, but is used here.
-
-Thanks for your review.
-Indeed there is a mistake here. It will be fixed it next version.
+^^^
+I did not Co-develop this, nor did I provide an explicit Signed-off-by.
+Please don't add Signed-off-by statements which have not been explicitly
+agreed on.
 
