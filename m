@@ -1,111 +1,160 @@
-Return-Path: <netdev+bounces-39885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CEE7C4B21
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:05:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B8E7C4B44
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913351C20AF1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:05:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8CC228162F
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77967171B1;
-	Wed, 11 Oct 2023 07:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E36B171D6;
+	Wed, 11 Oct 2023 07:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dr3qP0gN"
+	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="gSITyVIP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B186AAB;
-	Wed, 11 Oct 2023 07:05:02 +0000 (UTC)
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBB208F;
-	Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-690f8e63777so1706495b3a.0;
-        Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697007899; x=1697612699; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SzkXH1LFEzjCCR/7DMEL+wPWEqFwEny0dN9u7sSoZdk=;
-        b=dr3qP0gNrk5VYmdeGG0W0Yi9gvyhrOV9T0se1fDd1JeZDD4zwK2FTBV9ONpff1Rjoe
-         EH3y60Cs0yIS+d95YmC9OLPrnkmAqfa/+mQZioXDOmy6iMxR3aOoBJ7D3/lJgqZpuGgX
-         nefrLGnIwNsidCvW+ycAZaXYk1b9bV/LNz7ZHfz32+TjntPsLkWE0lJciLlfs+2N071g
-         0YEXHa2l424ZmVYV+fH6BLEpcmuhrDl54532j+Qxbl3PSKZlPvUverC0cTZVZWyeWivr
-         1LjCzixly6aF8hz9xdJBphcV9I/uEg/FixaXz0WGpj5xKu6QtF44XuCrTExCmP4+GDfv
-         9N2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697007899; x=1697612699;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SzkXH1LFEzjCCR/7DMEL+wPWEqFwEny0dN9u7sSoZdk=;
-        b=YCYOeAAIOlchIriuvSjU3a62/lOp+081zNAtWNhblA60Ya8pys0qSgZu8BQJMoriQ/
-         d3n/dG1LBjITeSwWT1T7V/0TPlXCG3vaaKeYPxkC5szMXnBJv6lSVQtaa8L6MSK/5Ue/
-         ZmLoejrrvnXzZ4arTuBwBBbNqZX+ikVUWo/UpjSb4mm6aPfi29l+8DmT2hCgLGpkNhYP
-         A7j+sQ6NnjBrWM0d33Zs4lEuZaF8A2C+076auwdFqajbids7936ualn6piG6+n68XqPp
-         Q4UzP3BtPnKHGREVTLe1LPjbsTRfhzmAxFm5kZFB7JI9fSANL4W8lTFYzAbXJEj2HCfi
-         TZww==
-X-Gm-Message-State: AOJu0YxOpfVxy4MBGhHmdlH+SsfPwPQNsTBLzQvWY317I6Dg30jKRSDH
-	qSghjZiPkEWI3vIIvMMV9/U=
-X-Google-Smtp-Source: AGHT+IF5evrM/bmA16l9iFSxJEyYji1X+t1TkeGy3Ix0n/Sk0WpIBK/k6LZ0kaBKnl/6RCpZnTUexQ==
-X-Received: by 2002:a05:6a21:a5a0:b0:15d:a247:d20c with SMTP id gd32-20020a056a21a5a000b0015da247d20cmr26817375pzc.6.1697007899013;
-        Wed, 11 Oct 2023 00:04:59 -0700 (PDT)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id ix3-20020a170902f80300b001b06c106844sm13095405plb.151.2023.10.11.00.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 00:04:58 -0700 (PDT)
-Date: Wed, 11 Oct 2023 16:04:58 +0900 (JST)
-Message-Id: <20231011.160458.2187571498289000541.fujita.tomonori@gmail.com>
-To: tmgross@umich.edu
-Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org,
- miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
- PHY drivers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CALNs47unEPkVtRVBZfqYJ_-tgf3HJ6mxz_pybL+y3=AXgX2o8g@mail.gmail.com>
-References: <2023100926-ambulance-mammal-8354@gregkh>
-	<20231010.002413.435110311325344494.fujita.tomonori@gmail.com>
-	<CALNs47unEPkVtRVBZfqYJ_-tgf3HJ6mxz_pybL+y3=AXgX2o8g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D3917986
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:09:09 +0000 (UTC)
+Received: from smtpcmd11128.aruba.it (smtpcmd11128.aruba.it [62.149.156.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02D9290
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 00:09:07 -0700 (PDT)
+Received: from smtpclient.apple ([178.197.207.108])
+	by Aruba Outgoing Smtp  with ESMTPA
+	id qTL5qhUPwT2S6qTL5qdYwG; Wed, 11 Oct 2023 09:09:05 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1697008145; bh=OFZaDkGYXLAqctRIWUHK2zLsfn3fVaLLoVZLlGB7ECs=;
+	h=Content-Type:Mime-Version:Subject:From:Date:To;
+	b=gSITyVIPmvPqIY+TI/ONWy67LBXZJoWfIYTOxHdmsrkexV5uF3oHAFAJWUwRfNUex
+	 j73xgyR6znKwSVHy1RAp9pRRozrw88QIOVSnCx0pnZ308W3zN7bQKPTIpFDOUKF/yU
+	 wy/ycug6rFPjx4esbpCrQuR8jY1CtwpoeH++e96ag2voR6rjA+ImmPhaOMdbGarIuu
+	 /8HtmJ8YEXI4okreyZ1nlUj40sCcw+IyLVSEhygfb8IUnK+Cri7sBnyzXdB0cgYD3f
+	 YF44wNUfGmNBsyl/LWOIegybCxd43Kb4G3qYzngFfYyBtApVWgJUahjCQSTgDuN2ry
+	 n+AXx1jYXy87A==
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.15\))
+Subject: Re: [PATCH 01/10] appletalk: remove localtalk and ppp support
+From: Rodolfo Zitellini <rwz@xhero.org>
+In-Reply-To: <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
+Date: Wed, 11 Oct 2023 09:09:02 +0200
+Cc: Arnd Bergmann <arnd@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Netdev <netdev@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ linux-wireless@vger.kernel.org,
+ Johannes Berg <johannes@sipsolutions.net>,
+ linux-wpan@vger.kernel.org,
+ Michael Hennerich <michael.hennerich@analog.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ linux-kernel@vger.kernel.org,
+ Doug Brown <doug@schmorgal.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D4934680-DFB5-471F-893F-32FEA9A6C26C@xhero.org>
+References: <20231009141908.1767241-1-arnd@kernel.org>
+ <790BA488-B6F6-41ED-96EF-2089EF1C043B@xhero.org>
+ <3cb4bb96-1651-4179-9c32-507937282d7d@app.fastmail.com>
+ <DE61EEA5-D560-40B6-8F4D-22F299AC61ED@xhero.org>
+ <2d325867-95c9-4bff-8f24-9083c730d7ba@app.fastmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+X-Mailer: Apple Mail (2.3654.120.0.1.15)
+X-CMAE-Envelope: MS4xfJ+NY3qkgFTiuA0L32HFj+5woru5XqLJ2Z2A2TqBSyNMJjn9LTpk+PwA/TopQdGSgZemVGvpmWUkrlezKQaaSorGUs9nrzbOLTMBAdAjKxcCKnQ07IS3
+ MjQ6AI+8VVwJBvQpEn3Xv82MRQiQmMkCGgXJ19Y7pPt0j21usz3a1MYa4c7pNjY0/woBJG3IAUohLs0BK1DVJo+2DDCNWeZhjrqBgXEzJeKtiuXAEusogHqk
+ Kv/XrrLNv82hS8KstVy59xpwj+1mUKhMvH4JdRDUFsxdVUFBcvqcL0WRsGhtnfzcCdyA/TygYOtuOVrl6o5UlSbzo0ebTHp3Y8W0PaKbEdOsGLlpnixo4bm7
+ KgcsyGX1T/poBUvWCUxFJPJ1fPYcC0GUM2BgGPYOuH7rm4lf6GntqES+VwZNZbwhoyq74t4PC/Pz1vtF1pC9eTeJm1utj9fotl8OGUQhd3CLuHGAGnMNwOIe
+ xBDzmq8bC0rDCVKWXr26+qe3YPQHq1JbDi2yYPEerMcJigv+JZLrzidZ51bE2WiqMsfJG8guomcqd2+GcBgf6rxC/SYB7kx5sM1LnUAl8lhu4h0bEIs+zk4N
+ xaQHjZItQCeMyU264BiSV9NbEwikOv9u7uR7tnhC9x80EA==
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gTW9uLCA5IE9jdCAyMDIzIDE3OjA3OjE4IC0wNDAwDQpUcmV2b3IgR3Jvc3MgPHRtZ3Jvc3NA
-dW1pY2guZWR1PiB3cm90ZToNCg0KPiBPbiBNb24sIE9jdCA5LCAyMDIzIGF0IDExOjI04oCvQU0g
-RlVKSVRBIFRvbW9ub3JpDQo+IDxmdWppdGEudG9tb25vcmlAZ21haWwuY29tPiB3cm90ZToNCj4+
-IFRyZXZvciBnYXZlIFJldmlld2VkLWJ5LiBOb3QgcGVyZmVjdCBidXQgcmVhc29uYWJsZSBzaGFw
-ZSwgSU1ITy4gU2VlbXMNCj4+IHRoYXQgd2UgaGF2ZSBiZWVuIGRpc2N1c3NpbmcgdGhlIHNhbWUg
-dG9waWNzIGxpa2UgbG9ja2luZywgbmFtaW5nLCBldGMNCj4+IGFnYWluIGFuZCBhZ2Fpbi4NCj4g
-DQo+IFRvIGJlIGNsZWFyOiB0aGlzIGlzIE9OTFkgZm9yIHRoZSBydXN0IGRlc2lnbiwgSSBhbSBu
-b3QgYXQgYWxsDQo+IHF1YWxpZmllZCB0byByZXZpZXcgdGhlIGJ1aWxkIHN5c3RlbSBpbnRlZ3Jh
-dGlvbi4gSSBwcm92aWRlZCBhIHJldmlldw0KPiB3aXRoIHRoZSBrbm93biBjYXZlYXRzIHRoYXQ6
-DQoNCkkgdGhpbmsgdGhhdCBpdCdzIHNhZmUgdG8gYXNzdW1lIHRoYXQgc3Vic3lzdGVtIG1haW50
-YWluZXJzIHVuZGVyc3RhbmQgdGhhdC4NCg0KSSByZWFsbHkgYXBwcmVjYXRlIHlvdXIgZmVlZGJh
-Y2sgb24gdGhlIHBhdGNoc2V0Lg0KDQo+IDEuIFRoZSBjdXJyZW50IGVudW0gaGFuZGxpbmcgaXMg
-ZnJhZ2lsZSwgYnV0IG9ubHkgdG8gdGhlIGV4dGVudCB0aGF0DQo+IHdlIGRvIG5vdCBoYW5kbGUg
-dmFsdWVzIG5vdCBzcGVjaWZpZWQgaW4gdGhlIEMtc2lkZSBlbnVtLiBJIGFtIG5vdA0KPiBzdXJl
-IHdoYXQgd2UgY2FuIGRvIGJldHRlciBoZXJlIHVudGlsIGJpbmRnZW4gcHJvdmlkZXMgYmV0dGVy
-DQo+IHNvbHV0aW9ucy4NCj4gMi4gVHlwZXMgZm9yICNkZWZpbmUgYXJlIG5vdCBpZGVhbA0KPiBo
-dHRwczovL2xvcmUua2VybmVsLm9yZy9ydXN0LWZvci1saW51eC9DQUxOczQ3dG5YV00zYVZwZU5N
-a3VWWkFKS2M9c2VXeExBb0xnU3dxUDBKbXMrTWZjX0FAbWFpbC5nbWFpbC5jb20vDQo+IA0KPiBU
-aGVzZSBzZWVtIHRvIG1lIHRvIGJlIHJlYXNvbmFibGUgY29uY2Vzc2lvbnMgYXQgdGhpcyB0aW1l
-LCBidXQgb2YNCj4gY291cnNlIHRoZSBvdGhlciByZXZpZXdlcnMgd2lsbCByZXF1ZXN0IGZ1cnRo
-ZXIgY2hhbmdlcyBvciBwZXJoYXBzDQo+IGhhdmUgc3VnZ2VzdGlvbnMgZm9yIHRoZXNlIGl0ZW1z
-Lg0KDQpGb3IgbWUsIHRoZXkgYXJlIGFuIGxvbmctdGVybSBpc3N1ZS4NCg==
+
+
+> Il giorno 10 ott 2023, alle ore 10:15, Arnd Bergmann <arnd@arndb.de> =
+ha scritto:
+>=20
+> On Tue, Oct 10, 2023, at 09:10, Rodolfo Zitellini wrote:
+>>> Il giorno 9 ott 2023, alle ore 19:29, Arnd Bergmann <arnd@arndb.de> =
+ha scritto:
+>>> On Mon, Oct 9, 2023, at 18:49, Rodolfo Zitellini wrote:
+>>> I can see a few ways this could work out:
+>>>=20
+>>> - add a custom callback pointer to struct atalk_iface to
+>>> get and set the address for phase1 probing instead of going
+>>> through the ioctl
+>>=20
+>> This was my initial thought, at least for the moment, mostly to keep=20=
+
+>> netatalk happy and make sure I don=E2=80=99t break other stuff that =
+makes=20
+>> assumptions on how the address probing worked. There are other bits I=20=
+
+>> would like to improve, for example tcpdump (which parses correctly=20
+>> appetalk packets!) is broken in the current implementation.
+>>=20
+>>> - rewrite the probing logic in aarp.c more widely, and improve
+>>> the userspace interface in the process by introducing a netlink
+>>> interface
+>>=20
+>> This is sorta the =E2=80=9Csecond step=E2=80=9D I was planning, I =
+think the logic for=20
+>> probing could be redesigned and simplified (it also does not work =
+100%=20
+>> correctly), and it could be a good chance to improve the interface =
+with=20
+>> netatalk too.
+>=20
+> Ok, I've adapted my patch now to not actually drop the
+> localtalk code for now, and sent that out, I hope that works
+> for you. Even if we go with the v1 patch that removes it all,
+> you could just as well start with a revert of my patch when
+> you add your driver, so in the end it shouldn't make much
+> of a difference.
+
+Thank you very much! I will try to make my patch ready to be submitted =
+soon, and I will add the proper reverts if needed.
+
+>>> - Move your entire driver into userspace and go to the kernel
+>>> using tun/tap. This has the added benefit of avoiding a lot
+>>> of the complexity of the tty line discipline code you have.
+>>=20
+>> We had some discussion too if to just make the lt an userspace stack, =
+I=20
+>> personally like how it is currently implemented because existing code=20=
+
+>> can run basically without modification.
+>>=20
+>> I would propose at this stage to change the TashTalk driver to remove=20=
+
+>> ndo_do_ioctl and to use a custom callback, if this ok.
+>=20
+> It looks like you still need a custom userspace tool to set up
+> the uart for your new driver, so my feeling would be that having a
+> userspace bridge to implement the localtalk/uart to ethertalk/tap
+> driver would actually be nicer for both usability and maintenance.
+>=20
+> It's not something we need to decide now though, and is up to
+> you in the end.
+
+I will experiment with this too, as it will require a bit of work to =
+morph localtalk packets to ethertalk/aarp ones, and the code in the =
+kernel has some specialized bits for localtalk here and there.
+
+In any case, many thanks!
+Rodolfo
+
 
