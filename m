@@ -1,70 +1,109 @@
-Return-Path: <netdev+bounces-40081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AC617C5A42
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:32:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E26157C5A4E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:35:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF72282237
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:32:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C077281DE4
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 17:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8657A41;
-	Wed, 11 Oct 2023 17:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6CA39943;
+	Wed, 11 Oct 2023 17:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8QiIfdk"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vcAb4y4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9603B39934
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 17:32:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28C54C433C8;
-	Wed, 11 Oct 2023 17:32:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697045563;
-	bh=1f/EjuaPCbCGCWkRuzwu7a/NWcfvSrtywlpUesiHtM0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D8QiIfdkartjbgMJbdZfAIe/B8248Oe+9iU9+iNObtvUFhpcUx59HjafLbdesD7yY
-	 9C39bIgRNubYlaCDttZgUof1EpP4dEP32Cl9MpjhA8O+DRja0sEdA0YtjXTtFPYJNw
-	 6bBxWH1L8CsDbDNpWe3T3NGqwiC4xuNJ9S1QK1Y4AIXuZVZavIXj/YCY9RxiRtG8Jb
-	 nKXAuXP7Hqt38P0ZIXlXkta7z+NYTlJdVwUML5xaxLNvux4O0rJi2MJYHTVI5FE4X5
-	 r0LWeUhQuNvybeYIB9K8ldbcVQpDjUAECauna/3lUFllgKZ7HsWrfJq4bO/6iFE9Hh
-	 dKUapuhSPA1mw==
-Date: Wed, 11 Oct 2023 11:32:38 -0600
-From: Keith Busch <kbusch@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 11/18] nvme-fabrics: parse options 'keyring' and 'tls_key'
-Message-ID: <ZSbcNnJP_ug4ojyl@kbusch-mbp.dhcp.thefacebook.com>
-References: <20230824143925.9098-1-hare@suse.de>
- <20230824143925.9098-12-hare@suse.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25349A41;
+	Wed, 11 Oct 2023 17:35:47 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A4B7E3;
+	Wed, 11 Oct 2023 10:35:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697045745; x=1728581745;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=frjHI9ddst3f8PxeQu1ZvawNbZ4ccQ7c9yX6fhgSKSs=;
+  b=vcAb4y4WKuYk9vj2/UeS47wGjbNErHG3bUR57IFQHgeM3KR6xg1iD3UA
+   CCuh1QlvyWbzOPLKnPWgB1WEngLUQVzNkRPFN4VP2+YbJQxYTq+nK1l4P
+   zx9LLjTELV6qLHrJ/G1va4JJcrt4x4Df17+S79gCa+fKtLzoxWoZ+G5it
+   c=;
+X-IronPort-AV: E=Sophos;i="6.03,216,1694736000"; 
+   d="scan'208";a="35167844"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 17:35:42 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad55-ws-svc-p15-lb9-vlan2.iad.amazon.com [10.40.159.162])
+	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id 20EDD48670;
+	Wed, 11 Oct 2023 17:35:38 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 17:35:38 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 17:35:36 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daan.j.demeyer@gmail.com>
+CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH bpf-next v10 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+Date: Wed, 11 Oct 2023 10:35:28 -0700
+Message-ID: <20231011173528.41599-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231011170321.73950-3-daan.j.demeyer@gmail.com>
+References: <20231011170321.73950-3-daan.j.demeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230824143925.9098-12-hare@suse.de>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.62]
+X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Aug 24, 2023 at 04:39:18PM +0200, Hannes Reinecke wrote:
->  	args.ta_data = queue;
->  	args.ta_my_peerids[0] = pskid;
->  	args.ta_num_peerids = 1;
-> +	if (nctrl->opts->keyring)
-> +		keyring = key_serial(nctrl->opts->keyring;
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 11 Oct 2023 19:03:11 +0200
+[...]
+> @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+>  	if (!ctx.uaddr) {
+>  		memset(&unspec, 0, sizeof(unspec));
+>  		ctx.uaddr = (struct sockaddr *)&unspec;
+> -	}
+> +		ctx.uaddrlen = 0;
+> +	} else
+> +		ctx.uaddrlen = *uaddrlen;
+>  
+>  	cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+> -	return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> -				     0, flags);
+> +	ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> +				    0, flags);
+> +
+> +	if (!ret && uaddrlen)
 
-The key_serial call is missing the closing ')'. I fixed it up while
-applying, but a little concerning. I'm guessing you tested with a
-previous version?
+nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
 
-Anyway, I've applied the series to nvme-6.7 since this otherwise looks
-good. I'll let it sit there a day and send a pull request to Jens if the
-build bots don't complain.
+
+> +		*uaddrlen = ctx.uaddrlen;
+> +
+> +	return ret;
+>  }
+>  EXPORT_SYMBOL(__cgroup_bpf_run_filter_sock_addr);
+> 
 
