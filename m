@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-39897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEB37C4BF3
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:33:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 687777C4BF0
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98635282249
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:33:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 176832821F3
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C395199B9;
-	Wed, 11 Oct 2023 07:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5732199C2;
+	Wed, 11 Oct 2023 07:33:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07708199B4
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:33:38 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A1EA7;
-	Wed, 11 Oct 2023 00:33:33 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VtvoMEO_1697009611;
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VtvoMEO_1697009611)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC00199A0
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:33:37 +0000 (UTC)
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C9EB7;
+	Wed, 11 Oct 2023 00:33:35 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VtvoMEe_1697009611;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VtvoMEe_1697009611)
           by smtp.aliyun-inc.com;
-          Wed, 11 Oct 2023 15:33:31 +0800
+          Wed, 11 Oct 2023 15:33:32 +0800
 From: "D. Wythe" <alibuda@linux.alibaba.com>
 To: kgraul@linux.ibm.com,
 	wenjia@linux.ibm.com,
@@ -37,9 +37,9 @@ Cc: kuba@kernel.org,
 	linux-s390@vger.kernel.org,
 	linux-rdma@vger.kernel.org,
 	"D. Wythe" <alibuda@linux.alibaba.com>
-Subject: [PATCH net 3/5] net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
-Date: Wed, 11 Oct 2023 15:33:18 +0800
-Message-Id: <1697009600-22367-4-git-send-email-alibuda@linux.alibaba.com>
+Subject: [PATCH net 4/5] net/smc: protect connection state transitions in listen work
+Date: Wed, 11 Oct 2023 15:33:19 +0800
+Message-Id: <1697009600-22367-5-git-send-email-alibuda@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
 References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
@@ -57,55 +57,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
 From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-This patch re-fix the issues memtianed by commit 22a825c541d7
-("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()").
+Consider the following scenario:
 
-Blocking sending message do solve the issues though, but it also
-prevents the peer to receive the final message. Besides, in logic,
-whether the sndbuf_desc is NULL or not have no impact on the processing
-of cdc message sending.
+				smc_close_passive_work
+smc_listen_out_connected
+				lock_sock()
+if (state  == SMC_INIT)
+				if (state  == SMC_INIT)
+					state = SMC_APPCLOSEWAIT1;
+	state = SMC_ACTIVE
+				release_sock()
 
-Hence that, this patch allow the cdc message sending but to check the
-sndbuf_desc with care in smc_cdc_tx_handler().
+This would cause the state machine of the connection to be corrupted.
+Also, this issue can occur in smc_listen_out_err().
 
-Fixes: 22a825c541d7 ("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()")
+To solve this problem, we can protect the state transitions under
+the lock of sock to avoid collision.
+
+Fixes: 3b2dec2603d5 ("net/smc: restructure client and server code in af_smc")
 Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 ---
- net/smc/smc_cdc.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/smc/af_smc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 01bdb79..3c06625 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -28,13 +28,15 @@ static void smc_cdc_tx_handler(struct smc_wr_tx_pend_priv *pnd_snd,
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 5ad2a9f..3bb8265 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -1926,8 +1926,10 @@ static void smc_listen_out_connected(struct smc_sock *new_smc)
  {
- 	struct smc_cdc_tx_pend *cdcpend = (struct smc_cdc_tx_pend *)pnd_snd;
- 	struct smc_connection *conn = cdcpend->conn;
-+	struct smc_buf_desc *sndbuf_desc;
- 	struct smc_sock *smc;
- 	int diff;
+ 	struct sock *newsmcsk = &new_smc->sk;
  
-+	sndbuf_desc = conn->sndbuf_desc;
- 	smc = container_of(conn, struct smc_sock, conn);
- 	bh_lock_sock(&smc->sk);
--	if (!wc_status) {
--		diff = smc_curs_diff(cdcpend->conn->sndbuf_desc->len,
-+	if (!wc_status && sndbuf_desc) {
-+		diff = smc_curs_diff(sndbuf_desc->len,
- 				     &cdcpend->conn->tx_curs_fin,
- 				     &cdcpend->cursor);
- 		/* sndbuf_space is decreased in smc_sendmsg */
-@@ -114,9 +116,6 @@ int smc_cdc_msg_send(struct smc_connection *conn,
- 	union smc_host_cursor cfed;
- 	int rc;
++	lock_sock(newsmcsk);
+ 	if (newsmcsk->sk_state == SMC_INIT)
+ 		newsmcsk->sk_state = SMC_ACTIVE;
++	release_sock(newsmcsk);
  
--	if (unlikely(!READ_ONCE(conn->sndbuf_desc)))
--		return -ENOBUFS;
--
- 	smc_cdc_add_pending_send(conn, pend);
+ 	smc_listen_out(new_smc);
+ }
+@@ -1939,9 +1941,12 @@ static void smc_listen_out_err(struct smc_sock *new_smc)
+ 	struct net *net = sock_net(newsmcsk);
  
- 	conn->tx_cdc_seq++;
+ 	this_cpu_inc(net->smc.smc_stats->srv_hshake_err_cnt);
++
++	lock_sock(newsmcsk);
+ 	if (newsmcsk->sk_state == SMC_INIT)
+ 		sock_put(&new_smc->sk); /* passive closing */
+ 	newsmcsk->sk_state = SMC_CLOSED;
++	release_sock(newsmcsk);
+ 
+ 	smc_listen_out(new_smc);
+ }
 -- 
 1.8.3.1
 
