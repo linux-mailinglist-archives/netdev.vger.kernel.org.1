@@ -1,153 +1,133 @@
-Return-Path: <netdev+bounces-39994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E387C5590
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:35:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519417C5597
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335701C20FD1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:35:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFE70282782
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BD81F942;
-	Wed, 11 Oct 2023 13:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A511F944;
+	Wed, 11 Oct 2023 13:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gLDRwfvL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vOrMNnAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015351F928
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:35:05 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB5B790
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:35:02 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-4065dea9a33so65775455e9.3
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697031301; x=1697636101; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dP5Q5Du7NAyXjtMY9uD2ENDLxtJmtUvg1pfS99UAKK4=;
-        b=gLDRwfvL6xk5DPNWYrstjrAjpdSS0L0nK8kxbr8OmMy5z7taLSHi9bLcCQJDktMRuv
-         gLtlw0FG4VDFue9mqQ2c5PjvRkUcUV/PwaBStFxgEVZ9sERtxvpclyBCegrkHSZe6QGy
-         b23a5aQMRy2JVX/CMSYqH3eSY9aDe8qhCUdN7lge2tnibPRQNxrUiOGVBLJdK/R+dK5w
-         7RvmkWmSzzY3HQ0qE53AQfeFmHA/22fgRiEXhNNJ0nYOOLQbCMV8OeOq9pdL5iRDms7m
-         i6W3tvOmNDewnXmPECq21B8s53vzbACBy4OxrbrvhkYX39hpfjJ80rcrIYBYG+2jRjwa
-         4W/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697031301; x=1697636101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dP5Q5Du7NAyXjtMY9uD2ENDLxtJmtUvg1pfS99UAKK4=;
-        b=pFqnDh2H+VJGozOyNZJUI+NqPaz93XdHId61V9kngZamO2xDpY+xgjFrP7FgAbLsQ1
-         +vbZyjZistihN4JDnB9IDeiq4MbQbsUjsOHAcDGQBW+dj9qpPrZHBcqN6jWKwpiWKw1x
-         nfRuoZFx0d9QDa8gUOYAaEPBYg50jRO+QWJW+vhMPhb8a2HQse7JHcSFUenUv1q1WBeL
-         yGfnzIijhhw+vvnzCI+HkIBpvYp78hGafNSnbeXUMiytjoZsJxTeigqQBRFA+3trkfIL
-         zEvNe8MGFTqgpX2QfuVVrsI97yLpGUXiLePUtXMRF5rvdQUlwCDfCAQ+O9t3+s4MSM7x
-         W5yA==
-X-Gm-Message-State: AOJu0YwCU877JKCBdFiuFGnuAymBz8yrbCI+zArNMIN3D2UyKIwf324b
-	pnywJORXJ79mdY++I+pN8es7eb7Kj4VeTHjnLDw=
-X-Google-Smtp-Source: AGHT+IERDgO4HSN33tTuJmyh+SPJECo0HeZPwPCxrGhfbNAezDV/2jzo0rbyEk6b7uGdDFs7p1Hjtg==
-X-Received: by 2002:a7b:cd98:0:b0:405:1ba2:4fcb with SMTP id y24-20020a7bcd98000000b004051ba24fcbmr19313228wmj.16.1697031300933;
-        Wed, 11 Oct 2023 06:35:00 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id y11-20020a05600c364b00b004063977eccesm19227045wmq.42.2023.10.11.06.35.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 06:35:00 -0700 (PDT)
-Date: Wed, 11 Oct 2023 15:34:59 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, gal@nvidia.com
-Subject: Re: [patch net-next] devlink: don't take instance lock for nested
- handle put
-Message-ID: <ZSakg8W+SBgahXtW@nanopsycho>
-References: <ZSA+1qA6gNVOKP67@nanopsycho>
- <20231006151446.491b5965@kernel.org>
- <ZSEwO+1pLuV6F6K/@nanopsycho>
- <20231009081532.07e902d4@kernel.org>
- <ZSQeNxmoual7ewcl@nanopsycho>
- <20231009093129.377167bb@kernel.org>
- <ZST9yFTeeTuYD3RV@nanopsycho>
- <20231010075231.322ced83@kernel.org>
- <ZSV0NOackGvWn7t/@nanopsycho>
- <20231010111605.2d520efc@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BE31F928;
+	Wed, 11 Oct 2023 13:39:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE381C433C7;
+	Wed, 11 Oct 2023 13:39:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697031556;
+	bh=47vFEIfynYM2SLVuIlBK4kOi9a9GpRQT3cwG45gN3mQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vOrMNnAGCvhXr0s28XZ7tcCt2hw5zS9++2trRSGf/T4CZt2QzgkfTpdZzG4TE/U56
+	 LA77ChGUDhVkrPStTXkLFX7RzvZ9K/l2ZfBmM0785zUkgxQ8wTLPjfAwMYUhjDjLXJ
+	 daUfMUxdeOAPxXsemxK+6y/r2hV6Q7BlCRg2/eSwVpnwQlMYaKZnjMhP36tKkE6np3
+	 u5RuUwQ3N4kDnfmxVX5VXeYSnSXjKYmSsQt2lFZuguPoMDB0nQOYPr0C5iBb85LaM/
+	 gg9OtnW5vrT3HD5oPGjIQkm/k3OU7a3XGm4dfFupmOpJ+RiLlZn9IjpOY0L4uBSx4c
+	 hRoU2YKUrLDQQ==
+Date: Wed, 11 Oct 2023 14:39:10 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: UNGLinuxDriver@microchip.com, andrew@lunn.ch, conor+dt@kernel.org,
+	davem@davemloft.net, devicetree@vger.kernel.org,
+	edumazet@google.com, f.fainelli@gmail.com,
+	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
+	olteanv@gmail.com, pabeni@redhat.com, robh+dt@kernel.org,
+	woojung.huh@microchip.com
+Subject: Re: [PATCH net-next 2/2] dt-bindings: net: microchip,ksz: document
+ microchip,rmii-clk-internal
+Message-ID: <20231011-brittle-frantic-d39ec3dd23f9@spud>
+References: <20231010-unwired-trench-c7a467118879@spud>
+ <20231011132600.26297-1-ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="tHfanppQTDzMi70y"
+Content-Disposition: inline
+In-Reply-To: <20231011132600.26297-1-ante.knezic@helmholz.de>
+
+
+--tHfanppQTDzMi70y
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231010111605.2d520efc@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Oct 10, 2023 at 08:16:05PM CEST, kuba@kernel.org wrote:
->On Tue, 10 Oct 2023 17:56:36 +0200 Jiri Pirko wrote:
->> >You understand what I'm saying tho, right?
->> >
->> >If we can depend on the parent not disappearing before the child,
->> >and the hierarchy is a DAG - the locking is much easier, because
->> >parent can lock the child.  
->> 
->> It won't help with the locking though. During GET, the devlink lock
->> is taken and within it, you need to access the nested devlink attributes.
->> 
->> And during reload->notify, we still need work so the lock are taken in
->> proper order.
->
->If parent is guaranteed to exist the read only fields can be accessed
->freely and the read-write fields can be cached on children.
+On Wed, Oct 11, 2023 at 03:26:00PM +0200, Ante Knezic wrote:
+> On Tue, 10 Oct 2023 16:25:55 +0100, Conor Dooley wrote:
+> > On Tue, Oct 10, 2023 at 03:18:54PM +0200, Ante Knezic wrote:
+> > > Add documentation for selecting reference rmii clock on KSZ88X3 devic=
+es
+> > >=20
+> > > Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> > > ---
+> > >  Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml | 6 +++=
++++
+> > >  1 file changed, 6 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.=
+yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > index e51be1ac0362..3df5d2e72dba 100644
+> > > --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> > > @@ -49,6 +49,12 @@ properties:
+> > >        Set if the output SYNCLKO clock should be disabled. Do not mix=
+ with
+> > >        microchip,synclko-125.
+> > > =20
+> > > +  microchip,rmii-clk-internal:
+> > > +    $ref: /schemas/types.yaml#/definitions/flag
+> > > +    description:
+> > > +      Set if the RMII reference clock should be provided internally.
+> >=20
+> > > Applies only
+> > > +      to KSZ88X3 devices.
+> >=20
+> > This should be enforced by the schema, the example schema in the docs
+> > should show you how to do this.
+>=20
+> I am guessing you are refering to limiting the property to ksz88x3 device=
+s?
+> Something like:
+>=20
+> if:
+>   properties:
+>     compatible:
+>       enum:
+>         - microchip,ksz8863
+>         - microchip,ksz8873
+> then:
+>   properties:
+>     microchip,rmii-clk-internal:
+>       $ref: /schemas/types.yaml#/definitions/flag
+>       description:
+>         Set if the RMII reference clock is provided internally. Otherwise
+>         reference clock should be provided externally.
 
-Only reason to access parent currently is netns change notification.
-See devlink_rel_nested_in_notify().
-It basically just scheduled delayed work by calling:
-devlink_rel_nested_in_notify_work_schedule().
+Not quite. The definition of the property should be outside the if/then,
+but one should be used to allow/disallow the property.
 
-When work is processed in
-devlink_rel_nested_in_notify_work()
-There is no guarantee the parent exists, therefore devlink_index is used
-to get the instance and then obj_index to get port/linecard index.
+--tHfanppQTDzMi70y
+Content-Type: application/pgp-signature; name="signature.asc"
 
-notify_cb() basically sends notification of parent object and that needs
-parent instance lock. <--- This is why you need to lock the parent.
+-----BEGIN PGP SIGNATURE-----
 
-I see no way how to cache anything on children as you describe in this
-scenario.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZSalfgAKCRB4tDGHoIJi
+0j1vAQDpZsPIcSqaMqUI+uqMOAzykKbi5gXYur3unCFYlUPbUAD+KfDrAmTUEA2s
+On9Np5vf099rBCZAx/bTeVYk3kPP2Q4=
+=2uGA
+-----END PGP SIGNATURE-----
 
-
->Parent has a list of children, it can store/cache a netns pointer on all
->of them. When reload happens lock them and update that pointer.
->At which point children do not have to lock the parent.
-
-Access of netns pointer is not a problem. See my latest version (v2)
-where rcu is used in order to make sure peernet2id_alloc() call is safe:
-
-devlink: call peernet2id_alloc() with net pointer under RCU read lock
-
-       rcu_read_lock();
-       devl_net = read_pnet_rcu(&devlink->_net);
-       if (!net_eq(net, devl_net)) {
-               int id = peernet2id_alloc(net, devl_net, GFP_ATOMIC);
-
-               rcu_read_unlock();
-               if (nla_put_s32(msg, DEVLINK_ATTR_NETNS_ID, id))
-                       return -EMSGSIZE;
-       } else {
-               rcu_read_unlock();
-       }
-
-
->
->> It would only make the rel infrastructure a bit similer. I will look
->> into that. But it's parallel to this patchset really.
->
+--tHfanppQTDzMi70y--
 
