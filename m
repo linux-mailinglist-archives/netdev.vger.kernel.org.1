@@ -1,128 +1,243 @@
-Return-Path: <netdev+bounces-39963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51DF27C5201
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:27:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E89E7C5218
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81B311C20C24
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:27:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621C31C20BD8
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26EA1E51A;
-	Wed, 11 Oct 2023 11:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mzOzmH8D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF1C1E51D;
+	Wed, 11 Oct 2023 11:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A1F1DA32
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:27:10 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EF3B9E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:27:09 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53829312d12so1788970a12.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 04:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697023627; x=1697628427; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8tx44OmdH8AvzAnmc17r/0+R1TfYuVOlLDwB/vI8elw=;
-        b=mzOzmH8DXiX+CGCC8A/ek5gS++7OpIT+IM4uaH8Dro10rHjg7gBuHeV7EcLpshhf2I
-         23/zOprZhv/jg7SLiu58pLX3c+Now5SatYiaWk2N1owvFbI05cVTkbgZ4zN/kzN0D1Ey
-         KyUodTMP6VYOFOK8MeohbXRS1PgFSkHeyv+U5xONyjMbpZT7rvQLfi8RJ4HuyFX/ONL7
-         JWRZb0T2i5cVHmepYb51zzLwO6nrNzVBcELZ3stHZGZP3yAnBHMuY8vgc/5mzvHhfCl6
-         nv9u/Fzi3HXwlfba+j0XfIhXrp8slra6t24fIpwV3qTVdQLLMN8l0+DcBHEIKgCTVcue
-         5ZNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697023627; x=1697628427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8tx44OmdH8AvzAnmc17r/0+R1TfYuVOlLDwB/vI8elw=;
-        b=EGmnZ1nav8rvWZski+3KRwwQXj2uUMbau4pe6zO3sPDz58rkz1CEwF7yzGLg3Tqcvo
-         F5K/KXKdA5MX3alynQzLdwsHHVUQf0lkSUD6dP6gKhttST53rBpk7oTv/dWEHJs1FbsE
-         NGy01KH+lgJ9jNZECIcagWGBIeSgzBF3XSZPS4GsKh6LRAiILo+379SIvMCNFHRSRffw
-         +KiVhKDG3NbY5TDCEIxx9gOuO3ZezcJzZphB9NU8qpqQi5p4u361d1TjHGPLe82qzM6n
-         CJSRSSI3iscTEW//9yNISnKUtvVhIKTTia+LjoFcUGCzaMLtVhHmhcJ/WsnvQ9NCVJ2u
-         uN6A==
-X-Gm-Message-State: AOJu0YxVEdHbBB/BH7jgA28nyx3MzpqXsycijyj1aWHeUahS2uaTXVbl
-	HY7y6TJxDJ0L5vOzHMSYl9HN0g==
-X-Google-Smtp-Source: AGHT+IF8jo3wwFKAZTk3KcJHRN2x+Cd7hmDJH+TJ+11D6N55qoMsAcUb4rXKfK6SOXUkl4tR3hKpOw==
-X-Received: by 2002:a05:6402:2687:b0:530:8b92:b69d with SMTP id w7-20020a056402268700b005308b92b69dmr16471091edd.10.1697023627580;
-        Wed, 11 Oct 2023 04:27:07 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id d9-20020a05640208c900b005256771db39sm8833843edz.58.2023.10.11.04.27.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 04:27:06 -0700 (PDT)
-Date: Wed, 11 Oct 2023 13:27:05 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, jacob.e.keller@intel.com,
-	johannes@sipsolutions.net
-Subject: Re: [patch net-next 01/10] genetlink: don't merge dumpit split op
- for different cmds into single iter
-Message-ID: <ZSaGiSKL5/ocFYOE@nanopsycho>
-References: <20231010110828.200709-1-jiri@resnulli.us>
- <20231010110828.200709-2-jiri@resnulli.us>
- <20231010114845.019c0f78@kernel.org>
- <ZSY7+b5qQhKgzXo5@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BDD35506
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:31:29 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 534189E;
+	Wed, 11 Oct 2023 04:31:27 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S59ZJ0pD6z6K5Wx;
+	Wed, 11 Oct 2023 19:31:04 +0800 (CST)
+Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 11 Oct
+ 2023 12:31:24 +0100
+Date: Wed, 11 Oct 2023 12:31:23 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Konstantin Aladyshev <aladyshev22@gmail.com>
+CC: <minyard@acm.org>, <joel@jms.id.au>, <andrew@aj.id.au>,
+	<avifishman70@gmail.com>, <tmaimon77@gmail.com>, <tali.perry1@gmail.com>,
+	<venture@google.com>, <yuenn@google.com>, <benjaminfair@google.com>,
+	<jk@codeconstruct.com.au>, <matt@codeconstruct.com.au>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <openipmi-developer@lists.sourceforge.net>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <openbmc@lists.ozlabs.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v5 1/3] ipmi: Move KCS headers to common include folder
+Message-ID: <20231011123123.00000394@Huawei.com>
+In-Reply-To: <20231010122321.823-2-aladyshev22@gmail.com>
+References: <20231010122321.823-1-aladyshev22@gmail.com>
+	<20231010122321.823-2-aladyshev22@gmail.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZSY7+b5qQhKgzXo5@nanopsycho>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.76]
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Oct 11, 2023 at 08:08:57AM CEST, jiri@resnulli.us wrote:
->Tue, Oct 10, 2023 at 08:48:45PM CEST, kuba@kernel.org wrote:
->>On Tue, 10 Oct 2023 13:08:20 +0200 Jiri Pirko wrote:
->>> Fixes: b8fd60c36a44 ("genetlink: allow families to use split ops directly")
->>
->>Drop Fixes, add "currently no family declares ops which could trigger
->>this issue".
->
->Yeah, we need fixes semantics written down somewhere.
->I can do it, sure.
+On Tue, 10 Oct 2023 15:23:19 +0300
+Konstantin Aladyshev <aladyshev22@gmail.com> wrote:
 
-I found 2 mentions that relate to netdev regarging Fixes:
+> The current KCS header files can be utilized by both IPMI drivers
+> (drivers/char/ipmi) and MCTP driver (drivers/net/mctp). To be able to
+> use them in both cases move the headers to 'include/linux' folder.
+> 
+> Signed-off-by: Konstantin Aladyshev <aladyshev22@gmail.com>
+Not particularly important but I wonder if
+include/linux/kcs/bmc.h
+include/linux/kcs/bmc_client.h
+include/linux/kcs/bmc_device.h
 
-Quoting Documentation/process/submitting-patches.rst:
-If your patch fixes a bug in a specific commit, e.g. you found an issue using
-``git bisect``, please use the 'Fixes:' tag with the first 12 characters of
-the SHA-1 ID, and the one line summary. 
+might be a cleaner choice given that you are moving them.
 
-Quoting Documentation/process/maintainer-netdev.rst:
- - for fixes the ``Fixes:`` tag is required, regardless of the tree
+I don't care that much though so up to you :)
 
-This patch fixes a bug, sure, bug is not hit by existing code, but still
-it is present.
+Jonathan
 
-Why it is wrong to put "Fixes" in this case?
-Could you please document this?
+> ---
+>  drivers/char/ipmi/kcs_bmc.c                           | 8 +++-----
+>  drivers/char/ipmi/kcs_bmc_aspeed.c                    | 3 +--
+>  drivers/char/ipmi/kcs_bmc_cdev_ipmi.c                 | 2 +-
+>  drivers/char/ipmi/kcs_bmc_npcm7xx.c                   | 2 +-
+>  drivers/char/ipmi/kcs_bmc_serio.c                     | 2 +-
+>  {drivers/char/ipmi => include/linux}/kcs_bmc.h        | 0
+>  {drivers/char/ipmi => include/linux}/kcs_bmc_client.h | 3 +--
+>  {drivers/char/ipmi => include/linux}/kcs_bmc_device.h | 3 +--
+>  8 files changed, 9 insertions(+), 14 deletions(-)
+>  rename {drivers/char/ipmi => include/linux}/kcs_bmc.h (100%)
+>  rename {drivers/char/ipmi => include/linux}/kcs_bmc_client.h (97%)
+>  rename {drivers/char/ipmi => include/linux}/kcs_bmc_device.h (96%)
+> 
+> diff --git a/drivers/char/ipmi/kcs_bmc.c b/drivers/char/ipmi/kcs_bmc.c
+> index 8b1161d5194a..d29a8505d6ed 100644
+> --- a/drivers/char/ipmi/kcs_bmc.c
+> +++ b/drivers/char/ipmi/kcs_bmc.c
+> @@ -5,15 +5,13 @@
+>   */
+>  
+>  #include <linux/device.h>
+> +#include <linux/kcs_bmc.h>
+> +#include <linux/kcs_bmc_client.h>
+> +#include <linux/kcs_bmc_device.h>
+>  #include <linux/list.h>
+>  #include <linux/module.h>
+>  #include <linux/mutex.h>
+>  
+> -#include "kcs_bmc.h"
+> -
+> -/* Implement both the device and client interfaces here */
+> -#include "kcs_bmc_device.h"
+> -#include "kcs_bmc_client.h"
+>  
+>  /* Record registered devices and drivers */
+>  static DEFINE_MUTEX(kcs_bmc_lock);
+> diff --git a/drivers/char/ipmi/kcs_bmc_aspeed.c b/drivers/char/ipmi/kcs_bmc_aspeed.c
+> index 72640da55380..3dc0dfb448f5 100644
+> --- a/drivers/char/ipmi/kcs_bmc_aspeed.c
+> +++ b/drivers/char/ipmi/kcs_bmc_aspeed.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+>  #include <linux/irq.h>
+> +#include <linux/kcs_bmc_device.h>
+>  #include <linux/mfd/syscon.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> @@ -21,8 +22,6 @@
+>  #include <linux/slab.h>
+>  #include <linux/timer.h>
+>  
+> -#include "kcs_bmc_device.h"
+> -
+>  
+>  #define DEVICE_NAME     "ast-kcs-bmc"
+>  
+> diff --git a/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c b/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
+> index cf670e891966..bf1001130a6c 100644
+> --- a/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
+> +++ b/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/io.h>
+>  #include <linux/ipmi_bmc.h>
+> +#include <linux/kcs_bmc_client.h>
+>  #include <linux/list.h>
+>  #include <linux/miscdevice.h>
+>  #include <linux/module.h>
+> @@ -17,7 +18,6 @@
+>  #include <linux/sched.h>
+>  #include <linux/slab.h>
+>  
+> -#include "kcs_bmc_client.h"
+>  
+>  /* Different phases of the KCS BMC module.
+>   *  KCS_PHASE_IDLE:
+> diff --git a/drivers/char/ipmi/kcs_bmc_npcm7xx.c b/drivers/char/ipmi/kcs_bmc_npcm7xx.c
+> index 7961fec56476..160553248a93 100644
+> --- a/drivers/char/ipmi/kcs_bmc_npcm7xx.c
+> +++ b/drivers/char/ipmi/kcs_bmc_npcm7xx.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/errno.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+> +#include <linux/kcs_bmc_device.h>
+>  #include <linux/mfd/syscon.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+> @@ -17,7 +18,6 @@
+>  #include <linux/regmap.h>
+>  #include <linux/slab.h>
+>  
+> -#include "kcs_bmc_device.h"
+>  
+>  #define DEVICE_NAME	"npcm-kcs-bmc"
+>  #define KCS_CHANNEL_MAX	3
+> diff --git a/drivers/char/ipmi/kcs_bmc_serio.c b/drivers/char/ipmi/kcs_bmc_serio.c
+> index 1793358be782..24df7144a189 100644
+> --- a/drivers/char/ipmi/kcs_bmc_serio.c
+> +++ b/drivers/char/ipmi/kcs_bmc_serio.c
+> @@ -5,12 +5,12 @@
+>  #include <linux/device.h>
+>  #include <linux/errno.h>
+>  #include <linux/list.h>
+> +#include <linux/kcs_bmc_client.h>
+>  #include <linux/module.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/serio.h>
+>  #include <linux/slab.h>
+>  
+> -#include "kcs_bmc_client.h"
+>  
+>  struct kcs_bmc_serio {
+>  	struct list_head entry;
+> diff --git a/drivers/char/ipmi/kcs_bmc.h b/include/linux/kcs_bmc.h
+> similarity index 100%
+> rename from drivers/char/ipmi/kcs_bmc.h
+> rename to include/linux/kcs_bmc.h
+> diff --git a/drivers/char/ipmi/kcs_bmc_client.h b/include/linux/kcs_bmc_client.h
+> similarity index 97%
+> rename from drivers/char/ipmi/kcs_bmc_client.h
+> rename to include/linux/kcs_bmc_client.h
+> index 6fdcde0a7169..f6350c9366dd 100644
+> --- a/drivers/char/ipmi/kcs_bmc_client.h
+> +++ b/include/linux/kcs_bmc_client.h
+> @@ -5,8 +5,7 @@
+>  #define __KCS_BMC_CONSUMER_H__
+>  
+>  #include <linux/irqreturn.h>
+> -
+> -#include "kcs_bmc.h"
+> +#include <linux/kcs_bmc.h>
+>  
+>  struct kcs_bmc_driver_ops {
+>  	int (*add_device)(struct kcs_bmc_device *kcs_bmc);
+> diff --git a/drivers/char/ipmi/kcs_bmc_device.h b/include/linux/kcs_bmc_device.h
+> similarity index 96%
+> rename from drivers/char/ipmi/kcs_bmc_device.h
+> rename to include/linux/kcs_bmc_device.h
+> index 17c572f25c54..65333b68c0af 100644
+> --- a/drivers/char/ipmi/kcs_bmc_device.h
+> +++ b/include/linux/kcs_bmc_device.h
+> @@ -5,8 +5,7 @@
+>  #define __KCS_BMC_DEVICE_H__
+>  
+>  #include <linux/irqreturn.h>
+> -
+> -#include "kcs_bmc.h"
+> +#include <linux/kcs_bmc.h>
+>  
+>  struct kcs_bmc_device_ops {
+>  	void (*irq_mask_update)(struct kcs_bmc_device *kcs_bmc, u8 mask, u8 enable);
 
->
->
->>
->>>  	if (i + cnt < family->n_split_ops &&
->>> -	    family->split_ops[i + cnt].flags & GENL_CMD_CAP_DUMP) {
->>> +	    family->split_ops[i + cnt].flags & GENL_CMD_CAP_DUMP &&
->>> +	    (!cnt ||
->>> +	     (cnt && family->split_ops[i + cnt].cmd == iter->doit.cmd))) {
->>
->>Why are you checking cnt? if do was not found cmd will be 0, which
->>cannot mis-match.
->
->Correct. Will remove cnt check.
 
