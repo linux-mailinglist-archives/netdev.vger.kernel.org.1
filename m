@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-39783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2897C479A
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 04:01:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643217C47A1
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 04:10:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883FC1C20C59
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:01:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA9C3281D48
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 02:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64881A5D;
-	Wed, 11 Oct 2023 02:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB2935511;
+	Wed, 11 Oct 2023 02:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+SAnBzA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A0n2bizF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44941819
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 02:01:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84727C433C8;
-	Wed, 11 Oct 2023 02:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB96819
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 02:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1D5DC433C8;
+	Wed, 11 Oct 2023 02:10:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1696989672;
-	bh=kbWICzSB4IKAHMv/+9GW4UxQ64X13NVNXGJ6Mchx14I=;
+	s=k20201202; t=1696990221;
+	bh=SCN+YvrTAvn/rzETs6OSh7GFIZOLCdOcc5xTG+BWl0g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=O+SAnBzAZxt2yAxcJcTnlGbrGefRa0Z8GYgs6FBiVcPoA2wZsrpaGtub8Bxzg6U1N
-	 Wzk+kiA8MCKEimqgMGgRQssGOhrretwKPtfneBFvfNp9kfrf2Y7Trx+0pCkx6POhMH
-	 icegletrzbTJiD4YY+a3l3uUQatPHVIOQBi74h7AxkEPKlJ1CnNGC+iRZTq4yo0L4N
-	 0QvuEdM6RVw4RsgZRW/PzLP+WN3DqWa2bcakIcXmNY2/Jsckj7roGcvc/lusopzZtk
-	 jaNk56SrSKNEEzHKS2uB6uDZGB7Ica11cpr25DgFuRuhZ+RsaHTSJbwPFWNsCQrcKH
-	 wnv2oJ3WdxTXQ==
-Date: Tue, 10 Oct 2023 19:01:10 -0700
+	b=A0n2bizFMpZqqKeGhyfo1ozKH4zwv1E5WO/KuO+JorM7wXzRM6u21i+SvPPYJPSgL
+	 8IqhnLJh5EdIJKh+kVXpg8RCAGy8fiWXmjx6wag+lF9y2PDpt33HpFV6iz8JSsWBIM
+	 QFyLHie+TUizdXcW9qnZcCeEwjxw3/2lrXoEwz9cZ1ctYvcWrhSBPQmqeaysAwknlh
+	 BUkjjBOydhkCOQvKK2JxDXFKCCFNMJ5XcTXWPK8kz/gRCkT8fW47b9auOrDVAGrzGQ
+	 vzgylqoG1XQ39ay/nXMofyJqIkddLIywkojM3gpXsJy4O0dYN98IQuVdgltPbH1/Ag
+	 0z1PUB0veiV3A==
+Date: Tue, 10 Oct 2023 19:10:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paul M Stillwell Jr <paul.m.stillwell.jr@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <jacob.e.keller@intel.com>, <vaishnavi.tipireddy@intel.com>,
- <horms@kernel.org>, <leon@kernel.org>, Pucha Himasekhar Reddy
- <himasekharx.reddy.pucha@intel.com>
-Subject: Re: [PATCH net-next v4 2/5] ice: configure FW logging
-Message-ID: <20231010190110.4181ce87@kernel.org>
-In-Reply-To: <835b8308-c2b1-097b-8b1c-e020647b5a33@intel.com>
-References: <20231005170110.3221306-1-anthony.l.nguyen@intel.com>
-	<20231005170110.3221306-3-anthony.l.nguyen@intel.com>
-	<20231006170206.297687e2@kernel.org>
-	<835b8308-c2b1-097b-8b1c-e020647b5a33@intel.com>
+To: takeru hayasaka <hayatake396@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP
+ from ethtool
+Message-ID: <20231010191019.12fb7071@kernel.org>
+In-Reply-To: <CADFiAcKF08osdvd4EiXSR1YJ22TXrMu3b7ujkMTwAsEE8jzgOw@mail.gmail.com>
+References: <20231008075221.61863-1-hayatake396@gmail.com>
+	<20231010123235.4a6498da@kernel.org>
+	<CADFiAcKF08osdvd4EiXSR1YJ22TXrMu3b7ujkMTwAsEE8jzgOw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,16 +56,34 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 10 Oct 2023 16:26:15 -0700 Paul M Stillwell Jr wrote:
-> I'm probably missing something here, but I don't know if this will do 
-> what I need or not. What I have is a user passing a module name and a 
-> log level and I'm trying to match those strings and create integer 
-> values from them so I can configure the FW log for that module. I'm not 
-> seeing how the above gets me there...
-> 
-> I was trying to not use strncmp and instead use the built in kernel 
-> string matching functions so that's how I ended up with the code I have
+On Wed, 11 Oct 2023 10:56:17 +0900 takeru hayasaka wrote:
+> GTP generates a flow that includes an ID called TEID to identify the
+> tunnel. This tunnel is created for each UE (User Equipment).
+> By performing RSS based on this flow, it is possible to apply RSS for
+> each communication unit from the UE.
+> Without this, RSS would only be effective within the range of IP addresses.
+> For instance, the PGW can only perform RSS within the IP range of the SGW.
+> What I'm trying to say is that RSS based solely on IP addresses can be
+> problematic from a load distribution perspective, especially if
+> there's a bias in the terminals connected to a particular base
+> station.
+> As a reference that discusses a similar topic, please see the link
+> below(is not RSS, is TEID Flow):
+> https://docs.nvidia.com/networking-ethernet-software/cumulus-linux-56/Layer-3/Routing/Equal-Cost-Multipath-Load-Sharing/#gtp-hashing
 
-You're supposed to do very simple and targeted matching here.
-The cmdline parsing makes the code harder to follow.
+Makes sense, thanks for the extra information. I think it would be
+worth adding all of this to the commit message!
+
+Regarding the patch - you are only adding flow types, not a new field 
+(which are defined as RXH_*). If we want to hash on an extra field, 
+I think we need to specify that field as well?
+
+> Thank you for your understanding.
+> ---
+> Sorry! My email was blocked because it wasn't sent in plain text mode.
+> I've made the necessary changes and will resend it.
+
+No worries! Additional request - in the future please prefer the
+bottom-posting or interleaved style of replies:
+https://en.wikipedia.org/wiki/Posting_style#Interleaved_style
 
