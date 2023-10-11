@@ -1,178 +1,311 @@
-Return-Path: <netdev+bounces-40020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171FA7C5678
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:15:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07DE7C567E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A2A828241D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:15:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3FB81C20E0C
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 14:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18552031D;
-	Wed, 11 Oct 2023 14:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FABF20324;
+	Wed, 11 Oct 2023 14:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g1dNhFwo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge+eqSnV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B0D200BC;
-	Wed, 11 Oct 2023 14:15:48 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E827192;
-	Wed, 11 Oct 2023 07:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697033743; x=1728569743;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DuNvaLmuSBpRQ/OE9jIM2FpK9gH/+55vqfRXvHb1aOE=;
-  b=g1dNhFwoFIs7RHU5h3KQ44AATkF0kyJGjDd9GPYUt2OR6fuzOB5WKkLX
-   dTPCFUnxbbQsuPklDSpv72fMf6Nqg90N3PHJ3k0g02/2qiGcuxRdNoBL2
-   SQ9oc/P9a9/SjshxzAdCGAKfByuDXprxUXtjk/WtduvZ4+TTbKYWYJ9xo
-   t9aTi5dx3wZh+iY+AsmyW79QS1j3i0rAX2Dyo2FUg0SzgrJCT5RzuawCX
-   j1yAT7oST57bf6/FGl1uNhqnU/xQ80Omf0077GY2kPjSGpaXJ1cBz/Q4/
-   Pj9aElb9PpS1XnWRCuu2L8l+GbpDCy9/9JbSATn2mts4LXXVfaamx2/gN
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="364036253"
-X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
-   d="scan'208";a="364036253"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 07:15:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="877693397"
-X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
-   d="scan'208";a="877693397"
-Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 11 Oct 2023 07:15:37 -0700
-Received: from kbuild by f64821696465 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qqZzF-0002ID-2k;
-	Wed, 11 Oct 2023 14:15:15 +0000
-Date: Wed, 11 Oct 2023 22:13:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	virtualization@lists.linux-foundation.org
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH vhost 01/22] virtio_ring: virtqueue_set_dma_premapped
- support disable
-Message-ID: <202310112204.h03TUDpH-lkp@intel.com>
-References: <20231011092728.105904-2-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EA820325;
+	Wed, 11 Oct 2023 14:16:13 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9211BCF;
+	Wed, 11 Oct 2023 07:16:09 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-692af7b641cso1242599b3a.1;
+        Wed, 11 Oct 2023 07:16:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697033768; x=1697638568; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E7bq7R0jS1gakQ6odYWB7+KjbWCzk7tjw1A7qKItlgU=;
+        b=Ge+eqSnVw+9DAA42BbmWOGp/+7njhst0mOaAzfAYDWq4scqxA5JPhGAQbbg1N1QAvx
+         RrFWkQWoznUq/RNJ3+xYBPdgNYDv/I/WBo8u8HFbR15g74jnvDQisG0v7qBNCTAgOL/V
+         yEp6OzI+H4fRqE9LnqqfsvzSkbJ0OpqRVrhDQwe/n5+5w3/vrAVVwRFU5WF75h5xwsSA
+         vCX6rAUp2HyAFvFnaFP1BDLZ8yeUkfq0rnV88xmUEZYuXpq9fVCVXduTdXGd/4U4V2Qm
+         n33JqFgk66EU0htqED4/hFuHyvI7gDIQCt/eE2xxYKsuaPoc9tr+aQk6Viohs+Qh4VFj
+         2nDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697033768; x=1697638568;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E7bq7R0jS1gakQ6odYWB7+KjbWCzk7tjw1A7qKItlgU=;
+        b=Y+OHa4za2mKd2yhgxcvaQVX5k7VdOn3BmkEK60rg4jGzlhpI66Q75b+/AgY93oJjrr
+         zVsF2rhmttxt/n8GZ+UXZRQ5xJXKp9gM5hNXXjLiMH5hZ/8O8Ex91ddHyjuvh/ub3AY0
+         k+UExcAwAcOqQg/8FJqai46+zmhMyfJ8TYdPb1ayUGIx3xviA15YryGDNhR7dpsOG14P
+         NCZPK1DOci5y/wkMeb+6MPqCe31UHSeKkf1vY35KZF5JLjJm4wCZUd76ftVTomwXM7iA
+         aRPiswmQbgpNDrhBWlfu3JzXcU9Jasm6egAmnBPehLR8+LzvWXt17R59vX2mgWpIDJAI
+         RU3w==
+X-Gm-Message-State: AOJu0Yz+sNH3vqope8WhcIzciC0fprdTUOqFHFoOBBhAt5nPGypSfa8B
+	x970W9LIM5fsC61CUyt1bA71yfxx2Y6Ihokj
+X-Google-Smtp-Source: AGHT+IG8HMOl7n1DunhTAX9+zRfsP6NCJQypLkpmLCbNEc5A2fsS1FK8C0PrczQTLXrEAOxkySuhgw==
+X-Received: by 2002:a05:6a20:a123:b0:13f:65ca:52a2 with SMTP id q35-20020a056a20a12300b0013f65ca52a2mr24054272pzk.5.1697033768319;
+        Wed, 11 Oct 2023 07:16:08 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id ev7-20020a17090aeac700b00274922d4b38sm12150470pjb.27.2023.10.11.07.16.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 07:16:08 -0700 (PDT)
+Date: Wed, 11 Oct 2023 23:16:07 +0900 (JST)
+Message-Id: <20231011.231607.1747074555988728415.fujita.tomonori@gmail.com>
+To: benno.lossin@proton.me
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+	<20231009013912.4048593-2-fujita.tomonori@gmail.com>
+	<1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011092728.105904-2-xuanzhuo@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Xuan,
+On Mon, 09 Oct 2023 12:19:54 +0000
+Benno Lossin <benno.lossin@proton.me> wrote:
 
-kernel test robot noticed the following build warnings:
+I skipped the topics that you've already discussed with Andrew.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.6-rc5 next-20231011]
-[cannot apply to mst-vhost/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> On 09.10.23 03:39, FUJITA Tomonori wrote:
+>> This patch adds abstractions to implement network PHY drivers; the
+>> driver registration and bindings for some of callback functions in
+>> struct phy_driver and many genphy_ functions.
+>> 
+>> This feature is enabled with CONFIG_RUST_PHYLIB_BINDINGS.
+>> 
+>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> ---
+>>   init/Kconfig                    |   8 +
+>>   rust/Makefile                   |   1 +
+>>   rust/bindings/bindings_helper.h |   3 +
+>>   rust/kernel/lib.rs              |   3 +
+>>   rust/kernel/net.rs              |   6 +
+>>   rust/kernel/net/phy.rs          | 733 ++++++++++++++++++++++++++++++++
+>>   6 files changed, 754 insertions(+)
+>>   create mode 100644 rust/kernel/net.rs
+>>   create mode 100644 rust/kernel/net/phy.rs
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_ring-virtqueue_set_dma_premapped-support-disable/20231011-180709
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20231011092728.105904-2-xuanzhuo%40linux.alibaba.com
-patch subject: [PATCH vhost 01/22] virtio_ring: virtqueue_set_dma_premapped support disable
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20231011/202310112204.h03TUDpH-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231011/202310112204.h03TUDpH-lkp@intel.com/reproduce)
+(snip)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202310112204.h03TUDpH-lkp@intel.com/
+>> +impl Device {
+>> +    /// Creates a new [`Device`] instance from a raw pointer.
+>> +    ///
+>> +    /// # Safety
+>> +    ///
+>> +    /// For the duration of the lifetime 'a, the pointer must be valid for writing and nobody else
+>> +    /// may read or write to the `phy_device` object.
+>> +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+>> +        unsafe { &mut *ptr.cast() }
+> 
+> Missing `SAFETY` comment.
 
-All warnings (new ones prefixed by >>):
+Added:
 
->> drivers/virtio/virtio_ring.c:2788: warning: Function parameter or member 'mode' not described in 'virtqueue_set_dma_premapped'
+// SAFETY: The safety requirements guarantee the validity of the dereference, while the
+// `Device` type being transparent makes the cast ok.
 
 
-vim +2788 drivers/virtio/virtio_ring.c
+>> +    /// Gets the id of the PHY.
+>> +    pub fn phy_id(&mut self) -> u32 {
+>> +        let phydev = self.0.get();
+>> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+>> +        unsafe { (*phydev).phy_id }
+>> +    }
+>> +
+>> +    /// Gets the state of the PHY.
+>> +    pub fn state(&mut self) -> DeviceState {
+>> +        let phydev = self.0.get();
+>> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+>> +        let state = unsafe { (*phydev).state };
+>> +        // FIXME: enum-cast
+>> +        match state {
+>> +            bindings::phy_state::PHY_DOWN => DeviceState::Down,
+>> +            bindings::phy_state::PHY_READY => DeviceState::Ready,
+>> +            bindings::phy_state::PHY_HALTED => DeviceState::Halted,
+>> +            bindings::phy_state::PHY_ERROR => DeviceState::Error,
+>> +            bindings::phy_state::PHY_UP => DeviceState::Up,
+>> +            bindings::phy_state::PHY_RUNNING => DeviceState::Running,
+>> +            bindings::phy_state::PHY_NOLINK => DeviceState::NoLink,
+>> +            bindings::phy_state::PHY_CABLETEST => DeviceState::CableTest,
+>> +        }
+>> +    }
+>> +
+>> +    /// Returns true if the link is up.
+>> +    pub fn get_link(&mut self) -> bool {
+> 
+> I would call this function `is_link_up`.
+> 
+>> +        const LINK_IS_UP: u32 = 1;
+>> +        let phydev = self.0.get();
+>> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+>> +        unsafe { (*phydev).link() == LINK_IS_UP }
+> 
+> Can you move the call to `link` and the `==` operation out
+> of the `unsafe` block? They are safe operations. (also do
+> that below where possible)
 
-c790e8e1817f1a Xuan Zhuo 2022-08-01  2765  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2766  /**
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2767   * virtqueue_set_dma_premapped - set the vring premapped mode
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2768   * @_vq: the struct virtqueue we're talking about.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2769   *
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2770   * Enable the premapped mode of the vq.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2771   *
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2772   * The vring in premapped mode does not do dma internally, so the driver must
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2773   * do dma mapping in advance. The driver must pass the dma_address through
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2774   * dma_address of scatterlist. When the driver got a used buffer from
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2775   * the vring, it has to unmap the dma address.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2776   *
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2777   * This function must be called immediately after creating the vq, or after vq
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2778   * reset, and before adding any buffers to it.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2779   *
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2780   * Caller must ensure we don't call this with other virtqueue operations
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2781   * at the same time (except where noted).
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2782   *
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2783   * Returns zero or a negative error.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2784   * 0: success.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2785   * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2786   */
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2787  int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode)
-8daafe9ebbd21a Xuan Zhuo 2023-08-10 @2788  {
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2789  	struct vring_virtqueue *vq = to_vvq(_vq);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2790  	u32 num;
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2791  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2792  	START_USE(vq);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2793  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2794  	num = vq->packed_ring ? vq->packed.vring.num : vq->split.vring.num;
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2795  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2796  	if (num != vq->vq.num_free) {
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2797  		END_USE(vq);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2798  		return -EINVAL;
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2799  	}
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2800  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2801  	if (!vq->use_dma_api) {
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2802  		END_USE(vq);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2803  		return -EINVAL;
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2804  	}
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2805  
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2806  	if (mode) {
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2807  		vq->premapped = true;
-b319940f83c21b Xuan Zhuo 2023-08-10  2808  		vq->do_unmap = false;
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2809  	} else {
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2810  		vq->premapped = false;
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2811  		vq->do_unmap = vq->use_dma_api;
-f8d1a236ad114f Xuan Zhuo 2023-10-11  2812  	}
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2813  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2814  	END_USE(vq);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2815  
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2816  	return 0;
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2817  }
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2818  EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
-8daafe9ebbd21a Xuan Zhuo 2023-08-10  2819  
+Sure, fixed.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+>> +/// Creates the kernel's `phy_driver` instance.
+>> +///
+>> +/// This is used by [`module_phy_driver`] macro to create a static array of phy_driver`.
+> 
+> Missing '`'.
+
+Fixed.
+
+
+>> +/// Registration structure for a PHY driver.
+>> +///
+>> +/// # Invariants
+>> +///
+>> +/// The `drivers` points to an array of `struct phy_driver`, which is
+>> +/// registered to the kernel via `phy_drivers_register`.
+> 
+> Since it is a reference you do not need to explicitly state
+> that it points to an array of `struct phy_driver`. Instead I would
+> suggest the following invariant:
+> 
+> All elements of the `drivers` slice are valid and currently registered
+> to the kernel via `phy_drivers_register`.
+
+Surely, makes sense. 
+
+
+>> +pub struct Registration {
+>> +    drivers: Option<&'static [Opaque<bindings::phy_driver>]>,
+> 
+> Why is this an `Option`?
+
+Oops, removed; leftover of older version.
+
+
+>> +}
+>> +
+>> +impl Registration {
+>> +    /// Registers a PHY driver.
+>> +    #[must_use]
+>> +    pub fn register(
+>> +        module: &'static crate::ThisModule,
+>> +        drivers: &'static [Opaque<bindings::phy_driver>],
+>> +    ) -> Result<Self> {
+>> +        if drivers.len() == 0 {
+>> +            return Err(code::EINVAL);
+>> +        }
+>> +        // SAFETY: `drivers` has static lifetime and used only in the C side.
+>> +        to_result(unsafe {
+>> +            bindings::phy_drivers_register(drivers[0].get(), drivers.len() as i32, module.0)
+>> +        })?;
+> 
+> This `register` function seems to assume that the values of the
+> `drivers` array are initialized and otherwise also considered valid.
+> So please change that or make this function `unsafe`.
+
+Understood.
+
+
+>> +        Ok(Registration {
+> 
+> Please add an `INVARIANT` comment similar to a `SAFETY` comment
+> that explains why the invariant is upheld.
+
+Added.
+
+
+>> +#[macro_export]
+>> +macro_rules! module_phy_driver {
+>> +    (@replace_expr $_t:tt $sub:expr) => {$sub};
+>> +
+>> +    (@count_devices $($x:expr),*) => {
+>> +        0usize $(+ $crate::module_phy_driver!(@replace_expr $x 1usize))*
+>> +    };
+>> +
+>> +    (@device_table [$($dev:expr),+]) => {
+>> +        #[no_mangle]
+>> +        static __mod_mdio__phydev_device_table: [
+> 
+> Shouldn't this have a unique name? If we define two different
+> phy drivers with this macro we would have a symbol collision?
+> 
+>> +            kernel::bindings::mdio_device_id;
+> 
+> Please use absolute paths in macros:
+> `::kernel::bindings::mdio_device_id` (also below).
+
+Updated.
+
+
+>> +            $crate::module_phy_driver!(@count_devices $($dev),+) + 1
+>> +        ] = [
+>> +            $(kernel::bindings::mdio_device_id {
+>> +                phy_id: $dev.id,
+>> +                phy_id_mask: $dev.mask_as_int()
+>> +            }),+,
+>> +            kernel::bindings::mdio_device_id {
+>> +                phy_id: 0,
+>> +                phy_id_mask: 0
+>> +            }
+>> +        ];
+>> +    };
+>> +
+>> +    (drivers: [$($driver:ident),+], device_table: [$($dev:expr),+], $($f:tt)*) => {
+>> +        struct Module {
+>> +            _reg: kernel::net::phy::Registration,
+>> +        }
+>> +
+>> +        $crate::prelude::module! {
+>> +             type: Module,
+>> +             $($f)*
+>> +        }
+>> +
+>> +        static mut DRIVERS: [
+>> +            kernel::types::Opaque<kernel::bindings::phy_driver>;
+>> +            $crate::module_phy_driver!(@count_devices $($driver),+)
+>> +        ] = [
+>> +            $(kernel::net::phy::create_phy_driver::<$driver>()),+
+>> +        ];
+>> +
+>> +        impl kernel::Module for Module {
+>> +            fn init(module: &'static ThisModule) -> Result<Self> {
+>> +                // SAFETY: static `DRIVERS` array is used only in the C side.
+> 
+> In order for this SAFETY comment to be correct, you need to ensure
+> that nobody else can access the `DRIVERS` static. You can do that by
+> placing both the `static mut DRIVERS` and the `impl ::kernel::Module
+> for Module` items inside of a `const _: () = {}`, so like this:
+> 
+>      const _: () = {
+>          static mut DRIVERS: [...] = ...;
+>          impl ::kernel::Module for Module { ... }
+>      };
+> 
+> You can also mention this in the SAFETY comment.
+
+Great, that's exactly what to be needed here. Thanks a lot!
 
