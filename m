@@ -1,125 +1,275 @@
-Return-Path: <netdev+bounces-40093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D2B87C5B2E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:22:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1B67C5B2D
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41B781C20FF1
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:22:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1200C282359
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AED322328;
-	Wed, 11 Oct 2023 18:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663772231E;
+	Wed, 11 Oct 2023 18:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9RyY747"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="iMM7AOE0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24182231A
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 18:22:11 +0000 (UTC)
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13766A4
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:22:06 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-27d17f5457fso260117a91.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:22:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697048525; x=1697653325; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6hN3Y1Gx/7diunP62IVxUnXD4EF9Jlv9k/rCp+joDrQ=;
-        b=F9RyY747R5dYuBkwljHEsFwQkmwBZiMM2mdVT6v9XV5DA5X/6cFZlufymsMrdpeI+d
-         9nlQDwtpEQz4lgpP0o4sH/jV3ZMRw3UmUJ732HfH/XSBPPl2WtfpbY9BrDq+ScZWysiz
-         FMsGEGKWYUOEL4tlXfWN+K3sIKBx6XmYJaLJfrgKJD3KFNbS0yc+nh7Xk3GMjjlqXBqE
-         FMD245YiNTdsDPeiBKfq2UTZQJEvMyw5wg0Eyfp9w3VzfWyeuBuM/cWvdi2ZqV+BGj6J
-         qcnL0fRaHS6yKpAyc48PgcHLiOgvlUvhTtjpXoMw3BcMXzGeFqJ0W9MNfTOLWIQnu6YL
-         zTIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697048525; x=1697653325;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6hN3Y1Gx/7diunP62IVxUnXD4EF9Jlv9k/rCp+joDrQ=;
-        b=avqGpwoC+xcADoJk8p3oeUoUKiLnMrLkxcRH6AZyAAhNXmz3+3hEgBGMcpPKsm6aZN
-         g7OFwl2SXQweVPLm0bFLJx3u0pqOXREWTflQgTzO0GiRQQ0n5fHifXzpa3kqtktceZiY
-         nmPhE52oUcpPy6XVqAAddlnzL8tXUjCHRTGqpLCBX9tUQQAWz1ou38KqFLBxAbXWNbhm
-         fcanfgNsybtlXQCx/fgbzl7HPOZjR0W7VvkUa1YNiKxLh3vWXMsiFc5pfH1uQhYvdGTa
-         peaLM3SVwV6orVIdys81/lV6kceQoRLeemxWoYwaisSMrrIvTHkvD2HHTmlBMndEOkSX
-         QqVA==
-X-Gm-Message-State: AOJu0Ywpkh3ityVGEfsxCgj8tuBzer3Cza6EbrOiSzp+f78V5Lehzkgi
-	P7V5nFwtIx25HR75NyS1tZo=
-X-Google-Smtp-Source: AGHT+IE5i9kcTlfZR2H5tYKcfbjlJT+Ckal6PZYpU1eGohJyt0+C8lji4HPCyFEuAw/5DTaKt+dj2g==
-X-Received: by 2002:a17:90a:348b:b0:27d:c5b:747c with SMTP id p11-20020a17090a348b00b0027d0c5b747cmr2765992pjb.2.1697048525371;
-        Wed, 11 Oct 2023 11:22:05 -0700 (PDT)
-Received: from ?IPV6:2001:df0:0:200c:298e:308c:8339:ebb8? ([2001:df0:0:200c:298e:308c:8339:ebb8])
-        by smtp.gmail.com with ESMTPSA id e5-20020aa78c45000000b00692acfc4b3csm10246601pfd.136.2023.10.11.11.22.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 11:22:04 -0700 (PDT)
-Message-ID: <12c7b0db-938c-9ca4-7861-dd703a83389a@gmail.com>
-Date: Thu, 12 Oct 2023 07:21:52 +1300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D1E3995E
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 18:22:10 +0000 (UTC)
+Received: from mx28lb.world4you.com (mx28lb.world4you.com [81.19.149.138])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4976E9D
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:22:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EBU7OyYlG56Qnr8vPUfD6MEo4IBVyBZ04uIA9q49dOk=; b=iMM7AOE0mlMB8e1kmDXyhSfVWD
+	71Ob5aMJAZBipyRj34uy2bA6bzHvz8XSKIneeLlyWkRDxiA1B9c2e+sRRV1GQphzWfdYABXQzIK67
+	mq3bYcPTLYLs6ixTSnMb+59BOvM3L1qWLR7WF4LwgkrCQTh5fN6xaJ52byOgAjKqFOnM=;
+Received: from [88.117.49.31] (helo=hornet.engleder.at)
+	by mx28lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1qqdqL-0000ct-26;
+	Wed, 11 Oct 2023 20:22:01 +0200
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Gerhard Engleder <gerhard@engleder-embedded.com>
+Subject: [PATCH net-next] tsnep: Inline small fragments within TX descriptor
+Date: Wed, 11 Oct 2023 20:21:54 +0200
+Message-Id: <20231011182154.20699-1-gerhard@engleder-embedded.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
-Content-Language: en-US
-To: Greg Ungerer <gerg@linux-m68k.org>, Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
- netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
-References: <20231009074121.219686-1-hch@lst.de>
- <20231009074121.219686-6-hch@lst.de>
- <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com>
- <0299895c-24a5-4bd4-b7a4-dc50cc21e3d8@linux-m68k.org>
- <20231011055213.GA1131@lst.de>
- <cff2d9f0-4719-4b88-8ed5-68c8093bcebf@linux-m68k.org>
-From: Michael Schmitz <schmitzmic@gmail.com>
-In-Reply-To: <cff2d9f0-4719-4b88-8ed5-68c8093bcebf@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-AV-Do-Run: Yes
+X-ACL-Warn: X-W4Y-Internal
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Greg,
+The tsnep network controller is able to extend the descriptor directly
+with data to be transmitted. In this case no TX data DMA address is
+necessary. Instead of the TX data DMA address the TX data buffer is
+placed at the end of the descriptor.
 
-On 12/10/23 02:09, Greg Ungerer wrote:
->
-> I think this needs to be CONFIG_COLDFIRE is set and none of 
-> CONFIG_HAVE_CACHE_CB or
-> CONFIG_CACHE_D or CONFIG_CACHE_BOTH are set.
->
->
->
->> in the fec driver do the alloc_noncoherent and global cache flush
->> hack if:
->>
->> COMFIG_COLDFIRE && (CONFIG_CACHE_D || CONFIG_CACHE_BOTH)
->
-> And then this becomes:
->
-> CONFIG_COLDFIRE && (CONFIG_HAVE_CACHE_CB || CONFIG_CACHE_D || 
-> CONFIG_CACHE_BOTH)
+The descriptor is read with a 64 bytes DMA read by the tsnep network
+controller. If the sum of descriptor data and TX data is less than or
+equal to 64 bytes, then no additional DMA read is necessary to read the
+TX data. Therefore, it makes sense to inline small fragments up to this
+limit within the descriptor ring.
 
-You appear to have dropped a '!' there ...
+Inlined fragments need to be copied to the descriptor ring. On the other
+hand DMA mapping is not necessary. At most 40 bytes are copied, so
+copying should be faster than DMA mapping.
 
-Cheers,
+For A53 1.2 GHz copying takes <100ns and DMA mapping takes >200ns. So
+inlining small fragments should result in lower CPU load. Performance
+improvement is small. Thus, comparision of CPU load with and without
+inlining of small fragments did not show any significant difference.
+With this optimization less DMA reads will be done, which decreases the
+load of the interconnect.
 
-     Michael
+Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+---
+ drivers/net/ethernet/engleder/tsnep_hw.h   |   2 +
+ drivers/net/ethernet/engleder/tsnep_main.c | 103 +++++++++++++++------
+ 2 files changed, 79 insertions(+), 26 deletions(-)
 
-
+diff --git a/drivers/net/ethernet/engleder/tsnep_hw.h b/drivers/net/ethernet/engleder/tsnep_hw.h
+index 55e1caf193a6..64c97eb66f67 100644
+--- a/drivers/net/ethernet/engleder/tsnep_hw.h
++++ b/drivers/net/ethernet/engleder/tsnep_hw.h
+@@ -181,6 +181,8 @@ struct tsnep_gcl_operation {
+ #define TSNEP_DESC_SIZE 256
+ #define TSNEP_DESC_SIZE_DATA_AFTER 2048
+ #define TSNEP_DESC_OFFSET 128
++#define TSNEP_DESC_SIZE_DATA_AFTER_INLINE (64 - sizeof(struct tsnep_tx_desc) + \
++					   sizeof_field(struct tsnep_tx_desc, tx))
+ #define TSNEP_DESC_OWNER_COUNTER_MASK 0xC0000000
+ #define TSNEP_DESC_OWNER_COUNTER_SHIFT 30
+ #define TSNEP_DESC_LENGTH_MASK 0x00003FFF
+diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+index 77a3fcb821c8..f16b6b3e21a6 100644
+--- a/drivers/net/ethernet/engleder/tsnep_main.c
++++ b/drivers/net/ethernet/engleder/tsnep_main.c
+@@ -51,12 +51,22 @@
+ #define TSNEP_COALESCE_USECS_MAX     ((ECM_INT_DELAY_MASK >> ECM_INT_DELAY_SHIFT) * \
+ 				      ECM_INT_DELAY_BASE_US + ECM_INT_DELAY_BASE_US - 1)
+ 
+-#define TSNEP_TX_TYPE_SKB	BIT(0)
+-#define TSNEP_TX_TYPE_SKB_FRAG	BIT(1)
+-#define TSNEP_TX_TYPE_XDP_TX	BIT(2)
+-#define TSNEP_TX_TYPE_XDP_NDO	BIT(3)
+-#define TSNEP_TX_TYPE_XDP	(TSNEP_TX_TYPE_XDP_TX | TSNEP_TX_TYPE_XDP_NDO)
+-#define TSNEP_TX_TYPE_XSK	BIT(4)
++/* mapping type */
++#define TSNEP_TX_TYPE_MAP		BIT(0)
++#define TSNEP_TX_TYPE_MAP_PAGE		BIT(1)
++#define TSNEP_TX_TYPE_INLINE		BIT(2)
++/* buffer type */
++#define TSNEP_TX_TYPE_SKB		BIT(8)
++#define TSNEP_TX_TYPE_SKB_MAP		(TSNEP_TX_TYPE_SKB | TSNEP_TX_TYPE_MAP)
++#define TSNEP_TX_TYPE_SKB_INLINE	(TSNEP_TX_TYPE_SKB | TSNEP_TX_TYPE_INLINE)
++#define TSNEP_TX_TYPE_SKB_FRAG		BIT(9)
++#define TSNEP_TX_TYPE_SKB_FRAG_MAP_PAGE	(TSNEP_TX_TYPE_SKB_FRAG | TSNEP_TX_TYPE_MAP_PAGE)
++#define TSNEP_TX_TYPE_SKB_FRAG_INLINE	(TSNEP_TX_TYPE_SKB_FRAG | TSNEP_TX_TYPE_INLINE)
++#define TSNEP_TX_TYPE_XDP_TX		BIT(10)
++#define TSNEP_TX_TYPE_XDP_NDO		BIT(11)
++#define TSNEP_TX_TYPE_XDP_NDO_MAP_PAGE	(TSNEP_TX_TYPE_XDP_NDO | TSNEP_TX_TYPE_MAP_PAGE)
++#define TSNEP_TX_TYPE_XDP		(TSNEP_TX_TYPE_XDP_TX | TSNEP_TX_TYPE_XDP_NDO)
++#define TSNEP_TX_TYPE_XSK		BIT(12)
+ 
+ #define TSNEP_XDP_TX		BIT(0)
+ #define TSNEP_XDP_REDIRECT	BIT(1)
+@@ -416,6 +426,8 @@ static void tsnep_tx_activate(struct tsnep_tx *tx, int index, int length,
+ 		entry->properties |= TSNEP_TX_DESC_OWNER_USER_FLAG;
+ 	entry->desc->more_properties =
+ 		__cpu_to_le32(entry->len & TSNEP_DESC_LENGTH_MASK);
++	if (entry->type & TSNEP_TX_TYPE_INLINE)
++		entry->properties |= TSNEP_TX_DESC_DATA_AFTER_DESC_FLAG;
+ 
+ 	/* descriptor properties shall be written last, because valid data is
+ 	 * signaled there
+@@ -433,39 +445,79 @@ static int tsnep_tx_desc_available(struct tsnep_tx *tx)
+ 		return tx->read - tx->write - 1;
+ }
+ 
++static int tsnep_tx_map_frag(skb_frag_t *frag, struct tsnep_tx_entry *entry,
++			     struct device *dmadev, dma_addr_t *dma)
++{
++	unsigned int len;
++	int mapped;
++
++	len = skb_frag_size(frag);
++	if (likely(len > TSNEP_DESC_SIZE_DATA_AFTER_INLINE)) {
++		*dma = skb_frag_dma_map(dmadev, frag, 0, len, DMA_TO_DEVICE);
++		if (dma_mapping_error(dmadev, *dma))
++			return -ENOMEM;
++		entry->type = TSNEP_TX_TYPE_SKB_FRAG_MAP_PAGE;
++		mapped = 1;
++	} else {
++		void *fragdata = skb_frag_address_safe(frag);
++
++		if (likely(fragdata)) {
++			memcpy(&entry->desc->tx, fragdata, len);
++		} else {
++			struct page *page = skb_frag_page(frag);
++
++			fragdata = kmap_local_page(page);
++			memcpy(&entry->desc->tx, fragdata + skb_frag_off(frag),
++			       len);
++			kunmap_local(fragdata);
++		}
++		entry->type = TSNEP_TX_TYPE_SKB_FRAG_INLINE;
++		mapped = 0;
++	}
++
++	return mapped;
++}
++
+ static int tsnep_tx_map(struct sk_buff *skb, struct tsnep_tx *tx, int count)
+ {
+ 	struct device *dmadev = tx->adapter->dmadev;
+ 	struct tsnep_tx_entry *entry;
+ 	unsigned int len;
+-	dma_addr_t dma;
+ 	int map_len = 0;
+-	int i;
++	dma_addr_t dma;
++	int i, mapped;
+ 
+ 	for (i = 0; i < count; i++) {
+ 		entry = &tx->entry[(tx->write + i) & TSNEP_RING_MASK];
+ 
+ 		if (!i) {
+ 			len = skb_headlen(skb);
+-			dma = dma_map_single(dmadev, skb->data, len,
+-					     DMA_TO_DEVICE);
+-
+-			entry->type = TSNEP_TX_TYPE_SKB;
++			if (likely(len > TSNEP_DESC_SIZE_DATA_AFTER_INLINE)) {
++				dma = dma_map_single(dmadev, skb->data, len,
++						     DMA_TO_DEVICE);
++				if (dma_mapping_error(dmadev, dma))
++					return -ENOMEM;
++				entry->type = TSNEP_TX_TYPE_SKB_MAP;
++				mapped = 1;
++			} else {
++				memcpy(&entry->desc->tx, skb->data, len);
++				entry->type = TSNEP_TX_TYPE_SKB_INLINE;
++				mapped = 0;
++			}
+ 		} else {
+-			len = skb_frag_size(&skb_shinfo(skb)->frags[i - 1]);
+-			dma = skb_frag_dma_map(dmadev,
+-					       &skb_shinfo(skb)->frags[i - 1],
+-					       0, len, DMA_TO_DEVICE);
++			skb_frag_t *frag = &skb_shinfo(skb)->frags[i - 1];
+ 
+-			entry->type = TSNEP_TX_TYPE_SKB_FRAG;
++			len = skb_frag_size(frag);
++			mapped = tsnep_tx_map_frag(frag, entry, dmadev, &dma);
++			if (mapped < 0)
++				return mapped;
+ 		}
+-		if (dma_mapping_error(dmadev, dma))
+-			return -ENOMEM;
+ 
+ 		entry->len = len;
+-		dma_unmap_addr_set(entry, dma, dma);
+-
+-		entry->desc->tx = __cpu_to_le64(dma);
++		if (likely(mapped)) {
++			dma_unmap_addr_set(entry, dma, dma);
++			entry->desc->tx = __cpu_to_le64(dma);
++		}
+ 
+ 		map_len += len;
+ 	}
+@@ -484,13 +536,12 @@ static int tsnep_tx_unmap(struct tsnep_tx *tx, int index, int count)
+ 		entry = &tx->entry[(index + i) & TSNEP_RING_MASK];
+ 
+ 		if (entry->len) {
+-			if (entry->type & TSNEP_TX_TYPE_SKB)
++			if (entry->type & TSNEP_TX_TYPE_MAP)
+ 				dma_unmap_single(dmadev,
+ 						 dma_unmap_addr(entry, dma),
+ 						 dma_unmap_len(entry, len),
+ 						 DMA_TO_DEVICE);
+-			else if (entry->type &
+-				 (TSNEP_TX_TYPE_SKB_FRAG | TSNEP_TX_TYPE_XDP_NDO))
++			else if (entry->type & TSNEP_TX_TYPE_MAP_PAGE)
+ 				dma_unmap_page(dmadev,
+ 					       dma_unmap_addr(entry, dma),
+ 					       dma_unmap_len(entry, len),
+@@ -586,7 +637,7 @@ static int tsnep_xdp_tx_map(struct xdp_frame *xdpf, struct tsnep_tx *tx,
+ 			if (dma_mapping_error(dmadev, dma))
+ 				return -ENOMEM;
+ 
+-			entry->type = TSNEP_TX_TYPE_XDP_NDO;
++			entry->type = TSNEP_TX_TYPE_XDP_NDO_MAP_PAGE;
+ 		} else {
+ 			page = unlikely(frag) ? skb_frag_page(frag) :
+ 						virt_to_page(xdpf->data);
+-- 
+2.30.2
 
 
