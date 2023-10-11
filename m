@@ -1,147 +1,105 @@
-Return-Path: <netdev+bounces-40116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E259A7C5D3D
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:57:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF4F7C5D43
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:58:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA17282AF7
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:57:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD9621C20C39
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091213A29A;
-	Wed, 11 Oct 2023 18:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B62A23A29B;
+	Wed, 11 Oct 2023 18:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Znfct9J5"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="i5WZan49"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED963A290
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 18:57:35 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87559D
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:57:33 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-537f07dfe8eso2136a12.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:57:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A46F12E48;
+	Wed, 11 Oct 2023 18:58:34 +0000 (UTC)
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2183EA9;
+	Wed, 11 Oct 2023 11:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697050652; x=1697655452; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RxkPm2B1OBi9iYXN9MuYvqMChLrgNkYVTRTGG0T2fWU=;
-        b=Znfct9J5uEgMZVS1t6P08/oENe6hb2X2cUn4rUHygOG4K4hSUJyA46KYMfvuMVvnNC
-         YBOg90xjmdMPkrghJIlAI1sFi3qYnzIvOAFlLJlt0SkPZIgITJf0aEdqZlk33s27PL0/
-         rTu+SQsfw9ESzD7QWQ2+5kvmW63c2uUtP0j3a7r2Ght46DlR0kUS+pLaOLfxxr1DgVT7
-         wPYLtGItYZiDYhtRIvID7Wq9EACmVar0wTdyCmGKI5VNywMahzf6bOBVV6tqXtj5vc5Q
-         S8qW30qGBXXJn2rRFxe4jS9ZhMVHRHKerR93I0WeFeJRYsMx9fSk/rVjmwO8q2Be+3RY
-         Zjkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697050652; x=1697655452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RxkPm2B1OBi9iYXN9MuYvqMChLrgNkYVTRTGG0T2fWU=;
-        b=j8FxgH0Nd479xNKi3YNqWIF4cGNoNIJSC3t9QIOJLx70F2jskWBGZkkqb9fJc3yC8a
-         lTIgoeKSeoLXCuJgMVNRedLHuyuyit6/KM0RAXnE6Br38MZ+lN8Yo7ur6uiTTWe1O97n
-         krdVnWIYM+v7u7hx1pDpFKbgloPeONpK6mq7VMM4KmfaWulpKy0+ld96isl6CrehH5PC
-         t2WA3TQiCBeE9PaT7LssCli7LvClVlh23PTkmk4/9k/xHlDXaAxqVFBDtlUr1d/SpWlx
-         bJSEgZL/soRc8ZGPhOJpEwdYavtNrgxqjU9ZkS0SUO7En2BWtRFNxPzAQ35JRg+ddy7P
-         3HIw==
-X-Gm-Message-State: AOJu0YzfJlm6h2yplLtHSPKoggh7iVw5GcRcbiyzC7r7vv68yzTZGLmI
-	zCefFP9Gq4T5vPTM/AbclB1RA4EYIj/bx4ucQrGoUw==
-X-Google-Smtp-Source: AGHT+IFc/89I7Y+6rUKwx8XNGrZ9m5vt94TlXkrFXEIM0Zdkve1IgyQhh4RAedFUg2xtXtVh8L8xDVXSIjlO7zGT0M0=
-X-Received: by 2002:a50:c35c:0:b0:538:50e4:5446 with SMTP id
- q28-20020a50c35c000000b0053850e45446mr140284edb.5.1697050652003; Wed, 11 Oct
- 2023 11:57:32 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697050712; x=1728586712;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OBLtXvYkpP2dJlnKnj5QT1SIsIZu7BoIndfSENwTaQQ=;
+  b=i5WZan49iy9adl310SOgYafn8nnG30LlLK8T0RZMktEeA779c6SGNx1x
+   YFR98XRdd1BtbqtwYsy5QxjRVQPklSYl6AGcBkJ+vV4qroSIpcfZx8gby
+   Rrg5ADzOZma+N+czp18NOg5GkuFfvWhk4nddstl6Dgd7LEEvtnOBPKin+
+   4=;
+X-IronPort-AV: E=Sophos;i="6.03,216,1694736000"; 
+   d="scan'208";a="677811921"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 18:58:25 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com (Postfix) with ESMTPS id C00FDA0509;
+	Wed, 11 Oct 2023 18:58:24 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 11 Oct 2023 18:58:24 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.37;
+ Wed, 11 Oct 2023 18:58:22 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daan.j.demeyer@gmail.com>
+CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <kuniyu@amazon.com>,
+	<martin.lau@linux.dev>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v10 2/9] bpf: Propagate modified uaddrlen from cgroup sockaddr programs
+Date: Wed, 11 Oct 2023 11:58:14 -0700
+Message-ID: <20231011185814.53217-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAO8sHc=FfDo_LnpV_tF5aPF4BjpWkQk2jLxLWH50X0JzSQ+s6Q@mail.gmail.com>
+References: <CAO8sHc=FfDo_LnpV_tF5aPF4BjpWkQk2jLxLWH50X0JzSQ+s6Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1696965810-8315-1-git-send-email-haiyangz@microsoft.com>
- <20231010151404.3f7faa87@hermes.local> <CAK6E8=c576Gt=G9Wdk0gQi=2EiL_=6g1SA=mJ3HhzPCsLRk9tw@mail.gmail.com>
- <PH7PR21MB3116FC142CAECCD5D981C530CACDA@PH7PR21MB3116.namprd21.prod.outlook.com>
- <20231010191542.3688fe24@hermes.local> <PH7PR21MB311616744CBE08375C52C2B8CACCA@PH7PR21MB3116.namprd21.prod.outlook.com>
-In-Reply-To: <PH7PR21MB311616744CBE08375C52C2B8CACCA@PH7PR21MB3116.namprd21.prod.outlook.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Oct 2023 20:57:18 +0200
-Message-ID: <CANn89i+DWa-xbBToc2-Zr2YyZ_axbeo6poyLp9t-XqGr2EzOPA@mail.gmail.com>
-Subject: Re: [PATCH net-next,v2] tcp: Set pingpong threshold via sysctl
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Yuchung Cheng <ycheng@google.com>, 
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan <kys@microsoft.com>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"dsahern@kernel.org" <dsahern@kernel.org>, "ncardwell@google.com" <ncardwell@google.com>, 
-	"kuniyu@amazon.com" <kuniyu@amazon.com>, "morleyd@google.com" <morleyd@google.com>, 
-	"mfreemon@cloudflare.com" <mfreemon@cloudflare.com>, "mubashirq@google.com" <mubashirq@google.com>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "weiwan@google.com" <weiwan@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.187.170.62]
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 8:49=E2=80=AFPM Haiyang Zhang <haiyangz@microsoft.c=
-om> wrote:
->
->
->
-> > -----Original Message-----
-> > From: Stephen Hemminger <stephen@networkplumber.org>
-> > Sent: Tuesday, October 10, 2023 10:16 PM
-> > To: Haiyang Zhang <haiyangz@microsoft.com>
-> > Cc: Yuchung Cheng <ycheng@google.com>; linux-hyperv@vger.kernel.org;
-> > netdev@vger.kernel.org; KY Srinivasan <kys@microsoft.com>;
-> > davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; corbet@lwn.net; dsahern@kernel.org;
-> > ncardwell@google.com; kuniyu@amazon.com; morleyd@google.com;
-> > mfreemon@cloudflare.com; mubashirq@google.com; linux-
-> > doc@vger.kernel.org; weiwan@google.com; linux-kernel@vger.kernel.org
-> > Subject: Re: [PATCH net-next,v2] tcp: Set pingpong threshold via sysctl
-> >
-> > On Tue, 10 Oct 2023 22:59:49 +0000
-> > Haiyang Zhang <haiyangz@microsoft.com> wrote:
-> >
-> > > > > If this an application specific optimization, it should be in a s=
-ocket option
-> > > > > rather than system wide via sysctl.
-> > > > Initially I had a similar comment but later decided a sysctl could
-> > > > still be useful if
-> > > > 1) the entire host (e.g. virtual machine) is dedicated to that appl=
-ication
-> > > > 2) that application is difficult to change
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 11 Oct 2023 20:37:49 +0200
+> > > @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+> > >       if (!ctx.uaddr) {
+> > >               memset(&unspec, 0, sizeof(unspec));
+> > >               ctx.uaddr = (struct sockaddr *)&unspec;
+> > > -     }
+> > > +             ctx.uaddrlen = 0;
+> > > +     } else
+> > > +             ctx.uaddrlen = *uaddrlen;
 > > >
-> > > Yes, the customer actually wants a global setting. But as suggested b=
-y Neal,
-> > > I changed it to be per-namespace to match other TCP tunables.
+> > >       cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+> > > -     return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > -                                  0, flags);
+> > > +     ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > +                                 0, flags);
+> > > +
+> > > +     if (!ret && uaddrlen)
 > >
-> > Like congestion control choice, it could be both a sysctl and a socket =
-option.
-> > The reason is that delayed ack is already controlled by socket options.
->
-> I see. I am updating the doc and variable location for this sysctl tunabl=
-e patch
-> as suggested by the reviewers, and will resubmit it.
->
-> I will also work on a separate patch for the setsockopt option.
->
->
+> > nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
+> 
+> Are you sure? uaddrlen can still be NULL if uaddr is also NULL
 
-I am not sure about adding a socket option, and finding room in the
-socket structure.
-
-See our recent effort reshuffling fields in tcp socket for better
-performance (stalled at this time).
-
-I would rather experiment first with a sysctl.
+How?  In the patch 2 and 4, it seems uaddrlen always points to an
+actual variable.
 
