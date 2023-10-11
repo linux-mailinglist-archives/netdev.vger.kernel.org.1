@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-39964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E89E7C5218
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:31:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43747C52A4
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 621C31C20BD8
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF7F1C20C6A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACF1C1E51D;
-	Wed, 11 Oct 2023 11:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B191EA85;
+	Wed, 11 Oct 2023 11:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BDD35506
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C7B1EA7F
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 11:58:14 +0000 (UTC)
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 534189E;
-	Wed, 11 Oct 2023 04:31:27 -0700 (PDT)
-Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S59ZJ0pD6z6K5Wx;
-	Wed, 11 Oct 2023 19:31:04 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88938F;
+	Wed, 11 Oct 2023 04:58:11 -0700 (PDT)
+Received: from lhrpeml500005.china.huawei.com (unknown [172.18.147.201])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4S5B7D4JYxz6K5xf;
+	Wed, 11 Oct 2023 19:56:08 +0800 (CST)
 Received: from localhost (10.202.227.76) by lhrpeml500005.china.huawei.com
  (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 11 Oct
- 2023 12:31:24 +0100
-Date: Wed, 11 Oct 2023 12:31:23 +0100
+ 2023 12:58:08 +0100
+Date: Wed, 11 Oct 2023 12:58:07 +0100
 From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To: Konstantin Aladyshev <aladyshev22@gmail.com>
 CC: <minyard@acm.org>, <joel@jms.id.au>, <andrew@aj.id.au>,
@@ -41,11 +41,11 @@ CC: <minyard@acm.org>, <joel@jms.id.au>, <andrew@aj.id.au>,
 	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-aspeed@lists.ozlabs.org>, <openbmc@lists.ozlabs.org>,
 	<netdev@vger.kernel.org>
-Subject: Re: [PATCH v5 1/3] ipmi: Move KCS headers to common include folder
-Message-ID: <20231011123123.00000394@Huawei.com>
-In-Reply-To: <20231010122321.823-2-aladyshev22@gmail.com>
+Subject: Re: [PATCH v5 3/3] mctp: Add MCTP-over-KCS transport binding
+Message-ID: <20231011125807.00004db0@Huawei.com>
+In-Reply-To: <20231010122321.823-4-aladyshev22@gmail.com>
 References: <20231010122321.823-1-aladyshev22@gmail.com>
-	<20231010122321.823-2-aladyshev22@gmail.com>
+	<20231010122321.823-4-aladyshev22@gmail.com>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
@@ -57,187 +57,233 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.202.227.76]
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
  lhrpeml500005.china.huawei.com (7.191.163.240)
 X-CFilter-Loop: Reflected
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
 	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 10 Oct 2023 15:23:19 +0300
+On Tue, 10 Oct 2023 15:23:21 +0300
 Konstantin Aladyshev <aladyshev22@gmail.com> wrote:
 
-> The current KCS header files can be utilized by both IPMI drivers
-> (drivers/char/ipmi) and MCTP driver (drivers/net/mctp). To be able to
-> use them in both cases move the headers to 'include/linux' folder.
+> This change adds a MCTP KCS transport binding, as defined by the DMTF
+> specification DSP0254 - "MCTP KCS Transport Binding".
+> A MCTP protocol network device is created for each KCS channel found in
+> the system.
+> The interrupt code for the KCS state machine is based on the current
+> IPMI KCS driver.
 > 
 > Signed-off-by: Konstantin Aladyshev <aladyshev22@gmail.com>
-Not particularly important but I wonder if
-include/linux/kcs/bmc.h
-include/linux/kcs/bmc_client.h
-include/linux/kcs/bmc_device.h
 
-might be a cleaner choice given that you are moving them.
+Hi Konstantin.
 
-I don't care that much though so up to you :)
+Many of the comments I have inline will be more about general KCS issues
+that need sorting out.  Whether this can move forwards before that
+(or whether to take any noticed of this) is a question for relevant
+maintainers.
+
+BTW it's fine to propose fixes /cleanup to a subsystem alongside a new driver
+if you do fancy taking on some of the issues with managed allocations etc called out.
 
 Jonathan
 
-> ---
->  drivers/char/ipmi/kcs_bmc.c                           | 8 +++-----
->  drivers/char/ipmi/kcs_bmc_aspeed.c                    | 3 +--
->  drivers/char/ipmi/kcs_bmc_cdev_ipmi.c                 | 2 +-
->  drivers/char/ipmi/kcs_bmc_npcm7xx.c                   | 2 +-
->  drivers/char/ipmi/kcs_bmc_serio.c                     | 2 +-
->  {drivers/char/ipmi => include/linux}/kcs_bmc.h        | 0
->  {drivers/char/ipmi => include/linux}/kcs_bmc_client.h | 3 +--
->  {drivers/char/ipmi => include/linux}/kcs_bmc_device.h | 3 +--
->  8 files changed, 9 insertions(+), 14 deletions(-)
->  rename {drivers/char/ipmi => include/linux}/kcs_bmc.h (100%)
->  rename {drivers/char/ipmi => include/linux}/kcs_bmc_client.h (97%)
->  rename {drivers/char/ipmi => include/linux}/kcs_bmc_device.h (96%)
-> 
-> diff --git a/drivers/char/ipmi/kcs_bmc.c b/drivers/char/ipmi/kcs_bmc.c
-> index 8b1161d5194a..d29a8505d6ed 100644
-> --- a/drivers/char/ipmi/kcs_bmc.c
-> +++ b/drivers/char/ipmi/kcs_bmc.c
-> @@ -5,15 +5,13 @@
->   */
->  
->  #include <linux/device.h>
-> +#include <linux/kcs_bmc.h>
-> +#include <linux/kcs_bmc_client.h>
-> +#include <linux/kcs_bmc_device.h>
->  #include <linux/list.h>
->  #include <linux/module.h>
->  #include <linux/mutex.h>
->  
-> -#include "kcs_bmc.h"
-> -
-> -/* Implement both the device and client interfaces here */
-> -#include "kcs_bmc_device.h"
-> -#include "kcs_bmc_client.h"
->  
->  /* Record registered devices and drivers */
->  static DEFINE_MUTEX(kcs_bmc_lock);
-> diff --git a/drivers/char/ipmi/kcs_bmc_aspeed.c b/drivers/char/ipmi/kcs_bmc_aspeed.c
-> index 72640da55380..3dc0dfb448f5 100644
-> --- a/drivers/char/ipmi/kcs_bmc_aspeed.c
-> +++ b/drivers/char/ipmi/kcs_bmc_aspeed.c
-> @@ -10,6 +10,7 @@
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
->  #include <linux/irq.h>
-> +#include <linux/kcs_bmc_device.h>
->  #include <linux/mfd/syscon.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
-> @@ -21,8 +22,6 @@
->  #include <linux/slab.h>
->  #include <linux/timer.h>
->  
-> -#include "kcs_bmc_device.h"
-> -
->  
->  #define DEVICE_NAME     "ast-kcs-bmc"
->  
-> diff --git a/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c b/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
-> index cf670e891966..bf1001130a6c 100644
-> --- a/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
-> +++ b/drivers/char/ipmi/kcs_bmc_cdev_ipmi.c
-> @@ -8,6 +8,7 @@
->  #include <linux/errno.h>
->  #include <linux/io.h>
->  #include <linux/ipmi_bmc.h>
-> +#include <linux/kcs_bmc_client.h>
->  #include <linux/list.h>
->  #include <linux/miscdevice.h>
->  #include <linux/module.h>
-> @@ -17,7 +18,6 @@
->  #include <linux/sched.h>
->  #include <linux/slab.h>
->  
-> -#include "kcs_bmc_client.h"
->  
->  /* Different phases of the KCS BMC module.
->   *  KCS_PHASE_IDLE:
-> diff --git a/drivers/char/ipmi/kcs_bmc_npcm7xx.c b/drivers/char/ipmi/kcs_bmc_npcm7xx.c
-> index 7961fec56476..160553248a93 100644
-> --- a/drivers/char/ipmi/kcs_bmc_npcm7xx.c
-> +++ b/drivers/char/ipmi/kcs_bmc_npcm7xx.c
-> @@ -10,6 +10,7 @@
->  #include <linux/errno.h>
->  #include <linux/interrupt.h>
->  #include <linux/io.h>
-> +#include <linux/kcs_bmc_device.h>
->  #include <linux/mfd/syscon.h>
->  #include <linux/module.h>
->  #include <linux/of.h>
-> @@ -17,7 +18,6 @@
->  #include <linux/regmap.h>
->  #include <linux/slab.h>
->  
-> -#include "kcs_bmc_device.h"
->  
->  #define DEVICE_NAME	"npcm-kcs-bmc"
->  #define KCS_CHANNEL_MAX	3
-> diff --git a/drivers/char/ipmi/kcs_bmc_serio.c b/drivers/char/ipmi/kcs_bmc_serio.c
-> index 1793358be782..24df7144a189 100644
-> --- a/drivers/char/ipmi/kcs_bmc_serio.c
-> +++ b/drivers/char/ipmi/kcs_bmc_serio.c
-> @@ -5,12 +5,12 @@
->  #include <linux/device.h>
->  #include <linux/errno.h>
->  #include <linux/list.h>
-> +#include <linux/kcs_bmc_client.h>
->  #include <linux/module.h>
->  #include <linux/sched/signal.h>
->  #include <linux/serio.h>
->  #include <linux/slab.h>
->  
-> -#include "kcs_bmc_client.h"
->  
->  struct kcs_bmc_serio {
->  	struct list_head entry;
-> diff --git a/drivers/char/ipmi/kcs_bmc.h b/include/linux/kcs_bmc.h
-> similarity index 100%
-> rename from drivers/char/ipmi/kcs_bmc.h
-> rename to include/linux/kcs_bmc.h
-> diff --git a/drivers/char/ipmi/kcs_bmc_client.h b/include/linux/kcs_bmc_client.h
-> similarity index 97%
-> rename from drivers/char/ipmi/kcs_bmc_client.h
-> rename to include/linux/kcs_bmc_client.h
-> index 6fdcde0a7169..f6350c9366dd 100644
-> --- a/drivers/char/ipmi/kcs_bmc_client.h
-> +++ b/include/linux/kcs_bmc_client.h
-> @@ -5,8 +5,7 @@
->  #define __KCS_BMC_CONSUMER_H__
->  
->  #include <linux/irqreturn.h>
-> -
-> -#include "kcs_bmc.h"
-> +#include <linux/kcs_bmc.h>
->  
->  struct kcs_bmc_driver_ops {
->  	int (*add_device)(struct kcs_bmc_device *kcs_bmc);
-> diff --git a/drivers/char/ipmi/kcs_bmc_device.h b/include/linux/kcs_bmc_device.h
-> similarity index 96%
-> rename from drivers/char/ipmi/kcs_bmc_device.h
-> rename to include/linux/kcs_bmc_device.h
-> index 17c572f25c54..65333b68c0af 100644
-> --- a/drivers/char/ipmi/kcs_bmc_device.h
-> +++ b/include/linux/kcs_bmc_device.h
-> @@ -5,8 +5,7 @@
->  #define __KCS_BMC_DEVICE_H__
->  
->  #include <linux/irqreturn.h>
-> -
-> -#include "kcs_bmc.h"
-> +#include <linux/kcs_bmc.h>
->  
->  struct kcs_bmc_device_ops {
->  	void (*irq_mask_update)(struct kcs_bmc_device *kcs_bmc, u8 mask, u8 enable);
+
+> diff --git a/drivers/net/mctp/mctp-kcs.c b/drivers/net/mctp/mctp-kcs.c
+> new file mode 100644
+> index 000000000000..b0d903609c64
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-kcs.c
+> @@ -0,0 +1,600 @@
+
+
+...
+
+> +
+> +static DEFINE_SPINLOCK(kcs_bmc_mctp_instances_lock);
+> +static LIST_HEAD(kcs_bmc_mctp_instances);
+> +
+> +static int kcs_bmc_mctp_add_device(struct kcs_bmc_device *kcs_bmc)
+> +{
+> +	struct net_device *ndev;
+> +	struct mctp_kcs *mkcs;
+> +	char name[32];
+> +	int rc;
+> +
+> +	snprintf(name, sizeof(name), "mctpkcs%d", kcs_bmc->channel);
+> +
+> +	ndev = alloc_netdev(sizeof(*mkcs), name, NET_NAME_ENUM, mctp_kcs_setup);
+> +	if (!ndev) {
+> +		dev_err_probe(kcs_bmc->dev, -ENOMEM,
+> +			      "alloc_netdev failed for KCS channel %d\n",
+> +			      kcs_bmc->channel);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	mkcs = netdev_priv(ndev);
+> +	mkcs->netdev = ndev;
+> +	mkcs->client.dev = kcs_bmc;
+> +	mkcs->client.ops = &kcs_bmc_mctp_client_ops;
+> +	mkcs->data_in = devm_kmalloc(kcs_bmc->dev, KCS_MSG_BUFSIZ, GFP_KERNEL);
+> +	if (!mkcs->data_in) {
+> +		dev_err_probe(
+> +			kcs_bmc->dev, -ENOMEM,
+> +			"failed to allocate data_in buffer for KCS channel %d\n",
+> +			kcs_bmc->channel);
+> +		rc = -ENOMEM;
+> +		goto free_netdev;
+> +	}
+> +	mkcs->data_out = devm_kmalloc(kcs_bmc->dev, KCS_MSG_BUFSIZ, GFP_KERNEL);
+> +	if (!mkcs->data_out) {
+> +		dev_err_probe(
+> +			kcs_bmc->dev, -ENOMEM,
+> +			"failed to allocate data_out buffer for KCS channel %d\n",
+> +			kcs_bmc->channel);
+> +		rc = -ENOMEM;
+> +		goto free_netdev;
+> +	}
+> +
+> +	INIT_WORK(&mkcs->rx_work, mctp_kcs_rx_work);
+> +
+> +	rc = register_netdev(ndev);
+> +	if (rc)
+> +		goto free_netdev;
+> +
+> +	spin_lock_irq(&kcs_bmc_mctp_instances_lock);
+> +	list_add(&mkcs->entry, &kcs_bmc_mctp_instances);
+> +	spin_unlock_irq(&kcs_bmc_mctp_instances_lock);
+> +
+> +	dev_info(kcs_bmc->dev, "Add MCTP client for the KCS channel %d",
+> +		 kcs_bmc->channel);
+> +	return 0;
+> +
+> +free_netdev:
+> +	free_netdev(ndev);
+
+Mixing devm and non devm is something you should not do. 
+Very simple rule that must be kept to is that you stop using devm for
+any calls in an add_device / probe() function at the first line that needs
+manual cleanup.
+
+Use devm_add_action_or_reset() for this case as you can add a custom
+callback to the devm managed queue.
+
+The reason this all matters is that devm cleanup happens after error paths
+/ remove_device() callbacks and as such it makes a reviewer have to reason
+about whether there are any dependencies that are a result of the reordering.
+Tearing down in exact reverse order of setup is a lot easier to do!
+
+
+> +
+> +	return rc;
+> +}
+> +
+> +static int kcs_bmc_mctp_remove_device(struct kcs_bmc_device *kcs_bmc)
+> +{
+> +	struct mctp_kcs *mkcs = NULL, *pos;
+> +
+> +	dev_info(kcs_bmc->dev, "Remove MCTP client for the KCS channel %d",
+> +		 kcs_bmc->channel);
+> +	spin_lock_irq(&kcs_bmc_mctp_instances_lock);
+> +	list_for_each_entry(pos, &kcs_bmc_mctp_instances, entry) {
+
+I've commented on this before, but this lookup should not be necessary.
+It should be possible to go directly from kcs_bmc entry as registered
+to the mctp_kcs structure.  Typical approach being to embed the structure
+or using some drvdata type field that add has filled in with appropriate
+pointer.
+
+There is a need for the kcs subsystem to manage which devices it
+calls this on.  Currently this also serves the purpose of filtering
+for that.  If not going to do management at subsystem layer (some smaller
+subsystems don't) then use an enum to add a type to kcs_bmc
+and have each driver add a new one.  You can check that in driver
+or in core code. Doesn't matter which as check will be trivial.
+
+
+> +		if (pos->client.dev == kcs_bmc) {
+> +			mkcs = pos;
+> +			list_del(&pos->entry);
+> +			break;
+> +		}
+> +	}
+> +	spin_unlock_irq(&kcs_bmc_mctp_instances_lock);
+> +
+> +	if (!mkcs)
+> +		return -ENODEV;
+> +
+> +	unregister_netdev(mkcs->netdev);
+> +	free_netdev(mkcs->netdev);
+> +	kcs_bmc_disable_device(kcs_bmc, &mkcs->client);
+> +	devm_kfree(kcs_bmc->dev, mkcs->data_out);
+> +	devm_kfree(kcs_bmc->dev, mkcs->data_in);
+
+I don't like mixture of letting devm delete these on remove and
+it being done manually here.
+
+Note that if you just didn't have these two calls, they'd be deleted soon
+after this exit anyway.
+
+If devm is any use when combined with kcs, these will be freed shortly after
+this anyway. If it isn't of use with this subsystem then then they won't
+do the right thing in the add_device callback error cases.
+
+I'd test if it does anything at all via each path where we'd expect it to
+(driver unbind, device removal, error in add_device callback)
+
+In all those cases the devm unwinding callbacks should be called. 
+(add a bonus one for testing with devm_add_action_or_reset() and
+see if that one is called in each path).
+
+I'm very suspicious of this working as not setting the normal calls
+to make it happen.
+e.g. for I2c, it happens here:
+https://elixir.bootlin.com/linux/latest/source/drivers/i2c/i2c-core-base.c#L597
+for the error path with a call to devres_release_group()
+in other subsystems it's handled by the bus_type logic which ultimately
+calls device_unbind_cleanup() in probe() failure.  That calls
+devres_release_all() triggering the tear down paths.
+
+However I might be missing a route by which the cleanup happens.
+
+Anyhow, if that is fixed, these devm cleanup calls in remove_device()
+should not be here.  The whole point of devm is to simplify this - if
+you manually have to unwind it the advantages go away and you should
+manage things explicitly.
+
+
+
+> +	return 0;
+> +}
+> +
+> +static const struct kcs_bmc_driver_ops kcs_bmc_mctp_driver_ops = {
+> +	.add_device = kcs_bmc_mctp_add_device,
+> +	.remove_device = kcs_bmc_mctp_remove_device,
+> +};
+> +
+> +static struct kcs_bmc_driver kcs_bmc_mctp_driver = {
+> +	.ops = &kcs_bmc_mctp_driver_ops,
+> +};
+> +
+> +static int __init mctp_kcs_init(void)
+> +{
+> +	kcs_bmc_register_driver(&kcs_bmc_mctp_driver);
+> +	return 0;
+> +}
+> +
+> +static void __exit mctp_kcs_exit(void)
+> +{
+> +	kcs_bmc_unregister_driver(&kcs_bmc_mctp_driver);
+> +}
+> +
+> +module_init(mctp_kcs_init);
+> +module_exit(mctp_kcs_exit);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Konstantin Aladyshev <aladyshev22@gmail.com>");
+> +MODULE_DESCRIPTION("MCTP KCS transport");
 
 
