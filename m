@@ -1,123 +1,143 @@
-Return-Path: <netdev+bounces-40118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91A117C5D68
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:08:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DABD27C5D6A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 21:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46C382821A2
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:08:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA0291C20AC3
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 19:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A339E12E4F;
-	Wed, 11 Oct 2023 19:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFDC12E53;
+	Wed, 11 Oct 2023 19:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2jhRyBD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FxD4j6H3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182283A26E
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 19:08:54 +0000 (UTC)
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA1490;
-	Wed, 11 Oct 2023 12:08:50 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id ca18e2360f4ac-7a2874d2820so3195739f.1;
-        Wed, 11 Oct 2023 12:08:50 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3F73A296;
+	Wed, 11 Oct 2023 19:09:46 +0000 (UTC)
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1333D90;
+	Wed, 11 Oct 2023 12:09:45 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-27ce05a23e5so1071535a91.1;
+        Wed, 11 Oct 2023 12:09:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697051330; x=1697656130; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UOAHf3xPVNAj31p9ZuVv8f99VDpjedw2IWf54wQ2koM=;
-        b=R2jhRyBDCYWcs+M0RzfihZ7KPwzHAVwLQ73iF/LdNZcnpyNzujkSLdfpvXXlpEdjwB
-         PkUtczMQ95YKWio/huWt0GETC4zRtuwA9wK1MbmtRGq5lX9ej/o+BHcz2XhTT31N2ey/
-         JQ5LtCmf4DfGmnh74d8vaxMi0foQ6cLIdH16rzG2no7KnvK5oSMt25m3OzJOAW9NQXEa
-         QAh5Is0jsanS9d/RUZwZsooDlUl6zmfzqbEZqdtH8ySqmgHMzPMLxcIxnObRsjRin5XQ
-         zsowaqO/vj2Pyh4otYjeyLZdTCGpzOuTQqycOHYOWObsBy9gmpVuyZVhmMw2ruYvStdA
-         qcvw==
+        d=gmail.com; s=20230601; t=1697051384; x=1697656184; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=w3bqlqLMcqSzzO28omMpnVsJCdKQl//HrMRuNlrJBLs=;
+        b=FxD4j6H3rIfIgmNUFSO3GAc2iEiLBuryLZkZhGuRH8lA44p3btYYESIslekiHc39Ix
+         uO8Zbc5C7tDmw0l0P+p2vlAp37Ca/VzeIdQCPVAnNdKk+TZoPB5JS9J7ZpcgRRyBWFB9
+         1D/yvOgjjpPjAux3dPQ++zGcVCxcXsbvpLYo+Ixfw9pCrAo5REPi3bNFPoPFOXXJRQNo
+         rSE9isKuzvlMZvMeQZvvfQXeXkvVNHG2NXQNqb5FFcd1xPNoLzGsKQF/YalfusKIc5xj
+         CNk8dSkSn4doIQ4Sge2dJhJWVSy0uzJlfOPSPSnmCA0IGfxhisTFwfIWAhpTX9AHudHI
+         g4Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697051330; x=1697656130;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UOAHf3xPVNAj31p9ZuVv8f99VDpjedw2IWf54wQ2koM=;
-        b=U6IWOi7kB0NthWNqlKQVlJpLJh7UEx8/QFbv4NTX+CwnLhvhJecG6Wi+yLMyLfCf4M
-         ms2lI5grpqtP7rq99hBdwdRMqzyysgFXQ08LERnxbCd4sCgs5HapwDJTcdviMfq8N357
-         zq2libauY1fDEKwAgJNJ2Fvqgr6/dQh3qn2iQuh9SRkMas9KiqaBprpwmvA1OYZF52Oj
-         jgYCG5B4tvafXEn7vGxX3i1TBXIE67CT9yEmU2/UFMVGJiMTG8SuZNygJ9YDNfWyZsdf
-         gCixXwL4c9o4s5oiJ2BbYUwSOPTCK6JcRNHvA8tXjnmthpO9PV4o+PyoYVZ7AqcyNmax
-         fapg==
-X-Gm-Message-State: AOJu0Yz9TvhAxQG3F52bZdL8A1LRUADpZqOnc+erPIkkN6nd33Ax43hp
-	29IVpX5zn94WBRVK3XqiuRA=
-X-Google-Smtp-Source: AGHT+IEvyVcmyoResAsmvkfmIStWlRecPzJs24Pekw51sgdB1+vZgz26xmObGIfV15Y7nuH+4KXd1Q==
-X-Received: by 2002:a6b:5a0a:0:b0:790:958e:a667 with SMTP id o10-20020a6b5a0a000000b00790958ea667mr21122819iob.2.1697051329738;
-        Wed, 11 Oct 2023 12:08:49 -0700 (PDT)
-Received: from [192.168.0.152] ([103.75.161.211])
-        by smtp.gmail.com with ESMTPSA id n3-20020a5e8c03000000b0079ab2787139sm3852955ioj.7.2023.10.11.12.07.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 12:08:10 -0700 (PDT)
-Message-ID: <b34b4e95-2d0c-4cb0-97b0-2613857d2c35@gmail.com>
-Date: Thu, 12 Oct 2023 00:37:37 +0530
+        d=1e100.net; s=20230601; t=1697051384; x=1697656184;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w3bqlqLMcqSzzO28omMpnVsJCdKQl//HrMRuNlrJBLs=;
+        b=Kp1VYVbRotf1jjX8AFIKIgrI56j7LJUngSOY3Gd8TA9uckyezzea5oG5Tjz0u7RI8/
+         27v2KUJDIDd2bE4ocFxB3DnDOqjdijxKWCxZMdCdcTvrrxGlKn7VjBTu3UDlU+ivwxmQ
+         khyJkwqN4FBfitCsbgKz8cxkqhVlsVKdJy0pGzLmBZP707lhG9tPdgcFj5ilTQuipvA+
+         ohQHaDPVzdnPWnOgMkPuKrhatKCo5+C2WO2UU510jib6LvN/Smcx/XE4UZNlnB4Tmld/
+         BDy0WZrMFeScyN929smZw9gj/bQeD/4Bt+R4jXw6n1PvHjuuA+HS8v2bEzPrWWzllOMj
+         no4g==
+X-Gm-Message-State: AOJu0YwiXnuXEWedY0BVC0YJB1gF40YzH++pIdy4DvfWmqAVRMwQ+qjf
+	GJXss1K3MHJx3aYv/HygMHOx6ABlrLVGA/QE8k+a8ATuxdnD1zXl
+X-Google-Smtp-Source: AGHT+IE88VHET0gASa81d6KlHa5MrIFcGO0NCdHs88aK191VzY8OtEwe0v+TW3J4pDYvsiajkWHIxg/68HOq1KOlMVM=
+X-Received: by 2002:a17:90b:82:b0:27d:d9a:be8b with SMTP id
+ bb2-20020a17090b008200b0027d0d9abe8bmr2926854pjb.6.1697051384289; Wed, 11 Oct
+ 2023 12:09:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Remove extra unlock for the mutex
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel-mentees@lists.linuxfoundation.org,
- linux-kernel@vger.kernel.org
-References: <20231010224630.238254-1-singhabhinav9051571833@gmail.com>
- <2023101136-irritate-shrine-cde6@gregkh>
- <3073e9a6-9f10-4326-9734-7e203d509888@gmail.com>
- <CANn89i+hMbhLqXKCF2P=HVeeRSCxvgH_xY1b=T=udLFJjG3ZwA@mail.gmail.com>
-From: Abhinav Singh <singhabhinav9051571833@gmail.com>
-In-Reply-To: <CANn89i+hMbhLqXKCF2P=HVeeRSCxvgH_xY1b=T=udLFJjG3ZwA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <CAO8sHc=FfDo_LnpV_tF5aPF4BjpWkQk2jLxLWH50X0JzSQ+s6Q@mail.gmail.com>
+ <20231011185814.53217-1-kuniyu@amazon.com>
+In-Reply-To: <20231011185814.53217-1-kuniyu@amazon.com>
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Wed, 11 Oct 2023 21:09:33 +0200
+Message-ID: <CAO8sHcmFHLpk2LfJKxHcA_9y6TyouS0sr=8oj09gLGvGmhYavw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v10 2/9] bpf: Propagate modified uaddrlen from
+ cgroup sockaddr programs
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: bpf@vger.kernel.org, kernel-team@meta.com, martin.lau@linux.dev, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/11/23 23:13, Eric Dumazet wrote:
-> 
-> There is no undefined behavior, only sparse that might be confused a little.
-> 
-> I do not think we can express in sparse the fact that
-> inet_csk_find_open_port() acquires head->lock
-> 
-> (head being the return value of this function...)
-> 
-> The following does not help.
-> 
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-> index aeebe881668996057d1495c84eee0f0b644b7ad0..ed7b3993316cd1ba0b2859b0bd3f447e066bd3b5
-> 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -323,6 +323,7 @@ static struct inet_bind_hashbucket *
->   inet_csk_find_open_port(const struct sock *sk, struct
-> inet_bind_bucket **tb_ret,
->                          struct inet_bind2_bucket **tb2_ret,
->                          struct inet_bind_hashbucket **head2_ret, int *port_ret)
-> +       __acquires(head->lock)
->   {
->          struct inet_hashinfo *hinfo = tcp_or_dccp_get_hashinfo(sk);
->          int i, low, high, attempt_half, port, l3mdev;
+> From: Daan De Meyer <daan.j.demeyer@gmail.com>
+> Date: Wed, 11 Oct 2023 20:37:49 +0200
+> > > > @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+> > > >       if (!ctx.uaddr) {
+> > > >               memset(&unspec, 0, sizeof(unspec));
+> > > >               ctx.uaddr = (struct sockaddr *)&unspec;
+> > > > -     }
+> > > > +             ctx.uaddrlen = 0;
+> > > > +     } else
+> > > > +             ctx.uaddrlen = *uaddrlen;
+> > > >
+> > > >       cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+> > > > -     return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > -                                  0, flags);
+> > > > +     ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > +                                 0, flags);
+> > > > +
+> > > > +     if (!ret && uaddrlen)
+> > >
+> > > nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
+> >
+> > Are you sure? uaddrlen can still be NULL if uaddr is also NULL
+>
+> How?  In the patch 2 and 4, it seems uaddrlen always points to an
+> actual variable.
 
-Okay got it. Thank you for your time maintainers.And apologizes for not 
-thoroughly checking before sending the patch. I have a question, there 
-were some type checking warning as well from sparse tool. Can a create 
-patch for fixing those type checking warning?
+Right, I was assuming we don't know for sure how callers are calling
+this function. It is right that right now no caller calls it with uaddrlen set
+to NULL.
 
+It still seems like a good idea to check for uaddr instead of uaddrlen though,
+to mimic the same check that is done earlier in this function.
+
+
+On Wed, 11 Oct 2023 at 20:58, Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+>
+> From: Daan De Meyer <daan.j.demeyer@gmail.com>
+> Date: Wed, 11 Oct 2023 20:37:49 +0200
+> > > > @@ -1483,11 +1488,18 @@ int __cgroup_bpf_run_filter_sock_addr(struct sock *sk,
+> > > >       if (!ctx.uaddr) {
+> > > >               memset(&unspec, 0, sizeof(unspec));
+> > > >               ctx.uaddr = (struct sockaddr *)&unspec;
+> > > > -     }
+> > > > +             ctx.uaddrlen = 0;
+> > > > +     } else
+> > > > +             ctx.uaddrlen = *uaddrlen;
+> > > >
+> > > >       cgrp = sock_cgroup_ptr(&sk->sk_cgrp_data);
+> > > > -     return bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > -                                  0, flags);
+> > > > +     ret = bpf_prog_run_array_cg(&cgrp->bpf, atype, &ctx, bpf_prog_run,
+> > > > +                                 0, flags);
+> > > > +
+> > > > +     if (!ret && uaddrlen)
+> > >
+> > > nit: no need to check uaddrlen here or maybe check ctx.uaddrlen.
+> >
+> > Are you sure? uaddrlen can still be NULL if uaddr is also NULL
+>
+> How?  In the patch 2 and 4, it seems uaddrlen always points to an
+> actual variable.
 
