@@ -1,197 +1,175 @@
-Return-Path: <netdev+bounces-40158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F4E7C6039
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:17:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDDE67C6040
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC371C20966
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:17:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 246401C20B03
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6DB249EA;
-	Wed, 11 Oct 2023 22:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BACA249ED;
+	Wed, 11 Oct 2023 22:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V6d33GKV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t/xRp+KT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAC9249E2;
-	Wed, 11 Oct 2023 22:17:12 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A93FA91;
-	Wed, 11 Oct 2023 15:17:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JAe1Pi3KRsm83jZZlX7cXn1pxi4TaUy+eDWvSFfONQSX/LdT2gS/U2UqCgWn5b8qXiXeF3gMzLDWCZv6maYJwz6U9lboEvzFnSTPj6BKVwBw9+znL3Lo0P5dKSqL5u2PxjOp/pxeaJlHLTpvvv+7AW0zyCYd/+k4nTMTmPB3FBH3yNllsIykxfZzvGIZI/C1QItgueFCV9S+U3DQYa1yrAYgKvTfqSF8YxiL40g7N1GX5VRmCXb+8yW3f0yXuxmTHIo+D6T2Tam38mmF1Dwk2C9AkM7g8kriRvL6FUyHzDSTWF7uEGgfIl4fIaU7NFqXXMy16UTU0q7JnYYVcUl3Uw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KYz03LnvIU8O44jtQpAHEdb2+oSXbdgks8YK03sGt4A=;
- b=CU23BxDwFQPcwwtP3UV5m7EC0fFgMs7afZvmcw2oAmWyKfjBJl3TJ2f6gtanRh2VgCQnIuDEZ11DQT3Dv9a8I+TXcZSUN/p8df2AX+UkwfSH3TuW1uN6SlW8aw/BKHxLolKvHtCmY2WJLEPWHaRka9dOV9rnO31/ZjzNCuQTZ9/I8JHLedU3rfs3BrA0A2IM/WEEbIZX26q8CN8AQStFog9rXPqjB3COQdn9IpdTPI5rfeNFTXWrZT3hBI+Rb8BffcSZO4HWa/7F9SaI0FVKMCOTSC8H2maX4pKHMwRXweMDNN8Kn86iDwKfFtBxP98D2G7s4ncbYQLGCicPBOoAVw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KYz03LnvIU8O44jtQpAHEdb2+oSXbdgks8YK03sGt4A=;
- b=V6d33GKVb+nZJD/2wSUBWdIzKlk01iGKesl9z4A3ntvFS0zGe6sWvxSYuKxxyeUE2NQjvwvobxA7Xv7oFHwZbttMfP0oxL+7hLgMZ8s7K/qghC5tZoH4o02CpEiT5hSOY0+Tm5XRAf5LX8mNTR0kl5lnO/C3EZc+ZbfSbbn1EUU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- SA1PR12MB8886.namprd12.prod.outlook.com (2603:10b6:806:375::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6863.38; Wed, 11 Oct 2023 22:17:09 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e31c:de3c:af9d:cd2c]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::e31c:de3c:af9d:cd2c%5]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
- 22:17:09 +0000
-Message-ID: <cadf72fc-2c0b-428a-b445-0f6a34c18d9b@amd.com>
-Date: Wed, 11 Oct 2023 15:17:06 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ionic: replace deprecated strncpy with strscpy
-To: Justin Stitt <justinstitt@google.com>,
- Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-v1-1-23c62a16ff58@google.com>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-v1-1-23c62a16ff58@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR13CA0025.namprd13.prod.outlook.com
- (2603:10b6:a03:180::38) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1CF249E2
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:20:16 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DF6A9
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:20:13 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a4cbdad3fso400623276.2
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:20:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697062813; x=1697667613; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+Z96mQSNwBQxmdfHTfVSOBB7yU8CSx8L0b3jKxEJcSo=;
+        b=t/xRp+KTkHXq8Zld68JmaIzatv4ge2hi3hStZct8v/vgd5cKy+VFYjtbiq32MFWdQr
+         xT+YGEQvzbhLbQPgd/xjR10kHAnLFNnPSXND3Oc6RR2ChgZrvNjYay3ABUQWubbYrnkU
+         WFX9M7ybiEY1cmr3U29xAk9dR9EpQ0AjtWOHv3e2tts4/VSjOTILeifRdAJwI6hsBrK9
+         hXPvfy7sclOVx4Zm/yYoCtbfvuheL7UaRJCUWGED/PFEpgxeSkPXl/h1Pi1fcY89oZY9
+         tjNfSiunez2m5mur/NMFXbIw9Bs0QTD8piG1hJNZmtrKWkqEEmp4/fr5Lc6w+kXnuJPH
+         7P+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697062813; x=1697667613;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+Z96mQSNwBQxmdfHTfVSOBB7yU8CSx8L0b3jKxEJcSo=;
+        b=dRLwOpD78ca5rr2+ndboYY8egGWDsvxA+IpJt/6yv+6zNTcJSEMit+3eb66/j8KtL9
+         dPH+PzqNkRwkKH7r5uQ7bwbQUph2Rhd3nqKnP5aw3y5feKxSoF9SC5PUBqakg2GZjQ5E
+         pQVht8nNMA+PVRCavNduvAh2OIwLXYmP3Xr7K86AuopyQZcix8zDA6Id/2f/nKrGDgW9
+         1ckBdgwrvhFxMzckRAmi/a7CiI2TRTwAosVdRRPAF51fkoQxEl3kKLBkkucfdai33fJV
+         O4oJQWwxCIYRFxKwCmrODitJyMcL3WtE4usXKiHoJx/OJnrxDtCU4E1m6jxQBpMFHY0U
+         A9dQ==
+X-Gm-Message-State: AOJu0Yy6eVdc30/Qx5aiqmf1SOdjBZLywgINWGwU+o+FV5Op0ZthCamK
+	rHXoHQdcnueYMrx18hsRBBsOhD6LsTECJVJDYw==
+X-Google-Smtp-Source: AGHT+IGd5Zu1czxmjeL92aynbzUWAyCyWUMLzy4yM/u30YUbNTfHqpMJqGR4vyeCgOUkYHcW+xZmuu5thXi55bh27Q==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6902:a89:b0:d9a:5e10:c34d with
+ SMTP id cd9-20020a0569020a8900b00d9a5e10c34dmr122450ybb.11.1697062813111;
+ Wed, 11 Oct 2023 15:20:13 -0700 (PDT)
+Date: Wed, 11 Oct 2023 22:20:10 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|SA1PR12MB8886:EE_
-X-MS-Office365-Filtering-Correlation-Id: c2b047a1-9380-4531-6cc3-08dbcaa7cf60
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	7cq3DKr7ttAtQwJktn7NMNU+R6H3wCK/vER2qDmfj1atGvRxb9P/TcGSPk8YAFpGyb3VmHuhMLfvRSmHx/71v8WhF40nE+f4vfuNZWvR7W8IrnEJfubYO4vqDgAyqpsJK11QiHMnlS6Yivls2gX/2YiKiq0en5omzaoPHXU/SH1KnUQOy51yZq3MlSEGXQ7fQincf+M2vlyY2WvUuWlrkAVqb1gp96tW4rhFukplkKaML3mOnk8iJ7UlFuCJrMn7oWf9tgo5iCEqFKXL0433JLukX86aoYORMpQivYL698oClCddmrmGrapaRmslBaMqZ7w25Iq7yJUAj8Rj6RZbAShVcK3lCSd/nmTzwxkp3ha6pQ7blA/YEUu97pPtC0qJG/BA6Aawj12YxhSi1FF52M+80h5HSJXef5AycT1wxLH/cxiFGG8DUa5vF2TRjFmz95YYhOWMKrUNkBDcKk9e8MdpksmZtsuTF21O/EygQu3ayVgtWIUzG4E7zb7hGefoU0wb2zYsPYdfICVp5kMHkZVskweSqQfKkmyLdolyrRmTjlix6GTqKv43cr7xfjwijhWxjMWWiSYzlmk8J6CHnYH8HqPk7d2juW9kOq5y42tGDrhH9vBqH2/45e3YB/7CWXVE5TjtMsu+x4xtkNUVLhbIzz9zJBguPjipa4wpoFDpIC1n/7fg+H6NeiG1saloTmWc0Mf5NsP9iWQANv9gnQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(366004)(396003)(39860400002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(6512007)(53546011)(478600001)(6486002)(966005)(6666004)(2616005)(2906002)(26005)(83380400001)(110136005)(66946007)(5660300002)(66476007)(316002)(4326008)(8676002)(8936002)(41300700001)(31696002)(6506007)(36756003)(38100700002)(86362001)(66556008)(31686004)(156123004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MVd0QjhSbTdieExGLzdYeXM3VFd3alQzVHEvM2tjRFBvMkNJcWtKNVkyL0lY?=
- =?utf-8?B?N3NYSUVpcHZwNkxGcmcrOUNUSHdLb1RubC9JYm56czN3NHFPUHN6ZFkvVElS?=
- =?utf-8?B?NkMxOUJiZTdBZ09XN3N6MC91NkZJeDBVNGkvRkNLNk4rUXZSWDRUbE8vYm1W?=
- =?utf-8?B?UDlycUhHV1hmb1VrWFF1RHZhQUdpVFRsK29rbEd2Vk5RUzVBRDJ5c1ZZbHNy?=
- =?utf-8?B?RUk0SVV6aHJ6UloyS0U3a3c3QXVYSDNrTU4vMkVFanlBNHZncGZoZzBweC9j?=
- =?utf-8?B?alVLd3EvcFZGYVAzdEpyRVFxaHcyMlc0b0ZZMVBUL3dEM3F5SHhCL0p2UmxY?=
- =?utf-8?B?YjNTNXRHODIyU29HTi9jNFVhbkZDdFdQMGNQRUxwV0RuTVVvbTJpQUg3bjRi?=
- =?utf-8?B?QW4vTlp1QkM2MWN1ZkpsR1U1R2J2SkM1aGZTQk1YR2NsVGp0VHlJcFlkeXpw?=
- =?utf-8?B?aUozUEhHNExFN2RBWmk1U3BtaG9OaS8yV0RrZHl3MlFxc2J4c2NWd3FpMDhw?=
- =?utf-8?B?SXZML0R4VElGUHhiaFI4RER6TlpPRE1JdDFwenVucWVldkRFdXQvcXVsZC9o?=
- =?utf-8?B?Y0FyTjdzcEdQZmpQejdERGhRL0hWYXJ2NTdGQUN6OE1nYUxIaVFzUnQwNFlL?=
- =?utf-8?B?SG8yK0wrTnZ2YTVtQTVhNXlzSHJZOUJYOUdlSDFZandXdEpzbEFQRDNPYWQ4?=
- =?utf-8?B?MEdFMzBOTCt3MUhFU1hIQnh1UFMranhJK3VUTExNdll6Rk5ReGJncVNsZ0Ru?=
- =?utf-8?B?WFdQbjhrWWpMdU1rbmNtMzNLT3UvU216UkM0UDQyN1JrY0JmL1ZNdlBRRE43?=
- =?utf-8?B?cWcxKzVLYnNsQi9zdW9lbXJDcnYxN3hRQkxrc1BQR0NWL1pGWGlXUml6MUxi?=
- =?utf-8?B?eFdTMjJTeEx0Qm1qVVRSQ2JReUFJdkxCSVpHOXV2RUgxNXBQRHhtQVByVzNq?=
- =?utf-8?B?WSttaHUvK21zcjAzelVsRTRBRzlCOXM0Q0tPLzY5U0VFSk9EdzBHN3R5RmtM?=
- =?utf-8?B?dG14L1VUWUg2dkR5ZHlIc2Iwb3NpakNrZ25oSFQ2alFxZ1BXaGdwWkpHSU9t?=
- =?utf-8?B?VHFDeVlHTnFETGpjeGxCcWthQ2FraC9MSGRRZnpFTytXM3VUUnhiTTYrYlE2?=
- =?utf-8?B?YXpLQ294ZXBoUmRNWW9iR1VYT3J2Y0xEQTE1Y3laME1IN015RWVKT3haaThj?=
- =?utf-8?B?UytYNXhEMkJ4R2VXVGFWanU4bU5wOWlBM3E1dTUyaGhNSmNpQzU0bGFKbVlB?=
- =?utf-8?B?UklycHFMY05mOHB4TDNFOGJUTlk5Q3E5RzZHQ084dXlMNkZQcGFPNithT29h?=
- =?utf-8?B?MXNhcWV6TlVGMVdMbmRiRHNMOHVXa0psOG43czBqQ1czV1BZQlZEaGJ6Tkhw?=
- =?utf-8?B?NnBvME9WY1hiejNLUHBxZnNlWXF1YmFKelI3cFQzbmp4M0lxZnJKZDRmTWc1?=
- =?utf-8?B?ZVhaYlRQdG9aS0hRRlU2M0d1NUFrMHVOdTVyeXZXMnFnL20wcXd3d2xIcXA3?=
- =?utf-8?B?K1hKaGRQL1JESkJVbUd2MEFQaSsvN214YytrZ0xjcXhwRlpKVm5uV2VLU3Vm?=
- =?utf-8?B?L2NjZXQxajJSb3I4S2tqbC80QjJ6MkZENU9xa2RyTDY2LzR3WXRNalNjY3VQ?=
- =?utf-8?B?WlliMzRjaWJSMVcxWTZKS0IvMnVyVXVIM2dWcGRBR3BISktSS0Y1Y244RzZF?=
- =?utf-8?B?Y3c5em0xMHUvNDQvZ1o0S0EyNVUrekgyckM2VHBVeWU2NEZiYXJQY1UrWjFR?=
- =?utf-8?B?ck5qbGVVVThpUXdRanNtT3lJZUl6N0JXck1GaThVVm1CRkJibDBWdXhrVHIv?=
- =?utf-8?B?Q2FHZTQvQWZmZVBOL3Y3STV3dlkwaEx6em5BRFY0NHBwcTFESVBNYkhCbmIz?=
- =?utf-8?B?NG9CVWRBVnFSOC90SHVzZnkzV2hwQzFnakNGQnpnNzZxY3kzNjR1S1ZTWG1R?=
- =?utf-8?B?NStmYzcwTmUrOTR0RlNHQ0lwNytFcXFwUmY2T2xuZlRkd0NtcjhUdUcydzVa?=
- =?utf-8?B?UjlNVEhMY0MyQzNxV2FqMWwwTDlOVXRJaDEvTmo4cFpkZStJZDJVK2hMbXZQ?=
- =?utf-8?B?dnNLRE9nem9aTUVpUnFNbi80MXRvOWVyKzkvRGZhYm9nbEVLaVB4MWFlMStG?=
- =?utf-8?Q?nJ/v5lQYIyN0TKSsr/QClL+Wu?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2b047a1-9380-4531-6cc3-08dbcaa7cf60
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Oct 2023 22:17:09.1856
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xxiod5hcEYVRPA/r92GrlEjlpqKBglHu6taWYOYAkdDs9huIsxXf6Vr1K2KIx/cUc2XUSmbi0zVfGu/IYKwrlg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8886
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAJkfJ2UC/x2NQQrCMBBFr1Jm7UAm1oVeRUQ0+aYDkraTtCild
+ 7d18eC/zX8LFZii0KVZyDBr0T5vIoeGQvfICaxxc/LOH8WJcKmWw/DlaDrDCmdURu1g+xjffdL AI+LOPeI5JQ7sReLp3HonaGl7Hgwv/fyr19u6/gDruxsxhQAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697062812; l=3458;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=fcCFEgzIEgjdRagOjBJiBiruUTRZY6XKVFUfoSVmwHk=; b=aYtaA7N793tac2LBAe3z26VJ83HnPC3XYeXKcuGTOdnHD3nZAM+z+JKRjHuFt+Elo3vhm+wOG
+ /yIou6N7Ph6BRinJjrPjxnxkxoggxVG9baAO0ZIlWMuNMFUZlG1R4cS
+X-Mailer: b4 0.12.3
+Message-ID: <20231011-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-v1-1-60c9ca2d54a2@google.com>
+Subject: [PATCH] qed: replace uses of strncpy
+From: Justin Stitt <justinstitt@google.com>
+To: Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/11/2023 2:53 PM, 'Justin Stitt' via Pensando Drivers wrote:
-> 
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> NUL-padding is not needed due to `ident` being memset'd to 0 just before
-> the copy.
-> 
-> Considering the above, a suitable replacement is `strscpy` [2] due to
-> the fact that it guarantees NUL-termination on the destination buffer
-> without unnecessarily NUL-padding.
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
 
-Thanks, I suspected this was coming soon :-)
+This patch eliminates three uses of strncpy():
 
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+Firstly, `dest` is expected to be NUL-terminated which is evident by the
+manual setting of a NUL-byte at size - 1. For this use specifically,
+strscpy() is a viable replacement due to the fact that it guarantees
+NUL-termination on the destination buffer.
 
+The next two changes utilizes snprintf() to make the copying behavior
+more obvious. Previously, strncpy() was used to overwrite the first 3
+characters of mem_name and type_name by setting a length argument less
+than the size of the buffers themselves. This enables, in a roundabout
+way, creating a string like "ASD_BIG_RAM" or "ASD_RAM". Let's just use
+snprintf() with a precision specifier to hold the name prefix to exactly
+3 characters long.
 
-> ---
-> Note: build-tested only.
-> 
-> Found with: $ rg "strncpy\("
-> ---
->   drivers/net/ethernet/pensando/ionic/ionic_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_main.c b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-> index 1dc79cecc5cc..835577392178 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_main.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_main.c
-> @@ -554,8 +554,8 @@ int ionic_identify(struct ionic *ionic)
->          memset(ident, 0, sizeof(*ident));
-> 
->          ident->drv.os_type = cpu_to_le32(IONIC_OS_TYPE_LINUX);
-> -       strncpy(ident->drv.driver_ver_str, UTS_RELEASE,
-> -               sizeof(ident->drv.driver_ver_str) - 1);
-> +       strscpy(ident->drv.driver_ver_str, UTS_RELEASE,
-> +               sizeof(ident->drv.driver_ver_str));
-> 
->          mutex_lock(&ionic->dev_cmd_lock);
-> 
-> 
-> ---
-> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-> change-id: 20231011-strncpy-drivers-net-ethernet-pensando-ionic-ionic_main-c-709f8f1ea312
-> 
-> Best regards,
-> --
-> Justin Stitt <justinstitt@google.com>
-> 
+To be clear, there are no buffer overread bugs in the current code as
+the sizes and offsets are carefully managed such that buffers are
+NUL-terminated. However, with these changes, the code is now more robust
+and less ambiguous (and hopefully easier to read).
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Note: build-tested only.
+
+Found with: $ rg "strncpy\("
+---
+ drivers/net/ethernet/qlogic/qed/qed_debug.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_debug.c b/drivers/net/ethernet/qlogic/qed/qed_debug.c
+index cdcead614e9f..0a4fd1b04353 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_debug.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_debug.c
+@@ -3192,8 +3192,8 @@ static u32 qed_grc_dump_big_ram(struct qed_hwfn *p_hwfn,
+ {
+ 	struct dbg_tools_data *dev_data = &p_hwfn->dbg_info;
+ 	u32 block_size, ram_size, offset = 0, reg_val, i;
+-	char mem_name[12] = "???_BIG_RAM";
+-	char type_name[8] = "???_RAM";
++	char mem_name[12];
++	char type_name[8];
+ 	struct big_ram_defs *big_ram;
+ 
+ 	big_ram = &s_big_ram_defs[big_ram_id];
+@@ -3204,8 +3204,11 @@ static u32 qed_grc_dump_big_ram(struct qed_hwfn *p_hwfn,
+ 		     BIT(big_ram->is_256b_bit_offset[dev_data->chip_id]) ? 256
+ 									 : 128;
+ 
+-	strncpy(type_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
+-	strncpy(mem_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
++	snprintf(mem_name, sizeof(mem_name), "%.*s_BIG_RAM",
++		 BIG_RAM_NAME_LEN, big_ram->instance_name);
++
++	snprintf(type_name, sizeof(type_name), "%.*s_RAM",
++		 BIG_RAM_NAME_LEN, big_ram->instance_name);
+ 
+ 	/* Dump memory header */
+ 	offset += qed_grc_dump_mem_hdr(p_hwfn,
+@@ -6359,8 +6362,7 @@ static void qed_read_str_from_buf(void *buf, u32 *offset, u32 size, char *dest)
+ {
+ 	const char *source_str = &((const char *)buf)[*offset];
+ 
+-	strncpy(dest, source_str, size);
+-	dest[size - 1] = '\0';
++	strscpy(dest, source_str, size);
+ 	*offset += size;
+ }
+ 
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231011-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-211d594201e4
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
