@@ -1,154 +1,122 @@
-Return-Path: <netdev+bounces-39985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086577C5504
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:11:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63EE47C550C
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 15:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39AE91C20DC3
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:11:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93EA71C20BAB
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 13:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6EC1EA8B;
-	Wed, 11 Oct 2023 13:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21BE1F5FB;
+	Wed, 11 Oct 2023 13:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="iG/qXQk1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K1T5Ce36"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092791A27C
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:11:25 +0000 (UTC)
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0C4B8
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=42tnqTom3lqnbtnAUV2jklMcZP8YtoRpkftaoZuprnM=;
-	t=1697029881; x=1698239481; b=iG/qXQk1pqdGX34TbjHgz4PoanUoh41B7AwnUyMUMJHkniR
-	eu6q7Pu3ggkH7rUaC7lLJkCdYvocT1Z7+M68CwBMYvub69ayqLqfY+aEZhF5BIPpWd6+dCK3XCKpQ
-	AvsIYZ0aaRkjuP0ZHp27jwkPh6Rcipl20SxPfFobmhJMQjl+3XeZgWZbthfhkBVPRNIJbtEm8sUUA
-	hoAVBo+XLH3l024v2HJhseyTMBd7VdFMOISsZ8fU9ktV0ZCepgcNc/lPmlpYRJRwDXAOYWORF/1JU
-	+Pmh9BL4wsp71hdT96YOmsYuV1XpDTpZG0r8F3QR5eC4x5dNq3Y8iHXXgGrpDTrg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97-RC1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1qqYzc-00000001sD5-3K8M;
-	Wed, 11 Oct 2023 15:11:17 +0200
-Message-ID: <f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
-Subject: Re: [RFC] netlink: add variable-length / auto integers
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Cc: nicolas.dichtel@6wind.com, fw@strlen.de, pablo@netfilter.org, 
- jiri@resnulli.us, mkubecek@suse.cz, aleksander.lobakin@intel.com, Thomas
- Haller <thaller@redhat.com>
-Date: Wed, 11 Oct 2023 15:11:15 +0200
-In-Reply-To: <20231011003313.105315-1-kuba@kernel.org>
-References: <20231011003313.105315-1-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAF41A27C
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 13:14:56 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADB48F
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697030095; x=1728566095;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cOOcPKe0SjI006MvdpjWkc0xtpRtNoCUue6a2fyTCos=;
+  b=K1T5Ce36tjaBbyvPqXzJiLoFhCc8ueTmPsIpSUj2QlEgOGzNcvqin0SJ
+   +T7dh3LXfr5f81KDWv/dA3uuMEBmBIt0dkns+vjKTrdTPynupmoSqJ+hB
+   PotBj8T9H4vvNkf2Jqg+KrpErswP363wTSvt5ZG33EAE1ZEMLrW5A5qvZ
+   Fhy1/ovIjevtoPyICAxjI0Fr4JkcLX27vUcYfP/wrpJPH+e2B15Y0ANV1
+   SSDkZJ7G9D3XZcZPAxvXejJ9Oayx0kNagXfMbp0+aOWBxYj26qSrQb206
+   8B8pgJ8yuCfWXsoH4KDayrffCS+uwN48wlDGuWxp7Nj2KMUMD4xJBR0tf
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="364021490"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="364021490"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2023 06:14:47 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="703733879"
+X-IronPort-AV: E=Sophos;i="6.03,216,1694761200"; 
+   d="scan'208";a="703733879"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga003.jf.intel.com with ESMTP; 11 Oct 2023 06:14:43 -0700
+Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2F1533497A;
+	Wed, 11 Oct 2023 14:14:42 +0100 (IST)
+From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	andrew@lunn.ch,
+	aelior@marvell.com,
+	manishc@marvell.com,
+	horms@kernel.org,
+	vladimir.oltean@nxp.com,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jdamato@fastly.com,
+	d-tatianin@yandex-team.ru,
+	kuba@kernel.org,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>
+Subject: [PATCH net-next v4 0/2] ethtool: Add link mode maps for forced speeds
+Date: Wed, 11 Oct 2023 15:13:46 +0200
+Message-Id: <20231011131348.435353-1-pawel.chmielewski@intel.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-+Thomas Haller, if you didn't see it yet.
+The following patch set was initially a part of [1]. As the purpose of
+the original series was to add the support of the new hardware to the
+intel ice driver, the refactoring of advertised link modes mapping was
+extracted to a new set.
+The patch set adds a common mechanism for mapping Ethtool forced speeds
+with Ethtool supported link modes, which can be used in drivers code.
 
+[1] https://lore.kernel.org/netdev/20230823180633.2450617-1-pawel.chmielewski@intel.com
 
-On Tue, 2023-10-10 at 17:33 -0700, Jakub Kicinski wrote:
-> We currently push everyone to use padding to align 64b values in netlink.
-> I'm not sure what the story behind this is. I found this:
-> https://lore.kernel.org/all/1461339084-3849-1-git-send-email-nicolas.dich=
-tel@6wind.com/#t
-> but it doesn't go into details WRT the motivation.
-> Even for arches which don't have good unaligned access - I'd think
-> that access aligned to 4B *is* pretty efficient, and that's all
-> we need. Plus kernel deals with unaligned input. Why can't user space?
+Changelog:
+v3->v4:
+Moved the macro for setting fields into the common header file
 
-Hmm. I have a vague recollection that it was related to just not doing
-it - the kernel will do get_unaligned() or similar, but userspace if it
-just accesses it might take a trap on some architectures?
+v2->v3:
+Fixed whitespaces, added missing line at end of file
 
-But I can't find any record of this in public discussions, so ...
+v1->v2:
+Fixed formatting, typo, moved declaration of iterator to loop line.
 
+Paul Greenwalt (1):
+  ethtool: Add forced speed to supported link modes maps
 
-In any case, I think for _new_ attributes it would be perfectly
-acceptable to do it without padding, as long as userspace is prepared to
-do unaligned accesses for them, so we might need something in libnl (or
-similar) to do it correctly.
+Pawel Chmielewski (1):
+  ice: Refactor finding advertised link speed
 
-> Padded 64b is quite space-inefficient (64b + pad means at worst 16B
-> per attr vs 32b which takes 8B). It is also more typing:
->=20
->     if (nla_put_u64_pad(rsp, NETDEV_A_SOMETHING_SOMETHING,
->                         value, NETDEV_A_SOMETHING_PAD))
->=20
-> Create a new attribute type which will use 32 bits at netlink
-> level if value is small enough (probably most of the time?),
-> and (4B-aligned) 64 bits otherwise. Kernel API is just:
->=20
->     if (nla_put_uint(rsp, NETDEV_A_SOMETHING_SOMETHING, value))
->=20
-> Calling this new type "just" sint / uint with no specific size
-> will hopefully also make people more comfortable with using it.
-> Currently telling people "don't use u8, you may need the space,
-> and netlink will round up to 4B, anyway" is the #1 comment
-> we give to newcomers.
+ drivers/net/ethernet/intel/ice/ice.h          |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 193 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_main.c     |   2 +
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  46 ++---
+ include/linux/ethtool.h                       |  27 +++
+ net/ethtool/ioctl.c                           |  13 ++
+ 6 files changed, 183 insertions(+), 99 deletions(-)
 
-Yeah :)
+-- 
+2.37.3
 
-> Thoughts?
-
-Seems reasonable. I thought about endian variants, but with the variable
-size that doesn't make much sense.
-
-I do think the documentation in the patch could be clearer about the
-alignment, see below.
-
-> +++ b/include/net/netlink.h
-> @@ -183,6 +183,8 @@ enum {
->  	NLA_REJECT,
->  	NLA_BE16,
->  	NLA_BE32,
-> +	NLA_SINT,
-> +	NLA_UINT,
-
-You should also update the policy-related documentation in this file.
-
-> +++ b/include/uapi/linux/netlink.h
-> @@ -298,6 +298,8 @@ struct nla_bitfield32 {
->   *	entry has attributes again, the policy for those inner ones
->   *	and the corresponding maxtype may be specified.
->   * @NL_ATTR_TYPE_BITFIELD32: &struct nla_bitfield32 attribute
-> + * @NL_ATTR_TYPE_SINT: 32-bit or 64-bit signed attribute, aligned to 4B
-> + * @NL_ATTR_TYPE_UINT: 32-bit or 64-bit unsigned attribute, aligned to 4=
-B
-
-This is only for exposing the policy (policy description), not sure the
-alignment thing matters here?
-
-OTOH, there's nothing in this file that ever describes *any* of the
-attributes, yet in pracice all the uapi headers do refer to NLA_U8 and
-similar - so we should probably have a new comment section here in the
-UAPI that describes the various types as used by the documentation of
-other families?
-
-Anyway, I think some kind of bigger "careful with alignment" here would
-be good, so people do the correct thing and not just "if (big)
-nla_get_u64()" which would get the alignment thing problematic again.
-
-johannes
 
