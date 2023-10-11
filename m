@@ -1,87 +1,134 @@
-Return-Path: <netdev+bounces-39945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C311A7C4F46
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:40:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3327C4F5A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 11:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D6A71C20C72
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE6831C20AD4
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C761D6B8;
-	Wed, 11 Oct 2023 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA7A1D685;
+	Wed, 11 Oct 2023 09:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqR2rWc/"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="lOPMLHp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5BF1D68B
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:40:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D16D9C433C8;
-	Wed, 11 Oct 2023 09:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697017227;
-	bh=MPRn4REfCnP6OBo8bH+vknRtSjj7HNl2ZtErW6tgtY0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kqR2rWc/8e+nggQjp6Ar3eoRLVDjjjUYZc6UGUVgRrDNN9ii4Th6BpOit95afTWfv
-	 LSmCAb2YcBAsB3NWmYQyi5G3gf77SnCub8A0RHAVz3lHxFpmb6WWHntXbiSYvwbOm+
-	 q0A3vZ3GugahcIKO9WDtHkqMefD/dnXS7bM0gdU0xfaH3OdqoDTJR0nwaIVExeP3uk
-	 jv7LhYF6GasJgND241a8AWad5hgaA8CrhTveQ7b7Dr5ojYnpHu1l1orrIn4vqroco3
-	 FyE50WWwysM06IPjGKB8/MK8gUmStcJKZnuHSPTIqC0xuKXvJUdtLbuLVja1iIuye2
-	 eAgY4K7WpD+5g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B91C8C595C4;
-	Wed, 11 Oct 2023 09:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33161DA22
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:47:05 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884B994;
+	Wed, 11 Oct 2023 02:47:03 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39B9ktkt118342;
+	Wed, 11 Oct 2023 04:46:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697017615;
+	bh=pWbbzUvKEecylMAuLdNPqtTHRx8uDl4JWSOnleipvD0=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=lOPMLHp1U1v8QVRsQ35ngeD1/CpJLOquJHLpuuIWeA8v7MFuOEEfx3sSDmc+npSaz
+	 li65NJ61uTXHUVCyQV9YnUl6RZQ+VdIag3oU0X/PV6vXLBWKeogsaAZKrLVJwPu6F5
+	 xu2/2cS1DIqzM+dfBLHTnAmeYSEK3pEmszaq3CHQ=
+Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39B9ktHk022845
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 11 Oct 2023 04:46:55 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 11
+ Oct 2023 04:46:55 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 11 Oct 2023 04:46:55 -0500
+Received: from [172.24.227.83] (ileaxei01-snat.itg.ti.com [10.180.69.5])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39B9kppQ031933;
+	Wed, 11 Oct 2023 04:46:52 -0500
+Message-ID: <3bc32261-fdcf-2cea-cae2-f4dddc147d96@ti.com>
+Date: Wed, 11 Oct 2023 15:16:50 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] add skb_segment kunit coverage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169701722775.1947.6980237139794467834.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Oct 2023 09:40:27 +0000
-References: <20231009144205.269931-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20231009144205.269931-1-willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, alexander.duyck@gmail.com,
- fw@strlen.de, willemb@google.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
+Content-Language: en-US
+To: MD Danish Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David
+ S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20231011063700.1824093-1-danishanwar@ti.com>
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+In-Reply-To: <20231011063700.1824093-1-danishanwar@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
 
-On Mon,  9 Oct 2023 10:41:50 -0400 you wrote:
-> From: Willem de Bruijn <willemb@google.com>
+On 10/11/23 12:07 PM, MD Danish Anwar wrote:
+> ICSSG HW stats on TX side considers 8 preamble bytes as data bytes. Due
+> to this the tx_total_bytes of one interface doesn't match the
+> rx_total_bytes of other interface when two ICSSG interfaces are
+
+The errata is on the ICSSG Tx side regardless of which interface it is
+connected to. Please rephrase this part of the message to something like,
+"rx_total_bytes of the link partner".
+
+> connected with each other. There is no public errata available yet.
 > 
-> As discussed at netconf last week. Some kernel code is exercised in
-> many different ways. skb_segment is a prime example. This ~350 line
-> function has 49 different patches in git blame with 28 different
-> authors.
+> As a workaround to fix this, decrease tx_total_bytes by 8 bytes for every
+> tx frame.
 > 
-> [...]
+> Fixes: c1e10d5dc7a1 ("net: ti: icssg-prueth: Add ICSSG Stats")
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_stats.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> index bb0b33927e3b..dc12edcbac02 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
+> @@ -18,6 +18,7 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
+>  	struct prueth *prueth = emac->prueth;
+>  	int slice = prueth_emac_slice(emac);
+>  	u32 base = stats_base[slice];
+> +	u32 tx_pkt_cnt = 0;
+>  	u32 val;
+>  	int i;
+>  
+> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
+>  			     base + icssg_all_stats[i].offset,
+>  			     val);
+>  
+> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
+> +			tx_pkt_cnt = val;
+> +
+>  		emac->stats[i] += val;
+> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_total_bytes", ETH_GSTRING_LEN))
+> +			emac->stats[i] -= tx_pkt_cnt * 8;
+>  	}
+>  }
+>  
 
-Here is the summary with links:
-  - [net-next,v3,1/3] net: add skb_segment kunit test
-    https://git.kernel.org/netdev/net-next/c/b3098d32ed6e
-  - [net-next,v3,2/3] net: parametrize skb_segment unit test to expand coverage
-    https://git.kernel.org/netdev/net-next/c/1b4fa28a8b07
-  - [net-next,v3,3/3] net: expand skb_segment unit test with frag_list coverage
-    https://git.kernel.org/netdev/net-next/c/4688ecb1385f
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards,
+Ravi
 
