@@ -1,95 +1,85 @@
-Return-Path: <netdev+bounces-40090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD657C5AFA
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:11:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EBA07C5B22
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 20:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D6A282351
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A02728235E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E114418E39;
-	Wed, 11 Oct 2023 18:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CD222315;
+	Wed, 11 Oct 2023 18:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=flyingcircus.io header.i=@flyingcircus.io header.b="Wzr+nymK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gz/caJMS"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7F939944
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 18:11:52 +0000 (UTC)
-Received: from mail.flyingcircus.io (mail.flyingcircus.io [212.122.41.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689C494;
-	Wed, 11 Oct 2023 11:11:50 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flyingcircus.io;
-	s=mail; t=1697047907;
-	bh=d+Sr05wOr6odmI26LohhC7IvZbIgvBSxxhLMDUKBFdk=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To;
-	b=Wzr+nymKX+HnvaqMcmiXM5WSsO1EAMKuqTH188SJLylosOJe72/Lxe+UqhG8Oufat
-	 vV8Z1T6Ji6w/c734v2bpHlY7xr9mdKEnEtQmaKKC9XwnjTACE1LgzUuNfE7Yoy4BJ2
-	 H9s+wO0OLXhsH0R/VGZHlD6GFhVEVDkmX2DVDjcc=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3698839926
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 18:20:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5CA8C433C9;
+	Wed, 11 Oct 2023 18:20:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697048403;
+	bh=YIm0FW45BPKvF+X1OFYkrHMeewnDQo6DSIeSnbcXoY4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gz/caJMS9XpLYzznkn7hbGtO6iBp5YQBwlWeXaVO2aeovc1X8OVQhZQ7jlcUIW7o+
+	 ghCN+1bWAdy0HcDAyLR8SRpK7fumfmCZfanA/BiLwPgDo7ZH/LuzcYFGzxWET9HfLv
+	 i0+LbdnW8MGuGS/1sxtaXjNoZIRsAMHfSdJICxy7HM4cd5pM3HLStAi+sujH1YzqTm
+	 DgFgNbm57sUo9HuWgnWs8WhQsA59oXfgINZeLmcvjc2D4IeCxLI2Cd6tu8gHppiFbm
+	 08tttYidJWmRwXBdRo+KbhJFrtevCU7wleE/0NkNQkL9cGp87SZOiOFA4vzEXrImMm
+	 +YnnjvkNJ4r4w==
+Date: Wed, 11 Oct 2023 11:20:02 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
+ mask is set
+Message-ID: <ZSbnUlJT1u3xUIqY@x130>
+References: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
-Subject: Re: [REGRESSION] Userland interface breaks due to hard HFSC_FSC
- requirement
-From: Christian Theune <ct@flyingcircus.io>
-In-Reply-To: <CAM0EoMkKm4VcQB7p1abg9d-Pozz7fV-isexDtA1rGX+NuJEykA@mail.gmail.com>
-Date: Wed, 11 Oct 2023 20:11:26 +0200
-Cc: Jakub Kicinski <kuba@kernel.org>,
- Pedro Tammela <pctammela@mojatatu.com>,
- markovicbudimir@gmail.com,
- stable@vger.kernel.org,
- netdev@vger.kernel.org,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- davem@davemloft.net,
- edumazet@google.com,
- pabeni@redhat.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D7464B3C-53BE-435F-B58D-B9C612D3CAC7@flyingcircus.io>
-References: <297D84E3-736E-4AB4-B825-264279E2043C@flyingcircus.io>
- <065a0dac-499f-7375-ddb4-1800e8ef61d1@mojatatu.com>
- <0BC2C22C-F9AA-4B13-905D-FE32F41BDA8A@flyingcircus.io>
- <20231009080646.60ce9920@kernel.org>
- <da08ba06-e24c-d2c3-b9a0-8415a83ae791@mojatatu.com>
- <20231009172849.00f4a6c5@kernel.org>
- <CAM0EoM=mnOdEgHPzbPxCAotoy4C54XyGiisrjwnO_raqVWPryw@mail.gmail.com>
- <20231010112647.2cd6590c@kernel.org>
- <CAM0EoMkKm4VcQB7p1abg9d-Pozz7fV-isexDtA1rGX+NuJEykA@mail.gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
 
+On 11 Oct 09:57, Niklas Schnelle wrote:
+>Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
+>reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
+>called in probe_one() before mlx5_pci_init(). This is a problem because
+>mlx5_pci_init() is where the DMA and coherent mask is set but
+>mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+>allocation is done during probe before the correct mask is set. This
+>causes probe to fail initialization of the cmdif SW structs on s390x
+>after that is converted to the common dma-iommu code. This is because on
+>s390x DMA addresses below 4 GiB are reserved on current machines and
+>unlike the old s390x specific DMA API implementation common code
+>enforces DMA masks.
+>
+>Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
+>probe_one() before mlx5_mdev_init(). To match the overall naming scheme
+>rename it to mlx5_dma_init().
 
-> On 11. Oct 2023, at 19:27, Jamal Hadi Salim <jhs@mojatatu.com> wrote:
->=20
-> On Tue, Oct 10, 2023 at 2:26=E2=80=AFPM Jakub Kicinski =
-<kuba@kernel.org> wrote:
->=20
-> The qdisc is non-trivial. The good news is we now know there's at
-> least one user for this qdisc ;->
-
-Thanks everyone for taking the time to look at it. I hope and guess =
-I=E2=80=99m not the only user =E2=80=A6 :)
-
-Hugs,
-Christian
-
---=20
-Christian Theune =C2=B7 ct@flyingcircus.io =C2=B7 +49 345 219401 0
-Flying Circus Internet Operations GmbH =C2=B7 https://flyingcircus.io
-Leipziger Str. 70/71 =C2=B7 06108 Halle (Saale) =C2=B7 Deutschland
-HR Stendal HRB 21169 =C2=B7 Gesch=C3=A4ftsf=C3=BChrer: Christian Theune, =
-Christian Zagrodnick
-
+How about we just call mlx5_pci_init() before mlx5_mdev_init(), instead of
+breaking it apart ? 
+>
 
