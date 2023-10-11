@@ -1,222 +1,130 @@
-Return-Path: <netdev+bounces-39902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BB617C4C6E
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 09:58:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E3087C4C86
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 10:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB06A282037
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 07:58:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47242282047
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AE119BA6;
-	Wed, 11 Oct 2023 07:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFC019BAE;
+	Wed, 11 Oct 2023 08:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j7DqAfo0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InioOG/M"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17543199D6
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 07:58:02 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2873F91;
-	Wed, 11 Oct 2023 00:58:01 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39B7vZnq027168;
-	Wed, 11 Oct 2023 07:57:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : date : subject :
- content-type : message-id : to : cc : content-transfer-encoding :
- mime-version; s=pp1; bh=+Nh+ttaIlUVnlNuQdKZMcQ5FWauLUpkU6fMAGytoJds=;
- b=j7DqAfo0xor59I2htFF3DcLs60Qnewu5gu7tytRoBYhTWRlbJ5Of0iA2mkgefCBMbVGj
- /qaO/NJUZZ4gDiTNq8TwnP4GeN87hQSScOPNUKxzkha5drEMUKL3MkTb01mM/84S5ygp
- Dat9fgdHsK0OWfESORHYxa2t6V0w4nPTyed+IFhWhtmGPlr3JPWOQPK5Kpc794Qohn5M
- kEx9uLjoz5Bf6D46RiVFIun4Q2h6+PufaW/PoST5MTfL7J4o6OE5Gh6kQdFLoXj+HdMC
- uqQhG1L2DrPCjGfc7SgibEOPtfISz26FwlgFYV07Ud1WYbvd9tYQcZ0V01AJAk5FBryt 3w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnqs40077-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 07:57:50 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39B7vZYj027159;
-	Wed, 11 Oct 2023 07:57:50 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tnqs4006v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 07:57:49 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39B7XOis024458;
-	Wed, 11 Oct 2023 07:57:48 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkhnspwqj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Oct 2023 07:57:48 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39B7vkYl44565194
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Oct 2023 07:57:46 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EE93E20043;
-	Wed, 11 Oct 2023 07:57:45 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F5AB20040;
-	Wed, 11 Oct 2023 07:57:45 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 11 Oct 2023 07:57:45 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Wed, 11 Oct 2023 09:57:38 +0200
-Subject: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
- mask is set
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
-X-B4-Tracking: v=1; b=H4sIAHFVJmUC/3XN0QqDIBQG4FcJr2eoaeWu9h5jROnZOrBsaJNG9
- O4Tr0awy/8//N/ZSACPEMi52IiHiAFnl0J1KogZe/cAijZlIpiomBYtnZ6r6tDh0t1xpUbWalD
- G9pVoSNq8PKQ6e1fiYCG3VI4Yltl/8o/I8+kPFznltNGN1FYqAzW7PNG91xKHqTTzlLUofgV9F
- EQSFAcrmJZG2/Yo7Pv+BbgqfYf1AAAA
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory <shayd@nvidia.com>,
-        Moshe Shemesh <moshe@nvidia.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Leon Romanovsky <leon@kernel.org>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3636;
- i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=s4vuRbe1ctTn2sX8uQsBeRCDfvcgXhkrwsTDFdyTJEc=;
- b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGFLVQotOqvYpbb5vnW8vZjv72Mb9Et7BRWwRXyY/fp/Zz
- iT999W8jlIWBjEOBlkxRZZFXc5+6wqmmO4J6u+AmcPKBDKEgYtTACby0Izhr0DtVN2L530+rM/a
- MPeRy23GvMZHH+S8v+v6Ca98vXvP+hkMfyWmPtDIyNzdznbn11vlzVr/jGTlTQUufJFJ+73wxL7
- 0szwA
-X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
- fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3JCCzQyui7zKBQUbndel4jsSrX-48M9N
-X-Proofpoint-GUID: uvKxe_HwHqSYX_Vf6ALqULCM6UY1N_Bh
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F58ED2E3
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 08:00:31 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C33D9E
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 01:00:28 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-313e742a787so373913f8f.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 01:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697011226; x=1697616026; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qz8ZijtXypgZfgGaNG42ozEudQwZ/S4uYiYC3qrkT4w=;
+        b=InioOG/MLYTDZA2VHIziYLynQlDASgEG+NsTSePgf3hOroOP5kj0NKANmiB5gbdz12
+         aIqTEaXK9XQNielWD5T8+sDPokI4KknFTR4RhtYHpUTFyXbbWiNwjL10mDh9FayHngzC
+         iJGDxFBD7rnAKMz+WEndq+J7kc7cBGiF5fDYBTf2+oVPrZO15w3ZR5yfLEuDhGzahH8U
+         LfhzXgdZtv2kBprW7uywpeluZ/vBjFoqKC1uTHr3QECeMV0y4DLIzLAgUc04sQ9XLjH1
+         cz7aU9n/QBmMqNQ0w07ct+mqhcyCzgq6shmHSr2+LjQZth2g0ux3L12ooRYkqFohFRUj
+         YgHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697011226; x=1697616026;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qz8ZijtXypgZfgGaNG42ozEudQwZ/S4uYiYC3qrkT4w=;
+        b=UGb+WxXYh7Jf2MeCho83d8F1jeVJ+90c4OB+cuqcua1yGGZlVLHs7MRa5WsXfBDqyt
+         cmrCNWBWh3bL5PkOQjZW+MCq3UdcVd6Z5bsABcQoqU0CfmbuZ0Kx/Bh2Wq31phG1eUOX
+         OXRO01vdiJ5N2DZZn2g2kpF7w8NWJD9o7h9cUetm6fcnmWTWrHJNVsZzmIrm/4zFRwL2
+         rSg1g8kmSYl0ZvoGbtOv1m09K8QnDfHAznKXIVsxaR0uBA2/mSVVAz/W/0oQaRG38y5q
+         5cUbOmIijE5TpPm01gJTVC2qaTR1Nv2sQXDh0UHKV7nwTO9oq8tPmWuw29EgS8beWzfY
+         wGjw==
+X-Gm-Message-State: AOJu0Ywtun8ZV+WW3VBkuNcV8EVs7bU3QI8Jgei/2AvQU8NYr1mTdYW9
+	QnHqRG03tMHlRJMY71vpSLDUCA==
+X-Google-Smtp-Source: AGHT+IFZXX0jarvpNDfAJY2TbuzWh9WTigeX7sMPpWABOvC6Pd2KQOBcSrlU0uwBWQ3W4y5pUCkMbg==
+X-Received: by 2002:a05:6000:243:b0:329:6b53:e3ad with SMTP id m3-20020a056000024300b003296b53e3admr12254266wrz.34.1697011226548;
+        Wed, 11 Oct 2023 01:00:26 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id l9-20020a1c7909000000b00401b242e2e6sm18282714wme.47.2023.10.11.01.00.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Oct 2023 01:00:26 -0700 (PDT)
+Date: Wed, 11 Oct 2023 11:00:22 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Xiyu Yang <xiyuyang19@fudan.edu.cn>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+	Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"J. Bruce Fields" <bfields@fieldses.org>,
+	Xin Tan <tanxin.ctf@gmail.com>, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-XXX] SUNRPC: Add an IS_ERR() check back to where it was
+Message-ID: <356fb42c-9cf1-45cd-9233-ac845c507fb7@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-11_05,2023-10-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- impostorscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0
- clxscore=1011 mlxscore=0 suspectscore=0 mlxlogscore=999 spamscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310110069
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
-reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
-called in probe_one() before mlx5_pci_init(). This is a problem because
-mlx5_pci_init() is where the DMA and coherent mask is set but
-mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
-allocation is done during probe before the correct mask is set. This
-causes probe to fail initialization of the cmdif SW structs on s390x
-after that is converted to the common dma-iommu code. This is because on
-s390x DMA addresses below 4 GiB are reserved on current machines and
-unlike the old s390x specific DMA API implementation common code
-enforces DMA masks.
+This IS_ERR() check was deleted during in a cleanup because, at the time,
+the rpcb_call_async() function could not return an error pointer.  That
+changed in commit 25cf32ad5dba ("SUNRPC: Handle allocation failure in
+rpc_new_task()") and now it can return an error pointer.  Put the check
+back.
 
-Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
-probe_one() before mlx5_mdev_init(). To match the overall naming scheme
-rename it to mlx5_dma_init().
+A related revert was done in commit 13bd90141804 ("Revert "SUNRPC:
+Remove unreachable error condition"").
 
-Link: https://lore.kernel.org/linux-iommu/cfc9e9128ed5571d2e36421e347301057662a09e.camel@linux.ibm.com/
-Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Fixes: 037e910b52b0 ("SUNRPC: Remove unreachable error condition in rpcb_getport_async()")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
-Note: I ran into this while testing the linked series for converting
-s390x to use dma-iommu. The existing s390x specific DMA API
-implementation doesn't respect DMA masks and is thus not affected.
----
-Changes in v3:
-- Added R-b's from Leon R and Jacob K
-- Link to v2: https://lore.kernel.org/r/20230929-mlx5_init_fix-v2-1-51ed2094c9d8@linux.ibm.com
----
- drivers/net/ethernet/mellanox/mlx5/core/main.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+It's possible Smatch was responsible for generating the original warning
+because it warns for unnecessary NULL checks.  But generally, there was
+a future error pointer implied.  Those warnings are just a hint, not a
+command.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index 15561965d2af..f251d233a16c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -250,7 +250,7 @@ static void mlx5_set_driver_version(struct mlx5_core_dev *dev)
- 	mlx5_cmd_exec_in(dev, set_driver_version, in);
- }
+ net/sunrpc/rpcb_clnt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
+index 5988a5c5ff3f..102c3818bc54 100644
+--- a/net/sunrpc/rpcb_clnt.c
++++ b/net/sunrpc/rpcb_clnt.c
+@@ -769,6 +769,10 @@ void rpcb_getport_async(struct rpc_task *task)
  
--static int set_dma_caps(struct pci_dev *pdev)
-+static int mlx5_dma_init(struct pci_dev *pdev)
- {
- 	int err;
- 
-@@ -905,12 +905,6 @@ static int mlx5_pci_init(struct mlx5_core_dev *dev, struct pci_dev *pdev,
- 
- 	pci_set_master(pdev);
- 
--	err = set_dma_caps(pdev);
--	if (err) {
--		mlx5_core_err(dev, "Failed setting DMA capabilities mask, aborting\n");
--		goto err_clr_master;
--	}
--
- 	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32) &&
- 	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP64) &&
- 	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP128))
-@@ -1908,9 +1902,15 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto adev_init_err;
- 	}
- 
-+	err = mlx5_dma_init(pdev);
-+	if (err) {
-+		mlx5_core_err(dev, "Failed setting DMA capabilities mask, aborting\n");
-+		goto dma_init_err;
+ 	child = rpcb_call_async(rpcb_clnt, map, proc);
+ 	rpc_release_client(rpcb_clnt);
++	if (IS_ERR(child)) {
++		/* rpcb_map_release() has freed the arguments */
++		return;
 +	}
-+
- 	err = mlx5_mdev_init(dev, prof_sel);
- 	if (err)
--		goto mdev_init_err;
-+		goto dma_init_err;
  
- 	err = mlx5_pci_init(dev, pdev, id);
- 	if (err) {
-@@ -1942,7 +1942,7 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 	mlx5_pci_close(dev);
- pci_init_err:
- 	mlx5_mdev_uninit(dev);
--mdev_init_err:
-+dma_init_err:
- 	mlx5_adev_idx_free(dev->priv.adev_idx);
- adev_init_err:
- 	mlx5_devlink_free(devlink);
-
----
-base-commit: 94f6f0550c625fab1f373bb86a6669b45e9748b3
-change-id: 20230928-mlx5_init_fix-c465b5cda327
-
-Best regards,
+ 	xprt->stat.bind_count++;
+ 	rpc_put_task(child);
 -- 
-Niklas Schnelle
+2.39.2
 
 
