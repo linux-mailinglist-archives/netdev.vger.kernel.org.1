@@ -1,225 +1,198 @@
-Return-Path: <netdev+bounces-39876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8B17C4A26
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:17:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 035B27C4A29
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:17:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C381C28439B
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:17:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1D2428433E
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9B4199C9;
-	Wed, 11 Oct 2023 06:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m6DA3h82"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65421775D;
+	Wed, 11 Oct 2023 06:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B3318E19
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:16:59 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B5FED
-	for <netdev@vger.kernel.org>; Tue, 10 Oct 2023 23:16:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697004998; x=1728540998;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=przElFPghngL5Bn4qJWiHxAB6NzmkSXDKRSMCJVlmIo=;
-  b=m6DA3h829UYFrj48MtiQ0/T7TBjJQV61gB/sjf1OMR14XSq2iPa1iqTl
-   RTUsrT2tEO9S3ZRh7cjOQGpNmVwZO1/+hghbMiQUax+0ARR4cca1uNNV2
-   ohn4xRTUEfLHu7ni0YX/HyIn8PzTETD/j9JpGf3MsZZWykIbillVraBQd
-   0V/k+wS/M2e4caDoc52KyABk0TL/j9WyXiZEtJOp4USq4DqczjHj2K0/G
-   2xzF9/klWJqfT9afxRJctnvI3y3VeS5TC0oTywK9ABOOcBi/kMTooqUdr
-   gEDExMQyizMlpmXnB5Rhcl4/oswdmEc6UmeooE2I7kFqCSCLQuXrcTPN+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="448790351"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="448790351"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2023 23:16:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10859"; a="927442145"
-X-IronPort-AV: E=Sophos;i="6.03,214,1694761200"; 
-   d="scan'208";a="927442145"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Oct 2023 23:16:37 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:16:37 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:16:36 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Tue, 10 Oct 2023 23:16:36 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Tue, 10 Oct 2023 23:16:36 -0700
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
- by CYYPR11MB8385.namprd11.prod.outlook.com (2603:10b6:930:c1::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.36; Wed, 11 Oct
- 2023 06:16:32 +0000
-Received: from BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8]) by BL0PR11MB3122.namprd11.prod.outlook.com
- ([fe80::e372:f873:de53:dfa8%7]) with mapi id 15.20.6863.032; Wed, 11 Oct 2023
- 06:16:32 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "pmenzel@molgen.mpg.de" <pmenzel@molgen.mpg.de>, Vishal Agrawal
-	<vagrawal@redhat.com>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, "Brandeburg, Jesse"
-	<jesse.brandeburg@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "jkc@redhat.com" <jkc@redhat.com>, "Kitszel,
- Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash
- dump kernels
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash
- dump kernels
-Thread-Index: AQHZ9uU6c+T080bqgkOCqYNNHdK3T7BEJqZA
-Date: Wed, 11 Oct 2023 06:16:32 +0000
-Message-ID: <BL0PR11MB312214E63F486ECFDE49E2B2BDCCA@BL0PR11MB3122.namprd11.prod.outlook.com>
-References: <20231004170214.474792-1-jesse.brandeburg@intel.com>
-In-Reply-To: <20231004170214.474792-1-jesse.brandeburg@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|CYYPR11MB8385:EE_
-x-ms-office365-filtering-correlation-id: 2116e959-4200-47ba-017a-08dbca219d24
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UtOE3dW89eH3Q8mD+gPdBhbRVzQIBY18VcCHYaIcs75NyZ4ogA4KHXTQiw5kR47pArezUnchfv841Aa/UlsM8oc5Kznd3QIMy/AUjUAx6YvNit+Q93fV9mLC5B0NIKpPqqNnuj6ZGL9khtxyJijZIXftKSFYq+U2xKUN7LUXqH+1TONl9BVMn8aDv0hiB00YkoDCj9CeBs5wSAlf6N6PpFd0+do04csTQbRGHC1H3AFU9VUeLg60ND1Y9CbPZ+tyjYFk6dxpSBGjzF3nMc2QHexnEvG4tAjvTdt2Ebk6d5ZPh2CqpawzOLqvGNwWHiDs7P/0jsnnOHyPwLyOsX4Eqh2F7LivDCstpi+OXaQwpSJmgp+un8MoGgQZKy/1P2erXS2AaTT2ih30npObb7Wp+xXhs62T/iMMd6ls9Z4ua37xRbnIBSrfu+jzjRSmvxefYS/xzJX3KxUAgwOOuEK8JWGr6oyNg/DDOQqBYZj5ygNWy5e5GujzfCTvg2gFvo9f92YSSdC1ajJp53wrOZpVuTaYU1kmt6lKPTb8uzu/uMr4yXT2DxCv9cnGggOraAiIWiz3C1bnlW8dvAZebjfyjUzkebq+aP+eBxGd8n/qsJtrecUKq28el7xUoP4TW16x
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(346002)(396003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(71200400001)(53546011)(55236004)(26005)(38070700005)(7696005)(107886003)(8676002)(5660300002)(8936002)(66446008)(2906002)(4326008)(478600001)(66476007)(66946007)(64756008)(316002)(52536014)(54906003)(6506007)(110136005)(41300700001)(66556008)(55016003)(122000001)(38100700002)(82960400001)(76116006)(86362001)(33656002)(83380400001)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?LFTPPh2WCyWhTvbKedPtSl7CogWQJisUByb71a+vGMyFMJwktPxjJVtHPh2k?=
- =?us-ascii?Q?pzehBD1SF3klusJHbejOVfrMSeniMNertU0VccrGLXToMAmV0fgBB4IM76bh?=
- =?us-ascii?Q?osXKnPiSHwTS5HnMSSsi/XrBm6fVnrKgi08LP9xNL63l3UZYNPvIk54oOf6g?=
- =?us-ascii?Q?HuqO/dipVQQXqHR+qNEt1bloqr9Ao+m2uLguJ1xsnK4MFc9S6tufSlOoWaCH?=
- =?us-ascii?Q?2e8EEdGUezggp4ERE+CPQHSa1TRkFffS4SnEajPyTrqc+bOm6XTL7SfNsXTr?=
- =?us-ascii?Q?BXhAKmFCzD5T3q4tA4xLEHKtBQUrPqonofIQu0V556VuzAO3+nd5+Ei8SGsx?=
- =?us-ascii?Q?Jk+FPwhqQVs89dngqaY/aN7TY/LjUDpfcAeqnJz44QEGzF4eSTYNglXKmBTC?=
- =?us-ascii?Q?jwvcX59yBkCcr+4mee4mRQhfIOg2E6EfwhZuzCXskpFhhMSnPRi1zv20T1uW?=
- =?us-ascii?Q?2PRDzaU8ZhaPmY2PbN1R6JlWkIU9KlHGAQZGqmOszlfgcOyzGg0sNg98MTnL?=
- =?us-ascii?Q?R7+/jtpADnQ1pwcBrYV5OU0KibORp4w6IdNN1u098g344WZSc69zmN0bRTja?=
- =?us-ascii?Q?jwmpelWyZNxoBAmtEZBjzOzOFL0LyFYHe0oHyzzXj9dm+O/KoatD58xc4kpd?=
- =?us-ascii?Q?NJdnPwsK/RG+2wQFjumMK56kw23UOkUmRL4yyIM0CNJFSf1oDG4bFSc+HavW?=
- =?us-ascii?Q?EtcNMIlSGeWBnUrdNIuLiiZAFhET62WqRd7OOjwpsqIseX6tHvwwbHJlc/WC?=
- =?us-ascii?Q?n8pEw9JOajZ5mK6sP8Rn6ZZODMgan1zgQL9k0ZkotKK+GZpKbX73rnEwSMt8?=
- =?us-ascii?Q?ZtsEB8dzF+EBU5gtDgzlJ1Ui2s0OkBssSEDnEhUVrcs/Le5eaHvKa5bSXLDP?=
- =?us-ascii?Q?oLu3wvm1A5QaI4d79+86+Kx5XpQ2322w+vgYjkqaYmlpXeuMc1kh24HLeMvo?=
- =?us-ascii?Q?wWJOOOQazY9XwN4bC2SzDPO/9JH4Cbsn5O34oX1ZRj2U1dCGb5X95XFPLd0G?=
- =?us-ascii?Q?ECyryeD4NCBQs2TjXvhp2YsE2wYJk+eo18qWcjYrsQJAZXAoalMfk64uxO8z?=
- =?us-ascii?Q?s82pbu3LBz2bY1grdA/qgqU16Exp1fyqGqowSUPOcQHGs0VjrbsuADMoroze?=
- =?us-ascii?Q?MM7j1YzVAqkcxs3KQVlYmnfO410G8iLsnLoodQW+S7X+8Y5/11qIG5l7gXPV?=
- =?us-ascii?Q?V6wXcc5NYAUJlR3DKUajFX0GKmlz5yz4kbbWJLUXc8md55UhKVj10L76oUjd?=
- =?us-ascii?Q?Xs/FGNkb/bGRsKwdE8kGYzEcysylciHZkvjVuuxdWd0yN4lqpPrNlGGxwFF7?=
- =?us-ascii?Q?kpPy+2+UN276igW2W3gpGmUS1NlXZe9ehmu/LUARzq0kY7ynDesDzcQPS/i2?=
- =?us-ascii?Q?RQMdq/VBqj+X0hLJ6MomwBGshiWiSZghF137CPD89LTtHv8Dc9wQnqR39kIv?=
- =?us-ascii?Q?BjrLFFSkLMN1SpaeUy6xTFq1JZgPdgMg+vs5wRXuwlm4sDmqmBJFMGgJgnXj?=
- =?us-ascii?Q?zLS9wacImZahz+h494VQf1qgkqrIchzC18t42xjma09C6MDEZcC1CI/0wzTT?=
- =?us-ascii?Q?lr16bKcUWB2buOUM4deqYbSq1In1njCqq7P9HJDZNZ1osxPSyxz+o2AHL/ct?=
- =?us-ascii?Q?eQ=3D=3D?=
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ctaOq3SHmhHCXNgTfO6gdlB9VlMMrbblmOlg4Un+0zJTmOchDmOtCB0iQomnS3mjXCjvHbAOx5wl03b0fqJ1HPEZ03RWAq0X7dHmIjQzRp3/v4bisP00hmPv8hjIpy3+GQzCRe2TXjJ9V9crb75vY5dOl0RDbys6eTgPOZJZkkCFbcoThydzo2S3e8uUeOSpYkGb6Z8q9KvU2pUneK6Xpo6zmGkfR4jJzYX3UHx0OIX76vTEqi3WRhM5eXRKWtQm+hsVwLftSqmdcEnVg5chjZ8pGhl6zcSMTgQa7L8+ZKoG7d3jIeJZyqk6iIqdNlr6ZrkQp9eyHsypn45PBfd5gw==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A42/nuaNTpC+oaUJngYoZ8a8f5c9npTBKwNHCf8uAus=;
- b=KM0yweY4Nk0d/0I/zVqXyWorW0+Hl0ik75nZ37SOS0jE8OaLN0FkH7Ez4BxITNIVHSuoZBt3PETIGUpj63rshgnW8bCtqzcMJzFDn0s+9tZptUFW6/6F+rDalI4FZsuBh0XBFG7OkqSwh1v/jHGsM1n8LwO92izEy2WeEUq9V2fcsRMy0YJd7tqy92HvGrUtG9Gk8GBmy2Znvn+8NgkSrxGBGOsbIwRA/u5I9KnOoRp3IXDV5Z+WCAlJAx/0ONbDxbiJMEbMr9prlHzO2x0JYzzJYve/4UobJpncjCl5vIDdJrwc5u2bjjLqwcVnbsRlyjuVZTms4qIUvr8YGGDFFg==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-x-ms-exchange-crosstenant-authas: Internal
-x-ms-exchange-crosstenant-authsource: BL0PR11MB3122.namprd11.prod.outlook.com
-x-ms-exchange-crosstenant-network-message-id: 2116e959-4200-47ba-017a-08dbca219d24
-x-ms-exchange-crosstenant-originalarrivaltime: 11 Oct 2023 06:16:32.1614 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: RIGGkorEIKt9azb33+poHvmLmtBoyU3Jmd8GlRl96D1RCy9AXDUYKqjsLfnWydO/hJlqHyRXj3BFCmxQhSxbkh3Kxz3wsWlXZ4Sg0NY8g/UUSGokyWSCPA6t9bseEcxS
-x-ms-exchange-transport-crosstenantheadersstamped: CYYPR11MB8385
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4C017740;
+	Wed, 11 Oct 2023 06:17:16 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82715B9;
+	Tue, 10 Oct 2023 23:16:53 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.169])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4S52bg37Fkz4f3lVd;
+	Wed, 11 Oct 2023 14:16:47 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP3 (Coremail) with SMTP id _Ch0CgAXbEvOPSZlQjAMCg--.4750S2;
+	Wed, 11 Oct 2023 14:16:50 +0800 (CST)
+Subject: Re: Possible kernel memory leak in bpf_timer
+To: Hsin-Wei Hung <hsinweih@uci.edu>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Network Development <netdev@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>
+References: <CABcoxUaT2k9hWsS1tNgXyoU3E-=PuOgMn737qK984fbFmfYixQ@mail.gmail.com>
+ <8bf09dbd-670d-a666-8dcd-fc3406fa7ada@huaweicloud.com>
+ <CABcoxUZU-+aaPw1VsqbYRsbCEq8R7Mb+aCCkq6M6zVoP3Oq36g@mail.gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <bc65ba0c-831e-779e-cbf1-69a409fc211a@huaweicloud.com>
+Date: Wed, 11 Oct 2023 14:16:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <CABcoxUZU-+aaPw1VsqbYRsbCEq8R7Mb+aCCkq6M6zVoP3Oq36g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:_Ch0CgAXbEvOPSZlQjAMCg--.4750S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCF47XF4kZFW3tF1rXrWxtFb_yoWrAF1xpr
+	W8Ga12krW0qr48tw1Dtw1kX345t3yUC3WUXrn5JF1UZrZ2gFnFgF17Wr4j9F45Jws5AF17
+	Zr18t34Svr1UJaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of J=
-esse Brandeburg
-> Sent: Wednesday, October 4, 2023 10:32 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: pmenzel@molgen.mpg.de; Vishal Agrawal <vagrawal@redhat.com>; linux-pc=
-i@vger.kernel.org; Brandeburg, Jesse <jesse.brandeburg@intel.com>; netdev@v=
-ger.kernel.org; jkc@redhat.com; Kitszel, Przemyslaw <przemyslaw.kitszel@int=
-el.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v3] ice: reset first in crash d=
-ump kernels
->
-> When the system boots into the crash dump kernel after a panic, the ice
-> networking device may still have pending transactions that can cause erro=
-rs
-> or machine checks when the device is re-enabled. This can prevent the cra=
-sh
-> dump kernel from loading the driver or collecting the crash data.
->
-> To avoid this issue, perform a function level reset (FLR) on the ice devi=
-ce
-> via PCIe config space before enabling it on the crash kernel. This will
-> clear any outstanding transactions and stop all queues and interrupts.
-> Restore the config space after the FLR, otherwise it was found in testing
-> that the driver wouldn't load successfully.
->
-> The following sequence causes the original issue:
-> - Load the ice driver with modprobe ice
-> - Enable SR-IOV with 2 VFs: echo 2 > /sys/class/net/eth0/device/sriov_num=
-_vfs
-> - Trigger a crash with echo c > /proc/sysrq-trigger
-> - Load the ice driver again (or let it load automatically) with modprobe =
-ice
-> - The system crashes again during pcim_enable_device()
->
-> Fixes: 837f08fdecbe ("ice: Add basic driver framework for Intel(R) E800 S=
-eries")
->
-> Reported-by: Vishal Agrawal <vagrawal@redhat.com>
-> Reviewed-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-> ---
-> v3: add Fixes tag as approximate, added Jay's RB tag
-> v2: respond to list comments and update commit message
-> v1: initial version
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
->
+Hi,
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+On 10/11/2023 12:39 PM, Hsin-Wei Hung wrote:
+> On Sat, Oct 7, 2023 at 7:46 PM Hou Tao <houtao@huaweicloud.com> wrote:
+>> Hi,
+>>
+>> On 9/27/2023 1:32 PM, Hsin-Wei Hung wrote:
+>>> Hi,
+>>>
+>>> We found a potential memory leak in bpf_timer in v5.15.26 using a
+>>> customized syzkaller for fuzzing bpf runtime. It can happen when
+>>> an arraymap is being released. An entry that has been checked by
+>>> bpf_timer_cancel_and_free() can again be initialized by bpf_timer_init().
+>>> Since both paths are almost identical between v5.15 and net-next,
+>>> I suspect this problem still exists. Below are kmemleak report and
+>>> some additional printks I inserted.
+>>>
+>>> [ 1364.081694] array_map_free_timers map:0xffffc900005a9000
+>>> [ 1364.081730] ____bpf_timer_init map:0xffffc900005a9000
+>>> timer:0xffff888001ab4080
+>>>
+>>> *no bpf_timer_cancel_and_free that will kfree struct bpf_hrtimer*
+>>> at 0xffff888001ab4080 is called
+>> I think the kmemleak happened as follows:
+>>
+>> bpf_timer_init()
+>>   lock timer->lock
+>>     read timer->timer as NULL
+>>     read map->usercnt != 0
+>>
+>>                 bpf_map_put_uref()
+>>                   // map->usercnt = 0
+>>                   atomic_dec_and_test(map->usercnt)
+>>                     array_map_free_timers()
+>>                     // just return and lead to mem leak
+>>                     find timer->timer is NULL
+>>
+>>     t = bpf_map_kmalloc_node()
+>>     timer->timer = t
+>>   unlock timer->lock
+>>
+>> Could you please try the attached patch to check whether the kmemleak
+>> problem has been fixed ?
+>>
+> Hi,
+>
+> Sorry for the late reply to this thread.
+>
+> KASAN is complaining about double-free/invalid-free in the kfree after
+> applying the patch. There are some cases that jump to "out" before the
+> bpf_hrtimer is allocated or when the bpf_hrtimer is already allocated.
+
+My bad. Didn't carefully test the patch before posting the patch. Could
+you please apply the modification below to the patch and try it again ?
+
+diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+index bcbd47436a19..c72e28d0ce86 100644
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@ -1175,6 +1175,7 @@ BPF_CALL_3(bpf_timer_init, struct bpf_timer_kern
+*, timer, struct bpf_map *, map
+        __bpf_spin_lock_irqsave(&timer->lock);
+        t = timer->timer;
+        if (t) {
++               t = NULL;
+                ret = -EBUSY;
+                goto out;
+        }
+
+
+>
+> I am still trying to have a standalone working POC. I think a key to
+> trigger this memory leak is to 1) have a large array map 2) a bpf
+> program init a timer in a small-index entry and then 3) release the
+> map.
+Yes. And I still think my guess about how the kmemleak happens is correct.
+
+>
+> -Amery
+>
+>
+>>> [ 1383.907869] kmemleak: 1 new suspected memory leaks (see
+>>> /sys/kernel/debug/kmemleak)
+>>> BUG: memory leak
+>>> unreferenced object 0xffff888001ab4080 (size 96):
+>>>   comm "sshd", pid 279, jiffies 4295233126 (age 29.952s)
+>>>   hex dump (first 32 bytes):
+>>>     80 40 ab 01 80 88 ff ff 00 00 00 00 00 00 00 00  .@..............
+>>>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>>>   backtrace:
+>>>     [<000000009d018da0>] bpf_map_kmalloc_node+0x89/0x1a0
+>>>     [<00000000ebcb33fc>] bpf_timer_init+0x177/0x320
+>>>     [<00000000fb7e90bf>] 0xffffffffc02a0358
+>>>     [<000000000c89ec4f>] __cgroup_bpf_run_filter_skb+0xcbf/0x1110
+>>>     [<00000000fd663fc0>] ip_finish_output+0x13d/0x1f0
+>>>     [<00000000acb3205c>] ip_output+0x19b/0x310
+>>>     [<000000006b584375>] __ip_queue_xmit+0x182e/0x1ed0
+>>>     [<00000000b921b07e>] __tcp_transmit_skb+0x2b65/0x37f0
+>>>     [<0000000026104b23>] tcp_write_xmit+0xf19/0x6290
+>>>     [<000000006dc71bc5>] __tcp_push_pending_frames+0xaf/0x390
+>>>     [<00000000251b364a>] tcp_push+0x452/0x6d0
+>>>     [<000000008522b7d3>] tcp_sendmsg_locked+0x2567/0x3030
+>>>     [<0000000038c644d2>] tcp_sendmsg+0x30/0x50
+>>>     [<000000009fe3413f>] inet_sendmsg+0xba/0x140
+>>>     [<0000000034d78039>] sock_sendmsg+0x13d/0x190
+>>>     [<00000000f55b8db6>] sock_write_iter+0x296/0x3d0
+>>>
+>>>
+>>> Thanks,
+>>> Hsin-Wei (Amery)
+>>>
+>>>
+>>> .
+>
+> .
 
 
