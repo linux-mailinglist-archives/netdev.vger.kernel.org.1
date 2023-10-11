@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-40155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B91FE7C6032
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:13:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43A547C6033
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6602828ED
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:13:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FE9528248A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 22:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E20B9CA61;
-	Wed, 11 Oct 2023 22:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01926249E5;
+	Wed, 11 Oct 2023 22:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Xvyqnpsh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JA9ZddAP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EC73E47B
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:13:14 +0000 (UTC)
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745A5AF
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:12 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-775751c35d4so20909385a.0
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4544C9CA50
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:13:16 +0000 (UTC)
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7778B7
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:14 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-77574c2cffdso25353685a.0
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 15:13:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1697062391; x=1697667191; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1697062393; x=1697667193; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2Bh9gNnh3A0IybhaZX53wHaJJr5epn3uPcTBo/IM8Q=;
-        b=XvyqnpshoVNDpCtMVbXh83Vv5mFEsUG9gskTXqgyB2ueyq1HqPm8wAzBN+rdGNYRd9
-         Ps39cnVgltj9wnHq3KF5+N3Duy8InvrVUC52uMrfWpQK4egz/ZVBS7/g6W8Lewg8549W
-         71CCQ4a6UIDkypXu8FCW5TQ9T6y2IK+DquW5I=
+        bh=vgBfKQI+bcdgnUJLRPi9K81lb/kb64EIO01uYuyTmK0=;
+        b=JA9ZddAPaJ0APLyfYFthnNPHid8AaQ661BB5lnhtU1OoWfMXmzQZSYvf+iiOyON/CD
+         BPzJuCrF5+KmVchpQ8/P37kTYEnthE35G4aVWw+vzOnW/lFLb3nDwHCi81h34QGHrmyM
+         CtHDB6kt05apJdif1+y916xs/prEE/iV+koEo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697062391; x=1697667191;
+        d=1e100.net; s=20230601; t=1697062393; x=1697667193;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o2Bh9gNnh3A0IybhaZX53wHaJJr5epn3uPcTBo/IM8Q=;
-        b=SmUrL1a+oesiNbZrUJtk5il6oQ8HcoyLsgddrvPm9beUFLbVbdUTFLLNuz7ffst1n1
-         5IVR8JFlSoTji3D2qinyXODQAnrlAwoZ74YKdvTgIUXev3BOy30HdJB0Npugak+V+IEy
-         5UGUD+KpCe15zlzUjeahCNPvjo6UuBHFE50VXBh122eVlmUx756KxO69XDT9rlWCGOlH
-         09fMmK25mVDyTJaMiyLIcjBpn2l9MbNhqlQniHJSNpcftyFaElOYQxgalJku9wEHEYnq
-         PWAg8hbIaRSEfkGCKohAm2Sl3A4ROVI9h/MYNgn/IM2Ti3LT1lwh9dCwpHWTiniGS91M
-         /LEQ==
-X-Gm-Message-State: AOJu0YywUicGy/gR5gnmBD726YS0j0ebqD9Pjih9H1Or58QYmfsZeREz
-	RHzepipCXY49SsFQUYsQ2T5SBQgQrcObfl2Sy5TzCAotKKzrKV0eNnuH4+K7WeEnnnmlYjmskQO
-	xvUHr7tfRTTJBHw6LT6hVflo5fxSqgP9Mvo2UrnlEX/NSCHMItu3xyOWxdoTOs7u7Xte4kWOBoU
-	hMgmpzLKemzw==
-X-Google-Smtp-Source: AGHT+IFQ7rVYihdm5ov2ofoywW3yR40k8HlUPajh4MrjweNC5l5BdJZ0cx+WSHEn6g/PhmS//jilJQ==
-X-Received: by 2002:a05:620a:24c1:b0:76d:aa93:2e3c with SMTP id m1-20020a05620a24c100b0076daa932e3cmr26636543qkn.24.1697062391185;
-        Wed, 11 Oct 2023 15:13:11 -0700 (PDT)
+        bh=vgBfKQI+bcdgnUJLRPi9K81lb/kb64EIO01uYuyTmK0=;
+        b=O5j6pIv0u4+X2qqr8/YuNUVEWBSdoRK5QGJY04sRu5HsIixhqjqfp7oz9AJ6DtOZLy
+         DGvZfE07lEUDPA4RXf09Pr7oUNtjiLCKfreVmFGIvz63MXSAUz5tCuUW+pu6aFKKJhF7
+         SUC+YcYLABjNKvzUeer85+Ky0e6cdj9NG12+sZbwIdBTw8JYFU0P4+cV6SJ5JEU3Vyof
+         fNu9un3twL+RDZpinToKPLcZY55uTMcVZZcvZScX6hUDm9QE6h0VKFIy/7NvcNM3uE72
+         wgLXEdN8ZwLue+JlCuOxDCtkfOB1n96MhQxdeyHKep05V/U6fqnAKgkwdkUUGopFKg7v
+         vOQQ==
+X-Gm-Message-State: AOJu0YzxF6TP6KfeN85Q88Ab41bOooPxkF3GwkEoxq6JWMcbOwSGFxiq
+	zBjhVchrIIKfQC44vj3sUi/LV1opTfzXjaEQGDr/qbRslOvF0afz2uZhtyn8Ky6PwTExGlk9Tv+
+	l/Zhu3+bBaKdJNQ5BTzJzCPHYzxUA9/5UC2QfBg+G603ZD9gsG2xAmPHuBF7Ys8azqnncBF7jsl
+	3pJksqdobo/w==
+X-Google-Smtp-Source: AGHT+IE0DsHWYfnklFYHHNKa9TfNNc/z6g4z5e4XKLQqLNohgJTeJLS1BbSIiD6Ara1XTcHPYgRnjQ==
+X-Received: by 2002:a05:620a:c45:b0:76c:b7f0:2bc9 with SMTP id u5-20020a05620a0c4500b0076cb7f02bc9mr27782993qki.16.1697062393404;
+        Wed, 11 Oct 2023 15:13:13 -0700 (PDT)
 Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id a12-20020a05620a102c00b007759a81d88esm5505705qkk.50.2023.10.11.15.13.09
+        by smtp.gmail.com with ESMTPSA id a12-20020a05620a102c00b007759a81d88esm5505705qkk.50.2023.10.11.15.13.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 15:13:10 -0700 (PDT)
+        Wed, 11 Oct 2023 15:13:12 -0700 (PDT)
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 To: netdev@vger.kernel.org
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -70,9 +70,9 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
 	opendmb@gmail.com,
 	justin.chen@broadcom.com,
 	Michal Kubecek <mkubecek@suse.cz>
-Subject: [PATCH ethtool 1/2] update UAPI header copies for WAKE_MDA support
-Date: Wed, 11 Oct 2023 15:12:40 -0700
-Message-Id: <20231011221242.4180589-3-florian.fainelli@broadcom.com>
+Subject: [PATCH net-next 2/2] net: phy: broadcom: Add support for WAKE_MDA
+Date: Wed, 11 Oct 2023 15:12:41 -0700
+Message-Id: <20231011221242.4180589-4-florian.fainelli@broadcom.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
 References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000002c7a406077821d7"
+	boundary="000000000000257b7a060778217b"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED
@@ -91,66 +91,55 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---00000000000002c7a406077821d7
+--000000000000257b7a060778217b
 Content-Transfer-Encoding: 8bit
+
+Add support for waking-up from a custom MAC destination address which
+involves programming the BCM54XX_WOL_MPD_DATA2() and
+BCM54XX_WOL_MASK() register groups.
 
 Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- uapi/linux/ethtool.h         | 10 ++++++++--
- uapi/linux/ethtool_netlink.h |  1 +
- 2 files changed, 9 insertions(+), 2 deletions(-)
+ drivers/net/phy/bcm-phy-lib.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
-index 1d0731b3d289..32eb2aac542c 100644
---- a/uapi/linux/ethtool.h
-+++ b/uapi/linux/ethtool.h
-@@ -205,12 +205,17 @@ struct ethtool_drvinfo {
-  * @wolopts: Bitmask of %WAKE_* flags for enabled Wake-On-Lan modes.
-  * @sopass: SecureOn(tm) password; meaningful only if %WAKE_MAGICSECURE
-  *	is set in @wolopts.
-+ * @mac_da: Destination MAC address to match; meaningful only if
-+ *	%WAKE_MDA is set in @wolopts.
-  */
- struct ethtool_wolinfo {
- 	__u32	cmd;
- 	__u32	supported;
- 	__u32	wolopts;
--	__u8	sopass[SOPASS_MAX];
-+	union {
-+		__u8	sopass[SOPASS_MAX];
-+		__u8	mac_da[ETH_ALEN];
-+	};
- };
+diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
+index 876f28fd8256..00c0424f7b63 100644
+--- a/drivers/net/phy/bcm-phy-lib.c
++++ b/drivers/net/phy/bcm-phy-lib.c
+@@ -827,7 +827,8 @@ EXPORT_SYMBOL_GPL(bcm_phy_cable_test_get_status_rdb);
+ 					 WAKE_MCAST | \
+ 					 WAKE_BCAST | \
+ 					 WAKE_MAGIC | \
+-					 WAKE_MAGICSECURE)
++					 WAKE_MAGICSECURE | \
++					 WAKE_MDA)
  
- /* for passing single values */
-@@ -1987,8 +1992,9 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
- #define WAKE_MAGIC		(1 << 5)
- #define WAKE_MAGICSECURE	(1 << 6) /* only meaningful if WAKE_MAGIC */
- #define WAKE_FILTER		(1 << 7)
-+#define WAKE_MDA		(1 << 8)
+ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ {
+@@ -908,6 +909,8 @@ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ 			eth_broadcast_addr(da);
+ 		} else if (wol->wolopts & WAKE_MAGICSECURE) {
+ 			ether_addr_copy(da, wol->sopass);
++		} else if (wol->wolopts & WAKE_MDA) {
++			ether_addr_copy(da, wol->mac_da);
+ 		} else if (wol->wolopts & WAKE_MAGIC) {
+ 			memset(da, 0, sizeof(da));
+ 			memset(mask, 0xff, sizeof(mask));
+@@ -1010,6 +1013,8 @@ void bcm_phy_get_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
+ 	}
  
--#define WOL_MODE_COUNT		8
-+#define WOL_MODE_COUNT		9
- 
- /* L2-L4 network traffic flow types */
- #define	TCP_V4_FLOW	0x01	/* hash or spec (tcp_ip4_spec) */
-diff --git a/uapi/linux/ethtool_netlink.h b/uapi/linux/ethtool_netlink.h
-index a8b0d79dad95..6e168dd7eb1c 100644
---- a/uapi/linux/ethtool_netlink.h
-+++ b/uapi/linux/ethtool_netlink.h
-@@ -300,6 +300,7 @@ enum {
- 	ETHTOOL_A_WOL_HEADER,			/* nest - _A_HEADER_* */
- 	ETHTOOL_A_WOL_MODES,			/* bitset */
- 	ETHTOOL_A_WOL_SOPASS,			/* binary */
-+	ETHTOOL_A_WOL_MAC_DA,			/* binary */
- 
- 	/* add new constants above here */
- 	__ETHTOOL_A_WOL_CNT,
+ 	if (ctl & BCM54XX_WOL_DIR_PKT_EN) {
++		memcpy(wol->mac_da, da, sizeof(da));
++		wol->wolopts |= WAKE_MDA;
+ 		if (is_broadcast_ether_addr(da))
+ 			wol->wolopts |= WAKE_BCAST;
+ 		else if (is_multicast_ether_addr(da))
 -- 
 2.34.1
 
 
---00000000000002c7a406077821d7
+--000000000000257b7a060778217b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -221,15 +210,15 @@ kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
 NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
 AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
 LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILyEFIXJ/feKZGNf
-oopjkdRfoveOxPjY+u39J+Rd6L4LMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMTAxMTIyMTMxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHzwrCdQYhGn2jyP
+73huo7odSIkoFuPOSgstLa+Xr3v6MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAxMTIyMTMxM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
 AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAPbceK8UY6KoP75+Kw9o2zKKmqXG/HxPgf
-dEnJVcHg5dTR5IH7kQeYUZE3VSV0DtdJ5y8pOd++B55jB928LJGMxMR7MFUIKWgt0OJ0irpVUIWw
-GE5j+Bhu4P5PZzUzdtUOK9PKv80gf4LmCHe6neUxwU2VdWJA1Lk+szYmyK/qWbukcuBWlBC/XX5B
-TzEh6Xi2WqvFZkkbzSeCVeTJf6sBUO3+kCNtK+dVZuElsHmiOBRZ7XizANMZ7ZrxexZYroxrrTpj
-bGr3ErJd60Br9lNHwWAycKWp1GD32sQu/zWSpsbcWM4qUqqjCw47b5tW1Yfl33vx4aNmQcgbi3WZ
-E3Bu
---00000000000002c7a406077821d7--
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCw5cohc616tV/o9nB9bmaz5Cuos0oDrA82
++3eYNr6d9RSTQa0fT+2TYh3RKQtgKJk/Z/z0TsHEIkhi2RqXACbCW6zlmPA40iltfDtua4zDQv7n
+uKySpZp9reeci+UuMz6PQlND6HiEUGBokIu9mHp27sP/ufebtVr/wYRyfISQKC/olPwbkyhW+xRl
+SkoeXIbaL+Y2YjEkIYs7fPcfbdk0crgBEjRVsLfb61ZLwEy8W1A7F0tjHTI8iRMquHUKcWFTvp0z
+1K5ZX5zYSb+82/RMJeKOcYNvZ+/qYUbSFpU/ktVmXi8CBHCn7we5fyqGgsxI/3V/93PInWrGxbDP
+Ymz+
+--000000000000257b7a060778217b--
 
