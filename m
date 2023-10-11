@@ -1,147 +1,91 @@
-Return-Path: <netdev+bounces-40051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7BFC7C5904
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:20:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A6C37C590A
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 18:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02F4C1C20BA4
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:20:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231AC2828E9
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 16:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA49636AEE;
-	Wed, 11 Oct 2023 16:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC583AC0F;
+	Wed, 11 Oct 2023 16:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H98WJaL5"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="vNH1mUPK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76AF30F88
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 16:20:45 +0000 (UTC)
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA493B0
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:20:43 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-27d1a03f540so60534a91.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697041243; x=1697646043; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j9lJljhG7J0NRk5jXquLEzmz4kKiNkfUkpiLpvv0v7g=;
-        b=H98WJaL5RfVoiaalQKFNSgD07kq9V2RvVV0fx+6MFZ2fwuvqP7ctj4r8HYXc0swock
-         ruSVU0YrcEJdryMYf4joPZ8F078hcQz7vF8R2cVwCeyaHRGLEOK4290BQb3cfu5WXOYB
-         WkZCM+kPzD0yeMQOYBs/J7NrAT8J+2kfGfaVU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697041243; x=1697646043;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j9lJljhG7J0NRk5jXquLEzmz4kKiNkfUkpiLpvv0v7g=;
-        b=l5eGy9fe2nbfbpFvhpzVZf89EuZZ3gOjNHCBXKamHr81taXJsObqQW/phFgHtVMH0t
-         o1epkiPFW2p8sLk6OUMJ8Fv9JVR+j8KMJp//s9KWIjkgzpXqEoTo1MHPfx+chlc7TFrT
-         dxE+0VQfrO8QDOVbgJ2nphaD+W+qzEZB3UvTZKoOlGOQVx2zj+axkJ3Mb7/o/23su4t0
-         Xze//g4kmq6v2JRfhvEFlvkhnzj+6p3WskLwzAglF9F0i4mNHpsnfbd3kZYqhY7i7C5D
-         w8AC3221nwcPjm8K4S1qdCfoc4NLtUeGXUZhHbKcsV58Lk1WGpRfbxyz8Yf7HGbqRpN2
-         4ckg==
-X-Gm-Message-State: AOJu0Yx6BhHyiZ/DoMqL8gOVAxlTYstp4LftTF7+7Fvbdq2xdzvb+HfV
-	3lg+thT87OoLmAhEsgKqKqabLA==
-X-Google-Smtp-Source: AGHT+IFBkkzjfqUFPw2LHU/WJiBG51hkvc97uk8G4hhO5uBiGO2zJPFVWSMOQulsb16+hJ+LUaknmw==
-X-Received: by 2002:a17:90a:7541:b0:27c:eb7f:cd00 with SMTP id q59-20020a17090a754100b0027ceb7fcd00mr4432651pjk.22.1697041243325;
-        Wed, 11 Oct 2023 09:20:43 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id q7-20020a17090a178700b0027cf4c554dasm125627pja.11.2023.10.11.09.20.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 09:20:42 -0700 (PDT)
-Date: Wed, 11 Oct 2023 09:20:39 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Edward AD <twuufnxlz@gmail.com>
-Cc: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com,
-	davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com, marcel@holtmann.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] Bluetooth: hci_sock: fix slab oob read in
- create_monitor_event
-Message-ID: <202310110908.F2639D3276@keescook>
-References: <000000000000ae9ff70607461186@google.com>
- <20231010053656.2034368-2-twuufnxlz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D5930F88
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 16:21:53 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E9791
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 09:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=bZtFVgvbVAjM31h7NgC68RnZa/FNuu/zDs1Feq8HTpE=;
+	t=1697041311; x=1698250911; b=vNH1mUPKPMnKqJ4D+4GCzs55SbVHFM/kapRwrq3koWUagYT
+	qyJ3KRGhCk7YwtxCUoNu/W1mno64yIjCN9KNpQyQzMTeNGVlPCL5ykL5VdEt0Bw5QuqboVte5zW5s
+	5m08Lg7qoo9dvXRKQUVoWjTQj1WZm55jjIUzUJyvtHK3mFovDLRu2yMPuA3F2rrVJSDMs1LIxfwc8
+	kt1oEF7pssltqAQKcCSCw+//t1dDkU4w2Cfrw5UTWHBrOLGoKnBfCaTCk5ftzkVa0NqCwXRylKNau
+	TfGQRif0Dvo/tuAPF01+Ue56LY/KnqrjwsFkQnXLpf2lnuK6OXfMAHRd8EBtoXlA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97-RC1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qqby0-00000001zAF-2D6o;
+	Wed, 11 Oct 2023 18:21:48 +0200
+Message-ID: <1335ccffdaaa5a553717e42a855bba1a6f36dc9b.camel@sipsolutions.net>
+Subject: Re: [RFC] netlink: add variable-length / auto integers
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, nicolas.dichtel@6wind.com, fw@strlen.de, 
+	pablo@netfilter.org, mkubecek@suse.cz, aleksander.lobakin@intel.com
+Date: Wed, 11 Oct 2023 18:21:47 +0200
+In-Reply-To: <20231011091624.4057e456@kernel.org>
+References: <20231011003313.105315-1-kuba@kernel.org>
+	 <ZSanRz7kV1rduMBE@nanopsycho> <20231011091624.4057e456@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010053656.2034368-2-twuufnxlz@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 01:36:57PM +0800, Edward AD wrote:
-> When accessing hdev->name, the actual string length should prevail
-> 
-> Reported-by: syzbot+c90849c50ed209d77689@syzkaller.appspotmail.com
-> Fixes: dcda165706b9 ("Bluetooth: hci_core: Fix build warnings")
-> Signed-off-by: Edward AD <twuufnxlz@gmail.com>
-> ---
->  net/bluetooth/hci_sock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 5e4f718073b7..72abe54c45dd 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -488,7 +488,7 @@ static struct sk_buff *create_monitor_event(struct hci_dev *hdev, int event)
->  		ni->type = hdev->dev_type;
->  		ni->bus = hdev->bus;
->  		bacpy(&ni->bdaddr, &hdev->bdaddr);
-> -		memcpy(ni->name, hdev->name, 8);
-> +		memcpy(ni->name, hdev->name, strlen(hdev->name));
+On Wed, 2023-10-11 at 09:16 -0700, Jakub Kicinski wrote:
+>=20
+> > > +static inline int nla_put_uint(struct sk_buff *skb, int attrtype, u6=
+4 value)
+> > > +{
+> > > +	u64 tmp64 =3D value;
+> > > +	u32 tmp32 =3D value;
+> > > +
+> > > +	if (tmp64 =3D=3D tmp32)
+> > > +		return nla_put_u32(skb, attrtype, tmp32); =20
+> >=20
+> > It's a bit confusing, perheps better just to use nla_put() here as well=
+?
+>=20
+> I want to underscore the equivalency to u32 for smaller types.
 
-Uh, what's going on here?
+ITYM "smaller values".
 
-hdev is:
+Now I'm wondering if we should keep ourselves some option of going to
+even bigger values (128 bits) in some potential future, but I guess
+that's not really natively supported anywhere in the same way 64-bit is
+supposed on 32-bit.
 
-struct hci_dev {
-	...
-        const char      *name;
-
-ni is:
-
-struct hci_mon_new_index {
-        char            name[8];
-
-You can't use "strlen" here in the case that "hdev->name" is larger than
-8 bytes.
-
-Also, why memcpy() and not strscpy()? Is this supposed to be padded out
-with %NUL bytes? It appears to be sent over the network, so "yes" seems
-to be the safe answer.
-
-Should ni->name be always %NUL terminated? That I can't tell for sure,
-but I assume "no", because the solution was to explicitly copy all the
-bytes _except_ the %NUL byte (using strlen).
-
-struct hci_mon_new_index's "name" should be marked __nonstring, and
-instead strtomem_pad() should be used instead of memcpy.
-
--Kees
-
->  
->  		opcode = cpu_to_le16(HCI_MON_NEW_INDEX);
->  		break;
-> -- 
-> 2.25.1
-> 
-
--- 
-Kees Cook
+johannes
 
