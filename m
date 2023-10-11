@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-39838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-39839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E27A87C49B9
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:12:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E9C7C49BA
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 08:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAA4B1C20FB9
-	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:12:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CD292823C6
+	for <lists+netdev@lfdr.de>; Wed, 11 Oct 2023 06:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3AD111A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7817B1642A;
 	Wed, 11 Oct 2023 06:12:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmTd+RUS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNzBoYAn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E444615EBD
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:12:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 438ACC433C8;
-	Wed, 11 Oct 2023 06:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8C211CBE
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 06:12:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E55BC433C8;
+	Wed, 11 Oct 2023 06:12:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697004761;
-	bh=M+Z2nhIjy7/gp58Z5ErgM1xdgnFiBYeHcCIqdHolUyM=;
+	s=k20201202; t=1697004762;
+	bh=94RSAmmYfVMeVnGMRAhfoOAimdHk6P2xOnJ1FHSBw6Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tmTd+RUS6zRmNX5h4rn74bcogIeAQwBwimqDNBYORVPIR9z82ft2Pz6Q7FmSqBmjn
-	 wnml97c4bKMAbsjzFVh6TEhNgaVdEoue58o/LCbXTKs2JrtrCxujZsZP2+fp+O0hH4
-	 0TxRsMIK4e7fpBmxCqHz7jOKmsgHjkX0hF6mtMxVNoZym+RoRhz9v4eEtv6dNUr+FH
-	 Wup1AUeoQ2xwkMtKd7aBJlVTGZ1SBNLJlwn5hjHarBFUrVewDVqZUlkp/dj/sNAPsD
-	 KokQWF0zX24Qo0CRXYKhmRMns51mjw6ZA/94znyXyMBntF4oIkwrkAMiAHtKnhml3O
-	 T170gxUrjoj4w==
+	b=pNzBoYAn7NrDhfOys6H/YyHhNNOPRnnvzlJU+NUGueCi45owWi62rmznIVLUKtzPf
+	 E1WbuYjSzDK2Znx8wdRVWlqZmbgSvJzxoe2vCi1pOq4w1t7XVnk4gvY80XZAPwqg4w
+	 5wCflxZHYdkdGH47jz67pR9orcGtTxrzlAGUgk6tim64v3umWPD1QV7kta3BCIMUxX
+	 NPs8ca/aUZfZCVTlZx/hBQwPR40RY3DwYd9SWRVXf5wIRPMXWRG18DK2rZFZiMUk8e
+	 WnM8+Us6igFb/jqE1sOLaBqZaJ1LvTlgC+WqAS91vw3jzBTjOTzSvRL7Z8hqjhyvAk
+	 SaIpbdgKak5kA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Yu Liao <liaoyu15@huawei.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next 09/15] net/mlx5e: Use PTR_ERR_OR_ZERO() to simplify code
-Date: Tue, 10 Oct 2023 23:12:24 -0700
-Message-ID: <20231011061230.11530-10-saeed@kernel.org>
+	Adham Faris <afaris@nvidia.com>
+Subject: [net-next 10/15] net/mlx5e: Refactor rx_res_init() and rx_res_free() APIs
+Date: Tue, 10 Oct 2023 23:12:25 -0700
+Message-ID: <20231011061230.11530-11-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231011061230.11530-1-saeed@kernel.org>
 References: <20231011061230.11530-1-saeed@kernel.org>
@@ -56,43 +55,317 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yu Liao <liaoyu15@huawei.com>
+From: Adham Faris <afaris@nvidia.com>
 
-Use the standard error pointer macro to shorten the code and simplify.
+Refactor mlx5e_rx_res_init() and mlx5e_rx_res_free() by wrapping
+mlx5e_rx_res_alloc() and mlx5e_rx_res_destroy() API's respectively.
 
-Signed-off-by: Yu Liao <liaoyu15@huawei.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Adham Faris <afaris@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_fs.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ .../ethernet/mellanox/mlx5/core/en/rx_res.c   | 36 +++++++++++--------
+ .../ethernet/mellanox/mlx5/core/en/rx_res.h   | 11 +++---
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 24 ++++++-------
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  | 27 ++++++--------
+ .../ethernet/mellanox/mlx5/core/ipoib/ipoib.c | 24 +++++--------
+ 5 files changed, 56 insertions(+), 66 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-index 934b0d5ce1b3..777d311d44ef 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_fs.c
-@@ -1283,9 +1283,7 @@ static int mlx5e_create_inner_ttc_table(struct mlx5e_flow_steering *fs,
- 	mlx5e_set_inner_ttc_params(fs, rx_res, &ttc_params);
- 	fs->inner_ttc = mlx5_create_inner_ttc_table(fs->mdev,
- 						    &ttc_params);
--	if (IS_ERR(fs->inner_ttc))
--		return PTR_ERR(fs->inner_ttc);
--	return 0;
-+	return PTR_ERR_OR_ZERO(fs->inner_ttc);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+index 56e6b8c7501f..abbd08b6d1a9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
+@@ -284,7 +284,12 @@ struct mlx5e_rss *mlx5e_rx_res_rss_get(struct mlx5e_rx_res *res, u32 rss_idx)
+ 
+ /* End of API rx_res_rss_* */
+ 
+-struct mlx5e_rx_res *mlx5e_rx_res_alloc(void)
++static void mlx5e_rx_res_free(struct mlx5e_rx_res *res)
++{
++	kvfree(res);
++}
++
++static struct mlx5e_rx_res *mlx5e_rx_res_alloc(void)
+ {
+ 	return kvzalloc(sizeof(struct mlx5e_rx_res), GFP_KERNEL);
+ }
+@@ -404,13 +409,19 @@ static void mlx5e_rx_res_ptp_destroy(struct mlx5e_rx_res *res)
+ 	mlx5e_rqt_destroy(&res->ptp.rqt);
  }
  
- int mlx5e_create_ttc_table(struct mlx5e_flow_steering *fs,
-@@ -1295,9 +1293,7 @@ int mlx5e_create_ttc_table(struct mlx5e_flow_steering *fs,
+-int mlx5e_rx_res_init(struct mlx5e_rx_res *res, struct mlx5_core_dev *mdev,
+-		      enum mlx5e_rx_res_features features, unsigned int max_nch,
+-		      u32 drop_rqn, const struct mlx5e_packet_merge_param *init_pkt_merge_param,
+-		      unsigned int init_nch)
++struct mlx5e_rx_res *
++mlx5e_rx_res_create(struct mlx5_core_dev *mdev, enum mlx5e_rx_res_features features,
++		    unsigned int max_nch, u32 drop_rqn,
++		    const struct mlx5e_packet_merge_param *init_pkt_merge_param,
++		    unsigned int init_nch)
+ {
++	struct mlx5e_rx_res *res;
+ 	int err;
  
- 	mlx5e_set_ttc_params(fs, rx_res, &ttc_params, true);
- 	fs->ttc = mlx5_create_ttc_table(fs->mdev, &ttc_params);
--	if (IS_ERR(fs->ttc))
--		return PTR_ERR(fs->ttc);
++	res = mlx5e_rx_res_alloc();
++	if (!res)
++		return ERR_PTR(-ENOMEM);
++
+ 	res->mdev = mdev;
+ 	res->features = features;
+ 	res->max_nch = max_nch;
+@@ -421,7 +432,7 @@ int mlx5e_rx_res_init(struct mlx5e_rx_res *res, struct mlx5_core_dev *mdev,
+ 
+ 	err = mlx5e_rx_res_rss_init_def(res, init_nch);
+ 	if (err)
+-		goto err_out;
++		goto err_rx_res_free;
+ 
+ 	err = mlx5e_rx_res_channels_init(res);
+ 	if (err)
+@@ -431,14 +442,15 @@ int mlx5e_rx_res_init(struct mlx5e_rx_res *res, struct mlx5_core_dev *mdev,
+ 	if (err)
+ 		goto err_channels_destroy;
+ 
 -	return 0;
-+	return PTR_ERR_OR_ZERO(fs->ttc);
++	return res;
+ 
+ err_channels_destroy:
+ 	mlx5e_rx_res_channels_destroy(res);
+ err_rss_destroy:
+ 	__mlx5e_rx_res_rss_destroy(res, 0);
+-err_out:
+-	return err;
++err_rx_res_free:
++	mlx5e_rx_res_free(res);
++	return ERR_PTR(err);
  }
  
- int mlx5e_create_flow_steering(struct mlx5e_flow_steering *fs,
+ void mlx5e_rx_res_destroy(struct mlx5e_rx_res *res)
+@@ -446,11 +458,7 @@ void mlx5e_rx_res_destroy(struct mlx5e_rx_res *res)
+ 	mlx5e_rx_res_ptp_destroy(res);
+ 	mlx5e_rx_res_channels_destroy(res);
+ 	mlx5e_rx_res_rss_destroy_all(res);
+-}
+-
+-void mlx5e_rx_res_free(struct mlx5e_rx_res *res)
+-{
+-	kvfree(res);
++	mlx5e_rx_res_free(res);
+ }
+ 
+ u32 mlx5e_rx_res_get_tirn_direct(struct mlx5e_rx_res *res, unsigned int ix)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
+index 580fe8bc3cd2..4fa8366db31f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.h
+@@ -21,13 +21,12 @@ enum mlx5e_rx_res_features {
+ };
+ 
+ /* Setup */
+-struct mlx5e_rx_res *mlx5e_rx_res_alloc(void);
+-int mlx5e_rx_res_init(struct mlx5e_rx_res *res, struct mlx5_core_dev *mdev,
+-		      enum mlx5e_rx_res_features features, unsigned int max_nch,
+-		      u32 drop_rqn, const struct mlx5e_packet_merge_param *init_pkt_merge_param,
+-		      unsigned int init_nch);
++struct mlx5e_rx_res *
++mlx5e_rx_res_create(struct mlx5_core_dev *mdev, enum mlx5e_rx_res_features features,
++		    unsigned int max_nch, u32 drop_rqn,
++		    const struct mlx5e_packet_merge_param *init_pkt_merge_param,
++		    unsigned int init_nch);
+ void mlx5e_rx_res_destroy(struct mlx5e_rx_res *res);
+-void mlx5e_rx_res_free(struct mlx5e_rx_res *res);
+ 
+ /* TIRN getters for flow steering */
+ u32 mlx5e_rx_res_get_tirn_direct(struct mlx5e_rx_res *res, unsigned int ix);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index a2ae791538ed..4230990b74d2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -5325,10 +5325,6 @@ static int mlx5e_init_nic_rx(struct mlx5e_priv *priv)
+ 	enum mlx5e_rx_res_features features;
+ 	int err;
+ 
+-	priv->rx_res = mlx5e_rx_res_alloc();
+-	if (!priv->rx_res)
+-		return -ENOMEM;
+-
+ 	mlx5e_create_q_counters(priv);
+ 
+ 	err = mlx5e_open_drop_rq(priv, &priv->drop_rq);
+@@ -5340,12 +5336,16 @@ static int mlx5e_init_nic_rx(struct mlx5e_priv *priv)
+ 	features = MLX5E_RX_RES_FEATURE_PTP;
+ 	if (mlx5_tunnel_inner_ft_supported(mdev))
+ 		features |= MLX5E_RX_RES_FEATURE_INNER_FT;
+-	err = mlx5e_rx_res_init(priv->rx_res, priv->mdev, features,
+-				priv->max_nch, priv->drop_rq.rqn,
+-				&priv->channels.params.packet_merge,
+-				priv->channels.params.num_channels);
+-	if (err)
++
++	priv->rx_res = mlx5e_rx_res_create(priv->mdev, features, priv->max_nch, priv->drop_rq.rqn,
++					   &priv->channels.params.packet_merge,
++					   priv->channels.params.num_channels);
++	if (IS_ERR(priv->rx_res)) {
++		err = PTR_ERR(priv->rx_res);
++		priv->rx_res = NULL;
++		mlx5_core_err(mdev, "create rx resources failed, %d\n", err);
+ 		goto err_close_drop_rq;
++	}
+ 
+ 	err = mlx5e_create_flow_steering(priv->fs, priv->rx_res, priv->profile,
+ 					 priv->netdev);
+@@ -5375,12 +5375,11 @@ static int mlx5e_init_nic_rx(struct mlx5e_priv *priv)
+ 				    priv->profile);
+ err_destroy_rx_res:
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = NULL;
+ err_close_drop_rq:
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+ err_destroy_q_counters:
+ 	mlx5e_destroy_q_counters(priv);
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+ 	return err;
+ }
+ 
+@@ -5391,10 +5390,9 @@ static void mlx5e_cleanup_nic_rx(struct mlx5e_priv *priv)
+ 	mlx5e_destroy_flow_steering(priv->fs, !!(priv->netdev->hw_features & NETIF_F_NTUPLE),
+ 				    priv->profile);
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = NULL;
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+ 	mlx5e_destroy_q_counters(priv);
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+ }
+ 
+ static void mlx5e_set_mqprio_rl(struct mlx5e_priv *priv)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index 2fdb8895aecd..82dc27e31d9b 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -998,26 +998,22 @@ static int mlx5e_init_rep_rx(struct mlx5e_priv *priv)
+ 	struct mlx5_core_dev *mdev = priv->mdev;
+ 	int err;
+ 
+-	priv->rx_res = mlx5e_rx_res_alloc();
+-	if (!priv->rx_res) {
+-		err = -ENOMEM;
+-		goto err_free_fs;
+-	}
+-
+ 	mlx5e_fs_init_l2_addr(priv->fs, priv->netdev);
+ 
+ 	err = mlx5e_open_drop_rq(priv, &priv->drop_rq);
+ 	if (err) {
+ 		mlx5_core_err(mdev, "open drop rq failed, %d\n", err);
+-		goto err_rx_res_free;
++		goto err_free_fs;
+ 	}
+ 
+-	err = mlx5e_rx_res_init(priv->rx_res, priv->mdev, 0,
+-				priv->max_nch, priv->drop_rq.rqn,
+-				&priv->channels.params.packet_merge,
+-				priv->channels.params.num_channels);
+-	if (err)
++	priv->rx_res = mlx5e_rx_res_create(priv->mdev, 0, priv->max_nch, priv->drop_rq.rqn,
++					   &priv->channels.params.packet_merge,
++					   priv->channels.params.num_channels);
++	if (IS_ERR(priv->rx_res)) {
++		err = PTR_ERR(priv->rx_res);
++		mlx5_core_err(mdev, "Create rx resources failed, err=%d\n", err);
+ 		goto err_close_drop_rq;
++	}
+ 
+ 	err = mlx5e_create_rep_ttc_table(priv);
+ 	if (err)
+@@ -1041,11 +1037,9 @@ static int mlx5e_init_rep_rx(struct mlx5e_priv *priv)
+ 	mlx5_destroy_ttc_table(mlx5e_fs_get_ttc(priv->fs, false));
+ err_destroy_rx_res:
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = ERR_PTR(-EINVAL);
+ err_close_drop_rq:
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+-err_rx_res_free:
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+ err_free_fs:
+ 	mlx5e_fs_cleanup(priv->fs);
+ 	priv->fs = NULL;
+@@ -1059,9 +1053,8 @@ static void mlx5e_cleanup_rep_rx(struct mlx5e_priv *priv)
+ 	mlx5e_destroy_rep_root_ft(priv);
+ 	mlx5_destroy_ttc_table(mlx5e_fs_get_ttc(priv->fs, false));
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = ERR_PTR(-EINVAL);
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+ }
+ 
+ static void mlx5e_rep_mpesw_work(struct work_struct *work)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
+index baa7ef812313..2bf77a5251b4 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/ipoib/ipoib.c
+@@ -418,12 +418,6 @@ static int mlx5i_init_rx(struct mlx5e_priv *priv)
+ 		return -ENOMEM;
+ 	}
+ 
+-	priv->rx_res = mlx5e_rx_res_alloc();
+-	if (!priv->rx_res) {
+-		err = -ENOMEM;
+-		goto err_free_fs;
+-	}
+-
+ 	mlx5e_create_q_counters(priv);
+ 
+ 	err = mlx5e_open_drop_rq(priv, &priv->drop_rq);
+@@ -432,12 +426,13 @@ static int mlx5i_init_rx(struct mlx5e_priv *priv)
+ 		goto err_destroy_q_counters;
+ 	}
+ 
+-	err = mlx5e_rx_res_init(priv->rx_res, priv->mdev, 0,
+-				priv->max_nch, priv->drop_rq.rqn,
+-				&priv->channels.params.packet_merge,
+-				priv->channels.params.num_channels);
+-	if (err)
++	priv->rx_res = mlx5e_rx_res_create(priv->mdev, 0, priv->max_nch, priv->drop_rq.rqn,
++					   &priv->channels.params.packet_merge,
++					   priv->channels.params.num_channels);
++	if (IS_ERR(priv->rx_res)) {
++		err = PTR_ERR(priv->rx_res);
+ 		goto err_close_drop_rq;
++	}
+ 
+ 	err = mlx5i_create_flow_steering(priv);
+ 	if (err)
+@@ -447,13 +442,11 @@ static int mlx5i_init_rx(struct mlx5e_priv *priv)
+ 
+ err_destroy_rx_res:
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = ERR_PTR(-EINVAL);
+ err_close_drop_rq:
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+ err_destroy_q_counters:
+ 	mlx5e_destroy_q_counters(priv);
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+-err_free_fs:
+ 	mlx5e_fs_cleanup(priv->fs);
+ 	return err;
+ }
+@@ -462,10 +455,9 @@ static void mlx5i_cleanup_rx(struct mlx5e_priv *priv)
+ {
+ 	mlx5i_destroy_flow_steering(priv);
+ 	mlx5e_rx_res_destroy(priv->rx_res);
++	priv->rx_res = ERR_PTR(-EINVAL);
+ 	mlx5e_close_drop_rq(&priv->drop_rq);
+ 	mlx5e_destroy_q_counters(priv);
+-	mlx5e_rx_res_free(priv->rx_res);
+-	priv->rx_res = NULL;
+ 	mlx5e_fs_cleanup(priv->fs);
+ }
+ 
 -- 
 2.41.0
 
