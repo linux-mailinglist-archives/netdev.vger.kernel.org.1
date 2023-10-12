@@ -1,122 +1,108 @@
-Return-Path: <netdev+bounces-40348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A22E37C6D8F
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:03:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DC47C6D8D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B4E02828AB
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0388282830
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD7C25102;
-	Thu, 12 Oct 2023 12:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qjO9DbRx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3496425101;
+	Thu, 12 Oct 2023 12:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB7822EE6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:03:12 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A7BA9;
-	Thu, 12 Oct 2023 05:03:10 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CBslrH023887;
-	Thu, 12 Oct 2023 12:02:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=UwnvlILX10wd8eW3lTW+/kucpzhYMeZTj2OJc0Mjlm0=;
- b=qjO9DbRxlro0ypk4NLRIUY0akrkQDpDqUVzgsN2NjkJR31nP1EFCUlnefWgDgmkreTz4
- mTa+ZLnq1ivog3aaNOGmtef7cJQQYN+iTmppP0dyrNex0vV9k/qQuGxiIE5424mCQEZa
- aGDiflW33g6zFtBbVzRfEx5UjEsN1L+/zKvG9Hkviem+pF2lPcAs2vfv1VyK8akwnMw6
- 7pnlnqTsJdEUxcm+G3XFpzCVHNqbEj8nMMGjw0QNtVo/mCO2YanAr8WpLXTtcJS3esYM
- mlxYAdWzEN7V7EEWN8W/cdG2dYyQmPSf7cY+KwKHocs3+zSy9uiM0Jn/z4Ivkcg+mIxI Xw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpgbb88q9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 12:02:54 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CBt1i8024392;
-	Thu, 12 Oct 2023 12:02:33 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpgbb87uc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 12:02:33 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CC1X1A028191;
-	Thu, 12 Oct 2023 12:02:03 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkj1yfetg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 12:02:03 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CC22654850422
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 12:02:02 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1436F5805E;
-	Thu, 12 Oct 2023 12:02:02 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BF5B758059;
-	Thu, 12 Oct 2023 12:01:57 +0000 (GMT)
-Received: from [9.171.14.51] (unknown [9.171.14.51])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 12:01:57 +0000 (GMT)
-Message-ID: <a5f0f18e-4fe0-45b6-b962-f28bc9232293@linux.vnet.ibm.com>
-Date: Thu, 12 Oct 2023 17:31:55 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C9B22EE6
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:02:57 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60AD9A9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:02:55 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1qquOz-0008I6-1s; Thu, 12 Oct 2023 14:02:53 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] net: gso_test: release each segment individually
+Date: Thu, 12 Oct 2023 14:02:37 +0200
+Message-ID: <20231012120240.10447-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Bisected] [1b4fa28a8b07] Build failure "net/core/gso_test.c"
-Content-Language: en-US
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, willemb@google.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, abdhalee@linux.vnet.ibm.com,
-        sachinp@linux.vnet.com, mputtash@linux.vnet.com
-References: <79fbe35c-4dd1-4f27-acb2-7a60794bc348@linux.vnet.ibm.com>
- <20231012095746.GA26871@breakpoint.cc>
-From: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-In-Reply-To: <20231012095746.GA26871@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: p9RRXOpJ__9haWxZNh885aVaHS8foOjh
-X-Proofpoint-ORIG-GUID: _dR317mRYU1r6GCnKAZudttmZcIsBbl0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- bulkscore=0 malwarescore=0 spamscore=0 phishscore=0 mlxlogscore=688
- impostorscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310120098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Greetings,
+consume_skb() doesn't walk the segment list, so segments other than
+the first are leaked.
 
-Thank you Florian. I have tried the changes suggested by you and it 
-fixes the issue. With the suggested changes the problem is not seen.
+Move this skb_consume call into the loop.
 
-On 10/12/23 15:27, Florian Westphal wrote:
-> .linear_len = GSO_TEST_SIZE,
+Cc: Willem de Bruijn <willemb@google.com>
+Fixes: b3098d32ed6e ("net: add skb_segment kunit test")
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ net/core/gso_test.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
+diff --git a/net/core/gso_test.c b/net/core/gso_test.c
+index c4b13de6abfb..ceb684be4cbf 100644
+--- a/net/core/gso_test.c
++++ b/net/core/gso_test.c
+@@ -144,8 +144,8 @@ KUNIT_ARRAY_PARAM(gso_test, cases, gso_test_case_to_desc);
+ static void gso_test_func(struct kunit *test)
+ {
+ 	const int shinfo_size = SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
++	struct sk_buff *skb, *segs, *cur, *next, *last;
+ 	const struct gso_test_case *tcase;
+-	struct sk_buff *skb, *segs, *cur;
+ 	netdev_features_t features;
+ 	struct page *page;
+ 	int i;
+@@ -236,7 +236,10 @@ static void gso_test_func(struct kunit *test)
+ 		goto free_gso_skb;
+ 	}
+ 
+-	for (cur = segs, i = 0; cur; cur = cur->next, i++) {
++	last = segs->prev;
++	for (cur = segs, i = 0; cur; cur = next, i++) {
++		next = cur->next;
++
+ 		KUNIT_ASSERT_EQ(test, cur->len, sizeof(hdr) + tcase->segs[i]);
+ 
+ 		/* segs have skb->data pointing to the mac header */
+@@ -247,13 +250,14 @@ static void gso_test_func(struct kunit *test)
+ 		KUNIT_ASSERT_EQ(test, memcmp(skb_mac_header(cur), hdr, sizeof(hdr)), 0);
+ 
+ 		/* last seg can be found through segs->prev pointer */
+-		if (!cur->next)
+-			KUNIT_ASSERT_PTR_EQ(test, cur, segs->prev);
++		if (!next)
++			KUNIT_ASSERT_PTR_EQ(test, cur, last);
++
++		consume_skb(cur);
+ 	}
+ 
+ 	KUNIT_ASSERT_EQ(test, i, tcase->nr_segs);
+ 
+-	consume_skb(segs);
+ free_gso_skb:
+ 	consume_skb(skb);
+ }
 -- 
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
+2.41.0
 
 
