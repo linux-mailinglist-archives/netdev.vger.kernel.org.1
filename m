@@ -1,119 +1,170 @@
-Return-Path: <netdev+bounces-40320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 472097C6AC5
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:17:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C4237C6B37
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76D651C20DB7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:17:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9C41C20F0F
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB6C22EEB;
-	Thu, 12 Oct 2023 10:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCDDDDC5;
+	Thu, 12 Oct 2023 10:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="k6JFntva"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bN3f4Qk6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF4822336
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:17:25 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF1FBA9;
-	Thu, 12 Oct 2023 03:17:23 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39C7bZTp017956;
-	Thu, 12 Oct 2023 03:17:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=d+djpV289X90GjGTImlyzR3rGGKFxtvJnllV5lv1v8M=;
- b=k6JFntva6WFn24kjphD5nkC99GQjwno96LU2hXXwicvzLPJQXVDBvX3sS2jobt318uo+
- BE4KzyPuIgZl1ZC1WPDFkeNc0PEEb5yWGk6OhrmPPlDJ5xIgGKR/fyJlFNgv+cWq8Ldm
- /yuc1td3yPf5+TF2iFL8QBHXGI1ANl8FflFrpe6tF35vYzcc1XBVGtTz+6Gn60WE8w98
- ab7QFDyvjBT9J8pCWFYjfS8PHLAjR1uaY4a4LpLiF5XEQjXowNIDkWECRi8If1xqAfAZ
- c47tDTcmURoWtu1KdyjCMZJZ0DiSY4WW372N6gFVRkbTctN3Ylob5pNovUUgc43CFYav Bg== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3tp2pajs97-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 03:17:12 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 12 Oct
- 2023 03:17:10 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 12 Oct 2023 03:17:10 -0700
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 629AA3F7089;
-	Thu, 12 Oct 2023 03:17:10 -0700 (PDT)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <egallen@redhat.com>,
-        <hgani@marvell.com>, <kuba@kernel.org>, <mschmidt@redhat.com>,
-        <netdev@vger.kernel.org>, <srasheed@marvell.com>, <sedara@marvell.com>,
-        <vburru@marvell.com>, <vimleshk@marvell.com>
-Subject: [net PATCH v2] octeon_ep: update BQL sent bytes before ringing doorbell
-Date: Thu, 12 Oct 2023 03:17:06 -0700
-Message-ID: <20231012101706.2291551-1-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <PH0PR18MB47342FEB8D57162EE5765E3CC7D3A@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <PH0PR18MB47342FEB8D57162EE5765E3CC7D3A@PH0PR18MB4734.namprd18.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B5522F07
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:34:07 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960AC90;
+	Thu, 12 Oct 2023 03:34:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697106846; x=1728642846;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=ji8x2F8u0U0ggxefEbWPL9IJWQlQGGYyAuJIBploLj8=;
+  b=bN3f4Qk6kxsqtiPEdc7hozzc/lHyjyLmT9hB1THfw7cBEeXlPkp2ydv4
+   A5RWqQuNNWZM4AHxz7lFg/5vYZlLPnq3fbNSRje7q8fucWjt+5h6iHSUq
+   lV2n0tt63s27D4mcreO06tcglJUm++kPYTWNkmUiUTT9Su1BNqB0btepP
+   v2x/eCjoYn4Z/KmXkMXUfrnzCL0uqLlTPy7VYz2lRVcyCOX1YVtOgi8hz
+   PXk3wjIBqd57RZhJI714m3FQ9sIPDHK0wEz4wFbNmHdxX/NDdcpf5ZU/a
+   IrodtZrjUd3H3whvPsp1yjwKL187hu6QXV/0zKS3Pt5cD0Ws99XtR3TbB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="388748393"
+X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
+   d="scan'208";a="388748393"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:34:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10860"; a="870527710"
+X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
+   d="scan'208";a="870527710"
+Received: from asroczyn-mobl.ger.corp.intel.com ([10.249.36.107])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 03:34:00 -0700
+Date: Thu, 12 Oct 2023 13:29:49 +0300 (EEST)
+From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, 
+    Rob Herring <robh@kernel.org>, 
+    =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>, 
+    Lukas Wunner <lukas@wunner.de>, "Rafael J . Wysocki" <rafael@kernel.org>, 
+    Heiner Kallweit <hkallweit1@gmail.com>, 
+    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
+    LKML <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+    ath10k@lists.infradead.org, ath11k@lists.infradead.org, 
+    ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org, 
+    linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+    linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org, 
+    linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 04/13] PCI/ASPM: Move L0S/L1/sub states mask calculation
+ into a helper
+In-Reply-To: <20231011193206.GA1039708@bhelgaas>
+Message-ID: <bcecb577-bf69-e854-6f59-f4cb26c4b354@linux.intel.com>
+References: <20231011193206.GA1039708@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: o_Q5_OqbUIffA3x3swIX-MUTG36zW6eh
-X-Proofpoint-ORIG-GUID: o_Q5_OqbUIffA3x3swIX-MUTG36zW6eh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="8323329-1380828921-1697106845=:1692"
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sometimes Tx is completed immediately after doorbell is updated, which
-causes Tx completion routing to update completion bytes before the
-same packet bytes are updated in sent bytes in transmit function, hence
-hitting BUG_ON() in dql_completed(). To avoid this, update BQL
-sent bytes before ringing doorbell.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Fixes: 37d79d059606 ("octeon_ep: add Tx/Rx processing and interrupt support")
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V1 -> V2: Call netdev_tx_sent_queue before memory barrier
+--8323329-1380828921-1697106845=:1692
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index dbc518ff8276..15420325aef3 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -715,6 +715,7 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 		hw_desc->dptr = tx_buffer->sglist_dma;
- 	}
- 
-+	netdev_tx_sent_queue(iq->netdev_q, skb->len);
- 	/* Flush the hw descriptor before writing to doorbell */
- 	wmb();
- 
-@@ -726,7 +727,6 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 		wi = 0;
- 	iq->host_write_index = wi;
- 
--	netdev_tx_sent_queue(iq->netdev_q, skb->len);
- 	iq->stats.instr_posted++;
- 	skb_tx_timestamp(skb);
- 	return NETDEV_TX_OK;
+> On Mon, Sep 18, 2023 at 04:10:54PM +0300, Ilpo Järvinen wrote:
+> > ASPM service driver does the same L0S / L1S / sub states allowed
+> > calculation in __pci_disable_link_state() and
+> > pci_set_default_link_state().
+> 
+> Is there a typo or something here?  This patch only adds a call to
+> __pci_disable_link_state(), not to pci_set_default_link_state().
+
+This was because one of the changes that got included in the meantime made 
+the state handling in those two functions to differ so I removed the call 
+from the code but forgot to update the changelog to match the code. I'll 
+fix the changelog.
+
 -- 
-2.25.1
+ i.
 
+
+> > Create a helper to calculate the mask for the allowed states.
+> > 
+> > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> > ---
+> >  drivers/pci/pcie/aspm.c | 33 +++++++++++++++++++++------------
+> >  1 file changed, 21 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> > index ec6d7a092ac1..91dc95aca90f 100644
+> > --- a/drivers/pci/pcie/aspm.c
+> > +++ b/drivers/pci/pcie/aspm.c
+> > @@ -1034,6 +1034,26 @@ static struct pcie_link_state *pcie_aspm_get_link(struct pci_dev *pdev)
+> >  	return bridge->link_state;
+> >  }
+> >  
+> > +static u8 pci_link_state_mask(int state)
+> > +{
+> > +	u8 result = 0;
+> > +
+> > +	if (state & PCIE_LINK_STATE_L0S)
+> > +		result |= ASPM_STATE_L0S;
+> > +	if (state & PCIE_LINK_STATE_L1)
+> > +		result |= ASPM_STATE_L1;
+> > +	if (state & PCIE_LINK_STATE_L1_1)
+> > +		result |= ASPM_STATE_L1_1;
+> > +	if (state & PCIE_LINK_STATE_L1_2)
+> > +		result |= ASPM_STATE_L1_2;
+> > +	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
+> > +		result |= ASPM_STATE_L1_1_PCIPM;
+> > +	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
+> > +		result |= ASPM_STATE_L1_2_PCIPM;
+> > +
+> > +	return result;
+> > +}
+> > +
+> >  static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
+> >  {
+> >  	struct pcie_link_state *link = pcie_aspm_get_link(pdev);
+> > @@ -1063,18 +1083,7 @@ static int __pci_disable_link_state(struct pci_dev *pdev, int state, bool sem)
+> >  	if (sem)
+> >  		down_read(&pci_bus_sem);
+> >  	mutex_lock(&aspm_lock);
+> > -	if (state & PCIE_LINK_STATE_L0S)
+> > -		link->aspm_disable |= ASPM_STATE_L0S;
+> > -	if (state & PCIE_LINK_STATE_L1)
+> > -		link->aspm_disable |= ASPM_STATE_L1;
+> > -	if (state & PCIE_LINK_STATE_L1_1)
+> > -		link->aspm_disable |= ASPM_STATE_L1_1;
+> > -	if (state & PCIE_LINK_STATE_L1_2)
+> > -		link->aspm_disable |= ASPM_STATE_L1_2;
+> > -	if (state & PCIE_LINK_STATE_L1_1_PCIPM)
+> > -		link->aspm_disable |= ASPM_STATE_L1_1_PCIPM;
+> > -	if (state & PCIE_LINK_STATE_L1_2_PCIPM)
+> > -		link->aspm_disable |= ASPM_STATE_L1_2_PCIPM;
+> > +	link->aspm_disable |= pci_link_state_mask(state);
+> >  	pcie_config_aspm_link(link, policy_to_aspm_state(link));
+> >  
+> >  	if (state & PCIE_LINK_STATE_CLKPM)
+
+
+--8323329-1380828921-1697106845=:1692--
 
