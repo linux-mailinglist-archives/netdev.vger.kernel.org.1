@@ -1,89 +1,126 @@
-Return-Path: <netdev+bounces-40217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F257C61F6
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 02:44:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5CEA7C620C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 03:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A3191C20A1E
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:44:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C65D282484
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 01:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59297632;
-	Thu, 12 Oct 2023 00:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8357F652;
+	Thu, 12 Oct 2023 01:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mjbi5eqa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJ94F66V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD2862F
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:44:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A453EC433C7;
-	Thu, 12 Oct 2023 00:44:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697071447;
-	bh=gii1/SY/IIQ0trlQ2uqpr/lhWhqx2RSOhlKsZb9MFHc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mjbi5eqaRXNH3pe4v932grqsl0vVi3OqQtAF6gzwv9ba9dgmTy9bxxB1gl9HDL5tU
-	 +h7byR2/28RgO5vK3WIAbf6dbDgC1+T1h2yKrjT8ftknEZjlqfho7k8yA6tLEAkUg8
-	 wveMITdldXXDmJ2Z+sFHSM4exaq/LxWHXgfXGqgZRDBU2u9ZfmxBKm2fRPdesDxD+j
-	 IsbkdzUFYG94oLEWV8pML48aPj4gpCoJw1uMQMIRR0dnJcWCsSa8TyN3hnu39AdUXG
-	 2oJNdZk4uRnMPbyUkgseSIBRTEEHjCuugJeBQqJYHwzQ10ZaWOspWbxEE8ihwLEcM7
-	 d40+yzz1jOmrg==
-Date: Thu, 12 Oct 2023 08:43:56 +0800
-From: Shawn Guo <shawnguo@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Networking <netdev@vger.kernel.org>, Frank Li <Frank.Li@nxp.com>,
-	Haibo Chen <haibo.chen@nxp.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the imx-mxs tree with the net tree
-Message-ID: <20231012004356.GR819755@dragon>
-References: <20231012101434.1e5e7340@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB9362F
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 01:08:14 +0000 (UTC)
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E1BA4;
+	Wed, 11 Oct 2023 18:08:12 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d9a6b21d1daso495455276.3;
+        Wed, 11 Oct 2023 18:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697072891; x=1697677691; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q4XdKBSiKJOkL+MzxkZtnmYwHSE6NfuwxJcHbqMJt+4=;
+        b=FJ94F66VXsi58wqSCmeCfWcUX8k0hSO9Q7Qhu3nvVoHsATkymZm8dXO52JY14y3ll6
+         bjG+GpI6Eky3kXw8J/oOO+GTu8EaepGzSuXEtrl4cyd4tJCjfnFOzPGcvyLZL40qo5m+
+         /JlGp00YtJXJelZcDzSgHUwQeat2M4Y2sehXIArYESncgPFRyAf4GS3bIrKG/sKaI+8b
+         +OEiDSX+6WP4vG6pkwzd6g7IZQGi0axbadkcBA9UYQIahMSR1jqRHm11jz0NzD6tGSrh
+         XVPBddbPTXD3Yw5diimhdnPPKj+kNV0LpYohuQx+Lj+lsmqVykDcSmuTvokXEYeh44Uq
+         8+aQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697072891; x=1697677691;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q4XdKBSiKJOkL+MzxkZtnmYwHSE6NfuwxJcHbqMJt+4=;
+        b=qlVQo6J5sUW5FstCTm/kH6dYWCvBuExR/eiGjYUvz4LXrEeQDOnosmlR3PpGK4BdK7
+         7H/A3ciyxUZ3EMKrXfzLzInuWL4hI8/Mt6llLJvVIsA/fcoGUxmimiip2W5VpVPZBja7
+         GtQZryxe2I2C+h1FFsqw9LN75B5R4VTUyNe7JIe4G/wHAzK9O5puRhm1BUT0sM0HgJW8
+         l9kK1z0HyHOZbcW5QuKmBY/D/N8CVNrHXj6i1WVeiCLmR70tjlYm+WU6roMcQ9IxR1PS
+         fS6UHHcJdsueVe2AEhTQZzLTTQknXmFF74cPa23n3iFKEHhZRBF38yTRkiEr8Z/EMmBC
+         uTRA==
+X-Gm-Message-State: AOJu0YxnazZBnzZcc3ZDXc29QzeSYGizfBC6uKk1UUQh0G4GVfzXhD+4
+	Ve9+YPDohyrLa6apRhp2w4iF7owG5E3ZpXjIrCc=
+X-Google-Smtp-Source: AGHT+IENr/oeTnryZo3bVL80RuzCr5idt3tau25ZS+cjq7Apkt1xk7gcwUo3mPHZ5MeRrlTvJsvSbuCgoTiKZlb82eE=
+X-Received: by 2002:a25:18c1:0:b0:d81:61fd:ef5d with SMTP id
+ 184-20020a2518c1000000b00d8161fdef5dmr18975896yby.27.1697072891447; Wed, 11
+ Oct 2023 18:08:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012101434.1e5e7340@canb.auug.org.au>
+References: <20231008075221.61863-1-hayatake396@gmail.com> <20231010123235.4a6498da@kernel.org>
+ <CADFiAcKF08osdvd4EiXSR1YJ22TXrMu3b7ujkMTwAsEE8jzgOw@mail.gmail.com>
+ <20231010191019.12fb7071@kernel.org> <CADFiAcL-kAzpJJ+KAkvw2tH8H0-21kyOusPSPybcmkf3CM7w9g@mail.gmail.com>
+ <20231011094114.4d8f24c7@kernel.org>
+In-Reply-To: <20231011094114.4d8f24c7@kernel.org>
+From: takeru hayasaka <hayatake396@gmail.com>
+Date: Thu, 12 Oct 2023 10:08:00 +0900
+Message-ID: <CADFiAc+67wdcS5enobbty-_U9SGX9Mr-C_0ipU_KJAV+h-t_Tg@mail.gmail.com>
+Subject: Re: [PATCH net-next] ethtool: ice: Support for RSS settings to GTP
+ from ethtool
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 10:14:34AM +1100, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Today's linux-next merge of the imx-mxs tree got a conflict in:
-> 
->   arch/arm64/boot/dts/freescale/imx93.dtsi
-> 
-> between commit:
-> 
->   23ed2be5404d ("arm64: dts: imx93: add the Flex-CAN stop mode by GPR")
+> I think we should expose TEID as a field. It's easier to understand
+> the API if fields are all listed, and not implied by the flow hash.
 
-Marc,
+Jakub san Thank you for your feedback!
+I would like to make changes and send them as a patch for the next version.
 
-Is there any particular reason why this dts change needs to go via net
-tree?  Otherwise, could you drop it from net and let it go via i.MX tree?
-
-Shawn
-
-> 
-> from the net tree and commit:
-> 
->   d34d2aa594d0 ("arm64: dts: imx93: add edma1 and edma2")
-> 
-> from the imx-mxs tree.
-> 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
+2023=E5=B9=B410=E6=9C=8812=E6=97=A5(=E6=9C=A8) 1:41 Jakub Kicinski <kuba@ke=
+rnel.org>:
+>
+> On Wed, 11 Oct 2023 14:25:55 +0900 takeru hayasaka wrote:
+> > > Regarding the patch - you are only adding flow types, not a new field
+> > > (which are defined as RXH_*). If we want to hash on an extra field,
+> > > I think we need to specify that field as well?
+> >
+> > I've been really struggling with this...
+> > When I read the Intel ICE documentation, it suggests that in RSS, TEID
+> > can be an additional input.
+> > However, I couldn't think of a reason not to include TEID when
+> > enabling RSS for GTP cases.
+> >
+> > https://www.intel.com/content/www/us/en/content-details/617015/intel-et=
+hernet-controller-e810-dynamic-device-personalization-ddp-technology-guide.=
+html
+> > (cf. Table 8. Patterns and Input Sets for iavf RSS)
+> >
+> > However, for Flow Director, it's clear that you'd want to include the
+> > TEID field. But since I found that someone from Intel has already
+> > configured it to use TEID with Flow Director, I thought maybe we don't
+> > need to add the TEID parameter for now.
+> >
+> > https://patchwork.ozlabs.org/project/intel-wired-lan/cover/202101260652=
+06.137422-1-haiyue.wang@intel.com/
+> >
+> > If we want to include something other than TEID (e.g., QFI) in Flow
+> > Director, I think it would be better to prepare a new field.
+>
+> I think we should expose TEID as a field. It's easier to understand
+> the API if fields are all listed, and not implied by the flow hash.
 
