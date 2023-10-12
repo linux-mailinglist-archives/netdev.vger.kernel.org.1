@@ -1,121 +1,136 @@
-Return-Path: <netdev+bounces-40225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FAB7C641D
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:35:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D9D67C642D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:43:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5DE8282437
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 04:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7DCC28254A
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 04:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195552B759;
-	Thu, 12 Oct 2023 04:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647662B77F;
+	Thu, 12 Oct 2023 04:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Abz2obaK"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="Qz3pmMhl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C1B6116
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 04:35:23 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475E6A9;
-	Wed, 11 Oct 2023 21:35:21 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-406618d080eso6171955e9.2;
-        Wed, 11 Oct 2023 21:35:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A8D2B770
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 04:43:13 +0000 (UTC)
+Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274B3B7
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:43:12 -0700 (PDT)
+Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a7c95b8d14so7429127b3.3
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697085320; x=1697690120; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7WosZVTXUOEeXoWrox6z3tSDEIuK6BYXU7VnhYrOQfo=;
-        b=Abz2obaKCcFXHZMdHBGtU7VYc2C8izoDou+q0NFBo+gRLWyNzgY2Q6fbdBCKdVpIaS
-         paYWP3E3x8sSixMKxXLtY3liVmcSMxHSN1h72xqfcEniv3yq94WRU3PNv9eCiAwLYbST
-         u8hY/qSjBp/J8vWKF2xkwGw6wsRpHKDe1V/Xk+fEcY9TcBdIGttO+SmaPnXPdkKdSeRV
-         0PGRBPjcRNyyD5dUyDb1HyL/8BUtWdSyjryh61gfBjr4FmeWKqIX3aRqPGrZBbgOVmFn
-         YKy9QJLVH8GoqxilmsV2kknfKphDXNMraGgZJUttgRxruQcE4BJs3F1milXgf9zqDTUW
-         l63w==
+        d=umich.edu; s=google-2016-06-03; t=1697085791; x=1697690591; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hui30h64vLshR10fww6M29GXyrgaysgxLGB2PvuibEc=;
+        b=Qz3pmMhlHKgUD156RMyk2aEFe8r0kxtFf0hGGWLXxwXyBtre7Wx845Jf9A6IKTV3Rb
+         TEbXdmh0Gd4SuHHDqHJ8Mlv5TvlnxSlvDD2WjPW6X5B8tkwxK3jbUPWhbZ7PNa541Lt8
+         z927giZLe891jupYOYsNJW1SqedjjNn7hJlZoy06p5MLERdEIDaTrrgdA5hFOG076PpB
+         PHlbayiI4NanVrLjrfuE+Z74u9Q7hHO6QvOO8ibi991KtZ0p+r55NiqwN+qqKrXnERY3
+         /pisb2LVjmhyn12AMip8YcWB3oTE/GBlND+CkZ9qGRVV0nkbn7663pueSPuyHArOujjc
+         jzaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697085320; x=1697690120;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7WosZVTXUOEeXoWrox6z3tSDEIuK6BYXU7VnhYrOQfo=;
-        b=ZsNmGVDlG0j+LvF0ZiwJKHji49FrOCJy09Tw1d1zHVcbVG7ATEvC5AYLGQM9SyJ0pj
-         956N/wyty24Ei8c6av8n3hbrCPfY0bpzgrPOI6Ar8D5pVTZlzBSkoS0U6WAJFIuUzfc/
-         Gw2H8y460nKjvkwO5Zl4EMfFc+TrGc73wEIqHu2xUFkaeNv7wBGImBOAoTzZoMaIEwIf
-         pTz9DQLj1uw3QrIDvV3BYQhxLZeybx8wmmiU/m6PPg4qIK/SaBvrp0fpxvJly1xvhj05
-         f1My3D/aB7+Ga+E/ybkt3cmHdR1J+YW9bMxRNfh/nuu8jMtTVWaFcE1D2IWOoQKz1OAR
-         Oq0Q==
-X-Gm-Message-State: AOJu0YxEYLSvLH0iR/qGIBBGSR7m/0tysVDsyg1sKirbJplN2kjwutra
-	IG02UntNtsZsJhX30GLMq1g=
-X-Google-Smtp-Source: AGHT+IEMdBfINMg5wVoIJUHiN8ohSa4D2agSHU8u5m1PSGZ41FqRWyaFQksruR6jrWfdmas5zgNYbg==
-X-Received: by 2002:a05:600c:220b:b0:406:4242:e7df with SMTP id z11-20020a05600c220b00b004064242e7dfmr20647900wml.35.1697085319322;
-        Wed, 11 Oct 2023 21:35:19 -0700 (PDT)
-Received: from dreambig.dreambig.corp ([58.27.187.115])
-        by smtp.gmail.com with ESMTPSA id f12-20020a7bcd0c000000b003fefb94ccc9sm18246890wmj.11.2023.10.11.21.35.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 21:35:19 -0700 (PDT)
-From: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-To: horms@kernel.org,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-Subject: [PATCH v2] drivers: net: wwan: wwan_core.c: resolved spelling mistake
-Date: Thu, 12 Oct 2023 09:35:00 +0500
-Message-Id: <20231012043501.9610-1-m.muzzammilashraf@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1697085791; x=1697690591;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hui30h64vLshR10fww6M29GXyrgaysgxLGB2PvuibEc=;
+        b=sHx1dw1sFCRprzXLjj8+LFGqPwMmC1w6KeCHnTIE9jPcpT4dpAx8hAiT5/anBNCCEF
+         xUZUUH0V9fBXKTXnlKLRmCSjO1nGtIyf2ydVHyU4iKLDDtxWX8qZ8P1COifG8fs0XUFg
+         u9gpruCQnTH6rRcVCr6yp2L87wS+WPjOoYQrAHdqZ2akrMrqmmgFlBB2Nk2+trySXsSf
+         agp4PtTfaApNzd1KOGp409Zw5Pazc0YAzVTLEE8qk0UzO1KOpxDh2+rf1ovZloBKjJOd
+         ZnYmomThI5rD9w5202UNzVJlGowej884KLx7sx18BuTDCTjLS0epuYNurL7J4BehpGRZ
+         k6sg==
+X-Gm-Message-State: AOJu0YzpsK3bU/JseG2DgKScW6ZhJ2NsyLNCsBltQF8utBmJFkIdEktL
+	KAQC5OGCSJTfs9CQVNYWDfyMgmyNth9EPFE3E/zKcQ==
+X-Google-Smtp-Source: AGHT+IG0MTgX8ps5XL9XkfzqsRAHc1xu4VNxAQgOTDwDMNCuPWR6u6zZnrnTJJBx4iMuGOvm7byosGXzHPNC/Ji5d1Y=
+X-Received: by 2002:a81:71c2:0:b0:56d:43cb:da98 with SMTP id
+ m185-20020a8171c2000000b0056d43cbda98mr24486370ywc.29.1697085791362; Wed, 11
+ Oct 2023 21:43:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+ <20231009013912.4048593-2-fujita.tomonori@gmail.com> <CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
+ <20231012.125937.1346884503622296050.fujita.tomonori@gmail.com>
+In-Reply-To: <20231012.125937.1346884503622296050.fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Thu, 12 Oct 2023 00:43:00 -0400
+Message-ID: <CALNs47sAZNk4XRn4WMAbJeiYZwrzceqPJHZ7vi8SZYgVB_XSLA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, andrew@lunn.ch, greg@kroah.com, 
+	wedsonaf@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-resolved typing mistake from devce to device
+On Wed, Oct 11, 2023 at 11:59=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> >> +#![feature(const_maybe_uninit_zeroed)]
+> >
+> > The patch message should justify this addition and warn about it.
+>
+> I added the following to the commit log.
+>
+> This patch enables unstable const_maybe_uninit_zeroed feature for
+> kernel crate to enable unsafe code to handle a constant value with
+> uninitialized data. With the feature, the abstractions can initialize
+> a phy_driver structure with zero easily; instead of initializing all
+> the members by hand.
 
-changes since v1:
-	- resolved another typing mistake from concurent to
-	  concurrent
+Maybe also link something about its stability confidence?
+https://github.com/rust-lang/rust/pull/116218#issuecomment-1738534665
 
-Signed-off-by: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
----
- drivers/net/wwan/wwan_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> >> +    /// Executes software reset the PHY via BMCR_RESET bit.
+> >
+> > Markdown missing (multiple instances).
+>
+> Can you elaborate?
 
-diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index 87df60916960..72e01e550a16 100644
---- a/drivers/net/wwan/wwan_core.c
-+++ b/drivers/net/wwan/wwan_core.c
-@@ -302,7 +302,7 @@ static void wwan_remove_dev(struct wwan_device *wwandev)
- 
- static const struct {
- 	const char * const name;	/* Port type name */
--	const char * const devsuf;	/* Port devce name suffix */
-+	const char * const devsuf;	/* Port device name suffix */
- } wwan_port_types[WWAN_PORT_MAX + 1] = {
- 	[WWAN_PORT_AT] = {
- 		.name = "AT",
-@@ -1184,7 +1184,7 @@ void wwan_unregister_ops(struct device *parent)
- 	 */
- 	put_device(&wwandev->dev);
- 
--	rtnl_lock();	/* Prevent concurent netdev(s) creation/destroying */
-+	rtnl_lock();	/* Prevent concurrent netdev(s) creation/destroying */
- 
- 	/* Remove all child netdev(s), using batch removing */
- 	device_for_each_child(&wwandev->dev, &kill_list,
--- 
-2.27.0
+BMCR_RESET -> `BMCR_RESET` I believe
 
+> > +/// Represents the kernel's `struct mdio_device_id`.
+> > +pub struct DeviceId {
+> > +    /// Corresponds to `phy_id` in `struct mdio_device_id`.
+> > +    pub id: u32,
+> > +    mask: DeviceMask,
+> > +}
+>
+> It would be nice to explain why the field is `pub`.
+
+On this subject, I think it would be good to add
+
+    impl DeviceId {
+        #[doc(hidden)] // <- macro use only
+        pub const fn as_mdio_device_id(&self) ->
+bindings::mdio_device_id { /* ... */ }
+    }
+
+That makes more sense when creating the table, and `id` no longer has
+to be public.
+
+> > This patch could be split a bit too, but that is up to the maintainers.
+>
+> Yeah.
+
+Maybe it would make sense to put the macro in its own commit when you
+send the next version? That gets some attention on its own.
 
