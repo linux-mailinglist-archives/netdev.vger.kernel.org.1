@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-40289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0936F7C68E8
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:02:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6AED7C68EC
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:02:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B63322823F6
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:02:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB89F282995
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:02:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59712208D1;
-	Thu, 12 Oct 2023 09:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51706210EC;
+	Thu, 12 Oct 2023 09:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB31F93C
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79675208D7
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:02:39 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76083E7
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:02:35 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5B2E9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:02:36 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraM-0000CJ-Lr; Thu, 12 Oct 2023 11:02:26 +0200
+	id 1qqraM-0000CL-Lt; Thu, 12 Oct 2023 11:02:26 +0200
 Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraK-0016dM-WC; Thu, 12 Oct 2023 11:02:25 +0200
+	id 1qqraL-0016dN-0h; Thu, 12 Oct 2023 11:02:25 +0200
 Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
 	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.96)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqral-00FyMl-1O;
+	id 1qqral-00FyMl-1P;
 	Thu, 12 Oct 2023 11:02:24 +0200
 From: Johannes Zink <j.zink@pengutronix.de>
-Date: Thu, 12 Oct 2023 11:02:15 +0200
-Subject: [PATCH net-next 4/5] net: stmmac: ptp: stmmac_enable(): move
- change of plat->flags into mutex
+Date: Thu, 12 Oct 2023 11:02:16 +0200
+Subject: [PATCH net-next 5/5] net: stmmac: do not silently change auxiliary
+ snapshot capture channel
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v1-4-3eeca9e844fa@pengutronix.de>
+Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v1-5-3eeca9e844fa@pengutronix.de>
 References: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
 In-Reply-To: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
@@ -73,45 +73,60 @@ X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a preparation patch. The next patch will check if an external TS
-is active and return with an error. So we have to move the change of the
-plat->flags that tracks if external timestamping is enabled after that
-check.
+Even though the hardware theoretically supports up to 4 simultaneous
+auxiliary snapshot capture channels, the stmmac driver does support only
+a single channel to be active at a time.
 
-Prepare for this change and move the plat->flags change into the mutex
-and the if (on).
+Previously in case of a PTP_CLK_REQ_EXTTS request, previously active
+auxiliary snapshot capture channels were silently dropped and the new
+channel was activated.
+
+Instead of silently changing the state for all consumers, log an error
+and return -EBUSY if a channel is already in use in order to signal to
+userspace to disable the currently active channel before enabling another one.
 
 Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 60e3d3ff42f3..2a141db70c2e 100644
+index 2a141db70c2e..56683afc650c 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -192,17 +192,17 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+@@ -191,11 +191,23 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+ 					     priv->systime_flags);
  		write_unlock_irqrestore(&priv->ptp_lock, flags);
  		break;
- 	case PTP_CLK_REQ_EXTTS:
--		if (on)
--			priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
--		else
--			priv->plat->flags &= ~STMMAC_FLAG_EXT_SNAPSHOT_EN;
+-	case PTP_CLK_REQ_EXTTS:
++	case PTP_CLK_REQ_EXTTS: {
++		u8 channel;
++
  		mutex_lock(&priv->aux_ts_lock);
  		acr_value = readl(ptpaddr + PTP_ACR);
++		channel = ilog2(FIELD_GET(PTP_ACR_MASK, acr_value));
  		acr_value &= ~PTP_ACR_MASK;
- 		if (on) {
-+			priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
 +
+ 		if (on) {
++			if (FIELD_GET(PTP_ACR_MASK, acr_value)) {
++				netdev_err(priv->dev,
++					   "Cannot enable auxiliary snapshot %d as auxiliary snapshot %d is already enabled",
++					rq->extts.index, channel);
++				mutex_unlock(&priv->aux_ts_lock);
++				return -EBUSY;
++			}
++
+ 			priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
+ 
  			/* Enable External snapshot trigger */
- 			acr_value |= PTP_ACR_ATSEN(rq->extts.index);
- 			acr_value |= PTP_ACR_ATSFC;
-+		} else {
-+			priv->plat->flags &= ~STMMAC_FLAG_EXT_SNAPSHOT_EN;
- 		}
- 		netdev_dbg(priv->dev, "Auxiliary Snapshot %d %s.\n",
- 			   rq->extts.index, on ? "enabled" : "disabled");
+@@ -213,6 +225,7 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
+ 					 !(acr_value & PTP_ACR_ATSFC),
+ 					 10, 10000);
+ 		break;
++	}
+ 
+ 	default:
+ 		break;
 
 -- 
 2.39.2
