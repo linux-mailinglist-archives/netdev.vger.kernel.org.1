@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9021C7C7768
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BCE77C7769
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95ABC1C21319
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E496E282C7C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B693D3BE;
-	Thu, 12 Oct 2023 19:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBD13D968;
+	Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/yQSoMX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6aBdPRs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB47E3C6AD
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5151C43142;
-	Thu, 12 Oct 2023 19:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E71E3D39B
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7C5C43395;
+	Thu, 12 Oct 2023 19:53:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697140395;
-	bh=7U5IS50E8k0mMcflynttiMkdeY1RQyafLM9YsJBWJD4=;
+	s=k20201202; t=1697140396;
+	bh=6w+Qbp5FDzsN/+MdzSKHSBt3HZjqhvGNZ9eMDp8xgqk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=C/yQSoMXpP/C+gJgQe7jcyIwrQiAVPZffdPTc8gll/A0VU3H7f+QdsL2c5FrUto3n
-	 WZwxZbandmc/jbB8HUHB4oWSnzql5qZbmYsLzNwRLzotoiVKzmJuLv1jsl/yNP0R0K
-	 MyEa4Q+xtr2OPMC5QQJlEqa4rzJ5ySM9V7Jk0FguV8vJvmeXv6ZPCGYAHJSBs1j9X7
-	 XTpzaVxbM99WNdaYb6rv5rVg8sX5UV1G9pXU5O4oPwTF/1hvGVKpE4PswvS1AkrNYC
-	 v6RkKGMCEXmmU8KbMzuEbOaKJTo7odI64e5d5WBAZluT7xSgWWtBve8hgLE39PhtBR
-	 Pjk2S2KzPA3jw==
+	b=q6aBdPRsxOipPdXkr/e/3nAQ+Ff8HTA2L060xatp1QM2gIoocQmLjATmS1J9GHsSF
+	 U0NRGXAd1SITMDclHIQcg3EFYLmWslJ37cbcVD3UW508HPjQ4kEuN49NOOHCTRDKot
+	 FD/lf8dpHGUgdXWDmItXUwCflycfIH4EMiYUTzLyRiDvkgoNN4r5e4g1M/mJ/oX3tX
+	 jNVnJ3ajibDmyEj1vLeyqBPUYF18oOWRN8avssoGpI2D7hk18BXtWm3GYT3IwVHgHH
+	 rSlrJP1GoJM6Vp0eiKF4NrLKSAFIAxM4l49eOfVsmTe6CUaVTdr+t0bNZcQMfGSGE4
+	 3eB9i572Ftt/g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Lama Kayal <lkayal@nvidia.com>
-Subject: [net 08/10] net/mlx5e: Take RTNL lock before triggering netdev notifiers
-Date: Thu, 12 Oct 2023 12:51:25 -0700
-Message-ID: <20231012195127.129585-9-saeed@kernel.org>
+	Jianbo Liu <jianbol@nvidia.com>,
+	Ariel Levkovich <lariel@nvidia.com>
+Subject: [net 09/10] net/mlx5e: Don't offload internal port if filter device is out device
+Date: Thu, 12 Oct 2023 12:51:26 -0700
+Message-ID: <20231012195127.129585-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
 References: <20231012195127.129585-1-saeed@kernel.org>
@@ -55,138 +56,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Lama Kayal <lkayal@nvidia.com>
+From: Jianbo Liu <jianbol@nvidia.com>
 
-Hold RTNL lock when calling xdp_set_features() with a registered netdev,
-as the call triggers the netdev notifiers. This could happen when
-switching from nic profile to uplink representor for example.
+In the cited commit, if the routing device is ovs internal port, the
+out device is set to uplink, and packets go out after encapsulation.
 
-Similar logic which fixed a similar scenario was previously introduced in
-the following commit:
-commit 72cc65497065 net/mlx5e: Take RTNL lock when needed before calling
-xdp_set_features().
+If filter device is uplink, it can trigger the following syndrome:
+mlx5_core 0000:08:00.0: mlx5_cmd_out_err:803:(pid 3966): SET_FLOW_TABLE_ENTRY(0x936) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0xcdb051), err(-22)
 
-This fixes the following assertion and warning call trace:
+Fix this issue by not offloading internal port if filter device is out
+device. In this case, packets are not forwarded to the root table to
+be processed, the termination table is used instead to forward them
+from uplink to uplink.
 
-RTNL: assertion failed at net/core/dev.c (1961)
-WARNING: CPU: 13 PID: 2529 at net/core/dev.c:1961
-call_netdevice_notifiers_info+0x7c/0x80
-Modules linked in: rpcrdma rdma_ucm ib_iser libiscsi
-scsi_transport_iscsi ib_umad rdma_cm ib_ipoib iw_cm ib_cm mlx5_ib
-ib_uverbs ib_core xt_conntrack xt_MASQUERADE nf_conntrack_netlink
-nfnetlink xt_addrtype iptable_nat nf_nat br_netfilter rpcsec_gss_krb5
-auth_rpcgss oid_registry overlay mlx5_core zram zsmalloc fuse
-CPU: 13 PID: 2529 Comm: devlink Not tainted
-6.5.0_for_upstream_min_debug_2023_09_07_20_04 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-RIP: 0010:call_netdevice_notifiers_info+0x7c/0x80
-Code: 8f ff 80 3d 77 0d 16 01 00 75 c5 ba a9 07 00 00 48
-c7 c6 c4 bb 0d 82 48 c7 c7 18 c8 06 82 c6 05 5b 0d 16 01 01 e8 44 f6 8c
-ff <0f> 0b eb a2 0f 1f 44 00 00 55 48 89 e5 41 54 48 83 e4 f0 48 83 ec
-RSP: 0018:ffff88819930f7f0 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffffffff8309f740 RCX: 0000000000000027
-RDX: ffff88885fb5b5c8 RSI: 0000000000000001 RDI: ffff88885fb5b5c0
-RBP: 0000000000000028 R08: ffff88887ffabaa8 R09: 0000000000000003
-R10: ffff88887fecbac0 R11: ffff88887ff7bac0 R12: ffff88819930f810
-R13: ffff88810b7fea40 R14: ffff8881154e8fd8 R15: ffff888107e881a0
-FS:  00007f3ad248f800(0000) GS:ffff88885fb40000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000563b85f164e0 CR3: 0000000113b5c006 CR4: 0000000000370ea0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ? __warn+0x79/0x120
- ? call_netdevice_notifiers_info+0x7c/0x80
- ? report_bug+0x17c/0x190
- ? handle_bug+0x3c/0x60
- ? exc_invalid_op+0x14/0x70
- ? asm_exc_invalid_op+0x16/0x20
- ? call_netdevice_notifiers_info+0x7c/0x80
- call_netdevice_notifiers+0x2e/0x50
- mlx5e_set_xdp_feature+0x21/0x50 [mlx5_core]
- mlx5e_build_rep_params+0x97/0x130 [mlx5_core]
- mlx5e_init_ul_rep+0x9f/0x100 [mlx5_core]
- mlx5e_netdev_init_profile+0x76/0x110 [mlx5_core]
- mlx5e_netdev_attach_profile+0x1f/0x90 [mlx5_core]
- mlx5e_netdev_change_profile+0x92/0x160 [mlx5_core]
- mlx5e_vport_rep_load+0x329/0x4a0 [mlx5_core]
- mlx5_esw_offloads_rep_load+0x9e/0xf0 [mlx5_core]
- esw_offloads_enable+0x4bc/0xe90 [mlx5_core]
- mlx5_eswitch_enable_locked+0x3c8/0x570 [mlx5_core]
- ? kmalloc_trace+0x25/0x80
- mlx5_devlink_eswitch_mode_set+0x224/0x680 [mlx5_core]
- ? devlink_get_from_attrs_lock+0x9e/0x110
- devlink_nl_cmd_eswitch_set_doit+0x60/0xe0
- genl_family_rcv_msg_doit+0xd0/0x120
- genl_rcv_msg+0x180/0x2b0
- ? devlink_get_from_attrs_lock+0x110/0x110
- ? devlink_nl_cmd_eswitch_get_doit+0x290/0x290
- ? devlink_pernet_pre_exit+0xf0/0xf0
- ? genl_family_rcv_msg_dumpit+0xf0/0xf0
- netlink_rcv_skb+0x54/0x100
- genl_rcv+0x24/0x40
- netlink_unicast+0x1fc/0x2c0
- netlink_sendmsg+0x232/0x4a0
- sock_sendmsg+0x38/0x60
- ? _copy_from_user+0x2a/0x60
- __sys_sendto+0x110/0x160
- ? handle_mm_fault+0x161/0x260
- ? do_user_addr_fault+0x276/0x620
- __x64_sys_sendto+0x20/0x30
- do_syscall_64+0x3d/0x90
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f3ad231340a
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3
-0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f
-05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
-RSP: 002b:00007ffd70aad4b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000000000c36b00 RCX:00007f3ad231340a
-RDX: 0000000000000038 RSI: 0000000000c36b00 RDI: 0000000000000003
-RBP: 0000000000c36910 R08: 00007f3ad2625200 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000001
- </TASK>
----[ end trace 0000000000000000 ]---
-------------[ cut here ]------------
-
-Fixes: 4d5ab0ad964d ("net/mlx5e: take into account device reconfiguration for xdp_features flag")
-Signed-off-by: Lama Kayal <lkayal@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Fixes: 100ad4e2d758 ("net/mlx5e: Offload internal port as encap route device")
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Ariel Levkovich <lariel@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 2fdb8895aecd..5ca9bc337dc6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -769,6 +769,7 @@ static int mlx5e_rep_max_nch_limit(struct mlx5_core_dev *mdev)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+index 1730f6a716ee..b10e40e1a9c1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+@@ -24,7 +24,8 @@ static int mlx5e_set_int_port_tunnel(struct mlx5e_priv *priv,
  
- static void mlx5e_build_rep_params(struct net_device *netdev)
- {
-+	const bool take_rtnl = netdev->reg_state == NETREG_REGISTERED;
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
- 	struct mlx5e_rep_priv *rpriv = priv->ppriv;
- 	struct mlx5_eswitch_rep *rep = rpriv->rep;
-@@ -794,8 +795,15 @@ static void mlx5e_build_rep_params(struct net_device *netdev)
- 	/* RQ */
- 	mlx5e_build_rq_params(mdev, params);
+ 	route_dev = dev_get_by_index(dev_net(e->out_dev), e->route_dev_ifindex);
  
-+	/* If netdev is already registered (e.g. move from nic profile to uplink,
-+	 * RTNL lock must be held before triggering netdev notifiers.
-+	 */
-+	if (take_rtnl)
-+		rtnl_lock();
- 	/* update XDP supported features */
- 	mlx5e_set_xdp_feature(netdev);
-+	if (take_rtnl)
-+		rtnl_unlock();
+-	if (!route_dev || !netif_is_ovs_master(route_dev))
++	if (!route_dev || !netif_is_ovs_master(route_dev) ||
++	    attr->parse_attr->filter_dev == e->out_dev)
+ 		goto out;
  
- 	/* CQ moderation params */
- 	params->rx_dim_enabled = MLX5_CAP_GEN(mdev, cq_moderation);
+ 	err = mlx5e_set_fwd_to_int_port_actions(priv, attr, e->route_dev_ifindex,
 -- 
 2.41.0
 
