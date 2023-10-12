@@ -1,243 +1,162 @@
-Return-Path: <netdev+bounces-40428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 889D97C75E7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:34:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB12A7C75F9
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:35:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47B0D282ABA
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:34:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C87282AAD
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83C1224D6;
-	Thu, 12 Oct 2023 18:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F23B026296;
+	Thu, 12 Oct 2023 18:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WMKvvAQn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DSZHXL9g"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54C63A274
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:34:06 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 159E1C0;
-	Thu, 12 Oct 2023 11:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697135645; x=1728671645;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=9bLH26Cc693hacHSFBeql0VC3pFg0drdfby174FIdn8=;
-  b=WMKvvAQnMfgjEssssaS/LCQE0ud3jOtP5eRkFv5p/XMcWzMFUzRtff5H
-   frrVPRgw5dagF5bHKWametkqFE0Kvyb7Zap6PEJN1xk76t4f4IHmMsAHy
-   aEQfDqGQGOZpqB+HO83HTRGNfufyJxIe1+ISXSY+DEdujA6rSWgNwwXud
-   d6886MvoBIWvhbIyNy401HXPtXykiqw5hXKADFxkR1+rUZg+6eDdK5rcR
-   p3gqu6JkrD7rDqAGv6PoxkYkPVR0J1W84Qa9LvlLeMmlONhbcnJmUSI6e
-   Yw7vRM6z1cy11UNGHUMkjUV8V4TfT07lQmyaXXi4WApC8WXaegkg5pok1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="387861104"
-X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
-   d="scan'208";a="387861104"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 11:34:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="845101966"
-X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
-   d="scan'208";a="845101966"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Oct 2023 11:34:04 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32; Thu, 12 Oct 2023 11:34:04 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.32 via Frontend Transport; Thu, 12 Oct 2023 11:34:03 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.32; Thu, 12 Oct 2023 11:34:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EJtg4dtU4JgLMGzvr0Wr0LjKqVnc/Ohmr4Hx+MTuyFpyRd8jK/VFCPPyZs85byW6xAJ26Ot3aJSsZ/yWvPhnoUG1oNqFddhSEiXWtKYwjfIr9QA4DqaZCJC9rGdQ8A8iaiyrGK7CWBidkZH/ZR1BoAfRryV1WbU21NuN0Brzrh/01KJsvQDu2cwOei/O2cePuUVe89GcQxoHX41UBE/K4FS5irV6k1xmwqKgrEzhfSr8yKEU1u8nQSHiQX1R9seAsgTaUKJilYHl3+hKU6Xee57adnFXRbPFJnKomaF839ECUo0DjG8a3jeYBQY/gOFbrQC3ZU4D9CYk3v/+G0Q1Pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9bLH26Cc693hacHSFBeql0VC3pFg0drdfby174FIdn8=;
- b=m9cG2qU+EuF+lCU1had6HjUXTtKE/ttmIzw7jYeSlw3NlAz6E5SP8k7TajXwuCAP35NCCK/SVjujP6qoCVLk6oki2p1XRwS48Y0tBlGW2WMF6yXwQM3wU6bk3fufmCsZLWjUWnAVl8gbkPbulMO5RCdkxn/Bz43seeiiIwgh22KUvmzcfydHBhxW5RFCn91PhxvcZK8MeOPEAKlPhYT5mYDW50QGiGd7thCpn/PS3tSn/cKSTr/1xQOPuHYoFvxoZxbWGzvvSWFBg9a7p05YpPHDXXOKPXoTrIVFClrYLuAYkAAzMPYhumHsJSuL4z72aaYFfzyOFwt9tPGPsdvikw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.44; Thu, 12 Oct
- 2023 18:34:01 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::9654:610d:227a:104f]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::9654:610d:227a:104f%5]) with mapi id 15.20.6863.043; Thu, 12 Oct 2023
- 18:34:00 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Randy Dunlap <rdunlap@infradead.org>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: "Michalik, Michal" <michal.michalik@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Richard Cochran <richardcochran@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Kubalewski,
- Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Olech, Milena"
-	<milena.olech@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH net-next 3/3] idpf: fix undefined
- reference to tcp_gro_complete() when !CONFIG_INET
-Thread-Topic: [Intel-wired-lan] [PATCH net-next 3/3] idpf: fix undefined
- reference to tcp_gro_complete() when !CONFIG_INET
-Thread-Index: AQHZ6+2zvL5dTK0KXEmSDZ4XN62JhbAkO2eA//+1xoCAAI2EgIAh8C4AgAAr6EA=
-Date: Thu, 12 Oct 2023 18:34:00 +0000
-Message-ID: <CO1PR11MB508965D49B6144B0CC7E5221D6D3A@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20230920180745.1607563-1-aleksander.lobakin@intel.com>
- <20230920180745.1607563-4-aleksander.lobakin@intel.com>
- <2038f544-859f-4ffb-9840-37c1ba289259@infradead.org>
- <0df556eb-71b2-9612-a81d-cd83c27a2cd7@intel.com>
- <8eaece43-a30d-45e8-9610-28ed2af842fc@infradead.org>
- <b5c1030a-9831-4580-8684-7c68f5888131@infradead.org>
-In-Reply-To: <b5c1030a-9831-4580-8684-7c68f5888131@infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|PH0PR11MB5830:EE_
-x-ms-office365-filtering-correlation-id: 4ea109bb-4d01-44ff-1bd2-08dbcb51cda6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /hEu5Br3hk2Bkef9PaARIy6fiY+Rgl8U1vl2WOsFzZcV5rNseU3mKRgDYHR2TFgxb1MmyCZVIG/NkSIFVqEces2h2kA+qtPY1NcsJpIymGSqHnHoL2TSlnzwQsQVOPBBHTYdQSgkqOOdHTgyaFk2mkigF7qWuQQYNMzA2FdgKk4IeICwydkriz+x48j8/qsWZ87NJPsIYke2yfMn0ZICK5z7GJf0s8BvWAKEYoePz4JyY33d3Bo3bUXIP93ijqGGn0a+o/xwbMH70whVRP8qmgzuNNufybcgqoUaKJ7FRKTjWBtzFKl8wbx5vbFwX/dC6skkpPL71vjOmAQt4a3GIYyWgZtz7K0whC7sx8JowihS1G6FSCVmEbPqJCYmx74q5wUfTbrP/7NCAVFi2v0/BSUkFxryP/JFNFBQUm4O0wQoikqEo7/McW6LBbK1y9Whlx6UyPfz4Ipl3i3o56diQ5YtPlmYPhSE42SVIBwG51vTktWmsEhVS7QhG19g5MT5eUo8o+JLme+EnFH4hGRLrBc4+Q5jAIQFnFpnEOd4mxoPwLYT+TdMfPLMQi08j2BBvEtEzVZUUcCbXtvdB1CSQxTSOnvt6MygLpokWtb280tGcNq33EIE1sCfgKfA/QjhJLsbbRS4N/50oYAEZ+N10w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(366004)(376002)(346002)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(107886003)(83380400001)(26005)(55016003)(9686003)(82960400001)(5660300002)(66476007)(316002)(54906003)(64756008)(66556008)(8936002)(71200400001)(66446008)(122000001)(4326008)(8676002)(38070700005)(52536014)(38100700002)(66946007)(110136005)(76116006)(2906002)(41300700001)(478600001)(53546011)(7696005)(6506007)(33656002)(86362001)(966005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WXAxMHdiNHdmbkE5ZStNM2VveHVDcU5jMWZtb3ZpVEpiRHhiSG90Q3J4OHhl?=
- =?utf-8?B?REdzS3JINEZaZ0RUZUFmVmoxbWoyRmkwQXpzbjVYR0ZpREJmdFdaOWdSVVV5?=
- =?utf-8?B?eVRiOWIyRFFySkRvanFyM3E0WHpseVRUdEhCQXVmNUJDVFVxRXZJaWtXUXUy?=
- =?utf-8?B?N3JHSi8rbk5BMnRYTnQ0amk2ZFNxOUJjWUJCMTllSmdyMWU5ZCtPUkRoV3FV?=
- =?utf-8?B?SmNCS2c0OXhNZ2pYb3JRSkdzQktpaUpCZWdPZ1hJTXdDRU13MG5RcmNLZzAx?=
- =?utf-8?B?RDZmSzBzQiswa2JXSFR1am1GNk5GZ2VSNjJEdjJFLzJOV2Z4dDN1RE5MQzYz?=
- =?utf-8?B?dGZkT3REYUV5VG4veEw0WkVpLzJDaytSV0ZkRE9uNG1jVDJ3c2ZtTURnWG1Y?=
- =?utf-8?B?cUc2aVFJNFhzK2V0WEZPWWtJaWJMVUwyZTJiejlsM1ZiNng0aHhzclhaanF2?=
- =?utf-8?B?UVA5MSt2M3I0cXJWQnowRmVvUmFwOS9HcW5VK0dRblBkRWJoM21zNjRxSG02?=
- =?utf-8?B?TnVhWk9POXNrc3UwM3FMc0doaXpOcWtSRit6T1poSUI0TmtnUWRKRHZjYXNp?=
- =?utf-8?B?dkxEYkpEd0c0U0I3Rk1wWW5na1Q1UVlRZExQVTJuWnF3MEVkbmduM2lwRkIy?=
- =?utf-8?B?OG90TWtja3JRVjRPbUxyZ2c3Zlp3R1o1Y0tPSGZUamxYM0hpTG5DR3ZYelhw?=
- =?utf-8?B?RjdEeEUzWkd4SGhySGZCdUZqMEVZcGNuOUlsaVV5cm1NS3NPSWtDaE9LeW41?=
- =?utf-8?B?VnEwNUV5b05PcmE1S3c3b200R3NHTWw5NnF5aWFid2lrK0hxWldMNjBVRjR1?=
- =?utf-8?B?VXM2TmJNMVliZFoxQWRDUklQd2VUVjNha0F2SDdGb0w0eUZQN0VFQnh0bXhp?=
- =?utf-8?B?SzN2NHZST0dweEdRSnhRa2Fsb1dHN0l3czY2OVF4TzF5d2NVb2tTU0hFV2lz?=
- =?utf-8?B?UmdQMWtCWkNJZUdibnF2VXhEdVNLOHg2OFdqWnJFM0xKbzBQR0E3c3M0RTRn?=
- =?utf-8?B?QWRBSDNMZkQrMDRhMUhXQm1EV3h4QUFxQVFnUlZocUg4UjJyWkt4MHZlYzBy?=
- =?utf-8?B?aHJpOGRicGdOVVVZc1I0ckl1UkMrOVBBU2FWd1B6ZUNEd0lwZ1g2S3ZpelVi?=
- =?utf-8?B?V05SazJxUUwrbnM0VUJNSnBYNitibGtnakd4K283V3QrbTNuU1dXV2wrOC9W?=
- =?utf-8?B?Mzh3VUhYZ3kzVFcyanhKQzBmdC9tTTBEWld0MGw3dmUrRHZRRno3Yy80MTFE?=
- =?utf-8?B?STYwRUxTQUNZaDlNRmovbjlhQUZyTDNsMGVaZmVVMmF4bXkyVk9YbXkyMzlU?=
- =?utf-8?B?emZoRW1GRWJsYnEzanN4aU5lUW50bEtXc2xaRStGRFN6V3F3OUo3MXhQUCsz?=
- =?utf-8?B?ckkrTUhXTXk1aGI1anF5aDM2VzZ2TW5HUUtZemlQUDRBZmwrY2FmMVhNVXIr?=
- =?utf-8?B?RXVwbU1FRTRUNllRUS9WMUdITlg3aFZ0a0d0UEhMQWEyNDJySElVYmxqWmFt?=
- =?utf-8?B?SjJWd1l6Z3czNjRnZGRyV2h5NkMyZVg1SVdXQU5qQms2N3VRQXhyZi9yTjNq?=
- =?utf-8?B?Y092cGdxOEpOcUh2UzJxa0w2a2tYSk1PckYxV3Z2ZFppZnc5SzNCQW5HLzJU?=
- =?utf-8?B?NlhNUjkwMHd2a3Q2ditRR3VQNU9BaTh2d1hDenlyd0pyMTlNeThoVXdNSTRq?=
- =?utf-8?B?ME0waU5FL0hBTndDLzY1U3ZXQW5VbDA5RFZCRE9scnNoN2tXeElMOExxRTRY?=
- =?utf-8?B?eGpzejEvZEhwWDJMNEF1Y2RINWsrU1V4MzNaWnhncVJXdTVDc1hxankyeExX?=
- =?utf-8?B?Z3YvdDQxZ1p6OEM2SmRHajE2RFNWTCszU1lsbGllTDdFcHBJMTliOGpPUFZz?=
- =?utf-8?B?VU5hTUl5a3lXZm5TaGZFYkRlVm0rYTRBUVBjTE9haW5zemR4bStkaWlHbGlu?=
- =?utf-8?B?bTdSWHdyS0VaL1kwR1JlRFVQeFk4TWJsZncrZmRzTjBqb1JzY3BBMThEMWlT?=
- =?utf-8?B?R005dFpiLzRJdERTVFVGWm9qUEdHeGlDTjh2VGFWMmxxYXM4VXJ5dmdYekhT?=
- =?utf-8?B?ek1td2J1dEJzUEUwTFQ1V3g4Z3dRUlBIcjVzQlhsOWZvenRxRUtoWXU4VzZD?=
- =?utf-8?B?Q3JmY1M0WFZuVzErRUZwcVVaOXA2VHJYNXp2UmR1aVdoQUI3MnhXOXVMRDdj?=
- =?utf-8?B?emc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CDB3A270
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 18:35:47 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069B0138
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:35:42 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a5a3f2d4fso1769614276.3
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:35:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697135742; x=1697740542; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zZ5vZeZ1rQtj/pLLfjwP55zNf2pNIW6kvAeBQT1x4bU=;
+        b=DSZHXL9gw45hmfv+Snb7H4L6njWd/lhK8QsZGUxgaJzK/+K1VwiW30ehjEpi6SnpBQ
+         9y8ORbiypnX1Fn+DDilQf3mM35qgPXSo1htW9agMVupQ+92UDvisv5XSIQlI6xzDQxTa
+         ZtaSe9MHYfARRmh1WjATl/L+HYNO7GWdoUey4JDXB+aQpW5fjeLNZPo0mfeRAfKmzZs7
+         DsJ1iWc/+GwKoJr5VAS6sutmqYGQBpm+fSQ1WTCkbWGxFaCmUdKM/w8OEaduRF8mVfZX
+         4c1jMKvuqh9NNHxU52MdZ1MeI6y7XK3m65lp+Yt5cd5iJGHrm4/ILb6k23hLxl5pylmz
+         H6VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697135742; x=1697740542;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zZ5vZeZ1rQtj/pLLfjwP55zNf2pNIW6kvAeBQT1x4bU=;
+        b=gahqsG7bBZbKzODw2/psre1+Dex7TLq52VJq2CEInFSQm9S3OaC2NVJc9Cw8eZ0x3I
+         5vIqHsw4Z9hjsk6WFvhkdzdCGw7cR/RuBrfrrHljWgcbX9Nc28cj5GNf7oPEGSZvOZs7
+         WnBR8APYG1Pp1xUJkz1B3YU7Uom1YRnTW8WtXizpQ8SqUBWuJQz1Uu8lrXbozMoNe3J6
+         iMaYmPwjPcvGOF2nd+bt5q8rWYN7NKGr0lkvqHOWl6FWuC5xn1kmtJSZSOYIOP8bJUUI
+         RHImHDdP0jk0b6ABBqaM04MONvcyzAJOuxL5MB7B+W8BWuIkmYr1F9OxuZi4j5j7lkop
+         0UkA==
+X-Gm-Message-State: AOJu0Yw+YWivJqTZUq2GLsesA0YKk2LP0rCiT0aEeePeDUni2ocQAgvt
+	DOIGVqQ/3uOK5M8s9vtCc1x5oF4lJGJxGgxFcQ==
+X-Google-Smtp-Source: AGHT+IGAvRFiDoAAgv8+76QvrcJUTBz0asmElUscHpthtBCbO3PwIS4e92bgGQ5whYpEiOcgN0o4K9DW6LvVSd/RiQ==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a25:abab:0:b0:d9a:bd7c:189 with SMTP
+ id v40-20020a25abab000000b00d9abd7c0189mr67389ybi.4.1697135742183; Thu, 12
+ Oct 2023 11:35:42 -0700 (PDT)
+Date: Thu, 12 Oct 2023 18:35:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ea109bb-4d01-44ff-1bd2-08dbcb51cda6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Oct 2023 18:34:00.5576
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +m0hE+jLBYy254D7dZWfK6bJhaex37rurr3Y9SWefX9OP4y8lCzb9XafIo+opUC4AoprnWsDZwF0Vw/4fODtZb10W9jvHJxVMH2L3U2m/pk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5830
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAHw8KGUC/6WOQQrCMBREryJZ+yU/tkJdeQ8pUpNv+qEmbRKDp
+ fTupr2Ci4F5s5iZRUQKTFFcD4sIlDmydwXU8SB03zlLwKawUFKdUSJCTMHpcQYTOFOI4CgBpZ7
+ CZqbBW9Ywkdn0MPT8WNCgEE3dVEoiVaI0j4Fe/N1X723hnmPyYd5PZNzS//YyAsJF6kZ3ytRVp 27WezvQSfu3aNd1/QFDxYYM9wAAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697135741; l=2878;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=aHFOyb2iG6fjzUFXJXI6La24xrPjq56KO9Plhvehm8c=; b=xCNDPvyU646zkhkhjsYRp1o2dlZlirYKKLW2wM2NGn7p1AsuRwNCYh05miZknve/xyJY39trx
+ zLMNz9yaUKrAXx+fMPPolFn7b4FFi31Smw2iDKzM8nzzSdf16DUBlA2
+X-Mailer: b4 0.12.3
+Message-ID: <20231012-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-v2-1-16d2c0162b80@google.com>
+Subject: [PATCH v2] qed: replace uses of strncpy
+From: Justin Stitt <justinstitt@google.com>
+To: Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>, 
+	Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUmFuZHkgRHVubGFwIDxy
-ZHVubGFwQGluZnJhZGVhZC5vcmc+DQo+IFNlbnQ6IFRodXJzZGF5LCBPY3RvYmVyIDEyLCAyMDIz
-IDg6NDcgQU0NCj4gVG86IEtlbGxlciwgSmFjb2IgRSA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29t
-PjsgTG9iYWtpbiwgQWxla3NhbmRlcg0KPiA8YWxla3NhbmRlci5sb2Jha2luQGludGVsLmNvbT47
-IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEVyaWMNCj4gRHVtYXpldCA8
-ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47IEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBQ
-YW9sbw0KPiBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+DQo+IENjOiBNaWNoYWxpaywgTWljaGFs
-IDxtaWNoYWwubWljaGFsaWtAaW50ZWwuY29tPjsgbmV0ZGV2QHZnZXIua2VybmVsLm9yZzsNCj4g
-UmljaGFyZCBDb2NocmFuIDxyaWNoYXJkY29jaHJhbkBnbWFpbC5jb20+OyBsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnOw0KPiBLdWJhbGV3c2tpLCBBcmthZGl1c3ogPGFya2FkaXVzei5rdWJh
-bGV3c2tpQGludGVsLmNvbT47IGludGVsLXdpcmVkLQ0KPiBsYW5AbGlzdHMub3N1b3NsLm9yZzsg
-Tmd1eWVuLCBBbnRob255IEwgPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29tPjsgT2xlY2gsDQo+
-IE1pbGVuYSA8bWlsZW5hLm9sZWNoQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtJbnRlbC13
-aXJlZC1sYW5dIFtQQVRDSCBuZXQtbmV4dCAzLzNdIGlkcGY6IGZpeCB1bmRlZmluZWQgcmVmZXJl
-bmNlIHRvDQo+IHRjcF9ncm9fY29tcGxldGUoKSB3aGVuICFDT05GSUdfSU5FVA0KPiANCj4gSGks
-DQo+IA0KPiBPbiA5LzIwLzIzIDE4OjMwLCBSYW5keSBEdW5sYXAgd3JvdGU6DQo+ID4NCj4gPg0K
-PiA+IE9uIDkvMjAvMjMgMTc6MDQsIEphY29iIEtlbGxlciB3cm90ZToNCj4gPj4NCj4gPj4NCj4g
-Pj4gT24gOS8yMC8yMDIzIDI6MzAgUE0sIFJhbmR5IER1bmxhcCB3cm90ZToNCj4gPj4+DQo+ID4+
-Pg0KPiA+Pj4gT24gOS8yMC8yMyAxMTowNywgQWxleGFuZGVyIExvYmFraW4gd3JvdGU6DQo+ID4+
-Pj4gV2hlbiBDT05GSUdfSU5FVCBpcyBub3Qgc2V0LCB0Y3BfZ3JvX2NvbXBsZXRlIGlzIG5vdCBj
-b21waWxlZCwgYWx0aG91Z2gNCj4gPj4+PiB0aGUgZHJpdmVycyB1c2luZyBpdCBtYXkgc3RpbGwg
-YmUgY29tcGlsZWQgKHNwb3R0ZWQgYnkgUmFuZHkpOg0KPiA+Pj4+DQo+ID4+Pj4gYWFyY2g2NC1s
-aW51eC1sZDogZHJpdmVycy9uZXQvZXRoZXJuZXQvaW50ZWwvaWRwZi9pZHBmX3R4cngubzoNCj4g
-Pj4+PiBpbiBmdW5jdGlvbiBgaWRwZl9yeF9yc2MuaXNyYS4wJzoNCj4gPj4+PiBkcml2ZXJzL25l
-dC9ldGhlcm5ldC9pbnRlbC9pZHBmL2lkcGZfdHhyeC5jOjI5MDk6KC50ZXh0KzB4NDBjYyk6DQo+
-ID4+Pj4gdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgdGNwX2dyb19jb21wbGV0ZScNCj4gPj4+Pg0K
-PiA+Pj4+IFRoZSBkcml2ZXJzIG5lZWQgdG8gZ3VhcmQgdGhlIGNhbGxzIHRvIGl0IG1hbnVhbGx5
-Lg0KPiA+Pj4+IFJldHVybiBlYXJseSBmcm9tIHRoZSBSU0MgY29tcGxldGlvbiBmdW5jdGlvbiBp
-ZiAhQ09ORklHX0lORVQsIGl0IHdvbid0DQo+ID4+Pj4gd29yayBwcm9wZXJseSBlaXRoZXIgd2F5
-LiBUaGlzIGVmZmVjdGl2ZWx5IG1ha2VzIGl0IGJlIGNvbXBpbGVkLW91dA0KPiA+Pj4+IGFsbW9z
-dCBlbnRpcmVseSBvbiBzdWNoIGJ1aWxkcy4NCj4gPj4+Pg0KPiA+Pj4+IEZpeGVzOiAzYTg4NDVh
-ZjY2ZWQgKCJpZHBmOiBhZGQgUlggc3BsaXRxIG5hcGkgcG9sbCBzdXBwb3J0IikNCj4gPj4+PiBS
-ZXBvcnRlZC1ieTogUmFuZHkgRHVubGFwIDxyZHVubGFwQGluZnJhZGVhZC5vcmc+DQo+ID4+Pj4g
-Q2xvc2VzOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1uZXh0LzRjODRlYjdiLTNkZWMt
-NDY3Yi05MzRiLQ0KPiA4YTAyNDBmN2ZiMTJAaW5mcmFkZWFkLm9yZw0KPiA+Pj4+IFNpZ25lZC1v
-ZmYtYnk6IEFsZXhhbmRlciBMb2Jha2luIDxhbGVrc2FuZGVyLmxvYmFraW5AaW50ZWwuY29tPg0K
-PiA+Pj4NCj4gPj4+IFRoYXQgYnVpbGRzIGZvciBtZS4gIFRoYW5rcy4NCj4gPj4+DQo+ID4+PiBU
-ZXN0ZWQtYnk6IFJhbmR5IER1bmxhcCA8cmR1bmxhcEBpbmZyYWRlYWQub3JnPg0KPiA+Pj4NCj4g
-Pj4+IEkgaG9wZSB0aGF0IHRoZXNlIHBhdGNoZXMgY2FuIGJlIG1lcmdlZCBpbnRvIHRoZSB2Ni42
-IGluc3RlYWQgb2YNCj4gPj4+IHY2Ljcga2VybmVsIGF0IHNvbWUgcG9pbnQgKGkuZS4sIFtQQVRD
-SCBuZXRdIGluc3RlYWQgb2YgbmV0LW5leHQpLg0KPiA+Pj4NCj4gPj4NCj4gPj4gRGlkIGFueSBv
-ZiB0aGUgb2ZmZW5kaW5nIGNvZGUgbWFrZSBpdCBpbnRvIDYuNj8gSSB0aG91Z2h0IGFsbCBvZiB0
-aGlzDQo+ID4+IHdhcyBmcm9tIHJlY2VudCBtZXJnZXMgYWZ0ZXIgNi42IGNsb3NlZC4NCj4gPj4N
-Cj4gPj4gVGhhbmtzLA0KPiA+PiBKYWtlDQo+ID4NCj4gPiBPaCwgSSB0aGluayB0aGF0IHlvdSBh
-cmUgY29ycmVjdC4gU29ycnkgYWJvdXQgbXkgY29tbWVudC4NCj4gPiBUaGFua3MuDQo+ID4NCj4g
-DQo+IEV2ZW4gaWYgdGhpcyBpcyBqdXN0ID4gdjYuNiBrZXJuZWxzIChpLmUuLCBsaW51eC1uZXh0
-KSwNCj4gaXQgd291bGQgYmUgdmVyeSBnb29kIHRvIGdldCBhIGZpeCBtZXJnZWQgZm9yIHRoZXNl
-IGJ1aWxkIGVycm9ycy4NCj4gSSBrZWVwIGdldHRpbmcgYnVpbGQgZXJyb3JzIGluIGxpbnV4LW5l
-eHQuLi4uDQo+IA0KDQpBIHN0YW5kYWxvbmUgdmVyc2lvbiBmb3IgdGhlIGlkcGYgZHJpdmVyIGZp
-eCB3YXMgcG9zdGVkIGF0IFsxXSwgYW5kIGFub3RoZXIgYWx0ZXJuYXRpdmUgZml4IHdhcyBwb3N0
-ZWQgYXQgWzJdDQoNCkZpeGVzIGZvciB0aGUgaWNlIGRyaXZlciBoYXZlIGFscmVhZHkgbWVyZ2Vk
-Lg0KDQpbMV06IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL25ldGRldi8yMDIzMDkyMTEyNTkzNi4x
-NjIxMTkxLTEtYWxla3NhbmRlci5sb2Jha2luQGludGVsLmNvbS8NClsyXTogaHR0cHM6Ly9sb3Jl
-Lmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjMwOTI1MTU1ODU4LjY1MTQyNS0xLWFybmRAa2VybmVsLm9y
-Zy8NCg0KVGhlIGZpeCBmcm9tIEFybmQgZ290IGFwcHJvdmFsIGZyb20gT2xlaywgYnV0IGl0IHNl
-ZW1zIGxpa2UgaXQgc3RhbGxlZCBvdXQgYWZ0ZXIgYXNraW5nIGFib3V0IHN0dWJzLiBJJ20gZmlu
-ZSB3aXRoIGVpdGhlciBhcHByb2FjaCBidXQgd291bGQgIGFsc28gbGlrZSB0byBzZWUgYSBmaXgg
-bWVyZ2Ugc29vbi4NCg0KVGhhbmtzLA0KSmFrZQ0K
+strncpy() is deprecated for use on NUL-terminated destination strings
+[1] and as such we should prefer more robust and less ambiguous string
+interfaces.
+
+This patch eliminates three uses of strncpy():
+
+Firstly, `dest` is expected to be NUL-terminated which is evident by the
+manual setting of a NUL-byte at size - 1. For this use specifically,
+strscpy() is a viable replacement due to the fact that it guarantees
+NUL-termination on the destination buffer.
+
+The next two cases should simply be memcpy() as the size of the src
+string is always 3 and the destination string just wants the first 3
+bytes changed.
+
+To be clear, there are no buffer overread bugs in the current code as
+the sizes and offsets are carefully managed such that buffers are
+NUL-terminated. However, with these changes, the code is now more robust
+and less ambiguous (and hopefully easier to read).
+
+Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
+Link: https://github.com/KSPP/linux/issues/90
+Cc: linux-hardening@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>
+Signed-off-by: Justin Stitt <justinstitt@google.com>
+---
+Changes in v2:
+- prefer memcpy to snprintf (thanks Kees)
+- Link to v1: https://lore.kernel.org/r/20231011-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-v1-1-60c9ca2d54a2@google.com
+---
+Note: build-tested only.
+
+Found with: $ rg "strncpy\("
+---
+ drivers/net/ethernet/qlogic/qed/qed_debug.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_debug.c b/drivers/net/ethernet/qlogic/qed/qed_debug.c
+index cdcead614e9f..f67be4b8ad43 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_debug.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_debug.c
+@@ -3204,8 +3204,8 @@ static u32 qed_grc_dump_big_ram(struct qed_hwfn *p_hwfn,
+ 		     BIT(big_ram->is_256b_bit_offset[dev_data->chip_id]) ? 256
+ 									 : 128;
+ 
+-	strncpy(type_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
+-	strncpy(mem_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
++	memcpy(type_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
++	memcpy(mem_name, big_ram->instance_name, BIG_RAM_NAME_LEN);
+ 
+ 	/* Dump memory header */
+ 	offset += qed_grc_dump_mem_hdr(p_hwfn,
+@@ -6359,8 +6359,7 @@ static void qed_read_str_from_buf(void *buf, u32 *offset, u32 size, char *dest)
+ {
+ 	const char *source_str = &((const char *)buf)[*offset];
+ 
+-	strncpy(dest, source_str, size);
+-	dest[size - 1] = '\0';
++	strscpy(dest, source_str, size);
+ 	*offset += size;
+ }
+ 
+
+---
+base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
+change-id: 20231011-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-211d594201e4
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
+
 
