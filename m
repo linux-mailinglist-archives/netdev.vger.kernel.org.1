@@ -1,275 +1,236 @@
-Return-Path: <netdev+bounces-40400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D397C739F
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:03:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 828CD7C73C1
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:12:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537521C20B36
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:03:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C6B228291A
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422BB30FB7;
-	Thu, 12 Oct 2023 17:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1B2328C9;
+	Thu, 12 Oct 2023 17:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugzDwh8U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ah7yQW6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2569A200AE
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:03:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88563C433C7;
-	Thu, 12 Oct 2023 17:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697130222;
-	bh=0Y/nIS+JSufroA30qp7iEka7S/VoswZPUe/5whv+S3M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ugzDwh8UUd/SXCo8wFfUD+OMyGlcRDMe82MzPWysUll2SGi5R7puljV7H93tXFNn0
-	 ZN0tJj/Cm9qN/tL6GbHNu6bDfI4+Zd0Vwa0YWQdR786Nm013b2V65UqQTt9WTY3zpi
-	 +cTFDiSDEScsWBm+/T/jKc6/FF/clAmV4G2Onantzp6QJTfOtkvNPJOC+ukic4DqUU
-	 RupLY7vi0DVOq7AEhHc8NCt49w+T+qN7UVSoAe8NaZsewKE3Pvo3bapANUBgDU+/sj
-	 yfH8fNe1tqopDy0TbIs8VKKoC2hghPtzM+ezxjqYuK8BZrZJHXKuakdrzbzFwNkdZ/
-	 nBdKX8Er+L0qQ==
-Date: Thu, 12 Oct 2023 10:03:41 -0700
-From: Saeed Mahameed <saeed@kernel.org>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Shay Drory <shayd@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>, Leon Romanovsky <leon@kernel.org>
-Subject: Re: [RFC PATCH net] net/mlx5: Perform DMA operations cleanup before
- pci_disable_device()
-Message-ID: <ZSgm7UtdVnr3OojW@x130>
-References: <20231011184511.19818-1-saeed@kernel.org>
- <f93947daffa56e4cdf380ad644e78bcee1ad4183.camel@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7F72B76E;
+	Thu, 12 Oct 2023 17:12:41 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D92B7;
+	Thu, 12 Oct 2023 10:12:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697130760; x=1728666760;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AU5WQZnJB4MsmwO/vorGeCBj1LsumsIqK9Eo87FY3Kk=;
+  b=Ah7yQW6LhMqaanPBg+CfspuQDy87iWUA7rYqNyHw/9eCgksTcebBtE2W
+   +CcBVCtslPIAFGh1rdQGPQGV0gdeGhly/+9dRbxkXSyuSWxBlzDrPkL5h
+   MPObWws9aXSN/ogd0Le0cY12sO5dMkD3FWkXBTlk/nrrtmj0EPEXbYC82
+   MnisUDGdr5shyPPddY39dDAGLK65faR5AXMu2rtbXyVXEJEVgqNABm+Vx
+   Yrj4rorOZ6lxmcIGOkubu4Ghljy0aAJdU82M1NJeK4KZtDibkpRzjRepf
+   w1SjiOMYf7CaJOw0wBRFqOG6uoWdN7OzmRxbpMaYTuttUIRx1IqKZAD5n
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="416027516"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="416027516"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 10:11:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="783773891"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="783773891"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga008.jf.intel.com with ESMTP; 12 Oct 2023 10:11:46 -0700
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3F4A733BFF;
+	Thu, 12 Oct 2023 18:11:43 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>,
+	xdp-hints@xdp-project.net,
+	netdev@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Tariq Toukan <tariqt@mellanox.com>,
+	Saeed Mahameed <saeedm@mellanox.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH bpf-next v6 00/18] XDP metadata via kfuncs for ice + VLAN hint
+Date: Thu, 12 Oct 2023 19:05:06 +0200
+Message-ID: <20231012170524.21085-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <f93947daffa56e4cdf380ad644e78bcee1ad4183.camel@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 12 Oct 13:51, Niklas Schnelle wrote:
->On Wed, 2023-10-11 at 11:45 -0700, Saeed Mahameed wrote:
->> From: Shay Drory <shayd@nvidia.com>
->>
->> The cited patch change mlx5 driver so that during probe, DMA
->> operations were performed before pci_enable_device() and during
->> teardown, DMA operations were performed after pci_disable_device().
->> DMA operations require PCI to be enabled. Hence, The above leads to
->> the following oops in PPC systems[2].
->>
->> Fix it by performing the DMA operations during probe, after
->> pci_enable_device() and during teardown, before pci_disable_device().
->>
->> This also fixes a problem reported by Niklas Schnelle [1]
->>
->> [1] https://lore.kernel.org/lkml/20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com/
->>
->> [2]
->> Oops: Kernel access of bad area, sig: 11 [#1]
->> LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
->> Modules linked in: xt_MASQUERADE nf_conntrack_netlink
->> nfnetlink xfrm_user iptable_nat xt_addrtype xt_conntrack nf_nat
->> nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 netconsole rpcsec_gss_krb5
->> auth_rpcgss oid_registry overlay rpcrdma rdma_ucm ib_iser ib_umad
->> rdma_cm ib_ipoib iw_cm libiscsi scsi_transport_iscsi ib_cm ib_uverbs
->> ib_core mlx5_core(-) ptp pps_core fuse vmx_crypto crc32c_vpmsum [last
->> unloaded: mlx5_ib]
->> CPU: 1 PID: 8937 Comm: modprobe Not tainted 6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02 #1
->> Hardware name: IBM pSeries (emulated by qemu) POWER9 (raw) 0x4e1202 0xf000005 of:SLOF,HEAD hv:linux,kvm pSeries
->> NIP:  c000000000423388 LR: c0000000001e733c CTR: c0000000001e4720
->> REGS: c0000000055636d0 TRAP: 0380   Not tainted (6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02)
->> MSR:  8000000000009033  CR: 24008884  XER: 20040000
->> CFAR: c0000000001e7338 IRQMASK: 0
->> NIP [c000000000423388] __free_pages+0x28/0x160
->> LR [c0000000001e733c] dma_direct_free+0xac/0x190
->> Call Trace:
->> [c000000005563970] [5deadbeef0000100] 0x5deadbeef0000100 (unreliable)
->> [c0000000055639b0] [c0000000003d46cc] kfree+0x7c/0x150
->> [c000000005563a40] [c0000000001e47c8] dma_free_attrs+0xa8/0x1a0
->> [c000000005563aa0] [c008000000d0064c] mlx5_cmd_cleanup+0xa4/0x100 [mlx5_core]
->> [c000000005563ad0] [c008000000cf629c] mlx5_mdev_uninit+0xf4/0x140 [mlx5_core]
->> [c000000005563b00] [c008000000cf6448] remove_one+0x160/0x1d0 [mlx5_core]
->> [c000000005563b40] [c000000000958540] pci_device_remove+0x60/0x110
->> [c000000005563b80] [c000000000a35e80] device_remove+0x70/0xd0
->> [c000000005563bb0] [c000000000a37a38] device_release_driver_internal+0x2a8/0x330
->> [c000000005563c00] [c000000000a37b8c] driver_detach+0x8c/0x160
->> [c000000005563c40] [c000000000a35350] bus_remove_driver+0x90/0x110
->> [c000000005563c80] [c000000000a38948] driver_unregister+0x48/0x90
->> [c000000005563cf0] [c000000000957e38] pci_unregister_driver+0x38/0x150
->> [c000000005563d40] [c008000000eb6140] mlx5_cleanup+0x38/0x90 [mlx5_core]
->>
->> Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
->> Signed-off-by: Shay Drory <shayd@nvidia.com>
->> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
->> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
->> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
->> CC: Leon Romanovsky <leon@kernel.org>
->> CC: Niklas Schnelle <schnelle@linux.ibm.com>
->>
->> ---
->>  drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 62 ++++++++-----------
->>  1 file changed, 27 insertions(+), 35 deletions(-)
->
->
->I can confirm that this indeed fixes the problem I was seeing. I also
->tested hot unplug and re-plug as well as some smoke tests with the
->devices at hand across multiple ConnectX generations.
->So feel free to add my:
->
->Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
->
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
->> index afb348579577..dd36d9cba62f 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
->> @@ -2186,52 +2186,23 @@ static u16 cmdif_rev(struct mlx5_core_dev *dev)
->>
->>  int mlx5_cmd_init(struct mlx5_core_dev *dev)
->>  {
->> -	int size = sizeof(struct mlx5_cmd_prot_block);
->> -	int align = roundup_pow_of_two(size);
->>  	struct mlx5_cmd *cmd = &dev->cmd;
->> -	u32 cmd_l;
->> -	int err;
->> -
->> -	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
->> -	if (!cmd->pool)
->> -		return -ENOMEM;
->>
->> -	err = alloc_cmd_page(dev, cmd);
->> -	if (err)
->> -		goto err_free_pool;
->> -
->> -	cmd_l = (u32)(cmd->dma);
->> -	if (cmd_l & 0xfff) {
->> -		mlx5_core_err(dev, "invalid command queue address\n");
->> -		err = -ENOMEM;
->> -		goto err_cmd_page;
->> -	}
->>  	cmd->checksum_disabled = 1;
->>
->>  	spin_lock_init(&cmd->alloc_lock);
->>  	spin_lock_init(&cmd->token_lock);
->>
->> -	create_msg_cache(dev);
->> -
->>  	set_wqname(dev);
->>  	cmd->wq = create_singlethread_workqueue(cmd->wq_name);
->>  	if (!cmd->wq) {
->>  		mlx5_core_err(dev, "failed to create command workqueue\n");
->> -		err = -ENOMEM;
->> -		goto err_cache;
->> +		return -ENOMEM;
->>  	}
->>
->>  	mlx5_cmdif_debugfs_init(dev);
->>
->>  	return 0;
->> -
->> -err_cache:
->> -	destroy_msg_cache(dev);
->> -err_cmd_page:
->> -	free_cmd_page(dev, cmd);
->> -err_free_pool:
->> -	dma_pool_destroy(cmd->pool);
->> -	return err;
->>  }
->
->I like that this leaves mlx5_cmd_init() simpler.
->
->>
->>  void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
->> @@ -2240,15 +2211,15 @@ void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
->>
->>  	mlx5_cmdif_debugfs_cleanup(dev);
->>  	destroy_workqueue(cmd->wq);
->> -	destroy_msg_cache(dev);
->> -	free_cmd_page(dev, cmd);
->> -	dma_pool_destroy(cmd->pool);
->>  }
->>
->>  int mlx5_cmd_enable(struct mlx5_core_dev *dev)
->>  {
->> +	int size = sizeof(struct mlx5_cmd_prot_block);
->> +	int align = roundup_pow_of_two(size);
->>  	struct mlx5_cmd *cmd = &dev->cmd;
->>  	u32 cmd_h, cmd_l;
->> +	int err;
->>
->>  	memset(&cmd->vars, 0, sizeof(cmd->vars));
->>  	cmd->vars.cmdif_rev = cmdif_rev(dev);
->> @@ -2281,10 +2252,21 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
->>  	sema_init(&cmd->vars.pages_sem, 1);
->>  	sema_init(&cmd->vars.throttle_sem, DIV_ROUND_UP(cmd->vars.max_reg_cmds, 2));
->>
->> +	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
->> +	if (!cmd->pool)
->> +		return -ENOMEM;
->> +
->> +	err = alloc_cmd_page(dev, cmd);
->> +	if (err)
->> +		goto err_free_pool;
->> +
->>  	cmd_h = (u32)((u64)(cmd->dma) >> 32);
->>  	cmd_l = (u32)(cmd->dma);
->> -	if (WARN_ON(cmd_l & 0xfff))
->> -		return -EINVAL;
->> +	if (cmd_l & 0xfff) {
->> +		mlx5_core_err(dev, "invalid command queue address\n");
->> +		err = -ENOMEM;
->> +		goto err_cmd_page;
->> +	}
->>
->>  	iowrite32be(cmd_h, &dev->iseg->cmdq_addr_h);
->>  	iowrite32be(cmd_l, &dev->iseg->cmdq_addr_l_sz);
->> @@ -2297,16 +2279,26 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
->>  	cmd->mode = CMD_MODE_POLLING;
->>  	cmd->allowed_opcode = CMD_ALLOWED_OPCODE_ALL;
->>
->> +	create_msg_cache(dev);
->>  	create_debugfs_files(dev);
->>
->>  	return 0;
->> +
->> +err_cmd_page:
->> +	free_cmd_page(dev, cmd);
->> +err_free_pool:
->> +	dma_pool_destroy(cmd->pool);
->> +	return err;
->>  }
->>
->>  void mlx5_cmd_disable(struct mlx5_core_dev *dev)
->>  {
->>  	struct mlx5_cmd *cmd = &dev->cmd;
->>
->> +	destroy_msg_cache(dev);
->>  	clean_debug_files(dev);
->> +	free_cmd_page(dev, cmd);
->> +	dma_pool_destroy(cmd->pool);
->>  	flush_workqueue(cmd->wq);
->>  }
->
->I do like that this tears down the DMA stuff before
->pci_disable_device() I don't think this fixes a problem on s390x but to
->me it's the more natural order. That said, are we sure that the
->flush_workqueue() won't still need DMA and cmd page?
->
+This series introduces XDP hints via kfuncs [0] to the ice driver.
 
-Agreed, tt is safer to flush_workqueue first thing in the function.
+Series brings the following existing hints to the ice driver:
+ - HW timestamp
+ - RX hash with type
 
->>
->> --
->> 2.41.0
->>
->
+Series also introduces VLAN tag with protocol XDP hint, it now be accessed by
+XDP and userspace (AF_XDP) programs. They can also be checked with xdp_metadata
+test and xdp_hw_metadata program.
+
+On Maciej's request, I provide some numbers about impact of these patches
+on ice performance.
+ZC:
+* Full hints implementation before addition of the static key decreases
+  pps in ZC mode by 6%
+* Adding a static key eliminates this drop. Overall performce difference
+  compared to a clean tree in inconsequential.
+
+skb (packets with invalid IP, dropped by stack):
+* Overall, patchset improves peak performance in skb mode by about 0.5%
+
+[0] https://patchwork.kernel.org/project/netdevbpf/cover/20230119221536.3349901-1-sdf@google.com/
+
+Intermediate RFC v2:
+https://lore.kernel.org/bpf/20230927075124.23941-1-larysa.zaremba@intel.com/
+Intermediate RFC v1:
+https://lore.kernel.org/bpf/20230824192703.712881-1-larysa.zaremba@intel.com/
+v5:
+https://lore.kernel.org/bpf/20230811161509.19722-1-larysa.zaremba@intel.com/
+v4:
+https://lore.kernel.org/bpf/20230728173923.1318596-1-larysa.zaremba@intel.com/
+v3:
+https://lore.kernel.org/bpf/20230719183734.21681-1-larysa.zaremba@intel.com/
+v2:
+https://lore.kernel.org/bpf/20230703181226.19380-1-larysa.zaremba@intel.com/
+v1:
+https://lore.kernel.org/all/20230512152607.992209-1-larysa.zaremba@intel.com/
+
+Changes since v5:
+* drop checksum hint from the patchset entirely
+* Alex's patch that lifts the data_meta size limitation is no longer
+  required in this patchset, so will be sent separately
+* new patch: hide some ice hints code behind a static key
+* fix several bugs in ZC mode (ice)
+* change argument order in VLAN hint kfunc (tci, proto -> proto, tci)
+* cosmetic changes
+* analyze performance impact
+
+Changes since v4:
+* Drop the concept of partial checksum from the hint design
+* Drop the concept of checksum level from the hint design
+
+Changes since v3:
+* use XDP_CHECKSUM_VALID_LVL0 + csum_level instead of csum_level + 1
+* fix spelling mistakes
+* read XDP timestamp unconditionally
+* add TO_STR() macro
+
+Changes since v2:
+* redesign checksum hint, so now it gives full status
+* rename vlan_tag -> vlan_tci, where applicable
+* use open_netns() and close_netns() in xdp_metadata
+* improve VLAN hint documentation
+* replace CFI with DEI
+* use VLAN_VID_MASK in xdp_metadata
+* make vlan_get_tag() return -ENODATA
+* remove unused rx_ptype in ice_xsk.c
+* fix ice timestamp code division between patches
+
+Changes since v1:
+* directly return RX hash, RX timestamp and RX checksum status
+  in skb-common functions
+* use intermediate enum value for checksum status in ice
+* get rid of ring structure dependency in ice kfunc implementation
+* make variables const, when possible, in ice implementation
+* use -ENODATA instead of -EOPNOTSUPP for driver implementation
+* instead of having 2 separate functions for c-tag and s-tag,
+  use 1 function that outputs both VLAN tag and protocol ID
+* improve documentation for introduced hints
+* update xdp_metadata selftest to test new hints
+* implement new hints in veth, so they can be tested in xdp_metadata
+* parse VLAN tag in xdp_hw_metadata
+
+Larysa Zaremba (18):
+  ice: make RX hash reading code more reusable
+  ice: make RX HW timestamp reading code more reusable
+  ice: Make ptype internal to descriptor info processing
+  ice: Introduce ice_xdp_buff
+  ice: Support HW timestamp hint
+  ice: Support RX hash XDP hint
+  ice: Support XDP hints in AF_XDP ZC mode
+  xdp: Add VLAN tag hint
+  ice: Implement VLAN tag hint
+  ice: use VLAN proto from ring packet context in skb path
+  ice: put XDP meta sources assignment under a static key condition
+  veth: Implement VLAN tag XDP hint
+  net: make vlan_get_tag() return -ENODATA instead of -EINVAL
+  mlx5: implement VLAN tag XDP hint
+  selftests/bpf: Allow VLAN packets in xdp_hw_metadata
+  selftests/bpf: Add flags and VLAN hint to xdp_hw_metadata
+  selftests/bpf: Use AF_INET for TX in xdp_metadata
+  selftests/bpf: Check VLAN tag and proto in xdp_metadata
+
+ Documentation/networking/xdp-rx-metadata.rst  |   8 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   3 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   2 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 412 +++++++++---------
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  35 ++
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  25 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  16 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |  20 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  29 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 209 ++++++++-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  18 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  49 ++-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  15 +
+ drivers/net/veth.c                            |  19 +
+ include/linux/if_vlan.h                       |   4 +-
+ include/linux/mlx5/device.h                   |   2 +-
+ include/net/xdp.h                             |   9 +
+ include/uapi/linux/netdev.h                   |   5 +-
+ net/core/xdp.c                                |  33 ++
+ tools/include/uapi/linux/netdev.h             |   5 +-
+ .../selftests/bpf/prog_tests/xdp_metadata.c   | 184 ++++----
+ .../selftests/bpf/progs/xdp_hw_metadata.c     |  38 +-
+ .../selftests/bpf/progs/xdp_metadata.c        |   5 +
+ tools/testing/selftests/bpf/testing_helpers.h |   3 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  38 +-
+ tools/testing/selftests/bpf/xdp_metadata.h    |  34 +-
+ 27 files changed, 816 insertions(+), 406 deletions(-)
+
+-- 
+2.41.0
+
 
