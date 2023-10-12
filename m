@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0EA7C7761
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E8C7C7762
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF851C210E3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9501C210F7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797E3C68C;
-	Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121693C69F;
+	Thu, 12 Oct 2023 19:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KGCuC3IU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pD+ZJwx6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A805B3B7BD
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E571B3C693
 	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCDD0C433CA;
-	Thu, 12 Oct 2023 19:53:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAD4C433C7;
+	Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697140389;
-	bh=QwnFRBasn8ehotvJqAHZdQ7hP7OevsoX+PBJ3JFdnwc=;
+	s=k20201202; t=1697140390;
+	bh=XEdUF4MvARylaYh5io+PWEuSwVkPCzttZi1Bq/CfRdY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KGCuC3IUQ0eIK8o/D62pKaSluxybBU6jJbGFHlQ0ULaVvQJAzXHtdnWhVO/RoeLRz
-	 2aydh21UbnhF6MISCkEb/tCk5+dAqFTod++BMwYtRhIU2B/ks5YKbSrGWQxZnbO1IV
-	 QgCcfJI3/6kmFkGjDzGI7Cymi0i5ZRfEpbgZ+dpLvnfJpecqJKQTBX+QZS2amUT+ex
-	 itG7nPGPtXisOHMOH3R6bhxyokj5iq/5dbhvuHj2sdP6DEmsO5p9BH7h3mFk9d5He3
-	 lO4B6u4us4ld5wYD5jXSJxp8YFjaA71cZvSiuqrSNyeCRZV2DFcSKraL6ij5kk2RDD
-	 m2FLCGXZVAwYg==
+	b=pD+ZJwx6UPs4heGBeBicBssn/3HFIKdrURZt61aZn4dRi0WC7WbpAs6hURYCcUXL0
+	 SaKbDtx6Cb1KatjPbl4svlWL9bYE4ilJLm548I+W3gkBC2OwCT5Id8qgX+L3nsD5hS
+	 RH7CSp0NAw7fn97QFNFmIJE7+qyIbaF8jYhD5vsIk3wlXWu1fepzrlhrZfJV0jEAE0
+	 CBbxf9vhW6voEeif7jYoRAX/bYFoRbMdUe3I/ftSZOSb+1jziZzgK6YoMKyfuJFu6U
+	 BDj5aE3Zsu5EUqk+PCuvJQlQf9ppTjAoA0ZB7INEhVb9ulzqHn0p7XrJsBwpW3MGtm
+	 IdTlQATz78ZSw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,12 +41,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>
-Subject: [net 01/10] net/mlx5: Perform DMA operations in the right locations
-Date: Thu, 12 Oct 2023 12:51:18 -0700
-Message-ID: <20231012195127.129585-2-saeed@kernel.org>
+	Mark Bloch <mbloch@nvidia.com>
+Subject: [net 02/10] net/mlx5: E-switch, register event handler before arming the event
+Date: Thu, 12 Oct 2023 12:51:19 -0700
+Message-ID: <20231012195127.129585-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
 References: <20231012195127.129585-1-saeed@kernel.org>
@@ -60,202 +58,84 @@ Content-Transfer-Encoding: 8bit
 
 From: Shay Drory <shayd@nvidia.com>
 
-The cited patch change mlx5 driver so that during probe DMA
-operations were performed before pci_enable_device(), and during
-teardown DMA operations were performed after pci_disable_device().
-DMA operations require PCI to be enabled. Hence, The above leads to
-the following oops in PPC systems[1].
+Currently, mlx5 is registering event handler for vport context change
+event some time after arming the event. this can lead to missing an
+event, which will result in wrong rules in the FDB.
+Hence, register the event handler before arming the event.
 
-On s390x systems, as reported by Niklas Schnelle, this is a problem
-because mlx5_pci_init() is where the DMA and coherent mask is set but
-mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
-allocation is done during probe before the correct mask is set. This
-causes probe to fail initialization of the cmdif SW structs on s390x
-after that is converted to the common dma-iommu code. This is because on
-s390x DMA addresses below 4 GiB are reserved on current machines and
-unlike the old s390x specific DMA API implementation common code
-enforces DMA masks.
+This solution is valid since FW is sending vport context change event
+only on vports which SW armed, and SW arming the vport when enabling
+it, which is done after the FDB has been created.
 
-Fix it by performing the DMA operations during probe after
-pci_enable_device() and after the dma mask is set,
-and during teardown before pci_disable_device().
-
-[1]
-Oops: Kernel access of bad area, sig: 11 [#1]
-LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
-Modules linked in: xt_MASQUERADE nf_conntrack_netlink
-nfnetlink xfrm_user iptable_nat xt_addrtype xt_conntrack nf_nat
-nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 netconsole rpcsec_gss_krb5
-auth_rpcgss oid_registry overlay rpcrdma rdma_ucm ib_iser ib_umad
-rdma_cm ib_ipoib iw_cm libiscsi scsi_transport_iscsi ib_cm ib_uverbs
-ib_core mlx5_core(-) ptp pps_core fuse vmx_crypto crc32c_vpmsum [last
-unloaded: mlx5_ib]
-CPU: 1 PID: 8937 Comm: modprobe Not tainted 6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02 #1
-Hardware name: IBM pSeries (emulated by qemu) POWER9 (raw) 0x4e1202 0xf000005 of:SLOF,HEAD hv:linux,kvm pSeries
-NIP:  c000000000423388 LR: c0000000001e733c CTR: c0000000001e4720
-REGS: c0000000055636d0 TRAP: 0380   Not tainted (6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02)
-MSR:  8000000000009033  CR: 24008884  XER: 20040000
-CFAR: c0000000001e7338 IRQMASK: 0
-NIP [c000000000423388] __free_pages+0x28/0x160
-LR [c0000000001e733c] dma_direct_free+0xac/0x190
-Call Trace:
-[c000000005563970] [5deadbeef0000100] 0x5deadbeef0000100 (unreliable)
-[c0000000055639b0] [c0000000003d46cc] kfree+0x7c/0x150
-[c000000005563a40] [c0000000001e47c8] dma_free_attrs+0xa8/0x1a0
-[c000000005563aa0] [c008000000d0064c] mlx5_cmd_cleanup+0xa4/0x100 [mlx5_core]
-[c000000005563ad0] [c008000000cf629c] mlx5_mdev_uninit+0xf4/0x140 [mlx5_core]
-[c000000005563b00] [c008000000cf6448] remove_one+0x160/0x1d0 [mlx5_core]
-[c000000005563b40] [c000000000958540] pci_device_remove+0x60/0x110
-[c000000005563b80] [c000000000a35e80] device_remove+0x70/0xd0
-[c000000005563bb0] [c000000000a37a38] device_release_driver_internal+0x2a8/0x330
-[c000000005563c00] [c000000000a37b8c] driver_detach+0x8c/0x160
-[c000000005563c40] [c000000000a35350] bus_remove_driver+0x90/0x110
-[c000000005563c80] [c000000000a38948] driver_unregister+0x48/0x90
-[c000000005563cf0] [c000000000957e38] pci_unregister_driver+0x38/0x150
-[c000000005563d40] [c008000000eb6140] mlx5_cleanup+0x38/0x90 [mlx5_core]
-
-Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+Fixes: 6933a9379559 ("net/mlx5: E-Switch, Use async events chain")
 Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
-Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 64 ++++++++-----------
- 1 file changed, 28 insertions(+), 36 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c   | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index afb348579577..c22b0ad0c870 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -2186,52 +2186,23 @@ static u16 cmdif_rev(struct mlx5_core_dev *dev)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+index d4cde6555063..8d0b915a3121 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+@@ -1038,11 +1038,8 @@ const u32 *mlx5_esw_query_functions(struct mlx5_core_dev *dev)
+ 	return ERR_PTR(err);
+ }
  
- int mlx5_cmd_init(struct mlx5_core_dev *dev)
+-static void mlx5_eswitch_event_handlers_register(struct mlx5_eswitch *esw)
++static void mlx5_eswitch_event_handler_register(struct mlx5_eswitch *esw)
  {
--	int size = sizeof(struct mlx5_cmd_prot_block);
--	int align = roundup_pow_of_two(size);
- 	struct mlx5_cmd *cmd = &dev->cmd;
--	u32 cmd_l;
--	int err;
+-	MLX5_NB_INIT(&esw->nb, eswitch_vport_event, NIC_VPORT_CHANGE);
+-	mlx5_eq_notifier_register(esw->dev, &esw->nb);
 -
--	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
--	if (!cmd->pool)
--		return -ENOMEM;
- 
--	err = alloc_cmd_page(dev, cmd);
--	if (err)
--		goto err_free_pool;
--
--	cmd_l = (u32)(cmd->dma);
--	if (cmd_l & 0xfff) {
--		mlx5_core_err(dev, "invalid command queue address\n");
--		err = -ENOMEM;
--		goto err_cmd_page;
--	}
- 	cmd->checksum_disabled = 1;
- 
- 	spin_lock_init(&cmd->alloc_lock);
- 	spin_lock_init(&cmd->token_lock);
- 
--	create_msg_cache(dev);
--
- 	set_wqname(dev);
- 	cmd->wq = create_singlethread_workqueue(cmd->wq_name);
- 	if (!cmd->wq) {
- 		mlx5_core_err(dev, "failed to create command workqueue\n");
--		err = -ENOMEM;
--		goto err_cache;
-+		return -ENOMEM;
+ 	if (esw->mode == MLX5_ESWITCH_OFFLOADS && mlx5_eswitch_is_funcs_handler(esw->dev)) {
+ 		MLX5_NB_INIT(&esw->esw_funcs.nb, mlx5_esw_funcs_changed_handler,
+ 			     ESW_FUNCTIONS_CHANGED);
+@@ -1050,13 +1047,11 @@ static void mlx5_eswitch_event_handlers_register(struct mlx5_eswitch *esw)
  	}
+ }
  
- 	mlx5_cmdif_debugfs_init(dev);
+-static void mlx5_eswitch_event_handlers_unregister(struct mlx5_eswitch *esw)
++static void mlx5_eswitch_event_handler_unregister(struct mlx5_eswitch *esw)
+ {
+ 	if (esw->mode == MLX5_ESWITCH_OFFLOADS && mlx5_eswitch_is_funcs_handler(esw->dev))
+ 		mlx5_eq_notifier_unregister(esw->dev, &esw->esw_funcs.nb);
  
- 	return 0;
+-	mlx5_eq_notifier_unregister(esw->dev, &esw->nb);
 -
--err_cache:
--	destroy_msg_cache(dev);
--err_cmd_page:
--	free_cmd_page(dev, cmd);
--err_free_pool:
--	dma_pool_destroy(cmd->pool);
--	return err;
+ 	flush_workqueue(esw->work_queue);
  }
  
- void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
-@@ -2240,15 +2211,15 @@ void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
+@@ -1483,6 +1478,9 @@ int mlx5_eswitch_enable_locked(struct mlx5_eswitch *esw, int num_vfs)
  
- 	mlx5_cmdif_debugfs_cleanup(dev);
- 	destroy_workqueue(cmd->wq);
--	destroy_msg_cache(dev);
--	free_cmd_page(dev, cmd);
--	dma_pool_destroy(cmd->pool);
- }
+ 	mlx5_eswitch_update_num_of_vfs(esw, num_vfs);
  
- int mlx5_cmd_enable(struct mlx5_core_dev *dev)
- {
-+	int size = sizeof(struct mlx5_cmd_prot_block);
-+	int align = roundup_pow_of_two(size);
- 	struct mlx5_cmd *cmd = &dev->cmd;
- 	u32 cmd_h, cmd_l;
-+	int err;
- 
- 	memset(&cmd->vars, 0, sizeof(cmd->vars));
- 	cmd->vars.cmdif_rev = cmdif_rev(dev);
-@@ -2281,10 +2252,21 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
- 	sema_init(&cmd->vars.pages_sem, 1);
- 	sema_init(&cmd->vars.throttle_sem, DIV_ROUND_UP(cmd->vars.max_reg_cmds, 2));
- 
-+	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
-+	if (!cmd->pool)
-+		return -ENOMEM;
++	MLX5_NB_INIT(&esw->nb, eswitch_vport_event, NIC_VPORT_CHANGE);
++	mlx5_eq_notifier_register(esw->dev, &esw->nb);
 +
-+	err = alloc_cmd_page(dev, cmd);
-+	if (err)
-+		goto err_free_pool;
-+
- 	cmd_h = (u32)((u64)(cmd->dma) >> 32);
- 	cmd_l = (u32)(cmd->dma);
--	if (WARN_ON(cmd_l & 0xfff))
--		return -EINVAL;
-+	if (cmd_l & 0xfff) {
-+		mlx5_core_err(dev, "invalid command queue address\n");
-+		err = -ENOMEM;
-+		goto err_cmd_page;
-+	}
+ 	if (esw->mode == MLX5_ESWITCH_LEGACY) {
+ 		err = esw_legacy_enable(esw);
+ 	} else {
+@@ -1495,7 +1493,7 @@ int mlx5_eswitch_enable_locked(struct mlx5_eswitch *esw, int num_vfs)
  
- 	iowrite32be(cmd_h, &dev->iseg->cmdq_addr_h);
- 	iowrite32be(cmd_l, &dev->iseg->cmdq_addr_l_sz);
-@@ -2297,17 +2279,27 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
- 	cmd->mode = CMD_MODE_POLLING;
- 	cmd->allowed_opcode = CMD_ALLOWED_OPCODE_ALL;
+ 	esw->fdb_table.flags |= MLX5_ESW_FDB_CREATED;
  
-+	create_msg_cache(dev);
- 	create_debugfs_files(dev);
+-	mlx5_eswitch_event_handlers_register(esw);
++	mlx5_eswitch_event_handler_register(esw);
  
- 	return 0;
-+
-+err_cmd_page:
-+	free_cmd_page(dev, cmd);
-+err_free_pool:
-+	dma_pool_destroy(cmd->pool);
-+	return err;
- }
+ 	esw_info(esw->dev, "Enable: mode(%s), nvfs(%d), necvfs(%d), active vports(%d)\n",
+ 		 esw->mode == MLX5_ESWITCH_LEGACY ? "LEGACY" : "OFFLOADS",
+@@ -1622,7 +1620,8 @@ void mlx5_eswitch_disable_locked(struct mlx5_eswitch *esw)
+ 	 */
+ 	mlx5_esw_mode_change_notify(esw, MLX5_ESWITCH_LEGACY);
  
- void mlx5_cmd_disable(struct mlx5_core_dev *dev)
- {
- 	struct mlx5_cmd *cmd = &dev->cmd;
+-	mlx5_eswitch_event_handlers_unregister(esw);
++	mlx5_eq_notifier_unregister(esw->dev, &esw->nb);
++	mlx5_eswitch_event_handler_unregister(esw);
  
--	clean_debug_files(dev);
- 	flush_workqueue(cmd->wq);
-+	clean_debug_files(dev);
-+	destroy_msg_cache(dev);
-+	free_cmd_page(dev, cmd);
-+	dma_pool_destroy(cmd->pool);
- }
- 
- void mlx5_cmd_set_state(struct mlx5_core_dev *dev,
+ 	esw_info(esw->dev, "Disable: mode(%s), nvfs(%d), necvfs(%d), active vports(%d)\n",
+ 		 esw->mode == MLX5_ESWITCH_LEGACY ? "LEGACY" : "OFFLOADS",
 -- 
 2.41.0
 
