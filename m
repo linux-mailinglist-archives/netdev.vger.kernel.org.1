@@ -1,262 +1,115 @@
-Return-Path: <netdev+bounces-40229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26EB47C649A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:24:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E4E7C64F8
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:58:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF42282587
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 05:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00DBC282697
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 05:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294DECA6F;
-	Thu, 12 Oct 2023 05:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC061D274;
+	Thu, 12 Oct 2023 05:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P9bQpCQb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATchAQjv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A6DD263
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:24:11 +0000 (UTC)
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A198D90
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:24:09 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id 3f1490d57ef6-d9ad67058fcso53600276.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 22:24:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2A7613F;
+	Thu, 12 Oct 2023 05:58:27 +0000 (UTC)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65C07A9;
+	Wed, 11 Oct 2023 22:58:26 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-58974d4335aso87755a12.1;
+        Wed, 11 Oct 2023 22:58:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697088248; x=1697693048; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=I1cP6tomGjAXDkWGX7Lga93uumHzInEBBrDc/NcXHLc=;
-        b=P9bQpCQb0CWDpg7UOx32mftpDlHe7OKhXd9/8uBGxDz2E1BXCsa8flBSgJYOs8LUfa
-         TghvA1r+lj+0JfworovLKMyprQKbH51zmDK1X4VeZBR+esfVT9GZVQeCMmEM4zM+UXU8
-         XXnV74hTuPQ6UWVoCdM5FiTije9UXS8XeooaQv4NLpsJsCPsQJiIJOAeTn9OezUj5OGs
-         jWGBR1xRuSZwIuY+KktyvGbxi2b9KJPiKT0gMLKAfbHoz3T7t8PacQex98tb9vliSqqN
-         /oVoA0nsZTbOkq7oD8hED7vAm933DAtuoc4kZO4dok1W0ZdzbsKSvjkweGjbWan+eyK3
-         5qZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697088248; x=1697693048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1697090306; x=1697695106; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=I1cP6tomGjAXDkWGX7Lga93uumHzInEBBrDc/NcXHLc=;
-        b=oCLfA7Nqq+oufdLvSnZQn7YzH+dH3PYtoOpUL7JBj4tMJk33D69MlttVZWULX5s9T3
-         FKSf9r7yeQFms9PlceqrX2Rz3Qea2RCAZVNU7sLLDsOFeOrWW2ABHqkyKunzvjs7hFM9
-         jE1uZCABHa8tXCcWA7DlODyPbsuW622GO5X9dxCz1TOGo1jKK/QUJ+6FCa93Cg/tZ35N
-         UwT7AUtrF/NDXhgajcxhmFpzEZV8lZ2dHTLlFc1orArl5GTX5KYsMmnJBdhGx7fWri6K
-         /YuYwwxx7vj9WAQM1sLyWaao8QOwurciiBShIHnlMujKz8LIVRbkUqRWZz5uxNyU0W60
-         mUAg==
-X-Gm-Message-State: AOJu0YwppwouYddcVRQ+sQ7lX3K1tJwI5vUksZ/bdEVI61OywHq4y8wA
-	xDWD4tZ5IJukpQariOhVSUci1zCOXQg=
-X-Google-Smtp-Source: AGHT+IFt5y4/JkabSdkoGSoH1TMRDXnFm/XMYmukTjbN8assy4K510AEuOoVXRtFtggwiI1CizMEIA==
-X-Received: by 2002:a25:1941:0:b0:d85:4c83:5d81 with SMTP id 62-20020a251941000000b00d854c835d81mr22267137ybz.48.1697088248561;
-        Wed, 11 Oct 2023 22:24:08 -0700 (PDT)
-Received: from ocxma-dut.. ([153.126.233.61])
-        by smtp.gmail.com with ESMTPSA id w78-20020a25c751000000b00d9ac87e0b17sm172129ybe.30.2023.10.11.22.24.07
+        bh=Ug1h0skf15+cGkmSkcuzFhPPkKdfgImJKZvK9a+wJB0=;
+        b=ATchAQjvfm1sOmpzVXdVEF0Bvp6xGHP4SiBOh5ppCwjdmTVthh8GoyMqt+lDlVtWKB
+         7lHZUkyiI2ZRtXE9qDeotTjtqse2i+DtsE8qZwsKvliPAcCdL5T93FUN4u6nLNHNSj4Z
+         r13oMk41GC8l0QAkiI80cRqpEMvv9TCjrWEwW/Z3lTTe7xVpyCnc34OL9m7sOB6RLp8B
+         x0uEULux5UDMf0pG9HGHnOl0BaHIeKI/yv9BifRPy4/2YDJHjHtIZJHkuuc6gNM5Y9nH
+         zohKyv4MtaQMMnbLNYp+bvVR80mAcrb3DhXQnlCR38nqODCiKT7y3r6X3xhCKV/JAEIZ
+         TeOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697090306; x=1697695106;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ug1h0skf15+cGkmSkcuzFhPPkKdfgImJKZvK9a+wJB0=;
+        b=kSxAEbE8BrtJbFWWRzHrTNHIF0kWqHu1fAW4xK27I/p9ZMh4ctXRQ6D/aZcZV/q2E5
+         3Co5ZRR/zq5nqLamyx9lHyGpoOIMQISG3nLA6A2blybMyd+OQc+/zGZUx/mBvypA7KI/
+         fJVOtteGUmRNjRb8EbnWudTm8yBsr8Zb/hd57whMbRTi6PS/1fK19Px56ylof/Z1g/nS
+         bZIUJMzHesmbSdsEVLkpmEz2u5BSnZEBQL51Xhqe3iJlts6nK2a5DZbfX1seWQIJ3qeE
+         eRBrCDsvVTqZp77DV+OsCIdEJpydlzVylJpY8Q+wQeKaL+Hee1qNwdCnHgHL31vCkCbF
+         BpRg==
+X-Gm-Message-State: AOJu0YxMFttSpxCHtwmsJN4mef84YqrjZxlQHt3K69VkHPWnSUhN3BWm
+	0KofUOhz/meeauTQK5HmbCk=
+X-Google-Smtp-Source: AGHT+IGHjf+1I8rQToNR8D4ACZst6+yzZAMqzRu9uJYfHD04APlbAdtCCwgFoR6pUG6/dlZRfYbCRw==
+X-Received: by 2002:a17:902:d2c1:b0:1c1:fbec:bc32 with SMTP id n1-20020a170902d2c100b001c1fbecbc32mr25904024plc.6.1697090305810;
+        Wed, 11 Oct 2023 22:58:25 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id d17-20020a170903231100b001bb99e188fcsm941268plh.194.2023.10.11.22.58.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 22:24:08 -0700 (PDT)
-From: Takeru Hayasaka <hayatake396@gmail.com>
-To: netdev@vger.kernel.org
-Cc: mkubecek@suse.cz,
-	Takeru Hayasaka <hayatake396@gmail.com>
-Subject: [PATCH net-next v3] ethtool: add support for rx-flow-hash gtp
-Date: Thu, 12 Oct 2023 05:24:02 +0000
-Message-Id: <20231012052402.105909-1-hayatake396@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 11 Oct 2023 22:58:25 -0700 (PDT)
+Date: Thu, 12 Oct 2023 14:58:24 +0900 (JST)
+Message-Id: <20231012.145824.2016833275288545767.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, greg@kroah.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network
+ PHY drivers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <ZSbpmdO2myMezHp6@boqun-archlinux>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+	<20231009013912.4048593-2-fujita.tomonori@gmail.com>
+	<ZSbpmdO2myMezHp6@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-GTP Flow hash was added to the ice driver.
-By executing "ethtool -N <dev> rx-flow-hash gtpu4 sde", RSS can include
-not only the IP's src/dst but also the TEID of GTP packets.
-Additionally, options <e> have been support.
-These allow specification to include TEID in the hash computation.
+On Wed, 11 Oct 2023 11:29:45 -0700
+Boqun Feng <boqun.feng@gmail.com> wrote:
 
-Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
----
-Added GTPC flow type
-Changed so that TEID can be selected as a key
+> On Mon, Oct 09, 2023 at 10:39:10AM +0900, FUJITA Tomonori wrote:
+> [...]
+>> +impl Device {
+>> +    /// Creates a new [`Device`] instance from a raw pointer.
+>> +    ///
+>> +    /// # Safety
+>> +    ///
+>> +    /// For the duration of the lifetime 'a, the pointer must be valid for writing and nobody else
+>> +    /// may read or write to the `phy_device` object.
+>> +    pub unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+>> +        unsafe { &mut *ptr.cast() }
+>> +    }
+>> +
+>> +    /// Gets the id of the PHY.
+>> +    pub fn phy_id(&mut self) -> u32 {
+> 
+> This function doesn't modify the `self`, why does this need to be a
+> `&mut self` function? Ditto for a few functions in this impl block.
+> 
+> It seems you used `&mut self` for all the functions, which looks like
+> more design work is required here.
 
- ethtool.c            | 71 ++++++++++++++++++++++++++++++++++++++++++--
- uapi/linux/ethtool.h | 13 ++++++++
- 2 files changed, 82 insertions(+), 2 deletions(-)
-
-diff --git a/ethtool.c b/ethtool.c
-index af51220..714e226 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -360,6 +360,18 @@ static int rxflow_str_to_type(const char *str)
- 		flow_type = AH_ESP_V4_FLOW;
- 	else if (!strcmp(str, "sctp4"))
- 		flow_type = SCTP_V4_FLOW;
-+	else if (!strcmp(str, "gtpc4"))
-+		flow_type = GTPC_V4_FLOW;
-+	else if (!strcmp(str, "gtpc4t"))
-+		flow_type = GTPC_TEID_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4"))
-+		flow_type = GTPU_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4e"))
-+		flow_type = GTPU_EH_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4u"))
-+		flow_type = GTPU_UL_V4_FLOW;
-+	else if (!strcmp(str, "gtpu4d"))
-+		flow_type = GTPU_DL_V4_FLOW;
- 	else if (!strcmp(str, "tcp6"))
- 		flow_type = TCP_V6_FLOW;
- 	else if (!strcmp(str, "udp6"))
-@@ -370,6 +382,18 @@ static int rxflow_str_to_type(const char *str)
- 		flow_type = SCTP_V6_FLOW;
- 	else if (!strcmp(str, "ether"))
- 		flow_type = ETHER_FLOW;
-+	else if (!strcmp(str, "gtpc6"))
-+		flow_type = GTPC_V6_FLOW;
-+	else if (!strcmp(str, "gtpc6t"))
-+		flow_type = GTPC_TEID_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6"))
-+		flow_type = GTPU_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6e"))
-+		flow_type = GTPU_EH_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6u"))
-+		flow_type = GTPU_UL_V6_FLOW;
-+	else if (!strcmp(str, "gtpu6d"))
-+		flow_type = GTPU_DL_V6_FLOW;
- 
- 	return flow_type;
- }
-@@ -1010,6 +1034,9 @@ static int parse_rxfhashopts(char *optstr, u32 *data)
- 		case 'n':
- 			*data |= RXH_L4_B_2_3;
- 			break;
-+		case 'e':
-+			*data |= RXH_GTP_TEID;
-+			break;
- 		case 'r':
- 			*data |= RXH_DISCARD;
- 			break;
-@@ -1042,6 +1069,8 @@ static char *unparse_rxfhashopts(u64 opts)
- 			strcat(buf, "L4 bytes 0 & 1 [TCP/UDP src port]\n");
- 		if (opts & RXH_L4_B_2_3)
- 			strcat(buf, "L4 bytes 2 & 3 [TCP/UDP dst port]\n");
-+		if (opts & RXH_GTP_TEID)
-+			strcat(buf, "GTP TEID\n");
- 	} else {
- 		sprintf(buf, "None");
- 	}
-@@ -1559,6 +1588,24 @@ static int dump_rxfhash(int fhash, u64 val)
- 	case SCTP_V4_FLOW:
- 		fprintf(stdout, "SCTP over IPV4 flows");
- 		break;
-+	case GTPC_V4_FLOW:
-+		fprintf(stdout, "GTP-C over IPV4 flows");
-+		break;
-+	case GTPC_TEID_V4_FLOW:
-+		fprintf(stdout, "GTP-C (include TEID) over IPV4 flows");
-+		break;
-+	case GTPU_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 flows");
-+		break;
-+	case GTPU_EH_V4_FLOW:
-+		fprintf(stdout, "GTP-U and Extension Header over IPV4 flows");
-+		break;
-+	case GTPU_UL_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 Uplink flows");
-+		break;
-+	case GTPU_DL_V4_FLOW:
-+		fprintf(stdout, "GTP-U over IPV4 Downlink flows");
-+		break;
- 	case AH_ESP_V4_FLOW:
- 	case AH_V4_FLOW:
- 	case ESP_V4_FLOW:
-@@ -1573,6 +1620,24 @@ static int dump_rxfhash(int fhash, u64 val)
- 	case SCTP_V6_FLOW:
- 		fprintf(stdout, "SCTP over IPV6 flows");
- 		break;
-+	case GTPC_V6_FLOW:
-+		fprintf(stdout, "GTP-C over IPV6 flows");
-+		break;
-+	case GTPC_TEID_V6_FLOW:
-+		fprintf(stdout, "GTP-C (include TEID) over IPV6 flows");
-+		break;
-+	case GTPU_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 flows");
-+		break;
-+	case GTPU_EH_V6_FLOW:
-+		fprintf(stdout, "GTP-U and Extension Header over IPV6 flows");
-+		break;
-+	case GTPU_UL_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 Uplink flows");
-+		break;
-+	case GTPU_DL_V6_FLOW:
-+		fprintf(stdout, "GTP-U over IPV6 Downlink flows");
-+		break;
- 	case AH_ESP_V6_FLOW:
- 	case AH_V6_FLOW:
- 	case ESP_V6_FLOW:
-@@ -5833,7 +5898,8 @@ static const struct option args[] = {
- 		.func	= do_grxclass,
- 		.help	= "Show Rx network flow classification options or rules",
- 		.xhelp	= "		[ rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|"
--			  "tcp6|udp6|ah6|esp6|sctp6 [context %d] |\n"
-+			  "gtpc4|gtpc4t|gtpu4|gtpu4e|gtpu4u|gtpu4d|tcp6|udp6|ah6|esp6|sctp6|"
-+			  "gtpc6|gtpc6t|gtpu6|gtpu6e|gtpu6u|gtpu6d [context %d] |\n"
- 			  "		  rule %d ]\n"
- 	},
- 	{
-@@ -5841,7 +5907,8 @@ static const struct option args[] = {
- 		.func	= do_srxclass,
- 		.help	= "Configure Rx network flow classification options or rules",
- 		.xhelp	= "		rx-flow-hash tcp4|udp4|ah4|esp4|sctp4|"
--			  "tcp6|udp6|ah6|esp6|sctp6 m|v|t|s|d|f|n|r... [context %d] |\n"
-+			 "gtpc4|gtpc4t|gtpu4|gtpu4e|gtpu4u|gtpu4d|tcp6|udp6|ah6|esp6|sctp6"
-+			  "|gtpc6|gtpc6t|gtpu6|gtpu6e|gtpu6u|gtpu6d m|v|t|s|d|f|n|r|e... [context %d] |\n"
- 			  "		flow-type ether|ip4|tcp4|udp4|sctp4|ah4|esp4|"
- 			  "ip6|tcp6|udp6|ah6|esp6|sctp6\n"
- 			  "			[ src %x:%x:%x:%x:%x:%x [m %x:%x:%x:%x:%x:%x] ]\n"
-diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
-index 1d0731b..6fb6a07 100644
---- a/uapi/linux/ethtool.h
-+++ b/uapi/linux/ethtool.h
-@@ -2009,6 +2009,18 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
- #define	IPV4_FLOW	0x10	/* hash only */
- #define	IPV6_FLOW	0x11	/* hash only */
- #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
-+#define GTPU_V4_FLOW 0x13	/* hash only */
-+#define GTPU_V6_FLOW 0x14	/* hash only */
-+#define GTPC_V4_FLOW 0x15	/* hash only */
-+#define GTPC_V6_FLOW 0x16	/* hash only */
-+#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
-+#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
-+#define GTPU_EH_V4_FLOW 0x19	/* hash only */
-+#define GTPU_EH_V6_FLOW 0x20	/* hash only */
-+#define GTPU_UL_V4_FLOW 0x21	/* hash only */
-+#define GTPU_UL_V6_FLOW 0x22	/* hash only */
-+#define GTPU_DL_V4_FLOW 0x23	/* hash only */
-+#define GTPU_DL_V6_FLOW 0x24	/* hash only */
- /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
- #define	FLOW_EXT	0x80000000
- #define	FLOW_MAC_EXT	0x40000000
-@@ -2023,6 +2035,7 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
- #define	RXH_IP_DST	(1 << 5)
- #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
- #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
-+#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
- #define	RXH_DISCARD	(1 << 31)
- 
- #define	RX_CLS_FLOW_DISC	0xffffffffffffffffULL
--- 
-2.34.1
-
+Ah, I can drop all the mut here.
 
