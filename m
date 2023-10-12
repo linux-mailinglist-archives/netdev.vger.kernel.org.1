@@ -1,41 +1,50 @@
-Return-Path: <netdev+bounces-40254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29F637C6689
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B427C669B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDD652820D3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:40:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FAC62825DA
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D04B101C1;
-	Thu, 12 Oct 2023 07:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0f3kzq1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E0110795;
+	Thu, 12 Oct 2023 07:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34DEDF49
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65793C433C8;
-	Thu, 12 Oct 2023 07:40:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697096422;
-	bh=BKKA39C9Tt0Yl5gbHxH7plgRTiuALht33EVt+0dZXs8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W0f3kzq10SC8Yrp7aB0WV20UVG9lh827u9S/TSvFKN3qLm9lubyiYhqXr2tUrALBH
-	 jRLlkxTZshwBqVvsW6Y4aC7yazqE3TLu6UuGhHhXAQQEtMhKEJ0NirgE+AV30TGMZ2
-	 1/kx+hQnc6qOr3fiiNvxMwvONJp8kvhyRXwBMNlygsONWqgSUFdhoLYB4fW8FnGGmD
-	 3tPID4ZYRm2t2kTu1RKwC8awVEhapuDupKGjMOCWad6xwhPKeKuEkPavaErtg0ZSRq
-	 cSdjbnL/20B2Cq/gK9drJYe85nJykcgNYK18BeIYXZVcjrXUxnbXQ9UjQZPzU+tzlO
-	 SWaC17X0uS9xg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43C83C595C3;
-	Thu, 12 Oct 2023 07:40:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AB2101D5
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:44:14 +0000 (UTC)
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D95C090
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:44:12 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R321e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VtziJda_1697096649;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VtziJda_1697096649)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Oct 2023 15:44:10 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	"Liu, Yujie" <yujie.liu@intel.com>
+Subject: [PATCH net-next 0/5] virtio-net: support dynamic coalescing moderation
+Date: Thu, 12 Oct 2023 15:44:04 +0800
+Message-Id: <cover.1697093455.git.hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,46 +52,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] nfc: nci: assert requested protocol is valid
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169709642227.8662.4260240100354019441.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Oct 2023 07:40:22 +0000
-References: <20231009200054.82557-1-jeremy@jcline.org>
-In-Reply-To: <20231009200054.82557-1-jeremy@jcline.org>
-To: Jeremy Cline <jeremy@jcline.org>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, dvyukov@google.com, linma@zju.edu.cn,
- ilane@ti.com, linville@tuxdriver.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org,
- syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Now, virtio-net already supports per-queue moderation parameter
+setting. Based on this, we use the netdim library of linux to support
+dynamic coalescing moderation for virtio-net.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Due to hardware scheduling issues, we only tested rx dim.
 
-On Mon,  9 Oct 2023 16:00:54 -0400 you wrote:
-> The protocol is used in a bit mask to determine if the protocol is
-> supported. Assert the provided protocol is less than the maximum
-> defined so it doesn't potentially perform a shift-out-of-bounds and
-> provide a clearer error for undefined protocols vs unsupported ones.
-> 
-> Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
-> Reported-and-tested-by: syzbot+0839b78e119aae1fec78@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=0839b78e119aae1fec78
-> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
-> 
-> [...]
+@Test env
+rxq0 has affinity to cpu0.
 
-Here is the summary with links:
-  - [v2,net] nfc: nci: assert requested protocol is valid
-    https://git.kernel.org/netdev/net/c/354a6e707e29
+@Test cmd
+client: taskset -c 0 sockperf tp -i ${IP} -t 30 --tcp -m ${msg_size}
+server: taskset -c 0 sockperf sr --tcp
 
-You are awesome, thank you!
+@Test res
+The second column is the ratio of the result returned by client
+when rx dim is enabled to the result returned by client when
+rx dim is disabled.
+	--------------------------------------
+	| msg_size |  rx_dim=on / rx_dim=off |
+	--------------------------------------
+	|   14B    |         + 3%            |   
+	--------------------------------------
+	|   100B   |         + 16%           |
+	--------------------------------------
+	|   500B   |         + 25%           |
+	--------------------------------------
+	|   1400B  |         + 28%           |
+	--------------------------------------
+	|   2048B  |         + 22%           |
+	--------------------------------------
+	|   4096B  |         + 5%            |
+	--------------------------------------
+
+---
+This patch set was part of the previous netdim patch set[1].
+[1] was split into a merged bugfix set[2] and the current set.
+The previous relevant commentators have been Cced.
+
+[1] https://lore.kernel.org/all/20230811065512.22190-1-hengqi@linux.alibaba.com/
+[2] https://lore.kernel.org/all/cover.1696745452.git.hengqi@linux.alibaba.com/
+
+Heng Qi (5):
+  virtio-net: returns whether napi is complete
+  virtio-net: separate rx/tx coalescing moderation cmds
+  virtio-net: extract virtqueue coalescig cmd for reuse
+  virtio-net: support rx netdim
+  virtio-net: support tx netdim
+
+ drivers/net/virtio_net.c | 394 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 322 insertions(+), 72 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.19.1.6.gb485710b
 
 
