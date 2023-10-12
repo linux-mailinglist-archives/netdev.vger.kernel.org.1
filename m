@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5E27C7766
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD0E7C7767
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC2731C2119B
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78B16282ECF
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571073CD18;
-	Thu, 12 Oct 2023 19:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFC23D3A7;
+	Thu, 12 Oct 2023 19:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="luTbX7B1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pG+C0k1P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365B13CD14
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3F0DC433C9;
-	Thu, 12 Oct 2023 19:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2723D39B
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5EA1C433C8;
+	Thu, 12 Oct 2023 19:53:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697140394;
-	bh=RnK0OyT+rcsKf0NKASgntOYCyM/4HrW5yxiDKsr4Ekw=;
+	bh=msJAgf4+1mit8aMTSdB9VWe6D/lfDhb4lvAheCxJPM4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=luTbX7B1N84EmUyfA6yaPZOgpliMG/ZTrF041NGGQS+8unXggqGtz31nPJYbLdTlD
-	 EP8T7Pn5jmSDthPPKePDfMvm+ORrzn4QDxFWBcn6BI3D3S6sf/YTJuiUhBahEJwzIl
-	 NZls6gHSXY3jvPBD/F2lr+ljknDppfLxPcp6ckmQgtuYwxDxZeVVYW8LKGxqFaOcWS
-	 Vsu9FZPX8BGzrzSl2H2NWbel76l05Y9JoFl/6kOhi35kQD7Bat83K2H8eoWQngWF8R
-	 vzHZaEp8yAGsx5mpqtCfp5d2ZiHrFVHWovFH9DKFUPLRvA+CsJLyIBKn0s+XuOLqO0
-	 47LAtAcXyXV6g==
+	b=pG+C0k1PD8+GSapaAMjMP05ByQmHE5O6mtX05/phOU67CdLwn0W+3q1/1h9rjOdBf
+	 yL4nKdbsl6CUZjMKypsfGumUMo1WUi/pGBEozEBT00SIONE3PIO+49i8XptGdIvzUF
+	 Ze9dtoMw19PXIPcJgZrbVBIhFI7lFV9L2JTfk/UckE872FdEBcEyv+JRIX3Iqz5TD+
+	 W9QQNu5hMiA2W+944ojNp4vMc1IA8Oo9AHs5srvkBbjN30QG5weXmL0nCMts0Mfz8v
+	 0jkbNY5f0+kNdbQtVL/PAXWChihp93ncNceFQ0hyfMqAvIl9oVB5zAB0eUc2omXUVa
+	 i8OhoyQ9hPG7Q==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Chris Mason <clm@fb.com>
-Subject: [net 06/10] net/mlx5e: RX, Fix page_pool allocation failure recovery for legacy rq
-Date: Thu, 12 Oct 2023 12:51:23 -0700
-Message-ID: <20231012195127.129585-7-saeed@kernel.org>
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net 07/10] net/mlx5e: XDP, Fix XDP_REDIRECT mpwqe page fragment leaks on shutdown
+Date: Thu, 12 Oct 2023 12:51:24 -0700
+Message-ID: <20231012195127.129585-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
 References: <20231012195127.129585-1-saeed@kernel.org>
@@ -58,103 +57,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Dragos Tatulea <dtatulea@nvidia.com>
 
-When a page allocation fails during refill in mlx5e_refill_rx_wqes, the
-page will be released again on the next refill call. This triggers the
-page_pool negative page fragment count warning below:
+When mlx5e_xdp_xmit is called without the XDP_XMIT_FLUSH set it is
+possible that it leaves a mpwqe session open. That is ok during runtime:
+the session will be closed on the next call to mlx5e_xdp_xmit. But
+having a mpwqe session still open at XDP sq close time is problematic:
+the pc counter is not updated before flushing the contents of the
+xdpi_fifo. This results in leaking page fragments.
 
- [  338.326070] WARNING: CPU: 4 PID: 0 at include/net/page_pool/helpers.h:130 mlx5e_page_release_fragmented.isra.0+0x42/0x50 [mlx5_core]
-  ...
- [  338.328993] RIP: 0010:mlx5e_page_release_fragmented.isra.0+0x42/0x50 [mlx5_core]
- [  338.329094] Call Trace:
- [  338.329097]  <IRQ>
- [  338.329100]  ? __warn+0x7d/0x120
- [  338.329105]  ? mlx5e_page_release_fragmented.isra.0+0x42/0x50 [mlx5_core]
- [  338.329173]  ? report_bug+0x155/0x180
- [  338.329179]  ? handle_bug+0x3c/0x60
- [  338.329183]  ? exc_invalid_op+0x13/0x60
- [  338.329187]  ? asm_exc_invalid_op+0x16/0x20
- [  338.329192]  ? mlx5e_page_release_fragmented.isra.0+0x42/0x50 [mlx5_core]
- [  338.329259]  mlx5e_post_rx_wqes+0x210/0x5a0 [mlx5_core]
- [  338.329327]  ? mlx5e_poll_rx_cq+0x88/0x6f0 [mlx5_core]
- [  338.329394]  mlx5e_napi_poll+0x127/0x6b0 [mlx5_core]
- [  338.329461]  __napi_poll+0x25/0x1a0
- [  338.329465]  net_rx_action+0x28a/0x300
- [  338.329468]  __do_softirq+0xcd/0x279
- [  338.329473]  irq_exit_rcu+0x6a/0x90
- [  338.329477]  common_interrupt+0x82/0xa0
- [  338.329482]  </IRQ>
+The fix is to always close the mpwqe session at the end of
+mlx5e_xdp_xmit, regardless of the XDP_XMIT_FLUSH flag being set or not.
 
-This patch fixes the legacy rq case by releasing all allocated fragments
-and then setting the skip flag on all released fragments. It is
-important to note that the number of released fragments will be higher
-than the number of allocated fragments when an allocation error occurs.
-
-Fixes: 3f93f82988bc ("net/mlx5e: RX, Defer page release in legacy rq for better recycling")
-Tested-by: Chris Mason <clm@fb.com>
-Reported-by: Chris Mason <clm@fb.com>
-Closes: https://lore.kernel.org/netdev/117FF31A-7BE0-4050-B2BB-E41F224FF72F@meta.com
+Fixes: 5e0d2eef771e ("net/mlx5e: XDP, Support Enhanced Multi-Packet TX WQE")
 Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 33 ++++++++++++++-----
- 1 file changed, 24 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-index 7988b3a9598c..8d9743a5e42c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
-@@ -457,26 +457,41 @@ static int mlx5e_alloc_rx_wqes(struct mlx5e_rq *rq, u16 ix, int wqe_bulk)
- static int mlx5e_refill_rx_wqes(struct mlx5e_rq *rq, u16 ix, int wqe_bulk)
- {
- 	int remaining = wqe_bulk;
--	int i = 0;
-+	int total_alloc = 0;
-+	int refill_alloc;
-+	int refill;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index 12f56d0db0af..8bed17d8fe56 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -874,11 +874,11 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+ 	}
  
- 	/* The WQE bulk is split into smaller bulks that are sized
- 	 * according to the page pool cache refill size to avoid overflowing
- 	 * the page pool cache due to too many page releases at once.
- 	 */
- 	do {
--		int refill = min_t(u16, rq->wqe.info.refill_unit, remaining);
--		int alloc_count;
-+		refill = min_t(u16, rq->wqe.info.refill_unit, remaining);
+ out:
+-	if (flags & XDP_XMIT_FLUSH) {
+-		if (sq->mpwqe.wqe)
+-			mlx5e_xdp_mpwqe_complete(sq);
++	if (sq->mpwqe.wqe)
++		mlx5e_xdp_mpwqe_complete(sq);
++
++	if (flags & XDP_XMIT_FLUSH)
+ 		mlx5e_xmit_xdp_doorbell(sq);
+-	}
  
--		mlx5e_free_rx_wqes(rq, ix + i, refill);
--		alloc_count = mlx5e_alloc_rx_wqes(rq, ix + i, refill);
--		i += alloc_count;
--		if (unlikely(alloc_count != refill))
--			break;
-+		mlx5e_free_rx_wqes(rq, ix + total_alloc, refill);
-+		refill_alloc = mlx5e_alloc_rx_wqes(rq, ix + total_alloc, refill);
-+		if (unlikely(refill_alloc != refill))
-+			goto err_free;
- 
-+		total_alloc += refill_alloc;
- 		remaining -= refill;
- 	} while (remaining);
- 
--	return i;
-+	return total_alloc;
-+
-+err_free:
-+	mlx5e_free_rx_wqes(rq, ix, total_alloc + refill_alloc);
-+
-+	for (int i = 0; i < total_alloc + refill; i++) {
-+		int j = mlx5_wq_cyc_ctr2ix(&rq->wqe.wq, ix + i);
-+		struct mlx5e_wqe_frag_info *frag;
-+
-+		frag = get_frag(rq, j);
-+		for (int k = 0; k < rq->wqe.info.num_frags; k++, frag++)
-+			frag->flags |= BIT(MLX5E_WQE_FRAG_SKIP_RELEASE);
-+	}
-+
-+	return 0;
+ 	return nxmit;
  }
- 
- static void
 -- 
 2.41.0
 
