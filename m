@@ -1,68 +1,189 @@
-Return-Path: <netdev+bounces-40380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF71F7C7056
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:32:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A327C7081
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFC51C20D86
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:32:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F271C20909
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CABE125C7;
-	Thu, 12 Oct 2023 14:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrH2Ep83"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3A721358;
+	Thu, 12 Oct 2023 14:41:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCFE266B8
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 14:32:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8216DC433C8;
-	Thu, 12 Oct 2023 14:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697121144;
-	bh=KZZrnpR6jbdzIOr1mKe+cq4MYlkeEtVcZgM/Ge5JRvo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mrH2Ep839+GCWwI/Mj34mOf8AEN3yTsPqcMvnNx8PCCwH/ztOQeatTrAvGfe/zoeP
-	 9ALZZ5ueVmQYbECQXWVDZNcDPZkafwMF014eY9HO59VETKt33IQQVGo9wQ08ga5vxy
-	 PulcntUaEZZBWdN9PLCtt2FAhwgN3PtonJyziDHB45x5qrVWGi1FT0Z1RoBpYJV2ft
-	 /FuhTY4cHrf8W6P2msjRSKrWEBqzGBjXC2WebTL5QjWB6pwWyjwDozjZz03kKhEpgv
-	 4C7J+t10mne92pFAPqap7OULLljUJVNzetowxJrKJrPYkEc96TQfDpfvU/GS0GkBDD
-	 ZIEB/UXa9ucDg==
-Date: Thu, 12 Oct 2023 07:32:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com
-Subject: Re: [patch net-next] tools: ynl: introduce option to ignore unknown
- attributes or types
-Message-ID: <20231012073223.2210c517@kernel.org>
-In-Reply-To: <20231012140438.306857-1-jiri@resnulli.us>
-References: <20231012140438.306857-1-jiri@resnulli.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7473637A
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 14:41:49 +0000 (UTC)
+Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63890BB
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:41:46 -0700 (PDT)
+Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-6c6373a4aa7so1404140a34.3
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:41:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697121705; x=1697726505;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0sjLlGIFaUzWitAxPHuaZRKA3VR7ji9H637xkgZgO6c=;
+        b=YdCtCof6SKUbLPXhqm9IBkSSfKIT0Hu0DC6FhWpD4tD06ZRuJuwfqlXA6DcsHzc0LN
+         rxUB8GiHqfoSLhHky28rokPbK3N2E0wG31GYmjZSMg7BpwtzJKSRdRC3kF62ZHgRrdB3
+         U2r1wh8vmWFpKVP5H26+0JZ98blVfJ47sZq8E7Z8Rq3Fq8cAQTo9Zo7Z1waxl+BMK3yJ
+         eNcAQUXQINYi7S5eWSPOSCYHwqrnCpoNT/1C4cKuCB5+WwJoPVCQnpbBieD25vbxpqaf
+         QLYnCDes0s/9GXoHIUTbYSIIsrf6gcRTSA0px13Yl7y8yIb8yTKi2ZX6KORZSXnSZVSo
+         MDlg==
+X-Gm-Message-State: AOJu0YxRX5B6LIaOJk7A1Dxh1CKTdS1DdrleQo2cEbd3eZI1zBGB+mQ1
+	lZ8/yNRmb2NyyxaW3iWK0EPSUrSdDXua0b8Xttzj2y9/l/2Q
+X-Google-Smtp-Source: AGHT+IEuSWhLvSImEUWwm/crvQ4RlVw4J+LYSy+BxRn8YVmBQ6p1yaYel6U+3bJr01Qg/7Dbl55VzBv350526S0hwwbsniX3yq6o
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a9d:6394:0:b0:6ba:8e4a:8e62 with SMTP id
+ w20-20020a9d6394000000b006ba8e4a8e62mr7059219otk.7.1697121705800; Thu, 12 Oct
+ 2023 07:41:45 -0700 (PDT)
+Date: Thu, 12 Oct 2023 07:41:45 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006a3d0d060785f027@google.com>
+Subject: [syzbot] [net?] [wireless?] WARNING in ieee80211_bss_info_change_notify
+ (2)
+From: syzbot <syzbot+dd4779978217b1973180@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 16:04:38 +0200 Jiri Pirko wrote:
-> $ sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1", "trap-name": "source_mac_is_multicast"}' --ignore-unknown
-> {'bus-name': 'netdevsim',
->  'dev-name': 'netdevsim1',
->  'trap-action': 'drop',
->  'trap-group-name': 'l2_drops',
->  'trap-name': 'source_mac_is_multicast'}
+Hello,
 
-Wouldn't it be better to put the unknown attr in as raw binary?
-We can key it by attribute type (integer) and put the NlAttr object
-in as the value.
+syzbot found the following issue on:
 
-That way at least the user still sees that the unknown attrs are
-present.
+HEAD commit:    401644852d0b Merge tag 'fs_for_v6.6-rc6' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=176b01ad680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=32d0b9b42ceb8b10
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd4779978217b1973180
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/94b84d66fc32/disk-40164485.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2a510b785da4/vmlinux-40164485.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/663b784d908b/bzImage-40164485.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dd4779978217b1973180@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+wlan1: Failed check-sdata-in-driver check, flags: 0x0
+WARNING: CPU: 0 PID: 9044 at net/mac80211/main.c:236 ieee80211_bss_info_change_notify+0x2c9/0x820 net/mac80211/main.c:236
+Modules linked in:
+CPU: 0 PID: 9044 Comm: syz-executor.2 Not tainted 6.6.0-rc5-syzkaller-00072-g401644852d0b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
+RIP: 0010:ieee80211_bss_info_change_notify+0x2c9/0x820 net/mac80211/main.c:236
+Code: 00 00 e8 4a e3 d6 f7 48 8b 74 24 08 48 89 74 24 08 e8 3b e3 d6 f7 8b 14 24 48 c7 c7 c0 a2 c4 8b 48 8b 74 24 08 e8 87 0b 9d f7 <0f> 0b e8 20 e3 d6 f7 4c 89 f2 48 b8 00 00 00 00 00 fc ff df 48 c1
+RSP: 0018:ffffc900062472d8 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ffff888020030c80 RCX: ffffc90003ec1000
+RDX: 0000000000040000 RSI: ffffffff814df0c6 RDI: 0000000000000001
+RBP: 0000000000000a00 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffff888078ef8e20
+R13: ffff8880200328b0 R14: ffff8880200315a0 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0063) knlGS:00000000f7f3ab40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 00000000f72646b0 CR3: 0000000020d94000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_ibss_disconnect+0x411/0x9d0 net/mac80211/ibss.c:726
+ ieee80211_ibss_leave+0x16/0x160 net/mac80211/ibss.c:1872
+ rdev_leave_ibss net/wireless/rdev-ops.h:569 [inline]
+ __cfg80211_leave_ibss+0x1a2/0x410 net/wireless/ibss.c:210
+ cfg80211_leave_ibss+0x59/0x80 net/wireless/ibss.c:228
+ cfg80211_change_iface+0x457/0xdf0 net/wireless/util.c:1137
+ nl80211_set_interface+0x708/0x9b0 net/wireless/nl80211.c:4222
+ genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:971
+ genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1066
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2558
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2612
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2641
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0x61/0xe0 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+RIP: 0023:0xf7f3f579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f7f3a5ac EFLAGS: 00000292 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000020000100
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	ret
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
