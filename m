@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BCE77C7769
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EADA87C776A
 	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E496E282C7C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19E2B1C21242
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBD13D968;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A853D96E;
 	Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6aBdPRs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NFklREM3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E71E3D39B
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F7C5C43395;
-	Thu, 12 Oct 2023 19:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5213D96D
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4996FC433C7;
+	Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697140396;
-	bh=6w+Qbp5FDzsN/+MdzSKHSBt3HZjqhvGNZ9eMDp8xgqk=;
+	s=k20201202; t=1697140397;
+	bh=BpwSHoCzWrx3k7ZY6ysA4trLoy9KbB+YZT8eu6DcJvI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=q6aBdPRsxOipPdXkr/e/3nAQ+Ff8HTA2L060xatp1QM2gIoocQmLjATmS1J9GHsSF
-	 U0NRGXAd1SITMDclHIQcg3EFYLmWslJ37cbcVD3UW508HPjQ4kEuN49NOOHCTRDKot
-	 FD/lf8dpHGUgdXWDmItXUwCflycfIH4EMiYUTzLyRiDvkgoNN4r5e4g1M/mJ/oX3tX
-	 jNVnJ3ajibDmyEj1vLeyqBPUYF18oOWRN8avssoGpI2D7hk18BXtWm3GYT3IwVHgHH
-	 rSlrJP1GoJM6Vp0eiKF4NrLKSAFIAxM4l49eOfVsmTe6CUaVTdr+t0bNZcQMfGSGE4
-	 3eB9i572Ftt/g==
+	b=NFklREM3vTvqBhul3UcZJeUMBPJu+bKuxhFlyFPo58oLIwNskpON7Y4/hNBKm5SMH
+	 iKcMn7GZVmga295RcPvseO0+GqbzzA0unQ8R0jvSQGLAi+TWnf5DjHLKDVWnlau8Oe
+	 43jWUAYCDW8zV5Sr3CylD8q+S4BEjxoIZJnICjRAXtIoBu8OUfhIQof1lnrcjmNlft
+	 0xaYylXFnAaW2X9aX9V2+lYC4/TeO/rUxW560MhCAk5d8OV3piZcwXm2IeYnBuV/RW
+	 XON3Lmo7gSb8FErmtSRrGGrnoxvpOfljFhB/1IEH1JVQMfxOwagr1slWwQyBKzWcVL
+	 c9QtXfP06UbNA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Ariel Levkovich <lariel@nvidia.com>
-Subject: [net 09/10] net/mlx5e: Don't offload internal port if filter device is out device
-Date: Thu, 12 Oct 2023 12:51:26 -0700
-Message-ID: <20231012195127.129585-10-saeed@kernel.org>
+	Amir Tzin <amirtz@nvidia.com>,
+	Patrisious Haddad <phaddad@nvidia.com>
+Subject: [net 10/10] net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command
+Date: Thu, 12 Oct 2023 12:51:27 -0700
+Message-ID: <20231012195127.129585-11-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
 References: <20231012195127.129585-1-saeed@kernel.org>
@@ -56,41 +56,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Amir Tzin <amirtz@nvidia.com>
 
-In the cited commit, if the routing device is ovs internal port, the
-out device is set to uplink, and packets go out after encapsulation.
+Although vf_vport entry of struct mlx5e_stats is never updated, its
+values are mistakenly copied to the caller structure in the VF
+representor .ndo_get_stat_64 callback mlx5e_rep_get_stats(). Remove
+redundant entry and use the updated one, rep_stats, instead.
 
-If filter device is uplink, it can trigger the following syndrome:
-mlx5_core 0000:08:00.0: mlx5_cmd_out_err:803:(pid 3966): SET_FLOW_TABLE_ENTRY(0x936) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0xcdb051), err(-22)
-
-Fix this issue by not offloading internal port if filter device is out
-device. In this case, packets are not forwarded to the root table to
-be processed, the termination table is used instead to forward them
-from uplink to uplink.
-
-Fixes: 100ad4e2d758 ("net/mlx5e: Offload internal port as encap route device")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Ariel Levkovich <lariel@nvidia.com>
+Fixes: 64b68e369649 ("net/mlx5: Refactor and expand rep vport stat group")
+Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+Signed-off-by: Amir Tzin <amirtz@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_stats.h | 11 ++++++++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +++--
+ 3 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
-index 1730f6a716ee..b10e40e1a9c1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
-@@ -24,7 +24,8 @@ static int mlx5e_set_int_port_tunnel(struct mlx5e_priv *priv,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+index 5ca9bc337dc6..fd1cce542b68 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
+@@ -701,7 +701,7 @@ mlx5e_rep_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
  
- 	route_dev = dev_get_by_index(dev_net(e->out_dev), e->route_dev_ifindex);
+ 	/* update HW stats in background for next time */
+ 	mlx5e_queue_update_stats(priv);
+-	memcpy(stats, &priv->stats.vf_vport, sizeof(*stats));
++	mlx5e_stats_copy_rep_stats(stats, &priv->stats.rep_stats);
+ }
  
--	if (!route_dev || !netif_is_ovs_master(route_dev))
-+	if (!route_dev || !netif_is_ovs_master(route_dev) ||
-+	    attr->parse_attr->filter_dev == e->out_dev)
- 		goto out;
+ static int mlx5e_rep_change_mtu(struct net_device *netdev, int new_mtu)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+index 176fa5976259..477c547dcc04 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+@@ -484,11 +484,20 @@ struct mlx5e_stats {
+ 	struct mlx5e_vnic_env_stats vnic;
+ 	struct mlx5e_vport_stats vport;
+ 	struct mlx5e_pport_stats pport;
+-	struct rtnl_link_stats64 vf_vport;
+ 	struct mlx5e_pcie_stats pcie;
+ 	struct mlx5e_rep_stats rep_stats;
+ };
  
- 	err = mlx5e_set_fwd_to_int_port_actions(priv, attr, e->route_dev_ifindex,
++static inline void mlx5e_stats_copy_rep_stats(struct rtnl_link_stats64 *vf_vport,
++					      struct mlx5e_rep_stats *rep_stats)
++{
++	memset(vf_vport, 0, sizeof(*vf_vport));
++	vf_vport->rx_packets = rep_stats->vport_rx_packets;
++	vf_vport->tx_packets = rep_stats->vport_tx_packets;
++	vf_vport->rx_bytes = rep_stats->vport_rx_bytes;
++	vf_vport->tx_bytes = rep_stats->vport_tx_bytes;
++}
++
+ extern mlx5e_stats_grp_t mlx5e_nic_stats_grps[];
+ unsigned int mlx5e_nic_stats_grps_num(struct mlx5e_priv *priv);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index c24828b688ac..c8590483ddc6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -4972,7 +4972,8 @@ static int scan_tc_matchall_fdb_actions(struct mlx5e_priv *priv,
+ 			if (err)
+ 				return err;
+ 
+-			rpriv->prev_vf_vport_stats = priv->stats.vf_vport;
++			mlx5e_stats_copy_rep_stats(&rpriv->prev_vf_vport_stats,
++						   &priv->stats.rep_stats);
+ 			break;
+ 		default:
+ 			NL_SET_ERR_MSG_MOD(extack, "mlx5 supports only police action for matchall");
+@@ -5012,7 +5013,7 @@ void mlx5e_tc_stats_matchall(struct mlx5e_priv *priv,
+ 	u64 dbytes;
+ 	u64 dpkts;
+ 
+-	cur_stats = priv->stats.vf_vport;
++	mlx5e_stats_copy_rep_stats(&cur_stats, &priv->stats.rep_stats);
+ 	dpkts = cur_stats.rx_packets - rpriv->prev_vf_vport_stats.rx_packets;
+ 	dbytes = cur_stats.rx_bytes - rpriv->prev_vf_vport_stats.rx_bytes;
+ 	rpriv->prev_vf_vport_stats = cur_stats;
 -- 
 2.41.0
 
