@@ -1,202 +1,185 @@
-Return-Path: <netdev+bounces-40383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22FF47C70EB
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:05:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DEC47C712B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B5551C20E45
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:05:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1958D28215A
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B59B266A8;
-	Thu, 12 Oct 2023 15:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD22266C7;
+	Thu, 12 Oct 2023 15:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="OIEJ784B"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zzp61f7S"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1E6BA3C;
-	Thu, 12 Oct 2023 15:05:44 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2120.outbound.protection.outlook.com [40.107.237.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF20A90;
-	Thu, 12 Oct 2023 08:05:41 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MAoduIdB0EMI1EeBw2WRb2PpXJqj8GyO7f6Ak4DGdbZ9uT10s6zuT5UvaL10RtxSxskN4CpleV0ShtIDi9iV1PAN46v/7HkESEbAFWQJ5TudqQHAdENANssH3dxdbyJ573AMKv7bsBw1A7e8l646Hj4rcoqMxN4zwzxB64ItUF4VrQRfMnLmwk1VljjdXcHgQ7/7kAXtI695lN0JYZ4TGpLjp0V3SMfqZdSP7ca02tUIloLVVKmkVDHKLpWnm2klWgicRdFhAk8BxyKRiBYz6BKQ6rFeMyT9eFuIHIy+QTbDIC+CHY7eRMn1v+xXr0XdtmvQABBXHd07TqAPSKJ1sA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pmUoEMxmtg+XrVh3zuQOm0jIaQC1m5ysRiLcOu4e+10=;
- b=C2rkWnOwc8E/DK6cGt+vB+73eDa8t7CmbSnXnBby6hfSVxR25f4eAFcznz1qNqC4SolEPlplVJOJspusDq74BwRcYBYT/wMpUWqqwsl8mCyLEyvd/dgpiJSYcfxd0gColnWbXrqPMNhf7xL/DgTiQeEQLQzjDx/TXzOo5X9liO7TPtCrqtcky2xfTbZE7t7/bkrZW/hllvAqOovUkw5XGu+9DXTsAiS6uTRuVdPrzRiPlh5Vqr6+WPSD1g1Zmjsi/GuhvSv+we2z+XDpyXH69vqVpzPaOlazIs+EJ5DRgy6LaCuG2Am9UZvSaGRkTiUgKwp7mfdKfTXfIOnc9watZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pmUoEMxmtg+XrVh3zuQOm0jIaQC1m5ysRiLcOu4e+10=;
- b=OIEJ784BiolHSyhvIsbRwQu8ZL4J0QM53JkcXrO2ma+yiS3PitdlxA8Pz6Ujkr27eyGBeshf/QMq2g313JNJQ2bLpRgSUpql5aL1Kmg2mE3e99dbUxVWf9togXa4CZpECebxtqLStsrOGLxC1BxsP5pQzfXSZQ/AQK7Fobvg31o=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
- PH0PR13MB6000.namprd13.prod.outlook.com (2603:10b6:510:16f::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6863.38; Thu, 12 Oct 2023 15:05:36 +0000
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3]) by DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::6287:b0d7:3d05:a8b3%6]) with mapi id 15.20.6863.043; Thu, 12 Oct 2023
- 15:05:35 +0000
-Date: Thu, 12 Oct 2023 17:05:19 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] nfp: replace deprecated strncpy with strscpy
-Message-ID: <ZSgLLwDD9J3uDutU@LouisNoVo>
-References: <20231011-strncpy-drivers-net-ethernet-netronome-nfp-nfpcore-nfp_resource-c-v1-1-7d1c984f0eba@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231011-strncpy-drivers-net-ethernet-netronome-nfp-nfpcore-nfp_resource-c-v1-1-7d1c984f0eba@google.com>
-X-ClientProxiedBy: JNAP275CA0017.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::22)
- To DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83701BA3C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:15:32 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F385C0;
+	Thu, 12 Oct 2023 08:15:30 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CFC6fs014877;
+	Thu, 12 Oct 2023 15:15:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cu4OWlFcSkzAgQ1ZSUgowb6rWlcfQOprHpsTpGYe/I0=;
+ b=Zzp61f7SDD20yZHSnGWqesTlBhZRuuPoLqAjpRrWTbkF/dRS10ZY1wbaObTb/RaF2PRB
+ xGy8gFA9BclT6cTXjwSs3yQqcaNzgl7D78zUi3SHETVJYJEMcvCKFESBF09SdpTxKCNl
+ Hk7NKJyOiLpbFKoZ0VIzCwjH2Q2BXL8sWV7RBk5ZbOMpPh2ufPugW3VLu3FDpGpZ1sZO
+ BVHohNuDINuQuc+J48gvU4h1tAOQ1+7cos3J0FbrPFFvF8Eo7nw4ij4PfwK2sAng8enT
+ 7DdHNm/fz1swRhq8aD+EqFetZO3g07VtiU3+9Gws8O8YvC/4eUJbj1FF3k5kmHIZAguR 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpk8084cp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 15:15:20 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CFDFJs019790;
+	Thu, 12 Oct 2023 15:15:20 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpk8084bs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 15:15:20 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CFCslU028188;
+	Thu, 12 Oct 2023 15:15:19 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkj1ygf6p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 15:15:19 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CFFHUv17891842
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Oct 2023 15:15:18 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CAA1958058;
+	Thu, 12 Oct 2023 15:15:17 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1423458059;
+	Thu, 12 Oct 2023 15:15:16 +0000 (GMT)
+Received: from [9.171.29.13] (unknown [9.171.29.13])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Oct 2023 15:15:15 +0000 (GMT)
+Message-ID: <bf52b502-6be0-467d-bf0a-5ae0e8d84fe8@linux.ibm.com>
+Date: Thu, 12 Oct 2023 17:15:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|PH0PR13MB6000:EE_
-X-MS-Office365-Filtering-Correlation-Id: 79c8bfb7-0c19-46e4-cf3b-08dbcb34afec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	WHNlTejOU4s/xbIEVXIdpe3oSkAKisBtoSc34SnpxFDhs26n8yGoFpJKHnamQ0uQqXXW8eMUykOrUl/av44TmhWihjarXh4uSZX+MFulrWJrS5IBWL4kToHTe2s5RJzIQDJFl9JJ9naDno9m56GQK14+mTWle8LNESuG2Yg1PSxpyWHJO1TM9aUUofuLmwvn2WxWOXxud6+mns1xISW+InHxp6Y1VkKAh90GpwxX/GEdk5oAXbCZZbBZKnK09tmtJBQmTWSjCshdpNUDm7ZInrbx9wDyI9WuWlkF3ZO/bqSEYG1OPGCDG7NKCcUIua67QIlbB5Vrcd16IlMjULi3Pe1BFf+Z9oOvLS0xKY5DBOI139b4+e95VHre/rR109O72ZZuA7IfPJDs0k8ChJS3A/FNDJgXkmayxoaHSOimI9u+eXCSVt3SOXqIHkkNKwKbqI8tF6UVsdBh2+TD8QBSZADpPHtWtEiCEn7fzkLioQo7+5mQxxP6nRz+KPCiAhOgRwjQHcD4oeu5knyHXb9VCG2zGsAospHmEKUm7fTwIpFo3wIIMqFMZMh92stK9myeOd7MOooNOBSp2NObbluXtLJmLz1Et7iqgb+Om0rlqV0/wabvWYr7rLwxzTq2hD6ufB3k203b7eGtPuMNPynzbg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(376002)(136003)(396003)(39830400003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(33716001)(83380400001)(478600001)(6666004)(9686003)(6506007)(6512007)(6486002)(38100700002)(54906003)(966005)(316002)(26005)(66556008)(66946007)(6916009)(66476007)(41300700001)(8676002)(8936002)(4326008)(44832011)(5660300002)(2906002)(86362001)(156123004);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?64vkdV8kNrnRW+//kKx7FosAlonD6MqSeTigTDPdKCE+6OyFCvl89HyDSHRr?=
- =?us-ascii?Q?5qAPs2PBgnTRYwQSLpNSsnDPQJAlOGGbr407yVdGAjT7QRxC4YBZnYpJMPiD?=
- =?us-ascii?Q?8QfrGThlJOZZQBdjv0rnoq4JXJVjBxDh41ZaHtLDeMM4z01GUt/f/I0/lwN9?=
- =?us-ascii?Q?OPUIpWC44m+YZWPHDlp3D3wOOAuWydMpllyuUdDitZb8DtIuAXMuR+lZWLYS?=
- =?us-ascii?Q?fvIzLcCI2tnrCWpTubU4DaVttvJScAIQ4p6kPkEUNUN3/amI8T6HmEgWpXw8?=
- =?us-ascii?Q?47InZIHU/ZxUACONVo9VssCSKtztPzZ6/+sG6yWDgxkMxhUlNUiOmWzJlmr7?=
- =?us-ascii?Q?L01nAsdFtbkPr7k2S14EDnx/yWsrYyiig+Bqx8TVl3uhPaKXl9dmlYzQucNs?=
- =?us-ascii?Q?R8wAOcxDbMmOdoeaIql4vt5PT+21170VRapt8yihvi3eHcpJCTwS9TdT4K1I?=
- =?us-ascii?Q?1B6h/u+4IXJLOyb2mWjKYTM76RpR7NmFvsqqOHXfXKVAgo5Y1aygHqi2Ml3G?=
- =?us-ascii?Q?yIrqlolMb3mXqRYBCE1U+1Zg5OwR6Yzj42EgmriGPcd0e1Dw+ZzcEhZI+24z?=
- =?us-ascii?Q?BfuqsJIXNGeiMr0L+0Bd/HB96QIWfNt5lHvLhNJJi2v7g8jamOkKLVzqvMTL?=
- =?us-ascii?Q?7y1KSP8ONSSpulqcfbUivmB+M/xHaDkjGXPgMsmzGnS+B/EWnmK8GLCQoVfK?=
- =?us-ascii?Q?Fx5JP9PiB2n9gF015QrItB4WO9LgrOOZhT94380wTN9ppbSDSMVUnHv7J+/z?=
- =?us-ascii?Q?bs4qpIB5HP7hMFNPWpMUjBGMHxjFKnMSZ0pdU9h/XzBGE3SK9kUHYiqIJSPb?=
- =?us-ascii?Q?yRvuRlJBNqnqk5Rk6QpDUdoi898c7+mdlT3k/8gCzra9A2OBU1cA9Yc+TKCf?=
- =?us-ascii?Q?O+xXv2YOtvILAy6oNDUxBcyeZljEd9yebJMZ9EvcUCzzb4YQwTou6wg/WMPb?=
- =?us-ascii?Q?3gwo/RSh3uNvR4N7e1J1AkulD6t0faUF44q5ejGvoFjcf10QwhI+F/ROurie?=
- =?us-ascii?Q?6t58QmnTGb+BJ3t88LwKPAzsjRDRv2lME285Us+9UAOytkOuoV/ZO9bkLcid?=
- =?us-ascii?Q?FZqMi685lK2DlUe6zEaKP8K1D4pykL958bjEk3vWuon1/Gw05P/VbOopZrpz?=
- =?us-ascii?Q?BCaA5aEIx6cjXtuUReEgzRKFNlc2OHeympY6dzluAY8mx+ujwFd7z0hMZz+P?=
- =?us-ascii?Q?MY/7ZXr07d57idkwwZpyF2dmP4+2ApEUJVaIXufkhCAE7G7fJ/AMD7IaaWJG?=
- =?us-ascii?Q?Q8wHefI2AgZzMkDSz+4F+1l3/dUA4Mtvy1HP7qwoOyTQKm5IHR2amIOmMU3N?=
- =?us-ascii?Q?TGL3ooI0l8LWwq1vaEobBHrn478o0InqIYLBHhVwtSZG8rZSOaoVmua8osLG?=
- =?us-ascii?Q?JSdrfcybFvbGyWYMAwiMZJk5WBhEkjytzNmzUjdsiyT5HeXicqDZ+5htxPub?=
- =?us-ascii?Q?jCtdA65SnTJkGiEnQANagxbrdERqbxDBeFArvVrJlDWUhW5uybFqg+7umsGq?=
- =?us-ascii?Q?kT3zvGDlv8CGoI/WfRkJdC1CAwrZH9ocObG6xtO53Nj7H7aD80J+PDmIJ7GF?=
- =?us-ascii?Q?Wr5MCapaGAbyhre9OcesuRck4YF1eUV1L2fJk2jga0fFdCVafSV/tUyHbphB?=
- =?us-ascii?Q?ag=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79c8bfb7-0c19-46e4-cf3b-08dbcb34afec
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 15:05:35.8072
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Uuki/S7+5OTgzF6JppymcTbPc4QzxtnE6qXunOYwDA8d6bkM5SKvMn/iU+H6RCLSgkMDSJAfvkp7Yu7ACgw2T6lpWqPXZWzRi6ohScpdlfg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB6000
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/5] net/smc: allow cdc msg send rather than drop it
+ with NULL sndbuf_desc
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-4-git-send-email-alibuda@linux.alibaba.com>
+ <5e2efb4b-1d26-4159-a2c7-b0107cb6381c@linux.ibm.com>
+ <9f8f7a96-fcb0-3088-6d2f-d7e7d0fc83a1@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <9f8f7a96-fcb0-3088-6d2f-d7e7d0fc83a1@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: q7HZO0k_fuPjYd-RATOmZrt8Lv4X_j76
+X-Proofpoint-ORIG-GUID: c0urxwtWFHVgYYKy7AKzynSqeqhVINgp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ spamscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 clxscore=1015 adultscore=0 mlxlogscore=999
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310120125
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 09:48:39PM +0000, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> We expect res->name to be NUL-terminated based on its usage with format
-> strings:
-> |       dev_err(cpp->dev.parent, "Dangling area: %d:%d:%d:0x%0llx-0x%0llx%s%s\n",
-> |               NFP_CPP_ID_TARGET_of(res->cpp_id),
-> |               NFP_CPP_ID_ACTION_of(res->cpp_id),
-> |               NFP_CPP_ID_TOKEN_of(res->cpp_id),
-> |               res->start, res->end,
-> |               res->name ? " " : "",
-> |               res->name ? res->name : "");
-> ... and with strcmp()
-> |       if (!strcmp(res->name, NFP_RESOURCE_TBL_NAME)) {
-> 
-> Moreover, NUL-padding is not required as `res` is already
-> zero-allocated:
-> |       res = kzalloc(sizeof(*res), GFP_KERNEL);
-> 
-> Considering the above, a suitable replacement is `strscpy` [2] due to
-> the fact that it guarantees NUL-termination on the destination buffer
-> without unnecessarily NUL-padding.
-> 
-> Let's also opt to use the more idiomatic strscpy() usage of (dest, src,
-> sizeof(dest)) rather than (dest, src, SOME_LEN).
-> 
-> Typically the pattern of 1) allocate memory for string, 2) copy string
-> into freshly-allocated memory is a candidate for kmemdup_nul() but in
-> this case we are allocating the entirety of the `res` struct and that
-> should stay as is. As mentioned above, simple 1:1 replacement of strncpy
-> -> strscpy :)
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> ---
-> Note: build-tested only.
-> 
-> Found with: $ rg "strncpy\("
-Thanks Justin, I did also now check it on a nfp.
 
-Acked-by: Louis Peens <louis.peens@corigine.com>
-> ---
->  drivers/net/ethernet/netronome/nfp/nfpcore/nfp_resource.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+
+On 12.10.23 04:49, D. Wythe wrote:
 > 
-> diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_resource.c b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_resource.c
-> index ce7492a6a98f..279ea0b56955 100644
-> --- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_resource.c
-> +++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_resource.c
-> @@ -159,7 +159,7 @@ nfp_resource_acquire(struct nfp_cpp *cpp, const char *name)
->  	if (!res)
->  		return ERR_PTR(-ENOMEM);
->  
-> -	strncpy(res->name, name, NFP_RESOURCE_ENTRY_NAME_SZ);
-> +	strscpy(res->name, name, sizeof(res->name));
->  
->  	dev_mutex = nfp_cpp_mutex_alloc(cpp, NFP_RESOURCE_TBL_TARGET,
->  					NFP_RESOURCE_TBL_BASE,
 > 
-> ---
-> base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-> change-id: 20231011-strncpy-drivers-net-ethernet-netronome-nfp-nfpcore-nfp_resource-c-1812b8357fcd
+> On 10/12/23 4:37 AM, Wenjia Zhang wrote:
+>>
+>>
+>> On 11.10.23 09:33, D. Wythe wrote:
+>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>
+>>> This patch re-fix the issues memtianed by commit 22a825c541d7
+>>> ("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()").
+>>>
+>>> Blocking sending message do solve the issues though, but it also
+>>> prevents the peer to receive the final message. Besides, in logic,
+>>> whether the sndbuf_desc is NULL or not have no impact on the processing
+>>> of cdc message sending.
+>>>
+>> Agree.
+>>
+>>> Hence that, this patch allow the cdc message sending but to check the
+>>> sndbuf_desc with care in smc_cdc_tx_handler().
+>>>
+>>> Fixes: 22a825c541d7 ("net/smc: fix NULL sndbuf_desc in 
+>>> smc_cdc_tx_handler()")
+>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>> ---
+>>>   net/smc/smc_cdc.c | 9 ++++-----
+>>>   1 file changed, 4 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+>>> index 01bdb79..3c06625 100644
+>>> --- a/net/smc/smc_cdc.c
+>>> +++ b/net/smc/smc_cdc.c
+>>> @@ -28,13 +28,15 @@ static void smc_cdc_tx_handler(struct 
+>>> smc_wr_tx_pend_priv *pnd_snd,
+>>>   {
+>>>       struct smc_cdc_tx_pend *cdcpend = (struct smc_cdc_tx_pend 
+>>> *)pnd_snd;
+>>>       struct smc_connection *conn = cdcpend->conn;
+>>> +    struct smc_buf_desc *sndbuf_desc;
+>>>       struct smc_sock *smc;
+>>>       int diff;
+>>>   +    sndbuf_desc = conn->sndbuf_desc;
+>>>       smc = container_of(conn, struct smc_sock, conn);
+>>>       bh_lock_sock(&smc->sk);
+>>> -    if (!wc_status) {
+>>> -        diff = smc_curs_diff(cdcpend->conn->sndbuf_desc->len,
+>>> +    if (!wc_status && sndbuf_desc) {
+>>> +        diff = smc_curs_diff(sndbuf_desc->len,
+>> How could this guarantee that the sndbuf_desc would not be NULL?
+>>
 > 
-> Best regards,
-> --
-> Justin Stitt <justinstitt@google.com>
+> It can not guarantee he sndbuf_desc would not be NULL, but it will prevents
+> the smc_cdc_tx_handler() to access a NULL sndbuf_desc. So that we
+> can avoid the panic descried in commit 22a825c541d7
+> ("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()").
+> 
+got it, thanks!
+
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+
+>>> &cdcpend->conn->tx_curs_fin,
+>>>                        &cdcpend->cursor);
+>>>           /* sndbuf_space is decreased in smc_sendmsg */
+>>> @@ -114,9 +116,6 @@ int smc_cdc_msg_send(struct smc_connection *conn,
+>>>       union smc_host_cursor cfed;
+>>>       int rc;
+>>>   -    if (unlikely(!READ_ONCE(conn->sndbuf_desc)))
+>>> -        return -ENOBUFS;
+>>> -
+>>>       smc_cdc_add_pending_send(conn, pend);
+>>>         conn->tx_cdc_seq++;
 > 
 
