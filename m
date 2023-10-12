@@ -1,149 +1,139 @@
-Return-Path: <netdev+bounces-40425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614297C74D6
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:34:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C15C7C75B7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609201C20BE6
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:34:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35235282839
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC5636AEF;
-	Thu, 12 Oct 2023 17:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6ACD3A266;
+	Thu, 12 Oct 2023 18:12:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lZ5LV6ok"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="d9kWHJgs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84132AB39
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:34:20 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F084010B
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:34:17 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 46A1DFF805;
-	Thu, 12 Oct 2023 17:34:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1697132054;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BRiYshhP7qCU0RVMJ9W0l7j4l03NliW4PnPPeVL297Y=;
-	b=lZ5LV6oklBBCAbb7XWpi3qqqgnuB6au0/3wWSW2FMNAhbsf1PSlmgrySMmrsMRxhJiDUxa
-	sPZGLjtcduMllJRZIxkiTnwjh1SI3tfxDEc2OxX16A7ewzJsatVlb6peDtzWR5iwhnOBaB
-	Q9HY1sj+HCtPQQPBD2SJRuzX1lZ8yZI/seVTu6ZH8PzkwKNKqHXhVa8LdCNazrmddti/O7
-	9vl8V+2+Sz/i19N0nzDsRgcFR4CwTbUr/gH0OdJ47d6hky1XnciTYDMuwavLEHFlDjBV5/
-	4Q/85UrrtwG5n03kKdz+n3zcli4X+hdp1EuC0piQdBqlPe1buTgcA+FAhbq4vA==
-Date: Thu, 12 Oct 2023 19:34:10 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
- Wang <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Ethernet issue on imx6
-Message-ID: <20231012193410.3d1812cf@xps-13>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E688374F6;
+	Thu, 12 Oct 2023 18:12:08 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17528CA;
+	Thu, 12 Oct 2023 11:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1697134325; x=1728670325;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=eauz8HygDKnC71SVXX9udbFeg4RQQoUgaF7M/rkoS9M=;
+  b=d9kWHJgskFLOeeT/130WGppRNTFvlf2s0arR496WasD+ICLRmvuBT+9c
+   LbS8ujXUjUOZ2igzc+4qoM/PWnYiuqhDA6P+bqhd4OH8tzS57NJGRhIiu
+   Sh7gk//D0t3VHPytHPc1GA+om4xtIRYsFAhAy0p6gCDEYnzkkjKli+gau
+   g=;
+X-IronPort-AV: E=Sophos;i="6.03,219,1694736000"; 
+   d="scan'208";a="361594727"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 18:12:02 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id BB44B804CB;
+	Thu, 12 Oct 2023 18:12:00 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Thu, 12 Oct 2023 18:11:53 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Thu, 12 Oct 2023 18:11:51 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <daan.j.demeyer@gmail.com>
+CC: <bpf@vger.kernel.org>, <kernel-team@meta.com>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <kuniyu@amazon.com>
+Subject: Re: [PATCH bpf-next v2] Only run BPF cgroup unix sockaddr recvmsg() hooks on named sockets
+Date: Thu, 12 Oct 2023 11:11:42 -0700
+Message-ID: <20231012181142.60636-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20231012085216.219918-1-daan.j.demeyer@gmail.com>
+References: <20231012085216.219918-1-daan.j.demeyer@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.8]
+X-ClientProxiedBy: EX19D043UWC004.ant.amazon.com (10.13.139.206) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+From: Daan De Meyer <daan.j.demeyer@gmail.com>
+Date: Thu, 12 Oct 2023 10:52:13 +0200
+> Changes since v1:
+> 
+> * Added missing Signed-off-by tag
 
-I've been scratching my foreheads for weeks on a strange imx6
-network issue, I need help to go further, as I feel a bit clueless now.
+You can put these after --- so that it will disappear when merged.
 
-Here is my setup :
-- Custom imx6q board
-- Bootloader: U-Boot 2017.11 (also tried with a 2016.03)
-- Kernel : 4.14(.69,.146,.322), v5.10 and v6.5 with the same behavior
-- The MAC (fec driver) is connected to a Micrel 9031 PHY
-- The PHY is connected to the link partner through an industrial cable
-- Testing 100BASE-T (link is stable)
 
-The RGMII-ID timings are probably not totally optimal but offer rather
-good performance. In UDP with iperf3:
-* Downlink (host to the board) runs at full speed with 0% drop
-* Uplink (board to host) runs at full speed with <1% drop
+> 
+> We should not run the recvmsg() hooks on unnamed sockets as we do
+> not run them on unnamed sockets in the other hooks either. We may
+> look into relaxing this later but for now let's make sure we are
+> consistent and not run the hooks on unnamed sockets anywhere.
+> 
+> Signed-off-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+> ---
+>  net/unix/af_unix.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index e10d07c76044..81fb8bddaff9 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -2416,9 +2416,10 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+>  	if (msg->msg_name) {
+>  		unix_copy_addr(msg, skb->sk);
 
-However, if I ever try to limit the bandwidth in uplink (only), the drop
-rate rises significantly, up to 30%:
+How is an unnamed socket set to skb->sk ?
 
-//192.168.1.1 is my host, so the below lines are from the board:
-# iperf3 -c 192.168.1.1 -u -b100M
-[  5]   0.00-10.05  sec   113 MBytes  94.6 Mbits/sec  0.044 ms  467/82603 (=
-0.57%)  receiver
-# iperf3 -c 192.168.1.1 -u -b90M
-[  5]   0.00-10.04  sec  90.5 MBytes  75.6 Mbits/sec  0.146 ms  12163/77688=
- (16%)  receiver
-# iperf3 -c 192.168.1.1 -u -b80M
-[  5]   0.00-10.05  sec  66.4 MBytes  55.5 Mbits/sec  0.162 ms  20937/69055=
- (30%)  receiver
 
-One direct consequence, I believe, is that tcp transfers quickly stall
-or run at an insanely low speed (~40kiB/s).
-
-I've tried to disable all the hardware offloading reported by ethtool
-with no additional success.
-
-Last but not least, I observe another very strange behavior: when I
-perform an uplink transfer at a "reduced" speed (80Mbps or below), as
-said above, I observe a ~30% drop rate. But if I run a full speed UDP
-transfer in downlink at the same time, the drop rate lowers to ~3-4%.
-See below, this is an iperf server on my host receiving UDP traffic from
-my board. After 5 seconds I start a full speed UDP transfer from the
-host to the board:
-
-[  5] local 192.168.1.1 port 5201 connected to 192.168.1.2 port 57216
-[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total =
-Datagrams
-[  5]   0.00-1.00   sec  6.29 MBytes  52.7 Mbits/sec  0.152 ms  2065/6617 (=
-31%) =20
-[  5]   1.00-2.00   sec  6.50 MBytes  54.6 Mbits/sec  0.118 ms  2199/6908 (=
-32%) =20
-[  5]   2.00-3.00   sec  6.64 MBytes  55.7 Mbits/sec  0.123 ms  2099/6904 (=
-30%) =20
-[  5]   3.00-4.00   sec  6.58 MBytes  55.2 Mbits/sec  0.091 ms  2141/6905 (=
-31%) =20
-[  5]   4.00-5.00   sec  6.59 MBytes  55.3 Mbits/sec  0.092 ms  2134/6907 (=
-31%) =20
-[  5]   5.00-6.00   sec  8.36 MBytes  70.1 Mbits/sec  0.088 ms  853/6904 (1=
-2%) =20
-[  5]   6.00-7.00   sec  9.14 MBytes  76.7 Mbits/sec  0.085 ms  281/6901 (4=
-.1%) =20
-[  5]   7.00-8.00   sec  9.19 MBytes  77.1 Mbits/sec  0.147 ms  255/6911 (3=
-.7%) =20
-[  5]   8.00-9.00   sec  9.22 MBytes  77.3 Mbits/sec  0.160 ms  233/6907 (3=
-.4%) =20
-[  5]   9.00-10.00  sec  9.25 MBytes  77.6 Mbits/sec  0.129 ms  211/6906 (3=
-.1%) =20
-[  5]  10.00-10.04  sec   392 KBytes  76.9 Mbits/sec  0.113 ms  11/288 (3.8=
-%)=20
-
-If the downlink transfer is not at full speed, I don't observe any
-difference.
-
-I've commented out the runtime_pm callbacks in the fec driver, but
-nothing changed.
-
-Any hint or idea will be highly appreciated!
-
-Thanks a lot,
-Miqu=C3=A8l
+> 
+> -		BPF_CGROUP_RUN_PROG_UNIX_RECVMSG_LOCK(sk,
+> -						      msg->msg_name,
+> -						      &msg->msg_namelen);
+> +		if (msg->msg_namelen > 0)
+> +			BPF_CGROUP_RUN_PROG_UNIX_RECVMSG_LOCK(sk,
+> +							      msg->msg_name,
+> +							      &msg->msg_namelen);
+>  	}
+> 
+>  	if (size > skb->len - skip)
+> @@ -2773,9 +2774,10 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>  					 state->msg->msg_name);
+>  			unix_copy_addr(state->msg, skb->sk);
+> 
+> -			BPF_CGROUP_RUN_PROG_UNIX_RECVMSG_LOCK(sk,
+> -							      state->msg->msg_name,
+> -							      &state->msg->msg_namelen);
+> +			if (state->msg->msg_namelen > 0)
+> +				BPF_CGROUP_RUN_PROG_UNIX_RECVMSG_LOCK(sk,
+> +								      state->msg->msg_name,
+> +								      &state->msg->msg_namelen);
+> 
+>  			sunaddr = NULL;
+>  		}
+> --
+> 2.41.0
+> 
 
