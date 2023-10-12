@@ -1,131 +1,132 @@
-Return-Path: <netdev+bounces-40343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB9647C6D6E
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:55:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD6E7C6D81
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12AA31C20CA5
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:55:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9C8E282830
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD6624A1C;
-	Thu, 12 Oct 2023 11:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E4025100;
+	Thu, 12 Oct 2023 11:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O816NhHn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F0C24A11;
-	Thu, 12 Oct 2023 11:55:38 +0000 (UTC)
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 843B64C0C;
-	Thu, 12 Oct 2023 04:55:35 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vu-mkwQ_1697111731;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vu-mkwQ_1697111731)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Oct 2023 19:55:32 +0800
-Message-ID: <1697111642.7917345-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 21/22] virtio_net: update tx timeout record
-Date: Thu, 12 Oct 2023 19:54:02 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-22-xuanzhuo@linux.alibaba.com>
- <20231012050936-mutt-send-email-mst@kernel.org>
- <1697101953.6236846-1-xuanzhuo@linux.alibaba.com>
- <20231012052017-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231012052017-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F89F24A05;
+	Thu, 12 Oct 2023 11:57:40 +0000 (UTC)
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EE204EFD;
+	Thu, 12 Oct 2023 04:57:39 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-690d935dbc2so173570b3a.1;
+        Thu, 12 Oct 2023 04:57:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697111859; x=1697716659; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HQEM11ppiLh7tdmfqX7SGRNzgwI01XZbHBFYgkzMudM=;
+        b=O816NhHnCBuOb9KT1Ntwv0SYoB/JpObccZzBmZftnpMmFz73iSmlvQ1IMKWs1z2IwA
+         7M0bOgRmbO8NKTyRns5ls49hXiZfeTrfhUUJSwLH46bpf3ycl+uyIgv27BvZDa9rYO2T
+         8zmLz0uTeP3oaa3hHORabE8WVFMCT74BGVfVXmJ0xjW11r/fJxA4NrTIiFvcH8gDnZJK
+         3DnE71AUY3IkXkQy+k3HWuH1z9hewMeShu8GrwRwnrO3tar+xuckDf+ur3WB8hUltInn
+         M/lrIWIqN7QRpFJ0UFqBTKk9DdnUzwzqwaKwHyhSueMzCJAkSTyu9yE5C4D701PFbbNP
+         lsng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697111859; x=1697716659;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HQEM11ppiLh7tdmfqX7SGRNzgwI01XZbHBFYgkzMudM=;
+        b=aRQzXwUk97Ei5m/D7lIV8hVcelhlaUetZWpPZ1AD32zj8dV1lNvNPatBwwoo+Pc5G/
+         AbJ2LxiCsLwETguxfmIOHuvm/awRaEVv4eRyO3Ntd8TUgMNnzYCpSdRWrcq5rAte/gK5
+         SEA5K5d9IUHzk6NK2QWHO22ZQg9SL/cxbacwnF6bw4NV0PmYMPN+pIABliwqzxTkE7fY
+         FMY+VRYDEMzmdigz82rlefkMZLIKB0q+WDXpSAUkPKFtD5P0J8krNPDIT2CB8DyR0mbZ
+         eKewCSbvD0GKZG06w/p+b0lIZb8ULsXvQ0ilPSjdY4fDojMM+sYWsi+WXm0SFYTLLkTd
+         8D2w==
+X-Gm-Message-State: AOJu0YxlStsztDEp9OqwbNM2qckipNLy25oji+7V4QdJn36St99lTray
+	hEr9f8h42yKfWEk1YWB8h4M=
+X-Google-Smtp-Source: AGHT+IFQB4pa2UXDP3wFPGP2pMgjGtpDDufEZjp8IjMJWD2LoqE3iqudQD+MbIB1de4mu8iF0qOCuA==
+X-Received: by 2002:a05:6a00:3985:b0:68f:c8b3:3077 with SMTP id fi5-20020a056a00398500b0068fc8b33077mr25660139pfb.1.1697111858510;
+        Thu, 12 Oct 2023 04:57:38 -0700 (PDT)
+Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id v5-20020a63bf05000000b005894450b404sm1342433pgf.63.2023.10.12.04.57.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 04:57:38 -0700 (PDT)
+Date: Thu, 12 Oct 2023 20:57:37 +0900 (JST)
+Message-Id: <20231012.205737.1152392964209884159.fujita.tomonori@gmail.com>
+To: gregkh@linuxfoundation.org
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu
+Subject: Re: [PATCH net-next v3 3/3] net: phy: add Rust Asix PHY driver
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <2023100955-scrambler-radio-e93a@gregkh>
+References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
+	<20231009013912.4048593-4-fujita.tomonori@gmail.com>
+	<2023100955-scrambler-radio-e93a@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 05:36:56 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Oct 12, 2023 at 05:12:33PM +0800, Xuan Zhuo wrote:
-> > On Thu, 12 Oct 2023 05:10:55 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Wed, Oct 11, 2023 at 05:27:27PM +0800, Xuan Zhuo wrote:
-> > > > If send queue sent some packets, we update the tx timeout
-> > > > record to prevent the tx timeout.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio/xsk.c | 10 ++++++++++
-> > > >  1 file changed, 10 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
-> > > > index 7abd46bb0e3d..e605f860edb6 100644
-> > > > --- a/drivers/net/virtio/xsk.c
-> > > > +++ b/drivers/net/virtio/xsk.c
-> > > > @@ -274,6 +274,16 @@ bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
-> > > >
-> > > >  	virtnet_xsk_check_queue(sq);
-> > > >
-> > > > +	if (stats.packets) {
-> > > > +		struct netdev_queue *txq;
-> > > > +		struct virtnet_info *vi;
-> > > > +
-> > > > +		vi = sq->vq->vdev->priv;
-> > > > +
-> > > > +		txq = netdev_get_tx_queue(vi->dev, sq - vi->sq);
-> > > > +		txq_trans_cond_update(txq);
-> > > > +	}
-> > > > +
-> > > >  	u64_stats_update_begin(&sq->stats.syncp);
-> > > >  	sq->stats.packets += stats.packets;
-> > > >  	sq->stats.bytes += stats.bytes;
-> > >
-> > > I don't get what this is doing. Is there some kind of race here you
-> > > are trying to address? And what introduced the race?
-> >
-> >
-> > Because the xsk xmit shares the send queue with the kernel xmit,
-> > then when I do benchmark, the xsk will always use the send queue,
-> > so the kernel may have no chance to do xmit, the tx watchdog
-> > thinks that the send queue is hang and prints tx timeout log.
-> >
-> > So I call the txq_trans_cond_update() to tell the tx watchdog
-> > that the send queue is working.
-> >
-> > Thanks.
->
-> Don't like this hack.
-> So packets are stuck in queue - that's not good is it?
-> Is ours the only driver that shares queues like this?
+On Mon, 9 Oct 2023 12:10:11 +0200
+Greg KH <gregkh@linuxfoundation.org> wrote:
 
-NO.
+> On Mon, Oct 09, 2023 at 10:39:12AM +0900, FUJITA Tomonori wrote:
+>> This is the Rust implementation of drivers/net/phy/ax88796b.c. The
+>> features are equivalent. You can choose C or Rust versionon kernel
+>> configuration.
+>> 
+>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> ---
+>>  drivers/net/phy/Kconfig          |   7 ++
+>>  drivers/net/phy/Makefile         |   6 +-
+>>  drivers/net/phy/ax88796b_rust.rs | 129 +++++++++++++++++++++++++++++++
+>>  rust/uapi/uapi_helper.h          |   2 +
+>>  4 files changed, 143 insertions(+), 1 deletion(-)
+>>  create mode 100644 drivers/net/phy/ax88796b_rust.rs
+>> 
+>> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+>> index 421d2b62918f..0317be180ac2 100644
+>> --- a/drivers/net/phy/Kconfig
+>> +++ b/drivers/net/phy/Kconfig
+>> @@ -107,6 +107,13 @@ config AX88796B_PHY
+>>  	  Currently supports the Asix Electronics PHY found in the X-Surf 100
+>>  	  AX88796B package.
+>>  
+>> +config AX88796B_RUST_PHY
+>> +	bool "Rust version driver for Asix PHYs"
+>> +	depends on RUST_PHYLIB_BINDINGS && AX88796B_PHY
+>> +	help
+>> +	  Uses the Rust version driver for Asix PHYs (ax88796b_rust.ko)
+>> +	  instead of the C version.
+> 
+> This does not properly describe what hardware this driver supports.  And
 
-And txq_trans_cond_update() is called by many net drivers for the similar reason.
-
-Thanks
+I'll add (by copying the description of the C driver).
 
 
->
-> >
-> > >
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
-> > >
->
+> that's an odd way to describe the module name, but I see none of the
+> other entries in this file do that either, so maybe the PHY subsystm
+> doesn't require that?
+
+I leave it to Andrew. This is the first driver in Rust so I thought
+that users had no idea the relationship between the source file name
+and the module file name.
 
