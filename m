@@ -1,201 +1,150 @@
-Return-Path: <netdev+bounces-40302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DCC17C6958
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:21:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29337C6970
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 472321C20968
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:21:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA312828E5
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F18210FD;
-	Thu, 12 Oct 2023 09:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBB421114;
+	Thu, 12 Oct 2023 09:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAABB20B0C;
-	Thu, 12 Oct 2023 09:21:41 +0000 (UTC)
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9E6A9;
-	Thu, 12 Oct 2023 02:21:39 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vu-2qJN_1697102496;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vu-2qJN_1697102496)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Oct 2023 17:21:36 +0800
-Message-ID: <1697102334.7060938-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 01/22] virtio_ring: virtqueue_set_dma_premapped support disable
-Date: Thu, 12 Oct 2023 17:18:54 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-2-xuanzhuo@linux.alibaba.com>
- <20231012051416-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231012051416-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72FA210EA
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:26:12 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D629D
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:26:10 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-136-Kc7dHQ4TNP2tqTu0Kz4tzg-1; Thu, 12 Oct 2023 10:26:07 +0100
+X-MC-Unique: Kc7dHQ4TNP2tqTu0Kz4tzg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 12 Oct
+ 2023 10:26:06 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 12 Oct 2023 10:26:06 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Stephen Hemminger' <stephen@networkplumber.org>, Johannes Berg
+	<johannes@sipsolutions.net>
+CC: Jakub Kicinski <kuba@kernel.org>, Nicolas Dichtel
+	<nicolas.dichtel@6wind.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "fw@strlen.de" <fw@strlen.de>,
+	"pablo@netfilter.org" <pablo@netfilter.org>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>, Thomas Haller
+	<thaller@redhat.com>
+Subject: RE: [RFC] netlink: add variable-length / auto integers
+Thread-Topic: [RFC] netlink: add variable-length / auto integers
+Thread-Index: AQHZ/GJtGLGzNn8MkE21q6VfKdfF4LBF4v0A
+Date: Thu, 12 Oct 2023 09:26:06 +0000
+Message-ID: <e55db83d221d4b5c9fce899cc60cb378@AcuMS.aculab.com>
+References: <20231011003313.105315-1-kuba@kernel.org>
+	<f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
+	<6ec63a78-b0cc-452e-9946-0acef346cac2@6wind.com>
+	<20231011085230.2d3dc1ab@kernel.org>
+	<30be757c7a0bbe50b37e9f2e6f93c8cf4219bbc1.camel@sipsolutions.net>
+ <20231011094550.7837d43a@hermes.local>
+In-Reply-To: <20231011094550.7837d43a@hermes.local>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 05:15:52 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Wed, Oct 11, 2023 at 05:27:07PM +0800, Xuan Zhuo wrote:
-> > virtqueue_set_dma_premapped() adds a new parameter to disable the
-> > virtqueue premapped mode.
+From: Stephen Hemminger
+> Sent: 11 October 2023 17:46
+>=20
+> On Wed, 11 Oct 2023 18:01:49 +0200
+> Johannes Berg <johannes@sipsolutions.net> wrote:
+>=20
+> > On Wed, 2023-10-11 at 08:52 -0700, Jakub Kicinski wrote:
 > >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c     |  2 +-
-> >  drivers/virtio/virtio_ring.c | 11 ++++++++---
-> >  include/linux/virtio.h       |  2 +-
-> >  3 files changed, 10 insertions(+), 5 deletions(-)
+> > > > > > Even for arches which don't have good unaligned access - I'd th=
+ink
+> > > > > > that access aligned to 4B *is* pretty efficient, and that's all
+> > > > > > we need. Plus kernel deals with unaligned input. Why can't user=
+ space?
+> > > > >
+> > > > > Hmm. I have a vague recollection that it was related to just not =
+doing
+> > > > > it - the kernel will do get_unaligned() or similar, but userspace=
+ if it
+> > > > > just accesses it might take a trap on some architectures?
+> > > > >
+> > > > > But I can't find any record of this in public discussions, so ...
+> > > > If I remember well, at this time, we had some (old) architectures t=
+hat triggered
+> > > > traps (in kernel) when a 64-bit field was accessed and unaligned. M=
+aybe a mix
+> > > > between 64-bit kernel / 32-bit userspace, I don't remember exactly.=
+ The goal was
+> > > > to align u64 fields on 8 bytes.
+> > >
+> > > Reading the discussions I think we can chalk the alignment up
+> > > to "old way of doing things". Discussion was about stats64,
+> > > if someone wants to access stats directly in the message then yes,
+> > > they care a lot about alignment.
+> > >
+> > > Today we try to steer people towards attr-per-field, rather than
+> > > dumping structs. Instead of doing:
+> > >
+> > > =09struct stats *stats =3D nla_data(attr);
+> > > =09print("A: %llu", stats->a);
+> > >
+> > > We will do:
+> > >
+> > > =09print("A: %llu", nla_get_u64(attrs[NLA_BLA_STAT_A]));
 > >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index fe7f314d65c9..6b5f47ebf9b2 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -737,7 +737,7 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
-> >  		return;
+> > Well, yes, although the "struct stats" part _still_ even exists in the
+> > kernel, we never fixed that with the nla_put_u64_64bit() stuff, that wa=
+s
+> > only for something that does
 > >
-> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > -		if (virtqueue_set_dma_premapped(vi->rq[i].vq))
-> > +		if (virtqueue_set_dma_premapped(vi->rq[i].vq, true))
-> >  			continue;
+> > =09print("A: %" PRIu64, *(uint64_t *)nla_data(attrs[NLA_BLA_STAT_A]));
 > >
-> >  		vi->rq[i].do_dma = true;
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 51d8f3299c10..b3ded56722f4 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -2784,7 +2784,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> >   * 0: success.
-> >   * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-> >   */
-> > -int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> > +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode)
-> >  {
-> >  	struct vring_virtqueue *vq = to_vvq(_vq);
-> >  	u32 num;
-> > @@ -2803,8 +2803,13 @@ int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> >  		return -EINVAL;
-> >  	}
+> > > Assuming nla_get_u64() is unalign-ready the problem doesn't exist.
 > >
-> > -	vq->premapped = true;
-> > -	vq->do_unmap = false;
-> > +	if (mode) {
-> > +		vq->premapped = true;
-> > +		vq->do_unmap = false;
-> > +	} else {
-> > +		vq->premapped = false;
-> > +		vq->do_unmap = vq->use_dma_api;
-> > +	}
-> >
-> >  	END_USE(vq);
-> >
-> > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > index 4cc614a38376..1cf7b004348b 100644
-> > --- a/include/linux/virtio.h
-> > +++ b/include/linux/virtio.h
-> > @@ -81,7 +81,7 @@ bool virtqueue_enable_cb(struct virtqueue *vq);
-> >
-> >  unsigned virtqueue_enable_cb_prepare(struct virtqueue *vq);
-> >
-> > -int virtqueue_set_dma_premapped(struct virtqueue *_vq);
-> > +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode);
-> >
-> >  bool virtqueue_poll(struct virtqueue *vq, unsigned);
->
-> Wait a sec I thought we never change premapped. If you make this
-> dynamic don't you need a bunch of locking?
-> Or maybe queue is empty when you change this?
-> If yes pls add a bunch of BUG_ON checks to make sure this is not misused.
+> > Depends on the library, but at least for libnl that's true since ever.
+> > Same for libmnl and libnl-tiny. So I guess it only ever hit hand-coded
+> > implementations.
+>=20
+> Quick check of iproute2 shows places where stats are directly
+> mapped without accessors. One example is print_mpls_stats().
 
+You 'just' need to use the 64bit type that has __attribute__((aligned(4))).
+The same is true for the code that reads/writes the value.
+Better than passing by address and using memcpy();
 
-Actually, this api is called immediately after the vq init or vq reset.
+=09David
 
-We already have such a check.
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
-Thanks.
-
-/**
- * virtqueue_set_dma_premapped - set the vring premapped mode
- * @_vq: the struct virtqueue we're talking about.
- *
- * Enable the premapped mode of the vq.
- *
- * The vring in premapped mode does not do dma internally, so the driver must
- * do dma mapping in advance. The driver must pass the dma_address through
- * dma_address of scatterlist. When the driver got a used buffer from
- * the vring, it has to unmap the dma address.
- *
- * This function must be called immediately after creating the vq, or after vq
- * reset, and before adding any buffers to it.
- *
- * Caller must ensure we don't call this with other virtqueue operations
- * at the same time (except where noted).
- *
- * Returns zero or a negative error.
- * 0: success.
- * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
- */
-int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode)
-{
-	struct vring_virtqueue *vq = to_vvq(_vq);
-	u32 num;
-
-	START_USE(vq);
-
-	num = vq->packed_ring ? vq->packed.vring.num : vq->split.vring.num;
-
--->	if (num != vq->vq.num_free) {
-		END_USE(vq);
-		return -EINVAL;
-	}
-
-	if (!vq->use_dma_api) {
-		END_USE(vq);
-		return -EINVAL;
-	}
-
-	if (mode) {
-		vq->premapped = true;
-		vq->do_unmap = false;
-	} else {
-		vq->premapped = false;
-		vq->do_unmap = vq->use_dma_api;
-	}
-
-	END_USE(vq);
-
-	return 0;
-}
-EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
-
-
->
->
-> > --
-> > 2.32.0.3.g01195cf9f
->
 
