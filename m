@@ -1,179 +1,76 @@
-Return-Path: <netdev+bounces-40552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1497C7A74
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:33:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BBA7C7A7D
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20A9D282CEA
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:33:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7589B207B2
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D05D2B5E1;
-	Thu, 12 Oct 2023 23:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBA42B5E5;
+	Thu, 12 Oct 2023 23:37:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlyQ8TTK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Anl92KwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFEF3D03E;
-	Thu, 12 Oct 2023 23:33:06 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DCEA9;
-	Thu, 12 Oct 2023 16:33:04 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53e2dc8fa02so1047136a12.2;
-        Thu, 12 Oct 2023 16:33:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697153583; x=1697758383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=naelrzab06bC9MMj4BGYD3OPqUStfN/T5v5pDuFLbLk=;
-        b=dlyQ8TTKBsiPgdtUU8mgHMtGCQhTsCDGjcC5ztMpBg8aWlPcEXhKFCxYAcRS/xbSGC
-         /KiHZafSMUXB+jaf4AEbXtfKo9GS+ndS0hStSCIAXISRDB6/UIhPwKt9ejxPA/OawkFZ
-         rf/X2CToDLl65xYUQfryZ/REIvkQ5653DP6GfZUN9gf8GUGDTZPMTe2FCDsITScwb6aM
-         gOhktB8XvMIJ0vCJMm/2tbllG6NlT7nHKIZsOUIu0z79rzHJ1GyxoJoTA1yZuT3te7II
-         oJSLqMGRr0Uv9BIjYpw1NIh26i4Gnfj5v/YJsZmICeMS/cuexREYj0BiUga2B7zB3rlm
-         5mMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697153583; x=1697758383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=naelrzab06bC9MMj4BGYD3OPqUStfN/T5v5pDuFLbLk=;
-        b=XcPTA8QVU2LUG9kQM+Kw4jUx7xL7kDvCkxqof8gUyvMDC10Ke0SHj/Qn34yE2OdvsK
-         uFrvvdzy1yX3fdArW6+9s1bgEHMjvfaY6aAc3XgIzqUsq3CqrEaetqcAdzTd36x1ypoA
-         BAWyE+pSJd+BREb0a4KBiQEJGfJJc0A3SUc6kdjvOUBa7hCkKjwusyQ0rBOluxeLWAP3
-         fyK0F4ak2KKFTI54+okjRlD/LWfJPHaeTi7PO7IgBtFXAcOTRzdmECS3mLySIPPKzJYL
-         gMZcskk5S5oWLNFdIX36SrykKnIjIMbmcx5Z1z10znHtVXi6pgZEXpTEcnrdX/KUw4jk
-         z7uA==
-X-Gm-Message-State: AOJu0YznNrCwp2PboZtHnHcPlcz8dVNXHW7Lo45SQvyxnqWpy8ZABbMB
-	/djDH99bp0hcKvtAIgrGTIf8r6fEGTV+QjUqpzg++V9yZ0Y=
-X-Google-Smtp-Source: AGHT+IFktL1z+8uHtW7sSg/mm9ANSBxBw4G5ovXgGC7Jm0VRroUoXsw5G2EjR4YxqJnT4kE5+ExsDa7iJAWGsPaEWEM=
-X-Received: by 2002:aa7:c302:0:b0:533:97c:8414 with SMTP id
- l2-20020aa7c302000000b00533097c8414mr23598044edq.7.1697153583101; Thu, 12 Oct
- 2023 16:33:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAC52B5E2
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 23:37:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D26C433C7;
+	Thu, 12 Oct 2023 23:37:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697153854;
+	bh=c+3LuBsESfP3745tdLMWIFPLiLMUt1sjGKjdite7k/Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Anl92KwLM6JcUnMUb0WDYDd2thk2/YcUx45EUECGk7flVzyDQX4clEK2HASyFNPDa
+	 Ok/p7+YN7QbNEdkOcGMahVWLc/fGMw4wXzAgPkti74KfcsiJ8G57Jef5Sv9l83AL8P
+	 pT5HVAdFf3uMS42LYoiEQ8IiuVztBvs6VcipmcHg/SG6W0b8NdxF3SyKV3MQ1IpvXo
+	 uaOJM8kuNW+2UPrsbzrXuS3Gk0H+B75tCP7cV/EP6IbqUMwJbfmA9yE2Iwa9fwGejz
+	 Q7pxnPTctYOefoGZhrDjSrPRhBKCAsFt06W+mjo/vnd2aTRmqh6XEoM860Ci7v9M/v
+	 oWT8PFoDMYhyg==
+Date: Thu, 12 Oct 2023 16:37:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xabier Marquiegui <reibax@gmail.com>
+Cc: chrony-dev@chrony.tuxfamily.org, davem@davemloft.net, horms@kernel.org,
+ jstultz@google.com, mlichvar@redhat.com, netdev@vger.kernel.org,
+ ntp-lists@mattcorallo.com, richardcochran@gmail.com,
+ rrameshbabu@nvidia.com, shuah@kernel.org, tglx@linutronix.de,
+ vinicius.gomes@intel.com
+Subject: Re: [PATCH net-next v5 5/6] ptp: add debugfs interface to see
+ applied channel masks
+Message-ID: <20231012163733.1f61a56d@kernel.org>
+In-Reply-To: <20231011223604.4570-1-reibax@gmail.com>
+References: <20231009175421.57552c62@kernel.org>
+	<20231011223604.4570-1-reibax@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231005123413.GA488417@alecto.usersys.redhat.com>
- <20231012114550.152846-1-asavkov@redhat.com> <20231012094444.0967fa79@gandalf.local.home>
-In-Reply-To: <20231012094444.0967fa79@gandalf.local.home>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Thu, 12 Oct 2023 16:32:51 -0700
-Message-ID: <CAEf4BzZKWkJjOjw8x_eL_hsU-QzFuSzd5bkBH2EHtirN2hnEgA@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next] bpf: change syscall_nr type to int in struct syscall_tp_t
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Artem Savkov <asavkov@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-rt-users@vger.kernel.org, Jiri Olsa <jolsa@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 12, 2023 at 6:43=E2=80=AFAM Steven Rostedt <rostedt@goodmis.org=
-> wrote:
->
-> On Thu, 12 Oct 2023 13:45:50 +0200
-> Artem Savkov <asavkov@redhat.com> wrote:
->
-> > linux-rt-devel tree contains a patch (b1773eac3f29c ("sched: Add suppor=
-t
-> > for lazy preemption")) that adds an extra member to struct trace_entry.
-> > This causes the offset of args field in struct trace_event_raw_sys_ente=
-r
-> > be different from the one in struct syscall_trace_enter:
-> >
-> > struct trace_event_raw_sys_enter {
-> >         struct trace_entry         ent;                  /*     0    12=
- */
-> >
-> >         /* XXX last struct has 3 bytes of padding */
-> >         /* XXX 4 bytes hole, try to pack */
-> >
-> >         long int                   id;                   /*    16     8=
- */
-> >         long unsigned int          args[6];              /*    24    48=
- */
-> >         /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
-> >         char                       __data[];             /*    72     0=
- */
-> >
-> >         /* size: 72, cachelines: 2, members: 4 */
-> >         /* sum members: 68, holes: 1, sum holes: 4 */
-> >         /* paddings: 1, sum paddings: 3 */
-> >         /* last cacheline: 8 bytes */
-> > };
-> >
-> > struct syscall_trace_enter {
-> >         struct trace_entry         ent;                  /*     0    12=
- */
-> >
-> >         /* XXX last struct has 3 bytes of padding */
-> >
-> >         int                        nr;                   /*    12     4=
- */
-> >         long unsigned int          args[];               /*    16     0=
- */
-> >
-> >         /* size: 16, cachelines: 1, members: 3 */
-> >         /* paddings: 1, sum paddings: 3 */
-> >         /* last cacheline: 16 bytes */
-> > };
-> >
-> > This, in turn, causes perf_event_set_bpf_prog() fail while running bpf
-> > test_profiler testcase because max_ctx_offset is calculated based on th=
-e
-> > former struct, while off on the latter:
-> >
-> >   10488         if (is_tracepoint || is_syscall_tp) {
-> >   10489                 int off =3D trace_event_get_offsets(event->tp_e=
-vent);
-> >   10490
-> >   10491                 if (prog->aux->max_ctx_offset > off)
-> >   10492                         return -EACCES;
-> >   10493         }
-> >
-> > What bpf program is actually getting is a pointer to struct
-> > syscall_tp_t, defined in kernel/trace/trace_syscalls.c. This patch fixe=
-s
-> > the problem by aligning struct syscall_tp_t with with struct
-> > syscall_trace_(enter|exit) and changing the tests to use these structs
-> > to dereference context.
-> >
-> > Signed-off-by: Artem Savkov <asavkov@redhat.com>
->
+On Thu, 12 Oct 2023 00:36:04 +0200 Xabier Marquiegui wrote:
+> Jakub Kicinski said:
+> > If it's a self-test it should probably be included in the Makefile 
+> > so that bots run it.
+> 
+> Thank you for your input Jakub. It's actually designed as a debug tool for
+> humans. I wasn't thinking about self-tests, and I can't really think of how
+> that could be pulled of in this specific case. I hope that's ok. If not we
+> can try to throw a few ideas around and see if we find a way.
 
-I think these changes make sense regardless, can you please resend the
-patch without RFC tag so that our CI can run tests for it?
+Let's not throw random non-test scripts into selftests. It adds
+confusion to our pitiful kernel testing story :(
 
-> Thanks for doing a proper fix.
->
-> Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+The netdevsim driver which is supposed to be used for uAPI selftests
+now supports PHCs. Maybe we can extend it and build a proper-er test?
 
-But looking at [0] and briefly reading some of the discussions you,
-Steven, had. I'm just wondering if it would be best to avoid
-increasing struct trace_entry altogether? It seems like preempt_count
-is actually a 4-bit field in trace context, so it doesn't seem like we
-really need to allocate an entire byte for both preempt_count and
-preempt_lazy_count. Why can't we just combine them and not waste 8
-extra bytes for each trace event in a ring buffer?
-
-  [0] https://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git=
-/commit/?id=3Db1773eac3f29cbdcdfd16e0339f1a164066e9f71
-
->
-> -- Steve
+Whether we'd then want to move the debugfs entries onto netdevsim
+or leave them where you have then now is another question..
 
