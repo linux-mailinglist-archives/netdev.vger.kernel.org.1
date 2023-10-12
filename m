@@ -1,185 +1,131 @@
-Return-Path: <netdev+bounces-40384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DEC47C712B
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:15:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB717C7143
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1958D28215A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:15:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CF99282349
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD22266C7;
-	Thu, 12 Oct 2023 15:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E0F26E3D;
+	Thu, 12 Oct 2023 15:18:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zzp61f7S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OGuD6B3Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83701BA3C
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:15:32 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F385C0;
-	Thu, 12 Oct 2023 08:15:30 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CFC6fs014877;
-	Thu, 12 Oct 2023 15:15:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cu4OWlFcSkzAgQ1ZSUgowb6rWlcfQOprHpsTpGYe/I0=;
- b=Zzp61f7SDD20yZHSnGWqesTlBhZRuuPoLqAjpRrWTbkF/dRS10ZY1wbaObTb/RaF2PRB
- xGy8gFA9BclT6cTXjwSs3yQqcaNzgl7D78zUi3SHETVJYJEMcvCKFESBF09SdpTxKCNl
- Hk7NKJyOiLpbFKoZ0VIzCwjH2Q2BXL8sWV7RBk5ZbOMpPh2ufPugW3VLu3FDpGpZ1sZO
- BVHohNuDINuQuc+J48gvU4h1tAOQ1+7cos3J0FbrPFFvF8Eo7nw4ij4PfwK2sAng8enT
- 7DdHNm/fz1swRhq8aD+EqFetZO3g07VtiU3+9Gws8O8YvC/4eUJbj1FF3k5kmHIZAguR 8w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpk8084cp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 15:15:20 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CFDFJs019790;
-	Thu, 12 Oct 2023 15:15:20 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpk8084bs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 15:15:20 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CFCslU028188;
-	Thu, 12 Oct 2023 15:15:19 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkj1ygf6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 15:15:19 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CFFHUv17891842
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 15:15:18 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CAA1958058;
-	Thu, 12 Oct 2023 15:15:17 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1423458059;
-	Thu, 12 Oct 2023 15:15:16 +0000 (GMT)
-Received: from [9.171.29.13] (unknown [9.171.29.13])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 15:15:15 +0000 (GMT)
-Message-ID: <bf52b502-6be0-467d-bf0a-5ae0e8d84fe8@linux.ibm.com>
-Date: Thu, 12 Oct 2023 17:15:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16042421C;
+	Thu, 12 Oct 2023 15:18:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62640C433C7;
+	Thu, 12 Oct 2023 15:18:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697123894;
+	bh=ib4tVcVonMixI1OaRSfJ8k6/MBGpORgj2wRciIN3hFU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OGuD6B3Y4kGRzFfF+OHdIZKGMC3mk5oZ7/NsxSP/KgOEk2l4v7U3giA5yC4V2yoUI
+	 ALFjgu3Iter3SXK53rgH0MNqNidH1ui7rLKpfSxT/oToFP6YZj0iYshbGOvF4mYZCP
+	 BDrOKwCcTR5dZP+ix92yTYkvey50s+565Ay9NLsRzwwZZcC+09+/g/MykdNPAXAYmA
+	 b1RapCYfkBnWXxUhpVL7MpiIuTpYCO+zzTW8fSQMv00VU7D+1rLjEx78TpmkbWuAEl
+	 9Wq0yzECozGGuH09Egfq6KPAJkpLSFvIp1JHsBokmStGczuntXTd13vcMFUNOTdJNM
+	 dGffdeMES2n7w==
+Date: Thu, 12 Oct 2023 16:18:09 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ante Knezic <ante.knezic@helmholz.de>
+Cc: netdev@vger.kernel.org, woojung.huh@microchip.com, andrew@lunn.ch,
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, marex@denx.de, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] dt-bindings: net: microchip,ksz:
+ document microchip,rmii-clk-internal
+Message-ID: <20231012-unicorn-rambling-55dc66b78f2f@spud>
+References: <cover.1697107915.git.ante.knezic@helmholz.de>
+ <1b8db5331638f1380ec2ba6e00235c8d5d7a882c.1697107915.git.ante.knezic@helmholz.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/5] net/smc: allow cdc msg send rather than drop it
- with NULL sndbuf_desc
-Content-Language: en-GB
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-4-git-send-email-alibuda@linux.alibaba.com>
- <5e2efb4b-1d26-4159-a2c7-b0107cb6381c@linux.ibm.com>
- <9f8f7a96-fcb0-3088-6d2f-d7e7d0fc83a1@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <9f8f7a96-fcb0-3088-6d2f-d7e7d0fc83a1@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: q7HZO0k_fuPjYd-RATOmZrt8Lv4X_j76
-X-Proofpoint-ORIG-GUID: c0urxwtWFHVgYYKy7AKzynSqeqhVINgp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- spamscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
- priorityscore=1501 bulkscore=0 clxscore=1015 adultscore=0 mlxlogscore=999
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310120125
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="M6DiZrwt0r0ByUbo"
+Content-Disposition: inline
+In-Reply-To: <1b8db5331638f1380ec2ba6e00235c8d5d7a882c.1697107915.git.ante.knezic@helmholz.de>
 
 
+--M6DiZrwt0r0ByUbo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 12.10.23 04:49, D. Wythe wrote:
-> 
-> 
-> On 10/12/23 4:37 AM, Wenjia Zhang wrote:
->>
->>
->> On 11.10.23 09:33, D. Wythe wrote:
->>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>
->>> This patch re-fix the issues memtianed by commit 22a825c541d7
->>> ("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()").
->>>
->>> Blocking sending message do solve the issues though, but it also
->>> prevents the peer to receive the final message. Besides, in logic,
->>> whether the sndbuf_desc is NULL or not have no impact on the processing
->>> of cdc message sending.
->>>
->> Agree.
->>
->>> Hence that, this patch allow the cdc message sending but to check the
->>> sndbuf_desc with care in smc_cdc_tx_handler().
->>>
->>> Fixes: 22a825c541d7 ("net/smc: fix NULL sndbuf_desc in 
->>> smc_cdc_tx_handler()")
->>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>> ---
->>>   net/smc/smc_cdc.c | 9 ++++-----
->>>   1 file changed, 4 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
->>> index 01bdb79..3c06625 100644
->>> --- a/net/smc/smc_cdc.c
->>> +++ b/net/smc/smc_cdc.c
->>> @@ -28,13 +28,15 @@ static void smc_cdc_tx_handler(struct 
->>> smc_wr_tx_pend_priv *pnd_snd,
->>>   {
->>>       struct smc_cdc_tx_pend *cdcpend = (struct smc_cdc_tx_pend 
->>> *)pnd_snd;
->>>       struct smc_connection *conn = cdcpend->conn;
->>> +    struct smc_buf_desc *sndbuf_desc;
->>>       struct smc_sock *smc;
->>>       int diff;
->>>   +    sndbuf_desc = conn->sndbuf_desc;
->>>       smc = container_of(conn, struct smc_sock, conn);
->>>       bh_lock_sock(&smc->sk);
->>> -    if (!wc_status) {
->>> -        diff = smc_curs_diff(cdcpend->conn->sndbuf_desc->len,
->>> +    if (!wc_status && sndbuf_desc) {
->>> +        diff = smc_curs_diff(sndbuf_desc->len,
->> How could this guarantee that the sndbuf_desc would not be NULL?
->>
-> 
-> It can not guarantee he sndbuf_desc would not be NULL, but it will prevents
-> the smc_cdc_tx_handler() to access a NULL sndbuf_desc. So that we
-> can avoid the panic descried in commit 22a825c541d7
-> ("net/smc: fix NULL sndbuf_desc in smc_cdc_tx_handler()").
-> 
-got it, thanks!
+On Thu, Oct 12, 2023 at 12:55:56PM +0200, Ante Knezic wrote:
+> Add documentation for selecting reference rmii clock on KSZ88X3 devices
+>=20
+> Signed-off-by: Ante Knezic <ante.knezic@helmholz.de>
+> ---
+>  .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 19 +++++++++++++=
+++++++
+>  1 file changed, 19 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml=
+ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> index 41014f5c01c4..eaa347b04db1 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> @@ -72,6 +72,25 @@ properties:
+>    interrupts:
+>      maxItems: 1
+> =20
+> +  microchip,rmii-clk-internal:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      Set if the RMII reference clock is provided internally. Otherwise
+> +      reference clock should be provided externally.
 
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+I regret not asking this on the previous iteration - how come you need a
+custom property? In the externally provided case would there not be a
+clocks property pointing to the RMII reference clock, that would be
+absent when provided by the itnernal reference?
 
->>> &cdcpend->conn->tx_curs_fin,
->>>                        &cdcpend->cursor);
->>>           /* sndbuf_space is decreased in smc_sendmsg */
->>> @@ -114,9 +116,6 @@ int smc_cdc_msg_send(struct smc_connection *conn,
->>>       union smc_host_cursor cfed;
->>>       int rc;
->>>   -    if (unlikely(!READ_ONCE(conn->sndbuf_desc)))
->>> -        return -ENOBUFS;
->>> -
->>>       smc_cdc_add_pending_send(conn, pend);
->>>         conn->tx_cdc_seq++;
-> 
+Cheers,
+Conor.
+
+> +
+> +if:
+> +  not:
+> +    properties:
+> +      compatible:
+> +        enum:
+> +          - microchip,ksz8863
+> +          - microchip,ksz8873
+> +then:
+> +  not:
+> +    required:
+> +      - microchip,rmii-clk-internal
+> +
+> +
+>  required:
+>    - compatible
+>    - reg
+> --=20
+> 2.11.0
+>=20
+
+--M6DiZrwt0r0ByUbo
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZSgOMQAKCRB4tDGHoIJi
+0neJAP9d2qGGl2LH+I7VWMfbPU56oSDwdRC6pm1sFFw7lC9EOQEA+esT0L2AHZjZ
+D4EAcuZ5Z8L6DtFVkVh8TbCerUm5eAo=
+=LPuI
+-----END PGP SIGNATURE-----
+
+--M6DiZrwt0r0ByUbo--
 
