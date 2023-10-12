@@ -1,151 +1,203 @@
-Return-Path: <netdev+bounces-40434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3961C7C7693
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:18:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA487C76A8
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CF6282678
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 260C22825DD
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8517538DE6;
-	Thu, 12 Oct 2023 19:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872643AC08;
+	Thu, 12 Oct 2023 19:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="du3O6PWT"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lFviFLRw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EED938BD4
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:18:42 +0000 (UTC)
-Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 857D5B7
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:18:41 -0700 (PDT)
-Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-57b635e3fd9so692378eaf.3
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:18:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697138321; x=1697743121; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Lly61ot32j8FoDDoJ6cWEByOKtkJuuXw1V179YkQ+qQ=;
-        b=du3O6PWThPusSxdcUIm2H0Pbo1+I66NnP73BCgExsVUKYznH/9xm3GvV9jnmIYzckU
-         TFO6nlpM4cN0GICCV4+IGdT7FJ/J7SRrjlurgWcE8Rjm8R+9Yz/n5AkQt0lJe5zBlWw3
-         wdFS1lJCZ+Z/aFRqjiVkAi3qs4IObpiUCrHNVvDzjGHKFRPuLz4E3S6mPcvvckWf+YLq
-         zqIlhM1Y1nCu3Ts0r7oIUAX7YVYP/MyQgUPR3xzaJmTWv30DIuLZz/F3d/OyRs4WZLUL
-         VpMVO6hLep0neDjwdKH0ObcO4huIRBtBt5z7WLZSSJjr33XQxEL4Tofsb7kboiDbDkNX
-         3sQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697138321; x=1697743121;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lly61ot32j8FoDDoJ6cWEByOKtkJuuXw1V179YkQ+qQ=;
-        b=OhrfSaELzLw4+fWiWZHNcWkRSscL0kFC3UMLXGclB0E9S92QHrPDuXriKHlecuDy83
-         PheWwZuJVI7Rf7UqIdebamJbfha5HlMhzjFKoGv7ebq1OPRBkKlE2HpUVI0NpwE/a94o
-         iiMVILSBmOyNMdxskWD4igb5LoA3yAgk0RVkkaf0cN2WZV5bREVVQdJ9H/aUQVGrkJOu
-         it3zv2N4dyD75yZVXaKMWmgotQs0P0XhqsPe/dMUvZyGOl+1/4nY0cg2lHHpLJt7AlcM
-         BRo2H2pPD5x+yEAH0OQNA0LbQrgdRjs6LmGUYL4tenG58VOSU+c+QKUqjVrAuGVYp0c5
-         GpgA==
-X-Gm-Message-State: AOJu0Yzhx2J8A3RB7o2YtuU9X7G6tHsrLOoS2vF5wboxehBf09IZ5LzH
-	FWVsnB6KR2jpgfbsGOqMFbs=
-X-Google-Smtp-Source: AGHT+IFQ/8tRfh231wBImO6e9gycJ9gLPybhZL4tPQAP4HmrzWQeBUlcNv5nsoXTDJkx7CggGPiXrA==
-X-Received: by 2002:a05:6358:998e:b0:13c:dd43:f741 with SMTP id j14-20020a056358998e00b0013cdd43f741mr17793249rwb.24.1697138320720;
-        Thu, 12 Oct 2023 12:18:40 -0700 (PDT)
-Received: from ?IPV6:2001:df0:0:200c:a953:6b0a:23f3:fb73? ([2001:df0:0:200c:a953:6b0a:23f3:fb73])
-        by smtp.gmail.com with ESMTPSA id p6-20020aa78606000000b0068c006dd5c1sm12133698pfn.115.2023.10.12.12.18.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Oct 2023 12:18:40 -0700 (PDT)
-Message-ID: <2627cc80-f431-b47c-68aa-fc818785808f@gmail.com>
-Date: Fri, 13 Oct 2023 08:18:32 +1300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F8137CA6
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:23:56 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C198BB;
+	Thu, 12 Oct 2023 12:23:55 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CJMnpw028395;
+	Thu, 12 Oct 2023 19:23:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Ujq9HEe+dEgNGePgJ0zVUq1niKYvqT3YYqdkfFcOObk=;
+ b=lFviFLRwFWGhAQFAG8I+DXB98rHsRidJ4J0hLdgeT4R2Lc5jiSO0rj5o0/qH+68ooFBP
+ jHtuJ+jjP8IYjeb+KUnZgjKQfITt7LRUecVlHko61Y6kG/vNT6A/feNBX+JWHNB43tMK
+ q3eBp321qFmQPfKNogXUfSzj2nrPfczpr3kpHXObyqckDuU92tgOQNbyIgtie7QPJIz3
+ IHVdpc8lVx7vvwky2rNjSfZEi5hXN71cZd3kFZbVMoEzfSta5h45lE9vtzSINSMm0u7h
+ 07iGn1GH12R+auv5eYHEALFuuUP/WHMOSwgRRreZKdG0EyQ/1oDguSFEytj6oySfIMT5 fg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppwar0h8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:23:36 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CJNViI031012;
+	Thu, 12 Oct 2023 19:23:35 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppwar0gu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:23:35 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CIh3l3001170;
+	Thu, 12 Oct 2023 19:23:34 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk9fm9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:23:34 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CJNXiE11272764
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Oct 2023 19:23:33 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 811185805B;
+	Thu, 12 Oct 2023 19:23:33 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9CDA258058;
+	Thu, 12 Oct 2023 19:23:30 +0000 (GMT)
+Received: from [9.171.29.13] (unknown [9.171.29.13])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Oct 2023 19:23:30 +0000 (GMT)
+Message-ID: <2d5224b6-1ff2-4c0f-8b7b-3c3ff6d34157@linux.ibm.com>
+Date: Thu, 12 Oct 2023 21:23:29 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
+ containers.
+Content-Language: en-GB
+To: dust.li@linux.alibaba.com, Niklas Schnelle <schnelle@linux.ibm.com>,
+        Albert Huang <huangjie.albert@bytedance.com>,
+        Karsten Graul <kgraul@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu
+ <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
+ <00bbbf48440c1889ecd16a590ebb746b820a4f48.camel@linux.ibm.com>
+ <20231011144816.GO92403@linux.alibaba.com>
+ <20231012121740.GR92403@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20231012121740.GR92403@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: dQX6mAR0JwdnEXr-0JGA0JnUqegMsj_q
+X-Proofpoint-GUID: UiIth32omlzHZOJMLaylWZecWGdyJjrs
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
-Content-Language: en-US
-To: Greg Ungerer <gerg@linux-m68k.org>, Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
- netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
-References: <20231009074121.219686-1-hch@lst.de>
- <20231009074121.219686-6-hch@lst.de>
- <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com>
- <0299895c-24a5-4bd4-b7a4-dc50cc21e3d8@linux-m68k.org>
- <20231011055213.GA1131@lst.de>
- <cff2d9f0-4719-4b88-8ed5-68c8093bcebf@linux-m68k.org>
- <12c7b0db-938c-9ca4-7861-dd703a83389a@gmail.com>
- <e16ac0a4-3e4a-4e8c-98ba-7b600a8c6768@linux-m68k.org>
-From: Michael Schmitz <schmitzmic@gmail.com>
-In-Reply-To: <e16ac0a4-3e4a-4e8c-98ba-7b600a8c6768@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-12_11,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
+ impostorscore=0 suspectscore=0 adultscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310120161
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Greg,
 
-On 13/10/23 02:25, Greg Ungerer wrote:
-> Hi Michael,
->
-> On 12/10/23 04:21, Michael Schmitz wrote:
->> Hi Greg,
->>
->> On 12/10/23 02:09, Greg Ungerer wrote:
->>>
->>> I think this needs to be CONFIG_COLDFIRE is set and none of 
->>> CONFIG_HAVE_CACHE_CB or
->>> CONFIG_CACHE_D or CONFIG_CACHE_BOTH are set.
->>>
->>>
->>>> in the fec driver do the alloc_noncoherent and global cache flush
->>>> hack if:
+
+On 12.10.23 14:17, Dust Li wrote:
+> On Wed, Oct 11, 2023 at 10:48:16PM +0800, Dust Li wrote:
+>> On Thu, Sep 28, 2023 at 05:04:21PM +0200, Niklas Schnelle wrote:
+>>> On Mon, 2023-09-25 at 10:35 +0800, Albert Huang wrote:
+>>>> If the netdevice is within a container and communicates externally
+>>>> through network technologies like VXLAN, we won't be able to find
+>>>> routing information in the init_net namespace. To address this issue,
+>>>> we need to add a struct net parameter to the smc_ib_find_route function.
+>>>> This allow us to locate the routing information within the corresponding
+>>>> net namespace, ensuring the correct completion of the SMC CLC interaction.
 >>>>
->>>> COMFIG_COLDFIRE && (CONFIG_CACHE_D || CONFIG_CACHE_BOTH)
+>>>> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+>>>> ---
+>>>>   net/smc/af_smc.c | 3 ++-
+>>>>   net/smc/smc_ib.c | 7 ++++---
+>>>>   net/smc/smc_ib.h | 2 +-
+>>>>   3 files changed, 7 insertions(+), 5 deletions(-)
+>>>>
 >>>
->>> And then this becomes:
+>>> I'm trying to test this patch on s390x but I'm running into the same
+>>> issue I ran into with the original SMC namespace
+>>> support:https://lore.kernel.org/netdev/8701fa4557026983a9ec687cfdd7ac5b3b85fd39.camel@linux.ibm.com/
 >>>
->>> CONFIG_COLDFIRE && (CONFIG_HAVE_CACHE_CB || CONFIG_CACHE_D || 
->>> CONFIG_CACHE_BOTH)
+>>> Just like back then I'm using a server and a client network namespace
+>>> on the same system with two ConnectX-4 VFs from the same card and port.
+>>> Both TCP/IP traffic as well as user-space RDMA via "qperf … rc_bw" and
+>>> `qperf … rc_lat` work between namespaces and definitely go via the
+>>> card.
+>>>
+>>> I did use "rdma system set netns exclusive" then moved the RDMA devices
+>>> into the namespaces with "rdma dev set <rdma_dev> netns <namespace>". I
+>>> also verified with "ip netns exec <namespace> rdma dev"
+>>> that the RDMA devices are in the network namespace and as seen by the
+>>> qperf runs normal RDMA does work.
+>>>
+>>> For reference the smc_chck tool gives me the following output:
+>>>
+>>> Server started on port 37373
+>>> [DEBUG] Interfaces to check: eno4378
+>>> Test with target IP 10.10.93.12 and port 37373
+>>>   Live test (SMC-D and SMC-R)
+>>> [DEBUG] Running client: smc_run /tmp/echo-clt.x0q8iO 10.10.93.12 -p
+>>> 37373
+>>> [DEBUG] Client result: TCP 0x05000000/0x03030000
+>>>      Failed  (TCP fallback), reasons:
+>>>           Client:        0x05000000   Peer declined during handshake
+>>>           Server:        0x03030000   No SMC devices found (R and D)
+>>>
+>>> I also checked that SMC is generally working, once I add an ISM device
+>>> I do get SMC-D between the namespaces. Any ideas what could break SMC-R
+>>> here?
 >>
->> You appear to have dropped a '!' there ...
->
-> Not sure I follow. This is the opposite of the case above. The 
-> noncoherent alloc
-> and cache flush should be performed if ColdFire and any of 
-> CONFIG_HAVE_CACHE_CB,
-> CONFIG_CACHE_D or CONFIG_CACHE_BOTH are set - since that means there 
-> is data
-> caching involved.
+>> I missed the email :(
+>>
+>> Are you running SMC-Rv2 or v1 ?
+> 
+> Hi Niklas,
+> 
+> I tried your test today, and I encounter the same issue.
+> But I found it's because my 2 VFs are in difference subnets,
+> SMC-Rv2 work fine, SMC-Rv1 won't work, which is expected.
+> When I set the 2 VFs in the same subnet, SMC-Rv1 also works.
+> 
+> So I'm not sure it's the same for you. Can you check it out ?
+> 
+> BTW, the fallback reason(SMC_CLC_DECL_NOSMCDEV) in this case
+> is really not friendly, it's better to return SMC_CLC_DECL_DIFFPREFIX.
+> 
+> Best regards,
+> Dust
+> 
+Thank you, Dust, for trying it out!
+The reason code SMC_CLC_DECL_NOSMCDEV there could really make one 
+misunderstand.
 
-Now I see - I had read that definition to correspond to the 'select 
-coherent allocations on m68k' case, not the latter 'use non-coherent 
-allocations in the fec driver'.
-
-Your definitions are correct as written (and for all I can see, 
-Christoph's implementation is correct, too).
-
-Apologies for the noise - I blame jet leg for getting my wires crossed ...
-
-Cheers,
-
-     Michael
-
->
-> Regards
-> Greg
->
+> 
+>>
+>> Best regards,
+>> Dust
+>>
+>>
+>>>
+>>> Thanks,
+>>> Niklas
 
