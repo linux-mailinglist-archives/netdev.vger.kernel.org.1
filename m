@@ -1,152 +1,174 @@
-Return-Path: <netdev+bounces-40365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57EE37C6EBC
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:05:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63D217C6EC2
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB92E28281B
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:05:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EBD71C20D50
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1173F27701;
-	Thu, 12 Oct 2023 13:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5429F27EE3;
+	Thu, 12 Oct 2023 13:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="oTVXtGsc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M/0cRI1K"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6456C26E3B
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:05:35 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5DA291;
-	Thu, 12 Oct 2023 06:05:32 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CD2FJ9020431;
-	Thu, 12 Oct 2023 13:05:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=MdX39D2VCl3WqSbBA2/QodKI3FFA8NAfRhUxo9CYmpI=;
- b=oTVXtGsc/fSE5bnLHCfLaHb+3CiQ0EYzlqWZlfpEN1pl0Fv5F51l7DBuPO+RVr5Kihzf
- vIqH5vNxL+A0kjC/NIpTUGJmVH6iIoIDLka8nFMH63ZIsNJpCE16xagBHxJ1oPWZMa+G
- owVex5gq6MFInxQ/BMfkP24ECcQ3hi+tUP/wwsWWsxfr2Ao5zj8IyjjC6zgA3I5lHvg8
- dGiwQl82xInT80Ap+s7UH2N5NlZnd4+sN6X6YjXwKtc/OCIqiSU67bSAPu3JV0Mod8nQ
- 4BCnlw0dlSuWXI5dvK9vOjONUxaJnSiLafgeyikOa4HRKg12X0gK+G/8HGjXfKB9C+rB RQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tphb1r49g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 13:05:26 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CD2HCC020614;
-	Thu, 12 Oct 2023 13:05:26 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tphb1r48n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 13:05:25 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CCc1Ys025907;
-	Thu, 12 Oct 2023 13:05:24 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkjnnqk3d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 13:05:24 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CD5LxS44237196
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 13:05:21 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA0A320040;
-	Thu, 12 Oct 2023 13:05:20 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B633020043;
-	Thu, 12 Oct 2023 13:05:20 +0000 (GMT)
-Received: from [9.152.224.54] (unknown [9.152.224.54])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 13:05:20 +0000 (GMT)
-Message-ID: <5b54a227-2e18-46d5-9b15-aea9709cf2a5@linux.ibm.com>
-Date: Thu, 12 Oct 2023 15:05:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF2E12B7C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:07:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3186991
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:07:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697116050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6RsmbdmHeIJjajNpJlxE4knqBt1TJWSS+6uc9jgSnK8=;
+	b=M/0cRI1KUeBMbDkg++FV6NHiSCplY9sicEY4llaDf80pP0vZjaLYpHT4dDamr6vxUghZvv
+	ThjScP5W5R2oXwu0q28qBOBsd3x0k/DHp+dG0MMvNWpZgvWz9I/IQqQcdKK6ejl20FSHs/
+	6gtqyaTpseIZkSSvn026wrCpRXjwuCQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-593-hf5W4tbqOVC-LRHVkV9nMg-1; Thu, 12 Oct 2023 09:07:28 -0400
+X-MC-Unique: hf5W4tbqOVC-LRHVkV9nMg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4065d52a83aso6468655e9.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:07:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697116047; x=1697720847;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6RsmbdmHeIJjajNpJlxE4knqBt1TJWSS+6uc9jgSnK8=;
+        b=RkWBxOiU0S4QJY4SJXmqXfk0w8WpsxZfcjVRT1vaXjAXeG4/11WRYMe7VbkRojWeju
+         pKYQMc9CXC6taAh/2gqepTFTHW0FU0jzIG+5Scz3fK9usQD6amW4zNeoI4C0LwvPIVwb
+         VkunEd93OIJizMxdN+A1SEOeVZwDLF63DmZi8O0OqcV3eq6ONu+PKhWmKarc8yhkBs69
+         WqP9vzOa0T1ffPzuPJ7uLB0yZ3l6a6UubxobeRuFj2okEyxoSuKmFhilOeWT89mTFKc0
+         gaYjUsm8f7vqX/sJa56CzgSVziiaCbanYXhiP9A5vqMtcPVAEtjG6I0bA+I9cAzZAMNZ
+         6znA==
+X-Gm-Message-State: AOJu0YxciKB3y7hcEuuI74IZCtf65YgiE6HygoJKzwU4QzeX7mkrqHkj
+	Mo+FOJjT8knTIDILIESys4ndU/WrLWngSaPqRzbnDRXBC0d1aAfk2Zljbh+nVWfohb8/jJ8h49t
+	+aWLuyKJ/W0jR44Cu
+X-Received: by 2002:a05:600c:2219:b0:405:1c19:b747 with SMTP id z25-20020a05600c221900b004051c19b747mr20736201wml.15.1697116047559;
+        Thu, 12 Oct 2023 06:07:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENFzPHy318ZIAZGjzjpy4+I+lUIwRej9/NXgZPJcOdLn4eVm1MWxNkCTzCBfrKN6XADTgSJQ==
+X-Received: by 2002:a05:600c:2219:b0:405:1c19:b747 with SMTP id z25-20020a05600c221900b004051c19b747mr20736181wml.15.1697116047160;
+        Thu, 12 Oct 2023 06:07:27 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
+        by smtp.gmail.com with ESMTPSA id i2-20020a05600c290200b004063d8b43e7sm21849039wmd.48.2023.10.12.06.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 06:07:26 -0700 (PDT)
+Date: Thu, 12 Oct 2023 09:07:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost 21/22] virtio_net: update tx timeout record
+Message-ID: <20231012090632-mutt-send-email-mst@kernel.org>
+References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+ <20231011092728.105904-22-xuanzhuo@linux.alibaba.com>
+ <20231012050936-mutt-send-email-mst@kernel.org>
+ <1697101953.6236846-1-xuanzhuo@linux.alibaba.com>
+ <20231012052017-mutt-send-email-mst@kernel.org>
+ <1697111642.7917345-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: return the right falback reason when prefix
- checks fail
-To: Dust Li <dust.li@linux.alibaba.com>, Karsten Graul
- <kgraul@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20231012123729.29307-1-dust.li@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20231012123729.29307-1-dust.li@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MBfSyhAb_8tj5JP09lTYfO1AzGohvjlX
-X-Proofpoint-GUID: W2eDNxbKHD0fOckijwWojFYiy3FjFkAU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 phishscore=0 clxscore=1015 malwarescore=0 suspectscore=0
- bulkscore=0 adultscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310120107
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1697111642.7917345-2-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 12.10.23 14:37, Dust Li wrote:
-> In the smc_listen_work(), if smc_listen_prfx_check() failed,
-> the real reason: SMC_CLC_DECL_DIFFPREFIX was dropped, and
-> SMC_CLC_DECL_NOSMCDEV was returned.
+On Thu, Oct 12, 2023 at 07:54:02PM +0800, Xuan Zhuo wrote:
+> On Thu, 12 Oct 2023 05:36:56 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Thu, Oct 12, 2023 at 05:12:33PM +0800, Xuan Zhuo wrote:
+> > > On Thu, 12 Oct 2023 05:10:55 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > On Wed, Oct 11, 2023 at 05:27:27PM +0800, Xuan Zhuo wrote:
+> > > > > If send queue sent some packets, we update the tx timeout
+> > > > > record to prevent the tx timeout.
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >  drivers/net/virtio/xsk.c | 10 ++++++++++
+> > > > >  1 file changed, 10 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > > > > index 7abd46bb0e3d..e605f860edb6 100644
+> > > > > --- a/drivers/net/virtio/xsk.c
+> > > > > +++ b/drivers/net/virtio/xsk.c
+> > > > > @@ -274,6 +274,16 @@ bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > > > >
+> > > > >  	virtnet_xsk_check_queue(sq);
+> > > > >
+> > > > > +	if (stats.packets) {
+> > > > > +		struct netdev_queue *txq;
+> > > > > +		struct virtnet_info *vi;
+> > > > > +
+> > > > > +		vi = sq->vq->vdev->priv;
+> > > > > +
+> > > > > +		txq = netdev_get_tx_queue(vi->dev, sq - vi->sq);
+> > > > > +		txq_trans_cond_update(txq);
+> > > > > +	}
+> > > > > +
+> > > > >  	u64_stats_update_begin(&sq->stats.syncp);
+> > > > >  	sq->stats.packets += stats.packets;
+> > > > >  	sq->stats.bytes += stats.bytes;
+> > > >
+> > > > I don't get what this is doing. Is there some kind of race here you
+> > > > are trying to address? And what introduced the race?
+> > >
+> > >
+> > > Because the xsk xmit shares the send queue with the kernel xmit,
+> > > then when I do benchmark, the xsk will always use the send queue,
+> > > so the kernel may have no chance to do xmit, the tx watchdog
+> > > thinks that the send queue is hang and prints tx timeout log.
+> > >
+> > > So I call the txq_trans_cond_update() to tell the tx watchdog
+> > > that the send queue is working.
+> > >
+> > > Thanks.
+> >
+> > Don't like this hack.
+> > So packets are stuck in queue - that's not good is it?
+> > Is ours the only driver that shares queues like this?
 > 
-> Althrough this is also kind of SMC_CLC_DECL_NOSMCDEV, but return
-> the real reason is much friendly for debugging.
+> NO.
 > 
-> Fixes: e49300a6bf62 ("net/smc: add listen processing for SMC-Rv2")
-> Signed-off-by: Dust Li <dust.li@linux.alibaba.com>
-
-As you point out the current code is not really wrong. So I am not sure,
-whether this should be a fix for net, or rather a debug improvement for
-net-next.
-
-> ---
->  net/smc/af_smc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> And txq_trans_cond_update() is called by many net drivers for the similar reason.
 > 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index bacdd971615e..21d4476b937b 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -2361,7 +2361,7 @@ static int smc_listen_find_device(struct smc_sock *new_smc,
->  		smc_find_ism_store_rc(rc, ini);
->  		return (!rc) ? 0 : ini->rc;
->  	}
-> -	return SMC_CLC_DECL_NOSMCDEV;
-> +	return prfx_rc;
->  }
->  
->  /* listen worker: finish RDMA setup */
+> Thanks
 
-For the code change:
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Hmm it seems you are right. OK, sorry about the noise.
+
+> 
+> >
+> > >
+> > > >
+> > > > > --
+> > > > > 2.32.0.3.g01195cf9f
+> > > >
+> > > >
+> >
 
 
