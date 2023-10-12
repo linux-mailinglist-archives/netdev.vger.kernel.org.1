@@ -1,147 +1,94 @@
-Return-Path: <netdev+bounces-40352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3B677C6DCD
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:17:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00F6E7C6E19
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D4EA281141
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:17:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3181C1C20D2B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B072628C;
-	Thu, 12 Oct 2023 12:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51521262B7;
+	Thu, 12 Oct 2023 12:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hHspUfoP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92EC22EE6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:17:46 +0000 (UTC)
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E792B7;
-	Thu, 12 Oct 2023 05:17:44 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0Vu-eJHp_1697113061;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vu-eJHp_1697113061)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Oct 2023 20:17:41 +0800
-Date: Thu, 12 Oct 2023 20:17:40 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
-	Albert Huang <huangjie.albert@bytedance.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
- containers.
-Message-ID: <20231012121740.GR92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
- <00bbbf48440c1889ecd16a590ebb746b820a4f48.camel@linux.ibm.com>
- <20231011144816.GO92403@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18142511B
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:27:58 +0000 (UTC)
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DDF0B7
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:27:57 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id ada2fe7eead31-4524dc540c7so392907137.0
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:27:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697113676; x=1697718476; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YDu/2uqHkjW1Wxvgu3hcxeuiPTyT+MCxEgrv0YW9CCI=;
+        b=hHspUfoPNT8ZyuaKLZDODy9AaaAtUWqj8locBXBFbo78j4v+iFp5A9pG031p/u8bFE
+         FJcc60ztn1WUhRKsZ1AESe5DfoIHKMM+lWfkn1mu86Hj20GyoQ4b4LUM+0e6iKRK94sM
+         wOqRgwto9yyeo1xo9HPRNOdUnKrHULEPlaf7pIyBYff59Lbo7fIqGWJJcQzh5LQtOJbn
+         1wNwoRQN3JNCko6FwzyBiGM/ODkTu/ew2TYGgx6LdkzA1JeqyaykqCZi+l88+/WIluq/
+         0Ppkc8Jwc/bYfEDJzZQ/TTfH5x6aJt2NAd6Tu2+nHBkFQ3dAXAZc19Y666ojHYxXex1y
+         7G3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697113676; x=1697718476;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YDu/2uqHkjW1Wxvgu3hcxeuiPTyT+MCxEgrv0YW9CCI=;
+        b=kSIHZKgtBHUgQJyYr/tfdXAtInUJUSqtp+YNU08DZfPbIo6KNKj1htAzKfK6hJgcQy
+         z/QsouR0MmUOghBNoHV7Q+R9n1+4EXK4cXZgwg4K0Cmmsno0N+3x0TXoSoAnoZrw+Lbn
+         +xcjuCiTS8gPOnNEJw4tb27BBptk5i2tyrTqnzL3WjVvm+nJF0NOgCGqcVF7qGA5uOTe
+         oRfnVzauS7xvoh1YoY5DEERYHjS2A8O4L3+/Pb+PEfKCkZmHdL30wKV2A9w2m/qeM/YT
+         QK4Gyouw08MaF41clo6Tmj2xSjuVKARiNqeyG1Xk7qo9uasqOsPeXL8NRTA6/OF+VEoJ
+         MClQ==
+X-Gm-Message-State: AOJu0YwbcQf1gU09VETxr8H3QdEhqEmJHKl+MoeyBixJUAqBQudOU7wH
+	Wi//gaB8uhyBWmcPObp7o0TFiCRsDd1Y8D8JFOQzd+LH
+X-Google-Smtp-Source: AGHT+IH9W3xZl2714OjnDh+mCTkkwfXk8BZo2pekQr2XGcNGq+YlV7aQrkiIFsNjg/9Gvembgw3X1CL7VuS04W2AXRU=
+X-Received: by 2002:a67:f599:0:b0:452:c581:5a07 with SMTP id
+ i25-20020a67f599000000b00452c5815a07mr22561817vso.11.1697113676417; Thu, 12
+ Oct 2023 05:27:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231011144816.GO92403@linux.alibaba.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20231012120240.10447-1-fw@strlen.de>
+In-Reply-To: <20231012120240.10447-1-fw@strlen.de>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Thu, 12 Oct 2023 08:27:19 -0400
+Message-ID: <CAF=yD-Lu1dodkaE_nLiMSdbeLikZMm3y5-K=7D2_S1M2W5yO_g@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: gso_test: release each segment individually
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 10:48:16PM +0800, Dust Li wrote:
->On Thu, Sep 28, 2023 at 05:04:21PM +0200, Niklas Schnelle wrote:
->>On Mon, 2023-09-25 at 10:35 +0800, Albert Huang wrote:
->>> If the netdevice is within a container and communicates externally
->>> through network technologies like VXLAN, we won't be able to find
->>> routing information in the init_net namespace. To address this issue,
->>> we need to add a struct net parameter to the smc_ib_find_route function.
->>> This allow us to locate the routing information within the corresponding
->>> net namespace, ensuring the correct completion of the SMC CLC interaction.
->>> 
->>> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
->>> ---
->>>  net/smc/af_smc.c | 3 ++-
->>>  net/smc/smc_ib.c | 7 ++++---
->>>  net/smc/smc_ib.h | 2 +-
->>>  3 files changed, 7 insertions(+), 5 deletions(-)
->>> 
->>
->>I'm trying to test this patch on s390x but I'm running into the same
->>issue I ran into with the original SMC namespace
->>support:https://lore.kernel.org/netdev/8701fa4557026983a9ec687cfdd7ac5b3b85fd39.camel@linux.ibm.com/
->>
->>Just like back then I'm using a server and a client network namespace
->>on the same system with two ConnectX-4 VFs from the same card and port.
->>Both TCP/IP traffic as well as user-space RDMA via "qperf … rc_bw" and
->>`qperf … rc_lat` work between namespaces and definitely go via the
->>card.
->>
->>I did use "rdma system set netns exclusive" then moved the RDMA devices
->>into the namespaces with "rdma dev set <rdma_dev> netns <namespace>". I
->>also verified with "ip netns exec <namespace> rdma dev"
->>that the RDMA devices are in the network namespace and as seen by the
->>qperf runs normal RDMA does work.
->>
->>For reference the smc_chck tool gives me the following output:
->>
->>Server started on port 37373
->>[DEBUG] Interfaces to check: eno4378
->>Test with target IP 10.10.93.12 and port 37373
->>  Live test (SMC-D and SMC-R)
->>[DEBUG] Running client: smc_run /tmp/echo-clt.x0q8iO 10.10.93.12 -p
->>37373
->>[DEBUG] Client result: TCP 0x05000000/0x03030000
->>     Failed  (TCP fallback), reasons:
->>          Client:        0x05000000   Peer declined during handshake
->>          Server:        0x03030000   No SMC devices found (R and D)
->>
->>I also checked that SMC is generally working, once I add an ISM device
->>I do get SMC-D between the namespaces. Any ideas what could break SMC-R
->>here?
+On Thu, Oct 12, 2023 at 8:03=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
 >
->I missed the email :(
+> consume_skb() doesn't walk the segment list, so segments other than
+> the first are leaked.
 >
->Are you running SMC-Rv2 or v1 ?
-
-Hi Niklas,
-
-I tried your test today, and I encounter the same issue.
-But I found it's because my 2 VFs are in difference subnets,
-SMC-Rv2 work fine, SMC-Rv1 won't work, which is expected.
-When I set the 2 VFs in the same subnet, SMC-Rv1 also works.
-
-So I'm not sure it's the same for you. Can you check it out ?
-
-BTW, the fallback reason(SMC_CLC_DECL_NOSMCDEV) in this case
-is really not friendly, it's better to return SMC_CLC_DECL_DIFFPREFIX.
-
-Best regards,
-Dust
-
-
+> Move this skb_consume call into the loop.
 >
->Best regards,
->Dust
->
->
->>
->>Thanks,
->>Niklas
+> Cc: Willem de Bruijn <willemb@google.com>
+> Fixes: b3098d32ed6e ("net: add skb_segment kunit test")
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
