@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-40373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 196B27C6F71
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:40:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD3D7C6F70
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:40:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4454E1C20F63
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:40:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C1F2828D8
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F582942B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D6329429;
 	Thu, 12 Oct 2023 13:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nhdue6yi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQgE70va"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E372941E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DFA27705
 	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:40:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E976C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26A63C433CB;
 	Thu, 12 Oct 2023 13:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697118027;
-	bh=2nM5zaOqZbmd4ZhujnMcOSZBIhJQpWG9cLyspQCKOus=;
+	bh=L88CARRmiLu4rxw1K/f3K2I8S4J8TgYHDZZQDO7YRQU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Nhdue6yib9aCgermGJlXvK17udWbD/GP5Jn1rvCgxzxmGUy/T55e0cvRLpN48kpe7
-	 pyWTgomTagUFV0KNPhVq4RVnFjWkQPpUqlJ1+s2xgegTnSFkKptBFj7dNdIBS2ZV3o
-	 r4JONQWFl/2U+2BejBO0eNRJ2r1UQYSO9IrQi6eNvdi8hjO0EqFYg2p87blYLAtUOJ
-	 M/+s9pAD9jY4Oqz287cmUapncAZZ4Etno6c56sNE7DJSMrDr/UYphA/Q3pIwyt9bQD
-	 Ex3R7qMH+aILvDYPIatbULwrbaUbAOG4iHNOEnPMa0GL0g24G7/fcJUNiQ3dLyiv0M
-	 ESBi9qwCpsZJA==
+	b=ZQgE70vaPWOeHdiFL7zlPGuiZpm2vpHb+fFaSaY7214Bw0DE+K1a+IcvtIDZo/kzD
+	 wOc5vj1IwEEHJXM5s4Eig5Mu9g1f56NE3X1ClYaswtUUUvUWEucpUmvWZM0CEn+joU
+	 c9Vk9FJUzL3qiH4MM1HGmMCNtJxSmSe9nsLRzT2lqCLfned8qC5alO8MXnH3M2hqib
+	 I4nEuNmTcMhZ5e0/slaMpe3OQAF2gHMNuPa6ByTMqwd93AhIZJAiFDNyzcOgIlmm8S
+	 T/4UQputJzWNyOo+A6wN8q6cjCwbtG7tcp+Q5i0+6gl2GO5NSrIoFcbRGYDDPjIznP
+	 lngzE4uWPzVpA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 03B80E21EC0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C0C3C595C4;
 	Thu, 12 Oct 2023 13:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,43 +43,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/1] net: add offload support for
- CHACHA20-POLY1305
+Subject: Re: [PATCH net-next] net: gso_test: fix build with gcc-12 and earlier
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169711802701.13816.13270935364312409222.git-patchwork-notify@kernel.org>
+ <169711802704.13816.12651350014833242834.git-patchwork-notify@kernel.org>
 Date: Thu, 12 Oct 2023 13:40:27 +0000
-References: <20231009080946.7655-1-louis.peens@corigine.com>
-In-Reply-To: <20231009080946.7655-1-louis.peens@corigine.com>
-To: Louis Peens <louis.peens@corigine.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- steffen.klassert@secunet.com, herbert@gondor.apana.org.au, leon@kernel.org,
- horms@kernel.org, shihong.wang@corigine.com, netdev@vger.kernel.org,
- oss-drivers@corigine.com
+References: <20231012120901.10765-1-fw@strlen.de>
+In-Reply-To: <20231012120901.10765-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, willemb@google.com, tasmiya@linux.vnet.ibm.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon,  9 Oct 2023 10:09:45 +0200 you wrote:
-> This patch adds support for offloading the CHACHA20-POLY1305 ipsec
-> algorithm to nfp hardware. When the SADB_EALG_NONE path is hit use the
-> algorithm name to identify CHACHA20-POLY1305, and offload to the nfp.
+On Thu, 12 Oct 2023 14:08:56 +0200 you wrote:
+> gcc 12 errors out with:
+> net/core/gso_test.c:58:48: error: initializer element is not constant
+>    58 |                 .segs = (const unsigned int[]) { gso_size },
 > 
-> Changes since v1:
-> 
-> Remove modification to pfkey
->     The first version of this series modified xfrm itself to add new
->     things in pfkey. We were informed that this was deprecated, so in
->     this version the name is parsed directly as suggesting during
->     review of v1.
+> This version isn't old (2022), so switch to preprocessor-bsaed constant
+> instead of 'static const int'.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,1/1] nfp: add support CHACHA20-POLY1305 offload for ipsec
-    https://git.kernel.org/netdev/net-next/c/04317b129e4e
+  - [net-next] net: gso_test: fix build with gcc-12 and earlier
+    https://git.kernel.org/netdev/net-next/c/2f0968a030f2
 
 You are awesome, thank you!
 -- 
