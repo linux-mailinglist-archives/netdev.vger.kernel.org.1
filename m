@@ -1,147 +1,149 @@
-Return-Path: <netdev+bounces-40424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D688C7C74CF
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:32:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 614297C74D6
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0613C1C20D50
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:32:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609201C20BE6
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D8F358B3;
-	Thu, 12 Oct 2023 17:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC5636AEF;
+	Thu, 12 Oct 2023 17:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMj+xjMw"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lZ5LV6ok"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926203588F
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:32:29 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBD8EED
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:32:27 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40684f53bfcso12617695e9.0
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:32:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697131946; x=1697736746; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uTtI7zieYYaFnkvDEu6TAAF5Hyc1mP1avvewhcF8zig=;
-        b=YMj+xjMwooFeJkSldW8XuLqniHjRmri2xrc8d2VvLzI+FtEUn8Xdg2SmbUhcLf2J7W
-         0RVtfvel92O05gygFVf3sBZRjKjQCWCVgeClvAMDb8ezTRdrgn6oV7+Qb7hCI9lnpTl2
-         S5lWOGaycw1DYm4ciSjqmsFpg9bZhdQik6Kxaf2ppyFhMPdrPC4aAuyu9Dsm5imsVLul
-         dJvTTSWkC3kTGTOA+xY3+ebK8jTkdlQFehf2BSByMnCcIY5cGZ3sbFzfdLGHrE3XHIm3
-         emF5fVn/j3JpXzStTbXO5Hsm6F1SGVSpuvpMI2OUMphQK+dDvF5vEUS8s8tW63IRBREN
-         Cp+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697131946; x=1697736746;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uTtI7zieYYaFnkvDEu6TAAF5Hyc1mP1avvewhcF8zig=;
-        b=l+0ZU9fxEev8QG/7tBWId8nD99NNiaLi5RnV/YlVm/pmSbxJKuVrcrhMkVrOwiBeMC
-         tGJCGvq2xRB2RXvT3C7kx+tKAcJ9s4zoTrVlehs5bjT+NaHIRe9Io+P8m5sITV1R823y
-         1n8j63nd0vEvgzJ1zdErztieyeSrrycUvKOlm47ioBmQc5FP4vkrZfPTiDhrCrowZkTB
-         Kop9NEk9dIui60YDy+t06fJ8zsefNbmNA9AnqtmJz8luawnu/6JsqJrUAqLBiflKBXAc
-         TJQoyvvI5slu+t7l1G9kMhCkF8ZsyEHK3W+2gLmWTsvtJ9pVB0rLi/S8FJrexG4n89vO
-         T8oQ==
-X-Gm-Message-State: AOJu0YzGsVJfjvtFKMoeFjsf3q8kt2ghxxJWJcI+fitBZgC5jjAN1f/z
-	Z6ccNlgEMzVtJ5lVbY6Er/I=
-X-Google-Smtp-Source: AGHT+IFGmcJx9JJ5abCB3tPVHOwc4dhjcMGsFmgN1eEE2zbIyobmCfOI/Kim6i+eUhOOItrBfF4j2A==
-X-Received: by 2002:a7b:cd8c:0:b0:401:bcd9:4871 with SMTP id y12-20020a7bcd8c000000b00401bcd94871mr22992249wmj.21.1697131946092;
-        Thu, 12 Oct 2023 10:32:26 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id f8-20020adfe908000000b0032d8ce46caasm2981218wrm.93.2023.10.12.10.32.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Oct 2023 10:32:25 -0700 (PDT)
-Subject: Re: [PATCH net v4] docs: fix info about representor identification
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, netdev@vger.kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84132AB39
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:34:20 +0000 (UTC)
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F084010B
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:34:17 -0700 (PDT)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 46A1DFF805;
+	Thu, 12 Oct 2023 17:34:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1697132054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BRiYshhP7qCU0RVMJ9W0l7j4l03NliW4PnPPeVL297Y=;
+	b=lZ5LV6oklBBCAbb7XWpi3qqqgnuB6au0/3wWSW2FMNAhbsf1PSlmgrySMmrsMRxhJiDUxa
+	sPZGLjtcduMllJRZIxkiTnwjh1SI3tfxDEc2OxX16A7ewzJsatVlb6peDtzWR5iwhnOBaB
+	Q9HY1sj+HCtPQQPBD2SJRuzX1lZ8yZI/seVTu6ZH8PzkwKNKqHXhVa8LdCNazrmddti/O7
+	9vl8V+2+Sz/i19N0nzDsRgcFR4CwTbUr/gH0OdJ47d6hky1XnciTYDMuwavLEHFlDjBV5/
+	4Q/85UrrtwG5n03kKdz+n3zcli4X+hdp1EuC0piQdBqlPe1buTgcA+FAhbq4vA==
+Date: Thu, 12 Oct 2023 19:34:10 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jacob.e.keller@intel.com,
- Wojciech Drewek <wojciech.drewek@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20231012123144.15768-1-mateusz.polchlopek@intel.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <817e0bfc-16c8-1c8b-35f6-ba373b7b1b45@gmail.com>
-Date: Thu, 12 Oct 2023 18:32:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Ethernet issue on imx6
+Message-ID: <20231012193410.3d1812cf@xps-13>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231012123144.15768-1-mateusz.polchlopek@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 12/10/2023 13:31, Mateusz Polchlopek wrote:
-> Update the "How are representors identified?" documentation
-> subchapter. For newer kernels driver should use
-> SET_NETDEV_DEVLINK_PORT instead of ndo_get_devlink_port()
-> callback.
-> 
-> ---
+Hello,
 
-These --- lines in the middle of the commit message will cut off
- the tag block for 'git am'.
+I've been scratching my foreheads for weeks on a strange imx6
+network issue, I need help to go further, as I feel a bit clueless now.
 
-Other than that,
-Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
+Here is my setup :
+- Custom imx6q board
+- Bootloader: U-Boot 2017.11 (also tried with a 2016.03)
+- Kernel : 4.14(.69,.146,.322), v5.10 and v6.5 with the same behavior
+- The MAC (fec driver) is connected to a Micrel 9031 PHY
+- The PHY is connected to the link partner through an industrial cable
+- Testing 100BASE-T (link is stable)
 
-> v4:
-> - changed the docs description
-> 
-> v3:
-> - fixed the lack of hyphen in changelog
-> https://lore.kernel.org/netdev/20231010120845.151531-1-mateusz.polchlopek@intel.com/
-> 
-> v2:
-> - targeting -net, without IWL
-> https://lore.kernel.org/netdev/20231009111544.143609-1-mateusz.polchlopek@intel.com/
-> 
-> v1:
-> https://lore.kernel.org/netdev/20231006091412.92156-1-mateusz.polchlopek@intel.com/
-> ---
-> 
-> Fixes: 7712b3e966ea ("Merge branch 'net-fix-netdev-to-devlink_port-linkage-and-expose-to-user'")
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>> ---
->  Documentation/networking/representors.rst | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/networking/representors.rst b/Documentation/networking/representors.rst
-> index ee1f5cd54496..decb39c19b9e 100644
-> --- a/Documentation/networking/representors.rst
-> +++ b/Documentation/networking/representors.rst
-> @@ -162,9 +162,11 @@ How are representors identified?
->  The representor netdevice should *not* directly refer to a PCIe device (e.g.
->  through ``net_dev->dev.parent`` / ``SET_NETDEV_DEV()``), either of the
->  representee or of the switchdev function.
-> -Instead, it should implement the ``ndo_get_devlink_port()`` netdevice op, which
-> -the kernel uses to provide the ``phys_switch_id`` and ``phys_port_name`` sysfs
-> -nodes.  (Some legacy drivers implement ``ndo_get_port_parent_id()`` and
-> +Instead, the driver should use the ``SET_NETDEV_DEVLINK_PORT`` macro to
-> +assign a devlink port instance to the netdevice before registering the
-> +netdevice; the kernel uses the devlink port to provide the ``phys_switch_id``
-> +and ``phys_port_name`` sysfs nodes.
-> +(Some legacy drivers implement ``ndo_get_port_parent_id()`` and
->  ``ndo_get_phys_port_name()`` directly, but this is deprecated.)  See
->  :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>` for the
->  details of this API.
-> 
+The RGMII-ID timings are probably not totally optimal but offer rather
+good performance. In UDP with iperf3:
+* Downlink (host to the board) runs at full speed with 0% drop
+* Uplink (board to host) runs at full speed with <1% drop
 
+However, if I ever try to limit the bandwidth in uplink (only), the drop
+rate rises significantly, up to 30%:
+
+//192.168.1.1 is my host, so the below lines are from the board:
+# iperf3 -c 192.168.1.1 -u -b100M
+[  5]   0.00-10.05  sec   113 MBytes  94.6 Mbits/sec  0.044 ms  467/82603 (=
+0.57%)  receiver
+# iperf3 -c 192.168.1.1 -u -b90M
+[  5]   0.00-10.04  sec  90.5 MBytes  75.6 Mbits/sec  0.146 ms  12163/77688=
+ (16%)  receiver
+# iperf3 -c 192.168.1.1 -u -b80M
+[  5]   0.00-10.05  sec  66.4 MBytes  55.5 Mbits/sec  0.162 ms  20937/69055=
+ (30%)  receiver
+
+One direct consequence, I believe, is that tcp transfers quickly stall
+or run at an insanely low speed (~40kiB/s).
+
+I've tried to disable all the hardware offloading reported by ethtool
+with no additional success.
+
+Last but not least, I observe another very strange behavior: when I
+perform an uplink transfer at a "reduced" speed (80Mbps or below), as
+said above, I observe a ~30% drop rate. But if I run a full speed UDP
+transfer in downlink at the same time, the drop rate lowers to ~3-4%.
+See below, this is an iperf server on my host receiving UDP traffic from
+my board. After 5 seconds I start a full speed UDP transfer from the
+host to the board:
+
+[  5] local 192.168.1.1 port 5201 connected to 192.168.1.2 port 57216
+[ ID] Interval           Transfer     Bitrate         Jitter    Lost/Total =
+Datagrams
+[  5]   0.00-1.00   sec  6.29 MBytes  52.7 Mbits/sec  0.152 ms  2065/6617 (=
+31%) =20
+[  5]   1.00-2.00   sec  6.50 MBytes  54.6 Mbits/sec  0.118 ms  2199/6908 (=
+32%) =20
+[  5]   2.00-3.00   sec  6.64 MBytes  55.7 Mbits/sec  0.123 ms  2099/6904 (=
+30%) =20
+[  5]   3.00-4.00   sec  6.58 MBytes  55.2 Mbits/sec  0.091 ms  2141/6905 (=
+31%) =20
+[  5]   4.00-5.00   sec  6.59 MBytes  55.3 Mbits/sec  0.092 ms  2134/6907 (=
+31%) =20
+[  5]   5.00-6.00   sec  8.36 MBytes  70.1 Mbits/sec  0.088 ms  853/6904 (1=
+2%) =20
+[  5]   6.00-7.00   sec  9.14 MBytes  76.7 Mbits/sec  0.085 ms  281/6901 (4=
+.1%) =20
+[  5]   7.00-8.00   sec  9.19 MBytes  77.1 Mbits/sec  0.147 ms  255/6911 (3=
+.7%) =20
+[  5]   8.00-9.00   sec  9.22 MBytes  77.3 Mbits/sec  0.160 ms  233/6907 (3=
+.4%) =20
+[  5]   9.00-10.00  sec  9.25 MBytes  77.6 Mbits/sec  0.129 ms  211/6906 (3=
+.1%) =20
+[  5]  10.00-10.04  sec   392 KBytes  76.9 Mbits/sec  0.113 ms  11/288 (3.8=
+%)=20
+
+If the downlink transfer is not at full speed, I don't observe any
+difference.
+
+I've commented out the runtime_pm callbacks in the fec driver, but
+nothing changed.
+
+Any hint or idea will be highly appreciated!
+
+Thanks a lot,
+Miqu=C3=A8l
 
