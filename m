@@ -1,133 +1,197 @@
-Return-Path: <netdev+bounces-40355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D527C6E27
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:34:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3111A7C6E2B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E07B21C20F63
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:34:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC29E28277D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CBD2421D;
-	Thu, 12 Oct 2023 12:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CwE4S3ng"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707FC24A09;
+	Thu, 12 Oct 2023 12:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF38266C1
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:34:53 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA80B7
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:34:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697114092; x=1728650092;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pCgJXvRIM8UKT6SuTH43ahQNseXCq1L0JSy5YfhVEmM=;
-  b=CwE4S3ngPMXSB/cVMkWobCv5bpGaT5NoOvX3dqUCF2XWwnUCO9d4A/cE
-   49wgW3T4MySQw4JFIPvoMOEFXoJ/49+LnlVEJg0HedpXd/VGoHL+vnwZg
-   IH4woWSr+C3cUKdzM40O3+sXLHbuXAe2L+7qYTl3U3c0xIW9TSbiw5xDF
-   CKm6cGgC3+pbSA6L02E/bP02OqYH4Rbgn9i7sZKwgBiVGyBSFZSGPAgI6
-   BCCtrrg9e/Yx+HeNN7I2YRnLp8SJbbrcTUFIkagRNphOXARpqxOgabnV6
-   Pe3bHZ+I7RFMtNPl1Wt9g6b3o2ecJtGlwjzy5AkW1c7X+syon1IqutgXT
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="364274303"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="364274303"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:34:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="1001533795"
-X-IronPort-AV: E=Sophos;i="6.03,218,1694761200"; 
-   d="scan'208";a="1001533795"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmsmga006.fm.intel.com with ESMTP; 12 Oct 2023 05:34:49 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id A1D73332D6;
-	Thu, 12 Oct 2023 13:34:48 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	jacob.e.keller@intel.com,
-	ecree.xilinx@gmail.com,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net v4] docs: fix info about representor identification
-Date: Thu, 12 Oct 2023 08:31:44 -0400
-Message-Id: <20231012123144.15768-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F1F27711
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:35:21 +0000 (UTC)
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57D1BB7;
+	Thu, 12 Oct 2023 05:35:19 -0700 (PDT)
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-59e88a28b98so7334767b3.1;
+        Thu, 12 Oct 2023 05:35:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697114118; x=1697718918;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZNqyPohjCuzU12TG1w2zBV6Y85OUT4VT5oqC+OM6zBs=;
+        b=ktNhkoV/p5pLvO71gJD1QmTW5cYofJXa2BOv5UfdCFG5WGUvKV7YLhskGi0VnfCldp
+         lJ5z/lPY+SazOkHuEKVBjEvmSXKPmrQGxz3hzBeHQbKolDsuuKtwAjFrqV7u1iTVvBKT
+         bIkkV/zvNMBnA4VXo3yxujo1aQ+CKyJwW4Qfxim5xDB/arvlUsmjcR7ej6QOptJ9B9IB
+         +GyZdZ5DD4gwU/DfC/BjBDYZuU65AetROrOILteSyRymuhtpUnaHaWNyXW1ZVbsxSORG
+         W7+UudFUi43oLXvw2ELDRuTPpVGdrKttWAEIE2dxC1KN/jyfQDeu6dZe05z8zcVjjJrf
+         /dgw==
+X-Gm-Message-State: AOJu0YxsB74iE4J92442p0SOq1RUfEiifeo8zPbVA3hIR5UMYRMU3T+L
+	T0dHm+gYZmz1ccDUc9tCUjhKwX3cS764qg==
+X-Google-Smtp-Source: AGHT+IEwMKB5Xj5w0UGWgB7JpNOCLxDzfyJOWMSHmmg6FnUoiW/Y1GZ+3E/qru8M6Ma7snWKf6ZAVg==
+X-Received: by 2002:a05:690c:88c:b0:570:2542:cc9b with SMTP id cd12-20020a05690c088c00b005702542cc9bmr14333786ywb.18.1697114118315;
+        Thu, 12 Oct 2023 05:35:18 -0700 (PDT)
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com. [209.85.219.176])
+        by smtp.gmail.com with ESMTPSA id v20-20020a81a554000000b005a2521fb26csm5792034ywg.99.2023.10.12.05.35.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Oct 2023 05:35:18 -0700 (PDT)
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-d9ac3b4f42cso501297276.0;
+        Thu, 12 Oct 2023 05:35:18 -0700 (PDT)
+X-Received: by 2002:a25:24d5:0:b0:d9a:4178:70d5 with SMTP id
+ k204-20020a2524d5000000b00d9a417870d5mr5373929ybk.6.1697114117802; Thu, 12
+ Oct 2023 05:35:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20231012121618.267315-1-yoshihiro.shimoda.uh@renesas.com>
+In-Reply-To: <20231012121618.267315-1-yoshihiro.shimoda.uh@renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Oct 2023 14:35:06 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWAk9kJBGGq9K-RnC0HFZk1XbaosTBO2OW1kpYFPh1Mqg@mail.gmail.com>
+Message-ID: <CAMuHMdWAk9kJBGGq9K-RnC0HFZk1XbaosTBO2OW1kpYFPh1Mqg@mail.gmail.com>
+Subject: Re: [PATCH net-next] rswitch: Add PM ops
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Update the "How are representors identified?" documentation
-subchapter. For newer kernels driver should use
-SET_NETDEV_DEVLINK_PORT instead of ndo_get_devlink_port()
-callback.
+Hi Shimoda-san,
 
----
-v4:
-- changed the docs description
+On Thu, Oct 12, 2023 at 2:16=E2=80=AFPM Yoshihiro Shimoda
+<yoshihiro.shimoda.uh@renesas.com> wrote:
+> Add PM ops for Suspend to Idle. When the system suspended,
+> the Ethernet Serdes's clock will be stopped. So, this driver needs
+> to re-initialize the Ethernet Serdes by phy_init() in
+> renesas_eth_sw_resume(). Otherwise, timeout happened in phy_power_on().
+>
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
-v3:
-- fixed the lack of hyphen in changelog
-https://lore.kernel.org/netdev/20231010120845.151531-1-mateusz.polchlopek@intel.com/
+Thanks for your patch!
 
-v2:
-- targeting -net, without IWL
-https://lore.kernel.org/netdev/20231009111544.143609-1-mateusz.polchlopek@intel.com/
+> --- a/drivers/net/ethernet/renesas/rswitch.c
+> +++ b/drivers/net/ethernet/renesas/rswitch.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/of_net.h>
+>  #include <linux/phy/phy.h>
+>  #include <linux/platform_device.h>
+> +#include <linux/pm.h>
+>  #include <linux/pm_runtime.h>
+>  #include <linux/rtnetlink.h>
+>  #include <linux/slab.h>
+> @@ -1315,6 +1316,7 @@ static int rswitch_phy_device_init(struct rswitch_d=
+evice *rdev)
+>         if (!phydev)
+>                 goto out;
+>         __set_bit(rdev->etha->phy_interface, phydev->host_interfaces);
+> +       phydev->mac_managed_pm =3D true;
+>
+>         phydev =3D of_phy_connect(rdev->ndev, phy, rswitch_adjust_link, 0=
+,
+>                                 rdev->etha->phy_interface);
+> @@ -1991,11 +1993,52 @@ static void renesas_eth_sw_remove(struct platform=
+_device *pdev)
+>         platform_set_drvdata(pdev, NULL);
+>  }
+>
+> +static int __maybe_unused renesas_eth_sw_suspend(struct device *dev)
+> +{
+> +       struct rswitch_private *priv =3D dev_get_drvdata(dev);
+> +       struct net_device *ndev;
+> +       int i;
 
-v1:
-https://lore.kernel.org/netdev/20231006091412.92156-1-mateusz.polchlopek@intel.com/
----
+unsigned int (also below)
 
-Fixes: 7712b3e966ea ("Merge branch 'net-fix-netdev-to-devlink_port-linkage-and-expose-to-user'")
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- Documentation/networking/representors.rst | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+> +
+> +       rswitch_for_each_enabled_port(priv, i) {
+> +               ndev =3D priv->rdev[i]->ndev;
+> +               if (netif_running(ndev)) {
+> +                       netif_device_detach(ndev);
+> +                       rswitch_stop(ndev);
+> +               }
+> +               if (priv->rdev[i]->serdes->init_count)
+> +                       phy_exit(priv->rdev[i]->serdes);
 
-diff --git a/Documentation/networking/representors.rst b/Documentation/networking/representors.rst
-index ee1f5cd54496..decb39c19b9e 100644
---- a/Documentation/networking/representors.rst
-+++ b/Documentation/networking/representors.rst
-@@ -162,9 +162,11 @@ How are representors identified?
- The representor netdevice should *not* directly refer to a PCIe device (e.g.
- through ``net_dev->dev.parent`` / ``SET_NETDEV_DEV()``), either of the
- representee or of the switchdev function.
--Instead, it should implement the ``ndo_get_devlink_port()`` netdevice op, which
--the kernel uses to provide the ``phys_switch_id`` and ``phys_port_name`` sysfs
--nodes.  (Some legacy drivers implement ``ndo_get_port_parent_id()`` and
-+Instead, the driver should use the ``SET_NETDEV_DEVLINK_PORT`` macro to
-+assign a devlink port instance to the netdevice before registering the
-+netdevice; the kernel uses the devlink port to provide the ``phys_switch_id``
-+and ``phys_port_name`` sysfs nodes.
-+(Some legacy drivers implement ``ndo_get_port_parent_id()`` and
- ``ndo_get_phys_port_name()`` directly, but this is deprecated.)  See
- :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>` for the
- details of this API.
--- 
-2.38.1
+If !init_count, the PHY was not initialized before suspending? ...
 
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static int __maybe_unused renesas_eth_sw_resume(struct device *dev)
+> +{
+> +       struct rswitch_private *priv =3D dev_get_drvdata(dev);
+> +       struct net_device *ndev;
+> +       int i;
+> +
+> +       rswitch_for_each_enabled_port(priv, i) {
+> +               phy_init(priv->rdev[i]->serdes);
+
+... while it is always initialized after resuming? Is that intentional,
+or should the pre-suspend state be preserved?
+
+> +               ndev =3D priv->rdev[i]->ndev;
+> +               if (netif_running(ndev)) {
+> +                       rswitch_open(ndev);
+> +                       netif_device_attach(ndev);
+> +               }
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +static SIMPLE_DEV_PM_OPS(renesas_eth_sw_pm_ops, renesas_eth_sw_suspend,
+> +                        renesas_eth_sw_resume);
+
+Please use DEFINE_SIMPLE_DEV_PM_OPS() instead, so you can drop the
+__maybe_unused tags from the callbacks.
+
+> +
+>  static struct platform_driver renesas_eth_sw_driver_platform =3D {
+>         .probe =3D renesas_eth_sw_probe,
+>         .remove_new =3D renesas_eth_sw_remove,
+>         .driver =3D {
+>                 .name =3D "renesas_eth_sw",
+> +               .pm =3D &renesas_eth_sw_pm_ops,
+
+pm_sleep_ptr(...)
+
+>                 .of_match_table =3D renesas_eth_sw_of_table,
+>         }
+>  };
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
