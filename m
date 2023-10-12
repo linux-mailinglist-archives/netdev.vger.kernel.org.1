@@ -1,168 +1,152 @@
-Return-Path: <netdev+bounces-40359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EFA7C6E8A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:53:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 181D37C6E92
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:54:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5F7282782
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:53:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459D71C20CA5
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37634266C9;
-	Thu, 12 Oct 2023 12:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEA426E2D;
+	Thu, 12 Oct 2023 12:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XkJ9DZi5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M9V9dEIt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C3022EFA
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:53:48 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBA194;
-	Thu, 12 Oct 2023 05:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1697115227; x=1728651227;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=gNLNaEec64/5yPf43OhzXjxJ+9f0AwPObPN0gw90rTk=;
-  b=XkJ9DZi5gy3NgX1d7rCxq+rNL5s/H7mbScg9qZtZuE0o2ovQ6o1aTPfT
-   RSkn6+wb8jlENZvCR1cjCzBDMsPR4EVEUqfMche/YjYjxViTWu4FfobjZ
-   CUIaoL0Vn88ucROtDhnXUx8cGrpkNZlqzvBTl+tEYjfJXXv5HwINStMMu
-   8zBmNOBuAp3ttOy2oERrV+cd3OPVAUXLpZtxRF48y1iThmGNEYQk/nnxp
-   M5gc4C0aQJrhAithjm3hwCNljAEN+5WvwJjIgaNcaMlWVEUrwTo4vvUHc
-   f6Aea66STp3AIMpiHaWybUqw4Q6mkcqqgbb1kzpYS7Qrk5evW4cL4CAl5
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="471169655"
-X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
-   d="scan'208";a="471169655"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="783688889"
-X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
-   d="scan'208";a="783688889"
-Received: from asroczyn-mobl.ger.corp.intel.com ([10.249.36.107])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:41 -0700
-Date: Thu, 12 Oct 2023 15:53:39 +0300 (EEST)
-From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, 
-    Rob Herring <robh@kernel.org>, 
-    =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>, 
-    Lukas Wunner <lukas@wunner.de>, "Rafael J . Wysocki" <rafael@kernel.org>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
-    LKML <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-    ath10k@lists.infradead.org, ath11k@lists.infradead.org, 
-    ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org, 
-    linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
-    linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org, 
-    linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
-In-Reply-To: <20231011215327.GA1043654@bhelgaas>
-Message-ID: <afb4db5-5fe1-9f5d-a910-032adf195c@linux.intel.com>
-References: <20231011215327.GA1043654@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE47E266DC;
+	Thu, 12 Oct 2023 12:54:25 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 300D7FB;
+	Thu, 12 Oct 2023 05:54:24 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-690f8e63777so237418b3a.0;
+        Thu, 12 Oct 2023 05:54:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697115263; x=1697720063; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KARJWYDG1LXfd55izpQA/w+fD+DEi2wLeLv0QKgn6kA=;
+        b=M9V9dEIt5y2w4gAGykKLF1R0M7XxIJ9eBosoI2q8+6wszvYD/Yibg4BL3S2sgEdNUC
+         EDHtBu9iZ4RnWoaPGc/izR9rkJSg1ThdQXFLhYyzSmtFudznJQrGs0XQMSh/Vqv8wnIK
+         Oq2oNQct+9aBlzCF62PlaRL23/84sRXTxhnUaOD2DuO7kwlDdcUDE3QyiGRCWv5q1tf5
+         NIGIXBdGEe9aeXrWuCBfXp/7qtQGjDUX3yKloqDDtDUU8cKhYAXpMYmt3TsNHoIdh6tx
+         bd9SbiKT1GpdckshA+MceT55coCdV4LAQPED8XThp4E4i4Oy7xocf+ifmX6XQtiyhDHg
+         3l8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697115263; x=1697720063;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KARJWYDG1LXfd55izpQA/w+fD+DEi2wLeLv0QKgn6kA=;
+        b=bMOg7i9RgGdPG0K7JkCBTcSNgw2CDS1fmJR0k/NumVI+eg4tgOpO7ctBMd1TU5HRUT
+         lk/ox3zNQ0HPwgPvxcoNGkcfxPE8I5MXOxQlLCnaogAaJ1qr1TPdYDyhLQrwz8WquES4
+         uSXFmwo+e+2zdVUIk3OPAwbdTV3vYddZIdqtoW0DpMuNO0yTk889vMpkFAQ2Ef67BEqh
+         +m64Q3ArUZuWPoF06t1kQWNVz80zV9oeWrwOpqtPRVJfgdDlQQB+nW5Juh5PwIZbefhp
+         3oM7c1MCFvTNkEXNP8T4/Vuve3Jb9eTbwm+kO5OICQsdEhGykxjwFSDTPncSYLIlVl9g
+         j/lQ==
+X-Gm-Message-State: AOJu0YxTNFr+DwPypiQeFJS60srrUre6ihgX3Aqh6QJUbAH+psV/0Z5Z
+	ezuS/3bxKoPsVJrWVCO9ipN+MOzQfJT40jxe
+X-Google-Smtp-Source: AGHT+IHtApxvMUI38ubpSyMmGD1NGTH8jr9a2XFGjDP/XceXVELShmS8BvXPBOWZEYpfvqPsvB4lTg==
+X-Received: by 2002:a17:902:d352:b0:1c9:e121:ccc1 with SMTP id l18-20020a170902d35200b001c9e121ccc1mr1409700plk.5.1697115263356;
+        Thu, 12 Oct 2023 05:54:23 -0700 (PDT)
+Received: from ip-172-30-47-114.us-west-2.compute.internal (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
+        by smtp.gmail.com with ESMTPSA id r23-20020a170902be1700b001ba066c589dsm1886857pls.137.2023.10.12.05.54.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 05:54:23 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	miguel.ojeda.sandonis@gmail.com,
+	tmgross@umich.edu,
+	boqun.feng@gmail.com,
+	wedsonaf@gmail.com,
+	benno.lossin@proton.me,
+	greg@kroah.com
+Subject: [PATCH net-next v4 0/4] Rust abstractions for network PHY drivers
+Date: Thu, 12 Oct 2023 21:53:45 +0900
+Message-Id: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-1586418908-1697115226=:1692"
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+This patchset adds Rust abstractions for phylib. It doesn't fully
+cover the C APIs yet but I think that it's already useful. I implement
+two PHY drivers (Asix AX88772A PHYs and Realtek Generic FE-GE). Seems
+they work well with real hardware.
 
---8323329-1586418908-1697115226=:1692
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+The first patch introduces Rust bindings for phylib.
 
-On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
+The second patch add a macro to declare a kernel module for PHYs
+drivers.
 
-> On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
-> > pci_disable_link_state() lacks a symmetric pair. Some drivers want to
-> > disable ASPM during certain phases of their operation but then
-> > re-enable it later on. If pci_disable_link_state() is made for the
-> > device, there is currently no way to re-enable the states that were
-> > disabled.
-> 
-> pci_disable_link_state() gives drivers a way to disable specified ASPM
-> states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
-> PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
-> what changed and can't directly restore the original state, e.g.,
-> 
->   - PCIE_LINK_STATE_L1 enabled initially
->   - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
->   - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
->   - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
-> 
-> Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
-> enabled.  Maybe that's what we want; I dunno.
-> 
-> pci_disable_link_state() currently returns success/failure, but only
-> r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
-> non-trivial reason, so it's conceivable that it could return a bitmask
-> instead.
+The third patch updates the ETHERNET PHY LIBRARY entry in MAINTAINERS
+file; adds the binding file and me as a maintainer of the Rust
+bindings (as Andrew Lunn suggested).
 
-It's great that you suggested this since it's actually what also I've been 
-started to think should be done instead of this straightforward approach
-I used in V2. 
+The last patch introduces the Rust version of Asix PHY drivers,
+drivers/net/phy/ax88796b.c. The features are equivalent to the C
+version. You can choose C (by default) or Rust version on kernel
+configuration.
 
-That is, don't have the drivers to get anything directly from LNKCTL
-but they should get everything through the API provided by the 
-disable/enable calls which makes it easy for the driver to pass the same
-value back into the enable call.
-
-> > Add pci_enable_link_state() to remove ASPM states from the state
-> > disable mask.
-> > 
-> > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> > ---
-> >  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
-> >  include/linux/pci.h     |  2 ++
-> >  2 files changed, 44 insertions(+)
-> > 
-> > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
-> > index 91dc95aca90f..f45d18d47c20 100644
-> > --- a/drivers/pci/pcie/aspm.c
-> > +++ b/drivers/pci/pcie/aspm.c
-> > @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
-> >  }
-> >  EXPORT_SYMBOL(pci_disable_link_state);
-> >  
-> > +/**
-> > + * pci_enable_link_state - Re-enable device's link state
-> > + * @pdev: PCI device
-> > + * @state: ASPM link states to re-enable
-> > + *
-> > + * Enable device's link state that were previously disable so the link is
-> 
-> "state[s] that were previously disable[d]" alludes to the use case you
-> have in mind, but I don't think it describes how this function
-> actually works.  This function just makes it possible to enable the
-> specified states.  The @state parameter may have nothing to do with
-> any previously disabled states.
-
-Yes, it's what I've been thinking between the lines. But I see your point 
-that this API didn't make it easy/obvious as is.
-
-Would you want me to enforce it too besides altering the API such that the 
-states are actually returned from disable call? (I don't personally find
-that necessary as long as the API pair itself makes it obvious what the 
-driver is expect to pass there.)
+v4:
+  - split the core patch
+  - making Device::from_raw() private
+  - comment improvement with code update
+  - commit message improvement
+  - avoiding using bindings::phy_driver in public functions
+  - using an anonymous constant in module_phy_driver macro
+v3: https://lore.kernel.org/netdev/20231011.231607.1747074555988728415.fujita.tomonori@gmail.com/T/
+  - changes the base tree to net-next from rust-next
+  - makes this feature optional; only enabled with CONFIG_RUST_PHYLIB_BINDINGS=y
+  - cosmetic code and comment improvement
+  - adds copyright
+v2: https://lore.kernel.org/netdev/20231006094911.3305152-2-fujita.tomonori@gmail.com/T/
+  - build failure fix
+  - function renaming
+v1: https://lore.kernel.org/netdev/20231002085302.2274260-3-fujita.tomonori@gmail.com/T/
 
 
+FUJITA Tomonori (4):
+  rust: core abstractions for network PHY drivers
+  rust: net::phy add module_phy_driver macro
+  MAINTAINERS: add Rust PHY abstractions to the ETHERNET PHY LIBRARY
+  net: phy: add Rust Asix PHY driver
+
+ MAINTAINERS                      |   2 +
+ drivers/net/phy/Kconfig          |   8 +
+ drivers/net/phy/Makefile         |   6 +-
+ drivers/net/phy/ax88796b_rust.rs | 129 +++++
+ init/Kconfig                     |   8 +
+ rust/Makefile                    |   1 +
+ rust/bindings/bindings_helper.h  |   3 +
+ rust/kernel/lib.rs               |   3 +
+ rust/kernel/net.rs               |   6 +
+ rust/kernel/net/phy.rs           | 813 +++++++++++++++++++++++++++++++
+ rust/uapi/uapi_helper.h          |   2 +
+ 11 files changed, 980 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/phy/ax88796b_rust.rs
+ create mode 100644 rust/kernel/net.rs
+ create mode 100644 rust/kernel/net/phy.rs
+
+
+base-commit: 21b2e2624d2ec69b831cd2edd202ca30ac6beae1
 -- 
- i.
+2.34.1
 
---8323329-1586418908-1697115226=:1692--
 
