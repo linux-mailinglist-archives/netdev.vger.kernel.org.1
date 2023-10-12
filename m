@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-40281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31F37C68A5
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:57:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166267C68A9
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DCE3282766
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:57:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47B941C20E3F
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FEA200AA;
-	Thu, 12 Oct 2023 08:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB111F952;
+	Thu, 12 Oct 2023 08:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058DFD531
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 08:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1958820B0C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 08:57:47 +0000 (UTC)
 Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657C191;
-	Thu, 12 Oct 2023 01:57:37 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6C991;
+	Thu, 12 Oct 2023 01:57:46 -0700 (PDT)
 Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
 	(envelope-from <fw@breakpoint.cc>)
-	id 1qqrVc-00075p-R5; Thu, 12 Oct 2023 10:57:32 +0200
+	id 1qqrVg-000767-Sz; Thu, 12 Oct 2023 10:57:36 +0200
 From: Florian Westphal <fw@strlen.de>
 To: <netdev@vger.kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>,
@@ -32,10 +32,10 @@ Cc: Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	<netfilter-devel@vger.kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: [PATCH net 1/7] netfilter: nf_tables: do not remove elements if set backend implements .abort
-Date: Thu, 12 Oct 2023 10:57:04 +0200
-Message-ID: <20231012085724.15155-2-fw@strlen.de>
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net 2/7] netfilter: nfnetlink_log: silence bogus compiler warning
+Date: Thu, 12 Oct 2023 10:57:05 +0200
+Message-ID: <20231012085724.15155-3-fw@strlen.de>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012085724.15155-1-fw@strlen.de>
 References: <20231012085724.15155-1-fw@strlen.de>
@@ -52,36 +52,32 @@ X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Pablo Neira Ayuso <pablo@netfilter.org>
+net/netfilter/nfnetlink_log.c:800:18: warning: variable 'ctinfo' is uninitialized
 
-pipapo set backend maintains two copies of the datastructure, removing
-the elements from the copy that is going to be discarded slows down
-the abort path significantly, from several minutes to few seconds after
-this patch.
+The warning is bogus, the variable is only used if ct is non-NULL and
+always initialised in that case.  Init to 0 too to silence this.
 
-Fixes: 212ed75dc5fb ("netfilter: nf_tables: integrate pipapo into commit protocol")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202309100514.ndBFebXN-lkp@intel.com/
 Signed-off-by: Florian Westphal <fw@strlen.de>
 ---
- net/netfilter/nf_tables_api.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/netfilter/nfnetlink_log.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index a72b6aeefb1b..c3de3791cabd 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -10347,7 +10347,10 @@ static int __nf_tables_abort(struct net *net, enum nfnl_abort_action action)
- 				break;
- 			}
- 			te = (struct nft_trans_elem *)trans->data;
--			nft_setelem_remove(net, te->set, &te->elem);
-+			if (!te->set->ops->abort ||
-+			    nft_setelem_is_catchall(te->set, &te->elem))
-+				nft_setelem_remove(net, te->set, &te->elem);
-+
- 			if (!nft_setelem_is_catchall(te->set, &te->elem))
- 				atomic_dec(&te->set->nelems);
+diff --git a/net/netfilter/nfnetlink_log.c b/net/netfilter/nfnetlink_log.c
+index 53c9e76473ba..f03f4d4d7d88 100644
+--- a/net/netfilter/nfnetlink_log.c
++++ b/net/netfilter/nfnetlink_log.c
+@@ -698,8 +698,8 @@ nfulnl_log_packet(struct net *net,
+ 	unsigned int plen = 0;
+ 	struct nfnl_log_net *log = nfnl_log_pernet(net);
+ 	const struct nfnl_ct_hook *nfnl_ct = NULL;
++	enum ip_conntrack_info ctinfo = 0;
+ 	struct nf_conn *ct = NULL;
+-	enum ip_conntrack_info ctinfo;
  
+ 	if (li_user && li_user->type == NF_LOG_TYPE_ULOG)
+ 		li = li_user;
 -- 
 2.41.0
 
