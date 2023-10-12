@@ -1,186 +1,95 @@
-Return-Path: <netdev+bounces-40323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5967E7C6B97
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:54:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062F57C6B9D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 747641C20AC3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:54:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B42D0282845
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 10:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0FC12E75;
-	Thu, 12 Oct 2023 10:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070391D68D;
+	Thu, 12 Oct 2023 10:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YA236edX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=helmholz.de header.i=@helmholz.de header.b="TA8K93Uv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909A812E45
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:54:05 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD5C494;
-	Thu, 12 Oct 2023 03:54:04 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CAlNnF007306;
-	Thu, 12 Oct 2023 10:53:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=CZTYGOLITZz/5HSutlowApvi7I/NVLgN/RMhkr0VPug=;
- b=YA236edX0Xp7Q3ZSGlukmoukSXzLRk4gBJTsJlHpQo2t1io7WxhISc+IhSmD6axoFNC/
- aTNrxG77z3Ra0nVxF7X8Is/dITfCoaKIgnVIMaQFaHissaarATLAB2pMZi8WBpr+Q8JJ
- an97uIUv5DCY9rr1d9v4nhQ3FLI4RC8k1ffeJsKNZc7/sxQOUIUh4QvEBRAoTrQlSDvD
- KFfOYewU6GdZ2K2ip+p5ZskI7BO6tDTxbnbQeNPyNOqp65bhAPBGftMYAN/3GC6bpgLI
- aUx+1PkOXPd159NzepjwhU5pboLpMLG5to1ZFDG3I/YdVDAIxKt6ck2hcZCxpDP5ay0t Gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpfbr05sc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 10:53:46 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CAmbll010719;
-	Thu, 12 Oct 2023 10:53:46 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpfbr05rv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 10:53:46 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CAVCL2000640;
-	Thu, 12 Oct 2023 10:53:44 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3tkk5kxraq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 10:53:44 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CArdEX20185690
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 10:53:41 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA94820043;
-	Thu, 12 Oct 2023 10:53:39 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 799A220040;
-	Thu, 12 Oct 2023 10:53:38 +0000 (GMT)
-Received: from [9.171.78.5] (unknown [9.171.78.5])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 10:53:38 +0000 (GMT)
-Message-ID: <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
-Subject: Re: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
- mask is set
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory
- <shayd@nvidia.com>,
-        Moshe Shemesh <moshe@nvidia.com>, Heiko Carstens
- <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jacob Keller
- <jacob.e.keller@intel.com>
-Date: Thu, 12 Oct 2023 12:53:38 +0200
-In-Reply-To: <ZSbvxeLKS8zHltdg@x130>
-References: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
-	 <ZSbnUlJT1u3xUIqY@x130> <ZSbvxeLKS8zHltdg@x130>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kRd3oGJK6y8N7MPlgAvIihFPuil2K1C6
-X-Proofpoint-GUID: LC3xu5ymSIwgc6Rq_1QRO0UnRdoy9rGg
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E485A12E47
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:56:13 +0000 (UTC)
+Received: from mail.helmholz.de (mail.helmholz.de [217.6.86.34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FBBDB8
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 03:56:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=helmholz.de
+	; s=dkim1; h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=FtpKSP0hfJHCZWhMxfal7y4RuMSvS97qM5FFvV8QAOw=; b=TA8K93UvfrOuoV4BXvy2ijoeKs
+	TFOL88N+OOGc9g+fVjjf2AnAnc79x9P9OA53M/rA2Rd4zS1H0ss8Eynjl4THzOb+fF6QHZHufw5rz
+	IqiLH6pYtBOcj9csQBwlQNXjNRRTSB/gMX8Ca46wNCj1VkNCp5dlsTOLS2bax3isPA4NdKJgB4Q7A
+	32YwO7UsaDRHLbqb9K7jVlff+IU127QeX73BoneVmLvrgEgRqZ3mCp/DSczSSH/zch7pClAal409N
+	s/1DBtp02ewZ21BS/dPfrOHxXVumkICXPnZW5sO77lB56TUMhzpM2iutI0pu+4Ow66XulGnppodw1
+	Ht/51hAQ==;
+Received: from [192.168.1.4] (port=44470 helo=SH-EX2013.helmholz.local)
+	by mail.helmholz.de with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384
+	(Exim 4.96)
+	(envelope-from <Ante.Knezic@helmholz.de>)
+	id 1qqtMM-0005Tj-1W;
+	Thu, 12 Oct 2023 12:56:06 +0200
+Received: from linuxdev.helmholz.local (192.168.6.7) by
+ SH-EX2013.helmholz.local (192.168.1.4) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Thu, 12 Oct 2023 12:56:05 +0200
+From: Ante Knezic <ante.knezic@helmholz.de>
+To: <netdev@vger.kernel.org>
+CC: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
+	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>, <marex@denx.de>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Ante Knezic
+	<ante.knezic@helmholz.de>
+Subject: [PATCH net-next v2 0/2] net: dsa: microchip: enable setting rmii 
+Date: Thu, 12 Oct 2023 12:55:54 +0200
+Message-ID: <cover.1697107915.git.ante.knezic@helmholz.de>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- malwarescore=0 priorityscore=1501 clxscore=1011 adultscore=0 mlxscore=0
- spamscore=0 impostorscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310120088
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [192.168.6.7]
+X-ClientProxiedBy: SH-EX2013.helmholz.local (192.168.1.4) To
+ SH-EX2013.helmholz.local (192.168.1.4)
+X-EXCLAIMER-MD-CONFIG: 2ae5875c-d7e5-4d7e-baa3-654d37918933
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 2023-10-11 at 11:56 -0700, Saeed Mahameed wrote:
-> On 11 Oct 11:20, Saeed Mahameed wrote:
-> > On 11 Oct 09:57, Niklas Schnelle wrote:
-> > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe =
-and
-> > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which=
- is
-> > > called in probe_one() before mlx5_pci_init(). This is a problem becau=
-se
-> > > mlx5_pci_init() is where the DMA and coherent mask is set but
-> > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
-> > > allocation is done during probe before the correct mask is set. This
-> > > causes probe to fail initialization of the cmdif SW structs on s390x
-> > > after that is converted to the common dma-iommu code. This is because=
- on
-> > > s390x DMA addresses below 4 GiB are reserved on current machines and
-> > > unlike the old s390x specific DMA API implementation common code
-> > > enforces DMA masks.
-> > >=20
-> > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
-> > > probe_one() before mlx5_mdev_init(). To match the overall naming sche=
-me
-> > > rename it to mlx5_dma_init().
-> >=20
-> > How about we just call mlx5_pci_init() before mlx5_mdev_init(), instead=
- of
-> > breaking it apart ?
->=20
-> I just posted this RFC patch [1]:
+KSZ88X3 devices can select between internal and external RMII reference clock.
+This patch series introduces new device tree property for setting reference
+clock to internal.
 
-This patch works to solve the problem as well.
+Ante Knezic (2):
+  net:dsa:microchip: add property to select internal RMII reference
+    clock
+  dt-bindings: net: microchip,ksz: document microchip,rmii-clk-internal
 
->=20
-> I am working in very limited conditions these days, and I don't have stro=
-ng
-> opinion on which approach to take, Leon, Niklas, please advise.
->=20
-> The three possible solutions:
->=20
-> 1) mlx5_pci_init() before mlx5_mdev_init(), I don't think enabling pci
-> before initializing cmd dma would be a problem.
->=20
-> 2) This patch.
->=20
-> 3) Shay's patch from the link below:
-> [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231011184511.1=
-9818-1-saeed@kernel.org/
->=20
-> Thanks,
-> Saeed.
+ .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 19 +++++++++++++++++++
+ drivers/net/dsa/microchip/ksz8795.c                   |  5 +++++
+ drivers/net/dsa/microchip/ksz8795_reg.h               |  3 +++
+ drivers/net/dsa/microchip/ksz_common.c                |  3 +++
+ drivers/net/dsa/microchip/ksz_common.h                |  1 +
+ 5 files changed, 31 insertions(+)
 
-My first gut feeling was option 1) but I'm just as happy with 2) or 3).
-For me option 2 is the least invasive but not by much.
-
-For me the important thing is what Jason also said yesterday. We need
-to merge something now to unbreak linux-next on s390x and to make sure
-we don't end up with a broken v6.7-rc1. This is already hampering our
-CI tests with linux-next. So let's do whatever can be merged the
-quickest and then feel free to do any refactoring ideas that this
-discussion might have spawned on top of that. My guess for this
-criteria would be 2).
-
-Thanks,
-Niklas
+-- 
+2.11.0
 
 
