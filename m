@@ -1,203 +1,155 @@
-Return-Path: <netdev+bounces-40435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA487C76A8
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:24:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4DA07C76C7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 260C22825DD
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:24:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA8A282E98
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872643AC08;
-	Thu, 12 Oct 2023 19:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6503B2A5;
+	Thu, 12 Oct 2023 19:30:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lFviFLRw"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ClwdjZhH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F8137CA6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:23:56 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C198BB;
-	Thu, 12 Oct 2023 12:23:55 -0700 (PDT)
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CJMnpw028395;
-	Thu, 12 Oct 2023 19:23:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Ujq9HEe+dEgNGePgJ0zVUq1niKYvqT3YYqdkfFcOObk=;
- b=lFviFLRwFWGhAQFAG8I+DXB98rHsRidJ4J0hLdgeT4R2Lc5jiSO0rj5o0/qH+68ooFBP
- jHtuJ+jjP8IYjeb+KUnZgjKQfITt7LRUecVlHko61Y6kG/vNT6A/feNBX+JWHNB43tMK
- q3eBp321qFmQPfKNogXUfSzj2nrPfczpr3kpHXObyqckDuU92tgOQNbyIgtie7QPJIz3
- IHVdpc8lVx7vvwky2rNjSfZEi5hXN71cZd3kFZbVMoEzfSta5h45lE9vtzSINSMm0u7h
- 07iGn1GH12R+auv5eYHEALFuuUP/WHMOSwgRRreZKdG0EyQ/1oDguSFEytj6oySfIMT5 fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppwar0h8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 19:23:36 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CJNViI031012;
-	Thu, 12 Oct 2023 19:23:35 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppwar0gu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 19:23:35 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CIh3l3001170;
-	Thu, 12 Oct 2023 19:23:34 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk9fm9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 19:23:34 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CJNXiE11272764
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 19:23:33 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 811185805B;
-	Thu, 12 Oct 2023 19:23:33 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9CDA258058;
-	Thu, 12 Oct 2023 19:23:30 +0000 (GMT)
-Received: from [9.171.29.13] (unknown [9.171.29.13])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 19:23:30 +0000 (GMT)
-Message-ID: <2d5224b6-1ff2-4c0f-8b7b-3c3ff6d34157@linux.ibm.com>
-Date: Thu, 12 Oct 2023 21:23:29 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: add support for netdevice in
- containers.
-Content-Language: en-GB
-To: dust.li@linux.alibaba.com, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Albert Huang <huangjie.albert@bytedance.com>,
-        Karsten Graul <kgraul@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230925023546.9964-1-huangjie.albert@bytedance.com>
- <00bbbf48440c1889ecd16a590ebb746b820a4f48.camel@linux.ibm.com>
- <20231011144816.GO92403@linux.alibaba.com>
- <20231012121740.GR92403@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20231012121740.GR92403@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dQX6mAR0JwdnEXr-0JGA0JnUqegMsj_q
-X-Proofpoint-GUID: UiIth32omlzHZOJMLaylWZecWGdyJjrs
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983FE3AC3E
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:30:20 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E249C9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:30:16 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6934202b8bdso1077510b3a.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:30:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1697139016; x=1697743816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PIPGKLqX4lqtP5rqVW/Z8WpP9n2U6+vzX9cu74+l4o8=;
+        b=ClwdjZhHqjwVWio4JhMuQOREFoSrMk1z46czHsayyHLj3fLWFYQ282jFfOtwAl0BVe
+         n0FSgg1bBaRBtHKQUvGzhpJgEQs2gaBawGQNHBDZ/ypg2HTnPKFfn8gd8h+OpG/r0l7n
+         M89PgIVrMXRZ5/pBOcFhp0wCwuuR0SuXMaD2Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697139016; x=1697743816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PIPGKLqX4lqtP5rqVW/Z8WpP9n2U6+vzX9cu74+l4o8=;
+        b=Z90wYs6rlVEcIkrtUvsS9xpByGXe35nKSDtneCf9vLLliyHwfeA0vBAUU3cRxZ+l/x
+         aGAaz2eStg/Vz+W9Dj83ypMhfMxz8nJVbH9K5EMPyxez5qNWT+QARDhqKKZ40eYWFdS/
+         YdWiaAWbH4fY9lbu8fP2lB/tolxi/ddy3eEC+8ZpJT0HcIWdxrwxtDEUrHhA1ixtdEeV
+         4hVmFdLbCOi4sfOL/gfnBwlCvIFs7f8j5W5+psznTu384eupg/r2Fu6lF2Yfl0I2MPCH
+         xxb0+cKw0o1UtlVIy4pWSL6yZBUIn4W3xNvNCj0l4ooYeknGg5SBcYgbhF/jHpQ3FtTu
+         aqjQ==
+X-Gm-Message-State: AOJu0YzlRTGYdNEA9vJ2i704GST2VqeBIoHkivRcXA50Yr+1WD0D5V7p
+	Mu6B/K/JdN3QCQ3HTVahmkH0Wg==
+X-Google-Smtp-Source: AGHT+IERPTwnRrLuIcrF/qVItuc/Etf9Gx8qoNlfYGw4E40pryplJea9aQ7RybHzVk/5huQZcu4ZiQ==
+X-Received: by 2002:a05:6a20:7286:b0:15e:7323:5c0f with SMTP id o6-20020a056a20728600b0015e73235c0fmr30788570pzk.16.1697139015932;
+        Thu, 12 Oct 2023 12:30:15 -0700 (PDT)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:7c85:4a99:f03e:6f30])
+        by smtp.gmail.com with ESMTPSA id b3-20020a639303000000b0057c25885fcfsm2075720pge.10.2023.10.12.12.30.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 12:30:15 -0700 (PDT)
+From: Douglas Anderson <dianders@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Hayes Wang <hayeswang@realtek.com>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	Simon Horman <horms@kernel.org>,
+	Edward Hill <ecgh@chromium.org>,
+	Laura Nao <laura.nao@collabora.com>,
+	linux-usb@vger.kernel.org,
+	Grant Grundler <grundler@chromium.org>,
+	Douglas Anderson <dianders@chromium.org>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 0/5] r8152: Avoid writing garbage to the adapter's registers
+Date: Thu, 12 Oct 2023 12:24:59 -0700
+Message-ID: <20231012192552.3900360-1-dianders@chromium.org>
+X-Mailer: git-send-email 2.42.0.655.g421f12c284-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_11,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 clxscore=1015 lowpriorityscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 suspectscore=0 adultscore=0 spamscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310120161
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+This series is the result of a cooperative debug effort between
+Realtek and the ChromeOS team. On ChromeOS, we've noticed that Realtek
+Ethernet adapters can sometimes get so wedged that even a reboot of
+the host can't get them to enumerate again, assuming that the adapter
+was on a powered hub and din't lose power when the host rebooted. This
+is sometimes seen in the ChromeOS automated testing lab. The only way
+to recover adapters in this state is to manually power cycle them.
 
+I managed to reproduce one instance of this wedging (unknown if this
+is truly related to what the test lab sees) by doing this:
+1. Start a flood ping from a host to the device.
+2. Drop the device into kdb.
+3. Wait 90 seconds.
+4. Resume from kdb (the "g" command).
+5. Wait another 45 seconds.
 
-On 12.10.23 14:17, Dust Li wrote:
-> On Wed, Oct 11, 2023 at 10:48:16PM +0800, Dust Li wrote:
->> On Thu, Sep 28, 2023 at 05:04:21PM +0200, Niklas Schnelle wrote:
->>> On Mon, 2023-09-25 at 10:35 +0800, Albert Huang wrote:
->>>> If the netdevice is within a container and communicates externally
->>>> through network technologies like VXLAN, we won't be able to find
->>>> routing information in the init_net namespace. To address this issue,
->>>> we need to add a struct net parameter to the smc_ib_find_route function.
->>>> This allow us to locate the routing information within the corresponding
->>>> net namespace, ensuring the correct completion of the SMC CLC interaction.
->>>>
->>>> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
->>>> ---
->>>>   net/smc/af_smc.c | 3 ++-
->>>>   net/smc/smc_ib.c | 7 ++++---
->>>>   net/smc/smc_ib.h | 2 +-
->>>>   3 files changed, 7 insertions(+), 5 deletions(-)
->>>>
->>>
->>> I'm trying to test this patch on s390x but I'm running into the same
->>> issue I ran into with the original SMC namespace
->>> support:https://lore.kernel.org/netdev/8701fa4557026983a9ec687cfdd7ac5b3b85fd39.camel@linux.ibm.com/
->>>
->>> Just like back then I'm using a server and a client network namespace
->>> on the same system with two ConnectX-4 VFs from the same card and port.
->>> Both TCP/IP traffic as well as user-space RDMA via "qperf … rc_bw" and
->>> `qperf … rc_lat` work between namespaces and definitely go via the
->>> card.
->>>
->>> I did use "rdma system set netns exclusive" then moved the RDMA devices
->>> into the namespaces with "rdma dev set <rdma_dev> netns <namespace>". I
->>> also verified with "ip netns exec <namespace> rdma dev"
->>> that the RDMA devices are in the network namespace and as seen by the
->>> qperf runs normal RDMA does work.
->>>
->>> For reference the smc_chck tool gives me the following output:
->>>
->>> Server started on port 37373
->>> [DEBUG] Interfaces to check: eno4378
->>> Test with target IP 10.10.93.12 and port 37373
->>>   Live test (SMC-D and SMC-R)
->>> [DEBUG] Running client: smc_run /tmp/echo-clt.x0q8iO 10.10.93.12 -p
->>> 37373
->>> [DEBUG] Client result: TCP 0x05000000/0x03030000
->>>      Failed  (TCP fallback), reasons:
->>>           Client:        0x05000000   Peer declined during handshake
->>>           Server:        0x03030000   No SMC devices found (R and D)
->>>
->>> I also checked that SMC is generally working, once I add an ISM device
->>> I do get SMC-D between the namespaces. Any ideas what could break SMC-R
->>> here?
->>
->> I missed the email :(
->>
->> Are you running SMC-Rv2 or v1 ?
-> 
-> Hi Niklas,
-> 
-> I tried your test today, and I encounter the same issue.
-> But I found it's because my 2 VFs are in difference subnets,
-> SMC-Rv2 work fine, SMC-Rv1 won't work, which is expected.
-> When I set the 2 VFs in the same subnet, SMC-Rv1 also works.
-> 
-> So I'm not sure it's the same for you. Can you check it out ?
-> 
-> BTW, the fallback reason(SMC_CLC_DECL_NOSMCDEV) in this case
-> is really not friendly, it's better to return SMC_CLC_DECL_DIFFPREFIX.
-> 
-> Best regards,
-> Dust
-> 
-Thank you, Dust, for trying it out!
-The reason code SMC_CLC_DECL_NOSMCDEV there could really make one 
-misunderstand.
+Upon analysis, Realtek realized this was happening:
 
-> 
->>
->> Best regards,
->> Dust
->>
->>
->>>
->>> Thanks,
->>> Niklas
+1. The Linux driver was getting a "Tx timeout" after resuming from kdb
+   and then trying to reset itself.
+2. As part of the reset, the Linux driver was attempting to do a
+   read-modify-write of the adapter's registers.
+3. The read would fail (due to a timeout) and the driver pretended
+   that the register contained all 0xFFs. See commit f53a7ad18959
+   ("r8152: Set memory to all 0xFFs on failed reg reads")
+4. The driver would take this value of all 0xFFs, modify it, and
+   attempt to write it back to the adapter.
+5. By this time the USB channel seemed to recover and thus we'd
+   successfully write a value that was mostly 0xFFs to the adpater.
+6. The adapter didn't like this and would wedge itself.
+
+Another Engineer also managed to reproduce wedging of the Realtek
+Ethernet adpater during a reboot test on an AMD Chromebook. In that
+case he was sometimes seeing -EPIPE returned from the control
+transfers.
+
+This patch series fixes both issues.
+
+Changes in v3:
+- Fixed v2 changelog ending up in the commit message.
+- farmework -> framework in comments.
+
+Changes in v2:
+- ("Check for unplug in rtl_phy_patch_request()") new for v2.
+- ("Check for unplug in r8153b_ups_en() / r8153c_ups_en()") new for v2.
+- ("Rename RTL8152_UNPLUG to RTL8152_INACCESSIBLE") new for v2.
+- Reset patch no longer based on retry patch, since that was dropped.
+- Reset patch should be robust even if failures happen in probe.
+- Switched booleans to bits in the "flags" variable.
+- Check for -ENODEV instead of "udev->state == USB_STATE_NOTATTACHED"
+
+Douglas Anderson (5):
+  r8152: Increase USB control msg timeout to 5000ms as per spec
+  r8152: Check for unplug in rtl_phy_patch_request()
+  r8152: Check for unplug in r8153b_ups_en() / r8153c_ups_en()
+  r8152: Rename RTL8152_UNPLUG to RTL8152_INACCESSIBLE
+  r8152: Block future register access if register access fails
+
+ drivers/net/usb/r8152.c | 268 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 209 insertions(+), 59 deletions(-)
+
+-- 
+2.42.0.655.g421f12c284-goog
+
 
