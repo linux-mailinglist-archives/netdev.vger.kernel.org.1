@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-40239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901947C65DB
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:48:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DBC7C65E6
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0B21C20B13
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:48:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 792FC2826AC
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1253DDA8;
-	Thu, 12 Oct 2023 06:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B720EDDB6;
+	Thu, 12 Oct 2023 06:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="EkYMohy9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uf+WRz+R"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F0BD296
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:47:59 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FE26BA
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:47:57 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-4054496bde3so6630275e9.1
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:47:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9B4DDA7
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:51:17 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D93B90
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:51:16 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5333fb34be3so1115118a12.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:51:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1697093276; x=1697698076; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=McAn7XXo5ik6ohNaPH4SqxrrsZVKvhppZZA60/ZS6go=;
-        b=EkYMohy9EixrqwY5r2CuN0zz2o1EtSx7q5s2aVi83HyDfc1cCf0z+kKsS8ZpfzUXeC
-         F2sf63hCG5ymropNnVDbDsAgr8gk71mKvtD/1dn5kLsr/97F3MO4WBJWRkBj2kCOqDI4
-         anlR7i/eJTPtODCUv9Ck/UORFy0AddRIrXQEIUGweFsb5yFo3CXTutM9abS4RAb8F8z5
-         A0a2O/9h6rjLmwNG40yXPRtTEb+kHKsrzjvP9k49V0gOYjyZU1HvFPRGNKzZteiJv54N
-         aPzftAyZO2N7gkPMD0zPUmOdrVdYunziw7zwKBpU4CbvnjsbV4p1YrlUtTgNlS65xMTM
-         pN/Q==
+        d=gmail.com; s=20230601; t=1697093475; x=1697698275; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3/Osyk0Lx10uk3lKbedWqTvA+ctik89djOiSvn6731Q=;
+        b=Uf+WRz+RhAgb5boHFuc2c5st0KgcMp+xEFIJ9kHCJDr/faD2tCitRow91aRL1wsmy+
+         YFylLJaH/JPXRJNzONta0/bwc8oTF/SQzeHoGxQmEDRTSzMZ49SCLAJ1XweXRLbdUq2T
+         HFctNEWyMO6lvLA4IQHO1oq4m7KldNhH3FKqaUroLwdrp6jxKScx5KY+9/x6YDzdhbJu
+         +JRfWXgfM09K7Wcw4YdW5xvt/CPy3/9Sfehjky1O0A0V86YRp7YVMFGD7TmapPVC1aDm
+         DCP5BgxvGSoSwum9/VbVZmKeYCiPupUZvuO8K9R5SWIjx8tDiZdihhRLKCvXpHyRWV2W
+         /aTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697093276; x=1697698076;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=McAn7XXo5ik6ohNaPH4SqxrrsZVKvhppZZA60/ZS6go=;
-        b=FyMoEuLZAxG2CXn9oR/E3TMudoHC+mt7+dL/dXw1wj3G0YaZh3mDfBr/V26ltkqPfy
-         uEwOCQkQ1vVFO+wlLNhvCRcjJFmRKjLsuGlOXAhHrVuCQSHKB571WNOnkPas2UZU0ePD
-         iFahNwjIWgPfeJnNX6lERM+IXECxaFvHs/mB7100d1ggbyt78/9d61Bzmhi0vjjC0A/M
-         IlpZ2Dds33NMeTlTQJ8/C7s87JA6/oGtp9D7hjBSkiEFLMWs/IQY9q/4HvmpXOR3ezNX
-         KcbJ4I0CG/sJ5P1WNak1OX4GrFqZK3hMJfMcathPncnp4ONAimgAf1o62M1bFk70EFYQ
-         eQFQ==
-X-Gm-Message-State: AOJu0Yz4re2LwGhcpihbm4MFWUMTbTs5Yun8+zIxgyVtZbqOIcwvIy59
-	B1K8Atqqwll4ESLrA7uRgvENVQ==
-X-Google-Smtp-Source: AGHT+IFEY9RkFwacHqiCB62rS9yvuSISGruhHOV8JF0g17WOafZzldsWjDVM4TJb87Ej6choX9Wdtw==
-X-Received: by 2002:a7b:c8d7:0:b0:405:3b92:2fed with SMTP id f23-20020a7bc8d7000000b004053b922fedmr19676673wml.26.1697093276264;
-        Wed, 11 Oct 2023 23:47:56 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:19ad:3130:804:e23? ([2a01:e0a:b41:c160:19ad:3130:804:e23])
-        by smtp.gmail.com with ESMTPSA id z5-20020a7bc7c5000000b00401bbfb9b2bsm698355wmk.0.2023.10.11.23.47.55
+        d=1e100.net; s=20230601; t=1697093475; x=1697698275;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3/Osyk0Lx10uk3lKbedWqTvA+ctik89djOiSvn6731Q=;
+        b=Tl7fphN3XI+YbO2yahzCGLt/GyqoPOOKz6wG47HX6xVEWILVyIYnlETylKOkOiWzO6
+         Ss0piQBS3BX8LyNQEn4jS5iLdKQz8IvXAxpqFv2Vdr+SUgQ0FhYJaFITtTUD/Tv+4aq7
+         MnSQ81o53nnVOih/bdoUmP49i6ysGv+XVu7dWtH+MqGOb2C2mAqBMvv2waw+qLhbDaaX
+         oxh5H3KPkeUI8vqI/hY9yU8X2xWZh6znivk4iGLl1kex/DVLy09FJMRvXo/0/Itggux2
+         nLu9gi09O4lIjq4M4exdNb+5kaetE3m8kAYDo95eQkD5U8xftq3od8RhWN+Bp1ueuThg
+         HBMA==
+X-Gm-Message-State: AOJu0YwDXtnCM3XpDilFqO3aR4OKZeBiPmgFoIfxq4JjOrMV4L6/0/g6
+	tnDAx0K803sS6RsamrlHNVc=
+X-Google-Smtp-Source: AGHT+IEEZIHdX6k3EVgtPc1Z87fG46wsImIYIRiB4x3qSMiirpXl8rVC7dXWvCfhY+JDSaVdUrvVCA==
+X-Received: by 2002:a17:906:3012:b0:99d:e617:abeb with SMTP id 18-20020a170906301200b0099de617abebmr20525263ejz.23.1697093474443;
+        Wed, 11 Oct 2023 23:51:14 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7bee:c400:8df5:13c7:fec1:9238? (dynamic-2a01-0c22-7bee-c400-8df5-13c7-fec1-9238.c22.pool.telefonica.de. [2a01:c22:7bee:c400:8df5:13c7:fec1:9238])
+        by smtp.googlemail.com with ESMTPSA id cb22-20020a170906a45600b0099ce025f8ccsm10675802ejb.186.2023.10.11.23.51.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Oct 2023 23:47:55 -0700 (PDT)
-Message-ID: <8d3fc502-f568-4fab-96e3-aead6bd29063@6wind.com>
-Date: Thu, 12 Oct 2023 08:47:55 +0200
+        Wed, 11 Oct 2023 23:51:13 -0700 (PDT)
+Message-ID: <9edde757-9c3b-4730-be3b-0ef3a374ff71@gmail.com>
+Date: Thu, 12 Oct 2023 08:51:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,83 +67,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [RFC] netlink: add variable-length / auto integers
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
- fw@strlen.de, pablo@netfilter.org, jiri@resnulli.us, mkubecek@suse.cz,
- aleksander.lobakin@intel.com, Thomas Haller <thaller@redhat.com>
-References: <20231011003313.105315-1-kuba@kernel.org>
- <f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
- <6ec63a78-b0cc-452e-9946-0acef346cac2@6wind.com>
- <20231011085230.2d3dc1ab@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <20231011085230.2d3dc1ab@kernel.org>
+To: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ =?UTF-8?Q?Martin_Kj=C3=A6r_J=C3=B8rgensen?= <me@lagy.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: fix rare issue with broken rx after link-down
+ on RTL8125
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+In very rare cases (I've seen two reports so far about different
+RTL8125 chip versions) it seems the MAC locks up when link goes down
+and requires a software reset to get revived.
+Realtek doesn't publish hw errata information, therefore the root cause
+is unknown. Realtek vendor drivers do a full hw re-initialization on
+each link-up event, the slimmed-down variant here was reported to fix
+the issue for the reporting user.
+It's not fully clear which parts of the NIC are reset as part of the
+software reset, therefore I can't rule out side effects.
+Therefore apply the fix to net-next only. If no side effects are
+reported, it can be submitted for stable later.
 
+Fixes: f1bce4ad2f1c ("r8169: add support for RTL8125")
+Reported-by: Martin Kjær Jørgensen <me@lagy.org>
+Link: https://lore.kernel.org/netdev/97ec2232-3257-316c-c3e7-a08192ce16a6@gmail.com/T/
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Le 11/10/2023 à 17:52, Jakub Kicinski a écrit :
-> On Wed, 11 Oct 2023 16:03:26 +0200 Nicolas Dichtel wrote:
->>> On Tue, 2023-10-10 at 17:33 -0700, Jakub Kicinski wrote:  
->>>> We currently push everyone to use padding to align 64b values in netlink.
->>>> I'm not sure what the story behind this is. I found this:
->>>> https://lore.kernel.org/all/1461339084-3849-1-git-send-email-nicolas.dichtel@6wind.com/#t  
->> There was some attempts before:
->> https://lore.kernel.org/netdev/20121205.125453.1457654258131828976.davem@davemloft.net/
->> https://lore.kernel.org/netdev/1355500160.2626.9.camel@bwh-desktop.uk.solarflarecom.com/
->> https://lore.kernel.org/netdev/1461142655-5067-1-git-send-email-nicolas.dichtel@6wind.com/
->>
->>>> but it doesn't go into details WRT the motivation.
->>>> Even for arches which don't have good unaligned access - I'd think
->>>> that access aligned to 4B *is* pretty efficient, and that's all
->>>> we need. Plus kernel deals with unaligned input. Why can't user space?  
->>>
->>> Hmm. I have a vague recollection that it was related to just not doing
->>> it - the kernel will do get_unaligned() or similar, but userspace if it
->>> just accesses it might take a trap on some architectures?
->>>
->>> But I can't find any record of this in public discussions, so ...  
->> If I remember well, at this time, we had some (old) architectures that triggered
->> traps (in kernel) when a 64-bit field was accessed and unaligned. Maybe a mix
->> between 64-bit kernel / 32-bit userspace, I don't remember exactly. The goal was
->> to align u64 fields on 8 bytes.
-> 
-> Reading the discussions I think we can chalk the alignment up 
-> to "old way of doing things". Discussion was about stats64, 
-> if someone wants to access stats directly in the message then yes, 
-> they care a lot about alignment.
-> 
-> Today we try to steer people towards attr-per-field, rather than
-> dumping structs. Instead of doing:
-> 
-> 	struct stats *stats = nla_data(attr);
-> 	print("A: %llu", stats->a);
-> 
-> We will do:
-> 
-> 	print("A: %llu", nla_get_u64(attrs[NLA_BLA_STAT_A]));
-> 
-> Assuming nla_get_u64() is unalign-ready the problem doesn't exist.
-> 
-> If user space goes thru a standard parsing library like YNL
-> the application never even sees the raw netlink message,
-> and deals with deserialized structs.
-> 
-> 
-> Does the above sounds like a fair summary? If so I'll use it in 
-> the commit message?
-I think it is, it's ok for me.
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 6351a2dc1..df0df4d09 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4596,7 +4596,11 @@ static void r8169_phylink_handler(struct net_device *ndev)
+ 	if (netif_carrier_ok(ndev)) {
+ 		rtl_link_chg_patch(tp);
+ 		pm_request_resume(d);
++		netif_wake_queue(tp->dev);
+ 	} else {
++		/* In few cases rx is broken after link-down otherwise */
++		if (rtl_is_8125(tp))
++			rtl_reset_work(tp);
+ 		pm_runtime_idle(d);
+ 	}
+ 
+-- 
+2.42.0
 
-
-Thank you,
-Nicolas
 
