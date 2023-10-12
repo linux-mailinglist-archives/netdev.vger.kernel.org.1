@@ -1,82 +1,43 @@
-Return-Path: <netdev+bounces-40377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB497C6F96
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:46:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E623B7C6FE2
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:00:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDD941C20D62
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:46:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20E1E1C20D3B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC7B2AB35;
-	Thu, 12 Oct 2023 13:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="s8s5pySf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2220A2E659;
+	Thu, 12 Oct 2023 14:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FA329436
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:46:13 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E679C0
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:46:12 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso1245932a12.1
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:46:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697118370; x=1697723170; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WL4o0PnlTALPx2JWXQcQVAR5wsdcklh2Oh9j6J5p78o=;
-        b=s8s5pySfVGsOvbqrWvK2k8LuNwRuOVSZz33KIMLX/3ba1xPeA2UmJWZqChehN3e92F
-         v04YzDGP7HVwEwYO5OWlA8ULMTru471sNQIbYNZww5xDJ311BvdxnWp1JFavlr9QOQLf
-         wC/w7VNQabGsjUdburO0JP/G+GUbeKJJ4uZQrjlnFo0qJh0PJ21z3ZX7+2VlF9Hn7OZL
-         Gvz3aGCRnONbfH7npfPypuDvMH4DqykZB0E0Rpx/XH88v8KC+ORzMTLPDWnvINrQxqAb
-         v3k/b6+ljnzNqPNLgl5zsOELAweH2VCP9Q+e6yIAbQ/thAECha6Ai1PRSJJPeNa1EG1d
-         bx3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697118370; x=1697723170;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WL4o0PnlTALPx2JWXQcQVAR5wsdcklh2Oh9j6J5p78o=;
-        b=csP8kIu0BNhKO3e4mTA36wrN2Bf+9h6mqSZ3xqZ+zrYHQO7+TK5oyfPtt556WLt7LI
-         1dpDidMctMTq7o8X5ElHs4VsppNTy0UWFDLZxwews06DhIP218CxwMCAF+XslHKJm4Io
-         n/rxvqnKxdY/N3friht5TXxNoPQS7gcclPKxGoGhgCu8l8kXAR9sausLpV67N6xP5auJ
-         BIUWrfZRa5ycAFsWl+GxvhjpxfqpTm6sV/xrn3UYoE1/P8suwjQx6oWs/uIWVrChbLKC
-         FA21wotFhVn7TIMuI8jtreM3UuspUbeMgFmmDmy4f+NcIPpDVOub0VqBn9qFpvmTMj4I
-         t0Kg==
-X-Gm-Message-State: AOJu0YzvBvSRU0PRO8fQJRjbAAXwQDjKew+GcJ9mABHme/1Ki0hUExHv
-	kwJRGDaXXyE8ZAo/IMVsP4+cIA==
-X-Google-Smtp-Source: AGHT+IH59hmoDS+3N9HnCWrAqCjVPZ4ryC0EzwYrla5+l9OzTXH6ATWKCWWbfSW9us9NhxA/rflDvg==
-X-Received: by 2002:aa7:d14c:0:b0:533:2327:1eed with SMTP id r12-20020aa7d14c000000b0053323271eedmr23591165edo.24.1697118370561;
-        Thu, 12 Oct 2023 06:46:10 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id er24-20020a056402449800b0052febc781bfsm2998183edb.36.2023.10.12.06.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 06:46:09 -0700 (PDT)
-Date: Thu, 12 Oct 2023 15:46:08 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Netdev <netdev@vger.kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-wireless@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wpan@vger.kernel.org,
-	Michael Hennerich <michael.hennerich@analog.com>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Rodolfo Zitellini <rwz@xhero.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/10] appletalk: make localtalk and ppp support
- conditional
-Message-ID: <ZSf4oCBXZGi2BfqC@nanopsycho>
-References: <20231011140225.253106-1-arnd@kernel.org>
- <ZSa5bIcISlvW3zo5@nanopsycho>
- <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C5271A72D
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 14:00:50 +0000 (UTC)
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE363C0
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:00:45 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 9AB8E67373; Thu, 12 Oct 2023 16:00:39 +0200 (CEST)
+Date: Thu, 12 Oct 2023 16:00:38 +0200
+From: Christoph Hellwig <hch@lst.de>
+To: Greg Ungerer <gerg@linux-m68k.org>
+Cc: Michael Schmitz <schmitzmic@gmail.com>, Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>, iommu@lists.linux.dev,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>, linux-m68k@lists.linux-m68k.org,
+	netdev@vger.kernel.org, Jim Quinlan <james.quinlan@broadcom.com>
+Subject: Re: [PATCH 5/6] net: fec: use dma_alloc_noncoherent for m532x
+Message-ID: <20231012140038.GA8513@lst.de>
+References: <20231009074121.219686-1-hch@lst.de> <20231009074121.219686-6-hch@lst.de> <ea608718-8a50-4f87-aecf-fc100d283fe8@arm.com> <0299895c-24a5-4bd4-b7a4-dc50cc21e3d8@linux-m68k.org> <20231011055213.GA1131@lst.de> <cff2d9f0-4719-4b88-8ed5-68c8093bcebf@linux-m68k.org> <12c7b0db-938c-9ca4-7861-dd703a83389a@gmail.com> <e16ac0a4-3e4a-4e8c-98ba-7b600a8c6768@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,47 +46,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <82527b7f-4509-4a59-a9cf-2df47e6e1a7c@app.fastmail.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE
-	autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <e16ac0a4-3e4a-4e8c-98ba-7b600a8c6768@linux-m68k.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Oct 11, 2023 at 05:57:38PM CEST, arnd@arndb.de wrote:
->On Wed, Oct 11, 2023, at 17:04, Jiri Pirko wrote:
->> Could you provide a cover letter for the set please?
->
->Subject: [PATCH v2 00/10] remove final .ndo_do_ioctl references
->
->The .ndo_do_ioctl() netdev operation used to be how one communicates
->with a network driver from userspace, but since my previous cleanup [1],
->it is purely internal to the kernel.
->
->Removing the cops appletalk/localtalk driver made me revisit the
->missing pieces from that older series, removing all the unused
->implementations in wireless drivers as well as the two kernel-internal
->callers in the ieee802154 and appletalk stacks.
->
->One ethernet driver was already merged in the meantime that should
->have used .ndo_eth_ioctl instead of .ndo_do_ioctl, so fix that as well.
->With the complete removal, any future drivers making this mistake
->cause build failures that are easier to spot.
+On Thu, Oct 12, 2023 at 11:25:00PM +1000, Greg Ungerer wrote:
+> Not sure I follow. This is the opposite of the case above. The noncoherent alloc
+> and cache flush should be performed if ColdFire and any of CONFIG_HAVE_CACHE_CB,
+> CONFIG_CACHE_D or CONFIG_CACHE_BOTH are set - since that means there is data
+> caching involved.
 
-Looks fine.
+FYI, this is what I ended up with this morning:
 
+http://git.infradead.org/users/hch/misc.git/commitdiff/ea7c8c5ca3f158f88594f4f1c9a52735115f9aca
 
->
->[1] https://lore.kernel.org/netdev/20201106221743.3271965-1-arnd@kernel.org/
->
->----
->Hope that helps, I had commented on the cops removal about sending
->this but of course not everyone here saw that. Let me know if I should
->resend the patches together with the cover letter.
+Whole branch:
 
-Yes please. Thanks!
+http://git.infradead.org/users/hch/misc.git/shortlog/refs/heads/dma-coherent-deps
 
-
->
->    Arnd
 
