@@ -1,119 +1,143 @@
-Return-Path: <netdev+bounces-40431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 259197C7635
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:03:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225BE7C7639
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:04:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EAE528229A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:03:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E15128218D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:04:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE3F374D6;
-	Thu, 12 Oct 2023 19:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058AB36B1B;
+	Thu, 12 Oct 2023 19:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KAubfCj1"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HSJ3N7rC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C729728E21
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:03:40 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E127BE
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:03:38 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c8a1541232so11967415ad.0
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:03:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697137418; x=1697742218; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=h+UW4+U9HpV+E9ycAwBZg91gnF7Sw/DTzJeLz9wATvA=;
-        b=KAubfCj1S+bG6xkRbpfls3howND2lMjegG8CiiMKTaPC8AMb+PvBdSRjPOsXLwhPSB
-         fS9A82A0uL45C32+q87qYWAl3lXBX3VnIxkqFO9irHAyAS4mR6A8YaCSHSVTKa3n8ohC
-         veutWPALsUI0ecF9zfAtDRJpnb7ACVCbr1pJU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697137418; x=1697742218;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h+UW4+U9HpV+E9ycAwBZg91gnF7Sw/DTzJeLz9wATvA=;
-        b=qR6sZME0pUSLvhMaOu4in9g0aOl+bTngzBpCtM/W1WbK72AacBapRVj3R5/Bw0UOH/
-         T7Oeu8MlaceWlym9/tM6NMsoR6MwUDdZaxmRhD5Qe3Vl6QQ0qppgYILxTAFJ8Vj8kBhY
-         0nG1kpKnDokOCfToNGcyRU/u+JkUy0tDggUgcq8H6SENoX11T+wP8IGNEv0qpRO05+zv
-         RmRkL0K03B4I8cGy/QAkFQ1FuXcV55S6Ws6faGNld6h5BkwngXOuljQs8lskdr2A/IVd
-         dI4Nj6YfPsgPJTt6JEva0F3ACL6QY0e7jsWBZdUlD86kiCCImyb6uxqGLk6IVC/hytcx
-         X5uA==
-X-Gm-Message-State: AOJu0Yw/Mkdg8lU8fLebL9teTpUSOGk9Z2ZRo1v8ZLsaUPxtg600v6l2
-	EZvH2Yr0tkEwx0bI75OT+QHLaQ==
-X-Google-Smtp-Source: AGHT+IHX6L/aLX9NNOcwqRVmh9iizTWqDKSZdokhOeYvlGzRhloHgIdhhspGR9BXHTu8NSRDETlQuw==
-X-Received: by 2002:a17:903:120b:b0:1bf:2e5c:7367 with SMTP id l11-20020a170903120b00b001bf2e5c7367mr28527771plh.42.1697137417668;
-        Thu, 12 Oct 2023 12:03:37 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id o2-20020a1709026b0200b001c75627545csm2324737plk.135.2023.10.12.12.03.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 12:03:37 -0700 (PDT)
-Date: Thu, 12 Oct 2023 12:03:32 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Ariel Elior <aelior@marvell.com>, Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2] qed: replace uses of strncpy
-Message-ID: <202310121203.0415E3B@keescook>
-References: <20231012-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-v2-1-16d2c0162b80@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A30863B4
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:04:25 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EAB483;
+	Thu, 12 Oct 2023 12:04:23 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CIxTJ3027496;
+	Thu, 12 Oct 2023 19:04:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TcbF7u6h8UanVvB4kjio1B54RIcwpdiPlHJIrm5KHLw=;
+ b=HSJ3N7rC8AhJnjY7E/03t16tnbHGAo1F4E47rBxpe7IJbNl2E0tiyhTk6Bk6Nk9J6P8M
+ atiCAR4PAZxS2DlCTtfgI+f5C/VxVyFxKRbQVJT5VXor4uesldSsk1U3zDYfj+SSDula
+ lee6BXBtI8w6Y0FaYro9GcjmZ8H1qQaV6uwv9PjReHuhxJ2hQBIHcPpYNz5hsJB5Z6sa
+ 9XoFmNaT+M3hEOc0KCCapgdC6wcJ33MPMTrpbiq2Zl0/yXWkueMCpPoG2qm2urPygxhu
+ I23uihDhzjsSGx6X6Kjk9IFcHv6omueOZl9cNAj6DlgJqRJ6tLnJSty6rc+K1BHOJ4aH JQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppjbr8p2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:04:18 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CJ0uDc004429;
+	Thu, 12 Oct 2023 19:04:18 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tppjbr8n7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:04:18 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CIq8Fn001270;
+	Thu, 12 Oct 2023 19:04:17 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk9cnn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 19:04:17 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CJ4G0j2163202
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Oct 2023 19:04:16 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7642E5805B;
+	Thu, 12 Oct 2023 19:04:16 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1DE7B58058;
+	Thu, 12 Oct 2023 19:04:13 +0000 (GMT)
+Received: from [9.171.29.13] (unknown [9.171.29.13])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Oct 2023 19:04:12 +0000 (GMT)
+Message-ID: <bdcb307f-d2a8-4aef-bb7d-dd87e56ff740@linux.ibm.com>
+Date: Thu, 12 Oct 2023 21:04:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012-strncpy-drivers-net-ethernet-qlogic-qed-qed_debug-c-v2-1-16d2c0162b80@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 5/5] net/smc: put sk reference if close work was
+ canceled
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
+ <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1697009600-22367-6-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: xTSy0oJ5xzOmyXfFWym16YkPX7EqljP4
+X-Proofpoint-ORIG-GUID: dZIvluRzZfjkAwF0iy6-331tX2Cvbcyi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-12_11,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999
+ mlxscore=0 phishscore=0 adultscore=0 malwarescore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2309180000 definitions=main-2310120158
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 06:35:41PM +0000, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings
-> [1] and as such we should prefer more robust and less ambiguous string
-> interfaces.
-> 
-> This patch eliminates three uses of strncpy():
-> 
-> Firstly, `dest` is expected to be NUL-terminated which is evident by the
-> manual setting of a NUL-byte at size - 1. For this use specifically,
-> strscpy() is a viable replacement due to the fact that it guarantees
-> NUL-termination on the destination buffer.
-> 
-> The next two cases should simply be memcpy() as the size of the src
-> string is always 3 and the destination string just wants the first 3
-> bytes changed.
-> 
-> To be clear, there are no buffer overread bugs in the current code as
-> the sizes and offsets are carefully managed such that buffers are
-> NUL-terminated. However, with these changes, the code is now more robust
-> and less ambiguous (and hopefully easier to read).
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
 
-Yup, this looks good to me now. Thanks!
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
+On 11.10.23 09:33, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> Note that we always hold a reference to sock when attempting
+> to submit close_work. 
+yes
+Therefore, if we have successfully
+> canceled close_work from pending, we MUST release that reference
+> to avoid potential leaks.
+> 
+Isn't the corresponding reference already released inside the 
+smc_close_passive_work()?
 
--- 
-Kees Cook
+> Fixes: 42bfba9eaa33 ("net/smc: immediate termination for SMCD link groups")
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>   net/smc/smc_close.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+> index 449ef45..10219f5 100644
+> --- a/net/smc/smc_close.c
+> +++ b/net/smc/smc_close.c
+> @@ -116,7 +116,8 @@ static void smc_close_cancel_work(struct smc_sock *smc)
+>   	struct sock *sk = &smc->sk;
+>   
+>   	release_sock(sk);
+> -	cancel_work_sync(&smc->conn.close_work);
+> +	if (cancel_work_sync(&smc->conn.close_work))
+> +		sock_put(sk);
+>   	cancel_delayed_work_sync(&smc->conn.tx_work);
+>   	lock_sock(sk);
+>   }
 
