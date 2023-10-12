@@ -1,136 +1,120 @@
-Return-Path: <netdev+bounces-40226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D9D67C642D
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:43:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1DB7C6492
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7DCC28254A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 04:43:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 355B61C20A22
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 05:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647662B77F;
-	Thu, 12 Oct 2023 04:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B47CA63;
+	Thu, 12 Oct 2023 05:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="Qz3pmMhl"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Jx0wdWGi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A8D2B770
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 04:43:13 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274B3B7
-	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:43:12 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-5a7c95b8d14so7429127b3.3
-        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 21:43:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1697085791; x=1697690591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hui30h64vLshR10fww6M29GXyrgaysgxLGB2PvuibEc=;
-        b=Qz3pmMhlHKgUD156RMyk2aEFe8r0kxtFf0hGGWLXxwXyBtre7Wx845Jf9A6IKTV3Rb
-         TEbXdmh0Gd4SuHHDqHJ8Mlv5TvlnxSlvDD2WjPW6X5B8tkwxK3jbUPWhbZ7PNa541Lt8
-         z927giZLe891jupYOYsNJW1SqedjjNn7hJlZoy06p5MLERdEIDaTrrgdA5hFOG076PpB
-         PHlbayiI4NanVrLjrfuE+Z74u9Q7hHO6QvOO8ibi991KtZ0p+r55NiqwN+qqKrXnERY3
-         /pisb2LVjmhyn12AMip8YcWB3oTE/GBlND+CkZ9qGRVV0nkbn7663pueSPuyHArOujjc
-         jzaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697085791; x=1697690591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hui30h64vLshR10fww6M29GXyrgaysgxLGB2PvuibEc=;
-        b=sHx1dw1sFCRprzXLjj8+LFGqPwMmC1w6KeCHnTIE9jPcpT4dpAx8hAiT5/anBNCCEF
-         xUZUUH0V9fBXKTXnlKLRmCSjO1nGtIyf2ydVHyU4iKLDDtxWX8qZ8P1COifG8fs0XUFg
-         u9gpruCQnTH6rRcVCr6yp2L87wS+WPjOoYQrAHdqZ2akrMrqmmgFlBB2Nk2+trySXsSf
-         agp4PtTfaApNzd1KOGp409Zw5Pazc0YAzVTLEE8qk0UzO1KOpxDh2+rf1ovZloBKjJOd
-         ZnYmomThI5rD9w5202UNzVJlGowej884KLx7sx18BuTDCTjLS0epuYNurL7J4BehpGRZ
-         k6sg==
-X-Gm-Message-State: AOJu0YzpsK3bU/JseG2DgKScW6ZhJ2NsyLNCsBltQF8utBmJFkIdEktL
-	KAQC5OGCSJTfs9CQVNYWDfyMgmyNth9EPFE3E/zKcQ==
-X-Google-Smtp-Source: AGHT+IG0MTgX8ps5XL9XkfzqsRAHc1xu4VNxAQgOTDwDMNCuPWR6u6zZnrnTJJBx4iMuGOvm7byosGXzHPNC/Ji5d1Y=
-X-Received: by 2002:a81:71c2:0:b0:56d:43cb:da98 with SMTP id
- m185-20020a8171c2000000b0056d43cbda98mr24486370ywc.29.1697085791362; Wed, 11
- Oct 2023 21:43:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746D9CA4C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:21:29 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E7B590;
+	Wed, 11 Oct 2023 22:21:28 -0700 (PDT)
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39C5LHCN051170;
+	Thu, 12 Oct 2023 00:21:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697088077;
+	bh=mzJ6mczws2V1o12NE3ALNTxfbB/dSlBF4vOrX568DzU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=Jx0wdWGinDG26kPvuiEwfOJty21+RPavdxMGn/hEds6NkWc9u5FaNSufX6gdhTSRF
+	 g1b5GCiW92huGNJhviPjw8fOiIOXOJGoT4UisxtduyFvlQICFVZ9+ZFHZbzvL4Cxar
+	 RC8CC4JT7IJuyVk98I/3G9HyYwYTL1PDBRsyyy/w=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39C5LHfM073317
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 12 Oct 2023 00:21:17 -0500
+Received: from DFLE113.ent.ti.com (10.64.6.34) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 12
+ Oct 2023 00:21:17 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 12 Oct 2023 00:21:17 -0500
+Received: from [10.24.69.31] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39C5LCIS092468;
+	Thu, 12 Oct 2023 00:21:13 -0500
+Message-ID: <7b5f195f-c5c8-6847-9458-3d5563cf0112@ti.com>
+Date: Thu, 12 Oct 2023 10:51:12 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231009013912.4048593-1-fujita.tomonori@gmail.com>
- <20231009013912.4048593-2-fujita.tomonori@gmail.com> <CANiq72nBSyQw+vFayPco5b_-DDAKNqmhE7xiXSVbg920_ttAeQ@mail.gmail.com>
- <20231012.125937.1346884503622296050.fujita.tomonori@gmail.com>
-In-Reply-To: <20231012.125937.1346884503622296050.fujita.tomonori@gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Thu, 12 Oct 2023 00:43:00 -0400
-Message-ID: <CALNs47sAZNk4XRn4WMAbJeiYZwrzceqPJHZ7vi8SZYgVB_XSLA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, andrew@lunn.ch, greg@kroah.com, 
-	wedsonaf@gmail.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20231011063700.1824093-1-danishanwar@ti.com>
+ <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 11:59=E2=80=AFPM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> >> +#![feature(const_maybe_uninit_zeroed)]
-> >
-> > The patch message should justify this addition and warn about it.
->
-> I added the following to the commit log.
->
-> This patch enables unstable const_maybe_uninit_zeroed feature for
-> kernel crate to enable unsafe code to handle a constant value with
-> uninitialized data. With the feature, the abstractions can initialize
-> a phy_driver structure with zero easily; instead of initializing all
-> the members by hand.
+Hi Andrew,
 
-Maybe also link something about its stability confidence?
-https://github.com/rust-lang/rust/pull/116218#issuecomment-1738534665
+On 11/10/23 18:11, Andrew Lunn wrote:
+>> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
+>>  			     base + icssg_all_stats[i].offset,
+>>  			     val);
+>>  
+>> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
+>> +			tx_pkt_cnt = val;
+> 
+> Doing a strncmp seems very expensive. Could you make use of
+> icssg_stats.offset?
+> 
 
-> >> +    /// Executes software reset the PHY via BMCR_RESET bit.
-> >
-> > Markdown missing (multiple instances).
->
-> Can you elaborate?
+Sure. I can define the offset of these two stats and then use them in if
+condition as below.
 
-BMCR_RESET -> `BMCR_RESET` I believe
+#define ICSSG_TX_PACKET_OFFSET 0xA0
+#define ICSSG_TX_BYTE_OFFSET   0xEC
 
-> > +/// Represents the kernel's `struct mdio_device_id`.
-> > +pub struct DeviceId {
-> > +    /// Corresponds to `phy_id` in `struct mdio_device_id`.
-> > +    pub id: u32,
-> > +    mask: DeviceMask,
-> > +}
->
-> It would be nice to explain why the field is `pub`.
+if (icssg_ethtool_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
+	tx_pkt_cnt = val;
 
-On this subject, I think it would be good to add
+if (icssg_ethtool_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
+	emac->stats[i] -= tx_pkt_cnt * 8;
 
-    impl DeviceId {
-        #[doc(hidden)] // <- macro use only
-        pub const fn as_mdio_device_id(&self) ->
-bindings::mdio_device_id { /* ... */ }
-    }
 
-That makes more sense when creating the table, and `id` no longer has
-to be public.
+Pls let me know if this looks OK.
 
-> > This patch could be split a bit too, but that is up to the maintainers.
->
-> Yeah.
+> 	Andrew
 
-Maybe it would make sense to put the macro in its own commit when you
-send the next version? That gets some attention on its own.
+-- 
+Thanks and Regards,
+Danish
 
