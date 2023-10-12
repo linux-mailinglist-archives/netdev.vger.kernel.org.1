@@ -1,141 +1,106 @@
-Return-Path: <netdev+bounces-40476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EADA87C776A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EA077C77DD
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19E2B1C21242
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A0451C20EC9
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A853D96E;
-	Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4083D399;
+	Thu, 12 Oct 2023 20:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NFklREM3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="czAGNXYM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5213D96D
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4996FC433C7;
-	Thu, 12 Oct 2023 19:53:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697140397;
-	bh=BpwSHoCzWrx3k7ZY6ysA4trLoy9KbB+YZT8eu6DcJvI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NFklREM3vTvqBhul3UcZJeUMBPJu+bKuxhFlyFPo58oLIwNskpON7Y4/hNBKm5SMH
-	 iKcMn7GZVmga295RcPvseO0+GqbzzA0unQ8R0jvSQGLAi+TWnf5DjHLKDVWnlau8Oe
-	 43jWUAYCDW8zV5Sr3CylD8q+S4BEjxoIZJnICjRAXtIoBu8OUfhIQof1lnrcjmNlft
-	 0xaYylXFnAaW2X9aX9V2+lYC4/TeO/rUxW560MhCAk5d8OV3piZcwXm2IeYnBuV/RW
-	 XON3Lmo7gSb8FErmtSRrGGrnoxvpOfljFhB/1IEH1JVQMfxOwagr1slWwQyBKzWcVL
-	 c9QtXfP06UbNA==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Amir Tzin <amirtz@nvidia.com>,
-	Patrisious Haddad <phaddad@nvidia.com>
-Subject: [net 10/10] net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command
-Date: Thu, 12 Oct 2023 12:51:27 -0700
-Message-ID: <20231012195127.129585-11-saeed@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
-References: <20231012195127.129585-1-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01273D38C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 20:24:51 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E7FDD
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:24:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zVVjh9vMESdndK1O3Gkjn+lT8wRkRCe0artB4X9mVmc=; b=czAGNXYMgV9bK15mcBOWpLFd2u
+	KY9LdDggWdsFtICsn1xN5l93SlTOZgNgJ95eeK8ixM2sWk/8g86+gE3cHKQLPW4VbVxo58w9b/5zq
+	6SYcaKxZXDhQgOlHYvzR+cWu+DHfQ+63nQHG7RC52Eo+sRTK3fUqkPinEHngTebbC3Ao=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qr2Ee-00211C-Jf; Thu, 12 Oct 2023 22:24:44 +0200
+Date: Thu, 12 Oct 2023 22:24:44 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, opendmb@gmail.com,
+	justin.chen@broadcom.com
+Subject: Re: [PATCH net-next 1/2] ethtool: Introduce WAKE_MDA
+Message-ID: <779d6ab4-0c15-4564-9584-1c5332c1f5d1@lunn.ch>
+References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
+ <20231011221242.4180589-2-florian.fainelli@broadcom.com>
+ <20231011230821.75axavcrjuy5islt@lion.mk-sys.cz>
+ <3229ff0a-5ce5-4ee2-a79d-15007f2b6030@gmail.com>
+ <78aaaa09-1b35-4ddb-8be8-b8f40cf280bc@lunn.ch>
+ <0271cea4-f2ab-4d8c-aa0a-9dd65a1318db@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0271cea4-f2ab-4d8c-aa0a-9dd65a1318db@broadcom.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Amir Tzin <amirtz@nvidia.com>
+> > My previous concern was discoverability of the feature. Its not part
+> > of ethtool -s eth0 wol. At minimum, i would suggest something in the
+> > --help text in the wol section and man page pointing to the
+> > alternative way to configure wol. And maybe report via the standard
+> > wol flags that the hardware has the capability to use flow-type WoL?
+> 
+> WAKE_FILTER is supposed to be set by the driver if it supports waking-up
+> from a network filter. That is how you would know that the device supports
+> waking-up from a network filter, and then you need to configure the filters
+> with ethtool -N (rxnfc).
+> 
+> Where this API is a good fit is that you can specify a filter location and
+> the action (-2 = RX_CLS_FLOW_WAKE) to indicate where to install the filter
+> and what it should do. Where it may not be such a great fit is that it is a
+> two step process, where you need to make sure you install filter(s) plus
+> enable WAKE_FILTER from the .set_wol() call.
+> 
+> At the time it was proposed it felt like a reasonable way to program,
+> without having "ethtool -s eth0 wol" gain a form of packet matching parser.
+> Also, it does not seem to me like we need the operations to be necessarily
+> atomic in a single call to the kernel but if we feel like this is too
+> difficult to use, we could consider a .set_wol() call that supports being
+> passed network filter(s).
+ 
+I think two step is fine. I would say anybody using rxnfc is a pretty
+advanced user.
 
-Although vf_vport entry of struct mlx5e_stats is never updated, its
-values are mistakenly copied to the caller structure in the VF
-representor .ndo_get_stat_64 callback mlx5e_rep_get_stats(). Remove
-redundant entry and use the updated one, rep_stats, instead.
+But we should clearly define what we expect in terms of ordering and
+maybe try to enforce it in the core. Can we make the rxnfc call return
+-EBUSY or something and an extack message if WAKE_FILTER has not been
+enabled first?
 
-Fixes: 64b68e369649 ("net/mlx5: Refactor and expand rep vport stat group")
-Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
-Signed-off-by: Amir Tzin <amirtz@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.h | 11 ++++++++++-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +++--
- 3 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index 5ca9bc337dc6..fd1cce542b68 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -701,7 +701,7 @@ mlx5e_rep_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 
- 	/* update HW stats in background for next time */
- 	mlx5e_queue_update_stats(priv);
--	memcpy(stats, &priv->stats.vf_vport, sizeof(*stats));
-+	mlx5e_stats_copy_rep_stats(stats, &priv->stats.rep_stats);
- }
- 
- static int mlx5e_rep_change_mtu(struct net_device *netdev, int new_mtu)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-index 176fa5976259..477c547dcc04 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-@@ -484,11 +484,20 @@ struct mlx5e_stats {
- 	struct mlx5e_vnic_env_stats vnic;
- 	struct mlx5e_vport_stats vport;
- 	struct mlx5e_pport_stats pport;
--	struct rtnl_link_stats64 vf_vport;
- 	struct mlx5e_pcie_stats pcie;
- 	struct mlx5e_rep_stats rep_stats;
- };
- 
-+static inline void mlx5e_stats_copy_rep_stats(struct rtnl_link_stats64 *vf_vport,
-+					      struct mlx5e_rep_stats *rep_stats)
-+{
-+	memset(vf_vport, 0, sizeof(*vf_vport));
-+	vf_vport->rx_packets = rep_stats->vport_rx_packets;
-+	vf_vport->tx_packets = rep_stats->vport_tx_packets;
-+	vf_vport->rx_bytes = rep_stats->vport_rx_bytes;
-+	vf_vport->tx_bytes = rep_stats->vport_tx_bytes;
-+}
-+
- extern mlx5e_stats_grp_t mlx5e_nic_stats_grps[];
- unsigned int mlx5e_nic_stats_grps_num(struct mlx5e_priv *priv);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index c24828b688ac..c8590483ddc6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -4972,7 +4972,8 @@ static int scan_tc_matchall_fdb_actions(struct mlx5e_priv *priv,
- 			if (err)
- 				return err;
- 
--			rpriv->prev_vf_vport_stats = priv->stats.vf_vport;
-+			mlx5e_stats_copy_rep_stats(&rpriv->prev_vf_vport_stats,
-+						   &priv->stats.rep_stats);
- 			break;
- 		default:
- 			NL_SET_ERR_MSG_MOD(extack, "mlx5 supports only police action for matchall");
-@@ -5012,7 +5013,7 @@ void mlx5e_tc_stats_matchall(struct mlx5e_priv *priv,
- 	u64 dbytes;
- 	u64 dpkts;
- 
--	cur_stats = priv->stats.vf_vport;
-+	mlx5e_stats_copy_rep_stats(&cur_stats, &priv->stats.rep_stats);
- 	dpkts = cur_stats.rx_packets - rpriv->prev_vf_vport_stats.rx_packets;
- 	dbytes = cur_stats.rx_bytes - rpriv->prev_vf_vport_stats.rx_bytes;
- 	rpriv->prev_vf_vport_stats = cur_stats;
--- 
-2.41.0
-
+	Andrew
 
