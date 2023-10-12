@@ -1,149 +1,137 @@
-Return-Path: <netdev+bounces-40538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38B87C79D0
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:35:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 570847C79D5
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:35:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CCF41C213F4
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:35:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A79D4B20A3C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766D72B5D9;
-	Thu, 12 Oct 2023 22:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1043D00E;
+	Thu, 12 Oct 2023 22:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YupFDCoJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KV3CnEMx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC8A3D00C
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:33:38 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28746D8
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:33:36 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a3942461aso2110897276.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:33:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFE42B5D8
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:35:25 +0000 (UTC)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0011B8
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:22 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c5087d19a6so59001fa.0
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697150015; x=1697754815; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bMicK/Q5xy5Wa2FAFNQ3uoq4k2tHyYqo1F+SWUCF8nk=;
-        b=YupFDCoJl/YjOA4Gw1wPmwXlSJDLi7RzOJAzPKRduQYqfu1wyyYpuAYM997B25pRwj
-         lPiPxhNtHFbyvHPG6Mpk6QtzVtZMev1jKTEgPlqI32vxDcC+EH70szDzrER6VANc2mK8
-         NsMM2qLUDN+8zM40A0RxhZr7tEcNi5te/TNh5G7oN5o3ODp6m248El1Y1od0yHlXNSG/
-         hiPRLt88NukhlYPOhz6vkwXL8A9VzWKSutxDmYD0hQF7ZVhfMkVxWDV+MIvbDdOuaRYz
-         Fp4Vuf2U6gBbndoEKFdJGXZEdEpoX+1fSvl3QnxJeBLLUnpgmPdY8PkVzA6E3xlPVGfo
-         919Q==
+        d=linaro.org; s=google; t=1697150121; x=1697754921; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XXO4MwbGSox8rKRwzbnM2zZwOBZ2z8Fw/s+ke6QnvYQ=;
+        b=KV3CnEMxFJtvM3QTZMX6sbsVGR9yMUU3IaNqfwXPLsWzqHb9fji2VHY22O7/IVrWX/
+         qGuR4AMRwkJ0OByoVaoUbadLfPBLGIiTWprDSH1N3vBAXXzws3ICJRzCET2B6tWH/lCs
+         h1ArxcVwhGgXRmOFax8Kxupgi6my5yVaui2iT9E5x2Gr4a0vfIBOH6vTltN0liQcIHE0
+         lyZsaSRm/gyosCEpdgpkFIFIE7iGjnJ4Fdi9gjpbZ5h9CFKi0Ign3NqerVqegg22YwoC
+         im33GTdpW6hw7tH2CYJMgf2NBWkJg014ufolh+D8ABVXFty+4DgPW2v/+vOaf1jF+zT6
+         0Nyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697150015; x=1697754815;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bMicK/Q5xy5Wa2FAFNQ3uoq4k2tHyYqo1F+SWUCF8nk=;
-        b=BshAQNT8qLwqgDUWovMXffp7MnDyUaImwY5WmAc3oQHaF6KvpYZMw0GyYtDKXOwGFb
-         Rv+OYfuQkAbOmoVBfQxd+e499v0i6yvk2CdIngN2Vs8LaDeL6UyXPZiZwdYe0euz4iP0
-         OVQsdDoJVXkughPTYFB/7BTL+ck9LYgqGe5ykhEcmJ4gZoiNXRVcZuwLAzFyo/e2ZUG4
-         rikI2m6l58IYKBBnz5YhK+2/KMyqHnRtCWlMoNixbV3iFAo2St6ld+NNmRFijMpo+ksU
-         k+MkWv+VzLIxC1xakURz+elhBxG9kyw6uGdLEV75/5nA1CBUptC/2psR7646f0A5A4dW
-         /ovQ==
-X-Gm-Message-State: AOJu0YwBQahaniu5Zq0ZrVYfL656iprSeuwUkHnB598aSj/zl+CgfbIM
-	PgmK24LVh2flA3ROJJaFTQtkC9BA0X1vJKzLHA==
-X-Google-Smtp-Source: AGHT+IGFC2dIaMmI0JDuC8HythokMvivv7ImS1E9FTXqpn3afgMUg1e2O4A3TXVog4ZLvVdjsPz+NEQDS5+nUp4Oow==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:828c:0:b0:d9a:bc5a:737c with SMTP
- id r12-20020a25828c000000b00d9abc5a737cmr93260ybk.4.1697150015398; Thu, 12
- Oct 2023 15:33:35 -0700 (PDT)
-Date: Thu, 12 Oct 2023 22:33:34 +0000
+        d=1e100.net; s=20230601; t=1697150121; x=1697754921;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XXO4MwbGSox8rKRwzbnM2zZwOBZ2z8Fw/s+ke6QnvYQ=;
+        b=unwBj34bPz58lIKral8hMMgiqEB2dn1pAatjA8J07ZOjr87E83B3mRu6arXJiRl2PW
+         kFTCCpkuqnRWs04Ob0RYnqLiui0+4diazRWFu97k28Yg2zNlYvWyEy/DyNUBvZEDw9Te
+         GwMZB0tm7CviP7VtoxdTASczWPgmQRTcUolr9CIfROJUS6syOWsVbqB7Hb1vZ8+57gnL
+         ovn9VhI7014qhNjYro/2nZr41PH0lLkDLaLZ3045IVlVtaX4Aiqf4t/jwQmzNZf2n4Vy
+         92ou79Hm86sOm0dWc68Ya0rHLXy6dYfOxJpIz+yMDdVtxg2/TV11VbhazrH1chfxMVgQ
+         6a4A==
+X-Gm-Message-State: AOJu0Ywn1Cdi1lj2EVv5U8c6TBrBkbYJJXy5AtFO2t68M4o823alnW/W
+	96QBR9D9eSnpVf2UPbwjwxBxRg==
+X-Google-Smtp-Source: AGHT+IG2cIx6DdV3B+I16sZS0ktRHmF97um53+8sbh/NgQJX+5tMKhRcw84Ma5j9WlNR4GfU6ctdDw==
+X-Received: by 2002:a2e:8488:0:b0:2bc:d6a8:1efd with SMTP id b8-20020a2e8488000000b002bcd6a81efdmr21034673ljh.39.1697150121181;
+        Thu, 12 Oct 2023 15:35:21 -0700 (PDT)
+Received: from [192.168.1.2] (c-21d3225c.014-348-6c756e10.bbcust.telenor.se. [92.34.211.33])
+        by smtp.gmail.com with ESMTPSA id x21-20020a05651c105500b002bcb89e92dcsm3811671ljm.6.2023.10.12.15.35.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 15:35:20 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 0/3] Create a binding for the Marvell MV88E6xxx DSA
+ switches
+Date: Fri, 13 Oct 2023 00:35:13 +0200
+Message-Id: <20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAD10KGUC/x3NMQ6DMAxA0asgz7WUOEMoV0Ed2uCAlxTZFFFF3
- J2I8S3/VzBWYYOhq6C8i8m3NPhHB2l5l5lRpmYgR8E7T2iblrT+cVLZWQ0Lb/izD5o+e+cwYeh z9JQo50jQMqtyluNejK/zvADLCQxHcgAAAA==
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697150014; l=1997;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=1U/Iz4RqgIW06rmNmlXGTtLjP2+AJ5auEeXiBs7XZfQ=; b=brMk5Cj7eHq7rhc3oxxfK9fgzLcaoOEhVmgXPUsQEqJdbnaDQp+DNiJaosWeTFIN1Sj/ZHhsN
- dWoYta7Hsf0BJJ3Ttyiqah6k3lJtPK4DA+awnlETQMF5I19LrW2lFz5
-X-Mailer: b4 0.12.3
-Message-ID: <20231012-strncpy-drivers-net-usb-sr9800-c-v1-1-5540832c8ec2@google.com>
-Subject: [PATCH] net: usb: replace deprecated strncpy with strscpy
-From: Justin Stitt <justinstitt@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKJ0KGUC/x3MTQqAIBBA4avErBtQ+5OuEi0sxxowC4UKorsnL
+ b/Few8kikwJ+uKBSCcn3kOGLAuYVxMWQrbZoISqpBAaNxNP8h61plY2Ci8T0JPNnutq6pxVzkK
+ uj0iO7/88jO/7AQR7dUFpAAAA
+To: Andrew Lunn <andrew@lunn.ch>, 
+ Gregory Clement <gregory.clement@bootlin.com>, 
+ Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>, 
+ linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-strncpy() is deprecated for use on NUL-terminated destination strings
-[1] and as such we should prefer more robust and less ambiguous string
-interfaces.
+This shows the path we could take with this, deprecating the
+weird external bus thing.
 
-Other implementations of .*get_drvinfo use strscpy so this patch brings
-sr_get_drvinfo() in line as well:
+I don't know what to do about the irq lines with a pointless
+type flag that should be onecell:ed.
 
-igb/igb_ethtool.c +851
-static void igb_get_drvinfo(struct net_device *netdev,
+I need proper schema checking to add LED support to the
+Marvell switch. Just how it is, it can't go on like this.
 
-igbvf/ethtool.c
-167:static void igbvf_get_drvinfo(struct net_device *netdev,
+Andrew: if you have lots of ideas and want to do lots of
+changes, feel free to just take over the patch set and do
+what you like, this is an RFC after all.
 
-i40e/i40e_ethtool.c
-1999:static void i40e_get_drvinfo(struct net_device *netdev,
-
-e1000/e1000_ethtool.c
-529:static void e1000_get_drvinfo(struct net_device *netdev,
-
-ixgbevf/ethtool.c
-211:static void ixgbevf_get_drvinfo(struct net_device *netdev,
-
-...
-
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
-Link: https://github.com/KSPP/linux/issues/90
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Note: build-tested only.
+Linus Walleij (3):
+      ARM: dts: marvell: Fix some common switch mistakes
+      RFC: dt-bindings: marvell: Rewrite in schema
+      RFC: net: dsa: mv88e6xxx: Register mdio-external
 
-Found with: $ rg "strncpy\("
+ .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 249 +++++++++++++++++++++
+ .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
+ MAINTAINERS                                        |   2 +-
+ arch/arm/boot/dts/marvell/armada-370-rd.dts        |   2 -
+ .../dts/marvell/armada-381-netgear-gs110emx.dts    |   2 -
+ .../dts/marvell/armada-385-clearfog-gtr-l8.dts     |   2 +-
+ .../dts/marvell/armada-385-clearfog-gtr-s4.dts     |   2 +-
+ arch/arm/boot/dts/marvell/armada-385-linksys.dtsi  |   2 -
+ arch/arm/boot/dts/marvell/armada-388-clearfog.dts  |   2 -
+ .../boot/dts/marvell/armada-xp-linksys-mamba.dts   |   2 -
+ drivers/net/dsa/mv88e6xxx/chip.c                   |  16 +-
+ 11 files changed, 267 insertions(+), 123 deletions(-)
 ---
- drivers/net/usb/sr9800.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
-index f5e19f3ef6cd..143bd4ab160d 100644
---- a/drivers/net/usb/sr9800.c
-+++ b/drivers/net/usb/sr9800.c
-@@ -474,8 +474,8 @@ static void sr_get_drvinfo(struct net_device *net,
- {
- 	/* Inherit standard device info */
- 	usbnet_get_drvinfo(net, info);
--	strncpy(info->driver, DRIVER_NAME, sizeof(info->driver));
--	strncpy(info->version, DRIVER_VERSION, sizeof(info->version));
-+	strscpy(info->driver, DRIVER_NAME, sizeof(info->driver));
-+	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
- }
- 
- static u32 sr_get_link(struct net_device *net)
-
----
-base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231012-strncpy-drivers-net-usb-sr9800-c-38f712c2ff72
+base-commit: 69d714c69583c4387147d0b7f2f436d42baddadd
+change-id: 20231008-marvell-88e6152-wan-led-88c43b7fd2fd
 
 Best regards,
---
-Justin Stitt <justinstitt@google.com>
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
 
