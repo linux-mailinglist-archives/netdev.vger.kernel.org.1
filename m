@@ -1,65 +1,108 @@
-Return-Path: <netdev+bounces-40548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9864E7C7A5E
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:26:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C5F67C7A62
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0AF5282147
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:26:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 877761C2107B
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD6F2B5CB;
-	Thu, 12 Oct 2023 23:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565A62B5D8;
+	Thu, 12 Oct 2023 23:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKTB+Cck"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HKWW41YQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2847D2B5C1
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 23:26:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C1C9C433C7;
-	Thu, 12 Oct 2023 23:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F062B5C0;
+	Thu, 12 Oct 2023 23:26:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176C8C433CA;
+	Thu, 12 Oct 2023 23:26:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697153161;
-	bh=FxDU7fsWaLUrXPafq43dXGONyys3h5tlOTxIdNyvE9I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KKTB+CckA6PzylP9o8wEslGNh/PL2nvvlcuG2KM1UcDsF+u8N/LzKAbj+rDTzubhf
-	 sw97587wtQ0NJuFfogMBQpivZxWs9DoVGcZvbnBmtazb9Iivt5+r3wM09c46ZQ9Cut
-	 sqcOZRTept2jsYgju04bYJkZnXj1QFFSdPG9zBy1r8WAeUEfY7rtCVqSvhr7T9PGp8
-	 H0QgpC4X694t2KERLDcuigFzuCtFyWsnl5QmU3E9FbH9YnCo37auYfFrecqhQDtkH/
-	 8cD4WANl7ObjBqms9AKBfIosV+HxpZIS6BdtcA8iIkBgFvr/oZIvPMIgFEFqQ9TzzS
-	 GQPL77tfzqAzg==
-Date: Thu, 12 Oct 2023 16:26:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, Shyam-sundar.S-k@amd.com
-Subject: Re: [PATCH net] amd-xgbe: read STAT1 register twice to get correct
- value
-Message-ID: <20231012162600.0ba5adcf@kernel.org>
-In-Reply-To: <8804726a-cc2d-fcac-093b-8cd34209d662@amd.com>
-References: <20230914041944.450751-1-Raju.Rangoju@amd.com>
-	<8804726a-cc2d-fcac-093b-8cd34209d662@amd.com>
+	s=k20201202; t=1697153185;
+	bh=qNqWoA/ZDLB/uXCHNS8ySDtf00nZP74HHvVGjttkErQ=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=HKWW41YQy8EqNpNGM+UUKpc+RgJDT9JWw0QCWmqprmhVz5h0QulhwY8JfidW38YWT
+	 kreoZcDSL4oFttV2dRMx+v2DuddjZI0/yB/HA2uHlh98EADBUMpH726kyIFwKlvg4x
+	 8CJJIb4M1nW0ldfOVGb3I4FZGqr8rxTYWeAizA+4jmaUHuz2CR34yKnN216yLYNO9t
+	 Q7yNlM3mwpsje2zZ76/9y5RtJ3YPg6h6oU9IImpklyO1+j1SkUf27tsOCg0D3I3V9j
+	 N85228TKgf371oxZ1kXdwAYp8u65FWKwZgXKAWOz/sxsLS4WwyMeuCy+hoGBd4fDD1
+	 wm7fzxeKRwjbA==
+Received: (nullmailer pid 2140553 invoked by uid 1000);
+	Thu, 12 Oct 2023 23:26:23 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: Rob Herring <robh@kernel.org>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Eric Dumazet <edumazet@google.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Gregory Clement <gregory.clement@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>, Florian Fainelli <f.fainelli@gmail.com>, Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Rob Herring <robh+dt@kernel.org>, linux-kernel@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>
+In-Reply-To: <20231013-marvell-88e6152-wan-led-v1-2-0712ba99857c@linaro.org>
+References: <20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org>
+ <20231013-marvell-88e6152-wan-led-v1-2-0712ba99857c@linaro.org>
+Message-Id: <169715318309.2140513.13293051505659071749.robh@kernel.org>
+Subject: Re: [PATCH 2/3] RFC: dt-bindings: marvell: Rewrite in schema
+Date: Thu, 12 Oct 2023 18:26:23 -0500
 
-On Thu, 12 Oct 2023 22:59:57 +0530 Raju Rangoju wrote:
-> Hi Jakub,
+
+On Fri, 13 Oct 2023 00:35:15 +0200, Linus Walleij wrote:
+> This is an attempt to rewrite the Marvell MV88E6xxx switch bindings
+> in YAML schema.
 > 
-> Can you please apply this patch? Let me know if it needs to be resent.
+> The current text binding says:
+>   WARNING: This binding is currently unstable. Do not program it into a
+>   FLASH never to be changed again. Once this binding is stable, this
+>   warning will be removed.
+> 
+> Well that never happened before we switched to YAML markup,
+> we can't have it like this, what about fixing the mess?
+> 
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 249 +++++++++++++++++++++
+>  .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
+>  MAINTAINERS                                        |   2 +-
+>  3 files changed, 250 insertions(+), 110 deletions(-)
+> 
 
-Yes, please resend. And please put in the commit message an explanation
-more technically detailed than "The current approach is holding good
-for amd-xgbe." :(
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-Reminder: please don't top post on the ML.
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: switch@0: ports: '#address-cells' is a required property
+	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/marvell,mvusb.example.dtb: switch@0: ports: '#size-cells' is a required property
+	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.example.dtb: switch@0: mdio-external: Unevaluated properties are not allowed ('compatible' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.example.dtb: switch@0: Unevaluated properties are not allowed ('mdio-external' was unexpected)
+	from schema $id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6xxx.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231013-marvell-88e6152-wan-led-v1-2-0712ba99857c@linaro.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
