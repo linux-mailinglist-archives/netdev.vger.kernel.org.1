@@ -1,134 +1,123 @@
-Return-Path: <netdev+bounces-40292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AED7C68EC
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:02:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4F77C68F7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB89F282995
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:02:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 750CE282789
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51706210EC;
-	Thu, 12 Oct 2023 09:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF636208D5;
+	Thu, 12 Oct 2023 09:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QbyJM8Tb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79675208D7
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:02:39 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5B2E9
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:02:36 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraM-0000CL-Lt; Thu, 12 Oct 2023 11:02:26 +0200
-Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraL-0016dN-0h; Thu, 12 Oct 2023 11:02:25 +0200
-Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
-	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqral-00FyMl-1P;
-	Thu, 12 Oct 2023 11:02:24 +0200
-From: Johannes Zink <j.zink@pengutronix.de>
-Date: Thu, 12 Oct 2023 11:02:16 +0200
-Subject: [PATCH net-next 5/5] net: stmmac: do not silently change auxiliary
- snapshot capture channel
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF678200BD
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:03:40 +0000 (UTC)
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37EA7E7;
+	Thu, 12 Oct 2023 02:03:39 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3af5fd13004so443986b6e.0;
+        Thu, 12 Oct 2023 02:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697101418; x=1697706218; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yzVb0vhkKTU8KCtwfAzDZ8IflC6qM4IfCofuFQAqWtA=;
+        b=QbyJM8Tb1FkpysZnnBsLcReSywvqKbqZLqmy9461F5QMsI/4jNdqm5QowRWohM1px/
+         u623ozevra5l9pGhUSp+AKWq1/UesXEPv2vMFbVAISCWjDDqIGLu6VkGlRZE2tG1fA0D
+         5SoPISKmXBRZyLRq1XMUAgrMD3vOjVO/ue17Sd1PedQkdDDBYcvrYoC7C4PGF4mUmzdP
+         EpZh4yOEDzRZyNe2D5tD+avNbQMic8U0bRBYsBeXCbxNsdhgINDs6OOyAX3SQEa1T6Iq
+         D9C/jGXrwldLMKqq6sq5Tg+aAw6lFt1a7iRp273pzZSOPgcCeENljM9vRXuywxjtc4hg
+         15mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697101418; x=1697706218;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yzVb0vhkKTU8KCtwfAzDZ8IflC6qM4IfCofuFQAqWtA=;
+        b=uSY8g5UZX/uRGVT1hn0+Gk2ZNGu6+V2SmrzxKYeR0oT12F9a51JelrlUUpwcJsM4/Y
+         2ernb8azoRBJVDTCRJB785p4LwjzhuVe3xh4YCt0+ZwNP5h9i6o7g8mS/nW0aYqc9ctN
+         lvPzqCBRNJ8tNf9hgYwubVuy4y0iy7qcYqYFM3KMIt2tq4zgcT/SMMu+t4cBsHVt6bVU
+         gVpj0Aix1N+H7YPMGXvM3tsDelPJNKzVdUDknLRimZfDXz6nhNbeABnBvsRzBhbK1NGu
+         K5fKTIxsIYrlQfJOKP3Xh7php6FQ4pEsJ1ifrIRFtl8+0jCzUAPXRuZGD/VZMDGLixXq
+         Gexg==
+X-Gm-Message-State: AOJu0Ywa0jIQ0YgPJ9h2mywsgvptvn3At5v6oJCduyKkYB/51N/pY9GF
+	dm+HGa9e6KO9KBx2qAZG9uI=
+X-Google-Smtp-Source: AGHT+IFZPAv8fSDpyr9L424jpdJT5iixbs95Q1Hn3Kr/5p4A+D01DpflPRL1xGcYz8dznNOIAYlijA==
+X-Received: by 2002:aca:2308:0:b0:3ae:55e6:1e34 with SMTP id e8-20020aca2308000000b003ae55e61e34mr23199116oie.58.1697101418473;
+        Thu, 12 Oct 2023 02:03:38 -0700 (PDT)
+Received: from localhost.localdomain ([61.16.102.74])
+        by smtp.gmail.com with ESMTPSA id ey5-20020a056a0038c500b0068ff6d21563sm11857363pfb.148.2023.10.12.02.03.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 02:03:38 -0700 (PDT)
+From: Liansen Zhai <zhailiansen@gmail.com>
+X-Google-Original-From: Liansen Zhai <zhailiansen@kuaishou.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhailiansen@gmail.com,
+	yuwang@kuaishou.com,
+	wushukun@kuaishou.com,
+	Liansen Zhai <zhailiansen@kuaishou.com>
+Subject: [PATCH net-next,v2] cgroup, netclassid: on modifying netclassid in cgroup, only consider the main process.
+Date: Thu, 12 Oct 2023 17:03:30 +0800
+Message-Id: <20231012090330.29636-1-zhailiansen@kuaishou.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v1-5-3eeca9e844fa@pengutronix.de>
-References: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
-In-Reply-To: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Kurt Kanzenbach <kurt@linutronix.de>
-Cc: patchwork-jzi@pengutronix.de, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kernel@pengutronix.de, Johannes Zink <j.zink@pengutronix.de>
-X-Mailer: b4 0.12.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: j.zink@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Even though the hardware theoretically supports up to 4 simultaneous
-auxiliary snapshot capture channels, the stmmac driver does support only
-a single channel to be active at a time.
+When modifying netclassid, the command("echo 0x100001 > net_cls.classid")
+will take more time on many threads of one process, because the process
+create many fds.
+for example, one process exists 28000 fds and 60000 threads, echo command
+will task 45 seconds.
+Now, we only consider the main process when exec "iterate_fd", and the
+time is about 52 milliseconds.
 
-Previously in case of a PTP_CLK_REQ_EXTTS request, previously active
-auxiliary snapshot capture channels were silently dropped and the new
-channel was activated.
-
-Instead of silently changing the state for all consumers, log an error
-and return -EBUSY if a channel is already in use in order to signal to
-userspace to disable the currently active channel before enabling another one.
-
-Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
+Signed-off-by: Liansen Zhai <zhailiansen@kuaishou.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ net/core/netclassid_cgroup.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 2a141db70c2e..56683afc650c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -191,11 +191,23 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
- 					     priv->systime_flags);
- 		write_unlock_irqrestore(&priv->ptp_lock, flags);
- 		break;
--	case PTP_CLK_REQ_EXTTS:
-+	case PTP_CLK_REQ_EXTTS: {
-+		u8 channel;
-+
- 		mutex_lock(&priv->aux_ts_lock);
- 		acr_value = readl(ptpaddr + PTP_ACR);
-+		channel = ilog2(FIELD_GET(PTP_ACR_MASK, acr_value));
- 		acr_value &= ~PTP_ACR_MASK;
-+
- 		if (on) {
-+			if (FIELD_GET(PTP_ACR_MASK, acr_value)) {
-+				netdev_err(priv->dev,
-+					   "Cannot enable auxiliary snapshot %d as auxiliary snapshot %d is already enabled",
-+					rq->extts.index, channel);
-+				mutex_unlock(&priv->aux_ts_lock);
-+				return -EBUSY;
-+			}
-+
- 			priv->plat->flags |= STMMAC_FLAG_EXT_SNAPSHOT_EN;
+diff --git a/net/core/netclassid_cgroup.c b/net/core/netclassid_cgroup.c
+index d6a70ae..d22f091 100644
+--- a/net/core/netclassid_cgroup.c
++++ b/net/core/netclassid_cgroup.c
+@@ -88,6 +88,12 @@ static void update_classid_task(struct task_struct *p, u32 classid)
+ 	};
+ 	unsigned int fd = 0;
  
- 			/* Enable External snapshot trigger */
-@@ -213,6 +225,7 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
- 					 !(acr_value & PTP_ACR_ATSFC),
- 					 10, 10000);
- 		break;
-+	}
- 
- 	default:
- 		break;
-
++	/* Only update the leader task, when many threads in this task,
++	 * so it can avoid the useless traversal.
++	 */
++	if (p != p->group_leader)
++		return;
++
+ 	do {
+ 		task_lock(p);
+ 		fd = iterate_fd(p->files, fd, update_classid_sock, &ctx);
 -- 
-2.39.2
+1.8.3.1
 
 
