@@ -1,121 +1,122 @@
-Return-Path: <netdev+bounces-40387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536A97C717C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:30:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B1E7C7197
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 861C01C21052
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:30:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B171C20FC2
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90BD2773A;
-	Thu, 12 Oct 2023 15:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B12C27ECA;
+	Thu, 12 Oct 2023 15:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNlqy8im"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dLW1QH4G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1BB224CF;
-	Thu, 12 Oct 2023 15:30:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F77C433C8;
-	Thu, 12 Oct 2023 15:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697124617;
-	bh=ZtcSIbjB2WpeZfQRyCvdpc+0MAvoSIsAVFQJFGWoAZY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sNlqy8imXhwlW5ogqsGatXLJh6x3ULy2dxsaSxs56ggFVkTV6XlGelwtvmknbj7Xu
-	 ShUCZ/8OXslZolbuuvyrBlxLrcJ01GSlmz7CSJEaxf3rAcgbPMbnfuFHufU09E90RW
-	 5ApYEGyJHTTls7cFvAibnKaw6QYJ/MgybICMj+V6qAR0vsGzNnF3N6loiEvhXeakbo
-	 Tc8RBxaMuLt9cw9IyN5cmf2yVbPk/7zrWOf/NIL+18Z146Hj24oQ+EZR236LNiKgxH
-	 rW8s1EpB9lyTQA3S/nGP0hy8u95XFa9UJYnNgK7IXnZV4NIWHKMv5YsKgXN/Jehq6j
-	 lkrAiKBqcY2gw==
-Received: (nullmailer pid 821925 invoked by uid 1000);
-	Thu, 12 Oct 2023 15:30:12 -0000
-Date: Thu, 12 Oct 2023 10:30:12 -0500
-From: Rob Herring <robh@kernel.org>
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, davem@davemloft.net, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, netdev@vger.kernel.org, linux-p
- .hy@lists.infradead.org, linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
- STM32MP15x boards
-Message-ID: <20231012153012.GA698406-robh@kernel.org>
-References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
- <20231010125719.784627-11-gatien.chevallier@foss.st.com>
- <20231010184212.GA1221641-robh@kernel.org>
- <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E759B27EC1
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:34:59 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E59DA
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 08:34:56 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-405524e6768so11827345e9.2
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 08:34:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1697124894; x=1697729694; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AlYbARuGOvayK2I8gPmBtlTVphiwdBhXgzXNKnIpdgQ=;
+        b=dLW1QH4GEbS/jBNDsbmYOlK/rKTpAsNIBuwxsxTRwtfus1bRVn42gzcGT/NXKTRcr7
+         his/elYT+j9sk4RTtLsIxv76EOrp6T+wJnsPVnCmhsCznjOnP+CQLCOPKBwClGvSSi7d
+         rLmUILReAbJ8dPushIZIb26vpaqX8StdpCOxquQ0r4qxim8ij5qu5sgBZ4iCYJPSbJud
+         BrBcRa5DHU575qBGqPqlooRYEa3i8BNfwaYboe71JNMGyIDmdIEt6ntF+mjJW45uupYB
+         XsKWGwWb1PAt0mSvz/STYgV7e7wj78zNMyCjUy9BSf/L1cx8v97RaKpwvWn4vmNWEYAO
+         J2mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697124894; x=1697729694;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AlYbARuGOvayK2I8gPmBtlTVphiwdBhXgzXNKnIpdgQ=;
+        b=icJk50ARlQwvgnzPK6fFZqm00DYxGhJPJ2eGGXi0BodLtOg/uoEErKRX5NSGCObbpv
+         UXOAEe8buODCz4qV8F5Nq0llmjThGQS6ZlfXeGJggNtcNseXzRptFzRwpKEJ5jArZwLM
+         kvv/dgZFe4wnTE5608fzI71eOkIBSdpN3L14iermYCXrDUexhqo6dz39EbSCn4nO/961
+         olky8RuFsTBkznu7w7qYQHbFzsxLd5FbujIWXB3sPuayE8x5nZy/kxmuPe9ElFthxbhd
+         y6LMIulzOHtp2i8YKxlkezGWP+2T0wbCYXOWmDchcHS1trbVGPa9WBFshD+cA9pswmPy
+         Ppww==
+X-Gm-Message-State: AOJu0YwCie+vKaNJImbJfHKOsoBvuLxF/JPRf5iUbNMrfwicycoY6m/X
+	fYKrs7Or5xSw0ppN1MOsFSt5+g==
+X-Google-Smtp-Source: AGHT+IGg2dDbelEwQ6AKXVaNt6xSv454CPd0Ugdfj//8oRMrxMj2ciXjjzeqOjOTyIL2fKUpCJJCrg==
+X-Received: by 2002:a1c:7917:0:b0:405:3d27:70e8 with SMTP id l23-20020a1c7917000000b004053d2770e8mr20865780wme.36.1697124894284;
+        Thu, 12 Oct 2023 08:34:54 -0700 (PDT)
+Received: from ?IPV6:2a05:6e02:1041:c10:c49e:e1a5:3210:b8c0? ([2a05:6e02:1041:c10:c49e:e1a5:3210:b8c0])
+        by smtp.googlemail.com with ESMTPSA id x3-20020a05600c21c300b004053a6b8c41sm135419wmj.12.2023.10.12.08.34.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Oct 2023 08:34:53 -0700 (PDT)
+Message-ID: <c8cf0994-be7f-4ed0-9e9e-a2f81fd9709a@linaro.org>
+Date: Thu, 12 Oct 2023 17:34:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] imx6q related DT binding fixes
+Content-Language: en-US
+To: Alexander Stein <alexander.stein@ew.tq-group.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, "Rafael J . Wysocki"
+ <rafael@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
+ Lukasz Luba <lukasz.luba@arm.com>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: Pengutronix Kernel Team <kernel@pengutronix.de>,
+ NXP Linux Team <linux-imx@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-pm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20231012080033.2715241-1-alexander.stein@ew.tq-group.com>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+In-Reply-To: <20231012080033.2715241-1-alexander.stein@ew.tq-group.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
-> Hi Rob,
+On 12/10/2023 10:00, Alexander Stein wrote:
+> Hi everyone,
 > 
-> On 10/10/23 20:42, Rob Herring wrote:
-> > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
-> > > ETZPC is a firewall controller. Put all peripherals filtered by the
-> > > ETZPC as ETZPC subnodes and reference ETZPC as an
-> > > access-control-provider.
-> > > 
-> > > For more information on which peripheral is securable or supports MCU
-> > > isolation, please read the STM32MP15 reference manual.
-> > > 
-> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> > > ---
-> > > 
-> > > Changes in V6:
-> > >      	- Renamed access-controller to access-controllers
-> > >      	- Removal of access-control-provider property
-> > > 
-> > > Changes in V5:
-> > >      	- Renamed feature-domain* to access-control*
-> > > 
-> > >   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
-> > >   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
-> > >   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
-> > >   3 files changed, 1450 insertions(+), 1377 deletions(-)
-> > 
-> > This is not reviewable. Change the indentation and any non-functional
-> > change in one patch and then actual changes in another.
+> while working on i.MX6Q based board (arch/arm/boot/dts/nxp/imx/imx6q-mba6a.dts)
+> I noticed several warnings on dtbs_check.
+> I'm also not sure whether thse patches warrent a Fixes tag, so I only added that
+> for patch 3. All of these patches are independent and can be picked up
+> individually.
 > 
-> Ok, I'll make it easier to read.
-> 
-> > 
-> > This is also an ABI break. Though I'm not sure it's avoidable. All the
-> > devices below the ETZPC node won't probe on existing kernel. A
-> > simple-bus fallback for ETZPC node should solve that.
-> > 
-> 
-> I had one issue when trying with a simple-bus fallback that was the
-> drivers were probing even though the access rights aren't correct.
-> Hence the removal of the simple-bus compatible in the STM32MP25 patch.
+> Patches already merged:
+> * 0268e1ae25949 ("dt-bindings: trivial-devices: Remove national,lm75")
+> * 57db57ae15a97 ("dt-bindings: display: fsl,imx6-hdmi: Change to 'unevaluatedProperties: false'")
+>    which deprecates v1 patch 3
 
-But it worked before, right? So the difference is you have either added 
-new devices which need setup or your firmware changed how devices are 
-setup (or not setup). Certainly can't fix the latter case. You just need 
-to be explicit about what you are doing to users.
+Applied, thanks
 
 
-> Even though a node is tagged with the OF_POPULATED flag when checking
-> the access rights with the firewall controller, it seems that when
-> simple-bus is probing, there's no check of this flag.
+-- 
+<http://www.linaro.org/> Linaro.org │ Open source software for ARM SoCs
 
-It shouldn't. Those flags are for creating the devices (or not) and 
-removing only devices of_platform_populate() created.
+Follow Linaro:  <http://www.facebook.com/pages/Linaro> Facebook |
+<http://twitter.com/#!/linaroorg> Twitter |
+<http://www.linaro.org/linaro-blog/> Blog
 
-> of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
-> Maybe that is my error and the firewall bus populate should set
-> OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
-
-Shrug. Off hand, I'd say probably not, but am not certain.
-
-Rob
 
