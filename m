@@ -1,151 +1,318 @@
-Return-Path: <netdev+bounces-40396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 113747C7332
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:39:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 886217C7373
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:50:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E97CC1C20AC3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:39:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A76928291E
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:50:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA95C262BB;
-	Thu, 12 Oct 2023 16:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CDC2AB39;
+	Thu, 12 Oct 2023 16:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BoKu7lrE"
+	dkim=pass (2048-bit key) header.d=qwilt.com header.i=@qwilt.com header.b="DpOfRLQ1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD2C20E5
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:39:26 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB89CA9;
-	Thu, 12 Oct 2023 09:39:23 -0700 (PDT)
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39CGd46D036926;
-	Thu, 12 Oct 2023 11:39:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697128744;
-	bh=8qGWk2MmoYlEABHB+jdRa8pwXPRY/VwhT1ctiVDXyao=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=BoKu7lrEik3wHsUbwCsTLP4bX3r3Hno9g5mdyv3kjTgcIZWUbSk1EgXKuA4yRxVMX
-	 lwjd0o6vk/QAl58BHsuyuG30U6VBDCOWEdVbUsCWARXzawx+5ProUGpBapM6L5xDcx
-	 58rv8/SsVpqeyo5l4vFm43Mdc+nl82ciOqTp1fR8=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39CGd4ws081254
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 12 Oct 2023 11:39:04 -0500
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 12
- Oct 2023 11:39:03 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 12 Oct 2023 11:39:03 -0500
-Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39CGcxOT025695;
-	Thu, 12 Oct 2023 11:39:00 -0500
-Message-ID: <2d524100-7e34-7869-5e90-415614b767f3@ti.com>
-Date: Thu, 12 Oct 2023 22:08:58 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BAC2941C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:50:10 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4EABE
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:50:08 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c50305c5c4so2695601fa.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:50:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=qwilt.com; s=google; t=1697129407; x=1697734207; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NP2UjWWtV+bar9uxE3gwBdXRn3lU2iUzZDR1msmDvF0=;
+        b=DpOfRLQ1H/8ncc26PW83hY1cu2Fb4PhZXdhHDkdDfU5UWFg3jaEZOcbwck0bdiKj/H
+         nBvR4kLvAioxuXwyG3f/hBnSXtopfl4gY014CA3Epl2n1IImpHKqYale1MSsXVcqUeVZ
+         O1eBpvjRC9oaTMgbwvwJx9BdQrM7Lj+2BMYjfvHhmfrVNQerzTOD/jTa4Cm7pxsP37MN
+         VFX6pyoudMU1BITGO6wtbmiF0uFEH6AGMapGW+tVu39I8KB3lz2okCMtsxCliouijI1J
+         WHmt8QLlu3817QxtvTpdOoMqI8fPBKtmpZ7hFkvfJToTrmA0bn5Of5NUGtAOLXb/PGGY
+         3Byg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697129407; x=1697734207;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NP2UjWWtV+bar9uxE3gwBdXRn3lU2iUzZDR1msmDvF0=;
+        b=K5NdEXKkU1c8Od/RSdOJ1MQbh+Sj/UwdrPSAPTkt9ynixuV1PI/hLn9to4dD+poLhu
+         5W4U/3/CdW7XSCGy9hHsgaBxOZPAdT9yWoAC9WYnF/AUqJXSqQy4knnRkMO5tUUNfr0N
+         v4cTR1fgqmhbUFIWv3uXGby61OIf/JXqdOcP2RByzotMiojeUw+2HOMtx17yIiIBkKBg
+         C7uA7ydmqHwa2fPSGp79U6N8j4wu98iYkAtipeF8B/ENNlPQU+FYEDcJJmJZq6/9UkHd
+         nFIPuGAhyckiziqYXtqsFjbc9KCiYSTSh4nxZlslLnd4YIAo4WTu0SX1Rfie13P+hXXs
+         lSew==
+X-Gm-Message-State: AOJu0YwBFv664WBwUBWx/RufWO7fKXIX9aoYeMpR7l5+F0ZgncMP4BEG
+	TkmBGUCjEr96qdlD0VKUwAmJVUjVUqQ7Frs2UlrSoQ==
+X-Google-Smtp-Source: AGHT+IH1kqcCr8vEjsL9UV641Y4IUh0WSt9qvlAJYJFFXT5x+nYtn7eZNGmsm2DU5bGeNlsvicAwub+uLhZXbc/y75M=
+X-Received: by 2002:a2e:9897:0:b0:2bd:c3d:1dd5 with SMTP id
+ b23-20020a2e9897000000b002bd0c3d1dd5mr22059142ljj.32.1697129406731; Thu, 12
+ Oct 2023 09:50:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
-To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
-CC: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>
-References: <20231011063700.1824093-1-danishanwar@ti.com>
- <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
- <7b5f195f-c5c8-6847-9458-3d5563cf0112@ti.com>
- <524856b3-6876-48d1-aebf-09f7f6c71f7b@lunn.ch>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <524856b3-6876-48d1-aebf-09f7f6c71f7b@lunn.ch>
+References: <CAAvCjhhxBHL63O4s4ufhU7-rptJgX1LM7zEDGeQ9zGP+9Am2kA@mail.gmail.com>
+ <20231011205428.81550-1-kuniyu@amazon.com> <CAAvCjhhEPd4MHNT9x5h_gpyphp3jB9MAnzbCDogiuRVGcqtdkQ@mail.gmail.com>
+In-Reply-To: <CAAvCjhhEPd4MHNT9x5h_gpyphp3jB9MAnzbCDogiuRVGcqtdkQ@mail.gmail.com>
+From: Dmitry Kravkov <dmitryk@qwilt.com>
+Date: Thu, 12 Oct 2023 19:49:54 +0300
+Message-ID: <CAAvCjhjOmDDbDCF9xAVifHEsQqJOFJ1whtzzKu-0+Um=Odm=NQ@mail.gmail.com>
+Subject: Re: kernel BUG at net/ipv4/tcp_output.c:2642 with kernel 5.19.0-rc2
+ and newer
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: edumazet@google.com, netdev@vger.kernel.org, slavas@qwilt.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 10/12/2023 8:58 PM, Andrew Lunn wrote:
-> On Thu, Oct 12, 2023 at 10:51:12AM +0530, MD Danish Anwar wrote:
->> Hi Andrew,
->>
->> On 11/10/23 18:11, Andrew Lunn wrote:
->>>> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
->>>>  			     base + icssg_all_stats[i].offset,
->>>>  			     val);
->>>>  
->>>> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
->>>> +			tx_pkt_cnt = val;
->>>
->>> Doing a strncmp seems very expensive. Could you make use of
->>> icssg_stats.offset?
->>>
->>
->> Sure. I can define the offset of these two stats and then use them in if
->> condition as below.
->>
->> #define ICSSG_TX_PACKET_OFFSET 0xA0
->> #define ICSSG_TX_BYTE_OFFSET   0xEC
->>
->> if (icssg_ethtool_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
->> 	tx_pkt_cnt = val;
->>
->> if (icssg_ethtool_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
->> 	emac->stats[i] -= tx_pkt_cnt * 8;
-> 
-> That is much better. Also consider adding something like:
-> 
-> BUILD_BUG_ON(ICSSG_TX_PACKET_OFFSET < ICSSG_TX_BYTE_OFFSET)
-> 
-> I've no idea if this is correct. Just something to prove at build time
-> that ICSSG_TX_PACKET_OFFSET is read before ICSSG_TX_BYTE_OFFSET.
-> 
+On Thu, Oct 12, 2023 at 12:19=E2=80=AFAM Dmitry Kravkov <dmitryk@qwilt.com>=
+ wrote:
+>
+> On Wed, Oct 11, 2023 at 11:54=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> >
+> > From: Dmitry Kravkov <dmitryk@qwilt.com>
+> > Date: Wed, 11 Oct 2023 23:20:10 +0300
+> > > On Wed, Oct 11, 2023 at 5:02=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Wed, Oct 11, 2023 at 12:28=E2=80=AFPM Dmitry Kravkov <dmitryk@qw=
+ilt.com> wrote:
+> > > > >
+> > > > > Hi,
+> > > > >
+> > > > > In our try to upgrade from 5.10 to 6.1 kernel we noticed stable c=
+rash
+> > > > > in kernel that bisected to this commit:
+> > > > >
+> > > > > commit 849b425cd091e1804af964b771761cfbefbafb43
+> > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > Date:   Tue Jun 14 10:17:34 2022 -0700
+> > > > >
+> > > > >     tcp: fix possible freeze in tx path under memory pressure
+> > > > >
+> > > > >     Blamed commit only dealt with applications issuing small writ=
+es.
+> > > > >
+> > > > >     Issue here is that we allow to force memory schedule for the =
+sk_buff
+> > > > >     allocation, but we have no guarantee that sendmsg() is able t=
+o
+> > > > >     copy some payload in it.
+> > > > >
+> > > > >     In this patch, I make sure the socket can use up to tcp_wmem[=
+0] bytes.
+> > > > >
+> > > > >     For example, if we consider tcp_wmem[0] =3D 4096 (default on =
+x86),
+> > > > >     and initial skb->truesize being 1280, tcp_sendmsg() is able t=
+o
+> > > > >     copy up to 2816 bytes under memory pressure.
+> > > > >
+> > > > >     Before this patch a sendmsg() sending more than 2816 bytes
+> > > > >     would either block forever (if persistent memory pressure),
+> > > > >     or return -EAGAIN.
+> > > > >
+> > > > >     For bigger MTU networks, it is advised to increase tcp_wmem[0=
+]
+> > > > >     to avoid sending too small packets.
+> > > > >
+> > > > >     v2: deal with zero copy paths.
+> > > > >
+> > > > >     Fixes: 8e4d980ac215 ("tcp: fix behavior for epoll edge trigge=
+r")
+> > > > >     Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > >     Acked-by: Soheil Hassas Yeganeh <soheil@google.com>
+> > > > >     Reviewed-by: Wei Wang <weiwan@google.com>
+> > > > >     Reviewed-by: Shakeel Butt <shakeelb@google.com>
+> > > > >     Signed-off-by: David S. Miller <davem@davemloft.net>
+> > > > >
+> > > > > This happens in a pretty stressful situation when two 100Gb (E810=
+ or
+> > > > > ConnectX6) ports transmit above 150Gbps that most of the data is =
+read
+> > > > > from disks. So it appears that the system is constantly in a memo=
+ry
+> > > > > deficit. Apparently reverting the patch in 6.1.38 kernel eliminat=
+es
+> > > > > the crash and system appears stable at delivering 180Gbps
+> > > > >
+> > > > > [ 2445.532318] ------------[ cut here ]------------
+> > > > > [ 2445.532323] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > [ 2445.532334] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > [ 2445.550934] CPU: 61 PID: 109767 Comm: nginx Tainted: G S      =
+   OE
+> >
+> > It seems 3rd party module is loaded.
+> >
+> > Just curious if it is possible to reproduce the issue without
+> > out-of-tree modules.
+> Not sure if ice driver is mature enough there. We will give it a try. Tha=
+nks
 
-These registers are defined sequentially in the structure
-miig_stats_regs. The offset for rx_packets is 0x0, rx_broadcast_frames
-is 0x4 and so on. Basically the offset for i'th stat is i * sizeof(u32).
+Happens on not-tained kernel too (we went for 6.1.38 to have more mature ic=
+e)
 
-In the structure, tx_packet is defined first (index 40, offset 0xA0) and
-then tx_bytes is defined (index 59, offset 0xEC).
+[ 1057.099780] ------------[ cut here ]------------
+[ 1057.100389] RSP: 0018:ffffaa4e10093df0 EFLAGS: 00010286
+[ 1057.101060] kernel BUG at net/ipv4/tcp_output.c:2645!
+[ 1057.122021] RAX: 00000000ffff4000 RBX: ffff8ccad77e3540 RCX: 00000000000=
+00000
+[ 1057.122025] RDX: 0000000000000000 RSI: 00000000ffff4000 RDI: ffff8ccad77=
+e3540
+[ 1057.122027] RBP: ffff8ccad77e3480 R08: ffff8ccad77e35d4 R09: 00000000804=
+00013
+[ 1057.122029] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8ccad77=
+e3480
+[ 1057.122031] R13: 7fffffffffffff00 R14: ffff8ccad77e3698 R15: 00000000000=
+00000
+[ 1057.122033] FS:  00007fd600d42840(0000) GS:ffff8ce1ffac0000(0000)
+knlGS:0000000000000000
+[ 1057.122035] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1057.122038] CR2: 00007fd57dacdc80 CR3: 00000041dda7a005 CR4: 00000000007=
+70ee0
+[ 1057.122041] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[ 1057.122042] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[ 1057.122044] PKRU: 55555554
+[ 1057.122046] Call Trace:
+[ 1057.122880] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[ 1057.123683]  <TASK>
+[ 1057.124409] CPU: 112 PID: 51072 Comm: nginx Not tainted 6.1.38 #27
+[ 1057.125125]  ? show_trace_log_lvl+0x1c4/0x2df
+[ 1057.125812] Hardware name: Cisco Systems Inc
+UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
+11/21/2021
+[ 1057.125815] RIP: 0010:tcp_write_xmit+0x70f/0x830
+[ 1057.126559]  ? show_trace_log_lvl+0x1c4/0x2df
 
-In emac_update_hardware_stats() all these registers are read
-sequentially. Meaning first tx_packet register is read and then tx_byte.
 
-emac_update_hardware_stats() is called every 25s (by workqueue). Every
-time first tx_packet is read and then tx_byte. So every time we are
-decrementing tx_bytes by 8 bytes * num of packets, the num of packets
-always exists and it is read before doing this calculation.
 
-So I don't think any check is required to make sure
-ICSSG_TX_PACKET_OFFSET is read before ICSSG_TX_BYTE_OFFSET.
+> >
+> >
+> > > > >     5.19.0-rc2+ #21
+> > > > > [ 2445.560127] ------------[ cut here ]------------
+> > > > > [ 2445.560565] Hardware name: Cisco Systems Inc
+> > > > > UCSC-C220-M6N/UCSC-C220-M6N, BIOS C220M6.4.2.1g.0.1121212157
+> > > > > 11/21/2021
+> > > > > [ 2445.560571] RIP: 0010:tcp_write_xmit+0x70b/0x830
+> > > > > [ 2445.561221] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > [ 2445.561821] Code: 84 0b fc ff ff 0f b7 43 32 41 39 c6 0f 84 fe=
+ fb
+> > > > > ff ff 8b 43 70 41 39 c6 0f 82 ff 00 00 00 c7 43 30 01 00 00 00 e9=
+ e6
+> > > > > fb ff ff <0f> 0b 8b 74 24 20 8b 85 dc 05 00 00 44 89 ea 01 c8 2b =
+43 28
+> > > > > 41 39
+> > > > > [ 2445.561828] RSP: 0000:ffffc110ed647dc0 EFLAGS: 00010246
+> > > > > [ 2445.561832] RAX: 0000000000000000 RBX: ffff9fe1f8081a00 RCX: 0=
+0000000000005a8
+> > > > > [ 2445.561833] RDX: 000000000000043a RSI: 000002389172f8f4 RDI: 0=
+00000000000febf
+> > > > > [ 2445.561835] RBP: ffff9fe5f864e900 R08: 0000000000000000 R09: 0=
+000000000000100
+> > > > > [ 2445.561836] R10: ffffffff9be060d0 R11: 000000000000000e R12: f=
+fff9fe5f864e901
+> > > > > [ 2445.561837] R13: 0000000000000001 R14: 00000000000005a8 R15: 0=
+000000000000000
+> > > > > [ 2445.561839] FS:  00007f342530c840(0000) GS:ffff9ffa7f940000(00=
+00)
+> > > > > knlGS:0000000000000000
+> > > > > [ 2445.561842] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > [ 2445.561844] CR2: 00007f20ca4ed830 CR3: 00000045d976e005 CR4: 0=
+000000000770ee0
+> > > > > [ 2445.561846] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0=
+000000000000000
+> > > > > [ 2445.561847] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0=
+000000000000400
+> > > > > [ 2445.561849] PKRU: 55555554
+> > > > > [ 2445.561853] Call Trace:
+> > > > > [ 2445.561858]  <TASK>
+> > > > > [ 2445.564202] ------------[ cut here ]------------
+> > > > > [ 2445.568007]  ? tcp_tasklet_func+0x120/0x120
+> > > > > [ 2445.569107] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > [ 2445.569608]  tcp_tsq_handler+0x7c/0xa0
+> > > > > [ 2445.569627]  tcp_pace_kick+0x19/0x60
+> > > > > [ 2445.569632]  __run_hrtimer+0x5c/0x1d0
+> > > > > [ 2445.572264] ------------[ cut here ]------------
+> > > > > [ 2445.574287] ------------[ cut here ]------------
+> > > > > [ 2445.574292] kernel BUG at net/ipv4/tcp_output.c:2642!
+> > > > > [ 2445.582581]  __hrtimer_run_queues+0x7d/0xe0
+> > > > > --
+> > > > > --
+> > > > >
+> > > > > --
+> > > > > --
+> > > > >
+> > > > > Dmitry Kravkov     Software  Engineer
+> > > > > Qwilt | Mobile: +972-54-4839923 | dmitryk@qwilt.com
+> > > >
+> > > > Hi Dmitry, thanks for the report.
+> > > >
+> > > > Can you post content of /proc/sys/net/ipv4/tcp_wmem and
+> > > > /proc/sys/net/ipv4/tcp_rmem ?
+> > > Thank you, Eric
+> > >
+> > > # cat /proc/sys/net/ipv4/tcp_wmem
+> > > 786432 1048576 6291456
+> > > # cat /proc/sys/net/ipv4/tcp_rmem
+> > > 4096 87380 6291456
+> > >
+> > > >
+> > > > Are you using memcg ?
+> > > No
+> > > >
+> > > > Can you try the following patch ?
+> > > >
+> > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > index 3f66cdeef7decb5b5d2b84212c623781b8ce63db..d74b197e02e94aa2f03=
+2f2c3971969e604abc7de
+> > > > 100644
+> > > > --- a/net/ipv4/tcp.c
+> > > > +++ b/net/ipv4/tcp.c
+> > > > @@ -1286,6 +1286,7 @@ int tcp_sendmsg_locked(struct sock *sk, struc=
+t
+> > > > msghdr *msg, size_t size)
+> > > >                 continue;
+> > > >
+> > > >  wait_for_space:
+> > > > +               tcp_remove_empty_skb(sk);
+> > > >                 set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
+> > > >                 if (copied)
+> > > >                         tcp_push(sk, flags & ~MSG_MORE, mss_now,
+> > >
+> > >
+> > > The patched kernel crashed in the same manner:
+> > > [ 2214.154278] kernel BUG at net/ipv4/tcp_output.c:2642!
+> >
+>
+>
+> --
+> --
+>
+> Dmitry Kravkov     Software  Engineer
+> Qwilt | Mobile: +972-54-4839923 | dmitryk@qwilt.com
 
-The hardware design is such a way that these registers are read in a
-sequence and the same sequence is followed in driver (struct
-miig_stats_regs)
 
->      Andrew
 
--- 
-Thanks and Regards,
-Md Danish Anwar
+--=20
+--
+
+Dmitry Kravkov     Software  Engineer
+Qwilt | Mobile: +972-54-4839923 | dmitryk@qwilt.com
 
