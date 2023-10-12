@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-40213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555287C61EC
+	by mail.lfdr.de (Postfix) with ESMTPS id BF85F7C61EE
 	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 02:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEE9A2825B5
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2261B282905
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 00:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EBF62A;
-	Thu, 12 Oct 2023 00:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1597F4;
+	Thu, 12 Oct 2023 00:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KsX/29bm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VE5CUTDP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63E97EF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264C663D
 	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:40:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63D09C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83BDBC433CD;
 	Thu, 12 Oct 2023 00:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697071229;
-	bh=+Fxb+04u3GAnCvCgh89ui4EBZeVR68FztV6uRPFXUAQ=;
+	bh=wGHJyiALp3GFYTvWaoHxyso+f2Vuj4QGs+ejJHlDf/k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KsX/29bmwMFICi8khbKLftRHGvH5EipJ5qr1Sa7HM5QxZ6JuHtLxYwzFczojBhur4
-	 ochjAUw4n6nOoSuLtm62ZqMVSfHgY9KARuo4+ltgwBbZwyBNRQAtagsk2XOHPAk+A0
-	 9yOpgqwsQXLEgBKbZMPUK1qTN0D2qHLQCD6oZIhtUlxrzhz/pKcobT9HMmYjoWi2S1
-	 aDiYiCqrTbC+C4w/eV5nr8XvNog8NXasEy5J0+r6lbKvEj4TArrpm+YhyUj/V6RA3b
-	 ULAMMp/YIW+orwFScF1QNwLzLeIXZpkFez+ZPtGgy0l0elLUIehCUx+B7szvQ5v7KQ
-	 W8w+/QixHl+MQ==
+	b=VE5CUTDPsvYyqkldEDqOEXMVmFtYsTPZSIVSOrPhdqUiu+qC0gTSFu6e4mo37ejhQ
+	 /nJHSRLR/5Uq37Vk7V8G+nOXlNvk8vH6E7h/jFJuVqHPRQONGS0TzuyWGyPhojUAH7
+	 Y4urAQ4NY7DQHqZIv7DL90hwQTF8/SrBLn8tcK2EKIaO4+tESHK8SoJsiMlOStfslk
+	 O/7RUIjozO0FXUzHR0diff2R+Z5LRSigjR9sS4lydG4rj6L1lOXawWzS/iyDrc3/8u
+	 ubZ2+bqVueHFdmEqJE9Vi1b+9kyKU6EIaNcULLSEz66GZICCGoNPjSU3dE+Xj/HwlZ
+	 8gXY0TDIzUzzA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5093AC595C4;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5A538E21ED9;
 	Thu, 12 Oct 2023 00:40:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,53 +43,72 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/8] netfilter: nf_tables: Always allocate
- nft_rule_dump_ctx
+Subject: Re: [net-next v3 1/5] netdev: replace simple
+ napi_schedule_prep/__napi_schedule to napi_schedule
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169707122932.23011.16635889161175071072.git-patchwork-notify@kernel.org>
+ <169707122936.23011.6924255297609142862.git-patchwork-notify@kernel.org>
 Date: Thu, 12 Oct 2023 00:40:29 +0000
-References: <20231010145343.12551-2-fw@strlen.de>
-In-Reply-To: <20231010145343.12551-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- phil@nwl.cc, pablo@netfilter.org
+References: <20231009133754.9834-1-ansuelsmth@gmail.com>
+In-Reply-To: <20231009133754.9834-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: jgg@ziepe.ca, leon@kernel.org, wg@grandegger.com, mkl@pengutronix.de,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ chris.snook@gmail.com, rajur@chelsio.com, jeroendb@google.com,
+ pkaligineedi@google.com, shailend@google.com, dougmill@linux.ibm.com,
+ nnac123@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu, haren@linux.ibm.com, ricklind@linux.ibm.com,
+ danymadden@us.ibm.com, tlfalcon@linux.ibm.com, tariqt@nvidia.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, khalasa@piap.pl, kvalo@kernel.org,
+ quic_jjohnson@quicinc.com, gregory.greenman@intel.com,
+ chandrashekar.devegowda@intel.com, linuxwwan@intel.com,
+ chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+ m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
+ loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
+ ruc_gongyuanjun@163.com, elder@linaro.org, bhupesh.sharma@linaro.org,
+ horms@kernel.org, robh@kernel.org, bcf@google.com, junfeng.guo@intel.com,
+ gustavoars@kernel.org, ziweixiao@google.com, rushilg@google.com,
+ tglx@linutronix.de, u.kleine-koenig@pengutronix.de,
+ krzysztof.kozlowski@linaro.org, YKarpov@ispras.ru, andrew@lunn.ch,
+ zhengzengkai@huawei.com, set_pte_at@outlook.com,
+ pagadala.yesu.anjaneyulu@intel.com, benjamin.berg@intel.com,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Oct 2023 16:53:31 +0200 you wrote:
-> From: Phil Sutter <phil@nwl.cc>
+On Mon,  9 Oct 2023 15:37:50 +0200 you wrote:
+> Replace drivers that still use napi_schedule_prep/__napi_schedule
+> with napi_schedule helper as it does the same exact check and call.
 > 
-> It will move into struct netlink_callback's scratch area later, just put
-> nf_tables_dump_rules_start in shape to reduce churn later.
-> 
-> Suggested-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> Signed-off-by: Phil Sutter <phil@nwl.cc>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> ---
+> Changes v3:
+> - Add Reviewed-by tag
+> Changes v2:
+> - Add missing semicolon
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/8] netfilter: nf_tables: Always allocate nft_rule_dump_ctx
-    https://git.kernel.org/netdev/net-next/c/afed2b54c540
-  - [net-next,2/8] netfilter: nf_tables: Drop pointless memset when dumping rules
-    https://git.kernel.org/netdev/net-next/c/30fa41a0f6df
-  - [net-next,3/8] netfilter: nf_tables: Carry reset flag in nft_rule_dump_ctx
-    https://git.kernel.org/netdev/net-next/c/405c8fd62d61
-  - [net-next,4/8] netfilter: nf_tables: Carry s_idx in nft_rule_dump_ctx
-    https://git.kernel.org/netdev/net-next/c/8194d599bc01
-  - [net-next,5/8] netfilter: nf_tables: Don't allocate nft_rule_dump_ctx
-    https://git.kernel.org/netdev/net-next/c/99ab9f84b85e
-  - [net-next,6/8] netfilter: conntrack: simplify nf_conntrack_alter_reply
-    https://git.kernel.org/netdev/net-next/c/8a23f4ab92f9
-  - [net-next,7/8] netfilter: conntrack: prefer tcp_error_log to pr_debug
-    https://git.kernel.org/netdev/net-next/c/6ac9c51eebe8
-  - [net-next,8/8] netfilter: cleanup struct nft_table
-    https://git.kernel.org/netdev/net-next/c/94ecde833be5
+  - [net-next,v3,1/5] netdev: replace simple napi_schedule_prep/__napi_schedule to napi_schedule
+    https://git.kernel.org/netdev/net-next/c/ef724517b596
+  - [net-next,v3,2/5] netdev: make napi_schedule return bool on NAPI successful schedule
+    https://git.kernel.org/netdev/net-next/c/0a779003213b
+  - [net-next,v3,3/5] netdev: replace napi_reschedule with napi_schedule
+    https://git.kernel.org/netdev/net-next/c/73382e919f3d
+  - [net-next,v3,4/5] net: tc35815: rework network interface interrupt logic
+    https://git.kernel.org/netdev/net-next/c/be176234d0a8
+  - [net-next,v3,5/5] netdev: use napi_schedule bool instead of napi_schedule_prep/__napi_schedule
+    https://git.kernel.org/netdev/net-next/c/d1fea38f01ac
 
 You are awesome, thank you!
 -- 
