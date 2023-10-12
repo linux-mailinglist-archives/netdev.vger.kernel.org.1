@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-40294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 685547C68EF
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:02:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859B37C68EE
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:02:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D92F1C21146
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:02:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 885CE282C1D
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E2B2110D;
-	Thu, 12 Oct 2023 09:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF936210F0;
+	Thu, 12 Oct 2023 09:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD9520B38
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186EA20B0C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:02:42 +0000 (UTC)
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF48B111
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:02:38 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBA0D6
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:02:41 -0700 (PDT)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraM-0000CI-Lt; Thu, 12 Oct 2023 11:02:26 +0200
+	id 1qqraM-0000CK-Lr; Thu, 12 Oct 2023 11:02:26 +0200
 Received: from [2a0a:edc0:0:1101:1d::39] (helo=dude03.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqraK-0016dK-Vp; Thu, 12 Oct 2023 11:02:25 +0200
+	id 1qqraL-0016dL-0V; Thu, 12 Oct 2023 11:02:25 +0200
 Received: from localhost ([::1] helo=dude03.red.stw.pengutronix.de)
 	by dude03.red.stw.pengutronix.de with esmtp (Exim 4.96)
 	(envelope-from <j.zink@pengutronix.de>)
-	id 1qqral-00FyMl-1K;
+	id 1qqral-00FyMl-1M;
 	Thu, 12 Oct 2023 11:02:24 +0200
 From: Johannes Zink <j.zink@pengutronix.de>
-Date: Thu, 12 Oct 2023 11:02:13 +0200
-Subject: [PATCH net-next 2/5] net: stmmac: fix PPS capture input index
+Date: Thu, 12 Oct 2023 11:02:14 +0200
+Subject: [PATCH net-next 3/5] net: stmmac: intel: remove unnecessary field
+ struct plat_stmmacenet_data::ext_snapshot_num
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,7 +49,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v1-2-3eeca9e844fa@pengutronix.de>
+Message-Id: <20231010-stmmac_fix_auxiliary_event_capture-v1-3-3eeca9e844fa@pengutronix.de>
 References: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
 In-Reply-To: <20231010-stmmac_fix_auxiliary_event_capture-v1-0-3eeca9e844fa@pengutronix.de>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
@@ -72,54 +73,41 @@ X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The stmmac supports up to 4 auxiliary snapshots that can be enabled by
-setting the appropriate bits in the PTP_ACR bitfield.
+Do not store bitmask for enabling AUX_SNAPSHOT0. The previous commit
+("net: stmmac: fix PPS capture input index") takes care of calculating
+the proper bit mask from the request data's extts.index field, which is
+0 if not explicitly specified otherwise.
 
-Previously instead of setting the bits, a fixed value was written to
-this bitfield instead of passing the appropriate bitmask.
-
-Now the correct bit is set according to the ptp_clock_request.extts_index
-passed as a parameter to stmmac_enable().
-
-Fixes: f4da56529da6 ("net: stmmac: Add support for external trigger timestamping")
 Signed-off-by: Johannes Zink <j.zink@pengutronix.de>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 5 ++---
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h | 2 +-
- 2 files changed, 3 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 1 -
+ include/linux/stmmac.h                            | 1 -
+ 2 files changed, 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 29569188b30c..60e3d3ff42f3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -201,12 +201,11 @@ static int stmmac_enable(struct ptp_clock_info *ptp,
- 		acr_value &= ~PTP_ACR_MASK;
- 		if (on) {
- 			/* Enable External snapshot trigger */
--			acr_value |= priv->plat->ext_snapshot_num;
-+			acr_value |= PTP_ACR_ATSEN(rq->extts.index);
- 			acr_value |= PTP_ACR_ATSFC;
- 		}
- 		netdev_dbg(priv->dev, "Auxiliary Snapshot %d %s.\n",
--			   priv->plat->ext_snapshot_num >> PTP_ACR_ATSEN_SHIFT,
--			   on ? "enabled" : "disabled");
-+			   rq->extts.index, on ? "enabled" : "disabled");
- 		writel(acr_value, ptpaddr + PTP_ACR);
- 		mutex_unlock(&priv->aux_ts_lock);
- 		/* wait for auxts fifo clear to finish */
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-index d1fe4b46f162..fce3fba2ffd2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.h
-@@ -79,7 +79,7 @@
- #define	PTP_ACR_ATSEN1		BIT(5)	/* Auxiliary Snapshot 1 Enable */
- #define	PTP_ACR_ATSEN2		BIT(6)	/* Auxiliary Snapshot 2 Enable */
- #define	PTP_ACR_ATSEN3		BIT(7)	/* Auxiliary Snapshot 3 Enable */
--#define	PTP_ACR_ATSEN_SHIFT	5	/* Auxiliary Snapshot shift */
-+#define	PTP_ACR_ATSEN(index)	(PTP_ACR_ATSEN0 << (index))
- #define	PTP_ACR_MASK		GENMASK(7, 4)	/* Aux Snapshot Mask */
- #define	PMC_ART_VALUE0		0x01	/* PMC_ART[15:0] timer value */
- #define	PMC_ART_VALUE1		0x02	/* PMC_ART[31:16] timer value */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index a3a249c63598..60283543ffc8 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -605,7 +605,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	plat->mdio_bus_data->phy_mask |= 1 << INTEL_MGBE_XPCS_ADDR;
+ 
+ 	plat->int_snapshot_num = AUX_SNAPSHOT1;
+-	plat->ext_snapshot_num = AUX_SNAPSHOT0;
+ 
+ 	plat->crosststamp = intel_crosststamp;
+ 	plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index c0079a7574ae..0b4658a7eceb 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -303,7 +303,6 @@ struct plat_stmmacenet_data {
+ 	unsigned int eee_usecs_rate;
+ 	struct pci_dev *pdev;
+ 	int int_snapshot_num;
+-	int ext_snapshot_num;
+ 	int msi_mac_vec;
+ 	int msi_wol_vec;
+ 	int msi_lpi_vec;
 
 -- 
 2.39.2
