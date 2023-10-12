@@ -1,53 +1,51 @@
-Return-Path: <netdev+bounces-40386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E75F7C7169
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:28:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 536A97C717C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EE911C20AC3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 861C01C21052
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 15:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A7A273D9;
-	Thu, 12 Oct 2023 15:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90BD2773A;
+	Thu, 12 Oct 2023 15:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QiGAjHtD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNlqy8im"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A23224CF
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:28:34 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4ECBE;
-	Thu, 12 Oct 2023 08:28:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LtxAnAjUqRhHfJGOc405Qbe6cZQPQAf92M0E/m+mSns=; b=QiGAjHtDTnv4+anA8SuXlkh7jk
-	NIfxlHDjYt/UXj7RN33ePAKEzZtnZI0fJcB0srWzakaHsSNSIcL3sf5KPxe+kKWAK4xpc8c6eT4zc
-	H1MI+GTILX9PxysGH6pHmH39RHzeXDS0qVWhByuo44rRXgcCj/2fvPwmcucM4/WQwtmA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qqxbv-001xOP-DJ; Thu, 12 Oct 2023 17:28:27 +0200
-Date: Thu, 12 Oct 2023 17:28:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>, r-gunasekaran@ti.com,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
-Message-ID: <524856b3-6876-48d1-aebf-09f7f6c71f7b@lunn.ch>
-References: <20231011063700.1824093-1-danishanwar@ti.com>
- <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
- <7b5f195f-c5c8-6847-9458-3d5563cf0112@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1BB224CF;
+	Thu, 12 Oct 2023 15:30:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F77C433C8;
+	Thu, 12 Oct 2023 15:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697124617;
+	bh=ZtcSIbjB2WpeZfQRyCvdpc+0MAvoSIsAVFQJFGWoAZY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sNlqy8imXhwlW5ogqsGatXLJh6x3ULy2dxsaSxs56ggFVkTV6XlGelwtvmknbj7Xu
+	 ShUCZ/8OXslZolbuuvyrBlxLrcJ01GSlmz7CSJEaxf3rAcgbPMbnfuFHufU09E90RW
+	 5ApYEGyJHTTls7cFvAibnKaw6QYJ/MgybICMj+V6qAR0vsGzNnF3N6loiEvhXeakbo
+	 Tc8RBxaMuLt9cw9IyN5cmf2yVbPk/7zrWOf/NIL+18Z146Hj24oQ+EZR236LNiKgxH
+	 rW8s1EpB9lyTQA3S/nGP0hy8u95XFa9UJYnNgK7IXnZV4NIWHKMv5YsKgXN/Jehq6j
+	 lkrAiKBqcY2gw==
+Received: (nullmailer pid 821925 invoked by uid 1000);
+	Thu, 12 Oct 2023 15:30:12 -0000
+Date: Thu, 12 Oct 2023 10:30:12 -0500
+From: Rob Herring <robh@kernel.org>
+To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, davem@davemloft.net, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, netdev@vger.kernel.org, linux-p
+ .hy@lists.infradead.org, linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH v6 10/11] ARM: dts: stm32: add ETZPC as a system bus for
+ STM32MP15x boards
+Message-ID: <20231012153012.GA698406-robh@kernel.org>
+References: <20231010125719.784627-1-gatien.chevallier@foss.st.com>
+ <20231010125719.784627-11-gatien.chevallier@foss.st.com>
+ <20231010184212.GA1221641-robh@kernel.org>
+ <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,46 +54,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7b5f195f-c5c8-6847-9458-3d5563cf0112@ti.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <8f1b6915-68be-a525-c5d5-37f0983c14de@foss.st.com>
 
-On Thu, Oct 12, 2023 at 10:51:12AM +0530, MD Danish Anwar wrote:
-> Hi Andrew,
+On Wed, Oct 11, 2023 at 10:49:58AM +0200, Gatien CHEVALLIER wrote:
+> Hi Rob,
 > 
-> On 11/10/23 18:11, Andrew Lunn wrote:
-> >> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
-> >>  			     base + icssg_all_stats[i].offset,
-> >>  			     val);
-> >>  
-> >> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
-> >> +			tx_pkt_cnt = val;
+> On 10/10/23 20:42, Rob Herring wrote:
+> > On Tue, Oct 10, 2023 at 02:57:18PM +0200, Gatien Chevallier wrote:
+> > > ETZPC is a firewall controller. Put all peripherals filtered by the
+> > > ETZPC as ETZPC subnodes and reference ETZPC as an
+> > > access-control-provider.
+> > > 
+> > > For more information on which peripheral is securable or supports MCU
+> > > isolation, please read the STM32MP15 reference manual.
+> > > 
+> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> > > ---
+> > > 
+> > > Changes in V6:
+> > >      	- Renamed access-controller to access-controllers
+> > >      	- Removal of access-control-provider property
+> > > 
+> > > Changes in V5:
+> > >      	- Renamed feature-domain* to access-control*
+> > > 
+> > >   arch/arm/boot/dts/st/stm32mp151.dtsi  | 2756 +++++++++++++------------
+> > >   arch/arm/boot/dts/st/stm32mp153.dtsi  |   52 +-
+> > >   arch/arm/boot/dts/st/stm32mp15xc.dtsi |   19 +-
+> > >   3 files changed, 1450 insertions(+), 1377 deletions(-)
 > > 
-> > Doing a strncmp seems very expensive. Could you make use of
-> > icssg_stats.offset?
+> > This is not reviewable. Change the indentation and any non-functional
+> > change in one patch and then actual changes in another.
+> 
+> Ok, I'll make it easier to read.
+> 
+> > 
+> > This is also an ABI break. Though I'm not sure it's avoidable. All the
+> > devices below the ETZPC node won't probe on existing kernel. A
+> > simple-bus fallback for ETZPC node should solve that.
 > > 
 > 
-> Sure. I can define the offset of these two stats and then use them in if
-> condition as below.
-> 
-> #define ICSSG_TX_PACKET_OFFSET 0xA0
-> #define ICSSG_TX_BYTE_OFFSET   0xEC
-> 
-> if (icssg_ethtool_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
-> 	tx_pkt_cnt = val;
-> 
-> if (icssg_ethtool_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
-> 	emac->stats[i] -= tx_pkt_cnt * 8;
+> I had one issue when trying with a simple-bus fallback that was the
+> drivers were probing even though the access rights aren't correct.
+> Hence the removal of the simple-bus compatible in the STM32MP25 patch.
 
-That is much better. Also consider adding something like:
+But it worked before, right? So the difference is you have either added 
+new devices which need setup or your firmware changed how devices are 
+setup (or not setup). Certainly can't fix the latter case. You just need 
+to be explicit about what you are doing to users.
 
-BUILD_BUG_ON(ICSSG_TX_PACKET_OFFSET < ICSSG_TX_BYTE_OFFSET)
 
-I've no idea if this is correct. Just something to prove at build time
-that ICSSG_TX_PACKET_OFFSET is read before ICSSG_TX_BYTE_OFFSET.
+> Even though a node is tagged with the OF_POPULATED flag when checking
+> the access rights with the firewall controller, it seems that when
+> simple-bus is probing, there's no check of this flag.
 
-     Andrew
+It shouldn't. Those flags are for creating the devices (or not) and 
+removing only devices of_platform_populate() created.
+
+> of_platform_populate() checks and sets the OF_POPULATED_BUS flag.
+> Maybe that is my error and the firewall bus populate should set
+> OF_POPULATED_BUS instead of OF_POPULATED. Is that correct?
+
+Shrug. Off hand, I'd say probably not, but am not certain.
+
+Rob
 
