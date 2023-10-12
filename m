@@ -1,234 +1,196 @@
-Return-Path: <netdev+bounces-40339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB147C6CA1
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:45:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A26B7C6C8C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:40:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E614028272B
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:45:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EF4E1C20AC3
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1756D2421F;
-	Thu, 12 Oct 2023 11:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD0324217;
+	Thu, 12 Oct 2023 11:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mYQSWdfF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460F9249EB;
-	Thu, 12 Oct 2023 11:45:25 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A1A94;
-	Thu, 12 Oct 2023 04:45:22 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vu-YBhg_1697111118;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vu-YBhg_1697111118)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Oct 2023 19:45:19 +0800
-Message-ID: <1697110565.721146-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 01/22] virtio_ring: virtqueue_set_dma_premapped support disable
-Date: Thu, 12 Oct 2023 19:36:05 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
- <20231011092728.105904-2-xuanzhuo@linux.alibaba.com>
- <20231012051416-mutt-send-email-mst@kernel.org>
- <1697102334.7060938-2-xuanzhuo@linux.alibaba.com>
- <20231012053812-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231012053812-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E91FDF71
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:40:08 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D191D94;
+	Thu, 12 Oct 2023 04:40:06 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CBWcGi021017;
+	Thu, 12 Oct 2023 11:39:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=KRRc0CLfwbsoimO3IEq2LdfPo0KBY1KcHZ90MPhU3Zs=;
+ b=mYQSWdfFNrCQcmC9h+WHUuF4dB6hCwMZFzvuTbseUquG+dAP2eON/wGtBRo/S3+nxFbi
+ 6ClX4/Wd9a9DjCoZd+YtKjI3d4rIPHfVEHm9wWmYldx3aknBlNtz6LvI9+4FtjNrvIr0
+ 9nT+Qrcf81wAP6e/1hUpJxSXQH3ARdqGtdzHODXr94gouTyqbly1/fw969xZXDXJ7kUV
+ /v2F9VZVfcza2Ln0Ak87Nk6He2VASjJWD3QQC5qhCYe/WT0B+GNYmCn6aq1X4f2kAPFw
+ t4LbKtUQuUL6zPdDyNoS2kPBc94ato30hAFj/ZhvDMe0O+BNfeIjn68D4etMb7UjqSL8 zQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpg1005u7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 11:39:56 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CBXDnk025196;
+	Thu, 12 Oct 2023 11:39:55 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpg1005tt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 11:39:55 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CBO55h001147;
+	Thu, 12 Oct 2023 11:39:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk6rw8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Oct 2023 11:39:54 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CBdpnD3670758
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Oct 2023 11:39:51 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5668520040;
+	Thu, 12 Oct 2023 11:39:51 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 38A972004B;
+	Thu, 12 Oct 2023 11:39:50 +0000 (GMT)
+Received: from [9.171.78.5] (unknown [9.171.78.5])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 12 Oct 2023 11:39:50 +0000 (GMT)
+Message-ID: <ead14a91ffaec7b9e818edf735dbc18510d7915e.camel@linux.ibm.com>
+Subject: Re: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
+ mask is set
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Shay Drory
+ <shayd@nvidia.com>,
+        Moshe Shemesh <moshe@nvidia.com>, Heiko Carstens
+ <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jacob Keller
+ <jacob.e.keller@intel.com>
+Date: Thu, 12 Oct 2023 13:39:49 +0200
+In-Reply-To: <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
+References: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
+	 <ZSbnUlJT1u3xUIqY@x130> <ZSbvxeLKS8zHltdg@x130>
+	 <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7irmok6IoAPkFE5HGoyWPJ6omQ6CrC4W
+X-Proofpoint-ORIG-GUID: L2ll_4_bO2zBzV8YBz-DpUr5GbsGWqDX
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 priorityscore=1501 malwarescore=0 suspectscore=0
+ phishscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
+ definitions=main-2310120094
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 05:40:38 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Oct 12, 2023 at 05:18:54PM +0800, Xuan Zhuo wrote:
-> > On Thu, 12 Oct 2023 05:15:52 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Wed, Oct 11, 2023 at 05:27:07PM +0800, Xuan Zhuo wrote:
-> > > > virtqueue_set_dma_premapped() adds a new parameter to disable the
-> > > > virtqueue premapped mode.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c     |  2 +-
-> > > >  drivers/virtio/virtio_ring.c | 11 ++++++++---
-> > > >  include/linux/virtio.h       |  2 +-
-> > > >  3 files changed, 10 insertions(+), 5 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index fe7f314d65c9..6b5f47ebf9b2 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -737,7 +737,7 @@ static void virtnet_rq_set_premapped(struct virtnet_info *vi)
-> > > >  		return;
-> > > >
-> > > >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > -		if (virtqueue_set_dma_premapped(vi->rq[i].vq))
-> > > > +		if (virtqueue_set_dma_premapped(vi->rq[i].vq, true))
-> > > >  			continue;
-> > > >
-> > > >  		vi->rq[i].do_dma = true;
-> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > > > index 51d8f3299c10..b3ded56722f4 100644
-> > > > --- a/drivers/virtio/virtio_ring.c
-> > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > @@ -2784,7 +2784,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> > > >   * 0: success.
-> > > >   * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-> > > >   */
-> > > > -int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> > > > +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode)
-> > > >  {
-> > > >  	struct vring_virtqueue *vq = to_vvq(_vq);
-> > > >  	u32 num;
-> > > > @@ -2803,8 +2803,13 @@ int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> > > >  		return -EINVAL;
-> > > >  	}
-> > > >
-> > > > -	vq->premapped = true;
-> > > > -	vq->do_unmap = false;
-> > > > +	if (mode) {
-> > > > +		vq->premapped = true;
-> > > > +		vq->do_unmap = false;
-> > > > +	} else {
-> > > > +		vq->premapped = false;
-> > > > +		vq->do_unmap = vq->use_dma_api;
-> > > > +	}
-> > > >
-> > > >  	END_USE(vq);
-> > > >
-> > > > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > > > index 4cc614a38376..1cf7b004348b 100644
-> > > > --- a/include/linux/virtio.h
-> > > > +++ b/include/linux/virtio.h
-> > > > @@ -81,7 +81,7 @@ bool virtqueue_enable_cb(struct virtqueue *vq);
-> > > >
-> > > >  unsigned virtqueue_enable_cb_prepare(struct virtqueue *vq);
-> > > >
-> > > > -int virtqueue_set_dma_premapped(struct virtqueue *_vq);
-> > > > +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode);
-> > > >
-> > > >  bool virtqueue_poll(struct virtqueue *vq, unsigned);
-> > >
-> > > Wait a sec I thought we never change premapped. If you make this
-> > > dynamic don't you need a bunch of locking?
-> > > Or maybe queue is empty when you change this?
-> > > If yes pls add a bunch of BUG_ON checks to make sure this is not misused.
-> >
-> >
-> > Actually, this api is called immediately after the vq init or vq reset.
-> >
-> > We already have such a check.
-> >
-> > Thanks.
-> >
-> > /**
-> >  * virtqueue_set_dma_premapped - set the vring premapped mode
-> >  * @_vq: the struct virtqueue we're talking about.
-> >  *
-> >  * Enable the premapped mode of the vq.
-> >  *
-> >  * The vring in premapped mode does not do dma internally, so the driver must
-> >  * do dma mapping in advance. The driver must pass the dma_address through
-> >  * dma_address of scatterlist. When the driver got a used buffer from
-> >  * the vring, it has to unmap the dma address.
-> >  *
-> >  * This function must be called immediately after creating the vq, or after vq
-> >  * reset, and before adding any buffers to it.
-> >  *
-> >  * Caller must ensure we don't call this with other virtqueue operations
-> >  * at the same time (except where noted).
-> >  *
-> >  * Returns zero or a negative error.
-> >  * 0: success.
-> >  * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-> >  */
-> > int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool mode)
-> > {
-> > 	struct vring_virtqueue *vq = to_vvq(_vq);
-> > 	u32 num;
-> >
-> > 	START_USE(vq);
-> >
-> > 	num = vq->packed_ring ? vq->packed.vring.num : vq->split.vring.num;
-> >
-> > -->	if (num != vq->vq.num_free) {
-> > 		END_USE(vq);
-> > 		return -EINVAL;
-> > 	}
->
-> But it turns out virtnet_rq_set_premapped actually just ignores errors.
-> So returning EINVAL here does nothing caller just proceeds?
-> And checking num_free without locks is never safe anyway.
+On Thu, 2023-10-12 at 12:53 +0200, Niklas Schnelle wrote:
+> On Wed, 2023-10-11 at 11:56 -0700, Saeed Mahameed wrote:
+> > On 11 Oct 11:20, Saeed Mahameed wrote:
+> > > On 11 Oct 09:57, Niklas Schnelle wrote:
+> > > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to prob=
+e and
+> > > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() whi=
+ch is
+> > > > called in probe_one() before mlx5_pci_init(). This is a problem bec=
+ause
+> > > > mlx5_pci_init() is where the DMA and coherent mask is set but
+> > > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+> > > > allocation is done during probe before the correct mask is set. This
+> > > > causes probe to fail initialization of the cmdif SW structs on s390x
+> > > > after that is converted to the common dma-iommu code. This is becau=
+se on
+> > > > s390x DMA addresses below 4 GiB are reserved on current machines and
+> > > > unlike the old s390x specific DMA API implementation common code
+> > > > enforces DMA masks.
+> > > >=20
+> > > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
+> > > > probe_one() before mlx5_mdev_init(). To match the overall naming sc=
+heme
+> > > > rename it to mlx5_dma_init().
+> > >=20
+> > > How about we just call mlx5_pci_init() before mlx5_mdev_init(), inste=
+ad of
+> > > breaking it apart ?
+> >=20
+> > I just posted this RFC patch [1]:
+>=20
+> This patch works to solve the problem as well.
+>=20
+> >=20
+> > I am working in very limited conditions these days, and I don't have st=
+rong
+> > opinion on which approach to take, Leon, Niklas, please advise.
+> >=20
+> > The three possible solutions:
+> >=20
+> > 1) mlx5_pci_init() before mlx5_mdev_init(), I don't think enabling pci
+> > before initializing cmd dma would be a problem.
+> >=20
+> > 2) This patch.
+> >=20
+> > 3) Shay's patch from the link below:
+> > [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231011184511=
+.19818-1-saeed@kernel.org/
+> >=20
+> > Thanks,
+> > Saeed.
+>=20
+> My first gut feeling was option 1) but I'm just as happy with 2) or 3).
+> For me option 2 is the least invasive but not by much.
+>=20
+> For me the important thing is what Jason also said yesterday. We need
+> to merge something now to unbreak linux-next on s390x and to make sure
+> we don't end up with a broken v6.7-rc1. This is already hampering our
+> CI tests with linux-next. So let's do whatever can be merged the
+> quickest and then feel free to do any refactoring ideas that this
+> discussion might have spawned on top of that. My guess for this
+> criteria would be 2).
+>=20
+> Thanks,
+> Niklas
+>=20
 
-The premise of all this is that this is called immediately after reset or init.
-So here, this error doesn't occur, so I didn't check.
+Looking closer at the patch from Shay I do like that it changes the
+order in the disable/tear down path too. So since that also fixes a PPC
+issue I guess that may indeed be the best solution if we can get it
+merged quickly. I'll comment with my Tested-by there too.
 
-Regarding the lock issue, there will be no race for either rq or sq.
-rq is called after init vq, and there is no race at this time.
-
-In this patch set, sq is called during reset, and there will be no race.
-So I think it's safe.
-
-> I think the point is that this never triggers then just BUG_ON.
->
-
-Yes, I agree, it would be better to use BUG_ON.
-
-The next verion will remove this commit, because I will put the patch set
-to the net-next. So I will not let the premapped to be dynamic.
-
-About the BUG_ON, I will post a patch to fix that.
-
-Thanks.
-
-
->
-> >
-> > 	if (!vq->use_dma_api) {
-> > 		END_USE(vq);
-> > 		return -EINVAL;
-> > 	}
-> >
-> > 	if (mode) {
-> > 		vq->premapped = true;
-> > 		vq->do_unmap = false;
-> > 	} else {
-> > 		vq->premapped = false;
-> > 		vq->do_unmap = vq->use_dma_api;
-> > 	}
-> >
-> > 	END_USE(vq);
-> >
-> > 	return 0;
-> > }
-> > EXPORT_SYMBOL_GPL(virtqueue_set_dma_premapped);
-> >
-> >
-> > >
-> > >
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
->
+Thanks,
+Niklas
 
