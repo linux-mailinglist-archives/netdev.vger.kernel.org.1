@@ -1,196 +1,200 @@
-Return-Path: <netdev+bounces-40338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A26B7C6C8C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:40:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0AB87C6CAE
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EF4E1C20AC3
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:40:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47331C20BA0
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DD0324217;
-	Thu, 12 Oct 2023 11:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10661249F2;
+	Thu, 12 Oct 2023 11:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mYQSWdfF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fEGvh8AW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E91FDF71
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:40:08 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D191D94;
-	Thu, 12 Oct 2023 04:40:06 -0700 (PDT)
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39CBWcGi021017;
-	Thu, 12 Oct 2023 11:39:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=KRRc0CLfwbsoimO3IEq2LdfPo0KBY1KcHZ90MPhU3Zs=;
- b=mYQSWdfFNrCQcmC9h+WHUuF4dB6hCwMZFzvuTbseUquG+dAP2eON/wGtBRo/S3+nxFbi
- 6ClX4/Wd9a9DjCoZd+YtKjI3d4rIPHfVEHm9wWmYldx3aknBlNtz6LvI9+4FtjNrvIr0
- 9nT+Qrcf81wAP6e/1hUpJxSXQH3ARdqGtdzHODXr94gouTyqbly1/fw969xZXDXJ7kUV
- /v2F9VZVfcza2Ln0Ak87Nk6He2VASjJWD3QQC5qhCYe/WT0B+GNYmCn6aq1X4f2kAPFw
- t4LbKtUQuUL6zPdDyNoS2kPBc94ato30hAFj/ZhvDMe0O+BNfeIjn68D4etMb7UjqSL8 zQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpg1005u7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 11:39:56 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 39CBXDnk025196;
-	Thu, 12 Oct 2023 11:39:55 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3tpg1005tt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 11:39:55 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39CBO55h001147;
-	Thu, 12 Oct 2023 11:39:54 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3tkkvk6rw8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Oct 2023 11:39:54 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39CBdpnD3670758
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 12 Oct 2023 11:39:51 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5668520040;
-	Thu, 12 Oct 2023 11:39:51 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 38A972004B;
-	Thu, 12 Oct 2023 11:39:50 +0000 (GMT)
-Received: from [9.171.78.5] (unknown [9.171.78.5])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 12 Oct 2023 11:39:50 +0000 (GMT)
-Message-ID: <ead14a91ffaec7b9e818edf735dbc18510d7915e.camel@linux.ibm.com>
-Subject: Re: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
- mask is set
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory
- <shayd@nvidia.com>,
-        Moshe Shemesh <moshe@nvidia.com>, Heiko Carstens
- <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jacob Keller
- <jacob.e.keller@intel.com>
-Date: Thu, 12 Oct 2023 13:39:49 +0200
-In-Reply-To: <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
-References: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
-	 <ZSbnUlJT1u3xUIqY@x130> <ZSbvxeLKS8zHltdg@x130>
-	 <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7irmok6IoAPkFE5HGoyWPJ6omQ6CrC4W
-X-Proofpoint-ORIG-GUID: L2ll_4_bO2zBzV8YBz-DpUr5GbsGWqDX
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F16724A01
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:46:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FED2D6
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 04:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697111185;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WIegbc1FLrrwIh2JY6As7DXUlzCdo7e3rD7xAJ0V3OI=;
+	b=fEGvh8AWT8Xh+s5on7gGO2X9pYrZ1KlhD4CDKy4RSqFmjIay0LA7ZKyBNCQIZtMmL5QbWF
+	obaL8Y26vL2lbsSHc61drDW/SouA8MhjXKMEOtq5W06m26QubS+d2//D0X8I1/LGVRqEl7
+	/hrAHlH4HIgcv1L7a3Va2T28KgLiOgY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-648-3jWqN8JuMCGfw_MDG6rsJg-1; Thu, 12 Oct 2023 07:46:10 -0400
+X-MC-Unique: 3jWqN8JuMCGfw_MDG6rsJg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B1A3185530F;
+	Thu, 12 Oct 2023 11:46:09 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.43.17.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D6D462157F5A;
+	Thu, 12 Oct 2023 11:46:07 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-rt-users@vger.kernel.org,
+	Jiri Olsa <jolsa@kernel.org>,
+	Artem Savkov <asavkov@redhat.com>
+Subject: [RFC PATCH bpf-next] bpf: change syscall_nr type to int in struct syscall_tp_t
+Date: Thu, 12 Oct 2023 13:45:50 +0200
+Message-ID: <20231012114550.152846-1-asavkov@redhat.com>
+In-Reply-To: <20231005123413.GA488417@alecto.usersys.redhat.com>
+References: <20231005123413.GA488417@alecto.usersys.redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-12_05,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- bulkscore=0 clxscore=1015 priorityscore=1501 malwarescore=0 suspectscore=0
- phishscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2309180000
- definitions=main-2310120094
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-10-12 at 12:53 +0200, Niklas Schnelle wrote:
-> On Wed, 2023-10-11 at 11:56 -0700, Saeed Mahameed wrote:
-> > On 11 Oct 11:20, Saeed Mahameed wrote:
-> > > On 11 Oct 09:57, Niklas Schnelle wrote:
-> > > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to prob=
-e and
-> > > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() whi=
-ch is
-> > > > called in probe_one() before mlx5_pci_init(). This is a problem bec=
-ause
-> > > > mlx5_pci_init() is where the DMA and coherent mask is set but
-> > > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
-> > > > allocation is done during probe before the correct mask is set. This
-> > > > causes probe to fail initialization of the cmdif SW structs on s390x
-> > > > after that is converted to the common dma-iommu code. This is becau=
-se on
-> > > > s390x DMA addresses below 4 GiB are reserved on current machines and
-> > > > unlike the old s390x specific DMA API implementation common code
-> > > > enforces DMA masks.
-> > > >=20
-> > > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
-> > > > probe_one() before mlx5_mdev_init(). To match the overall naming sc=
-heme
-> > > > rename it to mlx5_dma_init().
-> > >=20
-> > > How about we just call mlx5_pci_init() before mlx5_mdev_init(), inste=
-ad of
-> > > breaking it apart ?
-> >=20
-> > I just posted this RFC patch [1]:
->=20
-> This patch works to solve the problem as well.
->=20
-> >=20
-> > I am working in very limited conditions these days, and I don't have st=
-rong
-> > opinion on which approach to take, Leon, Niklas, please advise.
-> >=20
-> > The three possible solutions:
-> >=20
-> > 1) mlx5_pci_init() before mlx5_mdev_init(), I don't think enabling pci
-> > before initializing cmd dma would be a problem.
-> >=20
-> > 2) This patch.
-> >=20
-> > 3) Shay's patch from the link below:
-> > [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231011184511=
-.19818-1-saeed@kernel.org/
-> >=20
-> > Thanks,
-> > Saeed.
->=20
-> My first gut feeling was option 1) but I'm just as happy with 2) or 3).
-> For me option 2 is the least invasive but not by much.
->=20
-> For me the important thing is what Jason also said yesterday. We need
-> to merge something now to unbreak linux-next on s390x and to make sure
-> we don't end up with a broken v6.7-rc1. This is already hampering our
-> CI tests with linux-next. So let's do whatever can be merged the
-> quickest and then feel free to do any refactoring ideas that this
-> discussion might have spawned on top of that. My guess for this
-> criteria would be 2).
->=20
-> Thanks,
-> Niklas
->=20
+linux-rt-devel tree contains a patch (b1773eac3f29c ("sched: Add support
+for lazy preemption")) that adds an extra member to struct trace_entry.
+This causes the offset of args field in struct trace_event_raw_sys_enter
+be different from the one in struct syscall_trace_enter:
 
-Looking closer at the patch from Shay I do like that it changes the
-order in the disable/tear down path too. So since that also fixes a PPC
-issue I guess that may indeed be the best solution if we can get it
-merged quickly. I'll comment with my Tested-by there too.
+struct trace_event_raw_sys_enter {
+        struct trace_entry         ent;                  /*     0    12 */
 
-Thanks,
-Niklas
+        /* XXX last struct has 3 bytes of padding */
+        /* XXX 4 bytes hole, try to pack */
+
+        long int                   id;                   /*    16     8 */
+        long unsigned int          args[6];              /*    24    48 */
+        /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
+        char                       __data[];             /*    72     0 */
+
+        /* size: 72, cachelines: 2, members: 4 */
+        /* sum members: 68, holes: 1, sum holes: 4 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 8 bytes */
+};
+
+struct syscall_trace_enter {
+        struct trace_entry         ent;                  /*     0    12 */
+
+        /* XXX last struct has 3 bytes of padding */
+
+        int                        nr;                   /*    12     4 */
+        long unsigned int          args[];               /*    16     0 */
+
+        /* size: 16, cachelines: 1, members: 3 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 16 bytes */
+};
+
+This, in turn, causes perf_event_set_bpf_prog() fail while running bpf
+test_profiler testcase because max_ctx_offset is calculated based on the
+former struct, while off on the latter:
+
+  10488         if (is_tracepoint || is_syscall_tp) {
+  10489                 int off = trace_event_get_offsets(event->tp_event);
+  10490
+  10491                 if (prog->aux->max_ctx_offset > off)
+  10492                         return -EACCES;
+  10493         }
+
+What bpf program is actually getting is a pointer to struct
+syscall_tp_t, defined in kernel/trace/trace_syscalls.c. This patch fixes
+the problem by aligning struct syscall_tp_t with with struct
+syscall_trace_(enter|exit) and changing the tests to use these structs
+to dereference context.
+
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
+---
+ kernel/trace/trace_syscalls.c                    | 4 ++--
+ tools/testing/selftests/bpf/progs/profiler.inc.h | 2 +-
+ tools/testing/selftests/bpf/progs/test_vmlinux.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/trace/trace_syscalls.c b/kernel/trace/trace_syscalls.c
+index de753403cdafb..9c581d6da843a 100644
+--- a/kernel/trace/trace_syscalls.c
++++ b/kernel/trace/trace_syscalls.c
+@@ -556,7 +556,7 @@ static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *re
+ {
+ 	struct syscall_tp_t {
+ 		struct trace_entry ent;
+-		unsigned long syscall_nr;
++		int syscall_nr;
+ 		unsigned long args[SYSCALL_DEFINE_MAXARGS];
+ 	} __aligned(8) param;
+ 	int i;
+@@ -661,7 +661,7 @@ static int perf_call_bpf_exit(struct trace_event_call *call, struct pt_regs *reg
+ {
+ 	struct syscall_tp_t {
+ 		struct trace_entry ent;
+-		unsigned long syscall_nr;
++		int syscall_nr;
+ 		unsigned long ret;
+ 	} __aligned(8) param;
+ 
+diff --git a/tools/testing/selftests/bpf/progs/profiler.inc.h b/tools/testing/selftests/bpf/progs/profiler.inc.h
+index f799d87e87002..897061930cb76 100644
+--- a/tools/testing/selftests/bpf/progs/profiler.inc.h
++++ b/tools/testing/selftests/bpf/progs/profiler.inc.h
+@@ -609,7 +609,7 @@ ssize_t BPF_KPROBE(kprobe__proc_sys_write,
+ }
+ 
+ SEC("tracepoint/syscalls/sys_enter_kill")
+-int tracepoint__syscalls__sys_enter_kill(struct trace_event_raw_sys_enter* ctx)
++int tracepoint__syscalls__sys_enter_kill(struct syscall_trace_enter* ctx)
+ {
+ 	struct bpf_func_stats_ctx stats_ctx;
+ 
+diff --git a/tools/testing/selftests/bpf/progs/test_vmlinux.c b/tools/testing/selftests/bpf/progs/test_vmlinux.c
+index 4b8e37f7fd06c..78b23934d9f8f 100644
+--- a/tools/testing/selftests/bpf/progs/test_vmlinux.c
++++ b/tools/testing/selftests/bpf/progs/test_vmlinux.c
+@@ -16,12 +16,12 @@ bool kprobe_called = false;
+ bool fentry_called = false;
+ 
+ SEC("tp/syscalls/sys_enter_nanosleep")
+-int handle__tp(struct trace_event_raw_sys_enter *args)
++int handle__tp(struct syscall_trace_enter *args)
+ {
+ 	struct __kernel_timespec *ts;
+ 	long tv_nsec;
+ 
+-	if (args->id != __NR_nanosleep)
++	if (args->nr != __NR_nanosleep)
+ 		return 0;
+ 
+ 	ts = (void *)args->args[0];
+-- 
+2.41.0
+
 
