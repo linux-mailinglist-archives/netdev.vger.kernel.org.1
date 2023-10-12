@@ -1,86 +1,104 @@
-Return-Path: <netdev+bounces-40251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233767C6662
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:30:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE5F7C6674
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:33:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53FB71C20BAC
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:30:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CC6C282833
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6978DDF6A;
-	Thu, 12 Oct 2023 07:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C16C101C1;
+	Thu, 12 Oct 2023 07:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yc9b/hKm"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="WFWUduTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4744A101C0
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B2991C433C9;
-	Thu, 12 Oct 2023 07:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697095824;
-	bh=JcDNeIe0yZllHx/V1e8yfZ/5Ffb9PqcUTTJMYxF40Ho=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yc9b/hKmXZHdxsbI25nCcb0s/ymoLuvGmTY6P8j0Uge46GGjSq3w0ju1cuEmieypy
-	 dziRkjlrnkwMKF/0BwGZcin6MELW18cXIxeC/Cf1xaVdjT5Fm8my4XE7jaDv19yqfs
-	 G/kIuMALN6A8r66SUW6UKDSA6SoTQuoqZENwfqMMTSpqKDjuPacBYZFvBIuKkfkxEx
-	 YvshVKMYPVXZsmgS1m7vZtEVL5472m5PoAeAXvvigOb5zsNJpVvAAbxkU75WPYq6US
-	 EUjfRD6ySTwAnifXVGvlkRvVYzYQ9tx+MjnnHhLb1iypg741qEh7JB0LegGIPT3FW4
-	 3JDIkkDEPLVUA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92EDFE11F70;
-	Thu, 12 Oct 2023 07:30:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CE2DF6E
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:32:58 +0000 (UTC)
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06C5B8
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:32:56 -0700 (PDT)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-5a2536adaf3so9290257b3.2
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:32:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1697095976; x=1697700776; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5RSBcWKzDInxa/puXq/LpkrmEMgpoQ4RI9D0wr5YKgU=;
+        b=WFWUduTjFSBTeWo9quLv0Vjfbo6R4wAKiaxBj29vg4LixrEdyu8TRiayF3arJN/yjW
+         aDUJ7xkd6gNlsabnucKxyOqWiCPQOMpzwlNzirL6GPl9gTL1n95iaYaolpS2xucAhlSu
+         KOYKDOCYc4qH5rVbKfclC1RRArOpfe7I/QsB5mU9Ju3A86tgwzeeYMv+tXXLq+JoWVN2
+         6q8a637Ef0LZe2o4t25ox2nVByEytTQZlodsvOPExqP7yY7AKOQvpi8Jq523ALPmgUV9
+         GVvsosWJF40975Ss75iO+bF+axjI4eW/iXvm506ftqVCgpT10ZDkKNOws0J42xOYn8WY
+         4YoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697095976; x=1697700776;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5RSBcWKzDInxa/puXq/LpkrmEMgpoQ4RI9D0wr5YKgU=;
+        b=HpreaeyUJqOIANoDjYysnrjOXycu54wY1n02EVffOiea4/BYc0+NjSFq9/58CvKhb+
+         q5yJwMIRxvAtKDmKLPkd41PibCbJIllCyB+HeejMfz6jhezlFVERrFVhh4yKC0hLfkWH
+         gEsXlZZPPLgOaeBvyEB8SkT+wvCSoSorQoAk7RJ2fiEJ1n1bae+5lhFynIgE/rOC6dj7
+         zC97gmuapmiz/yuMVHtXIeQEzelrhxL1k5Cb7LowQpaD5ivpFAsEwpJFgBC7JnJhZP+q
+         L3Mf1PcdvFMfDYMi1mvbs7NnronnkJKCZancthWCjfkSBC8Ayc5TNY6Y5P6VLQRvNcQC
+         4OYQ==
+X-Gm-Message-State: AOJu0YxbTJo904KEjnu4K19GBEx5O2CMGqd60oqlN/cbfAmuFpRuLTZB
+	++DRk9wPWddkmPEqmmyEe6fF8LSg361xlXM51FiOCA==
+X-Google-Smtp-Source: AGHT+IErOAKv6IFWFct8gKddv05t/UhON/R/qbMneAluaCdZqcfrkXm6jm24iRuIc7A5cDyqV/pJZvwS31sGCNMIbRY=
+X-Received: by 2002:a0d:ccc5:0:b0:5a7:e462:84ef with SMTP id
+ o188-20020a0dccc5000000b005a7e46284efmr3986734ywd.19.1697095975846; Thu, 12
+ Oct 2023 00:32:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] af_packet: Fix fortified memcpy() without flex array.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169709582458.1593.10221782315144344818.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Oct 2023 07:30:24 +0000
-References: <20231009153151.75688-1-kuniyu@amazon.com>
-In-Reply-To: <20231009153151.75688-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, willemdebruijn.kernel@gmail.com, keescook@chromium.org,
- horms@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- slyich@gmail.com
+References: <20231012.145824.2016833275288545767.fujita.tomonori@gmail.com>
+ <ZSeTag6jukYw-NGv@boqun-archlinux> <20231012.154444.1868411153601666717.fujita.tomonori@gmail.com>
+ <20231012.160246.2019423056896039320.fujita.tomonori@gmail.com> <ZSeckzvOTyre3SVM@boqun-archlinux>
+In-Reply-To: <ZSeckzvOTyre3SVM@boqun-archlinux>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Thu, 12 Oct 2023 03:32:44 -0400
+Message-ID: <CALNs47tKwVE_GF-kec_mAi2NZLe53t2Jcsec=vsoJXT01AYLQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] rust: core abstractions for network PHY drivers
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	miguel.ojeda.sandonis@gmail.com, greg@kroah.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Thu, Oct 12, 2023 at 3:13=E2=80=AFAM Boqun Feng <boqun.feng@gmail.com> w=
+rote:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> If `Device::from_raw`'s safety requirement is "only called in callbacks
+> with phydevice->lock held, etc.", then the exclusive access is
+> guaranteed by the safety requirement, therefore `mut` can be drop. It's
+> a matter of the exact semantics of the APIs.
+>
+> Regards,
+> Boqun
 
-On Mon, 9 Oct 2023 08:31:52 -0700 you wrote:
-> Sergei Trofimovich reported a regression [0] caused by commit a0ade8404c3b
-> ("af_packet: Fix warning of fortified memcpy() in packet_getname().").
-> 
-> It introduced a flex array sll_addr_flex in struct sockaddr_ll as a
-> union-ed member with sll_addr to work around the fortified memcpy() check.
-> 
-> However, a userspace program uses a struct that has struct sockaddr_ll in
-> the middle, where a flex array is illegal to exist.
-> 
-> [...]
+That is correct to my understanding, the core handles
+locking/unlocking and no driver functions are called if the core
+doesn't hold an exclusive lock first. Which also means the wrapper
+type can't be `Sync`.
 
-Here is the summary with links:
-  - [v1,net] af_packet: Fix fortified memcpy() without flex array.
-    https://git.kernel.org/netdev/net/c/e2bca4870fda
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Andrew said a bit about it in the second comment here:
+https://lore.kernel.org/rust-for-linux/ec6d8479-f893-4a3f-bf3e-aa0c81c4adad=
+@lunn.ch/
 
