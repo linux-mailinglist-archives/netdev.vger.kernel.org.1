@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E8C7C7762
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 339C17C7763
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9501C210F7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301641C21012
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121693C69F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73F23CCEF;
 	Thu, 12 Oct 2023 19:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pD+ZJwx6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WsLW325L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E571B3C693
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAAD4C433C7;
-	Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F8A3CCEA
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AABAC433C8;
+	Thu, 12 Oct 2023 19:53:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697140390;
-	bh=XEdUF4MvARylaYh5io+PWEuSwVkPCzttZi1Bq/CfRdY=;
+	s=k20201202; t=1697140391;
+	bh=VD1bqpqfEFLVU8Kz3uSU2gOhMjGsw3rWjWcg8XzmoNI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pD+ZJwx6UPs4heGBeBicBssn/3HFIKdrURZt61aZn4dRi0WC7WbpAs6hURYCcUXL0
-	 SaKbDtx6Cb1KatjPbl4svlWL9bYE4ilJLm548I+W3gkBC2OwCT5Id8qgX+L3nsD5hS
-	 RH7CSp0NAw7fn97QFNFmIJE7+qyIbaF8jYhD5vsIk3wlXWu1fepzrlhrZfJV0jEAE0
-	 CBbxf9vhW6voEeif7jYoRAX/bYFoRbMdUe3I/ftSZOSb+1jziZzgK6YoMKyfuJFu6U
-	 BDj5aE3Zsu5EUqk+PCuvJQlQf9ppTjAoA0ZB7INEhVb9ulzqHn0p7XrJsBwpW3MGtm
-	 IdTlQATz78ZSw==
+	b=WsLW325Lb/Uuaz1QOgh8CWyXpigdDAPMIzcfFioe40TTF7e4PonJB2iY7QnVEe1QY
+	 S3J9a8CiwaXkHi9kvWJaTMixAQGjfe5jeyd8vITmevgQTrL4iJrtLUcf/l/eDwKZD/
+	 hgsnuHpvlTCSWyU5b1Bi+s6RwS9vUChQZK+/CmMChe/05hccPlXRxb620OCaiNdog1
+	 bobgpl9KMB69VJQLTLhN0PJ0KSs+GWRIiGowGlrvjCZplGBmImrUwPD++wrI2xvWuK
+	 MXj0IaIDyqePhewNGAIr7yfaRiIYe4ee6UYa9HRFJeq5B8yTjEGfknQWBA5LaiQZXk
+	 zDniJk2l2HK9w==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>
-Subject: [net 02/10] net/mlx5: E-switch, register event handler before arming the event
-Date: Thu, 12 Oct 2023 12:51:19 -0700
-Message-ID: <20231012195127.129585-3-saeed@kernel.org>
+	Vlad Buslov <vladbu@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>
+Subject: [net 03/10] net/mlx5: Bridge, fix peer entry ageing in LAG mode
+Date: Thu, 12 Oct 2023 12:51:20 -0700
+Message-ID: <20231012195127.129585-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
 References: <20231012195127.129585-1-saeed@kernel.org>
@@ -56,86 +56,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shay Drory <shayd@nvidia.com>
+From: Vlad Buslov <vladbu@nvidia.com>
 
-Currently, mlx5 is registering event handler for vport context change
-event some time after arming the event. this can lead to missing an
-event, which will result in wrong rules in the FDB.
-Hence, register the event handler before arming the event.
+With current implementation in single FDB LAG mode all packets are
+processed by eswitch 0 rules. As such, 'peer' FDB entries receive the
+packets for rules of other eswitches and are responsible for updating the
+main entry by sending SWITCHDEV_FDB_ADD_TO_BRIDGE notification from their
+background update wq task. However, this introduces a race condition when
+non-zero eswitch instance decides to delete a FDB entry, sends
+SWITCHDEV_FDB_DEL_TO_BRIDGE notification, but another eswitch's update task
+refreshes the same entry concurrently while its async delete work is still
+pending on the workque. In such case another SWITCHDEV_FDB_ADD_TO_BRIDGE
+event may be generated and entry will remain stuck in FDB marked as
+'offloaded' since no more SWITCHDEV_FDB_DEL_TO_BRIDGE notifications are
+sent for deleting the peer entries.
 
-This solution is valid since FW is sending vport context change event
-only on vports which SW armed, and SW arming the vport when enabling
-it, which is done after the FDB has been created.
+Fix the issue by synchronously marking deleted entries with
+MLX5_ESW_BRIDGE_FLAG_DELETED flag and skipping them in background update
+job.
 
-Fixes: 6933a9379559 ("net/mlx5: E-Switch, Use async events chain")
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Jianbo Liu <jianbol@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/eswitch.c   | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ .../mellanox/mlx5/core/en/rep/bridge.c        | 11 ++++++++
+ .../ethernet/mellanox/mlx5/core/esw/bridge.c  | 25 ++++++++++++++++++-
+ .../ethernet/mellanox/mlx5/core/esw/bridge.h  |  3 +++
+ .../mellanox/mlx5/core/esw/bridge_priv.h      |  1 +
+ 4 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index d4cde6555063..8d0b915a3121 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -1038,11 +1038,8 @@ const u32 *mlx5_esw_query_functions(struct mlx5_core_dev *dev)
- 	return ERR_PTR(err);
- }
- 
--static void mlx5_eswitch_event_handlers_register(struct mlx5_eswitch *esw)
-+static void mlx5_eswitch_event_handler_register(struct mlx5_eswitch *esw)
- {
--	MLX5_NB_INIT(&esw->nb, eswitch_vport_event, NIC_VPORT_CHANGE);
--	mlx5_eq_notifier_register(esw->dev, &esw->nb);
--
- 	if (esw->mode == MLX5_ESWITCH_OFFLOADS && mlx5_eswitch_is_funcs_handler(esw->dev)) {
- 		MLX5_NB_INIT(&esw->esw_funcs.nb, mlx5_esw_funcs_changed_handler,
- 			     ESW_FUNCTIONS_CHANGED);
-@@ -1050,13 +1047,11 @@ static void mlx5_eswitch_event_handlers_register(struct mlx5_eswitch *esw)
- 	}
- }
- 
--static void mlx5_eswitch_event_handlers_unregister(struct mlx5_eswitch *esw)
-+static void mlx5_eswitch_event_handler_unregister(struct mlx5_eswitch *esw)
- {
- 	if (esw->mode == MLX5_ESWITCH_OFFLOADS && mlx5_eswitch_is_funcs_handler(esw->dev))
- 		mlx5_eq_notifier_unregister(esw->dev, &esw->esw_funcs.nb);
- 
--	mlx5_eq_notifier_unregister(esw->dev, &esw->nb);
--
- 	flush_workqueue(esw->work_queue);
- }
- 
-@@ -1483,6 +1478,9 @@ int mlx5_eswitch_enable_locked(struct mlx5_eswitch *esw, int num_vfs)
- 
- 	mlx5_eswitch_update_num_of_vfs(esw, num_vfs);
- 
-+	MLX5_NB_INIT(&esw->nb, eswitch_vport_event, NIC_VPORT_CHANGE);
-+	mlx5_eq_notifier_register(esw->dev, &esw->nb);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rep/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rep/bridge.c
+index 0fef853eab62..5d128c5b4529 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/rep/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rep/bridge.c
+@@ -467,6 +467,17 @@ static int mlx5_esw_bridge_switchdev_event(struct notifier_block *nb,
+ 		/* only handle the event on peers */
+ 		if (mlx5_esw_bridge_is_local(dev, rep, esw))
+ 			break;
 +
- 	if (esw->mode == MLX5_ESWITCH_LEGACY) {
- 		err = esw_legacy_enable(esw);
- 	} else {
-@@ -1495,7 +1493,7 @@ int mlx5_eswitch_enable_locked(struct mlx5_eswitch *esw, int num_vfs)
++		fdb_info = container_of(info,
++					struct switchdev_notifier_fdb_info,
++					info);
++		/* Mark for deletion to prevent the update wq task from
++		 * spuriously refreshing the entry which would mark it again as
++		 * offloaded in SW bridge. After this fallthrough to regular
++		 * async delete code.
++		 */
++		mlx5_esw_bridge_fdb_mark_deleted(dev, vport_num, esw_owner_vhca_id, br_offloads,
++						 fdb_info);
+ 		fallthrough;
+ 	case SWITCHDEV_FDB_ADD_TO_DEVICE:
+ 	case SWITCHDEV_FDB_DEL_TO_DEVICE:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+index e36294b7ade2..1b9bc32efd6f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -1748,6 +1748,28 @@ void mlx5_esw_bridge_fdb_update_used(struct net_device *dev, u16 vport_num, u16
+ 	entry->lastuse = jiffies;
+ }
  
- 	esw->fdb_table.flags |= MLX5_ESW_FDB_CREATED;
++void mlx5_esw_bridge_fdb_mark_deleted(struct net_device *dev, u16 vport_num, u16 esw_owner_vhca_id,
++				      struct mlx5_esw_bridge_offloads *br_offloads,
++				      struct switchdev_notifier_fdb_info *fdb_info)
++{
++	struct mlx5_esw_bridge_fdb_entry *entry;
++	struct mlx5_esw_bridge *bridge;
++
++	bridge = mlx5_esw_bridge_from_port_lookup(vport_num, esw_owner_vhca_id, br_offloads);
++	if (!bridge)
++		return;
++
++	entry = mlx5_esw_bridge_fdb_lookup(bridge, fdb_info->addr, fdb_info->vid);
++	if (!entry) {
++		esw_debug(br_offloads->esw->dev,
++			  "FDB mark deleted entry with specified key not found (MAC=%pM,vid=%u,vport=%u)\n",
++			  fdb_info->addr, fdb_info->vid, vport_num);
++		return;
++	}
++
++	entry->flags |= MLX5_ESW_BRIDGE_FLAG_DELETED;
++}
++
+ void mlx5_esw_bridge_fdb_create(struct net_device *dev, u16 vport_num, u16 esw_owner_vhca_id,
+ 				struct mlx5_esw_bridge_offloads *br_offloads,
+ 				struct switchdev_notifier_fdb_info *fdb_info)
+@@ -1810,7 +1832,8 @@ void mlx5_esw_bridge_update(struct mlx5_esw_bridge_offloads *br_offloads)
+ 			unsigned long lastuse =
+ 				(unsigned long)mlx5_fc_query_lastuse(entry->ingress_counter);
  
--	mlx5_eswitch_event_handlers_register(esw);
-+	mlx5_eswitch_event_handler_register(esw);
+-			if (entry->flags & MLX5_ESW_BRIDGE_FLAG_ADDED_BY_USER)
++			if (entry->flags & (MLX5_ESW_BRIDGE_FLAG_ADDED_BY_USER |
++					    MLX5_ESW_BRIDGE_FLAG_DELETED))
+ 				continue;
  
- 	esw_info(esw->dev, "Enable: mode(%s), nvfs(%d), necvfs(%d), active vports(%d)\n",
- 		 esw->mode == MLX5_ESWITCH_LEGACY ? "LEGACY" : "OFFLOADS",
-@@ -1622,7 +1620,8 @@ void mlx5_eswitch_disable_locked(struct mlx5_eswitch *esw)
- 	 */
- 	mlx5_esw_mode_change_notify(esw, MLX5_ESWITCH_LEGACY);
+ 			if (time_after(lastuse, entry->lastuse))
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h
+index c2c7c70d99eb..d6f539161993 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.h
+@@ -62,6 +62,9 @@ int mlx5_esw_bridge_vport_peer_unlink(struct net_device *br_netdev, u16 vport_nu
+ void mlx5_esw_bridge_fdb_update_used(struct net_device *dev, u16 vport_num, u16 esw_owner_vhca_id,
+ 				     struct mlx5_esw_bridge_offloads *br_offloads,
+ 				     struct switchdev_notifier_fdb_info *fdb_info);
++void mlx5_esw_bridge_fdb_mark_deleted(struct net_device *dev, u16 vport_num, u16 esw_owner_vhca_id,
++				      struct mlx5_esw_bridge_offloads *br_offloads,
++				      struct switchdev_notifier_fdb_info *fdb_info);
+ void mlx5_esw_bridge_fdb_create(struct net_device *dev, u16 vport_num, u16 esw_owner_vhca_id,
+ 				struct mlx5_esw_bridge_offloads *br_offloads,
+ 				struct switchdev_notifier_fdb_info *fdb_info);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h
+index 4911cc32161b..7c251af566c6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge_priv.h
+@@ -133,6 +133,7 @@ struct mlx5_esw_bridge_mdb_key {
+ enum {
+ 	MLX5_ESW_BRIDGE_FLAG_ADDED_BY_USER = BIT(0),
+ 	MLX5_ESW_BRIDGE_FLAG_PEER = BIT(1),
++	MLX5_ESW_BRIDGE_FLAG_DELETED = BIT(2),
+ };
  
--	mlx5_eswitch_event_handlers_unregister(esw);
-+	mlx5_eq_notifier_unregister(esw->dev, &esw->nb);
-+	mlx5_eswitch_event_handler_unregister(esw);
- 
- 	esw_info(esw->dev, "Disable: mode(%s), nvfs(%d), necvfs(%d), active vports(%d)\n",
- 		 esw->mode == MLX5_ESWITCH_LEGACY ? "LEGACY" : "OFFLOADS",
+ enum {
 -- 
 2.41.0
 
