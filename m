@@ -1,150 +1,136 @@
-Return-Path: <netdev+bounces-40303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29337C6970
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:26:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 529DC7C69A6
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BA312828E5
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:26:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A96B282B9F
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBB421114;
-	Thu, 12 Oct 2023 09:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C84921345;
+	Thu, 12 Oct 2023 09:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RVND3lOw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72FA210EA
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:26:12 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D629D
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:26:10 -0700 (PDT)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-136-Kc7dHQ4TNP2tqTu0Kz4tzg-1; Thu, 12 Oct 2023 10:26:07 +0100
-X-MC-Unique: Kc7dHQ4TNP2tqTu0Kz4tzg-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 12 Oct
- 2023 10:26:06 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 12 Oct 2023 10:26:06 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Stephen Hemminger' <stephen@networkplumber.org>, Johannes Berg
-	<johannes@sipsolutions.net>
-CC: Jakub Kicinski <kuba@kernel.org>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "fw@strlen.de" <fw@strlen.de>,
-	"pablo@netfilter.org" <pablo@netfilter.org>, "jiri@resnulli.us"
-	<jiri@resnulli.us>, "mkubecek@suse.cz" <mkubecek@suse.cz>,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>, Thomas Haller
-	<thaller@redhat.com>
-Subject: RE: [RFC] netlink: add variable-length / auto integers
-Thread-Topic: [RFC] netlink: add variable-length / auto integers
-Thread-Index: AQHZ/GJtGLGzNn8MkE21q6VfKdfF4LBF4v0A
-Date: Thu, 12 Oct 2023 09:26:06 +0000
-Message-ID: <e55db83d221d4b5c9fce899cc60cb378@AcuMS.aculab.com>
-References: <20231011003313.105315-1-kuba@kernel.org>
-	<f75851720c356fe43771a5c452d113ca25d43f0f.camel@sipsolutions.net>
-	<6ec63a78-b0cc-452e-9946-0acef346cac2@6wind.com>
-	<20231011085230.2d3dc1ab@kernel.org>
-	<30be757c7a0bbe50b37e9f2e6f93c8cf4219bbc1.camel@sipsolutions.net>
- <20231011094550.7837d43a@hermes.local>
-In-Reply-To: <20231011094550.7837d43a@hermes.local>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A6E21347
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:28:47 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39EBEA9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:28:44 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9b974955474so112757266b.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 02:28:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697102922; x=1697707722; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/PqUCxj5eLwzRrTgXT0yNS+BMBTGe+4yyNTwp4NiR6w=;
+        b=RVND3lOw2KXXF1jj/Vw1JafnZySVQq3a3aJ/NiYvRXw4zEA+Us/++D9O+mHvQP/I7L
+         BZZVqhC1aEnd7quc90e/rlm2/K5NJzBgsAJxQQTHtXd0ZB4Ns+KHmMxaa9YgXJVLInPX
+         Sh+EePPyptWOP0jRymLL/c2SZOivJP7bnp++xOWNu5/f2B6ZHaf9DsYCafYDiWwqRqVD
+         XuFTbp7vdtHIhy2MNyxz2bgbeIterUiHc0U1GmISp89PDrQuk2x2tnjPA5yO6d3RuCb3
+         NWnqHghEIvMp3qTvUuQ+sM8O123WM34+8Z4/jv/kBJlBOv7VhJrQ9SM7JLHHlf3UXcXT
+         HCfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697102922; x=1697707722;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/PqUCxj5eLwzRrTgXT0yNS+BMBTGe+4yyNTwp4NiR6w=;
+        b=DSM8Di+SIROSNT7KVcQ0c71veyzqHvkEOu1ZMCdMdFpqiuunO75Y0zSfaX9fZKqKVb
+         d95x1JYVRIpjfwVKXRORpvMwM4EoM78c/NmK/RQShRiUo2ZegSerjx93FNn7k47/rRHe
+         0kmuS28gsrLVm5/uM/48bd7oKEk0meisrZX/TckGb6/c2u96utofBRyp0njwTdt654a6
+         UqZOUSEYSW3C4BHH0sOF6ayJRSSEPka1wKpJFoHoyka6/noTJuue+F+Qb3VQaA9DSNik
+         4su/6CnzYIercci9MhUd8H7dqQ1UZMpImo0pZ/ztvhgya0HIURpcyAUowu8tftqVVH3o
+         rr1Q==
+X-Gm-Message-State: AOJu0YzgP33VVXHmdYWx5BAkAR57fVa3yqY8wdilMKOWHhHZZorMn58W
+	SYSUrj7lIK2cO4DM+fvkhfj4dA==
+X-Google-Smtp-Source: AGHT+IFpK46MO083H5ibDkbxduL5zsJoAEN6ufiFu4YNqSsc8mMX1u3OMTRyu1JzMlguwkliYF+cvQ==
+X-Received: by 2002:a17:906:29a:b0:9b2:b750:4a67 with SMTP id 26-20020a170906029a00b009b2b7504a67mr21158222ejf.67.1697102922435;
+        Thu, 12 Oct 2023 02:28:42 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170906354a00b00997cce73cc7sm10793641eja.29.2023.10.12.02.28.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 02:28:41 -0700 (PDT)
+Date: Thu, 12 Oct 2023 11:28:40 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com,
+	johannes@sipsolutions.net
+Subject: Re: [patch net-next 02/10] tools: ynl-gen: introduce support for
+ bitfield32 attribute type
+Message-ID: <ZSe8SGY3QeaJsYfg@nanopsycho>
+References: <20231010110828.200709-1-jiri@resnulli.us>
+ <20231010110828.200709-3-jiri@resnulli.us>
+ <20231010115804.761486f1@kernel.org>
+ <ZSY7kHSLKMgXk9Ao@nanopsycho>
+ <20231011095236.5fdca6e2@kernel.org>
+ <ZSbVqhM2AXNtG5xV@nanopsycho>
+ <20231011112537.2962c8be@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011112537.2962c8be@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Stephen Hemminger
-> Sent: 11 October 2023 17:46
->=20
-> On Wed, 11 Oct 2023 18:01:49 +0200
-> Johannes Berg <johannes@sipsolutions.net> wrote:
->=20
-> > On Wed, 2023-10-11 at 08:52 -0700, Jakub Kicinski wrote:
-> >
-> > > > > > Even for arches which don't have good unaligned access - I'd th=
-ink
-> > > > > > that access aligned to 4B *is* pretty efficient, and that's all
-> > > > > > we need. Plus kernel deals with unaligned input. Why can't user=
- space?
-> > > > >
-> > > > > Hmm. I have a vague recollection that it was related to just not =
-doing
-> > > > > it - the kernel will do get_unaligned() or similar, but userspace=
- if it
-> > > > > just accesses it might take a trap on some architectures?
-> > > > >
-> > > > > But I can't find any record of this in public discussions, so ...
-> > > > If I remember well, at this time, we had some (old) architectures t=
-hat triggered
-> > > > traps (in kernel) when a 64-bit field was accessed and unaligned. M=
-aybe a mix
-> > > > between 64-bit kernel / 32-bit userspace, I don't remember exactly.=
- The goal was
-> > > > to align u64 fields on 8 bytes.
-> > >
-> > > Reading the discussions I think we can chalk the alignment up
-> > > to "old way of doing things". Discussion was about stats64,
-> > > if someone wants to access stats directly in the message then yes,
-> > > they care a lot about alignment.
-> > >
-> > > Today we try to steer people towards attr-per-field, rather than
-> > > dumping structs. Instead of doing:
-> > >
-> > > =09struct stats *stats =3D nla_data(attr);
-> > > =09print("A: %llu", stats->a);
-> > >
-> > > We will do:
-> > >
-> > > =09print("A: %llu", nla_get_u64(attrs[NLA_BLA_STAT_A]));
-> >
-> > Well, yes, although the "struct stats" part _still_ even exists in the
-> > kernel, we never fixed that with the nla_put_u64_64bit() stuff, that wa=
-s
-> > only for something that does
-> >
-> > =09print("A: %" PRIu64, *(uint64_t *)nla_data(attrs[NLA_BLA_STAT_A]));
-> >
-> > > Assuming nla_get_u64() is unalign-ready the problem doesn't exist.
-> >
-> > Depends on the library, but at least for libnl that's true since ever.
-> > Same for libmnl and libnl-tiny. So I guess it only ever hit hand-coded
-> > implementations.
->=20
-> Quick check of iproute2 shows places where stats are directly
-> mapped without accessors. One example is print_mpls_stats().
+Wed, Oct 11, 2023 at 08:25:37PM CEST, kuba@kernel.org wrote:
+>On Wed, 11 Oct 2023 19:04:42 +0200 Jiri Pirko wrote:
+>> >> Why? Should be usable for all, same as other types, no?  
+>> >
+>> >array-nest already isn't. I don't see much value in bitfiled32
+>> >and listing it means every future codegen for genetlink will
+>> >have to support it to be compatible. It's easier to add stuff
+>> >than to remove it, so let's not.  
+>> 
+>> Interesting. You want to somehow mark bitfield32 obsolete? But why is
+>> it? I mean, what is the reason to discourage use of bitfield32?
+>
+>It's a tradeoff between simplicity of base types and usefulness.
+>bitfield32 is not bad in any way, but:
+>
+> - it's 32b, new features/caps like to start with 64b
 
-You 'just' need to use the 64bit type that has __attribute__((aligned(4))).
-The same is true for the code that reads/writes the value.
-Better than passing by address and using memcpy();
+That's fun. Back when Jamal (I think it was him) was pushing bitfield32,
+I argued that it would be better to make it flexible bitfield so it it
+future proof. IIRC DavidM said that it should be enough and that you can
+use extra attr in case the current one overflows.
 
-=09David
+Sigh :/
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+> - it doesn't support "by name" operations so ethtool didn't use it
+
+It follows the original Netlink rule: "all uapi should be well defined in
+enums/defines".
+
+
+> - it can be trivially re-implemented with 2 attrs
+
+Yeah, it's basically a wrapper to avoid unnecessary boilerplate and
+re-implementations. But I think that is a good thing. Or do you say it
+is not desirable to rather re-implement this with 2 attrs instead of
+using bitfield32 directly? 
+
+
+>
+>all in all there aren't very many new uses. So I think we should
+>put it in legacy for now. Maybe somehow mark it as being there due
+>to limited applicability rather than being "bad"?
+
+I think it is odd, but if you insists, sure. Your the boss.
 
 
