@@ -1,326 +1,138 @@
-Return-Path: <netdev+bounces-40260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040037C66A0
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:44:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01FD27C66A5
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9DE81C21021
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:44:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6E5F1C20AC3
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 07:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4C91170A;
-	Thu, 12 Oct 2023 07:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA25111A6;
+	Thu, 12 Oct 2023 07:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i8ErYKva"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282A4107B2
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:44:24 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFADECC
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:44:19 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VtzoyQp_1697096656;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VtzoyQp_1697096656)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Oct 2023 15:44:17 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	"Liu, Yujie" <yujie.liu@intel.com>
-Subject: [PATCH net-next 5/5] virtio-net: support tx netdim
-Date: Thu, 12 Oct 2023 15:44:09 +0800
-Message-Id: <ef5d159875745040e406473bd5c03e9875742ff5.1697093455.git.hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <cover.1697093455.git.hengqi@linux.alibaba.com>
-References: <cover.1697093455.git.hengqi@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DA8101C1
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:50:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2C6C9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:50:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697097028;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FiG13da8k/ZbjjqgCy1pf25ts3THBZ36xeSgrel6qHw=;
+	b=i8ErYKva0Z0GYhkPx14724ZbwMHt9+lYYUeGWJl0lNQ0pspH9TsAuq51HnYIF/FLwsRky6
+	95m+m46hiSG7gsAcG0zzTNdKKD9OWiCvJOexy2eHC8O9J8RAIs2oG1NH4I6zYwizJRJ/Ao
+	TTdE58KWtnMGHq3XfYQkL/jpYeyYNMU=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606--70VujBEMAK-CrQPoIUe-A-1; Thu, 12 Oct 2023 03:50:26 -0400
+X-MC-Unique: -70VujBEMAK-CrQPoIUe-A-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2c28192d818so6579401fa.0
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 00:50:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697097025; x=1697701825;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FiG13da8k/ZbjjqgCy1pf25ts3THBZ36xeSgrel6qHw=;
+        b=ZJPXDv4/BQCDuGx23udrbBHerCJH9WgJ5l8dXQWlOGa3AIGvfJztYdriFcRHqMV2ci
+         V1sQEZMWas1WOJ0XNJrt43vA2PyKwrRMJKQ0Y+YCvKSrq/GNNLV/1W1MHwvcYaRNxxxv
+         2B8OjNJHXyzgxC0vBEaYDc3Yn6eH2S7NgfbMMJYeiZlLYho6SOtYnuA2+jqw3Hmim7YB
+         W0dy4tBWIPE26qrLbClLneSrnZYYgiulShZ4K+TNCmOp0jHiBC1jkUS0Ke99ksGSGpEo
+         R7rTBxF0QxAwmqpL7XO6DUiXX//fqfOesZRtXOsR3tceXab5zMnTe0HyuClOBrM0uqbA
+         6+6A==
+X-Gm-Message-State: AOJu0YwpukIwJH9Obt842TlCLWIPHuIw6mbI5kf1Wa66Ovvl5i5gODRz
+	kAZsyryZEQ2ZhBpDCVB0rYPSuBazNdOimbtpPrZsPjkGu/LWfYh0zqlCUD4uTuJ0R6ZVKVqB8Jz
+	FQSJzyt97yv+mwr1bR8DAjYAeAaqdMVM7
+X-Received: by 2002:a2e:2c1a:0:b0:2bc:e470:1405 with SMTP id s26-20020a2e2c1a000000b002bce4701405mr18183615ljs.46.1697097025334;
+        Thu, 12 Oct 2023 00:50:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHzYu7Lfht/V4Rj2WUdNomulK6QlCD6ZyUl6D/Bh+QtwT3mYue+hyDIjXaThrj7GL3e+cS6zO8ebpAqF5FI2rI=
+X-Received: by 2002:a2e:2c1a:0:b0:2bc:e470:1405 with SMTP id
+ s26-20020a2e2c1a000000b002bce4701405mr18183602ljs.46.1697097025022; Thu, 12
+ Oct 2023 00:50:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+ <20231011100057.535f3834@kernel.org> <1697075634.444064-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1697075634.444064-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 12 Oct 2023 15:50:13 +0800
+Message-ID: <CACGkMEsadYH8Y-KOxPX6vPic7pBqzj2DLnog5osuBDtypKgEZA@mail.gmail.com>
+Subject: Re: [PATCH vhost 00/22] virtio-net: support AF_XDP zero copy
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux-foundation.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Similar to rx netdim, this patch supports adaptive tx
-coalescing moderation for the virtio-net.
+On Thu, Oct 12, 2023 at 9:58=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Wed, 11 Oct 2023 10:00:57 -0700, Jakub Kicinski <kuba@kernel.org> wrot=
+e:
+> > On Wed, 11 Oct 2023 17:27:06 +0800 Xuan Zhuo wrote:
+> > > ## AF_XDP
+> > >
+> > > XDP socket(AF_XDP) is an excellent bypass kernel network framework. T=
+he zero
+> > > copy feature of xsk (XDP socket) needs to be supported by the driver.=
+ The
+> > > performance of zero copy is very good. mlx5 and intel ixgbe already s=
+upport
+> > > this feature, This patch set allows virtio-net to support xsk's zeroc=
+opy xmit
+> > > feature.
+> >
+> > You're moving the driver and adding a major feature.
+> > This really needs to go via net or bpf.
+> > If you have dependencies in other trees please wait for
+> > after the merge window.
+>
+>
+> If so, I can remove the first two commits.
+>
+> Then, the sq uses the premapped mode by default.
+> And we can use the api virtqueue_dma_map_single_attrs to replace the
+> virtqueue_dma_map_page_attrs.
+>
+> And then I will fix that on the top.
+>
+> Hi Micheal and Jason, is that ok for you?
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 143 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 119 insertions(+), 24 deletions(-)
+I would go with what looks easy for you but I think Jakub wants the
+series to go with next-next (this is what we did in the past for
+networking specific features that is done in virtio-net). So we need
+to tweak the prefix to use net-next instead of vhost.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 6ad2890a7909..1c680cb09d48 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -154,6 +154,15 @@ struct send_queue {
- 
- 	struct virtnet_sq_stats stats;
- 
-+	/* The number of tx notifications */
-+	u16 calls;
-+
-+	/* Is dynamic interrupt moderation enabled? */
-+	bool dim_enabled;
-+
-+	/* Dynamic Interrupt Moderation */
-+	struct dim dim;
-+
- 	struct virtnet_interrupt_coalesce intr_coal;
- 
- 	struct napi_struct napi;
-@@ -317,8 +326,9 @@ struct virtnet_info {
- 	u8 duplex;
- 	u32 speed;
- 
--	/* Is rx dynamic interrupt moderation enabled? */
-+	/* Is dynamic interrupt moderation enabled? */
- 	bool rx_dim_enabled;
-+	bool tx_dim_enabled;
- 
- 	/* Interrupt coalescing settings */
- 	struct virtnet_interrupt_coalesce intr_coal_tx;
-@@ -464,19 +474,40 @@ static bool virtqueue_napi_complete(struct napi_struct *napi,
- 	return false;
- }
- 
-+static void virtnet_tx_dim_work(struct work_struct *work);
-+
-+static void virtnet_tx_dim_update(struct virtnet_info *vi, struct send_queue *sq)
-+{
-+	struct virtnet_sq_stats *stats = &sq->stats;
-+	struct dim_sample cur_sample = {};
-+
-+	u64_stats_update_begin(&sq->stats.syncp);
-+	dim_update_sample(sq->calls, stats->packets,
-+			  stats->bytes, &cur_sample);
-+	u64_stats_update_end(&sq->stats.syncp);
-+
-+	net_dim(&sq->dim, cur_sample);
-+}
-+
- static void skb_xmit_done(struct virtqueue *vq)
- {
- 	struct virtnet_info *vi = vq->vdev->priv;
--	struct napi_struct *napi = &vi->sq[vq2txq(vq)].napi;
-+	struct send_queue *sq = &vi->sq[vq2txq(vq)];
-+	struct napi_struct *napi = &sq->napi;
-+
-+	sq->calls++;
- 
- 	/* Suppress further interrupts. */
- 	virtqueue_disable_cb(vq);
- 
--	if (napi->weight)
-+	if (napi->weight) {
- 		virtqueue_napi_schedule(napi, vq);
--	else
-+	} else {
-+		if (sq->dim_enabled)
-+			virtnet_tx_dim_update(vi, sq);
- 		/* We were probably waiting for more output buffers. */
- 		netif_wake_subqueue(vi->dev, vq2txq(vq));
-+	}
- }
- 
- #define MRG_CTX_HEADER_SHIFT 22
-@@ -2217,6 +2248,7 @@ static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
- 	napi_disable(&vi->rq[qp_index].napi);
- 	xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
- 	cancel_work_sync(&vi->rq[qp_index].dim.work);
-+	cancel_work_sync(&vi->sq[qp_index].dim.work);
- }
- 
- static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
-@@ -2236,6 +2268,8 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
- 
- 	INIT_WORK(&vi->rq[qp_index].dim.work, virtnet_rx_dim_work);
- 	vi->rq[qp_index].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+	INIT_WORK(&vi->sq[qp_index].dim.work, virtnet_tx_dim_work);
-+	vi->sq[qp_index].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
- 
- 	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
- 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
-@@ -2316,6 +2350,9 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 				__netif_tx_unlock(txq);
- 				__napi_schedule(napi);
- 			}
-+		} else {
-+			if (sq->dim_enabled)
-+				virtnet_tx_dim_update(vi, sq);
- 		}
- 	}
- 
-@@ -3353,24 +3390,42 @@ static int virtnet_get_link_ksettings(struct net_device *dev,
- static int virtnet_send_tx_notf_coal_cmds(struct virtnet_info *vi,
- 					  struct ethtool_coalesce *ec)
- {
-+	bool tx_ctrl_dim_on = !!ec->use_adaptive_tx_coalesce;
- 	struct scatterlist sgs_tx;
- 	int i;
- 
--	vi->ctrl->coal_tx.tx_usecs = cpu_to_le32(ec->tx_coalesce_usecs);
--	vi->ctrl->coal_tx.tx_max_packets = cpu_to_le32(ec->tx_max_coalesced_frames);
--	sg_init_one(&sgs_tx, &vi->ctrl->coal_tx, sizeof(vi->ctrl->coal_tx));
--
--	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
--				  VIRTIO_NET_CTRL_NOTF_COAL_TX_SET,
--				  &sgs_tx))
-+	if (tx_ctrl_dim_on && (ec->tx_coalesce_usecs != vi->intr_coal_tx.max_usecs ||
-+			       ec->tx_max_coalesced_frames != vi->intr_coal_tx.max_packets))
- 		return -EINVAL;
- 
--	/* Save parameters */
--	vi->intr_coal_tx.max_usecs = ec->tx_coalesce_usecs;
--	vi->intr_coal_tx.max_packets = ec->tx_max_coalesced_frames;
--	for (i = 0; i < vi->max_queue_pairs; i++) {
--		vi->sq[i].intr_coal.max_usecs = ec->tx_coalesce_usecs;
--		vi->sq[i].intr_coal.max_packets = ec->tx_max_coalesced_frames;
-+	if (tx_ctrl_dim_on) {
-+		if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+			vi->tx_dim_enabled = true;
-+			for (i = 0; i < vi->max_queue_pairs; i++)
-+				vi->sq[i].dim_enabled = true;
-+		} else {
-+			return -EOPNOTSUPP;
-+		}
-+	} else {
-+		vi->tx_dim_enabled = false;
-+		for (i = 0; i < vi->max_queue_pairs; i++)
-+			vi->sq[i].dim_enabled = false;
-+
-+		vi->ctrl->coal_tx.tx_usecs = cpu_to_le32(ec->tx_coalesce_usecs);
-+		vi->ctrl->coal_tx.tx_max_packets = cpu_to_le32(ec->tx_max_coalesced_frames);
-+		sg_init_one(&sgs_tx, &vi->ctrl->coal_tx, sizeof(vi->ctrl->coal_tx));
-+
-+		if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
-+					  VIRTIO_NET_CTRL_NOTF_COAL_TX_SET,
-+					  &sgs_tx))
-+			return -EINVAL;
-+
-+		vi->intr_coal_tx.max_usecs = ec->tx_coalesce_usecs;
-+		vi->intr_coal_tx.max_packets = ec->tx_max_coalesced_frames;
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			vi->sq[i].intr_coal.max_usecs = ec->tx_coalesce_usecs;
-+			vi->sq[i].intr_coal.max_packets = ec->tx_max_coalesced_frames;
-+		}
- 	}
- 
- 	return 0;
-@@ -3436,11 +3491,37 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
- 	return 0;
- }
- 
-+static void virtnet_tx_dim_work(struct work_struct *work)
-+{
-+	struct dim *dim = container_of(work, struct dim, work);
-+	struct send_queue *sq = container_of(dim,
-+					     struct send_queue, dim);
-+	struct virtnet_info *vi = sq->vq->vdev->priv;
-+	struct net_device *dev = vi->dev;
-+	struct dim_cq_moder update_moder;
-+	int qnum = sq - vi->sq, err;
-+
-+	update_moder = net_dim_get_tx_moderation(dim->mode, dim->profile_ix);
-+	if (update_moder.usec != vi->sq[qnum].intr_coal.max_usecs ||
-+	    update_moder.pkts != vi->sq[qnum].intr_coal.max_packets) {
-+		rtnl_lock();
-+		err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, qnum,
-+						       update_moder.usec,
-+						       update_moder.pkts);
-+		if (err)
-+			pr_debug("%s: Failed to send dim parameters on txq%d\n",
-+				 dev->name, (int)(sq - vi->sq));
-+		rtnl_unlock();
-+	}
-+
-+	dim->state = DIM_START_MEASURE;
-+}
-+
- static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- 					  struct ethtool_coalesce *ec,
- 					  u16 queue)
- {
--	bool rx_ctrl_dim_on;
-+	bool rx_ctrl_dim_on, tx_ctrl_dim_on;
- 	u32 max_usecs, max_packets;
- 	int err;
- 
-@@ -3462,11 +3543,23 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- 			return err;
- 	}
- 
--	err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, queue,
--					       ec->tx_coalesce_usecs,
--					       ec->tx_max_coalesced_frames);
--	if (err)
--		return err;
-+	tx_ctrl_dim_on = !!ec->use_adaptive_tx_coalesce;
-+	max_usecs = vi->sq[queue].intr_coal.max_usecs;
-+	max_packets = vi->sq[queue].intr_coal.max_packets;
-+	if (tx_ctrl_dim_on && (ec->tx_coalesce_usecs != max_usecs ||
-+			       ec->tx_max_coalesced_frames != max_packets))
-+		return -EINVAL;
-+
-+	if (tx_ctrl_dim_on) {
-+		vi->sq[queue].dim_enabled = true;
-+	} else {
-+		vi->sq[queue].dim_enabled = false;
-+		err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, queue,
-+						       ec->tx_coalesce_usecs,
-+						       ec->tx_max_coalesced_frames);
-+		if (err)
-+			return err;
-+	}
- 
- 	return 0;
- }
-@@ -3579,6 +3672,7 @@ static int virtnet_get_coalesce(struct net_device *dev,
- 		ec->tx_max_coalesced_frames = vi->intr_coal_tx.max_packets;
- 		ec->rx_max_coalesced_frames = vi->intr_coal_rx.max_packets;
- 		ec->use_adaptive_rx_coalesce = vi->rx_dim_enabled;
-+		ec->use_adaptive_tx_coalesce = vi->tx_dim_enabled;
- 	} else {
- 		ec->rx_max_coalesced_frames = 1;
- 
-@@ -3637,6 +3731,7 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
- 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
- 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
- 		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
-+		ec->use_adaptive_tx_coalesce = vi->sq[queue].dim_enabled;
- 	} else {
- 		ec->rx_max_coalesced_frames = 1;
- 
-@@ -3762,7 +3857,7 @@ static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
- 
- static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
--		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
-+		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE,
- 	.get_drvinfo = virtnet_get_drvinfo,
- 	.get_link = ethtool_op_get_link,
- 	.get_ringparam = virtnet_get_ringparam,
--- 
-2.19.1.6.gb485710b
+Thanks
+
+
+>
+> Thanks.
+>
 
 
