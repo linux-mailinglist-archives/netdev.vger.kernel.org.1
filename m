@@ -1,235 +1,151 @@
-Return-Path: <netdev+bounces-40395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5AED7C728C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:29:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113747C7332
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:39:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8E7282902
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:29:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E97CC1C20AC3
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C452328C5;
-	Thu, 12 Oct 2023 16:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA95C262BB;
+	Thu, 12 Oct 2023 16:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="U67ngra9"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="BoKu7lrE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B6B328C0
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:29:15 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CEE0E6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:29:12 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-690bf8fdd1aso858590b3a.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:29:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1697128152; x=1697732952; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WE3Jo0Q6R2eDhOXLPAn5fI6nLqGl+yopyVyIxuKQuCM=;
-        b=U67ngra9kmwntvFkUCZK4bbeRmOU8mGM5rE7yItBt1leXCkDrOe8lqlY5fl8nqX2Uf
-         nPbLnTc4oiTJLgBTtX3hTYyrEyC4hPKqnIbCNqttioRS83pWwS77eVqddLUbIGY4OXMY
-         5T4u66py+xVG/9eX4vwonz44d1vF3kAcww5VE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697128152; x=1697732952;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WE3Jo0Q6R2eDhOXLPAn5fI6nLqGl+yopyVyIxuKQuCM=;
-        b=MFDwMS8q/hKiSN7DfNmMi8XKOEI0chM9dz0PnFGAg5O/vdSvSp6CTg9g6ZQb4w7oZ2
-         HShL7NG0bbPaz4M6tQNvKL2Cp4DWa9rscd7SAm5YPtaB2+M96/hd00KAXdZyU5QP1sb8
-         HPLqd2uvDyhbKTce8v6zLv9awnwazInd5k37h5MqPahihQAski0ZFUueZomSDiRtLgny
-         5xLDLKQYlc2s0IVkCLQEJ84y71AWkqH8QEJpwPmCj93Qe3fdCvzPazqfoQ3DVThsdktA
-         mrpXfZK2ghZQkPNtkHguqCGTHw5wZZwywihc+1VBbO/lTbsH1PpfkhaTnswJ4dbuJqkn
-         hy3g==
-X-Gm-Message-State: AOJu0Yx8eKD11rEWsV0dU9plKqYRfk307ki+U470YQO2l2QTclkYYUzh
-	sTKHnvWnrKWLdVc3/sojakrrsw==
-X-Google-Smtp-Source: AGHT+IGA3dYnTX2gx4tRNTqDSyaFZvdLD9jQ0uv4zzCA9gC04oYWVXvQWjDByBX7oKKZvymQRliLuA==
-X-Received: by 2002:a05:6a00:451b:b0:691:2d4:238e with SMTP id cw27-20020a056a00451b00b0069102d4238emr22840850pfb.6.1697128152366;
-        Thu, 12 Oct 2023 09:29:12 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id z23-20020aa785d7000000b00690d64a0cb6sm11942071pfn.72.2023.10.12.09.29.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 09:29:11 -0700 (PDT)
-Date: Thu, 12 Oct 2023 09:29:11 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	willemb@google.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, abdhalee@linux.vnet.ibm.com,
-	sachinp@linux.vnet.com, mputtash@linux.vnet.com
-Subject: Re: [Bisected] [1b4fa28a8b07] Build failure "net/core/gso_test.c"
-Message-ID: <202310120928.398BF883A8@keescook>
-References: <79fbe35c-4dd1-4f27-acb2-7a60794bc348@linux.vnet.ibm.com>
- <20231012095746.GA26871@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD2C20E5
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:39:26 +0000 (UTC)
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB89CA9;
+	Thu, 12 Oct 2023 09:39:23 -0700 (PDT)
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39CGd46D036926;
+	Thu, 12 Oct 2023 11:39:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697128744;
+	bh=8qGWk2MmoYlEABHB+jdRa8pwXPRY/VwhT1ctiVDXyao=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=BoKu7lrEik3wHsUbwCsTLP4bX3r3Hno9g5mdyv3kjTgcIZWUbSk1EgXKuA4yRxVMX
+	 lwjd0o6vk/QAl58BHsuyuG30U6VBDCOWEdVbUsCWARXzawx+5ProUGpBapM6L5xDcx
+	 58rv8/SsVpqeyo5l4vFm43Mdc+nl82ciOqTp1fR8=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39CGd4ws081254
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 12 Oct 2023 11:39:04 -0500
+Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 12
+ Oct 2023 11:39:03 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 12 Oct 2023 11:39:03 -0500
+Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39CGcxOT025695;
+	Thu, 12 Oct 2023 11:39:00 -0500
+Message-ID: <2d524100-7e34-7869-5e90-415614b767f3@ti.com>
+Date: Thu, 12 Oct 2023 22:08:58 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231012095746.GA26871@breakpoint.cc>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] net: ti: icssg-prueth: Fix tx_total_bytes count
+To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
+CC: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric
+ Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20231011063700.1824093-1-danishanwar@ti.com>
+ <4d7c2ab9-e980-42a5-9452-79bc0d33e094@lunn.ch>
+ <7b5f195f-c5c8-6847-9458-3d5563cf0112@ti.com>
+ <524856b3-6876-48d1-aebf-09f7f6c71f7b@lunn.ch>
+Content-Language: en-US
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <524856b3-6876-48d1-aebf-09f7f6c71f7b@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-7.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 11:57:46AM +0200, Florian Westphal wrote:
-> Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com> wrote:
-> > Greetings,
-> > 
-> > [net-next] [6.6-rc4] Build failure "net/core/gso_test.c"
-> > 
-> > --- Traces ---
-> > 
-> > make -j 33 -s && make modules_install && make install
-> > net/core/gso_test.c:58:48: error: initializer element is not constant
-> >    58 |                 .segs = (const unsigned int[]) { gso_size },
-> >       |                                                ^
+On 10/12/2023 8:58 PM, Andrew Lunn wrote:
+> On Thu, Oct 12, 2023 at 10:51:12AM +0530, MD Danish Anwar wrote:
+>> Hi Andrew,
+>>
+>> On 11/10/23 18:11, Andrew Lunn wrote:
+>>>> @@ -29,7 +30,12 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
+>>>>  			     base + icssg_all_stats[i].offset,
+>>>>  			     val);
+>>>>  
+>>>> +		if (!strncmp(icssg_ethtool_stats[i].name, "tx_good_frames", ETH_GSTRING_LEN))
+>>>> +			tx_pkt_cnt = val;
+>>>
+>>> Doing a strncmp seems very expensive. Could you make use of
+>>> icssg_stats.offset?
+>>>
+>>
+>> Sure. I can define the offset of these two stats and then use them in if
+>> condition as below.
+>>
+>> #define ICSSG_TX_PACKET_OFFSET 0xA0
+>> #define ICSSG_TX_BYTE_OFFSET   0xEC
+>>
+>> if (icssg_ethtool_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
+>> 	tx_pkt_cnt = val;
+>>
+>> if (icssg_ethtool_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
+>> 	emac->stats[i] -= tx_pkt_cnt * 8;
 > 
-> Ouch, I can reproduce this with: gcc --version
-> gcc (Debian 12.2.0-14) 12.2.0
-> Copyright (C) 2022 Free Software Foundation, Inc.
+> That is much better. Also consider adding something like:
 > 
-> gcc 13.2.1 and clang-16.0.6 are ok.
+> BUILD_BUG_ON(ICSSG_TX_PACKET_OFFSET < ICSSG_TX_BYTE_OFFSET)
 > 
-> Whats the preference here?  We could use simple preprocessor constant
-> or we could require much more recent compiler version for the net
-> kunit tests via kconfig.
+> I've no idea if this is correct. Just something to prove at build time
+> that ICSSG_TX_PACKET_OFFSET is read before ICSSG_TX_BYTE_OFFSET.
 > 
-> gcc-12.2.0 can compile it after this simple s//g "fix":
-> 
-> diff --git a/net/core/gso_test.c b/net/core/gso_test.c
-> --- a/net/core/gso_test.c
-> +++ b/net/core/gso_test.c
-> @@ -4,7 +4,7 @@
->  #include <linux/skbuff.h>
->  
->  static const char hdr[] = "abcdefgh";
-> -static const int gso_size = 1000;
-> +#define GSO_TEST_SIZE 1000
 
-This fixes the build for me too.
+These registers are defined sequentially in the structure
+miig_stats_regs. The offset for rx_packets is 0x0, rx_broadcast_frames
+is 0x4 and so on. Basically the offset for i'th stat is i * sizeof(u32).
 
-Tested-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Kees Cook <keescook@chromium.org>
+In the structure, tx_packet is defined first (index 40, offset 0xA0) and
+then tx_bytes is defined (index 59, offset 0xEC).
 
--Kees
+In emac_update_hardware_stats() all these registers are read
+sequentially. Meaning first tx_packet register is read and then tx_byte.
 
->  
->  static void __init_skb(struct sk_buff *skb)
->  {
-> @@ -18,7 +18,7 @@ static void __init_skb(struct sk_buff *skb)
->  
->  	/* proto is arbitrary, as long as not ETH_P_TEB or vlan */
->  	skb->protocol = htons(ETH_P_ATALK);
-> -	skb_shinfo(skb)->gso_size = gso_size;
-> +	skb_shinfo(skb)->gso_size = GSO_TEST_SIZE;
->  }
->  
->  enum gso_test_nr {
-> @@ -53,70 +53,70 @@ static struct gso_test_case cases[] = {
->  	{
->  		.id = GSO_TEST_NO_GSO,
->  		.name = "no_gso",
-> -		.linear_len = gso_size,
-> +		.linear_len = GSO_TEST_SIZE,
->  		.nr_segs = 1,
-> -		.segs = (const unsigned int[]) { gso_size },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE },
->  	},
->  	{
->  		.id = GSO_TEST_LINEAR,
->  		.name = "linear",
-> -		.linear_len = gso_size + gso_size + 1,
-> +		.linear_len = GSO_TEST_SIZE + GSO_TEST_SIZE + 1,
->  		.nr_segs = 3,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 1 },
->  	},
->  	{
->  		.id = GSO_TEST_FRAGS,
->  		.name = "frags",
-> -		.linear_len = gso_size,
-> +		.linear_len = GSO_TEST_SIZE,
->  		.nr_frags = 2,
-> -		.frags = (const unsigned int[]) { gso_size, 1 },
-> +		.frags = (const unsigned int[]) { GSO_TEST_SIZE, 1 },
->  		.nr_segs = 3,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 1 },
->  	},
->  	{
->  		.id = GSO_TEST_FRAGS_PURE,
->  		.name = "frags_pure",
->  		.nr_frags = 3,
-> -		.frags = (const unsigned int[]) { gso_size, gso_size, 2 },
-> +		.frags = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 2 },
->  		.nr_segs = 3,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size, 2 },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 2 },
->  	},
->  	{
->  		.id = GSO_TEST_GSO_PARTIAL,
->  		.name = "gso_partial",
-> -		.linear_len = gso_size,
-> +		.linear_len = GSO_TEST_SIZE,
->  		.nr_frags = 2,
-> -		.frags = (const unsigned int[]) { gso_size, 3 },
-> +		.frags = (const unsigned int[]) { GSO_TEST_SIZE, 3 },
->  		.nr_segs = 2,
-> -		.segs = (const unsigned int[]) { 2 * gso_size, 3 },
-> +		.segs = (const unsigned int[]) { 2 * GSO_TEST_SIZE, 3 },
->  	},
->  	{
->  		/* commit 89319d3801d1: frag_list on mss boundaries */
->  		.id = GSO_TEST_FRAG_LIST,
->  		.name = "frag_list",
-> -		.linear_len = gso_size,
-> +		.linear_len = GSO_TEST_SIZE,
->  		.nr_frag_skbs = 2,
-> -		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
-> +		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
->  		.nr_segs = 3,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, GSO_TEST_SIZE },
->  	},
->  	{
->  		.id = GSO_TEST_FRAG_LIST_PURE,
->  		.name = "frag_list_pure",
->  		.nr_frag_skbs = 2,
-> -		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
-> +		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
->  		.nr_segs = 2,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
->  	},
->  	{
->  		/* commit 43170c4e0ba7: GRO of frag_list trains */
->  		.id = GSO_TEST_FRAG_LIST_NON_UNIFORM,
->  		.name = "frag_list_non_uniform",
-> -		.linear_len = gso_size,
-> +		.linear_len = GSO_TEST_SIZE,
->  		.nr_frag_skbs = 4,
-> -		.frag_skbs = (const unsigned int[]) { gso_size, 1, gso_size, 2 },
-> +		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, 1, GSO_TEST_SIZE, 2 },
->  		.nr_segs = 4,
-> -		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size, 3 },
-> +		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, GSO_TEST_SIZE, 3 },
->  	},
->  	{
->  		/* commit 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes") and
+emac_update_hardware_stats() is called every 25s (by workqueue). Every
+time first tx_packet is read and then tx_byte. So every time we are
+decrementing tx_bytes by 8 bytes * num of packets, the num of packets
+always exists and it is read before doing this calculation.
+
+So I don't think any check is required to make sure
+ICSSG_TX_PACKET_OFFSET is read before ICSSG_TX_BYTE_OFFSET.
+
+The hardware design is such a way that these registers are read in a
+sequence and the same sequence is followed in driver (struct
+miig_stats_regs)
+
+>      Andrew
 
 -- 
-Kees Cook
+Thanks and Regards,
+Md Danish Anwar
 
