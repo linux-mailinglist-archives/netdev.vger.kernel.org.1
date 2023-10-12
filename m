@@ -1,102 +1,140 @@
-Return-Path: <netdev+bounces-40398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FD867C7384
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:54:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74BE77C7386
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 18:55:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB1D728290A
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EA521C20B85
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D3E2AB57;
-	Thu, 12 Oct 2023 16:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B5A2AB57;
+	Thu, 12 Oct 2023 16:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XYDux2c1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KWlJSI0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA002AB53
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:54:52 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5971C6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:54:50 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53e2dc8fa02so488549a12.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:54:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697129689; x=1697734489; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBUBWcfqd6h2FYCx6HxLCGICG3O8Ap6wf3BtHDsyNkw=;
-        b=XYDux2c1jm61KTl0piNXwt+k6rvxPnpV3yItyhaASGTP2US5lB3J520yPNlXP1bEN7
-         P/VPJ802FDEHGUtTsu6BO3QVLzh0sGIB1HsEepeVVBX5AZLH4Pgz0dJuiQXVOdQaMzlZ
-         vwKnBK5hlpq5+MreMPp5VzAfpHnQr+UWQbtrxDP+AlOyW6KUvUi8GVc+i+rBdVzuG+Og
-         ywQsuVByCGWvanFIkNQLS7rxlmF9J31tusfPQy7cw6gcPquZeg5jSBLq9hbjnNVQF7zv
-         K20+TeD3pllofe4IXandv7/f9Q5LOsUZeggzhHVdPunJqjcjGb1VZK+HSSWx3V10+h7F
-         1iRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697129689; x=1697734489;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bBUBWcfqd6h2FYCx6HxLCGICG3O8Ap6wf3BtHDsyNkw=;
-        b=S7VKtWf/8zPlDrz+v1wcLaTmq9thI9S9M04ip9QaJD9WMC15g7glc1umWbuhyhgLk4
-         Rj73C1neB7XUWsN3c+J9IEv9TjV4FktIwr2hwcW6MMgMOgkyUkvGsLjTwZulUCmJP8Bf
-         xYhnPPZjyVslik16AppwvdjqiC0mwJ/SSTX4OuEZ/1n+hRau85NuTWXIV5Jk72Jelbw9
-         8Lbac6V92cbJa0tDEDqOSZagoJ4F1nc4zxog1URwsRYF35rFrDcU1jbV2EJ+V9jycvTN
-         EaFzaXzXWJAQ0GYHH6f/AsGc+njcBebFDUbSgg/6+Uq48/Dr2prR+dOkFy5EegXbEByG
-         5UoQ==
-X-Gm-Message-State: AOJu0YwNClwTuiAXUaigHLVMp7Hpp7VyfL8V5GDnExYDgsUFxP+Wp45N
-	X5e8QN69zdcHqVNifVbdnNzApg3mCUAr6HRP3ArjOw==
-X-Google-Smtp-Source: AGHT+IERlaWWwiML/RFT3cp2GcW0IWarhx9gkibx1TlIHF9bhAGNQd9/QPTUhc2WeHSsLpPbF34UNy9rAMlj9u2bDOA=
-X-Received: by 2002:aa7:d88e:0:b0:532:e24d:34f4 with SMTP id
- u14-20020aa7d88e000000b00532e24d34f4mr21115676edq.39.1697129689228; Thu, 12
- Oct 2023 09:54:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D962AB53
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:55:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BEB6C433C8;
+	Thu, 12 Oct 2023 16:55:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697129716;
+	bh=O8UY1DvSBTTGnjJ9XccnIy1wMqCD+BqiH+/36Y/1MZE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KWlJSI0PM5XU1MvuMXMhSDW/+KG+gbxWbms9N1wWVEH1VHrp+PFFEtMNA1F7TmINm
+	 Vir1kvxAz3S+1cc+zoO7leMpyyRGnmRGzjtRhw9QTRvJ0KMNE9sN7RqKLK/wjOTbR0
+	 ze0K4mY+siE80ZYGdCFyj5fcVc/tER/4FQYJnm/LG1IE2JmtmB+L+EDdD93plmDbOT
+	 du6vLsLK2S6IIEku5xngpqCJKauULlg/U/LFlNjHCOu+HtyXVzlxkE8IsVY2wZMe+8
+	 rDhYakUxcDXcf05AQGHpAX84l3Xa/U9F0OGH/13wuCux+RljgfU1sGrqIQXBBtZFdg
+	 w+oZslObnrF3g==
+Date: Thu, 12 Oct 2023 09:55:14 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Joerg Roedel <joro@8bytes.org>, Robin Murphy <robin.murphy@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net v3] net/mlx5: fix calling mlx5_cmd_init() before DMA
+ mask is set
+Message-ID: <ZSgk8huR9xCUHWBi@x130>
+References: <20231011-mlx5_init_fix-v3-1-787ffb9183c6@linux.ibm.com>
+ <ZSbnUlJT1u3xUIqY@x130>
+ <ZSbvxeLKS8zHltdg@x130>
+ <5e7ec86d690ec5337052742ca75ad2ade23f291e.camel@linux.ibm.com>
+ <ead14a91ffaec7b9e818edf735dbc18510d7915e.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com>
-In-Reply-To: <267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com>
-From: Loic Poulain <loic.poulain@linaro.org>
-Date: Thu, 12 Oct 2023 18:54:11 +0200
-Message-ID: <CAMZdPi9RDSAsA8bCwN1f-4v3Ahqh8+eFLTArdyE5qZeocAMhtQ@mail.gmail.com>
-Subject: Re: Intel 7560 LTE Modem stops working after resuming from standby
-To: Bagas Sanjaya <bagasdotme@gmail.com>, M Chetan Kumar <m.chetan.kumar@linux.intel.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Regressions <regressions@lists.linux.dev>, Linux Networking <netdev@vger.kernel.org>, 
-	Linux Intel Wireless WAN <linuxwwan@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>, Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ead14a91ffaec7b9e818edf735dbc18510d7915e.camel@linux.ibm.com>
 
-Hi Chetan,
-
-On Thu, 12 Oct 2023 at 11:52, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
-> I notice a regression report on Bugzilla [1]. Quoting from it:
+On 12 Oct 13:39, Niklas Schnelle wrote:
+>On Thu, 2023-10-12 at 12:53 +0200, Niklas Schnelle wrote:
+>> On Wed, 2023-10-11 at 11:56 -0700, Saeed Mahameed wrote:
+>> > On 11 Oct 11:20, Saeed Mahameed wrote:
+>> > > On 11 Oct 09:57, Niklas Schnelle wrote:
+>> > > > Since commit 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and
+>> > > > reload routines") mlx5_cmd_init() is called in mlx5_mdev_init() which is
+>> > > > called in probe_one() before mlx5_pci_init(). This is a problem because
+>> > > > mlx5_pci_init() is where the DMA and coherent mask is set but
+>> > > > mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+>> > > > allocation is done during probe before the correct mask is set. This
+>> > > > causes probe to fail initialization of the cmdif SW structs on s390x
+>> > > > after that is converted to the common dma-iommu code. This is because on
+>> > > > s390x DMA addresses below 4 GiB are reserved on current machines and
+>> > > > unlike the old s390x specific DMA API implementation common code
+>> > > > enforces DMA masks.
+>> > > >
+>> > > > Fix this by moving set_dma_caps() out of mlx5_pci_init() and into
+>> > > > probe_one() before mlx5_mdev_init(). To match the overall naming scheme
+>> > > > rename it to mlx5_dma_init().
+>> > >
+>> > > How about we just call mlx5_pci_init() before mlx5_mdev_init(), instead of
+>> > > breaking it apart ?
+>> >
+>> > I just posted this RFC patch [1]:
+>>
+>> This patch works to solve the problem as well.
+>>
+>> >
+>> > I am working in very limited conditions these days, and I don't have strong
+>> > opinion on which approach to take, Leon, Niklas, please advise.
+>> >
+>> > The three possible solutions:
+>> >
+>> > 1) mlx5_pci_init() before mlx5_mdev_init(), I don't think enabling pci
+>> > before initializing cmd dma would be a problem.
+>> >
+>> > 2) This patch.
+>> >
+>> > 3) Shay's patch from the link below:
+>> > [1] https://patchwork.kernel.org/project/netdevbpf/patch/20231011184511.19818-1-saeed@kernel.org/
+>> >
+>> > Thanks,
+>> > Saeed.
+>>
+>> My first gut feeling was option 1) but I'm just as happy with 2) or 3).
+>> For me option 2 is the least invasive but not by much.
+>>
+>> For me the important thing is what Jason also said yesterday. We need
+>> to merge something now to unbreak linux-next on s390x and to make sure
+>> we don't end up with a broken v6.7-rc1. This is already hampering our
+>> CI tests with linux-next. So let's do whatever can be merged the
+>> quickest and then feel free to do any refactoring ideas that this
+>> discussion might have spawned on top of that. My guess for this
+>> criteria would be 2).
+>>
+>> Thanks,
+>> Niklas
+>>
 >
-> > I noticed a few days ago, after Fedora moved to Kernel 6.5, that my Intel LTE Modem was not working anymore after resuming from standby.
-> >
-> > The journal listed this error message multiple times:
-> > kernel: iosm 0000:01:00.0: msg timeout
-> >
-> > It took me a while to determine the root cause of the problem, since the modem did not work either in the following warm reboots.
-> > Only a shutdown revived the modem.
-> >
-> > I did a bisection of the error and I was able to find the culprit:
-> >
-> > [e4f5073d53be6cec0c654fac98372047efb66947] net: wwan: iosm: enable runtime pm support for 7560
+>Looking closer at the patch from Shay I do like that it changes the
+>order in the disable/tear down path too. So since that also fixes a PPC
+>issue I guess that may indeed be the best solution if we can get it
+>merged quickly. I'll comment with my Tested-by there too.
+>
 
-Any quick fix for this issue? alternatively we will probably revert e4f5073d53.
+Ack, will take Shay's patch then, Will add your Test-by and 
+Reviewed-by.
 
-Regards,
-Loic
+>Thanks,
+>Niklas
 
