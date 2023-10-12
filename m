@@ -1,458 +1,161 @@
-Return-Path: <netdev+bounces-40231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53C077C6503
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:01:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF8E97C6537
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 08:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20E891C209C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:01:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C4DC1C20A39
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 06:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3420FD277;
-	Thu, 12 Oct 2023 06:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB59D28A;
+	Thu, 12 Oct 2023 06:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dNHkPFcX"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NJ9GBBaa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2345CA70
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:01:34 +0000 (UTC)
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A53EA9;
-	Wed, 11 Oct 2023 23:01:32 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-d8164e661abso660688276.1;
-        Wed, 11 Oct 2023 23:01:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B21A28EF
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 06:14:10 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 194E1A9
+	for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:14:07 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-99bdcade7fbso88457566b.1
+        for <netdev@vger.kernel.org>; Wed, 11 Oct 2023 23:14:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697090491; x=1697695291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=t1a5vaqrUomY/MEaUi5flyYLhZewU130jRnytbykBy0=;
-        b=dNHkPFcXg6cZdc3JIL86oBpy4Q67QQk5LC6ZrdxmqqdeYZCEetUdoGoG7eSIjKJD+f
-         08dq2pm5C8vb8PtH8xveOr4NSQrVDhilJDtpvfM4VdDi/EM7E3MkR4BPh1SjcT2LOkws
-         1Qbex1TR5zbV5vMDnTsHyyp7tEtaFjWA1fc22aqvGEhFHrjS3auFl3q3iiQXhFdmKIEl
-         0o+mAieKXq5xF7iZlMDqsRZ5eDxcRpNpRVsNB4PZdBmgIkaHuHZDTH2Rk9NvhCNOKj3c
-         W+wuTN0QbAjrWas3bnDWzjVG+WZjzUfJ/6/7WxhhMjeLhvM/pI98crKRIcB6oPLRuGvS
-         fdXA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1697091245; x=1697696045; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p4HQzK95S9Wjb2C0nruurvcp8jEQs9ZhaOvxPRUnER0=;
+        b=NJ9GBBaaISXMLVBd2vGBqX/geatDQYO/5MSi36QgGyjtxmfABblrT2VNaKJFmdeS/g
+         jNI40/yN1tSBMvNFOBdsCBXPQqF+AE0U+yUnLS7syD3pqlaZOXjzfXU9WZE6F9iywQI7
+         qCRQg7g3Z7XToMIFYVHgwgqSI4V54/P5NQJ4Vac1+6E/H7J3+eVVNH2UHmPiQ5LzkujG
+         L4qzxBTMAbxfphYzzKtUtt3hsKM7kyZAAP+mHOZKsNQFDQAg7w2vMKQ3RTlM+Hr/lfKR
+         ZMpjicxxfQf+3bIYwkzARRgxx+RmGzfoWNMeRyNtl/pkKXGc2AghWZkBgFhewlE+qCFO
+         GA+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697090491; x=1697695291;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t1a5vaqrUomY/MEaUi5flyYLhZewU130jRnytbykBy0=;
-        b=eaj9WJds0xJt76/ua8YkMsMnSFcZLJbwYOKh6oOV7S3FIcWD5uNfthlqao1viAPgJt
-         yzp92TUeDODMQ4OGsXk003oRdHBa9KXQmem9sD4cmPRmYvAFcplOM80euYHgLe5b+0ar
-         Wp7XMCCMPCj4uoVDNrV3g9d3qd1Ygk0bHhlvgMwGC5rLXOwr0RG5FW+ZXGvaxUlJocKy
-         kJF6g+GTNFZY96iTSWYfyl+uvDRbjQ1kzyo/8/TdGrb5QNvrYmsGwoSwxwYJyi2At5TA
-         5wsY6HNwvxmdRxlljyXM9qp0tpzqWlssZoj0rd3SHIIZKBCvacNPWio6nZP7OzG/A3xq
-         9NUw==
-X-Gm-Message-State: AOJu0YywA/imd1Dmt9XyGzGGLBBgqsvXJYdaTESvNhHXSx6brWV9D/DA
-	oFOPXZKQx0GXEBePI0qQRhM=
-X-Google-Smtp-Source: AGHT+IHSo8uyr7upJGMZgscEF8vgcFfKCrYBJbNGLGt6zswHzMFTmnHMsdKVZBR9jMujanN24Nvwug==
-X-Received: by 2002:a25:2d20:0:b0:d9a:6259:5461 with SMTP id t32-20020a252d20000000b00d9a62595461mr6062694ybt.38.1697090491429;
-        Wed, 11 Oct 2023 23:01:31 -0700 (PDT)
-Received: from ocxma-dut.. ([153.126.233.61])
-        by smtp.gmail.com with ESMTPSA id m4-20020a255804000000b00d7745e2bb19sm4956925ybb.29.2023.10.11.23.01.28
+        d=1e100.net; s=20230601; t=1697091245; x=1697696045;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p4HQzK95S9Wjb2C0nruurvcp8jEQs9ZhaOvxPRUnER0=;
+        b=GtfGVhuuN3Xj6fT1PwL2qgt8NB+x4XU0E5s35eLQuxOq4TQR/UP2YYw1xfK2x4MJ37
+         TY72PUIssidV4k3z1f8687l9LM4my2b7cBLL/lQm9aJZLogYojb32pW0SSFHXRpnz6OY
+         +v+tTi0gb0LpyLRNwEMbzT4zaAlvMERqFY14YomxqdLOVL4uwebESVUfD9oz2Wc9Zic3
+         nUj/VVHpQaz7CkB3W3TrgD0LGEMxux9qf963VIBg1UiskitXq8oEnhUfAfi0hAB/04Vp
+         sQsDSMaSrLAb8+OqFD0PDjI4D7oSWT9notsf/Ss1HznFo7ToHfEJg0JmY4HX2/y4wrBG
+         0kbg==
+X-Gm-Message-State: AOJu0YwD4dU1aDlqmId1sicFJjWHHgtGBkWUis2bz1GqoOc34tNuJMQP
+	bRlbmTifzKyOfLX3rBhlJbc37A==
+X-Google-Smtp-Source: AGHT+IHNvEmBLi8xvtHV6MxPIm2hBCo5Wmp5yk50fCjrdC/4cPFmYdotXD4lFiTh66ariItUL2QvgQ==
+X-Received: by 2002:a17:907:7702:b0:9b2:b2ad:2a76 with SMTP id kw2-20020a170907770200b009b2b2ad2a76mr19191357ejc.16.1697091245393;
+        Wed, 11 Oct 2023 23:14:05 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id u13-20020a1709060b0d00b009ad87d1be17sm10620092ejg.22.2023.10.11.23.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Oct 2023 23:01:31 -0700 (PDT)
-From: Takeru Hayasaka <hayatake396@gmail.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Takeru Hayasaka <hayatake396@gmail.com>
-Subject: [PATCH net-next v2] ethtool: ice: Support for RSS settings to GTP from ethtool
-Date: Thu, 12 Oct 2023 06:01:15 +0000
-Message-Id: <20231012060115.107183-1-hayatake396@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 11 Oct 2023 23:14:04 -0700 (PDT)
+Date: Thu, 12 Oct 2023 08:14:03 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, gal@nvidia.com
+Subject: Re: [patch net-next] devlink: don't take instance lock for nested
+ handle put
+Message-ID: <ZSeOq+I+Z12E/oRC@nanopsycho>
+References: <ZSEwO+1pLuV6F6K/@nanopsycho>
+ <20231009081532.07e902d4@kernel.org>
+ <ZSQeNxmoual7ewcl@nanopsycho>
+ <20231009093129.377167bb@kernel.org>
+ <ZST9yFTeeTuYD3RV@nanopsycho>
+ <20231010075231.322ced83@kernel.org>
+ <ZSV0NOackGvWn7t/@nanopsycho>
+ <20231010111605.2d520efc@kernel.org>
+ <ZSakg8W+SBgahXtW@nanopsycho>
+ <20231011172025.5f4bebcb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011172025.5f4bebcb@kernel.org>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a patch that enables RSS functionality for GTP packets using
-ethtool.
-A user can include her TEID and make RSS work for GTP-U over IPv4 by
-doing the following:
-`ethtool -N ens3 rx-flow-hash gtpu4 sde`
-In addition to gtpu(4|6), we now support gtpc(4|6),gtpc(4|6)t,gtpu(4|6)e,
-gtpu(4|6)u, and gtpu(4|6)d.
+Thu, Oct 12, 2023 at 02:20:25AM CEST, kuba@kernel.org wrote:
+>On Wed, 11 Oct 2023 15:34:59 +0200 Jiri Pirko wrote:
+>> >If parent is guaranteed to exist the read only fields can be accessed
+>> >freely and the read-write fields can be cached on children.  
+>> 
+>> Only reason to access parent currently is netns change notification.
+>> See devlink_rel_nested_in_notify().
+>> It basically just scheduled delayed work by calling:
+>> devlink_rel_nested_in_notify_work_schedule().
+>> 
+>> When work is processed in
+>> devlink_rel_nested_in_notify_work()
+>> There is no guarantee the parent exists, therefore devlink_index is used
+>> to get the instance and then obj_index to get port/linecard index.
+>> 
+>> notify_cb() basically sends notification of parent object and that needs
+>> parent instance lock. <--- This is why you need to lock the parent.
+>> 
+>> I see no way how to cache anything on children as you describe in this
+>> scenario.
+>> 
+>> 
+>> >Parent has a list of children, it can store/cache a netns pointer on all
+>> >of them. When reload happens lock them and update that pointer.
+>> >At which point children do not have to lock the parent.  
+>> 
+>> Access of netns pointer is not a problem. 
+>
+>The current code is a problem in itself. You added another xarray,
+>with some mark, callbacks and unclear locking semantics. All of it
+>completely undocumented.
 
-GTP generates a flow that includes an ID called TEID to identify the
-tunnel. This tunnel is created for each UE (User Equipment).
-By performing RSS based on this flow, it is possible to apply RSS for
-each communication unit from the UE.
-Without this, RSS would only be effective within the range of IP
-addresses.
-For instance, the PGW can only perform RSS within the IP range of the
-SGW.
-problematic from a load distribution perspective, especially if there's
-a bias in the terminals connected to a particular base station.
-This case can be solved by using this patch
+Okay, I will add the documentation. But I thouth it is clear. The parent
+instance lock needs to be taken out of child lock. The problem this
+patch tries to fix is when the rntl comes into the picture in one flow,
+see the patch description.
 
-Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
----
-Added commit messages and options based on reviews
+>
+>The RCU lock on top is just fixing one obvious bug I pointed out to you.
 
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 116 ++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_flow.h    |  15 +++
- drivers/net/ethernet/intel/ice/ice_lib.c     |  84 ++++++++++++++
- include/uapi/linux/ethtool.h                 |  13 +++
- 4 files changed, 226 insertions(+), 2 deletions(-)
+Not sure what obvious bug you mean. If you mean the parent-child
+lifetime change, I don't know how that would help here. I don't see how.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index ad4d4702129f..8d8bf1b41049 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -2404,6 +2404,24 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	case SCTP_V4_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV4;
- 		break;
-+	case GTPU_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPC_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPC_TEID_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_EH_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_UL_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
-+	case GTPU_DL_V4_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4;
-+		break;
- 	case TCP_V6_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6;
- 		break;
-@@ -2413,9 +2431,28 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	case SCTP_V6_FLOW:
- 		hdrs |= ICE_FLOW_SEG_HDR_SCTP | ICE_FLOW_SEG_HDR_IPV6;
- 		break;
-+	case GTPU_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPC_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPC_TEID_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_EH_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_UL_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
-+	case GTPU_DL_V6_FLOW:
-+		hdrs |= ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6;
-+		break;
- 	default:
- 		break;
- 	}
-+
- 	return hdrs;
- }
- 
-@@ -2431,6 +2468,12 @@ static u32 ice_parse_hdrs(struct ethtool_rxnfc *nfc)
- 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_SRC_PORT)
- #define ICE_FLOW_HASH_FLD_SCTP_DST_PORT	\
- 	BIT_ULL(ICE_FLOW_FIELD_IDX_SCTP_DST_PORT)
-+#define ICE_FLOW_HASH_FLD_GTPC_TEID	BIT_ULL(ICE_FLOW_FIELD_IDX_GTPC_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_IP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_IP_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_EH_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_EH_QFI BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_EH_QFI)
-+#define ICE_FLOW_HASH_FLD_GTPU_UP_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID)
-+#define ICE_FLOW_HASH_FLD_GTPU_DWN_TEID BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID)
- 
- /**
-  * ice_parse_hash_flds - parses hash fields from RSS hash input
-@@ -2448,6 +2491,12 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 		case TCP_V4_FLOW:
- 		case UDP_V4_FLOW:
- 		case SCTP_V4_FLOW:
-+		case GTPU_V4_FLOW:
-+		case GTPC_V4_FLOW:
-+		case GTPC_TEID_V4_FLOW:
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_DL_V4_FLOW:
- 			if (nfc->data & RXH_IP_SRC)
- 				hfld |= ICE_FLOW_HASH_FLD_IPV4_SA;
- 			if (nfc->data & RXH_IP_DST)
-@@ -2456,6 +2505,12 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 		case TCP_V6_FLOW:
- 		case UDP_V6_FLOW:
- 		case SCTP_V6_FLOW:
-+		case GTPU_V6_FLOW:
-+		case GTPC_V6_FLOW:
-+		case GTPC_TEID_V6_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+		case GTPU_DL_V6_FLOW:
- 			if (nfc->data & RXH_IP_SRC)
- 				hfld |= ICE_FLOW_HASH_FLD_IPV6_SA;
- 			if (nfc->data & RXH_IP_DST)
-@@ -2489,6 +2544,48 @@ static u64 ice_parse_hash_flds(struct ethtool_rxnfc *nfc)
- 			if (nfc->data & RXH_L4_B_2_3)
- 				hfld |= ICE_FLOW_HASH_FLD_SCTP_DST_PORT;
- 			break;
-+		case GTPU_V4_FLOW:
-+		case GTPU_V6_FLOW:
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+		case GTPU_DL_V4_FLOW:
-+		case GTPU_DL_V6_FLOW:
-+			if (nfc->data & RXH_L4_B_0_1)
-+				hfld |= ICE_FLOW_HASH_FLD_TCP_SRC_PORT |
-+						ICE_FLOW_HASH_FLD_UDP_SRC_PORT;
-+			if (nfc->data & RXH_L4_B_2_3)
-+				hfld |= ICE_FLOW_HASH_FLD_TCP_DST_PORT |
-+						ICE_FLOW_HASH_FLD_UDP_DST_PORT;
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	if (nfc->data & RXH_GTP_TEID) {
-+		switch (nfc->flow_type) {
-+		case GTPC_TEID_V4_FLOW:
-+		case GTPC_TEID_V6_FLOW:
-+			hfld |= ICE_FLOW_HASH_FLD_GTPC_TEID;
-+			break;
-+		case GTPU_V4_FLOW:
-+		case GTPU_V6_FLOW:
-+			hfld |= ICE_FLOW_HASH_FLD_GTPU_IP_TEID;
-+			break;
-+		case GTPU_EH_V4_FLOW:
-+		case GTPU_EH_V6_FLOW:
-+			hfld |= ICE_FLOW_HASH_FLD_GTPU_EH_TEID;
-+			break;
-+		case GTPU_UL_V4_FLOW:
-+		case GTPU_UL_V6_FLOW:
-+			hfld |= ICE_FLOW_HASH_FLD_GTPU_UP_TEID;
-+			break;
-+		case GTPU_DL_V4_FLOW:
-+		case GTPU_DL_V6_FLOW:
-+			hfld |= ICE_FLOW_HASH_FLD_GTPU_DWN_TEID;
-+			break;
- 		default:
- 			break;
- 		}
-@@ -2590,13 +2687,28 @@ ice_get_rss_hash_opt(struct ice_vsi *vsi, struct ethtool_rxnfc *nfc)
- 
- 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_SRC_PORT ||
- 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_SRC_PORT ||
--	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT)
-+	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_SRC_PORT ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
- 		nfc->data |= (u64)RXH_L4_B_0_1;
- 
- 	if (hash_flds & ICE_FLOW_HASH_FLD_TCP_DST_PORT ||
- 	    hash_flds & ICE_FLOW_HASH_FLD_UDP_DST_PORT ||
--	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT)
-+	    hash_flds & ICE_FLOW_HASH_FLD_SCTP_DST_PORT ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
- 		nfc->data |= (u64)RXH_L4_B_2_3;
-+
-+	if (hash_flds & ICE_FLOW_HASH_FLD_GTPC_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_IP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_EH_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_UP_TEID ||
-+		hash_flds & ICE_FLOW_HASH_FLD_GTPU_DWN_TEID)
-+		nfc->data |= (u64)RXH_GTP_TEID;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.h b/drivers/net/ethernet/intel/ice/ice_flow.h
-index b465d27d9b80..7ddf6ce994e7 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.h
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.h
-@@ -64,6 +64,21 @@
- 	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_EH_TEID | \
- 	 ICE_FLOW_HASH_GTP_U_EH_QFI)
- 
-+#define ICE_FLOW_HASH_GTP_U_UP_TEID \
-+	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_UP_TEID))
-+#define ICE_FLOW_HASH_GTP_U_DWN_TEID \
-+	(BIT_ULL(ICE_FLOW_FIELD_IDX_GTPU_DWN_TEID))
-+
-+#define ICE_FLOW_HASH_GTP_U_IPV4_UP \
-+	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_UP_TEID)
-+#define ICE_FLOW_HASH_GTP_U_IPV6_UP \
-+	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_UP_TEID)
-+
-+#define ICE_FLOW_HASH_GTP_U_IPV4_DWN \
-+	(ICE_FLOW_HASH_IPV4 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
-+#define ICE_FLOW_HASH_GTP_U_IPV6_DWN \
-+	(ICE_FLOW_HASH_IPV6 | ICE_FLOW_HASH_GTP_U_DWN_TEID)
-+
- #define ICE_FLOW_HASH_PPPOE_SESS_ID \
- 	(BIT_ULL(ICE_FLOW_FIELD_IDX_PPPOE_SESS_ID))
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index 201570cd2e0b..17852f24ff7d 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1667,6 +1667,48 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
- 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp4 flow, vsi = %d, error = %d\n",
- 			vsi_num, status);
- 
-+	/* configure RSS for gtpc4 with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_IPV4,
-+				 ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpc4t with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV4_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc4t flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4 with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4e with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_EH,
-+				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4e flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4u with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_UP,
-+				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4u flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu4d with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV4_DWN,
-+				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV4);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
- 	/* configure RSS for tcp6 with input set IPv6 src/dst, TCP src/dst */
- 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_HASH_TCP_IPV6,
- 				 ICE_FLOW_SEG_HDR_TCP | ICE_FLOW_SEG_HDR_IPV6);
-@@ -1688,6 +1730,48 @@ static void ice_vsi_set_rss_flow_fld(struct ice_vsi *vsi)
- 		dev_dbg(dev, "ice_add_rss_cfg failed for sctp6 flow, vsi = %d, error = %d\n",
- 			vsi_num, status);
- 
-+	/* configure RSS for gtpc6 with input set IPv4 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_IPV6,
-+				 ICE_FLOW_SEG_HDR_GTPC | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpc6t with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_IPV6_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPC_TEID | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpc6t flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6 with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_TEID,
-+				 ICE_FLOW_SEG_HDR_GTPU_IP | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4 flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6e with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_EH,
-+				 ICE_FLOW_SEG_HDR_GTPU_EH | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6e flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6u with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_UP,
-+				 ICE_FLOW_SEG_HDR_GTPU_UP | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu6u flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
-+	/* configure RSS for gtpu6d with input set IPv6 src/dst */
-+	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_GTP_U_IPV6_DWN,
-+				 ICE_FLOW_SEG_HDR_GTPU_DWN | ICE_FLOW_SEG_HDR_IPV6);
-+	if (status)
-+		dev_dbg(dev, "ice_add_rss_cfg failed for gtpu4d flow, vsi = %d, error = %d\n",
-+			vsi_num, status);
-+
- 	status = ice_add_rss_cfg(hw, vsi_handle, ICE_FLOW_HASH_ESP_SPI,
- 				 ICE_FLOW_SEG_HDR_ESP);
- 	if (status)
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index f7fba0dc87e5..a2d4f2081cf3 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -2011,6 +2011,18 @@ static inline int ethtool_validate_duplex(__u8 duplex)
- #define	IPV4_FLOW	0x10	/* hash only */
- #define	IPV6_FLOW	0x11	/* hash only */
- #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
-+#define GTPU_V4_FLOW 0x13	/* hash only */
-+#define GTPU_V6_FLOW 0x14	/* hash only */
-+#define GTPC_V4_FLOW 0x15	/* hash only */
-+#define GTPC_V6_FLOW 0x16	/* hash only */
-+#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
-+#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
-+#define GTPU_EH_V4_FLOW 0x19	/* hash only */
-+#define GTPU_EH_V6_FLOW 0x20	/* hash only */
-+#define GTPU_UL_V4_FLOW 0x21	/* hash only */
-+#define GTPU_UL_V6_FLOW 0x22	/* hash only */
-+#define GTPU_DL_V4_FLOW 0x23	/* hash only */
-+#define GTPU_DL_V6_FLOW 0x24	/* hash only */
- /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
- #define	FLOW_EXT	0x80000000
- #define	FLOW_MAC_EXT	0x40000000
-@@ -2025,6 +2037,7 @@ static inline int ethtool_validate_duplex(__u8 duplex)
- #define	RXH_IP_DST	(1 << 5)
- #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
- #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
-+#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
- #define	RXH_DISCARD	(1 << 31)
- 
- #define	RX_CLS_FLOW_DISC	0xffffffffffffffffULL
--- 
-2.34.1
+Plus it has performance implications. When user removes SF port under
+instance lock, the SF itself is removed asynchonously out of the lock.
+You suggest to remove it synchronously holding the instance lock,
+correct? SF removal does not need that lock. Removing thousands of SFs
+would take much longer as currently, they are removed in parallel.
+You would serialize the removals for no good reason.
+
+
+>
+>Maybe this is completely unfair but I feel like devlink locking has
+>been haphazard and semi-broken since the inception. I had to step in 
+
+Well, it got broken over time. I appreciate you helped to fix it.
+
+
+>to fix it. And now a year later we're back to weird locking and random
+>dependencies. The only reason it was merged is because I was on PTO.
+
+Not sure what you mean by that. Locking is quite clear. Why weird?
+What's weird exactly? What do you mean by "random dependencies"?
+
+I have to say I feel we got a bit lost in the conversation.
+
+
 
 
