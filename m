@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-40518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 365A17C797E
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:31:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D38B87C79D0
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6783A1C20FEE
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:31:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CCF41C213F4
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739903CCE7;
-	Thu, 12 Oct 2023 22:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766D72B5D9;
+	Thu, 12 Oct 2023 22:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BbJ3txwM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YupFDCoJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901F2405DC
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:30:57 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54F2D8
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:30:55 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9a509861acso1951803276.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:30:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC8A3D00C
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:33:38 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28746D8
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:33:36 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9a3942461aso2110897276.2
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:33:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697149855; x=1697754655; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1697150015; x=1697754815; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=rizs44+83M1Yv3Y7Tz35EZFb6rX3ufgnc6hvuYWPAQA=;
-        b=BbJ3txwMvDd7M4UKTgvyRCRHEBi90MSZAP14YjDXT+vjcrBKHDLRmhOcIfMGEfsTMA
-         ZpcqG2M9PWNXdAf+sKsebnrIpKgpSJI2WS8EvdKG1jp+HHseXOlH5y3gux5budT7wuSF
-         a3ryjUu3kSoYUkz66BK5VxsS+QM8R+GYLi9IRtIXuMzz4FO51T48+sxgVSAd/kUSxLs6
-         XCNkNbAefeYVD4Pzel/GkitZM6d+3w24TIXH0lmUtnvtapwAcDB7VoiiYpMKbhnjRax/
-         G1xizao6qaheTEEiTOyzyvIO/SiHeWsxYRQ4llawVjaGqwtczbKW/p7vmujybI1qBykm
-         JoPQ==
+        bh=bMicK/Q5xy5Wa2FAFNQ3uoq4k2tHyYqo1F+SWUCF8nk=;
+        b=YupFDCoJl/YjOA4Gw1wPmwXlSJDLi7RzOJAzPKRduQYqfu1wyyYpuAYM997B25pRwj
+         lPiPxhNtHFbyvHPG6Mpk6QtzVtZMev1jKTEgPlqI32vxDcC+EH70szDzrER6VANc2mK8
+         NsMM2qLUDN+8zM40A0RxhZr7tEcNi5te/TNh5G7oN5o3ODp6m248El1Y1od0yHlXNSG/
+         hiPRLt88NukhlYPOhz6vkwXL8A9VzWKSutxDmYD0hQF7ZVhfMkVxWDV+MIvbDdOuaRYz
+         Fp4Vuf2U6gBbndoEKFdJGXZEdEpoX+1fSvl3QnxJeBLLUnpgmPdY8PkVzA6E3xlPVGfo
+         919Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697149855; x=1697754655;
+        d=1e100.net; s=20230601; t=1697150015; x=1697754815;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rizs44+83M1Yv3Y7Tz35EZFb6rX3ufgnc6hvuYWPAQA=;
-        b=lL4Pxu5J4Q5k5eY/+JZ69FKI14rvS/eq69nJmRcD/oVtqxZIdHn8nZNS+ME8bmtofI
-         911Bu6nfP9p9jEK4AzTL2jGiGCSZwNKr/uaSZRO4r1n5baeaYa2mdLa49eoK+JikLlNp
-         iQluB7EfSrdKjW3sOMWyn6E0UhTp608xcPX3sB3d1A1R+/M0JzBtVOb6Eh+0DzDxsP63
-         TJh+P9b+r/cxIGos/MEaiC0czj5ymLssmUHZ1/zFdqD9RxOzEcdLc2KtK5pay8Y+wi6u
-         dc7tRhM+x3mBVkH5gu8qJH/bTtUyM8jF8iP8xtVvQp56ViptXeREnOFLHEIPPdma5S3i
-         7Y+A==
-X-Gm-Message-State: AOJu0YwKx3qMfsWFplkhUNiUxbeQPR6tLO0YwrvuXmYHANfyeAz97g5F
-	xfkDnHyEYyCb550o0blbScW02S3vPul9d+R1HA==
-X-Google-Smtp-Source: AGHT+IEyJi+6aR4m8VCk9B1FVnsRZVbIeTZO5xWLf+zSzEab3f9/rvhauXqUE1a1ekH3cBluonY+I8G/UdZO0ZIl3A==
+        bh=bMicK/Q5xy5Wa2FAFNQ3uoq4k2tHyYqo1F+SWUCF8nk=;
+        b=BshAQNT8qLwqgDUWovMXffp7MnDyUaImwY5WmAc3oQHaF6KvpYZMw0GyYtDKXOwGFb
+         Rv+OYfuQkAbOmoVBfQxd+e499v0i6yvk2CdIngN2Vs8LaDeL6UyXPZiZwdYe0euz4iP0
+         OVQsdDoJVXkughPTYFB/7BTL+ck9LYgqGe5ykhEcmJ4gZoiNXRVcZuwLAzFyo/e2ZUG4
+         rikI2m6l58IYKBBnz5YhK+2/KMyqHnRtCWlMoNixbV3iFAo2St6ld+NNmRFijMpo+ksU
+         k+MkWv+VzLIxC1xakURz+elhBxG9kyw6uGdLEV75/5nA1CBUptC/2psR7646f0A5A4dW
+         /ovQ==
+X-Gm-Message-State: AOJu0YwBQahaniu5Zq0ZrVYfL656iprSeuwUkHnB598aSj/zl+CgfbIM
+	PgmK24LVh2flA3ROJJaFTQtkC9BA0X1vJKzLHA==
+X-Google-Smtp-Source: AGHT+IGFC2dIaMmI0JDuC8HythokMvivv7ImS1E9FTXqpn3afgMUg1e2O4A3TXVog4ZLvVdjsPz+NEQDS5+nUp4Oow==
 X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:ef4c:0:b0:d9a:6633:a799 with SMTP
- id w12-20020a25ef4c000000b00d9a6633a799mr181229ybm.13.1697149854993; Thu, 12
- Oct 2023 15:30:54 -0700 (PDT)
-Date: Thu, 12 Oct 2023 22:30:54 +0000
+ (user=justinstitt job=sendgmr) by 2002:a25:828c:0:b0:d9a:bc5a:737c with SMTP
+ id r12-20020a25828c000000b00d9abc5a737cmr93260ybk.4.1697150015398; Thu, 12
+ Oct 2023 15:33:35 -0700 (PDT)
+Date: Thu, 12 Oct 2023 22:33:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAJ1zKGUC/x3NTQqDQAxA4atI1g3MT6G2VyldTMeMBiSVRGWKe
- PcOXX6b9w4wUiaDR3eA0s7GH2nwlw7ylGQk5KEZggvROx/QVpW8fHFQ3kkNhVbc7I1zkltfK2Y s/n6NkcgVl6B1FqXC9f94vs7zB+QO05VzAAAA
+X-B4-Tracking: v=1; b=H4sIAD10KGUC/x3NMQ6DMAxA0asgz7WUOEMoV0Ed2uCAlxTZFFFF3
+ J2I8S3/VzBWYYOhq6C8i8m3NPhHB2l5l5lRpmYgR8E7T2iblrT+cVLZWQ0Lb/izD5o+e+cwYeh z9JQo50jQMqtyluNejK/zvADLCQxHcgAAAA==
 X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1697149854; l=1788;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1697150014; l=1997;
  i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=Q/1jnaD/aLB5yEOg0SnHWnlmWben+eHo3uTy3iuBQAU=; b=ddxVrViH6Mz9J+19fMq1qOkfWAGORwS3qksqgHG/khfZO5dItcJoGVoGPXwxYvfTsC69cmRPu
- fxom8MzxhspBbWX2KdeKk0vDJwAJA773DmNslhYSz0ZYxxrjAnEt60Q
+ bh=1U/Iz4RqgIW06rmNmlXGTtLjP2+AJ5auEeXiBs7XZfQ=; b=brMk5Cj7eHq7rhc3oxxfK9fgzLcaoOEhVmgXPUsQEqJdbnaDQp+DNiJaosWeTFIN1Sj/ZHhsN
+ dWoYta7Hsf0BJJ3Ttyiqah6k3lJtPK4DA+awnlETQMF5I19LrW2lFz5
 X-Mailer: b4 0.12.3
-Message-ID: <20231012-strncpy-drivers-net-usb-lan78xx-c-v1-1-99d513061dfc@google.com>
-Subject: [PATCH] lan78xx: replace deprecated strncpy with strscpy
+Message-ID: <20231012-strncpy-drivers-net-usb-sr9800-c-v1-1-5540832c8ec2@google.com>
+Subject: [PATCH] net: usb: replace deprecated strncpy with strscpy
 From: Justin Stitt <justinstitt@google.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
 	Justin Stitt <justinstitt@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -91,7 +90,7 @@ strncpy() is deprecated for use on NUL-terminated destination strings
 interfaces.
 
 Other implementations of .*get_drvinfo use strscpy so this patch brings
-lan78xx_get_drvinfo() in line as well:
+sr_get_drvinfo() in line as well:
 
 igb/igb_ethtool.c +851
 static void igb_get_drvinfo(struct net_device *netdev,
@@ -108,7 +107,10 @@ e1000/e1000_ethtool.c
 ixgbevf/ethtool.c
 211:static void ixgbevf_get_drvinfo(struct net_device *netdev,
 
+...
+
 Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
+Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html [2]
 Link: https://github.com/KSPP/linux/issues/90
 Cc: linux-hardening@vger.kernel.org
 Signed-off-by: Justin Stitt <justinstitt@google.com>
@@ -117,26 +119,28 @@ Note: build-tested only.
 
 Found with: $ rg "strncpy\("
 ---
- drivers/net/usb/lan78xx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/usb/sr9800.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 59cde06aa7f6..5add4145d9fc 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -1758,7 +1758,7 @@ static void lan78xx_get_drvinfo(struct net_device *net,
+diff --git a/drivers/net/usb/sr9800.c b/drivers/net/usb/sr9800.c
+index f5e19f3ef6cd..143bd4ab160d 100644
+--- a/drivers/net/usb/sr9800.c
++++ b/drivers/net/usb/sr9800.c
+@@ -474,8 +474,8 @@ static void sr_get_drvinfo(struct net_device *net,
  {
- 	struct lan78xx_net *dev = netdev_priv(net);
- 
+ 	/* Inherit standard device info */
+ 	usbnet_get_drvinfo(net, info);
 -	strncpy(info->driver, DRIVER_NAME, sizeof(info->driver));
+-	strncpy(info->version, DRIVER_VERSION, sizeof(info->version));
 +	strscpy(info->driver, DRIVER_NAME, sizeof(info->driver));
- 	usb_make_path(dev->udev, info->bus_info, sizeof(info->bus_info));
++	strscpy(info->version, DRIVER_VERSION, sizeof(info->version));
  }
  
+ static u32 sr_get_link(struct net_device *net)
 
 ---
 base-commit: cbf3a2cb156a2c911d8f38d8247814b4c07f49a2
-change-id: 20231012-strncpy-drivers-net-usb-lan78xx-c-f19433ee0f0a
+change-id: 20231012-strncpy-drivers-net-usb-sr9800-c-38f712c2ff72
 
 Best regards,
 --
