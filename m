@@ -1,189 +1,156 @@
-Return-Path: <netdev+bounces-40381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A327C7081
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:41:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1747C70B7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 16:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F271C20909
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:41:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8D01C209FC
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3A721358;
-	Thu, 12 Oct 2023 14:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02C124A0B;
+	Thu, 12 Oct 2023 14:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AM+zFJEi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7473637A
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 14:41:49 +0000 (UTC)
-Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63890BB
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:41:46 -0700 (PDT)
-Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-6c6373a4aa7so1404140a34.3
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:41:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF7D17F5
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 14:50:43 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBA9CD3
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:50:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697122239;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j5BqCXztfnjL1n8qvwFlaYSxk8LlaToCm50XqHKuKoc=;
+	b=AM+zFJEiVr6pf89D4Mj/LrJsm56fsNxUOeP/AMOYUq6vtg6m1/OGGkFCr1uYx0hhOgYARZ
+	efWZL6PqDCSW6+Gkk5JYDnxBtr/dz3whkCkJYDXymM+xecabyA4qKuq5q5/dILcO+VfeQD
+	S5aS3vP3xape7muD4sqlKEG8EvunRWk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-v_cLhbNiMCuEcEf6030IiQ-1; Thu, 12 Oct 2023 10:50:38 -0400
+X-MC-Unique: v_cLhbNiMCuEcEf6030IiQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-402cd372b8bso8511905e9.2
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 07:50:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697121705; x=1697726505;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0sjLlGIFaUzWitAxPHuaZRKA3VR7ji9H637xkgZgO6c=;
-        b=YdCtCof6SKUbLPXhqm9IBkSSfKIT0Hu0DC6FhWpD4tD06ZRuJuwfqlXA6DcsHzc0LN
-         rxUB8GiHqfoSLhHky28rokPbK3N2E0wG31GYmjZSMg7BpwtzJKSRdRC3kF62ZHgRrdB3
-         U2r1wh8vmWFpKVP5H26+0JZ98blVfJ47sZq8E7Z8Rq3Fq8cAQTo9Zo7Z1waxl+BMK3yJ
-         eNcAQUXQINYi7S5eWSPOSCYHwqrnCpoNT/1C4cKuCB5+WwJoPVCQnpbBieD25vbxpqaf
-         QLYnCDes0s/9GXoHIUTbYSIIsrf6gcRTSA0px13Yl7y8yIb8yTKi2ZX6KORZSXnSZVSo
-         MDlg==
-X-Gm-Message-State: AOJu0YxRX5B6LIaOJk7A1Dxh1CKTdS1DdrleQo2cEbd3eZI1zBGB+mQ1
-	lZ8/yNRmb2NyyxaW3iWK0EPSUrSdDXua0b8Xttzj2y9/l/2Q
-X-Google-Smtp-Source: AGHT+IEuSWhLvSImEUWwm/crvQ4RlVw4J+LYSy+BxRn8YVmBQ6p1yaYel6U+3bJr01Qg/7Dbl55VzBv350526S0hwwbsniX3yq6o
+        d=1e100.net; s=20230601; t=1697122237; x=1697727037;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j5BqCXztfnjL1n8qvwFlaYSxk8LlaToCm50XqHKuKoc=;
+        b=daEuLhJWDDkPOJ/NJSPypBq5Fw8ZlZBYMYtSzg6tepwI5UsBNmtFBLCJJydjtIsPXp
+         Kuo9h5yRB5mssv1HRmdk/TY9Z3oyPyqMosMHJO5ICxVkF9UA8JNWQ72LXIRbEhszKfZw
+         mrF0LU6qvbQlXMffS0Xo1s77RfLhJpeOjXIUWaWMwFbnNcPAxETGpWDY3DQ2GevGdGhE
+         tzfyZ/maKzLMkYKPXsLZqdX1WltwNKBj1SyKvlOUroEN+cEOcTSeDXD+jSRgS+KdztKd
+         I6Pk4ES/mRHoR3rZmTDQ0B0GzgbuxfEGT+jyKf8S6d/skOASj6OZ3HiBigRa5++VUiIv
+         P1mg==
+X-Gm-Message-State: AOJu0Yx1BgEM3cwu4RPvV8RNh8fruD13YivP9wxvPPAgo+KlphZYU3tC
+	vVCzGRrmzcHsd57XLwyzF4pVEL8itRG03WkIDparYvYwwpZxqbhGOuvwpBL25ilK/50MSQg346D
+	QKPCeIwVK+ry4b3jC
+X-Received: by 2002:a05:600c:228a:b0:406:592b:e5aa with SMTP id 10-20020a05600c228a00b00406592be5aamr21389549wmf.14.1697122237110;
+        Thu, 12 Oct 2023 07:50:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHF2Vo5PT8GSdHGVGE5cwCLnapcKJkvbtEZBt90uz120dcdtwDAi2HYtfKCc8opIa1m8atskQ==
+X-Received: by 2002:a05:600c:228a:b0:406:592b:e5aa with SMTP id 10-20020a05600c228a00b00406592be5aamr21389522wmf.14.1697122236749;
+        Thu, 12 Oct 2023 07:50:36 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73d2:bf00:e379:826:5137:6b23])
+        by smtp.gmail.com with ESMTPSA id 6-20020a05600c22c600b00406408dc788sm19240wmg.44.2023.10.12.07.50.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 07:50:36 -0700 (PDT)
+Date: Thu, 12 Oct 2023 10:50:33 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	virtualization@lists.linux-foundation.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost 00/22] virtio-net: support AF_XDP zero copy
+Message-ID: <20231012050829-mutt-send-email-mst@kernel.org>
+References: <20231011092728.105904-1-xuanzhuo@linux.alibaba.com>
+ <20231011100057.535f3834@kernel.org>
+ <1697075634.444064-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsadYH8Y-KOxPX6vPic7pBqzj2DLnog5osuBDtypKgEZA@mail.gmail.com>
+ <1697099560.6227698-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a9d:6394:0:b0:6ba:8e4a:8e62 with SMTP id
- w20-20020a9d6394000000b006ba8e4a8e62mr7059219otk.7.1697121705800; Thu, 12 Oct
- 2023 07:41:45 -0700 (PDT)
-Date: Thu, 12 Oct 2023 07:41:45 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006a3d0d060785f027@google.com>
-Subject: [syzbot] [net?] [wireless?] WARNING in ieee80211_bss_info_change_notify
- (2)
-From: syzbot <syzbot+dd4779978217b1973180@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.9 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1697099560.6227698-1-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Thu, Oct 12, 2023 at 04:32:40PM +0800, Xuan Zhuo wrote:
+> On Thu, 12 Oct 2023 15:50:13 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> > On Thu, Oct 12, 2023 at 9:58 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+> > >
+> > > On Wed, 11 Oct 2023 10:00:57 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> > > > On Wed, 11 Oct 2023 17:27:06 +0800 Xuan Zhuo wrote:
+> > > > > ## AF_XDP
+> > > > >
+> > > > > XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+> > > > > copy feature of xsk (XDP socket) needs to be supported by the driver. The
+> > > > > performance of zero copy is very good. mlx5 and intel ixgbe already support
+> > > > > this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+> > > > > feature.
+> > > >
+> > > > You're moving the driver and adding a major feature.
+> > > > This really needs to go via net or bpf.
+> > > > If you have dependencies in other trees please wait for
+> > > > after the merge window.
+> > >
+> > >
+> > > If so, I can remove the first two commits.
+> > >
+> > > Then, the sq uses the premapped mode by default.
+> > > And we can use the api virtqueue_dma_map_single_attrs to replace the
+> > > virtqueue_dma_map_page_attrs.
+> > >
+> > > And then I will fix that on the top.
+> > >
+> > > Hi Micheal and Jason, is that ok for you?
+> >
+> > I would go with what looks easy for you but I think Jakub wants the
+> > series to go with next-next (this is what we did in the past for
+> > networking specific features that is done in virtio-net). So we need
+> > to tweak the prefix to use net-next instead of vhost.
+> 
+> OK.
+> 
+> I will fix that in next version.
+> 
+> Thanks.
 
-syzbot found the following issue on:
+Scaling scope back as far as possible is a good idea generally.
+I am not sure how this will work though. Let's see.
 
-HEAD commit:    401644852d0b Merge tag 'fs_for_v6.6-rc6' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=176b01ad680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=32d0b9b42ceb8b10
-dashboard link: https://syzkaller.appspot.com/bug?extid=dd4779978217b1973180
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+> >
+> > Thanks
+> >
+> >
+> > >
+> > > Thanks.
+> > >
+> >
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/94b84d66fc32/disk-40164485.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2a510b785da4/vmlinux-40164485.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/663b784d908b/bzImage-40164485.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+dd4779978217b1973180@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-wlan1: Failed check-sdata-in-driver check, flags: 0x0
-WARNING: CPU: 0 PID: 9044 at net/mac80211/main.c:236 ieee80211_bss_info_change_notify+0x2c9/0x820 net/mac80211/main.c:236
-Modules linked in:
-CPU: 0 PID: 9044 Comm: syz-executor.2 Not tainted 6.6.0-rc5-syzkaller-00072-g401644852d0b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/06/2023
-RIP: 0010:ieee80211_bss_info_change_notify+0x2c9/0x820 net/mac80211/main.c:236
-Code: 00 00 e8 4a e3 d6 f7 48 8b 74 24 08 48 89 74 24 08 e8 3b e3 d6 f7 8b 14 24 48 c7 c7 c0 a2 c4 8b 48 8b 74 24 08 e8 87 0b 9d f7 <0f> 0b e8 20 e3 d6 f7 4c 89 f2 48 b8 00 00 00 00 00 fc ff df 48 c1
-RSP: 0018:ffffc900062472d8 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff888020030c80 RCX: ffffc90003ec1000
-RDX: 0000000000040000 RSI: ffffffff814df0c6 RDI: 0000000000000001
-RBP: 0000000000000a00 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff888078ef8e20
-R13: ffff8880200328b0 R14: ffff8880200315a0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0063) knlGS:00000000f7f3ab40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 00000000f72646b0 CR3: 0000000020d94000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_ibss_disconnect+0x411/0x9d0 net/mac80211/ibss.c:726
- ieee80211_ibss_leave+0x16/0x160 net/mac80211/ibss.c:1872
- rdev_leave_ibss net/wireless/rdev-ops.h:569 [inline]
- __cfg80211_leave_ibss+0x1a2/0x410 net/wireless/ibss.c:210
- cfg80211_leave_ibss+0x59/0x80 net/wireless/ibss.c:228
- cfg80211_change_iface+0x457/0xdf0 net/wireless/util.c:1137
- nl80211_set_interface+0x708/0x9b0 net/wireless/nl80211.c:4222
- genl_family_rcv_msg_doit+0x1fc/0x2e0 net/netlink/genetlink.c:971
- genl_family_rcv_msg net/netlink/genetlink.c:1051 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1066
- netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2545
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1075
- netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
- netlink_unicast+0x536/0x810 net/netlink/af_netlink.c:1368
- netlink_sendmsg+0x93c/0xe40 net/netlink/af_netlink.c:1910
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2558
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2612
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2641
- do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
- __do_fast_syscall_32+0x61/0xe0 arch/x86/entry/common.c:178
- do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
- entry_SYSENTER_compat_after_hwframe+0x70/0x82
-RIP: 0023:0xf7f3f579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000f7f3a5ac EFLAGS: 00000292 ORIG_RAX: 0000000000000172
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 0000000020000100
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	ret
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
