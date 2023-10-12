@@ -1,120 +1,192 @@
-Return-Path: <netdev+bounces-40308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB98D7C6A04
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:53:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E377C6A16
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:57:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FDB928271C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C309D2826F3
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 09:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F4B21357;
-	Thu, 12 Oct 2023 09:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+i1Lu5r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6037321367;
+	Thu, 12 Oct 2023 09:57:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB5021352
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:52:57 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0CDA9;
-	Thu, 12 Oct 2023 02:52:56 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-27d292d38c0so26567a91.1;
-        Thu, 12 Oct 2023 02:52:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697104376; x=1697709176; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5GPcG4HISW15HdH/wIIcwcI9FurWIe0F/LA1VfavK10=;
-        b=a+i1Lu5rxeqYy+k+eTVqMTOsP6tSubXcxODUVlYyypqk1Bu+oYoe++zSdAw2OhzJk2
-         hkTEXPHxE9B5ACTtbOXNoX0IMai8gXFIA7MrhV65BepDaBvJX8J4jNUpedGQDU/MrCXH
-         90tPeSam7ZI5jPngU0QRuFCKhAgtvSQO3/Oy27no+I3MkAtHwi4UovNxXgcNPXRZLpmI
-         8SlIDXPjrlfo34uE/6fuP1Xl5Eb26yJ3G111FqdrjFeEZIOggx3h6b+Z+f8ejUKcRgB/
-         mqprNnNFyF0KBgjIRFNv5eMrgbfBU+bNklmn5xlJCoKx42fw6UzNhXefcuUlfKKe9a2M
-         VvZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697104376; x=1697709176;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5GPcG4HISW15HdH/wIIcwcI9FurWIe0F/LA1VfavK10=;
-        b=pG3hlKH/tdAOYWjbjIavsjjDYjMw7UxjWW4oyCQRo06xo8HAhE+PU68Dutk4mVd7A0
-         K9X7GXJ18RLF0/PLEFosoEjTLmH3JA6l1DG/4jwqY5TeU2wOja5a4YaWAhQWy/aZHp03
-         JCS7/gAIOBgZbGTPWDQW7GT288Akvb+4LHit4gwAKpnGxUh6jB3osCDgHD1sme9HWDxH
-         6bTFasQiweKLnV5kQp5fCPYa5eqoXIY8Jj0397F7uvKHBUlfeHh4eiPGQbmMaD2HOa5X
-         O4ayfWHPMyq8qDqsQh2cdQFEtggOWqxZH5Vz63HsNpkyVlwK56nBa3305/1XValW/Kky
-         qQXw==
-X-Gm-Message-State: AOJu0Yx3WKpF7Jxw1gm0Yr0xbl/pg1AgMLblwKttzd0+/AgsT/ctl60r
-	xvHfhU0i1ITOiQojUa5IiAeEAVdqqv0=
-X-Google-Smtp-Source: AGHT+IE8Oe9KXbpDRNnlaCTZlxxhVs6faIab8J1drxYmO04exZINnSUsvkzdXNKkoTcZ/bL1+Zzl/A==
-X-Received: by 2002:a17:90a:b78f:b0:26f:7555:76 with SMTP id m15-20020a17090ab78f00b0026f75550076mr20070356pjr.11.1697104375764;
-        Thu, 12 Oct 2023 02:52:55 -0700 (PDT)
-Received: from [192.168.0.106] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id z18-20020a17090abd9200b002609cadc56esm1421733pjr.11.2023.10.12.02.52.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 Oct 2023 02:52:55 -0700 (PDT)
-Message-ID: <267abf02-4b60-4a2e-92cd-709e3da6f7d3@gmail.com>
-Date: Thu, 12 Oct 2023 16:52:50 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52198DDB6
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 09:57:54 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97148A9;
+	Thu, 12 Oct 2023 02:57:51 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qqsRu-0007Vp-5J; Thu, 12 Oct 2023 11:57:46 +0200
+Date: Thu, 12 Oct 2023 11:57:46 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, willemb@google.com, fw@strlen.de,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
+	mputtash@linux.vnet.com
+Subject: Re: [Bisected] [1b4fa28a8b07] Build failure "net/core/gso_test.c"
+Message-ID: <20231012095746.GA26871@breakpoint.cc>
+References: <79fbe35c-4dd1-4f27-acb2-7a60794bc348@linux.vnet.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux Intel Wireless WAN <linuxwwan@intel.com>
-Cc: M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
- "David S. Miller" <davem@davemloft.net>,
- Loic Poulain <loic.poulain@linaro.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: Intel 7560 LTE Modem stops working after resuming from standby
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <79fbe35c-4dd1-4f27-acb2-7a60794bc348@linux.vnet.ibm.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-I notice a regression report on Bugzilla [1]. Quoting from it:
-
-> I noticed a few days ago, after Fedora moved to Kernel 6.5, that my Intel LTE Modem was not working anymore after resuming from standby. 
+Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com> wrote:
+> Greetings,
 > 
-> The journal listed this error message multiple times:
-> kernel: iosm 0000:01:00.0: msg timeout
+> [net-next] [6.6-rc4] Build failure "net/core/gso_test.c"
 > 
-> It took me a while to determine the root cause of the problem, since the modem did not work either in the following warm reboots. 
-> Only a shutdown revived the modem.
+> --- Traces ---
 > 
-> I did a bisection of the error and I was able to find the culprit:
-> 
-> [e4f5073d53be6cec0c654fac98372047efb66947] net: wwan: iosm: enable runtime pm support for 7560
+> make -j 33 -s && make modules_install && make install
+> net/core/gso_test.c:58:48: error: initializer element is not constant
+>    58 |                 .segs = (const unsigned int[]) { gso_size },
+>       |                                                ^
 
-See Bugzilla for the full thread.
+Ouch, I can reproduce this with: gcc --version
+gcc (Debian 12.2.0-14) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
 
-Anyway, I'm adding this regression to regzbot:
+gcc 13.2.1 and clang-16.0.6 are ok.
 
-#regzbot introduced: e4f5073d53be6c https://bugzilla.kernel.org/show_bug.cgi?id=217996
-#regzbot title: pm support for Intel 7560 makes the modem stops working after resume
+Whats the preference here?  We could use simple preprocessor constant
+or we could require much more recent compiler version for the net
+kunit tests via kconfig.
 
-Thanks.
+gcc-12.2.0 can compile it after this simple s//g "fix":
 
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217996
-
--- 
-An old man doll... just what I always wanted! - Clara
+diff --git a/net/core/gso_test.c b/net/core/gso_test.c
+--- a/net/core/gso_test.c
++++ b/net/core/gso_test.c
+@@ -4,7 +4,7 @@
+ #include <linux/skbuff.h>
+ 
+ static const char hdr[] = "abcdefgh";
+-static const int gso_size = 1000;
++#define GSO_TEST_SIZE 1000
+ 
+ static void __init_skb(struct sk_buff *skb)
+ {
+@@ -18,7 +18,7 @@ static void __init_skb(struct sk_buff *skb)
+ 
+ 	/* proto is arbitrary, as long as not ETH_P_TEB or vlan */
+ 	skb->protocol = htons(ETH_P_ATALK);
+-	skb_shinfo(skb)->gso_size = gso_size;
++	skb_shinfo(skb)->gso_size = GSO_TEST_SIZE;
+ }
+ 
+ enum gso_test_nr {
+@@ -53,70 +53,70 @@ static struct gso_test_case cases[] = {
+ 	{
+ 		.id = GSO_TEST_NO_GSO,
+ 		.name = "no_gso",
+-		.linear_len = gso_size,
++		.linear_len = GSO_TEST_SIZE,
+ 		.nr_segs = 1,
+-		.segs = (const unsigned int[]) { gso_size },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE },
+ 	},
+ 	{
+ 		.id = GSO_TEST_LINEAR,
+ 		.name = "linear",
+-		.linear_len = gso_size + gso_size + 1,
++		.linear_len = GSO_TEST_SIZE + GSO_TEST_SIZE + 1,
+ 		.nr_segs = 3,
+-		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 1 },
+ 	},
+ 	{
+ 		.id = GSO_TEST_FRAGS,
+ 		.name = "frags",
+-		.linear_len = gso_size,
++		.linear_len = GSO_TEST_SIZE,
+ 		.nr_frags = 2,
+-		.frags = (const unsigned int[]) { gso_size, 1 },
++		.frags = (const unsigned int[]) { GSO_TEST_SIZE, 1 },
+ 		.nr_segs = 3,
+-		.segs = (const unsigned int[]) { gso_size, gso_size, 1 },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 1 },
+ 	},
+ 	{
+ 		.id = GSO_TEST_FRAGS_PURE,
+ 		.name = "frags_pure",
+ 		.nr_frags = 3,
+-		.frags = (const unsigned int[]) { gso_size, gso_size, 2 },
++		.frags = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 2 },
+ 		.nr_segs = 3,
+-		.segs = (const unsigned int[]) { gso_size, gso_size, 2 },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, 2 },
+ 	},
+ 	{
+ 		.id = GSO_TEST_GSO_PARTIAL,
+ 		.name = "gso_partial",
+-		.linear_len = gso_size,
++		.linear_len = GSO_TEST_SIZE,
+ 		.nr_frags = 2,
+-		.frags = (const unsigned int[]) { gso_size, 3 },
++		.frags = (const unsigned int[]) { GSO_TEST_SIZE, 3 },
+ 		.nr_segs = 2,
+-		.segs = (const unsigned int[]) { 2 * gso_size, 3 },
++		.segs = (const unsigned int[]) { 2 * GSO_TEST_SIZE, 3 },
+ 	},
+ 	{
+ 		/* commit 89319d3801d1: frag_list on mss boundaries */
+ 		.id = GSO_TEST_FRAG_LIST,
+ 		.name = "frag_list",
+-		.linear_len = gso_size,
++		.linear_len = GSO_TEST_SIZE,
+ 		.nr_frag_skbs = 2,
+-		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
++		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
+ 		.nr_segs = 3,
+-		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, GSO_TEST_SIZE },
+ 	},
+ 	{
+ 		.id = GSO_TEST_FRAG_LIST_PURE,
+ 		.name = "frag_list_pure",
+ 		.nr_frag_skbs = 2,
+-		.frag_skbs = (const unsigned int[]) { gso_size, gso_size },
++		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
+ 		.nr_segs = 2,
+-		.segs = (const unsigned int[]) { gso_size, gso_size },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE },
+ 	},
+ 	{
+ 		/* commit 43170c4e0ba7: GRO of frag_list trains */
+ 		.id = GSO_TEST_FRAG_LIST_NON_UNIFORM,
+ 		.name = "frag_list_non_uniform",
+-		.linear_len = gso_size,
++		.linear_len = GSO_TEST_SIZE,
+ 		.nr_frag_skbs = 4,
+-		.frag_skbs = (const unsigned int[]) { gso_size, 1, gso_size, 2 },
++		.frag_skbs = (const unsigned int[]) { GSO_TEST_SIZE, 1, GSO_TEST_SIZE, 2 },
+ 		.nr_segs = 4,
+-		.segs = (const unsigned int[]) { gso_size, gso_size, gso_size, 3 },
++		.segs = (const unsigned int[]) { GSO_TEST_SIZE, GSO_TEST_SIZE, GSO_TEST_SIZE, 3 },
+ 	},
+ 	{
+ 		/* commit 3953c46c3ac7 ("sk_buff: allow segmenting based on frag sizes") and
 
