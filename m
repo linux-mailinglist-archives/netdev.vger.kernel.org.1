@@ -1,60 +1,47 @@
-Return-Path: <netdev+bounces-40477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA077C77DD
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:24:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1E607C77EB
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A0451C20EC9
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:24:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73D95282B7C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 20:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4083D399;
-	Thu, 12 Oct 2023 20:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B304B3D971;
+	Thu, 12 Oct 2023 20:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="czAGNXYM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I9O2rBWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01273D38C
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 20:24:51 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E7FDD
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 13:24:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zVVjh9vMESdndK1O3Gkjn+lT8wRkRCe0artB4X9mVmc=; b=czAGNXYMgV9bK15mcBOWpLFd2u
-	KY9LdDggWdsFtICsn1xN5l93SlTOZgNgJ95eeK8ixM2sWk/8g86+gE3cHKQLPW4VbVxo58w9b/5zq
-	6SYcaKxZXDhQgOlHYvzR+cWu+DHfQ+63nQHG7RC52Eo+sRTK3fUqkPinEHngTebbC3Ao=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qr2Ee-00211C-Jf; Thu, 12 Oct 2023 22:24:44 +0200
-Date: Thu, 12 Oct 2023 22:24:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808C53D972;
+	Thu, 12 Oct 2023 20:34:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83CDEC433C7;
+	Thu, 12 Oct 2023 20:34:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697142886;
+	bh=1NmsynG7soJV4+TPuN+O1s9KhLN02NtYFh7WcmBFz8A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I9O2rBWF8gDar/1iXLQ4oZZKDeER69jhL3u6eC5bovsQijynepBATCh0hAMHpTqWw
+	 /vXM3y1SG0pkQD8OS+OKBAZ9rn0hsmJzk5VRmpHzXkF0Lu/LHurNnd62SH3TgwUrfa
+	 MKAJeZiLT2kX2yjJB0VYjxbaW822eObD5KQ6gyQY7qbeycSYF/QvVL+i3wJBG2+Fn1
+	 i1lGoa/2VsAuTKMzanhcWLUwwviGNuHAIjzoOsczqCc9s1mTHT9D6WP4q6N1v4VmX2
+	 emS3ZnCa2dbdUphUNYx3TptZIkTbls5KnuJEZM5JJYdfSHoIGXXTiKA/O8JDlHlCcB
+	 bSZmUDB1llELA==
+Received: (nullmailer pid 1698490 invoked by uid 1000);
+	Thu, 12 Oct 2023 20:34:44 -0000
+Date: Thu, 12 Oct 2023 15:34:44 -0500
+From: Rob Herring <robh@kernel.org>
 To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, opendmb@gmail.com,
-	justin.chen@broadcom.com
-Subject: Re: [PATCH net-next 1/2] ethtool: Introduce WAKE_MDA
-Message-ID: <779d6ab4-0c15-4564-9584-1c5332c1f5d1@lunn.ch>
-References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
- <20231011221242.4180589-2-florian.fainelli@broadcom.com>
- <20231011230821.75axavcrjuy5islt@lion.mk-sys.cz>
- <3229ff0a-5ce5-4ee2-a79d-15007f2b6030@gmail.com>
- <78aaaa09-1b35-4ddb-8be8-b8f40cf280bc@lunn.ch>
- <0271cea4-f2ab-4d8c-aa0a-9dd65a1318db@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, "open list:ARM/Mediatek SoC support" <linux-kernel@vger.kernel.org>, "moderated list:ARM/Mediatek SoC support" <linux-arm-kernel@lists.infradead.org>, "moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER" <linux-renesas-soc@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/2] net: dsa: Use conduit and user terms
+Message-ID: <20231012203444.GA1636217-robh@kernel.org>
+References: <20231010213942.3633407-1-florian.fainelli@broadcom.com>
+ <20231010213942.3633407-2-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,44 +50,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0271cea4-f2ab-4d8c-aa0a-9dd65a1318db@broadcom.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_PASS,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+In-Reply-To: <20231010213942.3633407-2-florian.fainelli@broadcom.com>
 
-> > My previous concern was discoverability of the feature. Its not part
-> > of ethtool -s eth0 wol. At minimum, i would suggest something in the
-> > --help text in the wol section and man page pointing to the
-> > alternative way to configure wol. And maybe report via the standard
-> > wol flags that the hardware has the capability to use flow-type WoL?
+On Tue, Oct 10, 2023 at 02:39:41PM -0700, Florian Fainelli wrote:
+> Use more inclusive terms throughout the DSA subsystem by moving away
+> from "master" which is replaced by "conduit" and "slave" which is
+> replaced by "user". No functional changes.
 > 
-> WAKE_FILTER is supposed to be set by the driver if it supports waking-up
-> from a network filter. That is how you would know that the device supports
-> waking-up from a network filter, and then you need to configure the filters
-> with ethtool -N (rxnfc).
-> 
-> Where this API is a good fit is that you can specify a filter location and
-> the action (-2 = RX_CLS_FLOW_WAKE) to indicate where to install the filter
-> and what it should do. Where it may not be such a great fit is that it is a
-> two step process, where you need to make sure you install filter(s) plus
-> enable WAKE_FILTER from the .set_wol() call.
-> 
-> At the time it was proposed it felt like a reasonable way to program,
-> without having "ethtool -s eth0 wol" gain a form of packet matching parser.
-> Also, it does not seem to me like we need the operations to be necessarily
-> atomic in a single call to the kernel but if we feel like this is too
-> difficult to use, we could consider a .set_wol() call that supports being
-> passed network filter(s).
- 
-I think two step is fine. I would say anybody using rxnfc is a pretty
-advanced user.
+> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
+>  .../bindings/net/dsa/mediatek,mt7530.yaml     |    2 +-
 
-But we should clearly define what we expect in terms of ordering and
-maybe try to enforce it in the core. Can we make the rxnfc call return
--EBUSY or something and an extack message if WAKE_FILTER has not been
-enabled first?
+Acked-by: Rob Herring <robh@kernel.org>
 
-	Andrew
+>  Documentation/networking/dsa/b53.rst          |   14 +-
+>  Documentation/networking/dsa/bcm_sf2.rst      |    2 +-
+>  .../networking/dsa/configuration.rst          |  104 +-
+>  Documentation/networking/dsa/dsa.rst          |  150 +-
+>  Documentation/networking/dsa/lan9303.rst      |    2 +-
+>  Documentation/networking/dsa/sja1105.rst      |    8 +-
+>  .../dts/marvell/armada-3720-espressobin.dtsi  |    2 +-
+>  drivers/net/dsa/b53/b53_common.c              |    4 +-
+>  drivers/net/dsa/b53/b53_mdio.c                |    2 +-
+>  drivers/net/dsa/bcm_sf2.c                     |   36 +-
+>  drivers/net/dsa/bcm_sf2.h                     |    2 +-
+>  drivers/net/dsa/bcm_sf2_cfp.c                 |    4 +-
+>  drivers/net/dsa/lan9303-core.c                |    4 +-
+>  drivers/net/dsa/lantiq_gswip.c                |   34 +-
+>  drivers/net/dsa/microchip/ksz9477.c           |    6 +-
+>  drivers/net/dsa/microchip/ksz_common.c        |   20 +-
+>  drivers/net/dsa/microchip/ksz_ptp.c           |    2 +-
+>  drivers/net/dsa/mt7530.c                      |   16 +-
+>  drivers/net/dsa/mv88e6xxx/chip.c              |    2 +-
+>  drivers/net/dsa/ocelot/felix.c                |   62 +-
+>  drivers/net/dsa/ocelot/felix.h                |    4 +-
+>  drivers/net/dsa/qca/qca8k-8xxx.c              |   48 +-
+>  drivers/net/dsa/qca/qca8k-common.c            |    2 +-
+>  drivers/net/dsa/qca/qca8k-leds.c              |    6 +-
+>  drivers/net/dsa/qca/qca8k.h                   |    2 +-
+>  drivers/net/dsa/realtek/realtek-smi.c         |   28 +-
+>  drivers/net/dsa/realtek/realtek.h             |    2 +-
+>  drivers/net/dsa/sja1105/sja1105_main.c        |    4 +-
+>  drivers/net/dsa/xrs700x/xrs700x.c             |   12 +-
+>  drivers/net/ethernet/broadcom/bcmsysport.c    |    2 +-
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c   |    2 +-
+>  include/linux/dsa/sja1105.h                   |    2 +-
+>  include/net/dsa.h                             |   54 +-
+>  include/net/dsa_stubs.h                       |   10 +-
+>  net/core/dev_ioctl.c                          |    2 +-
+>  net/dsa/Makefile                              |    4 +-
+>  net/dsa/{master.c => conduit.c}               |   96 +-
+>  net/dsa/conduit.h                             |   22 +
+>  net/dsa/dsa.c                                 |  218 +--
+>  net/dsa/dsa.h                                 |   10 +-
+>  net/dsa/master.h                              |   22 -
+>  net/dsa/netlink.c                             |   14 +-
+>  net/dsa/port.c                                |  114 +-
+>  net/dsa/port.h                                |    2 +-
+>  net/dsa/slave.h                               |   69 -
+>  net/dsa/switch.c                              |   18 +-
+>  net/dsa/switch.h                              |    4 +-
+>  net/dsa/tag.c                                 |   10 +-
+>  net/dsa/tag.h                                 |   26 +-
+>  net/dsa/tag_8021q.c                           |   22 +-
+>  net/dsa/tag_8021q.h                           |    2 +-
+>  net/dsa/tag_ar9331.c                          |    4 +-
+>  net/dsa/tag_brcm.c                            |   14 +-
+>  net/dsa/tag_dsa.c                             |    6 +-
+>  net/dsa/tag_gswip.c                           |    4 +-
+>  net/dsa/tag_hellcreek.c                       |    4 +-
+>  net/dsa/tag_ksz.c                             |   12 +-
+>  net/dsa/tag_lan9303.c                         |    4 +-
+>  net/dsa/tag_mtk.c                             |    4 +-
+>  net/dsa/tag_none.c                            |    4 +-
+>  net/dsa/tag_ocelot.c                          |   22 +-
+>  net/dsa/tag_ocelot_8021q.c                    |   12 +-
+>  net/dsa/tag_qca.c                             |    6 +-
+>  net/dsa/tag_rtl4_a.c                          |    6 +-
+>  net/dsa/tag_rtl8_4.c                          |    6 +-
+>  net/dsa/tag_rzn1_a5psw.c                      |    4 +-
+>  net/dsa/tag_sja1105.c                         |   30 +-
+>  net/dsa/tag_trailer.c                         |    4 +-
+>  net/dsa/tag_xrs700x.c                         |    4 +-
+>  net/dsa/{slave.c => user.c}                   | 1240 ++++++++---------
+>  net/dsa/user.h                                |   69 +
+>  72 files changed, 1385 insertions(+), 1385 deletions(-)
+>  rename net/dsa/{master.c => conduit.c} (79%)
+>  create mode 100644 net/dsa/conduit.h
+>  delete mode 100644 net/dsa/master.h
+>  delete mode 100644 net/dsa/slave.h
+>  rename net/dsa/{slave.c => user.c} (67%)
+>  create mode 100644 net/dsa/user.h
 
