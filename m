@@ -1,182 +1,327 @@
-Return-Path: <netdev+bounces-40328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4231A7C6BE2
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:03:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E727C6BE7
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 13:05:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658BA1C20ACD
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:03:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DA482828B5
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 11:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929D8224FE;
-	Thu, 12 Oct 2023 11:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E677E22F0F;
+	Thu, 12 Oct 2023 11:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="AG4CFqMV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hm5ut/dE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DF122EE6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:03:44 +0000 (UTC)
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02olkn2078.outbound.protection.outlook.com [40.92.50.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F368F5;
-	Thu, 12 Oct 2023 04:03:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d9I7Wsxoi2msSJTECusPF8OQOTWID4SHbJfShngm/DpVh9xIsEaooRKUYNDLc21aBBot7iJEf4iot7GytJI8hcAqHuEPetM3DWIJyAX0Xt+JgdWAj0tHekkuIG3jwR1gqWJiG/4I3I5/IWvBjqPyRy2qoWtAk4091WbsMF2kkkAO+HYJ5Tnvhw/cNW9XO1CENgrgLOWCWvFbvUcPN+06d3XUH2kn1eMpDoNW0uRW3N2FASAJnhljvPB+U+ITix98d2gfdaO7ZVTr0TR0AivaZdWlOeLTPJokKRIMzCqsxK+7dlOnPnyuTaKCKftIBt66jRbxZ0oV/BYS83XZSBQpYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dWAbrkXml6NEsYcTfWFt3VsGaLxIICZYwThYz40k9t0=;
- b=A1fbf7rQFi2LhlAbaCSY0nJ1dOTB4Bq4iPqXvpIw6U0AUC113CdXGYQ9q6NekYCDAUCY83yoLvGxY1tqH3vrjlrK6HAAC+4//MUBZhTpI3EP7fO84fWErEI6Cybqh9zT5+3gyHZPPGa4SI/ouS6cYheXG7u4ZPkFtRqFx+K9WZat25ErJt7hElaXEjncZh/0i8uSCu9pR5BRr9oFVWEeiGStl+mb+BIq1BdiCpuJdVXbbBWSGp6SA3QCz1SbAosjrSzaLkPQq3G7hIdkWwuXzM6LeF4y+XQu1VHvE1tK8xtF7sr+DtpYUHpeBoygclVj80cWRQkBmh1Hgz88TGw4BQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dWAbrkXml6NEsYcTfWFt3VsGaLxIICZYwThYz40k9t0=;
- b=AG4CFqMVUqffihyI1i/Ab1SoDZlvkVZO911mGFqffLis2hQrdVTI1jzNF06Kf2jzwkPxqfgjhmphHvRhA+xnANonBti9bOCHkO4Nbz5ujuw49lyBVqIS36b1O61jYqKPgQoNrxTlxdTrWR3wEuzm6nVhnPHz16/4ui3oGMgeju0RiYPpzkoznH1sK4bw9ArJmbwKqgRYpBRsc5FGfTQatcteOz180os8bt5BX3rnV7q2/KBLzpUIH9f6G/wbg+dfrhQs1wAGYqFakeptBwbhvRGVFh8LiGXAGVAqKPt/dceqXSzXqYMajzNVrm1ovQVPKlySOq6DGq7eF/Q6avo7aA==
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM (2603:10a6:800:32::19)
- by PAXP193MB2252.EURP193.PROD.OUTLOOK.COM (2603:10a6:102:232::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.43; Thu, 12 Oct
- 2023 11:03:36 +0000
-Received: from VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::af68:c2a:73ce:8e99]) by VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- ([fe80::af68:c2a:73ce:8e99%3]) with mapi id 15.20.6863.043; Thu, 12 Oct 2023
- 11:03:36 +0000
-From: Juntong Deng <juntong.deng@outlook.com>
-To: borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	kuba@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA5FC21352
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 11:05:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8521C0
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 04:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697108711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mwGju3Xeqw9ZXRBWglPx2ULyIsJ1jXFa8nItaSrqhkY=;
+	b=hm5ut/dE4J/GS4yaNom+uzzrrMXhAM4Pj3ZO9pcHTshTmyYsUXf6RpLokMNOXFvOYpPSoL
+	wLiGCgODnlRCMGCVPTM52yRHf0OhXJLZmKcxKEGFiN+TTzjGHj2Fq5cmbE/x4KzcInnDr7
+	JDlhI5u+gOQra6SezJonPg9a1m5Hp4Q=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-580-qiByKE1PMCeK9RIs6a6Jjw-1; Thu, 12 Oct 2023 07:05:09 -0400
+X-MC-Unique: qiByKE1PMCeK9RIs6a6Jjw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4643B1C0896B;
+	Thu, 12 Oct 2023 11:05:09 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.226.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1653710F1BE7;
+	Thu, 12 Oct 2023 11:05:07 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
 	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-Subject: [PATCH] net/tls: Fix slab-use-after-free in tls_encrypt_done
-Date: Thu, 12 Oct 2023 19:02:51 +0800
-Message-ID:
- <VI1P193MB0752428D259D066379242BD099D3A@VI1P193MB0752.EURP193.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [IYw6gEqPreLhsJRR+n9bpDeFOiGYOaZz]
-X-ClientProxiedBy: LNXP265CA0021.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:5e::33) To VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:800:32::19)
-X-Microsoft-Original-Message-ID:
- <20231012110251.10696-1-juntong.deng@outlook.com>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.6-rc6
+Date: Thu, 12 Oct 2023 13:04:43 +0200
+Message-ID: <20231012110443.13091-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1P193MB0752:EE_|PAXP193MB2252:EE_
-X-MS-Office365-Filtering-Correlation-Id: c77aa7bc-1b2d-4b0b-1b78-08dbcb12e130
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ncHInV2HNgsx5LhrR4Vg83pPI2No9Tz7Iz3dQOOWozVbhV5kQ9emIdVXhis6dW6TwltjbaYmexushk8rFLLLVP9FndPnUFK1voRTBb9nnUjvFEPtBvztrAb0J3zoLcVkITQQzla+zWhkazZ6CEGasZvtJvtA10WRZ8ZsrbvpWeVHLtQrw0fPEuzPS1mBP9LD0DNGqUKyQtK6nnHJDcXXi+NjeznaqulgHsT5FYjrO4PPr0o5y+fY6ZlblkTh2WCGM6ZWP1cDJnpeuBSPWPOgj2SHgohD4esdnrIJWXZMi65ClKfNWoVQ8T3UoI4+FEwFaQ8B+Tk64WjtyQR2FDyjS3vhvQcDF15KwJeyHKl6zdAFmewy3wP2QA4THH5oQVX/txdMmNQLRTX/wg0qz6lA9lxnr7aDyMrNyxhVIn21nTK5xmwemkHjzZDD0nsA96tOzNdR6ZPP69HGytfNL+es9ChkniUT42LyHKvynJPm9FkZRvUTz7Or0/O1mJ04CJVAhz2rzTRxKFuI/xoCHOvLhkpjsePYCCJ7tw3fPgULNxiBwfgpuqMpBfWYoIWZjgCTTSPjfY0prnaH3ey0GrZnBsmZ+qBCLRhUYjxM/2IWJaM=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YJ3qbzQt1oNaeXazn620RqPIf6L314yOqNlTP4Q7jG4mDxEN5voOmIUnrgwl?=
- =?us-ascii?Q?T2nAh57EZoMo33BPx0ZXb2AB5DoAdkWEpN3U/NYotavXUOZFMdw1sF7kfpl+?=
- =?us-ascii?Q?Zl6dUT1Dew3q3usIJ0sXjVKxNMMSEDg6ib6ixUgxK7AhOGtlHZ3QIYV83cOR?=
- =?us-ascii?Q?qE1sl3RSFGlRvjRWMRCO/EWC205DB2o5l9oyLG+lVVylj5e0eDDD9anU/n8g?=
- =?us-ascii?Q?EmP6Qc4P0wVH0e6fhXl79BafivjHqt9uf3DXf+fmB4thyN0t2Hsf+dFyan7o?=
- =?us-ascii?Q?YGVUeBUt+sIMdqw60nH8yrDYlQ89THYBridolMJV4ekVpFS5k9PJ1yr179FB?=
- =?us-ascii?Q?X9H2hjZOeJ8nXNgdDyaTfaAVRrBRf/7sWGH8EfaiG6nwVwmGc2YWB5IEUCau?=
- =?us-ascii?Q?JO7FShVhmJ/o9vb0hC0qBAEhOIF2x2CDQH7ACjrgaejVCd3vNxW1qi76Vzst?=
- =?us-ascii?Q?TieAhTRJwBXZ2s4bXrjsQnkHtm3XuC7KH6Jdd5OiJPGtH4YnLRdCacAXvgrH?=
- =?us-ascii?Q?UQBWTHf8yRClR/NJHoiK9aur60z9OxYyIOkhQMKgjk9BmXDoj9YFEFG9XV3b?=
- =?us-ascii?Q?huFgkrCLCw/BkkgaTFvNLK1KYn0KW8P3ZGhO17xALTkcwBWAhu4+yDxl4mQu?=
- =?us-ascii?Q?OPTaEmN9xHN0s/z/lNrlYzRr7O4L/Ph3MkyAvyB5cwimWXtHQCbCw/D93XBZ?=
- =?us-ascii?Q?D1j1adNJe67lcoRNAFtexTz7WV4Bo6e47s54VZOsGCngGSZBbsVvZjVh3KyL?=
- =?us-ascii?Q?ZCgLZJtJyf2VHp5KXj3xTHNdkje+rES4lY2wSgxVuwfDTCOHzjeq0pRl5iHY?=
- =?us-ascii?Q?BVSvQ45gHB/nWet+gK8xjEzHTaiPUlyJftcaxNB88tXDj28WuFmkRkFrI/Hs?=
- =?us-ascii?Q?QEjDOVcwwTGz6oFUKMUAlrH1HS/EDTkBth84H3P+GsQp22prKShz4gRcfHK3?=
- =?us-ascii?Q?HXCSnqFxHPkJHOSG7U2X0FEmVE6SvuB4v5vNIq/BPQMt1klh+wH2FtSBy77B?=
- =?us-ascii?Q?uNFzQAopdVS3dJwYFw9XejH/it9/QDAKRU8DlBTgVnQx8PrbaoJehUljNR+b?=
- =?us-ascii?Q?lVujm/Ia0KmLCvDuO8NJ3S9KU6nY6yg8XncCGj878Dnpps5n3lnHD2B8meYp?=
- =?us-ascii?Q?nz7ph2oMArNPgTMrbImBnnkF9xx2//7DYTqUtClmotPlPwE40xJ+ldlDr2E8?=
- =?us-ascii?Q?D/YBfmEUTXBk0Zqx3Ltwws4cG8cpscNxCeZSy2IA7dEX5gUTJAD+AMJIhiw?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c77aa7bc-1b2d-4b0b-1b78-08dbcb12e130
-X-MS-Exchange-CrossTenant-AuthSource: VI1P193MB0752.EURP193.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 11:03:36.4259
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP193MB2252
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In the current implementation, ctx->async_wait.completion is completed
-after spin_lock_bh, which causes tls_sw_release_resources_tx to
-continue executing and return to tls_sk_proto_cleanup, then return
-to tls_sk_proto_close, and after that enter tls_sw_free_ctx_tx to kfree
-the entire struct tls_context (including ctx->encrypt_compl_lock).
+Hi Linus!
 
-Since ctx->encrypt_compl_lock has been freed, subsequent spin_unlock_bh
-will result in slab-use-after-free error. Due to SMP, even using
-spin_lock_bh does not prevent tls_sw_release_resources_tx from continuing
-on other CPUs. After tls_sw_release_resources_tx is woken up, there is no
-attempt to hold ctx->encrypt_compl_lock again, therefore everything
-described above is possible.
+We have a regression in TC currently under investigation,
+otherwise the things that stand off most are probably the
+TCP and AF_PACKET fixes, with both issues coming from 6.5.
 
-The fix is to put complete(&ctx->async_wait.completion) after
-spin_unlock_bh, making the release after the unlock. Since complete is
-only executed if pending is 0, which means this is the last record, there
-is no need to worry about race condition causing duplicate completes.
+The following changes since commit f291209eca5eba0b4704fa0832af57b12dbc1a02:
 
-Reported-by: syzbot+29c22ea2d6b2c5fd2eae@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=29c22ea2d6b2c5fd2eae
-Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
----
- net/tls/tls_sw.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+  Merge tag 'net-6.6-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-10-05 11:29:21 -0700)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 270712b8d391..7abe5a6aa989 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -441,6 +441,7 @@ static void tls_encrypt_done(void *data, int err)
- 	struct sk_msg *msg_en;
- 	bool ready = false;
- 	struct sock *sk;
-+	int async_notify;
- 	int pending;
- 
- 	msg_en = &rec->msg_encrypted;
-@@ -482,10 +483,11 @@ static void tls_encrypt_done(void *data, int err)
- 
- 	spin_lock_bh(&ctx->encrypt_compl_lock);
- 	pending = atomic_dec_return(&ctx->encrypt_pending);
-+	async_notify = ctx->async_notify;
-+	spin_unlock_bh(&ctx->encrypt_compl_lock);
- 
--	if (!pending && ctx->async_notify)
-+	if (!pending && async_notify)
- 		complete(&ctx->async_wait.completion);
--	spin_unlock_bh(&ctx->encrypt_compl_lock);
- 
- 	if (!ready)
- 		return;
--- 
-2.39.2
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.6-rc6
+
+for you to fetch changes up to b91e8403373cab79375a65f5cf3495e2cd0bbdfa:
+
+  Merge branch 'rswitch-fix-issues-on-specific-conditions' (2023-10-12 11:22:24 +0200)
+
+----------------------------------------------------------------
+Including fixes from CAN and BPF.
+
+Previous releases - regressions:
+
+ - af_packet: fix fortified memcpy() without flex array.
+
+ - tcp: fix crashes trying to free half-baked MTU probes
+
+ - xdp: fix zero-size allocation warning in xskq_create()
+
+ - can: sja1000: always restart the tx queue after an overrun
+
+ - eth: mlx5e: again mutually exclude RX-FCS and RX-port-timestamp
+
+ - eth: nfp: avoid rmmod nfp crash issues
+
+ - eth: octeontx2-pf: fix page pool frag allocation warning
+
+Previous releases - always broken:
+
+ - mctp: perform route lookups under a RCU read-side lock
+
+ - bpf: s390: fix clobbering the caller's backchain in the trampoline
+
+ - phy: lynx-28g: cancel the CDR check work item on the remove path
+
+ - dsa: qca8k: fix qca8k driver for Turris 1.x
+
+ - eth: ravb: fix use-after-free issue in ravb_tx_timeout_work()
+
+ - eth: ixgbe: fix crash with empty VF macvlan list
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Andrew Kanner (1):
+      xdp: Fix zero-size allocation warning in xskq_create()
+
+Björn Töpel (2):
+      riscv, bpf: Sign-extend return values
+      riscv, bpf: Track both a0 (RISC-V ABI) and a5 (BPF) return values
+
+Dan Carpenter (2):
+      mlxsw: fix mlxsw_sp2_nve_vxlan_learning_set() return type
+      ixgbe: fix crash with empty VF macvlan list
+
+Daniel Borkmann (6):
+      bpf: Fix BPF_PROG_QUERY last field check
+      bpf: Handle bpf_mprog_query with NULL entry
+      selftests/bpf: Test bpf_mprog query API via libbpf and raw syscall
+      selftests/bpf: Adapt assert_mprog_count to always expect 0 count
+      selftests/bpf: Test query on empty mprog and pass revision into attach
+      selftests/bpf: Make seen_tc* variable tests more robust
+
+David S. Miller (2):
+      Merge branch 'lynx-28g-fixes'
+      Merge branch 'qca8k-fixes'
+
+David Vernet (2):
+      bpf: Fix verifier log for async callback return values
+      selftests/bpf: Add testcase for async callback return value failure
+
+Dinghao Liu (1):
+      ieee802154: ca8210: Fix a potential UAF in ca8210_probe
+
+Eric Dumazet (2):
+      net: refine debug info in skb_checksum_help()
+      net: nfc: fix races in nfc_llcp_sock_get() and nfc_llcp_sock_get_sn()
+
+Gerd Bayer (1):
+      net/smc: Fix dependency of SMC on ISM
+
+Gustavo A. R. Silva (1):
+      net: sched: cls_u32: Fix allocation size in u32_init()
+
+Haibo Chen (2):
+      arm64: dts: imx93: add the Flex-CAN stop mode by GPR
+      can: flexcan: remove the auto stop mode for IMX93
+
+Ilya Leoshkevich (2):
+      s390/bpf: Fix clobbering the caller's backchain in the trampoline
+      s390/bpf: Fix unwinding past the trampoline
+
+Ioana Ciornei (1):
+      phy: lynx-28g: cancel the CDR check work item on the remove path
+
+Jakub Kicinski (5):
+      Merge branch 'ravb-fix-use-after-free-issues'
+      Merge tag 'linux-can-fixes-for-6.6-20231009' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'ieee802154-for-net-2023-10-10' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan
+      net: tcp: fix crashes trying to free half-baked MTU probes
+
+Javier Carrasco (1):
+      net: usb: dm9601: fix uninitialized variable use in dm9601_mdio_read
+
+Jeremy Cline (1):
+      nfc: nci: assert requested protocol is valid
+
+Jeremy Kerr (1):
+      mctp: perform route lookups under a RCU read-side lock
+
+John Watts (1):
+      can: sun4i_can: Only show Kconfig if ARCH_SUNXI is set
+
+Kory Maincent (1):
+      ethtool: Fix mod state of verbose no_mask bitset
+
+Kuniyuki Iwashima (1):
+      af_packet: Fix fortified memcpy() without flex array.
+
+Lorenz Bauer (1):
+      bpf: Refuse unused attributes in bpf_prog_{attach,detach}
+
+Lukas Magel (1):
+      can: isotp: isotp_sendmsg(): fix TX state detection and wait behavior
+
+Marc Kleine-Budde (1):
+      Merge patch series "arm64: dts: imx93: add the Flex-CAN stop mode by GPR"
+
+Marek Behún (2):
+      net: dsa: qca8k: fix regmap bulk read/write methods on big endian systems
+      net: dsa: qca8k: fix potential MDIO bus conflict when accessing internal PHYs via management frames
+
+Markus Schneider-Pargmann (1):
+      can: tcan4x5x: Fix id2_register for tcan4553
+
+Michal Swiatkowski (1):
+      ice: block default rule setting on LAG interface
+
+Miquel Raynal (1):
+      can: sja1000: Always restart the Tx queue after an overrun
+
+Moshe Shemesh (1):
+      devlink: Hold devlink lock on health reporter dump get
+
+Nils Hoppmann (1):
+      net/smc: Fix pos miscalculation in statistics
+
+Paolo Abeni (2):
+      Merge branch 'add-update_pn-flag'
+      Merge branch 'rswitch-fix-issues-on-specific-conditions'
+
+Radu Pirea (NXP OSS) (4):
+      net: macsec: indicate next pn update when offloading
+      octeontx2-pf: mcs: update PN only when update_pn is true
+      net: phy: mscc: macsec: reject PN update requests
+      net/mlx5e: macsec: use update_pn flag instead of PN comparation
+
+Randy Dunlap (1):
+      net: skbuff: fix kernel-doc typos
+
+Ratheesh Kannoth (1):
+      octeontx2-pf: Fix page pool frag allocation warning
+
+Roger Pau Monne (1):
+      xen-netback: use default TX queue size for vifs
+
+Vladimir Oltean (2):
+      phy: lynx-28g: lock PHY while performing CDR lock workaround
+      phy: lynx-28g: serialize concurrent phy_set_mode_ext() calls to shared registers
+
+Will Mortensen (1):
+      net/mlx5e: Again mutually exclude RX-FCS and RX-port-timestamp
+
+Yanguo Li (1):
+      nfp: flower: avoid rmmod nfp crash issues
+
+Yoshihiro Shimoda (4):
+      ravb: Fix up dma_free_coherent() call in ravb_remove()
+      ravb: Fix use-after-free issue in ravb_tx_timeout_work()
+      rswitch: Fix renesas_eth_sw_remove() implementation
+      rswitch: Fix imbalance phy_power_off() calling
+
+ arch/arm64/boot/dts/freescale/imx93.dtsi           |   4 +-
+ arch/riscv/net/bpf_jit_comp64.c                    |  18 +-
+ arch/s390/net/bpf_jit_comp.c                       |  25 +-
+ drivers/net/can/Kconfig                            |   2 +-
+ drivers/net/can/flexcan/flexcan-core.c             |  46 +---
+ drivers/net/can/flexcan/flexcan.h                  |   2 -
+ drivers/net/can/m_can/tcan4x5x-core.c              |   2 +-
+ drivers/net/can/sja1000/sja1000.c                  |   8 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c                   |  15 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c           |  32 +++
+ drivers/net/ethernet/intel/ice/ice_lag.h           |   1 +
+ drivers/net/ethernet/intel/ice/ice_lib.c           |   6 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c     |   5 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k_macsec.c  |  13 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   |   1 +
+ .../ethernet/mellanox/mlx5/core/en_accel/macsec.c  |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   3 +-
+ .../ethernet/mellanox/mlxsw/spectrum_nve_vxlan.c   |   4 +-
+ drivers/net/ethernet/netronome/nfp/flower/cmsg.c   |  10 +-
+ .../net/ethernet/netronome/nfp/flower/conntrack.c  |  19 +-
+ drivers/net/ethernet/netronome/nfp/flower/main.h   |   2 +
+ .../net/ethernet/netronome/nfp/flower/metadata.c   |   2 +
+ .../net/ethernet/netronome/nfp/flower/offload.c    |  24 +-
+ .../net/ethernet/netronome/nfp/flower/qos_conf.c   |  20 +-
+ drivers/net/ethernet/renesas/ravb_main.c           |   6 +-
+ drivers/net/ethernet/renesas/rswitch.c             |  12 +-
+ drivers/net/ieee802154/ca8210.c                    |  17 +-
+ drivers/net/macsec.c                               |   2 +
+ drivers/net/phy/mscc/mscc_macsec.c                 |   6 +
+ drivers/net/usb/dm9601.c                           |   7 +-
+ drivers/net/xen-netback/interface.c                |   4 -
+ drivers/phy/freescale/phy-fsl-lynx-28g.c           |  27 +-
+ drivers/s390/net/Kconfig                           |   2 +-
+ include/linux/skbuff.h                             |   4 +-
+ include/net/macsec.h                               |   1 +
+ include/uapi/linux/if_packet.h                     |   6 +-
+ kernel/bpf/mprog.c                                 |  10 +-
+ kernel/bpf/syscall.c                               |  21 +-
+ kernel/bpf/tcx.c                                   |   8 +-
+ kernel/bpf/verifier.c                              |   6 +-
+ net/can/isotp.c                                    |  19 +-
+ net/core/dev.c                                     |   8 +-
+ net/devlink/health.c                               |  30 +--
+ net/ethtool/bitset.c                               |  32 ++-
+ net/ipv4/tcp_output.c                              |   1 +
+ net/mctp/route.c                                   |  22 +-
+ net/nfc/llcp_core.c                                |  30 +--
+ net/nfc/nci/core.c                                 |   5 +
+ net/packet/af_packet.c                             |   7 +-
+ net/sched/cls_u32.c                                |   2 +-
+ net/smc/Kconfig                                    |   1 +
+ net/smc/smc_stats.h                                |  14 +-
+ net/xdp/xsk_queue.c                                |  10 +
+ .../testing/selftests/bpf/prog_tests/tc_helpers.h  |  16 +-
+ tools/testing/selftests/bpf/prog_tests/tc_links.c  |  64 ++---
+ tools/testing/selftests/bpf/prog_tests/tc_opts.c   | 271 +++++++++++++++++++--
+ tools/testing/selftests/bpf/prog_tests/timer.c     |   6 +-
+ tools/testing/selftests/bpf/progs/timer_failure.c  |  47 ++++
+ 58 files changed, 712 insertions(+), 280 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/timer_failure.c
 
 
