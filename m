@@ -1,569 +1,172 @@
-Return-Path: <netdev+bounces-40422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F98F7C74C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:30:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16B977C74C9
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2A83282C48
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:30:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C79282C4C
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 17:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4A434CF7;
-	Thu, 12 Oct 2023 17:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11E83588A;
+	Thu, 12 Oct 2023 17:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdYN4GJ3"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="33YFYnxs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F110266BE
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:29:58 +0000 (UTC)
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2563DED
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:29:56 -0700 (PDT)
-Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-49dc95be894so428188e0c.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:29:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697131795; x=1697736595; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ERpB4HRiq1DkWAntm2RqpcUmvZFIt5oY6QlWkecr8bs=;
-        b=EdYN4GJ30lurxg3FXSI0WZiShtiN5Ylu5mY0VSS2mznVdP7lXMdTGJqT+EsIrQ6izt
-         YgZ4OKuvFej+qkxCHSPe6MEm5QROq8XMFzKejfNb76onnRM0EglKedT3uUufxWBT7rSc
-         fEfBUP2oDR/U3FNwbdbgGO4hV/PKOHuya2k3CyJfnAzOVgybMiInSW3ImH5CQ/pHa5vN
-         GApA/VRlJ1PAXx0fbZQUxaVpb5T9ueWynd+ix0WBNa63thOYEn+pHPEOVFludpKL0RbM
-         VieIZJ8NgktafFdmZJKATn92N/IEG99WLZr8byai2aedzRouBTgY8VSehbC0BgohQu7c
-         crhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697131795; x=1697736595;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:sender
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ERpB4HRiq1DkWAntm2RqpcUmvZFIt5oY6QlWkecr8bs=;
-        b=Xs+PfjQMF2fFEYOvlIcbM3PoORhrfYiW8z61+9rwposQShHWPQ5J/sQf3BV+8p6Cen
-         z0ZQkBQs0Q3CkVPFPD+2ROVH4Ju4jbshPsdyFJ3fVI4z1p2KZhRInnw4WxSdaJxhVmqh
-         XWMgGG0IpX2xPY0FxyDjoQ53zJlzN8lzoXFO+0f8Csv00lJWef852dDPCLiFTBuwaoIY
-         Q0lEPHjz0lazubJ8vnDEc6FM4sHxu9JfZofphxJOrmbWLS1EsrR+upP/0DQOzNqGVHd6
-         IrF7TJ/nZdyV+v92YnxeLu1KWyBOEnNZbySQlUtG8ulg0N94i7if6+dMe+Z5NtFeM6fF
-         8evQ==
-X-Gm-Message-State: AOJu0YwrDwulIUPqiy4bRsCouOzr1V4OaMaVLGxw5mN/xGw/Fcc+vLch
-	8lvTu5r4vtPtEWC4g4CgeiCHpVdlgRE=
-X-Google-Smtp-Source: AGHT+IGIGmjCkbf2pu1fpLTthG5RUYcQX2PFfmVlRYaoNzGhsF+e4lF5DMzJNa0LBnZSbN6KfDxFeg==
-X-Received: by 2002:a05:6122:2208:b0:48f:cd3a:108 with SMTP id bb8-20020a056122220800b0048fcd3a0108mr21697091vkb.12.1697131794685;
-        Thu, 12 Oct 2023 10:29:54 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 10-20020ac5ce8a000000b0049a5b8d475csm3036049vke.34.2023.10.12.10.29.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 10:29:53 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Thu, 12 Oct 2023 10:29:51 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Konrad Knitter <konrad.knitter@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jdelvare@suse.com, Marcin Domagala <marcinx.domagala@intel.com>,
-	Eric Joyner <eric.joyner@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v3] ice: read internal temperature sensor
-Message-ID: <df0e5774-3db7-4f0f-a9e8-c4369c2e6083@roeck-us.net>
-References: <20231012071358.1101438-1-konrad.knitter@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88CF266BE
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 17:30:12 +0000 (UTC)
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2060.outbound.protection.outlook.com [40.107.212.60])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B40B10B
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 10:30:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=itb0EAmBZ8DkBcvt8DpAuuCqqfSwFKaSS8uJ1SuJJQWqJPxpnGK7YgFbMGDSmhKO7oM70HHMuXZgcVWQu/RzWFJsZPXRM2KcAXdyO9m8zIG8wCHedbcn0PoIR/X1RhEDU8SC5huxny3VQ2lrgajB6516fBYM9BaclHgE1fYRsV9PQpkamgwUNjgHvfndMi12g1nt3DeXoG1mPhV9G5Vb/viSKlZehKjIcVaqBghFYqg17Gihl/rflb77XciW8JfJZUUVz1nxqSo/A20QximnyPoenNomvGxGB/hS45gvsan19XJ8egZxSQoYnt1RLcDDhkLd68/iNrkfLyryI41gUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=N/irzlsg6kVYVBqiTR4R8WuwZ2vjXD3hC5lcvFVj0vA=;
+ b=ogDQ3uqibi4OhQSZ8XyOzsVbbjFAjxEGlcbkgAN9d+Vy/MFq+K9mvzHFaPZF5JKAt7gdisqxppLzDFvFncSA8oRwrzxOPave+o5/r3o5S4Ep7YaQ735k44r0Hyl4e/rfd8lPc8ctfM8d36qbUecO2Pp4xMWOtFoFahMB3v8SGrdgcqroP7cB4JbE+sG6keYZiYOwvT2gRV4UbMBsWJE2pHZrHaK8TelEpnqOue9ZkvGJPQvf15nvZ9ksjKIUxptsECWmsbcXrEFVZDLB39d6dq0D6raUO9ru91q53X1QHFGpah2Vl0Kmsv+PEjTOmocWGFily6WGwp2VHr4kG6cVPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N/irzlsg6kVYVBqiTR4R8WuwZ2vjXD3hC5lcvFVj0vA=;
+ b=33YFYnxs7UvkXzCkv28FGNGj9WubGDR/jUc7Hg+em//TcwO7ipPGiT6kKGOi7DtX3MIVSQVp8QQw4hM2+sStXKZdZZ0xsqYI+/g4REqYgncnT+03Wu/0iuGxgsoYIY8nKJF5O0SLOB1QS8e4bumFkXF1NtGfPo8xLLUoWeOPl7o=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
+ by SA1PR12MB9245.namprd12.prod.outlook.com (2603:10b6:806:3a7::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.38; Thu, 12 Oct
+ 2023 17:30:08 +0000
+Received: from PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::69d5:951c:32bf:8dfb]) by PH7PR12MB6395.namprd12.prod.outlook.com
+ ([fe80::69d5:951c:32bf:8dfb%4]) with mapi id 15.20.6863.043; Thu, 12 Oct 2023
+ 17:30:08 +0000
+Message-ID: <8804726a-cc2d-fcac-093b-8cd34209d662@amd.com>
+Date: Thu, 12 Oct 2023 22:59:57 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH net] amd-xgbe: read STAT1 register twice to get correct
+ value
+Content-Language: en-US
+To: kuba@kernel.org, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ Shyam-sundar.S-k@amd.com
+References: <20230914041944.450751-1-Raju.Rangoju@amd.com>
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+In-Reply-To: <20230914041944.450751-1-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BM1PR01CA0152.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:68::22) To PH7PR12MB6395.namprd12.prod.outlook.com
+ (2603:10b6:510:1fd::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231012071358.1101438-1-konrad.knitter@intel.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|SA1PR12MB9245:EE_
+X-MS-Office365-Filtering-Correlation-Id: 25e615da-cdc7-493a-4862-08dbcb48e141
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8eDhosEH3Q4DS94xykvkIdh+5YG9QQIbJy2YUwovW/yHMrsuldvyFRZ/NN/THcidnqlVTDg9u/jL1fu7ZfsGarFbVk2OnUU18St+xe5mXb1F8ruZbC5ilqWdiUzuZ0fXd1Ym4v/BSG1Px/IdWm7klGl92ARvf1RbNsMwPe8ofNO8UtPuPzJ4Ss3pm77uPCzOTzgtt8E5vukdkOnXwa0XIef5+bcFBbank800KwsfIXa6MhA4L5IsAZROQ6rCCSOd653pUuqzGs1Fw089NsOgMegWkQZuyKfUPQhYLdsPdelP23ZDWyevoyrDSU2u956sxM7ineqNx6wqCUOTCMCJseF/1kjWyzU0HxCmyBiDx532PoH8xtMrdWoulpWYEejkWV2CAlaALz0MZZyA9BY8TMkwaANu5KsRWyTDw7EqzIn5HQZxPgcSBEyh0mbieHEFW1pgWpdtZ5a+6ZBHZEspdMDB76YNFABfqiCKoBwKsEUhDfrOI2m9OUrWpYSR+Yle21zj5aEbMfPhbdxrptufelAmhROvU1LnQH1gcclW0szQ6v5qqEZ4/A9wppbIBAYhQoWYD9kP+nAORsrqEVaWHeP51HagNRMNagQcn80HRpV8RsxxXDcck+y0UjsaU6eXvslJbItoV3xXm66hZZyJWw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(396003)(39860400002)(136003)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(6486002)(478600001)(8676002)(4326008)(2616005)(5660300002)(8936002)(2906002)(53546011)(316002)(6666004)(31696002)(6506007)(66556008)(41300700001)(31686004)(66946007)(66476007)(6512007)(86362001)(26005)(36756003)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SW1HcDBrejJoYmVnQW1kMjI2c0lmTFJuWkJ1NmZseG9nTGQvUDJLSmI0M1ZJ?=
+ =?utf-8?B?K0prYm51L0VZeCtHNUVZMVN6RnRsQ1I0eUoxcE9GVFlDZW9FOStLeE1EdlZl?=
+ =?utf-8?B?djQybTFVampIUXV5SDVSZHpiTktiZVdKWGRZeExhWm1rY0V3Rkx6WFZ6UDFR?=
+ =?utf-8?B?NXI0RkZQRGhkbUJKclhaRUVJWVhLT1VwbVFTSVpnVjhYakEzQzBxdEVJd0NZ?=
+ =?utf-8?B?N3NsYkFiQk5PMElzNkMxU296LzM2TXp0ZXdSb01HVFdsV1E2QUhLRDRoaTd5?=
+ =?utf-8?B?VGt3REZxTG9aeUc4VnNqK1Q4OXJ2bzRyZ1FvSTBRVitueGhXYnloMlRESlIr?=
+ =?utf-8?B?cDYrNy9seDlaV0liVVBMWVV0YnRuOG1VdHBoWXAyQ2ZKWnlQbXhTRkRYTzdM?=
+ =?utf-8?B?T3RsWjRkSUpXK2cyWm9QZjZ0U2tsQnFySUpNK3g5OHlQNGpsaHpZSVRXczAr?=
+ =?utf-8?B?V1hPK2FxSzJQNzVOa0oxK29wd1NwSnMvcDcxRlFlY0JSZ2dXQVh5Q3BseHRa?=
+ =?utf-8?B?c2c4WEY2TFdKTm9Ta0doN2k4ZjdjZTVtQmNYQm1OTis5RTFaS1I3Yzc4ZHRG?=
+ =?utf-8?B?bzdGY0Y5SmNsRW5rd1ZRL2lBQ291Q2tMWCtuTEdmZlRqdklyNnkxcjZJekZ5?=
+ =?utf-8?B?WFNRMGZsSEhOUmpUWW42VENESUs1cTRFbTZBbjBjTS9iUHVFR0ZCdDBsMzNI?=
+ =?utf-8?B?eGI1RWh6V1haRXFUb0hjMWYzTVVFRU55RTIvd0hkaml6aVowcTRiaFlhUnlw?=
+ =?utf-8?B?MWVKUG9jM2tXTWdzbnV0b1hBc1FaZnpibVkwR0Z6S1g1U3dmUXdmRUtEd0Vw?=
+ =?utf-8?B?Z2lsL3pFQ3ppQyt1S2hvaEpPN0pVdVpOci9NK0FaZGw5K0Z1ZUZ3TUxMTTA2?=
+ =?utf-8?B?QnRnZEF0dWFtbmIxNzBpcCt0N2V6VkxvOGFZQkJEb0ExY2QzTlhuS1BkMkZl?=
+ =?utf-8?B?b2xtUTIwZkNnNzJsVmVPcnF4cEVDL0NMbjdjK3dRNzEvR0xBeTRXVUJienlF?=
+ =?utf-8?B?dmNvSm1HRkdkN29ZWFkxUDBzUlYvSEFzQ2lJdzIwTlIyTkltakZQbTVQT1Fz?=
+ =?utf-8?B?RjZZZGZZTkpWRnc1TUlNbW9tWUtvOUZodUR6cDhtU3hFTmR5d1hPZXRwQkt2?=
+ =?utf-8?B?am04VCs0bEJWNW9xbWRMYnNrdDMyTVdSUklqb3EvRUY3MTM2Z3NtK080S0xj?=
+ =?utf-8?B?WHplaEZtb3pIenI2VVk5eGcwOFRVYTJ0OHBnMjA4RTBjNVNxK0I2OGgwL3BJ?=
+ =?utf-8?B?akpvTG5POFpldmZodWd1T05rTUZVdUZ2bHJIMU9lNnNSS3M4VndJQVZLSWhM?=
+ =?utf-8?B?dk4yaWtHVE5RRkwyTXc2SzB0c1dRbkZZUHczWnpoSXRqNG91Y0kvNU5HejFi?=
+ =?utf-8?B?dG1XNE1waXlubDRqekl3NVhWN1ZFNXA0OW5GV2t4aXFRWUNsc05nVGlXcE1w?=
+ =?utf-8?B?aUhMeEx4RVRxT2tPMXNZMGt6WDBHRWk3TnJ6amZhUDVJMDRZeFMxVlhyTk1N?=
+ =?utf-8?B?ME5zVGlVbTFHTU11bHdnOHJLSnlZQ0xrUGtrMjZicWZrNUFiYVErL2FYc3Bu?=
+ =?utf-8?B?cVA3TURWanllN1hJOGRYSUJoUzdDak93Zk9ad3NQM2JDRGhOb0UrSUc5OFYw?=
+ =?utf-8?B?dUFPdzExMC9scnI0NTd1UUhWKzFaMzdiQzFBS204aGZPVTNRZFI3SE5PcGV5?=
+ =?utf-8?B?K1FQajlSdEc5MVNzODBHSHRYZGh6REUrQjRoaS9xWlZOamtzSklLVERLL2sr?=
+ =?utf-8?B?eHJrSmdFWWtMTCtPTWl3SGtaSlZjZ1Nxd2JKV1l4MEE3cXo3Zy9YNldmaGtm?=
+ =?utf-8?B?NmJJSWl6a2taWTJVZnJXYk41SnZLNDk4TDdJaDJTMjBtQlVOTnNoTVlsRzdz?=
+ =?utf-8?B?MGV2TVlobjFlYnpranNpeVBEMHZtSEh5ZTF2ZTVrdmcyc2VQa2dVL2tpZkYr?=
+ =?utf-8?B?WjQ5VEtEUXpCSjR1enFPQ0VmQjlBWGVoLzBiRHQxL0xXY1U0d3U3TFBwUlpJ?=
+ =?utf-8?B?TUthT3hERWFUWC9RaXVyS1FmZkh1MHFEbjhxUEZ0MUNnS3BQdnFlaGNLc09o?=
+ =?utf-8?B?ckdpRXZzUndOajNhRmFWcUg1cTdQMTN6SThhOUxSUDVCQkUrWnVoVXhWVERo?=
+ =?utf-8?Q?R25EleydZyJxoWLxb9mIujLB0?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25e615da-cdc7-493a-4862-08dbcb48e141
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Oct 2023 17:30:08.4268
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KMGCWoRCOsM6B4965v/5H2k/mu4A3D3+mb/ktP/ZOPD1yidIYWWGNK+90g9YljT3gc+AXTWzofp+5vc42Feliw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9245
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 09:13:59AM +0200, Konrad Knitter wrote:
-> Since 4.30 firmware exposes internal thermal sensor reading via admin
-> queue commands. Expose those readouts via hwmon API when supported.
+
+Hi Jakub,
+
+Can you please apply this patch? Let me know if it needs to be resent.
+
+Thanks,
+Raju
+
+On 9/14/2023 9:49 AM, Raju Rangoju wrote:
+> Link status is latched low, so read once to clear
+> and then read again to get current state.
 > 
-> Driver provides current reading from HW as well as device specific
-> thresholds for thermal alarm (Warning, Critical, Fatal) events.
-> 
-> $ sensors
-> 
-> Output
-> =========================================================
-> ice-pci-b100
-> Adapter: PCI adapter
-> temp1:        +62.0°C  (high = +95.0°C, crit = +105.0°C)
->                        (emerg = +115.0°C)
-> 
-> Co-developed-by: Marcin Domagala <marcinx.domagala@intel.com>
-> Signed-off-by: Marcin Domagala <marcinx.domagala@intel.com>
-> Co-developed-by: Eric Joyner <eric.joyner@intel.com>
-> Signed-off-by: Eric Joyner <eric.joyner@intel.com>
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
+> Fixes: 4f3b20bfbb75 ("amd-xgbe: add support for rx-adaptation")
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
 > ---
-> v3: add SPDX identification to ice_hwmon files
-> v2: fix formmating issues, added hwmon maintainers to Cc
-> ---
->  drivers/net/ethernet/intel/ice/Makefile       |   1 +
-
-The code seems to be unconditional, but I see no added
-dependency on CONFIG_HWMON. Does this compile if
-HWMON=m and this code is built into the kernel, or if HWMON=n ?
-
->  drivers/net/ethernet/intel/ice/ice.h          |   1 +
->  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  28 ++++
->  drivers/net/ethernet/intel/ice/ice_common.c   |  57 +++++++-
->  drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
->  drivers/net/ethernet/intel/ice/ice_hwmon.c    | 130 ++++++++++++++++++
->  drivers/net/ethernet/intel/ice/ice_hwmon.h    |  10 ++
->  drivers/net/ethernet/intel/ice/ice_main.c     |   5 +
->  drivers/net/ethernet/intel/ice/ice_type.h     |   4 +
->  9 files changed, 237 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.c
->  create mode 100644 drivers/net/ethernet/intel/ice/ice_hwmon.h
+>   drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-> index 8757bec23fb3..b4c8f5303e57 100644
-> --- a/drivers/net/ethernet/intel/ice/Makefile
-> +++ b/drivers/net/ethernet/intel/ice/Makefile
-> @@ -36,6 +36,7 @@ ice-y := ice_main.o	\
->  	 ice_repr.o	\
->  	 ice_tc_lib.o	\
->  	 ice_fwlog.o	\
-> +	 ice_hwmon.o	\
->  	 ice_debugfs.o
->  ice-$(CONFIG_PCI_IOV) +=	\
->  	ice_sriov.o		\
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> index ad5614d4449c..61d26be502b2 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -650,6 +650,7 @@ struct ice_pf {
->  #define ICE_MAX_VF_AGG_NODES		32
->  	struct ice_agg_node vf_agg_node[ICE_MAX_VF_AGG_NODES];
->  	struct ice_dplls dplls;
-> +	struct device *hwmon_dev;
->  };
->  
->  extern struct workqueue_struct *ice_lag_wq;
-> diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> index 1202abfb9eb3..3c4295f8e4ba 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-> @@ -117,6 +117,7 @@ struct ice_aqc_list_caps_elem {
->  #define ICE_AQC_CAPS_NET_VER				0x004C
->  #define ICE_AQC_CAPS_PENDING_NET_VER			0x004D
->  #define ICE_AQC_CAPS_RDMA				0x0051
-> +#define ICE_AQC_CAPS_SENSOR_READING			0x0067
->  #define ICE_AQC_CAPS_PCIE_RESET_AVOIDANCE		0x0076
->  #define ICE_AQC_CAPS_POST_UPDATE_RESET_RESTRICT		0x0077
->  #define ICE_AQC_CAPS_NVM_MGMT				0x0080
-> @@ -1393,6 +1394,30 @@ struct ice_aqc_get_phy_rec_clk_out {
->  	__le16 node_handle;
->  };
->  
-> +/* Get sensor reading (direct 0x0632) */
-> +struct ice_aqc_get_sensor_reading {
-> +	u8 sensor;
-> +	u8 format;
-> +	u8 reserved[6];
-> +	__le32 addr_high;
-> +	__le32 addr_low;
-> +};
-> +
-> +/* Get sensor reading response (direct 0x0632) */
-> +struct ice_aqc_get_sensor_reading_resp {
-> +	union {
-> +		u8 raw[8];
-> +		/* Output data for sensor 0x00, format 0x00 */
-> +		struct {
-> +			s8 temp;
-> +			u8 temp_warning_threshold;
-> +			u8 temp_critical_threshold;
-> +			u8 temp_fatal_threshold;
-> +			u8 reserved[4];
-> +		} s0f0;
-> +	} data;
-> +};
-
-Kind of surprising that this doesn't need packed attributes.
-
-> +
->  struct ice_aqc_link_topo_params {
->  	u8 lport_num;
->  	u8 lport_num_valid;
-> @@ -2438,6 +2463,8 @@ struct ice_aq_desc {
->  		struct ice_aqc_restart_an restart_an;
->  		struct ice_aqc_set_phy_rec_clk_out set_phy_rec_clk_out;
->  		struct ice_aqc_get_phy_rec_clk_out get_phy_rec_clk_out;
-> +		struct ice_aqc_get_sensor_reading get_sensor_reading;
-> +		struct ice_aqc_get_sensor_reading_resp get_sensor_reading_resp;
->  		struct ice_aqc_gpio read_write_gpio;
->  		struct ice_aqc_sff_eeprom read_write_sff_param;
->  		struct ice_aqc_set_port_id_led set_port_id_led;
-> @@ -2617,6 +2644,7 @@ enum ice_adminq_opc {
->  	ice_aqc_opc_set_mac_lb				= 0x0620,
->  	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
->  	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
-> +	ice_aqc_opc_get_sensor_reading			= 0x0632,
->  	ice_aqc_opc_get_link_topo			= 0x06E0,
->  	ice_aqc_opc_read_i2c				= 0x06E2,
->  	ice_aqc_opc_write_i2c				= 0x06E3,
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> index 283492314215..e566485a01b2 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -2462,6 +2462,26 @@ ice_parse_fdir_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
->  		  dev_p->num_flow_director_fltr);
->  }
->  
-> +/**
-> + * ice_parse_sensor_reading_cap - Parse ICE_AQC_CAPS_SENSOR_READING cap
-> + * @hw: pointer to the HW struct
-> + * @dev_p: pointer to device capabilities structure
-> + * @cap: capability element to parse
-> + *
-> + * Parse ICE_AQC_CAPS_SENSOR_READING for device capability for reading
-> + * enabled sensors.
-> + */
-> +static void
-> +ice_parse_sensor_reading_cap(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
-> +			     struct ice_aqc_list_caps_elem *cap)
-> +{
-> +	dev_p->supported_sensors = le32_to_cpu(cap->number);
-> +
-> +	ice_debug(hw, ICE_DBG_INIT,
-> +		  "dev caps: supported sensors (bitmap) = 0x%x\n",
-> +		  dev_p->supported_sensors);
-> +}
-> +
->  /**
->   * ice_parse_dev_caps - Parse device capabilities
->   * @hw: pointer to the HW struct
-> @@ -2507,9 +2527,12 @@ ice_parse_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
->  		case ICE_AQC_CAPS_1588:
->  			ice_parse_1588_dev_caps(hw, dev_p, &cap_resp[i]);
->  			break;
-> -		case  ICE_AQC_CAPS_FD:
-> +		case ICE_AQC_CAPS_FD:
->  			ice_parse_fdir_dev_caps(hw, dev_p, &cap_resp[i]);
->  			break;
-> +		case ICE_AQC_CAPS_SENSOR_READING:
-> +			ice_parse_sensor_reading_cap(hw, dev_p, &cap_resp[i]);
-> +			break;
->  		default:
->  			/* Don't list common capabilities as unknown */
->  			if (!found)
-> @@ -5292,6 +5315,38 @@ ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
->  	return status;
->  }
->  
-> +/**
-> + * ice_aq_get_sensor_reading
-> + * @hw: pointer to the HW struct
-> + * @sensor: sensor type
-> + * @format: requested response format
-> + * @data: pointer to data to be read from the sensor
-> + *
-> + * Get sensor reading (0x0632)
-> + */
-> +int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
-> +			      struct ice_aqc_get_sensor_reading_resp *data)
-
-Are "sensor" and "format" ever going to be != 0 ? If not,
-those parameters are just noise.
-
-> +{
-> +	struct ice_aqc_get_sensor_reading *cmd;
-> +	struct ice_aq_desc desc;
-> +	int status;
-> +
-> +	if (!data)
-> +		return -EINVAL;
-
-This is never called with a NULL pointer. The check is pointless.
-
-> +
-> +	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_sensor_reading);
-> +	cmd = &desc.params.get_sensor_reading;
-> +	cmd->sensor = sensor;
-> +	cmd->format = format;
-> +
-> +	status = ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
-> +	if (!status)
-> +		memcpy(data, &desc.params.get_sensor_reading_resp,
-> +		       sizeof(*data));
-> +
-> +	return status;
-> +}
-> +
->  /**
->   * ice_replay_pre_init - replay pre initialization
->   * @hw: pointer to the HW struct
-> diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-> index 4a75c0c89301..e23787c17505 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_common.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-> @@ -240,6 +240,8 @@ ice_aq_set_phy_rec_clk_out(struct ice_hw *hw, u8 phy_output, bool enable,
->  int
->  ice_aq_get_phy_rec_clk_out(struct ice_hw *hw, u8 *phy_output, u8 *port_num,
->  			   u8 *flags, u16 *node_handle);
-> +int ice_aq_get_sensor_reading(struct ice_hw *hw, u8 sensor, u8 format,
-> +			      struct ice_aqc_get_sensor_reading_resp *data);
->  void
->  ice_stat_update40(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
->  		  u64 *prev_stat, u64 *cur_stat);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.c b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-> new file mode 100644
-> index 000000000000..6b23ae27169c
-> --- /dev/null
-> +++ b/drivers/net/ethernet/intel/ice/ice_hwmon.c
-> @@ -0,0 +1,130 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (C) 2022, Intel Corporation. */
-> +
-> +#include "ice.h"
-> +#include "ice_hwmon.h"
-> +#include "ice_adminq_cmd.h"
-> +
-> +#include <linux/hwmon.h>
-> +
-> +#define ICE_INTERNAL_TEMP_SENSOR 0
-> +#define ICE_INTERNAL_TEMP_SENSOR_FORMAT 0
-> +
-
-Personally I very much prefer
-
-#define<space>NAME<tab>value
-
-but obviously that is a maintainer decision to make.
-
-> +#define TEMP_FROM_REG(reg) ((reg) * 1000)
-> +
-> +static const struct hwmon_channel_info *ice_hwmon_info[] = {
-> +	HWMON_CHANNEL_INFO(temp,
-> +			   HWMON_T_INPUT | HWMON_T_MAX |
-> +			   HWMON_T_CRIT | HWMON_T_EMERGENCY),
-> +	NULL
-> +};
-> +
-> +static int ice_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
-> +			  u32 attr, int channel, long *val)
-> +{
-> +	struct ice_aqc_get_sensor_reading_resp resp;
-> +	struct ice_pf *pf = dev_get_drvdata(dev);
-> +	int ret;
-> +
-> +	if (type != hwmon_temp)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = ice_aq_get_sensor_reading(&pf->hw,
-> +					ICE_INTERNAL_TEMP_SENSOR,
-> +					ICE_INTERNAL_TEMP_SENSOR_FORMAT,
-> +					&resp);
-> +	if (ret) {
-> +		dev_warn(dev, "%s HW read failure (%d)\n", __func__, ret);
-
-Up to maintainers to decide, but I do not support error messages
-as result of normal operation because it may end up clogging
-the log if the underlying HW has a problem.
-
-> +		return ret;
-> +	}
-> +
-> +	switch (attr) {
-> +	case hwmon_temp_input:
-> +		*val = TEMP_FROM_REG(resp.data.s0f0.temp);
-> +		break;
-> +	case hwmon_temp_max:
-> +		*val = TEMP_FROM_REG(resp.data.s0f0.temp_warning_threshold);
-> +		break;
-> +	case hwmon_temp_crit:
-> +		*val = TEMP_FROM_REG(resp.data.s0f0.temp_critical_threshold);
-> +		break;
-> +	case hwmon_temp_emergency:
-> +		*val = TEMP_FROM_REG(resp.data.s0f0.temp_fatal_threshold);
-> +		break;
-> +	default:
-> +		dev_warn(dev, "%s unsupported attribute (%d)\n",
-> +			 __func__, attr);
-
-Same here, especially since this won't ever happen and the code
-just exists to make the compiler happy.
-
-> +		return -EINVAL;
-
-Should be -EOPNOTSUPP.
-
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static umode_t ice_hwmon_is_visible(const void *data,
-> +				    enum hwmon_sensor_types type, u32 attr,
-> +				    int channel)
-> +{
-> +	if (type != hwmon_temp)
-> +		return 0;
-> +
-> +	switch (attr) {
-> +	case hwmon_temp_input:
-> +	case hwmon_temp_crit:
-> +	case hwmon_temp_max:
-> +	case hwmon_temp_emergency:
-> +		return 0444;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct hwmon_ops ice_hwmon_ops = {
-> +	.is_visible = ice_hwmon_is_visible,
-> +	.read = ice_hwmon_read
-> +};
-> +
-> +static const struct hwmon_chip_info ice_chip_info = {
-> +	.ops = &ice_hwmon_ops,
-> +	.info = ice_hwmon_info
-> +};
-> +
-> +static bool ice_is_internal_reading_supported(struct ice_pf *pf)
-> +{
-> +	if (pf->hw.pf_id)
-> +		return false;
-> +
-
-This should be explained. From the rest of the code, it appears
-that pf_id==0 reflects the first "pf". Why should this device not register
-a hwmon device, and / or why is pf->hw.dev_caps.supported_sensors
-unsupported or not set correctly for it ?
-
-> +	unsigned long sensors = pf->hw.dev_caps.supported_sensors;
-> +
-> +	if (!_test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors))
-> +		return false;
-> +
-> +	return true;
-
-	return _test_bit(ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT, &sensors);
-
-would do the same.
-
-> +};
-> +
-> +void ice_hwmon_init(struct ice_pf *pf)
-> +{
-> +	struct device *dev = ice_pf_to_dev(pf);
-> +	struct device *hdev;
-> +
-> +	if (!ice_is_internal_reading_supported(pf))
-> +		return;
-> +
-> +	hdev = hwmon_device_register_with_info(dev, "ice", pf, &ice_chip_info,
-> +					       NULL);
-> +	if (IS_ERR(hdev)) {
-> +		dev_warn(dev,
-> +			 "hwmon_device_register_with_info returns error (%ld)",
-> +			 PTR_ERR(hdev));
-> +		return;
-> +	}
-> +	pf->hwmon_dev = hdev;
-> +}
-> +
-> +void ice_hwmon_exit(struct ice_pf *pf)
-> +{
-> +	if (!ice_is_internal_reading_supported(pf))
-> +		return;
-
-In this case hwmon_dev would be NULL, making the above check unnecessary.
-
-> +	if (!pf->hwmon_dev)
-> +		return;
-> +	hwmon_device_unregister(pf->hwmon_dev);
-> +}
-> diff --git a/drivers/net/ethernet/intel/ice/ice_hwmon.h b/drivers/net/ethernet/intel/ice/ice_hwmon.h
-> new file mode 100644
-> index 000000000000..8c74d19933d7
-> --- /dev/null
-> +++ b/drivers/net/ethernet/intel/ice/ice_hwmon.h
-> @@ -0,0 +1,10 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright (C) 2022, Intel Corporation. */
-> +
-> +#ifndef _ICE_HWMON_H_
-> +#define _ICE_HWMON_H_
-> +
-> +void ice_hwmon_init(struct ice_pf *pf);
-> +void ice_hwmon_exit(struct ice_pf *pf);
-> +
-> +#endif /* _ICE_HWMON_H_ */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index afe19219a640..8f7e901a6c95 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -14,6 +14,7 @@
->  #include "ice_dcb_lib.h"
->  #include "ice_dcb_nl.h"
->  #include "ice_devlink.h"
-> +#include "ice_hwmon.h"
->  /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
->   * ice tracepoint functions. This must be done exactly once across the
->   * ice driver.
-> @@ -4785,6 +4786,8 @@ static void ice_init_features(struct ice_pf *pf)
->  
->  	if (ice_init_lag(pf))
->  		dev_warn(dev, "Failed to init link aggregation support\n");
-> +
-> +	ice_hwmon_init(pf);
->  }
->  
->  static void ice_deinit_features(struct ice_pf *pf)
-> @@ -5310,6 +5313,8 @@ static void ice_remove(struct pci_dev *pdev)
->  		ice_free_vfs(pf);
->  	}
->  
-> +	ice_hwmon_exit(pf);
-> +
->  	ice_service_task_stop(pf);
->  	ice_aq_cancel_waiting_tasks(pf);
->  	set_bit(ICE_DOWN, pf->state);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-> index 877a92099ef0..0b5425d33adf 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_type.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_type.h
-> @@ -378,6 +378,8 @@ struct ice_hw_func_caps {
->  	struct ice_ts_func_info ts_func_info;
->  };
->  
-> +#define ICE_SENSOR_SUPPORT_E810_INT_TEMP_BIT	0
-> +
->  /* Device wide capabilities */
->  struct ice_hw_dev_caps {
->  	struct ice_hw_common_caps common_cap;
-> @@ -386,6 +388,8 @@ struct ice_hw_dev_caps {
->  	u32 num_flow_director_fltr;	/* Number of FD filters available */
->  	struct ice_ts_dev_info ts_dev_info;
->  	u32 num_funcs;
-> +	/* bitmap of supported sensors */
-> +	u32 supported_sensors;
->  };
->  
->  /* MAC info */
-> 
-> base-commit: 2318d58f358e7aef726c038aff87a68bec8f09e0
-> -- 
-> 2.35.3
-> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> index 6a716337f48b..c83085285e8c 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+> @@ -2930,6 +2930,7 @@ static int xgbe_phy_link_status(struct xgbe_prv_data *pdata, int *an_restart)
+>   
+>   		/* check again for the link and adaptation status */
+>   		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+> +		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+>   		if ((reg & MDIO_STAT1_LSTATUS) && pdata->rx_adapt_done)
+>   			return 1;
+>   	} else if (reg & MDIO_STAT1_LSTATUS)
 
