@@ -1,76 +1,138 @@
-Return-Path: <netdev+bounces-40553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38BBA7C7A7D
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:37:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 339887C7A83
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 01:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7589B207B2
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:37:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8311282B06
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 23:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CBA42B5E5;
-	Thu, 12 Oct 2023 23:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CD4F2B5E6;
+	Thu, 12 Oct 2023 23:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Anl92KwL"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="P4uS1OVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAC52B5E2
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 23:37:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D26C433C7;
-	Thu, 12 Oct 2023 23:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697153854;
-	bh=c+3LuBsESfP3745tdLMWIFPLiLMUt1sjGKjdite7k/Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Anl92KwLM6JcUnMUb0WDYDd2thk2/YcUx45EUECGk7flVzyDQX4clEK2HASyFNPDa
-	 Ok/p7+YN7QbNEdkOcGMahVWLc/fGMw4wXzAgPkti74KfcsiJ8G57Jef5Sv9l83AL8P
-	 pT5HVAdFf3uMS42LYoiEQ8IiuVztBvs6VcipmcHg/SG6W0b8NdxF3SyKV3MQ1IpvXo
-	 uaOJM8kuNW+2UPrsbzrXuS3Gk0H+B75tCP7cV/EP6IbqUMwJbfmA9yE2Iwa9fwGejz
-	 Q7pxnPTctYOefoGZhrDjSrPRhBKCAsFt06W+mjo/vnd2aTRmqh6XEoM860Ci7v9M/v
-	 oWT8PFoDMYhyg==
-Date: Thu, 12 Oct 2023 16:37:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xabier Marquiegui <reibax@gmail.com>
-Cc: chrony-dev@chrony.tuxfamily.org, davem@davemloft.net, horms@kernel.org,
- jstultz@google.com, mlichvar@redhat.com, netdev@vger.kernel.org,
- ntp-lists@mattcorallo.com, richardcochran@gmail.com,
- rrameshbabu@nvidia.com, shuah@kernel.org, tglx@linutronix.de,
- vinicius.gomes@intel.com
-Subject: Re: [PATCH net-next v5 5/6] ptp: add debugfs interface to see
- applied channel masks
-Message-ID: <20231012163733.1f61a56d@kernel.org>
-In-Reply-To: <20231011223604.4570-1-reibax@gmail.com>
-References: <20231009175421.57552c62@kernel.org>
-	<20231011223604.4570-1-reibax@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1257B1D68F
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 23:41:18 +0000 (UTC)
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A25DE
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:41:17 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id ca18e2360f4ac-7a2cc9ee64cso60848439f.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 16:41:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1697154076; x=1697758876; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8lPotT7caJ2i4rnfmOn5KsESAOXBOrfHJSZKahlwL+g=;
+        b=P4uS1OVAhhol/x5j9dfFaJZXBZAXoZyPEY4vGo1aH2YNwyG/8LORaaKOa6FXc/pdVM
+         IWVVoy7gOpYDXLGZtyh12nuKINDOOnT1kNTtj1tXdOBFPl8iX+D8NOv+elRuyF5jpl4+
+         AF0pjlkicHLO5bX5Ba/zUaFxzNF40KYAJBzh0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697154076; x=1697758876;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8lPotT7caJ2i4rnfmOn5KsESAOXBOrfHJSZKahlwL+g=;
+        b=tCIeNJ/m/uJJUdkcntYfLncx77v5/CDOLTi01c3uv2pbb6bl8xfUk3xXIwxw1L6jcz
+         Di/HQU7qURoOlvuqejvCNEUbwNnzBSuTPqjGJ6+h3bf2PkfAN6PoGym3Ct3oIabKToOh
+         ukrfsclvKUl5lAehTD+94bQO/I1xwB5IzNlpU1qwZB022rfPMAF3zhWJgN4g/Q9BWoKT
+         Tsgh15hqKe7kKjqyYMGltFsYzfAU6fvZcU6kHLcb+T/efrK12a4+HH1uHInA4klpTI2r
+         WpnwyK9srWYBYqKNhPuHcxbg6iEfwN1ql3XiqMu0sTgnGiqFAFeC8lqAKJNYZjC/rBFa
+         v+NQ==
+X-Gm-Message-State: AOJu0YzyWdM31w4k9OXrMj/Bz53YJBNi3C0XM//B3JGkJO+Yp1+MT/Ro
+	c8hlfYorTj+2eO2iuvOtfVNoVg==
+X-Google-Smtp-Source: AGHT+IHVcCcrRF23qP1MJVBs2OIkv1QitZZk132Zae4UHLUIu2aj2KVqpLdgi6v/dJwUgreFF9xBIA==
+X-Received: by 2002:a6b:f319:0:b0:783:63d6:4c5 with SMTP id m25-20020a6bf319000000b0078363d604c5mr29820716ioh.12.1697154076350;
+        Thu, 12 Oct 2023 16:41:16 -0700 (PDT)
+Received: from localhost.localdomain (d14-69-55-117.try.wideopenwest.com. [69.14.117.55])
+        by smtp.gmail.com with ESMTPSA id c6-20020a5ea806000000b0078702f4894asm4480238ioa.9.2023.10.12.16.41.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Oct 2023 16:41:15 -0700 (PDT)
+From: "Nabil S. Alramli" <nalramli@fastly.com>
+To: sbhogavilli@fastly.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: srao@fastly.com,
+	dev@nalramli.com
+Subject: [net] ipv4: Fix broken PMTUD when using L4 multipath hash
+Date: Thu, 12 Oct 2023 19:40:25 -0400
+Message-Id: <20231012234025.4025-1-nalramli@fastly.com>
+X-Mailer: git-send-email 2.31.1.windows.1
+In-Reply-To: <20231012005721.2742-2-nalramli@fastly.com>
+References: <20231012005721.2742-2-nalramli@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 12 Oct 2023 00:36:04 +0200 Xabier Marquiegui wrote:
-> Jakub Kicinski said:
-> > If it's a self-test it should probably be included in the Makefile 
-> > so that bots run it.
-> 
-> Thank you for your input Jakub. It's actually designed as a debug tool for
-> humans. I wasn't thinking about self-tests, and I can't really think of how
-> that could be pulled of in this specific case. I hope that's ok. If not we
-> can try to throw a few ideas around and see if we find a way.
+From: Suresh Bhogavilli <sbhogavilli@fastly.com>
 
-Let's not throw random non-test scripts into selftests. It adds
-confusion to our pitiful kernel testing story :(
+On a node with multiple network interfaces, if we enable layer 4 hash
+policy with net.ipv4.fib_multipath_hash_policy=1, path MTU discovery is
+broken and TCP connection does not make progress unless the incoming
+ICMP Fragmentation Needed (type 3, code 4) message is received on the
+egress interface of selected nexthop of the socket.
 
-The netdevsim driver which is supposed to be used for uAPI selftests
-now supports PHCs. Maybe we can extend it and build a proper-er test?
+This is because build_sk_flow_key() does not provide the sport and dport
+from the socket when calling flowi4_init_output(). This appears to be a
+copy/paste error of build_skb_flow_key() -> __build_flow_key() ->
+flowi4_init_output() call used for packet forwarding where an skb is
+present, is passed later to fib_multipath_hash() call, and can scrape
+out both sport and dport from the skb if L4 hash policy is in use.
 
-Whether we'd then want to move the debugfs entries onto netdevsim
-or leave them where you have then now is another question..
+In the socket write case, fib_multipath_hash() does not get an skb so
+it expects the fl4 to have sport and dport populated when L4 hashing is
+in use. Not populating them results in creating a nexthop exception
+entry against a nexthop that may not be the one used by the socket.
+Hence it is not later matched when inet_csk_rebuild_route is called to
+update the cached dst entry in the socket, so TCP does not lower its MSS
+and the connection does not make progress.
+
+Fix this by providing the source port and destination ports to
+flowi4_init_output() call in build_sk_flow_key().
+
+Fixes: 4895c771c7f0 ("ipv4: Add FIB nexthop exceptions.")
+Signed-off-by: Suresh Bhogavilli <sbhogavilli@fastly.com>
+---
+ net/ipv4/route.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index e2bf4602b559..2517eb12b7ef 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -557,7 +557,8 @@ static void build_sk_flow_key(struct flowi4 *fl4, const struct sock *sk)
+ 			   inet_test_bit(HDRINCL, sk) ?
+ 				IPPROTO_RAW : sk->sk_protocol,
+ 			   inet_sk_flowi_flags(sk),
+-			   daddr, inet->inet_saddr, 0, 0, sk->sk_uid);
++			   daddr, inet->inet_saddr, inet->inet_dport, inet->inet_sport,
++			   sk->sk_uid);
+ 	rcu_read_unlock();
+ }
+ 
+-- 
+2.31.1
+
 
