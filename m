@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4AEB7C76B9
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:28:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCF47C76BA
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:28:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2C7E1C2117B
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:28:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2744F1C2114E
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8287A3B78D;
-	Thu, 12 Oct 2023 19:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612703C6A4;
+	Thu, 12 Oct 2023 19:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oKxzr4oG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OT5gyaUE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664113C68C
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:28:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DD8FC433CB;
-	Thu, 12 Oct 2023 19:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F773B29F
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:28:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07519C433C7;
+	Thu, 12 Oct 2023 19:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697138880;
-	bh=PSDk4CHnP9MWlhiypPzafYt6+HGi80phUKp+YN3NIKQ=;
+	s=k20201202; t=1697138881;
+	bh=sCKW1lulrN47qnO06iR1/PFLTCfQeGivHQvENFLnd44=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oKxzr4oGfCK86za/qX9fB8T2b8a/YPuCezUTml6k2h2b0Oes/XIzmO6DdwxlIHAgR
-	 Ltf4kfhWUjJbCrmKzdSPM2S17llyidNXGI4BEIUb1nCtXHl6nd84KFTyybU6LzSdn7
-	 wYdKjBh5pJluxtdhYCEqMjxCVJ2e+p7nDIzt/+szizkbLkCZGYnXBCpx88JvAYfSxB
-	 NfZxxc1y7NtnO282E+nljcKCCxw9WsDpKSSytPwMV+yN9V1FJRwDv627pyLqoKzB28
-	 L4VSaJobZ2VL3rshFSTpxBlxlnolI4Wcls6pXAWyX80QbXTIKaYw7jZ11mJO8PRSFd
-	 VteDyJkdfAHpg==
+	b=OT5gyaUEQsH1irkSoB+SluhmCIh/Xk4ZbfOMZHO6Y7b1ArwHMuXfvOutPF8qxrWyF
+	 ykqwfJ2hKSCQf96bhCRcVWX4m45b/ak0nfWhBYFUSch0bYDWVTkmc+i/G/iOANQ3AS
+	 plSa1i8en6o0mzvWBx5bbZvU75kUfoESZOnHcDntU8wwr4enIDvPGVQBbGNUwsLa9i
+	 GdnFx8pd0C+392cPTC67SUMMuthajFPkpvV+A0z2tlUc3WYJ5ckbQRqapm0A0QST3B
+	 BnEUfRjt4KbIbi/4ETXd0mxOF0C2p71x1a54rc2FEoXZV29+3HpfK0rzNXZ0nBFaZz
+	 T6G/YTpc8YpRA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [net-next V2 07/15] net/mlx5: fix config name in Kconfig parameter documentation
-Date: Thu, 12 Oct 2023 12:27:42 -0700
-Message-ID: <20231012192750.124945-8-saeed@kernel.org>
+	Jinjie Ruan <ruanjinjie@huawei.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [net-next V2 08/15] net/mlx5: Use PTR_ERR_OR_ZERO() to simplify code
+Date: Thu, 12 Oct 2023 12:27:43 -0700
+Message-ID: <20231012192750.124945-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231012192750.124945-1-saeed@kernel.org>
 References: <20231012192750.124945-1-saeed@kernel.org>
@@ -55,34 +56,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
 
-Commit a12ba19269d7 ("net/mlx5: Update Kconfig parameter documentation")
-adds documentation on Kconfig options for the mlx5 driver. It refers to the
-config MLX5_EN_MACSEC for MACSec offloading, but the config is actually
-called MLX5_MACSEC.
+Return PTR_ERR_OR_ZERO() instead of return 0 or PTR_ERR() to
+simplify code.
 
-Fix the reference to the right config name in the documentation.
-
-Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../device_drivers/ethernet/mellanox/mlx5/kconfig.rst           | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-index 0a42c3395ffa..20d3b7e87049 100644
---- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-+++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-@@ -67,7 +67,7 @@ Enabling the driver and kconfig options
- |    Enables :ref:`IPSec XFRM cryptography-offload acceleration <xfrm_device>`.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+index 7d9bbb494d95..101b3bb90863 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/port_sel.c
+@@ -507,10 +507,7 @@ static int mlx5_lag_create_ttc_table(struct mlx5_lag *ldev)
  
+ 	mlx5_lag_set_outer_ttc_params(ldev, &ttc_params);
+ 	port_sel->outer.ttc = mlx5_create_ttc_table(dev, &ttc_params);
+-	if (IS_ERR(port_sel->outer.ttc))
+-		return PTR_ERR(port_sel->outer.ttc);
+-
+-	return 0;
++	return PTR_ERR_OR_ZERO(port_sel->outer.ttc);
+ }
  
--**CONFIG_MLX5_EN_MACSEC=(y/n)**
-+**CONFIG_MLX5_MACSEC=(y/n)**
+ static int mlx5_lag_create_inner_ttc_table(struct mlx5_lag *ldev)
+@@ -521,10 +518,7 @@ static int mlx5_lag_create_inner_ttc_table(struct mlx5_lag *ldev)
  
- |    Build support for MACsec cryptography-offload acceleration in the NIC.
+ 	mlx5_lag_set_inner_ttc_params(ldev, &ttc_params);
+ 	port_sel->inner.ttc = mlx5_create_inner_ttc_table(dev, &ttc_params);
+-	if (IS_ERR(port_sel->inner.ttc))
+-		return PTR_ERR(port_sel->inner.ttc);
+-
+-	return 0;
++	return PTR_ERR_OR_ZERO(port_sel->inner.ttc);
+ }
  
+ int mlx5_lag_port_sel_create(struct mlx5_lag *ldev,
 -- 
 2.41.0
 
