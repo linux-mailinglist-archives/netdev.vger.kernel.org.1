@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-40466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 594737C7760
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0EA7C7761
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 21:53:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BDFE282ABD
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF851C210E3
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 19:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754E13B7B0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C797E3C68C;
 	Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLo2KOwr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KGCuC3IU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C3B28E16
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F7A8C433C9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A805B3B7BD
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:53:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCDD0C433CA;
 	Thu, 12 Oct 2023 19:53:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1697140389;
-	bh=4cTzqrRqd2tfOjwKw7/ul5dhVW6/QY2IzPJ26/r1sls=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HLo2KOwrbfVqxvhmi1BIc+wmX1XbSYD8xuj0iXU7Rwqn2b83PCDthkkXfx7tipzuM
-	 k/z0Y95b3NEohpBqccpxJPoMedZGtrD77vsfiDU094ygThFV/Q01SQuYnFWDLG98pr
-	 Y9w9JIntDLwwbWdmTJ6cRgb/hyXVi9He/DyXcaMNY+fkDwZb68T4Q1TBVw0Rn30SKU
-	 19FJKx1/ap7bF3dkZbwoixO9ci6T1xxBEn3zla2tK+tOsmHYvHX6UDphpa6L841pZL
-	 WSdcRB3Y8vilpKGCXZxxhV7lK8ItHhbwO3AcNYDEHAVDGRPU6guaUDQ8FWikJHuXxw
-	 mWwUjO3XiScmA==
+	bh=QwnFRBasn8ehotvJqAHZdQ7hP7OevsoX+PBJ3JFdnwc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KGCuC3IUQ0eIK8o/D62pKaSluxybBU6jJbGFHlQ0ULaVvQJAzXHtdnWhVO/RoeLRz
+	 2aydh21UbnhF6MISCkEb/tCk5+dAqFTod++BMwYtRhIU2B/ks5YKbSrGWQxZnbO1IV
+	 QgCcfJI3/6kmFkGjDzGI7Cymi0i5ZRfEpbgZ+dpLvnfJpecqJKQTBX+QZS2amUT+ex
+	 itG7nPGPtXisOHMOH3R6bhxyokj5iq/5dbhvuHj2sdP6DEmsO5p9BH7h3mFk9d5He3
+	 lO4B6u4us4ld5wYD5jXSJxp8YFjaA71cZvSiuqrSNyeCRZV2DFcSKraL6ij5kk2RDD
+	 m2FLCGXZVAwYg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -39,11 +39,17 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [pull request][net 00/10] mlx5 fixes 2023-10-12
-Date: Thu, 12 Oct 2023 12:51:17 -0700
-Message-ID: <20231012195127.129585-1-saeed@kernel.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Shay Drory <shayd@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>
+Subject: [net 01/10] net/mlx5: Perform DMA operations in the right locations
+Date: Thu, 12 Oct 2023 12:51:18 -0700
+Message-ID: <20231012195127.129585-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231012195127.129585-1-saeed@kernel.org>
+References: <20231012195127.129585-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,67 +58,205 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Shay Drory <shayd@nvidia.com>
 
-This series provides bug fixes to mlx5 driver.
-Please pull and let me know if there is any problem.
+The cited patch change mlx5 driver so that during probe DMA
+operations were performed before pci_enable_device(), and during
+teardown DMA operations were performed after pci_disable_device().
+DMA operations require PCI to be enabled. Hence, The above leads to
+the following oops in PPC systems[1].
 
-Thanks,
-Saeed.
+On s390x systems, as reported by Niklas Schnelle, this is a problem
+because mlx5_pci_init() is where the DMA and coherent mask is set but
+mlx5_cmd_init() already does a dma_alloc_coherent(). Thus a DMA
+allocation is done during probe before the correct mask is set. This
+causes probe to fail initialization of the cmdif SW structs on s390x
+after that is converted to the common dma-iommu code. This is because on
+s390x DMA addresses below 4 GiB are reserved on current machines and
+unlike the old s390x specific DMA API implementation common code
+enforces DMA masks.
 
+Fix it by performing the DMA operations during probe after
+pci_enable_device() and after the dma mask is set,
+and during teardown before pci_disable_device().
 
-The following changes since commit b91e8403373cab79375a65f5cf3495e2cd0bbdfa:
+[1]
+Oops: Kernel access of bad area, sig: 11 [#1]
+LE PAGE_SIZE=64K MMU=Radix SMP NR_CPUS=2048 NUMA pSeries
+Modules linked in: xt_MASQUERADE nf_conntrack_netlink
+nfnetlink xfrm_user iptable_nat xt_addrtype xt_conntrack nf_nat
+nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 netconsole rpcsec_gss_krb5
+auth_rpcgss oid_registry overlay rpcrdma rdma_ucm ib_iser ib_umad
+rdma_cm ib_ipoib iw_cm libiscsi scsi_transport_iscsi ib_cm ib_uverbs
+ib_core mlx5_core(-) ptp pps_core fuse vmx_crypto crc32c_vpmsum [last
+unloaded: mlx5_ib]
+CPU: 1 PID: 8937 Comm: modprobe Not tainted 6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02 #1
+Hardware name: IBM pSeries (emulated by qemu) POWER9 (raw) 0x4e1202 0xf000005 of:SLOF,HEAD hv:linux,kvm pSeries
+NIP:  c000000000423388 LR: c0000000001e733c CTR: c0000000001e4720
+REGS: c0000000055636d0 TRAP: 0380   Not tainted (6.5.0-rc3_for_upstream_min_debug_2023_07_31_16_02)
+MSR:  8000000000009033  CR: 24008884  XER: 20040000
+CFAR: c0000000001e7338 IRQMASK: 0
+NIP [c000000000423388] __free_pages+0x28/0x160
+LR [c0000000001e733c] dma_direct_free+0xac/0x190
+Call Trace:
+[c000000005563970] [5deadbeef0000100] 0x5deadbeef0000100 (unreliable)
+[c0000000055639b0] [c0000000003d46cc] kfree+0x7c/0x150
+[c000000005563a40] [c0000000001e47c8] dma_free_attrs+0xa8/0x1a0
+[c000000005563aa0] [c008000000d0064c] mlx5_cmd_cleanup+0xa4/0x100 [mlx5_core]
+[c000000005563ad0] [c008000000cf629c] mlx5_mdev_uninit+0xf4/0x140 [mlx5_core]
+[c000000005563b00] [c008000000cf6448] remove_one+0x160/0x1d0 [mlx5_core]
+[c000000005563b40] [c000000000958540] pci_device_remove+0x60/0x110
+[c000000005563b80] [c000000000a35e80] device_remove+0x70/0xd0
+[c000000005563bb0] [c000000000a37a38] device_release_driver_internal+0x2a8/0x330
+[c000000005563c00] [c000000000a37b8c] driver_detach+0x8c/0x160
+[c000000005563c40] [c000000000a35350] bus_remove_driver+0x90/0x110
+[c000000005563c80] [c000000000a38948] driver_unregister+0x48/0x90
+[c000000005563cf0] [c000000000957e38] pci_unregister_driver+0x38/0x150
+[c000000005563d40] [c008000000eb6140] mlx5_cleanup+0x38/0x90 [mlx5_core]
 
-  Merge branch 'rswitch-fix-issues-on-specific-conditions' (2023-10-12 11:22:24 +0200)
+Fixes: 06cd555f73ca ("net/mlx5: split mlx5_cmd_init() to probe and reload routines")
+Signed-off-by: Shay Drory <shayd@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 64 ++++++++-----------
+ 1 file changed, 28 insertions(+), 36 deletions(-)
 
-are available in the Git repository at:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
+index afb348579577..c22b0ad0c870 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
+@@ -2186,52 +2186,23 @@ static u16 cmdif_rev(struct mlx5_core_dev *dev)
+ 
+ int mlx5_cmd_init(struct mlx5_core_dev *dev)
+ {
+-	int size = sizeof(struct mlx5_cmd_prot_block);
+-	int align = roundup_pow_of_two(size);
+ 	struct mlx5_cmd *cmd = &dev->cmd;
+-	u32 cmd_l;
+-	int err;
+-
+-	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
+-	if (!cmd->pool)
+-		return -ENOMEM;
+ 
+-	err = alloc_cmd_page(dev, cmd);
+-	if (err)
+-		goto err_free_pool;
+-
+-	cmd_l = (u32)(cmd->dma);
+-	if (cmd_l & 0xfff) {
+-		mlx5_core_err(dev, "invalid command queue address\n");
+-		err = -ENOMEM;
+-		goto err_cmd_page;
+-	}
+ 	cmd->checksum_disabled = 1;
+ 
+ 	spin_lock_init(&cmd->alloc_lock);
+ 	spin_lock_init(&cmd->token_lock);
+ 
+-	create_msg_cache(dev);
+-
+ 	set_wqname(dev);
+ 	cmd->wq = create_singlethread_workqueue(cmd->wq_name);
+ 	if (!cmd->wq) {
+ 		mlx5_core_err(dev, "failed to create command workqueue\n");
+-		err = -ENOMEM;
+-		goto err_cache;
++		return -ENOMEM;
+ 	}
+ 
+ 	mlx5_cmdif_debugfs_init(dev);
+ 
+ 	return 0;
+-
+-err_cache:
+-	destroy_msg_cache(dev);
+-err_cmd_page:
+-	free_cmd_page(dev, cmd);
+-err_free_pool:
+-	dma_pool_destroy(cmd->pool);
+-	return err;
+ }
+ 
+ void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
+@@ -2240,15 +2211,15 @@ void mlx5_cmd_cleanup(struct mlx5_core_dev *dev)
+ 
+ 	mlx5_cmdif_debugfs_cleanup(dev);
+ 	destroy_workqueue(cmd->wq);
+-	destroy_msg_cache(dev);
+-	free_cmd_page(dev, cmd);
+-	dma_pool_destroy(cmd->pool);
+ }
+ 
+ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
+ {
++	int size = sizeof(struct mlx5_cmd_prot_block);
++	int align = roundup_pow_of_two(size);
+ 	struct mlx5_cmd *cmd = &dev->cmd;
+ 	u32 cmd_h, cmd_l;
++	int err;
+ 
+ 	memset(&cmd->vars, 0, sizeof(cmd->vars));
+ 	cmd->vars.cmdif_rev = cmdif_rev(dev);
+@@ -2281,10 +2252,21 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
+ 	sema_init(&cmd->vars.pages_sem, 1);
+ 	sema_init(&cmd->vars.throttle_sem, DIV_ROUND_UP(cmd->vars.max_reg_cmds, 2));
+ 
++	cmd->pool = dma_pool_create("mlx5_cmd", mlx5_core_dma_dev(dev), size, align, 0);
++	if (!cmd->pool)
++		return -ENOMEM;
++
++	err = alloc_cmd_page(dev, cmd);
++	if (err)
++		goto err_free_pool;
++
+ 	cmd_h = (u32)((u64)(cmd->dma) >> 32);
+ 	cmd_l = (u32)(cmd->dma);
+-	if (WARN_ON(cmd_l & 0xfff))
+-		return -EINVAL;
++	if (cmd_l & 0xfff) {
++		mlx5_core_err(dev, "invalid command queue address\n");
++		err = -ENOMEM;
++		goto err_cmd_page;
++	}
+ 
+ 	iowrite32be(cmd_h, &dev->iseg->cmdq_addr_h);
+ 	iowrite32be(cmd_l, &dev->iseg->cmdq_addr_l_sz);
+@@ -2297,17 +2279,27 @@ int mlx5_cmd_enable(struct mlx5_core_dev *dev)
+ 	cmd->mode = CMD_MODE_POLLING;
+ 	cmd->allowed_opcode = CMD_ALLOWED_OPCODE_ALL;
+ 
++	create_msg_cache(dev);
+ 	create_debugfs_files(dev);
+ 
+ 	return 0;
++
++err_cmd_page:
++	free_cmd_page(dev, cmd);
++err_free_pool:
++	dma_pool_destroy(cmd->pool);
++	return err;
+ }
+ 
+ void mlx5_cmd_disable(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_cmd *cmd = &dev->cmd;
+ 
+-	clean_debug_files(dev);
+ 	flush_workqueue(cmd->wq);
++	clean_debug_files(dev);
++	destroy_msg_cache(dev);
++	free_cmd_page(dev, cmd);
++	dma_pool_destroy(cmd->pool);
+ }
+ 
+ void mlx5_cmd_set_state(struct mlx5_core_dev *dev,
+-- 
+2.41.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-fixes-2023-10-12
-
-for you to fetch changes up to 80f1241484dd1b1d4eab1a0211d52ec2bd83e2f1:
-
-  net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command (2023-10-12 11:10:35 -0700)
-
-----------------------------------------------------------------
-mlx5-fixes-2023-10-12
-
-----------------------------------------------------------------
-Amir Tzin (1):
-      net/mlx5e: Fix VF representors reporting zero counters to "ip -s" command
-
-Dragos Tatulea (3):
-      net/mlx5e: RX, Fix page_pool allocation failure recovery for striding rq
-      net/mlx5e: RX, Fix page_pool allocation failure recovery for legacy rq
-      net/mlx5e: XDP, Fix XDP_REDIRECT mpwqe page fragment leaks on shutdown
-
-Jianbo Liu (1):
-      net/mlx5e: Don't offload internal port if filter device is out device
-
-Lama Kayal (1):
-      net/mlx5e: Take RTNL lock before triggering netdev notifiers
-
-Maher Sanalla (1):
-      net/mlx5: Handle fw tracer change ownership event based on MTRC
-
-Shay Drory (2):
-      net/mlx5: Perform DMA operations in the right locations
-      net/mlx5: E-switch, register event handler before arming the event
-
-Vlad Buslov (1):
-      net/mlx5: Bridge, fix peer entry ageing in LAG mode
-
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c      | 64 ++++++++++------------
- .../ethernet/mellanox/mlx5/core/diag/fw_tracer.c   |  2 +-
- .../ethernet/mellanox/mlx5/core/en/rep/bridge.c    | 11 ++++
- .../ethernet/mellanox/mlx5/core/en/tc_tun_encap.c  |  3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c   |  8 +--
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   | 10 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    | 35 +++++++++---
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.h | 11 +++-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  5 +-
- .../net/ethernet/mellanox/mlx5/core/esw/bridge.c   | 25 ++++++++-
- .../net/ethernet/mellanox/mlx5/core/esw/bridge.h   |  3 +
- .../ethernet/mellanox/mlx5/core/esw/bridge_priv.h  |  1 +
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  | 17 +++---
- 13 files changed, 130 insertions(+), 65 deletions(-)
 
