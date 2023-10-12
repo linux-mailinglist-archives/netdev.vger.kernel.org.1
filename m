@@ -1,103 +1,168 @@
-Return-Path: <netdev+bounces-40358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6262B7C6E68
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:45:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07EFA7C6E8A
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 14:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91CA81C20C94
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:45:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF5F7282782
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 12:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B5225107;
-	Thu, 12 Oct 2023 12:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37634266C9;
+	Thu, 12 Oct 2023 12:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o9GcXIAS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XkJ9DZi5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAD1208D5
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:45:48 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD669BA
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 05:45:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Q5CgV1ItkLayLdnkEq41KCTvrOkCEeNEb8NVimejVY8=; b=o9GcXIASuyR0i3KtJEFM4dVURh
-	wxOK/RDsEGMDt4Nju+x6alG1v2thTKfuAZcW4d4Ex2DnxlB5e6riDhVVIsZYh3SddAcEn7hofcczq
-	fGm0QKz7Z8tM66BKBZl+inbqzmO6EYGNZpu6deDVcnmlPuF1GDCx2+chx6LJc+vr2c8g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qqv4Q-001v4Z-Bm; Thu, 12 Oct 2023 14:45:42 +0200
-Date: Thu, 12 Oct 2023 14:45:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Michal Kubecek <mkubecek@suse.cz>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, opendmb@gmail.com,
-	justin.chen@broadcom.com
-Subject: Re: [PATCH net-next 1/2] ethtool: Introduce WAKE_MDA
-Message-ID: <78aaaa09-1b35-4ddb-8be8-b8f40cf280bc@lunn.ch>
-References: <20231011221242.4180589-1-florian.fainelli@broadcom.com>
- <20231011221242.4180589-2-florian.fainelli@broadcom.com>
- <20231011230821.75axavcrjuy5islt@lion.mk-sys.cz>
- <3229ff0a-5ce5-4ee2-a79d-15007f2b6030@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C3022EFA
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 12:53:48 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BBA194;
+	Thu, 12 Oct 2023 05:53:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697115227; x=1728651227;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=gNLNaEec64/5yPf43OhzXjxJ+9f0AwPObPN0gw90rTk=;
+  b=XkJ9DZi5gy3NgX1d7rCxq+rNL5s/H7mbScg9qZtZuE0o2ovQ6o1aTPfT
+   RSkn6+wb8jlENZvCR1cjCzBDMsPR4EVEUqfMche/YjYjxViTWu4FfobjZ
+   CUIaoL0Vn88ucROtDhnXUx8cGrpkNZlqzvBTl+tEYjfJXXv5HwINStMMu
+   8zBmNOBuAp3ttOy2oERrV+cd3OPVAUXLpZtxRF48y1iThmGNEYQk/nnxp
+   M5gc4C0aQJrhAithjm3hwCNljAEN+5WvwJjIgaNcaMlWVEUrwTo4vvUHc
+   f6Aea66STp3AIMpiHaWybUqw4Q6mkcqqgbb1kzpYS7Qrk5evW4cL4CAl5
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="471169655"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="471169655"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="783688889"
+X-IronPort-AV: E=Sophos;i="6.03,219,1694761200"; 
+   d="scan'208";a="783688889"
+Received: from asroczyn-mobl.ger.corp.intel.com ([10.249.36.107])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Oct 2023 05:53:41 -0700
+Date: Thu, 12 Oct 2023 15:53:39 +0300 (EEST)
+From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+cc: linux-pci@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, 
+    Rob Herring <robh@kernel.org>, 
+    =?ISO-8859-2?Q?Krzysztof_Wilczy=F1ski?= <kw@linux.com>, 
+    Lukas Wunner <lukas@wunner.de>, "Rafael J . Wysocki" <rafael@kernel.org>, 
+    Heiner Kallweit <hkallweit1@gmail.com>, 
+    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
+    LKML <linux-kernel@vger.kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+    ath10k@lists.infradead.org, ath11k@lists.infradead.org, 
+    ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org, 
+    linux-arm-kernel@lists.infradead.org, linux-bluetooth@vger.kernel.org, 
+    linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org, 
+    linux-wireless@vger.kernel.org, Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 05/13] PCI/ASPM: Add pci_enable_link_state()
+In-Reply-To: <20231011215327.GA1043654@bhelgaas>
+Message-ID: <afb4db5-5fe1-9f5d-a910-032adf195c@linux.intel.com>
+References: <20231011215327.GA1043654@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3229ff0a-5ce5-4ee2-a79d-15007f2b6030@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="8323329-1586418908-1697115226=:1692"
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> I am having some second thoughts about this proposed interface as I can see
-> a few limitations:
-> 
-> - we can only specify an exact destination MAC address to match, but the HW
-> filter underneath is typically implemented using a match + mask so you can
-> actually be selective about which bits you want to match on. In the use case
-> that I have in mind we would actually want to match both multicast MAC
-> destination addresses corresponding to mDNS over IPv4 or IPv6
-> 
-> - in case a MAC/PHY/switch supports multiple filters/slots we would not be
-> able to address a specific slot in the matching logic
-> 
-> This sort of brings me back to the original proposal which allowed this:
-> 
-> https://lore.kernel.org/all/20230516231713.2882879-1-florian.fainelli@broadcom.com/
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-The Marvell PHY i just looked at supports upto 8 slots, and can match
-up to the first 128 bytes of frame data. So it does seem like a more
-generic and flexible interface would fit the hardware.
+--8323329-1586418908-1697115226=:1692
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-My previous concern was discoverability of the feature. Its not part
-of ethtool -s eth0 wol. At minimum, i would suggest something in the
---help text in the wol section and man page pointing to the
-alternative way to configure wol. And maybe report via the standard
-wol flags that the hardware has the capability to use flow-type WoL?
+On Wed, 11 Oct 2023, Bjorn Helgaas wrote:
 
-The example you gave matched on Flow Type: Raw Ethernet. Is it
-possible to combine flow types? If i can match on the first 128 bytes
-of the frame i might want to go deeper into the frame, so want both
-Ethernet and IP matching?
+> On Mon, Sep 18, 2023 at 04:10:55PM +0300, Ilpo Järvinen wrote:
+> > pci_disable_link_state() lacks a symmetric pair. Some drivers want to
+> > disable ASPM during certain phases of their operation but then
+> > re-enable it later on. If pci_disable_link_state() is made for the
+> > device, there is currently no way to re-enable the states that were
+> > disabled.
+> 
+> pci_disable_link_state() gives drivers a way to disable specified ASPM
+> states using a bitmask (PCIE_LINK_STATE_L0S, PCIE_LINK_STATE_L1,
+> PCIE_LINK_STATE_L1_1, etc), but IIUC the driver can't tell exactly
+> what changed and can't directly restore the original state, e.g.,
+> 
+>   - PCIE_LINK_STATE_L1 enabled initially
+>   - driver calls pci_disable_link_state(PCIE_LINK_STATE_L0S)
+>   - driver calls pci_enable_link_state(PCIE_LINK_STATE_L0S)
+>   - PCIE_LINK_STATE_L0S and PCIE_LINK_STATE_L1 are enabled now
+> 
+> Now PCIE_LINK_STATE_L0S is enabled even though it was not initially
+> enabled.  Maybe that's what we want; I dunno.
+> 
+> pci_disable_link_state() currently returns success/failure, but only
+> r8169 and mt76 even check, and only rtl_init_one() (r8169) has a
+> non-trivial reason, so it's conceivable that it could return a bitmask
+> instead.
 
-    Andrew
+It's great that you suggested this since it's actually what also I've been 
+started to think should be done instead of this straightforward approach
+I used in V2. 
+
+That is, don't have the drivers to get anything directly from LNKCTL
+but they should get everything through the API provided by the 
+disable/enable calls which makes it easy for the driver to pass the same
+value back into the enable call.
+
+> > Add pci_enable_link_state() to remove ASPM states from the state
+> > disable mask.
+> > 
+> > Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> > ---
+> >  drivers/pci/pcie/aspm.c | 42 +++++++++++++++++++++++++++++++++++++++++
+> >  include/linux/pci.h     |  2 ++
+> >  2 files changed, 44 insertions(+)
+> > 
+> > diff --git a/drivers/pci/pcie/aspm.c b/drivers/pci/pcie/aspm.c
+> > index 91dc95aca90f..f45d18d47c20 100644
+> > --- a/drivers/pci/pcie/aspm.c
+> > +++ b/drivers/pci/pcie/aspm.c
+> > @@ -1117,6 +1117,48 @@ int pci_disable_link_state(struct pci_dev *pdev, int state)
+> >  }
+> >  EXPORT_SYMBOL(pci_disable_link_state);
+> >  
+> > +/**
+> > + * pci_enable_link_state - Re-enable device's link state
+> > + * @pdev: PCI device
+> > + * @state: ASPM link states to re-enable
+> > + *
+> > + * Enable device's link state that were previously disable so the link is
+> 
+> "state[s] that were previously disable[d]" alludes to the use case you
+> have in mind, but I don't think it describes how this function
+> actually works.  This function just makes it possible to enable the
+> specified states.  The @state parameter may have nothing to do with
+> any previously disabled states.
+
+Yes, it's what I've been thinking between the lines. But I see your point 
+that this API didn't make it easy/obvious as is.
+
+Would you want me to enforce it too besides altering the API such that the 
+states are actually returned from disable call? (I don't personally find
+that necessary as long as the API pair itself makes it obvious what the 
+driver is expect to pass there.)
+
+
+-- 
+ i.
+
+--8323329-1586418908-1697115226=:1692--
 
