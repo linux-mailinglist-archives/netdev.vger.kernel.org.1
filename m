@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-40539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570847C79D5
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:35:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF8A7C79DF
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 00:35:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A79D4B20A3C
-	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:35:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE33FB20D7F
+	for <lists+netdev@lfdr.de>; Thu, 12 Oct 2023 22:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE1043D00E;
-	Thu, 12 Oct 2023 22:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5530D3D03A;
+	Thu, 12 Oct 2023 22:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KV3CnEMx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PX6lNn9A"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFE42B5D8
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:35:25 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0011B8
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:22 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c5087d19a6so59001fa.0
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CDF3D013
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:35:27 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAF0AC9
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:23 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b9338e4695so18650461fa.2
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 15:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1697150121; x=1697754921; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXO4MwbGSox8rKRwzbnM2zZwOBZ2z8Fw/s+ke6QnvYQ=;
-        b=KV3CnEMxFJtvM3QTZMX6sbsVGR9yMUU3IaNqfwXPLsWzqHb9fji2VHY22O7/IVrWX/
-         qGuR4AMRwkJ0OByoVaoUbadLfPBLGIiTWprDSH1N3vBAXXzws3ICJRzCET2B6tWH/lCs
-         h1ArxcVwhGgXRmOFax8Kxupgi6my5yVaui2iT9E5x2Gr4a0vfIBOH6vTltN0liQcIHE0
-         lyZsaSRm/gyosCEpdgpkFIFIE7iGjnJ4Fdi9gjpbZ5h9CFKi0Ign3NqerVqegg22YwoC
-         im33GTdpW6hw7tH2CYJMgf2NBWkJg014ufolh+D8ABVXFty+4DgPW2v/+vOaf1jF+zT6
-         0Nyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697150121; x=1697754921;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1697150122; x=1697754922; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XXO4MwbGSox8rKRwzbnM2zZwOBZ2z8Fw/s+ke6QnvYQ=;
-        b=unwBj34bPz58lIKral8hMMgiqEB2dn1pAatjA8J07ZOjr87E83B3mRu6arXJiRl2PW
-         kFTCCpkuqnRWs04Ob0RYnqLiui0+4diazRWFu97k28Yg2zNlYvWyEy/DyNUBvZEDw9Te
-         GwMZB0tm7CviP7VtoxdTASczWPgmQRTcUolr9CIfROJUS6syOWsVbqB7Hb1vZ8+57gnL
-         ovn9VhI7014qhNjYro/2nZr41PH0lLkDLaLZ3045IVlVtaX4Aiqf4t/jwQmzNZf2n4Vy
-         92ou79Hm86sOm0dWc68Ya0rHLXy6dYfOxJpIz+yMDdVtxg2/TV11VbhazrH1chfxMVgQ
-         6a4A==
-X-Gm-Message-State: AOJu0Ywn1Cdi1lj2EVv5U8c6TBrBkbYJJXy5AtFO2t68M4o823alnW/W
-	96QBR9D9eSnpVf2UPbwjwxBxRg==
-X-Google-Smtp-Source: AGHT+IG2cIx6DdV3B+I16sZS0ktRHmF97um53+8sbh/NgQJX+5tMKhRcw84Ma5j9WlNR4GfU6ctdDw==
-X-Received: by 2002:a2e:8488:0:b0:2bc:d6a8:1efd with SMTP id b8-20020a2e8488000000b002bcd6a81efdmr21034673ljh.39.1697150121181;
-        Thu, 12 Oct 2023 15:35:21 -0700 (PDT)
+        bh=t8U+a3PhU8m5mApmJF8MtIvjJ5OqBpg+Pl3mnQuevJg=;
+        b=PX6lNn9AThhXP8+nyVUcaa1tZhfQAw+6YVsqbdYckmvNa7ULpaq9Q8QVi6cpDNG2v4
+         ba95jYbOflf10dBd9IxWw6j7GTK7yy8wrt838bF+0Fkj1/ThKusqPmZalG09COcARm/U
+         lDVOXkAUkG5FuUUQoJeVBIzLhK9rFTFxRz3uslg8LfsC0JMQE3guMlmPDqkLTdJ8C5Zb
+         ohmEQdELgWBc00rndcb3hy9iPtitlvE4UWNYlRY72ar34wt28CdImNPFiXmd0PEl3NIy
+         kwc+Doewq0H02LpiBm4PLUprSPl/RlaWVj76FZmxNKkhFpImxeNBKV+gQcR0Zh9VsHGu
+         qhNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697150122; x=1697754922;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t8U+a3PhU8m5mApmJF8MtIvjJ5OqBpg+Pl3mnQuevJg=;
+        b=kCGG3wW3dC2SAaJeZSxtGose/WbchAIwMeNFZu75F2n+UeN+R4d5P6TrzPW534Wxkj
+         msovVMJP5nS8ujtCV3A2DCeOh4i5zp5ZNs1XbPk4yqMWmZLOKHyHecrCSrOVVP2NOoC8
+         XpcJ+k7lGJoCwAgwaELk5bSijGZ4hJQHu9XbJX/j2bZALc57eZ19hYrZ7gNH/4hcgA3u
+         EEw7O0QPjcbj45Ncw+bUTRBO5K8kDIgLRp0e/J5gVEg9meCfDV6DdqrQrjSiRa+7f0Eq
+         5ZwtBcYua1ic6KsbQZTCJYELEvZxZCfV/HJHQH46sHbv5yUmWmGugHV+tPuxVCf8RkRx
+         Ui+Q==
+X-Gm-Message-State: AOJu0Yxu4xMwPwOL6SWfNCBsilwMdTjza/7zMETFX8poFksRqTV1JzBU
+	8qjBG0Rr8j8XG0bTqJuzYnDprA==
+X-Google-Smtp-Source: AGHT+IGZTSbPvJZxknKfkA/iTsRvkhXfDcNp+3UEqfdvugniSIIFexQMavXsFpbuZZAamp/mOQab9g==
+X-Received: by 2002:a2e:be0e:0:b0:2c5:12b:6ef2 with SMTP id z14-20020a2ebe0e000000b002c5012b6ef2mr1334606ljq.33.1697150122289;
+        Thu, 12 Oct 2023 15:35:22 -0700 (PDT)
 Received: from [192.168.1.2] (c-21d3225c.014-348-6c756e10.bbcust.telenor.se. [92.34.211.33])
-        by smtp.gmail.com with ESMTPSA id x21-20020a05651c105500b002bcb89e92dcsm3811671ljm.6.2023.10.12.15.35.20
+        by smtp.gmail.com with ESMTPSA id x21-20020a05651c105500b002bcb89e92dcsm3811671ljm.6.2023.10.12.15.35.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 15:35:20 -0700 (PDT)
+        Thu, 12 Oct 2023 15:35:21 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH 0/3] Create a binding for the Marvell MV88E6xxx DSA
- switches
-Date: Fri, 13 Oct 2023 00:35:13 +0200
-Message-Id: <20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org>
+Date: Fri, 13 Oct 2023 00:35:14 +0200
+Subject: [PATCH 1/3] ARM: dts: marvell: Fix some common switch mistakes
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,9 +69,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAKJ0KGUC/x3MTQqAIBBA4avErBtQ+5OuEi0sxxowC4UKorsnL
- b/Few8kikwJ+uKBSCcn3kOGLAuYVxMWQrbZoISqpBAaNxNP8h61plY2Ci8T0JPNnutq6pxVzkK
- uj0iO7/88jO/7AQR7dUFpAAAA
+Message-Id: <20231013-marvell-88e6152-wan-led-v1-1-0712ba99857c@linaro.org>
+References: <20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org>
+In-Reply-To: <20231013-marvell-88e6152-wan-led-v1-0-0712ba99857c@linaro.org>
 To: Andrew Lunn <andrew@lunn.ch>, 
  Gregory Clement <gregory.clement@bootlin.com>, 
  Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
@@ -94,44 +93,123 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This shows the path we could take with this, deprecating the
-weird external bus thing.
+Fix some errors in the Marvell MV88E6xxx switch descriptions:
+- The top node had no address size or cells.
+- switch0@0 is not OK, should be switch@0.
 
-I don't know what to do about the irq lines with a pointless
-type flag that should be onecell:ed.
-
-I need proper schema checking to add LED support to the
-Marvell switch. Just how it is, it can't go on like this.
-
-Andrew: if you have lots of ideas and want to do lots of
-changes, feel free to just take over the patch set and do
-what you like, this is an RFC after all.
+This serves as an example of fixes needed for introducing a
+schema for the bindings, but the patch can simply be applied.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Linus Walleij (3):
-      ARM: dts: marvell: Fix some common switch mistakes
-      RFC: dt-bindings: marvell: Rewrite in schema
-      RFC: net: dsa: mv88e6xxx: Register mdio-external
+ arch/arm/boot/dts/marvell/armada-370-rd.dts               | 2 --
+ arch/arm/boot/dts/marvell/armada-381-netgear-gs110emx.dts | 2 --
+ arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-l8.dts  | 2 +-
+ arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-s4.dts  | 2 +-
+ arch/arm/boot/dts/marvell/armada-385-linksys.dtsi         | 2 --
+ arch/arm/boot/dts/marvell/armada-388-clearfog.dts         | 2 --
+ arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts     | 2 --
+ 7 files changed, 2 insertions(+), 12 deletions(-)
 
- .../bindings/net/dsa/marvell,mv88e6xxx.yaml        | 249 +++++++++++++++++++++
- .../devicetree/bindings/net/dsa/marvell.txt        | 109 ---------
- MAINTAINERS                                        |   2 +-
- arch/arm/boot/dts/marvell/armada-370-rd.dts        |   2 -
- .../dts/marvell/armada-381-netgear-gs110emx.dts    |   2 -
- .../dts/marvell/armada-385-clearfog-gtr-l8.dts     |   2 +-
- .../dts/marvell/armada-385-clearfog-gtr-s4.dts     |   2 +-
- arch/arm/boot/dts/marvell/armada-385-linksys.dtsi  |   2 -
- arch/arm/boot/dts/marvell/armada-388-clearfog.dts  |   2 -
- .../boot/dts/marvell/armada-xp-linksys-mamba.dts   |   2 -
- drivers/net/dsa/mv88e6xxx/chip.c                   |  16 +-
- 11 files changed, 267 insertions(+), 123 deletions(-)
----
-base-commit: 69d714c69583c4387147d0b7f2f436d42baddadd
-change-id: 20231008-marvell-88e6152-wan-led-88c43b7fd2fd
+diff --git a/arch/arm/boot/dts/marvell/armada-370-rd.dts b/arch/arm/boot/dts/marvell/armada-370-rd.dts
+index b459a670f615..e3a1834986ee 100644
+--- a/arch/arm/boot/dts/marvell/armada-370-rd.dts
++++ b/arch/arm/boot/dts/marvell/armada-370-rd.dts
+@@ -151,8 +151,6 @@ led@0 {
+ 
+ 	switch: switch@10 {
+ 		compatible = "marvell,mv88e6085";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+ 		reg = <0x10>;
+ 		interrupt-controller;
+ 		#interrupt-cells = <2>;
+diff --git a/arch/arm/boot/dts/marvell/armada-381-netgear-gs110emx.dts b/arch/arm/boot/dts/marvell/armada-381-netgear-gs110emx.dts
+index f4c4b213ef4e..d4fff4ea9f20 100644
+--- a/arch/arm/boot/dts/marvell/armada-381-netgear-gs110emx.dts
++++ b/arch/arm/boot/dts/marvell/armada-381-netgear-gs110emx.dts
+@@ -79,14 +79,12 @@ &mdio {
+ 
+ 	switch@0 {
+ 		compatible = "marvell,mv88e6190";
+-		#address-cells = <1>;
+ 		#interrupt-cells = <2>;
+ 		interrupt-controller;
+ 		interrupt-parent = <&gpio1>;
+ 		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
+ 		pinctrl-0 = <&switch_interrupt_pins>;
+ 		pinctrl-names = "default";
+-		#size-cells = <0>;
+ 		reg = <0>;
+ 
+ 		mdio {
+diff --git a/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-l8.dts b/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-l8.dts
+index 1990f7d0cc79..1be0419f8f3e 100644
+--- a/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-l8.dts
++++ b/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-l8.dts
+@@ -7,7 +7,7 @@ / {
+ };
+ 
+ &mdio {
+-	switch0: switch0@4 {
++	switch0: switch@4 {
+ 		compatible = "marvell,mv88e6190";
+ 		reg = <4>;
+ 		pinctrl-names = "default";
+diff --git a/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-s4.dts b/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-s4.dts
+index b795ad573891..6ec536222bfb 100644
+--- a/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-s4.dts
++++ b/arch/arm/boot/dts/marvell/armada-385-clearfog-gtr-s4.dts
+@@ -11,7 +11,7 @@ &sfp0 {
+ };
+ 
+ &mdio {
+-	switch0: switch0@4 {
++	switch0: switch@4 {
+ 		compatible = "marvell,mv88e6085";
+ 		reg = <4>;
+ 		pinctrl-names = "default";
+diff --git a/arch/arm/boot/dts/marvell/armada-385-linksys.dtsi b/arch/arm/boot/dts/marvell/armada-385-linksys.dtsi
+index fc8216fd9f60..63a0bc9455ca 100644
+--- a/arch/arm/boot/dts/marvell/armada-385-linksys.dtsi
++++ b/arch/arm/boot/dts/marvell/armada-385-linksys.dtsi
+@@ -160,8 +160,6 @@ &mdio {
+ 
+ 	switch@0 {
+ 		compatible = "marvell,mv88e6085";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+ 		reg = <0>;
+ 
+ 		ports {
+diff --git a/arch/arm/boot/dts/marvell/armada-388-clearfog.dts b/arch/arm/boot/dts/marvell/armada-388-clearfog.dts
+index 32c569df142f..ab46903580aa 100644
+--- a/arch/arm/boot/dts/marvell/armada-388-clearfog.dts
++++ b/arch/arm/boot/dts/marvell/armada-388-clearfog.dts
+@@ -94,8 +94,6 @@ &mdio {
+ 
+ 	switch@4 {
+ 		compatible = "marvell,mv88e6085";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+ 		reg = <4>;
+ 		pinctrl-0 = <&clearfog_dsa0_clk_pins &clearfog_dsa0_pins>;
+ 		pinctrl-names = "default";
+diff --git a/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts b/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
+index 7a0614fd0c93..2a5518c73bff 100644
+--- a/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
++++ b/arch/arm/boot/dts/marvell/armada-xp-linksys-mamba.dts
+@@ -267,8 +267,6 @@ &mdio {
+ 
+ 	switch@0 {
+ 		compatible = "marvell,mv88e6085";
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+ 		reg = <0>;
+ 
+ 		ports {
 
-Best regards,
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.41.0
 
 
