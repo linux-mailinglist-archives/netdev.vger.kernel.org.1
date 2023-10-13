@@ -1,242 +1,106 @@
-Return-Path: <netdev+bounces-40856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C8F7C8E0F
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 22:01:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CF247C8DF4
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:54:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDB57B20A82
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 20:01:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0764B282F36
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 19:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E67B24215;
-	Fri, 13 Oct 2023 20:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118F824207;
+	Fri, 13 Oct 2023 19:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="n5MfOSOG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="djcfVWzg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873D0241ED
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 20:01:46 +0000 (UTC)
-Received: from orbyte.nwl.cc (orbyte.nwl.cc [IPv6:2001:41d0:e:133a::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970B0BE;
-	Fri, 13 Oct 2023 13:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
-	s=mail2022; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Kt/e2VDRouEddqmGlQ/CUaMtNp8fxzeOtyMb2kbsVBM=; b=n5MfOSOGued9MSPD03al2jato2
-	kPKDv0lBIo/1jIK0hBpE3keQyCf9IifQK6RuaaG+OMa9dkelOfTw0OJw6L+vU8mZL2clh/QYHgBpm
-	NIdSZuQV3G85zmQwfnbgu2MOB1bXu2MJSPA+/e8UbjiXw2eMsMkzDivnlKn3041BxngbLv5PZcsM3
-	mbEmdxFP0ymz4PwsAhebc0tPt67y5ZV4ZqP2Q09mrkD+N9FbA2wGthijgi5XTBapMnpsLRMUComXw
-	sWmQhdrzLk0KCCIZ3Npt4NscgA/BmuMn8oqtQ4FRMGjfgVldSBpCxhZMoPw6zHJwczV4WD92UdCwG
-	MAdsMZdA==;
-Received: from localhost ([::1] helo=xic)
-	by orbyte.nwl.cc with esmtp (Exim 4.94.2)
-	(envelope-from <phil@nwl.cc>)
-	id 1qrOLr-000447-V1; Fri, 13 Oct 2023 22:01:40 +0200
-From: Phil Sutter <phil@nwl.cc>
-To: David Miller <davem@davemloft.net>
-Cc: netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: [net-next PATCH] net: skb_find_text: Ignore patterns extending past 'to'
-Date: Fri, 13 Oct 2023 21:51:13 +0200
-Message-ID: <20231013195113.3663-1-phil@nwl.cc>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C60241EB
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 19:54:08 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E13AD
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:54:07 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53de0d1dc46so4315144a12.3
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1697226846; x=1697831646; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/nr5rTcvx3Bqes76zmwwUrfRUqUSHDocyP1SazHWr+w=;
+        b=djcfVWzgXcmHpwjkTng5NwzHLhHeTcuTOg1UE7SXquOkVesAbN5DsrQrmETYpVO2YV
+         /ctBV5PnIvsdRvRIZQ+A/1fVqDDaJMc0lzQjazR8+jZ+CDNtV+yuXsyu7D9G1U9YHmyA
+         kt8orGquHe2FZ7kRPACc9elns1cBPpIsTlYoVWIMgkyHcM57GNmzXjDoXcG5pWzjWixA
+         siIMHUvWpcw3KvXjXsR68OgtTW5QJsm0pdjPA891TmLajS+fOYVT5M5Bz7DdbcLJux9G
+         1pNfngINuldZ08In7wISM0WVReHGRnrUUBkGlRQ0WbIzV0E1wYWia1Q+y8kbKpnrCfQV
+         vWbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697226846; x=1697831646;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/nr5rTcvx3Bqes76zmwwUrfRUqUSHDocyP1SazHWr+w=;
+        b=Ve7aBlHmitYDN7SND/rWfkGNER781off2NYIagHJx00MWEoBpCqHfAjoDvwgu4HzIW
+         VORZLznqvwgTEQRpsvx9PPHDOzuWIsWMZaGGveCFCKgWoMlmYClY9thtHw5E2f/rxr5w
+         wNJil7srt7fg9ZwapgXed99g7X+QZOND4R3RhvpZVUBW2pgMKVpiR13OQRCLsPzpnyMK
+         mVb1LVpQly7tvzZzPguPyfKYy5GtM1qk94hKamNTsguBDVWsnPlL7aB6zq3EQg/4vIJE
+         s6m2fpznZjlIpQh5UXyqaRRzedJtlJYuiG02U80VRT/JwACVKlgKUS2vU+yF74Fiphc0
+         ga0A==
+X-Gm-Message-State: AOJu0YxsyJ+8FM5X6lnyu4++s1xxTXoKWoEP7cfXJhM3NKxiz1eY4MBe
+	G/pT+dKFs/fOo/X8DRTxnjLi2f2atPHq6GcwJnIVOw==
+X-Google-Smtp-Source: AGHT+IEmQdB6jTOkef10X9umxYczo2MAno9vooZhhnlm41Ql4LMTSfvVX0/maWT0UikblvZ6Cn/oh+PSpaj7EXAV2fs=
+X-Received: by 2002:a50:c8cd:0:b0:53e:21f6:d784 with SMTP id
+ k13-20020a50c8cd000000b0053e21f6d784mr4099063edh.8.1697226845814; Fri, 13 Oct
+ 2023 12:54:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20231012-strncpy-drivers-net-phy-nxp-tja11xx-c-v1-1-5ad6c9dff5c4@google.com>
+ <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch>
+In-Reply-To: <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch>
+From: Justin Stitt <justinstitt@google.com>
+Date: Fri, 13 Oct 2023 12:53:53 -0700
+Message-ID: <CAFhGd8pmq3UKBE_6ZbLyvRRhXJzaWMQ2GfosvcEEeAS-n7M4aQ@mail.gmail.com>
+Subject: Re: [PATCH] net: phy: tja11xx: replace deprecated strncpy with ethtool_sprintf
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Assume that caller's 'to' offset really represents an upper boundary for
-the pattern search, so patterns extending past this offset are to be
-rejected.
+On Fri, Oct 13, 2023 at 5:22=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > -     for (i =3D 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++) {
+> > -             strncpy(data + i * ETH_GSTRING_LEN,
+> > -                     tja11xx_hw_stats[i].string, ETH_GSTRING_LEN);
+> > -     }
+> > +     for (i =3D 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++)
+> > +             ethtool_sprintf(&data, "%s", tja11xx_hw_stats[i].string);
+> >  }
+>
+> I assume you are using "%s" because tja11xx_hw_stats[i].string cannot
+> be trusted as a format string? Is this indicating we need an
+> ethtool_puts() ?
 
-The old behaviour also was kind of inconsistent when it comes to
-fragmentation (or otherwise non-linear skbs): If the pattern started in
-between 'to' and 'from' offsets but extended to the next fragment, it
-was not found if 'to' offset was still within the current fragment.
+Indeed, it would trigger a -Wformat-security warning.
 
-Test the new behaviour in a kselftest using iptables' string match.
+An ethtool_puts() would be useful for this situation.
 
-Suggested-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Fixes: f72b948dcbb85 ("[NET]: skb_find_text ignores to argument")
-Signed-off-by: Phil Sutter <phil@nwl.cc>
----
- net/core/skbuff.c                             |   3 +-
- .../testing/selftests/netfilter/xt_string.sh  | 128 ++++++++++++++++++
- 2 files changed, 130 insertions(+), 1 deletion(-)
- create mode 100755 tools/testing/selftests/netfilter/xt_string.sh
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 0401f40973a58..975c9a6ffb4ad 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4267,6 +4267,7 @@ static void skb_ts_finish(struct ts_config *conf, struct ts_state *state)
- unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
- 			   unsigned int to, struct ts_config *config)
- {
-+	unsigned int patlen = config->ops->get_pattern_len(config);
- 	struct ts_state state;
- 	unsigned int ret;
- 
-@@ -4278,7 +4279,7 @@ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
- 	skb_prepare_seq_read(skb, from, to, TS_SKB_CB(&state));
- 
- 	ret = textsearch_find(config, &state);
--	return (ret <= to - from ? ret : UINT_MAX);
-+	return (ret + patlen <= to - from ? ret : UINT_MAX);
- }
- EXPORT_SYMBOL(skb_find_text);
- 
-diff --git a/tools/testing/selftests/netfilter/xt_string.sh b/tools/testing/selftests/netfilter/xt_string.sh
-new file mode 100755
-index 0000000000000..1802653a47287
---- /dev/null
-+++ b/tools/testing/selftests/netfilter/xt_string.sh
-@@ -0,0 +1,128 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# return code to signal skipped test
-+ksft_skip=4
-+rc=0
-+
-+if ! iptables --version >/dev/null 2>&1; then
-+	echo "SKIP: Test needs iptables"
-+	exit $ksft_skip
-+fi
-+if ! ip -V >/dev/null 2>&1; then
-+	echo "SKIP: Test needs iproute2"
-+	exit $ksft_skip
-+fi
-+if ! nc -h >/dev/null 2>&1; then
-+	echo "SKIP: Test needs netcat"
-+	exit $ksft_skip
-+fi
-+
-+pattern="foo bar baz"
-+patlen=11
-+hdrlen=$((20 + 8)) # IPv4 + UDP
-+ns="ns-$(mktemp -u XXXXXXXX)"
-+trap 'ip netns del $ns' EXIT
-+ip netns add "$ns"
-+ip -net "$ns" link add d0 type dummy
-+ip -net "$ns" link set d0 up
-+ip -net "$ns" addr add 10.1.2.1/24 dev d0
-+
-+#ip netns exec "$ns" tcpdump -npXi d0 &
-+#tcpdump_pid=$!
-+#trap 'kill $tcpdump_pid; ip netns del $ns' EXIT
-+
-+add_rule() { # (alg, from, to)
-+	ip netns exec "$ns" \
-+		iptables -A OUTPUT -o d0 -m string \
-+			--string "$pattern" --algo $1 --from $2 --to $3
-+}
-+showrules() { # ()
-+	ip netns exec "$ns" iptables -v -S OUTPUT | grep '^-A'
-+}
-+zerorules() {
-+	ip netns exec "$ns" iptables -Z OUTPUT
-+}
-+countrule() { # (pattern)
-+	showrules | grep -c -- "$*"
-+}
-+send() { # (offset)
-+	( for ((i = 0; i < $1 - $hdrlen; i++)); do
-+		printf " "
-+	  done
-+	  printf "$pattern"
-+	) | ip netns exec "$ns" nc -w 1 -u 10.1.2.2 27374
-+}
-+
-+add_rule bm 1000 1500
-+add_rule bm 1400 1600
-+add_rule kmp 1000 1500
-+add_rule kmp 1400 1600
-+
-+zerorules
-+send 0
-+send $((1000 - $patlen))
-+if [ $(countrule -c 0 0) -ne 4 ]; then
-+	echo "FAIL: rules match data before --from"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send 1000
-+send $((1400 - $patlen))
-+if [ $(countrule -c 2) -ne 2 ]; then
-+	echo "FAIL: only two rules should match at low offset"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send $((1500 - $patlen))
-+if [ $(countrule -c 1) -ne 4 ]; then
-+	echo "FAIL: all rules should match at end of packet"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send 1495
-+if [ $(countrule -c 1) -ne 1 ]; then
-+	echo "FAIL: only kmp with proper --to should match pattern spanning fragments"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send 1500
-+if [ $(countrule -c 1) -ne 2 ]; then
-+	echo "FAIL: two rules should match pattern at start of second fragment"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send $((1600 - $patlen))
-+if [ $(countrule -c 1) -ne 2 ]; then
-+	echo "FAIL: two rules should match pattern at end of largest --to"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send $((1600 - $patlen + 1))
-+if [ $(countrule -c 1) -ne 0 ]; then
-+	echo "FAIL: no rules should match pattern extending largest --to"
-+	showrules
-+	((rc--))
-+fi
-+
-+zerorules
-+send 1600
-+if [ $(countrule -c 1) -ne 0 ]; then
-+	echo "FAIL: no rule should match pattern past largest --to"
-+	showrules
-+	((rc--))
-+fi
-+
-+exit $rc
--- 
-2.41.0
-
+>
+>         Andrew
 
