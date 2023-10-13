@@ -1,121 +1,137 @@
-Return-Path: <netdev+bounces-40596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E9D7C7C8F
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 06:23:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4BF27C7CCF
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 06:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D2C282CCD
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 04:23:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C6F81F20610
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 04:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E2801FD9;
-	Fri, 13 Oct 2023 04:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9055C110D;
+	Fri, 13 Oct 2023 04:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNHRZ1QP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdkAQknp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0884B1C3C
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 04:23:28 +0000 (UTC)
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAFE4BE;
-	Thu, 12 Oct 2023 21:23:27 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1c5c91bec75so13282195ad.3;
-        Thu, 12 Oct 2023 21:23:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E201139A
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 04:42:45 +0000 (UTC)
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FFCBE
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 21:42:43 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-65b0e623189so9040756d6.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 21:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697171007; x=1697775807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mgrJJGSoF6Q1a6fSDjSuymC/JdTZvEmvnPQt4mx+FO0=;
-        b=HNHRZ1QPc0oPoFp8vmmtEWf/msLpxBnChlLawRcgLbwciVlS5JFLCmcFzWn59nTPYd
-         +HKRYzbQfv2O9LTjdQeehGxcXFRp1ZPQnAFkgRPU+BJ1GfitwpW4TESLZP1gFpdEyoFT
-         067E5HwFS8l2oVwK/EjtoPiClke0WSDrLF0vlmgNO6ckNgRhI7DERSOv8Atr5twvDVvV
-         VO8LbwyeP134AKDf37L6RPdqhZgpLQwMI5N+H8jejv8pAqEhijFznLhR2eCp0U5Nrhh3
-         K2vokO8x/kqEZHFjeuGovg9zlUonMz0EK0ow4qqZDhF4qmimOf+t53OUYBw3E//Dsg8j
-         AivQ==
+        d=gmail.com; s=20230601; t=1697172162; x=1697776962; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5eXZNYajYxhXTb3UBWzzLxXc/EdYltPYPSY96CeeHUM=;
+        b=OdkAQknpRnfvGCH71xEU15qUCK5S/qt7qzkQVPYCnAj5HiNO+VHLW6KkEEb5KjwL5r
+         MNjF3ZCuu86IoF6MRnTo2QYafHOqizxRZX2ScOj6ZvtQ4Nb2TdJ1gxZvmG51dYXU19Ma
+         LeXdbqHlrelHWvYeAAE8UbDBXyK2HN4hRYhmcClPH9+c5zf8Q497Hzp9HRS/Bttm87ly
+         5Sv3PskjIYsvMqPxjIN7aB4EGUcFrsibWoaz8F8kU5S5wCAMczXQVHHjvBXhOiKUnY52
+         MxANoQKyu/PYLm86bGQutLBMjoibIYMNccntRjJEb3NGT6/uTZPS6+krrBorGrA5rfjw
+         IGlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697171007; x=1697775807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mgrJJGSoF6Q1a6fSDjSuymC/JdTZvEmvnPQt4mx+FO0=;
-        b=mOBxRNRbL8Imp+WdpjHgF6K7NSABkP+SYUh508OEJsCZZqRtxmn7C07qKV7wlIONFc
-         dzJUUhY/TQBdexUYPOGoKh8zT0fUF8Td7mfrtj6rwQ/7WGKLG+I1QjNDD50xy5z6N6tY
-         qhSdx4GTIp9pmr+73+MKyB/Aej2HFc3k/vja5j/HYE71SpNfscGTx6Ludaukfrc/PnBh
-         AJSlSAImFzafAyuSKRTit994MndN2C2l9+LFxUfUC3eTLesX2Tyf4LuMgoqHJsvzp/6k
-         jLl1K3IbgDoDoMJZb9USTS+q876F4PMd+D4nbOqYB5W3tBM+VcDmYyrby63g0KBKUedQ
-         RoKg==
-X-Gm-Message-State: AOJu0YwwhXlkUaEF8Jz4b0D8LyqvjIxGMd8RH522n5BhHW11r+M3TWVv
-	flcEgGebZOqFgIwgXgXvi32dgg1eBKr1XA==
-X-Google-Smtp-Source: AGHT+IEIazoL6I45lIn2nyAVQgyuJli758Z5lhoeNbnstJpTkASgj6TfDGFKp1BnI6j2inD3EYeSUA==
-X-Received: by 2002:a17:902:c40d:b0:1c5:de06:9e5a with SMTP id k13-20020a170902c40d00b001c5de069e5amr26212576plk.21.1697171006908;
-        Thu, 12 Oct 2023 21:23:26 -0700 (PDT)
-Received: from dreambig.dreambig.corp ([58.27.187.115])
-        by smtp.gmail.com with ESMTPSA id r8-20020a170902be0800b001c3e732b8dbsm2802786pls.168.2023.10.12.21.23.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 21:23:26 -0700 (PDT)
-From: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-To: horms@kernel.org,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Muhammad Muzammil <m.muzzammilashraf@gmail.com>
-Subject: [PATCH v2] drivers: net: wwan: wwan_core.c: resolved spelling mistake
-Date: Fri, 13 Oct 2023 09:23:04 +0500
-Message-Id: <20231013042304.7881-1-m.muzzammilashraf@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1697172162; x=1697776962;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5eXZNYajYxhXTb3UBWzzLxXc/EdYltPYPSY96CeeHUM=;
+        b=wfvzuDetGWyuAx0/jqrgu59HKAeom5Obp2n8K07biYRtXsCU/HGX1FQIwjbhfB/EOG
+         Meh15gq+OqNt1jeHcnF7IQeIqSWyn6jgh/a5uEOzDnEBuWnDh203tTxhCWXwcPivRoqt
+         nxWI9+Tzieie5sQ/nIe5gEWQjNu0Z9nCNBTCf5DWtOjXt8ZIvwWQZgFqMoCkdR6fLJ4P
+         MC1k1H7s6AALirwOY721b5Fj/67ZJ3rtSD8WgsXr2ELR6WeEfkekNg/ZaUfc2k62H0As
+         7+TJ18zXAJnzTvh8ljm61CzYX2cy7U20AsW7iotTvzTSzvBMam7HgkGSkk1T4jxrxQ9r
+         IyWw==
+X-Gm-Message-State: AOJu0YyJValqsZV8Y5mz7zp0EuysofmLd4zmhn0cQcOR2lmXZJrbumzq
+	ZUEzfQoJYm/iQpN+H6uLG6SZmH0j+lI8Jvicag==
+X-Google-Smtp-Source: AGHT+IE9PsZH1NhRmltNTrG8z6uPRtXN08y0szaTE+r0rr2NW5xbFQ7EibXW6brQBi4eyO0tZwCDZ15ktr1M3kNDWSw=
+X-Received: by 2002:a0c:aa0c:0:b0:66c:faa7:c5f0 with SMTP id
+ d12-20020a0caa0c000000b0066cfaa7c5f0mr7984319qvb.63.1697172162578; Thu, 12
+ Oct 2023 21:42:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <f3b95e47e3dbed840960548aebaa8d954372db41.1697008693.git.pabeni@redhat.com>
+ <CANn89iL_nbz9Cg1LP6c8amvvGbwBMFRxmtE_b6CF8WyLGt3MnA@mail.gmail.com>
+In-Reply-To: <CANn89iL_nbz9Cg1LP6c8amvvGbwBMFRxmtE_b6CF8WyLGt3MnA@mail.gmail.com>
+From: Xin Guo <guoxin0309@gmail.com>
+Date: Fri, 13 Oct 2023 12:42:31 +0800
+Message-ID: <CAMaK5_ii38_Ze2uBmcyX8rnntEi35kXJ47yhxZvCb-ks0bMbxw@mail.gmail.com>
+Subject: Re: [PATCH v2 net] tcp: allow again tcp_disconnect() when threads are waiting
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, mptcp@lists.linux.dev, 
+	Boris Pismenny <borisp@nvidia.com>, Tom Deseyn <tdeseyn@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-resolved typing mistake from devce to device
+Hi,
+In my view, this patch is NOT so good, and it seems that trying to fix
+a problem temporarily without knowing its root cause,
+because sk_wait_event function should know nothing about the other
+functions were called or not,
+but now this patch added a logic to let sk_wait_event know the
+specific tcp_dissconnect function was called by other threads or NOT,
+honestly speaking, it is NOT a good designation,
+so what is root cause about the problem which [0] commit want to fix?
+can we have a way to fix it directly instead of denying
+tcp_disconnect() when threads are waiting?
+if No better way to fix it, please add some description about the
+difficulty and our compromise in the commit message, otherwise the
+patch will be confused.
 
-Signed-off-by: Muhammad Muzammil <m.muzzammilashraf@gmail.com>
 
-changes since v1:
-	- resolved another typing mistake from concurent to
-	  concurrent
----
- drivers/net/wwan/wwan_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[0]: 4faeee0cf8a5 ("tcp: deny tcp_disconnect() when threads are waiting")
 
-diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index 87df60916960..72e01e550a16 100644
---- a/drivers/net/wwan/wwan_core.c
-+++ b/drivers/net/wwan/wwan_core.c
-@@ -302,7 +302,7 @@ static void wwan_remove_dev(struct wwan_device *wwandev)
- 
- static const struct {
- 	const char * const name;	/* Port type name */
--	const char * const devsuf;	/* Port devce name suffix */
-+	const char * const devsuf;	/* Port device name suffix */
- } wwan_port_types[WWAN_PORT_MAX + 1] = {
- 	[WWAN_PORT_AT] = {
- 		.name = "AT",
-@@ -1184,7 +1184,7 @@ void wwan_unregister_ops(struct device *parent)
- 	 */
- 	put_device(&wwandev->dev);
- 
--	rtnl_lock();	/* Prevent concurent netdev(s) creation/destroying */
-+	rtnl_lock();	/* Prevent concurrent netdev(s) creation/destroying */
- 
- 	/* Remove all child netdev(s), using batch removing */
- 	device_for_each_child(&wwandev->dev, &kill_list,
--- 
-2.27.0
-
+On Wed, Oct 11, 2023 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Oct 11, 2023 at 9:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > As reported by Tom, .NET and applications build on top of it rely
+> > on connect(AF_UNSPEC) to async cancel pending I/O operations on TCP
+> > socket.
+> >
+> > The blamed commit below caused a regression, as such cancellation
+> > can now fail.
+> >
+> > As suggested by Eric, this change addresses the problem explicitly
+> > causing blocking I/O operation to terminate immediately (with an error)
+> > when a concurrent disconnect() is executed.
+> >
+> > Instead of tracking the number of threads blocked on a given socket,
+> > track the number of disconnect() issued on such socket. If such counter
+> > changes after a blocking operation releasing and re-acquiring the socke=
+t
+> > lock, error out the current operation.
+> >
+> > Fixes: 4faeee0cf8a5 ("tcp: deny tcp_disconnect() when threads are waiti=
+ng")
+> > Reported-by: Tom Deseyn <tdeseyn@redhat.com>
+> > Closes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1886305
+> > Suggested-by: Eric Dumazet <edumazet@google.com>
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+>
+> Thanks !
+>
 
