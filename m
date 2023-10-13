@@ -1,49 +1,52 @@
-Return-Path: <netdev+bounces-40617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49757C7DF4
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 08:48:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A28B7C7E56
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 09:05:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FD1C282DE6
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 06:48:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 175E8B2085C
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3B8D2E6;
-	Fri, 13 Oct 2023 06:48:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9C4D279;
+	Fri, 13 Oct 2023 07:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bgcKwGfH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DE8101D9;
-	Fri, 13 Oct 2023 06:48:11 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B857DFD;
-	Thu, 12 Oct 2023 23:48:09 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4S6H7v1yxbzrTKL;
-	Fri, 13 Oct 2023 14:45:31 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 13 Oct 2023 14:48:07 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Alexander
- Duyck <alexander.duyck@gmail.com>, Liang Chen <liangchen.linux@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Eric Dumazet
-	<edumazet@google.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, <bpf@vger.kernel.org>
-Subject: [PATCH net-next v11 6/6] net: veth: use newly added page pool API for veth with xdp
-Date: Fri, 13 Oct 2023 14:48:26 +0800
-Message-ID: <20231013064827.61135-7-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20231013064827.61135-1-linyunsheng@huawei.com>
-References: <20231013064827.61135-1-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B9BE5692
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:05:27 +0000 (UTC)
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C5FC5B7;
+	Fri, 13 Oct 2023 00:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=frMwB
+	+yQcrqfw7+mUC1RLpFWBfRdjTmzx1BGRb9nPkY=; b=bgcKwGfHHQLttJDR/zMLu
+	yNDKelR5y7v871iubA92RBIKiOGPXIx2bs5JZcWRTJLe1NANMVqZXPh7HiFJ7AQo
+	CNTJHEsYpvnCmyWhHsIaaeGFw7oBGh8BFTH5/bqD95iE+A4nm/b3/imnEO9W2WmK
+	sZeR1GX1E1p6kIW6BZiqvs=
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by zwqz-smtp-mta-g4-4 (Coremail) with SMTP id _____wD3_9Dr6yhlQ_y2AQ--.20479S4;
+	Fri, 13 Oct 2023 15:04:20 +0800 (CST)
+From: Ma Ke <make_ruc2021@163.com>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make_ruc2021@163.com>
+Subject: [PATCH] tipc: Fix uninit-value access in tipc_nl_node_get_link()
+Date: Fri, 13 Oct 2023 15:04:08 +0800
+Message-Id: <20231013070408.1979343-1-make_ruc2021@163.com>
+X-Mailer: git-send-email 2.37.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,99 +54,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS
+X-CM-TRANSID:_____wD3_9Dr6yhlQ_y2AQ--.20479S4
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Wr4rCw4ktrW5WFyxJFW8WFg_yoWfJFX_Z3
+	92g3yfAry8J39Yyr4DXa95JrZ3Jan8G3Z5uw1akryUK34DCrWrZan5JFn8CrW3urZ7u3sr
+	Ga40vF1fXF12qjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRMg4SUUUUUU==
+X-Originating-IP: [183.174.60.14]
+X-CM-SenderInfo: 5pdnvshuxfjiisr6il2tof0z/1tbivggIC1ZcjGryowAAsI
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use page_pool[_cache]_alloc() API to allocate memory with
-least memory utilization and performance penalty.
+Names must be null-terminated strings. If a name which is not 
+null-terminated is passed through netlink, strstr() and similar 
+functions can cause buffer overrun. This patch fixes this issue 
+by returning -EINVAL if a non-null-terminated name is passed.
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-CC: Liang Chen <liangchen.linux@gmail.com>
-CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+Signed-off-by: Ma Ke <make_ruc2021@163.com>
 ---
- drivers/net/veth.c | 25 ++++++++++++++++---------
- 1 file changed, 16 insertions(+), 9 deletions(-)
+ net/tipc/node.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 0deefd1573cf..470791b0b533 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -737,10 +737,11 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 	if (skb_shared(skb) || skb_head_is_locked(skb) ||
- 	    skb_shinfo(skb)->nr_frags ||
- 	    skb_headroom(skb) < XDP_PACKET_HEADROOM) {
--		u32 size, len, max_head_size, off;
-+		u32 size, len, max_head_size, off, truesize, page_offset;
- 		struct sk_buff *nskb;
- 		struct page *page;
- 		int i, head_off;
-+		void *data;
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index 3105abe97bb9..a02bcd7e07d3 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -2519,6 +2519,9 @@ int tipc_nl_node_get_link(struct sk_buff *skb, struct genl_info *info)
+ 		return -EINVAL;
  
- 		/* We need a private copy of the skb and data buffers since
- 		 * the ebpf program can modify it. We segment the original skb
-@@ -753,14 +754,17 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		if (skb->len > PAGE_SIZE * MAX_SKB_FRAGS + max_head_size)
- 			goto drop;
+ 	name = nla_data(attrs[TIPC_NLA_LINK_NAME]);
++	if (name[strnlen(name,
++			 nla_len(attrs[TIPC_NLA_LINK_NAME]))] != '\0')
++		return -EINVAL;
  
-+		size = min_t(u32, skb->len, max_head_size);
-+		truesize = SKB_HEAD_ALIGN(size) + VETH_XDP_HEADROOM;
-+
- 		/* Allocate skb head */
--		page = page_pool_dev_alloc_pages(rq->page_pool);
--		if (!page)
-+		data = page_pool_dev_cache_alloc(rq->page_pool, &truesize);
-+		if (!data)
- 			goto drop;
- 
--		nskb = napi_build_skb(page_address(page), PAGE_SIZE);
-+		nskb = napi_build_skb(data, truesize);
- 		if (!nskb) {
--			page_pool_put_full_page(rq->page_pool, page, true);
-+			page_pool_cache_free(rq->page_pool, data, true);
- 			goto drop;
- 		}
- 
-@@ -768,7 +772,6 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		skb_copy_header(nskb, skb);
- 		skb_mark_for_recycle(nskb);
- 
--		size = min_t(u32, skb->len, max_head_size);
- 		if (skb_copy_bits(skb, 0, nskb->data, size)) {
- 			consume_skb(nskb);
- 			goto drop;
-@@ -783,14 +786,18 @@ static int veth_convert_skb_to_xdp_buff(struct veth_rq *rq,
- 		len = skb->len - off;
- 
- 		for (i = 0; i < MAX_SKB_FRAGS && off < skb->len; i++) {
--			page = page_pool_dev_alloc_pages(rq->page_pool);
-+			size = min_t(u32, len, PAGE_SIZE);
-+			truesize = size;
-+
-+			page = page_pool_dev_alloc(rq->page_pool, &page_offset,
-+						   &truesize);
- 			if (!page) {
- 				consume_skb(nskb);
- 				goto drop;
- 			}
- 
--			size = min_t(u32, len, PAGE_SIZE);
--			skb_add_rx_frag(nskb, i, page, 0, size, PAGE_SIZE);
-+			skb_add_rx_frag(nskb, i, page, page_offset, size,
-+					truesize);
- 			if (skb_copy_bits(skb, off, page_address(page),
- 					  size)) {
- 				consume_skb(nskb);
+ 	msg.skb = nlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
+ 	if (!msg.skb)
 -- 
-2.33.0
+2.37.2
 
 
