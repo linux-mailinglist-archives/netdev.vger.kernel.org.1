@@ -1,48 +1,47 @@
-Return-Path: <netdev+bounces-40864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ADB07C8EDF
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:17:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 391AF7C8EF2
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02C46B20AAC
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:17:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB2681F215B8
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C852510F;
-	Fri, 13 Oct 2023 21:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5402628E;
+	Fri, 13 Oct 2023 21:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDpQgZwy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lypgz7v7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0499924200;
-	Fri, 13 Oct 2023 21:17:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB0FC433C9;
-	Fri, 13 Oct 2023 21:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4A525113
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 21:23:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DA13C433C8;
+	Fri, 13 Oct 2023 21:23:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697231843;
-	bh=cb+6M+VjMEh/7lfug1HEZP7KTDY5oSMrWSCNgMT7D/Y=;
+	s=k20201202; t=1697232188;
+	bh=UasAX67RgbU+zYwQ4JKxcxlh9as+dDoHvrORQcLNTEA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mDpQgZwyNYaQ4ZKd1T5zGA3vB2Fs/4XuqGBZv8ZlEX8KpG7daXTKjPTyXzhDKXm+1
-	 uUfD8Y1uuax3AAASiNEkXGwrI/N1WEIblc6mK1/fTW6LPEFlpaY4c2AxWnBEHHdkrM
-	 4fFIoH7gCYQx1kICsvt8grWzgEgsxAzVYW6FEML0EZX+oqENb76z1nJVKUTCRkvQty
-	 fQEnyXJ6jrrjYk8EbrWVdYmoPCvtkEcME4FEITIi02BOLt11QnCFdVTGQ2SF2Fdb1p
-	 NmtvYja1NPEDkeLGqS/WC0bR3y75H4pTwinHBWhL488aYnXrYKPMVleEs7QSgw/nzZ
-	 K1z1Bk860845g==
-Date: Fri, 13 Oct 2023 14:17:22 -0700
+	b=lypgz7v7ipALziFsstmwzfsCm52uU5ufrWtsIU11+FefJ6xEBTNVaXDAeagbq7vA+
+	 6eaLPDQXBTYRFpwtWQqRVC1CK+XEqUMYjDW3aaEAOy+CgZKmN1jbnFjdLt85ZeXGrW
+	 y8/63BKpWQ1lzBJppxXNd4fjR3Cu4Ke2Tb1HzEpM17wD51IJAVSR9m+5AzCOuX1QoL
+	 GrBl2zKPdc/O5t7zHbjubx7IxJw6KstzECOLg1B2aWU1cn0kyTqv/XYLLwFMz/hlTU
+	 uW4a4fiFZ9D+HdCiFFgAgYz8nBfThgbW6rSyusq1ECU6HBoLNf2lS9AjxbVxHCCVtV
+	 tLUD4kheBiKJQ==
+Date: Fri, 13 Oct 2023 14:23:07 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, jhs@mojatatu.com,
- victor@mojatatu.com, martin.lau@linux.dev, dxu@dxuuu.xyz,
- xiyou.wangcong@gmail.com
-Subject: Re: [PATCH net-next v2 1/2] net, sched: Make tc-related drop reason
- more flexible
-Message-ID: <20231013141722.21165ef3@kernel.org>
-In-Reply-To: <20231009092655.22025-1-daniel@iogearbox.net>
-References: <20231009092655.22025-1-daniel@iogearbox.net>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com
+Subject: Re: [PATCH net-next 08/14] tls: also use init_prot_info in
+ tls_set_device_offload
+Message-ID: <20231013142307.70af75d6@kernel.org>
+In-Reply-To: <6da95c0d469415ee62cc23ce72227f8d058400bc.1696596130.git.sd@queasysnail.net>
+References: <cover.1696596130.git.sd@queasysnail.net>
+	<6da95c0d469415ee62cc23ce72227f8d058400bc.1696596130.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,20 +51,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  9 Oct 2023 11:26:54 +0200 Daniel Borkmann wrote:
-> Currently, the kfree_skb_reason() in sch_handle_{ingress,egress}() can only
-> express a basic SKB_DROP_REASON_TC_INGRESS or SKB_DROP_REASON_TC_EGRESS reason.
-> 
-> Victor kicked-off an initial proposal to make this more flexible by disambiguating
-> verdict from return code by moving the verdict into struct tcf_result and
-> letting tcf_classify() return a negative error. If hit, then two new drop
-> reasons were added in the proposal, that is SKB_DROP_REASON_TC_INGRESS_ERROR
-> as well as SKB_DROP_REASON_TC_EGRESS_ERROR. Further analysis of the actual
-> error codes would have required to attach to tcf_classify via kprobe/kretprobe
-> to more deeply debug skb and the returned error.
+On Mon,  9 Oct 2023 22:50:48 +0200 Sabrina Dubroca wrote:
+> +	if (mode == TLS_HW) {
+> +		prot->aad_size = 0;
+> +		prot->tail_size = 0;
+> +	}
 
-I guess Jamal said "this week" so he has two more days? :) 
-While we wait:
-
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Strange, tail_size doesn't matter because HW doesn't support TLS 1.3
+but aad_size?  Is it overwritten by SW init or something?
 
