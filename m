@@ -1,92 +1,136 @@
-Return-Path: <netdev+bounces-40889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB527C905C
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 00:43:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C607C910D
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 00:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87015B209A0
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 22:43:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 752F8282E13
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 22:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A285241F3;
-	Fri, 13 Oct 2023 22:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651332B5EE;
+	Fri, 13 Oct 2023 22:53:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKmjpQzW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QIobGk0v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA61107AD
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 22:43:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4BB8C433C8;
-	Fri, 13 Oct 2023 22:43:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697236984;
-	bh=tWTCttui4UFyt2yeWYK9aIb7UBMshVr8qR5BhDqrXNw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tKmjpQzWW/VWRluLD4JeRBorppjaZOyu92+11TACEcSPm0MIbe19kTLiEpQPh6Oca
-	 Xqdu8P3nXtvgRQFC9Wj9V+UZ6d8pPCUmGEwOBDW9OM0z9/H5D2Q9U/3pg7OKWgvaSQ
-	 G5mD/630665MNRz2AZiULwyJjNdNUZgWefA1GEOvpR3QFl+PxKKEu3wX4f4lAjBGxs
-	 TV+9igkGDxkeQkq7EhCIAEG8/5yVFvc7mu7MS6CF6k2uOOlq+eO71Lokz78B+x6l/w
-	 hOOOcbW3fFppnLnFQcIexWN6XpEzRnldI8WNutPU5MVqrYXReK0Zre+5k5u99TKQ+I
-	 fto+fFjjdhCXw==
-Date: Fri, 13 Oct 2023 15:43:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Daniel =?UTF-8?B?R3LDtmJlcg==?= <dxld@darkboxed.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, Richard Weinberger
- <richard@nod.at>, Serge Hallyn <serge.hallyn@canonical.com>, "Eric W.
- Biederman" <ebiederm@xmission.com>
-Subject: Re: [BUG] rtnl_newlink: Rogue MOVE event delivered on netns change
-Message-ID: <20231013154302.44cc197d@kernel.org>
-In-Reply-To: <20231013153605.487f5a74@kernel.org>
-References: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
-	<20231013153605.487f5a74@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A566A224DF;
+	Fri, 13 Oct 2023 22:53:06 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27CDACF;
+	Fri, 13 Oct 2023 15:53:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697237585; x=1728773585;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=2C5UrgkdXJHfjfoqNAM4SPZu5C0wbXCYHnYx7Cjk8OU=;
+  b=QIobGk0vrvjP9DUEc4lMNykP6fid709P0alhU4tlHcI+dizFmSG6/TOr
+   PkffopnbUHRqtiiIxazBHBOpB5o9XGJhkQhER3v/IZ3trJ8ObDZwGWU7R
+   ZcP4sGFk3mnnKyslB7pu3NJBBKeJrj7EDKmpt0B2zPMy9rMZCAGRsySL8
+   NlpTbpkoMoevRDn15r1Gktx2zR6GShKzFeNZrVk7SVg08ugjLYs80E2P8
+   igujlAk7rNMGsm/uf69M2l+B6H/MSjcI5jWvGZO/wHOVxN5adbrvWoG3p
+   8pdu886R4eDkVi5yQLRTMo3PtMfaQSVjE6+wyTQi8p4NVgT4qxYLhmIB3
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="388134476"
+X-IronPort-AV: E=Sophos;i="6.03,223,1694761200"; 
+   d="scan'208";a="388134476"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 15:53:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10862"; a="871267063"
+X-IronPort-AV: E=Sophos;i="6.03,223,1694761200"; 
+   d="scan'208";a="871267063"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 13 Oct 2023 15:52:57 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qrR1b-0005US-1U;
+	Fri, 13 Oct 2023 22:52:55 +0000
+Date: Sat, 14 Oct 2023 06:52:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Michael Walle <michael@walle.cc>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH net-next v5 10/16] net: ethtool: Add a command to list
+ available time stamping layers
+Message-ID: <202310140615.H4ByVgnr-lkp@intel.com>
+References: <20231009155138.86458-11-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231009155138.86458-11-kory.maincent@bootlin.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 13 Oct 2023 15:36:05 -0700 Jakub Kicinski wrote:
->    kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
->    dev_net_set(dev, net);
->    kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+Hi Köry,
 
-Greg, we seem to have a problem in networking with combined
-netns move and name change.
+kernel test robot noticed the following build warnings:
 
-We have this code in __dev_change_net_namespace():
+[auto build test WARNING on net-next/main]
 
-	kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
-	dev_net_set(dev, net);
-	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+url:    https://github.com/intel-lab-lkp/linux/commits/K-ry-Maincent/net-Convert-PHYs-hwtstamp-callback-to-use-kernel_hwtstamp_config/20231009-235451
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231009155138.86458-11-kory.maincent%40bootlin.com
+patch subject: [PATCH net-next v5 10/16] net: ethtool: Add a command to list available time stamping layers
+reproduce: (https://download.01.org/0day-ci/archive/20231014/202310140615.H4ByVgnr-lkp@intel.com/reproduce)
 
-	err = device_rename(&dev->dev, dev->name);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310140615.H4ByVgnr-lkp@intel.com/
 
-Is there any way we can only get the REMOVE (old name) and ADD
-(new name) events, without the move? I.e. silence the rename? 
+All warnings (new ones prefixed by >>):
 
-Daniel is reporting that with current code target netns sees an 
-add of an interface with the old (duplicated) name. And then a rename.
+>> Documentation/networking/ethtool-netlink.rst:2022: WARNING: Title underline too short.
 
-Without a silent move best we can do is probably:
+vim +2022 Documentation/networking/ethtool-netlink.rst
 
-	kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
-	dev_net_set(dev, net);
-	err = device_rename(&dev->dev, dev->name);
-	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+  2020	
+  2021	TS_LIST_GET
+> 2022	==========
+  2023	
 
-which will give us:
-
-	MOVE new-name
-	ADD new-name
-
-in target netns, which, hm.
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
