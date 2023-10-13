@@ -1,236 +1,176 @@
-Return-Path: <netdev+bounces-40894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 203D67C911F
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D19B47C9159
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:35:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 420CA1C20FDA
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F2E31C209AD
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:35:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7353A2C850;
-	Fri, 13 Oct 2023 23:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9A82C867;
+	Fri, 13 Oct 2023 23:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fFmxI7pg";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="KlF2m6D2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hMkPp69E"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4CF200AB
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:01:38 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16A01B7;
-	Fri, 13 Oct 2023 16:01:37 -0700 (PDT)
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39DLJJJk002791;
-	Fri, 13 Oct 2023 23:01:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=fudT+JiWDPPDDBQcKrp5fIaQDMRG5BdQFN3dOWGKMlU=;
- b=fFmxI7pgJe3po6QUZ+vIw4AMxp9E0OnGB+wnHCOGxjpKFSVoAWUF5eIBlyqfsmCkGaN/
- nio3n1LKIt3kY1h4USqdL7D6d8nsE2Qv1MJbINBPZGaO5CqpbAW2Hhx7LX5psw/+Z5Ac
- uPhZrBlpgsjaW4Wr7aJhrs+3X2sKQyk4rsz7lwjK/Yx91eBq/NfSPrALKhn0rE2OG/AQ
- L/K8kIjwKHCmHw96fhYcvy00HmfRfy283M8xJ0TBBMsSHbqk4as0FsVxDDD7MRilSGaF
- 6zkC2jZoUx1Gj5ZOEOMqWRZYjp5FTAGzCtUvFOkS2pQVZbV11ZOMpp3iPf4bI16W+Z1w zw== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3tjwx2e3dx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Oct 2023 23:01:14 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 39DL0CxO020219;
-	Fri, 13 Oct 2023 23:01:14 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3tptck9rsk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Oct 2023 23:01:14 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m97YhYFO4u4xYutfeVG0rjpD1M1l9lsldgOT/DxNQDQA/9yXObIB5RqMzjlGpHvHHYbWsmJpaag2//AQFroXA0tiUqP5wMH7vtPjOWonpd1+YOzb/iIrpSlPj7h6gZfkzeNwYnJeS4fGHtYGfxPEBWr20aPJ1VE4BnWI8cerYG1deCWYpXGZu5YZIac4l46b5yEWw26kb+7w5PWKCibNyJJKX29GOijGQ8tnGusQWeEvRECf8Y6SPDAnKCa4540/t+NY4SWhtCk75Prgpv9I2aQNcL57Z6ECdCFW+NLyL2f6b8ylVKCDSlyusslPy+dWpkurvSKGUKPVXyY59WtopA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fudT+JiWDPPDDBQcKrp5fIaQDMRG5BdQFN3dOWGKMlU=;
- b=aGXxJWCgrAkhIF5Ss4nrY8rtIF+pksDMtbg7PP6Niub1GH50XjqLOrlyRGlUpcq9W1ShznNfKX3CgpmBpTKQB8wUCaOEjomoGxuclrRRIst9Lcxg4VRCPxky+M1ZCTmvQhe1sB24lUSVi/ssWMSwxHNumjGJN1wmO42lznEataMlG3Wc0USoEOUeSGBpPqHJ3770p3WUtvtsKoUAiacYaC0QJGyyFyfudgDQzTRE+rHEQv5b7O59xtrXdAp9pQWlo7FvSWGTnA2jGCMUA7nOYg2D1nZu7H4wJuJZ3NStMKXfV0Lm2y9slZl5JtdCxYU52UXpBf7PuY/n/ZVHVldrpQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8927F2C863
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:35:11 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E8E6B7
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:35:08 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6b77ab73c6fso434878b3a.1
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 16:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fudT+JiWDPPDDBQcKrp5fIaQDMRG5BdQFN3dOWGKMlU=;
- b=KlF2m6D2MPsjx+P+f1nFSLU13Bf+9X5uLPZEjSzKLZCVyqhq6BRQz8ymigSyDREJuTkC+nd0fh1x3OhRUB5uujykRLRQmJf7jhfC6hb8aPFlQYOGh3qcyefs8Ri+N1rigxUfkYWmsbHWDiOvEv56345eckrsHVZeQTubvxUaeM4=
-Received: from BY5PR10MB4129.namprd10.prod.outlook.com (2603:10b6:a03:210::21)
- by PH7PR10MB7034.namprd10.prod.outlook.com (2603:10b6:510:278::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.44; Fri, 13 Oct
- 2023 23:01:12 +0000
-Received: from BY5PR10MB4129.namprd10.prod.outlook.com
- ([fe80::f5d4:dcca:5e7d:ad91]) by BY5PR10MB4129.namprd10.prod.outlook.com
- ([fe80::f5d4:dcca:5e7d:ad91%6]) with mapi id 15.20.6863.032; Fri, 13 Oct 2023
- 23:01:12 +0000
-From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-To: Simon Horman <horms@kernel.org>
-CC: open list <linux-kernel@vger.kernel.org>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        Liam Howlett <liam.howlett@oracle.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "oliver.sang@intel.com"
-	<oliver.sang@intel.com>
-Subject: Re: [PATCH v2] Fix NULL pointer deref due to filtering on fork
-Thread-Topic: [PATCH v2] Fix NULL pointer deref due to filtering on fork
-Thread-Index: AQHZ/AGKCAsFOxKU5UCM3TNn1o0Z4LBHod+AgAC4YoA=
-Date: Fri, 13 Oct 2023 23:01:11 +0000
-Message-ID: <86531411-0D87-4F45-BD19-CE456A70CC47@oracle.com>
-References: <20231011051225.3674436-1-anjali.k.kulkarni@oracle.com>
- <20231013120105.GH29570@kernel.org>
-In-Reply-To: <20231013120105.GH29570@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BY5PR10MB4129:EE_|PH7PR10MB7034:EE_
-x-ms-office365-filtering-correlation-id: d388086e-3c46-4989-611f-08dbcc404b89
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- I/Up1Pay/aLqtvAceuXnIQQ0iCXwcqUVafNYBPSgAZcpWL+Cln1hu7bDa62b1pVmY6sNMtRfyC4GzVSf8PbDreL9esFWCDuQgzNn+PuJIxROCfzCLTgKi+Zewjhpnrz3vHroomuyZ3zu0lFVQPeL0sSKPWB1Id8whHLOR5R98c6fVWcK3z+wY0g3NU+r6tN7aL2c79RzUPf7H7Hr96gBKgn+y5JNPKJ7qAclYRHhMqYV7l4WgPoA6xSOxAJbamO8/wuVBXfeZmEES0ZrmF7pnmNrAQ9bK7NkPdmgoanfufeRhmFV4VJFvu/A34UbAHoKY9qZn8I9LbIUZI2MaTmi6deYvvOlt1dOl2DHc0sPF/S0WXDQYb9Xs61xmArsSgPGUOV2G9+c8orRd8EwUU/DTjijeJXy+h5oY/HQTa/nOMgF77+TpQDDzE8yJs7IAgNWtcuUh+WrhG3TA4kHReoc/qN9FCQwngVxVNHc84mHyDvGHt0RNU5OG+TAPbZklY4YfT/B15izLUmmM2Ty3g7x/lr8bKAIh+laKjW3SfxAE/mYSHtJiJ1aoL2jVIKKXwSzoxnzH747ZJ+g23TgjqrNSe/SebFInRa7mT1am8lcM1HIb+IZAAQdRE7VEQTsVnNuHMr8/sPEUAqkBvFFAExD7g==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4129.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(136003)(376002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(2616005)(26005)(6916009)(76116006)(66556008)(66476007)(64756008)(66446008)(54906003)(4326008)(8676002)(8936002)(66946007)(53546011)(38070700005)(36756003)(122000001)(2906002)(6512007)(71200400001)(6506007)(33656002)(83380400001)(316002)(86362001)(5660300002)(38100700002)(478600001)(966005)(6486002)(41300700001)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?Sg0X7MV6j4EmUE/jBJGQRsas8zEPx8fcDeIWa7ZaZStu3Kn0pbicN7vXsgoM?=
- =?us-ascii?Q?2HwBatwn/2S5uRl9b6ohQmaaLIBspL5uA1Zuy6YhnyMoNEsANxsNkEw8s5pK?=
- =?us-ascii?Q?6xyMnIiQz70sY8TGGS6DxWiC7+YR7rDrXVdjTZugIi+S/Hb02AiUKIre4fHc?=
- =?us-ascii?Q?zlndP1U0o+L8qeatRcY5AuK44hgMfNj1cctd5RkYgNvzh+aSWySluOK5jwnd?=
- =?us-ascii?Q?of+YVDrzwkFpHFs513hypHKM4q3KJ8M1Ovfr4XPLSHVdAwgA9F2L9QAp7z1m?=
- =?us-ascii?Q?MD3cVADY9hsOnoJfRiC5DUjQh9UwcKXlSS1iuSNwOB+M3clf8P4wL56BUqAJ?=
- =?us-ascii?Q?bODfUjN9hP7mBiErDPUN3zTypvK5pR/u9t8XNHbhkBFFeoW94oMyurWjhvu2?=
- =?us-ascii?Q?gl1C2JynnZ03pWY3fzbIz9HZCUyAxFOfMLcP1XTQldg5Pb+Qm1XbcvheKmlb?=
- =?us-ascii?Q?AnpjGsxkTD7q/ulAD9sdbD38J9cg1/XLymafEd6OA0Q/e+1EKL6oR4/rZuvB?=
- =?us-ascii?Q?0EcrDqSO2kZyva2tV1UIVF82QvPgRd4vHcV/L6xV9YSM6vulrqcVmguvmyo8?=
- =?us-ascii?Q?tN+3KGtBGJuBpG9C6vcgGshl/DVcrl2LbaxK1EM04ZiWGlhPhJAsWbipNBDT?=
- =?us-ascii?Q?DBXxK3VbqWkM4dtE5IjzXsk0py73WSk9LxHKxsqvhlvsV/wu+hr3+omccPkG?=
- =?us-ascii?Q?6h6HrdMu+8tUFr4Rcj+yvJsFxuhETktLNTwQJan9CD5v7r+/tlfEKbZOohrh?=
- =?us-ascii?Q?yMMFpTjE2i72MsJy3bZ/Zu6MGIDe/VUEEJWVMHPBV/pu4LQxTdbV3SsNd/kz?=
- =?us-ascii?Q?Lrez7cyysPBJ+S6mHBZjjVnthIPEr2XgCbyJ8gGM+TWI+7qXPEcBD+LocBZz?=
- =?us-ascii?Q?ln9usw3b12nVaAeAka0mGJXbH/uopf/yMOIfHiFfdblx9o+7fj7YWhRTyBwe?=
- =?us-ascii?Q?JMkQQTb+o4osbFFw5XkVoWvu5jYWCUQKUP5/+pyUh9ill7Y9l7eYm3UWie21?=
- =?us-ascii?Q?8QQ03vlNc7YGmppAKnTs7wr+dW/KdxuHjx5ioQydTaWeRY8gvefdkid5Nu5G?=
- =?us-ascii?Q?LxvjbuSvysbm1BsNO4/8E2daxHPiYdudfkcNnNDXVlMA98xHk5OlH7yyFxtT?=
- =?us-ascii?Q?wKwpcKHlvsK/insYRX1G346tvWD3cXPEXy051Q/chd2YE7gQdiaXZqDicMw4?=
- =?us-ascii?Q?0GIHx7VosR2QntaT9tBMC8sA6fqegaGiTPmTvVlDI/n7RI14Gs+zjyrDSvyu?=
- =?us-ascii?Q?0ALayRCM1+2X0sKRO0pKaMzQbPervwWbyuuLRGLwOZUrEUZ+J1nxZ9HYSyoR?=
- =?us-ascii?Q?8T8N9WSIgWi3Yh2S+0/5j/tNp9CMKXCo5WTVQRC3iuNiBIxTP+y6NolpDJRe?=
- =?us-ascii?Q?K0gVONSZXghAvfU88FiFLbyGskA2lzAjozA1rsBSpFlI2SnyLgoxxlVojvNq?=
- =?us-ascii?Q?05cT3WuCqKQpJhEbJ8RsYsDSY7IQuAHf2Fn6GACwpGH63vrTK2YVqPH8J+FR?=
- =?us-ascii?Q?wZUwDTcI8IxPJFvPcWLztY2COMloeHM+St/yB8GhJpoHIWfeYihtBSCtdC8a?=
- =?us-ascii?Q?Gx58b/mUmVKaYe0wHuy/PBYClCKBnZKAqfMB8kLr6OfUWKDa5qqxxAKi3pce?=
- =?us-ascii?Q?vQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <69E382E667D9E44383775598312AE4DD@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=chromium.org; s=google; t=1697240107; x=1697844907; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AHKDZ3XDgz4acF4+DkWVpvMtmbGAqaQVvgAwz4bhM4Y=;
+        b=hMkPp69EStD3kWejd2MFFyrqD8k4pHKRS01+GAz7TEJNyhXN22W6XfcVVJLcx/2YNP
+         VJZAmTy+m0Oh8AhllsOLmuRI+z+ai7O+7G211JVeSmRhEL+BRQqNTilRO3XWl+1r1YGn
+         EI05wdZ6Pq/u7CigRzSZnsNGu5VClhMND5LEg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697240107; x=1697844907;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AHKDZ3XDgz4acF4+DkWVpvMtmbGAqaQVvgAwz4bhM4Y=;
+        b=gbQuqDLl7KLlEbYFeGdr2JbdaSGCUEDrJNwtrf8JsQixPerM+3oQI8OOQvnJKnPEqT
+         bpTvgW8fDp7iPs37uLJ3SLCFEkmMiaR6OA7E/iC2VpxoBCZEs/9DBAHZ2kZ/XqIBwZJm
+         E8WZSJ+4vTjT8/FTNfAFw6blKLWIuy6qmqgPZV2ZGGwvINh/FBU4t1K97T/Iarj2gJqV
+         L6N7Gg4WN4lwZYYgPTLz9JDp7tYXNTbIs7Vooodlm1ZBosQ/y16yAO8BgJ9HXLsokw64
+         4G86nluSkCvDybOdynoU/ZFMKjlJ8gnOgIMOdGf6CjoaH8Y+490JnehgyWZwkPRE6HcF
+         RL/w==
+X-Gm-Message-State: AOJu0Yy3IJJasZTCfANQ2OwCh2IlmBna9Ke6bHBCVoA8DiBxmrshnxPk
+	ObPgtOKXYcZ55NTk1guvm15MeQ==
+X-Google-Smtp-Source: AGHT+IFVsRqeEvvb0rxG9AitDSaFC9Eo2vYmuaEaLBSRUAgTIHFNojLc8fnR5monzQ6HhXkXFzrFKg==
+X-Received: by 2002:a62:8492:0:b0:68a:582b:6b62 with SMTP id k140-20020a628492000000b0068a582b6b62mr1709607pfd.7.1697240107470;
+        Fri, 13 Oct 2023 16:35:07 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id y16-20020aa793d0000000b0068fdb59e9d6sm668511pff.78.2023.10.13.16.35.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 16:35:06 -0700 (PDT)
+Date: Fri, 13 Oct 2023 16:35:06 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Justin Stitt <justinstitt@google.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: phy: tja11xx: replace deprecated strncpy with
+ ethtool_sprintf
+Message-ID: <202310131630.5E435AD@keescook>
+References: <20231012-strncpy-drivers-net-phy-nxp-tja11xx-c-v1-1-5ad6c9dff5c4@google.com>
+ <15af4bc4-2066-44bc-8d2e-839ff3945663@lunn.ch>
+ <CAFhGd8pmq3UKBE_6ZbLyvRRhXJzaWMQ2GfosvcEEeAS-n7M4aQ@mail.gmail.com>
+ <0c401bcb-70a8-47a5-bca0-0b9e8e0439a8@lunn.ch>
+ <CAFhGd8p3WzqQu7kT0Pt8Axuv5sKdHJQOLZVEg5x8S_QNwT6bjQ@mail.gmail.com>
+ <CAFhGd8qcLARQ4GEabEvcD=HmLdikgP6J82VdT=A9hLTDNru0LQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	QnWeaOcyEuVRhof37PaFWTXndTMS9m5T/klp0koTKe+MZpbx67DHwBL3raBza84dEFzDmKlp/ZrXuAx2M3o3F9G7cfau9gB8ili1fOZps6kZwF3QJjxh6LLzbJuYNwyGJQTRtiH8FfSuAr7sHpUZxrBZ0Xp/gOgE4HwEWR2Frjd+lXN/YiVQDFPGY2G5gT/k22SXQev2T7/3iy67ZSQaF4YLwtHqL6+og3dnXR1xfsjGDwQwcaVx7CzYqesSYikOlzmQCAvVeGsLWUcIpcQzKdzcLQYJgkVaDI3a8+apOcIlpr4c0efATElLoLG6Fd57HMlmoce/1TNJCNFiixp0i/A3qFS3uaPx2XOhHA+TJY02qDF1FL2pkZp+lMfaOX+egA7+6xD4TYqttvfYchb2YHFPyeAhRzaMUoOLSSVKFyLGD/ngsumhzos9hHPFp13t3jv5AGfwMHdPCfkmmxj5VC0y9ueS/qKGyoB0ibNeP9SevfC0iISurugKktLCTSHSt8iTERSQn19B9Hv2fOxE4TvtqFYg+snxfUcrNwPfbiQDQOXLNf3G3kr/BXI8OVSUmmLovodI2sXrcJAeY/Pqlpcejk+Z8+tepmWEC525Uv3+DMy/fPZEUAEp28w7Fg6KitjXJh/RZ5fZBb4v1AdYF7pPrHFS542E8qNN04CyweKdMYdIrguIDiAVCurZ1AUF86ffzSN0uqlkxObk1wuPsIEXIyx3uZ1CSYR1PVEH70lBp3T/pb4vqa66IDBSgIIuLKhndldADEHDZ6BZobxsTbM9pauNNFAYc+PyHPE5IbswuDudt05P7BuzJsYfIjJ3zvZZvCumczRnI49rskJ0dUq9p3JAJ0fZ7/Af64VatUM=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4129.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d388086e-3c46-4989-611f-08dbcc404b89
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2023 23:01:11.9772
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MZrUPFKmgcnYjHycaKwIgzDC6QHASTSawFm6apVUfZn7m4CiOutkmTRkvJn/MkcvCIfKp5fTtY13otzHy+hglT+hlhqF82koHcEiqyJ64jU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB7034
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-13_12,2023-10-12_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0
- suspectscore=0 phishscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2309180000 definitions=main-2310130200
-X-Proofpoint-GUID: 04zlpBG3Zr7oE2I5fUBAG5B-LEtttQaz
-X-Proofpoint-ORIG-GUID: 04zlpBG3Zr7oE2I5fUBAG5B-LEtttQaz
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFhGd8qcLARQ4GEabEvcD=HmLdikgP6J82VdT=A9hLTDNru0LQ@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Please discard this patch,=20
+On Fri, Oct 13, 2023 at 02:23:34PM -0700, Justin Stitt wrote:
+> On Fri, Oct 13, 2023 at 2:12 PM Justin Stitt <justinstitt@google.com> wrote:
+> >
+> > On Fri, Oct 13, 2023 at 1:13 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> > >
+> > > On Fri, Oct 13, 2023 at 12:53:53PM -0700, Justin Stitt wrote:
+> > > > On Fri, Oct 13, 2023 at 5:22 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> > > > >
+> > > > > > -     for (i = 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++) {
+> > > > > > -             strncpy(data + i * ETH_GSTRING_LEN,
+> > > > > > -                     tja11xx_hw_stats[i].string, ETH_GSTRING_LEN);
+> > > > > > -     }
+> > > > > > +     for (i = 0; i < ARRAY_SIZE(tja11xx_hw_stats); i++)
+> > > > > > +             ethtool_sprintf(&data, "%s", tja11xx_hw_stats[i].string);
+> > > > > >  }
+> > > > >
+> > > > > I assume you are using "%s" because tja11xx_hw_stats[i].string cannot
+> > > > > be trusted as a format string? Is this indicating we need an
+> > > > > ethtool_puts() ?
+> > > >
+> > > > Indeed, it would trigger a -Wformat-security warning.
+> > > >
+> > > > An ethtool_puts() would be useful for this situation.
+> > >
+> > > Hi Justin
+> > >
+> > > hyperv/netvsc_drv.c:                    ethtool_sprintf(&p, netvsc_stats[i].name);
+> > > hyperv/netvsc_drv.c:                    ethtool_sprintf(&p, vf_stats[i].name);
+> > > ethernet/intel/i40e/i40e_ethtool.c:             ethtool_sprintf(&p, i40e_gstrings_priv_flags[i].flag_string);
+> > > ethernet/intel/i40e/i40e_ethtool.c:             ethtool_sprintf(&p, i40e_gl_gstrings_priv_flags[i].flag_string);
+> > > ethernet/intel/ice/ice_ethtool.c:                       ethtool_sprintf(&p, ice_gstrings_priv_flags[i].name);
+> > > ethernet/intel/igc/igc_ethtool.c:                       ethtool_sprintf(&p, igc_gstrings_stats[i].stat_string);
+> > > ethernet/intel/ixgbe/ixgbe_ethtool.c:                   ethtool_sprintf(&p, ixgbe_gstrings_test[i]);
+> > > ethernet/netronome/nfp/nfp_net_ethtool.c:                       ethtool_sprintf(&data, nfp_self_test[i].name);
+> > > ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&data, nfp_net_et_stats[i + swap_off].name);
+> > > ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&data, nfp_net_et_stats[i - swap_off].name);
+> > > ethernet/netronome/nfp/nfp_net_ethtool.c:               ethtool_sprintf(&data, nfp_net_et_stats[i].name);
+> > > ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_sprintf(&p, txq_stat_names[j]);
+> > > ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_sprintf(&p, xdpq_stat_names[j]);
+> > > ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_sprintf(&p, rxq_stat_names[j]);
+> > > ethernet/fungible/funeth/funeth_ethtool.c:                      ethtool_sprintf(&p, tls_stat_names[j]);
+> > > ethernet/amazon/ena/ena_ethtool.c:              ethtool_sprintf(&data, ena_stats->name);
+> > > ethernet/amazon/ena/ena_ethtool.c:                      ethtool_sprintf(&data, ena_stats->name);
+> > > ethernet/brocade/bna/bnad_ethtool.c:            ethtool_sprintf(&string, bnad_net_stats_strings[i]);
+> > > ethernet/pensando/ionic/ionic_stats.c:          ethtool_sprintf(buf, ionic_lif_stats_desc[i].name);
+> > > ethernet/pensando/ionic/ionic_stats.c:          ethtool_sprintf(buf, ionic_port_stats_desc[i].name);
+> > > ethernet/hisilicon/hns/hns_dsaf_gmac.c:         ethtool_sprintf(&buff, g_gmac_stats_string[i].desc);
+> > > ethernet/hisilicon/hns/hns_dsaf_xgmac.c:                ethtool_sprintf(&buff, g_xgmac_stats_string[i].desc);
+> > > vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmxnet3_tq_dev_stats[i].desc);
+> > > vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmxnet3_tq_driver_stats[i].desc);
+> > > vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmxnet3_rq_dev_stats[i].desc);
+> > > vmxnet3/vmxnet3_ethtool.c:                      ethtool_sprintf(&buf, vmxnet3_rq_driver_stats[i].desc);
+> > > vmxnet3/vmxnet3_ethtool.c:              ethtool_sprintf(&buf, vmxnet3_global_stats[i].desc);
+> > >
+> >
+> > Woah, are these all triggering -Wformat-security warnings?
+> 
+> Erhm, I guess -Wformat-security is turned off:
+> 
+> ./scripts/Makefile.extrawarn +16:
+> KBUILD_CFLAGS += -Wno-format-security
 
-Anjali
+Whee. This is a longer issue, but yes, it would be nice if we could get
+out of the way of enabling -Wformat-security again some day.
 
-> On Oct 13, 2023, at 5:01 AM, Simon Horman <horms@kernel.org> wrote:
->=20
-> On Tue, Oct 10, 2023 at 10:12:25PM -0700, Anjali Kulkarni wrote:
->> cn_netlink_send_mult() should be called with filter & filter_data only
->> for EXIT case. For all other events, filter & filter_data should be
->> NULL.
->>=20
->> Fixes: 2aa1f7a1f47c ("connector/cn_proc: Add filtering to fix some bugs"=
-)
->> Reported-by: kernel test robot <oliver.sang@intel.com>
->> Closes: https://urldefense.com/v3/__https://lore.kernel.org/oe-lkp/20230=
-9201456.84c19e27-oliver.sang@intel.com__;!!ACWV5N9M2RV99hQ!PgqlHq_nOe_KlyKk=
-B9Mm_S8QstTJvicjuENwskatuuQK05KPuFw-KvRZeOH8iuEAMjRhkxEMPKJJnLcaT8zrPf9aqNs=
-$
->=20
-> For the record, this got a bit mangled. I believe it should be:
->=20
-> Closes: https://lore.kernel.org/oe-lkp/202309201456.84c19e27-oliver.sang@=
-intel.com/
->=20
-> Also, there is probably no need to resend because of this,
-> but no blank line here, please.
->=20
->> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
->> ---
->> drivers/connector/cn_proc.c | 8 ++++----
->> 1 file changed, 4 insertions(+), 4 deletions(-)
->>=20
->> diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
->> index 05d562e9c8b1..01e17f18d187 100644
->> --- a/drivers/connector/cn_proc.c
->> +++ b/drivers/connector/cn_proc.c
->> @@ -104,13 +104,13 @@ static inline void send_msg(struct cn_msg *msg)
->> if (filter_data[0] =3D=3D PROC_EVENT_EXIT) {
->> filter_data[1] =3D
->> ((struct proc_event *)msg->data)->event_data.exit.exit_code;
->> + cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
->> +      cn_filter, (void *)filter_data);
->> } else {
->> - filter_data[1] =3D 0;
->> + cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
->> +      NULL, NULL);
->> }
->>=20
->> - cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
->> -      cn_filter, (void *)filter_data);
->> -
->=20
-> I am wondering if you considered making cn_filter slightly smarter.
-> It seems it already understands not to do very much for PROC_EVENT_ALL.
->=20
->> local_unlock(&local_event.lock);
->> }
->>=20
->> --=20
->> 2.42.0
+> Kees, what do you think about this warning and the semantics of:
+> 
+> 1) ethtool_sprintf(&data, "%s", some[i].string);
+> 2) ethtool_sprintf(&data, some[i].string);
+> 3) ethtool_puts(&data, some[i].string);
 
+I've been told that this whole ethtool API area is considered
+deprecated. If that holds, then I don't think it's worth adding new
+helpers to support it when ethtool_sprintf() is sufficient.
 
+Once you're done with the strncpy->ethtool_sprintf conversions I think
+it would be nice to have a single patch that fixes all of these
+"%s"-less instances to use "%s". (Doing per-driver fixes for that case
+seems just overly painful.)
+
+-- 
+Kees Cook
 
