@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-40584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CA57C7B97
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 04:27:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023597C7B9E
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 04:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8E81C20BB4
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 02:27:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BA29B207E5
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 02:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED714A44;
-	Fri, 13 Oct 2023 02:27:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F995668;
+	Fri, 13 Oct 2023 02:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="QjsGWQkD"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="t7l4wyBl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5634BA40
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 02:27:43 +0000 (UTC)
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842E4D6
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:27:41 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-27cfb84432aso1199554a91.2
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:27:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E3F568C
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 02:30:59 +0000 (UTC)
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 030C6C0
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:30:58 -0700 (PDT)
+Received: by mail-oo1-xc31.google.com with SMTP id 006d021491bc7-57be3d8e738so947315eaf.1
+        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 19:30:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1697164061; x=1697768861; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1697164257; x=1697769057; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hzd1ftMQtB2BTCy0YmK46EH/0A56hMuJ7a7pVN/TrKs=;
-        b=QjsGWQkDqh7XeOimt5zyJjEd94HQyoG6is2+nk1cAN8zf+4HpRZsQ5VhniDLgbEULE
-         8577dWPvUCsyaeWahFMqgRwCauU6HBnTCKpp853yHFwVbFV/aZ+yR6sWX69SxO9R8HJW
-         0HN60lNPJq/5ACEcF7mEcpzeCUFiFJoX3Q7Vi6tEisdaPYew73iJkccEBn6TTBPxgXl3
-         DqmqYflIOQreHHBRjBOLSItjTznWDpeLHZQKzkcXuKF7ojAK+1SPrNxqE2paExIqfXa8
-         idmNp5X0EmOtNA/wZxlctZG8a3v6UBGqRY1ymp9c54XnqRj9C9YMDusHVFOVbNXScFnY
-         hP6A==
+        bh=9AlSt/UmPpPe6qrtiCDOOfX5E4Znn3Anpv8O+XesUkY=;
+        b=t7l4wyBl74o1MWNd5EGt92ncI1qSBLh26uNgNz1jZidkCSMm/hslP9MwX5JtVy4mCm
+         /VbLbnXh0Yer4xJCUYbOMIVWwgdIW+KO3NqgWnNo1+qkCDUL0QG9zCKlpIzbNP6M0aly
+         arss5MFB3ibA7cXi5Vv7e0u6gIi7jpMrMcG6IaGRi9ZxjlRXN2uVpDnpMBg6ZOZmICHy
+         qQYRPSDJCRlhREyEKFZ33jMeRyzhzW1F6NSPK+ZwSub7/6PRTXzkT8HnrW78J2sph/Ro
+         XpqM+ike6rlOx6F82fkyCWo8N8wCH3i8K073kr8cD8WRI6PJApWIG9rQTJClIV7AqPPB
+         MJYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697164061; x=1697768861;
+        d=1e100.net; s=20230601; t=1697164257; x=1697769057;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hzd1ftMQtB2BTCy0YmK46EH/0A56hMuJ7a7pVN/TrKs=;
-        b=anBJIzznj5qRDGI4CboGDpCYKmCXWCx3ZGU6GXl1Zi/M9UMrOSlNjHSENh52+JxIhg
-         hQtxpiUsniJJOQTyBtv1/pHDbvYreZsB1auNOmJRtmJFmq7uYI+n4U6Ua6mVGsKfpuir
-         yX0D/+UYs7gpRFk8nBNsd6lu/EwqHmv7nF7RfuJjpD2uBRsPWInUnKzr7Xp4r6WhWiu9
-         ThNCChaay6KCKcZwsbBKq2kLAmidk7CQ0eSU3lqjcPXLcyeW0y3dt+mgjQuBaZhYr1qH
-         FB06JyxeJLfloW8cN90wy7B0x2InTFdxQgAgDL5X8sjdrbE+mTvEXxBjYdwcaLqchwAg
-         eUTw==
-X-Gm-Message-State: AOJu0Yx5IPE7J1cCbsiHMueL5sQTeg+oz5ZbF0ShgzVTWvNu96gglRu7
-	fnyW6qoyheGbcS7Lfp+pPl8p2ZgnHJRTzent5FixgQ==
-X-Google-Smtp-Source: AGHT+IGoTN2C4roNtrSYRKYUnUYawQW/M1P5VhRIdVvftnv9XfoPjBlGSftc3z1ZNzMixxESHb0DkQ==
-X-Received: by 2002:a17:90a:fb83:b0:27d:4129:ecd9 with SMTP id cp3-20020a17090afb8300b0027d4129ecd9mr2595pjb.26.1697164060876;
-        Thu, 12 Oct 2023 19:27:40 -0700 (PDT)
+        bh=9AlSt/UmPpPe6qrtiCDOOfX5E4Znn3Anpv8O+XesUkY=;
+        b=Q6BG6Rx3T1bfps5/1LIc4OKUvD0hBRqlT4dSkx4AjkFtVx4aVN5VrcWQebaKloFfzG
+         Mow65p9lF7U4+Pylvv7qxv3z+0F/Pgsm78munokfVj66d4PSBv+VXn2qEP881B8G8Q8d
+         y+zl8rSc2SM0ftXgjUg2IqLNR8hj1FZnM+emVDJbwsFDamjzfkhqRLy/qT4jHrlPuuyA
+         ul317ifB+3QAfTb55afQyPpvOl53kP3fEXtbsgr57yd0jXSLpie3oWNH3bcT+PyLwleK
+         e7RCYqvLPz8n7vxFxTX42s1jqSLh6B8CctYuknI7iXAXvhdz6t8br9QpAscsLUfyhXDl
+         NjMQ==
+X-Gm-Message-State: AOJu0YzT8uxAkE4Dk0NiiqhmzYpxEhshE3zJZtG/+Fyr6Ui0RTRa4RPV
+	YnxqAIaUOh2k3oRVPPFVM3/v5Q==
+X-Google-Smtp-Source: AGHT+IHH3S84jjyAAYr9ohOLASSdFKUdZmxPJl7BDa8RTAh3YuPi9ZQk+GpkCGTRwxLvo8btmJvx2g==
+X-Received: by 2002:a05:6358:9691:b0:164:8742:525 with SMTP id o17-20020a056358969100b0016487420525mr21597307rwa.17.1697164257258;
+        Thu, 12 Oct 2023 19:30:57 -0700 (PDT)
 Received: from hermes.local (204-195-126-68.wavecable.com. [204.195.126.68])
-        by smtp.gmail.com with ESMTPSA id gm14-20020a17090b100e00b0027d06ddc06bsm2490510pjb.33.2023.10.12.19.27.40
+        by smtp.gmail.com with ESMTPSA id u204-20020a6279d5000000b006b1e8f17b85sm379297pfc.201.2023.10.12.19.30.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Oct 2023 19:27:40 -0700 (PDT)
-Date: Thu, 12 Oct 2023 19:27:38 -0700
+        Thu, 12 Oct 2023 19:30:57 -0700 (PDT)
+Date: Thu, 12 Oct 2023 19:30:54 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Vladimir Oltean <olteanv@gmail.com>
 Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
@@ -69,14 +69,14 @@ Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
  <bcm-kernel-feedback-list@broadcom.com>, "open list:ARM/Mediatek SoC
  support" <linux-kernel@vger.kernel.org>, "moderated list:ARM/Mediatek SoC
  support" <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH net-next v2 1/2] net: dsa: Use conduit and user terms
-Message-ID: <20231012192738.34ed1f19@hermes.local>
-In-Reply-To: <20231012231029.tqz3e5dnlvbmcmja@skbuf>
+Subject: Re: [PATCH net-next v2 2/2] net: dsa: Rename IFLA_DSA_MASTER to
+ IFLA_DSA_CONDUIT
+Message-ID: <20231012193054.4c6759fe@hermes.local>
+In-Reply-To: <20231012231345.3thxxxhe7pxs5bib@skbuf>
 References: <20231011222026.4181654-1-florian.fainelli@broadcom.com>
-	<20231011222026.4181654-1-florian.fainelli@broadcom.com>
-	<20231011222026.4181654-2-florian.fainelli@broadcom.com>
-	<20231011222026.4181654-2-florian.fainelli@broadcom.com>
-	<20231012231029.tqz3e5dnlvbmcmja@skbuf>
+	<20231011222026.4181654-3-florian.fainelli@broadcom.com>
+	<20231011163003.32036b28@hermes.local>
+	<20231012231345.3thxxxhe7pxs5bib@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,20 +91,34 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 13 Oct 2023 02:10:29 +0300
+On Fri, 13 Oct 2023 02:13:45 +0300
 Vladimir Oltean <olteanv@gmail.com> wrote:
 
-> >  Secondly, it is possible to perform load balancing between CPU ports on a per
-> >  packet basis, rather than statically assigning user ports to CPU ports.
-> > -This can be achieved by placing the DSA masters under a LAG interface (bonding
-> > +This can be achieved by placing the DSA conduits under a LAG interface (bonding
-> >  or team). DSA monitors this operation and creates a mirror of this software LAG
-> > -on the CPU ports facing the physical DSA masters that constitute the LAG slave
-> > +on the CPU ports facing the physical DSA conduits that constitute the LAG user  
+> > I don't know if it would be acceptable in the kernel UAPI but what
+> > we did in DPDK for similar situation to cause warning on use of deprecated value.
+> > 
+> > /**
+> >  *  Macro to mark macros and defines scheduled for removal
+> >  */
+> > #if defined(RTE_CC_GCC) || defined(RTE_CC_CLANG)
+> > #define RTE_PRAGMA(x)  _Pragma(#x)
+> > #define RTE_PRAGMA_WARNING(w) RTE_PRAGMA(GCC warning #w)
+> > #define RTE_DEPRECATED(x)  RTE_PRAGMA_WARNING(#x is deprecated)
+> > #else
+> > #define RTE_DEPRECATED(x)
+> > #endif
+> > 
+> > ...
+> > #define RTE_DEV_WHITELISTED \
+> > 	RTE_DEPRECATED(RTE_DEV_WHITELISTED) RTE_DEV_ALLOWED
+> > #define RTE_DEV_BLACKLISTED \
+> > 	RTE_DEPRECATED(RTE_DEV_BLACKLISTED) RTE_DEV_BLOCKED  
 > 
-> Replacing "LAG slave devices" with "LAG user devices" wasn't warranted,
-> and it alters the meaning.
+> What precedent exists in terms of intentionally breaking kernel headers?
+> If none, would this create one?
 
-The term slave is not in the IEEE 802 standard.
-Most other implementations use member instead of slave.
+It would cause warning, and most applications builds don't fail because of warning.
+Kernel already has __diag_warn macro which is similar, but see no usages of it.
+My comment was more of a "what if", probably not practical since it would just
+fuel lots of angry user feedback.
 
