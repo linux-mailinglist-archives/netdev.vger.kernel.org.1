@@ -1,213 +1,181 @@
-Return-Path: <netdev+bounces-40656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E172F7C82B8
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:06:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08FC97C82C4
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10E2CB207CF
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 10:06:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90B90282B10
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 10:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA2A11C8D;
-	Fri, 13 Oct 2023 10:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C72D11CA1;
+	Fri, 13 Oct 2023 10:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="CQ0eK1bX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lna7iAfu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5DCD279
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 10:06:23 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCAAAD;
-	Fri, 13 Oct 2023 03:06:20 -0700 (PDT)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39DA5vQB089050;
-	Fri, 13 Oct 2023 05:05:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1697191558;
-	bh=afm5I4zNUAuNxC8GzJdXHOSHi6pcLExp9ZdF1yWwCUQ=;
-	h=From:To:CC:Subject:Date;
-	b=CQ0eK1bXU7jTJa6ntX1Xpc7aWO/5mUpdmR+zkOVpl4p/fG/CSrsduxclIA1djicVV
-	 tJEgOFonTX5Ei/QUoSvGVpS4piUk8ETvX+BIqDRMo2Kl7gAZWCX9GzWR7CDIRVbOut
-	 S4qM3gcaNpb/yamM+dppZ1Ml4aI2zL0ASR3owiG8=
-Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39DA5v47007810
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 13 Oct 2023 05:05:57 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 13
- Oct 2023 05:05:57 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 13 Oct 2023 05:05:57 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39DA5vJC124553;
-	Fri, 13 Oct 2023 05:05:57 -0500
-Received: from localhost (dhcp-10-24-69-31.dhcp.ti.com [10.24.69.31])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 39DA5uUH007169;
-	Fri, 13 Oct 2023 05:05:56 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Simon Horman <horms@kernel.org>, Roger
- Quadros <rogerq@ti.com>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        MD Danish
- Anwar <danishanwar@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <srk@ti.com>,
-        <r-gunasekaran@ti.com>, Roger Quadros <rogerq@kernel.org>
-Subject: [PATCH net] net: ethernet: ti: Fix mixed module-builtin object
-Date: Fri, 13 Oct 2023 15:35:49 +0530
-Message-ID: <20231013100549.3198564-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5894B11C8D;
+	Fri, 13 Oct 2023 10:14:28 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4B81AD;
+	Fri, 13 Oct 2023 03:14:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1697192066; x=1728728066;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XFoqaJbduqLCyl9DPecY1ECvrkqVkONk2hKheDsUmwo=;
+  b=lna7iAfuP3cluWanA94OG3qQBcTREM2x+4gawebfKypVwOA+sPgSchoB
+   s7JFpUbqPCFM0nRAlDIxYDVzF8VYziq0/5A3N6t00T4lUdRY21zkhQ/IM
+   R5L4vesF50vxt6ZqYBxrUVs2+8i/HmpCNykBKoP/YPBRYjSvody3Ui9up
+   Tru6AnoFlzs5YGw5+iwZhIW/wlQy7u/NpD74YPSHBz6xPFhoVibqbM+L/
+   iu+KB6FmBa8pS/WSkP0kJt573A292uaVkafoCzLFSP6R9MA4xuyX044KT
+   HxmVuGZ82yawFwwzeNcfJLvGjZQdWsAbHRp49Kx/B2UJjQCPMMHelzx0w
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="416202068"
+X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
+   d="scan'208";a="416202068"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2023 03:14:26 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10861"; a="754653480"
+X-IronPort-AV: E=Sophos;i="6.03,221,1694761200"; 
+   d="scan'208";a="754653480"
+Received: from lkp-server02.sh.intel.com (HELO f64821696465) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 13 Oct 2023 03:14:18 -0700
+Received: from kbuild by f64821696465 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qrFBQ-0004cX-1O;
+	Fri, 13 Oct 2023 10:14:16 +0000
+Date: Fri, 13 Oct 2023 18:13:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	virtualization@lists.linux-foundation.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost 11/22] virtio_net: sq support premapped mode
+Message-ID: <202310131711.QjbkIwe0-lkp@intel.com>
+References: <20231011092728.105904-12-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_PASS,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231011092728.105904-12-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-With CONFIG_TI_K3_AM65_CPSW_NUSS=y and CONFIG_TI_ICSSG_PRUETH=m,
-k3-cppi-desc-pool.o is linked to a module and also to vmlinux even though
-the expected CFLAGS are different between builtins and modules.
+Hi Xuan,
 
-The build system is complaining about the following:
+kernel test robot noticed the following build warnings:
 
-k3-cppi-desc-pool.o is added to multiple modules: icssg-prueth
-ti-am65-cpsw-nuss
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.6-rc5 next-20231013]
+[cannot apply to mst-vhost/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Introduce the new module, k3-cppi-desc-pool, to provide the common
-functions to ti-am65-cpsw-nuss and icssg-prueth.
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_ring-virtqueue_set_dma_premapped-support-disable/20231011-180709
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20231011092728.105904-12-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH vhost 11/22] virtio_net: sq support premapped mode
+config: parisc-randconfig-001-20231013 (https://download.01.org/0day-ci/archive/20231013/202310131711.QjbkIwe0-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231013/202310131711.QjbkIwe0-lkp@intel.com/reproduce)
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/Kconfig             | 5 +++++
- drivers/net/ethernet/ti/Makefile            | 7 ++++---
- drivers/net/ethernet/ti/k3-cppi-desc-pool.c | 7 +++++++
- 3 files changed, 16 insertions(+), 3 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202310131711.QjbkIwe0-lkp@intel.com/
 
-diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-index 0784a3d0bbff..e60b557d59b9 100644
---- a/drivers/net/ethernet/ti/Kconfig
-+++ b/drivers/net/ethernet/ti/Kconfig
-@@ -90,12 +90,16 @@ config TI_CPTS
- 	  The unit can time stamp PTP UDP/IPv4 and Layer 2 packets, and the
- 	  driver offers a PTP Hardware Clock.
- 
-+config TI_K3_CPPI_DESC_POOL
-+	tristate
-+
- config TI_K3_AM65_CPSW_NUSS
- 	tristate "TI K3 AM654x/J721E CPSW Ethernet driver"
- 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
- 	select NET_DEVLINK
- 	select TI_DAVINCI_MDIO
- 	select PHYLINK
-+	select TI_K3_CPPI_DESC_POOL
- 	imply PHY_TI_GMII_SEL
- 	depends on TI_K3_AM65_CPTS || !TI_K3_AM65_CPTS
- 	help
-@@ -180,6 +184,7 @@ config TI_ICSSG_PRUETH
- 	tristate "TI Gigabit PRU Ethernet driver"
- 	select PHYLIB
- 	select TI_ICSS_IEP
-+	select TI_K3_CPPI_DESC_POOL
- 	depends on PRU_REMOTEPROC
- 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
- 	help
-diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-index e38ec9d6c99b..27de1d697134 100644
---- a/drivers/net/ethernet/ti/Makefile
-+++ b/drivers/net/ethernet/ti/Makefile
-@@ -23,14 +23,15 @@ keystone_netcp-y := netcp_core.o cpsw_ale.o
- obj-$(CONFIG_TI_KEYSTONE_NETCP_ETHSS) += keystone_netcp_ethss.o
- keystone_netcp_ethss-y := netcp_ethss.o netcp_sgmii.o netcp_xgbepcsr.o cpsw_ale.o
- 
-+obj-$(CONFIG_TI_K3_CPPI_DESC_POOL) += k3-cppi-desc-pool.o
-+
- obj-$(CONFIG_TI_K3_AM65_CPSW_NUSS) += ti-am65-cpsw-nuss.o
--ti-am65-cpsw-nuss-y := am65-cpsw-nuss.o cpsw_sl.o am65-cpsw-ethtool.o cpsw_ale.o k3-cppi-desc-pool.o am65-cpsw-qos.o
-+ti-am65-cpsw-nuss-y := am65-cpsw-nuss.o cpsw_sl.o am65-cpsw-ethtool.o cpsw_ale.o am65-cpsw-qos.o
- ti-am65-cpsw-nuss-$(CONFIG_TI_K3_AM65_CPSW_SWITCHDEV) += am65-cpsw-switchdev.o
- obj-$(CONFIG_TI_K3_AM65_CPTS) += am65-cpts.o
- 
- obj-$(CONFIG_TI_ICSSG_PRUETH) += icssg-prueth.o
--icssg-prueth-y := k3-cppi-desc-pool.o \
--		  icssg/icssg_prueth.o \
-+icssg-prueth-y := icssg/icssg_prueth.o \
- 		  icssg/icssg_classifier.o \
- 		  icssg/icssg_queues.o \
- 		  icssg/icssg_config.o \
-diff --git a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c b/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
-index 38cc12f9f133..1d9b456edff4 100644
---- a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
-+++ b/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
-@@ -39,6 +39,7 @@ void k3_cppi_desc_pool_destroy(struct k3_cppi_desc_pool *pool)
- 
- 	gen_pool_destroy(pool->gen_pool);	/* frees pool->name */
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_destroy);
- 
- struct k3_cppi_desc_pool *
- k3_cppi_desc_pool_create_name(struct device *dev, size_t size,
-@@ -98,29 +99,35 @@ k3_cppi_desc_pool_create_name(struct device *dev, size_t size,
- 	devm_kfree(pool->dev, pool);
- 	return ERR_PTR(ret);
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_create_name);
- 
- dma_addr_t k3_cppi_desc_pool_virt2dma(struct k3_cppi_desc_pool *pool,
- 				      void *addr)
- {
- 	return addr ? pool->dma_addr + (addr - pool->cpumem) : 0;
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_virt2dma);
- 
- void *k3_cppi_desc_pool_dma2virt(struct k3_cppi_desc_pool *pool, dma_addr_t dma)
- {
- 	return dma ? pool->cpumem + (dma - pool->dma_addr) : NULL;
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_dma2virt);
- 
- void *k3_cppi_desc_pool_alloc(struct k3_cppi_desc_pool *pool)
- {
- 	return (void *)gen_pool_alloc(pool->gen_pool, pool->desc_size);
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_alloc);
- 
- void k3_cppi_desc_pool_free(struct k3_cppi_desc_pool *pool, void *addr)
- {
- 	gen_pool_free(pool->gen_pool, (unsigned long)addr, pool->desc_size);
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_free);
- 
- size_t k3_cppi_desc_pool_avail(struct k3_cppi_desc_pool *pool)
- {
- 	return gen_pool_avail(pool->gen_pool) / pool->desc_size;
- }
-+EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_avail);
+All warnings (new ones prefixed by >>):
 
-base-commit: e8c127b0576660da9195504fe8393fe9da3de9ce
+   In file included from drivers/net/virtio/main.c:25:
+   drivers/net/virtio/virtio_net.h: In function 'virtnet_sq_unmap':
+>> drivers/net/virtio/virtio_net.h:235:25: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     235 |         head = (void *)((u64)data & ~VIRTIO_XMIT_DATA_MASK);
+         |                         ^
+>> drivers/net/virtio/virtio_net.h:235:16: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+     235 |         head = (void *)((u64)data & ~VIRTIO_XMIT_DATA_MASK);
+         |                ^
+   drivers/net/virtio/main.c: In function 'virtnet_sq_map_sg':
+>> drivers/net/virtio/main.c:600:25: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     600 |         return (void *)((u64)head | ((u64)data & VIRTIO_XMIT_DATA_MASK));
+         |                         ^
+   drivers/net/virtio/main.c:600:38: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     600 |         return (void *)((u64)head | ((u64)data & VIRTIO_XMIT_DATA_MASK));
+         |                                      ^
+>> drivers/net/virtio/main.c:600:16: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+     600 |         return (void *)((u64)head | ((u64)data & VIRTIO_XMIT_DATA_MASK));
+         |                ^
+   drivers/net/virtio/main.c: In function 'virtnet_find_vqs':
+   drivers/net/virtio/main.c:3977:48: warning: '%d' directive writing between 1 and 11 bytes into a region of size 10 [-Wformat-overflow=]
+    3977 |                 sprintf(vi->rq[i].name, "input.%d", i);
+         |                                                ^~
+   drivers/net/virtio/main.c:3977:41: note: directive argument in the range [-2147483641, 65534]
+    3977 |                 sprintf(vi->rq[i].name, "input.%d", i);
+         |                                         ^~~~~~~~~~
+   drivers/net/virtio/main.c:3977:17: note: 'sprintf' output between 8 and 18 bytes into a destination of size 16
+    3977 |                 sprintf(vi->rq[i].name, "input.%d", i);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/virtio/main.c:3978:49: warning: '%d' directive writing between 1 and 11 bytes into a region of size 9 [-Wformat-overflow=]
+    3978 |                 sprintf(vi->sq[i].name, "output.%d", i);
+         |                                                 ^~
+   drivers/net/virtio/main.c:3978:41: note: directive argument in the range [-2147483641, 65534]
+    3978 |                 sprintf(vi->sq[i].name, "output.%d", i);
+         |                                         ^~~~~~~~~~~
+   drivers/net/virtio/main.c:3978:17: note: 'sprintf' output between 9 and 19 bytes into a destination of size 16
+    3978 |                 sprintf(vi->sq[i].name, "output.%d", i);
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +235 drivers/net/virtio/virtio_net.h
+
+   230	
+   231	static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
+   232	{
+   233		struct virtnet_sq_dma *next, *head;
+   234	
+ > 235		head = (void *)((u64)data & ~VIRTIO_XMIT_DATA_MASK);
+   236	
+   237		data = head->data;
+   238	
+   239		while (head) {
+   240			virtqueue_dma_unmap_page_attrs(sq->vq, head->addr, head->len, DMA_TO_DEVICE, 0);
+   241	
+   242			next = head->next;
+   243	
+   244			head->next = sq->dmainfo.free;
+   245			sq->dmainfo.free = head;
+   246	
+   247			head = next;
+   248		}
+   249	
+   250		return data;
+   251	}
+   252	
+
 -- 
-2.34.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
