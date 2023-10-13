@@ -1,452 +1,281 @@
-Return-Path: <netdev+bounces-40869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D266B7C8F1B
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:31:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7799A7C8F94
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8841C28233F
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:31:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916801C20A83
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 21:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D770266A0;
-	Fri, 13 Oct 2023 21:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAC0273F9;
+	Fri, 13 Oct 2023 21:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="W3F9nVQ1"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="boJS4Eoe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A774241FF
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 21:31:33 +0000 (UTC)
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFC6B7
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1697232686; x=1697491886;
-	bh=xFnu/cVH22vc/MtKK0j1gDECBOUmGrUdl9GeHISpbck=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=W3F9nVQ1dq1l3UiNwNnSjWKoT92xd0S5C8qsclAE9yYse+FohNjFJ5kqOAkD7Mtmn
-	 N3W8q8is56KmnmHl3i8o2fLgoeM0HXaJaFcJJ9zGeSEhsX5LbtfKSArpxHRUXV3bQ+
-	 9awwW7gnfP2On7f3Alve2c2x/zYbNM4ekLG8QIhRh7PMXoqBZdwU/brm5sUC9okh1P
-	 z9qPkdXPV1uNcdsBv2/n61LVyUQRRESYeFUb7ITzj03x8C9dzf8CXhTy4a8s4gY8OX
-	 1RtThBiefXetfH8ocyQJyJviR0ZTEMrQB84Bl+RuWoaIyt+DvhFdWuVCvWksDTlrY3
-	 FHg/ldAmBzUYQ==
-Date: Fri, 13 Oct 2023 21:31:16 +0000
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu, boqun.feng@gmail.com, wedsonaf@gmail.com, greg@kroah.com
-Subject: Re: [PATCH net-next v4 1/4] rust: core abstractions for network PHY drivers
-Message-ID: <85d5c498-efbc-4c1a-8d12-f1eca63c45cf@proton.me>
-In-Reply-To: <20231012125349.2702474-2-fujita.tomonori@gmail.com>
-References: <20231012125349.2702474-1-fujita.tomonori@gmail.com> <20231012125349.2702474-2-fujita.tomonori@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC40262B0
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 21:52:57 +0000 (UTC)
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D1FBE
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:52:56 -0700 (PDT)
+Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-66afd39c8edso14914316d6.2
+        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:52:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1697233975; x=1697838775; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=h2UM+e5Hz313WNrOikZkpR+/NxtDtn6HF9/lMMMbJ1k=;
+        b=boJS4Eoe/2eARvdn9YzpEdMAux0zUpmTif39mGCdT0VIj/HnAok68F2+OsTS1eu2Ep
+         9TtCf1pB30l4iygRM5kWHLnZZu/KtYHnn3Gb6Mhvvt2KPhG5SQ1hSoUHJ2I90i7Jq/ZF
+         KS4RXb4TxygOXSaR2r4ZUjtmPXJpJb9WzduMo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697233975; x=1697838775;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h2UM+e5Hz313WNrOikZkpR+/NxtDtn6HF9/lMMMbJ1k=;
+        b=Ug/p6tRSLoCZvJqoIgPywTO4rDs530kTShWvmAmoGvshrPAHqy/v3wPJ6+A/IGUtEu
+         zf9PZq2gLcCTYTJZ89L5seNRGjT1E1cdxnB/PmTzmKkHlvp8IIoT8t10rZNP0gAnYl3J
+         jLJzj8F1+L1RQj8TAmn8RkCj9hdP0jzAkFKVz7MhFMyl6nL0/jX0Of4G1N978Zp043vU
+         WOOJ6ljtmeLSH8EigPMbEqHcMa3Mo3rxCNEI5GWYE16CwXAWXwHnKEothCdpINJzzvuY
+         z7rcKWGFJYYiY5qHyb4SqR79/6cOwQwjXQxm6jZ5JmB/Rc9Zxzrhu43b/vX4e0Pxmf2D
+         0Rfw==
+X-Gm-Message-State: AOJu0YwpNs6KDaca1Gf793YFo4uiVy0Ey6Rt0D0afzeyu2ChkoOGq88r
+	/TTk9rH88S7BABeIzpitBAjr+4/0rJ5VMPPOXioZSRTSl92rXh0zptxaMxsnDd0fB4vZDp8m0Uo
+	1xuLnzScCc3UfPyFbW2uldHeZ06T/ECyBd6Ia4ufzD7zVMc3UPtGeOKPB8+hFMeZqXb4R9R1akU
+	H3rJrELCU4Wg==
+X-Google-Smtp-Source: AGHT+IGvolrTSuur7kHoyJkoUsShsSJLY4cBLb/turbAyFsP4hpckyhJtZ81KaO0i+qHQQNMqSQBlA==
+X-Received: by 2002:a05:6214:27ed:b0:66d:1b3a:481e with SMTP id jt13-20020a05621427ed00b0066d1b3a481emr6624061qvb.6.1697233974972;
+        Fri, 13 Oct 2023 14:52:54 -0700 (PDT)
+Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id y11-20020a0cf14b000000b0066d0621bb67sm1005295qvl.114.2023.10.13.14.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 14:52:54 -0700 (PDT)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	linux-kernel@vger.kernel.org (open list:ARM/Mediatek SoC support),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/Mediatek SoC support)
+Subject: [PATCH net-next v3 0/2] Switch DSA to inclusive terminology
+Date: Fri, 13 Oct 2023 14:52:49 -0700
+Message-Id: <20231013215251.152912-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000333c6e0607a014d4"
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 12.10.23 14:53, FUJITA Tomonori wrote:
-> This patch adds abstractions to implement network PHY drivers; the
-> driver registration and bindings for some of callback functions in
-> struct phy_driver and many genphy_ functions.
->=20
-> This feature is enabled with CONFIG_RUST_PHYLIB_ABSTRACTIONS=3Dy.
->=20
-> This patch enables unstable const_maybe_uninit_zeroed feature for
-> kernel crate to enable unsafe code to handle a constant value with
-> uninitialized data. With the feature, the abstractions can initialize
-> a phy_driver structure with zero easily; instead of initializing all
-> the members by hand. It's supposed to be stable in the not so distant
-> future.
->=20
-> Link: https://github.com/rust-lang/rust/pull/116218
->=20
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->   init/Kconfig                    |   8 +
->   rust/Makefile                   |   1 +
->   rust/bindings/bindings_helper.h |   3 +
->   rust/kernel/lib.rs              |   3 +
->   rust/kernel/net.rs              |   6 +
->   rust/kernel/net/phy.rs          | 679 ++++++++++++++++++++++++++++++++
->   6 files changed, 700 insertions(+)
->   create mode 100644 rust/kernel/net.rs
->   create mode 100644 rust/kernel/net/phy.rs
->=20
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 6d35728b94b2..0fc6f5568748 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -1903,6 +1903,14 @@ config RUST
->=20
->   =09  If unsure, say N.
->=20
-> +config RUST_PHYLIB_ABSTRACTIONS
-> +        bool "PHYLIB abstractions support"
-> +        depends on RUST
-> +        depends on PHYLIB=3Dy
-> +        help
-> +          Adds support needed for PHY drivers written in Rust. It provid=
-es
-> +          a wrapper around the C phylib core.
-> +
+--000000000000333c6e0607a014d4
+Content-Transfer-Encoding: 8bit
 
-I find it a bit weird that this is its own option under "General". I think
-it would be reasonable to put it under "Rust", since that would also scale
-better when other subsystems do this.
+One of the action items following Netconf'23 is to switch subsystems to
+use inclusive terminology. DSA has been making extensive use of the
+"master" and "slave" words which are now replaced by "conduit" and
+"user" respectively.
 
->   config RUSTC_VERSION_TEXT
->   =09string
->   =09depends on RUST
-> diff --git a/rust/Makefile b/rust/Makefile
-> index 87958e864be0..f67e55945b36 100644
-> --- a/rust/Makefile
-> +++ b/rust/Makefile
-> @@ -331,6 +331,7 @@ quiet_cmd_bindgen =3D BINDGEN $@
->         cmd_bindgen =3D \
->   =09$(BINDGEN) $< $(bindgen_target_flags) \
->   =09=09--use-core --with-derive-default --ctypes-prefix core::ffi --no-l=
-ayout-tests \
-> +=09=09--rustified-enum phy_state\
+Changes in v3:
+- properly align arguments with the changed function names
+- ensure markup delimiters lengths are corrected to the name word length
+- maintain the existing wording about LAG devices
 
-Please change this to Miguel's solution.
+Changes in v2:
 
->   =09=09--no-debug '.*' \
->   =09=09-o $@ -- $(bindgen_c_flags_final) -DMODULE \
->   =09=09$(bindgen_target_cflags) $(bindgen_target_extra)
+- addressed kbuild test robots reports
+- preserve capitalization where relevant
+- fixed build error in mtk_ppe_offload.c
 
-[...]
+Florian Fainelli (2):
+  net: dsa: Use conduit and user terms
+  net: dsa: Rename IFLA_DSA_MASTER to IFLA_DSA_CONDUIT
 
-> +/// An instance of a PHY device.
-> +///
-> +/// Wraps the kernel's `struct phy_device`.
-> +///
-> +/// # Invariants
-> +///
-> +/// `self.0` is always in a valid state.
-> +#[repr(transparent)]
-> +pub struct Device(Opaque<bindings::phy_device>);
-> +
-> +impl Device {
-> +    /// Creates a new [`Device`] instance from a raw pointer.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// This function can be called only in the callbacks in `phy_driver=
-`. PHYLIB guarantees
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |    2 +-
+ Documentation/networking/dsa/b53.rst          |   14 +-
+ Documentation/networking/dsa/bcm_sf2.rst      |    2 +-
+ .../networking/dsa/configuration.rst          |  102 +-
+ Documentation/networking/dsa/dsa.rst          |  156 +-
+ Documentation/networking/dsa/lan9303.rst      |    2 +-
+ Documentation/networking/dsa/sja1105.rst      |    6 +-
+ .../dts/marvell/armada-3720-espressobin.dtsi  |    2 +-
+ drivers/net/dsa/b53/b53_common.c              |    4 +-
+ drivers/net/dsa/b53/b53_mdio.c                |    2 +-
+ drivers/net/dsa/bcm_sf2.c                     |   36 +-
+ drivers/net/dsa/bcm_sf2.h                     |    2 +-
+ drivers/net/dsa/bcm_sf2_cfp.c                 |    4 +-
+ drivers/net/dsa/lan9303-core.c                |    4 +-
+ drivers/net/dsa/lantiq_gswip.c                |   34 +-
+ drivers/net/dsa/microchip/ksz9477.c           |    6 +-
+ drivers/net/dsa/microchip/ksz_common.c        |   20 +-
+ drivers/net/dsa/microchip/ksz_ptp.c           |    2 +-
+ drivers/net/dsa/mt7530.c                      |   16 +-
+ drivers/net/dsa/mv88e6xxx/chip.c              |    2 +-
+ drivers/net/dsa/ocelot/felix.c                |   68 +-
+ drivers/net/dsa/ocelot/felix.h                |    6 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c              |   50 +-
+ drivers/net/dsa/qca/qca8k-common.c            |    2 +-
+ drivers/net/dsa/qca/qca8k-leds.c              |    6 +-
+ drivers/net/dsa/qca/qca8k.h                   |    2 +-
+ drivers/net/dsa/realtek/realtek-smi.c         |   28 +-
+ drivers/net/dsa/realtek/realtek.h             |    2 +-
+ drivers/net/dsa/sja1105/sja1105_main.c        |    4 +-
+ drivers/net/dsa/xrs700x/xrs700x.c             |   12 +-
+ drivers/net/ethernet/broadcom/bcmsysport.c    |    2 +-
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c   |    2 +-
+ .../net/ethernet/mediatek/mtk_ppe_offload.c   |    2 +-
+ include/linux/dsa/sja1105.h                   |    2 +-
+ include/net/dsa.h                             |   56 +-
+ include/net/dsa_stubs.h                       |   22 +-
+ include/uapi/linux/if_link.h                  |    4 +-
+ net/core/dev_ioctl.c                          |    2 +-
+ net/dsa/Makefile                              |    6 +-
+ net/dsa/{master.c => conduit.c}               |  118 +-
+ net/dsa/conduit.h                             |   22 +
+ net/dsa/dsa.c                                 |  222 +--
+ net/dsa/dsa.h                                 |   12 +-
+ net/dsa/master.h                              |   22 -
+ net/dsa/netlink.c                             |   22 +-
+ net/dsa/port.c                                |  124 +-
+ net/dsa/port.h                                |    4 +-
+ net/dsa/slave.h                               |   69 -
+ net/dsa/switch.c                              |   18 +-
+ net/dsa/switch.h                              |    4 +-
+ net/dsa/tag.c                                 |   10 +-
+ net/dsa/tag.h                                 |   26 +-
+ net/dsa/tag_8021q.c                           |   22 +-
+ net/dsa/tag_8021q.h                           |    2 +-
+ net/dsa/tag_ar9331.c                          |    4 +-
+ net/dsa/tag_brcm.c                            |   14 +-
+ net/dsa/tag_dsa.c                             |    6 +-
+ net/dsa/tag_gswip.c                           |    4 +-
+ net/dsa/tag_hellcreek.c                       |    4 +-
+ net/dsa/tag_ksz.c                             |   12 +-
+ net/dsa/tag_lan9303.c                         |    4 +-
+ net/dsa/tag_mtk.c                             |    4 +-
+ net/dsa/tag_none.c                            |    6 +-
+ net/dsa/tag_ocelot.c                          |   22 +-
+ net/dsa/tag_ocelot_8021q.c                    |   12 +-
+ net/dsa/tag_qca.c                             |    6 +-
+ net/dsa/tag_rtl4_a.c                          |    6 +-
+ net/dsa/tag_rtl8_4.c                          |    6 +-
+ net/dsa/tag_rzn1_a5psw.c                      |    4 +-
+ net/dsa/tag_sja1105.c                         |   30 +-
+ net/dsa/tag_trailer.c                         |    4 +-
+ net/dsa/tag_xrs700x.c                         |    4 +-
+ net/dsa/{slave.c => user.c}                   | 1462 ++++++++---------
+ net/dsa/user.h                                |   69 +
+ 74 files changed, 1539 insertions(+), 1537 deletions(-)
+ rename net/dsa/{master.c => conduit.c} (76%)
+ create mode 100644 net/dsa/conduit.h
+ delete mode 100644 net/dsa/master.h
+ delete mode 100644 net/dsa/slave.h
+ rename net/dsa/{slave.c => user.c} (62%)
+ create mode 100644 net/dsa/user.h
 
-"can be called in" -> "must only be called from"
+-- 
+2.34.1
 
-> +    /// the exclusive access for the duration of the lifetime `'a`.
 
-In some other thread you mentioned that no lock is held for
-`resume`/`suspend`, how does this interact with it?
+--000000000000333c6e0607a014d4
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> +    unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Se=
-lf {
-> +        // SAFETY: The safety requirements guarantee the validity of the=
- dereference, while the
-> +        // `Device` type being transparent makes the cast ok.
-> +        unsafe { &mut *ptr.cast() }
-
-please refactor to
-
-     // CAST: ...
-     let ptr =3D ptr.cast::<Self>();
-     // SAFETY: ...
-     unsafe { &mut *ptr }
-
-> +    }
-
-[...]
-
-> +    /// Returns true if auto-negotiation is completed.
-> +    pub fn is_autoneg_completed(&self) -> bool {
-> +        const AUTONEG_COMPLETED: u32 =3D 1;
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        let phydev =3D unsafe { *self.0.get() };
-> +        phydev.autoneg_complete() =3D=3D AUTONEG_COMPLETED
-> +    }
-> +
-> +    /// Sets the speed of the PHY.
-> +    pub fn set_speed(&self, speed: u32) {
-
-This function modifies state, but is `&self`?
-
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        let mut phydev =3D unsafe { *self.0.get() };
-> +        phydev.speed =3D speed as i32;
-> +    }
-> +
-> +    /// Sets duplex mode.
-> +    pub fn set_duplex(&self, mode: DuplexMode) {
-
-This function modifies state, but is `&self`?
-
-> +        let v =3D match mode {
-> +            DuplexMode::Full =3D> bindings::DUPLEX_FULL as i32,
-> +            DuplexMode::Half =3D> bindings::DUPLEX_HALF as i32,
-> +            DuplexMode::Unknown =3D> bindings::DUPLEX_UNKNOWN as i32,
-> +        };
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        let mut phydev =3D unsafe { *self.0.get() };
-> +        phydev.duplex =3D v;
-
-Note that this piece of code will actually not do the correct thing. It
-will create a copy of `phydev` on the stack and modify that instead of the
-pointee of `self`. I think the code was fine before this change.
-
-> +    }
-> +
-> +    /// Reads a given C22 PHY register.
-> +    pub fn read(&self, regnum: u16) -> Result<u16> {
-
-No idea if this function should be `&mut self` or `&self`. Would
-it be ok for mutltiple threads to call this function concurrently?
-If yes, then leave it as `&self`, if no then change it to `&mut self`.
-
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        let ret =3D unsafe {
-> +            bindings::mdiobus_read((*phydev).mdio.bus, (*phydev).mdio.ad=
-dr, regnum.into())
-> +        };
-> +        if ret < 0 {
-> +            Err(Error::from_errno(ret))
-> +        } else {
-> +            Ok(ret as u16)
-> +        }
-> +    }
-> +
-> +    /// Writes a given C22 PHY register.
-> +    pub fn write(&self, regnum: u16, val: u16) -> Result {
-
-This should probably be `&mut self`, but not sure.
-
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        to_result(unsafe {
-> +            bindings::mdiobus_write((*phydev).mdio.bus, (*phydev).mdio.a=
-ddr, regnum.into(), val)
-> +        })
-> +    }
-> +
-> +    /// Reads a paged register.
-> +    pub fn read_paged(&self, page: u16, regnum: u16) -> Result<u16> {
-
-Again same question (also for all other functions below that call the C
-side).
-
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So an FFI call with a valid pointer.
-> +        let ret =3D unsafe { bindings::phy_read_paged(phydev, page.into(=
-), regnum.into()) };
-> +        if ret < 0 {
-> +            Err(Error::from_errno(ret))
-> +        } else {
-> +            Ok(ret as u16)
-> +        }
-> +    }
-
-[...]
-
-> +}
-> +
-> +/// Defines certain other features this PHY supports (like interrupts).
-
-Maybe add a link where these flags can be used.
-
-> +pub mod flags {
-> +    /// PHY is internal.
-> +    pub const IS_INTERNAL: u32 =3D bindings::PHY_IS_INTERNAL;
-> +    /// PHY needs to be reset after the refclk is enabled.
-> +    pub const RST_AFTER_CLK_EN: u32 =3D bindings::PHY_RST_AFTER_CLK_EN;
-> +    /// Polling is used to detect PHY status changes.
-> +    pub const POLL_CABLE_TEST: u32 =3D bindings::PHY_POLL_CABLE_TEST;
-> +    /// Don't suspend.
-> +    pub const ALWAYS_CALL_SUSPEND: u32 =3D bindings::PHY_ALWAYS_CALL_SUS=
-PEND;
-> +}
-
-[...]
-
-> +
-> +/// Corresponds to functions in `struct phy_driver`.
-> +///
-> +/// This is used to register a PHY driver.
-> +#[vtable]
-> +pub trait Driver {
-> +    /// Defines certain other features this PHY supports.
-> +    /// It is a combination of the flags in the [`flags`] module.
-> +    const FLAGS: u32 =3D 0;
-
-What would happen if I set this to some value that is not a combination of
-the flag values above? I expect that bits that are not part of the flag
-values above to be ignored.
-
-> +    /// The friendly name of this PHY type.
-> +    const NAME: &'static CStr;
-> +
-> +    /// This driver only works for PHYs with IDs which match this field.
-
-Mention that the default value is 0.
-
-> +    const PHY_DEVICE_ID: DeviceId =3D DeviceId::new_with_custom_mask(0, =
-0);
-
-[...]
-
-> +}
-> +
-> +/// Registration structure for a PHY driver.
-> +///
-> +/// # Invariants
-> +///
-> +/// All elements of the `drivers` slice are valid and currently register=
-ed
-> +/// to the kernel via `phy_drivers_register`.
-
-Since `DriverType` is now safe a wrapper type, this invariant should be
-moved to that type instead.
-
-> +pub struct Registration {
-> +    drivers: &'static [DriverType],
-> +}
-> +
-> +impl Registration {
-> +    /// Registers a PHY driver.
-> +    ///
-> +    /// # Safety
-> +    ///
-> +    /// The values of the `drivers` array must be initialized properly.
-
-With the above change you do not need this (since all instances of
-`DriverType` are always initialized). But I am not sure if it would be
-fine to call `phy_driver_register` multiple times with the same driver
-without unregistering it first.
-
-I thought about this implementation of `Registration` a bit and I think
-there are two possible ways to avoid both this `unsafe` function and the
-mutable static in the `module_phy_driver` macro from patch 2:
-
-Option 1:
-- make the constructor of `DriverType` register the driver and the `Drop`
-   impl unregister the driver.
-- remove the `Registration` type.
-- in the `module_phy_driver` macro create the array of `DriverType`s inside
-   of the `Module` struct.
-
-The disadvantage of this solution is that `phy_drivers_register` is called
-for every driver (and also `phy_drivers_unregister`). But if you and Andrew
-think that that is fine, then go with this option. The other advantage of
-this solution is that it also becomes safely usable without the
-`module_phy_driver` macro. For exmaple when a more complex `Module`
-struct is needed by a driver.
-
-Option 2:
-- remove the `Registration` type.
-- in the `module_phy_driver` macro: create the array of `DriverType`s insid=
-e
-   of the `Module` struct.
-- in the `module_phy_driver` macro: register the drivers in the
-   `Module::init` function and unregister them in the `Drop` impl of
-   `Module`.
-
-This approach only has one call to `phy_drivers_(un)register`, but cannot
-really be used safely without the `module_phy_driver` macro.
-
-> +    pub unsafe fn register(
-> +        module: &'static crate::ThisModule,
-> +        drivers: &'static [DriverType],
-> +    ) -> Result<Self> {
-> +        if drivers.is_empty() {
-> +            return Err(code::EINVAL);
-> +        }
-> +        // SAFETY: The safety requirements of the function ensure that `=
-drivers` array are initialized properly.
-> +        // So an FFI call with a valid pointer.
-> +        to_result(unsafe {
-> +            bindings::phy_drivers_register(drivers[0].0.get(), drivers.l=
-en().try_into()?, module.0)
-> +        })?;
-> +        // INVARIANT: The safety requirements of the function and the su=
-ccess of `phy_drivers_register` ensure
-> +        // the invariants.
-> +        Ok(Registration { drivers })
-> +    }
-> +}
-
-[...]
-
-> +
-> +    /// Get a `mask` as u32.
-> +    pub const fn mask_as_int(&self) -> u32 {
-> +        self.mask.as_int()
-> +    }
-> +
-> +    // macro use only
-> +    #[doc(hidden)]
-> +    pub const fn as_mdio_device_id(&self) -> bindings::mdio_device_id {
-
-I would name this just `mdio_device_id`.
-
---=20
-Cheers,
-Benno
-
-> +        bindings::mdio_device_id {
-> +            phy_id: self.id,
-> +            phy_id_mask: self.mask.as_int(),
-> +        }
-> +    }
-> +}
-> +
-> +enum DeviceMask {
-> +    Exact,
-> +    Model,
-> +    Vendor,
-> +    Custom(u32),
-> +}
-> +
-> +impl DeviceMask {
-> +    const MASK_EXACT: u32 =3D !0;
-> +    const MASK_MODEL: u32 =3D !0 << 4;
-> +    const MASK_VENDOR: u32 =3D !0 << 10;
-> +
-> +    const fn as_int(&self) -> u32 {
-> +        match self {
-> +            DeviceMask::Exact =3D> Self::MASK_EXACT,
-> +            DeviceMask::Model =3D> Self::MASK_MODEL,
-> +            DeviceMask::Vendor =3D> Self::MASK_VENDOR,
-> +            DeviceMask::Custom(mask) =3D> *mask,
-> +        }
-> +    }
-> +}
-> --
-> 2.34.1
->
-
+MIIQeQYJKoZIhvcNAQcCoIIQajCCEGYCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3QMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIA7OdeQ91aanwa3i
+yCVO4Wl6PhBZVSW2wsDNwZ0Y9D5MMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTIzMTAxMzIxNTI1NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAA/2QQV75I/X2K6U/pJ7HTIgCWCBdwFegx
+3wgDyeq9/ulcO722ayOgVqzBKwIGAlhvFtCEbq1ZOOfjmzFPOgqc2PfhXr0w5dYvWQJ8vB595Ll5
+W33Sz0v00R+rhaIHQ8cEJx4eLGiA1BLFb594MpWDC7uSH/NZpfL7zcXgaDODhPzH+r72cRVyhTCL
+rpVQiFy8W5JVjMQ4uiMMRL/gHcIwn3ZWUF0aMIJvs0VBCPzaraVy9t8e/9Wq1Gjs1fa+Oyf841f2
+iJP1pQgH5k9mm4EPg3HJUbvXXgOpA6v7PphiHtcf0fIRcW3Uhi55j3ybph+TK9bVQLj26hwCRqiJ
+K8jd
+--000000000000333c6e0607a014d4--
 
