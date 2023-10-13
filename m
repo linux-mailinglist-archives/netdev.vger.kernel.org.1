@@ -1,306 +1,183 @@
-Return-Path: <netdev+bounces-40619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A507C7E81
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 09:21:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C5867C7E90
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 09:28:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69E3282B01
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94C6282AD6
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEEFDDAF;
-	Fri, 13 Oct 2023 07:21:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pzOa5h6G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DE101C9;
+	Fri, 13 Oct 2023 07:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED1A23D6
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:21:46 +0000 (UTC)
-Received: from mail-vs1-xe31.google.com (mail-vs1-xe31.google.com [IPv6:2607:f8b0:4864:20::e31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C81B8
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:21:43 -0700 (PDT)
-Received: by mail-vs1-xe31.google.com with SMTP id ada2fe7eead31-4577c1259c6so832826137.3
-        for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 00:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1697181702; x=1697786502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j8abOWZApChL1PiO6AUXU9AraOSNbvy4h27WNIKy1U8=;
-        b=pzOa5h6G+lnHpaZY8t2znU2TwS1KthQ+/97ZXN8Hs1rk4xj5125RaPKW9r3HX8Cfbm
-         sfenu3ex8G3pN8nt+FdP+frvctpew/iUOSAhG7K0Ewx1GLmABGyDxrPQLyc8skJPSbye
-         jmx7e3nximNAGdxz5Nevpnfr0ZelAdEny8NJf19YAEmMCU4CXuzheNkHnkkLyN3ao544
-         3bBjWVnnMxLz4ummO8akiR9xyvqh70tSVJS9NegW5xCHCKCboXITnDuds/eum5+HnZwj
-         5MimExDuLNVQIOmVtc5JhREEVNNHRCdOZHM0dDx6YLNUb0AYFHYl6T3n4pOti/IooJIS
-         XEAQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86575D307
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:28:46 +0000 (UTC)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9A03BD;
+	Fri, 13 Oct 2023 00:28:44 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-d8a000f6a51so1952631276.3;
+        Fri, 13 Oct 2023 00:28:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697181702; x=1697786502;
+        d=1e100.net; s=20230601; t=1697182124; x=1697786924;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j8abOWZApChL1PiO6AUXU9AraOSNbvy4h27WNIKy1U8=;
-        b=MVNRmZLuErQZi+fRjUzUWDU5iXI9EbSWj17xmsEmd5wWVcXWtWH5TLO4FKtQTF2ktJ
-         raanoniV5tImf3icuKDjW/hm2dgHhONNC6VhpYJ0Kyg1Qt1dXQO97S6r1JpIruJEgkbW
-         Y+yl3qPFEf3n2iFMbghy5H5djk2D8RGo5JcxICE8jfyR08SdACnKQpCBnIbowmlNad2p
-         gAIoc63z7ZTSMZse7T8MoSFjpkgq7RBrIad2h6TMfwUhY9T6H1AB/td9hmyh2acs7ucA
-         6q6X+gz2bgbg4kNHi/V7Up3UX5MjHW1bqFyt3QkyGvfLbo2SMfZiO6B8uL6eSerFTA+z
-         5M/w==
-X-Gm-Message-State: AOJu0Yw8yjOOpaVC/pfDps32YGXRzB+829hl1/mUMrVmBEvLfhQlhJtr
-	UA/iFS839FsIRHkweiN9fIB/gn2OYbiVsdOSnb/Glg==
-X-Google-Smtp-Source: AGHT+IGBIJ1+IYHOty4ow0VY+MIqV07mOzDrS2bzkJ5Er9WYHkkAIWiaTji+gKQOJegDt6nOcK6hqcbAv+JhMs9BdEc=
-X-Received: by 2002:a67:fd49:0:b0:452:5a4c:7278 with SMTP id
- g9-20020a67fd49000000b004525a4c7278mr20272141vsr.20.1697181701700; Fri, 13
- Oct 2023 00:21:41 -0700 (PDT)
+        bh=O+WBXNRhAR0kRrLkPQsIjB2me2dEptu6CHQ6Hg/HEvw=;
+        b=AdRHt1xWq0bGkcFq1s4Yru1j3YuSz0WJgz221EvzV0wrJxdO8TO+3v9w/27RMVx8bn
+         zABYsbb5bdOIhbH8fyj77r1EHca1Ocu/hRjVus4q6FIwySDbKTgR+MmNS1A3N02qR9ax
+         mCo9jPYUom6cC8wM3oFdx2+/ihvJ9n6mr/IIqN2JpLr/Jqms2jOiKlVFrldpZCrZiYD7
+         sYDZE5T8F7WClivWsCDFeZ2xsJyQ/hYvEPa40duBhlo3j9KSug1fVUJbxV62b0E8SKS6
+         Z0fLIfsF5JnK1M+i3u0R1ekuzcvTi0C996SzhNkcuMOAywzE/+qNQaaUwpg2fLCV3G7/
+         6Qow==
+X-Gm-Message-State: AOJu0YwU4ZABX2GXZq1Fewm1lqlOLdn6sQRYWU+blOQ774u/xe6aPr33
+	rr5uLg6TfSQxbgVvxjYS5TNau/sHOOQE3w==
+X-Google-Smtp-Source: AGHT+IGDjaijHhnf2UW+UfH0X9SgFRvxG3m6vb411EIdys5DLfyfFhrVJfbiVvsRRZEn8ZOLqNsZHg==
+X-Received: by 2002:a5b:f0c:0:b0:d05:59cd:a89d with SMTP id x12-20020a5b0f0c000000b00d0559cda89dmr23154364ybr.30.1697182123862;
+        Fri, 13 Oct 2023 00:28:43 -0700 (PDT)
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com. [209.85.128.181])
+        by smtp.gmail.com with ESMTPSA id v38-20020a25fc26000000b00d7e339ada01sm351773ybd.20.2023.10.13.00.28.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Oct 2023 00:28:43 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5a7c08b7744so21915377b3.3;
+        Fri, 13 Oct 2023 00:28:42 -0700 (PDT)
+X-Received: by 2002:a0d:dc81:0:b0:589:e7c1:96f2 with SMTP id
+ f123-20020a0ddc81000000b00589e7c196f2mr26603024ywe.46.1697182122538; Fri, 13
+ Oct 2023 00:28:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230927184158.243575-1-mirsad.todorovac@alu.unizg.hr>
- <0a201a6f-90dd-403c-97d0-94372be1e3e6@gmail.com> <CANpmjNP=jY2NzrXX4mgY5cL5tqZeLb18gQkzVhg1OofNtJ1VSw@mail.gmail.com>
- <250140d1-d592-45f4-aa27-691c1d68a528@alu.unizg.hr>
-In-Reply-To: <250140d1-d592-45f4-aa27-691c1d68a528@alu.unizg.hr>
-From: Marco Elver <elver@google.com>
-Date: Fri, 13 Oct 2023 09:21:05 +0200
-Message-ID: <CANpmjNNnkv1UH=RLaeejFicicRZFn4D2sChmppoFdOfJYY_0hw@mail.gmail.com>
-Subject: Re: [PATCH RFC v1 1/3] r8169: fix the KCSAN reported data-race in
- rtl_tx() while reading tp->cur_tx
-To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, nic_swsd@realtek.com, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20231012121618.267315-1-yoshihiro.shimoda.uh@renesas.com>
+ <CAMuHMdWAk9kJBGGq9K-RnC0HFZk1XbaosTBO2OW1kpYFPh1Mqg@mail.gmail.com> <TYBPR01MB5341F5AAE321E3E373012E4DD8D2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+In-Reply-To: <TYBPR01MB5341F5AAE321E3E373012E4DD8D2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 13 Oct 2023 09:28:30 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdU9Udd7xX7Us+3T06YMLAb4y0xnSOipN-5c-d-MfpvKdg@mail.gmail.com>
+Message-ID: <CAMuHMdU9Udd7xX7Us+3T06YMLAb4y0xnSOipN-5c-d-MfpvKdg@mail.gmail.com>
+Subject: Re: [PATCH net-next] rswitch: Add PM ops
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Cc: "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 13 Oct 2023 at 07:01, Mirsad Goran Todorovac
-<mirsad.todorovac@alu.unizg.hr> wrote:
->
-> On 9/28/2023 8:02 AM, Marco Elver wrote:
-> > On Wed, 27 Sept 2023 at 21:52, Heiner Kallweit <hkallweit1@gmail.com> w=
-rote:
-> >>
-> >> On 27.09.2023 20:41, Mirsad Goran Todorovac wrote:
-> >>> KCSAN reported the following data-race:
-> >>>
-> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>> BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r=
-8169]
-> >>>
-> >>> write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 2=
-9:
-> >>> rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r=
-8169
-> >>> dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux=
-/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
-> >>> sch_direct_xmit (net/sched/sch_generic.c:342)
-> >>> __dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
-> >>> ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/nei=
-ghbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
-> >>> __ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293=
-)
-> >>> ip_finish_output (net/ipv4/ip_output.c:328)
-> >>> ip_output (net/ipv4/ip_output.c:435)
-> >>> ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv=
-4/ip_output.c:1486)
-> >>> udp_send_skb (net/ipv4/udp.c:963)
-> >>> udp_sendmsg (net/ipv4/udp.c:1246)
-> >>> inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
-> >>> sock_sendmsg (net/socket.c:730 net/socket.c:753)
-> >>> __sys_sendto (net/socket.c:2177)
-> >>> __x64_sys_sendto (net/socket.c:2185)
-> >>> do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
-> >>> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
-> >>>
-> >>> read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
-> >>> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/=
-net/ethernet/realtek/r8169_main.c:4581) r8169
-> >>> __napi_poll (net/core/dev.c:6527)
-> >>> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
-> >>> __do_softirq (kernel/softirq.c:553)
-> >>> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
-> >>> irq_exit_rcu (kernel/softirq.c:647)
-> >>> common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
-> >>> asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
-> >>> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
-> >>> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
-> >>> call_cpuidle (kernel/sched/idle.c:135)
-> >>> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
-> >>> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
-> >>> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboo=
-t.c:294)
-> >>> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
-> >>>
-> >>> value changed: 0x002f4815 -> 0x002f4816
-> >>>
-> >>> Reported by Kernel Concurrency Sanitizer on:
-> >>> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc=
-2-kcsan-00143-gb5cbe7c00aa0 #41
-> >>> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.2=
-1 04/26/2023
-> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>>
-> >>> The write side of drivers/net/ethernet/realtek/r8169_main.c is:
-> >>> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>>     4251         /* rtl_tx needs to see descriptor changes before upd=
-ated tp->cur_tx */
-> >>>     4252         smp_wmb();
-> >>>     4253
-> >>>   =E2=86=92 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + =
-1);
-> >>>     4255
-> >>>     4256         stop_queue =3D !netif_subqueue_maybe_stop(dev, 0, rt=
-l_tx_slots_avail(tp),
-> >>>     4257                                                 R8169_TX_STO=
-P_THRS,
-> >>>     4258                                                 R8169_TX_STA=
-RT_THRS);
-> >>>
-> >>> The read side is the function rtl_tx():
-> >>>
-> >>>     4355 static void rtl_tx(struct net_device *dev, struct rtl8169_pr=
-ivate *tp,
-> >>>     4356                    int budget)
-> >>>     4357 {
-> >>>     4358         unsigned int dirty_tx, bytes_compl =3D 0, pkts_compl=
- =3D 0;
-> >>>     4359         struct sk_buff *skb;
-> >>>     4360
-> >>>     4361         dirty_tx =3D tp->dirty_tx;
-> >>>     4362
-> >>>     4363         while (READ_ONCE(tp->cur_tx) !=3D dirty_tx) {
-> >>>     4364                 unsigned int entry =3D dirty_tx % NUM_TX_DES=
-C;
-> >>>     4365                 u32 status;
-> >>>     4366
-> >>>     4367                 status =3D le32_to_cpu(tp->TxDescArray[entry=
-].opts1);
-> >>>     4368                 if (status & DescOwn)
-> >>>     4369                         break;
-> >>>     4370
-> >>>     4371                 skb =3D tp->tx_skb[entry].skb;
-> >>>     4372                 rtl8169_unmap_tx_skb(tp, entry);
-> >>>     4373
-> >>>     4374                 if (skb) {
-> >>>     4375                         pkts_compl++;
-> >>>     4376                         bytes_compl +=3D skb->len;
-> >>>     4377                         napi_consume_skb(skb, budget);
-> >>>     4378                 }
-> >>>     4379                 dirty_tx++;
-> >>>     4380         }
-> >>>     4381
-> >>>     4382         if (tp->dirty_tx !=3D dirty_tx) {
-> >>>     4383                 dev_sw_netstats_tx_add(dev, pkts_compl, byte=
-s_compl);
-> >>>     4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
-> >>>     4385
-> >>>     4386                 netif_subqueue_completed_wake(dev, 0, pkts_c=
-ompl, bytes_compl,
-> >>>     4387                                               rtl_tx_slots_a=
-vail(tp),
-> >>>     4388                                               R8169_TX_START=
-_THRS);
-> >>>     4389                 /*
-> >>>     4390                  * 8168 hack: TxPoll requests are lost when =
-the Tx packets are
-> >>>     4391                  * too close. Let's kick an extra TxPoll req=
-uest when a burst
-> >>>     4392                  * of start_xmit activity is detected (if it=
- is not detected,
-> >>>     4393                  * it is slow enough). -- FR
-> >>>     4394                  * If skb is NULL then we come here again on=
-ce a tx irq is
-> >>>     4395                  * triggered after the last fragment is mark=
-ed transmitted.
-> >>>     4396                  */
-> >>>   =E2=86=92 4397                 if (tp->cur_tx !=3D dirty_tx && skb)
-> >>>     4398                         rtl8169_doorbell(tp);
-> >>>     4399         }
-> >>>     4400 }
-> >>>
-> >>> Obviously from the code, an earlier detected data-race for tp->cur_tx=
- was fixed in the
-> >>> line 4363:
-> >>>
-> >>>     4363         while (READ_ONCE(tp->cur_tx) !=3D dirty_tx) {
-> >>>
-> >>> but the same solution is required for protecting the other access to =
-tp->cur_tx:
-> >>>
-> >>>   =E2=86=92 4397                 if (READ_ONCE(tp->cur_tx) !=3D dirty=
-_tx && skb)
-> >>>     4398                         rtl8169_doorbell(tp);
-> >>>
-> >>> The write in the line 4254 is protected with WRITE_ONCE(), but the re=
-ad in the line 4397
-> >>> might have suffered read tearing under some compiler optimisations.
-> >>>
-> >>> The fix eliminated the KCSAN data-race report for this bug.
-> >>>
-> >>> It is yet to be evaluated what happens if tp->cur_tx changes between =
-the test in line 4363
-> >>> and line 4397. This test should certainly not be cached by the compil=
-er in some register
-> >>> for such a long time, while asynchronous writes to tp->cur_tx might h=
-ave occurred in line
-> >>> 4254 in the meantime.
-> >>>
-> >>
-> >> netif_subqueue_completed_wake() has barriers ensuring that no cached v=
-alue for tp->cur_tx
-> >> is used in line 4397. I'm not aware of any reported issues with an obv=
-ious link to the
-> >> potentential issue you describe.
-> >> I don't have a strong opinion on these patches. They shouldn't hurt, a=
-nd if they make
-> >> KCSAN happy, why not.
-> >
-> > Barries don't protect unmarked accesses from being miscompiled. So the
-> > use of barriers and marked accesses like READ_ONCE() is correct:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree=
-/tools/memory-model/Documentation/access-marking.txt
-> > That said, actually encountering a miscompilation depends on
-> > architecture and compiler. Using the right marked accesses just
-> > ensures things don't suddenly break because the compiler decided to be
-> > a little more clever.
-> >
-> >>> Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell ri=
-ngs")
-> >>> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> >>> Cc: nic_swsd@realtek.com
-> >>> Cc: "David S. Miller" <davem@davemloft.net>
-> >>> Cc: Eric Dumazet <edumazet@google.com>
-> >>> Cc: Jakub Kicinski <kuba@kernel.org>
-> >>> Cc: Paolo Abeni <pabeni@redhat.com>
-> >>> Cc: Marco Elver <elver@google.com>
-> >>> Cc: netdev@vger.kernel.org
-> >>> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b531=
-88@alu.unizg.hr/
-> >>> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-> >
-> > Acked-by: Marco Elver <elver@google.com>
->
-> Hi, Marco,
->
-> Does this Acked-by: cover all of the [123]/3 in the patch series?
+Hi Shimoda-san,
 
-Technically, no. (Only if this was the cover lettter i.e. 0/n)
+On Fri, Oct 13, 2023 at 4:10=E2=80=AFAM Yoshihiro Shimoda
+<yoshihiro.shimoda.uh@renesas.com> wrote:
+> > From: Geert Uytterhoeven, Sent: Thursday, October 12, 2023 9:35 PM
+> > On Thu, Oct 12, 2023 at 2:16=E2=80=AFPM Yoshihiro Shimoda
+> > <yoshihiro.shimoda.uh@renesas.com> wrote:
+> > > Add PM ops for Suspend to Idle. When the system suspended,
+> > > the Ethernet Serdes's clock will be stopped. So, this driver needs
+> > > to re-initialize the Ethernet Serdes by phy_init() in
+> > > renesas_eth_sw_resume(). Otherwise, timeout happened in phy_power_on(=
+).
+> > >
+> > > Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> >
+> > Thanks for your patch!
+>
+> Thank you for your review!
+>
+> > > --- a/drivers/net/ethernet/renesas/rswitch.c
+> > > +++ b/drivers/net/ethernet/renesas/rswitch.c
+> > > @@ -17,6 +17,7 @@
+> > >  #include <linux/of_net.h>
+> > >  #include <linux/phy/phy.h>
+> > >  #include <linux/platform_device.h>
+> > > +#include <linux/pm.h>
+> > >  #include <linux/pm_runtime.h>
+> > >  #include <linux/rtnetlink.h>
+> > >  #include <linux/slab.h>
+> > > @@ -1315,6 +1316,7 @@ static int rswitch_phy_device_init(struct rswit=
+ch_device *rdev)
+> > >         if (!phydev)
+> > >                 goto out;
+> > >         __set_bit(rdev->etha->phy_interface, phydev->host_interfaces)=
+;
+> > > +       phydev->mac_managed_pm =3D true;
+> > >
+> > >         phydev =3D of_phy_connect(rdev->ndev, phy, rswitch_adjust_lin=
+k, 0,
+> > >                                 rdev->etha->phy_interface);
+> > > @@ -1991,11 +1993,52 @@ static void renesas_eth_sw_remove(struct plat=
+form_device *pdev)
+> > >         platform_set_drvdata(pdev, NULL);
+> > >  }
+> > >
+> > > +static int __maybe_unused renesas_eth_sw_suspend(struct device *dev)
+> > > +{
+> > > +       struct rswitch_private *priv =3D dev_get_drvdata(dev);
+> > > +       struct net_device *ndev;
+> > > +       int i;
+> >
+> > unsigned int (also below)
+>
+> I don't know why unsigned int is needed. Other functions use
 
-Send the non-RFC separately and I'll ack them.
+There's this old mantra "prefer unsigned over signed in C",
+and a valid port array index here is always unsigned.
+
+> rswitch_for_each_enabled_port{_continue_reverse}() with int.
+> Especially, rswitch_for_each_enabled_port_continue_reverse()
+> has the following code, unsigned int will not work correctly:
+
+Oh, there is also a reverse variant, which indeed needs a signed
+iterator, currently...
+
+> ---
+> #define rswitch_for_each_enabled_port_continue_reverse(priv, i) \
+>         for (i--; i >=3D 0; i--)                                  \
+
+I think this can be made to work with an unsigned iterator using
+
+    for (; i-- > 0; )
+
+>                 if (priv->rdev[i]->disabled)                    \
+>                         continue;                               \
+>                 else
+> ---
+>
+> So, I would like to keep this for consistency with other functions'
+> implementation. But, what do you think?
+
+Consistency is good...
+Surprising readers (why is this signed?) is bad...
+It's hard to keep a good balance...
+
+BTW, perhaps it would make sense to use the reverse order in suspend?
+Although it probably doesn't matter, as rswitch_deinit() uses the
+non-reverse order, too.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
