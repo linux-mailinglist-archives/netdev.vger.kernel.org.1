@@ -1,278 +1,201 @@
-Return-Path: <netdev+bounces-40601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A782D7C7D0B
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:32:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39E77C7D1D
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:42:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E031C1C20AC1
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 05:32:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68F93B208E7
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 05:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD85568C;
-	Fri, 13 Oct 2023 05:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805AF5691;
+	Fri, 13 Oct 2023 05:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJmVttwe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD5D53B8
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 05:32:21 +0000 (UTC)
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA23BC;
-	Thu, 12 Oct 2023 22:32:18 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R351e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0Vu0xtic_1697175134;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vu0xtic_1697175134)
-          by smtp.aliyun-inc.com;
-          Fri, 13 Oct 2023 13:32:15 +0800
-Date: Fri, 13 Oct 2023 13:32:14 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net/smc: fix dangling sock under state
- SMC_APPFINCLOSEWAIT
-Message-ID: <20231013053214.GT92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
- <e63b546f-b993-4e42-8269-e4d9afa5b845@linux.ibm.com>
- <f8089b26-bb11-f82d-8070-222b1f8c1db1@linux.alibaba.com>
- <745d3174-f497-4d6a-ba13-1074128ad99d@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4EC3D007
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 05:42:34 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2318B7
+	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 22:42:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1697175751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HvOpJVcRM5bVRhcIK2dFCcGNVXYwAYdPskD4OorCIcc=;
+	b=aJmVttweGvL1XlVxbwQgeM9KElhUFE/hU094IFXNQsvucMPyJ7w2ywt1LRLCeHSt/uOQxB
+	Rd9O4kCB2S0yavq3eEaMticMy8uu23DRJqb4Ll5XlTLChkyvweNsPC2NMRddHoNLlcaKiR
+	ePXUFfi0UNeulwZmnBz8wCjcV8qRNRM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-539--o11FYg9NjC8yFrdI-4SAg-1; Fri, 13 Oct 2023 01:42:30 -0400
+X-MC-Unique: -o11FYg9NjC8yFrdI-4SAg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4C09485A5A8;
+	Fri, 13 Oct 2023 05:42:29 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.45.224.106])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 452F61C060DF;
+	Fri, 13 Oct 2023 05:42:27 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-rt-users@vger.kernel.org,
+	Jiri Olsa <jolsa@kernel.org>,
+	Artem Savkov <asavkov@redhat.com>
+Subject: [PATCH bpf-next] bpf: change syscall_nr type to int in struct syscall_tp_t
+Date: Fri, 13 Oct 2023 07:42:19 +0200
+Message-ID: <20231013054219.172920-1-asavkov@redhat.com>
+In-Reply-To: <CAEf4BzZKWkJjOjw8x_eL_hsU-QzFuSzd5bkBH2EHtirN2hnEgA@mail.gmail.com>
+References: <CAEf4BzZKWkJjOjw8x_eL_hsU-QzFuSzd5bkBH2EHtirN2hnEgA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <745d3174-f497-4d6a-ba13-1074128ad99d@linux.ibm.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 01:51:54PM +0200, Wenjia Zhang wrote:
->
->
->On 12.10.23 04:37, D. Wythe wrote:
->> 
->> 
->> On 10/12/23 4:31 AM, Wenjia Zhang wrote:
->> > 
->> > 
->> > On 11.10.23 09:33, D. Wythe wrote:
->> > > From: "D. Wythe" <alibuda@linux.alibaba.com>
->> > > 
->> > > Considering scenario:
->> > > 
->> > >                 smc_cdc_rx_handler_rwwi
->> > > __smc_release
->> > >                 sock_set_flag
->> > > smc_close_active()
->> > > sock_set_flag
->> > > 
->> > > __set_bit(DEAD)            __set_bit(DONE)
->> > > 
->> > > Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
->> > > if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
->> > > in smc_close_passive_work:
->> > > 
->> > > if (sock_flag(sk, SOCK_DEAD) &&
->> > >     smc_close_sent_any_close(conn)) {
->> > >     sk->sk_state = SMC_CLOSED;
->> > > } else {
->> > >     /* just shutdown, but not yet closed locally */
->> > >     sk->sk_state = SMC_APPFINCLOSEWAIT;
->> > > }
->> > > 
->> > > Replace sock_set_flags or __set_bit to set_bit will fix this problem.
->> > > Since set_bit is atomic.
->> > > 
->> > I didn't really understand the scenario. What is
->> > smc_cdc_rx_handler_rwwi()? What does it do? Don't it get the lock
->> > during the runtime?
->> > 
->> 
->> Hi Wenjia,
->> 
->> Sorry for that, It is not smc_cdc_rx_handler_rwwi() but
->> smc_cdc_rx_handler();
->> 
->> Following is a more specific description of the issues
->> 
->> 
->> lock_sock()
->> __smc_release
->> 
->> smc_cdc_rx_handler()
->> smc_cdc_msg_recv()
->> bh_lock_sock()
->> smc_cdc_msg_recv_action()
->> sock_set_flag(DONE) sock_set_flag(DEAD)
->> __set_bit __set_bit
->> bh_unlock_sock()
->> release_sock()
->> 
->> 
->> 
->> Note : |bh_lock_sock|and |lock_sock|are not mutually exclusive. They are
->> actually used for different purposes and contexts.
->> 
->> 
->ok, that's true that |bh_lock_sock|and |lock_sock|are not really mutually
->exclusive. However, since bh_lock_sock() is used, this scenario you described
->above should not happen, because that gets the sk_lock.slock. Following this
->scenarios, IMO, only the following situation can happen.
->
->lock_sock()
->__smc_release
->
->smc_cdc_rx_handler()
->smc_cdc_msg_recv()
->bh_lock_sock()
->smc_cdc_msg_recv_action()
->sock_set_flag(DONE)
->bh_unlock_sock()
->sock_set_flag(DEAD)
->release_sock()
+linux-rt-devel tree contains a patch (b1773eac3f29c ("sched: Add support
+for lazy preemption")) that adds an extra member to struct trace_entry.
+This causes the offset of args field in struct trace_event_raw_sys_enter
+be different from the one in struct syscall_trace_enter:
 
-Hi wenjia,
+struct trace_event_raw_sys_enter {
+        struct trace_entry         ent;                  /*     0    12 */
 
-I think I know what D. Wythe means now, and I think he is right on this.
+        /* XXX last struct has 3 bytes of padding */
+        /* XXX 4 bytes hole, try to pack */
 
-IIUC, in process context, lock_sock() won't respect bh_lock_sock() if it
-acquires the lock before bh_lock_sock(). This is how the sock lock works.
+        long int                   id;                   /*    16     8 */
+        long unsigned int          args[6];              /*    24    48 */
+        /* --- cacheline 1 boundary (64 bytes) was 8 bytes ago --- */
+        char                       __data[];             /*    72     0 */
 
-    PROCESS CONTEXT                                 INTERRUPT CONTEXT
-------------------------------------------------------------------------
-lock_sock()
-    spin_lock_bh(&sk->sk_lock.slock);
-    ...
-    sk->sk_lock.owned = 1;
-    // here the spinlock is released
-    spin_unlock_bh(&sk->sk_lock.slock);
-__smc_release()
-                                                   bh_lock_sock(&smc->sk);
-                                                   smc_cdc_msg_recv_action(smc, cdc);
-                                                       sock_set_flag(&smc->sk, SOCK_DONE);
-                                                   bh_unlock_sock(&smc->sk);
+        /* size: 72, cachelines: 2, members: 4 */
+        /* sum members: 68, holes: 1, sum holes: 4 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 8 bytes */
+};
 
-    sock_set_flag(DEAD)  <-- Can be before or after sock_set_flag(DONE)
-release_sock()
+struct syscall_trace_enter {
+        struct trace_entry         ent;                  /*     0    12 */
 
-The bh_lock_sock() only spins on sk->sk_lock.slock, which is already released
-after lock_sock() return. Therefor, there is actually no lock between
-the code after lock_sock() and before release_sock() with bh_lock_sock()...bh_unlock_sock().
-Thus, sock_set_flag(DEAD) won't respect bh_lock_sock() at all, and might be
-before or after sock_set_flag(DONE).
+        /* XXX last struct has 3 bytes of padding */
 
+        int                        nr;                   /*    12     4 */
+        long unsigned int          args[];               /*    16     0 */
 
-Actually, in TCP, the interrupt context will check sock_owned_by_user().
-If it returns true, the softirq just defer the process to backlog, and process
-that in release_sock(). Which avoid the race between softirq and process
-when visiting the 'struct sock'.
+        /* size: 16, cachelines: 1, members: 3 */
+        /* paddings: 1, sum paddings: 3 */
+        /* last cacheline: 16 bytes */
+};
 
-tcp_v4_rcv()
-         bh_lock_sock_nested(sk);
-         tcp_segs_in(tcp_sk(sk), skb);
-         ret = 0;
-         if (!sock_owned_by_user(sk)) {
-                 ret = tcp_v4_do_rcv(sk, skb);
-         } else {
-                 if (tcp_add_backlog(sk, skb, &drop_reason))
-                         goto discard_and_relse;
-         }
-         bh_unlock_sock(sk);
+This, in turn, causes perf_event_set_bpf_prog() fail while running bpf
+test_profiler testcase because max_ctx_offset is calculated based on the
+former struct, while off on the latter:
 
+  10488         if (is_tracepoint || is_syscall_tp) {
+  10489                 int off = trace_event_get_offsets(event->tp_event);
+  10490
+  10491                 if (prog->aux->max_ctx_offset > off)
+  10492                         return -EACCES;
+  10493         }
 
-But in SMC we don't have a backlog, that means fields in 'struct sock'
-might all have race, and this sock_set_flag() is just one of the cases.
+What bpf program is actually getting is a pointer to struct
+syscall_tp_t, defined in kernel/trace/trace_syscalls.c. This patch fixes
+the problem by aligning struct syscall_tp_t with with struct
+syscall_trace_(enter|exit) and changing the tests to use these structs
+to dereference context.
 
-Best regards,
-Dust
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
+Acked-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
+---
+ kernel/trace/trace_syscalls.c                    | 4 ++--
+ tools/testing/selftests/bpf/progs/profiler.inc.h | 2 +-
+ tools/testing/selftests/bpf/progs/test_vmlinux.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/kernel/trace/trace_syscalls.c b/kernel/trace/trace_syscalls.c
+index de753403cdafb..9c581d6da843a 100644
+--- a/kernel/trace/trace_syscalls.c
++++ b/kernel/trace/trace_syscalls.c
+@@ -556,7 +556,7 @@ static int perf_call_bpf_enter(struct trace_event_call *call, struct pt_regs *re
+ {
+ 	struct syscall_tp_t {
+ 		struct trace_entry ent;
+-		unsigned long syscall_nr;
++		int syscall_nr;
+ 		unsigned long args[SYSCALL_DEFINE_MAXARGS];
+ 	} __aligned(8) param;
+ 	int i;
+@@ -661,7 +661,7 @@ static int perf_call_bpf_exit(struct trace_event_call *call, struct pt_regs *reg
+ {
+ 	struct syscall_tp_t {
+ 		struct trace_entry ent;
+-		unsigned long syscall_nr;
++		int syscall_nr;
+ 		unsigned long ret;
+ 	} __aligned(8) param;
+ 
+diff --git a/tools/testing/selftests/bpf/progs/profiler.inc.h b/tools/testing/selftests/bpf/progs/profiler.inc.h
+index f799d87e87002..897061930cb76 100644
+--- a/tools/testing/selftests/bpf/progs/profiler.inc.h
++++ b/tools/testing/selftests/bpf/progs/profiler.inc.h
+@@ -609,7 +609,7 @@ ssize_t BPF_KPROBE(kprobe__proc_sys_write,
+ }
+ 
+ SEC("tracepoint/syscalls/sys_enter_kill")
+-int tracepoint__syscalls__sys_enter_kill(struct trace_event_raw_sys_enter* ctx)
++int tracepoint__syscalls__sys_enter_kill(struct syscall_trace_enter* ctx)
+ {
+ 	struct bpf_func_stats_ctx stats_ctx;
+ 
+diff --git a/tools/testing/selftests/bpf/progs/test_vmlinux.c b/tools/testing/selftests/bpf/progs/test_vmlinux.c
+index 4b8e37f7fd06c..78b23934d9f8f 100644
+--- a/tools/testing/selftests/bpf/progs/test_vmlinux.c
++++ b/tools/testing/selftests/bpf/progs/test_vmlinux.c
+@@ -16,12 +16,12 @@ bool kprobe_called = false;
+ bool fentry_called = false;
+ 
+ SEC("tp/syscalls/sys_enter_nanosleep")
+-int handle__tp(struct trace_event_raw_sys_enter *args)
++int handle__tp(struct syscall_trace_enter *args)
+ {
+ 	struct __kernel_timespec *ts;
+ 	long tv_nsec;
+ 
+-	if (args->id != __NR_nanosleep)
++	if (args->nr != __NR_nanosleep)
+ 		return 0;
+ 
+ 	ts = (void *)args->args[0];
+-- 
+2.41.0
 
->
->> 
->> > > Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> > > ---
->> > >   net/smc/af_smc.c    | 4 ++--
->> > >   net/smc/smc.h       | 5 +++++
->> > >   net/smc/smc_cdc.c   | 2 +-
->> > >   net/smc/smc_close.c | 2 +-
->> > >   4 files changed, 9 insertions(+), 4 deletions(-)
->> > > 
->> > > diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> > > index bacdd97..5ad2a9f 100644
->> > > --- a/net/smc/af_smc.c
->> > > +++ b/net/smc/af_smc.c
->> > > @@ -275,7 +275,7 @@ static int __smc_release(struct smc_sock *smc)
->> > >         if (!smc->use_fallback) {
->> > >           rc = smc_close_active(smc);
->> > > -        sock_set_flag(sk, SOCK_DEAD);
->> > > +        smc_sock_set_flag(sk, SOCK_DEAD);
->> > >           sk->sk_shutdown |= SHUTDOWN_MASK;
->> > >       } else {
->> > >           if (sk->sk_state != SMC_CLOSED) {
->> > > @@ -1742,7 +1742,7 @@ static int smc_clcsock_accept(struct
->> > > smc_sock *lsmc, struct smc_sock **new_smc)
->> > >           if (new_clcsock)
->> > >               sock_release(new_clcsock);
->> > >           new_sk->sk_state = SMC_CLOSED;
->> > > -        sock_set_flag(new_sk, SOCK_DEAD);
->> > > +        smc_sock_set_flag(new_sk, SOCK_DEAD);
->> > >           sock_put(new_sk); /* final */
->> > >           *new_smc = NULL;
->> > >           goto out;
->> > > diff --git a/net/smc/smc.h b/net/smc/smc.h
->> > > index 24745fd..e377980 100644
->> > > --- a/net/smc/smc.h
->> > > +++ b/net/smc/smc.h
->> > > @@ -377,4 +377,9 @@ void smc_fill_gid_list(struct smc_link_group *lgr,
->> > >   int smc_nl_enable_hs_limitation(struct sk_buff *skb, struct
->> > > genl_info *info);
->> > >   int smc_nl_disable_hs_limitation(struct sk_buff *skb, struct
->> > > genl_info *info);
->> > >   +static inline void smc_sock_set_flag(struct sock *sk, enum
->> > > sock_flags flag)
->> > > +{
->> > > +    set_bit(flag, &sk->sk_flags);
->> > > +}
->> > > +
->> > >   #endif    /* __SMC_H */
->> > > diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
->> > > index 89105e9..01bdb79 100644
->> > > --- a/net/smc/smc_cdc.c
->> > > +++ b/net/smc/smc_cdc.c
->> > > @@ -385,7 +385,7 @@ static void smc_cdc_msg_recv_action(struct
->> > > smc_sock *smc,
->> > >           smc->sk.sk_shutdown |= RCV_SHUTDOWN;
->> > >           if (smc->clcsock && smc->clcsock->sk)
->> > >               smc->clcsock->sk->sk_shutdown |= RCV_SHUTDOWN;
->> > > -        sock_set_flag(&smc->sk, SOCK_DONE);
->> > > +        smc_sock_set_flag(&smc->sk, SOCK_DONE);
->> > >           sock_hold(&smc->sk); /* sock_put in close_work */
->> > >           if (!queue_work(smc_close_wq, &conn->close_work))
->> > >               sock_put(&smc->sk);
->> > > diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
->> > > index dbdf03e..449ef45 100644
->> > > --- a/net/smc/smc_close.c
->> > > +++ b/net/smc/smc_close.c
->> > > @@ -173,7 +173,7 @@ void smc_close_active_abort(struct smc_sock *smc)
->> > >           break;
->> > >       }
->> > >   -    sock_set_flag(sk, SOCK_DEAD);
->> > > +    smc_sock_set_flag(sk, SOCK_DEAD);
->> > >       sk->sk_state_change(sk);
->> > >         if (release_clcsock) {
->> 
 
