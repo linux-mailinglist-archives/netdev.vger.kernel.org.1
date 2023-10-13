@@ -1,143 +1,209 @@
-Return-Path: <netdev+bounces-40875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 688877C8FFE
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 00:04:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEFD7C9052
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 00:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B5C1C20E45
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 22:04:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DDE2B20B38
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 22:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE06C286AB;
-	Fri, 13 Oct 2023 22:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4FE250E8;
+	Fri, 13 Oct 2023 22:36:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2trp5+/r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzd2Yy3F"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E9C21A0A
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 22:04:47 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A44B7
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 15:04:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Cc:Content-ID:Content-Description;
-	bh=sd5NYqgGOlSeHETHK6YaVAyDF8OaAVoJZDSvEe0oBks=; b=2trp5+/rGLHFPNU8Okkl1NxXBr
-	X8dQkh/V5ygFGFkT2KLtxgMhoAk2r++bBsXUICwhJ6gzzaJK8LUdULdefJtXYIpMlh8bVeAh1CF92
-	gQeny/yO2PgkWlAtVnaxq5oErYFpouXayQCA4y7xU22RIeRXbLXpsFVILsDxnz/OTBVD3RxBfWRSd
-	03rLbrmBOen1A5ENF98gqLftPbRwUQrgb67Y8f+op5Uv+qeEPnyS1Azrcf/h/Wdq/MUbbboG15WgZ
-	miEGfoCKKHNILUS+YKrKzxokdqt5o62bkiiV1tL1Az6VyKpXwAkSY6BfW7v4CjPi+qufXn5Gly8IJ
-	I/I6QiVw==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qrQGq-004M4h-0H;
-	Fri, 13 Oct 2023 22:04:36 +0000
-Message-ID: <113bb0a0-b3f4-4220-a33d-d32091740634@infradead.org>
-Date: Fri, 13 Oct 2023 15:04:35 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9782C852
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 22:36:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85D5EC433C8;
+	Fri, 13 Oct 2023 22:36:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1697236566;
+	bh=KDeqnuX0ftWufp6sZJSSV2ClFe0LdNja3kr0DCnhBs0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uzd2Yy3FEwOuBO2HUqdBnmennzrD5jLTuTUPpYUijS8vrTSdAoxt/kqCeRjj2OXHm
+	 51w1yH+KX9Sz+VClafpo0c4iZCHUsCKIf+8+YJ2914ndSe3bsfsLfrAXtb6VoU7B2a
+	 Ts1Q1eK2vCgSJEOMsErZsVEel00yItoi6UBnC+fgtC3GAuq/MQPVuYuG2XhgiBx7OS
+	 Due2Y7Yr8oM1NM6AlPz2aj3agXLGqdhWrLx3oxLqWiYJUsN0M67jqolJc71STHGZ3t
+	 ofIeh+adnloM8Y535EyqnKYMNRsLJkRQIsUBT+s/jzc05netCaTgqhkcdMG8JKQ1au
+	 z6mEqbMWWyDVQ==
+Date: Fri, 13 Oct 2023 15:36:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel =?UTF-8?B?R3LDtmJlcg==?= <dxld@darkboxed.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Richard Weinberger <richard@nod.at>, Serge Hallyn
+ <serge.hallyn@canonical.com>, "Eric W. Biederman" <ebiederm@xmission.com>
+Subject: Re: [BUG] rtnl_newlink: Rogue MOVE event delivered on netns change
+Message-ID: <20231013153605.487f5a74@kernel.org>
+In-Reply-To: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
+References: <20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stub tcp_gro_complete if CONFIG_INET=n
-Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski
- <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Arnd Bergmann <arnd@kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-References: <20231013185502.1473541-1-jacob.e.keller@intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231013185502.1473541-1-jacob.e.keller@intel.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
-	SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, 10 Oct 2023 14:10:03 +0200 Daniel Gr=C3=B6ber wrote:
+> Changing a device's netns and renaming it with one RTM_NEWLINK call causes
+> a rogue MOVE uevent to be delivered to the new netns in addition to the
+> expected ADD uevent.
+>=20
+> iproute2 reproducer:
+>=20
+>     $ ip netns add test
+>     $ ip link add dev eth0 netns test type dummy
+>     $ ip link add dev eth0 type dummy
+>=20
+>     $ ip -netns test link set dev eth0 netns 1 name eth123
+>=20
+> With the last command, which renames the device and moves it out of the
+> netns, we get the following:
+>=20
+>     $ udevadm monitor -k
+>     KERNEL[230953.424834] add      /devices/virtual/net/eth0 (net)
+>     KERNEL[230953.424914] move     /devices/virtual/net/eth0 (net)
+>     KERNEL[230953.425066] move     /devices/virtual/net/eth123 (net)
 
+FTR I don't see the move on current net-next, I see two adds=20
+and one move.
 
-On 10/13/23 11:54, Jacob Keller wrote:
-> A few networking drivers including bnx2x, bnxt, qede, and idpf call
-> tcp_gro_complete as part of offloading TCP GRO. The function is only
-> defined if CONFIG_INET is true, since its TCP specific and is meaningless
-> if the kernel lacks IP networking support.
-> 
-> The combination of trying to use the complex network drivers with
-> CONFIG_NET but not CONFIG_INET is rather unlikely in practice: most use
-> cases are going to need IP networking.
-> 
-> The tcp_gro_complete function just sets some data in the socket buffer for
-> use in processing the TCP packet in the event that the GRO was offloaded to
-> the device. If the kernel lacks TCP support, such setup will simply go
-> unused.
-> 
-> The bnx2x, bnxt, and qede drivers wrap their TCP offload support in
-> CONFIG_INET checks and skip handling on such kernels.
-> 
-> The idpf driver did not check CONFIG_INET and thus fails to link if the
-> kernel is configured  with CONFIG_NET=y, CONFIG_IDPF=(m|y), and
-> CONFIG_INET=n.
-> 
-> While checking CONFIG_INET does allow the driver to bypass significantly
-> more instructions in the event that we know TCP networking isn't supported,
-> the configuration is unlikely to be used widely.
-> 
-> Rather than require driver authors to care about this, stub the
-> tcp_gro_complete function when CONFIG_INET=n. This allows drivers to be
-> left as-is. It does mean the idpf driver will perform slightly more work
-> than strictly necessary when CONFIG_INET=n, since it will still execute
-> some of the skb setup in idpf_rx_rsc. However, that work would be performed
-> in the case where CONFIG_INET=y anyways.
-> 
-> I did not change the existing drivers, since they appear to wrap a
-> significant portion of code when CONFIG_INET=n. There is little benefit in
-> trashing these drivers just to unwrap and remove the CONFIG_INET check.
-> 
-> Using a stub for tcp_gro_complete is still beneficial, as it means future
-> drivers no longer need to worry about this case of CONFIG_NET=y and
-> CONFIG_INET=n, which should reduce noise from buildbots that check such a
-> configuration.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+ [ ~]# udevadm monitor -k &
+ monitor will print the received events for:
+ KERNEL - the kernel uevent
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+ [ ~]# ip netns add test
+ [ ~]# ip link add dev eth0 netns test type dummy
+ KERNEL[115.393650] add      /module/dummy (module)
+ [ ~]# ip link add dev eth0 type dummy
+ KERNEL[121.702300] add      /devices/virtual/net/eth0 (net)
+ KERNEL[121.704608] add      /devices/virtual/net/eth0/queues/rx-0 (queues)
+ KERNEL[121.704733] add      /devices/virtual/net/eth0/queues/tx-0 (queues)
+ [ ~]# ip -netns test link set dev eth0 netns 1 name eth123
+ KERNEL[135.598907] add      /devices/virtual/net/eth0 (net)
+ KERNEL[135.600425] move     /devices/virtual/net/eth123 (net)
 
-Thanks.
+I don't think it matters for the problem you're describing, tho.
 
-> ---
-> I've only compile tested this.
-> 
->  include/net/tcp.h | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 7fdedf5c71f0..32146088a095 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -2081,7 +2081,11 @@ INDIRECT_CALLABLE_DECLARE(int tcp4_gro_complete(struct sk_buff *skb, int thoff))
->  INDIRECT_CALLABLE_DECLARE(struct sk_buff *tcp4_gro_receive(struct list_head *head, struct sk_buff *skb));
->  INDIRECT_CALLABLE_DECLARE(int tcp6_gro_complete(struct sk_buff *skb, int thoff));
->  INDIRECT_CALLABLE_DECLARE(struct sk_buff *tcp6_gro_receive(struct list_head *head, struct sk_buff *skb));
-> +#ifdef CONFIG_INET
->  void tcp_gro_complete(struct sk_buff *skb);
-> +#else
-> +static inline void tcp_gro_complete(struct sk_buff *skb) { }
-> +#endif
->  
->  void __tcp_v4_send_check(struct sk_buff *skb, __be32 saddr, __be32 daddr);
->  
+> The problem is the MOVE event hooribly confuses userspace. The particular
+> symptom we're seing is that systemd will bring down the ifup@eth0.service
+> on the host as it handles the MOVE of eth0->eth123 as a stop for the
+> BoundTo sys-subsystem-net-devices-eth0.device unit.
+>=20
+> I also create a clashing eth0 device on the host in the repro to
+> demonstrate that the RTM_NETLINK move+rename call is atomic and so the MO=
+VE
+> event is entirely nonsensical.
+>=20
+> Looking at the code in __rtnl_newlink I see do_setlink first calls
+> __dev_change_net_namespace and then dev_change_name. My guess is the order
+> is just wrong here.
 
--- 
-~Randy
+Interesting. My analysis is slightly different but only in low level
+aspects.. tell me if I'm wrong:
+
+1. we have tb[IFLA_IFNAME] set, so do_setlink() will populate ifname
+
+2. Because of #1, __dev_change_net_namespace() gets called with=20
+   new name provide (pat =3D eth123)
+
+3. It will do netdev_name_in_use(), which returns true.
+
+4. It will then call dev_get_valid_name() which, (confusingly?) already
+   sets the new name on the netdevice itself.
+
+5. It then calls device shutdown from the source netns.
+   This results in Bug#1, the netlink notification carries=20
+   the new name in the old netns.
+
+ [ ~]# ip -netns test link add dev eth0 netns test type dummy
+ [ ~]# ip -netns test link add dev eth1 netns test type dummy
+ [ ~]# ip -netns test link set dev eth0 netns 1 name eth1
+
+ip monitor inside netns:
+
+ 5: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default=20
+     link/ether be:4d:58:f9:d5:40 brd ff:ff:ff:ff:ff:ff
+ 6: eth1: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group default=20
+     link/ether 1e:4a:34:36:e3:cd brd ff:ff:ff:ff:ff:ff
+
+ Deleted inet eth0=20
+ Deleted inet6 eth0=20
+ Deleted 5: eth1: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN group de=
+fault=20
+     link/ether be:4d:58:f9:d5:40 brd ff:ff:ff:ff:ff:ff new-netnsid 0 new-i=
+findex 7
+
+tells us we deleted eth1, ifindex 5, which is not true. It was eth0.
+
+Small sidebar - altnames are completely broken when it comes to netns,
+too:
+
+ [ ~]# ip link add dev eth0 type dummy
+ [ ~]# ip link add dev eth1 type dummy
+ [ ~]# ip link property add dev eth1 altname eth0
+ RTNETLINK answers: File exists
+
+^ it's not letting us use eth0 because device eth0 exists, but
+
+ [ ~]# ip netns add test
+ [ ~]# ip -netns test link add dev ethX netns test type dummy
+ [ ~]# ip -netns test link property add dev ethX altname eth0
+ [ ~]# ip -netns test link set dev ethX netns 1 =20
+
+ [ ~]# ip li
+ ...
+ 3: eth0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT gro=
+up default qlen 1000
+     link/ether 02:40:88:62:ec:b8 brd ff:ff:ff:ff:ff:ff
+ ...
+ 5: ethX: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN mode DEFAULT gro=
+up default qlen 1000
+     link/ether 26:b7:28:78:38:0f brd ff:ff:ff:ff:ff:ff
+     altname eth0
+
+and we have eth0 altname. So that's Bug#2.
+Picking back up after the shutdown in old netns.
+
+6. We call:
+
+   kobject_uevent(&dev->dev.kobj, KOBJ_REMOVE);
+   dev_net_set(dev, net);
+   kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
+
+Those are the calls you see in udev, recall that device core has
+its own naming, so both of those calls will use the _old_ name.
+REMOVE in the source netns and ADD in the destination netns.
+
+The kobject calls were added by Serge in 4e66ae2ea371c, in 2012,
+curiously it states:
+
+    v2: also send KOBJ_ADD to new netns.  There will then be a
+    _MOVE event from the device_rename() call, but that should
+    be innocuous.
+
+Which was based on this conversation:
+https://lore.kernel.org/all/20121012031328.GA5472@sergelap/
+
+7. Now we finally call:
+
+   err =3D device_rename(&dev->dev, dev->name);
+
+Which tells device core that the name has changed, and gives you=20
+the (second) MOVE event. This time with the correct name.
+
+Which is what you're seeing, Bug#3, the ADD event should be after
+the call to device_rename()...
+
+Bug#1 and Bug#2 we can fix in networking. Bug#3 is a bit more tricky,
+because what we want is a "silent" rename, without generating the MOVE.
+This email is a bit long, so let me cut off here..
 
