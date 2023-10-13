@@ -1,159 +1,152 @@
-Return-Path: <netdev+bounces-40725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37AC7C87EC
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:34:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816967C8823
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 16:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 849411F21260
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:34:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 340CF282C9F
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D337E11C92;
-	Fri, 13 Oct 2023 14:34:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6327615ACB;
+	Fri, 13 Oct 2023 14:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XAoIFRi6"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LOU3wriQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1592718C2A;
-	Fri, 13 Oct 2023 14:34:48 +0000 (UTC)
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78096BE;
-	Fri, 13 Oct 2023 07:34:46 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-77386822cfbso141642485a.0;
-        Fri, 13 Oct 2023 07:34:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697207685; x=1697812485; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BiqOjv9CBy/YAIHlJ/Ek/j41xRRll4lh+8GJVCNSWig=;
-        b=XAoIFRi6sHgS7y3fopCCzMyyjlXmgt7lc0ko662dZz009IXW0GUdW/CSAcPdC+e7ik
-         LAcig2iA6UXWaJm4A++bVWb5wIqS8Z0JLF8W8Gol4OSTUIMHKMlYReDXx30zx80Qz9u5
-         muNYanYrmqye6L5xIZ+ad5kf1mxbBi5ggedL9QQ8KtPEZnz1o72rDlSlzzajOemowlD6
-         EmqQGoHltDiG99cB+fQh/sPHmxnlcNOCfZ2O6GtEaBLU/nzsNSTxf5U1Bif1hh2Mmk5b
-         AqVG8Utm7w3CwA0TVFGywRsmg12yqNlDtKWSPoLy/uCrkBTynJ6gm7r6Na8tkklnNfRX
-         aLDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697207685; x=1697812485;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BiqOjv9CBy/YAIHlJ/Ek/j41xRRll4lh+8GJVCNSWig=;
-        b=Gt3iEKZOvz9B7tpOPlbqu7VQUA/oaVFv9wn1zSqh1Q2IkOroXWprBrTQhfNUbLQ0du
-         Cv839rN0ZjDdgjfaT2Za7Qs5ZhjlwwrrBjXoXSrUk47dm+GaPqaoxCnBZsT6kNgAHWP3
-         NQoqA5HHKIoFXpdrYSe95yBYvDTLNHSIAYSHLeXXm0y8vF9/9rpGXkqksZnQyQDN+Kv9
-         epZtYoerAGQZIUVkv7WEepgXJhDk1bCOORIUrEjAyD1rhAztgEo80fm910dI1bZKKaqo
-         xAXq4cCUTk6HTGxWjXCGcw41PQe2Y4x+XG+bA6Dgap27wUqBFaro90XTqdUiwaEraVzU
-         doFg==
-X-Gm-Message-State: AOJu0YxutChN2A+l//gxwDQwDycv0PDMqy8lptjrwA4kA+WGXmOwPzbX
-	UeaKucUp0DOAMtJg5nlNwZk=
-X-Google-Smtp-Source: AGHT+IGzQlJa+bZAHv9r6/5L9A88yLN9vQ1HtjKY/22DandnrI3+Do5EuidEt5ufmvrDP6uLeAQndw==
-X-Received: by 2002:a05:620a:81d:b0:774:35da:75ac with SMTP id s29-20020a05620a081d00b0077435da75acmr26579669qks.55.1697207685443;
-        Fri, 13 Oct 2023 07:34:45 -0700 (PDT)
-Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
-        by smtp.gmail.com with ESMTPSA id e5-20020a05620a12c500b007756c8ce8f5sm671072qkl.59.2023.10.13.07.34.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Oct 2023 07:34:44 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailauth.nyi.internal (Postfix) with ESMTP id 9475727C005A;
-	Fri, 13 Oct 2023 10:34:43 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Fri, 13 Oct 2023 10:34:43 -0400
-X-ME-Sender: <xms:g1UpZQ0_l53NZT0QW29zfT45D7vnNCcl2wH_ApZD1tgZm0GB5EK72w>
-    <xme:g1UpZbGi_amYelqKBk9tvJ48b_jsndJVDEfEPHMtGnKr87EkEe_u1SX1cJlyj0OOv
-    r5TiVPpv4nI_yABPQ>
-X-ME-Received: <xmr:g1UpZY6jtbHrAyT0zfv8IF7Iyd_tvw4h3LNSafwwCe1MbkA7RXU6ZTSJl0w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrieefgdehhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeeuohhquhhn
-    ucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrth
-    htvghrnhephedugfduffffteeutddvheeuveelvdfhleelieevtdeguefhgeeuveeiudff
-    iedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsg
-    hoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieeg
-    qddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigi
-    hmvgdrnhgrmhgv
-X-ME-Proxy: <xmx:g1UpZZ2jEwuyjJAnvJTsu6hyRQeePDxA7KHaxoacuCcT9yA1FhoR_g>
-    <xmx:g1UpZTF8W5P4gNFtc9cJgE4AIwlvEkgWRMasZ9ntyEhDBu3Al70sVQ>
-    <xmx:g1UpZS-DmmskbJm5GVqlJHOkdsyeWoRO8dFYz38xT-If0InFnuyrrQ>
-    <xmx:g1UpZZaLbB6j-_U4ZUnO6ry3vRayUUQe5uxtZ4tZFxTgQApo1M1ykg>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Oct 2023 10:34:42 -0400 (EDT)
-Date: Fri, 13 Oct 2023 07:34:40 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
-	miguel.ojeda.sandonis@gmail.com, tmgross@umich.edu,
-	wedsonaf@gmail.com, benno.lossin@proton.me, greg@kroah.com
-Subject: Re: [PATCH net-next v4 3/4] MAINTAINERS: add Rust PHY abstractions
- to the ETHERNET PHY LIBRARY
-Message-ID: <ZSlVgAfz-O5UR_ps@Boquns-Mac-mini.home>
-References: <20231012125349.2702474-1-fujita.tomonori@gmail.com>
- <20231012125349.2702474-4-fujita.tomonori@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD51134DC
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 14:58:26 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 995DF95
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 07:58:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g23ROS7/zYgBHnZnoLBGenxuSK2yIRSm2+f32rJdPGmaf1hGCjJzfbdcrVX65s70z12S570mGQE9unWscMsW29FRsGxojkxUIAvJ6AKHayg5iODXwp5K71TlrA/dbCfkKsUW1BbLAFzFxt3a3Eocn5ZL5hSBWLw7COJDcKRfd4RW0gi9TrXhjqBswe8TyoMnDoq5F3LeTdRCkagcnOdREzDgCJOY+fibovc+UqY/uOckOIQ48mVs033KveOp9q79SSID693OchwJ0BnKdr7P7QUqkLb5e1milpBIAn8FBWPx4KfTGw2IdUuaj1ugYuFdiNXX48VjgiweXJxlFIccPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/EP7JNCqStGiEZixwEMIhKaRzx5CEQ8nxhUPqxd1VLo=;
+ b=ONVBZrYRBpBNBKkcJSlvkRYBOMqMJ70dvI6/uYaaow3PSURTdEKvE8aPbVy8YeGkLLzCb+epbvqlxasnNgK1uIAAw13QIiR8Hkz86w1kVZVofFzv+hRX1uo5Wh3YfjSuLUqls2g/ARcB8udLtgA/gXUSOv7/WoywHPljs6VRLxuWtpMMxCSmI9ADUMen2mO8bHw6RI+UOIB/d0vX8muvY0rZq+uV0IPh6NBwTgL0Et6/QQgleRe6TOlQFEoe486QgDR25cM0efgbYrEVDDbjmgjNokUKP0TozPAK+DHGpT1AYu0deuz5MzZHwCLm0fQBlE+AgyMtjj1Y4MwmOwjzDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/EP7JNCqStGiEZixwEMIhKaRzx5CEQ8nxhUPqxd1VLo=;
+ b=LOU3wriQrKVEORzbCxOMYJQn+V29MhzrJRX8btfoZLtKgpz3fcgk9OJW1X4/PyiKIUeyRDgSk1/qP8ATJVVOlxh5HWrPifrofErC6xSPJNhFYcDCpoZs7SL6GldeBoaCDbQVt5b31Z5obxiZseYkGa8FnReDlRHvbBoPAI0RNFj4bEhQ/f6JYMsTvbEeoeRllMQ1OcfO5iI83NeuI/g3gAbVffwgLnnY9c6s6GVIGqbMVJYbDt3jRsCe4hOFgWa9LURo0OFG48kf8kVJqG+4/J4w+04bDW0x+a/MeK9LvY5SJ9hae9ElGN1yevOKfk80GV/AZHnxC35xJjV7CsyTjA==
+Received: from CH2PR12MB3895.namprd12.prod.outlook.com (2603:10b6:610:2a::13)
+ by MW3PR12MB4540.namprd12.prod.outlook.com (2603:10b6:303:52::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6863.46; Fri, 13 Oct
+ 2023 14:58:23 +0000
+Received: from CH2PR12MB3895.namprd12.prod.outlook.com
+ ([fe80::a50a:75e9:b7c1:167b]) by CH2PR12MB3895.namprd12.prod.outlook.com
+ ([fe80::a50a:75e9:b7c1:167b%6]) with mapi id 15.20.6863.043; Fri, 13 Oct 2023
+ 14:58:22 +0000
+From: Asmaa Mnebhi <asmaa@nvidia.com>
+To: Florian Fainelli <f.fainelli@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"olteanv@gmail.com" <olteanv@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, David Thompson
+	<davthompson@nvidia.com>
+Subject: RE: [PATCH v3 1/3] mlxbf_gige: Fix kernel panic at shutdown
+Thread-Topic: [PATCH v3 1/3] mlxbf_gige: Fix kernel panic at shutdown
+Thread-Index: AQHZ7XtbKQBMq7gXmU2r8HgR2iQihLAnHeiAgCDSUDA=
+Date: Fri, 13 Oct 2023 14:58:22 +0000
+Message-ID:
+ <CH2PR12MB3895A1CB1D3E148E6707BE2DD7D2A@CH2PR12MB3895.namprd12.prod.outlook.com>
+References: <20230922173626.23790-1-asmaa@nvidia.com>
+ <20230922173626.23790-2-asmaa@nvidia.com>
+ <64a2b71c-f3ee-4a95-a2d4-79d2258a70e8@gmail.com>
+In-Reply-To: <64a2b71c-f3ee-4a95-a2d4-79d2258a70e8@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH2PR12MB3895:EE_|MW3PR12MB4540:EE_
+x-ms-office365-filtering-correlation-id: d5954834-e835-460a-22a1-08dbcbfcd862
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ kgyfpSicDrMkugqCW0oKvLsPnbXrqc+XYhXZPKEu6BxrYFTAjnSLHvDjyOnkbak/iXu6DwjtDZdAvj2uBMpEelpL44vTo731EMgFe/N+pKbf3BP/hVntktyMDdT79DYDZP3WWkY01zB1ib1su0zwQc7YE/8lPsglEIC+R1TDX/cDSj+FJ/WnRfaf0BG5vvarLulqvAchzoaOWOh2Px4dhe/19rXSpwnLMPd7TVQ5CIZdzME9dQnSdQhZbdQXj3vmA+BW6iQKOniRtFI56TKxZvNP1QHSfXvWNOVQVtP8R2Mdw+y1a+pciD4nq1mhnF7gnCc+GMtwiuD+/Lw1l9rXxJl5IWN6dP5WzO+D5QsxZI7Uh0r1xamVFMpAa/yJ9fvgWKDu5z8PXVnUu1E3LAwuxHWkBbPIdfUU+6yU6Gbh4MZvnT354aS7LBJQ2fVO3V8ZiMePvNI1pDj2JkWDIIRCAQIFyzE3P6vsTG4DAW1VQ4Pu4Pe2fY6anPfrhHw5fUncLQfGFxM+W7Rno2sC0igH2zqmJGPq+mV/Z2eMWP9GJJsVM78dpgEdCshNng8Hcgz7M9JIPLDMGmN47gzNnqg6xDZ36UBZkU/dFWfJrjsaNnuzIfzZLY83iBohHpfzhRDI
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB3895.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(346002)(376002)(366004)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(86362001)(55016003)(38100700002)(64756008)(66946007)(66476007)(66556008)(76116006)(54906003)(110136005)(8936002)(8676002)(4326008)(52536014)(5660300002)(316002)(41300700001)(66446008)(26005)(71200400001)(107886003)(478600001)(9686003)(7696005)(6506007)(2906002)(558084003)(122000001)(33656002)(38070700005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?U25UbmVhNjM4d2VtOE5PeEZvQTVMWDNSczFUcWIrY1hIcnIrYkFGY0t5QnB1?=
+ =?utf-8?B?YmdLUFJWQmdqQnZSM2NxckNISHViUlNNYnYxRks4Qy9rdVFMbzBha0NoTlVR?=
+ =?utf-8?B?MGtRRmg4cHVqNzVmNmtBbnR1NjNxRFlQVkF5STNQdVFNd28vc0NmaCtUTGNq?=
+ =?utf-8?B?aTdieDdnaWdGRW1vZFNjcmtTVFZYdmRkWmVSNTdmWndPK0VBUFJITGdWVXZ3?=
+ =?utf-8?B?eGFNRVpJRThWWUdYekFIam1BK1Q4MEdIL1Z5aTNoYVRsRzAva2s0djJmaFNw?=
+ =?utf-8?B?dGp6K1RWVEFoVVh0dVZjQXlQdFY0UTlrZ1Nqd1JYLzRmaDF2YlVGdUZzRmJK?=
+ =?utf-8?B?Tk5mVzFnUitNY2lpbStYMnczTFBtV253VnczRFpQN2Q2aTgwNjJQOTFkR2ZT?=
+ =?utf-8?B?RVBMR1RzRUFaVXhqeFJGV2lrMG5LNkJxc1NGeWVrQ0k5c2xNSDFmMGFLMjVO?=
+ =?utf-8?B?RVJueG04a3hCOUZGL3pxWGJrd3BNUm05SWRoamFvaDhnWDJ4S2tNRWR5dlZQ?=
+ =?utf-8?B?dElGbnBUQlZDSXdJb0tFWjFzRlFkVUxsamxkSkpkSCtHSTNOcWNKRUdaQlN6?=
+ =?utf-8?B?RHcyRUxudmJHSGlpZHNUSWRnWWxNV2VSU0l0a3JKWThKaHR1ZHV6TWE5bGdH?=
+ =?utf-8?B?dnQvOUhPdDhMZUtKV1J2NjBBVGNzWDk4Z1Nwcyt5UVdjeFVLNkQ3VFU0WTJj?=
+ =?utf-8?B?eS9iNVdsRlhpNHdHQlA4dllnakR3R2VUTWQ4L3c3UU82VUNCYzJjbXNoR0FX?=
+ =?utf-8?B?Zi8weHc0NDNSUVduVkEyRThQWmZadDRxd0VkZ0JBZ2NkMkVaYUFlQXlMaXdM?=
+ =?utf-8?B?a2YwZUpsSkkxeWZWdmtqOVV5V1lKQVlrYUs3SmpjeUpwTVo0S1VkQWxEN0Rz?=
+ =?utf-8?B?UFRCVkJ3RkxVMTlPLzRkMTBhVVpSd2dZU2srN1dvVk93TWc0VE5mTzF3RVBR?=
+ =?utf-8?B?ZytTUUxRMUVUYnZFMGd2M0NML0FiaG5RdTQ2MHV0REtVNk5iQ0x3bjhWTENq?=
+ =?utf-8?B?TWs5dkdYZjIwTHdDTzZhZ3QxRUd1a3lobjZkeEs4SjN4YjhCN3cwblFkK3Qx?=
+ =?utf-8?B?S3d3MjhZN2tuOEYrWWlaa1ZHK1FRem81SUt5Q1FqT0lNVEd5TnpjSTJlQkZs?=
+ =?utf-8?B?WklxYUp3enJjMS80dlJ3cmQwaWYyeVBFY0REbWptand5TjdIcFNRdm1ZcEE4?=
+ =?utf-8?B?UE9kZXdHOXhaejRrQmpObmdIV2VCNndpaGozN0hnbmY3OWhzbWpxdEtRbEdR?=
+ =?utf-8?B?bEZiK0w4Y3FXR3Y1VFZBRzk4TVlEaFE4T1NURTd2Z2VZQWtnV1B4ckFrWkZH?=
+ =?utf-8?B?YnJBeDVtT0ZUd0tMeFVEUy9HZEsxRzcrdTVuM016VHJxMWMxVC9YdlpvcGZQ?=
+ =?utf-8?B?S05KODQ1dHVYeFNmemNwMExmRnJQMEUydmlSb1RlRFVyTVZCcjJZVURYYW5u?=
+ =?utf-8?B?dnRrZk1SK3lVT2xuR1FvVDU4aXlGdnUyck54TWpPcnFDa01qZG4xTzRBMkdy?=
+ =?utf-8?B?NFFDWEVXQitTakxBc3NmbU1KNCtnS2VVd3lSUmhqb084ZW5pNnF3cHJ2K3Jl?=
+ =?utf-8?B?WjZ3TGlvYWVRZ3dzbVpUcE1IMTBsZWpPSHFyZlc2NDdmOXlkbzlLR0tTaXhU?=
+ =?utf-8?B?NkZPeVptVVhIdndwUTc5NkNSQmx0TVI4T3EvN0R3V0N5SWZnQUh0U3ZJVStD?=
+ =?utf-8?B?WjRUZlZSNVRXYnpydTMzU3dEK0xyTXlSVFJIa3pyTGpIR1V5T25YTDYwTENJ?=
+ =?utf-8?B?ckJLbnV3dEJnUUFDZk4rVGlDS3hXQldOcEYrWTl2WVhrcGcwZGxtMEJTbVl2?=
+ =?utf-8?B?NCtiMVR4R05iR0I3M3BkYmtpQlRhalVROHN1Vk1LRkU1UzBzdnhMRVhsZWg1?=
+ =?utf-8?B?NzNmSW5tc2NUMWU3VEl4TEk5RG1Mc2tsMHZrOFNPQzdSbWxSeWt0QVk5Wnkr?=
+ =?utf-8?B?RFNENUlRTDAwYVBDUTIrYVBOckRldFVtLzFyOEFiUkozL2k2UUd6QjhpczIy?=
+ =?utf-8?B?ckFGeHJ6eUVTd3lycVMyRENyRGNIN21mQ3lpbTY3TGw0UWVNSFAzWWxaQTFl?=
+ =?utf-8?B?M3lpL1lMRnNNRzZ4SENpam5ZOUQ2cUovU0JtUHlQUjFrYmpiR2hjRCt2UEtD?=
+ =?utf-8?Q?aC5U=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231012125349.2702474-4-fujita.tomonori@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.6
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB3895.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5954834-e835-460a-22a1-08dbcbfcd862
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Oct 2023 14:58:22.5084
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: G0oOOEf3m2TmgTJnYBt00f9ZLpKaa4+ujrec8Zu1HaO0BwyjRo2RjXUByMkxevDKaDd2VckwkxzDpcRKVkfyxQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4540
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Oct 12, 2023 at 09:53:48PM +0900, FUJITA Tomonori wrote:
-> Adds me as a maintainer for these Rust bindings too.
-> 
-> The files are placed at rust/kernel/ directory for now but the files
-> are likely to be moved to net/ directory once a new Rust build system
-> is implemented.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 698ebbd78075..eb51a1d526b7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -7770,6 +7770,7 @@ F:	net/bridge/
->  ETHERNET PHY LIBRARY
->  M:	Andrew Lunn <andrew@lunn.ch>
->  M:	Heiner Kallweit <hkallweit1@gmail.com>
-> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
->  R:	Russell King <linux@armlinux.org.uk>
-
-Since Trevor has been reviewing the series and showed a lot of
-expertise, I suggest having him as the reviewer in Rust networking, of
-course if he and everyone agree ;-)
-
-Trevor, what do you think?
-
-Regards,
-Boqun
-
->  L:	netdev@vger.kernel.org
->  S:	Maintained
-> @@ -7799,6 +7800,7 @@ F:	include/trace/events/mdio.h
->  F:	include/uapi/linux/mdio.h
->  F:	include/uapi/linux/mii.h
->  F:	net/core/of_net.c
-> +F:	rust/kernel/net/phy.rs
->  
->  EXEC & BINFMT API
->  R:	Eric Biederman <ebiederm@xmission.com>
-> -- 
-> 2.34.1
-> 
+PiA+ICAgCXByaXYgPSBjb250YWluZXJfb2YobmFwaSwgc3RydWN0IG1seGJmX2dpZ2UsIG5hcGkp
+Ow0KPiA+DQo+ID4gKwlpZiAoIXByaXYpDQo+ID4gKwkJcmV0dXJuIDA7DQo+IA0KPiBEbyB5b3Ug
+c3RpbGwgbmVlZCB0aGlzIHRlc3QgZXZlbiBhZnRlciB5b3UgdW5yZWdpc3RlcmVkIHRoZSBuZXR3
+b3JrIGRldmljZSBpbg0KPiB5b3VyIHNodXRkb3duIHJvdXRpbmU/DQoNCmFsd2F5cyBnb29kIHRv
+IGNoZWNrIHZhcmlhYmxlcyBidXQgaWYgd2FudCBtZSB0byByZW1vdmUgaXQgSSBjYW4uDQo=
 
