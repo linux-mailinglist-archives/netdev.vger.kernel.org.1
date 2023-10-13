@@ -1,139 +1,185 @@
-Return-Path: <netdev+bounces-40715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41BB37C8694
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:18:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A55737C86F4
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 15:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70E191C209E0
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:18:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4188BB20983
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3E415E84;
-	Fri, 13 Oct 2023 13:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC33715E9E;
+	Fri, 13 Oct 2023 13:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gYgfB/M5"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Oe55oofo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86CF613A
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 13:18:49 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6D0BD
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 06:18:48 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39DCrNEW010073;
-	Fri, 13 Oct 2023 06:18:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type :
- content-transfer-encoding; s=pfpt0220;
- bh=T+FKWK5R07Gk28yMeWRIKSSnTmPYZUsIKg+p/bDJT8w=;
- b=gYgfB/M5vw0P3CwT9dR0F99hZ+8yIYDiRPy3K3sG+Z8hhG5sKIe3jt9O3RH0kfOE6EUF
- vE+Gpx4DNu7pfEUxB5Xdw9JQYS7Vut5frap8oyrPJ0BTC6oDFeHYMMhcI3v+l0Ft8ifX
- PLzpjXcOGHiIxOF5KoAkQQVADOvIpdGw652bHDFQygEzS1CN8lhhm2GLsiX8kGwTju4M
- TFIsI85gOifcgSaEd/CGUExa960OLfTUdcP2qxe0OJQdyFkB/8+qNFBVMmNzk7Z7lFSV
- LO9mc7WvmaJ0iKicFWE+YJkV4aNoFELRcmpwcTG6wNY5xlNjgqxafzyYzGFVnLUrV3UC DA== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3tpt16jcba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 13 Oct 2023 06:18:25 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 13 Oct
- 2023 06:18:23 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 13 Oct 2023 06:18:23 -0700
-Received: from falcon.marvell.com (unknown [10.30.46.95])
-	by maili.marvell.com (Postfix) with ESMTP id 3D5763F704F;
-	Fri, 13 Oct 2023 06:18:18 -0700 (PDT)
-From: Manish Chopra <manishc@marvell.com>
-To: <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <aelior@marvell.com>, <palok@marvell.com>,
-        <njavali@marvell.com>, <skashyap@marvell.com>, <jmeneghi@redhat.com>,
-        <pabeni@redhat.com>, <cleech@redhat.com>, <edumazet@google.com>,
-        <horms@kernel.org>, <Yuval.Mintz@caviumnetworks.com>,
-        <Ram.Amrani@caviumnetworks.com>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: [PATCH net] qed: fix LL2 RX buffer allocation
-Date: Fri, 13 Oct 2023 18:48:12 +0530
-Message-ID: <20231013131812.873331-1-manishc@marvell.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EEC1096B
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 13:37:18 +0000 (UTC)
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AE2895
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 06:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net; s=s31663417;
+ t=1697204225; x=1697809025; i=wahrenst@gmx.net;
+ bh=M3CryACWh8gOvZZGn8MpbMigRUWDXhC/fi0OvVCJA/U=;
+ h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
+ b=Oe55oofo+aD1Ulow7k4bm/iEMnvD12iGrgumEKTIPufwlfrYSEQjmHVZd8ywQYJ4rzhNqeTZCOJ
+ tWX1oi4skxwpSAAhfjuGUHnDaBq2cGTx3Xcugclc9AvpLBVNTbxxhUeuDhA0tjBd0pxsggv/QBxAn
+ r9XgXmjdmxYAzY/9XCzjHjp4TJaB9k5Hbj5bD6qxyS0lDgr0OKl6f1rLep2vstAE9Mx+wKKSz76Cb
+ dksM7dU8dH6d+sfnigwv3wpu/r1tMIielDCRcm1DX0+7wqlr1vFfDRWTHhPZj1KzoDwbr+G4Ou64K
+ 8wZog42tLJAX9ABvaea3ymtCB0DAlTZPflQQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.129] ([37.4.248.43]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mzhj9-1rmIvA1C6r-00vhfP; Fri, 13
+ Oct 2023 15:37:05 +0200
+Message-ID: <a35b1a27-575f-4d19-ad2d-95bf4ded40e9@gmx.net>
+Date: Fri, 13 Oct 2023 15:37:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: ttL8H9toQfHwE2gwBK3gJDF_I2j0kH6M
-X-Proofpoint-ORIG-GUID: ttL8H9toQfHwE2gwBK3gJDF_I2j0kH6M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.980,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-13_04,2023-10-12_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: iperf performance regression since Linux 5.18
+To: Neal Cardwell <ncardwell@google.com>, Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Fabio Estevam <festevam@gmail.com>,
+ linux-imx@nxp.com, Stefan Wahren <stefan.wahren@chargebyte.com>,
+ Michael Heimpold <mhei@heimpold.de>, netdev@vger.kernel.org
+References: <7f31ddc8-9971-495e-a1f6-819df542e0af@gmx.net>
+ <CANn89iKY58YSknzOzkEHxFu=C=1_p=pXGAHGo9ZkAfAGon9ayw@mail.gmail.com>
+ <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <CADVnQymV=nv53YaC8kLC1qT1ufhJL9+w_wcZ+8AHwPRG+JRdnw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:F2qvbdjrd6gT8vKwIaB+4j0qFd5FCYuSKj1do0y7YAldLX3Ioan
+ PkZBV6kBTp1tNthJvkodIAu98nMCmSb3WSmukAeXJJcoWgsGlWIQg6Nui6GfzOXgqjjkn0s
+ 9nD+Fwl8odei9e/gKlnZH/Z0HjywdFJYI0ShgTWFbYoc7XEDk2I+ZDiutLn24gV+G9y79xh
+ OWrVO4dIQN3c466wgQ4eg==
+UI-OutboundReport: notjunk:1;M01:P0:8fBYIhNfcjE=;gHiz6BOS9ga0m79Ezc1gVGdCKsH
+ Z4oHbU1h04Jo5Uq8el7O9vCHQL3ivt1BBRaXN5uT+xNMSxyfiIos6l6v0wunB0jtg7Q/P7Cf4
+ qKzCPyuMMgt9ji9n/Dy1AN0iOblNFTcr3MthGWvQI6c35OCoAra1qhPHalOODYG4boVk7YRoM
+ XqOtWgGurml5qrJvSy0BZUZ6WfzajmkTDaO62uktML9Oh1Zg2yTCDKzt4qXycLVpyML7P22k4
+ 5UmI1dxuiX4x+1HLRNPUfIXWb+E97xrB37hNet9c5kK0vWzBBwNTRX66c33ccRVuvlKHF+DtT
+ FRHCBjY2XAsuAMjLcJ2iVXKHiwwmR1yWIV/Zispd7y4RxJpFZjYK9uaML29/5uElSTklvdeT/
+ lcvtLU5DHnTbKBQ8NE4ufQjwfj5UZXwyr0uHi300keuyWLajOz+xtt8SaBeWt7Wg+2dsnLhPu
+ k7G4Um863u0H/oDoQ2uTNiYFUkDenKOjJxI+GTQrvbDT4iAKA/YkWsNXdn2ztfiSSPpb5mUZE
+ COJZ3u4zNKCcHKEQWLP8KRD/Ov7UX8nSRjQMk4nk9AhjtvDJceux0mpVd4Xp3l/tuCx5UQo+l
+ 0kI6VH9Xlv3jPYc+GqcEX/ZZlWXG0JsC0vGxlfwjAN29HHHGMwzq18KOILEp0AIgEBsusQ4DC
+ 4GpodvQIqwMjNfVX2R7rL7Pt8QTX1LanEjBl1BhN/PX1iOPCUnmBIbxU9fuzTa7mOGiH8Wjln
+ 1j5XV8o7t5xAoSMsnitm2hxhPlakHH46fm4hfUnvBON0vv5qlF/kfPmIaYYwVeBr7ZyldUuIy
+ tuW69EXnqqOf8UFSb6FSRLrVIWzqzXOQgXmvafGOB8UWZVZZTdoZ7RfaQNPganITODkFrjHNr
+ B7Bo8vG0no5fNx1xEuuL3HSFWOq00aNUNZ8NTy03ktAYG1PpOJSE4axFPs216n6ULEpfhLkNw
+ 2a+HDwCgJuuaaNTw2+9pgwfnkGA=
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Driver allocates the LL2 rx buffers from kmalloc()
-area to construct the skb using slab_build_skb()
+Hi,
 
-The required size allocation seems to have overlooked
-for accounting both skb_shared_info size and device
-placement padding bytes which results into the below
-panic when doing skb_put() for a standard MTU sized frame.
+Am 09.10.23 um 21:19 schrieb Neal Cardwell:
+> On Mon, Oct 9, 2023 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+>> On Mon, Oct 9, 2023 at 8:58=E2=80=AFPM Stefan Wahren <wahrenst@gmx.net>=
+ wrote:
+>>> Hi,
+>>> we recently switched on our ARM NXP i.MX6ULL based embedded device
+>>> (Tarragon Master [1]) from an older kernel version to Linux 6.1. After
+>>> that we noticed a measurable performance regression on the Ethernet
+>>> interface (driver: fec, 100 Mbit link) while running iperf client on t=
+he
+>>> device:
+>>>
+>>> BAD
+>>>
+>>> # iperf -t 10 -i 1 -c 192.168.1.129
+>>> ------------------------------------------------------------
+>>> Client connecting to 192.168.1.129, TCP port 5001
+>>> TCP window size: 96.2 KByte (default)
+>>> ------------------------------------------------------------
+>>> [  3] local 192.168.1.12 port 56022 connected with 192.168.1.129 port =
+5001
+>>> [ ID] Interval       Transfer     Bandwidth
+>>> [  3]  0.0- 1.0 sec  9.88 MBytes  82.8 Mbits/sec
+>>> [  3]  1.0- 2.0 sec  9.62 MBytes  80.7 Mbits/sec
+>>> [  3]  2.0- 3.0 sec  9.75 MBytes  81.8 Mbits/sec
+>>> [  3]  3.0- 4.0 sec  9.62 MBytes  80.7 Mbits/sec
+>>> [  3]  4.0- 5.0 sec  9.62 MBytes  80.7 Mbits/sec
+>>> [  3]  5.0- 6.0 sec  9.62 MBytes  80.7 Mbits/sec
+>>> [  3]  6.0- 7.0 sec  9.50 MBytes  79.7 Mbits/sec
+>>> [  3]  7.0- 8.0 sec  9.75 MBytes  81.8 Mbits/sec
+>>> [  3]  8.0- 9.0 sec  9.62 MBytes  80.7 Mbits/sec
+>>> [  3]  9.0-10.0 sec  9.50 MBytes  79.7 Mbits/sec
+>>> [  3]  0.0-10.0 sec  96.5 MBytes  80.9 Mbits/sec
+>>>
+>>> GOOD
+>>>
+>>> # iperf -t 10 -i 1 -c 192.168.1.129
+>>> ------------------------------------------------------------
+>>> Client connecting to 192.168.1.129, TCP port 5001
+>>> TCP window size: 96.2 KByte (default)
+>>> ------------------------------------------------------------
+>>> [  3] local 192.168.1.12 port 54898 connected with 192.168.1.129 port =
+5001
+>>> [ ID] Interval       Transfer     Bandwidth
+>>> [  3]  0.0- 1.0 sec  11.2 MBytes  94.4 Mbits/sec
+>>> [  3]  1.0- 2.0 sec  11.0 MBytes  92.3 Mbits/sec
+>>> [  3]  2.0- 3.0 sec  10.8 MBytes  90.2 Mbits/sec
+>>> [  3]  3.0- 4.0 sec  11.0 MBytes  92.3 Mbits/sec
+>>> [  3]  4.0- 5.0 sec  10.9 MBytes  91.2 Mbits/sec
+>>> [  3]  5.0- 6.0 sec  10.9 MBytes  91.2 Mbits/sec
+>>> [  3]  6.0- 7.0 sec  10.8 MBytes  90.2 Mbits/sec
+>>> [  3]  7.0- 8.0 sec  10.9 MBytes  91.2 Mbits/sec
+>>> [  3]  8.0- 9.0 sec  10.9 MBytes  91.2 Mbits/sec
+>>> [  3]  9.0-10.0 sec  10.9 MBytes  91.2 Mbits/sec
+>>> [  3]  0.0-10.0 sec   109 MBytes  91.4 Mbits/sec
+>>>
+>>> We were able to bisect this down to this commit:
+>>>
+>>> first bad commit: [65466904b015f6eeb9225b51aeb29b01a1d4b59c] tcp: adju=
+st
+>>> TSO packet sizes based on min_rtt
+>>>
+>>> Disabling this new setting via:
+>>>
+>>> echo 0 > /proc/sys/net/ipv4/tcp_tso_rtt_log
+>>>
+>>> confirm that this was the cause of the performance regression.
+>>>
+>>> Is it expected that the new default setting has such a performance imp=
+act?
+> Indeed, thanks for the report.
+>
+> In addition to the "ss" output Eric mentioned, could you please grab
+> "nstat" output, which should allow us to calculate the average TSO/GSO
+> and LRO/GRO burst sizes, which is the key thing tuned with the
+> tcp_tso_rtt_log knob.
+>
+> So it would be great to have the following from both data sender and
+> data receiver, for both the good case and bad case, if you could start
+> these before your test and kill them after the test stops:
+>
+> (while true; do date; ss -tenmoi; sleep 1; done) > /root/ss.txt &
+> nstat -n; (while true; do date; nstat; sleep 1; done)  > /root/nstat.txt
+i upload everything here:
+https://github.com/lategoodbye/tcp_tso_rtt_log_regress
 
-skbuff: skb_over_panic: text:ffffffffc0b0225f len:1514 put:1514
-head:ff3dabceaf39c000 data:ff3dabceaf39c042 tail:0x62c end:0x566
-dev:<NULL>
-…
-skb_panic+0x48/0x4a
-skb_put.cold+0x10/0x10
-qed_ll2b_complete_rx_packet+0x14f/0x260 [qed]
-qed_ll2_rxq_handle_completion.constprop.0+0x169/0x200 [qed]
-qed_ll2_rxq_completion+0xba/0x320 [qed]
-qed_int_sp_dpc+0x1a7/0x1e0 [qed]
+The server part is a Ubuntu installation connected to the internet. At
+first i logged the good case, then i continued with the bad case.
+Accidentally i delete a log file of bad case, so i repeated the whole
+bad case again. So the uploaded bad case files are from the third run.
 
-This patch fixes this by accouting skb_shared_info and device
-placement padding size bytes when allocating the buffers.
-
-Cc: David S. Miller <davem@davemloft.net>
-Fixes: 0a7fb11c23c0 ("qed: Add Light L2 support")
-Signed-off-by: Manish Chopra <manishc@marvell.com>
----
- drivers/net/ethernet/qlogic/qed/qed_ll2.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_ll2.c b/drivers/net/ethernet/qlogic/qed/qed_ll2.c
-index 717a0b3f89bd..ab5ef254a748 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_ll2.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_ll2.c
-@@ -113,7 +113,10 @@ static void qed_ll2b_complete_tx_packet(void *cxt,
- static int qed_ll2_alloc_buffer(struct qed_dev *cdev,
- 				u8 **data, dma_addr_t *phys_addr)
- {
--	*data = kmalloc(cdev->ll2->rx_size, GFP_ATOMIC);
-+	size_t size = cdev->ll2->rx_size + NET_SKB_PAD +
-+		      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+
-+	*data = kmalloc(size, GFP_ATOMIC);
- 	if (!(*data)) {
- 		DP_INFO(cdev, "Failed to allocate LL2 buffer data\n");
- 		return -ENOMEM;
-@@ -2589,7 +2592,7 @@ static int qed_ll2_start(struct qed_dev *cdev, struct qed_ll2_params *params)
- 	INIT_LIST_HEAD(&cdev->ll2->list);
- 	spin_lock_init(&cdev->ll2->lock);
- 
--	cdev->ll2->rx_size = NET_SKB_PAD + ETH_HLEN +
-+	cdev->ll2->rx_size = PRM_DMA_PAD_BYTES_NUM + ETH_HLEN +
- 			     L1_CACHE_BYTES + params->mtu;
- 
- 	/* Allocate memory for LL2.
--- 
-2.27.0
+>
+> Thanks!
+> neal
 
 
