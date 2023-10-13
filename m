@@ -1,250 +1,115 @@
-Return-Path: <netdev+bounces-40706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F3CA7C85C7
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:27:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02027C85D1
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 14:33:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05428B20982
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:27:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 586C1282E38
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 12:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD4D14AA9;
-	Fri, 13 Oct 2023 12:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD791C3F;
+	Fri, 13 Oct 2023 12:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MarvLHah"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D1814280
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 12:27:36 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580EFBD;
-	Fri, 13 Oct 2023 05:27:33 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0Vu2UsWU_1697200049;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0Vu2UsWU_1697200049)
-          by smtp.aliyun-inc.com;
-          Fri, 13 Oct 2023 20:27:30 +0800
-Date: Fri, 13 Oct 2023 20:27:29 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net 1/5] net/smc: fix dangling sock under state
- SMC_APPFINCLOSEWAIT
-Message-ID: <20231013122729.GU92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1697009600-22367-1-git-send-email-alibuda@linux.alibaba.com>
- <1697009600-22367-2-git-send-email-alibuda@linux.alibaba.com>
- <e63b546f-b993-4e42-8269-e4d9afa5b845@linux.ibm.com>
- <f8089b26-bb11-f82d-8070-222b1f8c1db1@linux.alibaba.com>
- <745d3174-f497-4d6a-ba13-1074128ad99d@linux.ibm.com>
- <20231013053214.GT92403@linux.alibaba.com>
- <6666db42-a4de-425e-a96d-bfa899ab265e@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA35515E94;
+	Fri, 13 Oct 2023 12:32:55 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012FEBD;
+	Fri, 13 Oct 2023 05:32:53 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53de8fc1ad8so3563884a12.0;
+        Fri, 13 Oct 2023 05:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1697200372; x=1697805172; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vyT3QmhAn6GJqY6054QmJlw/CJpCAFNbS1sbCVTYiog=;
+        b=MarvLHahQ9YWJ+u28/n8ycyPyxiHM/qMIh95s5VomL6QE6vPybGfU+ifE/ARDMK32p
+         aFK19qsbCz+9IYyArpD/wXjbCOLZGGIs1HgARFxouVhgE+immpoPCKrdkpWFahUPsG51
+         ysi7zbD4OpjWto3fESpHX0ydYAr3Mnnxg6e7DAvCYN2EW3rM04yVwnIavHsNVKNiU0q8
+         2fi9ISAuJohPQaNh6gqSm6Cn52wLWjXzEMQa4PgYKOKFyC3KEZEu2j/oL/kWPZrbu1v5
+         O8D+XoVYwINmtTJcd/sZnhlS+4w6lu7t2XJXwjKXqQA71OmJY7aaq4qMg90rTJ5+axK2
+         i/fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1697200372; x=1697805172;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vyT3QmhAn6GJqY6054QmJlw/CJpCAFNbS1sbCVTYiog=;
+        b=U41J0biBaKZ/Rjxs6Cmaq37F+6mzwOq+vAJ4/tshiO7fuzDKjp2a8f+fq27OE0PR4J
+         2q9GP+VoC3KmTYIRlNjiMiyA5spMOxw7fS3/fmtPDcUY0PuqihAtb3kyG9KdI3km+8El
+         Oq01wnlDHOaHe8pEzLZl4/j3R4WnMajvdGh4GFY1N7SFDgVfjm5PR9SZQekMIj1ljexN
+         nO0BaijJH90QMb699V/GNP2jZeq5+yNwQP/HxlhVsbHOvxwV7q+ZcClTCqDqXEv9UvxL
+         sZfD/JeJ2YmOJzODAnzKioSktHT/KHheBrEQLyc3wHItJsViFcA2e+RWWInIlh2Fh3Xh
+         +7ZA==
+X-Gm-Message-State: AOJu0YzPXRskactDMLkrHPwB4lW4kiDi3g5T0YAkMD/3Cjm7W6eZgq+2
+	ZjdXTVo/jqtZAYzU8tmZnzo=
+X-Google-Smtp-Source: AGHT+IGFkKZRQGK0puL+I4DnaFn3Vbu9t+Fk0zHGGFiTgn7HLoYZ0PsuTdt4+GPp7G/hK+RrGBQfIA==
+X-Received: by 2002:a05:6402:4023:b0:53d:b2a5:465d with SMTP id d35-20020a056402402300b0053db2a5465dmr8584164eda.9.1697200372305;
+        Fri, 13 Oct 2023 05:32:52 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id b6-20020a056402138600b00536031525e5sm11380109edv.91.2023.10.13.05.32.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Oct 2023 05:32:52 -0700 (PDT)
+Date: Fri, 13 Oct 2023 15:32:49 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/7] net: dsa: microchip: Set unique MAC at
+ startup for WoL support
+Message-ID: <20231013123249.bhigwsezy6afb5qt@skbuf>
+References: <20231013122405.3745475-1-o.rempel@pengutronix.de>
+ <20231013122405.3745475-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6666db42-a4de-425e-a96d-bfa899ab265e@linux.ibm.com>
-X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20231013122405.3745475-3-o.rempel@pengutronix.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Oct 13, 2023 at 01:52:09PM +0200, Wenjia Zhang wrote:
->
->
->On 13.10.23 07:32, Dust Li wrote:
->> On Thu, Oct 12, 2023 at 01:51:54PM +0200, Wenjia Zhang wrote:
->> > 
->> > 
->> > On 12.10.23 04:37, D. Wythe wrote:
->> > > 
->> > > 
->> > > On 10/12/23 4:31 AM, Wenjia Zhang wrote:
->> > > > 
->> > > > 
->> > > > On 11.10.23 09:33, D. Wythe wrote:
->> > > > > From: "D. Wythe" <alibuda@linux.alibaba.com>
->> > > > > 
->> > > > > Considering scenario:
->> > > > > 
->> > > > >                  smc_cdc_rx_handler_rwwi
->> > > > > __smc_release
->> > > > >                  sock_set_flag
->> > > > > smc_close_active()
->> > > > > sock_set_flag
->> > > > > 
->> > > > > __set_bit(DEAD)            __set_bit(DONE)
->> > > > > 
->> > > > > Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
->> > > > > if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
->> > > > > in smc_close_passive_work:
->> > > > > 
->> > > > > if (sock_flag(sk, SOCK_DEAD) &&
->> > > > >      smc_close_sent_any_close(conn)) {
->> > > > >      sk->sk_state = SMC_CLOSED;
->> > > > > } else {
->> > > > >      /* just shutdown, but not yet closed locally */
->> > > > >      sk->sk_state = SMC_APPFINCLOSEWAIT;
->> > > > > }
->> > > > > 
->> > > > > Replace sock_set_flags or __set_bit to set_bit will fix this problem.
->> > > > > Since set_bit is atomic.
->> > > > > 
->> > > > I didn't really understand the scenario. What is
->> > > > smc_cdc_rx_handler_rwwi()? What does it do? Don't it get the lock
->> > > > during the runtime?
->> > > > 
->> > > 
->> > > Hi Wenjia,
->> > > 
->> > > Sorry for that, It is not smc_cdc_rx_handler_rwwi() but
->> > > smc_cdc_rx_handler();
->> > > 
->> > > Following is a more specific description of the issues
->> > > 
->> > > 
->> > > lock_sock()
->> > > __smc_release
->> > > 
->> > > smc_cdc_rx_handler()
->> > > smc_cdc_msg_recv()
->> > > bh_lock_sock()
->> > > smc_cdc_msg_recv_action()
->> > > sock_set_flag(DONE) sock_set_flag(DEAD)
->> > > __set_bit __set_bit
->> > > bh_unlock_sock()
->> > > release_sock()
->> > > 
->> > > 
->> > > 
->> > > Note : |bh_lock_sock|and |lock_sock|are not mutually exclusive. They are
->> > > actually used for different purposes and contexts.
->> > > 
->> > > 
->> > ok, that's true that |bh_lock_sock|and |lock_sock|are not really mutually
->> > exclusive. However, since bh_lock_sock() is used, this scenario you described
->> > above should not happen, because that gets the sk_lock.slock. Following this
->> > scenarios, IMO, only the following situation can happen.
->> > 
->> > lock_sock()
->> > __smc_release
->> > 
->> > smc_cdc_rx_handler()
->> > smc_cdc_msg_recv()
->> > bh_lock_sock()
->> > smc_cdc_msg_recv_action()
->> > sock_set_flag(DONE)
->> > bh_unlock_sock()
->> > sock_set_flag(DEAD)
->> > release_sock()
->> 
->> Hi wenjia,
->> 
->> I think I know what D. Wythe means now, and I think he is right on this.
->> 
->> IIUC, in process context, lock_sock() won't respect bh_lock_sock() if it
->> acquires the lock before bh_lock_sock(). This is how the sock lock works.
->> 
->>      PROCESS CONTEXT                                 INTERRUPT CONTEXT
->> ------------------------------------------------------------------------
->> lock_sock()
->>      spin_lock_bh(&sk->sk_lock.slock);
->>      ...
->>      sk->sk_lock.owned = 1;
->>      // here the spinlock is released
->>      spin_unlock_bh(&sk->sk_lock.slock);
->> __smc_release()
->>                                                     bh_lock_sock(&smc->sk);
->>                                                     smc_cdc_msg_recv_action(smc, cdc);
->>                                                         sock_set_flag(&smc->sk, SOCK_DONE);
->>                                                     bh_unlock_sock(&smc->sk);
->> 
->>      sock_set_flag(DEAD)  <-- Can be before or after sock_set_flag(DONE)
->> release_sock()
->> 
->> The bh_lock_sock() only spins on sk->sk_lock.slock, which is already released
->> after lock_sock() return. Therefor, there is actually no lock between
->> the code after lock_sock() and before release_sock() with bh_lock_sock()...bh_unlock_sock().
->> Thus, sock_set_flag(DEAD) won't respect bh_lock_sock() at all, and might be
->> before or after sock_set_flag(DONE).
->> 
->> 
->> Actually, in TCP, the interrupt context will check sock_owned_by_user().
->> If it returns true, the softirq just defer the process to backlog, and process
->> that in release_sock(). Which avoid the race between softirq and process
->> when visiting the 'struct sock'.
->> 
->> tcp_v4_rcv()
->>           bh_lock_sock_nested(sk);
->>           tcp_segs_in(tcp_sk(sk), skb);
->>           ret = 0;
->>           if (!sock_owned_by_user(sk)) {
->>                   ret = tcp_v4_do_rcv(sk, skb);
->>           } else {
->>                   if (tcp_add_backlog(sk, skb, &drop_reason))
->>                           goto discard_and_relse;
->>           }
->>           bh_unlock_sock(sk);
->> 
->> 
->> But in SMC we don't have a backlog, that means fields in 'struct sock'
->> might all have race, and this sock_set_flag() is just one of the cases.
->> 
->> Best regards,
->> Dust
->> 
->I agree on your description above.
->Sure, the following case 1) can also happen
->
->case 1)
->-------
-> lock_sock()
-> __smc_release
->
-> sock_set_flag(DEAD)
-> bh_lock_sock()
-> smc_cdc_msg_recv_action()
-> sock_set_flag(DONE)
-> bh_unlock_sock()
-> release_sock()
->
->case 2)
->-------
-> lock_sock()
-> __smc_release
->
-> bh_lock_sock()
-> smc_cdc_msg_recv_action()
-> sock_set_flag(DONE) sock_set_flag(DEAD)
-> __set_bit __set_bit
-> bh_unlock_sock()
-> release_sock()
->
->My point here is that case2) can never happen. i.e that sock_set_flag(DONE)
->and sock_set_flag(DEAD) can not happen concurrently. Thus, how could
->the atomic set help make sure that the Dead flag would not be overwritten
->with DONE?
+On Fri, Oct 13, 2023 at 02:24:00PM +0200, Oleksij Rempel wrote:
+> Set a unique global MAC address for each switch on the network at system
+> startup by syncing the switch's global MAC address with the Ethernet
+> address of the DSA master interface. This is crucial for supporting
+> Wake-on-LAN (WoL) functionality, as it requires a unique address for
+> each switch.
+> 
+> Although the operation is performed only at system start and won't sync
+> if the master Ethernet address changes dynamically, it lays the
+> groundwork for WoL support by ensuring a unique MAC address for each
+> switch.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
 
-I agree with you on this. I also don't see using atomic can
-solve the problem of overwriting the DEAD flag with DONE.
-
-I think we need some mechanisms to ensure that sk_flags and other
-struct sock related fields are not modified simultaneously.
-
-Best regards,
-Dust
-
-
+Why not take the MAC address of the user port at ksz9477_set_wol() time,
+and use the existing ksz_switch_macaddr_get() API that was just added so
+that this use case could work?
 
