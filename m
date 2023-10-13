@@ -1,137 +1,300 @@
-Return-Path: <netdev+bounces-40597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4BF27C7CCF
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 06:42:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264AC7C7CDA
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 07:01:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C6F81F20610
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 04:42:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80387B208B7
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 05:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9055C110D;
-	Fri, 13 Oct 2023 04:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54E13D017;
+	Fri, 13 Oct 2023 05:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdkAQknp"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="e2m9wx9U";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="QLRdvd1m"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E201139A
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 04:42:45 +0000 (UTC)
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85FFCBE
-	for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 21:42:43 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id 6a1803df08f44-65b0e623189so9040756d6.1
-        for <netdev@vger.kernel.org>; Thu, 12 Oct 2023 21:42:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1697172162; x=1697776962; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5eXZNYajYxhXTb3UBWzzLxXc/EdYltPYPSY96CeeHUM=;
-        b=OdkAQknpRnfvGCH71xEU15qUCK5S/qt7qzkQVPYCnAj5HiNO+VHLW6KkEEb5KjwL5r
-         MNjF3ZCuu86IoF6MRnTo2QYafHOqizxRZX2ScOj6ZvtQ4Nb2TdJ1gxZvmG51dYXU19Ma
-         LeXdbqHlrelHWvYeAAE8UbDBXyK2HN4hRYhmcClPH9+c5zf8Q497Hzp9HRS/Bttm87ly
-         5Sv3PskjIYsvMqPxjIN7aB4EGUcFrsibWoaz8F8kU5S5wCAMczXQVHHjvBXhOiKUnY52
-         MxANoQKyu/PYLm86bGQutLBMjoibIYMNccntRjJEb3NGT6/uTZPS6+krrBorGrA5rfjw
-         IGlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1697172162; x=1697776962;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5eXZNYajYxhXTb3UBWzzLxXc/EdYltPYPSY96CeeHUM=;
-        b=wfvzuDetGWyuAx0/jqrgu59HKAeom5Obp2n8K07biYRtXsCU/HGX1FQIwjbhfB/EOG
-         Meh15gq+OqNt1jeHcnF7IQeIqSWyn6jgh/a5uEOzDnEBuWnDh203tTxhCWXwcPivRoqt
-         nxWI9+Tzieie5sQ/nIe5gEWQjNu0Z9nCNBTCf5DWtOjXt8ZIvwWQZgFqMoCkdR6fLJ4P
-         MC1k1H7s6AALirwOY721b5Fj/67ZJ3rtSD8WgsXr2ELR6WeEfkekNg/ZaUfc2k62H0As
-         7+TJ18zXAJnzTvh8ljm61CzYX2cy7U20AsW7iotTvzTSzvBMam7HgkGSkk1T4jxrxQ9r
-         IyWw==
-X-Gm-Message-State: AOJu0YyJValqsZV8Y5mz7zp0EuysofmLd4zmhn0cQcOR2lmXZJrbumzq
-	ZUEzfQoJYm/iQpN+H6uLG6SZmH0j+lI8Jvicag==
-X-Google-Smtp-Source: AGHT+IE9PsZH1NhRmltNTrG8z6uPRtXN08y0szaTE+r0rr2NW5xbFQ7EibXW6brQBi4eyO0tZwCDZ15ktr1M3kNDWSw=
-X-Received: by 2002:a0c:aa0c:0:b0:66c:faa7:c5f0 with SMTP id
- d12-20020a0caa0c000000b0066cfaa7c5f0mr7984319qvb.63.1697172162578; Thu, 12
- Oct 2023 21:42:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B46A28EB
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 05:01:26 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851F9B7;
+	Thu, 12 Oct 2023 22:01:23 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 284FE60152;
+	Fri, 13 Oct 2023 07:01:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697173280; bh=mhSRRMLz3jAmea0c/jfOxmFHe6AXoaopsEh0rw/b3gA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e2m9wx9UCdqvrvXBRAgbBNTu1S0TAKErc7FwON5uwKHePP5AZYJGh/2EECcoyzPEc
+	 2IjM4OEYLJ9HcRogs/Qkqx2Mj9WU7OWrHrFeXXVj9QLZZisHlAfkFbMDa81jBGzwuT
+	 BhB3SNCvlzEFCOMjNWagaxIxglkF70w5cMUOFzhc9VDsrOBX3eoxxU9xNCimN9E4zw
+	 B5tJ2wm0ngk9iNpK1Dlc1+VvtPincPYwB5etcgwuaLC4qux+RCHy6OGuzWtYcwVGnW
+	 6D934I1w3mQA/tgSq3uMuwh4YeGZEQ+Dw7eHDXGCe6FGfRGPijGeP+eJnTpIgXR2bM
+	 xuVRL+bmrpiwQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id w7y9ULEQZ4SK; Fri, 13 Oct 2023 07:01:16 +0200 (CEST)
+Received: from [192.168.1.3] (78-2-88-84.adsl.net.t-com.hr [78.2.88.84])
+	by domac.alu.hr (Postfix) with ESMTPSA id 8A61C6013C;
+	Fri, 13 Oct 2023 07:01:15 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1697173276; bh=mhSRRMLz3jAmea0c/jfOxmFHe6AXoaopsEh0rw/b3gA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QLRdvd1mJ2L8o0XO/ipNMd7s6g386TnpZTuZD6sNeHErNiQ1lhiAM8uy9NOix1n3V
+	 BukV8V8L+hO4EyRo4fGKfdtFwiCvRDFwhNHreZZRogrxg/AIc/aAmPBYhEHjTKovqs
+	 kL7gxua+s6P6YO+lf8TUSvDMGfAlG0CXrcN8lpzZWeJfOQaZvMovh/y/XRU34GiYu4
+	 inN7I6IE3cs5PHX8t9Dp9kgV8QuvjX56I1nv7iLcMjJ2Rori0dWUU5AW0tLevevqrR
+	 TI9xozBmwkyBh+b1Mjw04G44l3HwWAozmzxHVUd5JWe3cXYGqz06gS4uO8jKMDC8vR
+	 KCVeioZdR28aw==
+Message-ID: <250140d1-d592-45f4-aa27-691c1d68a528@alu.unizg.hr>
+Date: Fri, 13 Oct 2023 07:01:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f3b95e47e3dbed840960548aebaa8d954372db41.1697008693.git.pabeni@redhat.com>
- <CANn89iL_nbz9Cg1LP6c8amvvGbwBMFRxmtE_b6CF8WyLGt3MnA@mail.gmail.com>
-In-Reply-To: <CANn89iL_nbz9Cg1LP6c8amvvGbwBMFRxmtE_b6CF8WyLGt3MnA@mail.gmail.com>
-From: Xin Guo <guoxin0309@gmail.com>
-Date: Fri, 13 Oct 2023 12:42:31 +0800
-Message-ID: <CAMaK5_ii38_Ze2uBmcyX8rnntEi35kXJ47yhxZvCb-ks0bMbxw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] tcp: allow again tcp_disconnect() when threads are waiting
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, mptcp@lists.linux.dev, 
-	Boris Pismenny <borisp@nvidia.com>, Tom Deseyn <tdeseyn@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v1 1/3] r8169: fix the KCSAN reported data-race in
+ rtl_tx() while reading tp->cur_tx
+Content-Language: en-US
+To: Marco Elver <elver@google.com>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ nic_swsd@realtek.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20230927184158.243575-1-mirsad.todorovac@alu.unizg.hr>
+ <0a201a6f-90dd-403c-97d0-94372be1e3e6@gmail.com>
+ <CANpmjNP=jY2NzrXX4mgY5cL5tqZeLb18gQkzVhg1OofNtJ1VSw@mail.gmail.com>
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Autocrypt: addr=mirsad.todorovac@alu.unizg.hr; keydata=
+ xjMEYp0QmBYJKwYBBAHaRw8BAQdAI14D1/OE3jLBYycg8HaOJOYrvEaox0abFZtJf3vagyLN
+ Nk1pcnNhZCBHb3JhbiBUb2Rvcm92YWMgPG1pcnNhZC50b2Rvcm92YWNAYWx1LnVuaXpnLmhy
+ PsKPBBMWCAA3FiEEdCs8n09L2Xwp/ytk6p9/SWOJhIAFAmKdEJgFCQ0oaIACGwMECwkIBwUV
+ CAkKCwUWAgMBAAAKCRDqn39JY4mEgIf/AP9hx09nve6VH6D/F3m5jRT5m1lzt5YzSMpxLGGU
+ vGlI4QEAvOvGI6gPCQMhuQQrOfRr1CnnTXeaXHhlp9GaZEW45QzOOARinRCZEgorBgEEAZdV
+ AQUBAQdAqJ1CxZGdTsiS0cqW3AvoufnWUIC/h3W2rpJ+HUxm61QDAQgHwn4EGBYIACYWIQR0
+ KzyfT0vZfCn/K2Tqn39JY4mEgAUCYp0QmQUJDShogAIbDAAKCRDqn39JY4mEgIMnAQDPKMJJ
+ fs8+QnWS2xx299NkVTRsZwfg54z9NIvH5L3HiAD9FT3zfHfvQxIViWEzcj0q+FLWoRkOh02P
+ Ny0lWTyFlgc=
+Organization: Academy of Fine Arts, University of Zagreb
+In-Reply-To: <CANpmjNP=jY2NzrXX4mgY5cL5tqZeLb18gQkzVhg1OofNtJ1VSw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-In my view, this patch is NOT so good, and it seems that trying to fix
-a problem temporarily without knowing its root cause,
-because sk_wait_event function should know nothing about the other
-functions were called or not,
-but now this patch added a logic to let sk_wait_event know the
-specific tcp_dissconnect function was called by other threads or NOT,
-honestly speaking, it is NOT a good designation,
-so what is root cause about the problem which [0] commit want to fix?
-can we have a way to fix it directly instead of denying
-tcp_disconnect() when threads are waiting?
-if No better way to fix it, please add some description about the
-difficulty and our compromise in the commit message, otherwise the
-patch will be confused.
+On 9/28/2023 8:02 AM, Marco Elver wrote:
+> On Wed, 27 Sept 2023 at 21:52, Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>
+>> On 27.09.2023 20:41, Mirsad Goran Todorovac wrote:
+>>> KCSAN reported the following data-race:
+>>>
+>>> ==================================================================
+>>> BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
+>>>
+>>> write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+>>> rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+>>> dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+>>> sch_direct_xmit (net/sched/sch_generic.c:342)
+>>> __dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+>>> ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+>>> __ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+>>> ip_finish_output (net/ipv4/ip_output.c:328)
+>>> ip_output (net/ipv4/ip_output.c:435)
+>>> ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+>>> udp_send_skb (net/ipv4/udp.c:963)
+>>> udp_sendmsg (net/ipv4/udp.c:1246)
+>>> inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+>>> sock_sendmsg (net/socket.c:730 net/socket.c:753)
+>>> __sys_sendto (net/socket.c:2177)
+>>> __x64_sys_sendto (net/socket.c:2185)
+>>> do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+>>> entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+>>>
+>>> read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+>>> rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+>>> __napi_poll (net/core/dev.c:6527)
+>>> net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+>>> __do_softirq (kernel/softirq.c:553)
+>>> __irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+>>> irq_exit_rcu (kernel/softirq.c:647)
+>>> common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+>>> asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+>>> cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+>>> cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+>>> call_cpuidle (kernel/sched/idle.c:135)
+>>> do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+>>> cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+>>> start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+>>> secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+>>>
+>>> value changed: 0x002f4815 -> 0x002f4816
+>>>
+>>> Reported by Kernel Concurrency Sanitizer on:
+>>> CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+>>> Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+>>> ==================================================================
+>>>
+>>> The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+>>> ==================
+>>>     4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+>>>     4252         smp_wmb();
+>>>     4253
+>>>   → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+>>>     4255
+>>>     4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+>>>     4257                                                 R8169_TX_STOP_THRS,
+>>>     4258                                                 R8169_TX_START_THRS);
+>>>
+>>> The read side is the function rtl_tx():
+>>>
+>>>     4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+>>>     4356                    int budget)
+>>>     4357 {
+>>>     4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+>>>     4359         struct sk_buff *skb;
+>>>     4360
+>>>     4361         dirty_tx = tp->dirty_tx;
+>>>     4362
+>>>     4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+>>>     4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+>>>     4365                 u32 status;
+>>>     4366
+>>>     4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+>>>     4368                 if (status & DescOwn)
+>>>     4369                         break;
+>>>     4370
+>>>     4371                 skb = tp->tx_skb[entry].skb;
+>>>     4372                 rtl8169_unmap_tx_skb(tp, entry);
+>>>     4373
+>>>     4374                 if (skb) {
+>>>     4375                         pkts_compl++;
+>>>     4376                         bytes_compl += skb->len;
+>>>     4377                         napi_consume_skb(skb, budget);
+>>>     4378                 }
+>>>     4379                 dirty_tx++;
+>>>     4380         }
+>>>     4381
+>>>     4382         if (tp->dirty_tx != dirty_tx) {
+>>>     4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+>>>     4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+>>>     4385
+>>>     4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+>>>     4387                                               rtl_tx_slots_avail(tp),
+>>>     4388                                               R8169_TX_START_THRS);
+>>>     4389                 /*
+>>>     4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+>>>     4391                  * too close. Let's kick an extra TxPoll request when a burst
+>>>     4392                  * of start_xmit activity is detected (if it is not detected,
+>>>     4393                  * it is slow enough). -- FR
+>>>     4394                  * If skb is NULL then we come here again once a tx irq is
+>>>     4395                  * triggered after the last fragment is marked transmitted.
+>>>     4396                  */
+>>>   → 4397                 if (tp->cur_tx != dirty_tx && skb)
+>>>     4398                         rtl8169_doorbell(tp);
+>>>     4399         }
+>>>     4400 }
+>>>
+>>> Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+>>> line 4363:
+>>>
+>>>     4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+>>>
+>>> but the same solution is required for protecting the other access to tp->cur_tx:
+>>>
+>>>   → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+>>>     4398                         rtl8169_doorbell(tp);
+>>>
+>>> The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+>>> might have suffered read tearing under some compiler optimisations.
+>>>
+>>> The fix eliminated the KCSAN data-race report for this bug.
+>>>
+>>> It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+>>> and line 4397. This test should certainly not be cached by the compiler in some register
+>>> for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+>>> 4254 in the meantime.
+>>>
+>>
+>> netif_subqueue_completed_wake() has barriers ensuring that no cached value for tp->cur_tx
+>> is used in line 4397. I'm not aware of any reported issues with an obvious link to the
+>> potentential issue you describe.
+>> I don't have a strong opinion on these patches. They shouldn't hurt, and if they make
+>> KCSAN happy, why not.
+> 
+> Barries don't protect unmarked accesses from being miscompiled. So the
+> use of barriers and marked accesses like READ_ONCE() is correct:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
+> That said, actually encountering a miscompilation depends on
+> architecture and compiler. Using the right marked accesses just
+> ensures things don't suddenly break because the compiler decided to be
+> a little more clever.
+> 
+>>> Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
+>>> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+>>> Cc: nic_swsd@realtek.com
+>>> Cc: "David S. Miller" <davem@davemloft.net>
+>>> Cc: Eric Dumazet <edumazet@google.com>
+>>> Cc: Jakub Kicinski <kuba@kernel.org>
+>>> Cc: Paolo Abeni <pabeni@redhat.com>
+>>> Cc: Marco Elver <elver@google.com>
+>>> Cc: netdev@vger.kernel.org
+>>> Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+>>> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+> 
+> Acked-by: Marco Elver <elver@google.com>
 
+Hi, Marco,
 
-[0]: 4faeee0cf8a5 ("tcp: deny tcp_disconnect() when threads are waiting")
+Does this Acked-by: cover all of the [123]/3 in the patch series?
 
-On Wed, Oct 11, 2023 at 3:36=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Oct 11, 2023 at 9:21=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > As reported by Tom, .NET and applications build on top of it rely
-> > on connect(AF_UNSPEC) to async cancel pending I/O operations on TCP
-> > socket.
-> >
-> > The blamed commit below caused a regression, as such cancellation
-> > can now fail.
-> >
-> > As suggested by Eric, this change addresses the problem explicitly
-> > causing blocking I/O operation to terminate immediately (with an error)
-> > when a concurrent disconnect() is executed.
-> >
-> > Instead of tracking the number of threads blocked on a given socket,
-> > track the number of disconnect() issued on such socket. If such counter
-> > changes after a blocking operation releasing and re-acquiring the socke=
-t
-> > lock, error out the current operation.
-> >
-> > Fixes: 4faeee0cf8a5 ("tcp: deny tcp_disconnect() when threads are waiti=
-ng")
-> > Reported-by: Tom Deseyn <tdeseyn@redhat.com>
-> > Closes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1886305
-> > Suggested-by: Eric Dumazet <edumazet@google.com>
-> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
->
-> Thanks !
->
+I guess I should resubmit the patches as the formal ones as patchwork will
+not pick up a PATH RFC?
+
+Thanks,
+Mirsad Todorovac
+
+>>> ---
+>>> v1:
+>>>   the initial patch proposal. fixes the KCSAN warning.
+>>>
+>>>   drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>>> index 6351a2dc13bc..281aaa851847 100644
+>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>>> @@ -4394,7 +4394,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+>>>                 * If skb is NULL then we come here again once a tx irq is
+>>>                 * triggered after the last fragment is marked transmitted.
+>>>                 */
+>>> -             if (tp->cur_tx != dirty_tx && skb)
+>>> +             if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+>>>                        rtl8169_doorbell(tp);
+>>>        }
+>>>   }
+>>
+
+-- 
+Mirsad Todorovac
+Sistem inženjer
+Grafički fakultet | Akademija likovnih umjetnosti
+Sveučilište u Zagrebu
+
+System engineer
+Faculty of Graphic Arts | Academy of Fine Arts
+University of Zagreb, Republic of Croatia
+tel. +385 (0)1 3711 451
+mob. +385 91 57 88 355
 
