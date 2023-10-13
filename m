@@ -1,86 +1,77 @@
-Return-Path: <netdev+bounces-40897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A7EC7C9161
-	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:40:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 535E77C9167
+	for <lists+netdev@lfdr.de>; Sat, 14 Oct 2023 01:42:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B27281C20B19
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:40:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43126B20AEA
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 23:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441392C87B;
-	Fri, 13 Oct 2023 23:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1EE92C873;
+	Fri, 13 Oct 2023 23:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RThRKjwZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLjWxlj+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242C32C869
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 23:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B35BC433CA;
-	Fri, 13 Oct 2023 23:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D782C869;
+	Fri, 13 Oct 2023 23:42:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B281C433C8;
+	Fri, 13 Oct 2023 23:42:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697240422;
-	bh=cIBbBEoDCeemOYg/TWHSK7glFjjTNw/tuJCkQesJoJI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RThRKjwZw5oTrzj/ehWUT0wrcYF9YDgeDYlt7Ac9gf7wQAnFTVja2U8pu0jlPfo0g
-	 GC++w7mmab/QkQk2e7TIHrzG6EqsNls+A5LyoEVEHO8Z91VjSk3l1+xbJegLq6shXM
-	 Af+uPR/fIwOQFj1RGtDDGYQiH/XJ0MbD9d1ZtS2OEryRTjbouc1rONBLricMSPP1jk
-	 zgQ4Bqcp/2QtTGHc5RQlch+ntEryt0zzmSlsK6lWMS2mTeuNoz/tCsChfwTkgVb1b4
-	 68yPHDwGam4NKAqYWqQ73Z7VIBqzShMeK533jLJmQx1CIjqFKb2TuToBxjfrewryJv
-	 WVGxYtcwn6ZIg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 71BAEE1F666;
-	Fri, 13 Oct 2023 23:40:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1697240560;
+	bh=r4IUZNE379YWHqCHxAQm/TihzJtfE6ZEd/gZZS7lJS4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bLjWxlj+Lc/b7dcG5rH3Gu4xfd6S8jL04AX81iJfqafgkHvZGp9pA/cf9DWs/48pE
+	 i9o6zpaBGtfArJvY5plwB2EcprvBeyZralvRuGguiTsQC9cTeZsdqhWcz5df+6k16r
+	 mmWkVo+n0nJv9ZV0d05MDUwqG5YynWRNSVcK6GO3XAFr/Ojd44GoXME8bsOz5E9Gey
+	 uBcpEbxlOhk0wMo5pt9jfo3GyA+R3gch8+cT5IYJo0JlumgDnqAnS9GR5uQcaX+X47
+	 OSy9epstWDE1TVLo5Ct0W4ceqSYMJV4pEOINs8mtu1VQV8yyscUPhmeKUxV75ZL7nf
+	 NI4IWA8Ci0Tag==
+Date: Fri, 13 Oct 2023 16:42:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Qiang
+ Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>, Liam Girdwood
+ <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Shengjiu Wang
+ <shengjiu.wang@gmail.com>, Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam
+ <festevam@gmail.com>, Nicolin Chen <nicoleotsuka@gmail.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Randy Dunlap <rdunlap@infradead.org>,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ alsa-devel@alsa-project.org, Simon Horman <horms@kernel.org>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v8 10/30] net: wan: Add support for QMC HDLC
+Message-ID: <20231013164238.4984b39e@kernel.org>
+In-Reply-To: <20231011061437.64213-11-herve.codina@bootlin.com>
+References: <20231011061437.64213-1-herve.codina@bootlin.com>
+	<20231011061437.64213-11-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net: dsa: bcm_sf2: Fix possible memory leak in
- bcm_sf2_mdio_register()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169724042246.991.1362342921975065108.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Oct 2023 23:40:22 +0000
-References: <20231011032419.2423290-1-ruanjinjie@huawei.com>
-In-Reply-To: <20231011032419.2423290-1-ruanjinjie@huawei.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, vivien.didelot@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 11 Oct 2023 11:24:19 +0800 you wrote:
-> In bcm_sf2_mdio_register(), the class_find_device() will call get_device()
-> to increment reference count for priv->master_mii_bus->dev if
-> of_mdio_find_bus() succeeds. If mdiobus_alloc() or mdiobus_register()
-> fails, it will call get_device() twice without decrement reference count
-> for the device. And it is the same if bcm_sf2_mdio_register() succeeds but
-> fails in bcm_sf2_sw_probe(), or if bcm_sf2_sw_probe() succeeds. If the
-> reference count has not decremented to zero, the dev related resource will
-> not be freed.
+On Wed, 11 Oct 2023 08:14:14 +0200 Herve Codina wrote:
+> The QMC HDLC driver provides support for HDLC using the QMC (QUICC
+> Multichannel Controller) to transfer the HDLC data.
 > 
-> [...]
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 
-Here is the summary with links:
-  - [v3] net: dsa: bcm_sf2: Fix possible memory leak in bcm_sf2_mdio_register()
-    https://git.kernel.org/netdev/net/c/61b40cefe51a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
