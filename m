@@ -1,91 +1,130 @@
-Return-Path: <netdev+bounces-40666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-40667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329FA7C8408
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:06:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9FD67C841D
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 13:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637761C20A99
-	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 11:06:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266A91C20A2A
+	for <lists+netdev@lfdr.de>; Fri, 13 Oct 2023 11:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAE1134A2;
-	Fri, 13 Oct 2023 11:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F83134B5;
+	Fri, 13 Oct 2023 11:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5HDk4rT"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HOkjapG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AF3125A0
-	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 11:06:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5316CC433C7;
-	Fri, 13 Oct 2023 11:06:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1697195204;
-	bh=dHEzqTXEd5FUqIWp2K1kqMsP14aeiGQKm0u06PA0HcE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A5HDk4rTMac0ZEF70SjLE1OdS4lgzRgjZOcMi/zVghFKH2rSbdQwMHk5HJ7GgUBct
-	 oXigqpxJ2qdal5HQr6ITv22qa12IRW3OyuIYq4ZplaqbV3Tsqy3ZTjJsx7okY/ut7+
-	 OfxWc1TE+R43VI1XKXV0M39RIG5Ezml63PUPZZyEGChJCckwtwz50DEFWRoQ1LQp8O
-	 YGGdT1fJGF51wGXv7tyCjKBASMgZs4G9H9Sxz29t6YXp4Z25/8sAjbO/n6yCioORTN
-	 PlCWeNa6p7dL9PUP3sLuHvLcfQVclrUQLcFmVMlIphoWQ/5BQcSA2P+hK/OIgtOO8O
-	 8AV43E1pBvl0A==
-Date: Fri, 13 Oct 2023 13:06:38 +0200
-From: Simon Horman <horms@kernel.org>
-To: Edward AD <twuufnxlz@gmail.com>
-Cc: syzbot+509238e523e032442b80@syzkaller.appspotmail.com,
-	davem@davemloft.net, edumazet@google.com, johannes.berg@intel.com,
-	johannes@sipsolutions.net, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] rfkill: fix deadlock in rfkill_send_events
-Message-ID: <20231013110638.GD29570@kernel.org>
-References: <000000000000e3788c06074e2b84@google.com>
- <20231010010814.1799012-2-twuufnxlz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F7910787
+	for <netdev@vger.kernel.org>; Fri, 13 Oct 2023 11:11:21 +0000 (UTC)
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93074BD;
+	Fri, 13 Oct 2023 04:11:20 -0700 (PDT)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 39DBB26B024931;
+	Fri, 13 Oct 2023 06:11:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1697195462;
+	bh=BAlapzkRWHzVFJ6S6sO0/lwo/UPnEom59HZeYwg6iwA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=HOkjapG3b3gfOck6k1IZmPJymPveCY6JC7bw/l0QEGU8zDlPxlyanghmPWCeE1gia
+	 /sYILAp8hgDfVRZTl/wP8AK/VjT3TG6YsdiBqRJMCRGcLnv9TEdrU5MPrNY25yqR53
+	 SwJn9nQEhQ5btlmVd6tBHE9+MKjf97E00Z3V85Zc=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 39DBB18f015952
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 13 Oct 2023 06:11:01 -0500
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 13
+ Oct 2023 06:11:01 -0500
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 13 Oct 2023 06:11:01 -0500
+Received: from [10.24.69.31] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 39DBAutq025442;
+	Fri, 13 Oct 2023 06:10:57 -0500
+Message-ID: <7b0a02ad-d23c-2c04-6672-58f16f2cca5a@ti.com>
+Date: Fri, 13 Oct 2023 16:40:56 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231010010814.1799012-2-twuufnxlz@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH net] net: ethernet: ti: Fix mixed module-builtin object
+Content-Language: en-US
+To: Arnd Bergmann <arnd@arndb.de>, Andrew Lunn <andrew@lunn.ch>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Simon Horman <horms@kernel.org>, Roger
+ Quadros <rogerq@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
+        <srk@ti.com>, <r-gunasekaran@ti.com>,
+        Roger Quadros <rogerq@kernel.org>
+References: <20231013100549.3198564-1-danishanwar@ti.com>
+ <4a53722d-e31d-4598-a4a9-cf374c84bc44@app.fastmail.com>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <4a53722d-e31d-4598-a4a9-cf374c84bc44@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Oct 10, 2023 at 09:08:15AM +0800, Edward AD wrote:
-> syzbot report:
-> syz-executor675/5132 is trying to acquire lock:
-> ffff8880297ee088 (&data->mtx){+.+.}-{3:3}, at: rfkill_send_events+0x226/0x3f0 net/rfkill/core.c:286
-> 
-> but task is already holding lock:
-> ffff88801bfc0088 (&data->mtx){+.+.}-{3:3}, at: rfkill_fop_open+0x146/0x750 net/rfkill/core.c:1183
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
-> 
->        CPU0
->        ----
->   lock(&data->mtx);
->   lock(&data->mtx);
-> 
->  *** DEADLOCK ***
-> 
-> In 2c3dfba4cf84 insert rfkill_sync() to rfkill_fop_open(), it will call
-> rfkill_send_events() and then triger this issue.
-> 
-> Fixes: 2c3dfba4cf84 ("rfkill: sync before userspace visibility/changes")
-> Reported-and-tested-by: syzbot+509238e523e032442b80@syzkaller.appspotmail.com
-> Signed-off-by: Edward AD <twuufnxlz@gmail.com>
+Hi Arnd,
 
-Hi Edward,
+On 13/10/23 16:08, Arnd Bergmann wrote:
+> On Fri, Oct 13, 2023, at 12:05, MD Danish Anwar wrote:
+>> With CONFIG_TI_K3_AM65_CPSW_NUSS=y and CONFIG_TI_ICSSG_PRUETH=m,
+>> k3-cppi-desc-pool.o is linked to a module and also to vmlinux even though
+>> the expected CFLAGS are different between builtins and modules.
+>>
+>> The build system is complaining about the following:
+>>
+>> k3-cppi-desc-pool.o is added to multiple modules: icssg-prueth
+>> ti-am65-cpsw-nuss
+>>
+>> Introduce the new module, k3-cppi-desc-pool, to provide the common
+>> functions to ti-am65-cpsw-nuss and icssg-prueth.
+>>
+>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> 
+> I submitted a different patch for this a while ago:
+> https://lore.kernel.org/lkml/20230612124024.520720-3-arnd@kernel.org/
+> 
+> I think I never sent a v2 of that, but I still have a
+> working version in my local tree. I've replaced my version
+> with yours for testing now, to see if you still need something
+> beyond that.
+> 
 
-I am wondering if you considered moving the rfkill_sync() calls
-to before &data->mtx is taken, to avoid the need to drop and
-retake it?
+I see your patch addresses different modules. My patch introduces a new
+module for k3-cppi-desc-pool which is used by both am65-cpsw-nuss and
+icssg-prueth driver. Where as your patch addresses modules common across
+different cpsw drivers (davinci-emac, cpsw, cpsw-switchdev, netcp,
+netcp_ethss and am65-cpsw-nuss). So I think that both these patches are
+addressing differet warnings.
 
-Perhaps it doesn't work for some reason (compile tested only!).
-But this does seem somehow cleaner for me.
+>     Arnd
+
+-- 
+Thanks and Regards,
+Danish
 
